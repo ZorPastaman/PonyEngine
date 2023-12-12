@@ -1,0 +1,31 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34316.72
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineGame", "Projects\PonyEngineGame\PonyEngineGame.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|x64 = Debug|x64
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{D35C7778-7993-437B-B2D1-9E97F128947E}.Debug|x64.ActiveCfg = Debug|x64
+		{D35C7778-7993-437B-B2D1-9E97F128947E}.Debug|x64.Build.0 = Debug|x64
+		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.ActiveCfg = Release|x64
+		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.Build.0 = Release|x64
+		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Debug|x64.ActiveCfg = Debug|x64
+		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Debug|x64.Build.0 = Debug|x64
+		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Release|x64.ActiveCfg = Release|x64
+		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}
+	EndGlobalSection
+EndGlobal
