@@ -11,13 +11,17 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\EntryPoint\PonyAPIMacro.h" />
+    <ClInclude Include="Include\Public\PonyAPIMacro.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Engine\Engine.cppm" />
     <ClCompile Include="Source\Private\EntryPoint\EntryPointDefinition.cppm" />
     <ClCompile Include="Source\Public\EntryPoint\EntryPoint.cppm" />
     <ClCompile Include="Source\Public\Engine\IEngine.cppm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyEngine.rc" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

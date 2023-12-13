@@ -9,7 +9,7 @@
 
 module;
 
-#include "EntryPoint/PonyAPIMacro.h"
+#include "PonyAPIMacro.h"
 
 export module PonyEngine.EntryPoint;
 
