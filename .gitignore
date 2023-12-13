@@ -37,3 +37,6 @@
 # Build
 [Ii]ntermediate/
 [Oo]utput/
+
+# Resource cache
+*.aps

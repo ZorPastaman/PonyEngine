@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint:Definition;
+module PonyEngine.EntryPoint.Definition;
 
 import PonyEngine.EntryPoint;
 import PonyEngine.IEngine;
