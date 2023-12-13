@@ -7,6 +7,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\Pony
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineGame", "Projects\PonyEngineGame\PonyEngineGame.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineTests", "Projects\PonyEngineTests\PonyEngineTests.vcxproj", "{3786A3E2-7E54-4D42-9C87-CAC481949A30}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -21,6 +23,10 @@ Global
 		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Debug|x64.Build.0 = Debug|x64
 		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Release|x64.ActiveCfg = Release|x64
 		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}.Release|x64.Build.0 = Release|x64
+		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Debug|x64.ActiveCfg = Debug|x64
+		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Debug|x64.Build.0 = Debug|x64
+		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Release|x64.ActiveCfg = Release|x64
+		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
