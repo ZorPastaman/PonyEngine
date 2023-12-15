@@ -18,7 +18,7 @@ import PonyEngine.EntryPoint;
 import PonyEngine.IEngine;
 import PonyEngine.Debug.ILoggerView;
 
-export int EngineMain(int argc, char** argv)
+export int main(int argc, char** argv)
 {
 	std::cout << "Hello World!" << std::endl;
 	std::cout << "Arguments:" << std::endl;

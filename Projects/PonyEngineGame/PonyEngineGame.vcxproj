@@ -89,8 +89,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\EngineMain.cppm" />
-    <ClCompile Include="Source\Main.cpp" />
+    <ClCompile Include="Source\Main.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
