@@ -7,26 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.IEngine;
+export module PonyEngine.IEngineView;
 
-import PonyEngine.IEngineView;
+import <cstddef>;
+
+import PonyEngine.Debug.ILoggerView;
 
 namespace PonyEngine
 {
 	/// <summary>
-	/// Pony Engine interface.
+	/// Pony Engine view interface.
 	/// </summary>
-	export class IEngine : public IEngineView
+	export class IEngineView
 	{
 	public:
-		virtual ~IEngine() noexcept = default;
-
 		/// <summary>
-		/// Ticks the engine.
+		/// Gets current frame count.
 		/// </summary>
-		/// <remarks>
-		/// It increments frame count.
-		/// </remarks>
-		virtual void Tick() = 0;
+		/// <returns>Current frame count.</returns>
+		virtual size_t GetFrameCount() const noexcept = 0;
+
+		virtual Debug::ILoggerView* GetLogger() const noexcept = 0;
+
+	protected:
+		virtual ~IEngineView() noexcept = default;
 	};
 }
