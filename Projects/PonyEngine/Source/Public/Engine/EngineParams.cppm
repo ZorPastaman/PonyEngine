@@ -7,23 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint.Definition;
+export module PonyEngine.EngineParams;
 
-import PonyEngine.EntryPoint;
-import PonyEngine.IEngine;
-import PonyEngine.Engine;
-import PonyEngine.EngineParams;
+import <vector>;
+
+import PonyEngine.Debug.ILogger;
+import PonyEngine.Debug.ILoggerEntryView;
+import PonyEngine.Factories.IEngineFeatureFactory;
 
 namespace PonyEngine
 {
-	IEngine* CreateEngine() noexcept
+	export struct EngineParams final
 	{
-		EngineParams params;
-		return CreateEngineWithParams(params);
-	}
-
-	IEngine* CreateEngineWithParams(const EngineParams& params) noexcept
-	{
-		return new PonyEngine::Engine(params);
-	}
+	public:
+		std::vector<Debug::ILoggerEntryView*> loggerEntryViews;
+		Factories::IEngineFeatureFactory<Debug::ILogger>* loggerFactory = nullptr;
+		bool addStandardOutputLoggerEntry = true;
+	};
 }

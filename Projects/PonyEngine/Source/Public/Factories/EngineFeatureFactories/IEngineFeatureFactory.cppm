@@ -7,23 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint.Definition;
+export module PonyEngine.Factories.IEngineFeatureFactory;
 
-import PonyEngine.EntryPoint;
-import PonyEngine.IEngine;
-import PonyEngine.Engine;
-import PonyEngine.EngineParams;
+import PonyEngine.IEngineView;
 
-namespace PonyEngine
+namespace PonyEngine::Factories
 {
-	IEngine* CreateEngine() noexcept
+	export
+	template<typename T>
+	class IEngineFeatureFactory
 	{
-		EngineParams params;
-		return CreateEngineWithParams(params);
-	}
-
-	IEngine* CreateEngineWithParams(const EngineParams& params) noexcept
-	{
-		return new PonyEngine::Engine(params);
-	}
+	public:
+		virtual T* Create(IEngineView* engine) = 0;
+	};
 }

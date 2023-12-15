@@ -14,6 +14,7 @@ module;
 export module PonyEngine.EntryPoint;
 
 import PonyEngine.IEngine;
+import PonyEngine.EngineParams;
 
 namespace PonyEngine
 {
@@ -22,5 +23,7 @@ namespace PonyEngine
 	/// and returns it as <see cref="IEngine"/>.
 	/// </summary>
 	/// <returns>New Engine.</returns>
-	export extern "C" PONY_API IEngine* CreateEngine();
+	export extern "C" PONY_API IEngine* CreateEngine() noexcept;
+
+	export extern "C" PONY_API IEngine* CreateEngineWithParams(const EngineParams& params) noexcept;
 }

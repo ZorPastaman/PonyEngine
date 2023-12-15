@@ -1,0 +1,118 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyEngine.Debug.Logger;
+
+import <string>;
+import <exception>;
+import <unordered_set>;
+import <chrono>;
+import <format>;
+import <cassert>;
+
+import PonyEngine.Debug.ILogger;
+import PonyEngine.Debug.ILoggerEntryView;
+import PonyEngine.IEngineView;
+
+namespace PonyEngine::Debug
+{
+	export class Logger final : public ILogger
+	{
+	public:
+		Logger(IEngineView* engine) noexcept;
+		Logger(const Logger&) = delete;
+		Logger(Logger&&) = delete;
+
+		virtual ~Logger() noexcept = default;
+
+		virtual void Log(const std::string& message) const noexcept override;
+
+		virtual void LogWarning(const std::string& message) const noexcept override;
+
+		virtual void LogError(const std::string& message) const noexcept override;
+
+		virtual void LogException(const std::exception& exception) const noexcept override;
+
+		virtual void AddLoggerEntry(ILoggerEntryView* loggerEntry) override;
+
+		virtual void RemoveLoggerEntry(ILoggerEntryView* loggerEntry) override;
+
+	private:
+		std::string FormatLog(const std::string& logType, const std::string& message) const noexcept;
+
+		std::unordered_set<ILoggerEntryView*> m_loggerEntries;
+
+		IEngineView* m_engine;
+	};
+
+	// TODO: source file and line, stacktrace
+
+	std::string Logger::FormatLog(const std::string& logType, const std::string& message) const noexcept
+	{
+		const std::chrono::time_point now = std::chrono::system_clock::now();
+
+		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", logType, now, m_engine->GetFrameCount(), message);
+	}
+
+	Logger::Logger(IEngineView* engine) noexcept :
+		m_engine(engine)
+	{
+	}
+
+	void Logger::Log(const std::string& message) const noexcept
+	{
+		const std::string formattedLog = FormatLog("Info", message);
+
+		for (ILoggerEntryView* const entry : m_loggerEntries)
+		{
+			entry->Log(formattedLog);
+		}
+	}
+
+	void Logger::LogWarning(const std::string& message) const noexcept
+	{
+		const std::string formattedLog = FormatLog("Warning", message);
+
+		for (ILoggerEntryView* const entry : m_loggerEntries)
+		{
+			entry->LogWarning(formattedLog);
+		}
+	}
+
+	void Logger::LogError(const std::string& message) const noexcept
+	{
+		const std::string formattedLog = FormatLog("Error", message);
+
+		for (ILoggerEntryView* const entry : m_loggerEntries)
+		{
+			entry->LogError(formattedLog);
+		}
+	}
+
+	void Logger::LogException(const std::exception& exception) const noexcept
+	{
+		const std::string formattedLog = FormatLog("Exception", exception.what());
+
+		for (ILoggerEntryView* const entry : m_loggerEntries)
+		{
+			entry->LogException(formattedLog, exception);
+		}
+	}
+
+	void Logger::AddLoggerEntry(ILoggerEntryView* const loggerEntry)
+	{
+		assert((loggerEntry != nullptr));
+		m_loggerEntries.insert(loggerEntry);
+	}
+
+	void Logger::RemoveLoggerEntry(ILoggerEntryView* const loggerEntry)
+	{
+		m_loggerEntries.erase(loggerEntry);
+	}
+}
