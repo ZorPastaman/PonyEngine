@@ -9,8 +9,6 @@
 
 export module PonyEngine.Debug.StandardOutputLoggerEntry;
 
-import <string>;
-import <exception>;
 import <iostream>;
 
 import PonyEngine.Debug.ILoggerEntry;
