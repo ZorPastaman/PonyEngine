@@ -9,14 +9,9 @@
 
 export module PonyEngine.Engine;
 
-import <cstddef>;
-import <string>;
-
 import PonyEngine.IEngine;
 import PonyEngine.EngineParams;
 import PonyEngine.EngineFeatures;
-import PonyEngine.Debug.ILoggerView;
-import PonyEngine.Debug.ILogger;
 import PonyEngine.LoggerOwnerKit;
 
 namespace PonyEngine
@@ -27,7 +22,7 @@ namespace PonyEngine
 	export class Engine final : public IEngine
 	{
 	public:
-		Engine(const EngineParams& params) noexcept;
+		Engine(const EngineParams& params);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
@@ -45,10 +40,10 @@ namespace PonyEngine
 		size_t m_frameCount;
 	};
 
-	Engine::Engine(const EngineParams& params) noexcept :
+	Engine::Engine(const EngineParams& params):
 		m_frameCount(0)
 	{
-		m_loggerKit = CreateLogger(params, this);
+		m_loggerKit = CreateLogger(params.loggerParams, this);
 
 		m_loggerKit.logger->Log("Engine created");
 	}

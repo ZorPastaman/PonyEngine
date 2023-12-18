@@ -9,15 +9,13 @@
 
 export module PonyEngine.Debug.Logger;
 
-import <string>;
-import <exception>;
-import <unordered_set>;
+import <vector>;
 import <chrono>;
 import <format>;
 import <cassert>;
+import <algorithm>;
 
 import PonyEngine.Debug.ILogger;
-import PonyEngine.Debug.ILoggerEntryView;
 import PonyEngine.IEngineView;
 
 namespace PonyEngine::Debug
@@ -46,12 +44,12 @@ namespace PonyEngine::Debug
 	private:
 		std::string FormatLog(const std::string& logType, const std::string& message) const noexcept;
 
-		std::unordered_set<ILoggerEntryView*> m_loggerEntries;
+		std::vector<ILoggerEntryView*> m_loggerEntries;
 
 		IEngineView* m_engine;
 	};
 
-	// TODO: source file and line, stacktrace
+	// TODO: category, source location, stacktrace (with c++ 23)
 
 	std::string Logger::FormatLog(const std::string& logType, const std::string& message) const noexcept
 	{
@@ -108,11 +106,16 @@ namespace PonyEngine::Debug
 	void Logger::AddLoggerEntry(ILoggerEntryView* const loggerEntry)
 	{
 		assert((loggerEntry != nullptr));
-		m_loggerEntries.insert(loggerEntry);
+		m_loggerEntries.push_back(loggerEntry);
 	}
 
 	void Logger::RemoveLoggerEntry(ILoggerEntryView* const loggerEntry)
 	{
-		m_loggerEntries.erase(loggerEntry);
+		std::vector<ILoggerEntryView*>::iterator position = std::find(m_loggerEntries.begin(), m_loggerEntries.end(), loggerEntry);
+
+		if (position != m_loggerEntries.end())
+		{
+			m_loggerEntries.erase(position);
+		}
 	}
 }

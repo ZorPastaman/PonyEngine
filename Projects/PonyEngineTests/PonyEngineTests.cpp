@@ -7,8 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "pch.h"
+module;
+
 #include "CppUnitTest.h"
+
+export module PonyEngineTests;
 
 import PonyEngine.EntryPoint;
 import PonyEngine.IEngine;
@@ -22,7 +25,7 @@ namespace PonyEngineTests
 	public:
 		TEST_METHOD(TickFrameCount)
 		{
-			PonyEngine::IEngine* engine = PonyEngine::CreateEngine();
+			PonyEngine::IEngine* const engine = PonyEngine::CreateEngine();
 
 			for (size_t i = 0; i < 1000; ++i)
 			{
@@ -37,6 +40,13 @@ namespace PonyEngineTests
 				actual = engine->GetFrameCount();
 				Assert::AreEqual(expected, actual);
 			}
+
+			delete engine;
+		}
+
+		TEST_METHOD(Logger)
+		{
+			PonyEngine::IEngine* const engine = PonyEngine::CreateEngine();
 
 			delete engine;
 		}

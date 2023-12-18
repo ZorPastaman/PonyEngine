@@ -9,19 +9,13 @@
 
 export module PonyEngine.EngineParams;
 
-import <vector>;
-
-import PonyEngine.Debug.ILogger;
-import PonyEngine.Debug.ILoggerEntryView;
-import PonyEngine.Factories.IEngineFeatureFactory;
+import PonyEngine.LoggerParams;
 
 namespace PonyEngine
 {
 	export struct EngineParams final
 	{
 	public:
-		std::vector<Debug::ILoggerEntryView*> loggerEntryViews;
-		Factories::IEngineFeatureFactory<Debug::ILogger>* loggerFactory = nullptr;
-		bool addStandardOutputLoggerEntry = true;
+		LoggerParams loggerParams;
 	};
 }

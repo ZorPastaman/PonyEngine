@@ -9,24 +9,26 @@
 
 export module PonyEngine.EngineFeatures;
 
-import <vector>;
-
-import PonyEngine.EngineParams;
+import PonyEngine.LoggerParams;
 import PonyEngine.IEngineView;
-import PonyEngine.Debug.ILogger;
 import PonyEngine.Debug.Logger;
 import PonyEngine.Debug.StandardOutputLoggerEntry;
 import PonyEngine.LoggerOwnerKit;
-import PonyEngine.Factories.IEngineFeatureFactory;
 
 namespace PonyEngine
 {
-	export LoggerOwnerKit CreateLogger(const EngineParams& params, IEngineView* const engine)
+	export LoggerOwnerKit CreateLogger(const LoggerParams& params, IEngineView* const engine)
 	{
 		LoggerOwnerKit answer;
 
-		// TODO: try-catch on factory
 		answer.logger = params.loggerFactory != nullptr ? params.loggerFactory->Create(engine) : new Debug::Logger(engine);
+
+		for (Factories::IEngineFeatureFactory<Debug::ILoggerEntry>* const entryFactory : params.loggerEntryFactories)
+		{
+			Debug::ILoggerEntry* const entry = entryFactory->Create(engine);
+			answer.loggerEntries.push_back(entry);
+			answer.logger->AddLoggerEntry(entry);
+		}
 
 		for (Debug::ILoggerEntryView* const entry : params.loggerEntryViews)
 		{
