@@ -7,12 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <iostream>
+export module EngineMain;
+
+import <iostream>;
+import <string>;
+import <format>;
+import <exception>;
 
 import PonyEngine.EntryPoint;
 import PonyEngine.IEngine;
+import PonyEngine.Debug.ILoggerView;
 
-int main(int argc, char** argv)
+export int main(int argc, char** argv)
 {
 	std::cout << "Hello World!" << std::endl;
 	std::cout << "Arguments:" << std::endl;
@@ -24,14 +30,13 @@ int main(int argc, char** argv)
 
 	PonyEngine::IEngine* engine = PonyEngine::CreateEngine();
 
-	std::cout << std::endl;
-
 	for (int i = 0; i < 10; ++i)
 	{
-		std::cout << "Frame Count Before Tick: " << engine->GetFrameCount() << std::endl;
-		std::cout << "Tick Count: " << i << std::endl;
+		std::string message = std::format("Frame Count Before Tick: {}", engine->GetFrameCount());
+		engine->GetLogger()->Log(message);
+		engine->GetLogger()->Log(std::format("Tick Count: {}", i));
 		engine->Tick();
-		std::cout << "Frame Count After Tick: " << engine->GetFrameCount() << std::endl << std::endl;
+		engine->GetLogger()->Log(std::format("Frame Count After Tick: {}", engine->GetFrameCount()));
 	}
 
 	delete engine;
