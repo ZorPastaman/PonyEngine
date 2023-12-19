@@ -15,6 +15,9 @@ import PonyEngine.Debug.ILoggerEntry;
 
 namespace PonyEngine::Debug
 {
+	/// <summary>
+	/// Logger entry that sends logs to std::cout, std::clog and std::cerr.
+	/// </summary>
 	export class StandardOutputLoggerEntry final : public ILoggerEntry
 	{
 	public:

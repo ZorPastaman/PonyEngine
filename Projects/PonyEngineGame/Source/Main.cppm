@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
- export module EngineMain;
+export module EngineMain;
 
 import <iostream>;
 import <string>;

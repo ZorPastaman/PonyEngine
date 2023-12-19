@@ -26,7 +26,7 @@ namespace PonyEngine
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
-		virtual ~Engine() noexcept;
+		virtual ~Engine();
 
 		virtual size_t GetFrameCount() const noexcept override;
 
@@ -35,20 +35,19 @@ namespace PonyEngine
 		virtual void Tick() override;
 
 	private:
-		LoggerOwnerKit m_loggerKit;
+		const LoggerOwnerKit m_loggerKit;
 
 		size_t m_frameCount;
 	};
 
-	Engine::Engine(const EngineParams& params):
-		m_frameCount(0)
+	Engine::Engine(const EngineParams& params) :
+		m_frameCount(0),
+		m_loggerKit(CreateLogger(params.loggerParams, this))
 	{
-		m_loggerKit = CreateLogger(params.loggerParams, this);
-
 		m_loggerKit.logger->Log("Engine created");
 	}
 
-	Engine::~Engine() noexcept
+	Engine::~Engine()
 	{
 		m_loggerKit.logger->Log("Engine destructed");
 

@@ -16,6 +16,9 @@ import PonyEngine.Debug.ILoggerEntry;
 
 namespace PonyEngine
 {
+	/// <summary>
+	/// Holds pointers to a logger and its entries which lifetimes are controlled by an engine.
+	/// </summary>
 	export struct LoggerOwnerKit final
 	{
 	public:

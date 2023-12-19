@@ -18,6 +18,9 @@ namespace PonyEngine
 	/// <summary>
 	/// Pony Engine view interface.
 	/// </summary>
+	/// <remarks>
+	///	This class is supposed to be pointed by external users.
+	/// </remarks>
 	export class IEngineView
 	{
 	public:
@@ -27,6 +30,12 @@ namespace PonyEngine
 		/// <returns>Current frame count.</returns>
 		virtual size_t GetFrameCount() const noexcept = 0;
 
+		/// <summary>
+		/// Gets engine logger.
+		/// </summary>
+		/// <returns>Engine logger.</returns>
+		/// <remarks>
+		/// Usually, it's used by classes that are dependent on the engine.
 		virtual Debug::ILoggerView* GetLogger() const noexcept = 0;
 
 	protected:

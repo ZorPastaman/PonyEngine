@@ -13,6 +13,12 @@ import PonyEngine.Debug.ILoggerView;
 
 namespace PonyEngine::Debug
 {
+	/// <summary>
+	/// Logger interface.
+	/// </summary>
+	/// <remarks>
+	///	This class is supposed to be pointed only by its owner.
+	/// </remarks>
 	export class ILogger : public ILoggerView
 	{
 	public:
