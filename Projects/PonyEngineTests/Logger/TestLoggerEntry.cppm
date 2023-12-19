@@ -22,13 +22,13 @@ namespace PonyEngineTests
 
 		virtual ~TestLoggerEntry() = default;
 
-		virtual void Log(const std::string& log) const noexcept override;
+		virtual void Log(const std::string& log) noexcept override;
 
-		virtual void LogWarning(const std::string& log) const noexcept override;
+		virtual void LogWarning(const std::string& log) noexcept override;
 
-		virtual void LogError(const std::string& log) const noexcept override;
+		virtual void LogError(const std::string& log) noexcept override;
 
-		virtual void LogException(const std::string& log, const std::exception& exception) const noexcept override;
+		virtual void LogException(const std::string& log, const std::exception& exception) noexcept override;
 
 	private:
 		bool* m_logResult;
@@ -45,22 +45,22 @@ namespace PonyEngineTests
 	{
 	}
 
-	void TestLoggerEntry::Log(const std::string& log) const noexcept
+	void TestLoggerEntry::Log(const std::string& log) noexcept
 	{
 		*m_logResult = true;
 	}
 
-	void TestLoggerEntry::LogWarning(const std::string& log) const noexcept
+	void TestLoggerEntry::LogWarning(const std::string& log) noexcept
 	{
 		*m_warningResult = true;
 	}
 
-	void TestLoggerEntry::LogError(const std::string& log) const noexcept
+	void TestLoggerEntry::LogError(const std::string& log) noexcept
 	{
 		*m_errorResult = true;
 	}
 
-	void TestLoggerEntry::LogException(const std::string& log, const std::exception& exception) const noexcept
+	void TestLoggerEntry::LogException(const std::string& log, const std::exception& exception) noexcept
 	{
 		*m_exceptionResult = true;
 	}

@@ -13,6 +13,7 @@ import PonyEngine.LoggerParams;
 import PonyEngine.IEngineView;
 import PonyEngine.Debug.Logger;
 import PonyEngine.Debug.StandardOutputLoggerEntry;
+import PonyEngine.Debug.LogFileLoggerEntry;
 import PonyEngine.LoggerOwnerKit;
 
 namespace PonyEngine
@@ -40,6 +41,13 @@ namespace PonyEngine
 			Debug::StandardOutputLoggerEntry* const standardEntry = new Debug::StandardOutputLoggerEntry();
 			answer.loggerEntries.push_back(standardEntry);
 			answer.logger->AddLoggerEntry(standardEntry);
+		}
+
+		if (params.addLogFileLoggerEntry)
+		{
+			Debug::LogFileLoggerEntry* const logEntry = new Debug::LogFileLoggerEntry(params.logFilePath);
+			answer.loggerEntries.push_back(logEntry);
+			answer.logger->AddLoggerEntry(logEntry);
 		}
 
 		return answer;

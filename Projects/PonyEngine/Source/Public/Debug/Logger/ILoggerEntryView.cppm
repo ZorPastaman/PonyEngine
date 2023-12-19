@@ -17,13 +17,13 @@ namespace PonyEngine::Debug
 	export class ILoggerEntryView
 	{
 	public:
-		virtual void Log(const std::string& log) const noexcept = 0;
+		virtual void Log(const std::string& log) noexcept = 0;
 
-		virtual void LogWarning(const std::string& log) const noexcept = 0;
+		virtual void LogWarning(const std::string& log) noexcept = 0;
 
-		virtual void LogError(const std::string& log) const noexcept = 0;
+		virtual void LogError(const std::string& log) noexcept = 0;
 
-		virtual void LogException(const std::string& log, const std::exception& exception) const noexcept = 0;
+		virtual void LogException(const std::string& log, const std::exception& exception) noexcept = 0;
 
 	protected:
 		virtual ~ILoggerEntryView() noexcept = default;
