@@ -13,6 +13,9 @@ import PonyEngine.LoggerParams;
 
 namespace PonyEngine
 {
+	/// <summary>
+	/// Holds parameters to set an engine.
+	/// </summary>
 	export struct EngineParams final
 	{
 	public:

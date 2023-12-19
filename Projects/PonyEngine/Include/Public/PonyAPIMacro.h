@@ -9,7 +9,7 @@
 
 #pragma once
 
-#ifdef DLL_OUT
+#ifdef PONY_OUT
 	#define PONY_API __declspec(dllexport)
 #else
 	#define PONY_API __declspec(dllimport)

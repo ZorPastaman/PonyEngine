@@ -14,20 +14,25 @@ import <chrono>;
 import <format>;
 import <cassert>;
 import <algorithm>;
+import <iostream>;
 
 import PonyEngine.Debug.ILogger;
 import PonyEngine.IEngineView;
 
 namespace PonyEngine::Debug
 {
+	/// <summary>
+	/// Default logger. It formats logs and sends them to its logger entries.
+	/// </summary>
 	export class Logger final : public ILogger
 	{
 	public:
-		Logger(IEngineView* engine) noexcept;
+		/// <param name="engine">Engine that the logger is owned by.</param>
+		Logger(IEngineView* engine);
 		Logger(const Logger&) = delete;
-		Logger(Logger&&) = delete;
+		Logger(Logger&& other);
 
-		virtual ~Logger() noexcept = default;
+		virtual ~Logger() = default;
 
 		virtual void Log(const std::string& message) const noexcept override;
 
@@ -49,17 +54,15 @@ namespace PonyEngine::Debug
 		IEngineView* m_engine;
 	};
 
-	// TODO: category, source location, stacktrace (with c++ 23)
-
-	std::string Logger::FormatLog(const std::string& logType, const std::string& message) const noexcept
+	Logger::Logger(IEngineView* engine) :
+		m_engine(engine)
 	{
-		const std::chrono::time_point now = std::chrono::system_clock::now();
-
-		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", logType, now, m_engine->GetFrameCount(), message);
+		assert((engine != nullptr));
 	}
 
-	Logger::Logger(IEngineView* engine) noexcept :
-		m_engine(engine)
+	Logger::Logger(Logger&& other) :
+		m_loggerEntries(std::move(other.m_loggerEntries)),
+		m_engine(other.m_engine)
 	{
 	}
 
@@ -111,11 +114,27 @@ namespace PonyEngine::Debug
 
 	void Logger::RemoveLoggerEntry(ILoggerEntryView* const loggerEntry)
 	{
-		std::vector<ILoggerEntryView*>::iterator position = std::find(m_loggerEntries.begin(), m_loggerEntries.end(), loggerEntry);
+		const std::vector<ILoggerEntryView*>::iterator position = std::find(m_loggerEntries.begin(), m_loggerEntries.end(), loggerEntry);
 
 		if (position != m_loggerEntries.end())
 		{
 			m_loggerEntries.erase(position);
+		}
+	}
+
+	// TODO: category, source location, stacktrace (with c++ 23)
+
+	std::string Logger::FormatLog(const std::string& logType, const std::string& message) const noexcept
+	{
+		try
+		{
+			const std::chrono::time_point now = std::chrono::system_clock::now();
+			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", logType, now, m_engine->GetFrameCount(), message);
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << e.what() << " on formatting log." << std::endl;
+			return std::string();
 		}
 	}
 }

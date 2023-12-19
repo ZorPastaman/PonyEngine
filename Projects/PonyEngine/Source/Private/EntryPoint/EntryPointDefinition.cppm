@@ -16,13 +16,13 @@ import PonyEngine.EngineParams;
 
 namespace PonyEngine
 {
-	IEngine* CreateEngine() noexcept
+	IEngine* CreateEngine()
 	{
 		EngineParams params;
 		return CreateEngineWithParams(params);
 	}
 
-	IEngine* CreateEngineWithParams(const EngineParams& params) noexcept
+	IEngine* CreateEngineWithParams(const EngineParams& params)
 	{
 		return new PonyEngine::Engine(params);
 	}

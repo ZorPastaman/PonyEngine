@@ -13,10 +13,19 @@ import PonyEngine.IEngineView;
 
 namespace PonyEngine::Factories
 {
+	/// <summary>
+	/// Interface for factory that creates an engine features.
+	/// </summary>
+	/// <typeparam name="T">Feature type.</typeparam>
 	export template<typename T>
 	class IEngineFeatureFactory
 	{
 	public:
+		/// <summary>
+		/// Creates a feature.
+		/// </summary>
+		/// <param name="engine">Engine that is an owner of the feature.</param>
+		/// <returns>Pointer to a feature.</returns>
 		virtual T* Create(IEngineView* engine) = 0;
 
 	protected:

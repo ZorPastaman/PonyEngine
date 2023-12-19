@@ -16,6 +16,9 @@ namespace PonyEngine
 	/// <summary>
 	/// Pony Engine interface.
 	/// </summary>
+	/// <remarks>
+	///	This class is supposed to be pointed only by its owner.
+	/// </remarks>
 	export class IEngine : public IEngineView
 	{
 	public:
