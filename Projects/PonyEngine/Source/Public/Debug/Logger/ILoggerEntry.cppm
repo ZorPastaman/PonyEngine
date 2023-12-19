@@ -7,23 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint.Definition;
+export module PonyEngine.Debug.ILoggerEntry;
 
-import PonyEngine.EntryPoint;
-import PonyEngine.IEngine;
-import PonyEngine.Engine;
-import PonyEngine.EngineParams;
+import PonyEngine.Debug.ILoggerEntryView;
 
-namespace PonyEngine
+namespace PonyEngine::Debug
 {
-	IEngine* CreateEngine()
+	/// <summary>
+	/// Logger entry interface.
+	/// </summary>
+	/// <remarks>
+	///	This class is supposed to be pointed only by its owner.
+	/// </remarks>
+	export class ILoggerEntry : public ILoggerEntryView
 	{
-		EngineParams params;
-		return CreateEngineWithParams(params);
-	}
-
-	IEngine* CreateEngineWithParams(const EngineParams& params)
-	{
-		return new PonyEngine::Engine(params);
-	}
+	public:
+		virtual ~ILoggerEntry() noexcept = default;
+	};
 }

@@ -7,29 +7,28 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.IEngine;
+export module PonyEngine.Factories.IEngineFeatureFactory;
 
 import PonyEngine.IEngineView;
 
-namespace PonyEngine
+namespace PonyEngine::Factories
 {
 	/// <summary>
-	/// Pony Engine interface.
+	/// Interface for factory that creates an engine features.
 	/// </summary>
-	/// <remarks>
-	///	This class is supposed to be pointed only by its owner.
-	/// </remarks>
-	export class IEngine : public IEngineView
+	/// <typeparam name="T">Feature type.</typeparam>
+	export template<typename T>
+	class IEngineFeatureFactory
 	{
 	public:
-		virtual ~IEngine() noexcept = default;
-
 		/// <summary>
-		/// Ticks the engine.
+		/// Creates a feature.
 		/// </summary>
-		/// <remarks>
-		/// It increments frame count.
-		/// </remarks>
-		virtual void Tick() = 0;
+		/// <param name="engine">Engine that is an owner of the feature.</param>
+		/// <returns>Pointer to a feature.</returns>
+		virtual T* Create(IEngineView* engine) = 0;
+
+	protected:
+		virtual ~IEngineFeatureFactory() noexcept = default;
 	};
 }

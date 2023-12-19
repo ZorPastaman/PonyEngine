@@ -7,23 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint.Definition;
+export module PonyEngine.LoggerOwnerKit;
 
-import PonyEngine.EntryPoint;
-import PonyEngine.IEngine;
-import PonyEngine.Engine;
-import PonyEngine.EngineParams;
+import <vector>;
+
+import PonyEngine.Debug.ILogger;
+import PonyEngine.Debug.ILoggerEntry;
 
 namespace PonyEngine
 {
-	IEngine* CreateEngine()
+	/// <summary>
+	/// Holds pointers to a logger and its entries which lifetimes are controlled by an engine.
+	/// </summary>
+	export struct LoggerOwnerKit final
 	{
-		EngineParams params;
-		return CreateEngineWithParams(params);
-	}
-
-	IEngine* CreateEngineWithParams(const EngineParams& params)
-	{
-		return new PonyEngine::Engine(params);
-	}
+	public:
+		std::vector<Debug::ILoggerEntry*> loggerEntries;
+		Debug::ILogger* logger = nullptr;
+	};
 }

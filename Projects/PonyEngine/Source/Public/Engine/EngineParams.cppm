@@ -7,23 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint.Definition;
+export module PonyEngine.EngineParams;
 
-import PonyEngine.EntryPoint;
-import PonyEngine.IEngine;
-import PonyEngine.Engine;
-import PonyEngine.EngineParams;
+import PonyEngine.LoggerParams;
 
 namespace PonyEngine
 {
-	IEngine* CreateEngine()
+	/// <summary>
+	/// Holds parameters to set an engine.
+	/// </summary>
+	export struct EngineParams final
 	{
-		EngineParams params;
-		return CreateEngineWithParams(params);
-	}
-
-	IEngine* CreateEngineWithParams(const EngineParams& params)
-	{
-		return new PonyEngine::Engine(params);
-	}
+	public:
+		LoggerParams loggerParams;
+	};
 }
