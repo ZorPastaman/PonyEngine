@@ -24,31 +24,31 @@ namespace PonyEngine::Debug
 
 		virtual ~StandardOutputLoggerEntry() noexcept = default;
 
-		virtual void Log(const std::string& log) const noexcept override;
+		virtual void Log(const std::string& log) noexcept override;
 
-		virtual void LogWarning(const std::string& log) const noexcept override;
+		virtual void LogWarning(const std::string& log) noexcept override;
 
-		virtual void LogError(const std::string& log) const noexcept override;
+		virtual void LogError(const std::string& log) noexcept override;
 
-		virtual void LogException(const std::string& log, const std::exception& exception) const noexcept override;
+		virtual void LogException(const std::string& log, const std::exception& exception) noexcept override;
 	};
 
-	void StandardOutputLoggerEntry::Log(const std::string& log) const noexcept
+	void StandardOutputLoggerEntry::Log(const std::string& log) noexcept
 	{
 		std::cout << log << std::endl;
 	}
 
-	void StandardOutputLoggerEntry::LogWarning(const std::string& log) const noexcept
+	void StandardOutputLoggerEntry::LogWarning(const std::string& log) noexcept
 	{
 		std::clog << log << std::endl;
 	}
 
-	void StandardOutputLoggerEntry::LogError(const std::string& log) const noexcept
+	void StandardOutputLoggerEntry::LogError(const std::string& log) noexcept
 	{
 		std::cerr << log << std::endl;
 	}
 
-	void StandardOutputLoggerEntry::LogException(const std::string& log, const std::exception& exception) const noexcept
+	void StandardOutputLoggerEntry::LogException(const std::string& log, const std::exception& exception) noexcept
 	{
 		std::cerr << log << std::endl;
 	}
