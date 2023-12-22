@@ -32,6 +32,8 @@
     <ClCompile Include="Source\Public\Debug\Logger\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntry.cppm" />
     <ClCompile Include="Source\Public\Factories\EngineFeatureFactories\IEngineFeatureFactory.cppm" />
+    <ClCompile Include="Source\Public\Math\VectorConcepts.cppm" />
+    <ClCompile Include="Source\Public\Math\Vector3.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
@@ -72,13 +74,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

@@ -10,6 +10,7 @@
 export module PonyEngine.Debug.Logger;
 
 import <vector>;
+import <utility>;
 import <chrono>;
 import <format>;
 import <cassert>;

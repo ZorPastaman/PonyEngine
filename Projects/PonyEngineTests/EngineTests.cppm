@@ -22,7 +22,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace PonyEngineTests
 {
-	TEST_CLASS(PonyEngineTests)
+	TEST_CLASS(EngineTests)
 	{
 	public:
 		TEST_METHOD(TickFrameCount)

@@ -96,8 +96,9 @@
     <ClCompile Include="Logger\TestLoggerEntry.cppm" />
     <ClCompile Include="Logger\TestLoggerEntryFactory.cppm" />
     <ClCompile Include="Logger\TestLoggerFactory.cppm" />
-    <ClCompile Include="PonyEngineTests.cppm" />
+    <ClCompile Include="EngineTests.cppm" />
     <ClCompile Include="Logger\TestLogger.cppm" />
+    <ClCompile Include="MathTests.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\PonyEngine\PonyEngine.vcxproj">
