@@ -14,15 +14,18 @@ import <concepts>;
 namespace PonyEngine::Math
 {
 	template<typename T>
-	concept Addable = requires (T x) 
-	{ 
-		{ x + x } -> std::same_as<T>;
-		{ x - x } -> std::same_as<T>;
+	concept Operatable = requires (T x) 
+	{
+		{ -x } -> std::convertible_to<T>;
+		{ x + x } -> std::convertible_to<T>;
+		{ x - x } -> std::convertible_to<T>;
+		{ x == x } -> std::convertible_to<bool>;
+		{ x != x } -> std::convertible_to<bool>;
 	};
 
 	template <typename T, typename U>
-	concept BothWaysConvertible = std::convertible_to<T, U>&& std::convertible_to<U, T>;
+	concept BothWaysConvertible = std::convertible_to<T, U> && std::convertible_to<U, T>;
 
 	export template <typename T>
-	concept VectorComponent = std::regular<T> && Addable<T> && BothWaysConvertible<T, float>;
+	concept VectorComponent = std::regular<T> && Operatable<T> && BothWaysConvertible<T, float>;
 }

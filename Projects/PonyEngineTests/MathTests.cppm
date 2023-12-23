@@ -47,15 +47,15 @@ namespace PonyEngineTests
 
 		TEST_METHOD(Vector3MagnitudeTest)
 		{
-			double x = 7.f;
-			double y = -17.f;
-			double z = -43.f;
-			double magnitudeSquare = pow(x, 2) + pow(y, 2) + pow(z, 2);
-			double magnitude = sqrt(magnitudeSquare);
-			auto vector = PonyEngine::Math::Vector3<double>(x, y, z);
+			float x = 7.f;
+			float y = -17.f;
+			float z = -43.f;
+			float magnitudeSquare = pow(x, 2.f) + pow(y, 2.f) + pow(z, 2.f);
+			float magnitude = sqrt(magnitudeSquare);
+			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
 
-			Assert::AreEqual(magnitudeSquare, vector.MagnitudeSquare(), 0.0001);
-			Assert::AreEqual(magnitude, vector.Magnitude(), 0.0001);
+			Assert::AreEqual(magnitudeSquare, vector.MagnitudeSquare());
+			Assert::AreEqual(magnitude, vector.Magnitude());
 		}
 
 		TEST_METHOD(Vector3NormalizationTest)
@@ -63,17 +63,17 @@ namespace PonyEngineTests
 			float x = -5.f;
 			float y = 15.f;
 			float z = 7.f;
-			double magnitudeSquare = pow(x, 2) + pow(y, 2) + pow(z, 2);
-			double magnitude = sqrt(magnitudeSquare);
+			float magnitudeSquare = pow(x, 2.f) + pow(y, 2.f) + pow(z, 2.f);
+			float magnitude = sqrt(magnitudeSquare);
 			float normX = x / magnitude;
 			float normY = y / magnitude;
 			float normZ = z / magnitude;
 			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
 			auto normVector = vector.Normalized();
 
-			Assert::AreEqual(static_cast<double>(normX), static_cast<double>(normVector.x), 0.0001);
-			Assert::AreEqual(static_cast<double>(normY), static_cast<double>(normVector.y), 0.0001);
-			Assert::AreEqual(static_cast<double>(normZ), static_cast<double>(normVector.z), 0.0001);
+			Assert::AreEqual(normX, normVector.x);
+			Assert::AreEqual(normY, normVector.y);
+			Assert::AreEqual(normZ, normVector.z);
 
 			vector.Normalize();
 			Assert::AreEqual(normVector.x, vector.x);

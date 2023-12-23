@@ -80,6 +80,9 @@
     <ClCompile Include="Source\Public\Math\VectorConcepts.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Math\Common.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc">
