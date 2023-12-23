@@ -39,7 +39,9 @@ namespace PonyEngine::Math
 		constexpr Vector3& operator +=(const Vector3& other) noexcept;
 		constexpr Vector3& operator -=(const Vector3& other) noexcept;
 		constexpr Vector3& operator *=(const float multiplier) noexcept;
+		constexpr Vector3& operator *=(const Vector3& other) noexcept;
 		constexpr Vector3& operator /=(const float divisor) noexcept;
+		constexpr Vector3& operator /=(const Vector3& other) noexcept;
 
 		T x;
 		T y;
@@ -49,9 +51,9 @@ namespace PonyEngine::Math
 	export template<VectorComponent T>
 	constexpr float Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return static_cast<T>(static_cast<float>(left.x) * static_cast<float>(right.x) +
+		return static_cast<float>(left.x) * static_cast<float>(right.x) +
 			static_cast<float>(left.y) * static_cast<float>(right.y) +
-			static_cast<float>(left.z) * static_cast<float>(right.z));
+			static_cast<float>(left.z) * static_cast<float>(right.z);
 	}
 
 	export template<VectorComponent T>
@@ -66,25 +68,31 @@ namespace PonyEngine::Math
 	export template<VectorComponent T>
 	constexpr bool operator ==(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return left.x == right.x && left.y == right.y && left.z == right.z;
+		return static_cast<bool>(left.x == right.x) && static_cast<bool>(left.y == right.y) && static_cast<bool>(left.z == right.z);
 	}
 
 	export template<VectorComponent T>
 	constexpr bool operator !=(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return left.x != right.x || left.y != right.y || left.z != right.z;
+		return static_cast<bool>(left.x != right.x) || static_cast<bool>(left.y != right.y) || static_cast<bool>(left.z != right.z);
 	}
 
 	export template<VectorComponent T>
 	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Vector3(left.x + right.x, left.y + right.y, left.z + right.z);
+		return Vector3(static_cast<T>(left.x + right.x), static_cast<T>(left.y + right.y), static_cast<T>(left.z + right.z));
+	}
+
+	export template<VectorComponent T>
+	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept
+	{
+		return Vector3(static_cast<T>(-vector.x), static_cast<T>(-vector.y), static_cast<T>(-vector.z));
 	}
 
 	export template<VectorComponent T>
 	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Vector3(left.x - right.x, left.y - right.y, left.z - right.z);
+		return Vector3(static_cast<T>(left.x - right.x), static_cast<T>(left.y - right.y), static_cast<T>(left.z - right.z));
 	}
 
 	export template<VectorComponent T>
@@ -103,20 +111,20 @@ namespace PonyEngine::Math
 	}
 
 	export template<VectorComponent T>
-	constexpr Vector3<T> operator /(const Vector3<T>& vector, const float divisor) noexcept
-	{
-		const T x = static_cast<T>(static_cast<float>(vector.x) / divisor);
-		const T y = static_cast<T>(static_cast<float>(vector.y) / divisor);
-		const T z = static_cast<T>(static_cast<float>(vector.z) / divisor);
-		return Vector3(x, y, z);
-	}
-
-	export template<VectorComponent T>
 	constexpr Vector3<T> operator *(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		const T x = static_cast<T>(static_cast<float>(left.x) * static_cast<float>(right.x));
 		const T y = static_cast<T>(static_cast<float>(left.y) * static_cast<float>(right.y));
 		const T z = static_cast<T>(static_cast<float>(left.z) * static_cast<float>(right.z));
+		return Vector3(x, y, z);
+	}
+
+	export template<VectorComponent T>
+	constexpr Vector3<T> operator /(const Vector3<T>& vector, const float divisor) noexcept
+	{
+		const T x = static_cast<T>(static_cast<float>(vector.x) / divisor);
+		const T y = static_cast<T>(static_cast<float>(vector.y) / divisor);
+		const T z = static_cast<T>(static_cast<float>(vector.z) / divisor);
 		return Vector3(x, y, z);
 	}
 
@@ -194,18 +202,18 @@ namespace PonyEngine::Math
 	template<VectorComponent T>
 	constexpr Vector3<T>& Vector3<T>::operator +=(const Vector3<T>& other) noexcept
 	{
-		x += other.x;
-		y += other.y;
-		z += other.z;
+		x = static_cast<T>(x + other.x);
+		y = static_cast<T>(y + other.y);
+		z = static_cast<T>(z + other.z);
 		return *this;
 	}
 
 	template<VectorComponent T>
 	constexpr Vector3<T>& Vector3<T>::operator -=(const Vector3<T>& other) noexcept
 	{
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
+		x = static_cast<T>(x - other.x);
+		y = static_cast<T>(y - other.y);
+		z = static_cast<T>(z - other.z);
 		return *this;
 	}
 
@@ -219,11 +227,28 @@ namespace PonyEngine::Math
 	}
 
 	template<VectorComponent T>
+	constexpr Vector3<T>& Vector3<T>::operator *=(const Vector3& other) noexcept
+	{
+		x = static_cast<T>(static_cast<float>(x) * static_cast<float>(other.x));
+		y = static_cast<T>(static_cast<float>(y) * static_cast<float>(other.y));
+		z = static_cast<T>(static_cast<float>(z) * static_cast<float>(other.z));
+		return *this;
+	}
+
+	template<VectorComponent T>
 	constexpr Vector3<T>& Vector3<T>::operator /=(const float divisor) noexcept
 	{
 		x = static_cast<T>(static_cast<float>(x) / divisor);
 		y = static_cast<T>(static_cast<float>(y) / divisor);
 		z = static_cast<T>(static_cast<float>(z) / divisor);
+		return *this;
+	}
+	template<VectorComponent T>
+	constexpr Vector3<T>& Vector3<T>::operator /=(const Vector3& other) noexcept
+	{
+		x = static_cast<T>(static_cast<float>(x) / static_cast<float>(other.x));
+		y = static_cast<T>(static_cast<float>(y) / static_cast<float>(other.y));
+		z = static_cast<T>(static_cast<float>(z) / static_cast<float>(other.z));
 		return *this;
 	}
 }
