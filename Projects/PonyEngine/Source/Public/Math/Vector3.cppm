@@ -11,8 +11,10 @@ export module PonyEngine.Math.Vector3;
 
 import <utility>;
 import <cmath>;
+import <algorithm>;
 
 import PonyEngine.Math.VectorConcepts;
+import PonyEngine.Math.Common;
 
 namespace PonyEngine::Math
 {
@@ -30,7 +32,7 @@ namespace PonyEngine::Math
 		constexpr ~Vector3() noexcept = default;
 
 		constexpr float Magnitude() const noexcept;
-		constexpr inline float MagnitudeSquare() const noexcept;
+		constexpr inline float MagnitudeSquared() const noexcept;
 
 		constexpr Vector3 Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
@@ -63,6 +65,58 @@ namespace PonyEngine::Math
 		const T y = static_cast<T>(static_cast<float>(left.z) * static_cast<float>(right.x) - static_cast<float>(left.x) * static_cast<float>(right.z));
 		const T z = static_cast<T>(static_cast<float>(left.x) * static_cast<float>(right.y) - static_cast<float>(left.y) * static_cast<float>(right.x));
 		return Vector3(x, y, z);
+	}
+
+	export template<VectorComponent T>
+	constexpr float Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		const float dot = Dot(left, right);
+		const float superMagnitude = sqrt(left.MagnitudeSquared() * right.MagnitudeSquared());
+		const float cos = std::clamp(dot / superMagnitude, -1.f, 1.f);
+		return std::acos(cos);
+	}
+
+	export template<VectorComponent T>
+	constexpr float AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	{
+		const Vector3 cross = Cross(left, right);
+		const float dot = Dot(cross, axis);
+		const float sign = Sign(dot);
+		const float angle = Angle(left, right);
+		return angle * sign;
+	}
+
+	export template<VectorComponent T>
+	constexpr inline float AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return Angle(left, right) * RadToDeg;
+	}
+
+	export template<VectorComponent T>
+	constexpr inline float AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	{
+		return AngleSigned(left, right, axis) * RadToDeg;
+	}
+
+	export template<VectorComponent T>
+	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept
+	{
+		const float multiplier = Dot(vector, target) / Dot(target, target);
+		return target * multiplier;
+	}
+
+	export template<VectorComponent T>
+	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
+	{
+		const float multiplier = Dot(vector, normal) / Dot(normal, normal);
+		return vector - normal * multiplier;
+	}
+
+	export template<VectorComponent T>
+	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
+	{
+		const float multiplier = -2.f * Dot(vector, normal);
+		return vector + normal * multiplier;
 	}
 
 	export template<VectorComponent T>
@@ -139,9 +193,9 @@ namespace PonyEngine::Math
 
 	template<VectorComponent T>
 	constexpr Vector3<T>::Vector3() noexcept :
-		x(),
-		y(),
-		z()
+		x{},
+		y{},
+		z{}
 	{
 	}
 
@@ -154,7 +208,8 @@ namespace PonyEngine::Math
 	}
 
 	template<VectorComponent T>
-	constexpr Vector3<T>::Vector3(const Vector3<T>& other) noexcept : Vector3(other.x, other.y, other.z)
+	constexpr Vector3<T>::Vector3(const Vector3<T>& other) noexcept : 
+		Vector3(other.x, other.y, other.z)
 	{
 	}
 
@@ -169,11 +224,11 @@ namespace PonyEngine::Math
 	template<VectorComponent T>
 	constexpr float Vector3<T>::Magnitude() const noexcept
 	{
-		return sqrt(MagnitudeSquare());
+		return sqrt(MagnitudeSquared());
 	}
 
 	template<VectorComponent T>
-	constexpr inline float Vector3<T>::MagnitudeSquare() const noexcept
+	constexpr inline float Vector3<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
