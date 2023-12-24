@@ -12,17 +12,18 @@ export module PonyEngine.Math.Vector3;
 import <utility>;
 import <cmath>;
 import <algorithm>;
+import <concepts>;
 
-import PonyEngine.Math.VectorConcepts;
 import PonyEngine.Math.Common;
 
 namespace PonyEngine::Math
 {
-	export template<VectorComponent T>
+	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
 	struct Vector3 final
 	{
 	public:
 		using value_type = T;
+		using computational_type = U;
 
 		constexpr Vector3() noexcept;
 		constexpr Vector3(const T xParam, const T yParam, const T zParam) noexcept;
@@ -31,8 +32,8 @@ namespace PonyEngine::Math
 
 		constexpr ~Vector3() noexcept = default;
 
-		constexpr float Magnitude() const noexcept;
-		constexpr inline float MagnitudeSquared() const noexcept;
+		constexpr U Magnitude() const noexcept;
+		constexpr inline U MagnitudeSquared() const noexcept;
 
 		constexpr Vector3 Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
@@ -40,9 +41,9 @@ namespace PonyEngine::Math
 		constexpr Vector3& operator =(const Vector3& other) noexcept;
 		constexpr Vector3& operator +=(const Vector3& other) noexcept;
 		constexpr Vector3& operator -=(const Vector3& other) noexcept;
-		constexpr Vector3& operator *=(const float multiplier) noexcept;
+		constexpr Vector3& operator *=(const U multiplier) noexcept;
 		constexpr Vector3& operator *=(const Vector3& other) noexcept;
-		constexpr Vector3& operator /=(const float divisor) noexcept;
+		constexpr Vector3& operator /=(const U divisor) noexcept;
 		constexpr Vector3& operator /=(const Vector3& other) noexcept;
 
 		T x;
@@ -50,203 +51,203 @@ namespace PonyEngine::Math
 		T z;
 	};
 
-	export template<VectorComponent T>
-	constexpr float Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr U Dot(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		return static_cast<float>(left.x) * static_cast<float>(right.x) +
-			static_cast<float>(left.y) * static_cast<float>(right.y) +
-			static_cast<float>(left.z) * static_cast<float>(right.z);
+		return static_cast<U>(left.x) * static_cast<U>(right.x) +
+			static_cast<U>(left.y) * static_cast<U>(right.y) +
+			static_cast<U>(left.z) * static_cast<U>(right.z);
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> Cross(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> Cross(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<float>(left.y) * static_cast<float>(right.z) - static_cast<float>(left.z) * static_cast<float>(right.y));
-		const T y = static_cast<T>(static_cast<float>(left.z) * static_cast<float>(right.x) - static_cast<float>(left.x) * static_cast<float>(right.z));
-		const T z = static_cast<T>(static_cast<float>(left.x) * static_cast<float>(right.y) - static_cast<float>(left.y) * static_cast<float>(right.x));
+		const T x = static_cast<T>(static_cast<U>(left.y) * static_cast<U>(right.z) - static_cast<U>(left.z) * static_cast<U>(right.y));
+		const T y = static_cast<T>(static_cast<U>(left.z) * static_cast<U>(right.x) - static_cast<U>(left.x) * static_cast<U>(right.z));
+		const T z = static_cast<T>(static_cast<U>(left.x) * static_cast<U>(right.y) - static_cast<U>(left.y) * static_cast<U>(right.x));
 		return Vector3(x, y, z);
 	}
 
-	export template<VectorComponent T>
-	constexpr float Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr U Angle(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const float dot = Dot(left, right);
-		const float superMagnitude = sqrt(left.MagnitudeSquared() * right.MagnitudeSquared());
-		const float cos = std::clamp(dot / superMagnitude, -1.f, 1.f);
+		const U dot = Dot(left, right);
+		const U superMagnitude = sqrt(left.MagnitudeSquared() * right.MagnitudeSquared());
+		const U cos = std::clamp(dot / superMagnitude, -1.f, 1.f);
 		return std::acos(cos);
 	}
 
-	export template<VectorComponent T>
-	constexpr float AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr U AngleSigned(const Vector3<T, U>& left, const Vector3<T, U>& right, const Vector3<T, U>& axis) noexcept
 	{
 		const Vector3 cross = Cross(left, right);
-		const float dot = Dot(cross, axis);
-		const float sign = Sign(dot);
-		const float angle = Angle(left, right);
+		const U dot = Dot(cross, axis);
+		const U sign = Sign(dot);
+		const U angle = Angle(left, right);
 		return angle * sign;
 	}
 
-	export template<VectorComponent T>
-	constexpr inline float AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr inline U AngleDegrees(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
 		return Angle(left, right) * RadToDeg;
 	}
 
-	export template<VectorComponent T>
-	constexpr inline float AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr inline U AngleSignedDegrees(const Vector3<T, U>& left, const Vector3<T, U>& right, const Vector3<T, U>& axis) noexcept
 	{
 		return AngleSigned(left, right, axis) * RadToDeg;
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> Project(const Vector3<T, U>& vector, const Vector3<T, U>& target) noexcept
 	{
-		const float multiplier = Dot(vector, target) / Dot(target, target);
+		const U multiplier = Dot(vector, target) / Dot(target, target);
 		return target * multiplier;
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> ProjectOnPlane(const Vector3<T, U>& vector, const Vector3<T, U>& normal) noexcept
 	{
-		const float multiplier = Dot(vector, normal) / Dot(normal, normal);
+		const U multiplier = Dot(vector, normal) / Dot(normal, normal);
 		return vector - normal * multiplier;
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> Reflect(const Vector3<T, U>& vector, const Vector3<T, U>& normal) noexcept
 	{
-		const float multiplier = -2.f * Dot(vector, normal);
+		const U multiplier = U(-2) * Dot(vector, normal);
 		return vector + normal * multiplier;
 	}
 
-	export template<VectorComponent T>
-	constexpr bool operator ==(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr bool operator ==(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		return static_cast<bool>(left.x == right.x) && static_cast<bool>(left.y == right.y) && static_cast<bool>(left.z == right.z);
+		return left.x == right.x && left.y == right.y && left.z == right.z;
 	}
 
-	export template<VectorComponent T>
-	constexpr bool operator !=(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr bool operator !=(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		return static_cast<bool>(left.x != right.x) || static_cast<bool>(left.y != right.y) || static_cast<bool>(left.z != right.z);
+		return left.x != right.x || left.y != right.y || left.z != right.z;
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator +(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
 		return Vector3(static_cast<T>(left.x + right.x), static_cast<T>(left.y + right.y), static_cast<T>(left.z + right.z));
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator -(const Vector3<T, U>& vector) noexcept
 	{
 		return Vector3(static_cast<T>(-vector.x), static_cast<T>(-vector.y), static_cast<T>(-vector.z));
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator -(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
 		return Vector3(static_cast<T>(left.x - right.x), static_cast<T>(left.y - right.y), static_cast<T>(left.z - right.z));
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator *(const Vector3<T>& vector, const float multiplier) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator *(const Vector3<T, U>& vector, const U multiplier) noexcept
 	{
-		const T x = static_cast<T>(static_cast<float>(vector.x) * multiplier);
-		const T y = static_cast<T>(static_cast<float>(vector.y) * multiplier);
-		const T z = static_cast<T>(static_cast<float>(vector.z) * multiplier);
+		const T x = static_cast<T>(static_cast<U>(vector.x) * multiplier);
+		const T y = static_cast<T>(static_cast<U>(vector.y) * multiplier);
+		const T z = static_cast<T>(static_cast<U>(vector.z) * multiplier);
 		return Vector3(x, y, z);
 	}
 
-	export template<VectorComponent T>
-	constexpr inline Vector3<T> operator *(const float multiplier, const Vector3<T>& vector) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr inline Vector3<T, U> operator *(const U multiplier, const Vector3<T, U>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator *(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator *(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<float>(left.x) * static_cast<float>(right.x));
-		const T y = static_cast<T>(static_cast<float>(left.y) * static_cast<float>(right.y));
-		const T z = static_cast<T>(static_cast<float>(left.z) * static_cast<float>(right.z));
+		const T x = static_cast<T>(static_cast<U>(left.x) * static_cast<U>(right.x));
+		const T y = static_cast<T>(static_cast<U>(left.y) * static_cast<U>(right.y));
+		const T z = static_cast<T>(static_cast<U>(left.z) * static_cast<U>(right.z));
 		return Vector3(x, y, z);
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator /(const Vector3<T>& vector, const float divisor) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator /(const Vector3<T, U>& vector, const U divisor) noexcept
 	{
-		const T x = static_cast<T>(static_cast<float>(vector.x) / divisor);
-		const T y = static_cast<T>(static_cast<float>(vector.y) / divisor);
-		const T z = static_cast<T>(static_cast<float>(vector.z) / divisor);
+		const T x = static_cast<T>(static_cast<U>(vector.x) / divisor);
+		const T y = static_cast<T>(static_cast<U>(vector.y) / divisor);
+		const T z = static_cast<T>(static_cast<U>(vector.z) / divisor);
 		return Vector3(x, y, z);
 	}
 
-	export template<VectorComponent T>
-	constexpr Vector3<T> operator /(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	export template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> operator /(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<float>(left.x) / static_cast<float>(right.x));
-		const T y = static_cast<T>(static_cast<float>(left.y) / static_cast<float>(right.y));
-		const T z = static_cast<T>(static_cast<float>(left.z) / static_cast<float>(right.z));
+		const T x = static_cast<T>(static_cast<U>(left.x) / static_cast<U>(right.x));
+		const T y = static_cast<T>(static_cast<U>(left.y) / static_cast<U>(right.y));
+		const T z = static_cast<T>(static_cast<U>(left.z) / static_cast<U>(right.z));
 		return Vector3(x, y, z);
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>::Vector3() noexcept :
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>::Vector3() noexcept :
 		x{},
 		y{},
 		z{}
 	{
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>::Vector3(const T xParam, const T yParam, const T zParam) noexcept :
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>::Vector3(const T xParam, const T yParam, const T zParam) noexcept :
 		x(xParam),
 		y(yParam),
 		z(zParam)
 	{
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>::Vector3(const Vector3<T>& other) noexcept : 
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>::Vector3(const Vector3<T, U>& other) noexcept : 
 		Vector3(other.x, other.y, other.z)
 	{
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>::Vector3(Vector3<T>&& other) noexcept :
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>::Vector3(Vector3<T, U>&& other) noexcept :
 		x(std::move(other.x)),
 		y(std::move(other.y)),
 		z(std::move(other.z))
 	{
 	}
 
-	template<VectorComponent T>
-	constexpr float Vector3<T>::Magnitude() const noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr U Vector3<T, U>::Magnitude() const noexcept
 	{
 		return sqrt(MagnitudeSquared());
 	}
 
-	template<VectorComponent T>
-	constexpr inline float Vector3<T>::MagnitudeSquared() const noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr inline U Vector3<T, U>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T> Vector3<T>::Normalized() const noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U> Vector3<T, U>::Normalized() const noexcept
 	{
 		return *this / Magnitude();
 	}
 
-	template<VectorComponent T>
-	constexpr inline void Vector3<T>::Normalize() noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr inline void Vector3<T, U>::Normalize() noexcept
 	{
 		*this = Normalized();
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator =(const Vector3<T>& other) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator =(const Vector3<T, U>& other) noexcept
 	{
 		x = other.x;
 		y = other.y;
@@ -254,8 +255,8 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator +=(const Vector3<T>& other) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator +=(const Vector3<T, U>& other) noexcept
 	{
 		x = static_cast<T>(x + other.x);
 		y = static_cast<T>(y + other.y);
@@ -263,8 +264,8 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator -=(const Vector3<T>& other) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator -=(const Vector3<T, U>& other) noexcept
 	{
 		x = static_cast<T>(x - other.x);
 		y = static_cast<T>(y - other.y);
@@ -272,38 +273,38 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator *=(const float multiplier) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator *=(const U multiplier) noexcept
 	{
-		x = static_cast<T>(static_cast<float>(x) * multiplier);
-		y = static_cast<T>(static_cast<float>(y) * multiplier);
-		z = static_cast<T>(static_cast<float>(z) * multiplier);
+		x = static_cast<T>(static_cast<U>(x) * multiplier);
+		y = static_cast<T>(static_cast<U>(y) * multiplier);
+		z = static_cast<T>(static_cast<U>(z) * multiplier);
 		return *this;
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator *=(const Vector3& other) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator *=(const Vector3& other) noexcept
 	{
-		x = static_cast<T>(static_cast<float>(x) * static_cast<float>(other.x));
-		y = static_cast<T>(static_cast<float>(y) * static_cast<float>(other.y));
-		z = static_cast<T>(static_cast<float>(z) * static_cast<float>(other.z));
+		x = static_cast<T>(static_cast<U>(x) * static_cast<U>(other.x));
+		y = static_cast<T>(static_cast<U>(y) * static_cast<U>(other.y));
+		z = static_cast<T>(static_cast<U>(z) * static_cast<U>(other.z));
 		return *this;
 	}
 
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator /=(const float divisor) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator /=(const U divisor) noexcept
 	{
-		x = static_cast<T>(static_cast<float>(x) / divisor);
-		y = static_cast<T>(static_cast<float>(y) / divisor);
-		z = static_cast<T>(static_cast<float>(z) / divisor);
+		x = static_cast<T>(static_cast<U>(x) / divisor);
+		y = static_cast<T>(static_cast<U>(y) / divisor);
+		z = static_cast<T>(static_cast<U>(z) / divisor);
 		return *this;
 	}
-	template<VectorComponent T>
-	constexpr Vector3<T>& Vector3<T>::operator /=(const Vector3& other) noexcept
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::operator /=(const Vector3& other) noexcept
 	{
-		x = static_cast<T>(static_cast<float>(x) / static_cast<float>(other.x));
-		y = static_cast<T>(static_cast<float>(y) / static_cast<float>(other.y));
-		z = static_cast<T>(static_cast<float>(z) / static_cast<float>(other.z));
+		x = static_cast<T>(static_cast<U>(x) / static_cast<U>(other.x));
+		y = static_cast<T>(static_cast<U>(y) / static_cast<U>(other.y));
+		z = static_cast<T>(static_cast<U>(z) / static_cast<U>(other.z));
 		return *this;
 	}
 }

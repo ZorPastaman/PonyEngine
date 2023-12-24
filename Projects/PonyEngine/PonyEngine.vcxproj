@@ -33,7 +33,6 @@
     <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntry.cppm" />
     <ClCompile Include="Source\Public\Factories\EngineFeatureFactories\IEngineFeatureFactory.cppm" />
     <ClCompile Include="Source\Public\Math\Common.cppm" />
-    <ClCompile Include="Source\Public\Math\VectorConcepts.cppm" />
     <ClCompile Include="Source\Public\Math\Vector3.cppm" />
   </ItemGroup>
   <ItemGroup>

@@ -77,9 +77,6 @@
     <ClCompile Include="Source\Public\Math\Vector3.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Math\VectorConcepts.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Math\Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
