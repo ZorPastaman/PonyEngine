@@ -62,9 +62,9 @@ namespace PonyEngine::Math
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> Cross(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<U>(left.y) * static_cast<U>(right.z) - static_cast<U>(left.z) * static_cast<U>(right.y));
-		const T y = static_cast<T>(static_cast<U>(left.z) * static_cast<U>(right.x) - static_cast<U>(left.x) * static_cast<U>(right.z));
-		const T z = static_cast<T>(static_cast<U>(left.x) * static_cast<U>(right.y) - static_cast<U>(left.y) * static_cast<U>(right.x));
+		const T x = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.y) * static_cast<U>(right.z) - static_cast<U>(left.z) * static_cast<U>(right.y));
+		const T y = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.z) * static_cast<U>(right.x) - static_cast<U>(left.x) * static_cast<U>(right.z));
+		const T z = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.x) * static_cast<U>(right.y) - static_cast<U>(left.y) * static_cast<U>(right.x));
 		return Vector3(x, y, z);
 	}
 
@@ -90,13 +90,13 @@ namespace PonyEngine::Math
 	export template<Arithmetic T, std::floating_point U>
 	constexpr inline U AngleDegrees(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		return Angle(left, right) * RadToDeg;
+		return Angle(left, right) * RadToDeg<U>;
 	}
 
 	export template<Arithmetic T, std::floating_point U>
 	constexpr inline U AngleSignedDegrees(const Vector3<T, U>& left, const Vector3<T, U>& right, const Vector3<T, U>& axis) noexcept
 	{
-		return AngleSigned(left, right, axis) * RadToDeg;
+		return AngleSigned(left, right, axis) * RadToDeg<U>;
 	}
 
 	export template<Arithmetic T, std::floating_point U>
@@ -153,9 +153,9 @@ namespace PonyEngine::Math
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> operator *(const Vector3<T, U>& vector, const U multiplier) noexcept
 	{
-		const T x = static_cast<T>(static_cast<U>(vector.x) * multiplier);
-		const T y = static_cast<T>(static_cast<U>(vector.y) * multiplier);
-		const T z = static_cast<T>(static_cast<U>(vector.z) * multiplier);
+		const T x = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.x) * multiplier);
+		const T y = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.y) * multiplier);
+		const T z = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.z) * multiplier);
 		return Vector3(x, y, z);
 	}
 
@@ -168,27 +168,27 @@ namespace PonyEngine::Math
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> operator *(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<U>(left.x) * static_cast<U>(right.x));
-		const T y = static_cast<T>(static_cast<U>(left.y) * static_cast<U>(right.y));
-		const T z = static_cast<T>(static_cast<U>(left.z) * static_cast<U>(right.z));
+		const T x = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.x) * static_cast<U>(right.x));
+		const T y = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.y) * static_cast<U>(right.y));
+		const T z = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.z) * static_cast<U>(right.z));
 		return Vector3(x, y, z);
 	}
 
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> operator /(const Vector3<T, U>& vector, const U divisor) noexcept
 	{
-		const T x = static_cast<T>(static_cast<U>(vector.x) / divisor);
-		const T y = static_cast<T>(static_cast<U>(vector.y) / divisor);
-		const T z = static_cast<T>(static_cast<U>(vector.z) / divisor);
+		const T x = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.x) / divisor);
+		const T y = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.y) / divisor);
+		const T z = RoundToIntegralIfPossible<U, T>(static_cast<U>(vector.z) / divisor);
 		return Vector3(x, y, z);
 	}
 
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> operator /(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
 	{
-		const T x = static_cast<T>(static_cast<U>(left.x) / static_cast<U>(right.x));
-		const T y = static_cast<T>(static_cast<U>(left.y) / static_cast<U>(right.y));
-		const T z = static_cast<T>(static_cast<U>(left.z) / static_cast<U>(right.z));
+		const T x = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.x) / static_cast<U>(right.x));
+		const T y = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.y) / static_cast<U>(right.y));
+		const T z = RoundToIntegralIfPossible<U, T>(static_cast<U>(left.z) / static_cast<U>(right.z));
 		return Vector3(x, y, z);
 	}
 
@@ -276,35 +276,35 @@ namespace PonyEngine::Math
 	template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U>& Vector3<T, U>::operator *=(const U multiplier) noexcept
 	{
-		x = static_cast<T>(static_cast<U>(x) * multiplier);
-		y = static_cast<T>(static_cast<U>(y) * multiplier);
-		z = static_cast<T>(static_cast<U>(z) * multiplier);
+		x = RoundToIntegralIfPossible<U, T>(static_cast<U>(x) * multiplier);
+		y = RoundToIntegralIfPossible<U, T>(static_cast<U>(y) * multiplier);
+		z = RoundToIntegralIfPossible<U, T>(static_cast<U>(z) * multiplier);
 		return *this;
 	}
 
 	template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U>& Vector3<T, U>::operator *=(const Vector3& other) noexcept
 	{
-		x = static_cast<T>(static_cast<U>(x) * static_cast<U>(other.x));
-		y = static_cast<T>(static_cast<U>(y) * static_cast<U>(other.y));
-		z = static_cast<T>(static_cast<U>(z) * static_cast<U>(other.z));
+		x = RoundToIntegralIfPossible<U, T>(static_cast<U>(x) * static_cast<U>(other.x));
+		y = RoundToIntegralIfPossible<U, T>(static_cast<U>(y) * static_cast<U>(other.y));
+		z = RoundToIntegralIfPossible<U, T>(static_cast<U>(z) * static_cast<U>(other.z));
 		return *this;
 	}
 
 	template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U>& Vector3<T, U>::operator /=(const U divisor) noexcept
 	{
-		x = static_cast<T>(static_cast<U>(x) / divisor);
-		y = static_cast<T>(static_cast<U>(y) / divisor);
-		z = static_cast<T>(static_cast<U>(z) / divisor);
+		x = RoundToIntegralIfPossible<U, T>(static_cast<U>(x) / divisor);
+		y = RoundToIntegralIfPossible<U, T>(static_cast<U>(y) / divisor);
+		z = RoundToIntegralIfPossible<U, T>(static_cast<U>(z) / divisor);
 		return *this;
 	}
 	template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U>& Vector3<T, U>::operator /=(const Vector3& other) noexcept
 	{
-		x = static_cast<T>(static_cast<U>(x) / static_cast<U>(other.x));
-		y = static_cast<T>(static_cast<U>(y) / static_cast<U>(other.y));
-		z = static_cast<T>(static_cast<U>(z) / static_cast<U>(other.z));
+		x = RoundToIntegralIfPossible<U, T>(static_cast<U>(x) / static_cast<U>(other.x));
+		y = RoundToIntegralIfPossible<U, T >>(static_cast<U>(y) / static_cast<U>(other.y));
+		z = RoundToIntegralIfPossible<U, T>(static_cast<U>(z) / static_cast<U>(other.z));
 		return *this;
 	}
 }
