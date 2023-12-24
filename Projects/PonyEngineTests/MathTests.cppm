@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 import PonyEngine.Math.Vector3;
+import PonyEngine.Math.Common;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -18,6 +19,42 @@ namespace PonyEngineTests
 	TEST_CLASS(MathTests)
 	{
 	public:
+		TEST_METHOD(SignTest)
+		{
+			signed char c = 0;
+			Assert::AreEqual((signed char)(0), PonyEngine::Math::Sign(c));
+
+			c = -3;
+			Assert::AreEqual((signed char)(-1), PonyEngine::Math::Sign(c));
+
+			c = 5;
+			Assert::AreEqual(signed char(1), PonyEngine::Math::Sign(c));
+
+			unsigned short s = 0;
+			Assert::AreEqual((unsigned short)(0), PonyEngine::Math::Sign(s));
+
+			s = 2;
+			Assert::AreEqual((unsigned short)(1), PonyEngine::Math::Sign(s));
+
+			signed int i = 0;
+			Assert::AreEqual(0, PonyEngine::Math::Sign(i));
+
+			i = -20;
+			Assert::AreEqual(-1, PonyEngine::Math::Sign(i));
+
+			i = 100;
+			Assert::AreEqual(1, PonyEngine::Math::Sign(i));
+
+			float f = 0.f;
+			Assert::AreEqual(0.f, PonyEngine::Math::Sign(f));
+
+			f = -42.f;
+			Assert::AreEqual(-1.f, PonyEngine::Math::Sign(f));
+
+			f = 50.f;
+			Assert::AreEqual(1.f, PonyEngine::Math::Sign(f));
+		}
+
 		TEST_METHOD(Vector3ConstructorsTest)
 		{
 			auto defaultFloatVector = PonyEngine::Math::Vector3<float>();
@@ -54,7 +91,7 @@ namespace PonyEngineTests
 			float magnitude = sqrt(magnitudeSquare);
 			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
 
-			Assert::AreEqual(magnitudeSquare, vector.MagnitudeSquare());
+			Assert::AreEqual(magnitudeSquare, vector.MagnitudeSquared());
 			Assert::AreEqual(magnitude, vector.Magnitude());
 		}
 
