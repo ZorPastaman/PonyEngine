@@ -441,5 +441,42 @@ namespace PonyEngineTests
 			Assert::AreEqual(y / y1, vector2.y);
 			Assert::AreEqual(z / z1, vector2.z);
 		}
+
+		TEST_METHOD(Vector3DefaultsTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Forward3<float> == PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Back3<float> == PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f));
+			Assert::IsTrue(PonyEngine::Math::Up3<float> == PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Down3<float> == PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Right3<float> == PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Left3<float> == PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f));
+		}
+
+		TEST_METHOD(Vector3TypesTest)
+		{
+			Assert::IsTrue(std::is_same_v<char, PonyEngine::Math::Vector3<char>::value_type>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<char>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<short, PonyEngine::Math::Vector3<short>::value_type>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<short>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<int, PonyEngine::Math::Vector3<int>::value_type>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<int>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<float>::value_type>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<float>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<long long, PonyEngine::Math::Vector3<long long>::value_type>);
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<long long>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<double>::value_type>);
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<double>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<int, PonyEngine::Math::Vector3<int, double>::value_type>);
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<int, double>::computational_type>);
+
+			Assert::IsTrue(std::is_same_v<long long, PonyEngine::Math::Vector3<long long, float>::value_type>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<long long, float>::computational_type>);
+		}
 	};
 }
