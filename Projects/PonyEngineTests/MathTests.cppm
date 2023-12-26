@@ -9,6 +9,8 @@
 
 #include "CppUnitTest.h"
 
+import <numbers>;
+
 import PonyEngine.Math.Vector3;
 import PonyEngine.Math.Common;
 
@@ -19,6 +21,15 @@ namespace PonyEngineTests
 	TEST_CLASS(MathTests)
 	{
 	public:
+		TEST_METHOD(DegToRadToDegTest)
+		{
+			Assert::AreEqual(std::numbers::pi_v<double> / 180, PonyEngine::Math::DegToRad<double>);
+			Assert::AreEqual(180 / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
+
+			Assert::AreEqual(std::numbers::pi_v<float> / 180, PonyEngine::Math::DegToRad<float>);
+			Assert::AreEqual(180 / std::numbers::pi_v<float>, PonyEngine::Math::RadToDeg<float>);
+		}
+
 		TEST_METHOD(SignTest)
 		{
 			signed char c = 0;
@@ -36,7 +47,7 @@ namespace PonyEngineTests
 			s = 2;
 			Assert::AreEqual((unsigned short)(1), PonyEngine::Math::Sign(s));
 
-			signed int i = 0;
+			int i = 0;
 			Assert::AreEqual(0, PonyEngine::Math::Sign(i));
 
 			i = -20;
@@ -53,6 +64,48 @@ namespace PonyEngineTests
 
 			f = 50.f;
 			Assert::AreEqual(1.f, PonyEngine::Math::Sign(f));
+		}
+
+		TEST_METHOD(RoundToIntegralTest)
+		{
+			signed char charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(0.3f);
+			Assert::AreEqual((signed char)(0), charValue);
+			charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(-0.3f);
+			Assert::AreEqual((signed char)(0), charValue);
+			charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(5.7f);
+			Assert::AreEqual((signed char)(6), charValue);
+			charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(-5.7f);
+			Assert::AreEqual((signed char)(-6), charValue);
+			charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(5.3f);
+			Assert::AreEqual((signed char)(5), charValue);
+			charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(-5.3f);
+			Assert::AreEqual((signed char)(-5), charValue);
+
+			int intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(0.3f);
+			Assert::AreEqual(0, intValue);
+			intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-0.3f);
+			Assert::AreEqual(0, intValue);
+			intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(5.7f);
+			Assert::AreEqual(6, intValue);
+			intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-5.7f);
+			Assert::AreEqual(-6, intValue);
+			intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(5.3f);
+			Assert::AreEqual(5, intValue);
+			intValue = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-5.3f);
+			Assert::AreEqual(-5, intValue);
+
+			long longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(0.3);
+			Assert::AreEqual((long)0, longValue);
+			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(-0.3);
+			Assert::AreEqual((long)0, longValue);
+			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(5.7);
+			Assert::AreEqual((long)6, longValue);
+			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(-5.7);
+			Assert::AreEqual((long)-6, longValue);
+			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(5.3);
+			Assert::AreEqual((long)5, longValue);
+			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(-5.3);
+			Assert::AreEqual((long)-5, longValue);
 		}
 
 		TEST_METHOD(Vector3ConstructorsTest)
@@ -210,6 +263,98 @@ namespace PonyEngineTests
 			Assert::AreEqual(cross.x, vectorCross.x);
 			Assert::AreEqual(cross.y, vectorCross.y);
 			Assert::AreEqual(cross.z, vectorCross.z);
+		}
+
+		TEST_METHOD(Vector3AngleTest)
+		{
+			auto vector0 = PonyEngine::Math::Vector3<double>(2., 0., 0.);
+			auto vector1 = PonyEngine::Math::Vector3<double>(0., 5., 2.);
+			double expected = acos(0);
+			double actual = PonyEngine::Math::Angle(vector0, vector1);
+			Assert::AreEqual(expected, actual);
+			expected *= PonyEngine::Math::RadToDeg<double>;
+			actual = PonyEngine::Math::AngleDegrees(vector0, vector1);
+			Assert::AreEqual(expected, actual);
+			expected = acos(0);
+			actual = PonyEngine::Math::AngleSigned(vector0, vector1, PonyEngine::Math::Vector3<double>(0., -1., 0.));
+			Assert::AreEqual(expected, actual);
+			expected = -expected;
+			actual = PonyEngine::Math::AngleSigned(vector0, vector1, PonyEngine::Math::Vector3<double>(0., 1., 0.));
+			Assert::AreEqual(expected, actual);
+			expected *= PonyEngine::Math::RadToDeg<double>;
+			actual = PonyEngine::Math::AngleSignedDegrees(vector0, vector1, PonyEngine::Math::Vector3<double>(0., 1., 0.));
+			Assert::AreEqual(expected, actual);
+
+			vector0 = PonyEngine::Math::Vector3<double>(5., -3., 1.);
+			vector1 = PonyEngine::Math::Vector3<double>(-7., 1., 9.);
+			expected = acos(PonyEngine::Math::Dot(vector0, vector1) / (vector0.Magnitude() * vector1.Magnitude()));
+			actual = PonyEngine::Math::Angle(vector0, vector1);
+			Assert::AreEqual(expected, actual);
+			expected *= PonyEngine::Math::RadToDeg<double>;
+			actual = PonyEngine::Math::AngleDegrees(vector0, vector1);
+			Assert::AreEqual(expected, actual);
+			expected = acos(PonyEngine::Math::Dot(vector0, vector1) / (vector0.Magnitude() * vector1.Magnitude()));
+			actual = PonyEngine::Math::AngleSigned(vector0, vector1, PonyEngine::Math::Vector3<double>(0., -1., 0.));
+			Assert::AreEqual(expected, actual);
+			expected = -expected;
+			actual = PonyEngine::Math::AngleSigned(vector0, vector1, PonyEngine::Math::Vector3<double>(0., 1., 0.));
+			Assert::AreEqual(expected, actual);
+			expected *= PonyEngine::Math::RadToDeg<double>;
+			actual = PonyEngine::Math::AngleSignedDegrees(vector0, vector1, PonyEngine::Math::Vector3<double>(0., 1., 0.));
+			Assert::AreEqual(expected, actual);
+		}
+
+		TEST_METHOD(Vector3ProjectTest)
+		{
+			auto vector0 = PonyEngine::Math::Vector3<float>(3.f, 0.f, 0.f);
+			auto vector1 = PonyEngine::Math::Vector3<float>(0.f, 0.f, 3.f);
+			float expected = 0.f;
+			float actual = PonyEngine::Math::Project(vector0, vector1).Magnitude();
+			Assert::AreEqual(expected, actual);
+
+			vector0.Set(-4.f, 2.f, 7.f);
+			vector1.Set(3.f, 1.f, 2.f);
+			auto expectedVector = PonyEngine::Math::Vector3<float>(6.f/7.f, 2.f/7.f, 4.f/7.f);
+			auto actualVector = PonyEngine::Math::Project(vector0, vector1);
+			Assert::AreEqual(static_cast<double>(expectedVector.x), static_cast<double>(actualVector.x), 0.0001);
+			Assert::AreEqual(static_cast<double>(expectedVector.y), static_cast<double>(actualVector.y), 0.0001);
+			Assert::AreEqual(static_cast<double>(expectedVector.z), static_cast<double>(actualVector.z), 0.0001);
+			Assert::AreEqual(0., static_cast<double>(PonyEngine::Math::AngleDegrees(actualVector, vector1)), 0.0001);
+		}
+
+		TEST_METHOD(Vector3ProjectOnPlaneTest)
+		{
+			auto vector = PonyEngine::Math::Vector3<float>(2.f, 0.f, 0.f);
+			auto normal = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			auto projection = PonyEngine::Math::ProjectOnPlane(vector, normal);
+			Assert::AreEqual(0.f, projection.Magnitude());
+
+			vector.Set(20.f, -30.f, 15.f);
+			normal.Set(0.5f, 0.1f, -0.24f).Normalize();
+			auto expected = vector - normal * PonyEngine::Math::Dot(vector, normal);
+			projection = PonyEngine::Math::ProjectOnPlane(vector, normal);
+			Assert::AreEqual(static_cast<double>(expected.x), static_cast<double>(projection.x), 0.0001);
+			Assert::AreEqual(static_cast<double>(expected.y), static_cast<double>(projection.y), 0.0001);
+			Assert::AreEqual(static_cast<double>(expected.z), static_cast<double>(projection.z), 0.0001);
+			Assert::AreEqual(90., static_cast<double>(PonyEngine::Math::AngleDegrees(projection, normal)), 0.0001);
+		}
+
+		TEST_METHOD(Vector3ReflectTest)
+		{
+			auto vector = PonyEngine::Math::Vector3<double>(0.5, -0.5, 0.);
+			auto normal = PonyEngine::Math::Vector3<double>(0., 1., 0.);
+			auto reflection = PonyEngine::Math::Reflect(vector, normal);
+			Assert::AreEqual(0.5, reflection.x, 0.0001);
+			Assert::AreEqual(0.5, reflection.y, 0.0001);
+			Assert::AreEqual(0., reflection.z, 0.0001);
+
+			vector.Set(-14., 39., -1.);
+			normal.Set(10., -17., -34.);
+			reflection = PonyEngine::Math::Reflect(vector, normal);
+			auto expected = vector - 2 * PonyEngine::Math::Dot(vector, normal) * normal;
+			Assert::AreEqual(expected.x, reflection.x, 0.0001);
+			Assert::AreEqual(expected.y, reflection.y, 0.0001);
+			Assert::AreEqual(expected.z, reflection.z, 0.0001);
 		}
 
 		TEST_METHOD(Vector3EqualityOperatorsTest)

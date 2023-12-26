@@ -28,7 +28,6 @@ namespace PonyEngine::Math
 		constexpr Vector3() noexcept;
 		constexpr Vector3(const T xParam, const T yParam, const T zParam) noexcept;
 		constexpr Vector3(const Vector3& other) noexcept;
-		constexpr Vector3(Vector3&& other) noexcept;
 
 		constexpr ~Vector3() noexcept = default;
 
@@ -37,6 +36,8 @@ namespace PonyEngine::Math
 
 		constexpr Vector3 Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
+
+		constexpr Vector3& Set(const T xParam, const T yParam, const T zParam) noexcept;
 
 		constexpr Vector3& operator =(const Vector3& other) noexcept;
 		constexpr Vector3& operator +=(const Vector3& other) noexcept;
@@ -73,7 +74,7 @@ namespace PonyEngine::Math
 	{
 		const U dot = Dot(left, right);
 		const U superMagnitude = sqrt(left.MagnitudeSquared() * right.MagnitudeSquared());
-		const U cos = std::clamp(dot / superMagnitude, -1.f, 1.f);
+		const U cos = std::clamp(dot / superMagnitude, U(-1), U(1));
 		return std::acos(cos);
 	}
 
@@ -215,14 +216,6 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T, std::floating_point U>
-	constexpr Vector3<T, U>::Vector3(Vector3<T, U>&& other) noexcept :
-		x(std::move(other.x)),
-		y(std::move(other.y)),
-		z(std::move(other.z))
-	{
-	}
-
-	template<Arithmetic T, std::floating_point U>
 	constexpr U Vector3<T, U>::Magnitude() const noexcept
 	{
 		return sqrt(MagnitudeSquared());
@@ -244,6 +237,15 @@ namespace PonyEngine::Math
 	constexpr inline void Vector3<T, U>::Normalize() noexcept
 	{
 		*this = Normalized();
+	}
+
+	template<Arithmetic T, std::floating_point U>
+	constexpr Vector3<T, U>& Vector3<T, U>::Set(const T xParam, const T yParam, const T zParam) noexcept
+	{
+		x = xParam;
+		y = yParam;
+		z = zParam;
+		return *this;
 	}
 
 	template<Arithmetic T, std::floating_point U>

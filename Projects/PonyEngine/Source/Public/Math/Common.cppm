@@ -35,7 +35,7 @@ namespace PonyEngine::Math
 	export template<Arithmetic T>
 	constexpr T Sign(const T value) noexcept
 	{
-		return (T{} < value) - (value < T{});
+		return static_cast<T>(T{} < value) - (value < T{});
 	}
 
 	export template<std::floating_point From, std::integral To>
