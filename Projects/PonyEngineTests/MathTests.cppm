@@ -452,6 +452,21 @@ namespace PonyEngineTests
 			Assert::IsTrue(PonyEngine::Math::Left3<float> == PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f));
 			Assert::IsTrue(PonyEngine::Math::One3<float> == PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f));
 			Assert::IsTrue(PonyEngine::Math::Zero3<float> == PonyEngine::Math::Vector3<float>(0.f, 0.f, 0.f));
+
+			Assert::IsTrue(PonyEngine::Math::Forward3<short> == PonyEngine::Math::Vector3<short>(0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Back3<short> == PonyEngine::Math::Vector3<short>(0, 0, -1));
+			Assert::IsTrue(PonyEngine::Math::Up3<short> == PonyEngine::Math::Vector3<short>(0, 1, 0));
+			Assert::IsTrue(PonyEngine::Math::Down3<short> == PonyEngine::Math::Vector3<short>(0, -1, 0));
+			Assert::IsTrue(PonyEngine::Math::Right3<short> == PonyEngine::Math::Vector3<short>(1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Left3<short> == PonyEngine::Math::Vector3<short>(-1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::One3<short> == PonyEngine::Math::Vector3<short>(1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Zero3<short> == PonyEngine::Math::Vector3<short>(0, 0, 0));
+
+			Assert::IsTrue(PonyEngine::Math::Forward3<unsigned char> == PonyEngine::Math::Vector3<unsigned char>(0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Up3<unsigned char> == PonyEngine::Math::Vector3<unsigned char>(0, 1, 0));
+			Assert::IsTrue(PonyEngine::Math::Right3<unsigned char> == PonyEngine::Math::Vector3<unsigned char>(1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::One3<unsigned char> == PonyEngine::Math::Vector3<unsigned char>(1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Zero3<unsigned char> == PonyEngine::Math::Vector3<unsigned char>(0, 0, 0));
 		}
 
 		TEST_METHOD(Vector3TypesTest)

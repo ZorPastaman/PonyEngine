@@ -53,21 +53,21 @@ namespace PonyEngine::Math
 	};
 
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Forward3 = Vector3<T, U>(T(0), T(0), T(1));
+	constexpr inline const Vector3<T, U> Forward3 = Vector3<T, U>(T{0}, T{0}, T{1});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Back3 = Vector3<T, U>(T(0), T(0), T(-1));
+	constexpr inline const Vector3<T, U> Back3 = Vector3<T, U>(T{0}, T{0}, T{-1});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Up3 = Vector3<T, U>(T(0), T(1), T(0));
+	constexpr inline const Vector3<T, U> Up3 = Vector3<T, U>(T{0}, T{1}, T{0});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Down3 = Vector3<T, U>(T(0), T(-1), T(0));
+	constexpr inline const Vector3<T, U> Down3 = Vector3<T, U>(T{0}, T{-1}, T{0});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Right3 = Vector3<T, U>(T(1), T(0), T(0));
+	constexpr inline const Vector3<T, U> Right3 = Vector3<T, U>(T{1}, T{0}, T{0});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Left3 = Vector3<T, U>(T(-1), T(0), T(0));
+	constexpr inline const Vector3<T, U> Left3 = Vector3<T, U>(T{-1}, T{0}, T{0});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> One3 = Vector3<T, U>(T(1), T(1), T(1));
+	constexpr inline const Vector3<T, U> One3 = Vector3<T, U>(T{1}, T{1}, T{1});
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
-	constexpr inline const Vector3<T, U> Zero3 = Vector3<T, U>(T(0), T(0), T(0));
+	constexpr inline const Vector3<T, U> Zero3 = Vector3<T, U>(T{0}, T{0}, T{0});
 
 	export template<Arithmetic T, std::floating_point U>
 	constexpr U Dot(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
@@ -220,9 +220,9 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U>::Vector3(const T xParam, const T yParam, const T zParam) noexcept :
-		x(xParam),
-		y(yParam),
-		z(zParam)
+		x{xParam},
+		y{yParam},
+		z{zParam}
 	{
 	}
 
@@ -322,7 +322,7 @@ namespace PonyEngine::Math
 	constexpr Vector3<T, U>& Vector3<T, U>::operator /=(const Vector3& other) noexcept
 	{
 		x = RoundToIntegralIfPossible<U, T>(static_cast<U>(x) / static_cast<U>(other.x));
-		y = RoundToIntegralIfPossible<U, T >>(static_cast<U>(y) / static_cast<U>(other.y));
+		y = RoundToIntegralIfPossible<U, T>(static_cast<U>(y) / static_cast<U>(other.y));
 		z = RoundToIntegralIfPossible<U, T>(static_cast<U>(z) / static_cast<U>(other.z));
 		return *this;
 	}
