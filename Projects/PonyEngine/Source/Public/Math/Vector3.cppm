@@ -64,6 +64,10 @@ namespace PonyEngine::Math
 	constexpr inline const Vector3<T, U> Right3 = Vector3<T, U>(T(1), T(0), T(0));
 	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
 	constexpr inline const Vector3<T, U> Left3 = Vector3<T, U>(T(-1), T(0), T(0));
+	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
+	constexpr inline const Vector3<T, U> One3 = Vector3<T, U>(T(1), T(1), T(1));
+	export template<Arithmetic T, std::floating_point U = ComputationalFor<T>>
+	constexpr inline const Vector3<T, U> Zero3 = Vector3<T, U>(T(0), T(0), T(0));
 
 	export template<Arithmetic T, std::floating_point U>
 	constexpr U Dot(const Vector3<T, U>& left, const Vector3<T, U>& right) noexcept
@@ -130,7 +134,7 @@ namespace PonyEngine::Math
 	export template<Arithmetic T, std::floating_point U>
 	constexpr Vector3<T, U> Reflect(const Vector3<T, U>& vector, const Vector3<T, U>& normal) noexcept
 	{
-		const U multiplier = U(-2) * Dot(vector, normal);
+		const U multiplier = U(-2) * Dot(vector, normal) / Dot(normal, normal);
 		return vector + normal * multiplier;
 	}
 

@@ -349,7 +349,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(0., reflection.z, 0.0001);
 
 			vector.Set(-14., 39., -1.);
-			normal.Set(10., -17., -34.);
+			normal.Set(10., -17., -34.).Normalize();
 			reflection = PonyEngine::Math::Reflect(vector, normal);
 			auto expected = vector - 2 * PonyEngine::Math::Dot(vector, normal) * normal;
 			Assert::AreEqual(expected.x, reflection.x, 0.0001);
@@ -450,6 +450,8 @@ namespace PonyEngineTests
 			Assert::IsTrue(PonyEngine::Math::Down3<float> == PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f));
 			Assert::IsTrue(PonyEngine::Math::Right3<float> == PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f));
 			Assert::IsTrue(PonyEngine::Math::Left3<float> == PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::One3<float> == PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Zero3<float> == PonyEngine::Math::Vector3<float>(0.f, 0.f, 0.f));
 		}
 
 		TEST_METHOD(Vector3TypesTest)
