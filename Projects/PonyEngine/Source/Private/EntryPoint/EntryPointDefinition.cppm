@@ -18,7 +18,7 @@ namespace PonyEngine
 {
 	IEngine* CreateEngine()
 	{
-		EngineParams params;
+		EngineParams params{};
 		return CreateEngineWithParams(params);
 	}
 

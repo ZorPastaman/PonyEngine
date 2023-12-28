@@ -31,7 +31,7 @@ namespace PonyEngine
 	/// </returns>
 	export LoggerOwnerKit CreateLogger(const LoggerParams& params, IEngineView* const engine)
 	{
-		LoggerOwnerKit answer;
+		LoggerOwnerKit answer{};
 
 		if (params.loggerFactory != nullptr)
 		{

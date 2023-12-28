@@ -19,6 +19,6 @@ namespace PonyEngine
 	export struct EngineParams final
 	{
 	public:
-		LoggerParams loggerParams;
+		LoggerParams loggerParams{};
 	};
 }
