@@ -35,6 +35,7 @@
     <ClCompile Include="Source\Public\Math\Common.cppm" />
     <ClCompile Include="Source\Public\Math\Vector2.cppm" />
     <ClCompile Include="Source\Public\Math\Vector3.cppm" />
+    <ClCompile Include="Source\Public\Math\Vector4.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
