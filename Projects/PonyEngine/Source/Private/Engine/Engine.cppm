@@ -41,8 +41,8 @@ namespace PonyEngine
 	};
 
 	Engine::Engine(const EngineParams& params) :
-		m_frameCount(0),
-		m_loggerKit(CreateLogger(params.loggerParams, this))
+		m_frameCount{0},
+		m_loggerKit{CreateLogger(params.loggerParams, this)}
 	{
 		m_loggerKit.logger->Log("Engine created");
 	}

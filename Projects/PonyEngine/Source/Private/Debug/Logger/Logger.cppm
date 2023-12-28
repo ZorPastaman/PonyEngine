@@ -55,14 +55,15 @@ namespace PonyEngine::Debug
 	};
 
 	Logger::Logger(IEngineView* engine) :
-		m_engine(engine)
+		m_loggerEntries{},
+		m_engine{engine}
 	{
 		assert((engine != nullptr));
 	}
 
 	Logger::Logger(Logger&& other) :
 		m_loggerEntries(std::move(other.m_loggerEntries)),
-		m_engine(other.m_engine)
+		m_engine{other.m_engine}
 	{
 	}
 

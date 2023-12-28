@@ -22,7 +22,7 @@ namespace PonyEngine
 	export struct LoggerOwnerKit final
 	{
 	public:
-		std::vector<Debug::ILoggerEntry*> loggerEntries;
-		Debug::ILogger* logger = nullptr;
+		std::vector<Debug::ILoggerEntry*> loggerEntries{};
+		Debug::ILogger* logger{nullptr};
 	};
 }
