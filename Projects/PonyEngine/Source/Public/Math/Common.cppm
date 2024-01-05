@@ -28,9 +28,9 @@ namespace PonyEngine::Math
 	using ComputationalFor = std::conditional_t<std::floating_point<T>, T, FloatingBySize<T>>;
 
 	export template<std::floating_point T> 
-	constexpr inline const T DegToRad = std::numbers::pi_v<T> / T(180);
+	constexpr inline const T DegToRad = std::numbers::pi_v<T> / T{180};
 	export template<std::floating_point T> 
-	constexpr inline const T RadToDeg = T(180) / std::numbers::pi_v<T>;
+	constexpr inline const T RadToDeg = T{180} / std::numbers::pi_v<T>;
 
 	export template<Arithmetic T>
 	constexpr T Sign(const T value) noexcept
@@ -41,7 +41,7 @@ namespace PonyEngine::Math
 	export template<std::floating_point From, std::integral To>
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
-		return static_cast<To>(from + From(0.5) - (from < From(0)));
+		return static_cast<To>(from + From{0.5} - (from < From{0}));
 	}
 
 	export template<Arithmetic From, Arithmetic To>

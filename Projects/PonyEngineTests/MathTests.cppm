@@ -14,6 +14,7 @@ import <numbers>;
 import PonyEngine.Math.Vector3;
 import PonyEngine.Math.Vector2;
 import PonyEngine.Math.Vector4;
+import PonyEngine.Math.Quaternion;
 import PonyEngine.Math.Common;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -1193,6 +1194,12 @@ namespace PonyEngineTests
 
 			Assert::IsTrue(std::is_same_v<long long, PonyEngine::Math::Vector4<long long, float>::value_type>);
 			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector4<long long, float>::computational_type>);
+		}
+
+		TEST_METHOD(QuaternionTest)
+		{
+			auto quaternion = PonyEngine::Math::Quaternion<float>::CreateByEuler(PonyEngine::Math::Vector3<float>(400.f, 410.f, 420.f));
+			PonyEngine::Math::Vector3<float> vector = quaternion.Euler();
 		}
 	};
 }
