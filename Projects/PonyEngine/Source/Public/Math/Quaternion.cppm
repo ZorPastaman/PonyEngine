@@ -32,11 +32,11 @@ namespace PonyEngine::Math
 		constexpr ~Quaternion() noexcept = default;
 
 		constexpr static Quaternion CreateByEuler(const T xRotation, const T yRotation, const T zRotation) noexcept;
-		constexpr static Quaternion CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept;
+		constexpr inline static Quaternion CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept;
 		constexpr inline static Quaternion CreateByEuler(const Vector3<T>& rotation) noexcept;
 		constexpr inline static Quaternion CreateByEulerDegrees(const Vector3<T>& rotation) noexcept;
 		constexpr static Quaternion CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept;
-		constexpr static Quaternion CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
+		constexpr inline static Quaternion CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
 		constexpr static Quaternion CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 		constexpr static Quaternion CreateByLook(const Vector3<T>& direction, const Vector3<T>& up = Up3<T>) noexcept;
 
@@ -47,17 +47,17 @@ namespace PonyEngine::Math
 		constexpr inline void Normalize() noexcept;
 
 		constexpr Vector3<T> Euler() const noexcept;
-		constexpr Vector3<T> EulerDegrees() const noexcept;
+		constexpr inline Vector3<T> EulerDegrees() const noexcept;
 
 		constexpr std::pair<Vector3<T>, T> AxisAngle() const noexcept;
-		constexpr std::pair<Vector3<T>, T> AxisAngleDegrees() const noexcept;
+		constexpr inline std::pair<Vector3<T>, T> AxisAngleDegrees() const noexcept;
 
 		constexpr Quaternion& Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
-		constexpr operator Vector4<T>() const noexcept;
+		constexpr inline operator Vector4<T>() const noexcept;
 
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept;
-		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
+		constexpr inline Quaternion& operator *=(const Quaternion& other) noexcept;
 
 		static const Quaternion Identity;
 
@@ -190,7 +190,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept
+	constexpr inline Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept
 	{
 		return CreateByEuler(xRotation * DegToRad<T>, yRotation * DegToRad<T>, zRotation * DegToRad<T>);
 	}
@@ -202,7 +202,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	inline constexpr Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const Vector3<T>& rotation) noexcept
+	constexpr inline Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const Vector3<T>& rotation) noexcept
 	{
 		return CreateByEuler(rotation.x * DegToRad<T>, rotation.y * DegToRad<T>, rotation.z * DegToRad<T>);
 	}
@@ -224,7 +224,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept
+	constexpr inline Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept
 	{
 		return CreateByAxisAngle(axis, angle * DegToRad<T>);
 	}
@@ -318,7 +318,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Vector3<T> Quaternion<T>::EulerDegrees() const noexcept
+	constexpr inline Vector3<T> Quaternion<T>::EulerDegrees() const noexcept
 	{
 		return Euler() * RadToDeg<T>;
 	}
@@ -341,9 +341,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr std::pair<Vector3<T>, T> Quaternion<T>::AxisAngleDegrees() const noexcept
+	constexpr inline std::pair<Vector3<T>, T> Quaternion<T>::AxisAngleDegrees() const noexcept
 	{
-		std::pair < Vector3<T>, T> axisAngle = AxisAngle;
+		std::pair < Vector3<T>, T> axisAngle = AxisAngle();
 		axisAngle.second *= RadToDeg<T>;
 
 		return axisAngle;
@@ -361,7 +361,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
+	constexpr inline Quaternion<T>::operator Vector4<T>() const noexcept
 	{
 		return Vector4<T>(x, y, z, w);
 	}
@@ -378,7 +378,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
+	constexpr inline Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
 	{
 		return *this = *this * other;
 	}
