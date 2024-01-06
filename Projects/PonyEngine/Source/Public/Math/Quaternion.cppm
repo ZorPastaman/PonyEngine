@@ -22,31 +22,23 @@ namespace PonyEngine::Math
 	struct Quaternion final
 	{
 	public:
-		using value_type = T;
+		using ValueType = T;
 
 		constexpr Quaternion() noexcept;
 		constexpr Quaternion(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
+		constexpr Quaternion(const Vector4<T>& vector) noexcept;
 		constexpr Quaternion(const Quaternion& other) noexcept;
 
 		constexpr ~Quaternion() noexcept = default;
 
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr inline static Quaternion CreateByVector(const Vector4<T, U>& vector) noexcept;
-
 		constexpr static Quaternion CreateByEuler(const T xRotation, const T yRotation, const T zRotation) noexcept;
 		constexpr static Quaternion CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr inline static Quaternion CreateByEuler(const Vector3<T, U>& rotation) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr inline static Quaternion CreateByEulerDegrees(const Vector3<T, U>& rotation) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr static Quaternion CreateByAxisAngle(const Vector3<T, U>& axis, const T angle) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr static Quaternion CreateByAxisAngleDegrees(const Vector3<T, U>& axis, const T angle) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr static Quaternion CreateByDirection(const Vector3<T, U>& fromDirection, const Vector3<T, U>& toDirection) noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr static Quaternion CreateByLook(const Vector3<T, U>& direction, const Vector3<T, U>& up = Up3<T, U>) noexcept;
+		constexpr inline static Quaternion CreateByEuler(const Vector3<T>& rotation) noexcept;
+		constexpr inline static Quaternion CreateByEulerDegrees(const Vector3<T>& rotation) noexcept;
+		constexpr static Quaternion CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept;
+		constexpr static Quaternion CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
+		constexpr static Quaternion CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
+		constexpr static Quaternion CreateByLook(const Vector3<T>& direction, const Vector3<T>& up = Up3<T>) noexcept;
 
 		constexpr Quaternion Inversed() const noexcept;
 		constexpr inline void Inverse() noexcept;
@@ -54,20 +46,15 @@ namespace PonyEngine::Math
 		constexpr Quaternion Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
 
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr Vector3<T, U> Euler() const noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr Vector3<T, U> EulerDegrees() const noexcept;
+		constexpr Vector3<T> Euler() const noexcept;
+		constexpr Vector3<T> EulerDegrees() const noexcept;
 
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr std::pair<Vector3<T, U>, T> AxisAngle() const noexcept;
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr std::pair<Vector3<T, U>, T> AxisAngleDegrees() const noexcept;
+		constexpr std::pair<Vector3<T>, T> AxisAngle() const noexcept;
+		constexpr std::pair<Vector3<T>, T> AxisAngleDegrees() const noexcept;
 
 		constexpr void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
-		template<std::floating_point U = ComputationalFor<T>>
-		constexpr operator Vector4<T, U>() const noexcept;
+		constexpr operator Vector4<T>() const noexcept;
 
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept;
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
@@ -123,8 +110,8 @@ namespace PonyEngine::Math
 		return Quaternion<T>(x, y, z, w);
 	}
 
-	export template<std::floating_point T, std::floating_point U = ComputationalFor<T>>
-	constexpr Vector3<T, U> operator *(const Quaternion<T>& quaternion, const Vector3<T, U> vector) noexcept
+	export template<std::floating_point T>
+	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T> vector) noexcept
 	{
 		const T m1 = quaternion.x * T{2};
 		const T m2 = quaternion.y * T{2};
@@ -143,15 +130,15 @@ namespace PonyEngine::Math
 		const T y = (m7 + m12) * vector.x + (T{1} - (m4 + m6)) * vector.y + (m9 - m10) * vector.z;
 		const T z = (m8 - m11) * vector.x + (m9 + m10) * vector.y + (T{1} - (m4 + m5)) * vector.z;
 
-		return Vector3<T, U>(x, y, z);
+		return Vector3<T>(x, y, z);
 	}
 
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion() noexcept :
-		x{0},
-		y{0},
-		z{0},
-		w{0}
+		x{},
+		y{},
+		z{},
+		w{}
 	{
 	}
 
@@ -165,19 +152,18 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	constexpr Quaternion<T>::Quaternion(const Vector4<T>& vector) noexcept :
+		Quaternion(vector.x, vector.y, vector.z, vector.w)
+	{
+	}
+
+	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const Quaternion& other) noexcept :
 		x{other.x},
 		y{other.y},
 		z{other.z},
 		w{other.w}
 	{
-	}
-
-	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr inline Quaternion<T> Quaternion<T>::CreateByVector(const Vector4<T, U>& vector) noexcept
-	{
-		return Quaternion(vector.x, vector.y, vector.z, vector.w);
 	}
 
 	template<std::floating_point T>
@@ -210,22 +196,19 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr inline Quaternion<T> Quaternion<T>::CreateByEuler(const Vector3<T, U>& rotation) noexcept
+	constexpr inline Quaternion<T> Quaternion<T>::CreateByEuler(const Vector3<T>& rotation) noexcept
 	{
 		return CreateByEuler(rotation.x, rotation.y, rotation.z);
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	inline constexpr Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const Vector3<T, U>& rotation) noexcept
+	inline constexpr Quaternion<T> Quaternion<T>::CreateByEulerDegrees(const Vector3<T>& rotation) noexcept
 	{
 		return CreateByEuler(rotation.x * DegToRad<T>, rotation.y * DegToRad<T>, rotation.z * DegToRad<T>);
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngle(const Vector3<T, U>& axis, const T angle) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept
 	{
 		const T angleHalf = angle / T{2};
 
@@ -241,26 +224,23 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T, U>& axis, const T angle) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept
 	{
 		return CreateByAxisAngle(axis, angle * DegToRad<T>);
 	}
 
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T, U>& fromDirection, const Vector3<T, U>& toDirection) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept
 	{
-		const Vector3<T, U> cross = Cross(fromDirection, toDirection);
+		const Vector3<T> cross = Cross(fromDirection, toDirection);
 		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
 
 		return Quaternion(cross.x, cross.y, cross.z, dot);
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T, U>& direction, const Vector3<T, U>& up) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T>& direction, const Vector3<T>& up) noexcept
 	{
 		/*
 		var xDir = direction;
@@ -304,8 +284,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Vector3<T, U> Quaternion<T>::Euler() const noexcept
+	constexpr Vector3<T> Quaternion<T>::Euler() const noexcept
 	{
 		const T dot = Dot(*this, *this);
 		const T test = x * w - y * z;
@@ -335,19 +314,17 @@ namespace PonyEngine::Math
 		const T yRotation = std::fmod(yRad, T{2} * std::numbers::pi_v<T>);
 		const T zRotation = std::fmod(zRad, T{2} * std::numbers::pi_v<T>);
 
-		return Vector3<T, U>(xRotation, yRotation, zRotation);
+		return Vector3<T>(xRotation, yRotation, zRotation);
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Vector3<T, U> Quaternion<T>::EulerDegrees() const noexcept
+	constexpr Vector3<T> Quaternion<T>::EulerDegrees() const noexcept
 	{
 		return Euler() * RadToDeg<T>;
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr std::pair<Vector3<T, U>, T> Quaternion<T>::AxisAngle() const noexcept
+	constexpr std::pair<Vector3<T>, T> Quaternion<T>::AxisAngle() const noexcept
 	{
 		const T halfAngle = std::acos(w);
 		const T angleSin = std::sin(halfAngle);
@@ -358,16 +335,15 @@ namespace PonyEngine::Math
 		const T yAxis = y / angleSin;
 		const T zAxis = z / angleSin;
 
-		const T axis = Vector3<T, U>(xAxis, yAxis, zAxis);
+		const T axis = Vector3<T>(xAxis, yAxis, zAxis);
 
-		return std::pair<Vector3<T, U>, T>(axis, angle);
+		return std::pair<Vector3<T>, T>(axis, angle);
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr std::pair<Vector3<T, U>, T> Quaternion<T>::AxisAngleDegrees() const noexcept
+	constexpr std::pair<Vector3<T>, T> Quaternion<T>::AxisAngleDegrees() const noexcept
 	{
-		std::pair < Vector3<T, U>, T> axisAngle = AxisAngle;
+		std::pair < Vector3<T>, T> axisAngle = AxisAngle;
 		axisAngle.second *= RadToDeg<T>;
 
 		return axisAngle;
@@ -383,10 +359,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	template<std::floating_point U>
-	constexpr Quaternion<T>::operator Vector4<T, U>() const noexcept
+	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T, U>(x, y, z, w);
+		return Vector4<T>(x, y, z, w);
 	}
 
 	template<std::floating_point T>
