@@ -52,19 +52,19 @@ namespace PonyEngine::Math
 		constexpr std::pair<Vector3<T>, T> AxisAngle() const noexcept;
 		constexpr std::pair<Vector3<T>, T> AxisAngleDegrees() const noexcept;
 
-		constexpr void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
+		constexpr Quaternion& Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
 		constexpr operator Vector4<T>() const noexcept;
 
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept;
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
 
+		static const Quaternion Identity;
+
 		T x;
 		T y;
 		T z;
 		T w;
-
-		static const Quaternion Identity;
 	};
 
 	export template<std::floating_point T>
@@ -350,12 +350,14 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void Quaternion<T>::Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept
+	constexpr Quaternion<T>& Quaternion<T>::Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept
 	{
 		x = xParam;
 		y = yParam;
 		z = zParam;
 		w = wParam;
+
+		return *this;
 	}
 
 	template<std::floating_point T>
@@ -378,8 +380,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
 	{
-		*this = *this * other;
-		return *this;
+		return *this = *this * other;
 	}
 
 	template<std::floating_point T>

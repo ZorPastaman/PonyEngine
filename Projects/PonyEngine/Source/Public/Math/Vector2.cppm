@@ -47,24 +47,17 @@ namespace PonyEngine::Math
 		constexpr Vector2& operator /=(const ComputationalType divisor) noexcept;
 		constexpr Vector2& operator /=(const Vector2& other) noexcept;
 
+		static const Vector2 Up;
+		static const Vector2 Down;
+		static const Vector2 Right;
+		static const Vector2 Left;
+		static const Vector2 One;
+		static const Vector2 Zero;
+		static const Vector2 Negative;
+
 		T x;
 		T y;
 	};
-
-	export template<Arithmetic T>
-	constexpr inline const Vector2<T> Up2 = Vector2<T>(T{0}, T{1});
-	export template<Arithmetic T> requires std::is_signed_v<T>
-	constexpr inline const Vector2<T> Down2 = Vector2<T>(T{0}, T{-1});
-	export template<Arithmetic T>
-	constexpr inline const Vector2<T> Right2 = Vector2<T>(T{1}, T{0});
-	export template<Arithmetic T> requires std::is_signed_v<T>
-	constexpr inline const Vector2<T> Left2 = Vector2<T>(T{-1}, T{0});
-	export template<Arithmetic T>
-	constexpr inline const Vector2<T> One2 = Vector2<T>(T{1}, T{1});
-	export template<Arithmetic T>
-	constexpr inline const Vector2<T> Zero2 = Vector2<T>(T{0}, T{0});
-	export template<Arithmetic T> requires std::is_signed_v<T>
-	constexpr inline const Vector2<T> Negative2 = Vector2<T>(T{-1}, T{-1});
 
 	export template<Arithmetic T>
 	constexpr Vector2<T>::ComputationalType Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept
@@ -80,6 +73,7 @@ namespace PonyEngine::Math
 		const Vector2<T>::ComputationalType superMagnitude = sqrt(left.MagnitudeSquared() * right.MagnitudeSquared());
 		const Vector2<T>::ComputationalType cos = std::clamp(dot / superMagnitude, 
 			typename Vector2<T>::ComputationalType{-1}, typename Vector2<T>::ComputationalType{1});
+
 		return std::acos(cos);
 	}
 
@@ -89,6 +83,7 @@ namespace PonyEngine::Math
 		const Vector2<T>::ComputationalType zCross = left.x * right.y - left.y * right.x;
 		const Vector2<T>::ComputationalType sign = Sign(zCross);
 		const Vector2<T>::ComputationalType angle = Angle(left, right);
+
 		return angle * sign;
 	}
 
@@ -108,6 +103,7 @@ namespace PonyEngine::Math
 	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& target) noexcept
 	{
 		const Vector2<T>::ComputationalType multiplier = Dot(vector, target) / Dot(target, target);
+
 		return target * multiplier;
 	}
 
@@ -115,6 +111,7 @@ namespace PonyEngine::Math
 	constexpr Vector2<T> ProjectOnPlane(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
 		const Vector2<T>::ComputationalType multiplier = Dot(vector, normal) / Dot(normal, normal);
+
 		return vector - normal * multiplier;
 	}
 
@@ -122,6 +119,7 @@ namespace PonyEngine::Math
 	constexpr Vector2<T> Reflect(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
 		const Vector2<T>::ComputationalType multiplier = typename Vector2<T>::ComputationalType{-2} * Dot(vector, normal) / Dot(normal, normal);
+
 		return vector + normal * multiplier;
 	}
 
@@ -160,6 +158,7 @@ namespace PonyEngine::Math
 	{
 		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.x) * multiplier);
 		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.y) * multiplier);
+
 		return Vector2(x, y);
 	}
 
@@ -174,6 +173,7 @@ namespace PonyEngine::Math
 	{
 		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.x) * static_cast<Vector2<T>::ComputationalType>(right.x));
 		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) * static_cast<Vector2<T>::ComputationalType>(right.y));
+
 		return Vector2(x, y);
 	}
 
@@ -182,6 +182,7 @@ namespace PonyEngine::Math
 	{
 		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.x) / divisor);
 		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.y) / divisor);
+
 		return Vector2(x, y);
 	}
 
@@ -190,6 +191,7 @@ namespace PonyEngine::Math
 	{
 		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.x) / static_cast<Vector2<T>::ComputationalType>(right.x));
 		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) / static_cast<Vector2<T>::ComputationalType>(right.y));
+
 		return Vector2(x, y);
 	}
 
@@ -242,6 +244,7 @@ namespace PonyEngine::Math
 	{
 		x = xParam;
 		y = yParam;
+
 		return *this;
 	}
 
@@ -250,6 +253,7 @@ namespace PonyEngine::Math
 	{
 		x = other.x;
 		y = other.y;
+
 		return *this;
 	}
 
@@ -258,6 +262,7 @@ namespace PonyEngine::Math
 	{
 		x = static_cast<T>(x + other.x);
 		y = static_cast<T>(y + other.y);
+
 		return *this;
 	}
 
@@ -266,6 +271,7 @@ namespace PonyEngine::Math
 	{
 		x = static_cast<T>(x - other.x);
 		y = static_cast<T>(y - other.y);
+
 		return *this;
 	}
 
@@ -274,6 +280,7 @@ namespace PonyEngine::Math
 	{
 		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) * multiplier);
 		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) * multiplier);
+
 		return *this;
 	}
 
@@ -282,6 +289,7 @@ namespace PonyEngine::Math
 	{
 		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) * static_cast<ComputationalType>(other.x));
 		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) * static_cast<ComputationalType>(other.y));
+
 		return *this;
 	}
 
@@ -290,6 +298,7 @@ namespace PonyEngine::Math
 	{
 		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / divisor);
 		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / divisor);
+
 		return *this;
 	}
 
@@ -298,6 +307,22 @@ namespace PonyEngine::Math
 	{
 		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / static_cast<ComputationalType>(other.x));
 		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / static_cast<ComputationalType>(other.y));
+
 		return *this;
 	}
+
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Up = Vector2<T>(T{0}, T{1});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Down = Vector2<T>(T{0}, T{-1});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Right = Vector2<T>(T{1}, T{0});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Left = Vector2<T>(T{-1}, T{0});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::One = Vector2<T>(T{1}, T{1});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Zero = Vector2<T>(T{0}, T{0});
+	template<Arithmetic T>
+	const Vector2<T> Vector2<T>::Negative = Vector2<T>(T{-1}, T{-1});
 }
