@@ -31,13 +31,13 @@ namespace PonyEngine::Math
 
 		constexpr ~Vector3() noexcept = default;
 
-		constexpr ComputationalType Magnitude() const noexcept;
+		constexpr inline ComputationalType Magnitude() const noexcept;
 		constexpr inline ComputationalType MagnitudeSquared() const noexcept;
 
 		constexpr Vector3 Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
 
-		constexpr Vector3& Set(const T xParam, const T yParam, const T zParam) noexcept;
+		constexpr void Set(const T xParam, const T yParam, const T zParam) noexcept;
 
 		constexpr Vector3& operator =(const Vector3& other) noexcept;
 		constexpr Vector3& operator +=(const Vector3& other) noexcept;
@@ -240,9 +240,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T>::ComputationalType Vector3<T>::Magnitude() const noexcept
+	constexpr inline Vector3<T>::ComputationalType Vector3<T>::Magnitude() const noexcept
 	{
-		return sqrt(MagnitudeSquared());
+		return std::sqrt(MagnitudeSquared());
 	}
 
 	template<Arithmetic T>
@@ -264,13 +264,11 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T>& Vector3<T>::Set(const T xParam, const T yParam, const T zParam) noexcept
+	constexpr void Vector3<T>::Set(const T xParam, const T yParam, const T zParam) noexcept
 	{
 		x = xParam;
 		y = yParam;
 		z = zParam;
-
-		return *this;
 	}
 
 	template<Arithmetic T>
