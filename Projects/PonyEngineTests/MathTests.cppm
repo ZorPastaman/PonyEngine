@@ -351,7 +351,8 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.f, projection.Magnitude());
 
 			vector.Set(20.f, -30.f, 15.f);
-			normal.Set(0.5f, 0.1f, -0.24f).Normalize();
+			normal.Set(0.5f, 0.1f, -0.24f);
+			normal.Normalize();
 			auto expected = vector - normal * PonyEngine::Math::Dot(vector, normal);
 			projection = PonyEngine::Math::ProjectOnPlane(vector, normal);
 			Assert::AreEqual(static_cast<double>(expected.x), static_cast<double>(projection.x), 0.0001);
@@ -370,7 +371,8 @@ namespace PonyEngineTests
 			Assert::AreEqual(0., reflection.z, 0.0001);
 
 			vector.Set(-14., 39., -1.);
-			normal.Set(10., -17., -34.).Normalize();
+			normal.Set(10., -17., -34.);
+			normal.Normalize();
 			reflection = PonyEngine::Math::Reflect(vector, normal);
 			auto expected = vector - 2 * PonyEngine::Math::Dot(vector, normal) * normal;
 			Assert::AreEqual(expected.x, reflection.x, 0.0001);
@@ -705,7 +707,8 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.f, projection.Magnitude());
 
 			vector.Set(20.f, -30.f);
-			normal.Set(0.5f, 0.1f).Normalize();
+			normal.Set(0.5f, 0.1f);
+			normal.Normalize();
 			auto expected = vector - normal * PonyEngine::Math::Dot(vector, normal);
 			projection = PonyEngine::Math::ProjectOnPlane(vector, normal);
 			Assert::AreEqual(static_cast<double>(expected.x), static_cast<double>(projection.x), 0.0001);
@@ -722,7 +725,8 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.5, reflection.y, 0.0001);
 
 			vector.Set(-14., 39.);
-			normal.Set(10., -17.).Normalize();
+			normal.Set(10., -17.);
+			normal.Normalize();
 			reflection = PonyEngine::Math::Reflect(vector, normal);
 			auto expected = vector - 2 * PonyEngine::Math::Dot(vector, normal) * normal;
 			Assert::AreEqual(expected.x, reflection.x, 0.0001);

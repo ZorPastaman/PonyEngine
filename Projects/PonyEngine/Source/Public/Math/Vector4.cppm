@@ -31,13 +31,13 @@ namespace PonyEngine::Math
 
 		constexpr ~Vector4() noexcept = default;
 
-		constexpr ComputationalType Magnitude() const noexcept;
+		constexpr inline ComputationalType Magnitude() const noexcept;
 		constexpr inline ComputationalType MagnitudeSquared() const noexcept;
 
 		constexpr Vector4 Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
 
-		constexpr Vector4& Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
+		constexpr void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
 		constexpr Vector4& operator =(const Vector4& other) noexcept;
 		constexpr Vector4& operator +=(const Vector4& other) noexcept;
@@ -182,7 +182,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T>::ComputationalType Vector4<T>::Magnitude() const noexcept
+	constexpr inline Vector4<T>::ComputationalType Vector4<T>::Magnitude() const noexcept
 	{
 		return sqrt(MagnitudeSquared());
 	}
@@ -206,14 +206,12 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T>& Vector4<T>::Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept
+	constexpr void Vector4<T>::Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept
 	{
 		x = xParam;
 		y = yParam;
 		z = zParam;
 		w = wParam;
-
-		return *this;
 	}
 
 	template<Arithmetic T>
