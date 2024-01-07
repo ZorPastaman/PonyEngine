@@ -245,16 +245,63 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T>& direction, const Vector3<T>& up) noexcept
 	{
-		/*
-		var xDir = direction;
-		var zDir= xDir.CrossProduct(upVector)
-		var yDir = zDir.CrossProduct(xDir)
-		var matrix = CreateARotationMatrixFromAxises(xDir, yDir, zDir)
-		var quaternion = CreateQuaternionFromRotationMatrix(matrix)
-		*/
-		// TODO: implement after matrix3x3
+		const Vector3<T> upDirCross = Cross(up, direction);
+		const Vector3<T> dirUpCross = Cross(direction, upDirCross);
+		const T m00 = upDirCross.x;
+		const T m01 = upDirCross.y;
+		const T m02 = upDirCross.z;
+		const T m10 = dirUpCross.x;
+		const T m11 = dirUpCross.y;
+		const T m12 = dirUpCross.z;
+		const T m20 = direction.x;
+		const T m21 = direction.y;
+		const T m22 = direction.z;
 
-		return Quaternion();
+		const T num8 = (m00 + m11) + m22;
+
+		if (num8 > 0f)
+		{
+			const T num = std::sqrt(num8 + T{1});
+			const T x = (m12 - m21) * (T{0.5} / num);
+			const T y = (m20 - m02) * (T{0.5} / num);
+			const T z = (m01 - m10) * (T{0.5} / num);
+			const T w = num * T{0.5};
+
+			return Quaternion(x, y, z, w);
+		}
+
+		if ((m00 >= m11) && (m00 >= m22))
+		{
+			const T num7 = std::sqrt(((T{1} + m00) - m11) - m22);
+			const T num4 = T{0.5} / num7;
+			const T x = T{0.5} * num7;
+			const T y = (m01 + m10) * num4;
+			const T z = (m02 + m20) * num4;
+			const T w = (m12 - m21) * num4;
+
+			return Quaternion(x, y, z, w);
+		}
+
+		if (m11 > m22)
+		{
+			const T num6 = std::sqrt(((T{1} + m11) - m00) - m22);
+			const T num3 = T{0.5} / num6;
+			const T x = (m10 + m01) * num3;
+			const T y = T{0.5} * num6;
+			const T z = (m21 + m12) * num3;
+			const T w = (m20 - m02) * num3;
+
+			return Quaternion(x, y, z, w);
+		}
+
+		const T num5 = std::sqrt(((T{1} + m22) - m00) - m11);
+		const T num2 = T{0.5} / num5;
+		const T x = (m20 + m02) * num2;
+		const T y = (m21 + m12) * num2;
+		const T z = T{0.5} * num5;
+		const T w = (m01 - m10) * num2;
+
+		return Quaternion(x, y, z, w);
 	}
 
 	template<std::floating_point T>
