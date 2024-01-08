@@ -38,10 +38,13 @@ namespace PonyEngine::Math
 		constexpr static Quaternion CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept;
 		constexpr inline static Quaternion CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
 		constexpr static Quaternion CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
-		constexpr static Quaternion CreateByLook(const Vector3<T>& direction, const Vector3<T>& up = Up3<T>) noexcept;
+		constexpr static Quaternion CreateByLook(const Vector3<T>& direction, const Vector3<T>& up = Vector3<T>::Up) noexcept;
 
 		constexpr inline T Magnitude() const noexcept;
 		constexpr inline T MagnitudeSquared() const noexcept;
+
+		constexpr inline Quaternion Conjugated() const noexcept;
+		constexpr inline void Conjugate() noexcept;
 
 		constexpr Quaternion Inversed() const noexcept;
 		constexpr inline void Inverse() noexcept;
@@ -116,24 +119,10 @@ namespace PonyEngine::Math
 	export template<std::floating_point T>
 	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T> vector) noexcept
 	{
-		const T m1 = quaternion.x * T{2};
-		const T m2 = quaternion.y * T{2};
-		const T m3 = quaternion.z * T{2};
-		const T m4 = quaternion.x * m1;
-		const T m5 = quaternion.y * m2;
-		const T m6 = quaternion.z * m3;
-		const T m7 = quaternion.x * m2;
-		const T m8 = quaternion.x * m3;
-		const T m9 = quaternion.y * m3;
-		const T m10 = quaternion.w * m1;
-		const T m11 = quaternion.w * m2;
-		const T m12 = quaternion.w * m3;
+		const Vector3<T> u = Vector3<T>(quaternion.x, quaternion.y, quaternion.z);
+		const Vector3<T> t = Cross(u, vector) * T{2};
 
-		const T x = (T{1} - (m5 + m6)) * vector.x + (m7 - m12) * vector.y + (m8 + m11) * vector.z;
-		const T y = (m7 + m12) * vector.x + (T{1} - (m4 + m6)) * vector.y + (m9 - m10) * vector.z;
-		const T z = (m8 - m11) * vector.x + (m9 + m10) * vector.y + (T{1} - (m4 + m5)) * vector.z;
-
-		return Vector3<T>(x, y, z);
+		return vector + quaternion.w * t + Cross(u, t);
 	}
 
 	template<std::floating_point T>
@@ -242,8 +231,9 @@ namespace PonyEngine::Math
 		return Quaternion(cross.x, cross.y, cross.z, dot);
 	}
 
+	// TODO: make it simpler with matrix3x3
 	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T>& direction, const Vector3<T>& up) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T>& direction, const Vector3<T>& up) noexcept // Must be normalized
 	{
 		const Vector3<T> upDirCross = Cross(up, direction);
 		const Vector3<T> dirUpCross = Cross(direction, upDirCross);
@@ -314,6 +304,18 @@ namespace PonyEngine::Math
 	constexpr inline T Quaternion<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
+	}
+
+	template<std::floating_point T>
+	constexpr inline Quaternion<T> Quaternion<T>::Conjugated() const noexcept
+	{
+		return Quaternion(-x, -y, -z, w);
+	}
+
+	template<std::floating_point T>
+	constexpr inline void Quaternion<T>::Conjugate() noexcept
+	{
+		*this = Conjugated();
 	}
 
 	template<std::floating_point T>
