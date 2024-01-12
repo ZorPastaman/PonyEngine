@@ -117,7 +117,7 @@ namespace PonyEngine::Math
 	}
 
 	export template<std::floating_point T>
-	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T> vector) noexcept
+	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T> vector) noexcept // Must be normalized
 	{
 		const Vector3<T> u = Vector3<T>(quaternion.x, quaternion.y, quaternion.z);
 		const Vector3<T> t = Cross(u, vector) * T{2};
@@ -200,7 +200,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept // Must be normalized
 	{
 		const T angleHalf = angle / T{2};
 
@@ -216,14 +216,14 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr inline Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept
+	constexpr inline Quaternion<T> Quaternion<T>::CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept // Must be normalized
 	{
 		return CreateByAxisAngle(axis, angle * DegToRad<T>);
 	}
 
 
 	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept
+	constexpr Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept // Must be normalized
 	{
 		const Vector3<T> cross = Cross(fromDirection, toDirection);
 		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
@@ -383,13 +383,14 @@ namespace PonyEngine::Math
 		const T halfAngle = std::acos(w);
 		const T angleSin = std::sin(halfAngle);
 
-		const T angle = T{2} * halfAngle;
+		const T angleCorrection = (halfAngle > std::numbers::pi_v<T> / T{2}) * std::numbers::pi_v<T>;
+		const T angle = T{2} * (halfAngle - angleCorrection);
 
 		const T xAxis = x / angleSin;
 		const T yAxis = y / angleSin;
 		const T zAxis = z / angleSin;
 
-		const T axis = Vector3<T>(xAxis, yAxis, zAxis);
+		const Vector3<T> axis = Vector3<T>(xAxis, yAxis, zAxis);
 
 		return std::pair<Vector3<T>, T>(axis, angle);
 	}
