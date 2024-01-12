@@ -349,35 +349,26 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Vector3<T> Quaternion<T>::Euler() const noexcept
 	{
-		const T dot = Dot(*this, *this);
-		const T test = x * w - y * z;
+		const T halfSinp = (x * w - y * z);
 
-		T xRad, yRad, zRad;
+		if (std::abs(halfSinp) > T{0.4995}) // singularity at north pole (+) or south pole (-)
+		{
+			const T xRotation = std::copysign(std::numbers::pi_v<T> / T{2}, halfSinp);
+			const T yRotationRound = std::copysign(T{2}, halfSinp) * std::atan2(y, x);
+			const T signedPi = std::copysign(std::numbers::pi_v<T>, yRotationRound);
+			const T yRotation = std::fmod(yRotationRound + signedPi, T{2} * std::numbers::pi_v<T>) - signedPi;
+			const T zRotation = T{0};
 
-		if (test >= T{0.5} * dot) // singularity at north pole
-		{
-			xRad = std::numbers::pi_v<T> / T{2};
-			yRad = T{2} * std::atan2(y, x);
-			zRad = T{0};
-		}
-		else if (test <= T{-0.5} * dot) // singularity at south pole
-		{
-			xRad = -std::numbers::pi_v<T> / T{2};
-			yRad = T{-2} * std::atan2(y, x);
-			zRad = T{0};
+			return Vector3<T>(xRotation, yRotation, zRotation);
 		}
 		else
 		{
-			xRad = std::asin(T{2} * (x * w - y * z));
-			yRad = std::atan2(T{2} * y * w + T{2} * z * x, T{1} - T{2} * (x * x + y * y));
-			zRad = std::atan2(T{2} * z * w + T{2} * x * y, T{1} - T{2} * (x * x + z * z));
+			const T xRotation = std::asin(T{2} * halfSinp);
+			const T yRotation = std::atan2(T{2} * (y * w + z * x), T{1} - T{2} * (x * x + y * y));
+			const T zRotation = std::atan2(T{2} * (z * w + x * y), T{1} - T{2} * (x * x + z * z));
+
+			return Vector3<T>(xRotation, yRotation, zRotation);
 		}
-
-		const T xRotation = std::fmod(xRad, T{2} * std::numbers::pi_v<T>);
-		const T yRotation = std::fmod(yRad, T{2} * std::numbers::pi_v<T>);
-		const T zRotation = std::fmod(zRad, T{2} * std::numbers::pi_v<T>);
-
-		return Vector3<T>(xRotation, yRotation, zRotation);
 	}
 
 	template<std::floating_point T>
