@@ -45,9 +45,6 @@ namespace PonyEngine::Math
 		constexpr inline Quaternion Conjugated() const noexcept;
 		constexpr inline void Conjugate() noexcept;
 
-		constexpr Quaternion Inversed() const noexcept;
-		constexpr inline void Inverse() noexcept;
-
 		constexpr Quaternion Normalized() const noexcept;
 		constexpr inline void Normalize() noexcept;
 
@@ -258,20 +255,6 @@ namespace PonyEngine::Math
 	constexpr inline void Quaternion<T>::Conjugate() noexcept
 	{
 		*this = Conjugated();
-	}
-
-	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::Inversed() const noexcept
-	{
-		const T inverseFactor = T{1} / Dot(*this, *this);
-
-		return Quaternion(-x * inverseFactor, -y * inverseFactor, -z * inverseFactor, w * inverseFactor);
-	}
-
-	template<std::floating_point T>
-	constexpr inline void Quaternion<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<std::floating_point T>
