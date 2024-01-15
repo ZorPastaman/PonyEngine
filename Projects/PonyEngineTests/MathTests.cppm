@@ -1784,5 +1784,33 @@ namespace PonyEngineTests
 			Assert::AreEqual(conjugated.z, quaternion.z);
 			Assert::AreEqual(conjugated.w, quaternion.w);
 		}
+
+		TEST_METHOD(QuaternionSetTest)
+		{
+			auto quaternion = PonyEngine::Math::Quaternion<float>::Identity;
+			float x = 5.f;
+			float y = 1.f;
+			float z = -3.f;
+			float w = 4.f;
+			quaternion.Set(x, y, z, w);
+			Assert::AreEqual(x, quaternion.x);
+			Assert::AreEqual(y, quaternion.y);
+			Assert::AreEqual(z, quaternion.z);
+			Assert::AreEqual(w, quaternion.w);
+		}
+
+		TEST_METHOD(QuaternionToVector4Test)
+		{
+			float x = 5.f;
+			float y = 1.f;
+			float z = -3.f;
+			float w = 4.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Vector4<float> vector = quaternion;
+			Assert::AreEqual(x, vector.x);
+			Assert::AreEqual(y, vector.y);
+			Assert::AreEqual(z, vector.z);
+			Assert::AreEqual(w, vector.w);
+		}
 	};
 }
