@@ -1748,5 +1748,21 @@ namespace PonyEngineTests
 			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
 			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
 		}
+
+		TEST_METHOD(QuaternionMagnutudeTest)
+		{
+			float x = 4.f;
+			float y = 3.f;
+			float z = 1.f;
+			float w = -3.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			float expectedMagnitudeSquared = x * x + y * y + z * z + w * w;
+			Assert::AreEqual(expectedMagnitudeSquared, quaternion.MagnitudeSquared());
+			Assert::AreEqual(std::sqrt(expectedMagnitudeSquared), quaternion.Magnitude());
+
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f);
+			Assert::AreEqual(1.f, quaternion.MagnitudeSquared());
+			Assert::AreEqual(1.f, quaternion.Magnitude());
+		}
 	};
 }
