@@ -1719,5 +1719,34 @@ namespace PonyEngineTests
 			Assert::IsTrue(std::isnan(axisAngle.first.z));
 			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
 		}
+
+		TEST_METHOD(QuaternionDirectionTest)
+		{
+			auto from = PonyEngine::Math::Vector3<float>(1.f, 4.f, -3.f).Normalized();
+			auto to = PonyEngine::Math::Vector3<float>(-4.f, 2.f, 1.f).Normalized();
+			auto quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(from, to);
+			Assert::AreEqual(0.296, static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(0.326, static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(0.533, static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(0.722, static_cast<double>(quaternion.w), 0.001);
+
+			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Down, PonyEngine::Math::Vector3<float>::Up);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
+
+			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Left, PonyEngine::Math::Vector3<float>::Right);
+			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
+
+			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Down, PonyEngine::Math::Vector3<float>::Down);
+			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
+		}
 	};
 }
