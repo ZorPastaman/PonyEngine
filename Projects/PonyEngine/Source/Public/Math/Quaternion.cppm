@@ -38,7 +38,6 @@ namespace PonyEngine::Math
 		constexpr static Quaternion CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept;
 		constexpr inline static Quaternion CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
 		constexpr static Quaternion CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
-		constexpr static Quaternion CreateByLook(const Vector3<T>& direction, const Vector3<T>& up = Vector3<T>::Up) noexcept;
 
 		constexpr inline T Magnitude() const noexcept;
 		constexpr inline T MagnitudeSquared() const noexcept;
@@ -225,73 +224,16 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept // Must be normalized
 	{
-		const Vector3<T> cross = Cross(fromDirection, toDirection);
 		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
+		const Vector3<T> axis = dot < T{-0.9995}
+			?  std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.9995} 
+				? Cross(fromDirection, Vector3<T>::Forward) 
+				: Cross(fromDirection, Vector3<T>::Up)
+			: Cross(fromDirection, toDirection);
 
-		return Quaternion(cross.x, cross.y, cross.z, dot);
-	}
+		const T angle = std::acos(dot);
 
-	// TODO: make it simpler with matrix3x3
-	template<std::floating_point T>
-	constexpr Quaternion<T> Quaternion<T>::CreateByLook(const Vector3<T>& direction, const Vector3<T>& up) noexcept // Must be normalized
-	{
-		const Vector3<T> upDirCross = Cross(up, direction);
-		const Vector3<T> dirUpCross = Cross(direction, upDirCross);
-		const T m00 = upDirCross.x;
-		const T m01 = upDirCross.y;
-		const T m02 = upDirCross.z;
-		const T m10 = dirUpCross.x;
-		const T m11 = dirUpCross.y;
-		const T m12 = dirUpCross.z;
-		const T m20 = direction.x;
-		const T m21 = direction.y;
-		const T m22 = direction.z;
-
-		const T num8 = (m00 + m11) + m22;
-
-		if (num8 > 0f)
-		{
-			const T num = std::sqrt(num8 + T{1});
-			const T x = (m12 - m21) * (T{0.5} / num);
-			const T y = (m20 - m02) * (T{0.5} / num);
-			const T z = (m01 - m10) * (T{0.5} / num);
-			const T w = num * T{0.5};
-
-			return Quaternion(x, y, z, w);
-		}
-
-		if ((m00 >= m11) && (m00 >= m22))
-		{
-			const T num7 = std::sqrt(((T{1} + m00) - m11) - m22);
-			const T num4 = T{0.5} / num7;
-			const T x = T{0.5} * num7;
-			const T y = (m01 + m10) * num4;
-			const T z = (m02 + m20) * num4;
-			const T w = (m12 - m21) * num4;
-
-			return Quaternion(x, y, z, w);
-		}
-
-		if (m11 > m22)
-		{
-			const T num6 = std::sqrt(((T{1} + m11) - m00) - m22);
-			const T num3 = T{0.5} / num6;
-			const T x = (m10 + m01) * num3;
-			const T y = T{0.5} * num6;
-			const T z = (m21 + m12) * num3;
-			const T w = (m20 - m02) * num3;
-
-			return Quaternion(x, y, z, w);
-		}
-
-		const T num5 = std::sqrt(((T{1} + m22) - m00) - m11);
-		const T num2 = T{0.5} / num5;
-		const T x = (m20 + m02) * num2;
-		const T y = (m21 + m12) * num2;
-		const T z = T{0.5} * num5;
-		const T w = (m01 - m10) * num2;
-
-		return Quaternion(x, y, z, w);
+		return Quaternion::CreateByAxisAngle(axis, angle);
 	}
 
 	template<std::floating_point T>
