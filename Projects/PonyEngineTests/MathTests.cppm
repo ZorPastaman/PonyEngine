@@ -1764,5 +1764,25 @@ namespace PonyEngineTests
 			Assert::AreEqual(1.f, quaternion.MagnitudeSquared());
 			Assert::AreEqual(1.f, quaternion.Magnitude());
 		}
+
+		TEST_METHOD(QuaternionConjugationTest)
+		{
+			float x = 4.f;
+			float y = 3.f;
+			float z = 1.f;
+			float w = -3.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto conjugated = quaternion.Conjugated();
+			Assert::AreEqual(-x, conjugated.x);
+			Assert::AreEqual(-y, conjugated.y);
+			Assert::AreEqual(-z, conjugated.z);
+			Assert::AreEqual(w, conjugated.w);
+
+			quaternion.Conjugate();
+			Assert::AreEqual(conjugated.x, quaternion.x);
+			Assert::AreEqual(conjugated.y, quaternion.y);
+			Assert::AreEqual(conjugated.z, quaternion.z);
+			Assert::AreEqual(conjugated.w, quaternion.w);
+		}
 	};
 }
