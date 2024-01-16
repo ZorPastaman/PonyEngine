@@ -110,6 +110,9 @@ namespace PonyEngineTests
 			Assert::AreEqual((long)5, longValue);
 			longValue = PonyEngine::Math::RoundToIntegralIfPossible<double, long>(-5.3);
 			Assert::AreEqual((long)-5, longValue);
+
+			Assert::AreEqual(5.7f, PonyEngine::Math::RoundToIntegralIfPossible<float, float>(5.7f));
+			Assert::AreEqual(5.7, PonyEngine::Math::RoundToIntegralIfPossible<double, double>(5.7));
 		}
 
 		TEST_METHOD(Vector3ConstructorsTest)
@@ -1783,6 +1786,34 @@ namespace PonyEngineTests
 			Assert::AreEqual(conjugated.y, quaternion.y);
 			Assert::AreEqual(conjugated.z, quaternion.z);
 			Assert::AreEqual(conjugated.w, quaternion.w);
+
+			quaternion.Normalize();
+			conjugated = quaternion.Conjugated();
+			auto multiplied = quaternion * conjugated;
+			Assert::AreEqual(0., static_cast<double>(multiplied.x), 0.001);
+			Assert::AreEqual(0., static_cast<double>(multiplied.y), 0.001);
+			Assert::AreEqual(0., static_cast<double>(multiplied.z), 0.001);
+			Assert::AreEqual(1., static_cast<double>(multiplied.w), 0.001);
+		}
+
+		TEST_METHOD(QuaternionNormalizationTest)
+		{
+			float x = 4.f;
+			float y = 3.f;
+			float z = 1.f;
+			float w = -3.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto normalized = quaternion.Normalized();
+			Assert::AreEqual(0.676, static_cast<double>(normalized.x), 0.001);
+			Assert::AreEqual(0.507, static_cast<double>(normalized.y), 0.001);
+			Assert::AreEqual(0.169, static_cast<double>(normalized.z), 0.001);
+			Assert::AreEqual(-0.507, static_cast<double>(normalized.w), 0.001);
+
+			quaternion.Normalize();
+			Assert::AreEqual(normalized.x, quaternion.x);
+			Assert::AreEqual(normalized.y, quaternion.y);
+			Assert::AreEqual(normalized.z, quaternion.z);
+			Assert::AreEqual(normalized.w, quaternion.w);
 		}
 
 		TEST_METHOD(QuaternionSetTest)
@@ -1811,6 +1842,154 @@ namespace PonyEngineTests
 			Assert::AreEqual(y, vector.y);
 			Assert::AreEqual(z, vector.z);
 			Assert::AreEqual(w, vector.w);
+		}
+
+		TEST_METHOD(QuaternionEqualityOperatorsTest)
+		{
+			float x = 3.f;
+			float y = 4.f;
+			float z = 1.f;
+			float w = 2.f;
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::IsTrue(quaternion0 == quaternion1);
+			Assert::IsFalse(quaternion0 != quaternion1);
+
+			quaternion1.x += 1.f;
+			Assert::IsFalse(quaternion0 == quaternion1);
+			Assert::IsTrue(quaternion0 != quaternion1);
+
+			quaternion1.x = x;
+			quaternion1.y += 1.f;
+			Assert::IsFalse(quaternion0 == quaternion1);
+			Assert::IsTrue(quaternion0 != quaternion1);
+
+			quaternion1.y = y;
+			quaternion1.z += 1.f;
+			Assert::IsFalse(quaternion0 == quaternion1);
+			Assert::IsTrue(quaternion0 != quaternion1);
+
+			quaternion1.z = z;
+			quaternion1.w += 1.f;
+			Assert::IsFalse(quaternion0 == quaternion1);
+			Assert::IsTrue(quaternion0 != quaternion1);
+		}
+
+		TEST_METHOD(QuaternionMultiplicationTest)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(0.5f, 1.f, 2.f, -1.f);
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-0.7f, 2.f, -5.f, 1.f);
+			auto quaternion2 = quaternion0 * quaternion1;
+			Assert::AreEqual(-7.8, static_cast<double>(quaternion2.x), 0.001);
+			Assert::AreEqual(0.1, static_cast<double>(quaternion2.y), 0.001);
+			Assert::AreEqual(8.7, static_cast<double>(quaternion2.z), 0.001);
+			Assert::AreEqual(7.35, static_cast<double>(quaternion2.w), 0.001);
+
+			quaternion0.Normalize();
+			quaternion1.Normalize();
+			quaternion2 = quaternion0 * quaternion1;
+			Assert::AreEqual(-0.565, static_cast<double>(quaternion2.x), 0.001);
+			Assert::AreEqual(0.007, static_cast<double>(quaternion2.y), 0.001);
+			Assert::AreEqual(0.630, static_cast<double>(quaternion2.z), 0.001);
+			Assert::AreEqual(0.532, static_cast<double>(quaternion2.w), 0.001);
+
+			quaternion2 = PonyEngine::Math::Quaternion<float>::Identity * PonyEngine::Math::Quaternion<float>::Identity;
+			Assert::AreEqual(0.f, quaternion2.x);
+			Assert::AreEqual(0.f, quaternion2.y);
+			Assert::AreEqual(0.f, quaternion2.z);
+			Assert::AreEqual(1.f, quaternion2.w);
+		}
+
+		TEST_METHOD(QuaternionVectorMultiplicationTest)
+		{
+			auto quaternion = PonyEngine::Math::Quaternion<float>(4.f, 3.f, 1.f, -3.f);
+			auto vector = PonyEngine::Math::Vector3<float>(-4.f, 7.f, 8.f);
+			auto rotated = quaternion * vector;
+			Assert::AreEqual(206., static_cast<double>(rotated.x), 0.001);
+			Assert::AreEqual(-63., static_cast<double>(rotated.y), 0.001);
+			Assert::AreEqual(-622., static_cast<double>(rotated.z), 0.001);
+
+			quaternion.Normalize();
+			rotated = quaternion * vector;
+			Assert::AreEqual(2., static_cast<double>(rotated.x), 0.001);
+			Assert::AreEqual(5., static_cast<double>(rotated.y), 0.001);
+			Assert::AreEqual(-10., static_cast<double>(rotated.z), 0.001);
+
+			rotated = PonyEngine::Math::Quaternion<float>::Identity * vector;
+			Assert::AreEqual(vector.x, rotated.x);
+			Assert::AreEqual(vector.y, rotated.y);
+			Assert::AreEqual(vector.z, rotated.z);
+		}
+
+		TEST_METHOD(QuaternionAssignmentTest)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>();
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-0.7f, 2.f, -5.f, 1.f);
+			auto quaternion2 = quaternion0 = quaternion1;
+			Assert::AreEqual(quaternion1.x, quaternion0.x);
+			Assert::AreEqual(quaternion1.y, quaternion0.y);
+			Assert::AreEqual(quaternion1.z, quaternion0.z);
+			Assert::AreEqual(quaternion1.w, quaternion0.w);
+			Assert::AreEqual(quaternion2.x, quaternion0.x);
+			Assert::AreEqual(quaternion2.y, quaternion0.y);
+			Assert::AreEqual(quaternion2.z, quaternion0.z);
+			Assert::AreEqual(quaternion2.w, quaternion0.w);
+
+			quaternion0 = PonyEngine::Math::Quaternion<float>(4.f, 3.f, 1.f, -3.f);
+			quaternion2 = quaternion0 * quaternion1;
+			auto quaternion3 = quaternion0 *= quaternion1;
+			Assert::AreEqual(quaternion0.x, quaternion2.x);
+			Assert::AreEqual(quaternion0.y, quaternion2.y);
+			Assert::AreEqual(quaternion0.z, quaternion2.z);
+			Assert::AreEqual(quaternion0.w, quaternion2.w);
+			Assert::AreEqual(quaternion3.x, quaternion2.x);
+			Assert::AreEqual(quaternion3.y, quaternion2.y);
+			Assert::AreEqual(quaternion3.z, quaternion2.z);
+			Assert::AreEqual(quaternion3.w, quaternion2.w);
+		}
+
+		TEST_METHOD(QuaternionDotTest)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(2.f, 3.f, -1.f, 7.f);
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-2.f, -5.f, 2.f, 10.f);
+			float expected = quaternion0.x * quaternion1.x + quaternion0.y * quaternion1.y + 
+				quaternion0.z * quaternion1.z + quaternion0.w * quaternion1.w;
+			Assert::AreEqual(expected, PonyEngine::Math::Dot(quaternion0, quaternion1)); 
+
+			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::Quaternion<float>::Identity, PonyEngine::Math::Quaternion<float>::Identity));
+		}
+
+		TEST_METHOD(QuaternionAngleTest)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(3.f, 2.f, -9.f, -6.f).Normalized();
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(1.f, -2.f, -7.f, 3.f).Normalized();
+			Assert::AreEqual(2.126, static_cast<double>(PonyEngine::Math::Angle(quaternion0, quaternion1)), 0.001);
+			Assert::AreEqual(121.818, static_cast<double>(PonyEngine::Math::AngleDegrees(quaternion0, quaternion1)), 0.001);
+
+			quaternion1 = quaternion0;
+			Assert::AreEqual(0.f, PonyEngine::Math::Angle(quaternion0, quaternion1));
+			Assert::AreEqual(0.f, PonyEngine::Math::AngleDegrees(quaternion0, quaternion1));
+		}
+
+		TEST_METHOD(QuaternionDefaultTest)
+		{
+			auto identityF = PonyEngine::Math::Quaternion<float>::Identity;
+			Assert::AreEqual(0.f, identityF.x);
+			Assert::AreEqual(0.f, identityF.y);
+			Assert::AreEqual(0.f, identityF.y);
+			Assert::AreEqual(1.f, identityF.w);
+
+			auto identityD = PonyEngine::Math::Quaternion<double>::Identity;
+			Assert::AreEqual(0., identityD.x);
+			Assert::AreEqual(0., identityD.y);
+			Assert::AreEqual(0., identityD.y);
+			Assert::AreEqual(1., identityD.w);
+		}
+
+		TEST_METHOD(QuaternionValueTypeTest)
+		{
+			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<float>::ValueType, float>);
+			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<double>::ValueType, double>);
 		}
 	};
 }
