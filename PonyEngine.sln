@@ -3,9 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineGame", "Projects\PonyEngineGame\PonyEngineGame.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineTests", "Projects\PonyEngineTests\PonyEngineTests.vcxproj", "{3786A3E2-7E54-4D42-9C87-CAC481949A30}"
 EndProject
