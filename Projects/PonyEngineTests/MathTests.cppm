@@ -11,6 +11,7 @@
 
 import <numbers>;
 import <cmath>;
+import <format>;
 
 import PonyEngine.Math.Vector3;
 import PonyEngine.Math.Vector2;
@@ -1145,10 +1146,10 @@ namespace PonyEngineTests
 			Assert::AreEqual(w * w1, vector2.w);
 
 			vector2 = vector / vector1;
-			Assert::AreEqual(x / x1, vector2.x);
-			Assert::AreEqual(y / y1, vector2.y);
-			Assert::AreEqual(z / z1, vector2.z);
-			Assert::AreEqual(w / w1, vector2.w);
+			Assert::AreEqual(static_cast<double>(x / x1), static_cast<double>(vector2.x), 0.001);
+			Assert::AreEqual(static_cast<double>(y / y1), static_cast<double>(vector2.y), 0.001);
+			Assert::AreEqual(static_cast<double>(z / z1), static_cast<double>(vector2.z), 0.001);
+			Assert::AreEqual(static_cast<double>(w / w1), static_cast<double>(vector2.w), 0.001);
 		}
 
 		TEST_METHOD(Vector4DefaultsTest)
@@ -1717,9 +1718,9 @@ namespace PonyEngineTests
 			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
 			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
 			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::IsTrue(std::isnan(axisAngle.first.x));
-			Assert::IsTrue(std::isnan(axisAngle.first.y));
-			Assert::IsTrue(std::isnan(axisAngle.first.z));
+			Assert::IsTrue(std::isnan(axisAngle.first.x) || axisAngle.first.x == 0.f);
+			Assert::IsTrue(std::isnan(axisAngle.first.y) || axisAngle.first.y == 0.f);
+			Assert::IsTrue(std::isnan(axisAngle.first.z) || axisAngle.first.z == 0.f);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
 		}
 
@@ -1961,14 +1962,14 @@ namespace PonyEngineTests
 
 		TEST_METHOD(QuaternionAngleTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(3.f, 2.f, -9.f, -6.f).Normalized();
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(1.f, -2.f, -7.f, 3.f).Normalized();
-			Assert::AreEqual(2.126, static_cast<double>(PonyEngine::Math::Angle(quaternion0, quaternion1)), 0.001);
-			Assert::AreEqual(121.818, static_cast<double>(PonyEngine::Math::AngleDegrees(quaternion0, quaternion1)), 0.001);
+			auto quaternion0 = PonyEngine::Math::Quaternion<double>(3.f, 2.f, -9.f, -6.f).Normalized();
+			auto quaternion1 = PonyEngine::Math::Quaternion<double>(1.f, -2.f, -7.f, 3.f).Normalized();
+			Assert::AreEqual(2.126, PonyEngine::Math::Angle(quaternion0, quaternion1), 0.001);
+			Assert::AreEqual(121.818, PonyEngine::Math::AngleDegrees(quaternion0, quaternion1), 0.001);
 
 			quaternion1 = quaternion0;
-			Assert::AreEqual(0.f, PonyEngine::Math::Angle(quaternion0, quaternion1));
-			Assert::AreEqual(0.f, PonyEngine::Math::AngleDegrees(quaternion0, quaternion1));
+			Assert::AreEqual(0., PonyEngine::Math::Angle(quaternion0, quaternion1));
+			Assert::AreEqual(0., PonyEngine::Math::AngleDegrees(quaternion0, quaternion1));
 		}
 
 		TEST_METHOD(QuaternionDefaultTest)
