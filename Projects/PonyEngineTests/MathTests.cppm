@@ -38,37 +38,37 @@ namespace PonyEngineTests
 		TEST_METHOD(SignTest)
 		{
 			signed char c = 0;
-			Assert::AreEqual((signed char)(0), PonyEngine::Math::Sign(c));
+			Assert::AreEqual((signed char)(0), PonyEngine::Math::Signum(c));
 
 			c = -3;
-			Assert::AreEqual((signed char)(-1), PonyEngine::Math::Sign(c));
+			Assert::AreEqual((signed char)(-1), PonyEngine::Math::Signum(c));
 
 			c = 5;
-			Assert::AreEqual(signed char(1), PonyEngine::Math::Sign(c));
+			Assert::AreEqual(signed char(1), PonyEngine::Math::Signum(c));
 
 			unsigned short s = 0;
-			Assert::AreEqual((unsigned short)(0), PonyEngine::Math::Sign(s));
+			Assert::AreEqual((unsigned short)(0), PonyEngine::Math::Signum(s));
 
 			s = 2;
-			Assert::AreEqual((unsigned short)(1), PonyEngine::Math::Sign(s));
+			Assert::AreEqual((unsigned short)(1), PonyEngine::Math::Signum(s));
 
 			int i = 0;
-			Assert::AreEqual(0, PonyEngine::Math::Sign(i));
+			Assert::AreEqual(0, PonyEngine::Math::Signum(i));
 
 			i = -20;
-			Assert::AreEqual(-1, PonyEngine::Math::Sign(i));
+			Assert::AreEqual(-1, PonyEngine::Math::Signum(i));
 
 			i = 100;
-			Assert::AreEqual(1, PonyEngine::Math::Sign(i));
+			Assert::AreEqual(1, PonyEngine::Math::Signum(i));
 
 			float f = 0.f;
-			Assert::AreEqual(0.f, PonyEngine::Math::Sign(f));
+			Assert::AreEqual(0.f, PonyEngine::Math::Signum(f));
 
 			f = -42.f;
-			Assert::AreEqual(-1.f, PonyEngine::Math::Sign(f));
+			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(f));
 
 			f = 50.f;
-			Assert::AreEqual(1.f, PonyEngine::Math::Sign(f));
+			Assert::AreEqual(1.f, PonyEngine::Math::Signum(f));
 		}
 
 		TEST_METHOD(RoundToIntegralTest)
@@ -114,6 +114,16 @@ namespace PonyEngineTests
 
 			Assert::AreEqual(5.7f, PonyEngine::Math::RoundToIntegralIfPossible<float, float>(5.7f));
 			Assert::AreEqual(5.7, PonyEngine::Math::RoundToIntegralIfPossible<double, double>(5.7));
+		}
+
+		TEST_METHOD(CommonConstexprTest)
+		{
+			constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
+			constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
+			constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
+			constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
+			constexpr int round1 = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(3.6f);
+			constexpr float round2 = PonyEngine::Math::RoundToIntegralIfPossible<float, float>(3.7f);
 		}
 
 		TEST_METHOD(Vector3ConstructorsTest)
@@ -332,20 +342,20 @@ namespace PonyEngineTests
 
 		TEST_METHOD(Vector3ProjectTest)
 		{
-			auto vector0 = PonyEngine::Math::Vector3<float>(3.f, 0.f, 0.f);
-			auto vector1 = PonyEngine::Math::Vector3<float>(0.f, 0.f, 3.f);
-			float expected = 0.f;
-			float actual = PonyEngine::Math::Project(vector0, vector1).Magnitude();
+			auto vector0 = PonyEngine::Math::Vector3<double>(3., 0., 0.);
+			auto vector1 = PonyEngine::Math::Vector3<double>(0., 0., 3.);
+			double expected = 0.;
+			double actual = PonyEngine::Math::Project(vector0, vector1).Magnitude();
 			Assert::AreEqual(expected, actual);
 
-			vector0.Set(-4.f, 2.f, 7.f);
-			vector1.Set(3.f, 1.f, 2.f);
-			auto expectedVector = PonyEngine::Math::Vector3<float>(6.f/7.f, 2.f/7.f, 4.f/7.f);
+			vector0.Set(-4., 2., 7.);
+			vector1.Set(3., 1., 2.);
+			auto expectedVector = PonyEngine::Math::Vector3<double>(6./7., 2./7., 4./7.);
 			auto actualVector = PonyEngine::Math::Project(vector0, vector1);
-			Assert::AreEqual(static_cast<double>(expectedVector.x), static_cast<double>(actualVector.x), 0.0001);
-			Assert::AreEqual(static_cast<double>(expectedVector.y), static_cast<double>(actualVector.y), 0.0001);
-			Assert::AreEqual(static_cast<double>(expectedVector.z), static_cast<double>(actualVector.z), 0.0001);
-			Assert::AreEqual(0., static_cast<double>(PonyEngine::Math::AngleDegrees(actualVector, vector1)), 0.0001);
+			Assert::AreEqual(expectedVector.x, actualVector.x, 0.001);
+			Assert::AreEqual(expectedVector.y, actualVector.y, 0.001);
+			Assert::AreEqual(expectedVector.z, actualVector.z, 0.001);
+			Assert::AreEqual(0., PonyEngine::Math::AngleDegrees(actualVector.Normalized(), vector1.Normalized()), 0.001);
 		}
 
 		TEST_METHOD(Vector3ProjectOnPlaneTest)
@@ -520,6 +530,34 @@ namespace PonyEngineTests
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<double>::ComputationalType>);
 		}
 
+		TEST_METHOD(Vector3ConstexprTest)
+		{
+			constexpr auto defaultVector = PonyEngine::Math::Vector3<float>();
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);
+			constexpr PonyEngine::Math::Vector3<float> copiedVector = vector;
+			constexpr auto normal = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+
+			constexpr float magnitudeSquared = vector.MagnitudeSquared();
+
+			constexpr float dot = PonyEngine::Math::Dot(vector, copiedVector);
+			constexpr auto cross = PonyEngine::Math::Cross(vector, copiedVector);
+			constexpr auto project = PonyEngine::Math::Project(vector, normal);
+			constexpr auto projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, normal);
+			constexpr auto reflection = PonyEngine::Math::Reflect(vector, normal);
+
+			constexpr bool equal = vector == copiedVector;
+			constexpr bool notEqual = vector != copiedVector;
+
+			constexpr auto sum = vector + copiedVector;
+			constexpr auto negative = -vector;
+			constexpr auto sub = vector - copiedVector;
+			constexpr auto multiplied = vector * 3.f;
+			constexpr auto multipliedL = 3.f * vector;
+			constexpr auto multipliedV = vector * normal;
+			constexpr auto divided = vector / 3.f;
+			constexpr auto dividedV = vector / copiedVector;
+		}
+
 		TEST_METHOD(Vector2ConstructorsTest)
 		{
 			auto defaultFloatVector = PonyEngine::Math::Vector2<float>();
@@ -689,19 +727,19 @@ namespace PonyEngineTests
 
 		TEST_METHOD(Vector2ProjectTest)
 		{
-			auto vector0 = PonyEngine::Math::Vector2<float>(3.f, 0.f);
-			auto vector1 = PonyEngine::Math::Vector2<float>(0.f, 6.f);
-			float expected = 0.f;
-			float actual = PonyEngine::Math::Project(vector0, vector1).Magnitude();
+			auto vector0 = PonyEngine::Math::Vector2<double>(3.f, 0.f);
+			auto vector1 = PonyEngine::Math::Vector2<double>(0.f, 6.f);
+			double expected = 0.;
+			double actual = PonyEngine::Math::Project(vector0, vector1).Magnitude();
 			Assert::AreEqual(expected, actual);
 
-			vector0.Set(-4.f, 2.f);
-			vector1.Set(3.f, 1.f);
-			auto expectedVector = PonyEngine::Math::Vector2<float>(-3.f, -1.f);
+			vector0.Set(-4., 2.);
+			vector1.Set(3., 1.);
+			auto expectedVector = PonyEngine::Math::Vector2<double>(-3.f, -1.f);
 			auto actualVector = PonyEngine::Math::Project(vector0, vector1);
-			Assert::AreEqual(static_cast<double>(expectedVector.x), static_cast<double>(actualVector.x), 0.0001);
-			Assert::AreEqual(static_cast<double>(expectedVector.y), static_cast<double>(actualVector.y), 0.0001);
-			Assert::AreEqual(180., static_cast<double>(PonyEngine::Math::AngleDegrees(actualVector, vector1)), 0.0001);
+			Assert::AreEqual(expectedVector.x, actualVector.x, 0.001);
+			Assert::AreEqual(expectedVector.y, actualVector.y, 0.001);
+			Assert::AreEqual(180., PonyEngine::Math::AngleDegrees(actualVector.Normalized(), vector1.Normalized()), 0.001);
 		}
 
 		TEST_METHOD(Vector2ProjectOnPlaneTest)
@@ -846,6 +884,33 @@ namespace PonyEngineTests
 
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector2<double>::ValueType>);
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector2<double>::ComputationalType>);
+		}
+
+		TEST_METHOD(Vector2ConstexprTest)
+		{
+			constexpr auto defaultVector = PonyEngine::Math::Vector2<float>();
+			constexpr auto vector = PonyEngine::Math::Vector2<float>(2.f, 3.f);
+			constexpr auto copiedVector = vector;
+			constexpr auto normal = PonyEngine::Math::Vector2<float>(1.f, 0.f);
+
+			constexpr float magnitudeSquared = vector.MagnitudeSquared();
+
+			constexpr float dot = PonyEngine::Math::Dot(vector, copiedVector);
+			constexpr auto project = PonyEngine::Math::Project(vector, normal);
+			constexpr auto projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, normal);
+			constexpr auto reflection = PonyEngine::Math::Reflect(vector, normal);
+
+			constexpr bool equal = vector == copiedVector;
+			constexpr bool notEqual = vector != copiedVector;
+
+			constexpr auto sum = vector + copiedVector;
+			constexpr auto negative = -vector;
+			constexpr auto sub = vector - copiedVector;
+			constexpr auto multiplied = vector * 2.f;
+			constexpr auto multipliedL = 2.f * vector;
+			constexpr auto multipliedV = vector * normal;
+			constexpr auto divided = vector / 2.f;
+			constexpr auto dividedV = vector / copiedVector;
 		}
 
 		TEST_METHOD(Vector4ConstructorsTest)
@@ -1185,6 +1250,30 @@ namespace PonyEngineTests
 
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector4<double>::ValueType>);
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector4<double>::ComputationalType>);
+		}
+
+		TEST_METHOD(Vector4ConstexprTest)
+		{
+			constexpr auto defaultVector = PonyEngine::Math::Vector4<float>();
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(3.f, 1.f, 2.f, 4.f);
+			constexpr auto copiedVector = vector;
+
+			constexpr float magnitudeSquared = vector.MagnitudeSquared();
+
+			constexpr float dot = PonyEngine::Math::Dot(vector, copiedVector);
+			constexpr auto project = PonyEngine::Math::Project(vector, copiedVector);
+
+			constexpr bool equal = vector == copiedVector;
+			constexpr bool notEqual = vector != copiedVector;
+
+			constexpr auto sum = vector + copiedVector;
+			constexpr auto negative = -vector;
+			constexpr auto sub = vector - copiedVector;
+			constexpr auto multiplied = vector * 4.f;
+			constexpr auto multipliedL = 4.f * vector;
+			constexpr auto multipliedV = vector * copiedVector;
+			constexpr auto divided = vector / 4.f;
+			constexpr auto dividedV = vector / copiedVector;
 		}
 
 		TEST_METHOD(QuaternionConstructionTest)
@@ -1991,6 +2080,28 @@ namespace PonyEngineTests
 		{
 			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<float>::ValueType, float>);
 			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<double>::ValueType, double>);
+		}
+
+		TEST_METHOD(QuaternionConstexprTest)
+		{
+			constexpr auto vector3 = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);
+			constexpr auto vector4 = PonyEngine::Math::Vector4<float>(1.f, 1.f, 1.f, 2.f);
+			constexpr auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(1.f, 2.f, 3.f, 4.f);
+			constexpr auto quaternionV = PonyEngine::Math::Quaternion<float>(vector4);
+			constexpr auto copiedQuaternion = quaternion;
+
+			constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
+			constexpr auto conjugated = quaternion.Conjugated();
+			constexpr PonyEngine::Math::Vector4<float> vectorQ = quaternion;
+
+			constexpr float dot = PonyEngine::Math::Dot(quaternion, quaternionV);
+
+			constexpr bool equal = quaternion == copiedQuaternion;
+			constexpr bool notEqual = quaternion != copiedQuaternion;
+
+			constexpr auto rotatedQ = quaternion * copiedQuaternion;
+			constexpr auto rotatedV = quaternion * vector3;
 		}
 	};
 }

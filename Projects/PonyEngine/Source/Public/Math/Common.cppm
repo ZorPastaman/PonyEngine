@@ -27,13 +27,13 @@ namespace PonyEngine::Math
 	export template <typename T>
 	using ComputationalFor = std::conditional_t<std::floating_point<T>, T, FloatingBySize<T>>;
 
-	export template<std::floating_point T> 
+	export template<std::floating_point T>
 	constexpr inline const T DegToRad = std::numbers::pi_v<T> / T{180};
-	export template<std::floating_point T> 
+	export template<std::floating_point T>
 	constexpr inline const T RadToDeg = T{180} / std::numbers::pi_v<T>;
 
 	export template<Arithmetic T>
-	constexpr T Sign(const T value) noexcept
+	constexpr T Signum(const T value) noexcept
 	{
 		return static_cast<T>(T{} < value) - (value < T{});
 	}
