@@ -480,6 +480,21 @@ namespace PonyEngineTests
 			Assert::AreEqual(z / z1, vector2.z);
 		}
 
+		TEST_METHOD(Vector3ToStringTest)
+		{
+			float x = 3.f;
+			float y = 2.f;
+			float z = -1.f;
+			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
+			std::string expected = std::format("({}, {}, {})", x, y, z);
+			std::string vectorString = vector.ToString();
+			Assert::AreEqual(expected, vectorString);
+
+			std::ostringstream ss;
+			ss << vector;
+			Assert::AreEqual(expected, ss.str());
+		}
+
 		TEST_METHOD(Vector3DefaultsTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Forward == PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
@@ -839,6 +854,19 @@ namespace PonyEngineTests
 			vector2 = vector / vector1;
 			Assert::AreEqual(x / x1, vector2.x);
 			Assert::AreEqual(y / y1, vector2.y);
+		}
+
+		TEST_METHOD(Vector2ToStringTest)
+		{
+			float x = -2.f;
+			float y = 3.f;
+			auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			std::string expected = std::format("({}, {})", x, y);
+			Assert::AreEqual(expected, vector.ToString());
+
+			std::ostringstream ss;
+			ss << vector;
+			Assert::AreEqual(expected, ss.str());
 		}
 
 		TEST_METHOD(Vector2DefaultsTest)
@@ -1215,6 +1243,21 @@ namespace PonyEngineTests
 			Assert::AreEqual(static_cast<double>(y / y1), static_cast<double>(vector2.y), 0.001);
 			Assert::AreEqual(static_cast<double>(z / z1), static_cast<double>(vector2.z), 0.001);
 			Assert::AreEqual(static_cast<double>(w / w1), static_cast<double>(vector2.w), 0.001);
+		}
+
+		TEST_METHOD(Vector4ToStringTest)
+		{
+			float x = 1.f;
+			float y = -2.f;
+			float z = 3.f;
+			float w = -4.f;
+			auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			std::string expected = std::format("({}, {}, {}, {})", x, y, z, w);
+			Assert::AreEqual(expected, vector.ToString());
+
+			std::ostringstream ss;
+			ss << vector;
+			Assert::AreEqual(expected, ss.str());
 		}
 
 		TEST_METHOD(Vector4DefaultsTest)
@@ -2059,6 +2102,21 @@ namespace PonyEngineTests
 			quaternion1 = quaternion0;
 			Assert::AreEqual(0., PonyEngine::Math::Angle(quaternion0, quaternion1));
 			Assert::AreEqual(0., PonyEngine::Math::AngleDegrees(quaternion0, quaternion1));
+		}
+
+		TEST_METHOD(QuaternionToStringTest)
+		{
+			float x = -3.f;
+			float y = 3.f;
+			float z = 2.f;
+			float w = -2.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			std::string expected = std::format("({}, {}, {}, {})", x, y, z, w);
+			Assert::AreEqual(expected, quaternion.ToString());
+
+			std::ostringstream ss;
+			ss << quaternion;
+			Assert::AreEqual(expected, ss.str());
 		}
 
 		TEST_METHOD(QuaternionDefaultTest)

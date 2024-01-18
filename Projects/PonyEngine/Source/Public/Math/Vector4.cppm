@@ -7,12 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <format>
+
 export module PonyEngine.Math.Vector4;
 
 import <utility>;
 import <cmath>;
 import <algorithm>;
 import <concepts>;
+import <ostream>;
 
 import PonyEngine.Math.Common;
 
@@ -46,6 +51,8 @@ namespace PonyEngine::Math
 		Vector4<T>& operator *=(const Vector4<T>& other) noexcept;
 		Vector4<T>& operator /=(const ComputationalType divisor) noexcept;
 		Vector4<T>& operator /=(const Vector4<T>& other) noexcept;
+
+		std::string ToString() const;
 
 		static const Vector4<T> One;
 		static const Vector4<T> Zero;
@@ -155,6 +162,12 @@ namespace PonyEngine::Math
 		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(static_cast<Vector4<T>::ComputationalType>(left.w) / static_cast<Vector4<T>::ComputationalType>(right.w));
 
 		return Vector4<T>(x, y, z, w);
+	}
+
+	export template<Arithmetic T>
+	inline std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector)
+	{
+		return stream << vector.ToString();
 	}
 
 	template<Arithmetic T>
@@ -289,6 +302,12 @@ namespace PonyEngine::Math
 		w = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(w) / static_cast<ComputationalType>(other.w));
 
 		return *this;
+	}
+
+	template<Arithmetic T>
+	std::string Vector4<T>::ToString() const
+	{
+		return std::format("({}, {}, {}, {})", x, y, z, w);
 	}
 
 	template<Arithmetic T>

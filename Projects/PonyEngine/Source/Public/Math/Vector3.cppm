@@ -7,12 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <format>
+
 export module PonyEngine.Math.Vector3;
 
 import <utility>;
 import <cmath>;
 import <algorithm>;
 import <concepts>;
+import <ostream>;
 
 import PonyEngine.Math.Common;
 
@@ -46,6 +51,8 @@ namespace PonyEngine::Math
 		Vector3<T>& operator *=(const Vector3<T>& other) noexcept;
 		Vector3<T>& operator /=(const ComputationalType divisor) noexcept;
 		Vector3<T>& operator /=(const Vector3<T>& other) noexcept;
+
+		std::string ToString() const;
 
 		static const Vector3<T> Forward;
 		static const Vector3<T> Back;
@@ -209,6 +216,12 @@ namespace PonyEngine::Math
 		return Vector3<T>(x, y, z);
 	}
 
+	export template<Arithmetic T>
+	inline std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector)
+	{
+		return stream << vector.ToString();
+	}
+
 	template<Arithmetic T>
 	constexpr inline Vector3<T>::Vector3() noexcept :
 		x{},
@@ -330,6 +343,12 @@ namespace PonyEngine::Math
 		z = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(z) / static_cast<ComputationalType>(other.z));
 
 		return *this;
+	}
+
+	template<Arithmetic T>
+	std::string Vector3<T>::ToString() const
+	{
+		return std::format("({}, {}, {})", x, y, z);
 	}
 
 	template<Arithmetic T>
