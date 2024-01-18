@@ -7,10 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <format>
+
 export module PonyEngine.Math.Quaternion;
 
 import <concepts>;
 import <cmath>;
+import <ostream>;
 
 import PonyEngine.Math.Common;
 import PonyEngine.Math.Vector3;
@@ -60,6 +65,8 @@ namespace PonyEngine::Math
 
 		inline Quaternion<T>& operator =(const Quaternion<T>& other) noexcept;
 		inline Quaternion<T>& operator *=(const Quaternion<T>& other) noexcept;
+
+		std::string ToString() const;
 
 		static const Quaternion<T> Identity;
 
@@ -117,6 +124,12 @@ namespace PonyEngine::Math
 		const Vector3<T> t = Cross(u, vector) * T{2};
 
 		return vector + t * quaternion.w + Cross(u, t);
+	}
+
+	export template<std::floating_point T>
+	inline std::ostream& operator <<(std::ostream& stream, const Quaternion<T>& quaternion)
+	{
+		return stream << quaternion.ToString();
 	}
 
 	template<std::floating_point T>
@@ -353,6 +366,12 @@ namespace PonyEngine::Math
 	inline Quaternion<T>& Quaternion<T>::operator *=(const Quaternion<T>& other) noexcept
 	{
 		return *this = *this * other;
+	}
+
+	template<std::floating_point T>
+	std::string Quaternion<T>::ToString() const
+	{
+		return std::format("({}, {}, {}, {})", x, y, z, w);
 	}
 
 	template<std::floating_point T>
