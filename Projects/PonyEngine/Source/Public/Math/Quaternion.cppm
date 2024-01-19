@@ -95,6 +95,40 @@ namespace PonyEngine::Math
 	}
 
 	export template<std::floating_point T>
+	Quaternion<T> Lerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time)
+	{
+		const T x = from.x + (to.x - from.x) * time;
+		const T y = from.y + (to.y - from.y) * time;
+		const T z = from.z + (to.z - from.z) * time;
+		const T w = from.w + (to.w - from.w) * time;
+
+		return Quaternion<T>(x, y, z, w);
+	}
+
+	export template<std::floating_point T>
+	Quaternion<T> Slerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time) // Must be normalized
+	{
+		const T dot = Dot(from, to);
+
+		const T xOrth = (to.x - from.x * dot);
+		const T yOrth = (to.y - from.y * dot);
+		const T zOrth = (to.z - from.z * dot);
+		const T wOrth = (to.w - from.w * dot);
+		const Quaternion<T> orth = Quaternion<T>(xOrth, yOrth, zOrth, wOrth).Normalized();
+
+		const T angle = std::acos(dot) * time;
+		const T sin = std::sin(angle);
+		const T cos = std::cos(angle);
+		
+		const T x = from.x * cos + orth.x * sin;
+		const T y = from.y * cos + orth.y * sin;
+		const T z = from.z * cos + orth.z * sin;
+		const T w = from.w * cos + orth.w * sin;
+
+		return Quaternion<T>(x, y, z, w);
+	}
+
+	export template<std::floating_point T>
 	constexpr bool operator ==(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
@@ -231,8 +265,8 @@ namespace PonyEngine::Math
 		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
 
 		const Vector3<T> axis = dot < T{-0.9995}
-			?  std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.9995} 
-				? Cross(fromDirection, Vector3<T>::Forward) 
+			?  std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.9995}
+				? Cross(fromDirection, Vector3<T>::Forward)
 				: Cross(fromDirection, Vector3<T>::Up)
 			: Cross(fromDirection, toDirection);
 		const T angle = std::acos(dot);
