@@ -395,6 +395,36 @@ namespace PonyEngineTests
 			Assert::AreEqual(expected.z, reflection.z, 0.0001);
 		}
 
+		TEST_METHOD(Vector3LerpTest)
+		{
+			auto vector0 = PonyEngine::Math::Vector3<float>(-2.f, 2.f, 4.f);
+			auto vector1 = PonyEngine::Math::Vector3<float>(2.f, 4.f, -8.f);
+			auto lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.f);
+			Assert::AreEqual(vector0.x, lerped.x);
+			Assert::AreEqual(vector0.y, lerped.y);
+			Assert::AreEqual(vector0.z, lerped.z);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 1.f);
+			Assert::AreEqual(vector1.x, lerped.x);
+			Assert::AreEqual(vector1.y, lerped.y);
+			Assert::AreEqual(vector1.z, lerped.z);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.5f);
+			Assert::AreEqual(0.f, lerped.x);
+			Assert::AreEqual(3.f, lerped.y);
+			Assert::AreEqual(-2.f, lerped.z);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 2.f);
+			Assert::AreEqual(6.f, lerped.x);
+			Assert::AreEqual(6.f, lerped.y);
+			Assert::AreEqual(-20.f, lerped.z);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, -1.f);
+			Assert::AreEqual(-6.f, lerped.x);
+			Assert::AreEqual(0.f, lerped.y);
+			Assert::AreEqual(16.f, lerped.z);
+		}
+
 		TEST_METHOD(Vector3EqualityOperatorsTest)
 		{
 			float x = 10.f;
@@ -791,6 +821,31 @@ namespace PonyEngineTests
 			Assert::AreEqual(expected.y, reflection.y, 0.0001);
 		}
 
+		TEST_METHOD(Vector2LerpTest)
+		{
+			auto vector0 = PonyEngine::Math::Vector2<float>(-2.f, 2.f);
+			auto vector1 = PonyEngine::Math::Vector2<float>(2.f, 4.f);
+			auto lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.f);
+			Assert::AreEqual(vector0.x, lerped.x);
+			Assert::AreEqual(vector0.y, lerped.y);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 1.f);
+			Assert::AreEqual(vector1.x, lerped.x);
+			Assert::AreEqual(vector1.y, lerped.y);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.5f);
+			Assert::AreEqual(0.f, lerped.x);
+			Assert::AreEqual(3.f, lerped.y);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 2.f);
+			Assert::AreEqual(6.f, lerped.x);
+			Assert::AreEqual(6.f, lerped.y);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, -1.f);
+			Assert::AreEqual(-6.f, lerped.x);
+			Assert::AreEqual(0.f, lerped.y);
+		}
+
 		TEST_METHOD(Vector2EqualityOperatorsTest)
 		{
 			float x = 10.f;
@@ -1143,6 +1198,41 @@ namespace PonyEngineTests
 			Assert::AreEqual(static_cast<double>(expectedVector.y), static_cast<double>(actualVector.y), 0.0001);
 			Assert::AreEqual(static_cast<double>(expectedVector.z), static_cast<double>(actualVector.z), 0.0001);
 			Assert::AreEqual(static_cast<double>(expectedVector.w), static_cast<double>(actualVector.w), 0.0001);
+		}
+
+		TEST_METHOD(Vector4LerpTest)
+		{
+			auto vector0 = PonyEngine::Math::Vector4<float>(-2.f, 2.f, 4.f, 1.f);
+			auto vector1 = PonyEngine::Math::Vector4<float>(2.f, 4.f, -8.f, 3.f);
+			auto lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.f);
+			Assert::AreEqual(vector0.x, lerped.x);
+			Assert::AreEqual(vector0.y, lerped.y);
+			Assert::AreEqual(vector0.z, lerped.z);
+			Assert::AreEqual(vector0.w, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 1.f);
+			Assert::AreEqual(vector1.x, lerped.x);
+			Assert::AreEqual(vector1.y, lerped.y);
+			Assert::AreEqual(vector1.z, lerped.z);
+			Assert::AreEqual(vector1.w, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.5f);
+			Assert::AreEqual(0.f, lerped.x);
+			Assert::AreEqual(3.f, lerped.y);
+			Assert::AreEqual(-2.f, lerped.z);
+			Assert::AreEqual(2.f, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 2.f);
+			Assert::AreEqual(6.f, lerped.x);
+			Assert::AreEqual(6.f, lerped.y);
+			Assert::AreEqual(-20.f, lerped.z);
+			Assert::AreEqual(5.f, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, -1.f);
+			Assert::AreEqual(-6.f, lerped.x);
+			Assert::AreEqual(0.f, lerped.y);
+			Assert::AreEqual(16.f, lerped.z);
+			Assert::AreEqual(-1.f, lerped.w);
 		}
 
 		TEST_METHOD(Vector4EqualityOperatorsTest)
@@ -1961,6 +2051,107 @@ namespace PonyEngineTests
 			Assert::AreEqual(y, quaternion.y);
 			Assert::AreEqual(z, quaternion.z);
 			Assert::AreEqual(w, quaternion.w);
+		}
+
+		TEST_METHOD(QuaternionLerpTest)
+		{
+			auto vector0 = PonyEngine::Math::Quaternion<float>(-2.f, 2.f, 4.f, 1.f);
+			auto vector1 = PonyEngine::Math::Quaternion<float>(2.f, 4.f, -8.f, 3.f);
+			auto lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.f);
+			Assert::AreEqual(vector0.x, lerped.x);
+			Assert::AreEqual(vector0.y, lerped.y);
+			Assert::AreEqual(vector0.z, lerped.z);
+			Assert::AreEqual(vector0.w, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 1.f);
+			Assert::AreEqual(vector1.x, lerped.x);
+			Assert::AreEqual(vector1.y, lerped.y);
+			Assert::AreEqual(vector1.z, lerped.z);
+			Assert::AreEqual(vector1.w, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.5f);
+			Assert::AreEqual(0.f, lerped.x);
+			Assert::AreEqual(3.f, lerped.y);
+			Assert::AreEqual(-2.f, lerped.z);
+			Assert::AreEqual(2.f, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, 2.f);
+			Assert::AreEqual(6.f, lerped.x);
+			Assert::AreEqual(6.f, lerped.y);
+			Assert::AreEqual(-20.f, lerped.z);
+			Assert::AreEqual(5.f, lerped.w);
+
+			lerped = PonyEngine::Math::Lerp(vector0, vector1, -1.f);
+			Assert::AreEqual(-6.f, lerped.x);
+			Assert::AreEqual(0.f, lerped.y);
+			Assert::AreEqual(16.f, lerped.z);
+			Assert::AreEqual(-1.f, lerped.w);
+		}
+
+		TEST_METHOD(QuaternionSlerpTest)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(4.f, 4.f, 4.f, 7.f).Normalized();
+			auto quaternion1 = PonyEngine::Math::Quaternion<float>(1.f, 1.f, 10.f, 3.f).Normalized();
+			auto slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.f);
+			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 1.f);
+			Assert::AreEqual(static_cast<double>(quaternion1.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.5f);
+			Assert::AreEqual(0.275, static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(0.275, static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(0.743, static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(0.546, static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 0.5f);
+			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 0.f);
+			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 1.f);
+			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
+
+			quaternion1 = quaternion0.Conjugated();
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.f);
+			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 1.f);
+			Assert::AreEqual(static_cast<double>(quaternion1.x), static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.y), static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.z), static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternion1.w), static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.5f);
+			Assert::AreEqual(0., static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(0., static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(0., static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(1., static_cast<double>(slerped.w), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.7f);
+			Assert::AreEqual(-0.177, static_cast<double>(slerped.x), 0.001);
+			Assert::AreEqual(-0.177, static_cast<double>(slerped.y), 0.001);
+			Assert::AreEqual(-0.177, static_cast<double>(slerped.z), 0.001);
+			Assert::AreEqual(0.952, static_cast<double>(slerped.w), 0.001);
 		}
 
 		TEST_METHOD(QuaternionToVector4Test)

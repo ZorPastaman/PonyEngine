@@ -82,6 +82,12 @@ namespace PonyEngine::Math
 	}
 
 	export template<Arithmetic T>
+	constexpr Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, const typename Vector4<T>::ComputationalType time)
+	{
+		return from + (to - from) * time;
+	}
+
+	export template<Arithmetic T>
 	constexpr bool operator ==(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
 		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
