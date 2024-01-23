@@ -155,6 +155,19 @@ namespace PonyEngine::Math
 		return from + (to - from) * time;
 	}
 
+	/// @brief Checks if two @p Vectors are almost equal with a tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left @p Vector.
+	/// @param right Right @p Vector.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
+	export template<Arithmetic T>
+	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right,
+		const typename Vector4<T>::ComputationalType tolerance = typename Vector4<T>::ComputationalType{0.00001})
+	{
+		return (left - right).MagnitudeSquared() < tolerance * tolerance;
+	}
+
 	/// @brief Checks if two @p Vectors are absolutely equal.
 	/// @tparam T Component type.
 	/// @param left Left @p Vector.
