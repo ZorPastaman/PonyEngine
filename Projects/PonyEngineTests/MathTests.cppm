@@ -35,6 +35,15 @@ namespace PonyEngineTests
 			Assert::AreEqual(180 / std::numbers::pi_v<float>, PonyEngine::Math::RadToDeg<float>);
 		}
 
+		TEST_METHOD(AreAlmostEqualTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, std::nextafter(1.f, 0.f)));
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, 0.f, 2.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(1.f, 1.5f));
+		}
+
 		TEST_METHOD(SignTest)
 		{
 			signed char c = 0;
@@ -437,6 +446,22 @@ namespace PonyEngineTests
 			Assert::AreEqual(-6.f, lerped.x);
 			Assert::AreEqual(0.f, lerped.y);
 			Assert::AreEqual(16.f, lerped.z);
+		}
+
+		TEST_METHOD(Vector3AreAlmostEqual)
+		{
+			auto vector0 = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f);
+			auto vector1 = vector0;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+			
+			vector1.x = std::nextafter(vector1.x, 0.f);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+
+			vector1.x = 0.f;
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1, 5.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
 		}
 
 		TEST_METHOD(Vector3EqualityOperatorsTest)
@@ -871,6 +896,22 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.f, lerped.y);
 		}
 
+		TEST_METHOD(Vector2AreAlmostEqual)
+		{
+			auto vector0 = PonyEngine::Math::Vector2<float>(1.f, 1.f);
+			auto vector1 = vector0;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+
+			vector1.x = std::nextafter(vector1.x, 0.f);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+
+			vector1.x = 0.f;
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1, 5.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+		}
+
 		TEST_METHOD(Vector2EqualityOperatorsTest)
 		{
 			float x = 10.f;
@@ -1275,6 +1316,22 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.f, lerped.y);
 			Assert::AreEqual(16.f, lerped.z);
 			Assert::AreEqual(-1.f, lerped.w);
+		}
+
+		TEST_METHOD(Vector4AreAlmostEqual)
+		{
+			auto vector0 = PonyEngine::Math::Vector4<float>(1.f, 1.f, 1.f, 1.f);
+			auto vector1 = vector0;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+
+			vector1.x = std::nextafter(vector1.x, 0.f);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+
+			vector1.x = 0.f;
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1, 5.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
 		}
 
 		TEST_METHOD(Vector4EqualityOperatorsTest)
@@ -2021,9 +2078,9 @@ namespace PonyEngineTests
 			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngle(axis, std::acos(std::nextafter(-1.f, 0.f)));
 			to = quaternion * from;
 			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(from, to);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.707, static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
 		}
 
@@ -2236,6 +2293,35 @@ namespace PonyEngineTests
 			Assert::AreEqual(y, vector.y);
 			Assert::AreEqual(z, vector.z);
 			Assert::AreEqual(w, vector.w);
+		}
+
+		TEST_METHOD(QuaternionAreAlmostEqual)
+		{
+			auto quaternion0 = PonyEngine::Math::Quaternion<float>(1.f, 1.f, 1.f, 1.f);
+			auto quaternion1 = quaternion0;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
+
+			quaternion1.x = std::nextafter(quaternion1.x, 0.f);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
+
+			quaternion1.x = 0.f;
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1, 5.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
+
+			quaternion0.Normalize();
+			quaternion1 = quaternion0;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
+
+			quaternion1.x = std::nextafter(quaternion1.x, 0.f);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
+
+			quaternion1.x = 0.f;
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1, 5.f));
+
+			Assert::IsFalse(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
 		}
 
 		TEST_METHOD(QuaternionEqualityOperatorsTest)

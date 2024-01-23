@@ -12,6 +12,7 @@ export module PonyEngine.Math.Common;
 import <numbers>;
 import <type_traits>;
 import <concepts>;
+import <cmath>;
 
 namespace PonyEngine::Math
 {
@@ -43,6 +44,18 @@ namespace PonyEngine::Math
 	/// @tparam T Value type.
 	export template<std::floating_point T>
 	constexpr inline const T RadToDeg = T{180} / std::numbers::pi_v<T>;
+
+	/// @brief Checks if two floating point values are almost equal with a tolerance value.
+	/// @tparam T Floating point type.
+	/// @param left First value.
+	/// @param right Second value.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if the values are almost equal; @a false otherwise.
+	export template<std::floating_point T>
+	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance = T{0.00001})
+	{
+		return std::abs(left - right) < tolerance;
+	}
 
 	/// @brief Signum function.
 	/// @tparam T Value type.

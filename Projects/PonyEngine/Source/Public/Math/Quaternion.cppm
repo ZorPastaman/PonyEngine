@@ -205,12 +205,9 @@ namespace PonyEngine::Math
 	export template<std::floating_point T>
 	Quaternion<T> Lerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time)
 	{
-		const T x = from.x + (to.x - from.x) * time;
-		const T y = from.y + (to.y - from.y) * time;
-		const T z = from.z + (to.z - from.z) * time;
-		const T w = from.w + (to.w - from.w) * time;
+		const Vector4<T> lerped = Lerp(static_cast<Vector4<T>>(from), static_cast<Vector4<T>>(to), time);
 
-		return Quaternion<T>(x, y, z, w);
+		return Quaternion<T>(lerped);
 	}
 
 	/// @brief Spherical linear interpolation between two @p Quaternions if the @p time is in range [0, 1].
@@ -244,6 +241,33 @@ namespace PonyEngine::Math
 		const T w = from.w * cos + orth.w * sin;
 
 		return Quaternion<T>(x, y, z, w);
+	}
+
+	/// @brief Checks if two @p Quaternions are almost equal with a tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left @p Quaternion.
+	/// @param right Right @p Quaternion.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if the @p Quaternions are almost equal; @a false otherwise.
+	export template<std::floating_point T>
+	constexpr bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance = T{0.00001})
+	{
+		return AreAlmostEqual(static_cast<Vector4<T>>(left), static_cast<Vector4<T>>(right), tolerance);
+	}
+
+	/// @brief Checks if two @p Quaternions are almost equal with a tolerance value.
+	/// @details This function is faster than AreAlmostEqual().
+	/// @tparam T Component type.
+	/// @param left Left @p Quaternion. Must be normalized.
+	/// @param right Right @p Quaternion. Must be normalized.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if the @p Quaternions are almost equal; @a false otherwise.
+	export template<std::floating_point T>
+	constexpr bool AreAlmostEqualNormalized(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance = T{0.00001})
+	{
+		const T dot = Dot(left, right);
+
+		return AreAlmostEqual(dot, T{1}, tolerance);
 	}
 
 	/// @brief Determines if two @p Quaternions are absolutely equal.
@@ -408,7 +432,7 @@ namespace PonyEngine::Math
 		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
 
 		Vector3<T> axis;
-		if (dot < T{-0.9999})
+		if (AreAlmostEqual(dot, T{-1}))
 		{
 			axis = std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.5}
 				? Cross(fromDirection, Vector3<T>::Forward)
@@ -472,7 +496,7 @@ namespace PonyEngine::Math
 	{
 		const T halfSinp = (x * w - y * z);
 
-		if (std::abs(halfSinp) > T{0.4999}) // singularity at north pole (+) or south pole (-)
+		if (std::abs(halfSinp) > T{0.49999}) // singularity at north pole (+) or south pole (-)
 		{
 			const T xRotation = std::copysign(std::numbers::pi_v<T> * T{0.5}, halfSinp);
 			const T yRotationRound = std::copysign(T{2}, halfSinp) * std::atan2(y, x);
