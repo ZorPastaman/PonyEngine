@@ -189,6 +189,20 @@ namespace PonyEngineTests
 			Assert::AreEqual(normVector.z, vector.z);
 		}
 
+		TEST_METHOD(Vector3IsFiniteTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Zero.IsFinite());
+			float nan = std::numeric_limits<float>::quiet_NaN();
+			auto vector = PonyEngine::Math::Vector3<float>(nan, 0.f, 0.f);
+			Assert::IsFalse(vector.IsFinite());
+			vector.x = 0.f;
+			vector.y = nan;
+			Assert::IsFalse(vector.IsFinite());
+			vector.y = 0.f;
+			vector.z = nan;
+			Assert::IsFalse(vector.IsFinite());
+		}
+
 		TEST_METHOD(Vector3AssignmentTest)
 		{
 			PonyEngine::Math::Vector3<float> left, central, right;
@@ -656,6 +670,17 @@ namespace PonyEngineTests
 			Assert::AreEqual(normVector.y, vector.y);
 		}
 
+		TEST_METHOD(Vector2IsFiniteTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Zero.IsFinite());
+			float nan = std::numeric_limits<float>::quiet_NaN();
+			auto vector = PonyEngine::Math::Vector2<float>(nan, 0.f);
+			Assert::IsFalse(vector.IsFinite());
+			vector.x = 0.f;
+			vector.y = nan;
+			Assert::IsFalse(vector.IsFinite());
+		}
+
 		TEST_METHOD(Vector2AssignmentTest)
 		{
 			PonyEngine::Math::Vector2<float> left, central, right;
@@ -1067,6 +1092,23 @@ namespace PonyEngineTests
 			Assert::AreEqual(normVector.y, vector.y);
 			Assert::AreEqual(normVector.z, vector.z);
 			Assert::AreEqual(normVector.w, vector.w);
+		}
+
+		TEST_METHOD(Vector4IsFiniteTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Zero.IsFinite());
+			float nan = std::numeric_limits<float>::quiet_NaN();
+			auto vector = PonyEngine::Math::Vector4<float>(nan, 0.f, 0.f, 0.f);
+			Assert::IsFalse(vector.IsFinite());
+			vector.x = 0.f;
+			vector.y = nan;
+			Assert::IsFalse(vector.IsFinite());
+			vector.y = 0.f;
+			vector.z = nan;
+			Assert::IsFalse(vector.IsFinite());
+			vector.z = 0.f;
+			vector.w = nan;
+			Assert::IsFalse(vector.IsFinite());
 		}
 
 		TEST_METHOD(Vector4AssignmentTest)
@@ -1973,6 +2015,16 @@ namespace PonyEngineTests
 			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
 			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			auto axis = PonyEngine::Math::Cross(from, PonyEngine::Math::Vector3<float>::Right).Normalized();
+			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngle(axis, std::acos(std::nextafter(-1.f, 0.f)));
+			to = quaternion * from;
+			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(from, to);
+			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.y), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.z), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
 		}
 
 		TEST_METHOD(QuaternionMagnutudeTest)
@@ -2037,6 +2089,24 @@ namespace PonyEngineTests
 			Assert::AreEqual(normalized.y, quaternion.y);
 			Assert::AreEqual(normalized.z, quaternion.z);
 			Assert::AreEqual(normalized.w, quaternion.w);
+		}
+
+		TEST_METHOD(QuaternionIsFiniteTest)
+		{
+			auto quaternion = PonyEngine::Math::Quaternion<float>();
+			Assert::IsTrue(quaternion.IsFinite());
+			float nan = std::numeric_limits<float>::quiet_NaN();
+			quaternion = PonyEngine::Math::Quaternion<float>(nan, 0.f, 0.f, 0.f);
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.x = 0.f;
+			quaternion.y = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.y = 0.f;
+			quaternion.z = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.z = 0.f;
+			quaternion.w = nan;
+			Assert::IsFalse(quaternion.IsFinite());
 		}
 
 		TEST_METHOD(QuaternionSetTest)
