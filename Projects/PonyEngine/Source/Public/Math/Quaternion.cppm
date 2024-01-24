@@ -32,18 +32,22 @@ namespace PonyEngine::Math
 		using ValueType = T; /// @brief Component type.
 
 		/// @brief Creates a default @p Quaternion where every component is zero initialized.
+		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion() noexcept;
 		/// @brief Creates a @p Quaternion and assigns its components from the arguments.
 		/// @param xParam Value to assign to the @p x component.
 		/// @param yParam Value to assign to the @p y component.
 		/// @param zParam Value to assign to the @p z component.
 		/// @param wParam Value to assign to the @p w component.
+		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 		/// @brief Creates a @p Quaternion and assigns its components from the @p vector components.
 		/// @param vector Component values source.
+		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(const Vector4<T>& vector) noexcept;
 		/// @brief Copy constructor.
 		/// @param other Copy source.
+		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(const Quaternion<T>& other) noexcept;
 
 		constexpr ~Quaternion() noexcept = default;
@@ -54,6 +58,7 @@ namespace PonyEngine::Math
 		/// @param yRotation Rotation around y axis in radians.
 		/// @param zRotation Rotation around z axis in radians.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		static Quaternion<T> CreateByEuler(const T xRotation, const T yRotation, const T zRotation) noexcept;
 		/// @brief Creates a @p Quaternion by Euler angles.
 		///        The rotation order is ZXY.
@@ -61,72 +66,87 @@ namespace PonyEngine::Math
 		/// @param yRotation Rotation around y axis in degrees.
 		/// @param zRotation Rotation around z axis in degrees.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		inline static Quaternion<T> CreateByEulerDegrees(const T xRotation, const T yRotation, const T zRotation) noexcept;
 		/// @brief Creates a @p Quaternion by Euler angles.
 		///        The rotation order is ZXY.
 		/// @param rotation Rotations in radians around x, y and z axis component-wise.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		inline static Quaternion<T> CreateByEuler(const Vector3<T>& rotation) noexcept;
 		/// @brief Creates a @p Quaternion by Euler angles.
 		///        The rotation order is ZXY.
 		/// @param rotation Rotations in degrees around x, y and z axis component-wise.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		inline static Quaternion<T> CreateByEulerDegrees(const Vector3<T>& rotation) noexcept;
 		/// @brief Creates a @p Quaternion by the rotation of @p angle around the @p axis.
 		/// @param axis Rotation axis. Must be normalized.
 		/// @param angle Rotation angle in radians.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		static Quaternion<T> CreateByAxisAngle(const Vector3<T>& axis, const T angle) noexcept;
 		/// @brief Creates a @p Quaternion by the rotation of @p angle around the @p axis.
 		/// @param axis Rotation axis. Must be normalized.
 		/// @param angle Rotation angle in degrees.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		inline static Quaternion<T> CreateByAxisAngleDegrees(const Vector3<T>& axis, const T angle) noexcept;
 		/// @brief Creates a @p Quaternion representing a rotation 
 		///        from the vector @p fromDirection to the vector @p toDirection.
 		/// @param fromDirection From direction. Must be normalized.
 		/// @param toDirection To direction. Must be normalized.
 		/// @return Created @p Quaternion.
+		[[nodiscard("Pure function")]]
 		static Quaternion<T> CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
 		/// @brief Computes a magnitude of a @p Quaternion.
 		/// @details The pure rotation @p Quaternion always has a magnitude of 1.
 		/// @return Computed magnitude.
+		[[nodiscard("Pure function")]]
 		inline T Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of a @p Quaternion.
 		/// @details The pure rotation @p Quaternion always has a magnitude of 1.
 		///          This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
+		[[nodiscard("Pure function")]]
 		constexpr inline T MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a @p Quaternion conjugated to this one.
 		/// @return Conjugated @p Quaternion.
+		[[nodiscard("Pure function")]]
 		constexpr inline Quaternion<T> Conjugated() const noexcept;
 		/// @brief Conjugates a @p Quaternion.
 		inline void Conjugate() noexcept;
 
 		/// @brief Computes a @p Quaternion normalized from this one.
 		/// @return Normalized @p Quaternion.
+		[[nodiscard("Pure function")]]
 		Quaternion<T> Normalized() const noexcept;
 		/// @brief Normalizes a @p Quaternion.
 		inline void Normalize() noexcept;
 
 		/// @brief Computes Euler angles. The rotation order is ZXY.
 		/// @return Euler angles in radians.
+		[[nodiscard("Pure function")]]
 		Vector3<T> Euler() const noexcept;
 		/// @brief Computes Euler angles. The rotation order is ZXY.
 		/// @return Euler angles in degrees.
+		[[nodiscard("Pure function")]]
 		inline Vector3<T> EulerDegrees() const noexcept;
 
 		/// @brief Computes a rotation axis and angle.
 		/// @return Axis and angle in radians.
+		[[nodiscard("Pure function")]]
 		std::pair<Vector3<T>, T> AxisAngle() const noexcept;
 		/// @brief Computes a rotation axis and angle.
 		/// @return Axis and angle in degrees.
+		[[nodiscard("Pure function")]]
 		inline std::pair<Vector3<T>, T> AxisAngleDegrees() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
+		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
 		/// @brief Assigns arguments to @p Quaternion components.
@@ -137,6 +157,7 @@ namespace PonyEngine::Math
 		inline void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
 		/// @brief Casts a @p Quaternion to a @p Vector4 copying components.
+		[[nodiscard("Pure operator")]]
 		constexpr inline operator Vector4<T>() const noexcept;
 
 		/// @brief Copies the @p other to @a this.
@@ -152,6 +173,7 @@ namespace PonyEngine::Math
 		/// @brief Creates a string representing a state of a @p Quaternion.
 		///        The format is '(x, y, z, w)'.
 		/// @return State string.
+		[[nodiscard("Pure function")]]
 		inline std::string ToString() const;
 
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.
@@ -167,7 +189,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Quaternion.
 	/// @param right Right @p Quaternion.
 	/// @return Dot product.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
@@ -178,7 +200,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Quaternion. Must be normalized.
 	/// @param right Right @p Quaternion. Must be normalized.
 	/// @return Angle in radians.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return T{2} * std::acos(Dot(left, right));
@@ -189,7 +211,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Quaternion. Must be normalized.
 	/// @param right Right @p Quaternion. Must be normalized.
 	/// @return Angle in degrees.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	inline T AngleDegrees(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return Angle(left, right) * RadToDeg<T>;
@@ -202,7 +224,7 @@ namespace PonyEngine::Math
 	/// @param to Interpolation/Extrapolation target point.
 	/// @param time Interpolation/Extrapolation time. It can be negative.
 	/// @return Interpolated/Extrapolated @p Quaternion.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> Lerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time)
 	{
 		const Vector4<T> lerped = Lerp(static_cast<Vector4<T>>(from), static_cast<Vector4<T>>(to), time);
@@ -216,7 +238,7 @@ namespace PonyEngine::Math
 	/// @param to Interpolation target point. Must be normalized.
 	/// @param time Interpolation time. Must be normalized.
 	/// @return Interpolated @p Quaternion.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> Slerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time)
 	{
 		const T dot = Dot(from, to);
@@ -226,7 +248,7 @@ namespace PonyEngine::Math
 		const T zOrth = (to.z - from.z * dot);
 		const T wOrth = (to.w - from.w * dot);
 		const Quaternion<T> orth = Quaternion<T>(xOrth, yOrth, zOrth, wOrth).Normalized();
-		if (!orth.IsFinite())
+		if (!orth.IsFinite()) [[unlikely]]
 		{
 			return Lerp(from, to, time).Normalized();
 		}
@@ -249,7 +271,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Quaternion.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the @p Quaternions are almost equal; @a false otherwise.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance = T{0.00001})
 	{
 		return AreAlmostEqual(static_cast<Vector4<T>>(left), static_cast<Vector4<T>>(right), tolerance);
@@ -262,7 +284,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Quaternion. Must be normalized.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the @p Quaternions are almost equal; @a false otherwise.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqualNormalized(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance = T{0.00001})
 	{
 		const T dot = Dot(left, right);
@@ -275,7 +297,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Quaternion.
 	/// @param right Right @p Quaternion.
 	/// @return @a True if the @p Quaternions are absolutely equal; @a false otherwise.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr bool operator ==(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
@@ -286,7 +308,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Quaternion.
 	/// @param right Right @p Quaternion.
 	/// @return @a True if the @p Quaternions are not absolutely equal; @a false otherwise.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr bool operator !=(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		return left.x != right.x || left.y != right.y || left.z != right.z || left.w != right.w;
@@ -297,7 +319,7 @@ namespace PonyEngine::Math
 	/// @param left First @p Quaternion to rotate.
 	/// @param right Last @p Quaternion to rotate.
 	/// @return @p Quaternion of both rotations.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Quaternion<T> operator *(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		const T x = left.x * right.w + left.y * right.z - left.z * right.y + left.w * right.x;
@@ -313,7 +335,7 @@ namespace PonyEngine::Math
 	/// @param quaternion Rotation.
 	/// @param vector Vector to rotate.
 	/// @return Rotated vector.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T>& vector) noexcept
 	{
 		const Vector3<T> u = Vector3<T>(quaternion.x, quaternion.y, quaternion.z);
@@ -496,7 +518,7 @@ namespace PonyEngine::Math
 	{
 		const T halfSinp = (x * w - y * z);
 
-		if (std::abs(halfSinp) > T{0.49999}) // singularity at north pole (+) or south pole (-)
+		if (std::abs(halfSinp) > T{0.49999}) [[unlikely]] // singularity at north pole (+) or south pole (-)
 		{
 			const T xRotation = std::copysign(std::numbers::pi_v<T> * T{0.5}, halfSinp);
 			const T yRotationRound = std::copysign(T{2}, halfSinp) * std::atan2(y, x);
@@ -506,7 +528,7 @@ namespace PonyEngine::Math
 
 			return Vector3<T>(xRotation, yRotation, zRotation);
 		}
-		else
+		else [[likely]]
 		{
 			const T xRotation = std::asin(T{2} * halfSinp);
 			const T yRotation = std::atan2(T{2} * (y * w + z * x), T{1} - T{2} * (x * x + y * y));

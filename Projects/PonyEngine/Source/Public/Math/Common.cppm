@@ -51,7 +51,7 @@ namespace PonyEngine::Math
 	/// @param right Second value.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the values are almost equal; @a false otherwise.
-	export template<std::floating_point T>
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance = T{0.00001})
 	{
 		return std::abs(left - right) < tolerance;
@@ -61,7 +61,7 @@ namespace PonyEngine::Math
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @p 1 if @p value is positive, @p -1 if @p value is negative and @p 0 if @p value is @p 0.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Signum(const T value) noexcept
 	{
 		return static_cast<T>(T{} < value) - (value < T{});
@@ -72,7 +72,7 @@ namespace PonyEngine::Math
 	/// @tparam To Output type.
 	/// @param from Input value.
 	/// @return Rounded integral.
-	export template<std::floating_point From, std::integral To>
+	export template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
 		return static_cast<To>(from + From{0.5} - (from < From{0}));
@@ -84,7 +84,7 @@ namespace PonyEngine::Math
 	/// @tparam To To type.
 	/// @param from from value.
 	/// @return Rounded or cast value.
-	export template<Arithmetic From, Arithmetic To>
+	export template<Arithmetic From, Arithmetic To> [[nodiscard("Pure function")]]
 	constexpr inline To RoundToIntegralIfPossible(const From from) noexcept
 	{
 		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
