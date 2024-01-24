@@ -33,34 +33,41 @@ namespace PonyEngine::Math
 		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
 
 		/// @brief Creates a default @p Vector3 where every component is zero initialized.
+		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector3() noexcept;
 		/// @brief Creates a @p Vector3 and assigns its components from the arguments.
 		/// @param xParam Value to assign to the @p x component.
 		/// @param yParam Value to assign to the @p y component.
 		/// @param zParam Value to assign to the @p z component.
+		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector3(const T xParam, const T yParam, const T zParam) noexcept;
 		/// @brief Copy constructor.
 		/// @param other Copy source.
+		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector3(const Vector3<T>& other) noexcept;
 
 		constexpr inline ~Vector3() noexcept = default;
 
 		/// @brief Computes a magnitude of a @p Vector.
 		/// @return Computed magnitude.
+		[[nodiscard("Pure function")]]
 		inline ComputationalType Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of a @p Vector.
 		/// @details This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
+		[[nodiscard("Pure function")]]
 		constexpr inline ComputationalType MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a @p Vector normalized from this one.
 		/// @return Normalized @p Vector.
+		[[nodiscard("Pure function")]]
 		Vector3<T> Normalized() const noexcept;
 		/// @brief Normalizes a @p Vector.
 		inline void Normalize() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
+		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
 		/// @brief Assigns arguments to @p Vector components.
@@ -101,6 +108,7 @@ namespace PonyEngine::Math
 		/// @brief Creates a string representing a state of a @p Vector.
 		///        The format is '(x, y, z)'.
 		/// @return State string.
+		[[nodiscard("Pure function")]]
 		inline std::string ToString() const;
 
 		static const Vector3<T> Forward; /// @brief Vector3(0, 0, 1).
@@ -123,7 +131,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector.
 	/// @param right Right @p Vector.
 	/// @return Dot product.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T>::ComputationalType Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return static_cast<Vector3<T>::ComputationalType>(left.x) * static_cast<Vector3<T>::ComputationalType>(right.x) +
@@ -136,7 +144,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector.
 	/// @param right Right @p Vector.
 	/// @return Cross product.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Cross(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.y) * static_cast<Vector3<T>::ComputationalType>(right.z) - 
@@ -154,7 +162,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector. Must be normalized.
 	/// @param right Right @p Vector. Must be normalized.
 	/// @return Angle in radians.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	inline Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return std::acos(Dot(left, right));
@@ -167,7 +175,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector. Must be normalized.
 	/// @param axis Sign reference.
 	/// @return Angle in radians.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
 	{
 		const Vector3<T> cross = Cross(left, right);
@@ -182,7 +190,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector. Must be normalized.
 	/// @param right Right @p Vector. Must be normalized.
 	/// @return Angle in degrees.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	inline Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return Angle(left, right) * RadToDeg<Vector3<T>::ComputationalType>;
@@ -195,7 +203,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector. Must be normalized.
 	/// @param axis Sign reference.
 	/// @return Angle in degrees.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	inline Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
 	{
 		return AngleSigned(left, right, axis) * RadToDeg<Vector3<T>::ComputationalType>;
@@ -206,7 +214,7 @@ namespace PonyEngine::Math
 	/// @param vector Projection source.
 	/// @param target Projection target.
 	/// @return Projected @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept
 	{
 		const Vector3<T>::ComputationalType multiplier = Dot(vector, target) / Dot(target, target);
@@ -219,7 +227,7 @@ namespace PonyEngine::Math
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Projected @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
 	{
 		return vector - normal * Dot(vector, normal);
@@ -230,7 +238,7 @@ namespace PonyEngine::Math
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Reflected @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
 	{
 		const Vector3<T>::ComputationalType multiplier = typename Vector3<T>::ComputationalType{-2} * Dot(vector, normal);
@@ -245,7 +253,7 @@ namespace PonyEngine::Math
 	/// @param to Interpolation/Extrapolation target point.
 	/// @param time Interpolation/Extrapolation time. It can be negative.
 	/// @return Interpolated/Extrapolated @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Lerp(const Vector3<T>& from, const Vector3<T>& to, const typename Vector3<T>::ComputationalType time)
 	{
 		return from + (to - from) * time;
@@ -257,7 +265,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right,
 		const typename Vector3<T>::ComputationalType tolerance = typename Vector3<T>::ComputationalType{0.00001})
 	{
@@ -269,7 +277,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector.
 	/// @param right Right @p Vector.
 	/// @return @a True if the @p Vectors are absolutely equal; @a false otherwise.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr bool operator ==(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return left.x == right.x && left.y == right.y && left.z == right.z;
@@ -280,7 +288,7 @@ namespace PonyEngine::Math
 	/// @param left Left @p Vector.
 	/// @param right Right @p Vector.
 	/// @return @a True if the @p Vectors are not absolutely equal; @a false otherwise.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr bool operator !=(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return left.x != right.x || left.y != right.y || left.z != right.z;
@@ -291,7 +299,7 @@ namespace PonyEngine::Math
 	/// @param left Augend @p Vector.
 	/// @param right Addend @p Vector.
 	/// @return Sum @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return Vector3<T>(static_cast<T>(left.x + right.x), static_cast<T>(left.y + right.y), static_cast<T>(left.z + right.z));
@@ -301,7 +309,7 @@ namespace PonyEngine::Math
 	/// @tparam T Component type.
 	/// @param vector @p Vector to negate.
 	/// @return Negated @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept
 	{
 		return Vector3<T>(static_cast<T>(-vector.x), static_cast<T>(-vector.y), static_cast<T>(-vector.z));
@@ -312,7 +320,7 @@ namespace PonyEngine::Math
 	/// @param left Minuend @p Vector.
 	/// @param right Subtrahend @p Vector.
 	/// @return Difference @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return Vector3<T>(static_cast<T>(left.x - right.x), static_cast<T>(left.y - right.y), static_cast<T>(left.z - right.z));
@@ -323,7 +331,7 @@ namespace PonyEngine::Math
 	/// @param vector Multiplicand @p Vector.
 	/// @param multiplier Multiplier.
 	/// @return Product @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType multiplier) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(vector.x) * multiplier);
@@ -338,7 +346,7 @@ namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand @p Vector.
 	/// @return Product @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr inline Vector3<T> operator *(const typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept
 	{
 		return vector * multiplier;
@@ -349,7 +357,7 @@ namespace PonyEngine::Math
 	/// @param left Multiplicand @p Vector.
 	/// @param right Multiplier @p Vector.
 	/// @return Product @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.x) * static_cast<Vector3<T>::ComputationalType>(right.x));
@@ -364,7 +372,7 @@ namespace PonyEngine::Math
 	/// @param vector Dividend @p Vector.
 	/// @param divisor Divisor.
 	/// @return Quotient @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(vector.x) / divisor);
@@ -379,7 +387,7 @@ namespace PonyEngine::Math
 	/// @param left Dividend @p Vector.
 	/// @param right Divisor @p Vector.
 	/// @return Quotient @p Vector.
-	export template<Arithmetic T>
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator /(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.x) / static_cast<Vector3<T>::ComputationalType>(right.x));
