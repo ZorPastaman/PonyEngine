@@ -13,12 +13,11 @@ module;
 
 export module PonyEngine.Math.Vector4;
 
-import <utility>;
-import <cmath>;
-import <algorithm>;
-import <concepts>;
-import <ostream>;
 import <array>;
+import <cmath>;
+import <cstddef>;
+import <ostream>;
+import <string>;
 
 import PonyEngine.Math.Common;
 
@@ -378,7 +377,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T> Vector4<T>::Normalized() const noexcept
 	{
-		return *this / Magnitude();
+		return *this * (T{1} / Magnitude());
 	}
 
 	template<Arithmetic T>

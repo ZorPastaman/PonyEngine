@@ -13,10 +13,14 @@ module;
 
 export module PonyEngine.Math.Quaternion;
 
-import <concepts>;
-import <cmath>;
-import <ostream>;
 import <array>;
+import <cmath>;
+import <cstddef>;
+import <concepts>;
+import <numbers>;
+import <ostream>;
+import <string>;
+import <utility>;
 
 import PonyEngine.Math.Common;
 import PonyEngine.Math.Vector3;
@@ -239,6 +243,7 @@ namespace PonyEngine::Math
 
 	/// @brief Linear interpolation between two @p Quaternions if the @p time is in range [0, 1].
 	///        Linear extrapolation between two @p Quaternions if the @p time is out of range [0, 1].
+	/// @details The function treats a @p Quaternion as a @p Vector4.
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
 	/// @param to Interpolation/Extrapolation target point.
@@ -262,27 +267,21 @@ namespace PonyEngine::Math
 	Quaternion<T> Slerp(const Quaternion<T>& from, const Quaternion<T>& to, const T time)
 	{
 		const T dot = Dot(from, to);
+		const Vector4<T> fromVector = from;
+		const Vector4<T> toVector = to;
+		const Vector4<T> orth = (toVector - fromVector * dot).Normalized();
 
-		const T xOrth = (to.x - from.x * dot);
-		const T yOrth = (to.y - from.y * dot);
-		const T zOrth = (to.z - from.z * dot);
-		const T wOrth = (to.w - from.w * dot);
-		const Quaternion<T> orth = Quaternion<T>(xOrth, yOrth, zOrth, wOrth).Normalized();
 		if (!orth.IsFinite()) [[unlikely]]
 		{
-			return Lerp(from, to, time).Normalized();
+			return Lerp(fromVector, toVector, time).Normalized();
 		}
 
 		const T angle = std::acos(dot) * time;
 		const T sin = std::sin(angle);
 		const T cos = std::cos(angle);
-		
-		const T x = from.x * cos + orth.x * sin;
-		const T y = from.y * cos + orth.y * sin;
-		const T z = from.z * cos + orth.z * sin;
-		const T w = from.w * cos + orth.w * sin;
+		const Vector4<T> answer = fromVector * cos + orth * sin;
 
-		return Quaternion<T>(x, y, z, w);
+		return Quaternion<T>(answer);
 	}
 
 	/// @brief Checks if two @p Quaternions are almost equal with a tolerance value.
@@ -568,16 +567,12 @@ namespace PonyEngine::Math
 	std::pair<Vector3<T>, T> Quaternion<T>::AxisAngle() const noexcept
 	{
 		const T halfAngle = std::acos(w);
+
 		const T inverseAngleSin = T{1} / std::sin(halfAngle);
+		const Vector3<T> axis = Vector3<T>(x, y, z) * inverseAngleSin;
 
 		const T angleCorrection = (halfAngle > std::numbers::pi_v<T> * T{0.5}) * std::numbers::pi_v<T>;
 		const T angle = T{2} * (halfAngle - angleCorrection);
-
-		const T xAxis = x * inverseAngleSin;
-		const T yAxis = y * inverseAngleSin;
-		const T zAxis = z * inverseAngleSin;
-
-		const Vector3<T> axis = Vector3<T>(xAxis, yAxis, zAxis);
 
 		return std::pair<Vector3<T>, T>(axis, angle);
 	}
@@ -585,7 +580,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	inline std::pair<Vector3<T>, T> Quaternion<T>::AxisAngleDegrees() const noexcept
 	{
-		std::pair < Vector3<T>, T> axisAngle = AxisAngle();
+		std::pair<Vector3<T>, T> axisAngle = AxisAngle();
 		axisAngle.second *= RadToDeg<T>;
 
 		return axisAngle;
