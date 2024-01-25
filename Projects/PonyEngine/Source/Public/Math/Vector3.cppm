@@ -18,6 +18,7 @@ import <cmath>;
 import <algorithm>;
 import <concepts>;
 import <ostream>;
+import <array>;
 
 import PonyEngine.Math.Common;
 
@@ -76,6 +77,17 @@ namespace PonyEngine::Math
 		/// @param zParam Z component.
 		inline void Set(const T xParam, const T yParam, const T zParam) noexcept;
 
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 2].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
+		[[nodiscard("Pure operator")]]
+		inline T& operator [](const std::size_t index) noexcept;
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 2].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
+		[[nodiscard("Pure operator")]]
+		inline const T& operator [](const std::size_t index) const noexcept;
+
 		/// @brief Copies the @p other to @a this.
 		/// @param other @p Vector to copy.
 		/// @return @a This.
@@ -121,10 +133,18 @@ namespace PonyEngine::Math
 		static const Vector3<T> Zero; /// @brief Vector3(0, 0, 0).
 		static const Vector3<T> Negative; /// @brief Vector3(-1, -1, -1).
 
+		constexpr inline static const std::size_t ComponentCount = 3; /// @brief Component count. For any @p Vector3, it's always 3.
+
 		T x;
 		T y;
 		T z;
 	};
+
+	/// @brief Array of pointers to @p Vector components.
+	/// @tparam T Component type.
+	template<Arithmetic T>
+	static const std::array<T Vector3<T>::*, Vector3<T>::ComponentCount> s_vector3ComponentPointers
+		{ &Vector3<T>::x, &Vector3<T>::y, &Vector3<T>::z };
 
 	/// @brief Computes a dot product of two @p Vectors.
 	/// @tparam T Component type.
@@ -466,6 +486,18 @@ namespace PonyEngine::Math
 		x = xParam;
 		y = yParam;
 		z = zParam;
+	}
+
+	template<Arithmetic T>
+	inline T& Vector3<T>::operator[](const std::size_t index) noexcept
+	{
+		return this->*s_vector3ComponentPointers<T>[index];
+	}
+
+	template<Arithmetic T>
+	inline const T& Vector3<T>::operator[](const std::size_t index) const noexcept
+	{
+		return this->*s_vector3ComponentPointers<T>[index];
 	}
 
 	template<Arithmetic T>

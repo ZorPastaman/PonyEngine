@@ -12,6 +12,7 @@
 import <numbers>;
 import <cmath>;
 import <format>;
+import <array>;
 
 import PonyEngine.Math.Vector3;
 import PonyEngine.Math.Vector2;
@@ -464,6 +465,40 @@ namespace PonyEngineTests
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
 		}
 
+		TEST_METHOD(Vector3AccessOperatorTest)
+		{
+			float x = 2.f;
+			float y = 5.f;
+			float z = 7.f;
+			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
+			Assert::AreEqual(x, vector[0]);
+			Assert::AreEqual(y, vector[1]);
+			Assert::AreEqual(z, vector[2]);
+
+			float x1 = 20.f;
+			float y1 = 34.f;
+			float z1 = 55.f;
+			vector[0] = x1;
+			vector[1] = y1;
+			vector[2] = z1;
+			Assert::AreEqual(x1, vector[0]);
+			Assert::AreEqual(y1, vector[1]);
+			Assert::AreEqual(z1, vector[2]);
+
+			const auto vectorC = PonyEngine::Math::Vector3<float>(x, y, z);
+			Assert::AreEqual(x, vectorC[0]);
+			Assert::AreEqual(y, vectorC[1]);
+			Assert::AreEqual(z, vectorC[2]);
+
+			for (size_t i = 0; i < PonyEngine::Math::Vector3<float>::ComponentCount; ++i)
+			{
+				float num = static_cast<float>(i);
+				vector[i] = num;
+				Assert::AreEqual(num, vector[i]);
+			}
+			Assert::AreEqual(static_cast<std::size_t>(3), PonyEngine::Math::Vector3<float>::ComponentCount);
+		}
+
 		TEST_METHOD(Vector3EqualityOperatorsTest)
 		{
 			float x = 10.f;
@@ -912,6 +947,34 @@ namespace PonyEngineTests
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
 		}
 
+		TEST_METHOD(Vector2AccessOperatorTest)
+		{
+			float x = 2.f;
+			float y = 5.f;
+			auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			Assert::AreEqual(x, vector[0]);
+			Assert::AreEqual(y, vector[1]);
+
+			float x1 = 20.f;
+			float y1 = 34.f;
+			vector[0] = x1;
+			vector[1] = y1;
+			Assert::AreEqual(x1, vector[0]);
+			Assert::AreEqual(y1, vector[1]);
+
+			const auto vectorC = PonyEngine::Math::Vector2<float>(x, y);
+			Assert::AreEqual(x, vectorC[0]);
+			Assert::AreEqual(y, vectorC[1]);
+
+			for (size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
+			{
+				float num = static_cast<float>(i);
+				vector[i] = num;
+				Assert::AreEqual(num, vector[i]);
+			}
+			Assert::AreEqual(static_cast<std::size_t>(2), PonyEngine::Math::Vector2<float>::ComponentCount);
+		}
+
 		TEST_METHOD(Vector2EqualityOperatorsTest)
 		{
 			float x = 10.f;
@@ -1332,6 +1395,46 @@ namespace PonyEngineTests
 			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vector0, vector1, 5.f));
 
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
+		}
+
+		TEST_METHOD(Vector4AccessOperatorTest)
+		{
+			float x = 2.f;
+			float y = 5.f;
+			float z = 7.f;
+			float w = 9.f;
+			auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			Assert::AreEqual(x, vector[0]);
+			Assert::AreEqual(y, vector[1]);
+			Assert::AreEqual(z, vector[2]);
+			Assert::AreEqual(w, vector[3]);
+
+			float x1 = 20.f;
+			float y1 = 34.f;
+			float z1 = 55.f;
+			float w1 = 77.f;
+			vector[0] = x1;
+			vector[1] = y1;
+			vector[2] = z1;
+			vector[3] = w1;
+			Assert::AreEqual(x1, vector[0]);
+			Assert::AreEqual(y1, vector[1]);
+			Assert::AreEqual(z1, vector[2]);
+			Assert::AreEqual(w1, vector[3]);
+
+			const auto vectorC = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			Assert::AreEqual(x, vectorC[0]);
+			Assert::AreEqual(y, vectorC[1]);
+			Assert::AreEqual(z, vectorC[2]);
+			Assert::AreEqual(w, vectorC[3]);
+
+			for (size_t i = 0; i < PonyEngine::Math::Vector4<float>::ComponentCount; ++i)
+			{
+				float num = static_cast<float>(i);
+				vector[i] = num;
+				Assert::AreEqual(num, vector[i]);
+			}
+			Assert::AreEqual(static_cast<std::size_t>(4), PonyEngine::Math::Vector4<float>::ComponentCount);
 		}
 
 		TEST_METHOD(Vector4EqualityOperatorsTest)
@@ -2293,6 +2396,46 @@ namespace PonyEngineTests
 			Assert::AreEqual(y, vector.y);
 			Assert::AreEqual(z, vector.z);
 			Assert::AreEqual(w, vector.w);
+		}
+
+		TEST_METHOD(QuaternionAccessOperatorTest)
+		{
+			float x = 2.f;
+			float y = 5.f;
+			float z = 10.f;
+			float w = 3.f;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternion[0]);
+			Assert::AreEqual(y, quaternion[1]);
+			Assert::AreEqual(z, quaternion[2]);
+			Assert::AreEqual(w, quaternion[3]);
+
+			float x1 = 20.f;
+			float y1 = 34.f;
+			float z1 = 55.f;
+			float w1 = 33.f;
+			quaternion[0] = x1;
+			quaternion[1] = y1;
+			quaternion[2] = z1;
+			quaternion[3] = w1;
+			Assert::AreEqual(x1, quaternion[0]);
+			Assert::AreEqual(y1, quaternion[1]);
+			Assert::AreEqual(z1, quaternion[2]);
+			Assert::AreEqual(w1, quaternion[3]);
+
+			const auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternionC[0]);
+			Assert::AreEqual(y, quaternionC[1]);
+			Assert::AreEqual(z, quaternionC[2]);
+			Assert::AreEqual(w, quaternionC[3]);
+
+			for (size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				float num = static_cast<float>(i);
+				quaternion[i] = num;
+				Assert::AreEqual(num, quaternion[i]);
+			}
+			Assert::AreEqual(static_cast<std::size_t>(4), PonyEngine::Math::Quaternion<float>::ComponentCount);
 		}
 
 		TEST_METHOD(QuaternionAreAlmostEqual)
