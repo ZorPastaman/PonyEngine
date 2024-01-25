@@ -13,12 +13,11 @@ module;
 
 export module PonyEngine.Math.Vector2;
 
-import <utility>;
-import <cmath>;
-import <algorithm>;
-import <concepts>;
-import <ostream>;
 import <array>;
+import <cmath>;
+import <cstddef>;
+import <ostream>;
+import <string>;
 
 import PonyEngine.Math.Common;
 

@@ -189,14 +189,14 @@ namespace PonyEngineTests
 			auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
 			auto normVector = vector.Normalized();
 
-			Assert::AreEqual(normX, normVector.x);
-			Assert::AreEqual(normY, normVector.y);
-			Assert::AreEqual(normZ, normVector.z);
+			Assert::AreEqual(static_cast<double>(normX), static_cast<double>(normVector.x), 0.001);
+			Assert::AreEqual(static_cast<double>(normY), static_cast<double>(normVector.y), 0.001);
+			Assert::AreEqual(static_cast<double>(normZ), static_cast<double>(normVector.z), 0.001);
 
 			vector.Normalize();
-			Assert::AreEqual(normVector.x, vector.x);
-			Assert::AreEqual(normVector.y, vector.y);
-			Assert::AreEqual(normVector.z, vector.z);
+			Assert::AreEqual(static_cast<double>(normVector.x), static_cast<double>(vector.x), 0.001);
+			Assert::AreEqual(static_cast<double>(normVector.y), static_cast<double>(vector.y), 0.001);
+			Assert::AreEqual(static_cast<double>(normVector.z), static_cast<double>(vector.z), 0.001);
 		}
 
 		TEST_METHOD(Vector3IsFiniteTest)

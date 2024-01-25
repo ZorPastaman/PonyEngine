@@ -9,10 +9,10 @@
 
 export module PonyEngine.Math.Common;
 
+import <cmath>;
+import <concepts>;
 import <numbers>;
 import <type_traits>;
-import <concepts>;
-import <cmath>;
 
 namespace PonyEngine::Math
 {
@@ -34,7 +34,7 @@ namespace PonyEngine::Math
 	/// @brief It's @p T if @p T is a floating point type; otherwise the type is chosen by @ref FloatingBySize.
 	/// @tparam T Input type.
 	export template <typename T>
-	using ComputationalFor = std::conditional_t<std::floating_point<T>, T, FloatingBySize<T>>;
+	using ComputationalFor = std::conditional_t<std::is_floating_point_v<T>, T, FloatingBySize<T>>;
 
 	/// @brief Degrees to radians multiplier.
 	/// @tparam T Value type.
