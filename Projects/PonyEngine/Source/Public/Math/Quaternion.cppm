@@ -16,6 +16,7 @@ export module PonyEngine.Math.Quaternion;
 import <concepts>;
 import <cmath>;
 import <ostream>;
+import <array>;
 
 import PonyEngine.Math.Common;
 import PonyEngine.Math.Vector3;
@@ -160,6 +161,17 @@ namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr inline operator Vector4<T>() const noexcept;
 
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 3].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
+		[[nodiscard("Pure operator")]]
+		inline T& operator [](const std::size_t index) noexcept;
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 3].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
+		[[nodiscard("Pure operator")]]
+		inline const T& operator [](const std::size_t index) const noexcept;
+
 		/// @brief Copies the @p other to @a this.
 		/// @param other @p Quaternion to copy.
 		/// @return @a This.
@@ -178,11 +190,19 @@ namespace PonyEngine::Math
 
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.
 
+		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Quaternion, it's always 4.
+
 		T x;
 		T y;
 		T z;
 		T w;
 	};
+
+	/// @brief Array of pointers to @p Quaternion components.
+	/// @tparam T Component type.
+	template <std::floating_point T>
+	static const std::array<T Quaternion<T>::*, Quaternion<T>::ComponentCount> s_quaternionComponentPointers 
+		{ &Quaternion<T>::x, &Quaternion<T>::y, &Quaternion<T>::z, &Quaternion<T>::w };
 
 	/// @brief Computes a dot product of two @p Quaternions.
 	/// @tparam T Component type.
@@ -590,6 +610,18 @@ namespace PonyEngine::Math
 	constexpr inline Quaternion<T>::operator Vector4<T>() const noexcept
 	{
 		return Vector4<T>(x, y, z, w);
+	}
+
+	template<std::floating_point T>
+	inline T& Quaternion<T>::operator [](const std::size_t index) noexcept
+	{
+		return this->*s_quaternionComponentPointers<T>[index];
+	}
+
+	template<std::floating_point T>
+	inline const T& Quaternion<T>::operator[](const std::size_t index) const noexcept
+	{
+		return this->*s_quaternionComponentPointers<T>[index];
 	}
 
 	template<std::floating_point T>

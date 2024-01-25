@@ -18,6 +18,7 @@ import <cmath>;
 import <algorithm>;
 import <concepts>;
 import <ostream>;
+import <array>;
 
 import PonyEngine.Math.Common;
 
@@ -74,6 +75,17 @@ namespace PonyEngine::Math
 		/// @param yParam Y component.
 		inline void Set(const T xParam, const T yParam) noexcept;
 
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 1].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y.
+		[[nodiscard("Pure operator")]]
+		inline T& operator [](const std::size_t index) noexcept;
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 1].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y.
+		[[nodiscard("Pure operator")]]
+		inline const T& operator [](const std::size_t index) const noexcept;
+
 		/// @brief Copies the @p other to @a this.
 		/// @param other @p Vector to copy.
 		/// @return @a This.
@@ -117,9 +129,17 @@ namespace PonyEngine::Math
 		static const Vector2<T> Zero; /// @brief Vector2(0, 0).
 		static const Vector2<T> Negative; /// @brief Vector2(-1, -1).
 
+		constexpr inline static const std::size_t ComponentCount = 2; /// @brief Component count. For any @p Vector2, it's always 2.
+
 		T x;
 		T y;
 	};
+
+	/// @brief Array of pointers to @p Vector components.
+	/// @tparam T Component type.
+	template<Arithmetic T>
+	static const std::array<T Vector2<T>::*, Vector2<T>::ComponentCount> s_vector2ComponentPointers
+		{ &Vector2<T>::x, &Vector2<T>::y };
 
 	/// @brief Computes a dot product of two @ Vectors.
 	/// @tparam T Component type.
@@ -434,6 +454,18 @@ namespace PonyEngine::Math
 	{
 		x = xParam;
 		y = yParam;
+	}
+
+	template<Arithmetic T>
+	inline T& Vector2<T>::operator [](const std::size_t index) noexcept
+	{
+		return this->*s_vector2ComponentPointers<T>[index];
+	}
+
+	template<Arithmetic T>
+	inline const T& Vector2<T>::operator [](const std::size_t index) const noexcept
+	{
+		return this->*s_vector2ComponentPointers<T>[index];
 	}
 
 	template<Arithmetic T>

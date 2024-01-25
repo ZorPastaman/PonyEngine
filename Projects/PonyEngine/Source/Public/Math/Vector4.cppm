@@ -18,6 +18,7 @@ import <cmath>;
 import <algorithm>;
 import <concepts>;
 import <ostream>;
+import <array>;
 
 import PonyEngine.Math.Common;
 
@@ -78,6 +79,17 @@ namespace PonyEngine::Math
 		/// @param wParam w component.
 		void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 3].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
+		[[nodiscard("Pure operator")]]
+		inline T& operator [](const std::size_t index) noexcept;
+		/// @brief Access to a component operator.
+		/// @param index Component index. Must be in range [0, 3].
+		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
+		[[nodiscard("Pure operator")]]
+		inline const T& operator [](const std::size_t index) const noexcept;
+
 		/// @brief Copies the @p other to @a this.
 		/// @param other @p Vector to copy.
 		/// @return @a This.
@@ -117,11 +129,19 @@ namespace PonyEngine::Math
 		static const Vector4<T> Zero; /// @brief Vector3(0, 0, 0, 0).
 		static const Vector4<T> Negative; /// @brief Vector3(-1, -1, -1, -1).
 
+		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Vector4, it's always 4.
+
 		T x;
 		T y;
 		T z;
 		T w;
 	};
+
+	/// @brief Array of pointers to @p Vector components.
+	/// @tparam T Component type.
+	template<Arithmetic T>
+	static const std::array<T Vector4<T>::*, Vector4<T>::ComponentCount> s_vector4ComponentPointers
+		{ &Vector4<T>::x, &Vector4<T>::y, &Vector4<T>::z, &Vector4<T>::w };
 
 	/// @brief Computes a dot product of two @p Vectors.
 	/// @tparam T Component type.
@@ -380,6 +400,18 @@ namespace PonyEngine::Math
 		y = yParam;
 		z = zParam;
 		w = wParam;
+	}
+
+	template<Arithmetic T>
+	inline T& Vector4<T>::operator[](const std::size_t index) noexcept
+	{
+		return this->*s_vector4ComponentPointers<T>[index];
+	}
+
+	template<Arithmetic T>
+	inline const T& Vector4<T>::operator[](const std::size_t index) const noexcept
+	{
+		return this->*s_vector4ComponentPointers<T>[index];
 	}
 
 	template<Arithmetic T>
