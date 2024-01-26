@@ -78,13 +78,13 @@
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;</PublicIncludeDirectories>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
