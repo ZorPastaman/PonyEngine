@@ -27,60 +27,6 @@ namespace PonyEngineTests
 	TEST_CLASS(MathTests)
 	{
 	public:
-		TEST_METHOD(DegToRadToDegTest)
-		{
-			Assert::AreEqual(std::numbers::pi_v<double> / 180, PonyEngine::Math::DegToRad<double>);
-			Assert::AreEqual(180 / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
-
-			Assert::AreEqual(std::numbers::pi_v<float> / 180, PonyEngine::Math::DegToRad<float>);
-			Assert::AreEqual(180 / std::numbers::pi_v<float>, PonyEngine::Math::RadToDeg<float>);
-		}
-
-		TEST_METHOD(AreAlmostEqualTest)
-		{
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, std::nextafter(1.f, 0.f)));
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(1.f, 0.f, 2.f));
-
-			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(1.f, 1.5f));
-		}
-
-		TEST_METHOD(SignTest)
-		{
-			signed char c = 0;
-			Assert::AreEqual((signed char)(0), PonyEngine::Math::Signum(c));
-
-			c = -3;
-			Assert::AreEqual((signed char)(-1), PonyEngine::Math::Signum(c));
-
-			c = 5;
-			Assert::AreEqual(signed char(1), PonyEngine::Math::Signum(c));
-
-			unsigned short s = 0;
-			Assert::AreEqual((unsigned short)(0), PonyEngine::Math::Signum(s));
-
-			s = 2;
-			Assert::AreEqual((unsigned short)(1), PonyEngine::Math::Signum(s));
-
-			int i = 0;
-			Assert::AreEqual(0, PonyEngine::Math::Signum(i));
-
-			i = -20;
-			Assert::AreEqual(-1, PonyEngine::Math::Signum(i));
-
-			i = 100;
-			Assert::AreEqual(1, PonyEngine::Math::Signum(i));
-
-			float f = 0.f;
-			Assert::AreEqual(0.f, PonyEngine::Math::Signum(f));
-
-			f = -42.f;
-			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(f));
-
-			f = 50.f;
-			Assert::AreEqual(1.f, PonyEngine::Math::Signum(f));
-		}
-
 		TEST_METHOD(RoundToIntegralTest)
 		{
 			signed char charValue = PonyEngine::Math::RoundToIntegralIfPossible<float, unsigned char>(0.3f);

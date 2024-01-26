@@ -1,0 +1,23 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup Label="Globals">
+    <MSBuildAllProjects Condition="'$(MSBuildVersion)' == '' Or '$(MSBuildVersion)' &lt; '16.0'">$(MSBuildAllProjects);$(MSBuildThisFileFullPath)</MSBuildAllProjects>
+    <HasSharedItems>true</HasSharedItems>
+    <ItemsProjectGuid>{668b24de-ba42-4b91-b2bf-e14bad0604d6}</ItemsProjectGuid>
+  </PropertyGroup>
+  <ItemDefinitionGroup>
+    <ClCompile>
+      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories);$(MSBuildThisFileDirectory)</AdditionalIncludeDirectories>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ProjectCapability Include="SourceItemsFromImports" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\Common.cppm" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\Quaternion.cppm" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\Vector2.cppm" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\Vector3.cppm" />
+    <ClCompile Include="$(MSBuildThisFileDirectory)Source\Vector4.cppm" />
+  </ItemGroup>
+</Project>
