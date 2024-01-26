@@ -12,9 +12,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{3786A3E2-7E54-4D42-9C87-CAC481949A30}</ProjectGuid>
+    <ProjectGuid>{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PonyEngineTests</RootNamespace>
+    <RootNamespace>PonyEngineMathTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
@@ -118,17 +118,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Logger\TestLoggerEntry.cppm" />
-    <ClCompile Include="Logger\TestLoggerEntryFactory.cppm" />
-    <ClCompile Include="Logger\TestLoggerFactory.cppm" />
-    <ClCompile Include="EngineTests.cppm" />
-    <ClCompile Include="Logger\TestLogger.cppm" />
-    <ClCompile Include="MathTests.cppm" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PonyEngine\PonyEngine.vcxproj">
-      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
-    </ProjectReference>
+    <ClCompile Include="CommonTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
