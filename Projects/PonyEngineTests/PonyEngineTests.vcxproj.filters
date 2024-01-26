@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="PonyEngineTests.cppm">
+    <ClCompile Include="EngineTests.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logger\TestLogger.cppm">
@@ -28,6 +28,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Logger\TestLoggerEntryFactory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="MathTests.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
