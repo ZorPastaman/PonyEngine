@@ -1,2 +1,6 @@
 # PonyEngine
-Game engine on C++. Very deep WIP.
+Game engine on C++ 20. Very deep WIP.
+
+## Math
+
+Pony Engine uses left-handed coordinate system. X is right, Y is up and Z is forward. The rotation order is ZXY (roll-pitch-yaw).
