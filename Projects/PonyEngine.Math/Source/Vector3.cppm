@@ -15,6 +15,7 @@ export module PonyEngine.Math.Vector3;
 
 import <array>;
 import <cmath>;
+import <concepts>;
 import <cstddef>;
 import <ostream>;
 import <string>;
@@ -59,10 +60,12 @@ namespace PonyEngine::Math
 		constexpr inline ComputationalType MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a @p Vector normalized from this one.
+		/// @details This vector must be non-zero.
 		/// @return Normalized @p Vector.
 		[[nodiscard("Pure function")]]
 		Vector3<T> Normalized() const noexcept;
 		/// @brief Normalizes a @p Vector.
+		/// @details This vector must be non-zero.
 		inline void Normalize() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
@@ -284,7 +287,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right,
 		const typename Vector3<T>::ComputationalType tolerance = typename Vector3<T>::ComputationalType{0.00001})
 	{
@@ -476,7 +479,14 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Vector3<T>::IsFinite() const noexcept
 	{
-		return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return std::isfinite(x) && std::isfinite(y) && std::isfinite(z);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	template<Arithmetic T>
