@@ -18,6 +18,7 @@ import <cmath>;
 import <cstddef>;
 import <ostream>;
 import <string>;
+import <type_traits>;
 
 import PonyEngine.Math.Common;
 
@@ -74,6 +75,12 @@ namespace PonyEngine::Math
 		/// @param yParam Y component.
 		inline void Set(const T xParam, const T yParam) noexcept;
 
+		/// @brief Creates a string representing a state of a @p Vector.
+		///        The format is '(x, y)'.
+		/// @return State string.
+		[[nodiscard("Pure function")]]
+		inline std::string ToString() const;
+
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 1].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y.
@@ -113,12 +120,6 @@ namespace PonyEngine::Math
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
 		Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
-
-		/// @brief Creates a string representing a state of a @p Vector.
-		///        The format is '(x, y)'.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
 
 		static const Vector2<T> Up; /// @brief Vector2(0, 1).
 		static const Vector2<T> Down; /// @brief Vector2(0, -1).
@@ -173,7 +174,8 @@ namespace PonyEngine::Math
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		const Vector2<T>::ComputationalType zCross = left.x * right.y - left.y * right.x;
+		const Vector2<T>::ComputationalType zCross = static_cast<Vector2<T>::ComputationalType>(left.x) * Vector2<T>::ComputationalType(right.y) - 
+			Vector2<T>::ComputationalType(left.y) * Vector2<T>::ComputationalType(right.x);
 		const Vector2<T>::ComputationalType angle = Angle(left, right);
 
 		return std::copysign(angle, zCross);
@@ -445,7 +447,14 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Vector2<T>::IsFinite() const noexcept
 	{
-		return std::isfinite(x) && std::isfinite(y);
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return std::isfinite(x) && std::isfinite(y);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	template<Arithmetic T>
@@ -453,6 +462,12 @@ namespace PonyEngine::Math
 	{
 		x = xParam;
 		y = yParam;
+	}
+
+	template<Arithmetic T>
+	std::string Vector2<T>::ToString() const
+	{
+		return std::format("({}, {})", x, y);
 	}
 
 	template<Arithmetic T>
@@ -528,12 +543,6 @@ namespace PonyEngine::Math
 		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / static_cast<ComputationalType>(other.y));
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	std::string Vector2<T>::ToString() const
-	{
-		return std::format("({}, {})", x, y);
 	}
 
 	template<Arithmetic T>
