@@ -23,7 +23,7 @@ namespace PonyEngineTests
 {
 	TEST_CLASS(Vector3Tests)
 	{
-		TEST_METHOD(Vector3ConstructorsTest)
+		TEST_METHOD(ConstructorsTest)
 		{
 			auto defaultFloatVector = PonyEngine::Math::Vector3<float>();
 			Assert::AreEqual(float{}, defaultFloatVector.x);
@@ -74,7 +74,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(zi, movedShortVector.z);
 		}
 
-		TEST_METHOD(Vector3MagnitudeTest)
+		TEST_METHOD(MagnitudeTest)
 		{
 			float xf = 7.f;
 			float yf = -17.f;
@@ -103,7 +103,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(0.f, PonyEngine::Math::Vector3<short>::Zero.Magnitude());
 		}
 
-		TEST_METHOD(Vector3NormalizationTest)
+		TEST_METHOD(NormalizationTest)
 		{
 			float xf = -5.f;
 			float yf = 15.f;
@@ -147,9 +147,14 @@ namespace PonyEngineTests
 			Assert::AreEqual(normVectorI.x, vectorI.x);
 			Assert::AreEqual(normVectorI.y, vectorI.y);
 			Assert::AreEqual(normVectorI.z, vectorI.z);
+
+			auto zeroNormalizedI = PonyEngine::Math::Vector3<short>::Zero.Normalized();
+			Assert::AreEqual(short{0}, zeroNormalizedI.x);
+			Assert::AreEqual(short{0}, zeroNormalizedI.y);
+			Assert::AreEqual(short{0}, zeroNormalizedI.z);
 		}
 
-		TEST_METHOD(Vector3IsFiniteTest)
+		TEST_METHOD(IsFiniteTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Zero.IsFinite());
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::One.IsFinite());
@@ -167,7 +172,7 @@ namespace PonyEngineTests
 			Assert::IsTrue(PonyEngine::Math::Vector3<short>::One.IsFinite());
 		}
 
-		TEST_METHOD(Vector3SetTest)
+		TEST_METHOD(SetTest)
 		{
 			auto vectorF = PonyEngine::Math::Vector3<float>();
 			float xf = 3.f;
@@ -188,7 +193,34 @@ namespace PonyEngineTests
 			Assert::AreEqual(zi, vectorI.z);
 		}
 
-		TEST_METHOD(Vector3AccessOperatorsTest)
+		TEST_METHOD(ToStringTest)
+		{
+			float xf = 3.f;
+			float yf = 2.f;
+			float zf = -1.f;
+			auto vectorF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
+			std::string expected = std::format("({}, {}, {})", xf, yf, zf);
+			std::string vectorString = vectorF.ToString();
+			Assert::AreEqual(expected, vectorString);
+
+			std::ostringstream ssF;
+			ssF << vectorF;
+			Assert::AreEqual(expected, ssF.str());
+
+			short xi = 3;
+			short yi = 2;
+			short zi = -1;
+			auto vectorI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
+			expected = std::format("({}, {}, {})", xi, yi, zi);
+			vectorString = vectorF.ToString();
+			Assert::AreEqual(expected, vectorString);
+
+			std::ostringstream ssI;
+			ssI << vectorI;
+			Assert::AreEqual(expected, ssI.str());
+		}
+
+		TEST_METHOD(AccessOperatorsTest)
 		{
 			float xf = 2.f;
 			float yf = -5.f;
@@ -241,7 +273,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(std::size_t{3}, PonyEngine::Math::Vector3<short>::ComponentCount);
 		}
 
-		TEST_METHOD(Vector3AssignmentOperatorsTest)
+		TEST_METHOD(AssignmentOperatorsTest)
 		{
 			PonyEngine::Math::Vector3<float> leftF, centralF, rightF;
 			float xf = 8.f;
@@ -393,34 +425,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(zi) / rightI.z), centralI.z);
 		}
 
-		TEST_METHOD(Vector3ToStringTest)
-		{
-			float xf = 3.f;
-			float yf = 2.f;
-			float zf = -1.f;
-			auto vectorF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
-			std::string expected = std::format("({}, {}, {})", xf, yf, zf);
-			std::string vectorString = vectorF.ToString();
-			Assert::AreEqual(expected, vectorString);
-
-			std::ostringstream ssF;
-			ssF << vectorF;
-			Assert::AreEqual(expected, ssF.str());
-
-			short xi = 3;
-			short yi = 2;
-			short zi = -1;
-			auto vectorI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
-			expected = std::format("({}, {}, {})", xi, yi, zi);
-			vectorString = vectorF.ToString();
-			Assert::AreEqual(expected, vectorString);
-
-			std::ostringstream ssI;
-			ssI << vectorI;
-			Assert::AreEqual(expected, ssI.str());
-		}
-
-		TEST_METHOD(Vector3DefaultsTest)
+		TEST_METHOD(DefaultsTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Forward == PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f));
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Back == PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f));
@@ -449,7 +454,7 @@ namespace PonyEngineTests
 			Assert::IsTrue(PonyEngine::Math::Vector3<unsigned char>::Zero == PonyEngine::Math::Vector3<unsigned char>(0, 0, 0));
 		}
 
-		TEST_METHOD(Vector3DotTest)
+		TEST_METHOD(DotTest)
 		{
 			float xf = 5.f;
 			float yf = -1.f;
@@ -486,7 +491,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(-1.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector3<short>::Forward, PonyEngine::Math::Vector3<short>::Back));
 		}
 
-		TEST_METHOD(Vector3CrossTest)
+		TEST_METHOD(CrossTest)
 		{
 			float xf = 5.f;
 			float yf = -1.f;
@@ -561,7 +566,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(short{0}, vectorCrossI.z);
 		}
 
-		TEST_METHOD(Vector3AngleTest)
+		TEST_METHOD(AngleTest)
 		{
 			auto vectorF = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
 			auto vectorF1 = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
@@ -620,7 +625,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(180.f, PonyEngine::Math::AngleSignedDegrees(vectorI, vectorI1, PonyEngine::Math::Vector3<short>::Back));
 		}
 
-		TEST_METHOD(Vector3ProjectTest)
+		TEST_METHOD(ProjectTest)
 		{
 			auto vectorF = PonyEngine::Math::Vector3<float>(3.f, 0.f, 0.f);
 			auto vectorF1 = PonyEngine::Math::Vector3<float>(0.f, 0.f, 3.f);
@@ -645,7 +650,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(short{0}, projectedI.z);
 		}
 
-		TEST_METHOD(Vector3ProjectOnPlaneTest)
+		TEST_METHOD(ProjectOnPlaneTest)
 		{
 			auto vectorF = PonyEngine::Math::Vector3<float>(2.f, 0.f, 0.f);
 			auto normalF = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
@@ -676,7 +681,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(expectedI.z, projectionI.z);
 		}
 
-		TEST_METHOD(Vector3ReflectTest)
+		TEST_METHOD(ReflectTest)
 		{
 			auto vectorF = PonyEngine::Math::Vector3<float>(0.5f, -0.5f, 0.f);
 			auto normalF = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
@@ -738,7 +743,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(short{0}, reflectionI.z);
 		}
 
-		TEST_METHOD(Vector3LerpTest)
+		TEST_METHOD(LerpTest)
 		{
 			auto vectorF0 = PonyEngine::Math::Vector3<float>(-2.f, 2.f, 4.f);
 			auto vectorF1 = PonyEngine::Math::Vector3<float>(2.f, 4.f, -8.f);
@@ -795,7 +800,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(short{16}, lerpedI.z);
 		}
 
-		TEST_METHOD(Vector3AreAlmostEqual)
+		TEST_METHOD(AreAlmostEqual)
 		{
 			auto vector0 = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f);
 			auto vector1 = vector0;
@@ -811,7 +816,7 @@ namespace PonyEngineTests
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vector0, vector1));
 		}
 
-		TEST_METHOD(Vector3EqualityOperatorsTest)
+		TEST_METHOD(EqualityOperatorsTest)
 		{
 			float xf = 10.f;
 			float yf = 15.f;
@@ -882,7 +887,7 @@ namespace PonyEngineTests
 			Assert::IsFalse(vectorI != vectorI1);
 		}
 
-		TEST_METHOD(Vector3ComputationOperatorsTest)
+		TEST_METHOD(ComputationOperatorsTest)
 		{
 			float xf = 90.f;
 			float yf = 100.f;
@@ -974,7 +979,7 @@ namespace PonyEngineTests
 			Assert::AreEqual(static_cast<short>(zi / zi1 + 1), vectorI2.z);
 		}
 
-		TEST_METHOD(Vector3TypesTest)
+		TEST_METHOD(TypesTest)
 		{
 			Assert::IsTrue(std::is_same_v<char, PonyEngine::Math::Vector3<char>::ValueType>);
 			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Vector3<char>::ComputationalType>);
@@ -995,7 +1000,7 @@ namespace PonyEngineTests
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Vector3<double>::ComputationalType>);
 		}
 
-		TEST_METHOD(Vector3ConstexprTest)
+		TEST_METHOD(ConstexprTest)
 		{
 			constexpr auto defaultVector = PonyEngine::Math::Vector3<float>();
 			constexpr auto vector = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);

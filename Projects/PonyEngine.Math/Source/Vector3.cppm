@@ -19,6 +19,7 @@ import <concepts>;
 import <cstddef>;
 import <ostream>;
 import <string>;
+import <type_traits>;
 
 import PonyEngine.Math.Common;
 
@@ -79,6 +80,12 @@ namespace PonyEngine::Math
 		/// @param zParam Z component.
 		inline void Set(const T xParam, const T yParam, const T zParam) noexcept;
 
+		/// @brief Creates a string representing a state of a @p Vector.
+		///        The format is '(x, y, z)'.
+		/// @return State string.
+		[[nodiscard("Pure function")]]
+		inline std::string ToString() const;
+
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
@@ -118,12 +125,6 @@ namespace PonyEngine::Math
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
 		Vector3<T>& operator /=(const Vector3<T>& other) noexcept;
-
-		/// @brief Creates a string representing a state of a @p Vector.
-		///        The format is '(x, y, z)'.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
 
 		static const Vector3<T> Forward; /// @brief Vector3(0, 0, 1).
 		static const Vector3<T> Back; /// @brief Vector3(0, 0, -1).
@@ -498,6 +499,12 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	inline std::string Vector3<T>::ToString() const
+	{
+		return std::format("({}, {}, {})", x, y, z);
+	}
+
+	template<Arithmetic T>
 	inline T& Vector3<T>::operator[](const std::size_t index) noexcept
 	{
 		return this->*s_vector3ComponentPointers<T>[index];
@@ -576,12 +583,6 @@ namespace PonyEngine::Math
 		z = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(z) / static_cast<ComputationalType>(other.z));
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	inline std::string Vector3<T>::ToString() const
-	{
-		return std::format("({}, {}, {})", x, y, z);
 	}
 
 	template<Arithmetic T>
