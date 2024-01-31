@@ -119,6 +119,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommonTests.cpp" />
+    <ClCompile Include="QuaternionTests.cpp" />
     <ClCompile Include="Vector2Tests.cpp" />
     <ClCompile Include="Vector3Tests.cpp" />
     <ClCompile Include="Vector4Tests.cpp" />

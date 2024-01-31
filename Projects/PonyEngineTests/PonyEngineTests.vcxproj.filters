@@ -30,8 +30,5 @@
     <ClCompile Include="Logger\TestLoggerEntryFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="MathTests.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

@@ -161,6 +161,12 @@ namespace PonyEngine::Math
 		/// @param wParam W component.
 		inline void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
+		/// @brief Creates a string representing a state of a @p Quaternion.
+		///        The format is '(x, y, z, w)'.
+		/// @return State string.
+		[[nodiscard("Pure function")]]
+		inline std::string ToString() const;
+
 		/// @brief Casts a @p Quaternion to a @p Vector4 copying components.
 		[[nodiscard("Pure operator")]]
 		constexpr inline operator Vector4<T>() const noexcept;
@@ -185,12 +191,6 @@ namespace PonyEngine::Math
 		/// @param other Last @p Quaternion to rotate.
 		/// @return @a This.
 		inline Quaternion<T>& operator *=(const Quaternion<T>& other) noexcept;
-
-		/// @brief Creates a string representing a state of a @p Quaternion.
-		///        The format is '(x, y, z, w)'.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
 
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.
 
@@ -602,6 +602,12 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	inline std::string Quaternion<T>::ToString() const
+	{
+		return std::format("({}, {}, {}, {})", x, y, z, w);
+	}
+
+	template<std::floating_point T>
 	constexpr inline Quaternion<T>::operator Vector4<T>() const noexcept
 	{
 		return Vector4<T>(x, y, z, w);
@@ -634,12 +640,6 @@ namespace PonyEngine::Math
 	inline Quaternion<T>& Quaternion<T>::operator *=(const Quaternion<T>& other) noexcept
 	{
 		return *this = *this * other;
-	}
-
-	template<std::floating_point T>
-	inline std::string Quaternion<T>::ToString() const
-	{
-		return std::format("({}, {}, {}, {})", x, y, z, w);
 	}
 
 	template<std::floating_point T>
