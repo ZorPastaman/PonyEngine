@@ -18,6 +18,7 @@ import <cmath>;
 import <cstddef>;
 import <ostream>;
 import <string>;
+import <type_traits>;
 
 import PonyEngine.Math.Common;
 
@@ -78,6 +79,12 @@ namespace PonyEngine::Math
 		/// @param wParam w component.
 		void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
 
+		/// @brief Creates a string representing a state of a @p Vector.
+		///        The format is '(x, y, z, w)'.
+		/// @return State string.
+		[[nodiscard("Pure function")]]
+		inline std::string ToString() const;
+
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
@@ -117,12 +124,6 @@ namespace PonyEngine::Math
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
 		Vector4<T>& operator /=(const Vector4<T>& other) noexcept;
-
-		/// @brief Creates a string representing a state of a @p Vector.
-		///        The format is '(x, y, z, w)'.
-		/// @return State string.
-		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
 
 		static const Vector4<T> One; /// @brief Vector3(1, 1, 1, 1).
 		static const Vector4<T> Zero; /// @brief Vector3(0, 0, 0, 0).
@@ -389,7 +390,14 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Vector4<T>::IsFinite() const noexcept
 	{
-		return std::isfinite(x) && std::isfinite(y) && std::isfinite(z) && std::isfinite(w);
+		if constexpr (std::is_floating_point_v<T>)
+		{
+			return std::isfinite(x) && std::isfinite(y) && std::isfinite(z) && std::isfinite(w);
+		}
+		else
+		{
+			return true;
+		}
 	}
 
 	template<Arithmetic T>
@@ -399,6 +407,12 @@ namespace PonyEngine::Math
 		y = yParam;
 		z = zParam;
 		w = wParam;
+	}
+
+	template<Arithmetic T>
+	inline std::string Vector4<T>::ToString() const
+	{
+		return std::format("({}, {}, {}, {})", x, y, z, w);
 	}
 
 	template<Arithmetic T>
@@ -488,12 +502,6 @@ namespace PonyEngine::Math
 		w = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(w) / static_cast<ComputationalType>(other.w));
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	inline std::string Vector4<T>::ToString() const
-	{
-		return std::format("({}, {}, {}, {})", x, y, z, w);
 	}
 
 	template<Arithmetic T>
