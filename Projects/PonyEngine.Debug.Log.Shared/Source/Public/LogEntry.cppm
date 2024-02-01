@@ -48,10 +48,11 @@ namespace PonyEngine::Debug::Log
 		LogType logType; /// @brief Log type.
 	};
 
-	export std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
-	{
-		return stream << logEntry.ToString();
-	}
+	/// @brief Puts logEntry.ToString() into the @p stream.
+	/// @param stream Target stream.
+	/// @param logEntry Input source.
+	/// @return @p stream.
+	export inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
 
 	constexpr LogEntry::LogEntry(const std::string& message, const std::exception* const exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept :
 		message(message),
@@ -83,5 +84,10 @@ namespace PonyEngine::Debug::Log
 		}
 
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", PonyEngine::Debug::Log::ToString(logType, false), timePoint, frameCount, message);
+	}
+
+	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
+	{
+		return stream << logEntry.ToString();
 	}
 }
