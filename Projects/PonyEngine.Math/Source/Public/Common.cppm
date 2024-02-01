@@ -52,20 +52,14 @@ namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the values are almost equal; @a false otherwise.
 	export template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance = T{0.00001})
-	{
-		return std::abs(left - right) < tolerance;
-	}
+	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @p 1 if @p value is positive, @p -1 if @p value is negative and @p 0 if @p value is @p 0.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr T Signum(const T value) noexcept
-	{
-		return static_cast<T>(T{} < value) - (value < T{});
-	}
+	constexpr T Signum(const T value) noexcept;
 
 	/// @brief Rounds a floating point value to an integral value and returns it as an integral value.
 	/// @tparam From Input type.
@@ -73,11 +67,7 @@ namespace PonyEngine::Math
 	/// @param from Input value.
 	/// @return Rounded integral.
 	export template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
-	constexpr To RoundToIntegral(const From from) noexcept
-	{
-		return static_cast<To>(from + From{0.5} - (from < From{0}));
-	}
-
+	constexpr To RoundToIntegral(const From from) noexcept;
 	/// @brief Calls @ref RoundToIntegral if @p From is a floating point type and @p To is an integral type;
 	///        otherwise it just does @p static_cast<To>(from).
 	/// @tparam From From type.
@@ -85,7 +75,28 @@ namespace PonyEngine::Math
 	/// @param from from value.
 	/// @return Rounded or cast value.
 	export template<Arithmetic From, Arithmetic To> [[nodiscard("Pure function")]]
-	constexpr inline To RoundToIntegralIfPossible(const From from) noexcept
+	constexpr inline To RoundToIntegralIfPossible(const From from) noexcept;
+
+	template<std::floating_point T>
+	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance) noexcept
+	{
+		return std::abs(left - right) < tolerance;
+	}
+
+	template<Arithmetic T>
+	constexpr T Signum(const T value) noexcept
+	{
+		return static_cast<T>(T{} < value) - (value < T{});
+	}
+
+	template<std::floating_point From, std::integral To>
+	constexpr To RoundToIntegral(const From from) noexcept
+	{
+		return static_cast<To>(from + From{ 0.5 } - (from < From{ 0 }));
+	}
+
+	template<Arithmetic From, Arithmetic To>
+	constexpr To RoundToIntegralIfPossible(const From from) noexcept
 	{
 		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
 		{
