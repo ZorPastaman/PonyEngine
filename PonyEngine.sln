@@ -13,6 +13,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Projects\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Debug.Log.Shared", "Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems", "{88F7079D-33D4-46B7-B34B-50990709BFA0}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -45,6 +47,10 @@ Global
 	GlobalSection(SharedMSBuildProjectFiles) = preSolution
 		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{3786a3e2-7e54-4d42-9c87-cac481949a30}*SharedItemsImports = 4
 		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{4a46dded-881e-4a6e-9874-2ebfb1a9ce50}*SharedItemsImports = 4
+		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}*SharedItemsImports = 4
+		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}*SharedItemsImports = 4
 		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{668b24de-ba42-4b91-b2bf-e14bad0604d6}*SharedItemsImports = 9
+		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{88f7079d-33d4-46b7-b34b-50990709bfa0}*SharedItemsImports = 9
+		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{d35c7778-7993-437b-b2d1-9e97f128947e}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

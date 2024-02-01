@@ -15,22 +15,18 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Debug\Logger\LogFileLoggerEntry.cppm" />
-    <ClCompile Include="Source\Private\Debug\Logger\Logger.cppm" />
-    <ClCompile Include="Source\Private\Debug\Logger\StandardOutputLoggerEntry.cppm" />
+    <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
+    <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
     <ClCompile Include="Source\Private\Engine\EngineFeatures.cppm" />
     <ClCompile Include="Source\Private\Engine\Engine.cppm" />
     <ClCompile Include="Source\Private\Engine\LoggerOwnerKit.cppm" />
     <ClCompile Include="Source\Private\EntryPoint\EntryPointDefinition.cppm" />
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntryView.cppm" />
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerView.cppm" />
     <ClCompile Include="Source\Public\Engine\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Engine\IEngineView.cppm" />
     <ClCompile Include="Source\Public\Engine\LoggerParams.cppm" />
     <ClCompile Include="Source\Public\EntryPoint\EntryPoint.cppm" />
     <ClCompile Include="Source\Public\Engine\IEngine.cppm" />
-    <ClCompile Include="Source\Public\Debug\Logger\ILogger.cppm" />
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntry.cppm" />
     <ClCompile Include="Source\Public\Factories\EngineFeatureFactories\IEngineFeatureFactory.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -61,6 +57,7 @@
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
   <ImportGroup Label="Shared">
+    <Import Project="..\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems" Label="Shared" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />

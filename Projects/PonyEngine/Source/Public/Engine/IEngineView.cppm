@@ -11,7 +11,7 @@ export module PonyEngine.IEngineView;
 
 import <cstddef>;
 
-import PonyEngine.Debug.ILoggerView;
+import PonyEngine.Debug.Log.ILogger;
 
 namespace PonyEngine
 {
@@ -36,7 +36,7 @@ namespace PonyEngine
 		/// <returns>Engine logger.</returns>
 		/// <remarks>
 		/// Usually, it's used by classes that are dependent on the engine.
-		virtual Debug::ILoggerView* GetLogger() const noexcept = 0;
+		virtual Debug::Log::ILogger* GetLogger() const noexcept = 0;
 
 	protected:
 		virtual ~IEngineView() noexcept = default;

@@ -69,7 +69,7 @@ namespace PonyEngineTests
 			TestLoggerEntry* const loggerEntry = new TestLoggerEntry(&log, &warning, &error, &exception);
 
 			PonyEngine::EngineParams params;
-			params.loggerParams.loggerEntryViews.push_back(loggerEntry);
+			params.loggerParams.subLoggers.push_back(loggerEntry);
 			PonyEngine::IEngine* const engine = PonyEngine::CreateEngineWithParams(params);
 
 			log = warning = error = exception = false;
@@ -139,7 +139,7 @@ namespace PonyEngineTests
 			TestLoggerEntryFactory* const loggerEntryFactory = new TestLoggerEntryFactory(&log, &warning, &error, &exception);
 
 			PonyEngine::EngineParams params;
-			params.loggerParams.loggerEntryFactories.push_back(loggerEntryFactory);
+			params.loggerParams.subLoggerFactories.push_back(loggerEntryFactory);
 			PonyEngine::IEngine* const engine = PonyEngine::CreateEngineWithParams(params);
 			delete loggerEntryFactory;
 
