@@ -9,14 +9,17 @@
 
 module;
 
+#include <cassert>
 #include <chrono>
 
 export module PonyEngine.Debug.Log.Logger;
 
-import <cassert>;
+import <algorithm>;
 import <exception>;
 import <iostream>;
+import <string>;
 import <vector>;
+import <utility>;
 
 import PonyEngine.IEngineView;
 import PonyEngine.Debug.Log.ILogger;
@@ -26,31 +29,33 @@ import PonyEngine.Debug.Log.LogType;
 
 namespace PonyEngine::Debug::Log
 {
-	/// <summary>
-	/// Default logger. It formats logs and sends them to its logger entries.
-	/// </summary>
+	/// @brief Default logger. It just resends logs to its sub-loggers.
 	export class Logger final : public ILogger
 	{
 	public:
-		/// <param name="engine">Engine that the logger is owned by.</param>
-		Logger(IEngineView* engine);
+		/// @brief Creates a @p Logger.
+		/// @param engine Engine that the logger is owned by.
+		Logger(const IEngineView* engine);
 		Logger(const Logger&) = delete;
+		/// @brief Move constructor.
+		/// @param other Move source.
 		Logger(Logger&& other);
 
 		virtual ~Logger() = default;
 
 		virtual void Log(LogType logType, const std::string& message) noexcept override;
+		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept override;
 
 		virtual void AddSubLogger(ISubLogger* subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
 	private:
-		std::vector<ISubLogger*> m_subLoggers;
+		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
 
-		IEngineView* m_engine;
+		const IEngineView* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
 
-	Logger::Logger(IEngineView* engine) :
+	Logger::Logger(const IEngineView* const engine) :
 		m_subLoggers{},
 		m_engine{engine}
 	{
@@ -63,18 +68,37 @@ namespace PonyEngine::Debug::Log
 	{
 	}
 
-	void Logger::Log(LogType logType, const std::string& message) noexcept
+	void Logger::Log(const LogType logType, const std::string& message) noexcept
 	{
+		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
+
 		try
 		{
-			LogEntry logEntry(message, std::chrono::system_clock::now(), m_engine->GetFrameCount(), logType);
+			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_engine->GetFrameCount(), logType);
 
-			for (ISubLogger* subLogger : m_subLoggers)
+			for (ISubLogger* const subLogger : m_subLoggers)
 			{
 				subLogger->Log(logEntry);
 			}
 		}
-		catch (std::exception& e)
+		catch (const std::exception& e)
+		{
+			std::cerr << e.what() << " on writing to log.";
+		}
+	}
+
+	void Logger::LogException(const std::exception& exception, const std::string& message) noexcept
+	{
+		try
+		{
+			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_engine->GetFrameCount(), LogType::Exception);
+
+			for (ISubLogger* const subLogger : m_subLoggers)
+			{
+				subLogger->Log(logEntry);
+			}
+		}
+		catch (const std::exception& e)
 		{
 			std::cerr << e.what() << " on writing to log.";
 		}
@@ -86,7 +110,7 @@ namespace PonyEngine::Debug::Log
 		m_subLoggers.push_back(subLogger);
 	}
 
-	void Logger::RemoveSubLogger(ISubLogger* subLogger)
+	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
 		const std::vector<ISubLogger*>::iterator position = std::find(m_subLoggers.begin(), m_subLoggers.end(), subLogger);
 

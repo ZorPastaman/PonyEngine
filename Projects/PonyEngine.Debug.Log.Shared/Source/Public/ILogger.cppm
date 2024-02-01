@@ -9,6 +9,7 @@
 
 export module PonyEngine.Debug.Log.ILogger;
 
+import <exception>;
 import <string>;
 
 import PonyEngine.Debug.Log.ISubLogger;
@@ -22,9 +23,14 @@ namespace PonyEngine::Debug::Log
 	{
 	public:
 		/// @brief Logs via current @p SubLoggers.
-		/// @param logType Log type.
+		/// @details Don't log exceptions via this.
+		/// @param logType Log type. Must be a valid one-bit value.
 		/// @param message Log message.
 		virtual void Log(LogType logType, const std::string& message) noexcept = 0;
+		/// @brief Logs an exception via current @p SubLoggers.
+		/// @param exception Exception to log.
+		/// @param message Additional message.
+		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept = 0;
 
 		/// @brief Adds the @p subLogger to the list of sub-loggers.
 		/// @param subLogger @p SubLogger to add. It mustn't be already added.

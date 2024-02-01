@@ -20,7 +20,6 @@ import <concepts>;
 import <numbers>;
 import <ostream>;
 import <string>;
-import <utility>;
 
 import PonyEngine.Math.Common;
 import PonyEngine.Math.Vector3;

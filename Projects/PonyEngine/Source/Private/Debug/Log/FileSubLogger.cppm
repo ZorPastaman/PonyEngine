@@ -15,21 +15,23 @@ export module PonyEngine.Debug.Log.FileSubLogger;
 
 import <filesystem>;
 import <iostream>;
+import <utility>;
 
 import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Debug.Log.LogEntry;
 
 namespace PonyEngine::Debug::Log
 {
-	/// <summary>
-	/// Logger entry that logs to a file.
-	/// </summary>
+	/// @brief Sub-logger that logs to a file.
 	export class FileSubLogger final : public ISubLogger
 	{
 	public:
-		/// <param name="logPath">Path to a log file.</param>
+		/// @brief Creates a @p FileSubLogger.
+		/// @param logPath Path to a log file.
 		FileSubLogger(const std::filesystem::path& logPath);
 		FileSubLogger(const FileSubLogger&) = delete;
+		/// @brief Move constructor.
+		/// @param other Move source.
 		FileSubLogger(FileSubLogger&& other);
 
 		virtual ~FileSubLogger();
@@ -37,7 +39,7 @@ namespace PonyEngine::Debug::Log
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 	private:
-		std::ofstream m_logFile;
+		std::ofstream m_logFile; /// @brief log file stream.
 	};
 
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
@@ -60,16 +62,19 @@ namespace PonyEngine::Debug::Log
 
 	FileSubLogger::~FileSubLogger()
 	{
-		m_logFile.close();
+		if (m_logFile.is_open())
+		{
+			m_logFile.close();
+		}
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
 		{
-			m_logFile << logEntry.message << std::endl;
+			m_logFile << logEntry << std::endl;
 		}
-		catch (std::exception& e)
+		catch (const std::exception& e)
 		{
 			std::cerr << e.what() << " on writing to a log file.";
 		}
