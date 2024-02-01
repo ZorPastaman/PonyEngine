@@ -13,9 +13,9 @@ import <cassert>;
 
 import PonyEngine.LoggerParams;
 import PonyEngine.IEngineView;
-import PonyEngine.Debug.Logger;
-import PonyEngine.Debug.StandardOutputLoggerEntry;
-import PonyEngine.Debug.LogFileLoggerEntry;
+import PonyEngine.Debug.Log.Logger;
+import PonyEngine.Debug.Log.ConsoleSubLogger;
+import PonyEngine.Debug.Log.FileSubLogger;
 import PonyEngine.LoggerOwnerKit;
 
 namespace PonyEngine
@@ -40,36 +40,36 @@ namespace PonyEngine
 		}
 		else
 		{
-			answer.logger = new Debug::Logger(engine);
+			answer.logger = new Debug::Log::Logger(engine);
 		}
 
-		for (Factories::IEngineFeatureFactory<Debug::ILoggerEntry>* const entryFactory : params.loggerEntryFactories)
+		for (Factories::IEngineFeatureFactory<Debug::Log::ISubLogger>* const subLoggerFactory : params.subLoggerFactories)
 		{
-			assert((entryFactory != nullptr));
-			Debug::ILoggerEntry* const entry = entryFactory->Create(engine);
-			assert((entry != nullptr));
-			answer.loggerEntries.push_back(entry);
-			answer.logger->AddLoggerEntry(entry);
+			assert((subLoggerFactory != nullptr));
+			Debug::Log::ISubLogger* const subLogger = subLoggerFactory->Create(engine);
+			assert((subLogger != nullptr));
+			answer.subLoggers.push_back(subLogger);
+			answer.logger->AddSubLogger(subLogger);
 		}
 
-		for (Debug::ILoggerEntryView* const entry : params.loggerEntryViews)
+		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{
-			assert((entry != nullptr));
-			answer.logger->AddLoggerEntry(entry);
+			assert((subLogger != nullptr));
+			answer.logger->AddSubLogger(subLogger);
 		}
 
-		if (params.addStandardOutputLoggerEntry)
+		if (params.addConsoleSubLogger)
 		{
-			Debug::StandardOutputLoggerEntry* const standardEntry = new Debug::StandardOutputLoggerEntry();
-			answer.loggerEntries.push_back(standardEntry);
-			answer.logger->AddLoggerEntry(standardEntry);
+			Debug::Log::ConsoleSubLogger* const consoleSubLogger = new Debug::Log::ConsoleSubLogger();
+			answer.subLoggers.push_back(consoleSubLogger);
+			answer.logger->AddSubLogger(consoleSubLogger);
 		}
 
 		if (params.addLogFileLoggerEntry)
 		{
-			Debug::LogFileLoggerEntry* const logEntry = new Debug::LogFileLoggerEntry(params.logFilePath);
-			answer.loggerEntries.push_back(logEntry);
-			answer.logger->AddLoggerEntry(logEntry);
+			Debug::Log::FileSubLogger* const logEntry = new Debug::Log::FileSubLogger(params.logFilePath);
+			answer.subLoggers.push_back(logEntry);
+			answer.logger->AddSubLogger(logEntry);
 		}
 
 		return answer;

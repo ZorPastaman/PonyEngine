@@ -13,6 +13,7 @@ import PonyEngine.IEngine;
 import PonyEngine.EngineParams;
 import PonyEngine.EngineFeatures;
 import PonyEngine.LoggerOwnerKit;
+import PonyEngine.Debug.Log.LogType;
 
 namespace PonyEngine
 {
@@ -30,7 +31,7 @@ namespace PonyEngine
 
 		virtual size_t GetFrameCount() const noexcept override;
 
-		virtual Debug::ILoggerView* GetLogger() const noexcept override;
+		virtual Debug::Log::ILogger* GetLogger() const noexcept override;
 
 		virtual void Tick() override;
 
@@ -44,17 +45,17 @@ namespace PonyEngine
 		m_frameCount{0},
 		m_loggerKit{CreateLogger(params.loggerParams, this)}
 	{
-		m_loggerKit.logger->Log("Engine created");
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
 	}
 
 	Engine::~Engine()
 	{
-		m_loggerKit.logger->Log("Engine destructed");
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine destructed");
 
-		for (Debug::ILoggerEntry* const loggerEntry : m_loggerKit.loggerEntries)
+		for (Debug::Log::ISubLogger* const subLogger : m_loggerKit.subLoggers)
 		{
-			m_loggerKit.logger->RemoveLoggerEntry(loggerEntry);
-			delete loggerEntry;
+			m_loggerKit.logger->RemoveSubLogger(subLogger);
+			delete subLogger;
 		}
 
 		delete m_loggerKit.logger;
@@ -65,7 +66,7 @@ namespace PonyEngine
 		return m_frameCount;
 	}
 
-	Debug::ILoggerView* Engine::GetLogger() const noexcept
+	Debug::Log::ILogger* Engine::GetLogger() const noexcept
 	{
 		return m_loggerKit.logger;
 	}

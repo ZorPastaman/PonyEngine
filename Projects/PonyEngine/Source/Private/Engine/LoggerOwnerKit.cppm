@@ -11,8 +11,8 @@ export module PonyEngine.LoggerOwnerKit;
 
 import <vector>;
 
-import PonyEngine.Debug.ILogger;
-import PonyEngine.Debug.ILoggerEntry;
+import PonyEngine.Debug.Log.ILogger;
+import PonyEngine.Debug.Log.ISubLogger;
 
 namespace PonyEngine
 {
@@ -22,7 +22,7 @@ namespace PonyEngine
 	export struct LoggerOwnerKit final
 	{
 	public:
-		std::vector<Debug::ILoggerEntry*> loggerEntries{};
-		Debug::ILogger* logger{nullptr};
+		std::vector<Debug::Log::ISubLogger*> subLoggers{};
+		Debug::Log::ILogger* logger{nullptr};
 	};
 }

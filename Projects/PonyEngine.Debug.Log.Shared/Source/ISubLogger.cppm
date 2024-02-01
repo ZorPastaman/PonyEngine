@@ -7,21 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.ILogger;
+export module PonyEngine.Debug.Log.ISubLogger;
 
-import PonyEngine.Debug.ILoggerView;
+import PonyEngine.Debug.Log.LogEntry;
 
-namespace PonyEngine::Debug
+namespace PonyEngine::Debug::Log
 {
-	/// <summary>
-	/// Logger interface.
-	/// </summary>
-	/// <remarks>
-	///	This class is supposed to be pointed only by its owner.
-	/// </remarks>
-	export class ILogger : public ILoggerView
+	export class ISubLogger
 	{
 	public:
-		virtual ~ILogger() noexcept = default;
+		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 	};
 }

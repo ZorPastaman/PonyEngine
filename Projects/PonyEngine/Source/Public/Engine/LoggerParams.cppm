@@ -12,9 +12,8 @@ export module PonyEngine.LoggerParams;
 import <filesystem>;
 import <vector>;
 
-import PonyEngine.Debug.ILogger;
-import PonyEngine.Debug.ILoggerEntry;
-import PonyEngine.Debug.ILoggerEntryView;
+import PonyEngine.Debug.Log.ILogger;
+import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Factories.IEngineFeatureFactory;
 
 namespace PonyEngine
@@ -32,19 +31,19 @@ namespace PonyEngine
 		/// <summary>
 		/// Collection of logger entry factories. The produced logger entries lifetimes will be controlled by the engine.
 		/// </summary>
-		std::vector<Factories::IEngineFeatureFactory<Debug::ILoggerEntry>*> loggerEntryFactories{};
+		std::vector<Factories::IEngineFeatureFactory<Debug::Log::ISubLogger>*> subLoggerFactories{};
 		/// <summary>
 		/// Collection of legger entries. Their lifetimes won't be controlled by the engine.
 		/// </summary>
-		std::vector<Debug::ILoggerEntryView*> loggerEntryViews{};
+		std::vector<Debug::Log::ISubLogger*> subLoggers{};
 		/// <summary>
 		/// Logger factory. The produced logger lifetime is controlled by the engine.
 		/// </summary>
-		Factories::IEngineFeatureFactory<Debug::ILogger>* loggerFactory{nullptr};
+		Factories::IEngineFeatureFactory<Debug::Log::ILogger>* loggerFactory{nullptr};
 		/// <summary>
 		/// If it's true, adds a logger entry that prints logs to a console.
 		/// </summary>
-		bool addStandardOutputLoggerEntry{true};
+		bool addConsoleSubLogger{true};
 		/// <summary>
 		/// If it's true, adds a logger entry that prints logs to a file which path is set in <see cref="logFilePath"/>.
 		/// </summary>
