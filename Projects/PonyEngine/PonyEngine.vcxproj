@@ -32,6 +32,11 @@
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxproj">
+      <Project>{c30759bb-6453-4b34-a8ad-7c35d745e366}</Project>
+    </ProjectReference>
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
@@ -56,9 +61,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared">
-    <Import Project="..\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems" Label="Shared" />
-  </ImportGroup>
+  <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -76,7 +79,7 @@
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;</PublicIncludeDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

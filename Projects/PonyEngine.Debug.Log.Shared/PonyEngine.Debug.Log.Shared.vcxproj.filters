@@ -15,19 +15,16 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="EngineTests.cppm">
+    <ClCompile Include="Source\Public\ILogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Logger\TestLogger.cppm">
+    <ClCompile Include="Source\Public\ISubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Logger\TestLoggerFactory.cppm">
+    <ClCompile Include="Source\Public\LogEntry.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Logger\TestLoggerEntry.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Logger\TestLoggerEntryFactory.cppm">
+    <ClCompile Include="Source\Public\LogType.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
