@@ -9,8 +9,8 @@
 
 export module PonyEngine.Debug.Log.ConsoleSubLogger;
 
+import <exception>;
 import <iostream>;
-import <ostream>;
 import <stdexcept>;
 
 import PonyEngine.Debug.Log.ISubLogger;
@@ -19,9 +19,7 @@ import PonyEngine.Debug.Log.LogType;
 
 namespace PonyEngine::Debug::Log
 {
-	/// <summary>
-	/// Logger entry that sends logs to std::cout, std::clog and std::cerr.
-	/// </summary>
+	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
 	export class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
@@ -34,6 +32,9 @@ namespace PonyEngine::Debug::Log
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
 
+	/// @brief Chooses a console output stream by the @p logType.
+	/// @param logType Log type.
+	/// @return Chosen stream.
 	static std::ostream& ChooseStream(const LogType logType)
 	{
 		switch (logType)
@@ -48,7 +49,7 @@ namespace PonyEngine::Debug::Log
 		case LogType::Exception:
 			return std::cerr;
 		default:
-			throw std::invalid_argument("logType is an incorrect value.");
+			throw std::invalid_argument("logType has an incorrect value.");
 		}
 	}
 
@@ -57,11 +58,11 @@ namespace PonyEngine::Debug::Log
 		try
 		{
 			std::ostream& stream = ChooseStream(logEntry.logType);
-			stream << logEntry.message << std::endl;
+			stream << logEntry << std::endl;
 		}
-		catch (std::exception& e)
+		catch (const std::exception& e)
 		{
-			std::cerr << e.what() << " on writing to a console.";
+			std::cerr << e.what() << " on writing to a console." << std::endl;
 		}
 	}
 }
