@@ -12,9 +12,9 @@
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{3786A3E2-7E54-4D42-9C87-CAC481949A30}</ProjectGuid>
+    <ProjectGuid>{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PonyEngineTests</RootNamespace>
+    <RootNamespace>PonyEngineMathTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
@@ -37,9 +37,7 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared">
-    <Import Project="..\PonyEngine.Math\PonyEngine.Math.vcxitems" Label="Shared" />
-  </ImportGroup>
+  <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -118,15 +116,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Logger\TestLoggerEntry.cppm" />
-    <ClCompile Include="Logger\TestLoggerEntryFactory.cppm" />
-    <ClCompile Include="Logger\TestLoggerFactory.cppm" />
-    <ClCompile Include="EngineTests.cppm" />
-    <ClCompile Include="Logger\TestLogger.cppm" />
+    <ClCompile Include="CommonTests.cpp" />
+    <ClCompile Include="QuaternionTests.cpp" />
+    <ClCompile Include="Vector2Tests.cpp" />
+    <ClCompile Include="Vector3Tests.cpp" />
+    <ClCompile Include="Vector4Tests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PonyEngine\PonyEngine.vcxproj">
-      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
+    <ProjectReference Include="..\..\Projects\PonyEngine.Math\PonyEngine.Math.vcxproj">
+      <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
     </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

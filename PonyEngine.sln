@@ -7,13 +7,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Projects\Game\Game.
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngineTests", "Projects\PonyEngineTests\PonyEngineTests.vcxproj", "{3786A3E2-7E54-4D42-9C87-CAC481949A30}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine.Math\PonyEngine.Math.vcxproj", "{933D1110-B95B-4DF9-8584-3D39BC307A67}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine.Math\PonyEngine.Math.vcxitems", "{668B24DE-BA42-4B91-B2BF-E14BAD0604D6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Debug.Log.Shared", "Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxproj", "{C30759BB-6453-4B34-A8AD-7C35D745E366}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Projects\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Debug.Log.Shared", "Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems", "{88F7079D-33D4-46B7-B34B-50990709BFA0}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Tests\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -29,28 +27,23 @@ Global
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Debug|x64.Build.0 = Debug|x64
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.ActiveCfg = Release|x64
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.Build.0 = Release|x64
-		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Debug|x64.ActiveCfg = Debug|x64
-		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Debug|x64.Build.0 = Debug|x64
-		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Release|x64.ActiveCfg = Release|x64
-		{3786A3E2-7E54-4D42-9C87-CAC481949A30}.Release|x64.Build.0 = Release|x64
+		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Debug|x64.ActiveCfg = Debug|x64
+		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Debug|x64.Build.0 = Debug|x64
+		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Release|x64.ActiveCfg = Release|x64
+		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Release|x64.Build.0 = Release|x64
 		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.ActiveCfg = Debug|x64
 		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.Build.0 = Debug|x64
 		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.ActiveCfg = Release|x64
 		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.Build.0 = Release|x64
+		{C30759BB-6453-4B34-A8AD-7C35D745E366}.Debug|x64.ActiveCfg = Debug|x64
+		{C30759BB-6453-4B34-A8AD-7C35D745E366}.Debug|x64.Build.0 = Debug|x64
+		{C30759BB-6453-4B34-A8AD-7C35D745E366}.Release|x64.ActiveCfg = Release|x64
+		{C30759BB-6453-4B34-A8AD-7C35D745E366}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}
-	EndGlobalSection
-	GlobalSection(SharedMSBuildProjectFiles) = preSolution
-		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{3786a3e2-7e54-4d42-9c87-cac481949a30}*SharedItemsImports = 4
-		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{4a46dded-881e-4a6e-9874-2ebfb1a9ce50}*SharedItemsImports = 4
-		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}*SharedItemsImports = 4
-		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}*SharedItemsImports = 4
-		Projects\PonyEngine.Math\PonyEngine.Math.vcxitems*{668b24de-ba42-4b91-b2bf-e14bad0604d6}*SharedItemsImports = 9
-		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{88f7079d-33d4-46b7-b34b-50990709bfa0}*SharedItemsImports = 9
-		Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxitems*{d35c7778-7993-437b-b2d1-9e97f128947e}*SharedItemsImports = 4
 	EndGlobalSection
 EndGlobal

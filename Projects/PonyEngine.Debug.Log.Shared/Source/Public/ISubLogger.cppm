@@ -7,21 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log.ILogger;
+export module PonyEngine.Debug.Log.ISubLogger;
 
-import <string>;
-
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Debug.Log.LogEntry;
 
 namespace PonyEngine::Debug::Log
 {
-	export class ILogger
+	/// @brief SubLogger interface.
+	/// @details The sub-logger writes received logs to something.
+	export class ISubLogger
 	{
 	public:
-		virtual void Log(LogType logType, const std::string& message) noexcept = 0;
-
-		virtual void AddSubLogger(ISubLogger* subLogger) = 0;
-		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;
+		/// @brief Logs the @p logEntry to something.
+		/// @param logEntry Log entry to log.
+		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 	};
 }
