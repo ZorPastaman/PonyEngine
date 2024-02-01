@@ -35,7 +35,22 @@ namespace PonyEngine::Debug::Log
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
 	/// @return Chosen stream.
-	static std::ostream& ChooseStream(const LogType logType)
+	static std::ostream& ChooseStream(const LogType logType);
+
+	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
+	{
+		try
+		{
+			std::ostream& stream = ChooseStream(logEntry.logType);
+			stream << logEntry << std::endl;
+		}
+		catch (const std::exception& e)
+		{
+			std::cerr << e.what() << " on writing to a console." << std::endl;
+		}
+	}
+
+	std::ostream& ChooseStream(const LogType logType)
 	{
 		switch (logType)
 		{
@@ -50,19 +65,6 @@ namespace PonyEngine::Debug::Log
 			return std::cerr;
 		default:
 			throw std::invalid_argument("logType has an incorrect value.");
-		}
-	}
-
-	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
-	{
-		try
-		{
-			std::ostream& stream = ChooseStream(logEntry.logType);
-			stream << logEntry << std::endl;
-		}
-		catch (const std::exception& e)
-		{
-			std::cerr << e.what() << " on writing to a console." << std::endl;
 		}
 	}
 }
