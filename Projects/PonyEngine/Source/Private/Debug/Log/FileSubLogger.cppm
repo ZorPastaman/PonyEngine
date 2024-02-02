@@ -45,7 +45,7 @@ namespace PonyEngine::Debug::Log
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		m_logFile(logPath)
 	{
-		if (!m_logFile.is_open())
+		if (!m_logFile.is_open()) [[unlikely]]
 		{
 			std::cerr << logPath << " isn't open. Logs won't be written to file!" << std::endl;
 		}
@@ -54,7 +54,7 @@ namespace PonyEngine::Debug::Log
 	FileSubLogger::FileSubLogger(FileSubLogger&& other) :
 		m_logFile(std::move(other.m_logFile))
 	{
-		if (!m_logFile.is_open())
+		if (!m_logFile.is_open()) [[unlikely]]
 		{
 			std::cerr << "Moved non-opened logFile. Logs won't be written to file!" << std::endl;
 		}
@@ -62,7 +62,7 @@ namespace PonyEngine::Debug::Log
 
 	FileSubLogger::~FileSubLogger()
 	{
-		if (m_logFile.is_open())
+		if (m_logFile.is_open()) [[likely]]
 		{
 			m_logFile.close();
 		}

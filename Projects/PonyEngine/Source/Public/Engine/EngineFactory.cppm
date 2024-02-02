@@ -7,27 +7,38 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EntryPoint;
+export module PonyEngine.EngineFactory;
 
 import "PonyAPIMacro.h";
 
+import PonyEngine.Engine;
 import PonyEngine.IEngine;
 import PonyEngine.EngineParams;
 
 namespace PonyEngine
 {
-	/// <summary>
-	/// Creates a new Engine instance with default parameters
-	/// and returns it as <see cref="IEngine"/>.
-	/// </summary>
-	/// <returns>New Engine.</returns>
+	/// @brief Creates a new @p Engine instance with default parameters.
+	/// @return Created @p Engine.
 	export extern "C" PONY_API IEngine* CreateEngine();
 
-	/// <summary>
-	/// Creates a new Engine instance with <paramref name="params"/>
-	/// and returns it as <see cref="IEngine"/>.
-	/// </summary>
-	/// <param name="params">Engine parameters.</param>
-	/// <returns>New Engine.</returns>
+	/// @brief Creates a new @p Engine instance with the @p params.
+	/// @param params Engine parameters.
+	/// @return Created @p Engine.
 	export extern "C" PONY_API IEngine* CreateEngineWithParams(const EngineParams& params);
+}
+
+module : private;
+
+namespace PonyEngine
+{
+	IEngine* CreateEngine()
+	{
+		EngineParams params;
+		return CreateEngineWithParams(params);
+	}
+
+	IEngine* CreateEngineWithParams(const EngineParams& params)
+	{
+		return new PonyEngine::Engine(params);
+	}
 }

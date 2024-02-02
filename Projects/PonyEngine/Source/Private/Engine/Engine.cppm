@@ -9,6 +9,8 @@
 
 export module PonyEngine.Engine;
 
+import <cstddef>;
+
 import PonyEngine.IEngine;
 import PonyEngine.EngineParams;
 import PonyEngine.EngineFeatures;
@@ -29,7 +31,7 @@ namespace PonyEngine
 
 		virtual ~Engine();
 
-		virtual size_t GetFrameCount() const noexcept override;
+		virtual std::size_t GetFrameCount() const noexcept override;
 
 		virtual Debug::Log::ILogger* GetLogger() const noexcept override;
 
@@ -38,12 +40,12 @@ namespace PonyEngine
 	private:
 		const LoggerOwnerKit m_loggerKit;
 
-		size_t m_frameCount;
+		std::size_t m_frameCount;
 	};
 
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
-		m_loggerKit{CreateLogger(params.loggerParams, this)}
+		m_loggerKit{CreateLogger(params.loggerParams, *this)}
 	{
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
 	}
