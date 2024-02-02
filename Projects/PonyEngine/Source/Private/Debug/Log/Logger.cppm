@@ -35,10 +35,12 @@ namespace PonyEngine::Debug::Log
 	public:
 		/// @brief Creates a @p Logger.
 		/// @param engine Engine that the logger is owned by.
+		[[nodiscard("Pure constructor")]]
 		Logger(const Core::IEngine& engine) noexcept;
 		Logger(const Logger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
+		[[nodiscard("Pure constructor")]]
 		Logger(Logger&& other) noexcept;
 
 		virtual ~Logger() noexcept = default;
@@ -54,7 +56,12 @@ namespace PonyEngine::Debug::Log
 
 		const Core::IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Debug::Log
+{
 	Logger::Logger(const Core::IEngine& engine) noexcept :
 		m_subLoggers{},
 		m_engine{&engine}
@@ -113,7 +120,7 @@ namespace PonyEngine::Debug::Log
 	{
 		const std::vector<ISubLogger*>::iterator position = std::find(m_subLoggers.begin(), m_subLoggers.end(), subLogger);
 
-		if (position != m_subLoggers.end())
+		if (position != m_subLoggers.end()) [[likely]]
 		{
 			m_subLoggers.erase(position);
 		}

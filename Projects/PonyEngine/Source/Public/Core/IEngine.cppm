@@ -23,10 +23,12 @@ namespace PonyEngine::Core
 
 		/// @brief Gets current frame count.
 		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
 		virtual std::size_t GetFrameCount() const noexcept = 0;
 
 		/// @brief Gets an engine logger.
 		/// @return Engine logger.
+		[[nodiscard("Pure function")]]
 		virtual Debug::Log::ILogger* GetLogger() const noexcept = 0;
 
 		/// @brief Ticks the engine and increments its frame count.

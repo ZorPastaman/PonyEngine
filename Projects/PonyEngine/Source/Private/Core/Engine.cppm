@@ -10,6 +10,8 @@
 export module PonyEngine.Core.Engine;
 
 import <cstddef>;
+import <iostream>;
+import <exception>;
 
 import PonyEngine.Core.EngineFeatures;
 import PonyEngine.Core.EngineParams;
@@ -26,16 +28,20 @@ namespace PonyEngine::Core
 	public:
 		/// @brief Creates an @p Engine with the @p params.
 		/// @param params Engine parameters.
+		[[nodiscard("Pure constructor")]]
 		Engine(const EngineParams& params);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
-		virtual ~Engine();
+		virtual ~Engine() noexcept;
 
+		[[nodiscard("Pure function")]]
 		virtual std::size_t GetFrameCount() const noexcept override;
 
+		[[nodiscard("Pure function")]]
 		virtual Debug::Log::ILogger* GetLogger() const noexcept override;
 
+		[[nodiscard("Pure function")]]
 		virtual void Tick() override;
 
 	private:
@@ -43,7 +49,12 @@ namespace PonyEngine::Core
 
 		std::size_t m_frameCount; /// @brief Current frame.
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Core
+{
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
 		m_loggerKit{CreateLogger(params.loggerParams, *this)}
@@ -51,14 +62,21 @@ namespace PonyEngine::Core
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
 	}
 
-	Engine::~Engine()
+	Engine::~Engine() noexcept
 	{
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine destructed");
 
 		for (Debug::Log::ISubLogger* const subLogger : m_loggerKit.subLoggers)
 		{
-			m_loggerKit.logger->RemoveSubLogger(subLogger);
-			delete subLogger;
+			try
+			{
+				m_loggerKit.logger->RemoveSubLogger(subLogger);
+				delete subLogger;
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << "Exception on removing sub logger: " << e.what() << std::endl;
+			}
 		}
 
 		delete m_loggerKit.logger;

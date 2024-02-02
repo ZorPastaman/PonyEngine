@@ -24,7 +24,15 @@ namespace PonyEngine::Core
 	/// @param params Logger parameters.
 	/// @param engine Engine that is an owner of the created logger.
 	/// @return Struct that holds pointers to a created logger and its sub-loggers.
-	export LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
+	export [[nodiscard("Pure function")]] 
+	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine);
+}
+
+module : private;
+
+namespace PonyEngine::Core
+{
+	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
 		answer.logger = new Debug::Log::Logger(engine);
