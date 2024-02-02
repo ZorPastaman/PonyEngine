@@ -11,45 +11,28 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\PonyAPIMacro.h" />
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
-    <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Core\EngineFeatures.cppm" />
-    <ClCompile Include="Source\Private\Core\Engine.cppm" />
-    <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm" />
-    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
-    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PonyEngine.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxproj">
-      <Project>{c30759bb-6453-4b34-a8ad-7c35d745e366}</Project>
-    </ProjectReference>
+    <ClCompile Include="Source\Public\Common.cppm" />
+    <ClCompile Include="Source\Public\Quaternion.cppm" />
+    <ClCompile Include="Source\Public\Vector2.cppm" />
+    <ClCompile Include="Source\Public\Vector3.cppm" />
+    <ClCompile Include="Source\Public\Vector4.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{d35c7778-7993-437b-b2d1-9e97f128947e}</ProjectGuid>
-    <RootNamespace>PonyEngine</RootNamespace>
+    <ProjectGuid>{933d1110-b95b-4df9-8584-3d39bc307a67}</ProjectGuid>
+    <RootNamespace>PonyEngineMath</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <WholeProgramOptimization>true</WholeProgramOptimization>
@@ -58,7 +41,8 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" />
+  <ImportGroup Label="Shared">
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
   </ImportGroup>
@@ -69,13 +53,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
