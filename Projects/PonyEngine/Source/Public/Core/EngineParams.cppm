@@ -20,19 +20,27 @@ namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates an @p EngineParams.
+		[[nodiscard("Pure constructor")]]
 		EngineParams();
 		/// @brief Copy constructor.
 		/// @param other Copy source.
+		[[nodiscard("Pure constructor")]]
 		EngineParams(const EngineParams& other);
 		/// @brief Move constructor.
 		/// @param other Move source.
+		[[nodiscard("Pure constructor")]]
 		EngineParams(EngineParams&& other);
 
 		~EngineParams() = default;
 
 		LoggerParams loggerParams; /// @brief Logger parameters.
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Core
+{
 	EngineParams::EngineParams() :
 		loggerParams()
 	{

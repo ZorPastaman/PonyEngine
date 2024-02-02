@@ -23,6 +23,7 @@ namespace PonyEngine::Debug::Log
 	export class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
 		ConsoleSubLogger() noexcept = default;
 		ConsoleSubLogger(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger(ConsoleSubLogger&&) = delete;
@@ -31,10 +32,16 @@ namespace PonyEngine::Debug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Debug::Log
+{
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
 	/// @return Chosen stream.
+	[[nodiscard("Pure function")]]
 	static std::ostream& ChooseStream(const LogType logType);
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept

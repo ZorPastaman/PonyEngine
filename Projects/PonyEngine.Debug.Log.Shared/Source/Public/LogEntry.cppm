@@ -33,12 +33,14 @@ namespace PonyEngine::Debug::Log
 		/// @param timePoint Time when the log entry is created.
 		/// @param frameCount Frame when the log entry is created.
 		/// @param logType Log type.
-		constexpr LogEntry(const std::string& message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
+		[[nodiscard("Pure constructor")]]
+		LogEntry(const std::string& message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
 
-		constexpr ~LogEntry() = default;
+		~LogEntry() noexcept = default;
 
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Created string.
+		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
 		const std::string& message; /// @brief Log message.
@@ -52,9 +54,20 @@ namespace PonyEngine::Debug::Log
 	/// @param stream Target stream.
 	/// @param logEntry Input source.
 	/// @return @p stream.
-	export inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
+	export [[nodiscard("Pure function")]]
+	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
 
-	constexpr LogEntry::LogEntry(const std::string& message, const std::exception* const exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept :
+	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
+	{
+		return stream << logEntry.ToString();
+	}
+}
+
+module : private;
+
+namespace PonyEngine::Debug::Log
+{
+	LogEntry::LogEntry(const std::string& message, const std::exception* const exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept :
 		message(message),
 		exception(exception),
 		timePoint(timePoint),
@@ -84,10 +97,5 @@ namespace PonyEngine::Debug::Log
 		}
 
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", PonyEngine::Debug::Log::ToString(logType, false), timePoint, frameCount, message);
-	}
-
-	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
-	{
-		return stream << logEntry.ToString();
 	}
 }

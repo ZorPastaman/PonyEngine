@@ -21,8 +21,11 @@ namespace PonyEngine::Core
 	export struct LoggerOwnerKit final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
 		LoggerOwnerKit() noexcept;
+		[[nodiscard("Pure constructor")]]
 		LoggerOwnerKit(const LoggerOwnerKit& other);
+		[[nodiscard("Pure constructor")]]
 		LoggerOwnerKit(LoggerOwnerKit&& other) noexcept;
 
 		~LoggerOwnerKit() noexcept = default;
@@ -30,7 +33,12 @@ namespace PonyEngine::Core
 		std::vector<Debug::Log::ISubLogger*> subLoggers;
 		Debug::Log::ILogger* logger;
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Core
+{
 	LoggerOwnerKit::LoggerOwnerKit() noexcept :
 		subLoggers{},
 		logger{}
