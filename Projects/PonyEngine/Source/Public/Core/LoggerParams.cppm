@@ -7,16 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.LoggerParams;
+export module PonyEngine.Core.LoggerParams;
 
 import <filesystem>;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.ISubLogger;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
 	/// @brief Holds engine logger parameters.
 	export struct LoggerParams final

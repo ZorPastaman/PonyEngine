@@ -7,32 +7,27 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EngineFeatures;
+export module PonyEngine.Core.EngineFeatures;
 
 import <cassert>;
 
-import PonyEngine.LoggerParams;
-import PonyEngine.IEngine;
-import PonyEngine.Debug.Log.Logger;
+import PonyEngine.Core.IEngine;
+import PonyEngine.Core.LoggerOwnerKit;
+import PonyEngine.Core.LoggerParams;
 import PonyEngine.Debug.Log.ConsoleSubLogger;
 import PonyEngine.Debug.Log.FileSubLogger;
-import PonyEngine.LoggerOwnerKit;
+import PonyEngine.Debug.Log.Logger;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
-	/// <summary>
-	/// Creates a logger and its entries.
-	/// </summary>
-	/// <param name="params">Logger parameters.</param>
-	/// <param name="engine">Engine that is an owner of the created logger.</param>
-	/// <returns>
-	/// Struct that holds pointers to a created logger and its entries
-	/// which lifetimes are controlled by the engine.
-	/// </returns>
+	/// @brief Creates a logger and its sub-loggers.
+	/// @param params Logger parameters.
+	/// @param engine Engine that is an owner of the created logger.
+	/// @return Struct that holds pointers to a created logger and its sub-loggers.
 	export LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
-		answer.logger = new Debug::Log::Logger(&engine);
+		answer.logger = new Debug::Log::Logger(engine);
 
 		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{

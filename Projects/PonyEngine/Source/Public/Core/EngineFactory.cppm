@@ -7,15 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.EngineFactory;
+export module PonyEngine.Core.EngineFactory;
 
 import "PonyAPIMacro.h";
 
-import PonyEngine.Engine;
-import PonyEngine.IEngine;
-import PonyEngine.EngineParams;
+import PonyEngine.Core.Engine;
+import PonyEngine.Core.EngineParams;
+import PonyEngine.Core.IEngine;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
 	/// @brief Creates a new @p Engine instance with default parameters.
 	/// @return Created @p Engine.
@@ -29,7 +29,7 @@ namespace PonyEngine
 
 module : private;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
 	IEngine* CreateEngine()
 	{
@@ -39,6 +39,6 @@ namespace PonyEngine
 
 	IEngine* CreateEngineWithParams(const EngineParams& params)
 	{
-		return new PonyEngine::Engine(params);
+		return new Engine(params);
 	}
 }

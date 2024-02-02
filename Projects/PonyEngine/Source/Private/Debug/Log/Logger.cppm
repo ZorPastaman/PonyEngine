@@ -21,7 +21,7 @@ import <string>;
 import <vector>;
 import <utility>;
 
-import PonyEngine.IEngine;
+import PonyEngine.Core.IEngine;
 import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Debug.Log.LogEntry;
@@ -35,7 +35,7 @@ namespace PonyEngine::Debug::Log
 	public:
 		/// @brief Creates a @p Logger.
 		/// @param engine Engine that the logger is owned by.
-		Logger(const IEngine* engine) noexcept;
+		Logger(const Core::IEngine& engine) noexcept;
 		Logger(const Logger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
@@ -52,14 +52,13 @@ namespace PonyEngine::Debug::Log
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
 
-		const IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
+		const Core::IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
 
-	Logger::Logger(const IEngine* const engine) noexcept :
+	Logger::Logger(const Core::IEngine& engine) noexcept :
 		m_subLoggers{},
-		m_engine{engine}
+		m_engine{&engine}
 	{
-		assert((engine != nullptr));
 	}
 
 	Logger::Logger(Logger&& other) noexcept :

@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.IEngine;
+export module PonyEngine.Core.IEngine;
 
 import <cstddef>;
 
 import PonyEngine.Debug.Log.ILogger;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
 	/// @brief Main Pony Engine interface.
 	export class IEngine
