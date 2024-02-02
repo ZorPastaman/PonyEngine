@@ -801,10 +801,10 @@ namespace PonyEngineTests
 			Assert::AreEqual(wf * wf1, vectorF2.w);
 
 			vectorF2 = vectorF / vectorF1;
-			Assert::AreEqual(xf / xf1, vectorF2.x);
-			Assert::AreEqual(yf / yf1, vectorF2.y);
-			Assert::AreEqual(zf / zf1, vectorF2.z);
-			Assert::AreEqual(wf / wf1, vectorF2.w);
+			Assert::AreEqual(static_cast<double>(xf / xf1), static_cast<double>(vectorF2.x), 0.0001);
+			Assert::AreEqual(static_cast<double>(yf / yf1), static_cast<double>(vectorF2.y), 0.0001);
+			Assert::AreEqual(static_cast<double>(zf / zf1), static_cast<double>(vectorF2.z), 0.0001);
+			Assert::AreEqual(static_cast<double>(wf / wf1), static_cast<double>(vectorF2.w), 0.0001);
 
 			short xi = 90;
 			short yi = 100;

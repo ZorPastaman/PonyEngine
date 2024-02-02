@@ -22,12 +22,15 @@ namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates a @p LoggerParams.
+		[[nodiscard("Pure constructor")]]
 		LoggerParams();
 		/// @brief Copy constructor.
 		/// @param other Copy source.
+		[[nodiscard("Pure constructor")]]
 		LoggerParams(const LoggerParams& other);
 		/// @brief Move constructor.
 		/// @param other Move source.
+		[[nodiscard("Pure constructor")]]
 		LoggerParams(LoggerParams&& other);
 
 		~LoggerParams() = default;
@@ -37,7 +40,12 @@ namespace PonyEngine::Core
 		bool addConsoleSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a console.
 		bool addLogFileSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a file which path is set in the @p logFilePath.
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Core
+{
 	LoggerParams::LoggerParams() :
 		logFilePath("Log.log"),
 		subLoggers{},
