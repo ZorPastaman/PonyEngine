@@ -28,10 +28,12 @@ namespace PonyEngine::Debug::Log
 	public:
 		/// @brief Creates a @p FileSubLogger.
 		/// @param logPath Path to a log file.
+		[[nodiscard("Pure constructor")]]
 		FileSubLogger(const std::filesystem::path& logPath);
 		FileSubLogger(const FileSubLogger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
+		[[nodiscard("Pure constructor")]]
 		FileSubLogger(FileSubLogger&& other);
 
 		virtual ~FileSubLogger();
@@ -41,7 +43,12 @@ namespace PonyEngine::Debug::Log
 	private:
 		std::ofstream m_logFile; /// @brief log file stream.
 	};
+}
 
+module : private;
+
+namespace PonyEngine::Debug::Log
+{
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		m_logFile(logPath)
 	{

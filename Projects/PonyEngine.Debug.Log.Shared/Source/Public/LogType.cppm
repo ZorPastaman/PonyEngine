@@ -45,22 +45,58 @@ namespace PonyEngine::Debug::Log
 	/// @param logType Log type.
 	/// @param addNumber If it's true, the string will contain a number representation.
 	/// @return Created string.
-	export std::string ToString(const LogType logType, const bool addNumber = false);
+	export [[nodiscard("Pure function")]] 
+	std::string ToString(const LogType logType, const bool addNumber = false);
 
-	export constexpr inline LogType operator ~(const LogType logType) noexcept;
+	export [[nodiscard("Pure function")]] 
+	constexpr inline LogType operator ~(const LogType logType) noexcept;
 
-	export constexpr inline LogType operator &(const LogType left, const LogType right) noexcept;
+	export [[nodiscard("Pure function")]] 
+	constexpr inline LogType operator &(const LogType left, const LogType right) noexcept;
 
-	export constexpr inline LogType operator |(const LogType left, const LogType right) noexcept;
+	export [[nodiscard("Pure function")]] 
+	constexpr inline LogType operator |(const LogType left, const LogType right) noexcept;
 
-	export constexpr inline LogType operator ^(const LogType left, const LogType right) noexcept;
+	export [[nodiscard("Pure function")]] 
+	constexpr inline LogType operator ^(const LogType left, const LogType right) noexcept;
 
 	/// @brief Puts ToString(logType) into the @p stream.
 	/// @param stream Target stream.
 	/// @param logType Input source.
 	/// @return @p stream.
-	export inline std::ostream& operator <<(std::ostream& stream, const LogType logType);
+	export [[nodiscard("Pure function")]]
+	inline std::ostream& operator <<(std::ostream& stream, const LogType logType);
 
+	constexpr inline LogType operator ~(const LogType logType) noexcept
+	{
+		return static_cast<LogType>(~static_cast<std::underlying_type_t<LogType>>(logType));
+	}
+
+	constexpr inline LogType operator &(const LogType left, const LogType right) noexcept
+	{
+		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) & static_cast<std::underlying_type_t<LogType>>(right));
+	}
+
+	constexpr inline LogType operator |(const LogType left, const LogType right) noexcept
+	{
+		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) | static_cast<std::underlying_type_t<LogType>>(right));
+	}
+
+	constexpr inline LogType operator ^(const LogType left, const LogType right) noexcept
+	{
+		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) ^ static_cast<std::underlying_type_t<LogType>>(right));
+	}
+
+	inline std::ostream& operator <<(std::ostream& stream, const LogType logType)
+	{
+		return stream << ToString(logType, true);
+	}
+}
+
+module : private;
+
+namespace PonyEngine::Debug::Log
+{
 	std::string ToString(const LogType logType, const bool addNumber)
 	{
 		const std::string delimiter = " | ";
@@ -114,30 +150,5 @@ namespace PonyEngine::Debug::Log
 
 		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
 		return std::format("{} ({})", answer, number);
-	}
-
-	constexpr inline LogType operator ~(const LogType logType) noexcept
-	{
-		return static_cast<LogType>(~static_cast<std::underlying_type_t<LogType>>(logType));
-	}
-
-	constexpr inline LogType operator &(const LogType left, const LogType right) noexcept
-	{
-		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) & static_cast<std::underlying_type_t<LogType>>(right));
-	}
-
-	constexpr inline LogType operator |(const LogType left, const LogType right) noexcept
-	{
-		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) | static_cast<std::underlying_type_t<LogType>>(right));
-	}
-
-	constexpr inline LogType operator ^(const LogType left, const LogType right) noexcept
-	{
-		return static_cast<LogType>(static_cast<std::underlying_type_t<LogType>>(left) ^ static_cast<std::underlying_type_t<LogType>>(right));
-	}
-
-	inline std::ostream& operator <<(std::ostream& stream, const LogType logType)
-	{
-		return stream << ToString(logType, true);
 	}
 }

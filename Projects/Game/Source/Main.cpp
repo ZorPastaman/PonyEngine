@@ -9,6 +9,7 @@
 
 #include <format>
 #include <iostream>
+#include <memory>
 #include <string>
 
 import PonyEngine.Core.EngineFactory;
@@ -26,7 +27,7 @@ int main(int argc, char** argv)
 		std::cout << '\t' << argv[i] << std::endl;
 	}
 
-	PonyEngine::Core::IEngine* engine = PonyEngine::Core::CreateEngine();
+	auto engine = std::unique_ptr<PonyEngine::Core::IEngine>(PonyEngine::Core::CreateEngine());
 
 	for (int i = 0; i < 10; ++i)
 	{
@@ -36,8 +37,6 @@ int main(int argc, char** argv)
 		engine->Tick();
 		engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, std::format("Frame Count After Tick: {}", engine->GetFrameCount()));
 	}
-
-	delete engine;
 
 	return 0;
 }

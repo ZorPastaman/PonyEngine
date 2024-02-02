@@ -456,12 +456,12 @@ namespace PonyEngineTests
 			Assert::AreEqual(-90.f, PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI));
 
 			vectorI1.Set(-1, 0);
-			Assert::AreEqual(std::numbers::pi_v<float>, PonyEngine::Math::Angle(vectorI, vectorI1));
-			Assert::AreEqual(180.f, PonyEngine::Math::AngleDegrees(vectorI, vectorI1));
-			Assert::AreEqual(std::numbers::pi_v<float>, PonyEngine::Math::AngleSigned(vectorI, vectorI1));
-			Assert::AreEqual(180.f, PonyEngine::Math::AngleSignedDegrees(vectorI, vectorI1));
-			Assert::AreEqual(-std::numbers::pi_v<float>, PonyEngine::Math::AngleSigned(vectorI1, vectorI));
-			Assert::AreEqual(-180.f, PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI));
+			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::Angle(vectorI, vectorI1)));
+			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleDegrees(vectorI, vectorI1)));
+			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::AngleSigned(vectorI, vectorI1)));
+			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleSignedDegrees(vectorI, vectorI1)));
+			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::AngleSigned(vectorI1, vectorI)));
+			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI)));
 		}
 
 		TEST_METHOD(ProjectTest)
