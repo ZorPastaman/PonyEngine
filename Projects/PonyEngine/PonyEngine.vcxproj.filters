@@ -23,70 +23,34 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Engine\Engine.cppm">
+    <ClCompile Include="Source\Private\Core\Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\EntryPoint\EntryPointDefinition.cppm">
+    <ClCompile Include="Source\Public\Core\IEngine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Engine\IEngine.cppm">
+    <ClCompile Include="Source\Public\Core\EngineFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\EntryPoint\EntryPoint.cppm">
+    <ClCompile Include="Source\Public\Core\EngineParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Engine\IEngineView.cppm">
+    <ClCompile Include="Source\Private\Core\EngineFeatures.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Logger\ILogger.cppm">
+    <ClCompile Include="Source\Private\Debug\Log\Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntry.cppm">
+    <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Engine\EngineParams.cppm">
+    <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Engine\EngineFeatures.cppm">
+    <ClCompile Include="Source\Public\Core\LoggerParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Logger\Logger.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerView.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Logger\StandardOutputLoggerEntry.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Logger\ILoggerEntryView.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Factories\EngineFeatureFactories\IEngineFeatureFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Engine\LoggerOwnerKit.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Engine\LoggerParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Logger\LogFileLoggerEntry.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Math\Vector3.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Math\Common.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Math\Vector2.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Math\Vector4.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Math\Quaternion.cppm">
+    <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
