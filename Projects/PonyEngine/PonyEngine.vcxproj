@@ -18,13 +18,13 @@
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Engine\EngineFeatures.cppm" />
-    <ClCompile Include="Source\Private\Engine\Engine.cppm" />
-    <ClCompile Include="Source\Private\Engine\LoggerOwnerKit.cppm" />
-    <ClCompile Include="Source\Public\Engine\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Engine\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Engine\EngineFactory.cppm" />
-    <ClCompile Include="Source\Public\Engine\IEngine.cppm" />
+    <ClCompile Include="Source\Private\Core\EngineFeatures.cppm" />
+    <ClCompile Include="Source\Private\Core\Engine.cppm" />
+    <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm" />
+    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
+    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
@@ -69,13 +69,13 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Engine;$(ProjectDir)\Source\Public\EntryPoint;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Logger;$(ProjectDir)\Source\Public\Factories;$(ProjectDir)\Source\Public\Factories\EngineFeatureFactories</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>

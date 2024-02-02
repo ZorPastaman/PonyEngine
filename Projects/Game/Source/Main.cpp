@@ -7,22 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
 #include <format>
+#include <iostream>
+#include <string>
 
-export module EngineMain;
-
-import <iostream>;
-import <string>;
-import <exception>;
-
-import PonyEngine.EngineFactory;
-import PonyEngine.IEngine;
+import PonyEngine.Core.EngineFactory;
+import PonyEngine.Core.IEngine;
 import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.LogType;
 
-export int main(int argc, char** argv)
+int main(int argc, char** argv)
 {
 	std::cout << "Hello World!" << std::endl;
 	std::cout << "Arguments:" << std::endl;
@@ -32,7 +26,7 @@ export int main(int argc, char** argv)
 		std::cout << '\t' << argv[i] << std::endl;
 	}
 
-	PonyEngine::IEngine* engine = PonyEngine::CreateEngine();
+	PonyEngine::Core::IEngine* engine = PonyEngine::Core::CreateEngine();
 
 	for (int i = 0; i < 10; ++i)
 	{

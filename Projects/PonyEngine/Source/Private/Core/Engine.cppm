@@ -7,24 +7,25 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Engine;
+export module PonyEngine.Core.Engine;
 
 import <cstddef>;
 
-import PonyEngine.IEngine;
-import PonyEngine.EngineParams;
-import PonyEngine.EngineFeatures;
-import PonyEngine.LoggerOwnerKit;
+import PonyEngine.Core.EngineFeatures;
+import PonyEngine.Core.EngineParams;
+import PonyEngine.Core.IEngine;
+import PonyEngine.Core.LoggerOwnerKit;
+import PonyEngine.Debug.Log.Logger;
 import PonyEngine.Debug.Log.LogType;
 
-namespace PonyEngine
+namespace PonyEngine::Core
 {
-	/// <summary>
-	/// Pony Engine main class.
-	/// </summary>
+	/// @brief Pony Engine main class.
 	export class Engine final : public IEngine
 	{
 	public:
+		/// @brief Creates an @p Engine with the @p params.
+		/// @param params Engine parameters.
 		Engine(const EngineParams& params);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
@@ -38,9 +39,9 @@ namespace PonyEngine
 		virtual void Tick() override;
 
 	private:
-		const LoggerOwnerKit m_loggerKit;
+		const LoggerOwnerKit m_loggerKit; /// @brief Logger and sub-logger that are owned by the @p Engine.
 
-		std::size_t m_frameCount;
+		std::size_t m_frameCount; /// @brief Current frame.
 	};
 
 	Engine::Engine(const EngineParams& params) :
@@ -63,7 +64,7 @@ namespace PonyEngine
 		delete m_loggerKit.logger;
 	}
 
-	size_t Engine::GetFrameCount() const noexcept
+	std::size_t Engine::GetFrameCount() const noexcept
 	{
 		return m_frameCount;
 	}
