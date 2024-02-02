@@ -9,27 +9,27 @@
 
 export module PonyEngine.IEngine;
 
-import PonyEngine.IEngineView;
+import <cstddef>;
+
+import PonyEngine.Debug.Log.ILogger;
 
 namespace PonyEngine
 {
-	/// <summary>
-	/// Pony Engine interface.
-	/// </summary>
-	/// <remarks>
-	///	This class is supposed to be pointed only by its owner.
-	/// </remarks>
-	export class IEngine : public IEngineView
+	/// @brief Main Pony Engine interface.
+	export class IEngine
 	{
 	public:
 		virtual ~IEngine() noexcept = default;
 
-		/// <summary>
-		/// Ticks the engine.
-		/// </summary>
-		/// <remarks>
-		/// It increments frame count.
-		/// </remarks>
+		/// @brief Gets current frame count.
+		/// @return Current frame count.
+		virtual std::size_t GetFrameCount() const noexcept = 0;
+
+		/// @brief Gets an engine logger.
+		/// @return Engine logger.
+		virtual Debug::Log::ILogger* GetLogger() const noexcept = 0;
+
+		/// @brief Ticks the engine and increments its frame count.
 		virtual void Tick() = 0;
 	};
 }

@@ -12,7 +12,7 @@ export module PonyEngine.EngineFeatures;
 import <cassert>;
 
 import PonyEngine.LoggerParams;
-import PonyEngine.IEngineView;
+import PonyEngine.IEngine;
 import PonyEngine.Debug.Log.Logger;
 import PonyEngine.Debug.Log.ConsoleSubLogger;
 import PonyEngine.Debug.Log.FileSubLogger;
@@ -29,28 +29,10 @@ namespace PonyEngine
 	/// Struct that holds pointers to a created logger and its entries
 	/// which lifetimes are controlled by the engine.
 	/// </returns>
-	export LoggerOwnerKit CreateLogger(const LoggerParams& params, IEngineView* const engine)
+	export LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
-		LoggerOwnerKit answer{};
-
-		if (params.loggerFactory != nullptr)
-		{
-			answer.logger = params.loggerFactory->Create(engine);
-			assert((answer.logger != nullptr));
-		}
-		else
-		{
-			answer.logger = new Debug::Log::Logger(engine);
-		}
-
-		for (Factories::IEngineFeatureFactory<Debug::Log::ISubLogger>* const subLoggerFactory : params.subLoggerFactories)
-		{
-			assert((subLoggerFactory != nullptr));
-			Debug::Log::ISubLogger* const subLogger = subLoggerFactory->Create(engine);
-			assert((subLogger != nullptr));
-			answer.subLoggers.push_back(subLogger);
-			answer.logger->AddSubLogger(subLogger);
-		}
+		LoggerOwnerKit answer;
+		answer.logger = new Debug::Log::Logger(&engine);
 
 		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{
@@ -65,7 +47,7 @@ namespace PonyEngine
 			answer.logger->AddSubLogger(consoleSubLogger);
 		}
 
-		if (params.addLogFileLoggerEntry)
+		if (params.addLogFileSubLogger)
 		{
 			Debug::Log::FileSubLogger* const logEntry = new Debug::Log::FileSubLogger(params.logFilePath);
 			answer.subLoggers.push_back(logEntry);

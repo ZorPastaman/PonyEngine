@@ -21,7 +21,7 @@ import <string>;
 import <vector>;
 import <utility>;
 
-import PonyEngine.IEngineView;
+import PonyEngine.IEngine;
 import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Debug.Log.LogEntry;
@@ -35,13 +35,13 @@ namespace PonyEngine::Debug::Log
 	public:
 		/// @brief Creates a @p Logger.
 		/// @param engine Engine that the logger is owned by.
-		Logger(const IEngineView* engine);
+		Logger(const IEngine* engine) noexcept;
 		Logger(const Logger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
-		Logger(Logger&& other);
+		Logger(Logger&& other) noexcept;
 
-		virtual ~Logger() = default;
+		virtual ~Logger() noexcept = default;
 
 		virtual void Log(LogType logType, const std::string& message) noexcept override;
 		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept override;
@@ -52,17 +52,17 @@ namespace PonyEngine::Debug::Log
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
 
-		const IEngineView* const m_engine; /// @brief Engine the owner of the @p Logger.
+		const IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
 
-	Logger::Logger(const IEngineView* const engine) :
+	Logger::Logger(const IEngine* const engine) noexcept :
 		m_subLoggers{},
 		m_engine{engine}
 	{
 		assert((engine != nullptr));
 	}
 
-	Logger::Logger(Logger&& other) :
+	Logger::Logger(Logger&& other) noexcept :
 		m_subLoggers(std::move(other.m_subLoggers)),
 		m_engine{other.m_engine}
 	{

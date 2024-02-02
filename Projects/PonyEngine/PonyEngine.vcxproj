@@ -21,13 +21,10 @@
     <ClCompile Include="Source\Private\Engine\EngineFeatures.cppm" />
     <ClCompile Include="Source\Private\Engine\Engine.cppm" />
     <ClCompile Include="Source\Private\Engine\LoggerOwnerKit.cppm" />
-    <ClCompile Include="Source\Private\EntryPoint\EntryPointDefinition.cppm" />
     <ClCompile Include="Source\Public\Engine\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Engine\IEngineView.cppm" />
     <ClCompile Include="Source\Public\Engine\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\EntryPoint\EntryPoint.cppm" />
+    <ClCompile Include="Source\Public\Engine\EngineFactory.cppm" />
     <ClCompile Include="Source\Public\Engine\IEngine.cppm" />
-    <ClCompile Include="Source\Public\Factories\EngineFeatureFactories\IEngineFeatureFactory.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
