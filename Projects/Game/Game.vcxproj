@@ -107,9 +107,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxproj">
-      <Project>{c30759bb-6453-4b34-a8ad-7c35d745e366}</Project>
-    </ProjectReference>
     <ProjectReference Include="..\PonyEngine.Math\PonyEngine.Math.vcxproj">
       <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
     </ProjectReference>
