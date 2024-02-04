@@ -87,14 +87,14 @@ namespace PonyEngineTests
 			PonyEngine::Core::EngineParams engineParamsNoLog;
 			engineParamsNoLog.loggerParams.logFilePath = logFilePath;
 			engineParamsNoLog.loggerParams.addLogFileSubLogger = false;
-			auto engine = PonyEngine::Core::CreateEngineWithParams(engineParamsNoLog);
+			auto engine = PonyEngine::Core::CreateEngine(engineParamsNoLog);
 			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, logText);
 			Assert::IsFalse(std::filesystem::exists(logFilePath));
 			PonyEngine::Core::DestroyEngine(engine);
 
 			PonyEngine::Core::EngineParams engineParamsWithLog;
 			engineParamsWithLog.loggerParams.logFilePath = logFilePath;
-			engine = PonyEngine::Core::CreateEngineWithParams(engineParamsWithLog);
+			engine = PonyEngine::Core::CreateEngine(engineParamsWithLog);
 			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, logText);
 			Assert::IsTrue(std::filesystem::exists(logFilePath));
 			std::ifstream logFile(logFilePath);
@@ -122,7 +122,7 @@ namespace PonyEngineTests
 
 			PonyEngine::Core::EngineParams engineParams;
 			engineParams.loggerParams.subLoggers.push_back(&testSubLogger);
-			engine = PonyEngine::Core::CreateEngineWithParams(engineParams);
+			engine = PonyEngine::Core::CreateEngine(engineParams);
 			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsTrue(onLog);
 			PonyEngine::Core::DestroyEngine(engine);
