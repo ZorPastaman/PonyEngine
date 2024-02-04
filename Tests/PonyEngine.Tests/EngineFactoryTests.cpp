@@ -26,7 +26,7 @@ namespace PonyEngineTests
 			PonyEngine::Core::DestroyEngine(engine);
 
 			PonyEngine::Core::EngineParams params;
-			engine = PonyEngine::Core::CreateEngineWithParams(params);
+			engine = PonyEngine::Core::CreateEngine(params);
 			Assert::IsNotNull(engine);
 			PonyEngine::Core::DestroyEngine(engine);
 		}

@@ -19,18 +19,15 @@ namespace PonyEngine::Core
 {
 	/// @brief Creates a new @p Engine instance with default parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export extern "C" [[nodiscard("Pure function")]]
-	PONY_API IEngine* CreateEngine();
+	export [[nodiscard("Pure function")]] PONY_API IEngine* CreateEngine();
 
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export extern "C" [[nodiscard("Pure function")]]
-	PONY_API IEngine* CreateEngineWithParams(const EngineParams& params);
+	export [[nodiscard("Pure function")]] PONY_API IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
-	export extern "C"
-	PONY_API void DestroyEngine(IEngine* engine);
+	export PONY_API void DestroyEngine(IEngine* engine);
 }
 
 module : private;
@@ -40,10 +37,10 @@ namespace PonyEngine::Core
 	IEngine* CreateEngine()
 	{
 		EngineParams params;
-		return CreateEngineWithParams(params);
+		return CreateEngine(params);
 	}
 
-	IEngine* CreateEngineWithParams(const EngineParams& params)
+	IEngine* CreateEngine(const EngineParams& params)
 	{
 		return new Engine(params);
 	}

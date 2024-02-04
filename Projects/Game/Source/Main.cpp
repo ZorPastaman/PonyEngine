@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 
 	PonyEngine::Core::EngineParams engineParams;
 	engineParams.loggerParams.addConsoleSubLogger = true;
-	auto engine = std::unique_ptr<PonyEngine::Core::IEngine, void(*)(PonyEngine::Core::IEngine*)>(PonyEngine::Core::CreateEngineWithParams(engineParams), &PonyEngine::Core::DestroyEngine);
+	auto engine = std::unique_ptr<PonyEngine::Core::IEngine, void(*)(PonyEngine::Core::IEngine*)>(PonyEngine::Core::CreateEngine(engineParams), &PonyEngine::Core::DestroyEngine);
 
 	for (int i = 0; i < 10; ++i)
 	{
