@@ -136,12 +136,14 @@ namespace PonyEngineTests
 
 		TEST_METHOD(CommonConstexprTest)
 		{
+#pragma warning(disable:4189)
 			constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
 			constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
 			constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
 			constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
 			constexpr int round1 = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(3.6f);
 			constexpr float round2 = PonyEngine::Math::RoundToIntegralIfPossible<float, float>(3.7f);
+#pragma warning(default:4189)
 		}
 	};
 }
