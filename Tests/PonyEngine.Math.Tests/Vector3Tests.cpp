@@ -1002,6 +1002,7 @@ namespace PonyEngineTests
 
 		TEST_METHOD(ConstexprTest)
 		{
+#pragma warning(disable:4189)
 			constexpr auto defaultVector = PonyEngine::Math::Vector3<float>();
 			constexpr auto vector = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);
 			constexpr PonyEngine::Math::Vector3<float> copiedVector = vector;
@@ -1031,6 +1032,7 @@ namespace PonyEngineTests
 			constexpr auto multipliedV = vector * normal;
 			constexpr auto divided = vector / 3.f;
 			constexpr auto dividedV = vector / copiedVector;
+#pragma warning(default:4189)
 		}
 	};
 }
