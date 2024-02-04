@@ -13,12 +13,16 @@ import <filesystem>;
 import <utility>;
 import <vector>;
 
+import "PonyAPIMacro.h";
+
 import PonyEngine.Debug.Log.ISubLogger;
+
+#pragma warning(disable:4251) // It's a requirement to build everything in one solution with the same parameters. So, no worry here. But it needs to be fixed in the future.
 
 namespace PonyEngine::Core
 {
 	/// @brief Holds engine logger parameters.
-	export struct LoggerParams final
+	export struct PONY_API LoggerParams final
 	{
 	public:
 		/// @brief Creates a @p LoggerParams.
@@ -35,7 +39,7 @@ namespace PonyEngine::Core
 
 		~LoggerParams() = default;
 
-		std::filesystem::path logFilePath; /// @brief Path to a log file. It's used only if the @p addLogFileSubLogger is true.
+		std::filesystem::path logFilePath; /// @brief Path to a log file. It's used only if the @p addLogFileSubLogger is true. The default value is Log.log.
 		std::vector<Debug::Log::ISubLogger*> subLoggers; /// @brief Collection of sub-loggers added to a logger on start. Their lifetimes won't be controlled by the engine.
 		bool addConsoleSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a console.
 		bool addLogFileSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a file which path is set in the @p logFilePath.
