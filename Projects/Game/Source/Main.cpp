@@ -13,6 +13,7 @@
 #include <string>
 
 import PonyEngine.Core.EngineFactory;
+import PonyEngine.Core.EngineParams;
 import PonyEngine.Core.IEngine;
 import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.LogType;
@@ -27,7 +28,9 @@ int main(int argc, char** argv)
 		std::cout << '\t' << argv[i] << std::endl;
 	}
 
-	auto engine = std::unique_ptr<PonyEngine::Core::IEngine>(PonyEngine::Core::CreateEngine());
+	PonyEngine::Core::EngineParams engineParams;
+	engineParams.loggerParams.addConsoleSubLogger = true;
+	auto engine = std::unique_ptr<PonyEngine::Core::IEngine, void(*)(PonyEngine::Core::IEngine*)>(PonyEngine::Core::CreateEngineWithParams(engineParams), &PonyEngine::Core::DestroyEngine);
 
 	for (int i = 0; i < 10; ++i)
 	{

@@ -96,6 +96,6 @@ namespace PonyEngine::Debug::Log
 			messageOut = message;
 		}
 
-		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", PonyEngine::Debug::Log::ToString(logType, false), timePoint, frameCount, message);
+		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", PonyEngine::Debug::Log::ToString(logType, false), timePoint, frameCount, messageOut);
 	}
 }
