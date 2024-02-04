@@ -1035,6 +1035,7 @@ namespace PonyEngineTests
 
 		TEST_METHOD(QuaternionConstexprTest)
 		{
+#pragma warning(disable:4189)
 			constexpr auto vector3 = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);
 			constexpr auto vector4 = PonyEngine::Math::Vector4<float>(1.f, 1.f, 1.f, 2.f);
 			constexpr auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
@@ -1053,6 +1054,7 @@ namespace PonyEngineTests
 
 			constexpr auto rotatedQ = quaternion * copiedQuaternion;
 			constexpr auto rotatedV = quaternion * vector3;
+#pragma warning(default:4189)
 		}
 	};
 }

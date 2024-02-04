@@ -17,7 +17,7 @@ import "PonyAPIMacro.h";
 
 import PonyEngine.Debug.Log.ISubLogger;
 
-#pragma warning(disable:4251) // It's a requirement to build everything in one solution with the same parameters. So, no worry here. But it needs to be fixed in the future.
+#pragma warning(disable:4251) // It's a requirement to build everything in one solution with the same parameters. So, no worry here.
 
 namespace PonyEngine::Core
 {

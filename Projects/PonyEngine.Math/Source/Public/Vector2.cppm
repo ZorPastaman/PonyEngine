@@ -342,7 +342,9 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector2<T> Vector2<T>::Normalized() const noexcept
 	{
+#pragma warning(disable:4723) // Potential divide by 0 - It's a requirement that the vector must be non zero.
 		return *this / Magnitude();
+#pragma warning(default:4723)
 	}
 
 	template<Arithmetic T>
