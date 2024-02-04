@@ -9,7 +9,8 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Entry point.
-- Basic math struct: vectors, quaternion.
+- Engine main features.
+- Logger.
+- Basic math structs: vectors, quaternion.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
