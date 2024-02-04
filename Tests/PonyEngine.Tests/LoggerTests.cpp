@@ -28,7 +28,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace PonyEngineTests
 {
-	TEST_CLASS(LoggerParamsTests)
+	TEST_CLASS(LoggerTests)
 	{
 		class TestSubLogger : public PonyEngine::Debug::Log::ISubLogger
 		{

@@ -13,7 +13,7 @@
   <ItemGroup>
     <ClCompile Include="EngineFactoryTests.cpp" />
     <ClCompile Include="IEngineTests.cpp" />
-    <ClCompile Include="LoggerParamsTests.cpp" />
+    <ClCompile Include="LoggerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\Projects\PonyEngine.Debug.Log.Shared\PonyEngine.Debug.Log.Shared.vcxproj">
