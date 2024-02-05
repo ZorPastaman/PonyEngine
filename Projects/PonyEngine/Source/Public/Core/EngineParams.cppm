@@ -11,14 +11,12 @@ export module PonyEngine.Core.EngineParams;
 
 import <utility>;
 
-import "PonyAPIMacro.h";
-
 import PonyEngine.Core.LoggerParams;
 
 namespace PonyEngine::Core
 {
 	/// @brief Holds engine parameters.
-	export struct PONY_API EngineParams final
+	export struct __declspec(dllexport) EngineParams final
 	{
 	public:
 		/// @brief Creates an @p EngineParams.

@@ -13,8 +13,6 @@ import <filesystem>;
 import <utility>;
 import <vector>;
 
-import "PonyAPIMacro.h";
-
 import PonyEngine.Debug.Log.ISubLogger;
 
 #pragma warning(disable:4251) // It's a requirement to build everything in one solution with the same parameters. So, no worry here.
@@ -22,7 +20,7 @@ import PonyEngine.Debug.Log.ISubLogger;
 namespace PonyEngine::Core
 {
 	/// @brief Holds engine logger parameters.
-	export struct PONY_API LoggerParams final
+	export struct __declspec(dllexport) LoggerParams final
 	{
 	public:
 		/// @brief Creates a @p LoggerParams.
