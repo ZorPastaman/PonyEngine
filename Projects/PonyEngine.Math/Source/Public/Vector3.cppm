@@ -7,16 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <format>
-
 export module PonyEngine.Math.Vector3;
 
 import <array>;
 import <cmath>;
 import <concepts>;
 import <cstddef>;
+import <format>;
 import <ostream>;
 import <string>;
 import <type_traits>;

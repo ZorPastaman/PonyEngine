@@ -7,13 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <fstream>
-
 export module PonyEngine.Debug.Log.FileSubLogger;
 
 import <filesystem>;
+import <fstream>;
 import <iostream>;
 import <utility>;
 
