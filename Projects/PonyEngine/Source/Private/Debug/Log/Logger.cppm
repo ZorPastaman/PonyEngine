@@ -7,14 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-#include <chrono>
-
 export module PonyEngine.Debug.Log.Logger;
 
 import <algorithm>;
+import <cassert>;
+import <chrono>;
 import <exception>;
 import <iostream>;
 import <string>;

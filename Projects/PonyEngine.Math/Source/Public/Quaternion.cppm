@@ -7,16 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <format>
-
 export module PonyEngine.Math.Quaternion;
 
 import <array>;
 import <cmath>;
 import <cstddef>;
 import <concepts>;
+import <format>;
 import <numbers>;
 import <ostream>;
 import <string>;
