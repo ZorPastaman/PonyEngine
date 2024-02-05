@@ -9,8 +9,6 @@
 
 export module PonyEngine.Core.EngineFactory;
 
-import "PonyAPIMacro.h";
-
 import PonyEngine.Core.Engine;
 import PonyEngine.Core.EngineParams;
 import PonyEngine.Core.IEngine;
@@ -19,15 +17,15 @@ namespace PonyEngine::Core
 {
 	/// @brief Creates a new @p Engine instance with default parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export [[nodiscard("Pure function")]] PONY_API IEngine* CreateEngine();
+	export [[nodiscard("Pure function")]] __declspec(dllexport) IEngine* CreateEngine();
 
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export [[nodiscard("Pure function")]] PONY_API IEngine* CreateEngine(const EngineParams& params);
+	export [[nodiscard("Pure function")]] __declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
-	export PONY_API void DestroyEngine(IEngine* engine);
+	export __declspec(dllexport) void DestroyEngine(IEngine* engine);
 }
 
 module : private;
