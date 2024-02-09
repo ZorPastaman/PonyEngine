@@ -40,7 +40,7 @@
   <ImportGroup Label="Shared" />
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
-	<Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
+    <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
     <Import Project="$(SolutionDir)\PropertySheets\DebugPonyEngineProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -83,6 +83,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommonTests.cpp" />
+    <ClCompile Include="MathTests.cpp" />
     <ClCompile Include="QuaternionTests.cpp" />
     <ClCompile Include="Vector2Tests.cpp" />
     <ClCompile Include="Vector3Tests.cpp" />
