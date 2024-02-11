@@ -15,6 +15,7 @@ import <exception>;
 
 import PonyEngine.Core.EngineParams;
 import PonyEngine.Core.IEngine;
+import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.Logger;
 import PonyEngine.Debug.Log.LogType;
 
