@@ -40,12 +40,7 @@ namespace PonyEngine::Debug::Log
 	private:
 		std::ofstream m_logFile; /// @brief log file stream.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		m_logFile(logPath)
 	{
