@@ -19,10 +19,9 @@
 import PonyEngine.Core.EngineFactory;
 import PonyEngine.Core.EngineParams;
 import PonyEngine.Core.IEngine;
-import PonyEngine.Core.LoggerParams;
+import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Debug.Log.LogEntry;
-import PonyEngine.Debug.Log.LogType;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

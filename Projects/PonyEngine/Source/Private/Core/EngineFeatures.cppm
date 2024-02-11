@@ -11,8 +11,8 @@ export module PonyEngine.Core.Engine:EngineFeatures;
 
 import <cassert>;
 
+import PonyEngine.Core.EngineParams;
 import PonyEngine.Core.IEngine;
-import PonyEngine.Core.LoggerParams;
 import PonyEngine.Debug.Log.ConsoleSubLogger;
 import PonyEngine.Debug.Log.FileSubLogger;
 import PonyEngine.Debug.Log.Logger;

@@ -88,12 +88,7 @@ namespace PonyEngine::Debug::Log
 	{
 		return stream << ToString(logType, true);
 	}
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	std::string ToString(const LogType logType, const bool addNumber)
 	{
 		const std::string delimiter = " | ";
@@ -125,27 +120,27 @@ namespace PonyEngine::Debug::Log
 		}
 
 		if (answer.empty()) [[unlikely]]
-		{
-			if (logType == LogType::None)
 			{
-				answer = "None";
+				if (logType == LogType::None)
+				{
+					answer = "None";
+				}
+				else
+				{
+					answer = "Unknown";
+				}
+
+				answer += delimiter;
 			}
-			else
+
+			answer.erase(answer.end() - delimiter.size(), answer.end());
+
+			if (!addNumber)
 			{
-				answer = "Unknown";
+				return answer;
 			}
 
-			answer += delimiter;
-		}
-
-		answer.erase(answer.end() - delimiter.size(), answer.end());
-
-		if (!addNumber)
-		{
-			return answer;
-		}
-
-		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
-		return std::format("{} ({})", answer, number);
+			auto number = static_cast<std::underlying_type_t<LogType>>(logType);
+			return std::format("{} ({})", answer, number);
 	}
 }

@@ -26,12 +26,7 @@ namespace PonyEngine::Core
 
 	/// @brief Destroy the @p engine instance.
 	export __declspec(dllexport) void DestroyEngine(IEngine* engine);
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	IEngine* CreateEngine()
 	{
 		EngineParams params;
@@ -45,6 +40,6 @@ namespace PonyEngine::Core
 
 	void DestroyEngine(IEngine* const engine)
 	{
-		delete engine;
+		delete static_cast<Engine*>(engine);
 	}
 }

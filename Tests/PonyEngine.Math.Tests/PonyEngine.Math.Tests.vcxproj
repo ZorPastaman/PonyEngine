@@ -83,7 +83,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="CommonTests.cpp" />
-    <ClCompile Include="MathTests.cpp" />
     <ClCompile Include="QuaternionTests.cpp" />
     <ClCompile Include="Vector2Tests.cpp" />
     <ClCompile Include="Vector3Tests.cpp" />
