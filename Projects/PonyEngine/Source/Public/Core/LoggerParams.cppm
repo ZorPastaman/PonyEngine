@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.LoggerParams;
+export module PonyEngine.Core:LoggerParams;
 
 import <filesystem>;
 import <utility>;
@@ -42,12 +42,7 @@ namespace PonyEngine::Core
 		bool addConsoleSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a console.
 		bool addLogFileSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a file which path is set in the @p logFilePath.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	LoggerParams::LoggerParams() :
 		logFilePath("Log.log"),
 		subLoggers{},

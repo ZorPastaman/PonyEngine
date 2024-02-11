@@ -9,8 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core.EngineFactory;
-import PonyEngine.Core.IEngine;
+import PonyEngine.Core;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

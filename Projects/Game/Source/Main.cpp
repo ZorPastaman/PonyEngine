@@ -12,11 +12,8 @@
 #include <memory>
 #include <string>
 
-import PonyEngine.Core.EngineFactory;
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
-import PonyEngine.Debug.Log.ILogger;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Core;
+import PonyEngine.Debug.Log;
 
 int main(int argc, char** argv)
 {

@@ -22,8 +22,6 @@ namespace PonyEngine::Debug::Log
 	export class ILogger
 	{
 	public:
-		virtual ~ILogger() noexcept = default;
-
 		/// @brief Logs via current @p SubLoggers.
 		/// @details Don't log exceptions via this.
 		/// @param logType Log type. Must be a valid one-bit value.
@@ -40,5 +38,8 @@ namespace PonyEngine::Debug::Log
 		/// @brief Removes the @p subLogger from the list of sub-loggers.
 		/// @param subLogger @p SubLogger to remove.
 		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;
+
+	protected:
+		virtual ~ILogger() noexcept = default;
 	};
 }

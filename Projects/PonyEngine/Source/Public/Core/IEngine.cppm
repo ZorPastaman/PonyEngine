@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.IEngine;
+export module PonyEngine.Core:IEngine;
 
 import <cstddef>;
 
-import PonyEngine.Debug.Log.ILogger;
+import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Core
 {
@@ -19,8 +19,6 @@ namespace PonyEngine::Core
 	export class IEngine
 	{
 	public:
-		virtual ~IEngine() noexcept = default;
-
 		/// @brief Gets current frame count.
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
@@ -33,5 +31,8 @@ namespace PonyEngine::Core
 
 		/// @brief Ticks the engine and increments its frame count.
 		virtual void Tick() = 0;
+
+	protected:
+		virtual ~IEngine() noexcept = default;
 	};
 }

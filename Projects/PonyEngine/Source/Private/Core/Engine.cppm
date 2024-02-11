@@ -7,18 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Engine;
+export module PonyEngine.Core:Engine;
 
 import <cstddef>;
 import <iostream>;
 import <exception>;
 
-import PonyEngine.Core.EngineFeatures;
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
-import PonyEngine.Core.LoggerOwnerKit;
+import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Logger;
-import PonyEngine.Debug.Log.LogType;
+
+import :EngineFeatures;
+import :EngineParams;
+import :IEngine;
+import :LoggerOwnerKit;
 
 namespace PonyEngine::Core
 {
@@ -49,15 +50,10 @@ namespace PonyEngine::Core
 
 		std::size_t m_frameCount; /// @brief Current frame.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
-		m_loggerKit{CreateLogger(params.loggerParams, *this)}
+		m_loggerKit(CreateLogger(params.loggerParams, *this))
 	{
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
 	}

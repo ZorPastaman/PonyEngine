@@ -58,12 +58,7 @@ namespace PonyEngine::Debug::Log
 	{
 		return stream << logEntry.ToString();
 	}
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	LogEntry::LogEntry(const std::string& message, const std::exception* const exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept :
 		message(message),
 		exception(exception),
