@@ -9,6 +9,7 @@
 
 export module PonyEngine.Core;
 
-export import PonyEngine.Core.EngineFactory;
-export import PonyEngine.Core.EngineParams;
-export import PonyEngine.Core.IEngine;
+export import :EngineFactory;
+export import :EngineParams;
+export import :IEngine;
+export import :LoggerParams;

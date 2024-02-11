@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.EngineParams:LoggerParams;
+export module PonyEngine.Core:LoggerParams;
 
 import <filesystem>;
 import <utility>;

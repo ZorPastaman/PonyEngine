@@ -7,19 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Engine;
+export module PonyEngine.Core:Engine;
 
 import <cstddef>;
 import <iostream>;
 import <exception>;
 
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
-import PonyEngine.Debug.Log.ILogger;
+import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Logger;
-import PonyEngine.Debug.Log.LogType;
 
 import :EngineFeatures;
+import :EngineParams;
+import :IEngine;
 import :LoggerOwnerKit;
 
 namespace PonyEngine::Core

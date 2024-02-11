@@ -16,9 +16,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core.EngineFactory;
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
+import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.ISubLogger;
 import PonyEngine.Debug.Log.LogEntry;

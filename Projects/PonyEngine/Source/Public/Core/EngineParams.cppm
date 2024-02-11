@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.EngineParams;
+export module PonyEngine.Core:EngineParams;
 
 import <utility>;
 
-export import :LoggerParams;
+import :LoggerParams;
 
 namespace PonyEngine::Core
 {
