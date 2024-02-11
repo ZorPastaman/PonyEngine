@@ -53,12 +53,7 @@ namespace PonyEngine::Debug::Log
 
 		const Core::IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	Logger::Logger(const Core::IEngine& engine) noexcept :
 		m_subLoggers{},
 		m_engine{&engine}

@@ -11,7 +11,7 @@ export module PonyEngine.Core.EngineParams;
 
 import <utility>;
 
-import PonyEngine.Core.LoggerParams;
+export import :LoggerParams;
 
 namespace PonyEngine::Core
 {
@@ -35,12 +35,7 @@ namespace PonyEngine::Core
 
 		LoggerParams loggerParams; /// @brief Logger parameters.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	EngineParams::EngineParams() :
 		loggerParams()
 	{
