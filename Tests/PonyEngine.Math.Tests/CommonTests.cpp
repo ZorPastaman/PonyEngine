@@ -12,7 +12,7 @@
 import <numbers>;
 import <type_traits>;
 
-import PonyEngine.Math.Common;
+import PonyEngine.Math;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

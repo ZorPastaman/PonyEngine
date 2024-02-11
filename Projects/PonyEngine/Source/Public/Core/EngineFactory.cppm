@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.EngineFactory;
+export module PonyEngine.Core:EngineFactory;
 
-import PonyEngine.Core.Engine;
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
+import :Engine;
+import :EngineParams;
+import :IEngine;
 
 namespace PonyEngine::Core
 {
@@ -26,12 +26,7 @@ namespace PonyEngine::Core
 
 	/// @brief Destroy the @p engine instance.
 	export __declspec(dllexport) void DestroyEngine(IEngine* engine);
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	IEngine* CreateEngine()
 	{
 		EngineParams params;
@@ -45,6 +40,6 @@ namespace PonyEngine::Core
 
 	void DestroyEngine(IEngine* const engine)
 	{
-		delete engine;
+		delete static_cast<Engine*>(engine);
 	}
 }

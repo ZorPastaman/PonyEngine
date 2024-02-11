@@ -11,11 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Common.cppm" />
-    <ClCompile Include="Source\Public\Quaternion.cppm" />
-    <ClCompile Include="Source\Public\Vector2.cppm" />
-    <ClCompile Include="Source\Public\Vector3.cppm" />
-    <ClCompile Include="Source\Public\Vector4.cppm" />
+    <ClCompile Include="Source\Public\Math\Common.cppm" />
+    <ClCompile Include="Source\Public\Math\Math.cppm" />
+    <ClCompile Include="Source\Public\Math\Quaternion.cppm" />
+    <ClCompile Include="Source\Public\Math\Vector2.cppm" />
+    <ClCompile Include="Source\Public\Math\Vector3.cppm" />
+    <ClCompile Include="Source\Public\Math\Vector4.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -60,12 +61,14 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

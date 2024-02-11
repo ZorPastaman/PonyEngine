@@ -13,9 +13,7 @@ import <exception>;
 import <iostream>;
 import <stdexcept>;
 
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogEntry;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Debug.Log.Full;
 
 namespace PonyEngine::Debug::Log
 {
@@ -32,12 +30,7 @@ namespace PonyEngine::Debug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
 	/// @return Chosen stream.

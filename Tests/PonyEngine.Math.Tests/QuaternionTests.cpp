@@ -11,8 +11,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Math.Common;
-import PonyEngine.Math.Quaternion;
+import PonyEngine.Math;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

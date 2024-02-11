@@ -14,15 +14,12 @@ import <cassert>;
 import <chrono>;
 import <exception>;
 import <iostream>;
+import <functional>;
 import <string>;
 import <vector>;
 import <utility>;
 
-import PonyEngine.Core.IEngine;
-import PonyEngine.Debug.Log.ILogger;
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogEntry;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Debug.Log.Full;
 
 namespace PonyEngine::Debug::Log
 {
@@ -31,9 +28,9 @@ namespace PonyEngine::Debug::Log
 	{
 	public:
 		/// @brief Creates a @p Logger.
-		/// @param engine Engine that the logger is owned by.
+		/// @param frameCountProvider Current frame provider.
 		[[nodiscard("Pure constructor")]]
-		Logger(const Core::IEngine& engine) noexcept;
+		Logger(const std::function<std::size_t()>& frameCountProvider);
 		Logger(const Logger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
@@ -49,25 +46,21 @@ namespace PonyEngine::Debug::Log
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
 	private:
+		const std::function<std::size_t()> m_frameCountProvider; /// @brief Current frame provider.
+
 		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
-
-		const Core::IEngine* const m_engine; /// @brief Engine the owner of the @p Logger.
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
-	Logger::Logger(const Core::IEngine& engine) noexcept :
-		m_subLoggers{},
-		m_engine{&engine}
+	Logger::Logger(const std::function<std::size_t()>& frameCountProvider) :
+		m_frameCountProvider(frameCountProvider),
+		m_subLoggers{}
+		
 	{
 	}
 
 	Logger::Logger(Logger&& other) noexcept :
-		m_subLoggers(std::move(other.m_subLoggers)),
-		m_engine{other.m_engine}
+		m_frameCountProvider(std::move(other.m_frameCountProvider)),
+		m_subLoggers(std::move(other.m_subLoggers))
 	{
 	}
 
@@ -77,7 +70,7 @@ namespace PonyEngine::Debug::Log
 
 		try
 		{
-			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_engine->GetFrameCount(), logType);
+			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_frameCountProvider(), logType);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -94,7 +87,7 @@ namespace PonyEngine::Debug::Log
 	{
 		try
 		{
-			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_engine->GetFrameCount(), LogType::Exception);
+			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_frameCountProvider(), LogType::Exception);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{

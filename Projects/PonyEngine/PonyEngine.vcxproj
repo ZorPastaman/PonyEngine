@@ -20,12 +20,15 @@
     <ClCompile Include="Source\Private\Core\EngineFeatures.cppm" />
     <ClCompile Include="Source\Private\Core\Engine.cppm" />
     <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm" />
+    <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
     <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\Log.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\Log.Full.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
   </ItemGroup>
