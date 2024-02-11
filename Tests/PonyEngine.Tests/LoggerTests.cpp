@@ -17,7 +17,6 @@
 #include "CppUnitTest.h"
 
 import PonyEngine.Core;
-import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Full;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
