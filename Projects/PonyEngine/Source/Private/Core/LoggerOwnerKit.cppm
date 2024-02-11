@@ -12,8 +12,8 @@ export module PonyEngine.Core.Engine:LoggerOwnerKit;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log.ILogger;
 import PonyEngine.Debug.Log.ISubLogger;
+import PonyEngine.Debug.Log.Logger;
 
 namespace PonyEngine::Core
 {
@@ -30,7 +30,7 @@ namespace PonyEngine::Core
 		~LoggerOwnerKit() noexcept = default;
 
 		std::vector<Debug::Log::ISubLogger*> subLoggers;
-		Debug::Log::ILogger* logger;
+		Debug::Log::Logger* logger;
 	};
 
 	LoggerOwnerKit::LoggerOwnerKit() noexcept :
