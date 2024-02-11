@@ -32,12 +32,7 @@ namespace PonyEngine::Debug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
-}
 
-module : private;
-
-namespace PonyEngine::Debug::Log
-{
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
 	/// @return Chosen stream.

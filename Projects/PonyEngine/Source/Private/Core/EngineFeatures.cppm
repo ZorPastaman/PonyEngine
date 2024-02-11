@@ -7,16 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.EngineFeatures;
+export module PonyEngine.Core.Engine:EngineFeatures;
 
 import <cassert>;
 
 import PonyEngine.Core.IEngine;
-import PonyEngine.Core.LoggerOwnerKit;
 import PonyEngine.Core.LoggerParams;
 import PonyEngine.Debug.Log.ConsoleSubLogger;
 import PonyEngine.Debug.Log.FileSubLogger;
 import PonyEngine.Debug.Log.Logger;
+
+import :LoggerOwnerKit;
 
 namespace PonyEngine::Core
 {
@@ -26,12 +27,7 @@ namespace PonyEngine::Core
 	/// @return Struct that holds pointers to a created logger and its sub-loggers.
 	export [[nodiscard("Pure function")]] 
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine);
-}
 
-module : private;
-
-namespace PonyEngine::Core
-{
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
