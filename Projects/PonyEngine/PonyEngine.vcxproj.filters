@@ -68,6 +68,9 @@
     <ClCompile Include="Source\Public\Core\Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Debug\Log\Log.Full.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc">

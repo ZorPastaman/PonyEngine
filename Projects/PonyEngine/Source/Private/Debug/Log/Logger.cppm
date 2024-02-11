@@ -19,10 +19,7 @@ import <string>;
 import <vector>;
 import <utility>;
 
-import PonyEngine.Debug.Log.ILogger;
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogEntry;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Debug.Log.Full;
 
 namespace PonyEngine::Debug::Log
 {
