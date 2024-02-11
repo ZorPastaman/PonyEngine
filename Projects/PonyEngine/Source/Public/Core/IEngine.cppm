@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.IEngine;
+export module PonyEngine.Core:IEngine;
 
 import <cstddef>;
 

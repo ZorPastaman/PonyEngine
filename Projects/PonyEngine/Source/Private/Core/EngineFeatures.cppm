@@ -7,16 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Engine:EngineFeatures;
+export module PonyEngine.Core:EngineFeatures;
 
 import <cassert>;
+import <functional>;
 
-import PonyEngine.Core.EngineParams;
-import PonyEngine.Core.IEngine;
 import PonyEngine.Debug.Log.ConsoleSubLogger;
 import PonyEngine.Debug.Log.FileSubLogger;
 import PonyEngine.Debug.Log.Logger;
 
+import :IEngine;
+import :LoggerParams;
 import :LoggerOwnerKit;
 
 namespace PonyEngine::Core
@@ -31,7 +32,7 @@ namespace PonyEngine::Core
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
-		answer.logger = new Debug::Log::Logger(engine);
+		answer.logger = new Debug::Log::Logger(std::bind(&IEngine::GetFrameCount, &engine));
 
 		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{

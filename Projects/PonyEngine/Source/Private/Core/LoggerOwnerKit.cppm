@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Engine:LoggerOwnerKit;
+export module PonyEngine.Core:LoggerOwnerKit;
 
 import <utility>;
 import <vector>;
