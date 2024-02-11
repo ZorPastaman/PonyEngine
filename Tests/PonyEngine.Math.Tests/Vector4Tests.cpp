@@ -14,8 +14,7 @@
 import <cmath>;
 import <numbers>;
 
-import PonyEngine.Math.Common;
-import PonyEngine.Math.Vector4;
+import PonyEngine.Math;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
