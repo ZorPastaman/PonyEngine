@@ -14,8 +14,7 @@ import <fstream>;
 import <iostream>;
 import <utility>;
 
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogEntry;
+import PonyEngine.Debug.Log.Full;
 
 namespace PonyEngine::Debug::Log
 {

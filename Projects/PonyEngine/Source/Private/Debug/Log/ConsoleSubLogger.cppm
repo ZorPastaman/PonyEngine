@@ -13,9 +13,7 @@ import <exception>;
 import <iostream>;
 import <stdexcept>;
 
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.LogEntry;
-import PonyEngine.Debug.Log.LogType;
+import PonyEngine.Debug.Log.Full;
 
 namespace PonyEngine::Debug::Log
 {
