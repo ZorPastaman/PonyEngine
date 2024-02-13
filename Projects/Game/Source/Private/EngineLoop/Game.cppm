@@ -21,14 +21,14 @@ namespace Game
 	{
 		// Called before first tick
 
-		engine.GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "Begin");
+		engine.GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Begin");
 	}
 
 	export void PreTick(PonyEngine::Core::IEngine& engine)
 	{
 		// Called before every tick
 
-		engine.GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, std::format("Frame Count Before Tick: {}", engine.GetFrameCount()));
+		engine.GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, std::format("Frame Count Before Tick: {}", engine.GetFrameCount()));
 		
 	}
 
@@ -36,13 +36,13 @@ namespace Game
 	{
 		// Called after every tick
 
-		engine.GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, std::format("Frame Count After Tick: {}", engine.GetFrameCount()));
+		engine.GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, std::format("Frame Count After Tick: {}", engine.GetFrameCount()));
 	}
 
 	export void End(PonyEngine::Core::IEngine& engine)
 	{
 		// Called after last tick
 
-		engine.GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "End");
+		engine.GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "End");
 	}
 }

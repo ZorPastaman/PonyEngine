@@ -40,7 +40,7 @@ namespace PonyEngine::Core
 		virtual std::size_t GetFrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual Debug::Log::ILogger* GetLogger() const noexcept override;
+		virtual Debug::Log::ILogger& GetLogger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept override;
@@ -93,9 +93,9 @@ namespace PonyEngine::Core
 		return m_frameCount;
 	}
 
-	Debug::Log::ILogger* Engine::GetLogger() const noexcept
+	Debug::Log::ILogger& Engine::GetLogger() const noexcept
 	{
-		return m_loggerKit.logger;
+		return *m_loggerKit.logger;
 	}
 
 	bool Engine::IsRunning() const noexcept
