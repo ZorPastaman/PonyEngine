@@ -9,5 +9,7 @@
 
 export module PonyEngine.Debug.Log;
 
-export import PonyEngine.Debug.Log.ILogger;
-export import PonyEngine.Debug.Log.LogType;
+export import :ILogger;
+export import :ISubLogger;
+export import :LogEntry;
+export import :LogType;

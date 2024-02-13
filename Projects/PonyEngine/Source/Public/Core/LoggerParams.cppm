@@ -13,7 +13,7 @@ import <filesystem>;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log.ISubLogger;
+import PonyEngine.Debug.Log;
 
 #pragma warning(disable:4251) // It's a requirement to build everything in one solution with the same parameters. So, no worry here.
 

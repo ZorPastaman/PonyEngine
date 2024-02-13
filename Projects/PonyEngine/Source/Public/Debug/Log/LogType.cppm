@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log.LogType;
+export module PonyEngine.Debug.Log:LogType;
 
 import <cstdint>;
 import <format>;
