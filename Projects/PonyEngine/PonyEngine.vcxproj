@@ -25,12 +25,16 @@
     <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
     <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\WindowParams.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\Log.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\Log.Full.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
+    <ClCompile Include="Source\Public\Window\IWindow.cppm" />
+    <ClCompile Include="Source\Private\Window\WindowsWindow.cppm" />
+    <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
@@ -71,16 +75,16 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Window</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Window</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -90,7 +94,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

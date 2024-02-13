@@ -9,9 +9,9 @@
 
 #include <windows.h>
 
-import Game;
+import EngineLoop;
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	return Game::GameMain();
+	return Game::EngineLoop();
 }

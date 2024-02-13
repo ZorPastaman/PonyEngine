@@ -11,7 +11,8 @@ export module PonyEngine.Core:EngineParams;
 
 import <utility>;
 
-import :LoggerParams;
+export import :LoggerParams;
+export import :WindowParams;
 
 namespace PonyEngine::Core
 {
@@ -34,20 +35,24 @@ namespace PonyEngine::Core
 		~EngineParams() = default;
 
 		LoggerParams loggerParams; /// @brief Logger parameters.
+		WindowParams windowParams; /// @brief Window parameters.
 	};
 
 	EngineParams::EngineParams() :
-		loggerParams()
+		loggerParams(),
+		windowParams()
 	{
 	}
 
 	EngineParams::EngineParams(const EngineParams& other) :
-		loggerParams(other.loggerParams)
+		loggerParams(other.loggerParams),
+		windowParams(other.windowParams)
 	{
 	}
 
 	EngineParams::EngineParams(EngineParams&& other) :
-		loggerParams(std::move(other.loggerParams))
+		loggerParams(std::move(other.loggerParams)),
+		windowParams(std::move(other.windowParams))
 	{
 	}
 }

@@ -43,16 +43,26 @@ namespace PonyEngine::Core
 		virtual Debug::Log::ILogger* GetLogger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual bool IsRunning() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual int GetExitCode() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual void Tick() override;
 
 	private:
 		const LoggerOwnerKit m_loggerKit; /// @brief Logger and sub-logger that are owned by the @p Engine.
 
 		std::size_t m_frameCount; /// @brief Current frame.
+
+		int m_exitCode;
+		bool m_isRunning;
 	};
 
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
+		m_isRunning{true},
 		m_loggerKit(CreateLogger(params.loggerParams, *this))
 	{
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
@@ -86,6 +96,16 @@ namespace PonyEngine::Core
 	Debug::Log::ILogger* Engine::GetLogger() const noexcept
 	{
 		return m_loggerKit.logger;
+	}
+
+	bool Engine::IsRunning() const noexcept
+	{
+		return m_isRunning;
+	}
+
+	int Engine::GetExitCode() const noexcept
+	{
+		return m_exitCode;
 	}
 
 	void Engine::Tick()

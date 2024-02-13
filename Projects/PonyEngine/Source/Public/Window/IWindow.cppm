@@ -7,8 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Window:IWindow;
 
-export import :EngineFactory;
-export import :EngineParams;
-export import :IEngine;
+namespace PonyEngine::Window
+{
+	export class IWindow
+	{
+	public:
+		virtual ~IWindow() = default;
+
+		virtual void ShowWindow() = 0;
+	};
+}

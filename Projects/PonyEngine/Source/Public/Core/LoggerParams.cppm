@@ -39,8 +39,8 @@ namespace PonyEngine::Core
 
 		std::filesystem::path logFilePath; /// @brief Path to a log file. It's used only if the @p addLogFileSubLogger is true. The default value is Log.log.
 		std::vector<Debug::Log::ISubLogger*> subLoggers; /// @brief Collection of sub-loggers added to a logger on start. Their lifetimes won't be controlled by the engine.
-		bool addConsoleSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a console.
-		bool addLogFileSubLogger; /// @brief If it's true, adds a sub-logger that prints logs to a file which path is set in the @p logFilePath.
+		bool addConsoleSubLogger; /// @brief If it's @a true, adds a sub-logger that prints logs to a console. The default value is @a true.
+		bool addLogFileSubLogger; /// @brief If it's @a true, adds a sub-logger that prints logs to a file which path is set in the @p logFilePath. The default value is @a true.
 	};
 
 	LoggerParams::LoggerParams() :

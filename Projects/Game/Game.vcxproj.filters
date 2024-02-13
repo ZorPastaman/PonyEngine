@@ -18,7 +18,13 @@
     <ClCompile Include="Source\WinMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Game.cppm">
+    <ClCompile Include="Source\Private\EngineLoop\Game.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\EngineLoop\EngineLoop.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
