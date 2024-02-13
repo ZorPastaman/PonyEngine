@@ -83,14 +83,14 @@ namespace PonyEngineTests
 			engineParamsNoLog.loggerParams.logFilePath = logFilePath;
 			engineParamsNoLog.loggerParams.addLogFileSubLogger = false;
 			auto engine = PonyEngine::Core::CreateEngine(engineParamsNoLog);
-			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, logText);
+			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, logText);
 			Assert::IsFalse(std::filesystem::exists(logFilePath));
 			PonyEngine::Core::DestroyEngine(engine);
 
 			PonyEngine::Core::EngineParams engineParamsWithLog;
 			engineParamsWithLog.loggerParams.logFilePath = logFilePath;
 			engine = PonyEngine::Core::CreateEngine(engineParamsWithLog);
-			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, logText);
+			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, logText);
 			Assert::IsTrue(std::filesystem::exists(logFilePath));
 			std::ifstream logFile(logFilePath);
 			Assert::IsTrue(HasText(logFile, logText));
@@ -106,19 +106,19 @@ namespace PonyEngineTests
 			testSubLogger.onLog = &onLog;
 
 			auto engine = PonyEngine::Core::CreateEngine();
-			engine->GetLogger()->AddSubLogger(&testSubLogger);
-			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
+			engine->GetLogger().AddSubLogger(&testSubLogger);
+			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsTrue(onLog);
 			onLog = false;
-			engine->GetLogger()->RemoveSubLogger(&testSubLogger);
-			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
+			engine->GetLogger().RemoveSubLogger(&testSubLogger);
+			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsFalse(onLog);
 			PonyEngine::Core::DestroyEngine(engine);
 
 			PonyEngine::Core::EngineParams engineParams;
 			engineParams.loggerParams.subLoggers.push_back(&testSubLogger);
 			engine = PonyEngine::Core::CreateEngine(engineParams);
-			engine->GetLogger()->Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
+			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsTrue(onLog);
 			PonyEngine::Core::DestroyEngine(engine);
 		}
@@ -131,7 +131,7 @@ namespace PonyEngineTests
 			testSubLogger.onLog = &onLog;
 
 			auto engine = PonyEngine::Core::CreateEngine();
-			engine->GetLogger()->AddSubLogger(&testSubLogger);
+			engine->GetLogger().AddSubLogger(&testSubLogger);
 
 			std::string message = "Test log Verbose";
 			auto logType = PonyEngine::Debug::Log::LogType::Verbose;
@@ -140,7 +140,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->Log(logType, message);
+			engine->GetLogger().Log(logType, message);
 
 			engine->Tick();
 			message = "Test log Debug";
@@ -149,7 +149,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->Log(logType, message);
+			engine->GetLogger().Log(logType, message);
 
 			engine->Tick();
 			message = "Test log Info";
@@ -158,7 +158,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->Log(logType, message);
+			engine->GetLogger().Log(logType, message);
 
 			engine->Tick();
 			message = "Test log Warning";
@@ -167,7 +167,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->Log(logType, message);
+			engine->GetLogger().Log(logType, message);
 
 			engine->Tick();
 			message = "Test log Error";
@@ -176,7 +176,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->Log(logType, message);
+			engine->GetLogger().Log(logType, message);
 
 			engine->Tick();
 			message = "Test log Exception";
@@ -186,9 +186,9 @@ namespace PonyEngineTests
 			testSubLogger.expectedStartPoint = std::chrono::system_clock::now();
 			testSubLogger.expectedFrame = engine->GetFrameCount();
 			testSubLogger.expectedLogType = logType;
-			engine->GetLogger()->LogException(e, message);
+			engine->GetLogger().LogException(e, message);
 			
-			engine->GetLogger()->RemoveSubLogger(&testSubLogger);
+			engine->GetLogger().RemoveSubLogger(&testSubLogger);
 
 			PonyEngine::Core::DestroyEngine(engine);
 		}
