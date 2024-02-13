@@ -12,8 +12,8 @@ export module PonyEngine.Core:LoggerOwnerKit;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log.ISubLogger;
-import PonyEngine.Debug.Log.Logger;
+import PonyEngine.Debug.Log;
+import PonyEngine.Debug.Log.Implementation;
 
 namespace PonyEngine::Core
 {

@@ -15,6 +15,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Debug\Log\Log.Implementation.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
     <ClCompile Include="Source\Private\Core\EngineFeatures.cppm" />
@@ -29,7 +30,6 @@
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\Log.cppm" />
-    <ClCompile Include="Source\Public\Debug\Log\Log.Full.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />

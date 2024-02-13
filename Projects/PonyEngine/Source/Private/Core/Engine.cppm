@@ -14,7 +14,7 @@ import <iostream>;
 import <exception>;
 
 import PonyEngine.Debug.Log;
-import PonyEngine.Debug.Log.Logger;
+import PonyEngine.Debug.Log.Implementation;
 
 import :EngineFeatures;
 import :EngineParams;

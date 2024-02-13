@@ -12,9 +12,7 @@ export module PonyEngine.Core:EngineFeatures;
 import <cassert>;
 import <functional>;
 
-import PonyEngine.Debug.Log.ConsoleSubLogger;
-import PonyEngine.Debug.Log.FileSubLogger;
-import PonyEngine.Debug.Log.Logger;
+import PonyEngine.Debug.Log.Implementation;
 
 import :IEngine;
 import :LoggerParams;

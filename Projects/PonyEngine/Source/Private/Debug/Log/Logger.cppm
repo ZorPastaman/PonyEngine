@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log.Logger;
+export module PonyEngine.Debug.Log.Implementation:Logger;
 
 import <algorithm>;
 import <cassert>;
@@ -19,7 +19,7 @@ import <string>;
 import <vector>;
 import <utility>;
 
-import PonyEngine.Debug.Log.Full;
+import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Debug::Log
 {

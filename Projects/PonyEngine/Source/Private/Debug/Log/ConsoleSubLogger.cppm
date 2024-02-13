@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log.ConsoleSubLogger;
+export module PonyEngine.Debug.Log.Implementation:ConsoleSubLogger;
 
 import <exception>;
 import <iostream>;
 import <stdexcept>;
 
-import PonyEngine.Debug.Log.Full;
+import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Debug::Log
 {
