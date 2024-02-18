@@ -79,7 +79,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-	<ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
       <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
@@ -90,10 +90,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\EngineLoop\EngineLoop.cppm" />
+    <ClCompile Include="Source\Private\EngineLoop\EngineRunner.cppm" />
     <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm" />
     <ClCompile Include="Source\Private\EngineLoop\Game.cppm" />
-	<ClCompile Include="Source\WindowsMain.cpp" />
+    <ClCompile Include="Source\WindowsMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

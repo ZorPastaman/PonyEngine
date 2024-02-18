@@ -9,9 +9,43 @@
 
 #include <windows.h>
 
-import EngineLoop;
+import EngineRunner;
+
+bool PeekMessages(WPARAM& wParam);
 
 int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
 {
-	return Game::EngineLoop();
+	Game::EngineRunner engineRunner;
+
+	while (engineRunner.IsRunning())
+	{
+		engineRunner.Tick();
+
+		WPARAM wParam;
+		if (PeekMessages(wParam))
+		{
+			return wParam;
+		}
+	}
+
+	return engineRunner.GetExitCode();
+}
+
+bool PeekMessages(WPARAM& wParam)
+{
+	MSG message;
+	while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
+	{
+		TranslateMessage(&message);
+		DispatchMessage(&message);
+
+		switch (message.message)
+		{
+		case WM_QUIT:
+			wParam = message.wParam;
+			return true;
+		}
+	}
+
+	return false;
 }
