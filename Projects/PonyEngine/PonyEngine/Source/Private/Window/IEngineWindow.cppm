@@ -13,11 +13,16 @@ import PonyEngine.Window;
 
 namespace PonyEngine::Window
 {
+	/// @brief Window interface used by an engine.
 	export class IEngineWindow : public IWindow
 	{
 	public:
 		virtual ~IEngineWindow() noexcept = default;
 
+		/// @brief Shows a window.
 		virtual void ShowWindow() = 0;
+
+		/// @brief Ticks a window message queue.
+		virtual void Tick() = 0;
 	};
 }

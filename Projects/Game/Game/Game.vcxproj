@@ -50,16 +50,20 @@
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <OutDir>$(SolutionDir)\Output\$(Platform)\$(Configuration)\</OutDir>
     <IntDir>$(SolutionDir)\Intermediate\$(ProjectName)\$(Platform)\$(Configuration)\</IntDir>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Include\Private;$(ProjectDir)\Include\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -68,28 +72,28 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
       <PreprocessorDefinitions>NDEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Include\Private;$(ProjectDir)\Include\Public;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
+	<ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
       <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
-    </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine\PonyEngine.vcxproj">
-      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\EngineLoop\EngineLoop.cppm" />
     <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm" />
-    <ClCompile Include="Source\WinMain.cpp" />
     <ClCompile Include="Source\Private\EngineLoop\Game.cppm" />
+	<ClCompile Include="Source\WindowsMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

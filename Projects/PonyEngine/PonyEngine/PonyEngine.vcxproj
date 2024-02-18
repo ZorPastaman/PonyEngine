@@ -27,13 +27,14 @@
     <ClCompile Include="Source\Private\Window\Window.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
-    <ClCompile Include="Source\Private\Window\WindowsWindow.cppm" />
+    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsWindowFactory.cppm" />
+    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsWindow.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
   </ItemGroup>
@@ -73,12 +74,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

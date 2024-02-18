@@ -21,27 +21,43 @@ namespace PonyEngine::Core
 	export struct LoggerOwnerKit final
 	{
 	public:
+		/// @brief Creates a @p LoggerOwnerKit with default initialized values.
 		[[nodiscard("Pure constructor")]]
-		LoggerOwnerKit() noexcept;
+		inline LoggerOwnerKit() noexcept;
 		LoggerOwnerKit(const LoggerOwnerKit& other) = delete;
+		/// @brief Move constructor.
+		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		LoggerOwnerKit(LoggerOwnerKit&& other) noexcept;
+		inline LoggerOwnerKit(LoggerOwnerKit&& other) noexcept;
 
-		~LoggerOwnerKit() noexcept = default;
+		inline ~LoggerOwnerKit() noexcept = default;
 
-		std::vector<Debug::Log::ISubLogger*> subLoggers;
-		Debug::Log::IEngineLogger* logger;
+		/// @brief Move assignment.
+		/// @param other Move source.
+		/// @return @a This.
+		inline LoggerOwnerKit& operator =(LoggerOwnerKit&& other) noexcept;
+
+		std::vector<Debug::Log::ISubLogger*> subLoggers; /// @brief Main sub-loggers. The owner must destroy them on its destruction.
+		Debug::Log::IEngineLogger* logger; /// @brief Logger.
 	};
 
-	LoggerOwnerKit::LoggerOwnerKit() noexcept :
+	inline LoggerOwnerKit::LoggerOwnerKit() noexcept :
 		subLoggers{},
 		logger{}
 	{
 	}
 
-	LoggerOwnerKit::LoggerOwnerKit(LoggerOwnerKit&& other) noexcept :
+	inline LoggerOwnerKit::LoggerOwnerKit(LoggerOwnerKit&& other) noexcept :
 		subLoggers(std::move(other.subLoggers)),
 		logger{other.logger}
 	{
+	}
+
+	inline LoggerOwnerKit& LoggerOwnerKit::operator =(LoggerOwnerKit&& other) noexcept
+	{
+		subLoggers = std::move(other.subLoggers);
+		logger = other.logger;
+
+		return *this;
 	}
 }

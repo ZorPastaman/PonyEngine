@@ -61,13 +61,13 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math</PublicModuleDirectories>
-    <PublicIncludeDirectories>$(ProjectDir)\Include\Public</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Math;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <AllProjectBMIsArePublic>false</AllProjectBMIsArePublic>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
