@@ -7,21 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Implementation;
+export module PonyEngine.Window.Implementation:WindowFactory;
 
 import <string>;
+import <windows.h>;
 
 import PonyEngine.Core;
+import PonyEngine.Window;
 
-export import :IEngineWindow;
-export import :WindowFactory;
+import :IEngineWindow;
+import :WindowsWindow;
 
 namespace PonyEngine::Window
 {
-	/// @brief Creates an engine window.
-	/// @param title Window title.
-	/// @param engine Engine that owns the window.
-	/// @return Created window.
-	export [[nodiscard]]
-	IEngineWindow* CreateEngineWindow(const std::string& title, Core::IEngine& engine);
+	IEngineWindow* CreateEngineWindow(const std::string& title, Core::IEngine& engine)
+	{
+		HINSTANCE hInstance = GetModuleHandle(NULL);
+
+		return new WindowsWindow(title, engine, hInstance, SW_NORMAL);
+	}
 }

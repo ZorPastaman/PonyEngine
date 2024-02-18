@@ -22,11 +22,11 @@ namespace PonyEngine::Debug::Log
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		ConsoleSubLogger() noexcept = default;
+		inline ConsoleSubLogger() noexcept = default;
 		ConsoleSubLogger(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger(ConsoleSubLogger&&) = delete;
 
-		virtual ~ConsoleSubLogger() noexcept = default;
+		inline virtual ~ConsoleSubLogger() noexcept = default;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};

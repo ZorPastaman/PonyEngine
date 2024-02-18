@@ -12,6 +12,7 @@ export module PonyEngine.Debug.Log.Implementation:FileSubLogger;
 import <filesystem>;
 import <fstream>;
 import <iostream>;
+import <stdexcept>;
 import <utility>;
 
 import PonyEngine.Debug.Log;
@@ -32,7 +33,7 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure constructor")]]
 		FileSubLogger(FileSubLogger&& other);
 
-		virtual ~FileSubLogger();
+		virtual ~FileSubLogger() noexcept;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -45,7 +46,7 @@ namespace PonyEngine::Debug::Log
 	{
 		if (!m_logFile.is_open()) [[unlikely]]
 		{
-			std::cerr << logPath << " isn't open. Logs won't be written to file!" << std::endl;
+			throw std::logic_error("Log file isn't opened.");
 		}
 	}
 
@@ -54,15 +55,22 @@ namespace PonyEngine::Debug::Log
 	{
 		if (!m_logFile.is_open()) [[unlikely]]
 		{
-			std::cerr << "Moved non-opened logFile. Logs won't be written to file!" << std::endl;
+			throw std::logic_error("Log file isn't opened.");
 		}
 	}
 
-	FileSubLogger::~FileSubLogger()
+	FileSubLogger::~FileSubLogger() noexcept
 	{
-		if (m_logFile.is_open()) [[likely]]
+		if (m_logFile.is_open())
 		{
-			m_logFile.close();
+			try
+			{
+				m_logFile.close();
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << " on closing a log file.";
+			}
 		}
 	}
 

@@ -9,7 +9,7 @@
 
 export module PonyEngine.Debug.Log.Implementation:LoggerFactory;
 
-import <functional>;
+import PonyEngine.Core;
 
 import :ConsoleSubLogger;
 import :FileSubLogger;
@@ -18,17 +18,20 @@ import :Logger;
 
 namespace PonyEngine::Debug::Log
 {
-	export IEngineLogger* CreateLogger(const std::function<std::size_t()>& frameCountProvider)
+	export [[nodiscard("Pure function")]]
+	IEngineLogger* CreateLogger(const Core::IEngine& engine)
 	{
-		return new Logger(frameCountProvider);
+		return new Logger(engine);
 	}
 
-	export ISubLogger* CreateConsoleSubLogger()
+	export [[nodiscard("Pure function")]]
+	ISubLogger* CreateConsoleSubLogger()
 	{
 		return new ConsoleSubLogger();
 	}
 
-	export ISubLogger* CreateFileSubLogger(const std::filesystem::path& logPath)
+	export [[nodiscard("Pure function")]]
+	ISubLogger* CreateFileSubLogger(const std::filesystem::path& logPath)
 	{
 		return new FileSubLogger(logPath);
 	}

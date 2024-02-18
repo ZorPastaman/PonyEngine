@@ -10,10 +10,13 @@
 export module PonyEngine.Core.Implementation:EngineFeatures;
 
 import <cassert>;
-import <functional>;
+import <exception>;
+import <iostream>;
 
 import PonyEngine.Core;
+import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Implementation;
+import PonyEngine.Window.Implementation;
 
 import :LoggerOwnerKit;
 
@@ -26,31 +29,83 @@ namespace PonyEngine::Core
 	export [[nodiscard("Pure function")]] 
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine);
 
+	/// @brief Creates a window.
+	/// @param params Window parameters.
+	/// @param engine Engine that owns the window.
+	/// @return Engine window.
+	export [[nodiscard("Pure function")]]
+	Window::IEngineWindow* CreateWindow(const WindowParams& params, IEngine& engine);
+
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
-		answer.logger = Debug::Log::CreateLogger(std::bind(&IEngine::GetFrameCount, &engine));
+		answer.logger = Debug::Log::CreateLogger(engine);
 
 		if (params.addConsoleSubLogger)
 		{
-			Debug::Log::ISubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
-			answer.subLoggers.push_back(consoleSubLogger);
-			answer.logger->AddSubLogger(consoleSubLogger);
+			try
+			{
+				Debug::Log::ISubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
+				answer.subLoggers.push_back(consoleSubLogger);
+				answer.logger->AddSubLogger(consoleSubLogger);
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << " on create a console sub-logger." << std::endl;
+			}
 		}
 
 		if (params.addLogFileSubLogger)
 		{
-			Debug::Log::ISubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
-			answer.subLoggers.push_back(fileSubLogger);
-			answer.logger->AddSubLogger(fileSubLogger);
+			try
+			{
+				Debug::Log::ISubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
+				answer.subLoggers.push_back(fileSubLogger);
+				answer.logger->AddSubLogger(fileSubLogger);
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << " on create a log file sub-logger." << std::endl;
+			}
 		}
 
 		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{
 			assert((subLogger != nullptr));
-			answer.logger->AddSubLogger(subLogger);
+
+			try
+			{
+				answer.logger->AddSubLogger(subLogger);
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << " on adding a sub-logger." << std::endl;
+			}
 		}
 
 		return answer;
+	}
+
+	Window::IEngineWindow* CreateWindow(const WindowParams& params, IEngine& engine)
+	{
+		if (params.createWindow)
+		{
+			engine.GetLogger().Log(Debug::Log::LogType::Info, "Create a window");
+
+			try
+			{
+				return Window::CreateEngineWindow(params.title, engine);
+			}
+			catch (std::exception& e)
+			{
+				engine.GetLogger().LogException(e, "on creating a window");
+			}
+
+			return nullptr;
+		}
+
+		engine.GetLogger().Log(Debug::Log::LogType::Info, "Skip creating a window");
+
+		return nullptr;
 	}
 }

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\WinMain.cpp">
+    <ClCompile Include="Source\WindowsMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\EngineLoop\Game.cppm">

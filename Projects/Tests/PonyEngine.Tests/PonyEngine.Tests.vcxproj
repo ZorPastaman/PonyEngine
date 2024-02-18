@@ -16,10 +16,10 @@
     <ClCompile Include="LoggerTests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
       <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
     </ProjectReference>
   </ItemGroup>

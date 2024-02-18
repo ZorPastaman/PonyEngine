@@ -33,7 +33,7 @@ namespace PonyEngine::Core
 		~WindowParams() = default;
 
 		std::string title; /// @brief Window title. The default value is Pony Engine Game.
-		bool createWindow; /// @brief If it's @a true, a window will be created; otherwise the engine will work without a window.
+		bool createWindow; /// @brief If it's @a true, a window will be created; otherwise the engine will work without a window. The default value is @a true.
 	};
 
 	WindowParams::WindowParams() :

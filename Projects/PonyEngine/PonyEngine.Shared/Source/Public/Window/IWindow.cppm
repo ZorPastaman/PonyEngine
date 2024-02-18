@@ -11,6 +11,7 @@ export module PonyEngine.Window:IWindow;
 
 namespace PonyEngine::Window
 {
+	/// @brief Engine window interface.
 	export class IWindow
 	{
 	protected:
