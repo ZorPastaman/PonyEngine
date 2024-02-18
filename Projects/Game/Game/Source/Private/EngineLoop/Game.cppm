@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module EngineLoop:Game;
+export module EngineRunner:Game;
 
 import <format>;
 import <string>;

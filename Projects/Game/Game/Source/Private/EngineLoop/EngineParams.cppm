@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module EngineLoop:EngineParams;
+export module EngineRunner:EngineParams;
 
 import PonyEngine.Core;
 

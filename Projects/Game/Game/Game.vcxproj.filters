@@ -21,7 +21,7 @@
     <ClCompile Include="Source\Private\EngineLoop\Game.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\EngineLoop\EngineLoop.cppm">
+    <ClCompile Include="Source\Private\EngineLoop\EngineRunner.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm">
