@@ -44,18 +44,18 @@ namespace PonyEngine::Debug::Log
 		virtual void Log(LogType logType, const std::string& message) noexcept override;
 		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept override;
 
-		virtual void AddSubLogger(ISubLogger* subLogger) override;
-		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
+		virtual void AddSubLogger(ISubLogger& subLogger) override;
+		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
 
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
 
-		const Core::IEngine* const m_engine; /// @brief Engine that owns this logger.
+		const Core::IEngine& m_engine; /// @brief Engine that owns this logger.
 	};
 
 	Logger::Logger(const Core::IEngine& engine) :
 		m_subLoggers{},
-		m_engine{&engine}
+		m_engine{engine}
 	{
 	}
 
@@ -71,7 +71,7 @@ namespace PonyEngine::Debug::Log
 
 		try
 		{
-			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_engine->GetFrameCount(), logType);
+			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_engine.GetFrameCount(), logType);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -88,7 +88,7 @@ namespace PonyEngine::Debug::Log
 	{
 		try
 		{
-			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_engine->GetFrameCount(), LogType::Exception);
+			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_engine.GetFrameCount(), LogType::Exception);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -101,15 +101,14 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	void Logger::AddSubLogger(ISubLogger* const subLogger)
+	void Logger::AddSubLogger(ISubLogger& subLogger)
 	{
-		assert((subLogger != nullptr));
-		m_subLoggers.push_back(subLogger);
+		m_subLoggers.push_back(&subLogger);
 	}
 
-	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
+	void Logger::RemoveSubLogger(ISubLogger& subLogger)
 	{
-		const std::vector<ISubLogger*>::iterator position = std::find(m_subLoggers.begin(), m_subLoggers.end(), subLogger);
+		const std::vector<ISubLogger*>::iterator position = std::find(m_subLoggers.begin(), m_subLoggers.end(), &subLogger);
 
 		if (position != m_subLoggers.end()) [[likely]]
 		{

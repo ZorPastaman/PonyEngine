@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window;
+export module PonyEngine.Window:MessageListeners.IKeyboardMessageListener;
 
-export import :IWindow;
+import :Messages.KeyboardMessage;
 
-export import :MessageListeners.IKeyboardMessageListener;
+namespace PonyEngine::Window::MessageListeners
+{
+	export class IKeyboardMessageListener
+	{
+	public:
+		virtual ~IKeyboardMessageListener() noexcept = default;
 
-export import :Messages.KeyboardMessage;
-export import :Messages.KeyboardKeyCode;
+		virtual void Listen(Messages::KeyboardMessage keyboardMessage) noexcept = 0;
+	};
+}

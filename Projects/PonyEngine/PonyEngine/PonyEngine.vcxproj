@@ -24,6 +24,7 @@
     <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\LoggerFactory.cppm" />
     <ClCompile Include="Source\Private\Window\IEngineWindow.cppm" />
+    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsKeyCodeToKeyboardKeyCode.cppm" />
     <ClCompile Include="Source\Private\Window\Window.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />
@@ -87,7 +88,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
     </Link>
   </ItemDefinitionGroup>
@@ -97,7 +98,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
     </Link>
   </ItemDefinitionGroup>

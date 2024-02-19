@@ -67,7 +67,7 @@ namespace PonyEngine::Debug::Log
 			{
 				m_logFile.close();
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
 				std::cerr << e.what() << " on closing a log file.";
 			}

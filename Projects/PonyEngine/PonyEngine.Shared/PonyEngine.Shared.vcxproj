@@ -22,6 +22,9 @@
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />
+    <ClCompile Include="Source\Public\Window\MessageListeners\IKeyboardMessageListener.cppm" />
+    <ClCompile Include="Source\Public\Window\Messages\KeyboardMessage.cppm" />
+    <ClCompile Include="Source\Public\Window\Messages\KeyboardKeyCode.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -83,7 +86,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
     </Link>
   </ItemDefinitionGroup>
@@ -93,7 +96,7 @@
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
     </Link>
   </ItemDefinitionGroup>
