@@ -34,10 +34,10 @@ namespace PonyEngine::Debug::Log
 
 		/// @brief Adds the @p subLogger to the list of sub-loggers.
 		/// @param subLogger @p SubLogger to add. It mustn't be already added.
-		virtual void AddSubLogger(ISubLogger* subLogger) = 0;
+		virtual void AddSubLogger(ISubLogger& subLogger) = 0;
 		/// @brief Removes the @p subLogger from the list of sub-loggers.
 		/// @param subLogger @p SubLogger to remove.
-		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;
+		virtual void RemoveSubLogger(ISubLogger& subLogger) = 0;
 
 	protected:
 		virtual ~ILogger() noexcept = default;

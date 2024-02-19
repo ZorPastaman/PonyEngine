@@ -96,9 +96,9 @@ namespace PonyEngine::Core
 		{
 			try
 			{
-				m_loggerKit.logger->RemoveSubLogger(subLogger);
+				m_loggerKit.logger->RemoveSubLogger(*subLogger);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
 				std::cerr << "Exception on removing sub logger: " << e.what() << std::endl;
 			}

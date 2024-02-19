@@ -47,9 +47,9 @@ namespace PonyEngine::Core
 			{
 				Debug::Log::ISubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
 				answer.subLoggers.push_back(consoleSubLogger);
-				answer.logger->AddSubLogger(consoleSubLogger);
+				answer.logger->AddSubLogger(*consoleSubLogger);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
 				std::cerr << e.what() << " on create a console sub-logger." << std::endl;
 			}
@@ -61,9 +61,9 @@ namespace PonyEngine::Core
 			{
 				Debug::Log::ISubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
 				answer.subLoggers.push_back(fileSubLogger);
-				answer.logger->AddSubLogger(fileSubLogger);
+				answer.logger->AddSubLogger(*fileSubLogger);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
 				std::cerr << e.what() << " on create a log file sub-logger." << std::endl;
 			}
@@ -75,9 +75,9 @@ namespace PonyEngine::Core
 
 			try
 			{
-				answer.logger->AddSubLogger(subLogger);
+				answer.logger->AddSubLogger(*subLogger);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
 				std::cerr << e.what() << " on adding a sub-logger." << std::endl;
 			}
@@ -96,9 +96,9 @@ namespace PonyEngine::Core
 			{
 				return Window::CreateEngineWindow(params.title, engine);
 			}
-			catch (std::exception& e)
+			catch (const std::exception& e)
 			{
-				engine.GetLogger().LogException(e, "on creating a window");
+				engine.GetLogger().LogException(e, "On creating a window");
 			}
 
 			return nullptr;

@@ -65,6 +65,9 @@
     <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsWindowFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsKeyCodeToKeyboardKeyCode.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.rc">

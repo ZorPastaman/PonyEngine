@@ -107,11 +107,11 @@ namespace PonyEngineTests
 			testSubLogger.onLog = &onLog;
 
 			auto engine = PonyEngine::Core::CreateEngine();
-			engine->GetLogger().AddSubLogger(&testSubLogger);
+			engine->GetLogger().AddSubLogger(testSubLogger);
 			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsTrue(onLog);
 			onLog = false;
-			engine->GetLogger().RemoveSubLogger(&testSubLogger);
+			engine->GetLogger().RemoveSubLogger(testSubLogger);
 			engine->GetLogger().Log(PonyEngine::Debug::Log::LogType::Info, "Any string");
 			Assert::IsFalse(onLog);
 			PonyEngine::Core::DestroyEngine(engine);
@@ -132,7 +132,7 @@ namespace PonyEngineTests
 			testSubLogger.onLog = &onLog;
 
 			auto engine = PonyEngine::Core::CreateEngine();
-			engine->GetLogger().AddSubLogger(&testSubLogger);
+			engine->GetLogger().AddSubLogger(testSubLogger);
 
 			std::string message = "Test log Verbose";
 			auto logType = PonyEngine::Debug::Log::LogType::Verbose;
@@ -189,7 +189,7 @@ namespace PonyEngineTests
 			testSubLogger.expectedLogType = logType;
 			engine->GetLogger().LogException(e, message);
 			
-			engine->GetLogger().RemoveSubLogger(&testSubLogger);
+			engine->GetLogger().RemoveSubLogger(testSubLogger);
 
 			PonyEngine::Core::DestroyEngine(engine);
 		}

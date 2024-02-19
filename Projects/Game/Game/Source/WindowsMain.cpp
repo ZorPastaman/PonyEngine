@@ -24,7 +24,7 @@ int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine
 		WPARAM wParam;
 		if (PeekMessages(wParam))
 		{
-			return wParam;
+			return static_cast<int>(wParam);
 		}
 	}
 
