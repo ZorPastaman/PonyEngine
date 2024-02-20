@@ -7,11 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Input.Implementation:InputSystem;
 
-export import :EngineParams;
-export import :IEngine;
-export import :IService;
-export import :IServiceManager;
-export import :ISystem;
-export import :ISystemManager;
+import PonyEngine.Input;
+
+namespace PonyEngine::Input
+{
+	export class InputSystem final : public IInputSystem
+	{
+	public:
+		InputSystem() noexcept = default;
+
+		virtual ~InputSystem() noexcept = default;
+
+		virtual void Tick() override;
+	};
+
+	void InputSystem::Tick()
+	{
+	}
+}

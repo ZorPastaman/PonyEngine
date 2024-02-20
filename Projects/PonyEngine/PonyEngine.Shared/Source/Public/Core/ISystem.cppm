@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Core:ISystem;
 
-export import :EngineParams;
-export import :IEngine;
-export import :IService;
-export import :IServiceManager;
-export import :ISystem;
-export import :ISystemManager;
+import <cstdint>;
+
+namespace PonyEngine::Core
+{
+	export class ISystem
+	{
+	public:
+		virtual ~ISystem() noexcept = default;
+
+		virtual void Tick() = 0;
+	};
+}

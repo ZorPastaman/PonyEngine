@@ -14,6 +14,9 @@ import <cstddef>;
 import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
+import :IServiceManager;
+import :ISystemManager;
+
 namespace PonyEngine::Core
 {
 	/// @brief Main Pony Engine interface.
@@ -33,6 +36,11 @@ namespace PonyEngine::Core
 		/// @return Engine window. Can be @a nullptr.
 		[[nodiscard("Pure function")]]
 		virtual Window::IWindow* GetWindow() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IServiceManager& GetServiceManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual ISystemManager& GetSystemManager() noexcept = 0;
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().

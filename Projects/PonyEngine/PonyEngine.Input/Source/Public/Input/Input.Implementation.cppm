@@ -7,11 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Input.Implementation;
 
-export import :EngineParams;
-export import :IEngine;
-export import :IService;
-export import :IServiceManager;
-export import :ISystem;
-export import :ISystemManager;
+export import :InputSystemFactory;

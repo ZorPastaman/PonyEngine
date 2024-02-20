@@ -18,10 +18,13 @@ import <stdexcept>;
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Implementation;
+import PonyEngine.Window;
 import PonyEngine.Window.Implementation;
 
 import :EngineFeatures;
 import :LoggerOwnerKit;
+import :ServiceManager;
+import :SystemManager;
 
 namespace PonyEngine::Core
 {
@@ -47,6 +50,11 @@ namespace PonyEngine::Core
 		inline virtual Window::IWindow* GetWindow() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IServiceManager& GetServiceManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual ISystemManager& GetSystemManager() noexcept override;
+
+		[[nodiscard("Pure function")]]
 		inline virtual bool IsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
 		inline virtual int GetExitCode() const noexcept override;
@@ -58,6 +66,9 @@ namespace PonyEngine::Core
 		LoggerOwnerKit m_loggerKit; /// @brief Logger and sub-logger that are owned by the @p Engine.
 		Window::IEngineWindow* m_window; /// @brief Engine window. It can be nullptr.
 
+		ServiceManager m_serviceManager; /// @brief Service manager.
+		SystemManager m_systemManager; /// @brief System manager.
+
 		std::size_t m_frameCount; /// @brief Current frame.
 
 		int m_exitCode; /// @brief Exit code. It's defined only if @p m_isRunning is @a true.
@@ -66,7 +77,9 @@ namespace PonyEngine::Core
 
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
-		m_isRunning{true}
+		m_isRunning{true},
+		m_serviceManager(),
+		m_systemManager()
 	{
 		m_loggerKit = CreateLogger(params.loggerParams, *this);
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
@@ -124,6 +137,16 @@ namespace PonyEngine::Core
 		return m_window;
 	}
 
+	IServiceManager& Engine::GetServiceManager() noexcept
+	{
+		return m_serviceManager;
+	}
+
+	ISystemManager& Engine::GetSystemManager() noexcept
+	{
+		return m_systemManager;
+	}
+
 	inline bool Engine::IsRunning() const noexcept
 	{
 		return m_isRunning;
@@ -155,6 +178,8 @@ namespace PonyEngine::Core
 		{
 			m_window->Tick();
 		}
+
+		m_systemManager.Tick();
 
 		++m_frameCount;
 	}
