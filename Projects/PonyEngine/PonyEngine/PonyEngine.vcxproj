@@ -14,6 +14,8 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Core\ServiceManager.cppm" />
+    <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\IEngineLogger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\Log.Implementation.cppm" />

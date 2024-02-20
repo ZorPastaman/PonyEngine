@@ -13,7 +13,7 @@ import PonyEngine.Core;
 import PonyEngine.Core.Implementation;
 
 import :EngineParams;
-import :Game;
+import :GameRunner;
 
 namespace Game
 {
@@ -31,17 +31,20 @@ namespace Game
 
 	private:
 		PonyEngine::Core::IEngine* const m_engine;
+		GameRunner* m_gameRunner;
 	};
 
 	EngineRunner::EngineRunner() :
 		m_engine{PonyEngine::Core::CreateEngine(GetEngineParams())}
 	{
-		Begin(*m_engine);
+		m_gameRunner = new GameRunner(*m_engine);
+		m_gameRunner->Begin();
 	}
 
 	EngineRunner::~EngineRunner() noexcept
 	{
-		End(*m_engine);
+		m_gameRunner->End();
+		delete m_gameRunner;
 		PonyEngine::Core::DestroyEngine(m_engine);
 	}
 
@@ -57,8 +60,8 @@ namespace Game
 
 	void EngineRunner::Tick()
 	{
-		PreTick(*m_engine);
+		m_gameRunner->PreTick();
 		m_engine->Tick();
-		PostTick(*m_engine);
+		m_gameRunner->PostTick();
 	}
 }

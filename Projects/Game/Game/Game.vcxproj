@@ -88,11 +88,17 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.Shared\PonyEngine.Input.Shared.vcxproj">
+      <Project>{4c20c746-3a48-46c8-8573-d8c04aa009b2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
+      <Project>{d637b8c4-8abf-421e-9b7e-0b842096fb62}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\EngineLoop\EngineRunner.cppm" />
     <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm" />
-    <ClCompile Include="Source\Private\EngineLoop\Game.cppm" />
+    <ClCompile Include="Source\Private\EngineLoop\GameRunner.cppm" />
     <ClCompile Include="Source\WindowsMain.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
