@@ -16,6 +16,6 @@ namespace PonyEngine::Debug::Log
 	export class IEngineLogger : public ILogger
 	{
 	public:
-		virtual ~IEngineLogger() noexcept = default;
+		inline virtual ~IEngineLogger() noexcept = default;
 	};
 }

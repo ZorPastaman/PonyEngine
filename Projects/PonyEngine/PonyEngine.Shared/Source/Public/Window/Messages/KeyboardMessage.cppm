@@ -22,6 +22,8 @@ namespace PonyEngine::Window::Messages
 		
 		constexpr inline ~KeyboardMessage() noexcept = default;
 
+		constexpr inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept;
+
 		KeyboardKeyCode keyCode;
 		bool isDown;
 	};
@@ -32,7 +34,7 @@ namespace PonyEngine::Window::Messages
 	{
 	}
 
-	constexpr inline KeyboardMessage::KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept :
+	constexpr inline KeyboardMessage::KeyboardMessage(const KeyboardKeyCode keyCode, const bool isDown) noexcept :
 		keyCode{keyCode},
 		isDown{isDown}
 	{
@@ -42,5 +44,13 @@ namespace PonyEngine::Window::Messages
 		keyCode{other.keyCode},
 		isDown{other.isDown}
 	{
+	}
+
+	inline constexpr KeyboardMessage& KeyboardMessage::operator =(const KeyboardMessage& other) noexcept
+	{
+		keyCode = other.keyCode;
+		isDown = other.isDown;
+
+		return *this;
 	}
 }

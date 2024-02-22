@@ -13,11 +13,14 @@ import <cstdint>;
 
 namespace PonyEngine::Core
 {
+	/// @brief Engine system.
 	export class ISystem
 	{
 	public:
-		virtual ~ISystem() noexcept = default;
-
+		/// @brief Ticks the system.
 		virtual void Tick() = 0;
+
+	protected:
+		inline virtual ~ISystem() noexcept = default;
 	};
 }

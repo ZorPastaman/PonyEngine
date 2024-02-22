@@ -32,7 +32,7 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		EngineParams(EngineParams&& other);
 
-		~EngineParams() = default;
+		~EngineParams() noexcept = default;
 
 		LoggerParams loggerParams; /// @brief Logger parameters.
 		WindowParams windowParams; /// @brief Window parameters.

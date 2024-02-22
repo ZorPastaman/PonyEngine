@@ -50,9 +50,13 @@ namespace PonyEngine::Core
 		inline virtual Window::IWindow* GetWindow() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IServiceManager& GetServiceManager() noexcept override;
+		inline virtual IServiceManager& GetServiceManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& GetSystemManager() noexcept override;
+		inline virtual ISystemManager& GetSystemManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		inline virtual const IServiceManager& GetServiceManager() const noexcept override;
+		[[nodiscard("Pure function")]]
+		inline virtual const ISystemManager& GetSystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		inline virtual bool IsRunning() const noexcept override;
@@ -105,11 +109,11 @@ namespace PonyEngine::Core
 
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine destructed");
 
-		for (Debug::Log::ISubLogger* const subLogger : m_loggerKit.subLoggers)
+		for (Debug::Log::IEngineSubLogger* const subLogger : m_loggerKit.subLoggers)
 		{
 			try
 			{
-				m_loggerKit.logger->RemoveSubLogger(*subLogger);
+				m_loggerKit.logger->RemoveSubLogger(subLogger);
 			}
 			catch (const std::exception& e)
 			{
@@ -137,12 +141,22 @@ namespace PonyEngine::Core
 		return m_window;
 	}
 
-	IServiceManager& Engine::GetServiceManager() noexcept
+	inline IServiceManager& Engine::GetServiceManager() noexcept
 	{
 		return m_serviceManager;
 	}
 
-	ISystemManager& Engine::GetSystemManager() noexcept
+	inline ISystemManager& Engine::GetSystemManager() noexcept
+	{
+		return m_systemManager;
+	}
+
+	inline const IServiceManager& Engine::GetServiceManager() const noexcept
+	{
+		return m_serviceManager;
+	}
+
+	inline const ISystemManager& Engine::GetSystemManager() const noexcept
 	{
 		return m_systemManager;
 	}
@@ -157,7 +171,7 @@ namespace PonyEngine::Core
 		return m_exitCode;
 	}
 
-	void Engine::Stop(int exitCode) noexcept
+	void Engine::Stop(const int exitCode) noexcept
 	{
 		if (m_isRunning)
 		{

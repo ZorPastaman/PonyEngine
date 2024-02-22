@@ -18,10 +18,11 @@ namespace PonyEngine::Debug::Log
 	export class ISubLogger
 	{
 	public:
-		virtual ~ISubLogger() = default;
-
 		/// @brief Logs the @p logEntry to something.
 		/// @param logEntry Log entry to log.
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;
+
+	protected:
+		inline virtual ~ISubLogger() = default;
 	};
 }

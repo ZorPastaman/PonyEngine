@@ -20,35 +20,35 @@ namespace PonyEngine::Core
 	public:
 		/// @brief Creates a @p WindowParams.
 		[[nodiscard("Pure constructor")]]
-		WindowParams();
+		inline WindowParams();
 		/// @brief Copy constructor.
 		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
-		WindowParams(const WindowParams& other);
+		inline WindowParams(const WindowParams& other);
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		WindowParams(WindowParams&& other);
+		inline WindowParams(WindowParams&& other);
 
-		~WindowParams() = default;
+		inline ~WindowParams() = default;
 
 		std::string title; /// @brief Window title. The default value is Pony Engine Game.
 		bool createWindow; /// @brief If it's @a true, a window will be created; otherwise the engine will work without a window. The default value is @a true.
 	};
 
-	WindowParams::WindowParams() :
+	inline WindowParams::WindowParams() :
 		title("Pony Engine Game"),
 		createWindow{true}
 	{
 	}
 
-	WindowParams::WindowParams(const WindowParams& other) :
+	inline WindowParams::WindowParams(const WindowParams& other) :
 		title(other.title),
 		createWindow{other.createWindow}
 	{
 	}
 
-	WindowParams::WindowParams(WindowParams&& other) :
+	inline WindowParams::WindowParams(WindowParams&& other) :
 		title(std::move(other.title)),
 		createWindow{other.createWindow}
 	{

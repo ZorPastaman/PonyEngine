@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
+import <algorithm>;
+import <cassert>;
 import <utility>;
 import <vector>;
 
@@ -16,55 +18,70 @@ import PonyEngine.Core;
 
 namespace PonyEngine::Core
 {
+	/// @brief Holder and ticker of systems.
 	export class SystemManager final : public ISystemManager
 	{
 	public:
-		SystemManager() noexcept;
-		SystemManager(SystemManager&& other) noexcept;
+		/// @brief Creates a @p SystemManager.
+		[[nodiscard("Pure constructor")]]
+		inline SystemManager() noexcept;
+		SystemManager(const SystemManager&) = delete;
+		/// @brief Move constructor.
+		/// @param other Move source.
+		[[nodiscard("Pure constructor")]]
+		inline SystemManager(SystemManager&& other) noexcept;
 
-		virtual ~SystemManager() noexcept = default;
+		inline virtual ~SystemManager() noexcept = default;
 
-		virtual void AddSystem(ISystem& system) noexcept override;
-		virtual void RemoveSystem(ISystem& system) noexcept override;
+		inline virtual void AddSystem(ISystem* system) override;
+		virtual void RemoveSystem(ISystem* system) override;
 
-		virtual ISystem* FindSystem(const std::function<bool(const ISystem&)>& predicate) override;
+		[[nodiscard("Pure function")]]
+		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const override;
 
+		/// @brief Ticks the systems.
 		void Tick() const;
 
+		/// @brief Move assignment.
+		/// @param other Move source.
+		/// @return @a This.
+		inline SystemManager& operator =(SystemManager&& other) noexcept;
+
 	private:
-		std::vector<ISystem*> m_systems;
+		std::vector<ISystem*> m_systems; /// @brief Systems.
 	};
 
-	SystemManager::SystemManager() noexcept :
+	inline SystemManager::SystemManager() noexcept :
 		m_systems{}
 	{
 	}
 
-	SystemManager::SystemManager(SystemManager&& other) noexcept :
+	inline SystemManager::SystemManager(SystemManager&& other) noexcept :
 		m_systems(std::move(other.m_systems))
 	{
 	}
 
-	void SystemManager::AddSystem(ISystem& system) noexcept
+	inline void SystemManager::AddSystem(ISystem* const system)
 	{
-		m_systems.push_back(&system);
+		assert((system != nullptr));
+		m_systems.push_back(system);
 	}
 
-	void SystemManager::RemoveSystem(ISystem& system) noexcept
+	void SystemManager::RemoveSystem(ISystem* const system)
 	{
-		const std::vector<ISystem*>::iterator position = std::find(m_systems.begin(), m_systems.end(), &system);
+		const std::vector<ISystem*>::const_iterator position = std::find(m_systems.cbegin(), m_systems.cend(), system);
 
-		if (position != m_systems.end()) [[likely]]
+		if (position != m_systems.cend()) [[likely]]
 		{
 			m_systems.erase(position);
 		}
 	}
 
-	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem&)>& predicate)
+	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
 	{
 		for (ISystem* const system : m_systems)
 		{
-			if (predicate(*system))
+			if (predicate(system))
 			{
 				return system;
 			}
@@ -79,5 +96,12 @@ namespace PonyEngine::Core
 		{
 			system->Tick();
 		}
+	}
+
+	inline SystemManager& SystemManager::operator =(SystemManager&& other) noexcept
+	{
+		m_systems = std::move(other.m_systems);
+
+		return *this;
 	}
 }

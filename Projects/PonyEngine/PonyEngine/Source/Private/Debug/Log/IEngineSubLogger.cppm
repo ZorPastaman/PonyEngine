@@ -7,11 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window;
+export module PonyEngine.Debug.Log.Implementation:IEngineSubLogger;
 
-export import :IWindow;
+import PonyEngine.Debug.Log;
 
-export import :Listeners.IKeyboardListener;
-
-export import :Messages.KeyboardMessage;
-export import :Messages.KeyboardKeyCode;
+namespace PonyEngine::Debug::Log
+{
+	export class IEngineSubLogger : public ISubLogger
+	{
+	public:
+		inline virtual ~IEngineSubLogger() noexcept = default;
+	};
+}

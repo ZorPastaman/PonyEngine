@@ -39,7 +39,7 @@ namespace PonyEngine::Math
 		/// @param zParam Value to assign to the @p z component.
 		/// @param wParam Value to assign to the @p w component.
 		[[nodiscard("Pure constructor")]]
-		constexpr Vector4(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
+		constexpr Vector4(T xParam, T yParam, T zParam, T wParam) noexcept;
 		/// @brief Copy constructor.
 		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
@@ -74,7 +74,7 @@ namespace PonyEngine::Math
 		/// @param yParam Y component.
 		/// @param zParam Z component.
 		/// @param wParam w component.
-		void Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept;
+		void Set(T xParam, T yParam, T zParam, T wParam) noexcept;
 
 		/// @brief Creates a string representing a state of a @p Vector.
 		///        The format is '(x, y, z, w)'.
@@ -86,12 +86,12 @@ namespace PonyEngine::Math
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		inline T& operator [](const std::size_t index) noexcept;
+		inline T& operator [](std::size_t index) noexcept;
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		inline const T& operator [](const std::size_t index) const noexcept;
+		inline const T& operator [](std::size_t index) const noexcept;
 
 		/// @brief Copies the @p other to @a this.
 		/// @param other @p Vector to copy.
@@ -108,7 +108,7 @@ namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier @p Vector multiplier.
 		/// @return @a This.
-		Vector4<T>& operator *=(const ComputationalType multiplier) noexcept;
+		Vector4<T>& operator *=(ComputationalType multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p other component-wise.
 		/// @param other @p Vector to multiply.
 		/// @return @a This.
@@ -116,7 +116,7 @@ namespace PonyEngine::Math
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor @p Vector divisor.
 		/// @return @a This.
-		Vector4<T>& operator /=(const ComputationalType divisor) noexcept;
+		Vector4<T>& operator /=(ComputationalType divisor) noexcept;
 		/// @brief Divides @a this by the @p divisor component-wise.
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
@@ -128,10 +128,10 @@ namespace PonyEngine::Math
 
 		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Vector4, it's always 4.
 
-		T x;
-		T y;
-		T z;
-		T w;
+		T x; /// @brief X component.
+		T y; /// @brief Y component.
+		T z; /// @brief Z component.
+		T w; /// @brief W component.
 	};
 
 	/// @brief Computes a dot product of two @p Vectors.
@@ -158,7 +158,7 @@ namespace PonyEngine::Math
 	/// @param time Interpolation/Extrapolation time. It can be negative.
 	/// @return Interpolated/Extrapolated @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, const typename Vector4<T>::ComputationalType time) noexcept;
+	constexpr Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, typename Vector4<T>::ComputationalType time) noexcept;
 
 	/// @brief Checks if two @p Vectors are almost equal with a tolerance value.
 	/// @tparam T Component type.
@@ -167,7 +167,7 @@ namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, const typename Vector4<T>::ComputationalType tolerance = typename Vector4<T>::ComputationalType{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, typename Vector4<T>::ComputationalType tolerance = typename Vector4<T>::ComputationalType{0.00001}) noexcept;
 
 	/// @brief Checks if two @p Vectors are absolutely equal.
 	/// @tparam T Component type.
@@ -213,14 +213,14 @@ namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @return Product @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector4<T> operator *(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType multiplier) noexcept;
+	constexpr Vector4<T> operator *(const Vector4<T>& vector, typename Vector4<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand @p Vector.
 	/// @return Product @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector4<T> operator *(const typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept;
+	constexpr inline Vector4<T> operator *(typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept;
 	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
 	/// @param left Multiplicand @p Vector.
@@ -235,7 +235,7 @@ namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @return Quotient @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector4<T> operator /(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType divisor) noexcept;
+	constexpr Vector4<T> operator /(const Vector4<T>& vector, typename Vector4<T>::ComputationalType divisor) noexcept;
 	/// @brief Divides the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
 	/// @param left Dividend @p Vector.

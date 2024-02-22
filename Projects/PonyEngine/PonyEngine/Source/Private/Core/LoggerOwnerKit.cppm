@@ -12,7 +12,6 @@ export module PonyEngine.Core.Implementation:LoggerOwnerKit;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Implementation;
 
 namespace PonyEngine::Core
@@ -24,7 +23,7 @@ namespace PonyEngine::Core
 		/// @brief Creates a @p LoggerOwnerKit with default initialized values.
 		[[nodiscard("Pure constructor")]]
 		inline LoggerOwnerKit() noexcept;
-		LoggerOwnerKit(const LoggerOwnerKit& other) = delete;
+		LoggerOwnerKit(const LoggerOwnerKit&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
@@ -37,7 +36,7 @@ namespace PonyEngine::Core
 		/// @return @a This.
 		inline LoggerOwnerKit& operator =(LoggerOwnerKit&& other) noexcept;
 
-		std::vector<Debug::Log::ISubLogger*> subLoggers; /// @brief Main sub-loggers. The owner must destroy them on its destruction.
+		std::vector<Debug::Log::IEngineSubLogger*> subLoggers; /// @brief Main sub-loggers. The owner must destroy them on its destruction.
 		Debug::Log::IEngineLogger* logger; /// @brief Logger.
 	};
 

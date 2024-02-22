@@ -9,6 +9,9 @@
 
 export module EngineRunner;
 
+import <exception>;
+import <iostream>;
+
 import PonyEngine.Core;
 import PonyEngine.Core.Implementation;
 
@@ -20,11 +23,14 @@ namespace Game
 	export class EngineRunner final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
 		EngineRunner();
 
 		~EngineRunner() noexcept;
 
+		[[nodiscard("Pure function")]]
 		inline bool IsRunning() const noexcept;
+		[[nodiscard("Pure function")]]
 		inline int GetExitCode() const noexcept;
 
 		void Tick();
@@ -43,8 +49,16 @@ namespace Game
 
 	EngineRunner::~EngineRunner() noexcept
 	{
-		m_gameRunner->End();
+		try
+		{
+			m_gameRunner->End();
+		}
+		catch (std::exception& e)
+		{
+			std::cerr << e.what() << " On the game runner end." << std::endl;
+		}
 		delete m_gameRunner;
+
 		PonyEngine::Core::DestroyEngine(m_engine);
 	}
 

@@ -15,10 +15,12 @@ import <stdexcept>;
 
 import PonyEngine.Debug.Log;
 
+import :IEngineSubLogger;
+
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
-	export class ConsoleSubLogger final : public ISubLogger
+	export class ConsoleSubLogger final : public IEngineSubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -35,7 +37,7 @@ namespace PonyEngine::Debug::Log
 	/// @param logType Log type.
 	/// @return Chosen stream.
 	[[nodiscard("Pure function")]]
-	static std::ostream& ChooseStream(const LogType logType);
+	static std::ostream& ChooseStream(LogType logType);
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
@@ -50,7 +52,7 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	std::ostream& ChooseStream(const LogType logType)
+	static std::ostream& ChooseStream(const LogType logType)
 	{
 		switch (logType)
 		{

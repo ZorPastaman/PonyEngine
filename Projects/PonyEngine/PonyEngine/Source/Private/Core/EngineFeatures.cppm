@@ -45,9 +45,9 @@ namespace PonyEngine::Core
 		{
 			try
 			{
-				Debug::Log::ISubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
+				Debug::Log::IEngineSubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
 				answer.subLoggers.push_back(consoleSubLogger);
-				answer.logger->AddSubLogger(*consoleSubLogger);
+				answer.logger->AddSubLogger(consoleSubLogger);
 			}
 			catch (const std::exception& e)
 			{
@@ -59,9 +59,9 @@ namespace PonyEngine::Core
 		{
 			try
 			{
-				Debug::Log::ISubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
+				Debug::Log::IEngineSubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
 				answer.subLoggers.push_back(fileSubLogger);
-				answer.logger->AddSubLogger(*fileSubLogger);
+				answer.logger->AddSubLogger(fileSubLogger);
 			}
 			catch (const std::exception& e)
 			{
@@ -75,7 +75,7 @@ namespace PonyEngine::Core
 
 			try
 			{
-				answer.logger->AddSubLogger(*subLogger);
+				answer.logger->AddSubLogger(subLogger);
 			}
 			catch (const std::exception& e)
 			{
@@ -92,16 +92,7 @@ namespace PonyEngine::Core
 		{
 			engine.GetLogger().Log(Debug::Log::LogType::Info, "Create a window");
 
-			try
-			{
-				return Window::CreateEngineWindow(params.title, engine);
-			}
-			catch (const std::exception& e)
-			{
-				engine.GetLogger().LogException(e, "On creating a window");
-			}
-
-			return nullptr;
+			return Window::CreateEngineWindow(params.title, engine);
 		}
 
 		engine.GetLogger().Log(Debug::Log::LogType::Info, "Skip creating a window");

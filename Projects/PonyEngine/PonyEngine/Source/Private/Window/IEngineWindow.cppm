@@ -17,7 +17,7 @@ namespace PonyEngine::Window
 	export class IEngineWindow : public IWindow
 	{
 	public:
-		virtual ~IEngineWindow() noexcept = default;
+		inline virtual ~IEngineWindow() noexcept = default;
 
 		/// @brief Shows a window.
 		virtual void ShowWindow() = 0;

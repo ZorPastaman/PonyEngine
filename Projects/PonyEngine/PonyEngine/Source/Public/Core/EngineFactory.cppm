@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core.Implementation:EngineFactory;
 
+import <cassert>;
+
 import PonyEngine.Core;
 
 import :Engine;
@@ -17,19 +19,21 @@ namespace PonyEngine::Core
 {
 	/// @brief Creates a new @p Engine instance with default parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export [[nodiscard("Pure function")]] __declspec(dllexport) IEngine* CreateEngine();
+	export [[nodiscard("Pure function")]] 
+	__declspec(dllexport) IEngine* CreateEngine();
 
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
 	/// @return Created @p Engine. It has to be destroyed with the function @p DestroyEngine().
-	export [[nodiscard("Pure function")]] __declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
+	export [[nodiscard("Pure function")]] 
+	__declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
 	export __declspec(dllexport) void DestroyEngine(IEngine* engine);
 
 	IEngine* CreateEngine()
 	{
-		EngineParams params;
+		const EngineParams params;
 		return CreateEngine(params);
 	}
 
@@ -40,6 +44,7 @@ namespace PonyEngine::Core
 
 	void DestroyEngine(IEngine* const engine)
 	{
+		assert((engine != nullptr));
 		delete static_cast<Engine*>(engine);
 	}
 }

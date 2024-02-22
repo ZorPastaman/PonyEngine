@@ -32,20 +32,20 @@ namespace PonyEngine::Debug::Log
 		/// @brief Creates a @p Logger.
 		/// @param engine Engine that owns this logger.
 		[[nodiscard("Pure constructor")]]
-		Logger(const Core::IEngine& engine);
+		inline Logger(const Core::IEngine& engine) noexcept;
 		Logger(const Logger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		Logger(Logger&& other) noexcept;
+		inline Logger(Logger&& other) noexcept;
 
-		virtual ~Logger() noexcept = default;
+		inline virtual ~Logger() noexcept = default;
 
 		virtual void Log(LogType logType, const std::string& message) noexcept override;
 		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept override;
 
-		virtual void AddSubLogger(ISubLogger& subLogger) override;
-		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
+		virtual void AddSubLogger(ISubLogger* subLogger) override;
+		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
@@ -53,13 +53,13 @@ namespace PonyEngine::Debug::Log
 		const Core::IEngine& m_engine; /// @brief Engine that owns this logger.
 	};
 
-	Logger::Logger(const Core::IEngine& engine) :
+	inline Logger::Logger(const Core::IEngine& engine) noexcept :
 		m_subLoggers{},
 		m_engine{engine}
 	{
 	}
 
-	Logger::Logger(Logger&& other) noexcept :
+	inline Logger::Logger(Logger&& other) noexcept :
 		m_subLoggers(std::move(other.m_subLoggers)),
 		m_engine{other.m_engine}
 	{
@@ -101,16 +101,17 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	void Logger::AddSubLogger(ISubLogger& subLogger)
+	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
-		m_subLoggers.push_back(&subLogger);
+		assert((subLogger != nullptr));
+		m_subLoggers.push_back(subLogger);
 	}
 
-	void Logger::RemoveSubLogger(ISubLogger& subLogger)
+	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
-		const std::vector<ISubLogger*>::iterator position = std::find(m_subLoggers.begin(), m_subLoggers.end(), &subLogger);
+		const std::vector<ISubLogger*>::const_iterator position = std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger);
 
-		if (position != m_subLoggers.end()) [[likely]]
+		if (position != m_subLoggers.cend()) [[likely]]
 		{
 			m_subLoggers.erase(position);
 		}
