@@ -16,25 +16,37 @@ import :ISystem;
 
 namespace PonyEngine::Core
 {
+	/// @brief Holder and ticker of systems.
 	export class ISystemManager
 	{
 	public:
-		virtual void AddSystem(ISystem& system) noexcept = 0;
-		virtual void RemoveSystem(ISystem& system) noexcept = 0;
+		/// @brief Adds the @p system.
+		/// @param system System to add. Mustn't be nullptr. Mustn't be already added.
+		virtual void AddSystem(ISystem* system) = 0;
+		/// @brief Removes the @p system.
+		/// @param system System to remove.
+		virtual void RemoveSystem(ISystem* system) = 0;
 
-		virtual ISystem* FindSystem(const std::function<bool(const ISystem&)>& predicate) = 0;
+		/// @brief Finds a system by the @p predicate.
+		/// @param predicate Predicate.
+		/// @return Found system. It's nullptr if no system is found.
+		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const = 0;
 
 	protected:
-		virtual ~ISystemManager() noexcept = default;
+		inline virtual ~ISystemManager() noexcept = default;
 	};
 
+	/// @brief Finds a system of the type @p T in the @p systemManager.
+	/// @tparam T System type to find.
+	/// @param systemManager System manager.
+	/// @return Found system. It's nullptr if no system is found.
 	export template<typename T>
 	T* FindSystem(const ISystemManager& systemManager) requires std::is_convertible_v<ISystem*, T*>;
 
 	template<typename T>
 	T* FindSystem(const ISystemManager& systemManager)
 	{
-		ISystem* const service = systemManager.FindSystem([](const ISystem& system) {return dynamic_cast<const T*>(&system) != nullptr;});
-		return system != nullptr ? static_cast<T*>(system) : nullptr;
+		ISystem* const service = systemManager.FindSystem([](const ISystem* const system) {return dynamic_cast<const T*>(system) != nullptr;});
+		return system != nullptr ? dynamic_cast<T*>(system) : nullptr;
 	}
 }

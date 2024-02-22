@@ -18,6 +18,7 @@
     <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\IEngineLogger.cppm" />
+    <ClCompile Include="Source\Private\Debug\Log\IEngineSubLogger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\Log.Implementation.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
@@ -26,7 +27,7 @@
     <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\LoggerFactory.cppm" />
     <ClCompile Include="Source\Private\Window\IEngineWindow.cppm" />
-    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsKeyCodeToKeyboardKeyCode.cppm" />
+    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsKeyCodeMap.cppm" />
     <ClCompile Include="Source\Private\Window\Window.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
     <ClCompile Include="Source\Public\Core\EngineFactory.cppm" />

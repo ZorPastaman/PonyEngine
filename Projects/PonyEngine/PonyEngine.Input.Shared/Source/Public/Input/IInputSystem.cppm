@@ -15,7 +15,7 @@ namespace PonyEngine::Input
 {
 	export class IInputSystem : public Core::ISystem
 	{
-	public:
+	protected:
 		virtual ~IInputSystem() noexcept = default;
 	};
 }

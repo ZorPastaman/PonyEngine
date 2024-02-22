@@ -23,7 +23,8 @@ namespace Game
 		// Set window parameters here
 	}
 
-	export PonyEngine::Core::EngineParams GetEngineParams()
+	export [[nodiscard("Pure function")]] 
+	PonyEngine::Core::EngineParams GetEngineParams()
 	{
 		PonyEngine::Core::EngineParams engineParams;
 		GetLoggerParams(engineParams.loggerParams);

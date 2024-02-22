@@ -10,6 +10,7 @@
 export module PonyEngine.Window.Implementation:WindowFactory;
 
 import <string>;
+
 import <windows.h>;
 
 import PonyEngine.Core;
@@ -22,7 +23,7 @@ namespace PonyEngine::Window
 {
 	IEngineWindow* CreateEngineWindow(const std::string& title, Core::IEngine& engine)
 	{
-		HINSTANCE hInstance = GetModuleHandle(NULL);
+		const HINSTANCE hInstance = GetModuleHandle(NULL);
 
 		return new WindowsWindow(title, engine, hInstance, SW_NORMAL);
 	}

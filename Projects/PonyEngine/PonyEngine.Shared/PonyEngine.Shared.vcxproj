@@ -26,7 +26,7 @@
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />
-    <ClCompile Include="Source\Public\Window\MessageListeners\IKeyboardMessageListener.cppm" />
+    <ClCompile Include="Source\Public\Window\Listeners\IKeyboardListener.cppm" />
     <ClCompile Include="Source\Public\Window\Messages\KeyboardMessage.cppm" />
     <ClCompile Include="Source\Public\Window\Messages\KeyboardKeyCode.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />

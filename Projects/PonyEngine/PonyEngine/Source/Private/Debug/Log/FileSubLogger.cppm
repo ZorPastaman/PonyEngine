@@ -17,10 +17,12 @@ import <utility>;
 
 import PonyEngine.Debug.Log;
 
+import :IEngineSubLogger;
+
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that logs to a file.
-	export class FileSubLogger final : public ISubLogger
+	export class FileSubLogger final : public IEngineSubLogger
 	{
 	public:
 		/// @brief Creates a @p FileSubLogger.
@@ -36,6 +38,11 @@ namespace PonyEngine::Debug::Log
 		virtual ~FileSubLogger() noexcept;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
+
+		/// @brief Move assignment.
+		/// @param other Move source.
+		/// @return @a This.
+		inline FileSubLogger& operator =(FileSubLogger&& other) noexcept;
 
 	private:
 		std::ofstream m_logFile; /// @brief log file stream.
@@ -84,5 +91,12 @@ namespace PonyEngine::Debug::Log
 		{
 			std::cerr << e.what() << " on writing to a log file.";
 		}
+	}
+
+	inline FileSubLogger& FileSubLogger::operator =(FileSubLogger&& other) noexcept
+	{
+		m_logFile = std::move(other.m_logFile);
+
+		return *this;
 	}
 }

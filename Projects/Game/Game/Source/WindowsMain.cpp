@@ -13,7 +13,7 @@ import EngineRunner;
 
 bool PeekMessages(WPARAM& wParam);
 
-int WINAPI wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, PWSTR pCmdLine, int nCmdShow)
+int WINAPI wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PWSTR pCmdLine, const int nCmdShow)
 {
 	Game::EngineRunner engineRunner;
 

@@ -7,16 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Implementation:WindowsKeyCodeToKeyboardKeyCode;
+export module PonyEngine.Window.Implementation:WindowsKeyCodeMap;
 
 import <unordered_map>;
+
 import <windows.h>;
 
 import PonyEngine.Window;
 
 namespace PonyEngine::Window
 {
-	export const std::unordered_map<WPARAM, Messages::KeyboardKeyCode> WindowsKeyCodeToKeyboardKeyCode
+	export const std::unordered_map<WPARAM, Messages::KeyboardKeyCode> WindowsKeyCodeMap
 	{
 		// Letters
 		{ 'A', Messages::KeyboardKeyCode::A },

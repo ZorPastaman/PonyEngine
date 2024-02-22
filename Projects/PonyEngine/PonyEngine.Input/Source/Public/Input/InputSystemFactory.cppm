@@ -9,6 +9,8 @@
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
+import <cassert>;
+
 import PonyEngine.Input;
 
 import :InputSystem;
@@ -26,6 +28,7 @@ namespace PonyEngine::Input
 
 	void DestroyInputSystem(IInputSystem* inputSystem)
 	{
+		assert((inputSystem != nullptr));
 		delete static_cast<InputSystem*>(inputSystem);
 	}
 }

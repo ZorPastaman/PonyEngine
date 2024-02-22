@@ -9,7 +9,7 @@
 
 export module PonyEngine.Window:IWindow;
 
-import :MessageListeners.IKeyboardMessageListener;
+import :Listeners.IKeyboardListener;
 
 namespace PonyEngine::Window
 {
@@ -17,8 +17,8 @@ namespace PonyEngine::Window
 	export class IWindow
 	{
 	public:
-		virtual void AddKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener) = 0;
-		virtual void RemoveKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener) = 0;
+		virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
+		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
 
 	protected:
 		virtual ~IWindow() = default;

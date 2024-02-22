@@ -9,18 +9,20 @@
 
 export module PonyEngine.Window.Implementation:WindowsWindow;
 
+import <cassert>;
 import <exception>;
 import <stdexcept>;
 import <string>;
 import <utility>;
 import <vector>;
+
 import <windows.h>;
 
 import PonyEngine.Core;
 import PonyEngine.Window;
 
 import :IEngineWindow;
-import :WindowsKeyCodeToKeyboardKeyCode;
+import :WindowsKeyCodeMap;
 
 namespace PonyEngine::Window
 {
@@ -35,7 +37,7 @@ namespace PonyEngine::Window
 		/// @param nCmdShow Show type.
 		[[nodiscard("Pure constructor")]]
 		WindowsWindow(const std::string& title, Core::IEngine& engine, HINSTANCE hInstance, int nCmdShow);
-		WindowsWindow(const WindowsWindow& other) = delete;
+		WindowsWindow(const WindowsWindow&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
@@ -43,10 +45,10 @@ namespace PonyEngine::Window
 
 		virtual ~WindowsWindow() noexcept;
 
-		virtual void AddKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener) override;
-		virtual void RemoveKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener) override;
+		inline virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
+		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
 
-		virtual void ShowWindow() override;
+		inline virtual void ShowWindow() override;
 
 		virtual void Tick() override;
 
@@ -58,15 +60,18 @@ namespace PonyEngine::Window
 		/// @return Process result.
 		LRESULT LocalWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		void PushKeyboardKeyMessage(WPARAM wParam, bool isDown) noexcept;
+		/// @brief Sends a keyboard message to the @p m_keyboardMessageListeners.
+		/// @param wParam Windows key code.
+		/// @param isDown @a True if the button is pressed, @a false if it's up.
+		void PushKeyboardKeyMessage(WPARAM wParam, bool isDown);
 
-		std::vector<MessageListeners::IKeyboardMessageListener*> m_keyboardMessageListeners;
+		std::vector<Listeners::IKeyboardListener*> m_keyboardMessageListeners; /// @brief Keyboard message listeners.
 
-		std::wstring m_className; /// @brief Window class name.
+		const std::wstring m_className; /// @brief Window class name.
 		Core::IEngine& m_engine; /// @brief Engine that owns the window.
-		HINSTANCE m_hInstance; /// @brief Application that owns the engine.
+		const HINSTANCE m_hInstance; /// @brief Application that owns the engine.
 		HWND m_hWnd; /// @brief Window handler.
-		int m_nCmdShow; /// @brief Show type.
+		const int m_nCmdShow; /// @brief Show type.
 
 		friend static LRESULT CALLBACK GlobalWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 	};
@@ -139,22 +144,23 @@ namespace PonyEngine::Window
 		}
 	}
 
-	void WindowsWindow::AddKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener)
+	inline void WindowsWindow::AddKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
 	{
-		m_keyboardMessageListeners.push_back(&keyboardMessageListener);
+		assert((keyboardMessageListener != nullptr));
+		m_keyboardMessageListeners.push_back(keyboardMessageListener);
 	}
 
-	void WindowsWindow::RemoveKeyboardMessageListener(MessageListeners::IKeyboardMessageListener& keyboardMessageListener)
+	void WindowsWindow::RemoveKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
 	{
-		const std::vector<MessageListeners::IKeyboardMessageListener*>::iterator position = std::find(m_keyboardMessageListeners.begin(), m_keyboardMessageListeners.end(), &keyboardMessageListener);
+		const std::vector<Listeners::IKeyboardListener*>::const_iterator position = std::find(m_keyboardMessageListeners.cbegin(), m_keyboardMessageListeners.cend(), keyboardMessageListener);
 
-		if (position != m_keyboardMessageListeners.end()) [[likely]]
+		if (position != m_keyboardMessageListeners.cend()) [[likely]]
 		{
 			m_keyboardMessageListeners.erase(position);
 		}
 	}
 
-	void WindowsWindow::ShowWindow()
+	inline void WindowsWindow::ShowWindow()
 	{
 		::ShowWindow(m_hWnd, m_nCmdShow);
 	}
@@ -169,7 +175,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	LRESULT WindowsWindow::LocalWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
+	LRESULT WindowsWindow::LocalWindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		switch (uMsg)
 		{
@@ -191,14 +197,14 @@ namespace PonyEngine::Window
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::PushKeyboardKeyMessage(WPARAM wParam, bool isDown) noexcept
+	void WindowsWindow::PushKeyboardKeyMessage(const WPARAM wParam, const bool isDown)
 	{
-		const std::unordered_map<WPARAM, Messages::KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeToKeyboardKeyCode.find(wParam);
-		if (pair != WindowsKeyCodeToKeyboardKeyCode.end())
+		const std::unordered_map<WPARAM, Messages::KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeMap.find(wParam);
+		if (pair != WindowsKeyCodeMap.cend())
 		{
 			Messages::KeyboardMessage keyboardMessage(pair->second, isDown);
 
-			for (MessageListeners::IKeyboardMessageListener* const listener : m_keyboardMessageListeners)
+			for (Listeners::IKeyboardListener* const listener : m_keyboardMessageListeners)
 			{
 				try
 				{
@@ -212,9 +218,9 @@ namespace PonyEngine::Window
 		}
 	}
 
-	static LRESULT CALLBACK GlobalWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+	static LRESULT CALLBACK GlobalWindowProc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
-		WindowsWindow* window = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
+		WindowsWindow* const window = reinterpret_cast<WindowsWindow*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
 		if (window == nullptr) [[unlikely]]
 		{

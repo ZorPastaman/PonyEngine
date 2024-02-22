@@ -11,9 +11,10 @@ export module PonyEngine.Core:IService;
 
 namespace PonyEngine::Core
 {
+	/// @brief Engine service.
 	export class IService
 	{
-	public:
-		virtual ~IService() noexcept = default;
+	protected:
+		inline virtual ~IService() noexcept = default;
 	};
 }

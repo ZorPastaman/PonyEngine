@@ -10,4 +10,5 @@
 export module PonyEngine.Debug.Log.Implementation;
 
 export import :IEngineLogger;
+export import :IEngineSubLogger;
 export import :LoggerFactory;
