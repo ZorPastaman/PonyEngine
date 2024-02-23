@@ -14,9 +14,12 @@
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\INamed.cppm" />
     <ClCompile Include="Source\Public\Core\IService.cppm" />
+    <ClCompile Include="Source\Public\Core\ServiceFactoryInfo.cppm" />
     <ClCompile Include="Source\Public\Core\IServiceManager.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemFactoryInfo.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
     <ClCompile Include="Source\Public\Core\WindowParams.cppm" />

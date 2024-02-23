@@ -10,7 +10,6 @@
 export module PonyEngine.Core:ISystemManager;
 
 import <functional>;
-import <type_traits>;
 
 import :ISystem;
 
@@ -20,13 +19,6 @@ namespace PonyEngine::Core
 	export class ISystemManager
 	{
 	public:
-		/// @brief Adds the @p system.
-		/// @param system System to add. Mustn't be nullptr. Mustn't be already added.
-		virtual void AddSystem(ISystem* system) = 0;
-		/// @brief Removes the @p system.
-		/// @param system System to remove.
-		virtual void RemoveSystem(ISystem* system) = 0;
-
 		/// @brief Finds a system by the @p predicate.
 		/// @param predicate Predicate.
 		/// @return Found system. It's nullptr if no system is found.
@@ -41,12 +33,12 @@ namespace PonyEngine::Core
 	/// @param systemManager System manager.
 	/// @return Found system. It's nullptr if no system is found.
 	export template<typename T>
-	T* FindSystem(const ISystemManager& systemManager) requires std::is_convertible_v<ISystem*, T*>;
+	T* FindSystem(const ISystemManager& systemManager);
 
 	template<typename T>
 	T* FindSystem(const ISystemManager& systemManager)
 	{
-		ISystem* const service = systemManager.FindSystem([](const ISystem* const system) {return dynamic_cast<const T*>(system) != nullptr;});
-		return system != nullptr ? dynamic_cast<T*>(system) : nullptr;
+		ISystem* const system = systemManager.FindSystem([](const ISystem* const system) { return dynamic_cast<const T*>(system) != nullptr; });
+		return dynamic_cast<T*>(system);
 	}
 }

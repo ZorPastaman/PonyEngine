@@ -9,14 +9,17 @@
 
 export module PonyEngine.Core:ISystem;
 
-import <cstdint>;
+import :INamed;
 
 namespace PonyEngine::Core
 {
 	/// @brief Engine system.
-	export class ISystem
+	export class ISystem : public INamed
 	{
 	public:
+		virtual void Begin() = 0;
+		virtual void End() = 0;
+
 		/// @brief Ticks the system.
 		virtual void Tick() = 0;
 

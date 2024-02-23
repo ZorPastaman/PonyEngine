@@ -9,6 +9,8 @@
 
 export module PonyEngine.Input.Implementation:InputSystem;
 
+import <string>;
+
 import PonyEngine.Input;
 
 namespace PonyEngine::Input
@@ -20,8 +22,27 @@ namespace PonyEngine::Input
 
 		virtual ~InputSystem() noexcept = default;
 
+		virtual const std::string& GetName() const noexcept override;
+
+		virtual void Begin() override;
+		virtual void End() override;
+
 		virtual void Tick() override;
 	};
+
+	const std::string& InputSystem::GetName() const noexcept
+	{
+		static const std::string name = "PonyEngine::Input::InputSystem";
+		return name;
+	}
+
+	void InputSystem::Begin()
+	{
+	}
+
+	void InputSystem::End()
+	{
+	}
 
 	void InputSystem::Tick()
 	{
