@@ -11,6 +11,11 @@ export module PonyEngine.Core.Implementation:SystemManager;
 
 import <algorithm>;
 import <cassert>;
+import <cstddef>;
+import <exception>;
+import <functional>;
+import <iostream>;
+import <string>;
 import <utility>;
 import <vector>;
 
@@ -24,57 +29,75 @@ namespace PonyEngine::Core
 	public:
 		/// @brief Creates a @p SystemManager.
 		[[nodiscard("Pure constructor")]]
-		inline SystemManager() noexcept;
+		SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
 		inline SystemManager(SystemManager&& other) noexcept;
 
-		inline virtual ~SystemManager() noexcept = default;
-
-		inline virtual void AddSystem(ISystem* system) override;
-		virtual void RemoveSystem(ISystem* system) override;
+		virtual ~SystemManager() noexcept;
 
 		[[nodiscard("Pure function")]]
 		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const override;
 
+		void Begin();
+		void End() noexcept;
+
 		/// @brief Ticks the systems.
 		void Tick() const;
 
-		/// @brief Move assignment.
-		/// @param other Move source.
-		/// @return @a This.
-		inline SystemManager& operator =(SystemManager&& other) noexcept;
-
 	private:
 		std::vector<ISystem*> m_systems; /// @brief Systems.
+		std::vector<std::function<void(ISystem*)>> m_destroyFunctions;
+
+		const IEngine& m_engine;
 	};
 
-	inline SystemManager::SystemManager() noexcept :
-		m_systems{}
+	SystemManager::SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine) :
+		m_systems{},
+		m_destroyFunctions{},
+		m_engine{engine}
 	{
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Create systems");
+
+		for (const SystemFactoryInfo& factoryInfo : systemFactoryInfos)
+		{
+			ISystem* const system = factoryInfo.createFunction(engine);
+			m_systems.push_back(system);
+			m_destroyFunctions.push_back(factoryInfo.destroyFunction);
+			m_engine.GetLogger().Log(Debug::Log::LogType::Info, system->GetName());
+		}
+
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Systems created");
 	}
 
 	inline SystemManager::SystemManager(SystemManager&& other) noexcept :
-		m_systems(std::move(other.m_systems))
+		m_systems(std::move(other.m_systems)),
+		m_destroyFunctions(std::move(other.m_destroyFunctions)),
+		m_engine{other.m_engine}
 	{
 	}
 
-	inline void SystemManager::AddSystem(ISystem* const system)
+	SystemManager::~SystemManager() noexcept
 	{
-		assert((system != nullptr));
-		m_systems.push_back(system);
-	}
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Destroy systems");
 
-	void SystemManager::RemoveSystem(ISystem* const system)
-	{
-		const std::vector<ISystem*>::const_iterator position = std::find(m_systems.cbegin(), m_systems.cend(), system);
-
-		if (position != m_systems.cend()) [[likely]]
+		for (std::size_t i = 0, count = m_systems.size(); i < count; ++i)
 		{
-			m_systems.erase(position);
+			m_engine.GetLogger().Log(Debug::Log::LogType::Info, m_systems[i]->GetName());
+
+			try
+			{
+				m_destroyFunctions[i](m_systems[i]);
+			}
+			catch (std::exception& e)
+			{
+				std::cerr << e.what() << " on destroying a system." << std::endl;
+			}
 		}
+
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Systems destroyed");
 	}
 
 	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
@@ -90,18 +113,45 @@ namespace PonyEngine::Core
 		return nullptr;
 	}
 
+	void SystemManager::Begin()
+	{
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Begin systems");
+
+		for (ISystem* const system : m_systems)
+		{
+			m_engine.GetLogger().Log(Debug::Log::LogType::Info, system->GetName());
+			system->Begin();
+		}
+
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Systems begun");
+	}
+
+	void SystemManager::End() noexcept
+	{
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "End systems");
+
+		for (ISystem* const system : m_systems)
+		{
+			m_engine.GetLogger().Log(Debug::Log::LogType::Info, system->GetName());
+
+			try
+			{
+				system->End();
+			}
+			catch (std::exception& e)
+			{
+				m_engine.GetLogger().LogException(e, "on ending a system");
+			}
+		}
+
+		m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Systems ended");
+	}
+
 	void SystemManager::Tick() const
 	{
 		for (ISystem* const system : m_systems)
 		{
 			system->Tick();
 		}
-	}
-
-	inline SystemManager& SystemManager::operator =(SystemManager&& other) noexcept
-	{
-		m_systems = std::move(other.m_systems);
-
-		return *this;
 	}
 }

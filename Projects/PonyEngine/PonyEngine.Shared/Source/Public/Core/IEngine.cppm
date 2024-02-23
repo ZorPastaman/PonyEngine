@@ -40,19 +40,11 @@ namespace PonyEngine::Core
 		/// @brief Gets an engine service manager.
 		/// @return Service Manager.
 		[[nodiscard("Pure function")]]
-		virtual IServiceManager& GetServiceManager() noexcept = 0;
+		virtual IServiceManager& GetServiceManager() const noexcept = 0;
 		/// @brief Gets an engine system manager.
 		/// @return System Manager.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& GetSystemManager() noexcept = 0;
-		/// @brief Gets an engine service manager.
-		/// @return Service Manager.
-		[[nodiscard("Pure function")]]
-		virtual const IServiceManager& GetServiceManager() const noexcept = 0;
-		/// @brief Gets an engine system manager.
-		/// @return System Manager.
-		[[nodiscard("Pure function")]]
-		virtual const ISystemManager& GetSystemManager() const noexcept = 0;
+		virtual ISystemManager& GetSystemManager() const noexcept = 0;
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().

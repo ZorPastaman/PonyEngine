@@ -7,20 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:IService;
+export module PonyEngine.Core:INamed;
 
-import :INamed;
+import <string>;
 
 namespace PonyEngine::Core
 {
-	/// @brief Engine service.
-	export class IService : public INamed
+	export class INamed
 	{
 	public:
-		virtual void Begin() = 0;
-		virtual void End() = 0;
+		virtual const std::string& GetName() const noexcept = 0;
 
 	protected:
-		inline virtual ~IService() noexcept = default;
+		inline virtual ~INamed() noexcept = default;
 	};
 }

@@ -15,7 +15,7 @@
     <ClCompile Include="Source\Public\Input\Input.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
   </ItemGroup>

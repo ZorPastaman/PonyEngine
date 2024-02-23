@@ -19,6 +19,7 @@ import <vector>;
 import <windows.h>;
 
 import PonyEngine.Core;
+import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
 import :IEngineWindow;
@@ -59,6 +60,8 @@ namespace PonyEngine::Window
 		/// @param lParam LParam.
 		/// @return Process result.
 		LRESULT LocalWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+		void SetWindowCursor();
 
 		/// @brief Sends a keyboard message to the @p m_keyboardMessageListeners.
 		/// @param wParam Windows key code.
@@ -181,7 +184,11 @@ namespace PonyEngine::Window
 		{
 		// Main
 		case WM_DESTROY:
+			m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Received a destroy command");
 			m_engine.Stop(0);
+			break;
+		case WM_SETCURSOR:
+			SetWindowCursor();
 			break;
 		// Input
 		case WM_SYSKEYDOWN:
@@ -197,12 +204,21 @@ namespace PonyEngine::Window
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 
+	void WindowsWindow::SetWindowCursor()
+	{
+		HANDLE hCursor = LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
+		if (hCursor != NULL)
+		{
+			SetCursor(static_cast<HCURSOR>(hCursor));
+		}
+	}
+
 	void WindowsWindow::PushKeyboardKeyMessage(const WPARAM wParam, const bool isDown)
 	{
 		const std::unordered_map<WPARAM, Messages::KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeMap.find(wParam);
 		if (pair != WindowsKeyCodeMap.cend())
 		{
-			Messages::KeyboardMessage keyboardMessage(pair->second, isDown);
+			const Messages::KeyboardMessage keyboardMessage(pair->second, isDown);
 
 			for (Listeners::IKeyboardListener* const listener : m_keyboardMessageListeners)
 			{

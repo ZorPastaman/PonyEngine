@@ -29,7 +29,7 @@ namespace PonyEngine::Core
 	__declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
-	export __declspec(dllexport) void DestroyEngine(IEngine* engine);
+	export __declspec(dllexport) void DestroyEngine(IEngine* engine) noexcept;
 
 	IEngine* CreateEngine()
 	{
@@ -42,9 +42,9 @@ namespace PonyEngine::Core
 		return new Engine(params);
 	}
 
-	void DestroyEngine(IEngine* const engine)
+	void DestroyEngine(IEngine* const engine) noexcept
 	{
-		assert((engine != nullptr));
+		assert((dynamic_cast<Engine*>(engine) != nullptr));
 		delete static_cast<Engine*>(engine);
 	}
 }

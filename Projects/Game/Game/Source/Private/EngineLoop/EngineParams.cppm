@@ -9,27 +9,50 @@
 
 export module EngineRunner:EngineParams;
 
+import <functional>;
+import <vector>;
+
 import PonyEngine.Core;
+import PonyEngine.Input;
+import PonyEngine.Input.Implementation;
 
 namespace Game
 {
-	static void GetLoggerParams(PonyEngine::Core::LoggerParams& loggerParams)
-	{
-		// Set logger parameters here
-	}
+	export [[nodiscard("Pure function")]]
+	PonyEngine::Core::EngineParams GetEngineParams();
 
-	static void GetWindowParams(PonyEngine::Core::WindowParams& windowParams)
-	{
-		// Set window parameters here
-	}
+	static void GetLoggerParams(PonyEngine::Core::LoggerParams& loggerParams);
 
-	export [[nodiscard("Pure function")]] 
+	static void GetWindowParams(PonyEngine::Core::WindowParams& windowParams);
+
+	static void GetServiceParams(std::vector<PonyEngine::Core::ServiceFactoryInfo>& serviceFactoryInfos);
+	static void GetSystemParams(std::vector<PonyEngine::Core::SystemFactoryInfo>& systemFactoryInfos);
+
 	PonyEngine::Core::EngineParams GetEngineParams()
 	{
 		PonyEngine::Core::EngineParams engineParams;
 		GetLoggerParams(engineParams.loggerParams);
 		GetWindowParams(engineParams.windowParams);
+		GetServiceParams(engineParams.serviceFactoryInfos);
+		GetSystemParams(engineParams.systemFactoryInfos);
 
 		return engineParams;
+	}
+
+	void GetLoggerParams(PonyEngine::Core::LoggerParams& loggerParams)
+	{
+	}
+
+	void GetWindowParams(PonyEngine::Core::WindowParams& windowParams)
+	{
+	}
+
+	void GetServiceParams(std::vector<PonyEngine::Core::ServiceFactoryInfo>& serviceFactoryInfos)
+	{
+	}
+
+	void GetSystemParams(std::vector<PonyEngine::Core::SystemFactoryInfo>& systemFactoryInfos)
+	{
+		systemFactoryInfos.push_back(PonyEngine::Input::CreateSystemFactoryInfo());
 	}
 }

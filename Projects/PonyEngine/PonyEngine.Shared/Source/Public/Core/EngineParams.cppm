@@ -9,7 +9,11 @@
 
 export module PonyEngine.Core:EngineParams;
 
+import <vector>;
 import <utility>;
+
+import :ServiceFactoryInfo;
+import :SystemFactoryInfo;
 
 export import :LoggerParams;
 export import :WindowParams;
@@ -36,23 +40,32 @@ namespace PonyEngine::Core
 
 		LoggerParams loggerParams; /// @brief Logger parameters.
 		WindowParams windowParams; /// @brief Window parameters.
+
+		std::vector<ServiceFactoryInfo> serviceFactoryInfos;
+		std::vector<SystemFactoryInfo> systemFactoryInfos;
 	};
 
 	EngineParams::EngineParams() :
 		loggerParams(),
-		windowParams()
+		windowParams(),
+		serviceFactoryInfos{},
+		systemFactoryInfos{}
 	{
 	}
 
 	EngineParams::EngineParams(const EngineParams& other) :
 		loggerParams(other.loggerParams),
-		windowParams(other.windowParams)
+		windowParams(other.windowParams),
+		serviceFactoryInfos{other.serviceFactoryInfos},
+		systemFactoryInfos{other.systemFactoryInfos}
 	{
 	}
 
 	EngineParams::EngineParams(EngineParams&& other) :
 		loggerParams(std::move(other.loggerParams)),
-		windowParams(std::move(other.windowParams))
+		windowParams(std::move(other.windowParams)),
+		serviceFactoryInfos(std::move(other.serviceFactoryInfos)),
+		systemFactoryInfos(std::move(other.systemFactoryInfos))
 	{
 	}
 }

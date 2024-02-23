@@ -50,13 +50,9 @@ namespace PonyEngine::Core
 		inline virtual Window::IWindow* GetWindow() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual IServiceManager& GetServiceManager() noexcept override;
+		inline virtual IServiceManager& GetServiceManager() const noexcept override;
 		[[nodiscard("Pure function")]]
-		inline virtual ISystemManager& GetSystemManager() noexcept override;
-		[[nodiscard("Pure function")]]
-		inline virtual const IServiceManager& GetServiceManager() const noexcept override;
-		[[nodiscard("Pure function")]]
-		inline virtual const ISystemManager& GetSystemManager() const noexcept override;
+		inline virtual ISystemManager& GetSystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		inline virtual bool IsRunning() const noexcept override;
@@ -70,8 +66,8 @@ namespace PonyEngine::Core
 		LoggerOwnerKit m_loggerKit; /// @brief Logger and sub-logger that are owned by the @p Engine.
 		Window::IEngineWindow* m_window; /// @brief Engine window. It can be nullptr.
 
-		ServiceManager m_serviceManager; /// @brief Service manager.
-		SystemManager m_systemManager; /// @brief System manager.
+		ServiceManager* m_serviceManager; /// @brief Service manager.
+		SystemManager* m_systemManager; /// @brief System manager.
 
 		std::size_t m_frameCount; /// @brief Current frame.
 
@@ -81,14 +77,17 @@ namespace PonyEngine::Core
 
 	Engine::Engine(const EngineParams& params) :
 		m_frameCount{0},
-		m_isRunning{true},
-		m_serviceManager(),
-		m_systemManager()
+		m_isRunning{true}
 	{
 		m_loggerKit = CreateLogger(params.loggerParams, *this);
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine created");
 
 		m_window = CreateWindow(params.windowParams, *this);
+
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Create a service manager");
+		m_serviceManager = new ServiceManager(params.serviceFactoryInfos, *this);
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Create a system manager");
+		m_systemManager = new SystemManager(params.systemFactoryInfos, *this);
 
 		if (m_window != nullptr)
 		{
@@ -96,18 +95,34 @@ namespace PonyEngine::Core
 			m_window->ShowWindow();
 		}
 
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Begin a service manager");
+		m_serviceManager->Begin();
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Begin a system manager");
+		m_systemManager->Begin();
+
 		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine initialized");
 	}
 
 	Engine::~Engine() noexcept
 	{
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "End a system manager");
+		m_systemManager->End();
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "End a service manager");
+		m_serviceManager->End();
+
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Destroy a system manager");
+		delete m_systemManager;
+
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Destroy a service manager");
+		delete m_serviceManager;
+
 		if (m_window != nullptr)
 		{
-			m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Destruct an engine window");
+			m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Destroy an engine window");
 			delete m_window;
 		}
 
-		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine destructed");
+		m_loggerKit.logger->Log(Debug::Log::LogType::Info, "Engine destroyed");
 
 		for (Debug::Log::IEngineSubLogger* const subLogger : m_loggerKit.subLoggers)
 		{
@@ -141,24 +156,14 @@ namespace PonyEngine::Core
 		return m_window;
 	}
 
-	inline IServiceManager& Engine::GetServiceManager() noexcept
+	inline IServiceManager& Engine::GetServiceManager() const noexcept
 	{
-		return m_serviceManager;
+		return *m_serviceManager;
 	}
 
-	inline ISystemManager& Engine::GetSystemManager() noexcept
+	inline ISystemManager& Engine::GetSystemManager() const noexcept
 	{
-		return m_systemManager;
-	}
-
-	inline const IServiceManager& Engine::GetServiceManager() const noexcept
-	{
-		return m_serviceManager;
-	}
-
-	inline const ISystemManager& Engine::GetSystemManager() const noexcept
-	{
-		return m_systemManager;
+		return *m_systemManager;
 	}
 
 	inline bool Engine::IsRunning() const noexcept
@@ -193,7 +198,7 @@ namespace PonyEngine::Core
 			m_window->Tick();
 		}
 
-		m_systemManager.Tick();
+		m_systemManager->Tick();
 
 		++m_frameCount;
 	}
