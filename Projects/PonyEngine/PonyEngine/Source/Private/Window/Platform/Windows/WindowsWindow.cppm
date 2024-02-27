@@ -7,10 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Window.Implementation:WindowsWindow;
 
 import <cassert>;
+import <format>;
 import <exception>;
+import <iostream>;
 import <stdexcept>;
 import <string>;
 import <utility>;
@@ -61,7 +67,8 @@ namespace PonyEngine::Window
 		/// @return Process result.
 		LRESULT LocalWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-		void SetWindowCursor();
+		/// @brief Updates a window cursor.
+		void UpdateCursor();
 
 		/// @brief Sends a keyboard message to the @p m_keyboardMessageListeners.
 		/// @param wParam Windows key code.
@@ -89,19 +96,24 @@ namespace PonyEngine::Window
 	/// @return Process result.
 	static LRESULT CALLBACK GlobalWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 
-	WindowsWindow::WindowsWindow(const std::string& title, Core::IEngine& engine, HINSTANCE hInstance, int nCmdShow) :
+	WindowsWindow::WindowsWindow(const std::string& title, Core::IEngine& engine, const HINSTANCE hInstance, const int nCmdShow) :
 		m_keyboardMessageListeners{},
 		m_className(title.begin(), title.end()),
 		m_engine{engine},
 		m_hInstance(hInstance),
 		m_nCmdShow{nCmdShow}
 	{
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create a window class");
 		WNDCLASS wc{};
 		wc.lpfnWndProc = &GlobalWindowProc;
 		wc.hInstance = m_hInstance;
 		wc.lpszClassName = m_className.c_str();
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window class created");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Register a window class");
 		RegisterClass(&wc);
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window class registered");
 
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create a window");
 		m_hWnd = CreateWindowEx(
 			0,
 			m_className.c_str(),
@@ -120,6 +132,7 @@ namespace PonyEngine::Window
 
 			throw std::logic_error("Windows hasn't created a window.");
 		}
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window created");
 
 		SetWindowLongPtr(m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	}
@@ -138,28 +151,41 @@ namespace PonyEngine::Window
 	{
 		try
 		{
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy a window");
 			DestroyWindow(m_hWnd);
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window destroyed");
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Unregister a window class");
 			UnregisterClass(m_className.c_str(), m_hInstance);
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window class unregistered");
 		}
 		catch (const std::exception& e)
 		{
-			m_engine.GetLogger().LogException(e, "On a window destroy");
+			PONY_LOG_E(m_engine.GetLogger(), e, "On a window destroy");
 		}
 	}
 
 	inline void WindowsWindow::AddKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
 	{
 		assert((keyboardMessageListener != nullptr));
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Debug, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()));
+
 		m_keyboardMessageListeners.push_back(keyboardMessageListener);
 	}
 
 	void WindowsWindow::RemoveKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
 	{
+		PONY_LOG_IF(keyboardMessageListener == nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, "Tried to remove a nullptr keyboard message listener");
+
 		const std::vector<Listeners::IKeyboardListener*>::const_iterator position = std::find(m_keyboardMessageListeners.cbegin(), m_keyboardMessageListeners.cend(), keyboardMessageListener);
 
 		if (position != m_keyboardMessageListeners.cend()) [[likely]]
 		{
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Debug, std::format("Remove a keyboard message listener '{}'", keyboardMessageListener->GetName()));
 			m_keyboardMessageListeners.erase(position);
+		}
+		else [[unlikely]]
+		{
+			PONY_LOG_IF(keyboardMessageListener != nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, std::format("Tried to remove a not added keyboard message listener '{}'", keyboardMessageListener->GetName()));
 		}
 	}
 
@@ -170,6 +196,8 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::Tick()
 	{
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Dispatch messages");
+
 		MSG message;
 
 		while (PeekMessage(&message, m_hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -184,19 +212,22 @@ namespace PonyEngine::Window
 		{
 		// Main
 		case WM_DESTROY:
-			m_engine.GetLogger().Log(Debug::Log::LogType::Info, "Received a destroy command");
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Received a destroy command");
 			m_engine.Stop(0);
 			break;
 		case WM_SETCURSOR:
-			SetWindowCursor();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Received a set cursor command");
+			UpdateCursor();
 			break;
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key down command with the code '{}'", wParam));
 			PushKeyboardKeyMessage(wParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key up command with the code '{}'", wParam));
 			PushKeyboardKeyMessage(wParam, false);
 			break;
 		}
@@ -204,12 +235,17 @@ namespace PonyEngine::Window
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::SetWindowCursor()
+	void WindowsWindow::UpdateCursor()
 	{
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Update a cursor to a standard arrow");
 		HANDLE hCursor = LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		if (hCursor != NULL)
+		if (hCursor != NULL) [[likely]]
 		{
 			SetCursor(static_cast<HCURSOR>(hCursor));
+		}
+		else [[unlikely]]
+		{
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Error, "Couldn't load an arrow cursor");
 		}
 	}
 
@@ -218,6 +254,8 @@ namespace PonyEngine::Window
 		const std::unordered_map<WPARAM, Messages::KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeMap.find(wParam);
 		if (pair != WindowsKeyCodeMap.cend())
 		{
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Push a keyboard message to the listeners. KeyCode: '{}'. IsDown: '{}'", PonyEngine::Window::Messages::ToString(pair->second), isDown));
+
 			const Messages::KeyboardMessage keyboardMessage(pair->second, isDown);
 
 			for (Listeners::IKeyboardListener* const listener : m_keyboardMessageListeners)
@@ -228,7 +266,7 @@ namespace PonyEngine::Window
 				}
 				catch (const std::exception& e)
 				{
-					m_engine.GetLogger().LogException(e, "On listening to a keyboard key message");
+					PONY_LOG_E(m_engine.GetLogger(), e, "On listening to a keyboard key message");
 				}
 			}
 		}
@@ -240,6 +278,7 @@ namespace PonyEngine::Window
 
 		if (window == nullptr) [[unlikely]]
 		{
+			PONY_CERR("Window pointer is nullptr. The window window won't receive a command.");
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 

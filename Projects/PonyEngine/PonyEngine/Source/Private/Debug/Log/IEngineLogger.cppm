@@ -13,6 +13,7 @@ import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Debug::Log
 {
+	/// @brief Logger used by the engine.
 	export class IEngineLogger : public ILogger
 	{
 	public:

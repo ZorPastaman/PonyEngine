@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Core.Implementation:EngineFeatures;
 
 import <cassert>;
@@ -39,19 +43,23 @@ namespace PonyEngine::Core
 	LoggerOwnerKit CreateLogger(const LoggerParams& params, const IEngine& engine)
 	{
 		LoggerOwnerKit answer;
+		PONY_COUT("Create logger.");
 		answer.logger = Debug::Log::CreateLogger(engine);
+		PONY_COUT("Logger created.");
 
 		if (params.addConsoleSubLogger)
 		{
 			try
 			{
+				PONY_COUT("Create a console sub-logger.");
 				Debug::Log::IEngineSubLogger* const consoleSubLogger = Debug::Log::CreateConsoleSubLogger();
 				answer.subLoggers.push_back(consoleSubLogger);
 				answer.logger->AddSubLogger(consoleSubLogger);
+				PONY_COUT("Console sub-logger created.");
 			}
 			catch (const std::exception& e)
 			{
-				std::cerr << e.what() << " on create a console sub-logger." << std::endl;
+				PONY_CEXC(e, "On create a console sub-logger.");
 			}
 		}
 
@@ -59,16 +67,19 @@ namespace PonyEngine::Core
 		{
 			try
 			{
+				PONY_COUT("Create a file sub-logger.");
 				Debug::Log::IEngineSubLogger* const fileSubLogger = Debug::Log::CreateFileSubLogger(params.logFilePath);
 				answer.subLoggers.push_back(fileSubLogger);
 				answer.logger->AddSubLogger(fileSubLogger);
+				PONY_COUT("File sub-logger created.");
 			}
 			catch (const std::exception& e)
 			{
-				std::cerr << e.what() << " on create a log file sub-logger." << std::endl;
+				PONY_CEXC(e, "On create a log file sub-logger.");
 			}
 		}
 
+		PONY_COUT("Add custom sub-loggers.");
 		for (Debug::Log::ISubLogger* const subLogger : params.subLoggers)
 		{
 			assert((subLogger != nullptr));
@@ -79,9 +90,10 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				std::cerr << e.what() << " on adding a sub-logger." << std::endl;
+				PONY_CEXC(e, "On adding a sub-logger.");
 			}
 		}
+		PONY_COUT("Custom sub-loggers added.");
 
 		return answer;
 	}
@@ -90,12 +102,13 @@ namespace PonyEngine::Core
 	{
 		if (params.createWindow)
 		{
-			engine.GetLogger().Log(Debug::Log::LogType::Info, "Create a window");
-
-			return Window::CreateEngineWindow(params.title, engine);
+			PONY_LOG(engine.GetLogger(), Debug::Log::LogType::Info, "Create an engine window");
+			Window::IEngineWindow* const window = Window::CreateEngineWindow(params.title, engine);
+			PONY_LOG(engine.GetLogger(), Debug::Log::LogType::Info, "Engine window created");
+			return window;
 		}
 
-		engine.GetLogger().Log(Debug::Log::LogType::Info, "Skip creating a window");
+		PONY_LOG(engine.GetLogger(), Debug::Log::LogType::Info, "Skip creating a window");
 
 		return nullptr;
 	}

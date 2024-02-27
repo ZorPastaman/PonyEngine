@@ -13,6 +13,7 @@ import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Debug::Log
 {
+	/// @brief Sub-logger which lifetime is controlled by the engine.
 	export class IEngineSubLogger : public ISubLogger
 	{
 	public:

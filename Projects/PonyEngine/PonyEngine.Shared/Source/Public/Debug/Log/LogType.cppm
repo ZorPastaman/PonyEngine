@@ -43,25 +43,25 @@ namespace PonyEngine::Debug::Log
 	/// @param addNumber If it's true, the string will contain a number representation.
 	/// @return Created string.
 	export [[nodiscard("Pure function")]] 
-	std::string ToString(const LogType logType, const bool addNumber = false);
+	std::string ToString(LogType logType, bool addNumber = false);
 
 	export [[nodiscard("Pure function")]] 
-	constexpr inline LogType operator ~(const LogType logType) noexcept;
+	constexpr inline LogType operator ~(LogType logType) noexcept;
 
 	export [[nodiscard("Pure function")]] 
-	constexpr inline LogType operator &(const LogType left, const LogType right) noexcept;
+	constexpr inline LogType operator &(LogType left, LogType right) noexcept;
 
 	export [[nodiscard("Pure function")]] 
-	constexpr inline LogType operator |(const LogType left, const LogType right) noexcept;
+	constexpr inline LogType operator |(LogType left, LogType right) noexcept;
 
 	export [[nodiscard("Pure function")]] 
-	constexpr inline LogType operator ^(const LogType left, const LogType right) noexcept;
+	constexpr inline LogType operator ^(LogType left, LogType right) noexcept;
 
 	/// @brief Puts ToString(logType) into the @p stream.
 	/// @param stream Target stream.
 	/// @param logType Input source.
 	/// @return @p stream.
-	export inline std::ostream& operator <<(std::ostream& stream, const LogType logType);
+	export inline std::ostream& operator <<(std::ostream& stream, LogType logType);
 
 	constexpr inline LogType operator ~(const LogType logType) noexcept
 	{
@@ -119,27 +119,27 @@ namespace PonyEngine::Debug::Log
 		}
 
 		if (answer.empty()) [[unlikely]]
+		{
+			if (logType == LogType::None)
 			{
-				if (logType == LogType::None)
-				{
-					answer = "None";
-				}
-				else
-				{
-					answer = "Unknown";
-				}
-
-				answer += delimiter;
+				answer = "None";
+			}
+			else
+			{
+				answer = "Unknown";
 			}
 
-			answer.erase(answer.end() - delimiter.size(), answer.end());
+			answer += delimiter;
+		}
 
-			if (!addNumber)
-			{
-				return answer;
-			}
+		answer.erase(answer.end() - delimiter.size(), answer.end());
 
-			auto number = static_cast<std::underlying_type_t<LogType>>(logType);
-			return std::format("{} ({})", answer, number);
+		if (!addNumber)
+		{
+			return answer;
+		}
+
+		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
+		return std::format("{} ({})", answer, number);
 	}
 }

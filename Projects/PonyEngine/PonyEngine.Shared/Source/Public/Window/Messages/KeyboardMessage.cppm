@@ -46,7 +46,7 @@ namespace PonyEngine::Window::Messages
 	{
 	}
 
-	inline constexpr KeyboardMessage& KeyboardMessage::operator =(const KeyboardMessage& other) noexcept
+	constexpr inline KeyboardMessage& KeyboardMessage::operator =(const KeyboardMessage& other) noexcept
 	{
 		keyCode = other.keyCode;
 		isDown = other.isDown;

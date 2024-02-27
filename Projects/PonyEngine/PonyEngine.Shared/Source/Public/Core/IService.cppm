@@ -9,12 +9,12 @@
 
 export module PonyEngine.Core:IService;
 
-import :INamed;
+import PonyEngine.Utility;
 
 namespace PonyEngine::Core
 {
 	/// @brief Engine service.
-	export class IService : public INamed
+	export class IService : public Utility::INamed
 	{
 	public:
 		virtual void Begin() = 0;

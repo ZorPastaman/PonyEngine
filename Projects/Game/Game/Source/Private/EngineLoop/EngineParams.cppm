@@ -7,12 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module EngineRunner:EngineParams;
 
 import <functional>;
+import <iostream>;
 import <vector>;
 
 import PonyEngine.Core;
+import PonyEngine.Debug.Log;
 import PonyEngine.Input;
 import PonyEngine.Input.Implementation;
 
@@ -30,11 +36,21 @@ namespace Game
 
 	PonyEngine::Core::EngineParams GetEngineParams()
 	{
+		PONY_COUT("Create engine params.");
 		PonyEngine::Core::EngineParams engineParams;
+		PONY_COUT("Create logger params.");
 		GetLoggerParams(engineParams.loggerParams);
+		PONY_COUT("Logger params created.");
+		PONY_COUT("Create window params.");
 		GetWindowParams(engineParams.windowParams);
+		PONY_COUT("Window params created.");
+		PONY_COUT("Create service factories.");
 		GetServiceParams(engineParams.serviceFactoryInfos);
+		PONY_COUT("Service factories created.");
+		PONY_COUT("Create system factories.");
 		GetSystemParams(engineParams.systemFactoryInfos);
+		PONY_COUT("System factories created.");
+		PONY_COUT("Engine params created.");
 
 		return engineParams;
 	}
@@ -53,6 +69,8 @@ namespace Game
 
 	void GetSystemParams(std::vector<PonyEngine::Core::SystemFactoryInfo>& systemFactoryInfos)
 	{
+		PONY_COUT("Create an input system factory.");
 		systemFactoryInfos.push_back(PonyEngine::Input::CreateSystemFactoryInfo());
+		PONY_COUT("Input system factory created.");
 	}
 }

@@ -9,6 +9,7 @@
 
 export module PonyEngine.Window.Implementation:WindowFactory;
 
+import <stdexcept>;
 import <string>;
 
 import <windows.h>;
@@ -23,8 +24,13 @@ namespace PonyEngine::Window
 {
 	IEngineWindow* CreateEngineWindow(const std::string& title, Core::IEngine& engine)
 	{
-		const HINSTANCE hInstance = GetModuleHandle(NULL);
+		HMODULE hModule;
+		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&CreateEngineWindow), &hModule);
+		if (hModule == nullptr)
+		{
+			throw std::logic_error("Couldn't find a dll module to create a window.");
+		}
 
-		return new WindowsWindow(title, engine, hInstance, SW_NORMAL);
+		return new WindowsWindow(title, engine, hModule, SW_NORMAL);
 	}
 }

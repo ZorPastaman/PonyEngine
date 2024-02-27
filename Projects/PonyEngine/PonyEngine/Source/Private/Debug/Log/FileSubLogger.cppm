@@ -7,12 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Debug.Log.Implementation:FileSubLogger;
 
 import <filesystem>;
 import <fstream>;
 import <iostream>;
 import <stdexcept>;
+import <string>;
 import <utility>;
 
 import PonyEngine.Debug.Log;
@@ -36,6 +41,9 @@ namespace PonyEngine::Debug::Log
 		FileSubLogger(FileSubLogger&& other);
 
 		virtual ~FileSubLogger() noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual const std::string& GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -76,9 +84,15 @@ namespace PonyEngine::Debug::Log
 			}
 			catch (const std::exception& e)
 			{
-				std::cerr << e.what() << " on closing a log file.";
+				PONY_CEXC(e, "On closing a log file.");
 			}
 		}
+	}
+
+	const std::string& FileSubLogger::GetName() const noexcept
+	{
+		static const std::string name = "PonyEngine::Debug::Log::FileSubLogger";
+		return name;
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
@@ -89,7 +103,7 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << e.what() << " on writing to a log file.";
+			PONY_CEXC(e, "On writing to a log file.");
 		}
 	}
 

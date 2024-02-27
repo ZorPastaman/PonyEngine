@@ -7,18 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:INamed;
+export module PonyEngine.Utility;
 
-import <string>;
-
-namespace PonyEngine::Core
-{
-	export class INamed
-	{
-	public:
-		virtual const std::string& GetName() const noexcept = 0;
-
-	protected:
-		inline virtual ~INamed() noexcept = default;
-	};
-}
+export import :INamed;

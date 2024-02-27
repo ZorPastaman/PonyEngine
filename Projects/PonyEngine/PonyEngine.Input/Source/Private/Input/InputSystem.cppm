@@ -18,10 +18,12 @@ namespace PonyEngine::Input
 	export class InputSystem final : public IInputSystem
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
 		InputSystem() noexcept = default;
 
 		virtual ~InputSystem() noexcept = default;
 
+		[[nodiscard("Pure function")]]
 		virtual const std::string& GetName() const noexcept override;
 
 		virtual void Begin() override;

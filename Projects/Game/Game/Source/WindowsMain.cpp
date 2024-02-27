@@ -7,7 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <format>
+#include <iostream>
 #include <windows.h>
+
+#include "Debug/Log/LogMacro.h"
+
+import PonyEngine.Debug.Log;
 
 import EngineRunner;
 
@@ -15,7 +21,9 @@ bool PeekMessages(WPARAM& wParam);
 
 int WINAPI wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const PWSTR pCmdLine, const int nCmdShow)
 {
+	PONY_COUT("Create an engine runner");
 	Game::EngineRunner engineRunner;
+	PONY_COUT("Engine runner created");
 
 	while (engineRunner.IsRunning())
 	{
@@ -24,11 +32,16 @@ int WINAPI wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, co
 		WPARAM wParam;
 		if (PeekMessages(wParam))
 		{
+			PONY_COUT(std::format("Application is ended with message code '{}'", wParam));
+
 			return static_cast<int>(wParam);
 		}
 	}
 
-	return engineRunner.GetExitCode();
+	int exitCode = engineRunner.GetExitCode();
+	PONY_COUT(std::format("Application is ended with the engine exit code '{}'", exitCode));
+
+	return exitCode;
 }
 
 bool PeekMessages(WPARAM& wParam)
