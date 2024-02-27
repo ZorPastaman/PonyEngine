@@ -7,9 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module EngineRunner:GameRunner;
 
 import <format>;
+import <iostream>;
 import <string>;
 
 import PonyEngine.Core;

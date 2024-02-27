@@ -7,20 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window:IWindow;
+export module PonyEngine.Utility:INamed;
 
-import :Listeners.IKeyboardListener;
+import <string>;
 
-namespace PonyEngine::Window
+namespace PonyEngine::Utility
 {
-	/// @brief Engine window interface.
-	export class IWindow
+	/// @brief Object that has a name.
+	export class INamed
 	{
 	public:
-		virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
-		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
+		/// @brief Gets a name of an object.
+		/// @return Name of an object.
+		[[nodiscard("Pure function")]]
+		virtual const std::string& GetName() const noexcept = 0;
 
 	protected:
-		inline virtual ~IWindow() = default;
+		inline virtual ~INamed() noexcept = default;
 	};
 }

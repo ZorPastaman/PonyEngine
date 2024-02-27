@@ -9,11 +9,13 @@
 
 export module PonyEngine.Window:Listeners.IKeyboardListener;
 
+import PonyEngine.Utility;
+
 import :Messages.KeyboardMessage;
 
 namespace PonyEngine::Window::Listeners
 {
-	export class IKeyboardListener
+	export class IKeyboardListener : public Utility::INamed
 	{
 	public:
 		virtual void Listen(Messages::KeyboardMessage keyboardMessage) noexcept = 0;

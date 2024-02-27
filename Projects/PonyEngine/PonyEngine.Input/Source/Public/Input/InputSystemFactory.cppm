@@ -40,8 +40,8 @@ namespace PonyEngine::Input
 
 	Core::SystemFactoryInfo CreateSystemFactoryInfo()
 	{
-		const std::function<Core::ISystem*(Core::IEngine&)> createInputSystem = &CreateInputSystem;
-		const std::function<void(Core::ISystem*)> destroyInputSystem = [](Core::ISystem* system) 
+		static const std::function<Core::ISystem*(Core::IEngine&)> createInputSystem = &CreateInputSystem;
+		static const std::function<void(Core::ISystem*)> destroyInputSystem = [](Core::ISystem* system) 
 		{
 			assert((dynamic_cast<IInputSystem*>(system) != nullptr));
 			DestroyInputSystem(static_cast<IInputSystem*>(system)); 

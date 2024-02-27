@@ -7,11 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Debug.Log.Implementation:Logger;
 
 import <algorithm>;
 import <cassert>;
 import <chrono>;
+import <format>;
 import <exception>;
 import <iostream>;
 import <string>;
@@ -80,7 +85,7 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << e.what() << " on writing to the log.";
+			PONY_CEXC(e, "On writing to the log.");
 		}
 	}
 
@@ -97,23 +102,31 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << e.what() << " on writing to the log.";
+			PONY_CEXC(e, "On writing to the log.");
 		}
 	}
 
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger != nullptr));
+		PONY_COUT(std::format("Add a sub-logger '{}'.", subLogger->GetName()));
 		m_subLoggers.push_back(subLogger);
 	}
 
 	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
+		PONY_CLOG_IF(subLogger == nullptr, "Tried to remove a nullptr sub-logger.");
+
 		const std::vector<ISubLogger*>::const_iterator position = std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger);
 
 		if (position != m_subLoggers.cend()) [[likely]]
 		{
+			PONY_COUT(std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
 			m_subLoggers.erase(position);
+		}
+		else [[unlikely]]
+		{
+			PONY_CLOG_IF(subLogger != nullptr, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()));
 		}
 	}
 }

@@ -9,13 +9,15 @@
 
 export module PonyEngine.Debug.Log:ISubLogger;
 
+import PonyEngine.Utility;
+
 import :LogEntry;
 
 namespace PonyEngine::Debug::Log
 {
 	/// @brief SubLogger interface.
 	/// @details The sub-logger writes received logs to something.
-	export class ISubLogger
+	export class ISubLogger : public Utility::INamed
 	{
 	public:
 		/// @brief Logs the @p logEntry to something.

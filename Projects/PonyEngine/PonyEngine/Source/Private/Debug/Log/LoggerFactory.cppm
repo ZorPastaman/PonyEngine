@@ -18,12 +18,20 @@ import :Logger;
 
 namespace PonyEngine::Debug::Log
 {
+	/// @brief Creates an engine logger.
+	/// @param engine Engine that owns the logger.
+	/// @return Created logger.
 	export [[nodiscard("Pure function")]]
 	inline IEngineLogger* CreateLogger(const Core::IEngine& engine);
 
+	/// @brief Create an engine console sub-logger.
+	/// @return Created sub-logger.
 	export [[nodiscard("Pure function")]]
 	inline IEngineSubLogger* CreateConsoleSubLogger();
 
+	/// @brief Creates an engine file sub-logger.
+	/// @param logPath Log file path.
+	/// @return Created sub-logger.
 	export [[nodiscard("Pure function")]]
 	inline IEngineSubLogger* CreateFileSubLogger(const std::filesystem::path& logPath);
 

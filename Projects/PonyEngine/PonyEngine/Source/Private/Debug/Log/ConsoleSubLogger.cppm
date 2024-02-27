@@ -7,11 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Debug.Log.Implementation:ConsoleSubLogger;
 
 import <exception>;
 import <iostream>;
 import <stdexcept>;
+import <string>;
 
 import PonyEngine.Debug.Log;
 
@@ -30,6 +35,9 @@ namespace PonyEngine::Debug::Log
 
 		inline virtual ~ConsoleSubLogger() noexcept = default;
 
+		[[nodiscard("Pure function")]]
+		virtual const std::string& GetName() const noexcept override;
+
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
 
@@ -38,6 +46,12 @@ namespace PonyEngine::Debug::Log
 	/// @return Chosen stream.
 	[[nodiscard("Pure function")]]
 	static std::ostream& ChooseStream(LogType logType);
+
+	const std::string& ConsoleSubLogger::GetName() const noexcept
+	{
+		static const std::string name = "PonyEngine::Debug::Log::ConsoleSubLogger";
+		return name;
+	}
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
@@ -48,7 +62,7 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			std::cerr << e.what() << " on writing to a console." << std::endl;
+			PONY_CEXC(e, "On writing to a console.");
 		}
 	}
 

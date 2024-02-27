@@ -124,6 +124,6 @@ namespace PonyEngine::Window
 		{ VK_SUBTRACT, Messages::KeyboardKeyCode::NumpadMinus },
 		{ VK_MULTIPLY, Messages::KeyboardKeyCode::NumpadStar },
 		{ VK_DIVIDE, Messages::KeyboardKeyCode::NumpadSlash },
-		{ VK_DECIMAL, Messages::KeyboardKeyCode::NumpadComma },
+		{ VK_DECIMAL, Messages::KeyboardKeyCode::NumpadComma }
 	};
 }
