@@ -21,6 +21,8 @@ namespace PonyEngine::Window::Messages
 	/// @brief Keyboard key codes.
 	export enum class KeyboardKeyCode : std::uint_fast8_t
 	{
+		// Special
+		None,
 		// Letters
 		A,
 		B,
@@ -141,8 +143,11 @@ namespace PonyEngine::Window::Messages
 	/// @return @p stream.
 	export inline std::ostream& operator <<(std::ostream& stream, KeyboardKeyCode keyCode);
 
-	static const std::unordered_map<KeyboardKeyCode, std::string> s_keyCodeStrings
+	/// @brief Key code to its name map.
+	static const std::unordered_map<KeyboardKeyCode, const char*> s_keyCodeStrings
 	{
+		// Special
+		{ KeyboardKeyCode::None, "None" },
 		// Letters
 		{ KeyboardKeyCode::A, "A" },
 		{ KeyboardKeyCode::B, "B" },
@@ -253,7 +258,7 @@ namespace PonyEngine::Window::Messages
 
 	std::string ToString(const KeyboardKeyCode keyCode)
 	{
-		const std::unordered_map<KeyboardKeyCode, std::string>::const_iterator position = s_keyCodeStrings.find(keyCode);
+		const std::unordered_map<KeyboardKeyCode, const char*>::const_iterator position = s_keyCodeStrings.find(keyCode);
 
 		if (position != s_keyCodeStrings.end()) [[likely]]
 		{

@@ -41,8 +41,8 @@ namespace PonyEngine::Core
 		LoggerParams loggerParams; /// @brief Logger parameters.
 		WindowParams windowParams; /// @brief Window parameters.
 
-		std::vector<ServiceFactoryInfo> serviceFactoryInfos;
-		std::vector<SystemFactoryInfo> systemFactoryInfos;
+		std::vector<ServiceFactoryInfo> serviceFactoryInfos; /// @brief Service factories.
+		std::vector<SystemFactoryInfo> systemFactoryInfos; /// @brief System factories.
 	};
 
 	EngineParams::EngineParams() :

@@ -13,19 +13,29 @@ import :Messages.KeyboardKeyCode;
 
 namespace PonyEngine::Window::Messages
 {
+	/// @brief Keyboard message.
 	export struct KeyboardMessage final
 	{
 	public:
+		/// @brief Creates an empty keyboard message.
 		constexpr inline KeyboardMessage() noexcept;
+		/// @brief Create a keyboard message.
+		/// @param keyCode Key code.
+		/// @param isDown @a True if the key is pressed; @a false if it's unpressed.
 		constexpr inline KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept;
+		/// @brief Copy constructor.
+		/// @param other Copy source.
 		constexpr inline KeyboardMessage(const KeyboardMessage& other) noexcept;
 		
 		constexpr inline ~KeyboardMessage() noexcept = default;
 
+		/// @brief Copy assignment.
+		/// @param other Copy source.
+		/// @return @a This.
 		constexpr inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept;
 
-		KeyboardKeyCode keyCode;
-		bool isDown;
+		KeyboardKeyCode keyCode; /// @brief Key code.
+		bool isDown; /// @brief @a True if the key is pressed; @a false if it's unpressed.
 	};
 
 	constexpr inline KeyboardMessage::KeyboardMessage() noexcept :

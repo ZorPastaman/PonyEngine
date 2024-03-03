@@ -17,7 +17,11 @@ namespace PonyEngine::Core
 	export class ISystem : public Utility::INamed
 	{
 	public:
+		/// @brief Begins a system.
+		/// @details The system takes its dependencies in this function.
 		virtual void Begin() = 0;
+		/// @brief Ends a system.
+		/// @details The function is called before a destruction.
 		virtual void End() = 0;
 
 		/// @brief Ticks the system.

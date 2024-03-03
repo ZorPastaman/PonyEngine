@@ -41,6 +41,12 @@ namespace PonyEngineTests
 
 			virtual ~TestSubLogger() = default;
 
+			[[nodiscard("Pure function")]]
+			virtual const char* GetName() const noexcept override
+			{
+				return "Test sub-logger";
+			}
+
 			virtual void Log(const PonyEngine::Debug::Log::LogEntry& logEntry) noexcept override
 			{
 				if (checkData)

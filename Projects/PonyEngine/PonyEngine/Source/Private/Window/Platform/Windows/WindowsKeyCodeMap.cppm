@@ -17,6 +17,7 @@ import PonyEngine.Window;
 
 namespace PonyEngine::Window
 {
+	/// @brief Windows virtual key code to Pony Engine key code map.
 	export const std::unordered_map<WPARAM, Messages::KeyboardKeyCode> WindowsKeyCodeMap
 	{
 		// Letters
