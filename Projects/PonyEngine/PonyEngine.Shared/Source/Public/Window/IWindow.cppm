@@ -9,6 +9,8 @@
 
 export module PonyEngine.Window:IWindow;
 
+import <string>;
+
 import :Listeners.IKeyboardListener;
 
 namespace PonyEngine::Window
@@ -17,6 +19,15 @@ namespace PonyEngine::Window
 	export class IWindow
 	{
 	public:
+		/// @brief Gets a window title.
+		/// @return Window title.
+		[[nodiscard("Pure function")]]
+		virtual std::string GetTitle() const = 0;
+		/// @brief Sets a window title.
+		/// @param title Window title to set.
+		/// @return @a True if the procedure is successful; @a false otherwise.
+		virtual bool SetTitle(const std::string& title) = 0;
+
 		/// @brief Adds a keyboard input listener.
 		/// @param keyboardMessageListener Keyboard input listener. Mustn't be nullptr.
 		virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;

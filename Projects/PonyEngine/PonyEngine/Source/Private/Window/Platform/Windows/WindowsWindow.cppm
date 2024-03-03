@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Window.Implementation:WindowsWindow;
 
+import <algorithm>;
 import <cassert>;
 import <format>;
 import <exception>;
@@ -51,6 +52,9 @@ namespace PonyEngine::Window
 		WindowsWindow(WindowsWindow&& other);
 
 		virtual ~WindowsWindow() noexcept;
+
+		virtual std::string GetTitle() const override;
+		virtual bool SetTitle(const std::string& title) override;
 
 		inline virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
 		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
@@ -100,7 +104,7 @@ namespace PonyEngine::Window
 
 	WindowsWindow::WindowsWindow(const std::string& title, Core::IEngine& engine, const HINSTANCE hInstance, const int nCmdShow) :
 		m_keyboardMessageListeners{},
-		m_className(title.begin(), title.end()),
+		m_className(title.cbegin(), title.cend()),
 		m_engine{engine},
 		m_hInstance(hInstance),
 		m_nCmdShow{nCmdShow}
@@ -119,7 +123,7 @@ namespace PonyEngine::Window
 		m_hWnd = CreateWindowEx(
 			0,
 			m_className.c_str(),
-			std::wstring(title.begin(), title.end()).c_str(),
+			std::wstring(title.cbegin(), title.cend()).c_str(),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 			NULL,
@@ -164,6 +168,40 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG_E(m_engine.GetLogger(), e, "On a window destroy");
 		}
+	}
+
+	std::string WindowsWindow::GetTitle() const
+	{
+		size_t length = GetWindowTextLength(m_hWnd) + 1;
+		std::string title(length, 0);
+
+		wchar_t* wtitle = new wchar_t[length];
+
+		try
+		{
+			std::fill_n(wtitle, length, wchar_t{0});
+			GetWindowText(m_hWnd, wtitle, length);
+
+			for (size_t i = 0; i < length; ++i)
+			{
+				title[i] = static_cast<char>(wtitle[i]);
+			}
+		}
+		catch (const std::exception& e)
+		{
+			delete[] wtitle;
+			throw e;
+		}
+
+		delete[] wtitle;
+
+		return title;
+	}
+
+	bool WindowsWindow::SetTitle(const std::string& title)
+	{
+		std::wstring wtitle(title.cbegin(), title.cend());
+		return SetWindowText(m_hWnd, wtitle.c_str());
 	}
 
 	inline void WindowsWindow::AddKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
