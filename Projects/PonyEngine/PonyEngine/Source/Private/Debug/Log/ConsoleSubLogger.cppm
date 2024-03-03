@@ -36,7 +36,7 @@ namespace PonyEngine::Debug::Log
 		inline virtual ~ConsoleSubLogger() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::string& GetName() const noexcept override;
+		inline virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 	};
@@ -47,10 +47,9 @@ namespace PonyEngine::Debug::Log
 	[[nodiscard("Pure function")]]
 	static std::ostream& ChooseStream(LogType logType);
 
-	const std::string& ConsoleSubLogger::GetName() const noexcept
+	inline const char* ConsoleSubLogger::GetName() const noexcept
 	{
-		static const std::string name = "PonyEngine::Debug::Log::ConsoleSubLogger";
-		return name;
+		return "PonyEngine::Debug::Log::ConsoleSubLogger";
 	}
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept

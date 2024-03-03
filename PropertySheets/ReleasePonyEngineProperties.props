@@ -11,6 +11,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <Optimization>MaxSpeed</Optimization>
+      <PreprocessorDefinitions>NDEBUG;PONY_LOG_INFO;PONY_LOG_WARNING;PONY_LOG_ERROR;PONY_LOG_EXCEPTION;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

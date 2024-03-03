@@ -55,6 +55,8 @@ namespace PonyEngine::Window
 		inline virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
 		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) override;
 
+		inline virtual void* GetNativeWindow() override;
+
 		inline virtual void ShowWindow() override;
 
 		virtual void Tick() override;
@@ -167,7 +169,7 @@ namespace PonyEngine::Window
 	inline void WindowsWindow::AddKeyboardMessageListener(Listeners::IKeyboardListener* const keyboardMessageListener)
 	{
 		assert((keyboardMessageListener != nullptr));
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Debug, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()));
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()));
 
 		m_keyboardMessageListeners.push_back(keyboardMessageListener);
 	}
@@ -180,13 +182,18 @@ namespace PonyEngine::Window
 
 		if (position != m_keyboardMessageListeners.cend()) [[likely]]
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Debug, std::format("Remove a keyboard message listener '{}'", keyboardMessageListener->GetName()));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Remove a keyboard message listener '{}'", keyboardMessageListener->GetName()));
 			m_keyboardMessageListeners.erase(position);
 		}
 		else [[unlikely]]
 		{
 			PONY_LOG_IF(keyboardMessageListener != nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, std::format("Tried to remove a not added keyboard message listener '{}'", keyboardMessageListener->GetName()));
 		}
+	}
+
+	inline void* WindowsWindow::GetNativeWindow()
+	{
+		return static_cast<void*>(&m_hWnd);
 	}
 
 	inline void WindowsWindow::ShowWindow()

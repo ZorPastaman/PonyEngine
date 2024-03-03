@@ -43,7 +43,7 @@ namespace PonyEngine::Debug::Log
 		virtual ~FileSubLogger() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::string& GetName() const noexcept override;
+		inline virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -89,10 +89,9 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	const std::string& FileSubLogger::GetName() const noexcept
+	inline const char* FileSubLogger::GetName() const noexcept
 	{
-		static const std::string name = "PonyEngine::Debug::Log::FileSubLogger";
-		return name;
+		return "PonyEngine::Debug::Log::FileSubLogger";
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
