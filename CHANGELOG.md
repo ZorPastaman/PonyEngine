@@ -14,5 +14,6 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 - Window management.
 - Windows platform.
 - Basic math structs: vectors, quaternion.
+- Input system.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
