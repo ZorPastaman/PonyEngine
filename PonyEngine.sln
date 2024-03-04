@@ -3,15 +3,27 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Projects\Game\Game.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Projects\Game\Game\Game.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine", "Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj", "{D35C7778-7993-437B-B2D1-9E97F128947E}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine.Math\PonyEngine.Math.vcxproj", "{933D1110-B95B-4DF9-8584-3D39BC307A67}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Shared", "Projects\PonyEngine\PonyEngine.Shared\PonyEngine.Shared.vcxproj", "{63697FEC-E0A2-44F9-ABF3-57A83CCA3350}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Tests\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input", "Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj", "{D637B8C4-8ABF-421E-9B7E-0B842096FB62}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Tests", "Tests\PonyEngine.Tests\PonyEngine.Tests.vcxproj", "{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj", "{933D1110-B95B-4DF9-8584-3D39BC307A67}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Tests", "Projects\Tests\PonyEngine.Tests\PonyEngine.Tests.vcxproj", "{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Projects\Tests\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43F91669-3F87-4CB1-BA38-E3D973C07263}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PonyEngine", "PonyEngine", "{720E2B60-DD48-4D80-BF09-599A12AD7E65}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{B548428F-A26F-4FD5-9587-45D3CB54C39D}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input.Shared", "Projects\PonyEngine\PonyEngine.Input.Shared\PonyEngine.Input.Shared.vcxproj", "{4C20C746-3A48-46C8-8573-D8C04AA009B2}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -27,21 +39,43 @@ Global
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Debug|x64.Build.0 = Debug|x64
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.ActiveCfg = Release|x64
 		{D35C7778-7993-437B-B2D1-9E97F128947E}.Release|x64.Build.0 = Release|x64
+		{63697FEC-E0A2-44F9-ABF3-57A83CCA3350}.Debug|x64.ActiveCfg = Debug|x64
+		{63697FEC-E0A2-44F9-ABF3-57A83CCA3350}.Debug|x64.Build.0 = Debug|x64
+		{63697FEC-E0A2-44F9-ABF3-57A83CCA3350}.Release|x64.ActiveCfg = Release|x64
+		{63697FEC-E0A2-44F9-ABF3-57A83CCA3350}.Release|x64.Build.0 = Release|x64
+		{D637B8C4-8ABF-421E-9B7E-0B842096FB62}.Debug|x64.ActiveCfg = Debug|x64
+		{D637B8C4-8ABF-421E-9B7E-0B842096FB62}.Debug|x64.Build.0 = Debug|x64
+		{D637B8C4-8ABF-421E-9B7E-0B842096FB62}.Release|x64.ActiveCfg = Release|x64
+		{D637B8C4-8ABF-421E-9B7E-0B842096FB62}.Release|x64.Build.0 = Release|x64
 		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Debug|x64.ActiveCfg = Debug|x64
 		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Debug|x64.Build.0 = Debug|x64
 		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Release|x64.ActiveCfg = Release|x64
 		{933D1110-B95B-4DF9-8584-3D39BC307A67}.Release|x64.Build.0 = Release|x64
-		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.ActiveCfg = Debug|x64
-		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.Build.0 = Debug|x64
-		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.ActiveCfg = Release|x64
-		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.Build.0 = Release|x64
 		{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}.Debug|x64.ActiveCfg = Debug|x64
 		{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}.Debug|x64.Build.0 = Debug|x64
 		{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}.Release|x64.ActiveCfg = Release|x64
 		{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E}.Release|x64.Build.0 = Release|x64
+		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.ActiveCfg = Debug|x64
+		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Debug|x64.Build.0 = Debug|x64
+		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.ActiveCfg = Release|x64
+		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}.Release|x64.Build.0 = Release|x64
+		{4C20C746-3A48-46C8-8573-D8C04AA009B2}.Debug|x64.ActiveCfg = Debug|x64
+		{4C20C746-3A48-46C8-8573-D8C04AA009B2}.Debug|x64.Build.0 = Debug|x64
+		{4C20C746-3A48-46C8-8573-D8C04AA009B2}.Release|x64.ActiveCfg = Release|x64
+		{4C20C746-3A48-46C8-8573-D8C04AA009B2}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223} = {B548428F-A26F-4FD5-9587-45D3CB54C39D}
+		{D35C7778-7993-437B-B2D1-9E97F128947E} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
+		{63697FEC-E0A2-44F9-ABF3-57A83CCA3350} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
+		{D637B8C4-8ABF-421E-9B7E-0B842096FB62} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
+		{933D1110-B95B-4DF9-8584-3D39BC307A67} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
+		{BBFD3BCE-66D0-4C3F-A20D-89CDA692395E} = {43F91669-3F87-4CB1-BA38-E3D973C07263}
+		{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50} = {43F91669-3F87-4CB1-BA38-E3D973C07263}
+		{4C20C746-3A48-46C8-8573-D8C04AA009B2} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}
