@@ -19,17 +19,24 @@ import :InputSystem;
 
 namespace PonyEngine::Input
 {
+	/// @brief Creates an input system.
+	/// @param engine Engine that owns the input system.
+	/// @return Created input system.
 	export [[nodiscard("Pure function")]] 
 	__declspec(dllexport) IInputSystem* CreateInputSystem(Core::IEngine& engine);
 
+	/// @brief Destroys an input system.
+	/// @param inputSystem Input system to destroy.
 	export __declspec(dllexport) void DestroyInputSystem(IInputSystem* inputSystem) noexcept;
 
+	/// @brief Creates a factory info wrapper over functions @p CreateInputSystem() and DestroyInputSystem().
+	/// @return Created factory info wrapper.
 	export [[nodiscard("Pure function")]] 
 	__declspec(dllexport) Core::SystemFactoryInfo CreateSystemFactoryInfo();
 
 	IInputSystem* CreateInputSystem(Core::IEngine& engine)
 	{
-		return new InputSystem();
+		return new InputSystem(engine);
 	}
 
 	void DestroyInputSystem(IInputSystem* const inputSystem) noexcept

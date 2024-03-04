@@ -95,13 +95,13 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy systems");
 
-		for (std::size_t i = 0, count = m_systems.size(); i < count; ++i)
+		for (std::size_t i = 0, count = m_systems.size(), index = count - i - 1; i < count; ++i, index = count - i - 1)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_systems[i]->GetName());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_systems[index]->GetName());
 
 			try
 			{
-				m_destroyFunctions[i](m_systems[i]);
+				m_destroyFunctions[index](m_systems[index]);
 			}
 			catch (const std::exception& e)
 			{
@@ -144,8 +144,10 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End systems");
 
-		for (ISystem* const system : m_systems)
+		for (std::vector<ISystem*>::reverse_iterator systemIterator = m_systems.rbegin(); systemIterator != m_systems.rend(); ++systemIterator)
 		{
+			ISystem* const system = *systemIterator;
+
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, system->GetName());
 
 			try
