@@ -94,7 +94,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PonyEngine.Shared.rc">
+    <ResourceCompile Include="PonyEngine.API.rc">
       <Filter>Resource Files</Filter>
     </ResourceCompile>
   </ItemGroup>
