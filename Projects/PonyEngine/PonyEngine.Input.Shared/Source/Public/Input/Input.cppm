@@ -9,4 +9,5 @@
 
 export module PonyEngine.Input;
 
+export import :Event;
 export import :IInputSystem;

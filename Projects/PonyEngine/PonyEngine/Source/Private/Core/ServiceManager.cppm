@@ -92,13 +92,13 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy services");
 
-		for (std::size_t i = 0, count = m_services.size(); i < count; ++i)
+		for (std::size_t i = 0, count = m_services.size(), index = count - i - 1; i < count; ++i, index = count - i - 1)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_services[i]->GetName());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_services[index]->GetName());
 
 			try
 			{
-				m_destroyFunctions[i](m_services[i]);
+				m_destroyFunctions[index](m_services[index]);
 			}
 			catch (const std::exception& e)
 			{
@@ -141,8 +141,10 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End services");
 
-		for (IService* const service : m_services)
+		for (std::vector<IService*>::reverse_iterator serviceIterator = m_services.rbegin(); serviceIterator != m_services.rend(); ++serviceIterator)
 		{
+			IService* const service = *serviceIterator;
+
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, service->GetName());
 
 			try

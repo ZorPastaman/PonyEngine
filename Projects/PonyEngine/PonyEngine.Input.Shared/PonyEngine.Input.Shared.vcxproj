@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Input\Event.cppm" />
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
     <ClCompile Include="Source\Public\Input\Input.cppm" />
   </ItemGroup>
