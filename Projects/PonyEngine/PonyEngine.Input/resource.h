@@ -1,6 +1,6 @@
 //{{NO_DEPENDENCIES}}
 // Microsoft Visual C++ generated include file.
-// Used by PonyEngine.Shared.rc
+// Used by PonyEngine.Input.rc
 
 // Next default values for new objects
 // 
