@@ -1,0 +1,112 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Public\Core\Core.cppm" />
+    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
+    <ClCompile Include="Source\Public\Utility\INamed.cppm" />
+    <ClCompile Include="Source\Public\Core\IService.cppm" />
+    <ClCompile Include="Source\Public\Core\ServiceFactoryInfo.cppm" />
+    <ClCompile Include="Source\Public\Core\IServiceManager.cppm" />
+    <ClCompile Include="Source\Public\Core\ISystem.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemFactoryInfo.cppm" />
+    <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
+    <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Core\WindowParams.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\Log.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility.cppm" />
+    <ClCompile Include="Source\Public\Window\IWindow.cppm" />
+    <ClCompile Include="Source\Public\Window\Listeners\IKeyboardListener.cppm" />
+    <ClCompile Include="Source\Public\Window\Messages\KeyboardMessage.cppm" />
+    <ClCompile Include="Source\Public\Window\Messages\KeyboardKeyCode.cppm" />
+    <ClCompile Include="Source\Public\Window\Window.cppm" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Public\Debug\Log\LogMacro.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyEngine.Shared.rc" />
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{63697fec-e0a2-44f9-abf3-57a83cca3350}</ProjectGuid>
+    <RootNamespace>PonyEngineShared</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
+    <Import Project="$(SolutionDir)\PropertySheets\DebugPonyEngineProperties.props" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+    <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
+    <Import Project="$(SolutionDir)\PropertySheets\ReleasePonyEngineProperties.props" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(PublicModuleDirectories)</PublicModuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(PublicModuleDirectories)</PublicModuleDirectories>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <Version>0.1</Version>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <Version>0.1</Version>
+    </Link>
+  </ItemDefinitionGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
