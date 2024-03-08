@@ -9,9 +9,7 @@
 
 export module PonyEngine.Window;
 
+export import :IKeyboardListener;
 export import :IWindow;
-
-export import :Listeners.IKeyboardListener;
-
-export import :Messages.KeyboardMessage;
-export import :Messages.KeyboardKeyCode;
+export import :KeyboardKeyCode;
+export import :KeyboardMessage;

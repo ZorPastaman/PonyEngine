@@ -11,7 +11,7 @@ export module PonyEngine.Window:IWindow;
 
 import <string>;
 
-import :Listeners.IKeyboardListener;
+import :IKeyboardListener;
 
 namespace PonyEngine::Window
 {
@@ -30,15 +30,16 @@ namespace PonyEngine::Window
 
 		/// @brief Adds a keyboard input listener.
 		/// @param keyboardMessageListener Keyboard input listener. Mustn't be nullptr.
-		virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
+		virtual void AddKeyboardMessageListener(IKeyboardListener* keyboardMessageListener) = 0;
 		/// @brief Removes a keyboard input listener.
 		/// @param keyboardMessageListener Keyboard input listener.
-		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
+		virtual void RemoveKeyboardMessageListener(IKeyboardListener* keyboardMessageListener) = 0;
 
-		/// @brief Gets a native window pointer.
-		/// @details It's HWND* on Windows.
-		/// @return Native window pointer.
-		virtual void* GetNativeWindow() = 0;
+		/// @brief Shows a window.
+		virtual void ShowWindow() = 0;
+
+		/// @brief Ticks a window message queue.
+		virtual void Tick() = 0;
 
 	protected:
 		inline virtual ~IWindow() = default;

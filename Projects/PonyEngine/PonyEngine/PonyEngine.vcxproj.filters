@@ -23,9 +23,6 @@
     <ClCompile Include="Source\Private\Core\Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\EngineFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Core\EngineFeatures.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -41,31 +38,10 @@
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsWindow.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Debug\Log\Log.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Window.Implementation.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\IEngineLogger.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Window\IEngineWindow.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\LoggerFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsWindowFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Window\Platform\Windows\WindowsKeyCodeMap.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Core\ServiceManager.cppm">
@@ -74,7 +50,7 @@
     <ClCompile Include="Source\Private\Core\SystemManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\IEngineSubLogger.cppm">
+    <ClCompile Include="Source\Private\Debug\Log\Factories\ConsoleSubLoggerFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

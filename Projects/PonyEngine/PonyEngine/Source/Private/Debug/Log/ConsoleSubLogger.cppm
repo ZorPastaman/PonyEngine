@@ -25,7 +25,7 @@ import :IEngineSubLogger;
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
-	export class ConsoleSubLogger final : public IEngineSubLogger
+	export class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

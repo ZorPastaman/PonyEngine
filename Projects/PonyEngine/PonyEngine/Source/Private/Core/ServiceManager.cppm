@@ -24,6 +24,7 @@ import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Core
@@ -33,10 +34,10 @@ namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates a @p ServiceManager.
-		/// @param serviceFactoryInfos Service factories.
+		/// @param serviceFactories Service factories.
 		/// @param engine Engine that owns the manager.
 		[[nodiscard("Pure constructor")]]
-		ServiceManager(const std::vector<ServiceFactoryInfo>& serviceFactoryInfos, IEngine& engine);
+		ServiceManager(const std::vector<IServiceFactory*>& serviceFactories, IEngine& engine);
 		ServiceManager(const ServiceManager&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
@@ -55,26 +56,26 @@ namespace PonyEngine::Core
 
 	private:
 		std::vector<IService*> m_services; /// @brief Services.
-		std::vector<std::function<void(IService*)>> m_destroyFunctions; /// @brief Destroy functions. Must be synchronized with @p m_services by index.
+		std::vector<IServiceFactory*> m_serviceFactories; /// @brief Service factories. Must be synchronized with @p m_services by index.
 
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
-	ServiceManager::ServiceManager(const std::vector<ServiceFactoryInfo>& serviceFactoryInfos, IEngine& engine) :
+	ServiceManager::ServiceManager(const std::vector<IServiceFactory*>& serviceFactories, IEngine& engine) :
 		m_services{},
 		m_destroyFunctions{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create services");
 
-		for (const ServiceFactoryInfo& factoryInfo : serviceFactoryInfos)
+		for (IServiceFactory* const serviceFactory : serviceFactories)
 		{
-			assert((factoryInfo.createFunction));
-			assert((factoryInfo.destroyFunction));
+			assert((serviceFactory != nullptr));
 
-			IService* const service = factoryInfo.createFunction(engine);
+			IService* const service = serviceFactory->Create(engine);
+			assert((service != nullptr));
 			m_services.push_back(service);
-			m_destroyFunctions.push_back(factoryInfo.destroyFunction);
+			m_serviceFactories.push_back(serviceFactory);
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, service->GetName());
 		}
 
@@ -83,7 +84,7 @@ namespace PonyEngine::Core
 
 	inline ServiceManager::ServiceManager(ServiceManager&& other) noexcept :
 		m_services(std::move(other.m_services)),
-		m_destroyFunctions(std::move(other.m_destroyFunctions)),
+		m_serviceFactories(std::move(other.m_serviceFactories)),
 		m_engine{other.m_engine}
 	{
 	}
@@ -98,7 +99,7 @@ namespace PonyEngine::Core
 
 			try
 			{
-				m_destroyFunctions[index](m_services[index]);
+				m_serviceFactories[index]->Destroy(m_services[index]);
 			}
 			catch (const std::exception& e)
 			{
