@@ -26,12 +26,10 @@ import <utility>;
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 
-import :IEngineLogger;
-
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Default logger. It just resends logs to its sub-loggers.
-	export class Logger final : public IEngineLogger
+	export class Logger final : public ILogger
 	{
 	public:
 		/// @brief Creates a @p Logger.

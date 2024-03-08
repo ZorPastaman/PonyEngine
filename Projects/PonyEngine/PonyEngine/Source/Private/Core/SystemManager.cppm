@@ -24,6 +24,7 @@ import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Core
@@ -33,10 +34,10 @@ namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
-		/// @param systemFactoryInfos System factories.
+		/// @param systemFactories System factories.
 		/// @param engine Engine that owns the manager.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine);
+		SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.
@@ -58,26 +59,25 @@ namespace PonyEngine::Core
 
 	private:
 		std::vector<ISystem*> m_systems; /// @brief Systems.
-		std::vector<std::function<void(ISystem*)>> m_destroyFunctions; /// @brief Destroy functions. Must be synchronized with @p m_systems by index.
+		std::vector<ISystemFactory*> m_systemFactories; /// @brief System factories. Must be synchronized with @p m_systems by index.
 
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
-	SystemManager::SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine) :
+	SystemManager::SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine) :
 		m_systems{},
-		m_destroyFunctions{},
+		m_systemFactories{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create systems");
 
-		for (const SystemFactoryInfo& factoryInfo : systemFactoryInfos)
+		for (ISystemFactory* const systemFactory : systemFactoryInfos)
 		{
-			assert((factoryInfo.createFunction));
-			assert((factoryInfo.destroyFunction));
+			assert((systemFactory != nullptr));
 
-			ISystem* const system = factoryInfo.createFunction(engine);
+			ISystem* const system = systemFactory->Create(engine);
 			m_systems.push_back(system);
-			m_destroyFunctions.push_back(factoryInfo.destroyFunction);
+			m_systemFactories.push_back(systemFactory);
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, system->GetName());
 		}
 
@@ -86,7 +86,7 @@ namespace PonyEngine::Core
 
 	inline SystemManager::SystemManager(SystemManager&& other) noexcept :
 		m_systems(std::move(other.m_systems)),
-		m_destroyFunctions(std::move(other.m_destroyFunctions)),
+		m_systemFactories(std::move(other.m_systemFactories)),
 		m_engine{other.m_engine}
 	{
 	}
@@ -101,7 +101,7 @@ namespace PonyEngine::Core
 
 			try
 			{
-				m_destroyFunctions[index](m_systems[index]);
+				m_systemFactories[index]->Destroy(m_systems[index]);
 			}
 			catch (const std::exception& e)
 			{

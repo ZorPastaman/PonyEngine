@@ -27,7 +27,7 @@ import PonyEngine.Window;
 namespace PonyEngine::Input
 {
 	/// @brief Default Pony Engine input system.
-	export class InputSystem final : public IInputSystem, public Window::Listeners::IKeyboardListener
+	export class InputSystem final : public IInputSystem, public Window::IKeyboardListener
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -50,12 +50,12 @@ namespace PonyEngine::Input
 		virtual std::size_t RegisterAction(Event event, std::function<void()> action) override;
 		virtual void UnregisterAction(std::size_t id) override;
 
-		virtual void Listen(Window::Messages::KeyboardMessage keyboardMessage) noexcept override;
+		virtual void Listen(Window::KeyboardMessage keyboardMessage) noexcept override;
 
 	private:
 		std::vector<std::pair<std::size_t, std::pair<Event, std::function<void()>>>> m_events; /// @brief Input event action map.
 		std::size_t m_currentId; /// @brief Id that will be given to a new event. It's incremented every time.
-		std::queue<Window::Messages::KeyboardMessage> m_queue; /// @brief Message queue.
+		std::queue<Window::KeyboardMessage> m_queue; /// @brief Message queue.
 
 		Core::IEngine& m_engine; /// @brief Engine that owns the input system.
 	};
@@ -101,7 +101,7 @@ namespace PonyEngine::Input
 	{
 		while (!m_queue.empty())
 		{
-			Window::Messages::KeyboardMessage message = m_queue.front();
+			Window::KeyboardMessage message = m_queue.front();
 			m_queue.pop();
 			
 			for (std::vector<std::pair<std::size_t, std::pair<Event, std::function<void()>>>>::const_iterator entry = m_events.cbegin(); entry != m_events.cend(); ++entry)
@@ -117,7 +117,7 @@ namespace PonyEngine::Input
 
 	std::size_t InputSystem::RegisterAction(Event event, std::function<void()> action)
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Register an action. KeyCode: '{}'; IsDown: '{}'; ID: '{}'", PonyEngine::Window::Messages::ToString(event.expectedMessage.keyCode), event.expectedMessage.isDown, m_currentId));
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Register an action. KeyCode: '{}'; IsDown: '{}'; ID: '{}'", Window::ToString(event.expectedMessage.keyCode), event.expectedMessage.isDown, m_currentId));
 
 		std::pair<Event, std::function<void()>> eventAction(event, action);
 		std::pair<std::size_t, std::pair<Event, std::function<void()>>> entry(m_currentId, eventAction);
@@ -140,9 +140,9 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void InputSystem::Listen(Window::Messages::KeyboardMessage keyboardMessage) noexcept
+	void InputSystem::Listen(Window::KeyboardMessage keyboardMessage) noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received an keyboard message. KeyCode: '{}'; IsDown: '{}'", PonyEngine::Window::Messages::ToString(keyboardMessage.keyCode), keyboardMessage.isDown));
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received an keyboard message. KeyCode: '{}'; IsDown: '{}'", Window::ToString(keyboardMessage.keyCode), keyboardMessage.isDown));
 		m_queue.push(keyboardMessage);
 	}
 }

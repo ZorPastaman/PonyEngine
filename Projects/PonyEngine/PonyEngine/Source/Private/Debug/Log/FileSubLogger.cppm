@@ -27,7 +27,7 @@ import :IEngineSubLogger;
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that logs to a file.
-	export class FileSubLogger final : public IEngineSubLogger
+	export class FileSubLogger final : public ISubLogger
 	{
 	public:
 		/// @brief Creates a @p FileSubLogger.

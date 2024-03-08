@@ -20,7 +20,7 @@ import <iostream>;
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Implementation;
-import PonyEngine.Window.Implementation;
+import PonyEngine.Window.Factories;
 
 import :LoggerOwnerKit;
 
