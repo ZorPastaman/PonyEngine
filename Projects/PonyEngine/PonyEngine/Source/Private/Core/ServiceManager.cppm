@@ -63,7 +63,7 @@ namespace PonyEngine::Core
 
 	ServiceManager::ServiceManager(const std::vector<IServiceFactory*>& serviceFactories, IEngine& engine) :
 		m_services{},
-		m_destroyFunctions{},
+		m_serviceFactories{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create services");

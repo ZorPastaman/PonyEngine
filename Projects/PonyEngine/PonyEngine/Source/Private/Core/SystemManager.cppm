@@ -71,7 +71,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create systems");
 
-		for (ISystemFactory* const systemFactory : systemFactoryInfos)
+		for (ISystemFactory* const systemFactory : systemFactories)
 		{
 			assert((systemFactory != nullptr));
 

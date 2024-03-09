@@ -7,31 +7,36 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log.Factories.Implementation:ConsoleSubLoggerFactory;
+export module PonyEngine.Debug.Log.Factories.Implementation:FileSubLoggerFactory;
+
+import <filesystem>;
 
 import PonyEngine.Debug.Log.Implementation;
 import PonyEngine.Debug.Log.Factories;
 
 namespace PonyEngine::Debug::Log
 {
-	export class ConsoleSubLoggerFactory final : public ISubLoggerFactory
+	export class FileSubLoggerFactory final : public ISubLoggerFactory
 	{
 	public:
-		ConsoleSubLoggerFactory() = default;
-		~ConsoleSubLoggerFactory() = default;
+		FileSubLoggerFactory() = default;
+		~FileSubLoggerFactory() = default;
 
 		[[nodiscard("Pure function")]]
 		virtual ISubLogger* Create(Core::IEngine& engine) override;
 		virtual void Destroy(ISubLogger* subLogger) override;
+
+	private:
+		std::filesystem::path m_path = "Log.log";
 	};
 
-	ISubLogger* ConsoleSubLoggerFactory::Create(Core::IEngine& engine)
+	ISubLogger* FileSubLoggerFactory::Create(Core::IEngine& engine)
 	{
-		return new ConsoleSubLogger();
+		return new FileSubLogger(m_path);
 	}
 
-	void ConsoleSubLoggerFactory::Destroy(ISubLogger* subLogger)
+	void FileSubLoggerFactory::Destroy(ISubLogger* subLogger)
 	{
-		delete static_cast<ConsoleSubLogger*>(subLogger);
+		delete static_cast<FileSubLogger*>(subLogger);
 	}
 }

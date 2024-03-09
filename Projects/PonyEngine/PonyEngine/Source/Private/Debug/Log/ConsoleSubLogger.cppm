@@ -20,8 +20,6 @@ import <string>;
 
 import PonyEngine.Debug.Log;
 
-import :IEngineSubLogger;
-
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.

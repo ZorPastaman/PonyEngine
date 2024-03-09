@@ -23,16 +23,10 @@
     <ClCompile Include="Source\Private\Core\Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Core\EngineFeatures.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Debug\Log\Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Core\LoggerOwnerKit.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm">
@@ -51,6 +45,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Debug\Log\Factories\ConsoleSubLoggerFactory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Debug\Log\Factories\FileSubLoggerFactory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Debug\Log\Factories\Log.Factories.Implementation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Core\LoggerManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Core\WindowManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
