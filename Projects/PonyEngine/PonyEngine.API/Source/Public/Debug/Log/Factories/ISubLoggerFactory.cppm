@@ -19,7 +19,7 @@ namespace PonyEngine::Debug::Log
 	public:
 		[[nodiscard("Pure function")]]
 		virtual ISubLogger* Create(Core::IEngine& engine) = 0;
-		virtual void Destroy(ISubLogger* sublogger) = 0;
+		virtual void Destroy(ISubLogger* subLogger) = 0;
 
 	protected:
 		inline virtual ~ISubLoggerFactory() noexcept = default;

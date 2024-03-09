@@ -23,12 +23,11 @@ import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 import PonyEngine.Debug.Log.Implementation;
 import PonyEngine.Window;
-import PonyEngine.Window.Implementation;
 
-import :EngineFeatures;
-import :LoggerOwnerKit;
+import :LoggerManager;
 import :ServiceManager;
 import :SystemManager;
+import :WindowManager;
 
 namespace PonyEngine::Core
 {
@@ -67,8 +66,8 @@ namespace PonyEngine::Core
 		virtual void Tick() override;
 
 	private:
-		LoggerOwnerKit m_loggerKit; /// @brief Logger and sub-logger that are owned by the @p Engine.
-		Window::IEngineWindow* m_window; /// @brief Engine window. It can be nullptr.
+		LoggerManager* m_loggerManager; /// @brief Logger and sub-logger that are owned by the @p Engine.
+		WindowManager* m_windowManager; /// @brief Engine window. It can be nullptr.
 
 		ServiceManager* m_serviceManager; /// @brief Service manager.
 		SystemManager* m_systemManager; /// @brief System manager.
@@ -83,77 +82,60 @@ namespace PonyEngine::Core
 		m_frameCount{0},
 		m_isRunning{true}
 	{
-		m_loggerKit = CreateLogger(params.loggerParams, *this);
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Initialize an engine");
+		m_loggerManager = new LoggerManager(params.subLoggerFactories, *this);
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Initialize an engine");
 
-		m_window = CreateWindow(params.windowParams, *this);
+		m_windowManager = new WindowManager(params.windowFactory, *this);
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Create a service manager")
-		m_serviceManager = new ServiceManager(params.serviceFactoryInfos, *this);
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Service manager created");
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Create a system manager");
-		m_systemManager = new SystemManager(params.systemFactoryInfos, *this);
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "System manager created");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Create a service manager")
+		m_serviceManager = new ServiceManager(params.serviceFactories, *this);
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Service manager created");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Create a system manager");
+		m_systemManager = new SystemManager(params.systemFactories, *this);
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "System manager created");
 
-		if (m_window != nullptr)
+		if (m_windowManager->GetWindow() != nullptr)
 		{
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Show an engine window");
-			m_window->ShowWindow();
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Engine window shown");
+			PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Show an engine window");
+			m_windowManager->GetWindow()->ShowWindow();
+			PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Engine window shown");
 		}
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Begin a service manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Begin a service manager");
 		m_serviceManager->Begin();
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Service manager begun");
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Begin a system manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Service manager begun");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Begin a system manager");
 		m_systemManager->Begin();
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "System manager begun");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "System manager begun");
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Engine initialized");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Engine initialized");
 	}
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Deinitialize an engine");
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "End a system manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Deinitialize an engine");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "End a system manager");
 		m_systemManager->End();
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "System manager ended");
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "End a service manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "System manager ended");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "End a service manager");
 		m_serviceManager->End();
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Service manager ended");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Service manager ended");
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Destroy a system manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Destroy a system manager");
 		delete m_systemManager;
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "System manager destroyed");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "System manager destroyed");
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Destroy a service manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Destroy a service manager");
 		delete m_serviceManager;
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Service manager destroyed");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Service manager destroyed");
 
-		if (m_window != nullptr)
-		{
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Destroy an engine window");
-			delete m_window;
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Engine window destroyed");
-		}
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Destroy an engine window");
+		delete m_windowManager;
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Engine window destroyed");
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, "Engine deinitialized");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Engine deinitialized");
 
-		for (Debug::Log::IEngineSubLogger* const subLogger : m_loggerKit.subLoggers)
-		{
-			try
-			{
-				m_loggerKit.logger->RemoveSubLogger(subLogger);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_CEXC(e, "On removing a sub logger");
-			}
-
-			delete subLogger;
-		}
-
-		delete m_loggerKit.logger;
+		delete m_loggerManager;
 	}
 
 	inline std::size_t Engine::GetFrameCount() const noexcept
@@ -163,12 +145,12 @@ namespace PonyEngine::Core
 
 	inline Debug::Log::ILogger& Engine::GetLogger() const noexcept
 	{
-		return *m_loggerKit.logger;
+		return m_loggerManager->GetLogger();
 	}
 
 	inline Window::IWindow* Engine::GetWindow() const noexcept
 	{
-		return m_window;
+		return m_windowManager->GetWindow();
 	}
 
 	inline IServiceManager& Engine::GetServiceManager() const noexcept
@@ -188,7 +170,7 @@ namespace PonyEngine::Core
 
 	inline int Engine::GetExitCode() const noexcept
 	{
-		PONY_LOG_PTR_IF(m_isRunning, m_loggerKit.logger, Debug::Log::LogType::Warning, "Got an exit code when the engine is still running");
+		PONY_LOG_IF(m_isRunning, m_loggerManager->GetLogger(), Debug::Log::LogType::Warning, "Got an exit code when the engine is still running");
 
 		return m_exitCode;
 	}
@@ -197,7 +179,7 @@ namespace PonyEngine::Core
 	{
 		if (m_isRunning)
 		{
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Info, std::format("Stop an engine with the exit code '{}'", exitCode));
+			PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, std::format("Stop an engine with the exit code '{}'", exitCode));
 			m_isRunning = false;
 			m_exitCode = exitCode;
 		}
@@ -210,13 +192,13 @@ namespace PonyEngine::Core
 			throw std::logic_error("The engine is ticked when it's already stopped.");
 		}
 
-		if (m_window != nullptr)
+		if (m_windowManager->GetWindow() != nullptr)
 		{
-			PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Verbose, "Tick an engine window");
-			m_window->Tick();
+			PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Verbose, "Tick an engine window");
+			m_windowManager->GetWindow()->Tick();
 		}
 
-		PONY_LOG_PTR(m_loggerKit.logger, Debug::Log::LogType::Verbose, "Tick a system manager");
+		PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Verbose, "Tick a system manager");
 		m_systemManager->Tick();
 
 		++m_frameCount;

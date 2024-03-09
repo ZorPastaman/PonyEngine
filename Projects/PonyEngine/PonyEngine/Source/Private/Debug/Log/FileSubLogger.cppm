@@ -22,8 +22,6 @@ import <utility>;
 
 import PonyEngine.Debug.Log;
 
-import :IEngineSubLogger;
-
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that logs to a file.
