@@ -24,70 +24,21 @@ namespace PonyEngine::Core
 	export struct EngineParams final
 	{
 	public:
-		/// @brief Creates an @p EngineParams.
 		[[nodiscard("Pure constructor")]]
-		EngineParams();
-		/// @brief Copy constructor.
-		/// @param other Copy source.
+		EngineParams() = default;
 		[[nodiscard("Pure constructor")]]
-		EngineParams(const EngineParams& other);
-		/// @brief Move constructor.
-		/// @param other Move source.
+		EngineParams(const EngineParams& other) = default;
 		[[nodiscard("Pure constructor")]]
-		EngineParams(EngineParams&& other);
+		EngineParams(EngineParams&& other) noexcept = default;
 
 		~EngineParams() noexcept = default;
 
-		EngineParams& operator =(const EngineParams& other);
-		EngineParams& operator =(EngineParams&& other) noexcept;
+		EngineParams& operator =(const EngineParams& other) = default;
+		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
-		std::vector<Debug::Log::ISubLoggerFactory*> subLoggerFactories;
-		std::vector<IServiceFactory*> serviceFactories;
-		std::vector<ISystemFactory*> systemFactories;
-		Window::IWindowFactory* windowFactory;
+		std::vector<Debug::Log::ISubLoggerFactory*> subLoggerFactories; /// @brief Sub-logger factories. Their lifetimes must exceed the engine lifetime.
+		std::vector<IServiceFactory*> serviceFactories; /// @brief Service factories. Their lifetimes must exceed the engine lifetime.
+		std::vector<ISystemFactory*> systemFactories; /// @brief System factories. Their lifetimes must exceed the engine lifetime.
+		Window::IWindowFactory* windowFactory; /// @brief Window factory. It's optional and can be nullptr. If it's not nullptr, its lifetime must exceed the engine lifetime.
 	};
-
-	EngineParams::EngineParams() :
-		subLoggerFactories{},
-		serviceFactories{},
-		systemFactories{},
-		windowFactory{}
-	{
-	}
-
-	EngineParams::EngineParams(const EngineParams& other) :
-		subLoggerFactories{other.subLoggerFactories},
-		serviceFactories{other.serviceFactories},
-		systemFactories{other.systemFactories},
-		windowFactory{other.windowFactory}
-	{
-	}
-
-	EngineParams::EngineParams(EngineParams&& other) :
-		subLoggerFactories(std::move(other.subLoggerFactories)),
-		serviceFactories(std::move(other.serviceFactories)),
-		systemFactories(std::move(other.systemFactories)),
-		windowFactory{other.windowFactory}
-	{
-	}
-
-	EngineParams& EngineParams::operator=(const EngineParams& other)
-	{
-		subLoggerFactories = other.subLoggerFactories;
-		serviceFactories = other.serviceFactories;
-		systemFactories = other.systemFactories;
-		windowFactory = other.windowFactory;
-
-		return *this;
-	}
-
-	EngineParams& EngineParams::operator=(EngineParams&& other) noexcept
-	{
-		subLoggerFactories = std::move(other.subLoggerFactories);
-		serviceFactories = std::move(other.serviceFactories);
-		systemFactories = std::move(other.systemFactories);
-		windowFactory = other.windowFactory;
-
-		return *this;
-	}
 }

@@ -27,9 +27,7 @@
     <ClCompile Include="Source\Public\Input\Input.cppm" />
     <ClCompile Include="Source\Public\Utility\INamed.cppm" />
     <ClCompile Include="Source\Public\Core\IService.cppm" />
-    <ClCompile Include="Source\Public\Core\IServiceManager.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
-    <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\Debug.Log.cppm" />
