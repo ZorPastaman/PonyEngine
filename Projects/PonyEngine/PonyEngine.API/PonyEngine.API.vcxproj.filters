@@ -60,12 +60,6 @@
     <ClCompile Include="Source\Public\Core\IService.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\IServiceManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Core\ISystemManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Utility\INamed.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

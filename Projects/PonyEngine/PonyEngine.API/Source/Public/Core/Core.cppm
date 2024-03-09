@@ -11,6 +11,4 @@ export module PonyEngine.Core;
 
 export import :IEngine;
 export import :IService;
-export import :IServiceManager;
 export import :ISystem;
-export import :ISystemManager;
