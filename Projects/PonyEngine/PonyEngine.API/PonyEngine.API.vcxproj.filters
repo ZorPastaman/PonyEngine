@@ -33,7 +33,7 @@
     <ClCompile Include="Source\Public\Window\IWindow.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Log\Debug.Log.cppm">
+    <ClCompile Include="Source\Public\Debug\Log\Log.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm">
@@ -90,7 +90,7 @@
     <ClCompile Include="Source\Public\Core\Factories\Core.Factories.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Log\Factories\Debug.Log.Factories.cppm">
+    <ClCompile Include="Source\Public\Debug\Log\Factories\Log.Factories.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Factories\Window.Factories.cppm">

@@ -9,6 +9,8 @@
 
 export module PonyEngine.Debug.Log:LogType;
 
+import <algorithm>;
+import <array>;
 import <cstdint>;
 import <format>;
 import <string>;
@@ -38,13 +40,6 @@ namespace PonyEngine::Debug::Log
 		All = Verbose | Debug | Info | Warning | Error | Exception
 	};
 
-	/// @brief Creates a string representing the @p logType.
-	/// @param logType Log type.
-	/// @param addNumber If it's true, the string will contain a number representation.
-	/// @return Created string.
-	export [[nodiscard("Pure function")]] 
-	std::string ToString(LogType logType, bool addNumber = false);
-
 	export [[nodiscard("Pure function")]] 
 	constexpr inline LogType operator ~(LogType logType) noexcept;
 
@@ -62,6 +57,31 @@ namespace PonyEngine::Debug::Log
 	/// @param logType Input source.
 	/// @return @p stream.
 	export inline std::ostream& operator <<(std::ostream& stream, LogType logType);
+
+	/// @brief Creates a string representing the @p logType.
+	/// @param logType Log type.
+	/// @param addNumber If it's true, the string will contain a number representation.
+	/// @return Created string.
+	export [[nodiscard("Pure function")]]
+	std::string ToString(LogType logType, bool addNumber = false);
+
+	/// @brief Creates a string representing the @p logType.
+	/// @param logType Log type.
+	/// @return Created string.
+	[[nodiscard("Pure function")]]
+	static std::string ToStringInternal(LogType logType);
+
+	/// @brief Log type names by index.
+	static const std::array<const char*, 7> s_logTypeNames
+	{
+		"Verbose",
+		"Debug",
+		"Info",
+		"Warning",
+		"Error",
+		"Exception",
+		"Unknown"
+	};
 
 	constexpr inline LogType operator ~(const LogType logType) noexcept
 	{
@@ -90,49 +110,7 @@ namespace PonyEngine::Debug::Log
 
 	std::string ToString(const LogType logType, const bool addNumber)
 	{
-		const std::string delimiter = " | ";
-		std::string answer;
-
-		if ((logType & LogType::Verbose) == LogType::Verbose)
-		{
-			answer += "Verbose" + delimiter;
-		}
-		if ((logType & LogType::Debug) == LogType::Debug)
-		{
-			answer += "Debug" + delimiter;
-		}
-		if ((logType & LogType::Info) == LogType::Info)
-		{
-			answer += "Info" + delimiter;
-		}
-		if ((logType & LogType::Warning) == LogType::Warning)
-		{
-			answer += "Warning" + delimiter;
-		}
-		if ((logType & LogType::Error) == LogType::Error)
-		{
-			answer += "Error" + delimiter;
-		}
-		if ((logType & LogType::Exception) == LogType::Exception)
-		{
-			answer += "Exception" + delimiter;
-		}
-
-		if (answer.empty()) [[unlikely]]
-		{
-			if (logType == LogType::None)
-			{
-				answer = "None";
-			}
-			else
-			{
-				answer = "Unknown";
-			}
-
-			answer += delimiter;
-		}
-
-		answer.erase(answer.end() - delimiter.size(), answer.end());
+		std::string answer = ToStringInternal(logType);
 
 		if (!addNumber)
 		{
@@ -141,5 +119,34 @@ namespace PonyEngine::Debug::Log
 
 		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
 		return std::format("{} ({})", answer, number);
+	}
+
+	static std::string ToStringInternal(LogType logType)
+	{
+		std::string answer;
+
+		if (logType == LogType::None)
+		{
+			answer = "None";
+		}
+		else
+		{
+			for (auto number = static_cast<std::underlying_type_t<LogType>>(logType), steps = std::underlying_type_t<LogType>{0};
+				number != std::underlying_type_t<LogType>{0};
+				number >>= 1, steps = std::min(static_cast<std::underlying_type_t<LogType>>(steps + 1), static_cast<std::underlying_type_t<LogType>>(s_logTypeNames.size() - 1)))
+			{
+				if (number & std::underlying_type_t<LogType>{1})
+				{
+					answer += s_logTypeNames[steps];
+
+					if (number >> 1)
+					{
+						answer += " | ";
+					}
+				}
+			}
+		}
+
+		return answer;
 	}
 }
