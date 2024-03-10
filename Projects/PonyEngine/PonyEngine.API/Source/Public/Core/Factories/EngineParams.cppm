@@ -10,7 +10,6 @@
 export module PonyEngine.Core.Factories:EngineParams;
 
 import <vector>;
-import <utility>;
 
 import PonyEngine.Debug.Log.Factories;
 import PonyEngine.Window.Factories;
