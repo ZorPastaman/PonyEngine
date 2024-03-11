@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math.Vector3;
+export module PonyEngine.Math:Vector3;
 
 import <array>;
 import <cmath>;
@@ -18,7 +18,7 @@ import <ostream>;
 import <string>;
 import <type_traits>;
 
-import PonyEngine.Math.Common;
+import :Common;
 
 namespace PonyEngine::Math
 {
@@ -31,19 +31,16 @@ namespace PonyEngine::Math
 		using ValueType = T; /// @brief Component type.
 		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
 
-		/// @brief Creates a default @p Vector3 where every component is zero initialized.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector3() noexcept;
+		constexpr inline Vector3() noexcept = default;
 		/// @brief Creates a @p Vector3 and assigns its components from the arguments.
 		/// @param xParam Value to assign to the @p x component.
 		/// @param yParam Value to assign to the @p y component.
 		/// @param zParam Value to assign to the @p z component.
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector3(T xParam, T yParam, T zParam) noexcept;
-		/// @brief Copy constructor.
-		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector3(const Vector3<T>& other) noexcept;
+		constexpr inline Vector3(const Vector3<T>& other) noexcept = default;
 
 		constexpr inline ~Vector3() noexcept = default;
 
@@ -94,10 +91,7 @@ namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		inline const T& operator [](std::size_t index) const noexcept;
 
-		/// @brief Copies the @p other to @a this.
-		/// @param other @p Vector to copy.
-		/// @return @a This.
-		inline Vector3<T>& operator =(const Vector3<T>& other) noexcept;
+		inline Vector3<T>& operator =(const Vector3<T>& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
 		/// @param other @p Vector to add.
 		/// @return @a This.
@@ -321,24 +315,10 @@ namespace PonyEngine::Math
 		{ &Vector3<T>::x, &Vector3<T>::y, &Vector3<T>::z };
 
 	template<Arithmetic T>
-	constexpr inline Vector3<T>::Vector3() noexcept :
-		x{},
-		y{},
-		z{}
-	{
-	}
-
-	template<Arithmetic T>
 	constexpr inline Vector3<T>::Vector3(const T xParam, const T yParam, const T zParam) noexcept :
 		x{xParam},
 		y{yParam},
 		z{zParam}
-	{
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T>::Vector3(const Vector3<T>& other) noexcept : 
-		Vector3(other.x, other.y, other.z)
 	{
 	}
 
@@ -564,16 +544,6 @@ namespace PonyEngine::Math
 		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.z) / static_cast<Vector3<T>::ComputationalType>(right.z));
 
 		return Vector3<T>(x, y, z);
-	}
-
-	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator =(const Vector3<T>& other) noexcept
-	{
-		x = other.x;
-		y = other.y;
-		z = other.z;
-
-		return *this;
 	}
 
 	template<Arithmetic T>

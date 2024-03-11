@@ -7,17 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Windows:IWindowsWindow;
+module;
 
-import <windows.h>;
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
+
+export module PonyEngine.Window.Windows:IWindowsWindow;
 
 import PonyEngine.Window;
 
 namespace PonyEngine::Window
 {
+	/// @brief Windows window interface.
 	export class IWindowsWindow : public IWindow
 	{
 	public:
+		/// @brief Gets a windows window handle.
+		/// @return Window handle.
 		virtual HWND GetWindowHandle() const noexcept = 0;
 
 	protected:

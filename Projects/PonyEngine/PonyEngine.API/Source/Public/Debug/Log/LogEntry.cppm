@@ -32,6 +32,8 @@ namespace PonyEngine::Debug::Log
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
+		[[nodiscard("Pure constructor")]]
+		LogEntry(const LogEntry& other) noexcept = default;
 
 		~LogEntry() noexcept = default;
 
@@ -39,6 +41,8 @@ namespace PonyEngine::Debug::Log
 		/// @return Created string.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
+
+		LogEntry& operator =(const LogEntry& other) noexcept = default;
 
 		const char* message; /// @brief Log message.
 		const std::exception* exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.

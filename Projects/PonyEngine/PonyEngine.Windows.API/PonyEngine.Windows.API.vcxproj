@@ -74,10 +74,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Window\Windows\Factories\Window.Windows.Factories.cppm" />
+    <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsWindow.Factories.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\IWindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\Factories\IWindowsWindowFactory.cppm" />
-    <ClCompile Include="Source\Public\Window\Windows\Window.Windows.cppm" />
+    <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

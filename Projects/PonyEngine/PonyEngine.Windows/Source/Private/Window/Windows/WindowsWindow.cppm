@@ -207,7 +207,7 @@ namespace PonyEngine::Window
 	inline void WindowsWindow::AddKeyboardMessageListener(IKeyboardListener* const keyboardMessageListener)
 	{
 		assert((keyboardMessageListener != nullptr));
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()));
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()).c_str());
 
 		m_keyboardMessageListeners.push_back(keyboardMessageListener);
 	}
@@ -220,12 +220,12 @@ namespace PonyEngine::Window
 
 		if (position != m_keyboardMessageListeners.cend()) [[likely]]
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Remove a keyboard message listener '{}'", keyboardMessageListener->GetName()));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Remove a keyboard message listener '{}'", keyboardMessageListener->GetName()).c_str());
 			m_keyboardMessageListeners.erase(position);
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageListener != nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, std::format("Tried to remove a not added keyboard message listener '{}'", keyboardMessageListener->GetName()));
+			PONY_LOG_IF(keyboardMessageListener != nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, std::format("Tried to remove a not added keyboard message listener '{}'", keyboardMessageListener->GetName()).c_str());
 		}
 	}
 
@@ -267,12 +267,12 @@ namespace PonyEngine::Window
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key down command with the code '{}'", wParam));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key down command with the code '{}'", wParam).c_str());
 			PushKeyboardKeyMessage(wParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key up command with the code '{}'", wParam));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received a key up command with the code '{}'", wParam).c_str());
 			PushKeyboardKeyMessage(wParam, false);
 			break;
 		}
@@ -299,7 +299,7 @@ namespace PonyEngine::Window
 		const std::unordered_map<WPARAM, KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeMap.find(wParam);
 		if (pair != WindowsKeyCodeMap.cend())
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Push a keyboard message to the listeners. KeyCode: '{}'. IsDown: '{}'", ToString(pair->second), isDown));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Push a keyboard message to the listeners. KeyCode: '{}'. IsDown: '{}'", ToString(pair->second), isDown).c_str());
 
 			const KeyboardMessage keyboardMessage(pair->second, isDown);
 
@@ -323,7 +323,7 @@ namespace PonyEngine::Window
 
 		if (window == nullptr) [[unlikely]]
 		{
-			PONY_CERR("Window pointer is nullptr. The window window won't receive a command.");
+			PONY_CONSOLE(Debug::Log::LogType::Error, "Window pointer is nullptr. The window window won't receive a command.");
 			return DefWindowProc(hWnd, uMsg, wParam, lParam);
 		}
 

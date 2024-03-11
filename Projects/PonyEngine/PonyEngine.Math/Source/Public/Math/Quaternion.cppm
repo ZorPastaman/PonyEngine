@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math.Quaternion;
+export module PonyEngine.Math:Quaternion;
 
 import <array>;
 import <cmath>;
@@ -18,9 +18,9 @@ import <numbers>;
 import <ostream>;
 import <string>;
 
-import PonyEngine.Math.Common;
-import PonyEngine.Math.Vector3;
-import PonyEngine.Math.Vector4;
+import :Common;
+import :Vector3;
+import :Vector4;
 
 namespace PonyEngine::Math
 {
@@ -32,26 +32,23 @@ namespace PonyEngine::Math
 	public:
 		using ValueType = T; /// @brief Component type.
 
-		/// @brief Creates a default @p Quaternion where every component is zero initialized.
 		[[nodiscard("Pure constructor")]]
-		constexpr Quaternion() noexcept;
+		constexpr inline Quaternion() noexcept = default;
 		/// @brief Creates a @p Quaternion and assigns its components from the arguments.
 		/// @param xParam Value to assign to the @p x component.
 		/// @param yParam Value to assign to the @p y component.
 		/// @param zParam Value to assign to the @p z component.
 		/// @param wParam Value to assign to the @p w component.
 		[[nodiscard("Pure constructor")]]
-		constexpr Quaternion(T xParam, T yParam, T zParam, T wParam) noexcept;
+		constexpr inline Quaternion(T xParam, T yParam, T zParam, T wParam) noexcept;
 		/// @brief Creates a @p Quaternion and assigns its components from the @p vector components.
 		/// @param vector Component values source.
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Quaternion(const Vector4<T>& vector) noexcept;
-		/// @brief Copy constructor.
-		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Quaternion(const Quaternion<T>& other) noexcept;
+		constexpr inline Quaternion(const Quaternion<T>& other) noexcept = default;
 
-		constexpr ~Quaternion() noexcept = default;
+		constexpr inline ~Quaternion() noexcept = default;
 
 		/// @brief Creates a @p Quaternion by Euler angles.
 		///        The rotation order is ZXY.
@@ -178,10 +175,7 @@ namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		inline const T& operator [](std::size_t index) const noexcept;
 
-		/// @brief Copies the @p other to @a this.
-		/// @param other @p Quaternion to copy.
-		/// @return @a This.
-		inline Quaternion<T>& operator =(const Quaternion<T>& other) noexcept;
+		inline Quaternion<T>& operator =(const Quaternion<T>& other) noexcept = default;
 		/// @brief Combines rotations of two @p Quaternions and assigns the result to @a this.
 		///        It rotates @a this first and the @p other then.
 		/// @param other Last @p Quaternion to rotate.
@@ -303,16 +297,7 @@ namespace PonyEngine::Math
 		{ &Quaternion<T>::x, &Quaternion<T>::y, &Quaternion<T>::z, &Quaternion<T>::w };
 
 	template<std::floating_point T>
-	constexpr Quaternion<T>::Quaternion() noexcept :
-		x{},
-		y{},
-		z{},
-		w{}
-	{
-	}
-
-	template<std::floating_point T>
-	constexpr Quaternion<T>::Quaternion(const T xParam, const T yParam, const T zParam, const T wParam) noexcept :
+	constexpr inline Quaternion<T>::Quaternion(const T xParam, const T yParam, const T zParam, const T wParam) noexcept :
 		x{xParam},
 		y{yParam},
 		z{zParam},
@@ -323,12 +308,6 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr inline Quaternion<T>::Quaternion(const Vector4<T>& vector) noexcept :
 		Quaternion(vector.x, vector.y, vector.z, vector.w)
-	{
-	}
-
-	template<std::floating_point T>
-	constexpr inline Quaternion<T>::Quaternion(const Quaternion<T>& other) noexcept :
-		Quaternion(other.x, other.y, other.z, other.w)
 	{
 	}
 
@@ -644,17 +623,6 @@ namespace PonyEngine::Math
 		const Vector3<T> t = Cross(u, vector) * T{2};
 
 		return vector + t * quaternion.w + Cross(u, t);
-	}
-
-	template<std::floating_point T>
-	inline Quaternion<T>& Quaternion<T>::operator =(const Quaternion<T>& other) noexcept
-	{
-		x = other.x;
-		y = other.y;
-		z = other.z;
-		w = other.w;
-
-		return *this;
 	}
 
 	template<std::floating_point T>
