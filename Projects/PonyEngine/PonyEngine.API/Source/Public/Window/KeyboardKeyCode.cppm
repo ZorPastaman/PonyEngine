@@ -9,7 +9,6 @@
 
 export module PonyEngine.Window:KeyboardKeyCode;
 
-import <algorithm>;
 import <cstdint>;
 import <ostream>;
 import <string>;

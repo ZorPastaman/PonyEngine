@@ -23,7 +23,7 @@
     <ClCompile Include="Source\Private\Window\Windows\Window.Windows.Implementation.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
-    <ClCompile Include="Source\Public\Window\Windows\Factories\Window.Windows.Factories.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsWindow.Factories.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

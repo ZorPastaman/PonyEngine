@@ -42,6 +42,6 @@ namespace PonyEngine::Window
 		virtual void Tick() = 0;
 
 	protected:
-		inline virtual ~IWindow() = default;
+		inline virtual ~IWindow() noexcept = default;
 	};
 }

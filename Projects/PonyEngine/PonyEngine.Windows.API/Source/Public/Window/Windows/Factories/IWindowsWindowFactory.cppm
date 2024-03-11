@@ -15,11 +15,15 @@ import PonyEngine.Window.Windows;
 
 namespace PonyEngine::Window
 {
+	/// @brief Windows window factory.
 	export class IWindowsWindowFactory : public IWindowFactory
 	{
 	public:
+		/// @brief Creates a windows window.
+		/// @param engine Engine that owns the window.
+		/// @return Created windows window.
 		[[nodiscard("Pure function")]]
-		virtual IWindowsWindow* Create(Core::IEngine& engine) = 0;
+		virtual IWindowsWindow* Create(Core::IEngine& engine) override = 0;
 
 	protected:
 		inline virtual ~IWindowsWindowFactory() noexcept = default;

@@ -15,11 +15,15 @@ import PonyEngine.Input;
 
 namespace PonyEngine::Input
 {
+	/// @brief Input system factory.
 	export class IInputSystemFactory : public Core::ISystemFactory
 	{
 	public:
+		/// @brief Creates an input system.
+		/// @param engine Engine that owns the system.
+		/// @return Created system.
 		[[nodiscard("Pure function")]]
-		virtual IInputSystem* Create(Core::IEngine& engine) = 0;
+		virtual IInputSystem* Create(Core::IEngine& engine) override = 0;
 
 	protected:
 		inline virtual ~IInputSystemFactory() noexcept = default;
