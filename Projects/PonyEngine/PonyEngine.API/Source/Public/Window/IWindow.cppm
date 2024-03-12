@@ -22,11 +22,11 @@ namespace PonyEngine::Window
 		/// @brief Gets a window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual std::string GetTitle() const = 0;
+		virtual std::wstring GetTitle() const = 0;
 		/// @brief Sets a window title.
 		/// @param title Window title to set.
 		/// @return @a True if the procedure is successful; @a false otherwise.
-		virtual bool SetTitle(const std::string& title) = 0;
+		virtual bool SetTitle(const std::wstring& title) = 0;
 
 		/// @brief Adds a keyboard input listener.
 		/// @param keyboardMessageListener Keyboard input listener. Mustn't be nullptr.

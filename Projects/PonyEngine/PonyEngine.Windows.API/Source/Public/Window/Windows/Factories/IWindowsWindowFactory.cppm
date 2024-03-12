@@ -25,6 +25,14 @@ namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual IWindowsWindow* Create(Core::IEngine& engine) override = 0;
 
+		/// @brief Gets a cmdShow of the next window.
+		/// @return CmdShow.
+		[[nodiscard("Pure function")]]
+		virtual int GetCmdShow() const noexcept = 0;
+		/// @brief Sets a cmdShow of the next window.
+		/// @param cmdShow CmdShow.
+		virtual void SetCmdShow(int cmdShow) noexcept = 0;
+
 	protected:
 		inline virtual ~IWindowsWindowFactory() noexcept = default;
 	};

@@ -7,11 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#define WIN32_LEAN_AND_MEAN 
+#include <windows.h>
+
 export module PonyEngine.Window.Windows.Implementation:WindowsKeyCodeMap;
 
 import <unordered_map>;
-
-import <windows.h>;
 
 import PonyEngine.Window;
 

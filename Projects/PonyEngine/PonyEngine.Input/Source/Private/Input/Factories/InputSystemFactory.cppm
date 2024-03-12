@@ -15,7 +15,7 @@ import PonyEngine.Input.Implementation;
 
 namespace PonyEngine::Input
 {
-	export class InputSystemFactory : public IInputSystemFactory
+	export class InputSystemFactory final : public IInputSystemFactory
 	{
 	public:
 		[[nodiscard("Pure function")]]

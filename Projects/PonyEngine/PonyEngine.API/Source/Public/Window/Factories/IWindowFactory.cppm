@@ -9,6 +9,8 @@
 
 export module PonyEngine.Window.Factories:IWindowFactory;
 
+import <string>;
+
 import PonyEngine.Core;
 import PonyEngine.Window;
 
@@ -25,7 +27,15 @@ namespace PonyEngine::Window
 		virtual IWindow* Create(Core::IEngine& engine) = 0;
 		/// @brief Destroys a previously created window.
 		/// @param window Window to destroy.
-		virtual void Destroy(IWindow* window) = 0;
+		virtual void Destroy(IWindow* window) noexcept = 0;
+
+		/// @brief Gets a title of the next created window.
+		/// @return Window title.
+		[[nodiscard("Pure function")]]
+		virtual std::wstring GetTitle() const noexcept = 0;
+		/// @brief Sets a title of the next created window.
+		/// @param title Window title.
+		virtual void SetTitle(const std::wstring& title) noexcept = 0;
 
 	protected:
 		inline virtual ~IWindowFactory() noexcept = default;

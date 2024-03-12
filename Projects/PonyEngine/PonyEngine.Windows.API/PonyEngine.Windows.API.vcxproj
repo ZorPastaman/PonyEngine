@@ -74,6 +74,7 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Window\Windows\Factories\WindowClassParams.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsWindow.Factories.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\IWindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\Factories\IWindowsWindowFactory.cppm" />
