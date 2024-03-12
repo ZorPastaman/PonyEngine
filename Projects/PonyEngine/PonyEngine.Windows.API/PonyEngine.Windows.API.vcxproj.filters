@@ -27,5 +27,8 @@
     <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsWindow.Factories.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Window\Windows\Factories\WindowClassParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

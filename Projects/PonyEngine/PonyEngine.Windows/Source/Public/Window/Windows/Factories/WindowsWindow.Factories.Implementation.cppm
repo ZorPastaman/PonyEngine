@@ -9,7 +9,8 @@
 
 export module PonyEngine.Window.Windows.Factories.Implementation;
 
-import <string>;
+// TODO: move cassert to global
+import <cassert>;
 
 import PonyEngine.Window.Windows.Factories;
 
@@ -17,16 +18,23 @@ import :WindowsWindowFactory;
 
 namespace PonyEngine::Window
 {
-	export __declspec(dllexport) IWindowsWindowFactory* CreateWindowsWindowFactory(std::string title);
-	export __declspec(dllexport) void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory);
+	/// @brief Creates a Windows window factory.
+	/// @param classParams Class parameters.
+	/// @return Created factory.
+	export [[nodiscard("Pure function")]]
+	__declspec(dllexport) IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams);
+	/// @brief Destroys a previously created Windows window factory.
+	/// @param factory Previously created Windows window factory.
+	export __declspec(dllexport) void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
 
-	IWindowsWindowFactory* CreateWindowsWindowFactory(std::string title)
+	IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams)
 	{
-		return new WindowsWindowFactory(title);
+		return new WindowsWindowFactory(classParams);
 	}
 
-	void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory)
+	void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept
 	{
+		assert((dynamic_cast<WindowsWindowFactory*>(factory) != nullptr));
 		delete static_cast<WindowsWindowFactory*>(factory);
 	}
 }

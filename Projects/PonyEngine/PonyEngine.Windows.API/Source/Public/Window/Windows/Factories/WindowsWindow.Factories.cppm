@@ -9,4 +9,5 @@
 
 export module PonyEngine.Window.Windows.Factories;
 
+export import :WindowClassParams;
 export import :IWindowsWindowFactory;

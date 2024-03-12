@@ -21,7 +21,7 @@ namespace PonyEngine::Window
 	public:
 		/// @brief Receives a new keyboard input.
 		/// @param keyboardMessage Keyboard message.
-		virtual void Listen(KeyboardMessage keyboardMessage) noexcept = 0;
+		virtual void Listen(KeyboardMessage keyboardMessage) = 0;
 
 	protected:
 		inline virtual ~IKeyboardListener() noexcept = default;

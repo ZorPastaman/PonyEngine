@@ -9,5 +9,7 @@
 
 export module PonyEngine.Window.Windows.Implementation;
 
+export import :WindowParams;
+export import :WindowProc;
 export import :WindowsKeyCodeMap;
 export import :WindowsWindow;

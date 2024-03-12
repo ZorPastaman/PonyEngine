@@ -17,12 +17,14 @@ namespace PonyEngine::Window
 	export struct KeyboardMessage final
 	{
 	public:
-		/// @brief Creates an empty keyboard message.
+		[[nodiscard("Pure constructor")]]
 		constexpr inline KeyboardMessage() noexcept = default;
 		/// @brief Create a keyboard message.
 		/// @param keyCode Key code.
 		/// @param isDown @a True if the key is pressed; @a false if it's unpressed.
+		[[nodiscard("Pure constructor")]]
 		constexpr inline KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr inline KeyboardMessage(const KeyboardMessage& other) noexcept = default;
 		
 		constexpr inline ~KeyboardMessage() noexcept = default;

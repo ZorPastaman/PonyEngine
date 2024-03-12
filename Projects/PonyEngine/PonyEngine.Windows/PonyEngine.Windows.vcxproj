@@ -20,7 +20,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Window\Windows\Factories\WindowsWindowFactory.cppm" />
-    <ClCompile Include="Source\Private\Window\Windows\Window.Windows.Implementation.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\Windows.Window.Implementation.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsWindow.Factories.Implementation.cppm" />
