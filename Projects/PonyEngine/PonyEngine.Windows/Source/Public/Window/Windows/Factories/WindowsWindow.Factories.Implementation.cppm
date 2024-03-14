@@ -7,10 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Windows.Factories.Implementation;
+module;
 
-// TODO: move cassert to global
-import <cassert>;
+#include <cassert>
+
+export module PonyEngine.Window.Windows.Factories.Implementation;
 
 import PonyEngine.Window.Windows.Factories;
 

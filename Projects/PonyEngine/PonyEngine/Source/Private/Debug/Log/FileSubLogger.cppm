@@ -45,10 +45,10 @@ namespace PonyEngine::Debug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
-		/// @brief Move assignment.
-		/// @param other Move source.
-		/// @return @a This.
-		inline FileSubLogger& operator =(FileSubLogger&& other) noexcept;
+		FileSubLogger& operator =(const FileSubLogger&) = delete;
+		inline FileSubLogger& operator =(FileSubLogger&& other) noexcept = default;
+
+		static const char* const Name;
 
 	private:
 		std::ofstream m_logFile; /// @brief log file stream.
@@ -59,7 +59,7 @@ namespace PonyEngine::Debug::Log
 	{
 		if (!m_logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error("Log file isn't opened.");
+			throw std::logic_error("Log file isn't open.");
 		}
 	}
 
@@ -68,7 +68,7 @@ namespace PonyEngine::Debug::Log
 	{
 		if (!m_logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error("Log file isn't opened.");
+			throw std::logic_error("Log file isn't open.");
 		}
 	}
 
@@ -82,14 +82,14 @@ namespace PonyEngine::Debug::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CEXC(e, "On closing a log file.");
+				PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On closing a log file"));
 			}
 		}
 	}
 
 	inline const char* FileSubLogger::GetName() const noexcept
 	{
-		return "PonyEngine::Debug::Log::FileSubLogger";
+		return Name;
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
@@ -100,14 +100,9 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CEXC(e, "On writing to a log file.");
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a log file"));
 		}
 	}
 
-	inline FileSubLogger& FileSubLogger::operator =(FileSubLogger&& other) noexcept
-	{
-		m_logFile = std::move(other.m_logFile);
-
-		return *this;
-	}
+	const char* const FileSubLogger::Name = "PonyEngine::Debug::Log::FileSubLogger";
 }

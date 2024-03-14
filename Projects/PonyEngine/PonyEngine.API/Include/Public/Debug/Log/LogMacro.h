@@ -50,6 +50,7 @@
 #define PONY_COUT_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK)
 #define PONY_CLOG_MASK PONY_LOG_WARNING_MASK
 #define PONY_CERR_MASK PONY_LOG_ERROR_MASK
+#define PONY_CEXC_MASK PONY_LOG_EXCEPTION_MASK
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param logger PonyEngine::Debug::Log::ILogger reference.
@@ -181,6 +182,10 @@
 	{ \
 		std::cerr << message << std::endl; \
 	} \
+	else if constexpr ((logType & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	{ \
+		std::cerr << message << std::endl; \
+	} \
 }
 
 /// @brief Log macro that conditionally puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
@@ -205,6 +210,13 @@
 		} \
 	} \
 	else if constexpr ((logType & PONY_CERR_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	{ \
+		if (condition) \
+		{ \
+			std::cerr << message << std::endl; \
+		} \
+	} \
+	else if constexpr ((logType & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
 		if (condition) \
 		{ \

@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>
 
@@ -17,7 +19,6 @@ module;
 export module PonyEngine.Window.Windows.Implementation:WindowsWindow;
 
 import <algorithm>;
-import <cassert>;
 import <format>;
 import <exception>;
 import <iostream>;
@@ -28,6 +29,7 @@ import <vector>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
+import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 
@@ -48,8 +50,7 @@ namespace PonyEngine::Window
 		[[nodiscard("Pure constructor")]]
 		WindowsWindow(Core::IEngine& engine, HINSTANCE hInstance, const std::wstring& className, const WindowParams& windowParams);
 		WindowsWindow(const WindowsWindow&) = delete;
-		[[nodiscard("Pure constructor")]]
-		WindowsWindow(WindowsWindow&& other) = default;
+		WindowsWindow(WindowsWindow&&) = delete;
 
 		virtual ~WindowsWindow() noexcept;
 
@@ -72,6 +73,9 @@ namespace PonyEngine::Window
 		/// @return Process result.
 		LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+		WindowsWindow& operator =(const WindowsWindow&) = delete;
+		WindowsWindow& operator =(WindowsWindow&&) = delete;
+
 	private:
 		/// @brief Updates a window cursor.
 		void UpdateCursor();
@@ -93,7 +97,7 @@ namespace PonyEngine::Window
 		m_engine{engine},
 		m_nCmdShow{windowParams.cmdShow}
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create a window of the class '{}'", std::string(className.cbegin(), className.cend())).c_str());
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create a window of the class '{}'", Utility::ConvertToString(className)).c_str());
 		m_hWnd = CreateWindowEx(
 			0,
 			className.c_str(),
@@ -110,7 +114,7 @@ namespace PonyEngine::Window
 		{
 			throw std::logic_error("Windows hasn't created a window.");
 		}
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Window of the class '{}' created", std::string(className.cbegin(), className.cend())).c_str());
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Window of the class '{}' created", Utility::ConvertToString(className)).c_str());
 
 		SetWindowLongPtr(m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
 	}

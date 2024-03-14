@@ -7,9 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Implementation;
+module;
 
-import <cassert>;
+#include <cassert>
+
+export module PonyEngine.Core.Implementation;
 
 import PonyEngine.Core;
 

@@ -17,21 +17,24 @@ namespace PonyEngine::Input
 	export struct Event final
 	{
 	public:
+		inline Event() noexcept = default;
 		/// @brief Creates an input event.
 		/// @param expectedMessage The event is raised if the input system receives such an event.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Event(Window::KeyboardMessage expectedMessage) noexcept;
+		inline Event(Window::KeyboardMessage expectedMessage) noexcept;
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Event(const Event& other) noexcept = default;
+		inline Event(const Event& other) noexcept = default;
+		inline Event(Event&& other) noexcept = default;
 
-		constexpr inline ~Event() noexcept = default;
+		inline ~Event() noexcept = default;
 
-		constexpr inline Event& operator =(const Event& other) noexcept = default;
+		inline Event& operator =(const Event& other) noexcept = default;
+		inline Event& operator =(Event&& other) noexcept = default;
 
 		Window::KeyboardMessage expectedMessage; /// @brief The event is raised if the input system receives such an event.
 	};
 
-	constexpr inline Event::Event(const Window::KeyboardMessage expectedMessage) noexcept :
+	inline Event::Event(const Window::KeyboardMessage expectedMessage) noexcept :
 		expectedMessage{expectedMessage}
 	{
 	}

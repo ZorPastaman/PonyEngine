@@ -26,6 +26,8 @@ namespace PonyEngine::Core
 		/// @param service Service to destroy.
 		virtual void Destroy(IService* service) noexcept = 0;
 
+		virtual const char* GetServiceName() const noexcept = 0;
+
 	protected:
 		inline virtual ~IServiceFactory() noexcept = default;
 	};

@@ -7,9 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Debug.Log:LogEntry;
 
-import <cassert>;
 import <chrono>;
 import <cstddef>;
 import <exception>;
@@ -34,6 +37,7 @@ namespace PonyEngine::Debug::Log
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const LogEntry& other) noexcept = default;
+		LogEntry(LogEntry&&) = delete;
 
 		~LogEntry() noexcept = default;
 
@@ -43,6 +47,7 @@ namespace PonyEngine::Debug::Log
 		std::string ToString() const;
 
 		LogEntry& operator =(const LogEntry& other) noexcept = default;
+		LogEntry& operator =(LogEntry&&) = delete;
 
 		const char* message; /// @brief Log message.
 		const std::exception* exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
