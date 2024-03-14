@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Debug.Log.Factories.Implementation:ConsoleSubLoggerFactory;
 
 import PonyEngine.Debug.Log.Implementation;
@@ -17,21 +21,35 @@ namespace PonyEngine::Debug::Log
 	export class ConsoleSubLoggerFactory final : public ISubLoggerFactory
 	{
 	public:
-		ConsoleSubLoggerFactory() = default;
-		~ConsoleSubLoggerFactory() = default;
+		inline ConsoleSubLoggerFactory() = default;
+		ConsoleSubLoggerFactory(const ConsoleSubLoggerFactory&) = delete;
+		ConsoleSubLoggerFactory(ConsoleSubLoggerFactory&&) = delete;
+
+		inline ~ConsoleSubLoggerFactory() = default;
 
 		[[nodiscard("Pure function")]]
 		virtual ISubLogger* Create(Core::IEngine& engine) override;
-		virtual void Destroy(ISubLogger* subLogger) override;
+		virtual void Destroy(ISubLogger* subLogger) noexcept override;
+
+		virtual const char* GetSubLoggerName() const noexcept override;
+
+		ConsoleSubLoggerFactory& operator =(const ConsoleSubLoggerFactory&) = delete;
+		ConsoleSubLoggerFactory& operator =(ConsoleSubLoggerFactory&&) = delete;
 	};
 
-	ISubLogger* ConsoleSubLoggerFactory::Create(Core::IEngine& engine)
+	ISubLogger* ConsoleSubLoggerFactory::Create(Core::IEngine&)
 	{
 		return new ConsoleSubLogger();
 	}
 
-	void ConsoleSubLoggerFactory::Destroy(ISubLogger* subLogger)
+	void ConsoleSubLoggerFactory::Destroy(ISubLogger* subLogger) noexcept
 	{
+		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) != nullptr));
 		delete static_cast<ConsoleSubLogger*>(subLogger);
+	}
+
+	const char* ConsoleSubLoggerFactory::GetSubLoggerName() const noexcept
+	{
+		return ConsoleSubLogger::Name;
 	}
 }

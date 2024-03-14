@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #define WIN32_LEAN_AND_MEAN 
 #include <windows.h>
 
@@ -16,13 +18,13 @@ module;
 
 export module PonyEngine.Window.Windows.Factories.Implementation:WindowsWindowFactory;
 
-import <cassert>;
 import <format>;
 import <iostream>;
 import <string>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
+import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 import PonyEngine.Window.Windows.Factories;
@@ -55,7 +57,8 @@ namespace PonyEngine::Window
 		inline virtual int GetCmdShow() const noexcept override;
 		inline virtual void SetCmdShow(int cmdShow) noexcept override;
 
-		// TODO: delete assignment operators.
+		WindowsWindowFactory& operator =(const WindowsWindowFactory&) = delete;
+		WindowsWindowFactory& operator =(WindowsWindowFactory&&) = delete;
 
 	private:
 		WindowParams m_windowParams; /// @brief Window parameters.
@@ -81,16 +84,16 @@ namespace PonyEngine::Window
 		wc.hInstance = m_hInstance;
 		wc.lpszClassName = m_className.c_str();
 
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Register a window class '{}'.", std::string(m_className.cbegin(), m_className.cend())));
+		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Register a window class '{}'.", Utility::ConvertToString(m_className)));
 		RegisterClass(&wc);
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' registered.", std::string(m_className.cbegin(), m_className.cend())));
+		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' registered.", Utility::ConvertToString(m_className)));
 	}
 
 	WindowsWindowFactory::~WindowsWindowFactory()
 	{
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Unregister a window class '{}'.", std::string(m_className.cbegin(), m_className.cend())));
+		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Unregister a window class '{}'.", Utility::ConvertToString(m_className)));
 		UnregisterClass(m_className.c_str(), m_hInstance);
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' unregistered.", std::string(m_className.cbegin(), m_className.cend())));
+		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' unregistered.", Utility::ConvertToString(m_className)));
 	}
 
 	inline IWindowsWindow* WindowsWindowFactory::Create(Core::IEngine& engine)

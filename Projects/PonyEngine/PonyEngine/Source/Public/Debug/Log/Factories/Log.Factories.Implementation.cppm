@@ -9,6 +9,8 @@
 
 export module PonyEngine.Debug.Log.Factories.Implementation;
 
+import <filesystem>;
+
 import PonyEngine.Debug.Log.Factories;
 
 import :ConsoleSubLoggerFactory;
@@ -19,7 +21,7 @@ namespace PonyEngine::Debug::Log
 	export ISubLoggerFactory* CreateConsoleSubLoggerFactory();
 	export void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger);
 
-	export ISubLoggerFactory* CreateFileSubLoggerFactory();
+	export ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path);
 	export void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger);
 
 	ISubLoggerFactory* CreateConsoleSubLoggerFactory()
@@ -32,9 +34,9 @@ namespace PonyEngine::Debug::Log
 		delete static_cast<ConsoleSubLoggerFactory*>(subLogger);
 	}
 
-	ISubLoggerFactory* CreateFileSubLoggerFactory()
+	ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path)
 	{
-		return new FileSubLoggerFactory();
+		return new FileSubLoggerFactory(path);
 	}
 
 	void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger)

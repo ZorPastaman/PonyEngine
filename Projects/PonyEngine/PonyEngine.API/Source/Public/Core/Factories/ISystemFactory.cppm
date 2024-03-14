@@ -26,6 +26,8 @@ namespace PonyEngine::Core
 		/// @param system System to destroy.
 		virtual void Destroy(ISystem* system) noexcept = 0;
 
+		virtual const char* GetSystemName() const noexcept = 0;
+
 	protected:
 		inline virtual ~ISystemFactory() noexcept = default;
 	};

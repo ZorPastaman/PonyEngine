@@ -19,14 +19,14 @@ export import :Logger;
 namespace PonyEngine::Debug::Log
 {
 	export ILogger* CreateLogger(Core::IEngine& engine);
-	export void DestroyLogger(ILogger* logger);
+	export void DestroyLogger(ILogger* logger) noexcept;
 
 	ILogger* CreateLogger(Core::IEngine& engine)
 	{
 		return new Logger(engine);
 	}
 
-	void DestroyLogger(ILogger* logger)
+	void DestroyLogger(ILogger* logger) noexcept
 	{
 		delete static_cast<Logger*>(logger);
 	}

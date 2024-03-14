@@ -9,14 +9,14 @@
 
 module;
 
+#include <cassert>
+
 #include "Debug/Log/LogMacro.h"
 
 export module PonyEngine.Core.Implementation:ServiceManager;
 
-import <algorithm>;
-import <cassert>;
-import <cstddef>;
 import <exception>;
+import <format>;
 import <functional>;
 import <iostream>;
 import <string>;
@@ -29,8 +29,8 @@ import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Core
 {
-	/// @brief Holder and ticker of services.
-	export class ServiceManager final : public IServiceManager
+	/// @brief Holder of services.
+	export class ServiceManager final
 	{
 	public:
 		/// @brief Creates a @p ServiceManager.
@@ -39,72 +39,62 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		ServiceManager(const std::vector<IServiceFactory*>& serviceFactories, IEngine& engine);
 		ServiceManager(const ServiceManager&) = delete;
-		/// @brief Move constructor.
-		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		inline ServiceManager(ServiceManager&& other) noexcept;
+		inline ServiceManager(ServiceManager&& other) noexcept = default;
 
-		virtual ~ServiceManager() noexcept;
+		~ServiceManager() noexcept;
 
+		/// @brief Finds a service with the @p predicate.
+		/// @param predicate Predicate.
+		/// @return Found service. May be nullptr.
 		[[nodiscard("Pure function")]]
-		virtual IService* FindService(const std::function<bool(const IService*)>& predicate) const override;
+		IService* FindService(const std::function<bool(const IService*)>& predicate) const;
 
 		/// @brief Begins services.
-		void Begin();
+		/// @details Call this after a creation of a @p ServiceManager.
+		void Begin() const;
 		/// @brief Ends services.
-		void End() noexcept;
+		/// @details Call this before a destruction of a @p ServiceManager.
+		void End() const noexcept;
+
+		ServiceManager& operator =(const ServiceManager&) = delete;
+		inline ServiceManager& operator =(ServiceManager&& other) noexcept = default;
 
 	private:
-		std::vector<IService*> m_services; /// @brief Services.
-		std::vector<IServiceFactory*> m_serviceFactories; /// @brief Service factories. Must be synchronized with @p m_services by index.
-
+		std::vector<std::pair<IService*, IServiceFactory*>> m_services; /// @brief Pairs of a service and a service factory that was used to create the service.
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
 	ServiceManager::ServiceManager(const std::vector<IServiceFactory*>& serviceFactories, IEngine& engine) :
 		m_services{},
-		m_serviceFactories{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create services");
 
-		for (IServiceFactory* const serviceFactory : serviceFactories)
+		for (IServiceFactory* const factory : serviceFactories)
 		{
-			assert((serviceFactory != nullptr));
-
-			IService* const service = serviceFactory->Create(engine);
+			assert((factory != nullptr));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create '{}'", factory->GetServiceName()).c_str());
+			IService* const service = factory->Create(engine);
 			assert((service != nullptr));
-			m_services.push_back(service);
-			m_serviceFactories.push_back(serviceFactory);
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, service->GetName());
+			m_services.push_back(std::pair(service, factory));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' created", service->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services created");
-	}
-
-	inline ServiceManager::ServiceManager(ServiceManager&& other) noexcept :
-		m_services(std::move(other.m_services)),
-		m_serviceFactories(std::move(other.m_serviceFactories)),
-		m_engine{other.m_engine}
-	{
 	}
 
 	ServiceManager::~ServiceManager() noexcept
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy services");
 
-		for (std::size_t i = 0, count = m_services.size(), index = count - i - 1; i < count; ++i, index = count - i - 1)
+		for (std::vector<std::pair<IService*, IServiceFactory*>>::const_reverse_iterator it = m_services.crbegin(); it != m_services.crend(); ++it)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_services[index]->GetName());
-
-			try
-			{
-				m_serviceFactories[index]->Destroy(m_services[index]);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(m_engine.GetLogger(), e, "On destroying a service");
-			}
+			IService* const service = it->first;
+			IServiceFactory* const factory = it->second;
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Destroy '{}'", service->GetName()).c_str());
+			factory->Destroy(service);
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' destroyed", factory->GetServiceName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services destroyed");
@@ -114,48 +104,49 @@ namespace PonyEngine::Core
 	{
 		assert((predicate));
 
-		for (IService* const service : m_services)
+		for (const std::pair<IService*, IServiceFactory*> serviceFactory : m_services)
 		{
-			if (predicate(service))
+			if (predicate(serviceFactory.first))
 			{
-				return service;
+				return serviceFactory.first;
 			}
 		}
 
 		return nullptr;
 	}
 
-	void ServiceManager::Begin()
+	void ServiceManager::Begin() const
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Begin services");
 
-		for (IService* const service : m_services)
+		for (const std::pair<IService*, IServiceFactory*> serviceFactory : m_services)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, service->GetName());
-			service->Begin();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Begin '{}'", serviceFactory.first->GetName()).c_str()); // TODO: safe format
+			serviceFactory.first->Begin();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' begun", serviceFactory.first->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services begun");
 	}
 
-	void ServiceManager::End() noexcept
+	void ServiceManager::End() const noexcept
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End services");
 
-		for (std::vector<IService*>::reverse_iterator serviceIterator = m_services.rbegin(); serviceIterator != m_services.rend(); ++serviceIterator)
+		for (std::vector<std::pair<IService*, IServiceFactory*>>::const_reverse_iterator it = m_services.crbegin(); it != m_services.crend(); ++it)
 		{
-			IService* const service = *serviceIterator;
-
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, service->GetName());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("End '{}'", it->first->GetName()).c_str());
 
 			try
 			{
-				service->End();
+				it->first->End();
 			}
 			catch (const std::exception& e)
 			{
 				PONY_LOG_E(m_engine.GetLogger(), e, "On ending a service");
 			}
+
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' ended", it->first->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services ended");

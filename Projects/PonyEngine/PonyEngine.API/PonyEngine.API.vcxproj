@@ -21,6 +21,7 @@
     <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\IInputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\Input.Factories.cppm" />
+    <ClCompile Include="Source\Public\Utility\StringUtility.cppm" />
     <ClCompile Include="Source\Public\Window\Factories\IWindowFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Event.cppm" />
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />

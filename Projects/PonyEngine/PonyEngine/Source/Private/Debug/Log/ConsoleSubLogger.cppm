@@ -37,6 +37,11 @@ namespace PonyEngine::Debug::Log
 		inline virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
+
+		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
+		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
+
+		static const char* const Name;
 	};
 
 	/// @brief Chooses a console output stream by the @p logType.
@@ -47,7 +52,7 @@ namespace PonyEngine::Debug::Log
 
 	inline const char* ConsoleSubLogger::GetName() const noexcept
 	{
-		return "PonyEngine::Debug::Log::ConsoleSubLogger";
+		return Name;
 	}
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
@@ -59,7 +64,7 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CEXC(e, "On writing to a console.");
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a console"));
 		}
 	}
 
@@ -80,4 +85,6 @@ namespace PonyEngine::Debug::Log
 			throw std::invalid_argument("logType has an incorrect value.");
 		}
 	}
+
+	const char* const ConsoleSubLogger::Name = "PonyEngine::Debug::Log::ConsoleSubLogger";
 }

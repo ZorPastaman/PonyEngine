@@ -18,24 +18,26 @@ namespace PonyEngine::Window
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		constexpr inline KeyboardMessage() noexcept = default;
+		inline KeyboardMessage() noexcept = default;
 		/// @brief Create a keyboard message.
 		/// @param keyCode Key code.
 		/// @param isDown @a True if the key is pressed; @a false if it's unpressed.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept;
+		inline KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept;
 		[[nodiscard("Pure constructor")]]
-		constexpr inline KeyboardMessage(const KeyboardMessage& other) noexcept = default;
+		inline KeyboardMessage(const KeyboardMessage& other) noexcept = default;
+		inline KeyboardMessage(KeyboardMessage&& other) noexcept = default;
 		
-		constexpr inline ~KeyboardMessage() noexcept = default;
+		inline ~KeyboardMessage() noexcept = default;
 
-		constexpr inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept = default;
+		inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept = default;
+		inline KeyboardMessage& operator =(KeyboardMessage&& other) noexcept = default;
 
 		KeyboardKeyCode keyCode; /// @brief Key code.
 		bool isDown; /// @brief @a True if the key is pressed; @a false if it's unpressed.
 	};
 
-	constexpr inline KeyboardMessage::KeyboardMessage(const KeyboardKeyCode keyCode, const bool isDown) noexcept :
+	inline KeyboardMessage::KeyboardMessage(const KeyboardKeyCode keyCode, const bool isDown) noexcept :
 		keyCode{keyCode},
 		isDown{isDown}
 	{
