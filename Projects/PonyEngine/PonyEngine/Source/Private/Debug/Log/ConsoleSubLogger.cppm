@@ -41,7 +41,7 @@ namespace PonyEngine::Debug::Log
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
 
-		static const char* const Name;
+		static const char* const Name; /// @brief Class name.
 	};
 
 	/// @brief Chooses a console output stream by the @p logType.
