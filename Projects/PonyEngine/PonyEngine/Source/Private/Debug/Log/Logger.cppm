@@ -22,7 +22,6 @@ import <exception>;
 import <iostream>;
 import <string>;
 import <vector>;
-import <utility>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
@@ -54,7 +53,6 @@ namespace PonyEngine::Debug::Log
 
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief Sub-loggers container.
-
 		const Core::IEngine& m_engine; /// @brief Engine that owns this logger.
 	};
 

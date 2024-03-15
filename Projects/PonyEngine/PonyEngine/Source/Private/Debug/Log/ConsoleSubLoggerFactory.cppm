@@ -11,44 +11,48 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Debug.Log.Factories.Implementation:ConsoleSubLoggerFactory;
+export module PonyEngine.Debug.Log.Implementation:ConsoleSubLoggerFactory;
 
-import PonyEngine.Debug.Log.Implementation;
 import PonyEngine.Debug.Log.Factories;
+
+import :ConsoleSubLogger;
 
 namespace PonyEngine::Debug::Log
 {
+	/// @brief Console sub-logger factory.
 	export class ConsoleSubLoggerFactory final : public ISubLoggerFactory
 	{
 	public:
-		inline ConsoleSubLoggerFactory() = default;
+		[[nodiscard("Pure constructor")]]
+		inline ConsoleSubLoggerFactory() noexcept = default;
 		ConsoleSubLoggerFactory(const ConsoleSubLoggerFactory&) = delete;
 		ConsoleSubLoggerFactory(ConsoleSubLoggerFactory&&) = delete;
 
-		inline ~ConsoleSubLoggerFactory() = default;
+		inline virtual ~ConsoleSubLoggerFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual ISubLogger* Create(Core::IEngine& engine) override;
-		virtual void Destroy(ISubLogger* subLogger) noexcept override;
+		inline virtual ISubLogger* Create(Core::IEngine&) override;
+		inline virtual void Destroy(ISubLogger* subLogger) noexcept override;
 
-		virtual const char* GetSubLoggerName() const noexcept override;
+		[[nodiscard("Pure function")]]
+		inline virtual const char* GetSubLoggerName() const noexcept override;
 
 		ConsoleSubLoggerFactory& operator =(const ConsoleSubLoggerFactory&) = delete;
 		ConsoleSubLoggerFactory& operator =(ConsoleSubLoggerFactory&&) = delete;
 	};
 
-	ISubLogger* ConsoleSubLoggerFactory::Create(Core::IEngine&)
+	inline ISubLogger* ConsoleSubLoggerFactory::Create(Core::IEngine&)
 	{
 		return new ConsoleSubLogger();
 	}
 
-	void ConsoleSubLoggerFactory::Destroy(ISubLogger* subLogger) noexcept
+	inline void ConsoleSubLoggerFactory::Destroy(ISubLogger* const subLogger) noexcept
 	{
 		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) != nullptr));
 		delete static_cast<ConsoleSubLogger*>(subLogger);
 	}
 
-	const char* ConsoleSubLoggerFactory::GetSubLoggerName() const noexcept
+	inline const char* ConsoleSubLoggerFactory::GetSubLoggerName() const noexcept
 	{
 		return ConsoleSubLogger::Name;
 	}

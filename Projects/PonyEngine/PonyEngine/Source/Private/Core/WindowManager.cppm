@@ -30,6 +30,7 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		WindowManager(Window::IWindowFactory* windowFactory, IEngine& engine);
 		WindowManager(const WindowManager&) = delete;
+		[[nodiscard("Pure constructor")]]
 		inline WindowManager(WindowManager&& other) noexcept = default;
 
 		~WindowManager() noexcept;

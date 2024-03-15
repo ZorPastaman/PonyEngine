@@ -21,6 +21,7 @@ import <iostream>;
 import <stdexcept>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
