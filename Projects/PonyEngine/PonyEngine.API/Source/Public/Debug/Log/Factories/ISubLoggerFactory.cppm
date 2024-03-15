@@ -27,6 +27,8 @@ namespace PonyEngine::Debug::Log
 		/// @param subLogger Sub-logger to destroy.
 		virtual void Destroy(ISubLogger* subLogger) noexcept = 0;
 
+		/// @brief Gets a sub-logger name.
+		/// @return Sub-logger name.
 		virtual const char* GetSubLoggerName() const noexcept = 0;
 
 	protected:

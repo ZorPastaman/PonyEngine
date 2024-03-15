@@ -49,7 +49,7 @@ namespace PonyEngine::Debug::Log
 		/// @brief Move assignment
 		/// @param other Move source.
 		/// @return @a This.
-		FileSubLogger& operator =(FileSubLogger&& other) noexcept;
+		FileSubLogger& operator =(FileSubLogger&& other);
 
 		static const char* const Name; /// @brief Class name.
 
@@ -107,7 +107,7 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	FileSubLogger& FileSubLogger::operator =(FileSubLogger&& other) noexcept
+	FileSubLogger& FileSubLogger::operator =(FileSubLogger&& other)
 	{
 		m_logFile = std::move(other.m_logFile);
 
