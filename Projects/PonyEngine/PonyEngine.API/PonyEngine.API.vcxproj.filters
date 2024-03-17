@@ -51,7 +51,7 @@
     <ClCompile Include="Source\Public\Window\KeyboardKeyCode.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window\IKeyboardListener.cppm">
+    <ClCompile Include="Source\Public\Window\IKeyboardObserver.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\ISystem.cppm">

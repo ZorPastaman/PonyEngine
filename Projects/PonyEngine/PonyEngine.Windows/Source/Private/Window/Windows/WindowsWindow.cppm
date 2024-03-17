@@ -57,8 +57,8 @@ namespace PonyEngine::Window
 		virtual std::wstring GetTitle() const override;
 		inline virtual bool SetTitle(const std::wstring& title) override;
 
-		inline virtual void AddKeyboardMessageListener(IKeyboardListener* keyboardMessageListener) override;
-		virtual void RemoveKeyboardMessageListener(IKeyboardListener* keyboardMessageListener) override;
+		inline virtual void AddKeyboardMessageListener(IKeyboardObserver* keyboardMessageListener) override;
+		virtual void RemoveKeyboardMessageListener(IKeyboardObserver* keyboardMessageListener) override;
 
 		inline virtual void ShowWindow() override;
 
@@ -85,7 +85,7 @@ namespace PonyEngine::Window
 		/// @param isDown @a True if the button is pressed, @a false if it's up.
 		void PushKeyboardKeyMessage(WPARAM wParam, bool isDown);
 
-		std::vector<IKeyboardListener*> m_keyboardMessageListeners; /// @brief Keyboard message listeners.
+		std::vector<IKeyboardObserver*> m_keyboardMessageListeners; /// @brief Keyboard message listeners.
 
 		Core::IEngine& m_engine; /// @brief Engine that owns the window.
 		HWND m_hWnd; /// @brief Window handler.
@@ -161,7 +161,7 @@ namespace PonyEngine::Window
 		return SetWindowText(m_hWnd, title.c_str());
 	}
 
-	inline void WindowsWindow::AddKeyboardMessageListener(IKeyboardListener* const keyboardMessageListener)
+	inline void WindowsWindow::AddKeyboardMessageListener(IKeyboardObserver* const keyboardMessageListener)
 	{
 		assert((keyboardMessageListener != nullptr));
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Add a keyboard message listener '{}'", keyboardMessageListener->GetName()).c_str());
@@ -169,11 +169,11 @@ namespace PonyEngine::Window
 		m_keyboardMessageListeners.push_back(keyboardMessageListener);
 	}
 
-	void WindowsWindow::RemoveKeyboardMessageListener(IKeyboardListener* const keyboardMessageListener)
+	void WindowsWindow::RemoveKeyboardMessageListener(IKeyboardObserver* const keyboardMessageListener)
 	{
 		PONY_LOG_IF(keyboardMessageListener == nullptr, m_engine.GetLogger(), Debug::Log::LogType::Warning, "Tried to remove a nullptr keyboard message listener");
 
-		const std::vector<IKeyboardListener*>::const_iterator position = std::find(m_keyboardMessageListeners.cbegin(), m_keyboardMessageListeners.cend(), keyboardMessageListener);
+		const std::vector<IKeyboardObserver*>::const_iterator position = std::find(m_keyboardMessageListeners.cbegin(), m_keyboardMessageListeners.cend(), keyboardMessageListener);
 
 		if (position != m_keyboardMessageListeners.cend()) [[likely]]
 		{
@@ -265,11 +265,11 @@ namespace PonyEngine::Window
 
 			const KeyboardMessage keyboardMessage(pair->second, isDown);
 
-			for (IKeyboardListener* const listener : m_keyboardMessageListeners)
+			for (IKeyboardObserver* const listener : m_keyboardMessageListeners)
 			{
 				try
 				{
-					listener->Listen(keyboardMessage);
+					listener->Observe(keyboardMessage);
 				}
 				catch (const std::exception& e)
 				{

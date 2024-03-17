@@ -26,12 +26,12 @@ namespace PonyEngine::Window
 		inline KeyboardMessage(KeyboardKeyCode keyCode, bool isDown) noexcept;
 		[[nodiscard("Pure constructor")]]
 		inline KeyboardMessage(const KeyboardMessage& other) noexcept = default;
-		inline KeyboardMessage(KeyboardMessage&& other) noexcept = default;
 		
 		inline ~KeyboardMessage() noexcept = default;
 
 		inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept = default;
-		inline KeyboardMessage& operator =(KeyboardMessage&& other) noexcept = default;
+
+		inline bool operator ==(const KeyboardMessage& other) const noexcept = default;
 
 		KeyboardKeyCode keyCode; /// @brief Key code.
 		bool isDown; /// @brief @a True if the key is pressed; @a false if it's unpressed.

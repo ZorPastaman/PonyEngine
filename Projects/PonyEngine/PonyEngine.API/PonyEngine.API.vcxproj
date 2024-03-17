@@ -40,7 +40,7 @@
     <ClCompile Include="Source\Public\Utility\Utility.cppm" />
     <ClCompile Include="Source\Public\Window\Factories\Window.Factories.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />
-    <ClCompile Include="Source\Public\Window\IKeyboardListener.cppm" />
+    <ClCompile Include="Source\Public\Window\IKeyboardObserver.cppm" />
     <ClCompile Include="Source\Public\Window\KeyboardMessage.cppm" />
     <ClCompile Include="Source\Public\Window\KeyboardKeyCode.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
