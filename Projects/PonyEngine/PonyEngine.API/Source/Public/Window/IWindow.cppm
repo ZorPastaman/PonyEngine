@@ -28,12 +28,12 @@ namespace PonyEngine::Window
 		/// @return @a True if the procedure is successful; @a false otherwise.
 		virtual void SetTitle(const std::wstring& title) = 0;
 
-		/// @brief Adds a keyboard input listener.
-		/// @param keyboardMessageListener Keyboard input listener. Mustn't be nullptr.
-		virtual void AddKeyboardMessageListener(IKeyboardObserver* keyboardMessageListener) = 0;
-		/// @brief Removes a keyboard input listener.
-		/// @param keyboardMessageListener Keyboard input listener.
-		virtual void RemoveKeyboardMessageListener(IKeyboardObserver* keyboardMessageListener) = 0;
+		/// @brief Adds a keyboard input observer.
+		/// @param keyboardMessageObserver Keyboard input observer. Mustn't be nullptr.
+		virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
+		/// @brief Removes a keyboard input observer.
+		/// @param keyboardMessageObserver Keyboard input observer.
+		virtual void RemoveKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
 
 		/// @brief Shows a window.
 		virtual void ShowWindow() = 0;
