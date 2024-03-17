@@ -182,6 +182,8 @@ namespace PonyEngine::Math
 		/// @return @a This.
 		inline Quaternion<T>& operator *=(const Quaternion<T>& other) noexcept;
 
+		bool operator ==(const Quaternion<T>& other) const noexcept = default;
+
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.
 
 		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Quaternion, it's always 4.
@@ -251,21 +253,6 @@ namespace PonyEngine::Math
 	/// @return @a True if the @p Quaternions are almost equal; @a false otherwise.
 	export template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqualNormalized(const Quaternion<T>& left, const Quaternion<T>& right, T tolerance = T{0.00001}) noexcept;
-
-	/// @brief Determines if two @p Quaternions are absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Quaternion.
-	/// @param right Right @p Quaternion.
-	/// @return @a True if the @p Quaternions are absolutely equal; @a false otherwise.
-	export template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr bool operator ==(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
-	/// @brief Determines if two @p Quaternions are not absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Quaternion.
-	/// @param right Right @p Quaternion.
-	/// @return @a True if the @p Quaternions are not absolutely equal; @a false otherwise.
-	export template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr bool operator !=(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
 	/// @brief Combines rotations of two @p Quaternions. It rotates the @p left first and the @p right then.
 	/// @tparam T Component type.
@@ -591,18 +578,6 @@ namespace PonyEngine::Math
 	inline const T& Quaternion<T>::operator [](const std::size_t index) const noexcept
 	{
 		return this->*s_quaternionComponentPointers<T>[index];
-	}
-
-	template<std::floating_point T>
-	constexpr bool operator ==(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
-	{
-		return left.x == right.x && left.y == right.y && left.z == right.z && left.w == right.w;
-	}
-
-	template<std::floating_point T>
-	constexpr bool operator !=(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
-	{
-		return left.x != right.x || left.y != right.y || left.z != right.z || left.w != right.w;
 	}
 
 	template<std::floating_point T>
