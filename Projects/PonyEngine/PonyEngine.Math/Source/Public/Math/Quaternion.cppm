@@ -182,6 +182,7 @@ namespace PonyEngine::Math
 		/// @return @a This.
 		inline Quaternion<T>& operator *=(const Quaternion<T>& other) noexcept;
 
+		[[nodiscard("Pure operator")]]
 		bool operator ==(const Quaternion<T>& other) const noexcept = default;
 
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.

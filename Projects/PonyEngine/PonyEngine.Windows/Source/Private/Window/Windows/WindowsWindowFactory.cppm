@@ -33,6 +33,7 @@ import PonyEngine.Window.Windows.Factories;
 
 import :WindowParams;
 import :WindowProc;
+import :WindowsWindow;
 
 namespace PonyEngine::Window
 {

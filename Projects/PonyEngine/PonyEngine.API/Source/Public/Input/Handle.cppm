@@ -34,6 +34,7 @@ namespace PonyEngine::Input
 
 		inline Handle& operator =(const Handle& other) noexcept = default;
 
+		[[nodiscard("Pure operator")]]
 		inline bool operator ==(const Handle& other) const noexcept = default;
 
 	private:

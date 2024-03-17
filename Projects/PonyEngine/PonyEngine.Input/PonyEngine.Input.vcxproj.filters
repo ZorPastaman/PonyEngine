@@ -18,13 +18,10 @@
     <ClCompile Include="Source\Private\Input\InputSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input\Factories\InputSystemFactory.cppm">
+    <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factories\InputSystemFactory.Implementation.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Input\InputSystem.Implementation.cppm">
+    <ClCompile Include="Source\Public\Input\Input.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
