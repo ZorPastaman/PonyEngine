@@ -112,6 +112,8 @@ namespace PonyEngine::Math
 		/// @return @a This.
 		Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
 
+		bool operator ==(const Vector2<T>& other) const noexcept = default;
+
 		static const Vector2<T> Up; /// @brief Vector2(0, 1).
 		static const Vector2<T> Down; /// @brief Vector2(0, -1).
 		static const Vector2<T> Right; /// @brief Vector2(1, 0).
@@ -208,21 +210,6 @@ namespace PonyEngine::Math
 	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, typename Vector2<T>::ComputationalType tolerance = typename Vector2<T>::ComputationalType{0.00001}) noexcept;
-
-	/// @brief Checks if two @p Vectors are absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
-	/// @return @a True if the @p Vectors are absolutely equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr bool operator ==(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-	/// @brief Checks if two @p Vectors are not absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
-	/// @return @a True if the @p Vectors are not absolutely equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr bool operator !=(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Addition operator for two @p Vectors.
 	/// @tparam T Component type.
@@ -436,18 +423,6 @@ namespace PonyEngine::Math
 	inline const T& Vector2<T>::operator [](const std::size_t index) const noexcept
 	{
 		return this->*s_vector2ComponentPointers<T>[index];
-	}
-
-	template<Arithmetic T>
-	constexpr bool operator ==(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return left.x == right.x && left.y == right.y;
-	}
-
-	template<Arithmetic T>
-	constexpr bool operator !=(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return left.x != right.x || left.y != right.y;
 	}
 
 	template<Arithmetic T>
