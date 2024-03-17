@@ -23,6 +23,7 @@ namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Gets a windows window handle.
+		/// @details Use this handle only for readonly operations.
 		/// @return Window handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND GetWindowHandle() const noexcept = 0;

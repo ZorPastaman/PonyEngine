@@ -16,10 +16,12 @@ module;
 
 #include "Debug/Log/LogMacro.h"
 
-export module PonyEngine.Window.Windows.Factories.Implementation:WindowsWindowFactory;
+export module PonyEngine.Window.Windows.Implementation:WindowsWindowFactory;
 
+import <exception>;
 import <format>;
 import <iostream>;
+import <stdexcept>;
 import <string>;
 
 import PonyEngine.Core;
@@ -28,7 +30,9 @@ import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 import PonyEngine.Window.Windows.Factories;
-import PonyEngine.Window.Windows.Implementation;
+
+import :WindowParams;
+import :WindowProc;
 
 namespace PonyEngine::Window
 {
@@ -43,7 +47,7 @@ namespace PonyEngine::Window
 		WindowsWindowFactory(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory(WindowsWindowFactory&&) = delete;
 
-		virtual ~WindowsWindowFactory();
+		virtual ~WindowsWindowFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
 		inline virtual IWindowsWindow* Create(Core::IEngine& engine) override;
@@ -89,10 +93,17 @@ namespace PonyEngine::Window
 		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' registered.", Utility::ConvertToString(m_className)));
 	}
 
-	WindowsWindowFactory::~WindowsWindowFactory()
+	WindowsWindowFactory::~WindowsWindowFactory() noexcept
 	{
 		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Unregister a window class '{}'.", Utility::ConvertToString(m_className)));
-		UnregisterClass(m_className.c_str(), m_hInstance);
+		try
+		{
+			UnregisterClass(m_className.c_str(), m_hInstance);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE(Debug::Log::LogType::Exception, std::format("{} - {}.", e.what(), "On unregistering a window class").c_str());
+		}
 		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' unregistered.", Utility::ConvertToString(m_className)));
 	}
 

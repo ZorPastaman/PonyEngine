@@ -83,7 +83,7 @@ namespace PonyEngine::Input
 		if (Window::IWindow* window = m_engine.GetWindow())
 		{
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Subscribe to keyboard messages");
-			window->AddKeyboardMessageListener(this);
+			window->AddKeyboardMessageObserver(this);
 		}
 		else
 		{
@@ -96,7 +96,7 @@ namespace PonyEngine::Input
 		if (Window::IWindow* window = m_engine.GetWindow())
 		{
 			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Unsubscribe to keyboard messages");
-			window->RemoveKeyboardMessageListener(this);
+			window->RemoveKeyboardMessageObserver(this);
 		}
 	}
 
