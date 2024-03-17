@@ -19,13 +19,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window\Windows\Factories\WindowsWindowFactory.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\Windows.Window.Implementation.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
-    <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Factories.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

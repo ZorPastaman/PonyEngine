@@ -21,13 +21,13 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\Factories\WindowsWindowFactory.cppm">
+    <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\Windows.Window.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Factories.Implementation.cppm">
+    <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm">
