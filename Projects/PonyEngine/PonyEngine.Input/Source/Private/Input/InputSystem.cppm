@@ -27,7 +27,7 @@ import PonyEngine.Window;
 namespace PonyEngine::Input
 {
 	/// @brief Default Pony Engine input system.
-	export class InputSystem final : public IInputSystem, public Window::IKeyboardListener
+	export class InputSystem final : public IInputSystem, public Window::IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -50,7 +50,7 @@ namespace PonyEngine::Input
 		virtual std::size_t RegisterAction(Event event, std::function<void()> action) override;
 		virtual void UnregisterAction(std::size_t id) override;
 
-		virtual void Listen(Window::KeyboardMessage keyboardMessage) noexcept override;
+		virtual void Observe(Window::KeyboardMessage keyboardMessage) noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
@@ -143,7 +143,7 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void InputSystem::Listen(Window::KeyboardMessage keyboardMessage) noexcept
+	void InputSystem::Observe(Window::KeyboardMessage keyboardMessage) noexcept
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received an keyboard message. KeyCode: '{}'; IsDown: '{}'", Window::ToString(keyboardMessage.keyCode), keyboardMessage.isDown).c_str());
 		m_queue.push(keyboardMessage);
