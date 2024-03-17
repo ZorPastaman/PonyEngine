@@ -7,15 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window:KeyboardKeyCode;
+export module PonyEngine.Input:KeyboardKeyCode;
 
-import <cstdint>;
 import <ostream>;
 import <string>;
-import <type_traits>;
 import <unordered_map>;
 
-namespace PonyEngine::Window
+// It's a copy-paste from Window::KeyboardKeyCode. Input must have its own codes.
+namespace PonyEngine::Input
 {
 	/// @brief Keyboard key codes.
 	export enum class KeyboardKeyCode : std::uint_fast8_t
@@ -269,7 +268,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	inline std::ostream& operator<<(std::ostream& stream, const KeyboardKeyCode keyCode)
+	inline std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
 	{
 		return stream << ToString(keyCode);
 	}

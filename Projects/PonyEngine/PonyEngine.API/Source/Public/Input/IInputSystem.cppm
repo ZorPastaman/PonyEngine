@@ -15,6 +15,7 @@ import <functional>;
 import PonyEngine.Core;
 
 import :Event;
+import :Handle;
 
 namespace PonyEngine::Input
 {
@@ -25,11 +26,11 @@ namespace PonyEngine::Input
 		/// @brief Registers an action that's raised if the event meets the conditions.
 		/// @param event Condition.
 		/// @param action Action.
-		/// @return Registration id. It's used to unregister.
-		virtual std::size_t RegisterAction(Event event, std::function<void()> action) = 0;
-		/// @brief Unregisters an action by id.
-		/// @param id Action id.
-		virtual void UnregisterAction(std::size_t id) = 0;
+		/// @return Registration handle. It's used to unregister.
+		virtual Handle RegisterAction(Event event, std::function<void()> action) = 0;
+		/// @brief Unregisters an action by its handle.
+		/// @param handle Action handle.
+		virtual void UnregisterAction(Handle handle) = 0;
 
 	protected:
 		inline virtual ~IInputSystem() noexcept = default;
