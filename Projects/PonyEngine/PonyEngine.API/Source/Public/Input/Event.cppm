@@ -21,7 +21,7 @@ namespace PonyEngine::Input
 		/// @brief Creates an input event.
 		/// @param expectedMessage The event is raised if the input system receives such an event.
 		[[nodiscard("Pure constructor")]]
-		inline Event(KeyboardMessage expectedMessage) noexcept;
+		inline Event(const KeyboardMessage& expectedMessage) noexcept;
 		[[nodiscard("Pure constructor")]]
 		inline Event(const Event& other) noexcept = default;
 
@@ -29,7 +29,7 @@ namespace PonyEngine::Input
 
 		/// @brief Gets an expected message.
 		/// @return Expected message.
-		inline KeyboardMessage GetExpectedMessage() const noexcept;
+		inline const KeyboardMessage& GetExpectedMessage() const noexcept;
 
 		inline Event& operator =(const Event& other) noexcept = default;
 
@@ -37,12 +37,12 @@ namespace PonyEngine::Input
 		KeyboardMessage m_expectedMessage; /// @brief The event is raised if the input system receives such an event.
 	};
 
-	inline Event::Event(const KeyboardMessage expectedMessage) noexcept :
+	inline Event::Event(const KeyboardMessage& expectedMessage) noexcept :
 		m_expectedMessage{expectedMessage}
 	{
 	}
 
-	inline KeyboardMessage Event::GetExpectedMessage() const noexcept
+	inline const KeyboardMessage& Event::GetExpectedMessage() const noexcept
 	{
 		return m_expectedMessage;
 	}

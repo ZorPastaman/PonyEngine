@@ -50,6 +50,10 @@
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(ProjectDir)\Source\Public\Window\Windows\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(ProjectDir)\Source\Public\Window\Windows\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>

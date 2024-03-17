@@ -112,6 +112,7 @@ namespace PonyEngine::Math
 		/// @return @a This.
 		Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
 
+		[[nodiscard("Pure operator")]]
 		bool operator ==(const Vector2<T>& other) const noexcept = default;
 
 		static const Vector2<T> Up; /// @brief Vector2(0, 1).

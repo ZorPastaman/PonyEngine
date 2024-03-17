@@ -24,9 +24,6 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\Windows.Window.Implementation.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

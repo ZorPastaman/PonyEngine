@@ -21,7 +21,7 @@ namespace PonyEngine::Window
 	public:
 		/// @brief Receives a new keyboard input.
 		/// @param keyboardMessage Keyboard message.
-		virtual void Observe(KeyboardMessage keyboardMessage) = 0;
+		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
 
 	protected:
 		inline virtual ~IKeyboardObserver() noexcept = default;

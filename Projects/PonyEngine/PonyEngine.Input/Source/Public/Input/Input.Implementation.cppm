@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Factories.Implementation;
+export module PonyEngine.Input.Implementation;
 
 import PonyEngine.Input.Factories;
 

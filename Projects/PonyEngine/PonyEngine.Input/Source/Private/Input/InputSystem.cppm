@@ -16,8 +16,8 @@ export module PonyEngine.Input.Implementation:InputSystem;
 import <format>;
 import <functional>;
 import <queue>;
+import <unordered_map>;
 import <utility>;
-import <vector>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
@@ -47,18 +47,21 @@ namespace PonyEngine::Input
 
 		virtual void Tick() override;
 
-		virtual std::size_t RegisterAction(Event event, std::function<void()> action) override;
-		virtual void UnregisterAction(std::size_t id) override;
+		[[nodiscard("Pure function")]]
+		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) override;
+		virtual void UnregisterAction(Handle handle) override;
 
-		virtual void Observe(Window::KeyboardMessage keyboardMessage) noexcept override;
+		virtual void Observe(const Window::KeyboardMessage& keyboardMessage) noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
 
+		static const char* const Name;
+
 	private:
-		std::vector<std::pair<std::size_t, std::pair<Event, std::function<void()>>>> m_events; /// @brief Input event action map.
+		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> m_events; /// @brief Input event action map.
 		std::size_t m_currentId; /// @brief Id that will be given to a new event. It's incremented every time.
-		std::queue<Window::KeyboardMessage> m_queue; /// @brief Message queue.
+		std::queue<KeyboardMessage> m_queue; /// @brief Message queue.
 
 		Core::IEngine& m_engine; /// @brief Engine that owns the input system.
 	};
@@ -73,7 +76,7 @@ namespace PonyEngine::Input
 
 	inline const char* InputSystem::GetName() const noexcept
 	{
-		return "PonyEngine::Input::InputSystem";
+		return Name;
 	}
 
 	void InputSystem::Begin()
@@ -104,48 +107,43 @@ namespace PonyEngine::Input
 	{
 		while (!m_queue.empty())
 		{
-			Window::KeyboardMessage message = m_queue.front();
+			const KeyboardMessage message = m_queue.front();
 			m_queue.pop();
 			
-			for (std::vector<std::pair<std::size_t, std::pair<Event, std::function<void()>>>>::const_iterator entry = m_events.cbegin(); entry != m_events.cend(); ++entry)
+			for (const auto& [handle, eventPair] : m_events)
 			{
-				if (entry->second.first.expectedMessage.keyCode == message.keyCode && entry->second.first.expectedMessage.isDown == message.isDown)
+				const KeyboardMessage expectedMessage = eventPair.first.GetExpectedMessage();
+
+				if (expectedMessage == message)
 				{
-					PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Tick an action. ID: '{}'", entry->first).c_str());
-					entry->second.second();
+					PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Tick an action. ID: '{}'", handle.GetId()).c_str());
+					eventPair.second();
 				}
 			}
 		}
 	}
 
-	std::size_t InputSystem::RegisterAction(Event event, std::function<void()> action)
+	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Register an action. KeyCode: '{}'; IsDown: '{}'; ID: '{}'", Window::ToString(event.expectedMessage.keyCode), event.expectedMessage.isDown, m_currentId).c_str());
+		const Handle handle(m_currentId++);
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
+		const std::pair<Event, std::function<void()>> eventAction(event, action);
+		m_events.insert({handle, eventAction});
 
-		std::pair<Event, std::function<void()>> eventAction(event, action);
-		std::pair<std::size_t, std::pair<Event, std::function<void()>>> entry(m_currentId, eventAction);
-		m_events.push_back(entry);
-
-		return m_currentId++;
+		return handle;
 	}
 
-	void InputSystem::UnregisterAction(std::size_t id)
+	void InputSystem::UnregisterAction(const Handle handle)
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Unregister an action. ID: '{}'", id).c_str());
-
-		for (std::vector<std::pair<std::size_t, std::pair<Event, std::function<void()>>>>::const_iterator entry = m_events.cbegin(); entry != m_events.cend(); ++entry)
-		{
-			if (entry->first == id)
-			{
-				m_events.erase(entry);
-				break;
-			}
-		}
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Unregister an action. ID: '{}'", handle.GetId()).c_str());
+		m_events.erase(handle);
 	}
 
-	void InputSystem::Observe(Window::KeyboardMessage keyboardMessage) noexcept
+	void InputSystem::Observe(const Window::KeyboardMessage& keyboardMessage) noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received an keyboard message. KeyCode: '{}'; IsDown: '{}'", Window::ToString(keyboardMessage.keyCode), keyboardMessage.isDown).c_str());
-		m_queue.push(keyboardMessage);
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, std::format("Received an keyboard message: '{}'", keyboardMessage.ToString()).c_str());
+		m_queue.push(KeyboardMessage(static_cast<KeyboardKeyCode>(keyboardMessage.GetKeyCode()), keyboardMessage.GetIsDown()));
 	}
+
+	const char* const InputSystem::Name = "PonyEngine::Input::InputSystem";
 }

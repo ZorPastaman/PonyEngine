@@ -59,7 +59,7 @@ namespace PonyEngine::Debug::Log
 	{
 		try
 		{
-			std::ostream& stream = ChooseStream(logEntry.logType);
+			std::ostream& stream = ChooseStream(logEntry.GetLogType());
 			stream << logEntry << std::endl;
 		}
 		catch (const std::exception& e)

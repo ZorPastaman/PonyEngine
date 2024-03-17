@@ -11,10 +11,9 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Input\Factories\InputSystemFactory.cppm" />
+    <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
-    <ClCompile Include="Source\Private\Input\InputSystem.Implementation.cppm" />
-    <ClCompile Include="Source\Public\Input\Factories\InputSystemFactory.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Input\Input.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">

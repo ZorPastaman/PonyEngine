@@ -20,7 +20,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm" />
-    <ClCompile Include="Source\Private\Window\Windows\Windows.Window.Implementation.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
@@ -63,6 +62,14 @@
     <Import Project="..\..\..\PropertySheets\ReleasePonyEngineProperties.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
