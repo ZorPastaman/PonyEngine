@@ -25,11 +25,11 @@ namespace Launcher
 	/// @param quitChecker Platform quit checker.
 	/// @param platformEngineParamsProvider Platform engine params provider.
 	/// @return Exit code.
-	export int LauncherMain(IPlatformQuitChecker& quitChecker, IPlatformEngineParamsProvider& engineParamsProvider);
+	export int LauncherMain(const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& engineParamsProvider);
 
-	int LauncherMain(IPlatformQuitChecker& quitChecker, IPlatformEngineParamsProvider& platformEngineParamsProvider)
+	int LauncherMain(const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
 	{
-		EngineParamsProvider engineParamsProvider;
+		const EngineParamsProvider engineParamsProvider;
 		EngineRunner engineRunner(engineParamsProvider, platformEngineParamsProvider);
 
 		int exitCode = 0;

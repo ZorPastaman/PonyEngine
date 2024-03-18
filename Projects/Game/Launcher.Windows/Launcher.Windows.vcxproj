@@ -11,16 +11,16 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Windows.API\PonyEngine.Windows.API.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Windows.API\PonyEngine.Windows.API.vcxproj">
       <Project>{4c500618-3909-4505-9b61-4c5794964d76}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Windows\PonyEngine.Windows.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Windows\PonyEngine.Windows.vcxproj">
       <Project>{6265aff4-a641-43f4-8553-1a41e593480a}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Launcher\Launcher.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\Game\Launcher\Launcher.vcxproj">
       <Project>{7e5b9125-f55a-48d9-8458-b961a4eace9a}</Project>
     </ProjectReference>
   </ItemGroup>
@@ -64,6 +64,12 @@
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>

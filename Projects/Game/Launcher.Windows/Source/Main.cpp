@@ -13,10 +13,10 @@
 import Launcher;
 import Launcher.Windows;
 
-int APIENTRY wWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPWSTR lpCmdLine, int nCmdShow)
+int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const LPWSTR lpCmdLine, const int nCmdShow)
 {
-	Launcher::WindowsEngineParamsProvider windowsEngineParamsProvider;
-	Launcher::WindowsQuitChecker windowsQuitChecker;
+	const Launcher::WindowsEngineParamsProvider windowsEngineParamsProvider;
+	const Launcher::WindowsQuitChecker windowsQuitChecker;
 
 	return Launcher::LauncherMain(windowsQuitChecker, windowsEngineParamsProvider);
 }

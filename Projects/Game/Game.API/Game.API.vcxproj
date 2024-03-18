@@ -15,10 +15,10 @@
     <ClCompile Include="Source\Public\Game\IGame.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
       <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
     </ProjectReference>
   </ItemGroup>

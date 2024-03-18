@@ -117,7 +117,7 @@ namespace Launcher
 		PONY_LOG(m_engine->GetLogger(), LogType::Verbose, "Post-tick a game");
 		m_game->PostTick();
 
-		bool isRunning = m_engine->IsRunning();
+		const bool isRunning = m_engine->IsRunning();
 		
 		if (!isRunning) [[unlikely]]
 		{

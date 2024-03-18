@@ -19,7 +19,7 @@ namespace Launcher
 		/// @param exitCode Exit code.
 		/// @return @a True if the application must be closed; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual bool Check(int& exitCode) = 0;
+		virtual bool Check(int& exitCode) const = 0;
 
 	protected:
 		inline virtual ~IPlatformQuitChecker() noexcept = default;
