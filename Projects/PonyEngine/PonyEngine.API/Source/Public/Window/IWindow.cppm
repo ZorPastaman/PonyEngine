@@ -11,7 +11,7 @@ export module PonyEngine.Window:IWindow;
 
 import <string>;
 
-import :Listeners.IKeyboardListener;
+import :IKeyboardObserver;
 
 namespace PonyEngine::Window
 {
@@ -22,25 +22,26 @@ namespace PonyEngine::Window
 		/// @brief Gets a window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual std::string GetTitle() const = 0;
+		virtual std::wstring GetTitle() const = 0;
 		/// @brief Sets a window title.
 		/// @param title Window title to set.
 		/// @return @a True if the procedure is successful; @a false otherwise.
-		virtual bool SetTitle(const std::string& title) = 0;
+		virtual void SetTitle(const std::wstring& title) = 0;
 
-		/// @brief Adds a keyboard input listener.
-		/// @param keyboardMessageListener Keyboard input listener. Mustn't be nullptr.
-		virtual void AddKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
-		/// @brief Removes a keyboard input listener.
-		/// @param keyboardMessageListener Keyboard input listener.
-		virtual void RemoveKeyboardMessageListener(Listeners::IKeyboardListener* keyboardMessageListener) = 0;
+		/// @brief Adds a keyboard input observer.
+		/// @param keyboardMessageObserver Keyboard input observer. Mustn't be nullptr.
+		virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
+		/// @brief Removes a keyboard input observer.
+		/// @param keyboardMessageObserver Keyboard input observer.
+		virtual void RemoveKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
 
-		/// @brief Gets a native window pointer.
-		/// @details It's HWND* on Windows.
-		/// @return Native window pointer.
-		virtual void* GetNativeWindow() = 0;
+		/// @brief Shows a window.
+		virtual void ShowWindow() = 0;
+
+		/// @brief Ticks a window message queue.
+		virtual void Tick() = 0;
 
 	protected:
-		inline virtual ~IWindow() = default;
+		inline virtual ~IWindow() noexcept = default;
 	};
 }

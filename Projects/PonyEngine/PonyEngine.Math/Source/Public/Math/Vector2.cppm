@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math.Vector2;
+export module PonyEngine.Math:Vector2;
 
 import <array>;
 import <cmath>;
@@ -17,7 +17,7 @@ import <ostream>;
 import <string>;
 import <type_traits>;
 
-import PonyEngine.Math.Common;
+import :Common;
 
 namespace PonyEngine::Math
 {
@@ -30,18 +30,15 @@ namespace PonyEngine::Math
 		using ValueType = T; /// @brief Component type.
 		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
 
-		/// @brief Creates a default @p Vector2 where every component is zero initialized.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector2() noexcept;
+		constexpr inline Vector2() noexcept = default;
 		/// @brief Creates a @p Vector2 and assigns its components from the arguments.
 		/// @param xParam Value to assign to the @p x component.
 		/// @param yParam Value to assign to the @p y component.
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector2(T xParam, T yParam) noexcept;
-		/// @brief Copy constructor.
-		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector2(const Vector2<T>& other) noexcept;
+		constexpr inline Vector2(const Vector2<T>& other) noexcept = default;
 
 		constexpr inline ~Vector2() noexcept = default;
 
@@ -89,10 +86,7 @@ namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		inline const T& operator [](std::size_t index) const noexcept;
 
-		/// @brief Copies the @p other to @a this.
-		/// @param other @p Vector to copy.
-		/// @return @a This.
-		inline Vector2<T>& operator =(const Vector2<T>& other) noexcept;
+		inline Vector2<T>& operator =(const Vector2<T>& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
 		/// @param other @p Vector to add.
 		/// @return @a This.
@@ -117,6 +111,9 @@ namespace PonyEngine::Math
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
 		Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Vector2<T>& other) const noexcept = default;
 
 		static const Vector2<T> Up; /// @brief Vector2(0, 1).
 		static const Vector2<T> Down; /// @brief Vector2(0, -1).
@@ -215,21 +212,6 @@ namespace PonyEngine::Math
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, typename Vector2<T>::ComputationalType tolerance = typename Vector2<T>::ComputationalType{0.00001}) noexcept;
 
-	/// @brief Checks if two @p Vectors are absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
-	/// @return @a True if the @p Vectors are absolutely equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr bool operator ==(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-	/// @brief Checks if two @p Vectors are not absolutely equal.
-	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
-	/// @return @a True if the @p Vectors are not absolutely equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr bool operator !=(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-
 	/// @brief Addition operator for two @p Vectors.
 	/// @tparam T Component type.
 	/// @param left Augend @p Vector.
@@ -305,22 +287,9 @@ namespace PonyEngine::Math
 		{ &Vector2<T>::x, &Vector2<T>::y };
 
 	template<Arithmetic T>
-	constexpr inline Vector2<T>::Vector2() noexcept :
-		x{},
-		y{}
-	{
-	}
-
-	template<Arithmetic T>
 	constexpr inline Vector2<T>::Vector2(const T xParam, const T yParam) noexcept :
 		x{xParam},
 		y{yParam}
-	{
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector2<T>::Vector2(const Vector2<T>& other) noexcept :
-		Vector2(other.x, other.y)
 	{
 	}
 
@@ -458,18 +427,6 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr bool operator ==(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return left.x == right.x && left.y == right.y;
-	}
-
-	template<Arithmetic T>
-	constexpr bool operator !=(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return left.x != right.x || left.y != right.y;
-	}
-
-	template<Arithmetic T>
 	constexpr Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return Vector2<T>(static_cast<T>(left.x + right.x), static_cast<T>(left.y + right.y));
@@ -527,15 +484,6 @@ namespace PonyEngine::Math
 		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) / static_cast<Vector2<T>::ComputationalType>(right.y));
 
 		return Vector2<T>(x, y);
-	}
-
-	template<Arithmetic T>
-	inline Vector2<T>& Vector2<T>::operator =(const Vector2<T>& other) noexcept
-	{
-		x = other.x;
-		y = other.y;
-
-		return *this;
 	}
 
 	template<Arithmetic T>

@@ -9,29 +9,27 @@
 
 module;
 
+#include <cassert>
+
 #include "Debug/Log/LogMacro.h"
 
 export module PonyEngine.Debug.Log.Implementation:Logger;
 
 import <algorithm>;
-import <cassert>;
 import <chrono>;
 import <format>;
 import <exception>;
 import <iostream>;
 import <string>;
 import <vector>;
-import <utility>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 
-import :IEngineLogger;
-
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Default logger. It just resends logs to its sub-loggers.
-	export class Logger final : public IEngineLogger
+	export class Logger final : public ILogger
 	{
 	public:
 		/// @brief Creates a @p Logger.
@@ -39,22 +37,22 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure constructor")]]
 		inline Logger(const Core::IEngine& engine) noexcept;
 		Logger(const Logger&) = delete;
-		/// @brief Move constructor.
-		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		inline Logger(Logger&& other) noexcept;
+		inline Logger(Logger&& other) noexcept = default;
 
 		inline virtual ~Logger() noexcept = default;
 
-		virtual void Log(LogType logType, const std::string& message) noexcept override;
-		virtual void LogException(const std::exception& exception, const std::string& message = "") noexcept override;
+		virtual void Log(LogType logType, const char* message) noexcept override;
+		virtual void LogException(const std::exception& exception, const char* message = "") noexcept override;
 
 		virtual void AddSubLogger(ISubLogger* subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
-	private:
-		std::vector<ISubLogger*> m_subLoggers; /// @brief sub-loggers container.
+		Logger& operator =(const Logger&) = delete;
+		inline Logger& operator =(Logger&& other) noexcept = default;
 
+	private:
+		std::vector<ISubLogger*> m_subLoggers; /// @brief Sub-loggers container.
 		const Core::IEngine& m_engine; /// @brief Engine that owns this logger.
 	};
 
@@ -64,13 +62,7 @@ namespace PonyEngine::Debug::Log
 	{
 	}
 
-	inline Logger::Logger(Logger&& other) noexcept :
-		m_subLoggers(std::move(other.m_subLoggers)),
-		m_engine{other.m_engine}
-	{
-	}
-
-	void Logger::Log(const LogType logType, const std::string& message) noexcept
+	void Logger::Log(const LogType logType, const char* const message) noexcept
 	{
 		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
 
@@ -85,11 +77,11 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CEXC(e, "On writing to the log.");
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to the log"));
 		}
 	}
 
-	void Logger::LogException(const std::exception& exception, const std::string& message) noexcept
+	void Logger::LogException(const std::exception& exception, const char* const message) noexcept
 	{
 		try
 		{
@@ -102,31 +94,31 @@ namespace PonyEngine::Debug::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CEXC(e, "On writing to the log.");
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to the log"));
 		}
 	}
 
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger != nullptr));
-		PONY_COUT(std::format("Add a sub-logger '{}'.", subLogger->GetName()));
+		PONY_CONSOLE(LogType::Info, std::format("Add a sub-logger '{}'.", subLogger->GetName()));
 		m_subLoggers.push_back(subLogger);
 	}
 
 	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
-		PONY_CLOG_IF(subLogger == nullptr, "Tried to remove a nullptr sub-logger.");
+		PONY_CONSOLE_IF(subLogger == nullptr, LogType::Warning, "Tried to remove a nullptr sub-logger.");
 
 		const std::vector<ISubLogger*>::const_iterator position = std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger);
 
 		if (position != m_subLoggers.cend()) [[likely]]
 		{
-			PONY_COUT(std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
+			PONY_CONSOLE(LogType::Info, std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
 			m_subLoggers.erase(position);
 		}
 		else [[unlikely]]
 		{
-			PONY_CLOG_IF(subLogger != nullptr, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()));
+			PONY_CONSOLE_IF(subLogger != nullptr, LogType::Warning, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()));
 		}
 	}
 }
