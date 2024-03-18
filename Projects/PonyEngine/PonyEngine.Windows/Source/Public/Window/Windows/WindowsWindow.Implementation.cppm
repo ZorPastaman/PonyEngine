@@ -23,17 +23,17 @@ namespace PonyEngine::Window
 	/// @param classParams Class parameters.
 	/// @return Created factory.
 	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) inline IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams);
+	__declspec(dllexport) IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams);
 	/// @brief Destroys a previously created Windows window factory.
 	/// @param factory Previously created Windows window factory.
-	export __declspec(dllexport) inline void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
+	export __declspec(dllexport) void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
 
-	inline IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams)
+	IWindowsWindowFactory* CreateWindowsWindowFactory(const WindowClassParams& classParams)
 	{
 		return new WindowsWindowFactory(classParams);
 	}
 
-	inline void DestroyWindowsWindowFactory(IWindowsWindowFactory* const factory) noexcept
+	void DestroyWindowsWindowFactory(IWindowsWindowFactory* const factory) noexcept
 	{
 		assert((dynamic_cast<WindowsWindowFactory*>(factory) != nullptr));
 		delete static_cast<WindowsWindowFactory*>(factory);

@@ -69,7 +69,7 @@ namespace PonyEngine::Input
 	InputSystem::InputSystem(Core::IEngine& engine) noexcept :
 		m_engine{engine},
 		m_events{},
-		m_currentId{0},
+		m_currentId{1},
 		m_queue{}
 	{
 	}
@@ -128,7 +128,7 @@ namespace PonyEngine::Input
 		const Handle handle(m_currentId++);
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
-		m_events.insert({handle, eventAction});
+		m_events.insert(std::pair(handle, eventAction));
 
 		return handle;
 	}

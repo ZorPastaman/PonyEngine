@@ -15,16 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\WindowsMain.cpp">
+    <ClCompile Include="Source\Public\Game\Game.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\EngineLoop\GameRunner.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\EngineLoop\EngineRunner.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\EngineLoop\EngineParams.cppm">
+    <ClCompile Include="Source\Private\Game\Game.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
