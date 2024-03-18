@@ -9,8 +9,8 @@
 
 export module PonyEngine.Math;
 
-export import PonyEngine.Math.Common;
-export import PonyEngine.Math.Quaternion;
-export import PonyEngine.Math.Vector2;
-export import PonyEngine.Math.Vector3;
-export import PonyEngine.Math.Vector4;
+export import :Common;
+export import :Quaternion;
+export import :Vector2;
+export import :Vector3;
+export import :Vector4;

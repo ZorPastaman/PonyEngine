@@ -12,27 +12,37 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\Factories\Core.Factories.cppm" />
+    <ClCompile Include="Source\Public\Core\Factories\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\Factories\IServiceFactory.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\Factories\Log.Factories.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\Factories\ISubLoggerFactory.cppm" />
+    <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Factories\IInputSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Factories\Input.Factories.cppm" />
+    <ClCompile Include="Source\Public\Input\Handle.cppm" />
+    <ClCompile Include="Source\Public\Input\InputKeyboardKeyCode.cppm" />
+    <ClCompile Include="Source\Public\Input\InputKeyboardMessage.cppm" />
+    <ClCompile Include="Source\Public\Utility\StringUtility.cppm" />
+    <ClCompile Include="Source\Public\Window\Factories\IWindowFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Event.cppm" />
+    <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
+    <ClCompile Include="Source\Public\Input\Input.cppm" />
     <ClCompile Include="Source\Public\Utility\INamed.cppm" />
     <ClCompile Include="Source\Public\Core\IService.cppm" />
-    <ClCompile Include="Source\Public\Core\ServiceFactoryInfo.cppm" />
-    <ClCompile Include="Source\Public\Core\IServiceManager.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
-    <ClCompile Include="Source\Public\Core\SystemFactoryInfo.cppm" />
-    <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Core\WindowParams.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\Log.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogEntry.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility.cppm" />
+    <ClCompile Include="Source\Public\Window\Factories\Window.Factories.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />
-    <ClCompile Include="Source\Public\Window\Listeners\IKeyboardListener.cppm" />
-    <ClCompile Include="Source\Public\Window\Messages\KeyboardMessage.cppm" />
-    <ClCompile Include="Source\Public\Window\Messages\KeyboardKeyCode.cppm" />
+    <ClCompile Include="Source\Public\Window\IKeyboardObserver.cppm" />
+    <ClCompile Include="Source\Public\Window\KeyboardMessage.cppm" />
+    <ClCompile Include="Source\Public\Window\KeyboardKeyCode.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -70,21 +80,19 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
-    <Import Project="$(SolutionDir)\PropertySheets\DebugPonyEngineProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
-    <Import Project="$(SolutionDir)\PropertySheets\ReleasePonyEngineProperties.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

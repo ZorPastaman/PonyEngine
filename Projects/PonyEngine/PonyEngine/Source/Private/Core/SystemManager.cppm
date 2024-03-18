@@ -9,14 +9,14 @@
 
 module;
 
+#include <cassert>
+
 #include "Debug/Log/LogMacro.h"
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
-import <algorithm>;
-import <cassert>;
-import <cstddef>;
 import <exception>;
+import <format>;
 import <functional>;
 import <iostream>;
 import <string>;
@@ -24,89 +24,80 @@ import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Core
 {
 	/// @brief Holder and ticker of systems.
-	export class SystemManager final : public ISystemManager
+	export class SystemManager final
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
-		/// @param systemFactoryInfos System factories.
+		/// @param systemFactories System factories.
 		/// @param engine Engine that owns the manager.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine);
+		SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
-		/// @brief Move constructor.
-		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		inline SystemManager(SystemManager&& other) noexcept;
+		inline SystemManager(SystemManager&& other) noexcept = default;
 
-		virtual ~SystemManager() noexcept;
+		~SystemManager() noexcept;
 
+		/// @brief Finds a system with the @p predicate.
+		/// @param predicate Predicate.
+		/// @return Found system. May be nullptr.
 		[[nodiscard("Pure function")]]
-		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const override;
+		ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const;
 
 		/// @brief Begins the systems.
-		void Begin();
+		/// @details Call this before a first tick.
+		void Begin() const;
 		/// @brief Ends the systems.
-		void End() noexcept;
+		/// @details Call this before a destruction of a @p SystemManager.
+		void End() const noexcept;
 
 		/// @brief Ticks the systems.
 		void Tick() const;
 
-	private:
-		std::vector<ISystem*> m_systems; /// @brief Systems.
-		std::vector<std::function<void(ISystem*)>> m_destroyFunctions; /// @brief Destroy functions. Must be synchronized with @p m_systems by index.
+		SystemManager& operator =(const SystemManager&) = delete;
+		inline SystemManager& operator =(SystemManager&& other) noexcept = default;
 
+	private:
+		std::vector<std::pair<ISystem*, ISystemFactory*>> m_systems; /// @brief Pairs of a system and a system factory that was used to create the system.
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
-	SystemManager::SystemManager(const std::vector<SystemFactoryInfo>& systemFactoryInfos, IEngine& engine) :
+	SystemManager::SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine) :
 		m_systems{},
-		m_destroyFunctions{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create systems");
 
-		for (const SystemFactoryInfo& factoryInfo : systemFactoryInfos)
+		for (ISystemFactory* const factory : systemFactories)
 		{
-			assert((factoryInfo.createFunction));
-			assert((factoryInfo.destroyFunction));
-
-			ISystem* const system = factoryInfo.createFunction(engine);
-			m_systems.push_back(system);
-			m_destroyFunctions.push_back(factoryInfo.destroyFunction);
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, system->GetName());
+			assert((factory != nullptr));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create '{}'", factory->GetSystemName()).c_str());
+			ISystem* const system = factory->Create(engine);
+			assert((system != nullptr));
+			m_systems.push_back(std::pair(system, factory));
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' created", system->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems created");
-	}
-
-	inline SystemManager::SystemManager(SystemManager&& other) noexcept :
-		m_systems(std::move(other.m_systems)),
-		m_destroyFunctions(std::move(other.m_destroyFunctions)),
-		m_engine{other.m_engine}
-	{
 	}
 
 	SystemManager::~SystemManager() noexcept
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy systems");
 
-		for (std::size_t i = 0, count = m_systems.size(), index = count - i - 1; i < count; ++i, index = count - i - 1)
+		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, m_systems[index]->GetName());
-
-			try
-			{
-				m_destroyFunctions[index](m_systems[index]);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E(m_engine.GetLogger(), e, "On destroying a system");
-			}
+			ISystem* const system = it->first;
+			ISystemFactory* const factory = it->second;
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Destroy '{}'", system->GetName()).c_str());
+			factory->Destroy(system);
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' destroyed", factory->GetSystemName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems destroyed");
@@ -116,48 +107,47 @@ namespace PonyEngine::Core
 	{
 		assert((predicate));
 
-		for (ISystem* const system : m_systems)
+		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
 		{
-			if (predicate(system))
+			if (predicate(systemFactory.first))
 			{
-				return system;
+				return systemFactory.first;
 			}
 		}
 
 		return nullptr;
 	}
 
-	void SystemManager::Begin()
+	void SystemManager::Begin() const
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Begin systems");
 
-		for (ISystem* const system : m_systems)
+		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, system->GetName());
-			system->Begin();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Begin '{}'", systemFactory.first->GetName()).c_str());
+			systemFactory.first->Begin();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' begun", systemFactory.first->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems begun");
 	}
 
-	void SystemManager::End() noexcept
+	void SystemManager::End() const noexcept
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End systems");
 
-		for (std::vector<ISystem*>::reverse_iterator systemIterator = m_systems.rbegin(); systemIterator != m_systems.rend(); ++systemIterator)
+		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
-			ISystem* const system = *systemIterator;
-
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, system->GetName());
-
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("End '{}'", it->first->GetName()).c_str());
 			try
 			{
-				system->End();
+				it->first->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(m_engine.GetLogger(), e, "On ending a system");
+				PONY_LOG_E(m_engine.GetLogger(), e, "On endine a system");
 			}
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' ended", it->first->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems ended");
@@ -167,10 +157,10 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Tick systems");
 
-		for (ISystem* const system : m_systems)
+		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, system->GetName());
-			system->Tick();
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, systemFactory.first->GetName());
+			systemFactory.first->Tick();
 		}
 	}
 }

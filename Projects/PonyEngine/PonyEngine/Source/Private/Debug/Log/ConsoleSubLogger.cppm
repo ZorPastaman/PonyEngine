@@ -20,12 +20,10 @@ import <string>;
 
 import PonyEngine.Debug.Log;
 
-import :IEngineSubLogger;
-
 namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
-	export class ConsoleSubLogger final : public IEngineSubLogger
+	export class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -39,6 +37,11 @@ namespace PonyEngine::Debug::Log
 		inline virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
+
+		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
+		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
+
+		static const char* const Name; /// @brief Class name.
 	};
 
 	/// @brief Chooses a console output stream by the @p logType.
@@ -49,19 +52,19 @@ namespace PonyEngine::Debug::Log
 
 	inline const char* ConsoleSubLogger::GetName() const noexcept
 	{
-		return "PonyEngine::Debug::Log::ConsoleSubLogger";
+		return Name;
 	}
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
 		{
-			std::ostream& stream = ChooseStream(logEntry.logType);
+			std::ostream& stream = ChooseStream(logEntry.GetLogType());
 			stream << logEntry << std::endl;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CEXC(e, "On writing to a console.");
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a console"));
 		}
 	}
 
@@ -82,4 +85,6 @@ namespace PonyEngine::Debug::Log
 			throw std::invalid_argument("logType has an incorrect value.");
 		}
 	}
+
+	const char* const ConsoleSubLogger::Name = "PonyEngine::Debug::Log::ConsoleSubLogger";
 }

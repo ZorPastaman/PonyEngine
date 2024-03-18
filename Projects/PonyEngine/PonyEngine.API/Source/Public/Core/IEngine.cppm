@@ -10,12 +10,13 @@
 export module PonyEngine.Core:IEngine;
 
 import <cstddef>;
+import <functional>;
 
 import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
-import :IServiceManager;
-import :ISystemManager;
+import :IService;
+import :ISystem;
 
 namespace PonyEngine::Core
 {
@@ -37,14 +38,26 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual Window::IWindow* GetWindow() const noexcept = 0;
 
-		/// @brief Gets an engine service manager.
-		/// @return Service Manager.
+		/// @brief Finds a service by the @p predicate.
+		/// @param predicate Predicate.
+		/// @return Found service. It's nullptr if no service is found.
 		[[nodiscard("Pure function")]]
-		virtual IServiceManager& GetServiceManager() const noexcept = 0;
-		/// @brief Gets an engine system manager.
-		/// @return System Manager.
+		virtual IService* FindService(const std::function<bool(const IService*)>& predicate) const = 0;
+		/// @brief Finds a service of the type @p T.
+		/// @tparam T Service type to find.
+		/// @return Found service. It's nullptr if no service is found.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* FindService();
+		/// @brief Finds a system by the @p predicate.
+		/// @param predicate Predicate.
+		/// @return Found system. It's nullptr if no system is found.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& GetSystemManager() const noexcept = 0;
+		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const = 0;
+		/// @brief Finds a system of the type @p T.
+		/// @tparam T System type to find.
+		/// @return Found system. It's nullptr if no system is found.
+		template<typename T> [[nodiscard("Pure function")]]
+		T* FindSystem();
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().
@@ -67,4 +80,18 @@ namespace PonyEngine::Core
 	protected:
 		inline virtual ~IEngine() noexcept = default;
 	};
+
+	template<typename T>
+	T* IEngine::FindService()
+	{
+		IService* const service = FindService([](const IService* const service) { return dynamic_cast<const T*>(service) != nullptr; });
+		return dynamic_cast<T*>(service);
+	}
+
+	template<typename T>
+	T* IEngine::FindSystem()
+	{
+		ISystem* const system = FindSystem([](const ISystem* const system) { return dynamic_cast<const T*>(system) != nullptr; });
+		return dynamic_cast<T*>(system);
+	}
 }

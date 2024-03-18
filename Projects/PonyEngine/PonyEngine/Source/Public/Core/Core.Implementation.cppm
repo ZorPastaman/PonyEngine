@@ -7,6 +7,37 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Core.Implementation;
 
-export import :EngineFactory;
+import PonyEngine.Core;
+import PonyEngine.Core.Factories;
+
+import :Engine;
+
+namespace PonyEngine::Core
+{
+	/// @brief Creates a new @p Engine instance with the @p params.
+	/// @param params Engine parameters.
+	/// @return Created @p Engine.
+	export [[nodiscard("Pure function")]]
+	__declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
+
+	/// @brief Destroy the @p engine instance.
+	/// @param engine Engine to destroy.
+	export __declspec(dllexport) void DestroyEngine(IEngine* engine) noexcept;
+
+	IEngine* CreateEngine(const EngineParams& params)
+	{
+		return new Engine(params);
+	}
+
+	void DestroyEngine(IEngine* const engine) noexcept
+	{
+		assert((dynamic_cast<Engine*>(engine) != nullptr));
+		delete static_cast<Engine*>(engine);
+	}
+}
