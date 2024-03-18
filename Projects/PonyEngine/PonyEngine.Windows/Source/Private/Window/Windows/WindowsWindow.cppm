@@ -11,9 +11,7 @@ module;
 
 #include <cassert>
 
-#define WIN32_LEAN_AND_MEAN 
-#include <windows.h>
-
+#include "Platform/Windows/Framework.h"
 #include "Debug/Log/LogMacro.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindow;

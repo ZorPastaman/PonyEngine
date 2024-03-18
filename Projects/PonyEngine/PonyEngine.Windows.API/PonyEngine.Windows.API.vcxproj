@@ -84,6 +84,9 @@
     <ClCompile Include="Source\Public\Window\Windows\Factories\IWindowsWindowFactory.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.cppm" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Include\Public\Platform\Windows\Framework.h" />
+  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>
