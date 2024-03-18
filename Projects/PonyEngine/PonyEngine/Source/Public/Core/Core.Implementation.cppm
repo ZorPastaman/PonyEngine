@@ -24,18 +24,18 @@ namespace PonyEngine::Core
 	/// @param params Engine parameters.
 	/// @return Created @p Engine.
 	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) inline IEngine* CreateEngine(const EngineParams& params);
+	__declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
 	/// @param engine Engine to destroy.
-	export __declspec(dllexport) inline void DestroyEngine(IEngine* engine) noexcept;
+	export __declspec(dllexport) void DestroyEngine(IEngine* engine) noexcept;
 
-	inline IEngine* CreateEngine(const EngineParams& params)
+	IEngine* CreateEngine(const EngineParams& params)
 	{
 		return new Engine(params);
 	}
 
-	inline void DestroyEngine(IEngine* const engine) noexcept
+	void DestroyEngine(IEngine* const engine) noexcept
 	{
 		assert((dynamic_cast<Engine*>(engine) != nullptr));
 		delete static_cast<Engine*>(engine);

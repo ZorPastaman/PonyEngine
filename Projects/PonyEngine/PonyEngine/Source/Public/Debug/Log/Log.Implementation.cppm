@@ -37,23 +37,23 @@ namespace PonyEngine::Debug::Log
 	/// @brief Creates a console sub-logger factory.
 	/// @return Created console sub-logger factory.
 	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) inline ISubLoggerFactory* CreateConsoleSubLoggerFactory();
+	__declspec(dllexport) ISubLoggerFactory* CreateConsoleSubLoggerFactory();
 	/// @brief Destroys a previously created console sub-logger factory.
 	/// @param subLogger Console sub-logger factory to destroy.
-	export __declspec(dllexport) inline void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger);
+	export __declspec(dllexport) void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger);
 
 	/// @brief Creates a file sub-logger factory with the default log file path, Log.log.
 	/// @return Created file sub-logger factory.
 	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) inline ISubLoggerFactory* CreateFileSubLoggerFactory();
+	__declspec(dllexport) ISubLoggerFactory* CreateFileSubLoggerFactory();
 	/// @brief Creates a file sub-logger factory with the @p path.
 	/// @param path Log file path.
 	/// @return Created file sub-logger factory.
 	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) inline ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path);
+	__declspec(dllexport) ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path);
 	/// @brief Destroys a previously created file sub-logger factory.
 	/// @param subLogger File sub-logger factory to destroy.
-	export __declspec(dllexport) inline void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger);
+	export __declspec(dllexport) void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger);
 
 	inline ILogger* CreateLogger(Core::IEngine& engine)
 	{
@@ -66,28 +66,28 @@ namespace PonyEngine::Debug::Log
 		delete static_cast<Logger*>(logger);
 	}
 
-	inline ISubLoggerFactory* CreateConsoleSubLoggerFactory()
+	ISubLoggerFactory* CreateConsoleSubLoggerFactory()
 	{
 		return new ConsoleSubLoggerFactory();
 	}
 
-	inline void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger)
+	void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger)
 	{
 		assert((dynamic_cast<ConsoleSubLoggerFactory*>(subLogger) != nullptr));
 		delete static_cast<ConsoleSubLoggerFactory*>(subLogger);
 	}
 
-	inline ISubLoggerFactory* CreateFileSubLoggerFactory()
+	ISubLoggerFactory* CreateFileSubLoggerFactory()
 	{
 		return new FileSubLoggerFactory();
 	}
 
-	inline ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path)
+	ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path)
 	{
 		return new FileSubLoggerFactory(path);
 	}
 
-	inline void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger)
+	void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger)
 	{
 		assert((dynamic_cast<FileSubLoggerFactory*>(subLogger) != nullptr));
 		delete static_cast<FileSubLoggerFactory*>(subLogger);
