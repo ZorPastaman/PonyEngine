@@ -19,22 +19,22 @@
     <ClCompile Include="Source\Public\Launcher\LauncherMain.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
       <Project>{d637b8c4-8abf-421e-9b7e-0b842096fb62}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
       <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\..\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
       <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Game.API\Game.API.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game.API\Game.API.vcxproj">
       <Project>{99fdb484-32aa-4b54-8136-4e3ae086a989}</Project>
     </ProjectReference>
-    <ProjectReference Include="..\Game\Game.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game\Game.vcxproj">
       <Project>{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}</Project>
     </ProjectReference>
   </ItemGroup>

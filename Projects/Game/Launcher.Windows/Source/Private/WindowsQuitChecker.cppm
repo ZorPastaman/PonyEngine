@@ -30,13 +30,13 @@ namespace Launcher
 		virtual ~WindowsQuitChecker() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual bool Check(int& exitCode) override;
+		virtual bool Check(int& exitCode) const override;
 
 		WindowsQuitChecker& operator =(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 	};
 
-	bool WindowsQuitChecker::Check(int& exitCode)
+	bool WindowsQuitChecker::Check(int& exitCode) const
 	{
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
