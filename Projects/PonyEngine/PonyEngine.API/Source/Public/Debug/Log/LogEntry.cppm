@@ -180,7 +180,7 @@ namespace PonyEngine::Debug::Log
 	{
 		if (m_isDirty)
 		{
-			m_stringCache = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", Log::ToString(m_logType, false), m_timePoint, m_frameCount,
+			m_stringCache = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", Log::ToString(m_logType, false), m_timePoint, m_frameCount, // TODO: remove . from format
 				m_exception == nullptr
 					? m_message
 					: *m_message == '\0'

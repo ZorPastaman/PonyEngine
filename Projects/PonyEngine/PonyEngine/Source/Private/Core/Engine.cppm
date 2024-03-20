@@ -182,6 +182,10 @@ namespace PonyEngine::Core
 			m_isRunning = false;
 			m_exitCode = exitCode;
 		}
+		else
+		{
+			PONY_LOG(m_loggerManager->GetLogger(), Debug::Log::LogType::Info, "Tried to stop an already stopped engine. Ignore it");
+		}
 	}
 
 	void Engine::Tick()

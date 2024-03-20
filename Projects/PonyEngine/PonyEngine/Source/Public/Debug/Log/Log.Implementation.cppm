@@ -40,7 +40,7 @@ namespace PonyEngine::Debug::Log
 	__declspec(dllexport) ISubLoggerFactory* CreateConsoleSubLoggerFactory();
 	/// @brief Destroys a previously created console sub-logger factory.
 	/// @param subLogger Console sub-logger factory to destroy.
-	export __declspec(dllexport) void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger);
+	export __declspec(dllexport) void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger) noexcept;
 
 	/// @brief Creates a file sub-logger factory with the default log file path, Log.log.
 	/// @return Created file sub-logger factory.
@@ -53,7 +53,7 @@ namespace PonyEngine::Debug::Log
 	__declspec(dllexport) ISubLoggerFactory* CreateFileSubLoggerFactory(const std::filesystem::path& path);
 	/// @brief Destroys a previously created file sub-logger factory.
 	/// @param subLogger File sub-logger factory to destroy.
-	export __declspec(dllexport) void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger);
+	export __declspec(dllexport) void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger) noexcept;
 
 	inline ILogger* CreateLogger(Core::IEngine& engine)
 	{
@@ -71,7 +71,7 @@ namespace PonyEngine::Debug::Log
 		return new ConsoleSubLoggerFactory();
 	}
 
-	void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger)
+	void DestroyConsoleSubLoggerFactory(ISubLoggerFactory* subLogger) noexcept
 	{
 		assert((dynamic_cast<ConsoleSubLoggerFactory*>(subLogger) != nullptr));
 		delete static_cast<ConsoleSubLoggerFactory*>(subLogger);
@@ -87,7 +87,7 @@ namespace PonyEngine::Debug::Log
 		return new FileSubLoggerFactory(path);
 	}
 
-	void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger)
+	void DestroyFileSubLoggerFactory(ISubLoggerFactory* subLogger) noexcept
 	{
 		assert((dynamic_cast<FileSubLoggerFactory*>(subLogger) != nullptr));
 		delete static_cast<FileSubLoggerFactory*>(subLogger);

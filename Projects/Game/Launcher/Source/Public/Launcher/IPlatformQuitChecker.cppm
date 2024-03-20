@@ -18,7 +18,7 @@ namespace Launcher
 		/// @brief Checks if the application must be closed.
 		/// @param exitCode Exit code.
 		/// @return @a True if the application must be closed; @a false otherwise.
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Non-ignorable result")]]
 		virtual bool Check(int& exitCode) const = 0;
 
 	protected:
