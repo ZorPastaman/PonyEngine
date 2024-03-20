@@ -108,6 +108,8 @@
 	} \
 }
 
+// TODO: Add console preposition to turn off logging to a console
+
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
 /// @param logType Log type.

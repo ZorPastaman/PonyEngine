@@ -9,11 +9,19 @@
 
 module;
 
+#include "Debug/Log/LogMacro.h"
 #include "Platform/Windows/Framework.h"
 
 export module Launcher.Windows:WindowsQuitChecker;
 
+import <format>;
+import <iostream>;
+
+import PonyEngine.Debug.Log;
+
 import Launcher;
+
+using LogType = PonyEngine::Debug::Log::LogType;
 
 namespace Launcher
 {
@@ -28,7 +36,7 @@ namespace Launcher
 
 		virtual ~WindowsQuitChecker() noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Non-ignorable result")]]
 		virtual bool Check(int& exitCode) const override;
 
 		WindowsQuitChecker& operator =(const WindowsQuitChecker&) = delete;
@@ -37,6 +45,8 @@ namespace Launcher
 
 	bool WindowsQuitChecker::Check(int& exitCode) const
 	{
+		PONY_CONSOLE(LogType::Verbose, "Check for a quit message.");
+
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
@@ -50,6 +60,8 @@ namespace Launcher
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
+				PONY_CONSOLE(LogType::Info, std::format("Received the exit code '{}' from the platform.", exitCode));
+
 				return false;
 			}
 		}

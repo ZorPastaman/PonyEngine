@@ -13,6 +13,7 @@ module;
 
 export module Launcher:EngineRunner;
 
+import <format>;
 import <iostream>;
 
 import PonyEngine.Core;
@@ -50,6 +51,7 @@ namespace Launcher
 		/// @brief Ticks an engine.
 		/// @param exitCode Engine exit code. It's set only if the function returns @a false.
 		/// @return @a True if the engine is running; @a false otherwise.
+		[[nodiscard("Non-ignorable result")]]
 		bool Tick(int& exitCode);
 
 	private:
@@ -85,7 +87,7 @@ namespace Launcher
 
 	EngineRunner::~EngineRunner() noexcept
 	{
-		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Try to stop an engine");
+		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Stop an engine");
 		m_engine->Stop();
 		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Engine stopped");
 
@@ -122,6 +124,7 @@ namespace Launcher
 		if (!isRunning) [[unlikely]]
 		{
 			exitCode = m_engine->GetExitCode();
+			PONY_LOG(m_engine->GetLogger(), LogType::Info, std::format("Received the exit code '{}' from the engine.", exitCode).c_str());
 		}
 
 		return isRunning;
