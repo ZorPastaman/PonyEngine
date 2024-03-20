@@ -89,7 +89,7 @@ namespace Launcher
 		m_engine->Stop();
 		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Engine stopped");
 
-		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Stop a game");
+		PONY_LOG(m_engine->GetLogger(), LogType::Info, "End a game");
 		try
 		{
 			m_game->End();
@@ -98,7 +98,7 @@ namespace Launcher
 		{
 			PONY_LOG_E(m_engine->GetLogger(), e, "On ending a game");
 		}
-		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Game stopped");
+		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Game ended");
 
 		PONY_LOG(m_engine->GetLogger(), LogType::Info, "Destroy a game");
 		Game::DestroyGame(m_game);

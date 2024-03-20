@@ -86,6 +86,10 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Public\Platform\Windows\Framework.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyEngine.Windows.API.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
