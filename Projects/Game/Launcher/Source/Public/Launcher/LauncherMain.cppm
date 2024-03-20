@@ -33,11 +33,11 @@ namespace Launcher
 		EngineRunner engineRunner(engineParamsProvider, platformEngineParamsProvider);
 
 		int exitCode = 0;
-		bool shouldExit = false;
+		bool isRunning = true;
 
-		while (!shouldExit)
+		while (isRunning)
 		{
-			shouldExit = !engineRunner.Tick(exitCode) || !quitChecker.Check(exitCode);
+			isRunning = engineRunner.Tick(exitCode) && quitChecker.Check(exitCode);
 		}
 
 		return exitCode;

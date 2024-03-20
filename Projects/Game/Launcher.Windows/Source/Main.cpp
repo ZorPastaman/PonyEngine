@@ -14,6 +14,11 @@ import Launcher.Windows;
 
 int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const LPWSTR lpCmdLine, const int nCmdShow)
 {
+	UNREFERENCED_PARAMETER(hInstance);
+	UNREFERENCED_PARAMETER(hPrevInstance);
+	UNREFERENCED_PARAMETER(lpCmdLine);
+	UNREFERENCED_PARAMETER(nCmdShow);
+
 	const Launcher::WindowsEngineParamsProvider windowsEngineParamsProvider;
 	const Launcher::WindowsQuitChecker windowsQuitChecker;
 

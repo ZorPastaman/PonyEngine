@@ -26,6 +26,12 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyEngine.Windows.rc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
