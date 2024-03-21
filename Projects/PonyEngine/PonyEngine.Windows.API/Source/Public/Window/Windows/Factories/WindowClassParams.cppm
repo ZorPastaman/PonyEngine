@@ -17,11 +17,12 @@ namespace PonyEngine::Window
 	export struct WindowClassParams final
 	{
 	public:
-		/// @brief Creates a default Window class params.
-		WindowClassParams();
 		/// @brief Create a Window class params with a predefined class name.
 		/// @param className Class name.
-		WindowClassParams(const std::wstring& className);
+		explicit inline WindowClassParams(const std::wstring& className);
+		/// @brief Create a Window class params with a predefined class name.
+		/// @param className Class name.
+		explicit inline WindowClassParams(std::wstring&& className) noexcept;
 		WindowClassParams(const WindowClassParams& other) = default;
 		WindowClassParams(WindowClassParams&& other) = default;
 
@@ -33,12 +34,12 @@ namespace PonyEngine::Window
 		std::wstring m_className; /// @brief Class name.
 	};
 
-	WindowClassParams::WindowClassParams() :
-		m_className(L"Pony Engine Game")
+	inline WindowClassParams::WindowClassParams(const std::wstring& className) :
+		m_className(className)
 	{
 	}
 
-	WindowClassParams::WindowClassParams(const std::wstring& className) :
+	inline WindowClassParams::WindowClassParams(std::wstring&& className) noexcept :
 		m_className(className)
 	{
 	}
