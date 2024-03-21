@@ -69,35 +69,35 @@ namespace PonyEngine::Core
 		m_services{},
 		m_engine{engine}
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create services");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create services.");
 
 		for (IServiceFactory* const factory : serviceFactories)
 		{
 			assert((factory != nullptr));
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create '{}'", factory->GetServiceName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create '{}'.", factory->GetServiceName()).c_str());
 			IService* const service = factory->Create(engine);
 			assert((service != nullptr));
 			m_services.push_back(std::pair(service, factory));
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' created", service->GetName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' created.", service->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services created");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services created.");
 	}
 
 	ServiceManager::~ServiceManager() noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy services");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy services.");
 
 		for (std::vector<std::pair<IService*, IServiceFactory*>>::const_reverse_iterator it = m_services.crbegin(); it != m_services.crend(); ++it)
 		{
 			IService* const service = it->first;
 			IServiceFactory* const factory = it->second;
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Destroy '{}'", service->GetName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Destroy '{}'.", service->GetName()).c_str());
 			factory->Destroy(service);
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' destroyed", factory->GetServiceName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' destroyed.", factory->GetServiceName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services destroyed");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services destroyed.");
 	}
 
 	IService* ServiceManager::FindService(const std::function<bool(const IService*)>& predicate) const
@@ -117,25 +117,25 @@ namespace PonyEngine::Core
 
 	void ServiceManager::Begin() const
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Begin services");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Begin services.");
 
 		for (const std::pair<IService*, IServiceFactory*> serviceFactory : m_services)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Begin '{}'", serviceFactory.first->GetName()).c_str()); // TODO: safe format
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Begin '{}'.", serviceFactory.first->GetName()).c_str()); // TODO: safe format
 			serviceFactory.first->Begin();
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' begun", serviceFactory.first->GetName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' begun.", serviceFactory.first->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services begun");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services begun.");
 	}
 
 	void ServiceManager::End() const noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End services");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End services.");
 
 		for (std::vector<std::pair<IService*, IServiceFactory*>>::const_reverse_iterator it = m_services.crbegin(); it != m_services.crend(); ++it)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("End '{}'", it->first->GetName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("End '{}'.", it->first->GetName()).c_str());
 
 			try
 			{
@@ -143,12 +143,12 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(m_engine.GetLogger(), e, "On ending a service");
+				PONY_LOG_E(m_engine.GetLogger(), e, "On ending a service.");
 			}
 
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' ended", it->first->GetName()).c_str());
+			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' ended.", it->first->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services ended");
+		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Services ended.");
 	}
 }
