@@ -19,7 +19,6 @@ import <iostream>;
 
 import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
-import PonyEngine.Debug.Log.Factories;
 import PonyEngine.Debug.Log.Implementation;
 import PonyEngine.Input.Factories;
 import PonyEngine.Input.Implementation;
@@ -33,8 +32,9 @@ namespace Launcher
 	{
 	public:
 		/// @brief Creates an @p EngineParamsProvider.
+		/// @param logger Logger.
 		[[nodiscard("Pure constructor")]]
-		EngineParamsProvider();
+		EngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
 		EngineParamsProvider(const EngineParamsProvider&) = delete;
 		EngineParamsProvider(EngineParamsProvider&&) = delete;
 
@@ -48,54 +48,34 @@ namespace Launcher
 		EngineParamsProvider& operator =(EngineParamsProvider&&) = delete;
 
 	private:
-		// Set all platform-independent factories here.
-		PonyEngine::Debug::Log::ISubLoggerFactory* m_consoleSubLoggerFactory;
-		PonyEngine::Debug::Log::ISubLoggerFactory* m_fileSubLoggerFactory;
+		PonyEngine::Debug::Log::ILogger& m_logger;
 
+		// Set all platform-independent factories here.
 		PonyEngine::Input::IInputSystemFactory* m_inputSystemFactory;
 	};
 
-	EngineParamsProvider::EngineParamsProvider()
+	EngineParamsProvider::EngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger) :
+		m_logger{logger}
 	{
 		// Create all platform-independent factories here.
-		PONY_CONSOLE(LogType::Info, "Create a console sub-logger factory.");
-		m_consoleSubLoggerFactory = PonyEngine::Debug::Log::CreateConsoleSubLoggerFactory();
-		assert((m_consoleSubLoggerFactory != nullptr));
-		PONY_CONSOLE(LogType::Info, "Console sub-logger factory created.");
-		PONY_CONSOLE(LogType::Info, "Create a file sub-logger factory.");
-		m_fileSubLoggerFactory = PonyEngine::Debug::Log::CreateFileSubLoggerFactory();
-		assert((m_fileSubLoggerFactory != nullptr));
-		PONY_CONSOLE(LogType::Info, "File sub-logger factory created.");
-
-		PONY_CONSOLE(LogType::Info, "Create an input system factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Create an input system factory.");
 		m_inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
 		assert((m_inputSystemFactory != nullptr));
-		PONY_CONSOLE(LogType::Info, "Input system factory created.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Input system factory created.");
 	}
 
 	EngineParamsProvider::~EngineParamsProvider() noexcept
 	{
 		// Destroy all platform-independent factories here.
-		PONY_CONSOLE(LogType::Info, "Destroy an input system factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Destroy an input system factory.");
 		PonyEngine::Input::DestroyInputSystemFactory(m_inputSystemFactory);
-		PONY_CONSOLE(LogType::Info, "Input system factory destroyed.");
-
-		PONY_CONSOLE(LogType::Info, "Destroy a file sub-logger factory.");
-		PonyEngine::Debug::Log::DestroyFileSubLoggerFactory(m_fileSubLoggerFactory);
-		PONY_CONSOLE(LogType::Info, "File sub-logger factory destroyed.");
-		PONY_CONSOLE(LogType::Info, "Destroy a console sub-logger factory.");
-		PonyEngine::Debug::Log::DestroyConsoleSubLoggerFactory(m_consoleSubLoggerFactory);
-		PONY_CONSOLE(LogType::Info, "Console sub-logger factory destroyed.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Input system factory destroyed.");
 	}
 
 	void EngineParamsProvider::Modify(PonyEngine::Core::EngineParams& engineParams) const
 	{
 		// Set all platform-independent factories and other parameters here.
-		PONY_CONSOLE(LogType::Debug, "Push a console sub-logger factory.");
-		engineParams.subLoggerFactories.push_back(m_consoleSubLoggerFactory);
-		PONY_CONSOLE(LogType::Debug, "Push a file sub-logger factory.");
-		engineParams.subLoggerFactories.push_back(m_fileSubLoggerFactory);
-		PONY_CONSOLE(LogType::Debug, "Push an input system factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Debug, "Push an input system factory.");
 		engineParams.systemFactories.push_back(m_inputSystemFactory);
 	}
 }

@@ -34,7 +34,7 @@ namespace Launcher
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		WindowsEngineParamsProvider();
+		WindowsEngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
 		WindowsEngineParamsProvider(const WindowsEngineParamsProvider&) = delete;
 		WindowsEngineParamsProvider(WindowsEngineParamsProvider&&) = delete;
 
@@ -46,33 +46,36 @@ namespace Launcher
 		WindowsEngineParamsProvider& operator =(WindowsEngineParamsProvider&&) = delete;
 
 	private:
+		PonyEngine::Debug::Log::ILogger& m_logger;
+
 		// Set all platform-dependent factories here.
 		PonyEngine::Window::IWindowsWindowFactory* m_windowsWindowFactory;
 	};
 
-	WindowsEngineParamsProvider::WindowsEngineParamsProvider()
+	WindowsEngineParamsProvider::WindowsEngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger) :
+		m_logger{logger}
 	{
 		// Create all platform-dependent factories here.
-		PONY_CONSOLE(LogType::Info, "Create a Windows window factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Create a Windows window factory.");
 		PonyEngine::Window::WindowClassParams windowClassParams(L"Pony Engine Game");
-		m_windowsWindowFactory = PonyEngine::Window::CreateWindowsWindowFactory(windowClassParams);
+		m_windowsWindowFactory = PonyEngine::Window::CreateWindowsWindowFactory(m_logger, windowClassParams);
 		assert((m_windowsWindowFactory != nullptr));
 		m_windowsWindowFactory->SetTitle(L"Pony Engine Game");
-		PONY_CONSOLE(LogType::Info, "Windows window factory created.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Windows window factory created.");
 	}
 
 	WindowsEngineParamsProvider::~WindowsEngineParamsProvider() noexcept
 	{
 		// Destroy all platform-dependent factories here.
-		PONY_CONSOLE(LogType::Info, "Destroy a Windows window factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Destroy a Windows window factory.");
 		PonyEngine::Window::DestroyWindowsWindowFactory(m_windowsWindowFactory);
-		PONY_CONSOLE(LogType::Info, "Windows window factory destroyed.");
+		PONY_LOG_GENERAL(m_logger, LogType::Info, "Windows window factory destroyed.");
 	}
 
 	void WindowsEngineParamsProvider::Modify(PonyEngine::Core::EngineParams& engineParams) const
 	{
 		// Set platform-dependent engine parameters here.
-		PONY_CONSOLE(LogType::Debug, "Push a Windows window factory.");
+		PONY_LOG_GENERAL(m_logger, LogType::Debug, "Push a Windows window factory.");
 		engineParams.windowFactory = m_windowsWindowFactory;
 	}
 }

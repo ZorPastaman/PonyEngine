@@ -16,9 +16,8 @@
     <ClCompile Include="Source\Public\Core\Factories\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
     <ClCompile Include="Source\Public\Core\Factories\IServiceFactory.cppm" />
-    <ClCompile Include="Source\Public\Debug\Log\Factories\Log.Factories.cppm" />
-    <ClCompile Include="Source\Public\Debug\Log\Factories\ISubLoggerFactory.cppm" />
     <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Debug\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\IInputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\Input.Factories.cppm" />
     <ClCompile Include="Source\Public\Input\Handle.cppm" />

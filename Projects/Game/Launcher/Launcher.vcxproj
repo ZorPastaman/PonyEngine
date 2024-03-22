@@ -17,6 +17,7 @@
     <ClCompile Include="Source\Public\Launcher\IPlatformQuitChecker.cppm" />
     <ClCompile Include="Source\Public\Launcher\Launcher.cppm" />
     <ClCompile Include="Source\Public\Launcher\LauncherMain.cppm" />
+    <ClCompile Include="Source\Public\Launcher\LoggerManager.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">

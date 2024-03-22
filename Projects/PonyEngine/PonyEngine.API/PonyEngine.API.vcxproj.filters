@@ -84,13 +84,7 @@
     <ClCompile Include="Source\Public\Window\Factories\IWindowFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Log\Factories\ISubLoggerFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\Factories\Core.Factories.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Debug\Log\Factories\Log.Factories.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Factories\Window.Factories.cppm">
@@ -112,6 +106,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input\Handle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Debug\Log\LogInput.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

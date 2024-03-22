@@ -42,7 +42,7 @@ namespace PonyEngine::Window
 		/// @brief Creates a Windows window factory.
 		/// @param classParams Window class parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowFactory(const WindowClassParams& classParams);
+		WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams);
 		WindowsWindowFactory(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory(WindowsWindowFactory&&) = delete;
 
@@ -68,13 +68,16 @@ namespace PonyEngine::Window
 
 		const std::wstring m_className; /// @brief Window class name.
 		HINSTANCE m_hInstance; /// @brief This dll instance.
+
+		Debug::Log::ILogger& m_logger;
 	};
 
 	/// @brief Empty function.
 	void Dummy();
 
-	WindowsWindowFactory::WindowsWindowFactory(const WindowClassParams& classParams) :
-		m_className(classParams.m_className)
+	WindowsWindowFactory::WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams) :
+		m_className(classParams.m_className),
+		m_logger{logger}
 	{
 		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&Dummy), &m_hInstance);
 		if (m_hInstance == nullptr)
@@ -87,23 +90,23 @@ namespace PonyEngine::Window
 		wc.hInstance = m_hInstance;
 		wc.lpszClassName = m_className.c_str();
 
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Register a window class '{}'.", Utility::ConvertToString(m_className)));
+		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Register a window class '{}'.", Utility::ConvertToString(m_className)).c_str());
 		RegisterClass(&wc);
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' registered.", Utility::ConvertToString(m_className)));
+		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window class '{}' registered.", Utility::ConvertToString(m_className)).c_str());
 	}
 
 	WindowsWindowFactory::~WindowsWindowFactory() noexcept
 	{
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Unregister a window class '{}'.", Utility::ConvertToString(m_className)));
+		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Unregister a window class '{}'.", Utility::ConvertToString(m_className)).c_str());
 		try
 		{
 			UnregisterClass(m_className.c_str(), m_hInstance);
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(Debug::Log::LogType::Exception, std::format("{} - {}.", e.what(), "On unregistering a window class").c_str());
+			PONY_LOG_E_GENERAL(m_logger, e, "On unregistering a window class");
 		}
-		PONY_CONSOLE(Debug::Log::LogType::Info, std::format("Window class '{}' unregistered.", Utility::ConvertToString(m_className)));
+		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window class '{}' unregistered.", Utility::ConvertToString(m_className)).c_str());
 	}
 
 	inline IWindowsWindow* WindowsWindowFactory::Create(Core::IEngine& engine)
