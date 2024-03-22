@@ -9,5 +9,4 @@
 
 export module Launcher.Windows;
 
-export import :WindowsEngineParamsProvider;
-export import :WindowsQuitChecker;
+export import :WindowsLauncherMain;

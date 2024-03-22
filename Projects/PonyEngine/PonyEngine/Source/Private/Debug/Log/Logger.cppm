@@ -23,7 +23,6 @@ import <iostream>;
 import <string>;
 import <vector>;
 
-import PonyEngine.Core;
 import PonyEngine.Debug.Log;
 
 namespace PonyEngine::Debug::Log
@@ -32,18 +31,16 @@ namespace PonyEngine::Debug::Log
 	export class Logger final : public ILogger
 	{
 	public:
-		/// @brief Creates a @p Logger.
-		/// @param engine Engine that owns this logger.
 		[[nodiscard("Pure constructor")]]
-		inline Logger(const Core::IEngine& engine) noexcept;
+		inline Logger() noexcept = default;
 		Logger(const Logger&) = delete;
 		[[nodiscard("Pure constructor")]]
 		inline Logger(Logger&& other) noexcept = default;
 
 		inline virtual ~Logger() noexcept = default;
 
-		virtual void Log(LogType logType, const char* message) noexcept override;
-		virtual void LogException(const std::exception& exception, const char* message = "") noexcept override;
+		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
+		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
 
 		virtual void AddSubLogger(ISubLogger* subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
@@ -53,22 +50,15 @@ namespace PonyEngine::Debug::Log
 
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief Sub-loggers container.
-		const Core::IEngine& m_engine; /// @brief Engine that owns this logger.
 	};
 
-	inline Logger::Logger(const Core::IEngine& engine) noexcept :
-		m_subLoggers{},
-		m_engine{engine}
-	{
-	}
-
-	void Logger::Log(const LogType logType, const char* const message) noexcept
+	void Logger::Log(const LogType logType, const LogInput& logInput) noexcept
 	{
 		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
 
 		try
 		{
-			const LogEntry logEntry(message, nullptr, std::chrono::system_clock::now(), m_engine.GetFrameCount(), logType);
+			const LogEntry logEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -81,11 +71,11 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	void Logger::LogException(const std::exception& exception, const char* const message) noexcept
+	void Logger::LogException(const std::exception& exception, const LogInput& logInput) noexcept
 	{
 		try
 		{
-			const LogEntry logEntry(message, &exception, std::chrono::system_clock::now(), m_engine.GetFrameCount(), LogType::Exception);
+			const LogEntry logEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{

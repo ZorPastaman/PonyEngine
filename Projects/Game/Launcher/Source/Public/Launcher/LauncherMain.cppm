@@ -33,18 +33,18 @@ namespace Launcher
 	/// @param quitChecker Platform quit checker.
 	/// @param platformEngineParamsProvider Platform engine params provider.
 	/// @return Exit code.
-	export int LauncherMain(const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& engineParamsProvider);
+	export int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& engineParamsProvider);
 
-	int LauncherMain(const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
+	int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
 	{
-		PONY_CONSOLE(LogType::Info, "Create an engine params provider.");
-		const EngineParamsProvider engineParamsProvider;
-		PONY_CONSOLE(LogType::Info, "Engine params provider created.");
-		PONY_CONSOLE(LogType::Info, "Create an engine runner.");
-		EngineRunner engineRunner(engineParamsProvider, platformEngineParamsProvider);
-		PONY_CONSOLE(LogType::Info, "Engine runner created.");
+		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine params provider.");
+		const EngineParamsProvider engineParamsProvider(logger);
+		PONY_LOG_GENERAL(logger, LogType::Info, "Engine params provider created.");
+		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine runner.");
+		EngineRunner engineRunner(logger, engineParamsProvider, platformEngineParamsProvider);
+		PONY_LOG_GENERAL(logger, LogType::Info, "Engine runner created.");
 
-		PONY_CONSOLE(LogType::Info, "Start a main loop.");
+		PONY_LOG_GENERAL(logger, LogType::Info, "Start a main loop.");
 
 		int exitCode = 0;
 		bool isRunning = true;
@@ -54,7 +54,7 @@ namespace Launcher
 			isRunning = engineRunner.Tick(exitCode) && quitChecker.Check(exitCode);
 		}
 
-		PONY_CONSOLE(LogType::Info, std::format("Main loop ended with the exit code '{}'.", exitCode));
+		PONY_LOG_GENERAL(logger, LogType::Info, std::format("Main loop ended with the exit code '{}'.", exitCode).c_str());
 
 		return exitCode;
 	}
