@@ -27,8 +27,5 @@
     <ClCompile Include="Source\Private\Launcher\Windows\Launcher.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\Windows\WindowsLauncherMain.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

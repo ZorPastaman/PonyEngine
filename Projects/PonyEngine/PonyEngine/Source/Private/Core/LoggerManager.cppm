@@ -1,3 +1,3 @@
-Launcher::LoggerManager::LoggerManager()
+Launcher::LoggerProvider::LoggerProvider()
 {
 }

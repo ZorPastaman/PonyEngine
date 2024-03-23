@@ -36,6 +36,7 @@ namespace Launcher
 	{
 	public:
 		/// @brief Creates an @p EngineRunner.
+		/// @param logger Logger to use.
 		/// @param engineParamsProvider Platform-independent engine params provider.
 		/// @param platformEngineParamsProvider Platform-dependent engine params provider.
 		[[nodiscard("Pure constructor")]]
@@ -65,8 +66,7 @@ namespace Launcher
 		m_logger{logger}
 	{
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Create engine params.");
-		PonyEngine::Core::EngineParams engineParams;
-		engineParams.logger = &logger;
+		PonyEngine::Core::EngineParams engineParams(m_logger);
 
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Set engine params.");
 		engineParamsProvider.Modify(engineParams);

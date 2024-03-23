@@ -30,6 +30,7 @@ using LogType = PonyEngine::Debug::Log::LogType;
 namespace Launcher
 {
 	/// @brief Main function.
+	/// @param logger Logger to use.
 	/// @param quitChecker Platform quit checker.
 	/// @param platformEngineParamsProvider Platform engine params provider.
 	/// @return Exit code.
