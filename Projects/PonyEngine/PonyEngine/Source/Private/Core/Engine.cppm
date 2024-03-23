@@ -71,7 +71,7 @@ namespace PonyEngine::Core
 		Engine& operator =(Engine&&) = delete;
 
 	private:
-		Debug::Log::ILogger* const m_logger; /// @brief Logger.
+		Debug::Log::ILogger& m_logger; /// @brief Logger.
 
 		WindowManager* m_windowManager; /// @brief Engine window. It can be nullptr.
 
@@ -89,8 +89,6 @@ namespace PonyEngine::Core
 		m_frameCount{0},
 		m_isRunning{true}
 	{
-		assert((m_logger != nullptr));
-
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Create a window manager.");
 		m_windowManager = new WindowManager(params.windowFactory, *this);
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Window manager created.");
@@ -141,7 +139,7 @@ namespace PonyEngine::Core
 
 	inline Debug::Log::ILogger& Engine::GetLogger() const noexcept
 	{
-		return *m_logger;
+		return m_logger;
 	}
 
 	inline Window::IWindow* Engine::GetWindow() const noexcept

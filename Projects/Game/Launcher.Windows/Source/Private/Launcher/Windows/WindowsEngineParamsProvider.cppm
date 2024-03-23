@@ -33,6 +33,8 @@ namespace Launcher
 	export class WindowsEngineParamsProvider final : public IPlatformEngineParamsProvider
 	{
 	public:
+		/// @brief Creates WindowsEngineParamsProvider.
+		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
 		WindowsEngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
 		WindowsEngineParamsProvider(const WindowsEngineParamsProvider&) = delete;
@@ -46,7 +48,7 @@ namespace Launcher
 		WindowsEngineParamsProvider& operator =(WindowsEngineParamsProvider&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger;
+		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
 
 		// Set all platform-dependent factories here.
 		PonyEngine::Window::IWindowsWindowFactory* m_windowsWindowFactory;

@@ -29,6 +29,8 @@ namespace Launcher
 	export class WindowsQuitChecker : public IPlatformQuitChecker
 	{
 	public:
+		/// @brief Creates a @p WindowsQuitChecker.
+		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
 		WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept;
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
