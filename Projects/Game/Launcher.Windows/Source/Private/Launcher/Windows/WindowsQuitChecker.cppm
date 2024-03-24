@@ -45,7 +45,7 @@ namespace Launcher
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger;
+		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
 	};
 
 	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept :

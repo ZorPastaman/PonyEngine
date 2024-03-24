@@ -48,7 +48,7 @@ namespace Launcher
 		EngineParamsProvider& operator =(EngineParamsProvider&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger;
+		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
 
 		// Set all platform-independent factories here.
 		PonyEngine::Input::IInputSystemFactory* m_inputSystemFactory;

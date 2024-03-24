@@ -56,7 +56,7 @@ namespace Launcher
 		bool Tick(int& exitCode);
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger;
+		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
 
 		PonyEngine::Core::IEngine* m_engine; /// @brief Run engine.
 		Game::IGame* m_game; /// @brief Run game.
