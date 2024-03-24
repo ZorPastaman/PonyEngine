@@ -12,3 +12,4 @@ export module Launcher;
 export import :IPlatformEngineParamsProvider;
 export import :IPlatformQuitChecker;
 export import :LauncherMain;
+export import :LoggerProvider;

@@ -11,12 +11,15 @@ module;
 
 #include <cassert>
 
+#include "Debug/Log/LogMacro.h"
+
 export module PonyEngine.Debug.Log:LogEntry;
 
 import <chrono>;
 import <cstddef>;
 import <exception>;
 import <format>;
+import <iostream>;
 import <ostream>;
 import <string>;
 
@@ -83,11 +86,13 @@ namespace PonyEngine::Debug::Log
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Created string.
 		[[nodiscard("Pure function")]]
-		std::string ToString() const;
+		std::string ToString() const noexcept;
 
 		LogEntry& operator =(const LogEntry& other) noexcept = default;
 
 	private:
+		void MakeString() const noexcept;
+
 		const char* m_message; /// @brief Log message.
 		const std::exception* m_exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
 		std::chrono::time_point<std::chrono::system_clock> m_timePoint; /// @brief Time when the log entry is created.
@@ -176,19 +181,40 @@ namespace PonyEngine::Debug::Log
 		m_isDirty = true;
 	}
 
-	std::string LogEntry::ToString() const
+	std::string LogEntry::ToString() const noexcept
 	{
 		if (m_isDirty)
 		{
-			m_stringCache = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}.", Log::ToString(m_logType, false), m_timePoint, m_frameCount,
-				m_exception == nullptr
-					? m_message
-					: *m_message == '\0'
-						? m_exception->what()
-						: std::format("{} - {}", m_exception->what(), m_message).c_str());
+			MakeString();
 			m_isDirty = false;
 		}
 
 		return m_stringCache;
+	}
+
+	void LogEntry::MakeString() const noexcept
+	{
+		try
+		{
+			try
+			{
+				const std::string logTypeString = Log::ToString(m_logType, false);
+				const std::string messageToFormat = m_exception == nullptr
+					? m_message
+					: m_message == nullptr || *m_message == '\0'
+						? m_exception->what()
+						: std::format("{} - {}", m_exception->what(), m_message);
+				m_stringCache = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, m_timePoint, m_frameCount, messageToFormat);
+			}
+			catch (const std::exception& e)
+			{
+				PONY_CONSOLE(LogType::Exception, e.what());
+				m_stringCache = "";
+			}
+		}
+		catch (const std::exception& e)
+		{
+			m_stringCache = "";
+		}
 	}
 }

@@ -11,7 +11,7 @@ export module PonyEngine.Core.Factories:EngineParams;
 
 import <vector>;
 
-import PonyEngine.Debug.Log.Factories;
+import PonyEngine.Debug.Log;
 import PonyEngine.Window.Factories;
 
 import :IServiceFactory;
@@ -23,8 +23,10 @@ namespace PonyEngine::Core
 	export struct EngineParams final
 	{
 	public:
+		/// @brief Create an engine params.
+		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		EngineParams() = default;
+		EngineParams(Debug::Log::ILogger& logger) noexcept;
 		[[nodiscard("Pure constructor")]]
 		EngineParams(const EngineParams& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -35,9 +37,17 @@ namespace PonyEngine::Core
 		EngineParams& operator =(const EngineParams& other) = default;
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
-		std::vector<Debug::Log::ISubLoggerFactory*> subLoggerFactories; /// @brief Sub-logger factories. Their lifetimes must exceed the engine lifetime.
 		std::vector<IServiceFactory*> serviceFactories; /// @brief Service factories. Their lifetimes must exceed the engine lifetime.
 		std::vector<ISystemFactory*> systemFactories; /// @brief System factories. Their lifetimes must exceed the engine lifetime.
+		Debug::Log::ILogger& logger; /// @brief Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
 		Window::IWindowFactory* windowFactory; /// @brief Window factory. It's optional and can be nullptr. If it's not nullptr, its lifetime must exceed the engine lifetime.
 	};
+
+	EngineParams::EngineParams(Debug::Log::ILogger& logger) noexcept :
+		serviceFactories{},
+		systemFactories{},
+		logger{logger},
+		windowFactory{}
+	{
+	}
 }

@@ -72,35 +72,35 @@ namespace PonyEngine::Core
 		m_systems{},
 		m_engine{engine}
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Create systems");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Create systems.");
 
 		for (ISystemFactory* const factory : systemFactories)
 		{
 			assert((factory != nullptr));
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Create '{}'", factory->GetSystemName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
 			ISystem* const system = factory->Create(engine);
 			assert((system != nullptr));
 			m_systems.push_back(std::pair(system, factory));
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' created", system->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' created.", system->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems created");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems created.");
 	}
 
 	SystemManager::~SystemManager() noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy systems");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Destroy systems.");
 
 		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
 			ISystem* const system = it->first;
 			ISystemFactory* const factory = it->second;
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Destroy '{}'", system->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Destroy '{}'.", system->GetName()).c_str());
 			factory->Destroy(system);
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' destroyed", factory->GetSystemName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' destroyed.", factory->GetSystemName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems destroyed");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems destroyed.");
 	}
 
 	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
@@ -120,46 +120,46 @@ namespace PonyEngine::Core
 
 	void SystemManager::Begin() const
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Begin systems");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Begin systems.");
 
 		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("Begin '{}'", systemFactory.first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Begin '{}'.", systemFactory.first->GetName()).c_str());
 			systemFactory.first->Begin();
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' begun", systemFactory.first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' begun.", systemFactory.first->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems begun");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems begun.");
 	}
 
 	void SystemManager::End() const noexcept
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "End systems");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "End systems.");
 
 		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("End '{}'", it->first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("End '{}'.", it->first->GetName()).c_str());
 			try
 			{
 				it->first->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(m_engine.GetLogger(), e, "On endine a system");
+				PONY_LOG_E(m_engine, e, "On ending a system.");
 			}
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, std::format("'{}' ended", it->first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' ended.", it->first->GetName()).c_str());
 		}
 
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Systems ended");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems ended.");
 	}
 
 	void SystemManager::Tick() const
 	{
-		PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Tick systems");
+		PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Tick systems.");
 
 		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, systemFactory.first->GetName());
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, systemFactory.first->GetName());
 			systemFactory.first->Tick();
 		}
 	}

@@ -33,5 +33,8 @@
     <ClCompile Include="Source\Private\Launcher\EngineParamsProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Launcher\LoggerProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
