@@ -40,6 +40,8 @@ namespace PonyEngine::Debug::Log
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const LogEntry& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		LogEntry(LogEntry&& other) noexcept = default;
 
 		~LogEntry() noexcept = default;
 
