@@ -61,17 +61,17 @@ namespace PonyEngine::Core
 		m_windowFactory{windowFactory},
 		m_engine{engine}
 	{
-		PONY_LOG_IF(m_window != nullptr, m_engine.GetLogger(), Debug::Log::LogType::Info, "Window created");
-		PONY_LOG_IF(m_window == nullptr, m_engine.GetLogger(), Debug::Log::LogType::Info, "Window creation skipped");
+		PONY_LOG_IF(m_window != nullptr, m_engine, Debug::Log::LogType::Info, "Window created.");
+		PONY_LOG_IF(m_window == nullptr, m_engine, Debug::Log::LogType::Info, "Window creation skipped.");
 	}
 
 	WindowManager::~WindowManager() noexcept
 	{
 		if (m_windowFactory != nullptr)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Destroy a window");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Destroy a window.");
 			m_windowFactory->Destroy(m_window);
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window destroyed");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window destroyed.");
 		}
 	}
 
@@ -84,9 +84,9 @@ namespace PonyEngine::Core
 	{
 		if (m_window != nullptr)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Show a window");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Show a window.");
 			m_window->ShowWindow();
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Info, "Window shown");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window shown.");
 		}
 	}
 
@@ -94,7 +94,7 @@ namespace PonyEngine::Core
 	{
 		if (m_window != nullptr)
 		{
-			PONY_LOG(m_engine.GetLogger(), Debug::Log::LogType::Verbose, "Tick a window");
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Tick a window.");
 			m_window->Tick();
 		}
 	}
