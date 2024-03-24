@@ -65,11 +65,11 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="CommonTests.cpp" />
-    <ClCompile Include="QuaternionTests.cpp" />
-    <ClCompile Include="Vector2Tests.cpp" />
-    <ClCompile Include="Vector3Tests.cpp" />
-    <ClCompile Include="Vector4Tests.cpp" />
+    <ClCompile Include="Math\CommonTests.cpp" />
+    <ClCompile Include="Math\QuaternionTests.cpp" />
+    <ClCompile Include="Math\Vector2Tests.cpp" />
+    <ClCompile Include="Math\Vector3Tests.cpp" />
+    <ClCompile Include="Math\Vector4Tests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">

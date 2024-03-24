@@ -16,7 +16,7 @@ import PonyEngine.Math;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace PonyEngineTests
+namespace Math
 {
 	TEST_CLASS(CommonTests)
 	{
