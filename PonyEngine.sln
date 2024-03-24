@@ -19,11 +19,11 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input", "Project
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj", "{933D1110-B95B-4DF9-8584-3D39BC307A67}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math.Tests", "Projects\Tests\PonyEngine.Math.Tests\PonyEngine.Math.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Windows.API", "Projects\PonyEngine\PonyEngine.Windows.API\PonyEngine.Windows.API.vcxproj", "{4C500618-3909-4505-9B61-4C5794964D76}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Windows", "Projects\PonyEngine\PonyEngine.Windows\PonyEngine.Windows.vcxproj", "{6265AFF4-A641-43F4-8553-1A41E593480A}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Tests", "Projects\Tests\PonyEngine.Tests\PonyEngine.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PonyEngine", "PonyEngine", "{720E2B60-DD48-4D80-BF09-599A12AD7E65}"
 EndProject
