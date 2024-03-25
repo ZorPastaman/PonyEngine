@@ -7,9 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <format>
-
 #include "CppUnitTest.h"
+
+import <format>;
 
 import PonyEngine.Math;
 
