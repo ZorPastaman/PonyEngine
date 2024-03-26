@@ -75,13 +75,14 @@ namespace PonyEngine::Debug::Log
 		LogEntry& operator =(LogEntry&& other) noexcept = default;
 
 	private:
+		/// @brief Makes a string for the function ToString().
 		void MakeString() const noexcept;
 
-		const char* m_message; /// @brief Log message.
-		const std::exception* m_exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
-		std::chrono::time_point<std::chrono::system_clock> m_timePoint; /// @brief Time when the log entry is created.
-		std::size_t m_frameCount; /// @brief Frame when the log entry is created.
-		LogType m_logType; /// @brief Log type.
+		const char* const m_message; /// @brief Log message.
+		const std::exception* const m_exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
+		const std::chrono::time_point<std::chrono::system_clock> m_timePoint; /// @brief Time when the log entry is created.
+		const std::size_t m_frameCount; /// @brief Frame when the log entry is created.
+		const LogType m_logType; /// @brief Log type.
 
 		mutable std::string m_stringCache; /// @brief ToString() cache.
 		mutable bool m_isDirty; /// @brief If it's @a true, the cache is invalid.
