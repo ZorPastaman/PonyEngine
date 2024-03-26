@@ -68,7 +68,7 @@ namespace PonyEngine::Debug::Log
 
 		try
 		{
-			const LogEntry logEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
+			const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -85,7 +85,7 @@ namespace PonyEngine::Debug::Log
 	{
 		try
 		{
-			const LogEntry logEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
+			const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
