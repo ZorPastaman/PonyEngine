@@ -65,6 +65,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\EngineParamsTests.cpp" />
     <ClCompile Include="Debug\Log\LogEntryTests.cpp" />
     <ClCompile Include="Debug\Log\LogInputTests.cpp" />
     <ClCompile Include="Debug\Log\LogTypeTests.cpp" />

@@ -48,5 +48,8 @@
     <ClCompile Include="Window\KeyboardMessageTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\EngineParamsTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
