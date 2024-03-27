@@ -74,6 +74,8 @@
     <ClCompile Include="Math\Vector3Tests.cpp" />
     <ClCompile Include="Math\Vector4Tests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
+    <ClCompile Include="Window\KeyboardKeyCodeTests.cpp" />
+    <ClCompile Include="Window\KeyboardMessageTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
