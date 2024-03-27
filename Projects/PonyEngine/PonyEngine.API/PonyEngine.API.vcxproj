@@ -88,10 +88,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
+	<LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
+	<LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
