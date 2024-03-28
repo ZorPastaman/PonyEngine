@@ -10,5 +10,4 @@
 export module PonyEngine.Core;
 
 export import :IEngine;
-export import :IService;
 export import :ISystem;

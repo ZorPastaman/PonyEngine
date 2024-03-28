@@ -24,6 +24,9 @@ namespace PonyEngine::Core
 		/// @details The function is called before a destruction.
 		virtual void End() = 0;
 
+		/// @brief Is the system tickable. The engine will call @p Tick() only if it returns @a true.
+		/// @return @a True if the system is tickable; @a false otherwise.
+		virtual bool IsTickable() const noexcept = 0;
 		/// @brief Ticks the system.
 		virtual void Tick() = 0;
 

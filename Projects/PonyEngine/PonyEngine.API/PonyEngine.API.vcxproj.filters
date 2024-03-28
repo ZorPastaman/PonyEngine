@@ -57,9 +57,6 @@
     <ClCompile Include="Source\Public\Core\ISystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\IService.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Utility\INamed.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -76,9 +73,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factories\IServiceFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Factories\IWindowFactory.cppm">
