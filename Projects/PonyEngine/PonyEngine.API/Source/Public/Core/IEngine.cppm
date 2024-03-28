@@ -47,7 +47,7 @@ namespace PonyEngine::Core
 		/// @tparam T Service type to find.
 		/// @return Found service. It's nullptr if no service is found.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* FindService();
+		T* FindService() const;
 		/// @brief Finds a system by the @p predicate.
 		/// @param predicate Predicate.
 		/// @return Found system. It's nullptr if no system is found.
@@ -57,7 +57,7 @@ namespace PonyEngine::Core
 		/// @tparam T System type to find.
 		/// @return Found system. It's nullptr if no system is found.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* FindSystem();
+		T* FindSystem() const;
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().
@@ -82,14 +82,14 @@ namespace PonyEngine::Core
 	};
 
 	template<typename T>
-	T* IEngine::FindService()
+	T* IEngine::FindService() const
 	{
 		IService* const service = FindService([](const IService* const service) { return dynamic_cast<const T*>(service) != nullptr; });
 		return dynamic_cast<T*>(service);
 	}
 
 	template<typename T>
-	T* IEngine::FindSystem()
+	T* IEngine::FindSystem() const
 	{
 		ISystem* const system = FindSystem([](const ISystem* const system) { return dynamic_cast<const T*>(system) != nullptr; });
 		return dynamic_cast<T*>(system);

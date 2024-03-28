@@ -72,7 +72,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\EngineParamsTests.cpp" />
+    <ClCompile Include="Debug\Log\ConsoleSubLoggerTests.cpp" />
+    <ClCompile Include="Debug\Log\FileSubLoggerTests.cpp" />
     <ClCompile Include="Debug\Log\LogEntryTests.cpp" />
+    <ClCompile Include="Debug\Log\LoggerTests.cpp" />
     <ClCompile Include="Debug\Log\LogInputTests.cpp" />
     <ClCompile Include="Debug\Log\LogTypeTests.cpp" />
     <ClCompile Include="Math\CommonTests.cpp" />
