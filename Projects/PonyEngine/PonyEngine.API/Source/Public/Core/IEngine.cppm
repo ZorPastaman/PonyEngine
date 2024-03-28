@@ -15,7 +15,6 @@ import <functional>;
 import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
-import :IService;
 import :ISystem;
 
 namespace PonyEngine::Core
@@ -38,16 +37,6 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual Window::IWindow* GetWindow() const noexcept = 0;
 
-		/// @brief Finds a service by the @p predicate.
-		/// @param predicate Predicate.
-		/// @return Found service. It's nullptr if no service is found.
-		[[nodiscard("Pure function")]]
-		virtual IService* FindService(const std::function<bool(const IService*)>& predicate) const = 0;
-		/// @brief Finds a service of the type @p T.
-		/// @tparam T Service type to find.
-		/// @return Found service. It's nullptr if no service is found.
-		template<typename T> [[nodiscard("Pure function")]]
-		T* FindService() const;
 		/// @brief Finds a system by the @p predicate.
 		/// @param predicate Predicate.
 		/// @return Found system. It's nullptr if no system is found.
@@ -80,13 +69,6 @@ namespace PonyEngine::Core
 	protected:
 		inline virtual ~IEngine() noexcept = default;
 	};
-
-	template<typename T>
-	T* IEngine::FindService() const
-	{
-		IService* const service = FindService([](const IService* const service) { return dynamic_cast<const T*>(service) != nullptr; });
-		return dynamic_cast<T*>(service);
-	}
 
 	template<typename T>
 	T* IEngine::FindSystem() const

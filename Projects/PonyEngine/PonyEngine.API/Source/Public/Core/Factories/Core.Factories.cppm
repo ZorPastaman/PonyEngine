@@ -10,5 +10,4 @@
 export module PonyEngine.Core.Factories;
 
 export import :EngineParams;
-export import :IServiceFactory;
 export import :ISystemFactory;

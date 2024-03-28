@@ -27,7 +27,6 @@ import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 
-import :ServiceManager;
 import :SystemManager;
 import :WindowManager;
 
@@ -55,8 +54,6 @@ namespace PonyEngine::Core
 		inline virtual Window::IWindow* GetWindow() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual IService* FindService(const std::function<bool(const IService*)>& predicate) const override;
-		[[nodiscard("Pure function")]]
 		inline virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const override;
 
 		[[nodiscard("Pure function")]]
@@ -74,8 +71,6 @@ namespace PonyEngine::Core
 		Debug::Log::ILogger& m_logger; /// @brief Logger.
 
 		WindowManager* m_windowManager; /// @brief Engine window. It can be nullptr.
-
-		ServiceManager* m_serviceManager; /// @brief Service manager.
 		SystemManager* m_systemManager; /// @brief System manager.
 
 		std::size_t m_frameCount; /// @brief Current frame.
@@ -93,18 +88,12 @@ namespace PonyEngine::Core
 		m_windowManager = new WindowManager(params.windowFactory, *this);
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Window manager created.");
 
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Create a service manager.");
-		m_serviceManager = new ServiceManager(params.serviceFactories, *this);
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Service manager created.");
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Create a system manager.");
 		m_systemManager = new SystemManager(params.systemFactories, *this);
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "System manager created.");
 
 		m_windowManager->ShowWindow();
 
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Begin a service manager.");
-		m_serviceManager->Begin();
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Service manager begun.");
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Begin a system manager.");
 		m_systemManager->Begin();
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "System manager begun.");
@@ -115,17 +104,10 @@ namespace PonyEngine::Core
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "End a system manager.");
 		m_systemManager->End();
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "System manager ended.");
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "End a service manager.");
-		m_serviceManager->End();
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Service manager ended.");
 
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Destroy a system manager.");
 		delete m_systemManager;
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "System manager destroyed.");
-
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Destroy a service manager.");
-		delete m_serviceManager;
-		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Service manager destroyed.");
 
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Destroy a window manager.");
 		delete m_windowManager;
@@ -145,11 +127,6 @@ namespace PonyEngine::Core
 	inline Window::IWindow* Engine::GetWindow() const noexcept
 	{
 		return m_windowManager->GetWindow();
-	}
-
-	inline IService* Engine::FindService(const std::function<bool(const IService*)>& predicate) const
-	{
-		return m_serviceManager->FindService(predicate);
 	}
 
 	inline ISystem* Engine::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
