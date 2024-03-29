@@ -129,7 +129,7 @@ namespace Window
 			observer.expectedMessages = false;
 			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, static_cast<WPARAM>(13), 0);
 			engine->Tick();
-			Assert::AreEqual(std::size_t{ 4 }, observer.count);
+			Assert::AreEqual(std::size_t{4}, observer.count);
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
