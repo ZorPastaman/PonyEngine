@@ -25,7 +25,7 @@ namespace PonyEngine::Core
 		/// @brief Create an engine params.
 		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		EngineParams(Debug::Log::ILogger& logger) noexcept;
+		explicit EngineParams(Debug::Log::ILogger& logger) noexcept;
 		[[nodiscard("Pure constructor")]]
 		EngineParams(const EngineParams& other) = default;
 		[[nodiscard("Pure constructor")]]

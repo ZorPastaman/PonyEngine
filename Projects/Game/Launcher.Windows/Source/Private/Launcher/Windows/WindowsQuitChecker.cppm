@@ -32,7 +32,7 @@ namespace Launcher
 		/// @brief Creates a @p WindowsQuitChecker.
 		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept;
+		explicit WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept;
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
@@ -60,12 +60,8 @@ namespace Launcher
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
+			TranslateMessage(&message);
 			DispatchMessage(&message);
-
-			if (TranslateMessage(&message))
-			{
-				DispatchMessage(&message);
-			}
 
 			if (message.message == WM_QUIT)
 			{

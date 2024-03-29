@@ -40,7 +40,7 @@ namespace PonyEngine::Core
 		SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		[[nodiscard("Pure constructor")]]
-		inline SystemManager(SystemManager&& other) noexcept = default;
+		SystemManager(SystemManager&& other) noexcept = default;
 
 		~SystemManager() noexcept;
 
@@ -61,7 +61,7 @@ namespace PonyEngine::Core
 		void Tick() const;
 
 		SystemManager& operator =(const SystemManager&) = delete;
-		inline SystemManager& operator =(SystemManager&& other) noexcept = default;
+		SystemManager& operator =(SystemManager&& other) noexcept = default;
 
 	private:
 		std::vector<ISystem*> m_systems; /// @brief Systems. It's synced with the @p m_factories by index.

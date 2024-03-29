@@ -36,7 +36,7 @@ namespace Launcher
 		/// @brief Creates WindowsEngineParamsProvider.
 		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		WindowsEngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
+		explicit WindowsEngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
 		WindowsEngineParamsProvider(const WindowsEngineParamsProvider&) = delete;
 		WindowsEngineParamsProvider(WindowsEngineParamsProvider&&) = delete;
 

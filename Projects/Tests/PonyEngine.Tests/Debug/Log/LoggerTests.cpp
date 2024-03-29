@@ -31,6 +31,7 @@ namespace Debug::Log
 			std::size_t expectedFrameCount;
 			PonyEngine::Debug::Log::LogType expectedLogType;
 			bool expectMessages;
+			std::size_t count = 0;
 
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override
@@ -45,6 +46,7 @@ namespace Debug::Log
 				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedException), reinterpret_cast<std::uintptr_t>(logEntry.GetException()));
 				Assert::AreEqual(expectedFrameCount, logEntry.GetFrameCount());
 				Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Debug::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyEngine::Debug::Log::LogType>>(logEntry.GetLogType()));
+				++count;
 			}
 		};
 
@@ -78,14 +80,17 @@ namespace Debug::Log
 			testSubLogger.expectMessages = true;
 			testSubLogger.expectedLogType = PonyEngine::Debug::Log::LogType::Info;
 			logger->Log(PonyEngine::Debug::Log::LogType::Info, logInput);
+			Assert::AreEqual(std::size_t{1}, testSubLogger.count);
 
 			testSubLogger.expectedException = &exception;
 			testSubLogger.expectedLogType = PonyEngine::Debug::Log::LogType::Exception;
 			logger->LogException(exception, logInput);
+			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
 			logger->RemoveSubLogger(&testSubLogger);
 			testSubLogger.expectMessages = false;
 			logger->Log(PonyEngine::Debug::Log::LogType::Info, logInput);
+			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
 			PonyEngine::Debug::Log::DestroyLogger(logger);
 		}
