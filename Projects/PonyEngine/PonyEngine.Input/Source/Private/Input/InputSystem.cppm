@@ -33,7 +33,7 @@ namespace PonyEngine::Input
 		/// @brief Creates an @p Input system
 		/// @param engine Engine that owns the input system.
 		[[nodiscard("Pure constructor")]]
-		InputSystem(Core::IEngine& engine) noexcept;
+		explicit InputSystem(Core::IEngine& engine) noexcept;
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 

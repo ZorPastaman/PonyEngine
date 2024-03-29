@@ -39,7 +39,7 @@ namespace PonyEngine::Core
 		/// @brief Creates an @p Engine with the @p params.
 		/// @param params Engine parameters.
 		[[nodiscard("Pure constructor")]]
-		Engine(const EngineParams& params);
+		explicit Engine(const EngineParams& params);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 

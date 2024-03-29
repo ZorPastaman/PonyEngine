@@ -23,14 +23,23 @@ namespace PonyEngine::Window
 		/// @brief Create a Window class params with a predefined class name.
 		/// @param className Class name.
 		explicit inline WindowClassParams(std::wstring&& className) noexcept;
+		/// @brief Create a Window class params with a predefined class name.
+		/// @param className Class name.
+		explicit inline WindowClassParams(const wchar_t* className) noexcept;
 		WindowClassParams(const WindowClassParams& other) = default;
 		WindowClassParams(WindowClassParams&& other) = default;
 
 		~WindowClassParams() noexcept = default;
 
+		/// @brief Gets a class name.
+		/// @return Class name.
+		[[nodiscard("Pure function")]]
+		inline const std::wstring& GetWindowClassName() const noexcept;
+
 		WindowClassParams& operator =(const WindowClassParams& other) = default;
 		WindowClassParams& operator =(WindowClassParams&& other) = default;
 
+	private:
 		std::wstring m_className; /// @brief Class name.
 	};
 
@@ -42,5 +51,15 @@ namespace PonyEngine::Window
 	inline WindowClassParams::WindowClassParams(std::wstring&& className) noexcept :
 		m_className(className)
 	{
+	}
+
+	inline WindowClassParams::WindowClassParams(const wchar_t* className) noexcept :
+		m_className(className)
+	{
+	}
+
+	inline const std::wstring& WindowClassParams::GetWindowClassName() const noexcept
+	{
+		return m_className;
 	}
 }

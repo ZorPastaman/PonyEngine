@@ -10,11 +10,29 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
+      <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Windows.API\PonyEngine.Windows.API.vcxproj">
+      <Project>{4c500618-3909-4505-9b61-4c5794964d76}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Windows\PonyEngine.Windows.vcxproj">
+      <Project>{6265aff4-a641-43f4-8553-1a41e593480a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Window\Windows\WindowClassParamsTests.cpp" />
+    <ClCompile Include="Window\Windows\WindowsWindowTests.cpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
-    <ProjectGuid>{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}</ProjectGuid>
+    <ProjectGuid>{15A0D211-65CA-42AD-AFFB-21FA80071EA9}</ProjectGuid>
     <Keyword>Win32Proj</Keyword>
-    <RootNamespace>PonyEngineTests</RootNamespace>
+    <RootNamespace>PonyEngineWindowsTests</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
     <ProjectSubType>NativeUnitTestProject</ProjectSubType>
   </PropertyGroup>
@@ -34,7 +52,8 @@
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
   <ImportGroup Label="ExtensionSettings">
   </ImportGroup>
-  <ImportGroup Label="Shared" />
+  <ImportGroup Label="Shared">
+  </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
@@ -70,38 +89,6 @@
       <AdditionalLibraryDirectories>$(VCInstallDir)UnitTest\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <ClCompile Include="Core\EngineParamsTests.cpp" />
-    <ClCompile Include="Core\EngineTests.cpp" />
-    <ClCompile Include="Debug\Log\ConsoleSubLoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\FileSubLoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\LogEntryTests.cpp" />
-    <ClCompile Include="Debug\Log\LoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\LogInputTests.cpp" />
-    <ClCompile Include="Debug\Log\LogTypeTests.cpp" />
-    <ClCompile Include="Math\CommonTests.cpp" />
-    <ClCompile Include="Math\QuaternionTests.cpp" />
-    <ClCompile Include="Math\Vector2Tests.cpp" />
-    <ClCompile Include="Math\Vector3Tests.cpp" />
-    <ClCompile Include="Math\Vector4Tests.cpp" />
-    <ClCompile Include="Utility\StringUtilityTests.cpp" />
-    <ClCompile Include="Window\KeyboardKeyCodeTests.cpp" />
-    <ClCompile Include="Window\KeyboardMessageTests.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
-      <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
-      <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
-      <Project>{d637b8c4-8abf-421e-9b7e-0b842096fb62}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
-      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
-    </ProjectReference>
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
   </ImportGroup>

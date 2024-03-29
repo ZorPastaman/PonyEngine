@@ -17,11 +17,10 @@ namespace PonyEngine::Input
 	export struct Event final
 	{
 	public:
-		inline Event() noexcept = default;
 		/// @brief Creates an input event.
 		/// @param expectedMessage The event is raised if the input system receives such an event.
 		[[nodiscard("Pure constructor")]]
-		inline Event(const KeyboardMessage& expectedMessage) noexcept;
+		explicit inline Event(const KeyboardMessage& expectedMessage) noexcept;
 		[[nodiscard("Pure constructor")]]
 		inline Event(const Event& other) noexcept = default;
 
