@@ -7,18 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <format>
-
 #include "CppUnitTest.h"
 
 import <cmath>;
+import <format>;
 import <numbers>;
 
 import PonyEngine.Math;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace PonyEngineTests
+namespace Math
 {
 	TEST_CLASS(Vector3Tests)
 	{

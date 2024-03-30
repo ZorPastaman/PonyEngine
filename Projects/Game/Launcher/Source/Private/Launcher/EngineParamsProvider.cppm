@@ -34,7 +34,7 @@ namespace Launcher
 		/// @brief Creates an @p EngineParamsProvider.
 		/// @param logger Logger.
 		[[nodiscard("Pure constructor")]]
-		EngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
+		explicit EngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger);
 		EngineParamsProvider(const EngineParamsProvider&) = delete;
 		EngineParamsProvider(EngineParamsProvider&&) = delete;
 

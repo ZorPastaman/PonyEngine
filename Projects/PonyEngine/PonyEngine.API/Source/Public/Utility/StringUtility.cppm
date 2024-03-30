@@ -23,7 +23,7 @@ namespace PonyEngine::Utility
 	inline std::string ConvertToString(const std::wstring& source)
 	{
 		std::string answer(source.length(), 0);
-		std::transform(source.cbegin(), source.cend(), answer.begin(), [](wchar_t c) { return static_cast<std::string::value_type>(c); });
+		std::transform(source.cbegin(), source.cend(), answer.begin(), [](const wchar_t c) { return static_cast<std::string::value_type>(c); });
 
 		return answer;
 	}

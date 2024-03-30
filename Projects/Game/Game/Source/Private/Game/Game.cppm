@@ -33,7 +33,7 @@ namespace Game
 		/// @brief Creates a game.
 		/// @param engine Engine that owns the game.
 		[[nodiscard("Pure constructor")]]
-		Game(PonyEngine::Core::IEngine& engine);
+		explicit Game(PonyEngine::Core::IEngine& engine);
 		Game(const Game&) = delete;
 		Game(Game&&) = delete;
 

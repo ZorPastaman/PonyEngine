@@ -21,7 +21,7 @@ namespace PonyEngine::Input
 		/// @brief Creates a handle with the @p id.
 		/// @param id Unique event ID.
 		[[nodiscard("Pure constructor")]]
-		inline Handle(std::size_t id) noexcept;
+		explicit inline Handle(std::size_t id) noexcept;
 		[[nodiscard("Pure constructor")]]
 		inline Handle(const Handle& other) noexcept = default;
 

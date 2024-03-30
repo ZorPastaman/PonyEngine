@@ -35,9 +35,6 @@
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Core\ServiceManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Core\SystemManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

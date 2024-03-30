@@ -7,24 +7,26 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:IService;
+#include "CppUnitTest.h"
+
+import <string>;
 
 import PonyEngine.Utility;
 
-namespace PonyEngine::Core
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace Utility
 {
-	/// @brief Engine service.
-	export class IService : public Utility::INamed
+	TEST_CLASS(StringUtilityTests)
 	{
 	public:
-		/// @brief Begins a service.
-		/// @details The service takes its dependencies in this function.
-		virtual void Begin() = 0;
-		/// @brief Ends a service.
-		/// @details The function is called before a destruction.
-		virtual void End() = 0;
+		TEST_METHOD(ConvertWStringToStringTest)
+		{
+			std::string origin("Pony. Engine, Convert- String!");
+			std::wstring wideOrigin(origin.cbegin(), origin.cend());
 
-	protected:
-		inline virtual ~IService() noexcept = default;
+			std::string converted = PonyEngine::Utility::ConvertToString(wideOrigin);
+			Assert::AreEqual(0, origin.compare(converted));
+		}
 	};
 }

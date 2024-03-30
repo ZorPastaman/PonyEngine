@@ -15,12 +15,12 @@ module;
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
+import <cstddef>;
 import <exception>;
 import <format>;
 import <functional>;
 import <iostream>;
 import <string>;
-import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
@@ -40,7 +40,7 @@ namespace PonyEngine::Core
 		SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		[[nodiscard("Pure constructor")]]
-		inline SystemManager(SystemManager&& other) noexcept = default;
+		SystemManager(SystemManager&& other) noexcept = default;
 
 		~SystemManager() noexcept;
 
@@ -61,15 +61,19 @@ namespace PonyEngine::Core
 		void Tick() const;
 
 		SystemManager& operator =(const SystemManager&) = delete;
-		inline SystemManager& operator =(SystemManager&& other) noexcept = default;
+		SystemManager& operator =(SystemManager&& other) noexcept = default;
 
 	private:
-		std::vector<std::pair<ISystem*, ISystemFactory*>> m_systems; /// @brief Pairs of a system and a system factory that was used to create the system.
+		std::vector<ISystem*> m_systems; /// @brief Systems. It's synced with the @p m_factories by index.
+		std::vector<ISystemFactory*> m_factories; /// @brief System factories. It's synced with the @p m_systems by index.
+		std::vector<ISystem*> m_tickableSystems; /// @brief Tickable systems.
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
 	SystemManager::SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine) :
 		m_systems{},
+		m_factories{},
+		m_tickableSystems{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Create systems.");
@@ -80,7 +84,17 @@ namespace PonyEngine::Core
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
 			ISystem* const system = factory->Create(engine);
 			assert((system != nullptr));
-			m_systems.push_back(std::pair(system, factory));
+			m_systems.push_back(system);
+			m_factories.push_back(factory);
+			if (system->IsTickable())
+			{
+				PONY_LOG(m_engine, Debug::Log::LogType::Info, "Add to tickable systems.");
+				m_tickableSystems.push_back(system);
+			}
+			else
+			{
+				PONY_LOG(m_engine, Debug::Log::LogType::Info, "The system is not tickable.");
+			}
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' created.", system->GetName()).c_str());
 		}
 
@@ -91,10 +105,10 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Destroy systems.");
 
-		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
+		for (std::size_t i = m_systems.size() - 1; i != std::size_t{0} - 1; --i)
 		{
-			ISystem* const system = it->first;
-			ISystemFactory* const factory = it->second;
+			ISystem* const system = m_systems[i];
+			ISystemFactory* const factory = m_factories[i];
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Destroy '{}'.", system->GetName()).c_str());
 			factory->Destroy(system);
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' destroyed.", factory->GetSystemName()).c_str());
@@ -107,11 +121,11 @@ namespace PonyEngine::Core
 	{
 		assert((predicate));
 
-		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
+		for (ISystem* const system : m_systems)
 		{
-			if (predicate(systemFactory.first))
+			if (predicate(system))
 			{
-				return systemFactory.first;
+				return system;
 			}
 		}
 
@@ -122,11 +136,11 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Begin systems.");
 
-		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
+		for (ISystem* const system : m_systems)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Begin '{}'.", systemFactory.first->GetName()).c_str());
-			systemFactory.first->Begin();
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' begun.", systemFactory.first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Begin '{}'.", system->GetName()).c_str());
+			system->Begin();
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' begun.", system->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems begun.");
@@ -136,18 +150,20 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "End systems.");
 
-		for (std::vector<std::pair<ISystem*, ISystemFactory*>>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
+		for (std::vector<ISystem*>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("End '{}'.", it->first->GetName()).c_str());
+			ISystem* const system = *it;
+
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("End '{}'.", system->GetName()).c_str());
 			try
 			{
-				it->first->End();
+				system->End();
 			}
 			catch (const std::exception& e)
 			{
 				PONY_LOG_E(m_engine, e, "On ending a system.");
 			}
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' ended.", it->first->GetName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("'{}' ended.", system->GetName()).c_str());
 		}
 
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Systems ended.");
@@ -157,10 +173,10 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Tick systems.");
 
-		for (const std::pair<ISystem*, ISystemFactory*> systemFactory : m_systems)
+		for (ISystem* const system : m_tickableSystems)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, systemFactory.first->GetName());
-			systemFactory.first->Tick();
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, system->GetName());
+			system->Tick();
 		}
 	}
 }

@@ -15,19 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="CommonTests.cpp">
+    <ClCompile Include="Window\Windows\WindowClassParamsTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Vector3Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector2Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Vector4Tests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="QuaternionTests.cpp">
+    <ClCompile Include="Window\Windows\WindowsWindowTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

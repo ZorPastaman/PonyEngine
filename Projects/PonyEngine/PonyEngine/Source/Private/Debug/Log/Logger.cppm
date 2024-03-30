@@ -39,6 +39,9 @@ namespace PonyEngine::Debug::Log
 
 		inline virtual ~Logger() noexcept = default;
 
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
+
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
 
@@ -48,9 +51,16 @@ namespace PonyEngine::Debug::Log
 		Logger& operator =(const Logger&) = delete;
 		inline Logger& operator =(Logger&& other) noexcept = default;
 
+		static const char* const Name; /// @brief Class name.
+
 	private:
 		std::vector<ISubLogger*> m_subLoggers; /// @brief Sub-loggers container.
 	};
+
+	const char* Logger::GetName() const noexcept
+	{
+		return Name;
+	}
 
 	void Logger::Log(const LogType logType, const LogInput& logInput) noexcept
 	{
@@ -58,7 +68,7 @@ namespace PonyEngine::Debug::Log
 
 		try
 		{
-			const LogEntry logEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
+			const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -75,7 +85,7 @@ namespace PonyEngine::Debug::Log
 	{
 		try
 		{
-			const LogEntry logEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
+			const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
 
 			for (ISubLogger* const subLogger : m_subLoggers)
 			{
@@ -111,4 +121,6 @@ namespace PonyEngine::Debug::Log
 			PONY_CONSOLE_IF(subLogger != nullptr, LogType::Warning, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()));
 		}
 	}
+
+	const char* const Logger::Name = "PonyEngine::Debug::Logger";
 }

@@ -33,7 +33,7 @@ namespace PonyEngine::Input
 		/// @brief Creates an @p Input system
 		/// @param engine Engine that owns the input system.
 		[[nodiscard("Pure constructor")]]
-		InputSystem(Core::IEngine& engine) noexcept;
+		explicit InputSystem(Core::IEngine& engine) noexcept;
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
@@ -45,6 +45,7 @@ namespace PonyEngine::Input
 		virtual void Begin() override;
 		virtual void End() override;
 
+		inline virtual bool IsTickable() const noexcept override;
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
@@ -101,6 +102,11 @@ namespace PonyEngine::Input
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Unsubscribe to keyboard messages.");
 			window->RemoveKeyboardMessageObserver(this);
 		}
+	}
+
+	inline bool InputSystem::IsTickable() const noexcept
+	{
+		return true;
 	}
 
 	void InputSystem::Tick()

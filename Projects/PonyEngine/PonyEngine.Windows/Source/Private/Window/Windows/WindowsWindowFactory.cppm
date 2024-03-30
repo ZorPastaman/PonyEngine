@@ -53,7 +53,7 @@ namespace PonyEngine::Window
 		inline virtual void Destroy(IWindow* window) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual std::wstring GetTitle() const noexcept override;
+		inline virtual const std::wstring& GetTitle() const noexcept override;
 		inline virtual void SetTitle(const std::wstring& title) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -76,7 +76,7 @@ namespace PonyEngine::Window
 	void Dummy();
 
 	WindowsWindowFactory::WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams) :
-		m_className(classParams.m_className),
+		m_className(classParams.GetWindowClassName()),
 		m_logger{logger}
 	{
 		GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&Dummy), &m_hInstance);
@@ -120,7 +120,7 @@ namespace PonyEngine::Window
 		delete static_cast<WindowsWindow*>(window);
 	}
 
-	inline std::wstring WindowsWindowFactory::GetTitle() const noexcept
+	inline const std::wstring& WindowsWindowFactory::GetTitle() const noexcept
 	{
 		return m_windowParams.title;
 	}

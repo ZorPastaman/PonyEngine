@@ -198,12 +198,8 @@ namespace PonyEngine::Window
 		MSG message;
 		while (PeekMessage(&message, m_hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
+			TranslateMessage(&message);
 			DispatchMessage(&message);
-
-			if (TranslateMessage(&message))
-			{
-				DispatchMessage(&message);
-			}
 		}
 	}
 
