@@ -15,7 +15,6 @@
     <ClCompile Include="Source\Public\Core\Factories\Core.Factories.cppm" />
     <ClCompile Include="Source\Public\Core\Factories\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
-    <ClCompile Include="Source\Public\Core\Factories\IServiceFactory.cppm" />
     <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\IInputSystemFactory.cppm" />
@@ -29,7 +28,6 @@
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
     <ClCompile Include="Source\Public\Input\Input.cppm" />
     <ClCompile Include="Source\Public\Utility\INamed.cppm" />
-    <ClCompile Include="Source\Public\Core\IService.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Debug\Log\ISubLogger.cppm" />
@@ -88,10 +86,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factories;$(ProjectDir)\Source\Public\Debug;$(ProjectDir)\Source\Public\Debug\Log;$(ProjectDir)\Source\Public\Debug\Log\Factories;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factories;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Factories;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

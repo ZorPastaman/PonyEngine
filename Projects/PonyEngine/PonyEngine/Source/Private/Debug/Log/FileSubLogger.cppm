@@ -31,7 +31,7 @@ namespace PonyEngine::Debug::Log
 		/// @brief Creates a @p FileSubLogger.
 		/// @param logPath Path to a log file.
 		[[nodiscard("Pure constructor")]]
-		FileSubLogger(const std::filesystem::path& logPath);
+		explicit FileSubLogger(const std::filesystem::path& logPath);
 		FileSubLogger(const FileSubLogger&) = delete;
 		/// @brief Move constructor.
 		/// @param other Move source.

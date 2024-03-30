@@ -14,6 +14,8 @@ module;
 
 export module PonyEngine.Window.Windows.Implementation:WindowProc;
 
+import <iostream>;
+
 import PonyEngine.Debug.Log;
 
 import :WindowsWindow;

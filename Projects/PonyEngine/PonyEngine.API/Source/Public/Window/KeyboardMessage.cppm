@@ -18,11 +18,9 @@ import :KeyboardKeyCode;
 namespace PonyEngine::Window
 {
 	/// @brief Keyboard message.
-	export struct KeyboardMessage final
+	export class KeyboardMessage final
 	{
 	public:
-		[[nodiscard("Pure constructor")]]
-		inline KeyboardMessage() noexcept = default;
 		/// @brief Create a keyboard message.
 		/// @param keyCode Key code.
 		/// @param isDown @a True if the key is pressed; @a false if it's unpressed.
@@ -83,6 +81,6 @@ namespace PonyEngine::Window
 
 	std::ostream& operator <<(std::ostream& stream, const KeyboardMessage& message)
 	{
-		return stream << message;
+		return stream << message.ToString();
 	}
 }
