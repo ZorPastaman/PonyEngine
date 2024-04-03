@@ -37,6 +37,11 @@ namespace PonyEngine::Window
 		/// @param title Window title.
 		virtual void SetTitle(const std::wstring& title) noexcept = 0;
 
+		/// @brief Gets a window class name.
+		/// @return Window class name.
+		[[nodiscard("Pure function")]]
+		virtual const char* GetWindowName() const noexcept = 0; // TODO: add a test
+
 	protected:
 		inline virtual ~IWindowFactory() noexcept = default;
 	};

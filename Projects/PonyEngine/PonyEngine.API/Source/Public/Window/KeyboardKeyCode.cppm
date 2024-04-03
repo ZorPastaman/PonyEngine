@@ -265,11 +265,11 @@ namespace PonyEngine::Window
 		}
 		else [[unlikely]]
 		{
-			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
+			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode)); // TODO: test this branch.
 		}
 	}
 
-	inline std::ostream& operator<<(std::ostream& stream, const KeyboardKeyCode keyCode)
+	inline std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
 	{
 		return stream << ToString(keyCode);
 	}

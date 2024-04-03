@@ -27,18 +27,18 @@ namespace Core
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void Log(PonyEngine::Debug::Log::LogType logType, const PonyEngine::Debug::Log::LogInput& logInput) noexcept override { }
-			virtual void LogException(const std::exception& exception, const PonyEngine::Debug::Log::LogInput& logInput) noexcept override { }
+			virtual void Log(PonyEngine::Debug::Log::LogType, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
+			virtual void LogException(const std::exception&, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
 
-			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger* subLogger) override { }
-			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger* subLogger) override { }
+			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
+			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
 		};
 
 		TEST_METHOD(ContructorTest)
 		{
 			EmptyLogger logger;
 			PonyEngine::Core::EngineParams engineParams(logger);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Debug::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.logger));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Debug::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
 		}
 	};
 }

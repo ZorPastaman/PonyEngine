@@ -9,6 +9,9 @@
 
 #pragma once
 
+// TODO: add tests for this file.
+// TODO: add optional std::terminate.
+
 #if PONY_LOG_VERBOSE
 #define PONY_LOG_VERBOSE_MASK PonyEngine::Debug::Log::LogType::Verbose
 #else
@@ -66,7 +69,14 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		engine.GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+		try \
+		{ \
+			engine.GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -78,7 +88,14 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		engine->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+		try \
+		{ \
+			engine->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -90,7 +107,14 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		logger.Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)); \
+		try \
+		{ \
+			logger.Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -103,9 +127,16 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			engine.GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+			if (condition) \
+			{ \
+				engine.GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -119,9 +150,16 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			engine->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+			if (condition) \
+			{ \
+				engine->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -135,9 +173,16 @@
 { \
 	if constexpr ((logType & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			logger.Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)); \
+			if (condition) \
+			{ \
+				logger.Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -150,7 +195,14 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		engine.GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+		try \
+		{ \
+			engine.GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -162,7 +214,14 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		engine->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+		try \
+		{ \
+			engine->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -174,7 +233,14 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		logger.LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)); \
+		try \
+		{ \
+			logger.LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)); \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -187,9 +253,16 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			engine.GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+			if (condition) \
+			{ \
+				engine.GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine.GetFrameCount())); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -203,9 +276,16 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			engine->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+			if (condition) \
+			{ \
+				engine->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, engine->GetFrameCount())); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -219,9 +299,16 @@
 { \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			logger.LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)); \
+			if (condition) \
+			{ \
+				logger.LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)); \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }
@@ -234,19 +321,47 @@
 { \
 	if constexpr ((logType & PONY_COUT_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		std::cout << message << std::endl; \
+		try \
+		{ \
+			std::cout << message << std::endl; \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 	else if constexpr ((logType & PONY_CLOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		std::clog << message << std::endl; \
+		try \
+		{ \
+			std::clog << message << std::endl; \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 	else if constexpr ((logType & PONY_CERR_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		std::cerr << message << std::endl; \
+		try \
+		{ \
+			std::cerr << message << std::endl; \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 	else if constexpr ((logType & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		std::cerr << message << std::endl; \
+		try \
+		{ \
+			std::cerr << message << std::endl; \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
+		} \
 	} \
 }
 
@@ -259,30 +374,58 @@
 { \
 	if constexpr ((logType & PONY_COUT_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			std::cout << message << std::endl; \
+			if (condition) \
+			{ \
+				std::cout << message << std::endl; \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 	else if constexpr ((logType & PONY_CLOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			std::clog << message << std::endl; \
+			if (condition) \
+			{ \
+				std::clog << message << std::endl; \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 	else if constexpr ((logType & PONY_CERR_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			std::cerr << message << std::endl; \
+			if (condition) \
+			{ \
+				std::cerr << message << std::endl; \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 	else if constexpr ((logType & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
 	{ \
-		if (condition) \
+		try \
 		{ \
-			std::cerr << message << std::endl; \
+			if (condition) \
+			{ \
+				std::cerr << message << std::endl; \
+			} \
+		} \
+		catch (...) \
+		{ \
+			std::terminate(); \
 		} \
 	} \
 }

@@ -33,22 +33,25 @@ namespace Core
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void Log(PonyEngine::Debug::Log::LogType logType, const PonyEngine::Debug::Log::LogInput& logInput) noexcept override { }
-			virtual void LogException(const std::exception& exception, const PonyEngine::Debug::Log::LogInput& logInput) noexcept override { }
+			virtual void Log(PonyEngine::Debug::Log::LogType, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
+			virtual void LogException(const std::exception&, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
 
-			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger* subLogger) override { }
-			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger* subLogger) override { }
+			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
+			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
 		};
 
 		class EmptyWindow final : public PonyEngine::Window::IWindow
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual std::wstring GetTitle() const override { return L""; }
-			virtual void SetTitle(const std::wstring& title) override { }
+			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void AddKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver* keyboardMessageObserver) override { }
-			virtual void RemoveKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver* keyboardMessageObserver) override { }
+			[[nodiscard("Pure function")]]
+			virtual const std::wstring& GetTitle() const noexcept override { return L""; }
+			virtual void SetTitle(const std::wstring&) override { }
+
+			virtual void AddKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
+			virtual void RemoveKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
 
 			virtual void ShowWindow() override { }
 
@@ -64,9 +67,11 @@ namespace Core
 			std::wstring m_title = L"";
 
 		public:
+			[[nodiscard("Pure function")]]
+			virtual const char* GetWindowName() const noexcept override { return ""; }
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindow* Create(PonyEngine::Core::IEngine& engine) override
+			virtual PonyEngine::Window::IWindow* Create(PonyEngine::Core::IEngine&) override
 			{
 				createdWindow = new EmptyWindow();
 				return createdWindow;
@@ -79,7 +84,7 @@ namespace Core
 
 			[[nodiscard("Pure function")]]
 			virtual const std::wstring& GetTitle() const noexcept override { return m_title; }
-			virtual void SetTitle(const std::wstring& title) noexcept override { }
+			virtual void SetTitle(const std::wstring&) noexcept override { }
 		};
 
 		class EmptySystem final : public PonyEngine::Core::ISystem
@@ -101,7 +106,7 @@ namespace Core
 			PonyEngine::Core::ISystem* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystem* Create(PonyEngine::Core::IEngine& engine) override
+			virtual PonyEngine::Core::ISystem* Create(PonyEngine::Core::IEngine&) override
 			{
 				createdSystem = new EmptySystem();
 				return createdSystem;
@@ -155,7 +160,7 @@ namespace Core
 			EmptyLogger logger;
 			EmptyWindowFactory windowFactory;
 			PonyEngine::Core::EngineParams params(logger);
-			params.windowFactory = &windowFactory;
+			params.SetWindowFactory(&windowFactory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(windowFactory.createdWindow), reinterpret_cast<std::uintptr_t>(engine->GetWindow()));
 			PonyEngine::Core::DestroyEngine(engine);
@@ -166,7 +171,7 @@ namespace Core
 			EmptyLogger logger;
 			EmptySystemFactory systemFactory;
 			PonyEngine::Core::EngineParams params(logger);
-			params.systemFactories.push_back(&systemFactory);
+			params.AddSystemFactory(&systemFactory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->FindSystem([](const PonyEngine::Core::ISystem* const system) { return dynamic_cast<const EmptySystem*>(system) != nullptr; })));
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->FindSystem<EmptySystem>()));
