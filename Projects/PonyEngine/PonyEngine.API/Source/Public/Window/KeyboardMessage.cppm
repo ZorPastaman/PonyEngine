@@ -33,9 +33,11 @@ namespace PonyEngine::Window
 
 		/// @brief Gets a key code.
 		/// @return Key code.
+		[[nodiscard("Pure function")]]
 		inline KeyboardKeyCode GetKeyCode() const noexcept;
 		/// @brief Gets is key down.
 		/// @return Is key down?
+		[[nodiscard("Pure function")]]
 		inline bool GetIsDown() const noexcept;
 
 		inline KeyboardMessage& operator =(const KeyboardMessage& other) noexcept = default;

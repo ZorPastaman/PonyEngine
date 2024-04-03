@@ -27,10 +27,13 @@
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm">
+    <ClCompile Include="Source\Private\Window\Windows\WindowProcFunction.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window\Windows\IWindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -11,21 +11,22 @@ export module PonyEngine.Window:IWindow;
 
 import <string>;
 
+import PonyEngine.Utility;
+
 import :IKeyboardObserver;
 
 namespace PonyEngine::Window
 {
 	/// @brief Engine window interface.
-	export class IWindow
+	export class IWindow : public Utility::INamed
 	{
 	public:
 		/// @brief Gets a window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual std::wstring GetTitle() const = 0;
+		virtual const std::wstring& GetTitle() const noexcept = 0;
 		/// @brief Sets a window title.
 		/// @param title Window title to set.
-		/// @return @a True if the procedure is successful; @a false otherwise.
 		virtual void SetTitle(const std::wstring& title) = 0;
 
 		/// @brief Adds a keyboard input observer.

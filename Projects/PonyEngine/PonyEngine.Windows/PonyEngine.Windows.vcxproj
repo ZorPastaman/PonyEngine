@@ -19,9 +19,10 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Window\Windows\IWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm" />
-    <ClCompile Include="Source\Private\Window\Windows\WindowProc.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\WindowProcFunction.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm" />
@@ -69,12 +70,12 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
-	<LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Window;$(ProjectDir)\Source\Public\Window\Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
-	<LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
+    <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

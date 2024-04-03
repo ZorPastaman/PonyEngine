@@ -56,7 +56,7 @@ namespace Window
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(*logger);
-			engineParams.windowFactory = factory;
+			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 
 			Assert::IsNotNull(engine->GetWindow());
@@ -75,7 +75,7 @@ namespace Window
 			factory->SetTitle(windowTitle);
 			Assert::AreEqual(windowTitle, factory->GetTitle().c_str());
 			PonyEngine::Core::EngineParams engineParams(*logger);
-			engineParams.windowFactory = factory;
+			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 
 			Assert::AreEqual(windowTitle, engine->GetWindow()->GetTitle().c_str());
@@ -95,7 +95,7 @@ namespace Window
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(*logger);
-			engineParams.windowFactory = factory;
+			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 			TestKeyboardObserver observer;
 

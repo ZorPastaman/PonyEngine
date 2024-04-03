@@ -39,7 +39,7 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
 		[[nodiscard("Pure constructor")]]
-		LogEntry(const LogEntry& other) noexcept = default;
+		LogEntry(const LogEntry& other) = default;
 		[[nodiscard("Pure constructor")]]
 		LogEntry(LogEntry&& other) noexcept = default;
 
@@ -71,12 +71,13 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure function")]]
 		std::string ToString() const noexcept;
 
-		LogEntry& operator =(const LogEntry& other) noexcept = default;
+		LogEntry& operator =(const LogEntry& other) = default;
 		LogEntry& operator =(LogEntry&& other) noexcept = default;
 
 	private:
 		/// @brief Makes a string for the function ToString().
-		void MakeString() const noexcept;
+		[[nodiscard("Pure function")]]
+		std::string MakeString() const noexcept;
 
 		const char* const m_message; /// @brief Log message.
 		const std::exception* const m_exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
@@ -140,34 +141,29 @@ namespace PonyEngine::Debug::Log
 	{
 		if (m_isDirty)
 		{
-			MakeString();
+			m_stringCache = MakeString();
 			m_isDirty = false;
 		}
 
 		return m_stringCache;
 	}
 
-	void LogEntry::MakeString() const noexcept
+	std::string LogEntry::MakeString() const noexcept
 	{
 		try
 		{
-			try
-			{
-				const std::string logTypeString = Log::ToString(m_logType, false);
-				const std::string messageToFormat = m_exception == nullptr
-					? m_message
-					: m_message == nullptr || *m_message == '\0'
-						? m_exception->what()
-						: std::format("{} - {}", m_exception->what(), m_message);
-				m_stringCache = std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, m_timePoint, m_frameCount, messageToFormat);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On making a log entry string").c_str());
-			}
+			const std::string logTypeString = Log::ToString(m_logType, false);
+			const std::string messageToFormat = m_exception == nullptr
+				? m_message
+				: m_message == nullptr || *m_message == '\0'
+				? m_exception->what()
+				: std::format("{} - {}", m_exception->what(), m_message);
+
+			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, m_timePoint, m_frameCount, messageToFormat);
 		}
 		catch (const std::exception&)
 		{
+			std::terminate();
 		}
 	}
 }
