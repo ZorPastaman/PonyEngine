@@ -18,7 +18,7 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm">
+    <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm">

@@ -47,8 +47,8 @@ namespace Core
 			virtual const char* GetName() const noexcept override { return ""; }
 
 			[[nodiscard("Pure function")]]
-			virtual const std::wstring& GetTitle() const noexcept override { return L""; }
-			virtual void SetTitle(const std::wstring&) override { }
+			virtual const wchar_t* GetTitle() const noexcept override { return L""; }
+			virtual void SetTitle(const wchar_t*) override { }
 
 			virtual void AddKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
 			virtual void RemoveKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
@@ -63,10 +63,6 @@ namespace Core
 		public:
 			PonyEngine::Window::IWindow* createdWindow = nullptr;
 
-		private:
-			std::wstring m_title = L"";
-
-		public:
 			[[nodiscard("Pure function")]]
 			virtual const char* GetWindowName() const noexcept override { return ""; }
 
@@ -83,8 +79,8 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const std::wstring& GetTitle() const noexcept override { return m_title; }
-			virtual void SetTitle(const std::wstring&) noexcept override { }
+			virtual const wchar_t* GetTitle() const noexcept override { return L""; }
+			virtual void SetTitle(const wchar_t*) noexcept override { }
 		};
 
 		class EmptySystem final : public PonyEngine::Core::ISystem

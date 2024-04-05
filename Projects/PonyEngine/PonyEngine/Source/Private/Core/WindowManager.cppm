@@ -59,7 +59,6 @@ namespace PonyEngine::Core
 		Window::IWindow* m_window; /// @brief Created window.
 		Window::IWindowFactory* m_windowFactory; /// @brief Factory that created the @p m_window.
 
-		// TODO: set const IEngine& wherever it's possible.
 		const IEngine& m_engine; /// @brief Engine that owns the @p WindowManager.
 	};
 
@@ -70,10 +69,10 @@ namespace PonyEngine::Core
 		
 		if (m_windowFactory != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create a window {}.", m_windowFactory->GetWindowName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create a window '{}'.", m_windowFactory->GetWindowName()).c_str());
 			m_window = m_windowFactory->Create(engine);
 			assert((m_window != nullptr));
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window {} created.", m_windowFactory->GetWindowName()).c_str());
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window '{}' created.", m_window->GetName()).c_str());
 		}
 		else
 		{
@@ -86,9 +85,9 @@ namespace PonyEngine::Core
 	{
 		if (m_windowFactory != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Destroy a window.");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Destroy a window '{}'.", m_window->GetName()).c_str());
 			m_windowFactory->Destroy(m_window);
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window destroyed.");
+			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window destroyed '{}'.", m_windowFactory->GetWindowName()).c_str());
 		}
 	}
 

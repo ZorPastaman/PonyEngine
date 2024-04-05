@@ -23,7 +23,7 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowProcFunction.cppm" />
-    <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeMap.cppm" />
+    <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeUtility.cppm" />
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm" />
     <ClCompile Include="Source\Public\Window\Windows\WindowsWindow.Implementation.cppm" />
   </ItemGroup>
