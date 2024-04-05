@@ -109,7 +109,7 @@ namespace Window
 
 			observer.expectedKeyCode = PonyEngine::Window::KeyboardKeyCode::H;
 			observer.expectedDown = false;
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, WPARAM{'H'}, LPARAM{0x0023} << 16);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, WPARAM{'H'}, LPARAM{0x0023} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{2}, observer.count);
 
