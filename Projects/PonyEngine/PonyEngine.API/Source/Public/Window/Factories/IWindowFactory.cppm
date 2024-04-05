@@ -32,10 +32,10 @@ namespace PonyEngine::Window
 		/// @brief Gets a title of the next created window.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual const std::wstring& GetTitle() const noexcept = 0;
+		virtual const wchar_t* GetTitle() const noexcept = 0;
 		/// @brief Sets a title of the next created window.
 		/// @param title Window title.
-		virtual void SetTitle(const std::wstring& title) noexcept = 0;
+		virtual void SetTitle(const wchar_t* title) noexcept = 0;
 
 		/// @brief Gets a window class name.
 		/// @return Window class name.

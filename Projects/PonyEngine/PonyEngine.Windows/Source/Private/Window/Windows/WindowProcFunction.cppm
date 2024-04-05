@@ -46,7 +46,7 @@ namespace PonyEngine::Window
 		{
 			if (const DWORD errorCode = GetLastError()) [[unlikely]]
 			{
-				throw std::logic_error(std::format("Error on registering a window proc. Error code: {}.", errorCode));
+				throw std::logic_error(std::format("Error on registering a window proc. Error code: '{}'.", errorCode));
 			}
 		}
 	}
@@ -59,7 +59,7 @@ namespace PonyEngine::Window
 		{
 			if (const DWORD errorCode = GetLastError()) [[likely]]
 			{
-				throw std::logic_error(std::format("Error on unregistering a window proc. Error code: {}.", errorCode));
+				throw std::logic_error(std::format("Error on unregistering a window proc. Error code: '{}'.", errorCode));
 			}
 		}
 	}
@@ -68,14 +68,18 @@ namespace PonyEngine::Window
 	{
 		SetLastError(DWORD{0});
 
-		const LONG_PTR windowsWindowProc = GetWindowLongPtr(hWnd, GWLP_USERDATA);
-		IWindowProc* const windowProc = reinterpret_cast<IWindowProc*>(windowsWindowProc);
+		IWindowProc* const windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
 
-		if (windowProc == nullptr) [[unlikely]]
+		if (windowProc != nullptr) [[likely]]
 		{
-			return DefWindowProc(hWnd, uMsg, wParam, lParam);
+			return windowProc->WindowProc(uMsg, wParam, lParam);
 		}
 
-		return windowProc->WindowProc(uMsg, wParam, lParam); // TODO: add message management here
+		if (const DWORD errorCode = GetLastError()) [[unlikely]]
+		{
+			throw std::logic_error(std::format("Error on a window proc. Error code: '{}'.", errorCode));
+		}
+
+		return DefWindowProc(hWnd, uMsg, wParam, lParam);
 	}
 }

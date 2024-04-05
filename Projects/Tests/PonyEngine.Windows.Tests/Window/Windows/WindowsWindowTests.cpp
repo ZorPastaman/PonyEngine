@@ -73,16 +73,16 @@ namespace Window
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			factory->SetTitle(windowTitle);
-			Assert::AreEqual(windowTitle, factory->GetTitle().c_str());
+			Assert::AreEqual(windowTitle, factory->GetTitle());
 			PonyEngine::Core::EngineParams engineParams(*logger);
 			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 
-			Assert::AreEqual(windowTitle, engine->GetWindow()->GetTitle().c_str());
+			Assert::AreEqual(windowTitle, engine->GetWindow()->GetTitle());
 
 			const wchar_t* const anotherWindowTitle = L"New Title";
 			engine->GetWindow()->SetTitle(anotherWindowTitle);
-			Assert::AreEqual(anotherWindowTitle, engine->GetWindow()->GetTitle().c_str());
+			Assert::AreEqual(anotherWindowTitle, engine->GetWindow()->GetTitle());
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
@@ -103,7 +103,7 @@ namespace Window
 			observer.expectedDown = true;
 			observer.expectedMessages = true;
 			engine->GetWindow()->AddKeyboardMessageObserver(&observer);
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, static_cast<WPARAM>('F'), 0);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, WPARAM{'F'}, LPARAM{0x0021} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{1}, observer.count);
 
