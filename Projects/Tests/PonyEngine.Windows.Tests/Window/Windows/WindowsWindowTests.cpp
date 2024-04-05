@@ -70,7 +70,7 @@ namespace Window
 		{
 			const wchar_t* const windowTitle = L"Title";
 			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
+			const PonyEngine::Window::WindowClassParams windowParams(L"Title Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			factory->SetTitle(windowTitle);
 			Assert::AreEqual(windowTitle, factory->GetTitle());
@@ -92,7 +92,7 @@ namespace Window
 		TEST_METHOD(KeyboardMessageObserverTest)
 		{
 			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
+			const PonyEngine::Window::WindowClassParams windowParams(L"Observer Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(*logger);
 			engineParams.SetWindowFactory(factory);
@@ -109,25 +109,25 @@ namespace Window
 
 			observer.expectedKeyCode = PonyEngine::Window::KeyboardKeyCode::H;
 			observer.expectedDown = false;
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, static_cast<WPARAM>('H'), 0);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, WPARAM{'H'}, LPARAM{0x0023} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{2}, observer.count);
 
 			observer.expectedKeyCode = PonyEngine::Window::KeyboardKeyCode::Enter;
 			observer.expectedDown = true;
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, static_cast<WPARAM>(13), 0);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYDOWN, WPARAM{13}, LPARAM{0x001C} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{3}, observer.count);
 
 			observer.expectedKeyCode = PonyEngine::Window::KeyboardKeyCode::Enter;
 			observer.expectedDown = false;
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, static_cast<WPARAM>(13), 0);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, WPARAM{13}, LPARAM{0x001C} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{4}, observer.count);
 
 			engine->GetWindow()->RemoveKeyboardMessageObserver(&observer);
 			observer.expectedMessages = false;
-			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, static_cast<WPARAM>(13), 0);
+			PostMessage(static_cast<PonyEngine::Window::IWindowsWindow*>(engine->GetWindow())->GetWindowHandle(), WM_KEYUP, WPARAM{13}, LPARAM{0x001C} << 16);
 			engine->Tick();
 			Assert::AreEqual(std::size_t{4}, observer.count);
 
