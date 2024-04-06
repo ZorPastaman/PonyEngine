@@ -161,9 +161,9 @@ namespace PonyEngine::Debug::Log
 
 			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, m_timePoint, m_frameCount, messageToFormat);
 		}
-		catch (const std::exception&)
+		catch (const std::exception& e)
 		{
-			std::terminate();
+			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On making a log entry string").c_str());
 		}
 	}
 }
