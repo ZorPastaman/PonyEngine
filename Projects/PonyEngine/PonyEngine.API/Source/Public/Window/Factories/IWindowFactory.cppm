@@ -40,7 +40,7 @@ namespace PonyEngine::Window
 		/// @brief Gets a window class name.
 		/// @return Window class name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetWindowName() const noexcept = 0; // TODO: add a test
+		virtual const char* GetWindowName() const noexcept = 0;
 
 	protected:
 		inline virtual ~IWindowFactory() noexcept = default;
