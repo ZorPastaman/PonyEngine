@@ -80,16 +80,16 @@ namespace PonyEngine::Core
 	};
 
 	Engine::Engine(const EngineParams& params) :
-		m_logger{params.logger},
+		m_logger{params.GetLogger()},
 		m_frameCount{0},
 		m_isRunning{true}
 	{
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Create a window manager.");
-		m_windowManager = new WindowManager(params.windowFactory, *this);
+		m_windowManager = new WindowManager(params, *this);
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Window manager created.");
 
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "Create a system manager.");
-		m_systemManager = new SystemManager(params.systemFactories, *this);
+		m_systemManager = new SystemManager(params, *this);
 		PONY_LOG_PTR(this, Debug::Log::LogType::Info, "System manager created.");
 
 		m_windowManager->ShowWindow();

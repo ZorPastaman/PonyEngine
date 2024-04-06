@@ -14,7 +14,7 @@ import <string>;
 namespace PonyEngine::Window
 {
 	/// @brief Window class parameters. They are used in RegisterClass() function.
-	export struct WindowClassParams final
+	export class WindowClassParams final
 	{
 	public:
 		/// @brief Create a Window class params with a predefined class name.

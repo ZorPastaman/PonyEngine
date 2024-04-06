@@ -76,6 +76,6 @@ namespace Launcher
 	{
 		// Set all platform-independent factories and other parameters here.
 		PONY_LOG_GENERAL(m_logger, LogType::Debug, "Push an input system factory.");
-		engineParams.systemFactories.push_back(m_inputSystemFactory);
+		engineParams.AddSystemFactory(m_inputSystemFactory);
 	}
 }

@@ -34,10 +34,10 @@ namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
-		/// @param systemFactories System factories.
+		/// @param engineParams Engine parameters.
 		/// @param engine Engine that owns the manager.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine);
+		SystemManager(const EngineParams& engineParams, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		[[nodiscard("Pure constructor")]]
 		SystemManager(SystemManager&& other) noexcept = default;
@@ -70,7 +70,7 @@ namespace PonyEngine::Core
 		const IEngine& m_engine; /// @brief Engine that owns the manager.
 	};
 
-	SystemManager::SystemManager(const std::vector<ISystemFactory*>& systemFactories, IEngine& engine) :
+	SystemManager::SystemManager(const EngineParams& engineParams, IEngine& engine) :
 		m_systems{},
 		m_factories{},
 		m_tickableSystems{},
@@ -78,8 +78,9 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Create systems.");
 
-		for (ISystemFactory* const factory : systemFactories)
+		for (EngineParams::SystemFactoriesIterator it = engineParams.GetSystemFactoriesIterator(); !it.IsEnd(); ++it)
 		{
+			ISystemFactory* const factory = *it;
 			assert((factory != nullptr));
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
 			ISystem* const system = factory->Create(engine);

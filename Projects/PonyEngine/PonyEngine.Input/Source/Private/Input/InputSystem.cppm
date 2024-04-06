@@ -64,7 +64,7 @@ namespace PonyEngine::Input
 		std::size_t m_currentId; /// @brief Id that will be given to a new event. It's incremented every time.
 		std::queue<KeyboardMessage> m_queue; /// @brief Message queue.
 
-		Core::IEngine& m_engine; /// @brief Engine that owns the input system.
+		const Core::IEngine& m_engine; /// @brief Engine that owns the input system.
 	};
 
 	InputSystem::InputSystem(Core::IEngine& engine) noexcept :

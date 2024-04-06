@@ -96,7 +96,7 @@ namespace PonyEngine::Debug::Log
 		return std::format("{} ({})", answer, number);
 	}
 
-	static std::string ToStringInternal(LogType logType)
+	static std::string ToStringInternal(const LogType logType)
 	{
 		std::string answer;
 
