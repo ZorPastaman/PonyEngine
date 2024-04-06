@@ -9,8 +9,6 @@
 
 #pragma once
 
-// TODO: add tests for this file.
-
 #if PONY_LOG_VERBOSE
 #define PONY_LOG_VERBOSE_MASK PonyEngine::Debug::Log::LogType::Verbose
 #else

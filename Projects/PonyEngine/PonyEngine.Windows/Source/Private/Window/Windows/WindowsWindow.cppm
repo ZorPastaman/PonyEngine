@@ -243,7 +243,7 @@ namespace PonyEngine::Window
 	inline void WindowsWindow::Destroy() noexcept
 	{
 		m_isAlive = false;
-		m_engine.Stop(0);
+		m_engine.Stop();
 	}
 
 	void WindowsWindow::PushKeyboardKeyMessage(const LPARAM lParam, const bool isDown)

@@ -127,6 +127,7 @@ namespace Window
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(94), static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(PonyEngine::Window::KeyboardKeyCode::NumpadStar));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(95), static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(PonyEngine::Window::KeyboardKeyCode::NumpadSlash));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(96), static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(PonyEngine::Window::KeyboardKeyCode::NumpadPeriod));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(97), static_cast<std::underlying_type_t<PonyEngine::Window::KeyboardKeyCode>>(PonyEngine::Window::KeyboardKeyCode::NumpadEnter));
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -228,6 +229,8 @@ namespace Window
 			AssertString(PonyEngine::Window::KeyboardKeyCode::NumpadStar, "Numpad *");
 			AssertString(PonyEngine::Window::KeyboardKeyCode::NumpadSlash, "Numpad /");
 			AssertString(PonyEngine::Window::KeyboardKeyCode::NumpadPeriod, "Numpad .");
+			AssertString(PonyEngine::Window::KeyboardKeyCode::NumpadEnter, "Numpad Enter");
+			AssertString(PonyEngine::Window::KeyboardKeyCode{98}, "98");
 		}
 	};
 }

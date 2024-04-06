@@ -269,7 +269,7 @@ namespace PonyEngine::Window
 		}
 		else [[unlikely]]
 		{
-			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode)); // TODO: test this branch.
+			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
 		}
 	}
 

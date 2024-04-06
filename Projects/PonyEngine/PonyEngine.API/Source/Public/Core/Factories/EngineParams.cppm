@@ -26,8 +26,6 @@ import :ISystemFactory;
 
 namespace PonyEngine::Core
 {
-	// TODO: Add tests to new api.
-
 	/// @brief Holds engine parameters.
 	export class EngineParams final
 	{
@@ -38,8 +36,6 @@ namespace PonyEngine::Core
 		public:
 			[[nodiscard("Pure constructor")]]
 			inline SystemFactoriesIterator(const SystemFactoriesIterator& other) noexcept = default;
-			[[nodiscard("Pure constructor")]]
-			inline SystemFactoriesIterator(SystemFactoriesIterator&& other) noexcept = default;
 
 			inline ~SystemFactoriesIterator() noexcept = default;
 
@@ -60,7 +56,9 @@ namespace PonyEngine::Core
 			inline bool IsEnd() const noexcept;
 
 			inline SystemFactoriesIterator& operator =(const SystemFactoriesIterator& other) noexcept = default;
-			inline SystemFactoriesIterator& operator =(SystemFactoriesIterator&& other) noexcept = default;
+
+			[[nodiscard("Pure operator")]]
+			inline bool operator ==(const SystemFactoriesIterator& other) const noexcept = default;
 
 		private:
 			/// @brief Creates a @p SystemFactoriesIterator.
