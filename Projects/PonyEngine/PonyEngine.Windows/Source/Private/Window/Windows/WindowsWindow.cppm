@@ -17,27 +17,26 @@ module;
 export module PonyEngine.Window.Windows.Implementation:WindowsWindow;
 
 import <algorithm>;
+import <cstdint>;
 import <format>;
 import <exception>;
-import <iostream>;
 import <stdexcept>;
 import <string>;
-import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
 import PonyEngine.Debug.Log;
-import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 
+import :IWindowProc;
 import :WindowParams;
-import :WindowsKeyCodeMap;
+import :WindowsKeyCodeUtility;
 
 namespace PonyEngine::Window
 {
 	/// @brief Engine window for @p Windows platform.
-	export class WindowsWindow final : public IWindowsWindow
+	export class WindowsWindow final : public IWindowsWindow, public IWindowProc
 	{
 	public:
 		/// @brief Creates a @p WindowsWindow.
@@ -46,15 +45,18 @@ namespace PonyEngine::Window
 		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindow(Core::IEngine& engine, HINSTANCE hInstance, const std::wstring& className, const WindowParams& windowParams);
+		WindowsWindow(Core::IEngine& engine, HINSTANCE hInstance, ATOM className, const WindowParams& windowParams);
 		WindowsWindow(const WindowsWindow&) = delete;
 		WindowsWindow(WindowsWindow&&) = delete;
 
 		virtual ~WindowsWindow() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual std::wstring GetTitle() const override;
-		inline virtual void SetTitle(const std::wstring& title) override;
+		inline virtual const char* GetName() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		inline virtual const wchar_t* GetTitle() const noexcept override;
+		virtual void SetTitle(const wchar_t* title) override;
 
 		inline virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) override;
 		virtual void RemoveKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) override;
@@ -66,42 +68,49 @@ namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		inline virtual HWND GetWindowHandle() const noexcept;
 
-		/// @brief Processes a window message.
-		/// @param uMsg Window message.
-		/// @param wParam WParam.
-		/// @param lParam LParam.
-		/// @return Process result.
-		LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		[[nodiscard("Pure function")]]
+		inline virtual bool IsWindowAlive() const noexcept override;
+
+		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		WindowsWindow& operator =(const WindowsWindow&) = delete;
 		WindowsWindow& operator =(WindowsWindow&&) = delete;
 
 	private:
-		/// @brief Updates a window cursor.
-		void UpdateCursor();
+		/// @brief Responds to a destroy message.
+		inline void Destroy() noexcept;
 
 		/// @brief Sends a keyboard message to the @p m_keyboardMessageObservers.
-		/// @param wParam Windows key code.
+		/// @param lParam Windows key info.
 		/// @param isDown @a True if the button is pressed, @a false if it's up.
-		void PushKeyboardKeyMessage(WPARAM wParam, bool isDown);
+		void PushKeyboardKeyMessage(LPARAM lParam, bool isDown);
 
+	public:
+		static const char* const Name; /// @brief WindowsWindow class name.
+
+	private:
 		std::vector<IKeyboardObserver*> m_keyboardMessageObservers; /// @brief Keyboard message observers.
 
-		Core::IEngine& m_engine; /// @brief Engine that owns the window.
+		std::wstring m_title;
 		HWND m_hWnd; /// @brief Window handler.
 		const int m_nCmdShow; /// @brief Show type.
+		bool m_isAlive; /// @brief Is the system window alive?
+
+		Core::IEngine& m_engine; /// @brief Engine that owns the window.
 	};
 
-	WindowsWindow::WindowsWindow(Core::IEngine& engine, const HINSTANCE hInstance, const std::wstring& className, const WindowParams& windowParams) :
+	WindowsWindow::WindowsWindow(Core::IEngine& engine, const HINSTANCE hInstance, const ATOM className, const WindowParams& windowParams) :
 		m_keyboardMessageObservers{},
+		m_title(windowParams.title),
 		m_engine{engine},
-		m_nCmdShow{windowParams.cmdShow}
+		m_nCmdShow{windowParams.cmdShow},
+		m_isAlive{false}
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create a window of the class '{}'.", Utility::ConvertToString(className)).c_str());
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create a system window of the class id '{}'.", className).c_str());
 		m_hWnd = CreateWindowEx(
 			0,
-			className.c_str(),
-			windowParams.title.c_str(),
+			reinterpret_cast<LPCTSTR>(className),
+			m_title.c_str(),
 			WS_OVERLAPPEDWINDOW,
 			CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
 			NULL,
@@ -112,16 +121,16 @@ namespace PonyEngine::Window
 
 		if (m_hWnd == NULL)
 		{
-			throw std::logic_error("Windows hasn't created a window.");
+			throw std::logic_error(std::format("Windows hasn't created a window. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window of the class '{}' created.", Utility::ConvertToString(className)).c_str());
 
-		SetWindowLongPtr(m_hWnd, GWLP_USERDATA, reinterpret_cast<LONG_PTR>(this));
+		m_isAlive = true;
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("System window of the class id '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(m_hWnd)).c_str());
 	}
 
 	WindowsWindow::~WindowsWindow() noexcept
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Destroy a window.");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Destroy a system window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(m_hWnd)).c_str());
 		try
 		{
 			DestroyWindow(m_hWnd);
@@ -130,40 +139,33 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG_E(m_engine, e, "On a window destroy.");
 		}
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window destroyed.");
+		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("System window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(m_hWnd)).c_str());
 	}
 
-	std::wstring WindowsWindow::GetTitle() const
+	inline const char* WindowsWindow::GetName() const noexcept
 	{
-		std::wstring title;
-		size_t length = static_cast<size_t>(GetWindowTextLength(m_hWnd)) + 1;
-		wchar_t* titleChars = new wchar_t[length];
-
-		try
-		{
-			std::fill_n(titleChars, length, wchar_t{0});
-			GetWindowText(m_hWnd, titleChars, static_cast<int>(length));
-			title = titleChars;
-		}
-		catch (const std::exception& e)
-		{
-			delete[] titleChars;
-			throw e;
-		}
-
-		delete[] titleChars;
-
-		return title;
+		return Name;
 	}
 
-	inline void WindowsWindow::SetTitle(const std::wstring& title)
+	inline const wchar_t* WindowsWindow::GetTitle() const noexcept
 	{
-		SetWindowText(m_hWnd, title.c_str());
+		return m_title.c_str();
+	}
+
+	void WindowsWindow::SetTitle(const wchar_t* const title)
+	{
+		if (!SetWindowText(m_hWnd, title))
+		{
+			throw std::logic_error(std::format("Couldn't set a new window title. Error code: '{}'.", GetLastError()));
+		}
+
+		m_title = title;
 	}
 
 	inline void WindowsWindow::AddKeyboardMessageObserver(IKeyboardObserver* const keyboardMessageObserver)
 	{
 		assert((keyboardMessageObserver != nullptr));
+		assert((std::find(m_keyboardMessageObservers.cbegin(), m_keyboardMessageObservers.cend(), keyboardMessageObserver) == m_keyboardMessageObservers.cend()));
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 
 		m_keyboardMessageObservers.push_back(keyboardMessageObserver);
@@ -208,6 +210,11 @@ namespace PonyEngine::Window
 		return m_hWnd;
 	}
 
+	inline bool WindowsWindow::IsWindowAlive() const noexcept
+	{
+		return m_isAlive;
+	}
+
 	LRESULT WindowsWindow::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		switch (uMsg)
@@ -215,51 +222,38 @@ namespace PonyEngine::Window
 		// Main
 		case WM_DESTROY:
 			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Received a destroy command.");
-			m_engine.Stop(0);
-			break;
-		// Window
-		case WM_SETCURSOR:
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Received a set cursor command.");
-			UpdateCursor();
+			Destroy();
 			break;
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Received a key down command with the code '{}'.", wParam).c_str());
-			PushKeyboardKeyMessage(wParam, true);
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Received a key down command with the code '{}' and param '{}'.", wParam, lParam).c_str());
+			PushKeyboardKeyMessage(lParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Received a key up command with the code '{}'.", wParam).c_str());
-			PushKeyboardKeyMessage(wParam, false);
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Received a key up command with the code '{}' and param '{}'.", wParam, lParam).c_str());
+			PushKeyboardKeyMessage(lParam, false);
 			break;
 		}
 
 		return DefWindowProc(m_hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::UpdateCursor()
+	inline void WindowsWindow::Destroy() noexcept
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Update a cursor to a standard arrow.");
-		HANDLE hCursor = LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED);
-		if (hCursor != NULL) [[likely]]
-		{
-			SetCursor(static_cast<HCURSOR>(hCursor));
-		}
-		else [[unlikely]]
-		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Error, "Couldn't load an arrow cursor.");
-		}
+		m_isAlive = false;
+		m_engine.Stop();
 	}
 
-	void WindowsWindow::PushKeyboardKeyMessage(const WPARAM wParam, const bool isDown)
+	void WindowsWindow::PushKeyboardKeyMessage(const LPARAM lParam, const bool isDown)
 	{
-		const std::unordered_map<WPARAM, KeyboardKeyCode>::const_iterator pair = WindowsKeyCodeMap.find(wParam);
-		if (pair != WindowsKeyCodeMap.cend())
-		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Push a keyboard message to the observers. KeyCode: '{}'. IsDown: '{}'.", ToString(pair->second), isDown).c_str());
+		const KeyboardKeyCode keyCode = ConvertToKeyCode(lParam);
 
-			const KeyboardMessage keyboardMessage(pair->second, isDown);
+		if (keyCode != KeyboardKeyCode::None)
+		{
+			const KeyboardMessage keyboardMessage(keyCode, isDown);
+			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Push a keyboard message '{}' to the observers.", keyboardMessage.ToString()).c_str());
 
 			for (IKeyboardObserver* const observer : m_keyboardMessageObservers)
 			{
@@ -274,4 +268,6 @@ namespace PonyEngine::Window
 			}
 		}
 	}
+
+	const char* const WindowsWindow::Name = "PonyEngine::Window::WindowsWindow";
 }

@@ -74,6 +74,7 @@ namespace PonyEngine::Core
 	T* IEngine::FindSystem() const
 	{
 		ISystem* const system = FindSystem([](const ISystem* const system) { return dynamic_cast<const T*>(system) != nullptr; });
+
 		return dynamic_cast<T*>(system);
 	}
 }

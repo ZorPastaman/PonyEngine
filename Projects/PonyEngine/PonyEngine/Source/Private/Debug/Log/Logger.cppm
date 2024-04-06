@@ -101,6 +101,7 @@ namespace PonyEngine::Debug::Log
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger != nullptr));
+		assert((std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger) == m_subLoggers.cend()));
 		PONY_CONSOLE(LogType::Info, std::format("Add a sub-logger '{}'.", subLogger->GetName()));
 		m_subLoggers.push_back(subLogger);
 	}

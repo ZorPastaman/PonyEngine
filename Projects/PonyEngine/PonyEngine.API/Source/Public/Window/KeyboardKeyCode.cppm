@@ -127,7 +127,9 @@ namespace PonyEngine::Window
 		NumpadMinus,
 		NumpadStar,
 		NumpadSlash,
-		NumpadComma
+		NumpadPeriod,
+		// Numpad system keys
+		NumpadEnter
 	};
 
 	/// @brief Creates a string representing the @p keyCode.
@@ -252,7 +254,9 @@ namespace PonyEngine::Window
 		{ KeyboardKeyCode::NumpadMinus, "Numpad -" },
 		{ KeyboardKeyCode::NumpadStar, "Numpad *" },
 		{ KeyboardKeyCode::NumpadSlash, "Numpad /" },
-		{ KeyboardKeyCode::NumpadComma, "Numpad ," }
+		{ KeyboardKeyCode::NumpadPeriod, "Numpad ." },
+		// Numpad system keys
+		{ KeyboardKeyCode::NumpadEnter, "Numpad Enter" }
 	};
 
 	std::string ToString(const KeyboardKeyCode keyCode)
@@ -269,7 +273,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	inline std::ostream& operator<<(std::ostream& stream, const KeyboardKeyCode keyCode)
+	inline std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
 	{
 		return stream << ToString(keyCode);
 	}
