@@ -102,14 +102,14 @@ namespace Math
 			short yi = -17;
 			short zi = -43;
 			short wi = 11;
-			float magnitudeSquaredI = std::pow(static_cast<float>(xi), 2.f) + std::pow(static_cast<float>(yi), 2.f) + std::pow(static_cast<float>(zi), 2.f) + std::pow(static_cast<float>(wi), 2.f);
+			short magnitudeSquaredI = static_cast<short>(xi * xi + yi * yi + zi * zi + wi * wi);
 			float magnitudeI = std::sqrt(magnitudeSquaredI);
 			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
 
 			Assert::AreEqual(magnitudeSquaredI, vectorI.MagnitudeSquared());
 			Assert::AreEqual(magnitudeI, vectorI.Magnitude());
 
-			Assert::AreEqual(0.f, PonyEngine::Math::Vector4<short>::Zero.MagnitudeSquared());
+			Assert::AreEqual(short{0}, PonyEngine::Math::Vector4<short>::Zero.MagnitudeSquared());
 			Assert::AreEqual(0.f, PonyEngine::Math::Vector4<short>::Zero.Magnitude());
 		}
 
@@ -455,6 +455,18 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(zi - zi1), centralI.z);
 			Assert::AreEqual(static_cast<short>(wi - wi1), centralI.w);
 
+			short multiplierI = short{3};
+			leftI = centralI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
+			leftI = centralI *= multiplierI;
+			Assert::AreEqual(static_cast<short>(xi * multiplierI), leftI.x);
+			Assert::AreEqual(static_cast<short>(yi * multiplierI), leftI.y);
+			Assert::AreEqual(static_cast<short>(zi * multiplierI), leftI.z);
+			Assert::AreEqual(static_cast<short>(wi * multiplierI), leftI.w);
+			Assert::AreEqual(static_cast<short>(xi * multiplierI), centralI.x);
+			Assert::AreEqual(static_cast<short>(yi * multiplierI), centralI.y);
+			Assert::AreEqual(static_cast<short>(zi * multiplierI), centralI.z);
+			Assert::AreEqual(static_cast<short>(wi * multiplierI), centralI.w);
+
 			leftI = centralI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
 			leftI = centralI *= multiplier;
 			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(xi * multiplier), leftI.x);
@@ -550,9 +562,9 @@ namespace Math
 			float vectorDotI = PonyEngine::Math::Dot(vectorI, vectorI1);
 			Assert::AreEqual(dotI, vectorDotI);
 
-			Assert::AreEqual(0.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::Zero, PonyEngine::Math::Vector4<short>::Zero));
-			Assert::AreEqual(4.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::One, PonyEngine::Math::Vector4<short>::One));
-			Assert::AreEqual(-4.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::One, PonyEngine::Math::Vector4<short>::Negative));
+			Assert::AreEqual(short{0}, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::Zero, PonyEngine::Math::Vector4<short>::Zero));
+			Assert::AreEqual(short{4}, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::One, PonyEngine::Math::Vector4<short>::One));
+			Assert::AreEqual(short{-4}, PonyEngine::Math::Dot(PonyEngine::Math::Vector4<short>::One, PonyEngine::Math::Vector4<short>::Negative));
 		}
 
 		TEST_METHOD(ProjectTest)
@@ -827,11 +839,24 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(zi - zi1), vectorI2.z);
 			Assert::AreEqual(static_cast<short>(wi - wi1), vectorI2.w);
 
+			short multiplierI = short{3};
+			vectorI2 = vectorI * multiplierI;
+			Assert::AreEqual(static_cast<short>(xi * multiplierI), vectorI2.x);
+			Assert::AreEqual(static_cast<short>(yi * multiplierI), vectorI2.y);
+			Assert::AreEqual(static_cast<short>(zi * multiplierI), vectorI2.z);
+			Assert::AreEqual(static_cast<short>(wi * multiplierI), vectorI2.w);
+
 			vectorI2 = vectorI * multiplier;
 			Assert::AreEqual(static_cast<short>(xi * multiplier), vectorI2.x);
 			Assert::AreEqual(static_cast<short>(yi * multiplier), vectorI2.y);
 			Assert::AreEqual(static_cast<short>(zi * multiplier), vectorI2.z);
 			Assert::AreEqual(static_cast<short>(wi * multiplier + 1), vectorI2.w);
+
+			vectorI2 = multiplierI * vectorI;
+			Assert::AreEqual(static_cast<short>(xi * multiplierI), vectorI2.x);
+			Assert::AreEqual(static_cast<short>(yi * multiplierI), vectorI2.y);
+			Assert::AreEqual(static_cast<short>(zi * multiplierI), vectorI2.z);
+			Assert::AreEqual(static_cast<short>(wi * multiplierI), vectorI2.w);
 
 			vectorI2 = multiplier * vectorI;
 			Assert::AreEqual(static_cast<short>(xi * multiplier), vectorI2.x);
@@ -908,6 +933,12 @@ namespace Math
 			constexpr auto multipliedV = vector * normal;
 			constexpr auto divided = vector / 3.f;
 			constexpr auto dividedV = vector / copiedVector;
+
+			constexpr auto intVector = PonyEngine::Math::Vector4<int>();
+			constexpr auto multipliedI = intVector * 3;
+			constexpr auto multipliedLI = 3 * intVector;
+			constexpr auto multipliedIF = intVector * 3.f;
+			constexpr auto multipliedLIF = 3.f * intVector;
 #pragma warning(default:4189)
 		}
 	};

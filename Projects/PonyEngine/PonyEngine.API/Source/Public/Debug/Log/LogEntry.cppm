@@ -165,5 +165,7 @@ namespace PonyEngine::Debug::Log
 		{
 			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On making a log entry string").c_str());
 		}
+
+		return std::string();
 	}
 }

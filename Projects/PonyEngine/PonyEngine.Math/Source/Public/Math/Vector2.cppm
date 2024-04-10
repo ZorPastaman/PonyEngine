@@ -45,12 +45,12 @@ namespace PonyEngine::Math
 		/// @brief Computes a magnitude of a @p Vector.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
-		inline ComputationalType Magnitude() const noexcept;
+		ComputationalType Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of a @p Vector.
 		/// @details This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
-		constexpr inline ComputationalType MagnitudeSquared() const noexcept;
+		constexpr inline T MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a @p Vector normalized from this one.
 		/// @return Normalized @p Vector.
@@ -90,30 +90,34 @@ namespace PonyEngine::Math
 		/// @brief Adds the @p other to @a this.
 		/// @param other @p Vector to add.
 		/// @return @a This.
-		Vector2<T>& operator +=(const Vector2<T>& other) noexcept;
+		inline Vector2<T>& operator +=(const Vector2<T>& other) noexcept;
 		/// @brief Subtracts the @p other from @a this.
 		/// @param other @p Vector to subtract.
 		/// @return @a This.
-		Vector2<T>& operator -=(const Vector2<T>& other) noexcept;
+		inline Vector2<T>& operator -=(const Vector2<T>& other) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier @p Vector multiplier.
 		/// @return @a This.
-		Vector2<T>& operator *=(ComputationalType multiplier) noexcept;
+		inline Vector2<T>& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		/// @brief Multiplies @a this by the @p multiplier.
+		/// @param multiplier @p Vector multiplier.
+		/// @return @a This.
+		inline Vector2<T>& operator *=(ComputationalType multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p other component-wise.
 		/// @param other @p Vector to multiply.
 		/// @return @a This.
-		Vector2<T>& operator *=(const Vector2<T>& other) noexcept;
+		inline Vector2<T>& operator *=(const Vector2<T>& other) noexcept;
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor @p Vector divisor.
 		/// @return @a This.
-		Vector2<T>& operator /=(ComputationalType divisor) noexcept;
+		inline Vector2<T>& operator /=(ComputationalType divisor) noexcept;
 		/// @brief Divides @a this by the @p divisor component-wise.
 		/// @param other @p Vector to divide by.
 		/// @return @a This.
-		Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
+		inline Vector2<T>& operator /=(const Vector2<T>& other) noexcept;
 
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const Vector2<T>& other) const noexcept = default;
+		constexpr inline bool operator ==(const Vector2<T>& other) const noexcept = default;
 
 		static const Vector2<T> Up; /// @brief Vector2(0, 1).
 		static const Vector2<T> Down; /// @brief Vector2(0, -1).
@@ -135,7 +139,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector.
 	/// @return Dot product.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T>::ComputationalType Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	constexpr inline T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Computes an angle between two @p Vectors.
 	/// @tparam T Component type.
@@ -143,7 +147,7 @@ namespace PonyEngine::Math
 	/// @param right Right @p Vector. Must be normalized.
 	/// @return Angle in radians.
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	inline Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a signed angle between two @p Vectors.
 	///        Sign is positive if the rotation is counterclockwise.
 	///        Sign is negative if the rotation is clockwise.
@@ -218,14 +222,14 @@ namespace PonyEngine::Math
 	/// @param right Addend @p Vector.
 	/// @return Sum @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	constexpr inline Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Negates the @p vector.
 	/// @tparam T Component type.
 	/// @param vector @p Vector to negate.
 	/// @return Negated @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator -(const Vector2<T>& vector) noexcept;
+	constexpr inline Vector2<T> operator -(const Vector2<T>& vector) noexcept;
 
 	/// @brief Subtracts the @p right vector from the @p left vector.
 	/// @tparam T Component type.
@@ -233,7 +237,7 @@ namespace PonyEngine::Math
 	/// @param right Subtrahend @p Vector.
 	/// @return Difference @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	constexpr inline Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
@@ -241,7 +245,21 @@ namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @return Product @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator *(const Vector2<T>& vector, typename Vector2<T>::ComputationalType multiplier) noexcept;
+	constexpr inline Vector2<T> operator *(const Vector2<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
+	/// @brief Multiplies the @p vector components by the @p multiplier.
+	/// @tparam T Component type.
+	/// @param vector Multiplicand @p Vector.
+	/// @param multiplier Multiplier.
+	/// @return Product @p Vector.
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr inline Vector2<T> operator *(const Vector2<T>& vector, typename Vector2<T>::ComputationalType multiplier) noexcept;
+	/// @brief Multiplies the @p vector components by the @p multiplier.
+	/// @tparam T Component type.
+	/// @param multiplier Multiplier.
+	/// @param vector Multiplicand @p Vector.
+	/// @return Product @p Vector.
+	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr inline Vector2<T> operator *(T multiplier, const Vector2<T>& vector) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
@@ -255,7 +273,7 @@ namespace PonyEngine::Math
 	/// @param right Multiplier @p Vector.
 	/// @return Product @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator *(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	constexpr inline Vector2<T> operator *(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
@@ -263,14 +281,14 @@ namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @return Quotient @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator /(const Vector2<T>& vector, typename Vector2<T>::ComputationalType divisor) noexcept;
+	constexpr inline Vector2<T> operator /(const Vector2<T>& vector, typename Vector2<T>::ComputationalType divisor) noexcept;
 	/// @brief Divides the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
 	/// @param left Dividend @p Vector.
 	/// @param right Divisor @p Vector.
 	/// @return Quotient @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator /(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	constexpr inline Vector2<T> operator /(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
 	/// @tparam T Component type.
@@ -294,13 +312,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector2<T>::ComputationalType Vector2<T>::Magnitude() const noexcept
+	Vector2<T>::ComputationalType Vector2<T>::Magnitude() const noexcept
 	{
-		return sqrt(MagnitudeSquared());
+		return std::sqrt(static_cast<Vector2<T>::ComputationalType>(MagnitudeSquared()));
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector2<T>::ComputationalType Vector2<T>::MagnitudeSquared() const noexcept
+	constexpr inline T Vector2<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
@@ -308,9 +326,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector2<T> Vector2<T>::Normalized() const noexcept
 	{
-#pragma warning(disable:4723) // Potential divide by 0 - It's a requirement that the vector must be non zero.
 		return *this / Magnitude();
-#pragma warning(default:4723)
 	}
 
 	template<Arithmetic T>
@@ -340,26 +356,24 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>::ComputationalType Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	constexpr inline T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return static_cast<Vector2<T>::ComputationalType>(left.x) * static_cast<Vector2<T>::ComputationalType>(right.x) +
-			static_cast<Vector2<T>::ComputationalType>(left.y) * static_cast<Vector2<T>::ComputationalType>(right.y);
+		return left.x * right.x + left.y * right.y;
 	}
 
 	template<Arithmetic T>
-	inline Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return std::acos(Dot(left, right));
+		return std::acos(static_cast<Vector2<T>::ComputationalType>(Dot(left, right)));
 	}
 
 	template<Arithmetic T>
 	Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		const Vector2<T>::ComputationalType zCross = static_cast<Vector2<T>::ComputationalType>(left.x) * Vector2<T>::ComputationalType(right.y) -
-			Vector2<T>::ComputationalType(left.y) * Vector2<T>::ComputationalType(right.x);
 		const Vector2<T>::ComputationalType angle = Angle(left, right);
+		const T zCross = left.x * right.y - left.y * right.x;
 
-		return std::copysign(angle, zCross);
+		return std::copysign(angle, static_cast<Vector2<T>::ComputationalType>(zCross));
 	}
 
 	template<Arithmetic T>
@@ -377,7 +391,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& target) noexcept
 	{
-		const Vector2<T>::ComputationalType multiplier = Dot(vector, target) / Dot(target, target);
+		const Vector2<T>::ComputationalType multiplier = static_cast<Vector2<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
 
 		return target * multiplier;
 	}
@@ -391,7 +405,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T> Reflect(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
-		const Vector2<T>::ComputationalType multiplier = typename Vector2<T>::ComputationalType{-2} *Dot(vector, normal);
+		const T multiplier = T{-2} * Dot(vector, normal);
 
 		return vector + normal * multiplier;
 	}
@@ -409,7 +423,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	std::string Vector2<T>::ToString() const
+	inline std::string Vector2<T>::ToString() const
 	{
 		return std::format("({}, {})", x, y);
 	}
@@ -427,30 +441,42 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	constexpr inline Vector2<T> operator +(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return Vector2<T>(static_cast<T>(left.x + right.x), static_cast<T>(left.y + right.y));
+		return Vector2<T>(left.x + right.x, left.y + right.y);
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator -(const Vector2<T>& vector) noexcept
+	constexpr inline Vector2<T> operator -(const Vector2<T>& vector) noexcept
 	{
-		return Vector2<T>(static_cast<T>(-vector.x), static_cast<T>(-vector.y));
+		return Vector2<T>(-vector.x, -vector.y);
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	constexpr inline Vector2<T> operator -(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return Vector2<T>(static_cast<T>(left.x - right.x), static_cast<T>(left.y - right.y));
+		return Vector2<T>(left.x - right.x, left.y - right.y);
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator *(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType multiplier) noexcept
+	constexpr inline Vector2<T> operator *(const Vector2<T>& vector, const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.x) * multiplier);
-		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.y) * multiplier);
+		return Vector2<T>(vector.x * multiplier, vector.y * multiplier);
+	}
+
+	template<Arithmetic T>
+	constexpr inline Vector2<T> operator *(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType multiplier) noexcept
+	{
+		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(vector.x * multiplier);
+		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(vector.y * multiplier);
 
 		return Vector2<T>(x, y);
+	}
+
+	template<Arithmetic T>
+	constexpr inline Vector2<T> operator *(const T multiplier, const Vector2<T>& vector) noexcept requires(std::is_integral_v<T>)
+	{
+		return vector * multiplier;
 	}
 
 	template<Arithmetic T>
@@ -460,88 +486,94 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator *(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	constexpr inline Vector2<T> operator *(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.x) * static_cast<Vector2<T>::ComputationalType>(right.x));
-		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) * static_cast<Vector2<T>::ComputationalType>(right.y));
+		return Vector2<T>(left.x * right.x, left.y * right.y);
+	}
+
+	template<Arithmetic T>
+	constexpr inline Vector2<T> operator /(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType divisor) noexcept
+	{
+		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(vector.x / divisor);
+		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(vector.y / divisor);
 
 		return Vector2<T>(x, y);
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator /(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType divisor) noexcept
+	constexpr inline Vector2<T> operator /(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.x) / divisor);
-		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(vector.y) / divisor);
+		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.x) / right.x);
+		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) / right.y);
 
 		return Vector2<T>(x, y);
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> operator /(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	inline Vector2<T>& Vector2<T>::operator +=(const Vector2<T>& other) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.x) / static_cast<Vector2<T>::ComputationalType>(right.x));
-		const T y = RoundToIntegralIfPossible<Vector2<T>::ComputationalType, T>(static_cast<Vector2<T>::ComputationalType>(left.y) / static_cast<Vector2<T>::ComputationalType>(right.y));
-
-		return Vector2<T>(x, y);
-	}
-
-	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator +=(const Vector2<T>& other) noexcept
-	{
-		x = static_cast<T>(x + other.x);
-		y = static_cast<T>(y + other.y);
+		x += other.x;
+		y += other.y;
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator -=(const Vector2<T>& other) noexcept
+	inline Vector2<T>& Vector2<T>::operator -=(const Vector2<T>& other) noexcept
 	{
-		x = static_cast<T>(x - other.x);
-		y = static_cast<T>(y - other.y);
+		x -= other.x;
+		y -= other.y;
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator *=(const Vector2<T>::ComputationalType multiplier) noexcept
+	inline Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) * multiplier);
-		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) * multiplier);
+		x *= multiplier;
+		y *= multiplier;
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator *=(const Vector2<T>& other) noexcept
+	inline Vector2<T>& Vector2<T>::operator *=(const Vector2<T>::ComputationalType multiplier) noexcept
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) * static_cast<ComputationalType>(other.x));
-		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) * static_cast<ComputationalType>(other.y));
+		x = RoundToIntegralIfPossible<ComputationalType, T>(x * multiplier);
+		y = RoundToIntegralIfPossible<ComputationalType, T>(y * multiplier);
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept
+	inline Vector2<T>& Vector2<T>::operator *=(const Vector2<T>& other) noexcept
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / divisor);
-		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / divisor);
+		x *= other.x;
+		y *= other.y;
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator /=(const Vector2<T>& other) noexcept
+	inline Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / static_cast<ComputationalType>(other.x));
-		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / static_cast<ComputationalType>(other.y));
+		x = RoundToIntegralIfPossible<ComputationalType, T>(x / divisor);
+		y = RoundToIntegralIfPossible<ComputationalType, T>(y / divisor);
 
 		return *this;
 	}
 
 	template<Arithmetic T>
-	std::ostream& operator<<(std::ostream& stream, const Vector2<T>& vector)
+	inline Vector2<T>& Vector2<T>::operator /=(const Vector2<T>& other) noexcept
+	{
+		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / other.x);
+		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / other.y);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	inline std::ostream& operator <<(std::ostream& stream, const Vector2<T>& vector)
 	{
 		return stream << vector.ToString();
 	}
