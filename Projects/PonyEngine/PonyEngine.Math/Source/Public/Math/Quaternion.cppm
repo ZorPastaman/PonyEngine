@@ -184,7 +184,7 @@ namespace PonyEngine::Math
 		inline Quaternion<T>& operator *=(const Quaternion<T>& other) noexcept;
 
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const Quaternion<T>& other) const noexcept = default;
+		constexpr inline bool operator ==(const Quaternion<T>& other) const noexcept = default;
 
 		static const Quaternion<T> Identity; /// @brief Zero rotation @p Quaternion.
 
@@ -366,7 +366,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Quaternion<T> Quaternion<T>::CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept
 	{
-		const T dot = static_cast<T>(Dot(fromDirection, toDirection));
+		const T dot = Dot(fromDirection, toDirection);
 
 		Vector3<T> axis;
 		if (AreAlmostEqual(dot, T{-1}))

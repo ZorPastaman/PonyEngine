@@ -96,7 +96,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic From, Arithmetic To>
-	constexpr To RoundToIntegralIfPossible(const From from) noexcept
+	constexpr inline To RoundToIntegralIfPossible(const From from) noexcept
 	{
 		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
 		{
