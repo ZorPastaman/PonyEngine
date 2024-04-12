@@ -174,6 +174,43 @@ namespace Math
 			Assert::AreEqual(short{0}, zeroNormalizedI.w);
 		}
 
+		TEST_METHOD(InverseTest)
+		{
+			float xf = -5.f;
+			float yf = 15.f;
+			float zf = 7.f;
+			float wf = 14.f;
+			auto vectorF = PonyEngine::Math::Vector4<float>(xf, yf, zf, wf);
+			auto inversedF = vectorF.Inversed();
+			Assert::AreEqual(wf, inversedF.x);
+			Assert::AreEqual(zf, inversedF.y);
+			Assert::AreEqual(yf, inversedF.z);
+			Assert::AreEqual(xf, inversedF.w);
+
+			vectorF.Inverse();
+			Assert::AreEqual(inversedF.x, vectorF.x);
+			Assert::AreEqual(inversedF.y, vectorF.y);
+			Assert::AreEqual(inversedF.z, vectorF.z);
+			Assert::AreEqual(inversedF.w, vectorF.w);
+
+			short xi = -5;
+			short yi = 15;
+			short zi = 7;
+			short wi = 14;
+			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
+			auto inversedI = vectorI.Inversed();
+			Assert::AreEqual(wi, inversedI.x);
+			Assert::AreEqual(zi, inversedI.y);
+			Assert::AreEqual(yi, inversedI.z);
+			Assert::AreEqual(xi, inversedI.w);
+
+			vectorI.Inverse();
+			Assert::AreEqual(inversedI.x, vectorI.x);
+			Assert::AreEqual(inversedI.y, vectorI.y);
+			Assert::AreEqual(inversedI.z, vectorI.z);
+			Assert::AreEqual(inversedI.w, vectorI.w);
+		}
+
 		TEST_METHOD(IsFiniteTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Zero.IsFinite());
