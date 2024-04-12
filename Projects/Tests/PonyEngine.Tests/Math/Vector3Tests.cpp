@@ -152,6 +152,37 @@ namespace Math
 			Assert::AreEqual(short{0}, zeroNormalizedI.z);
 		}
 
+		TEST_METHOD(InverseTest)
+		{
+			float xf = -5.f;
+			float yf = 15.f;
+			float zf = 7.f;
+			auto vectorF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
+			auto inversedF = vectorF.Inversed();
+			Assert::AreEqual(zf, inversedF.x);
+			Assert::AreEqual(yf, inversedF.y);
+			Assert::AreEqual(xf, inversedF.z);
+
+			vectorF.Inverse();
+			Assert::AreEqual(inversedF.x, vectorF.x);
+			Assert::AreEqual(inversedF.y, vectorF.y);
+			Assert::AreEqual(inversedF.z, vectorF.z);
+
+			short xi = -5;
+			short yi = 15;
+			short zi = 7;
+			auto vectorI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
+			auto inversedI = vectorI.Inversed();
+			Assert::AreEqual(zi, inversedI.x);
+			Assert::AreEqual(yi, inversedI.y);
+			Assert::AreEqual(xi, inversedI.z);
+
+			vectorI.Inverse();
+			Assert::AreEqual(inversedI.x, vectorI.x);
+			Assert::AreEqual(inversedI.y, vectorI.y);
+			Assert::AreEqual(inversedI.z, vectorI.z);
+		}
+
 		TEST_METHOD(IsFiniteTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Zero.IsFinite());
