@@ -330,24 +330,6 @@ namespace Math
 			Assert::AreEqual(yf / multiplier, centralF.y);
 			Assert::AreEqual(zf / multiplier, centralF.z);
 
-			leftF = centralF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
-			leftF = centralF *= rightF;
-			Assert::AreEqual(xf * rightF.x, leftF.x);
-			Assert::AreEqual(yf * rightF.y, leftF.y);
-			Assert::AreEqual(zf * rightF.z, leftF.z);
-			Assert::AreEqual(xf * rightF.x, centralF.x);
-			Assert::AreEqual(yf * rightF.y, centralF.y);
-			Assert::AreEqual(zf * rightF.z, centralF.z);
-
-			leftF = centralF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
-			leftF = centralF /= rightF;
-			Assert::AreEqual(xf / rightF.x, leftF.x);
-			Assert::AreEqual(yf / rightF.y, leftF.y);
-			Assert::AreEqual(zf / rightF.z, leftF.z);
-			Assert::AreEqual(xf / rightF.x, centralF.x);
-			Assert::AreEqual(yf / rightF.y, centralF.y);
-			Assert::AreEqual(zf / rightF.z, centralF.z);
-
 			PonyEngine::Math::Vector3<short> leftI, centralI, rightI;
 			short xi = 8;
 			short yi = 22;
@@ -413,24 +395,6 @@ namespace Math
 			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(xi / multiplier), centralI.x);
 			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(yi / multiplier), centralI.y);
 			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(zi / multiplier), centralI.z);
-
-			leftI = centralI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
-			leftI = centralI *= rightI;
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(xi) * rightI.x), leftI.x);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(yi) * rightI.y), leftI.y);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(zi) * rightI.z), leftI.z);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(xi) * rightI.x), centralI.x);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(yi) * rightI.y), centralI.y);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(zi) * rightI.z), centralI.z);
-
-			leftI = centralI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
-			leftI = centralI /= rightI;
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(xi) / rightI.x), leftI.x);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(yi) / rightI.y), leftI.y);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(zi) / rightI.z), leftI.z);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(xi) / rightI.x), centralI.x);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(yi) / rightI.y), centralI.y);
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(static_cast<float>(zi) / rightI.z), centralI.z);
 		}
 
 		TEST_METHOD(DefaultsTest)
@@ -751,6 +715,34 @@ namespace Math
 			Assert::AreEqual(short{0}, reflectionI.z);
 		}
 
+		TEST_METHOD(ScaleTest)
+		{
+			auto vectorF0 = PonyEngine::Math::Vector3<float>(-2.f, 2.f, 4.f);
+			auto vectorF1 = PonyEngine::Math::Vector3<float>(2.f, 4.f, -8.f);
+
+			auto scaledF = PonyEngine::Math::Scale(vectorF0, vectorF1);
+			Assert::AreEqual(-4.f, scaledF.x);
+			Assert::AreEqual(8.f, scaledF.y);
+			Assert::AreEqual(-32.f, scaledF.z);
+
+			auto vectorI0 = PonyEngine::Math::Vector3<short>(-2, 2, 4);
+			auto vectorI1 = PonyEngine::Math::Vector3<short>(2, 4, -8);
+			auto scaledI = PonyEngine::Math::Scale(vectorI0, vectorI1);
+			Assert::AreEqual(short{-4}, scaledI.x);
+			Assert::AreEqual(short{8}, scaledI.y);
+			Assert::AreEqual(short{-32}, scaledI.z);
+
+			vectorF0.Scale(vectorF1);
+			Assert::AreEqual(scaledF.x, vectorF0.x);
+			Assert::AreEqual(scaledF.y, vectorF0.y);
+			Assert::AreEqual(scaledF.z, vectorF0.z);
+
+			vectorI0.Scale(vectorI1);
+			Assert::AreEqual(scaledI.x, vectorI0.x);
+			Assert::AreEqual(scaledI.y, vectorI0.y);
+			Assert::AreEqual(scaledI.z, vectorI0.z);
+		}
+
 		TEST_METHOD(LerpTest)
 		{
 			auto vectorF0 = PonyEngine::Math::Vector3<float>(-2.f, 2.f, 4.f);
@@ -932,16 +924,6 @@ namespace Math
 			Assert::AreEqual(yf / multiplier, vectorF2.y);
 			Assert::AreEqual(zf / multiplier, vectorF2.z);
 
-			vectorF2 = vectorF * vectorF1;
-			Assert::AreEqual(xf * xf1, vectorF2.x);
-			Assert::AreEqual(yf * yf1, vectorF2.y);
-			Assert::AreEqual(zf * zf1, vectorF2.z);
-
-			vectorF2 = vectorF / vectorF1;
-			Assert::AreEqual(xf / xf1, vectorF2.x);
-			Assert::AreEqual(yf / yf1, vectorF2.y);
-			Assert::AreEqual(zf / zf1, vectorF2.z);
-
 			short xi = 90;
 			short yi = 100;
 			short zi = -80;
@@ -986,16 +968,6 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(xi / multiplier), vectorI2.x);
 			Assert::AreEqual(static_cast<short>(yi / multiplier), vectorI2.y);
 			Assert::AreEqual(static_cast<short>(zi / multiplier), vectorI2.z);
-
-			vectorI2 = vectorI * vectorI1;
-			Assert::AreEqual(static_cast<short>(xi * xi1), vectorI2.x);
-			Assert::AreEqual(static_cast<short>(yi * yi1), vectorI2.y);
-			Assert::AreEqual(static_cast<short>(zi * zi1), vectorI2.z);
-
-			vectorI2 = vectorI / vectorI1;
-			Assert::AreEqual(static_cast<short>(xi / xi1), vectorI2.x);
-			Assert::AreEqual(static_cast<short>(yi / yi1 + 1), vectorI2.y);
-			Assert::AreEqual(static_cast<short>(zi / zi1 + 1), vectorI2.z);
 		}
 
 		TEST_METHOD(TypesTest)
@@ -1048,9 +1020,8 @@ namespace Math
 			constexpr auto sub = vector - copiedVector;
 			constexpr auto multiplied = vector * 3.f;
 			constexpr auto multipliedL = 3.f * vector;
-			constexpr auto multipliedV = vector * normal;
+			constexpr auto scaled = PonyEngine::Math::Scale(vector, normal);
 			constexpr auto divided = vector / 3.f;
-			constexpr auto dividedV = vector / copiedVector;
 
 			constexpr auto intVector = PonyEngine::Math::Vector3<int>();
 			constexpr auto multipliedI = intVector * 3;

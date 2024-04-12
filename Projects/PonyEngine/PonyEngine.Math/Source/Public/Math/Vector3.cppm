@@ -63,6 +63,13 @@ namespace PonyEngine::Math
 		/// @details This vector must be non-zero.
 		inline void Normalize() noexcept;
 
+		/// @brief Computed a @p Vector inversed to this one.
+		/// @return Inversed @p Vector.
+		[[nodiscard("Pure function")]]
+		constexpr inline Vector3<T> Inversed() const noexcept;
+		/// @brief Inverses a @p Vector.
+		inline void Inverse() noexcept;
+
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -73,6 +80,10 @@ namespace PonyEngine::Math
 		/// @param yParam Y component.
 		/// @param zParam Z component.
 		inline void Set(T xParam, T yParam, T zParam) noexcept;
+
+		/// @brief Multiplies @a this by the @p scale component-wise.
+		/// @param scale @p Vector to multiply by.
+		inline void Scale(const Vector3<T>& scale) noexcept;
 
 		/// @brief Creates a string representing a state of a @p Vector.
 		///        The format is '(x, y, z)'.
@@ -108,18 +119,10 @@ namespace PonyEngine::Math
 		/// @param multiplier @p Vector multiplier.
 		/// @return @a This.
 		inline Vector3<T>& operator *=(ComputationalType multiplier) noexcept;
-		/// @brief Multiplies @a this by the @p other component-wise.
-		/// @param other @p Vector to multiply.
-		/// @return @a This.
-		inline Vector3<T>& operator *=(const Vector3<T>& other) noexcept;
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor @p Vector divisor.
 		/// @return @a This.
 		inline Vector3<T>& operator /=(ComputationalType divisor) noexcept;
-		/// @brief Divides @a this by the @p divisor component-wise.
-		/// @param other @p Vector to divide by.
-		/// @return @a This.
-		inline Vector3<T>& operator /=(const Vector3<T>& other) noexcept;
 
 		[[nodiscard("Pure operator")]]
 		constexpr inline bool operator ==(const Vector3<T>& other) const noexcept = default;
@@ -213,6 +216,14 @@ namespace PonyEngine::Math
 	export template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 
+	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
+	/// @tparam T Component type.
+	/// @param left Multiplicand @p Vector.
+	/// @param right Multiplier @p Vector.
+	/// @return Product @p Vector.
+	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr inline Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+
 	/// @brief Linear interpolation between two @p Vectors if the @p time is in range [0, 1].
 	///        Linear extrapolation between two @p Vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -283,13 +294,6 @@ namespace PonyEngine::Math
 	/// @return Product @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr inline Vector3<T> operator *(typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept;
-	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
-	/// @tparam T Component type.
-	/// @param left Multiplicand @p Vector.
-	/// @param right Multiplier @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator *(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
@@ -298,13 +302,6 @@ namespace PonyEngine::Math
 	/// @return Quotient @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr inline Vector3<T> operator /(const Vector3<T>& vector, typename Vector3<T>::ComputationalType divisor) noexcept;
-	/// @brief Divides the @p left vector by the @p right vector component-wise.
-	/// @tparam T Component type.
-	/// @param left Dividend @p Vector.
-	/// @param right Divisor @p Vector.
-	/// @return Quotient @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator /(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
 	/// @tparam T Component type.
@@ -353,6 +350,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	inline constexpr Vector3<T> Vector3<T>::Inversed() const noexcept
+	{
+		return Vector3<T>(z, y, x);
+	}
+
+	template<Arithmetic T>
+	inline void Vector3<T>::Inverse() noexcept
+	{
+		*this = Inversed();
+	}
+
+	template<Arithmetic T>
 	bool Vector3<T>::IsFinite() const noexcept
 	{
 		if constexpr (std::is_floating_point_v<T>)
@@ -371,6 +380,14 @@ namespace PonyEngine::Math
 		x = xParam;
 		y = yParam;
 		z = zParam;
+	}
+
+	template<Arithmetic T>
+	inline void Vector3<T>::Scale(const Vector3<T>& scale) noexcept
+	{
+		x *= scale.x;
+		y *= scale.y;
+		z *= scale.z;
 	}
 
 	template<Arithmetic T>
@@ -437,6 +454,12 @@ namespace PonyEngine::Math
 		const T multiplier = T{-2} * Dot(vector, normal);
 
 		return vector + normal * multiplier;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return Vector3<T>(left.x * right.x, left.y * right.y, left.z * right.z);
 	}
 
 	template<Arithmetic T>
@@ -516,27 +539,11 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector3<T> operator *(const Vector3<T>& left, const Vector3<T>& right) noexcept
-	{
-		return Vector3<T>(left.x * right.x, left.y * right.y, left.z * right.z);
-	}
-
-	template<Arithmetic T>
 	constexpr inline Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
 	{
 		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.x / divisor);
 		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.y / divisor);
 		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.z / divisor);
-
-		return Vector3<T>(x, y, z);
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator /(const Vector3<T>& left, const Vector3<T>& right) noexcept
-	{
-		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.x) / right.x);
-		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.y) / right.y);
-		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(static_cast<Vector3<T>::ComputationalType>(left.z) / right.z);
 
 		return Vector3<T>(x, y, z);
 	}
@@ -582,30 +589,11 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator *=(const Vector3<T>& other) noexcept
-	{
-		x *= other.x;
-		y *= other.y;
-		z *= other.z;
-
-		return *this;
-	}
-
-	template<Arithmetic T>
 	inline Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept
 	{
 		x = RoundToIntegralIfPossible<ComputationalType, T>(x / divisor);
 		y = RoundToIntegralIfPossible<ComputationalType, T>(y / divisor);
 		z = RoundToIntegralIfPossible<ComputationalType, T>(z / divisor);
-
-		return *this;
-	}
-	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator /=(const Vector3<T>& other) noexcept
-	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(x) / other.x);
-		y = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(y) / other.y);
-		z = RoundToIntegralIfPossible<ComputationalType, T>(static_cast<ComputationalType>(z) / other.z);
 
 		return *this;
 	}
