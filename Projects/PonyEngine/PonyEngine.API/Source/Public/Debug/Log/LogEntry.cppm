@@ -95,11 +95,6 @@ namespace PonyEngine::Debug::Log
 	/// @return @p stream.
 	export inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
 
-	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
-	{
-		return stream << logEntry.ToString();
-	}
-
 	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
 		m_message(message),
 		m_exception(exception),
@@ -167,5 +162,10 @@ namespace PonyEngine::Debug::Log
 		}
 
 		return std::string();
+	}
+
+	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
+	{
+		return stream << logEntry.ToString();
 	}
 }

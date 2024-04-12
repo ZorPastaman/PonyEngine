@@ -115,6 +115,17 @@ namespace PonyEngine::Core
 		Window::IWindowFactory* m_windowFactory; /// @brief Window factory. It's optional and can be nullptr. If it's not nullptr, its lifetime must exceed the engine lifetime.
 	};
 
+	inline bool EngineParams::SystemFactoriesIterator::IsEnd() const noexcept
+	{
+		return m_current == m_end;
+	}
+
+	inline EngineParams::SystemFactoriesIterator::SystemFactoriesIterator(std::vector<ISystemFactory*>::const_iterator begin, std::vector<ISystemFactory*>::const_iterator end) noexcept :
+		m_current(begin),
+		m_end(end)
+	{
+	}
+
 	inline ISystemFactory* EngineParams::SystemFactoriesIterator::operator *() const noexcept
 	{
 		return *m_current;
@@ -133,17 +144,6 @@ namespace PonyEngine::Core
 		++(*this);
 
 		return temp;
-	}
-
-	inline bool EngineParams::SystemFactoriesIterator::IsEnd() const noexcept
-	{
-		return m_current == m_end;
-	}
-
-	inline EngineParams::SystemFactoriesIterator::SystemFactoriesIterator(std::vector<ISystemFactory*>::const_iterator begin, std::vector<ISystemFactory*>::const_iterator end) noexcept :
-		m_current(begin),
-		m_end(end)
-	{
 	}
 
 	inline EngineParams::EngineParams(Debug::Log::ILogger& logger) noexcept :
