@@ -7,12 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math;
+#include "CppUnitTest.h"
 
-export import :Common;
-export import :Matrix2x2;
-export import :Matrix3x3;
-export import :Quaternion;
-export import :Vector2;
-export import :Vector3;
-export import :Vector4;
+import PonyEngine.Math;
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace Math
+{
+	TEST_CLASS(Matrix3x3Tests)
+	{
+		TEST_METHOD(Test)
+		{
+			auto wow = PonyEngine::Math::Matrix3x3<float>()[0];
+		}
+	};
+}

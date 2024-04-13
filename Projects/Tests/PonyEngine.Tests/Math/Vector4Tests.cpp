@@ -103,7 +103,7 @@ namespace Math
 			short zi = -43;
 			short wi = 11;
 			short magnitudeSquaredI = static_cast<short>(xi * xi + yi * yi + zi * zi + wi * wi);
-			float magnitudeI = std::sqrt(magnitudeSquaredI);
+			float magnitudeI = std::sqrt(static_cast<float>(magnitudeSquaredI));
 			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
 
 			Assert::AreEqual(magnitudeSquaredI, vectorI.MagnitudeSquared());

@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Math\Common.cppm" />
     <ClCompile Include="Source\Public\Math\Math.cppm" />
+    <ClCompile Include="Source\Public\Math\Matrix2x2.cppm" />
     <ClCompile Include="Source\Public\Math\Matrix3x3.cppm" />
     <ClCompile Include="Source\Public\Math\Quaternion.cppm" />
     <ClCompile Include="Source\Public\Math\Vector2.cppm" />

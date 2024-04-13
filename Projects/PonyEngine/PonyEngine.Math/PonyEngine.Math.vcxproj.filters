@@ -36,6 +36,9 @@
     <ClCompile Include="Source\Public\Math\Matrix3x3.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Math\Matrix2x2.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
