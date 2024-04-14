@@ -85,7 +85,7 @@ namespace PonyEngine::Math
 		constexpr inline Matrix2x2() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Matrix2x2(T m00, T m01,
-							T m10, T m11) noexcept;
+								T m10, T m11) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Matrix2x2(const Vector2<T>& row0, const Vector2<T>& row1) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -260,7 +260,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	constexpr inline Matrix2x2<T>::Matrix2x2(const Vector2<T>& row0, const Vector2<T>& row1) noexcept :
-		Matrix2x2(row0.x, row0.y, row1.x, row1.y)
+		Matrix2x2(row0.X(), row0.Y(), row1.X(), row1.Y())
 	{
 	}
 
