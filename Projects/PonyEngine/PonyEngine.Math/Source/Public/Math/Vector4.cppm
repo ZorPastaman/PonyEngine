@@ -24,25 +24,67 @@ namespace PonyEngine::Math
 	/// @brief 4D vector implementation.
 	/// @tparam T Component type.
 	export template<Arithmetic T>
-	struct Vector4 final
+	class Vector4 final
 	{
 	public:
 		using ValueType = T; /// @brief Component type.
 		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
 
+		/// @brief Creates a @p Vector4 and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector4() noexcept = default;
+		constexpr inline Vector4() noexcept;
 		/// @brief Creates a @p Vector4 and assigns its components from the arguments.
-		/// @param xParam Value to assign to the @p x component.
-		/// @param yParam Value to assign to the @p y component.
-		/// @param zParam Value to assign to the @p z component.
-		/// @param wParam Value to assign to the @p w component.
+		/// @param x Value to assign to the @p x component.
+		/// @param y Value to assign to the @p y component.
+		/// @param z Value to assign to the @p z component.
+		/// @param w Value to assign to the @p w component.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector4(T xParam, T yParam, T zParam, T wParam) noexcept;
+		constexpr inline Vector4(T x, T y, T z, T w) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr inline Vector4(const Vector4<T>& other) noexcept = default;
 
 		constexpr inline ~Vector4() noexcept = default;
+
+		/// @brief Gets a reference to the @p x component.
+		/// @return @p X component reference.
+		[[nodiscard("Pure function")]]
+		inline T& X() noexcept;
+		/// @brief Gets a reference to the const @p x component.
+		/// @return Const @p x component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& X() const noexcept;
+		/// @brief Gets a reference to the @p y component.
+		/// @return @p Y component reference.
+		[[nodiscard("Pure function")]]
+		inline T& Y() noexcept;
+		/// @brief Gets a reference to the const @p y component.
+		/// @return Const @p y component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& Y() const noexcept;
+		/// @brief Gets a reference to the @p z component.
+		/// @return @p Z component reference.
+		[[nodiscard("Pure function")]]
+		inline T& Z() noexcept;
+		/// @brief Gets a reference to the const @p z component.
+		/// @return Const @p z component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& Z() const noexcept;
+		/// @brief Gets a reference to the @p w component.
+		/// @return @p W component reference.
+		[[nodiscard("Pure function")]]
+		inline T& W() noexcept;
+		/// @brief Gets a reference to the const @p w component.
+		/// @return Const @p w component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& W() const noexcept;
+		/// @brief Gets a pointer to the data array. The order is x, y, z, w.
+		/// @return Data pointer.
+		[[nodiscard("Pure function")]]
+		inline T* Data() noexcept;
+		/// @brief Gets a pointer to the const data array. The order is x, y, z, w.
+		/// @return Const data pointer.
+		[[nodiscard("Pure function")]]
+		inline const T* Data() const noexcept;
 
 		/// @brief Computes a magnitude of a @p Vector.
 		/// @return Computed magnitude.
@@ -74,11 +116,11 @@ namespace PonyEngine::Math
 		bool IsFinite() const noexcept;
 
 		/// @brief Assigns arguments to @p Vector components.
-		/// @param xParam X component.
-		/// @param yParam Y component.
-		/// @param zParam Z component.
-		/// @param wParam w component.
-		inline void Set(T xParam, T yParam, T zParam, T wParam) noexcept;
+		/// @param x X component.
+		/// @param y Y component.
+		/// @param z Z component.
+		/// @param w W component.
+		inline void Set(T x, T y, T z, T w) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale @p Vector to multiply by.
@@ -99,7 +141,7 @@ namespace PonyEngine::Math
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		inline const T& operator [](std::size_t index) const noexcept;
+		constexpr inline const T& operator [](std::size_t index) const noexcept;
 
 		inline Vector4<T>& operator =(const Vector4<T>& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
@@ -132,10 +174,8 @@ namespace PonyEngine::Math
 
 		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Vector4, it's always 4.
 
-		T x; /// @brief X component.
-		T y; /// @brief Y component.
-		T z; /// @brief Z component.
-		T w; /// @brief W component.
+	private:
+		std::array<T, ComponentCount> m_components; /// @brief Component array in order x, y, z, w.
 	};
 
 	/// @brief Computes a dot product of two @p Vectors.
@@ -249,19 +289,76 @@ namespace PonyEngine::Math
 	export template<Arithmetic T>
 	inline std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector);
 
-	/// @brief Array of pointers to @p Vector components.
-	/// @tparam T Component type.
 	template<Arithmetic T>
-	static const std::array<T Vector4<T>::*, Vector4<T>::ComponentCount> s_vector4ComponentPointers
-		{ &Vector4<T>::x, &Vector4<T>::y, &Vector4<T>::z, &Vector4<T>::w };
+	constexpr inline Vector4<T>::Vector4() noexcept :
+		Vector4(T{}, T{}, T{}, T{})
+	{
+	}
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T>::Vector4(const T xParam, const T yParam, const T zParam, const T wParam) noexcept :
-		x{xParam},
-		y{yParam},
-		z{zParam},
-		w{wParam}
+	constexpr inline Vector4<T>::Vector4(const T x, const T y, const T z, const T w) noexcept :
+		m_components{x, y, z, w}
 	{
+	}
+
+	template<Arithmetic T>
+	inline T& Vector4<T>::X() noexcept
+	{
+		return m_components[0];
+	}
+
+	template<Arithmetic T>
+	constexpr inline const T& Vector4<T>::X() const noexcept
+	{
+		return m_components[0];
+	}
+
+	template<Arithmetic T>
+	inline T& Vector4<T>::Y() noexcept
+	{
+		return m_components[1];
+	}
+
+	template<Arithmetic T>
+	constexpr inline const T& Vector4<T>::Y() const noexcept
+	{
+		return m_components[1];
+	}
+
+	template<Arithmetic T>
+	inline T& Vector4<T>::Z() noexcept
+	{
+		return m_components[2];
+	}
+
+	template<Arithmetic T>
+	constexpr inline const T& Vector4<T>::Z() const noexcept
+	{
+		return m_components[2];
+	}
+
+	template<Arithmetic T>
+	inline T& Vector4<T>::W() noexcept
+	{
+		return m_components[3];
+	}
+
+	template<Arithmetic T>
+	constexpr inline const T& Vector4<T>::W() const noexcept
+	{
+		return m_components[3];
+	}
+
+	template<Arithmetic T>
+	inline T* Vector4<T>::Data() noexcept
+	{
+		return m_components.data();
+	}
+
+	template<Arithmetic T>
+	inline const T* Vector4<T>::Data() const noexcept
+	{
+		return m_components.data();
 	}
 
 	template<Arithmetic T>
@@ -291,7 +388,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	inline constexpr Vector4<T> Vector4<T>::Inversed() const noexcept
 	{
-		return Vector4<T>(w, z, y, x);
+		return Vector4<T>(W(), Z(), Y(), X());
 	}
 
 	template<Arithmetic T>
@@ -305,7 +402,7 @@ namespace PonyEngine::Math
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return std::isfinite(x) && std::isfinite(y) && std::isfinite(z) && std::isfinite(w);
+			return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
 		}
 		else
 		{
@@ -314,27 +411,27 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline void Vector4<T>::Set(const T xParam, const T yParam, const T zParam, const T wParam) noexcept
+	inline void Vector4<T>::Set(const T x, const T y, const T z, const T w) noexcept
 	{
-		x = xParam;
-		y = yParam;
-		z = zParam;
-		w = wParam;
+		X() = x;
+		Y() = y;
+		Z() = z;
+		W() = w;
 	}
 
 	template<Arithmetic T>
 	inline void Vector4<T>::Scale(const Vector4<T>& scale) noexcept
 	{
-		x *= scale.x;
-		y *= scale.y;
-		z *= scale.z;
-		w *= scale.w;
+		X() *= scale.X();
+		Y() *= scale.Y();
+		Z() *= scale.Z();
+		W() *= scale.W();
 	}
 
 	template<Arithmetic T>
 	constexpr T Dot(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return left.x * right.x + left.y * right.y + left.z * right.z + left.w * right.w;
+		return left.X() * right.X() + left.Y() * right.Y() + left.Z() * right.Z() + left.W() * right.W();
 	}
 
 	template<Arithmetic T>
@@ -348,7 +445,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.x * right.x, left.y * right.y, left.z * right.z, left.w * right.w);
+		return Vector4<T>(left.X() * right.X(), left.Y() * right.Y(), left.Z() * right.Z(), left.W() * right.W());
 	}
 
 	template<Arithmetic T>
@@ -366,52 +463,52 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	inline std::string Vector4<T>::ToString() const
 	{
-		return std::format("({}, {}, {}, {})", x, y, z, w);
+		return std::format("({}, {}, {}, {})", X(), Y(), Z(), W());
 	}
 
 	template<Arithmetic T>
 	inline T& Vector4<T>::operator [](const std::size_t index) noexcept
 	{
-		return this->*s_vector4ComponentPointers<T>[index];
+		return m_components[index];
 	}
 
 	template<Arithmetic T>
-	inline const T& Vector4<T>::operator [](const std::size_t index) const noexcept
+	constexpr inline const T& Vector4<T>::operator [](const std::size_t index) const noexcept
 	{
-		return this->*s_vector4ComponentPointers<T>[index];
+		return m_components[index];
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator +(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.x + right.x, left.y + right.y, left.z + right.z, left.w + right.w);
+		return Vector4<T>(left.X() + right.X(), left.Y() + right.Y(), left.Z() + right.Z(), left.W() + right.W());
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept
 	{
-		return Vector4<T>(-vector.x, -vector.y, -vector.z, -vector.w);
+		return Vector4<T>(-vector.X(), -vector.Y(), -vector.Z(), -vector.W());
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator -(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.x - right.x, left.y - right.y, left.z - right.z, left.w - right.w);
+		return Vector4<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z(), left.W() - right.W());
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		return Vector4<T>(vector.x * multiplier, vector.y * multiplier, vector.z * multiplier, vector.w * multiplier);
+		return Vector4<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier, vector.W() * multiplier);
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType multiplier) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.x * multiplier);
-		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.y * multiplier);
-		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.z * multiplier);
-		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.w * multiplier);
+		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.X() * multiplier);
+		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Y() * multiplier);
+		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Z() * multiplier);
+		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.W() * multiplier);
 
 		return Vector4<T>(x, y, z, w);
 	}
@@ -431,10 +528,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> operator /(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType divisor) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.x / divisor);
-		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.y / divisor);
-		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.z / divisor);
-		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.w / divisor);
+		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.X() / divisor);
+		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Y() / divisor);
+		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Z() / divisor);
+		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.W() / divisor);
 
 		return Vector4<T>(x, y, z, w);
 	}
@@ -442,10 +539,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator +=(const Vector4<T>& other) noexcept
 	{
-		x += other.x;
-		y += other.y;
-		z += other.z;
-		w += other.w;
+		X() += other.X();
+		Y() += other.Y();
+		Z() += other.Z();
+		W() += other.W();
 
 		return *this;
 	}
@@ -453,10 +550,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator -=(const Vector4<T>& other) noexcept
 	{
-		x -= other.x;
-		y -= other.y;
-		z -= other.z;
-		w -= other.w;
+		X() -= other.X();
+		Y() -= other.Y();
+		Z() -= other.Z();
+		W() -= other.W();
 
 		return *this;
 	}
@@ -464,10 +561,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		x *= multiplier;
-		y *= multiplier;
-		z *= multiplier;
-		w *= multiplier;
+		X() *= multiplier;
+		Y() *= multiplier;
+		Z() *= multiplier;
+		W() *= multiplier;
 
 		return *this;
 	}
@@ -475,10 +572,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator *=(const typename Vector4<T>::ComputationalType multiplier) noexcept
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(x * multiplier);
-		y = RoundToIntegralIfPossible<ComputationalType, T>(y * multiplier);
-		z = RoundToIntegralIfPossible<ComputationalType, T>(z * multiplier);
-		w = RoundToIntegralIfPossible<ComputationalType, T>(w * multiplier);
+		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
+		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
+		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() * multiplier);
+		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() * multiplier);
 
 		return *this;
 	}
@@ -486,10 +583,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		x = RoundToIntegralIfPossible<ComputationalType, T>(x / divisor);
-		y = RoundToIntegralIfPossible<ComputationalType, T>(y / divisor);
-		z = RoundToIntegralIfPossible<ComputationalType, T>(z / divisor);
-		w = RoundToIntegralIfPossible<ComputationalType, T>(w / divisor);
+		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
+		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
+		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() / divisor);
+		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() / divisor);
 
 		return *this;
 	}

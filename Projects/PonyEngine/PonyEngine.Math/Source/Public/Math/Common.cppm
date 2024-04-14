@@ -52,7 +52,7 @@ namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the values are almost equal; @a false otherwise.
 	export template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr inline bool AreAlmostEqual(T left, T right, T tolerance = T{0.00001}) noexcept;
+	inline bool AreAlmostEqual(T left, T right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Signum function.
 	/// @tparam T Value type.
@@ -78,7 +78,7 @@ namespace PonyEngine::Math
 	constexpr inline To RoundToIntegralIfPossible(From from) noexcept;
 
 	template<std::floating_point T>
-	constexpr inline bool AreAlmostEqual(const T left, const T right, const T tolerance) noexcept
+	inline bool AreAlmostEqual(const T left, const T right, const T tolerance) noexcept
 	{
 		return std::abs(left - right) < tolerance;
 	}
