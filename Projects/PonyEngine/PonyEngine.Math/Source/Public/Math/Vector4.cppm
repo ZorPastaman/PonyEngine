@@ -234,7 +234,7 @@ namespace PonyEngine::Math
 	/// @param vector @p Vector to negate.
 	/// @return Negated @p Vector.
 	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept;
+	constexpr inline Vector4<T> operator -(const Vector4<T>& vector) noexcept;
 
 	/// @brief Subtracts the @p right vector from the @p left vector.
 	/// @tparam T Component type.
@@ -376,7 +376,9 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T> Vector4<T>::Normalized() const noexcept
 	{
+#pragma warning(disable:4723)
 		return *this * (Vector4<T>::ComputationalType{1} / Magnitude());
+#pragma warning(default:4723)
 	}
 
 	template<Arithmetic T>
@@ -485,7 +487,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept
+	constexpr inline Vector4<T> operator -(const Vector4<T>& vector) noexcept
 	{
 		return Vector4<T>(-vector.X(), -vector.Y(), -vector.Z(), -vector.W());
 	}

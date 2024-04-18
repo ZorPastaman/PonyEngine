@@ -52,47 +52,6 @@ namespace PonyEngine::Math
 
 		constexpr inline ~Quaternion() noexcept = default;
 
-		/// @brief Gets a reference to the @p x component.
-		/// @return @p X component reference.
-		[[nodiscard("Pure function")]]
-		inline T& X() noexcept;
-		/// @brief Gets a reference to the const @p x component.
-		/// @return Const @p x component reference.
-		[[nodiscard("Pure function")]]
-		constexpr inline const T& X() const noexcept;
-		/// @brief Gets a reference to the @p y component.
-		/// @return @p Y component reference.
-		[[nodiscard("Pure function")]]
-		inline T& Y() noexcept;
-		/// @brief Gets a reference to the const @p y component.
-		/// @return Const @p y component reference.
-		[[nodiscard("Pure function")]]
-		constexpr inline const T& Y() const noexcept;
-		/// @brief Gets a reference to the @p z component.
-		/// @return @p Z component reference.
-		[[nodiscard("Pure function")]]
-		inline T& Z() noexcept;
-		/// @brief Gets a reference to the const @p z component.
-		/// @return Const @p z component reference.
-		[[nodiscard("Pure function")]]
-		constexpr inline const T& Z() const noexcept;
-		/// @brief Gets a reference to the @p w component.
-		/// @return @p W component reference.
-		[[nodiscard("Pure function")]]
-		inline T& W() noexcept;
-		/// @brief Gets a reference to the const @p w component.
-		/// @return Const @p w component reference.
-		[[nodiscard("Pure function")]]
-		constexpr inline const T& W() const noexcept;
-		/// @brief Gets a pointer to the data array. The order is x, y, z, w.
-		/// @return Data pointer.
-		[[nodiscard("Pure function")]]
-		inline T* Data() noexcept;
-		/// @brief Gets a pointer to the const data array. The order is x, y, z, w.
-		/// @return Const data pointer.
-		[[nodiscard("Pure function")]]
-		inline const T* Data() const noexcept;
-
 		/// @brief Creates a @p Quaternion by Euler angles.
 		///        The rotation order is ZXY.
 		/// @param xRotation Rotation around x axis in radians.
@@ -140,6 +99,47 @@ namespace PonyEngine::Math
 		/// @return Created @p Quaternion.
 		[[nodiscard("Pure function")]]
 		static Quaternion<T> CreateByDirection(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
+
+		/// @brief Gets a reference to the @p x component.
+		/// @return @p X component reference.
+		[[nodiscard("Pure function")]]
+		inline T& X() noexcept;
+		/// @brief Gets a reference to the const @p x component.
+		/// @return Const @p x component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& X() const noexcept;
+		/// @brief Gets a reference to the @p y component.
+		/// @return @p Y component reference.
+		[[nodiscard("Pure function")]]
+		inline T& Y() noexcept;
+		/// @brief Gets a reference to the const @p y component.
+		/// @return Const @p y component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& Y() const noexcept;
+		/// @brief Gets a reference to the @p z component.
+		/// @return @p Z component reference.
+		[[nodiscard("Pure function")]]
+		inline T& Z() noexcept;
+		/// @brief Gets a reference to the const @p z component.
+		/// @return Const @p z component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& Z() const noexcept;
+		/// @brief Gets a reference to the @p w component.
+		/// @return @p W component reference.
+		[[nodiscard("Pure function")]]
+		inline T& W() noexcept;
+		/// @brief Gets a reference to the const @p w component.
+		/// @return Const @p w component reference.
+		[[nodiscard("Pure function")]]
+		constexpr inline const T& W() const noexcept;
+		/// @brief Gets a pointer to the data array. The order is x, y, z, w.
+		/// @return Data pointer.
+		[[nodiscard("Pure function")]]
+		inline T* Data() noexcept;
+		/// @brief Gets a pointer to the const data array. The order is x, y, z, w.
+		/// @return Const data pointer.
+		[[nodiscard("Pure function")]]
+		inline const T* Data() const noexcept;
 
 		/// @brief Computes a magnitude of a @p Quaternion.
 		/// @details The pure rotation @p Quaternion always has a magnitude of 1.
@@ -338,66 +338,6 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	inline T& Quaternion<T>::X() noexcept
-	{
-		return m_components[0];
-	}
-
-	template<std::floating_point T>
-	constexpr inline const T& Quaternion<T>::X() const noexcept
-	{
-		return m_components[0];
-	}
-
-	template<std::floating_point T>
-	inline T& Quaternion<T>::Y() noexcept
-	{
-		return m_components[1];
-	}
-
-	template<std::floating_point T>
-	constexpr inline const T& Quaternion<T>::Y() const noexcept
-	{
-		return m_components[1];
-	}
-
-	template<std::floating_point T>
-	inline T& Quaternion<T>::Z() noexcept
-	{
-		return m_components[2];
-	}
-
-	template<std::floating_point T>
-	constexpr inline const T& Quaternion<T>::Z() const noexcept
-	{
-		return m_components[2];
-	}
-
-	template<std::floating_point T>
-	inline T& Quaternion<T>::W() noexcept
-	{
-		return m_components[3];
-	}
-
-	template<std::floating_point T>
-	constexpr inline const T& Quaternion<T>::W() const noexcept
-	{
-		return m_components[3];
-	}
-
-	template<std::floating_point T>
-	inline T* Quaternion<T>::Data() noexcept
-	{
-		return m_components.data();
-	}
-
-	template<std::floating_point T>
-	inline const T* Quaternion<T>::Data() const noexcept
-	{
-		return m_components.data();
-	}
-
-	template<std::floating_point T>
 	Quaternion<T> Quaternion<T>::CreateByEuler(const T xRotation, const T yRotation, const T zRotation) noexcept
 	{
 		const T xHalf = xRotation * T{0.5};
@@ -485,7 +425,67 @@ namespace PonyEngine::Math
 		const T angle = std::acos(dot);
 
 		return Quaternion::CreateByAxisAngle(axis, angle);
-	} 
+	}
+
+	template<std::floating_point T>
+	inline T& Quaternion<T>::X() noexcept
+	{
+		return m_components[0];
+	}
+
+	template<std::floating_point T>
+	constexpr inline const T& Quaternion<T>::X() const noexcept
+	{
+		return m_components[0];
+	}
+
+	template<std::floating_point T>
+	inline T& Quaternion<T>::Y() noexcept
+	{
+		return m_components[1];
+	}
+
+	template<std::floating_point T>
+	constexpr inline const T& Quaternion<T>::Y() const noexcept
+	{
+		return m_components[1];
+	}
+
+	template<std::floating_point T>
+	inline T& Quaternion<T>::Z() noexcept
+	{
+		return m_components[2];
+	}
+
+	template<std::floating_point T>
+	constexpr inline const T& Quaternion<T>::Z() const noexcept
+	{
+		return m_components[2];
+	}
+
+	template<std::floating_point T>
+	inline T& Quaternion<T>::W() noexcept
+	{
+		return m_components[3];
+	}
+
+	template<std::floating_point T>
+	constexpr inline const T& Quaternion<T>::W() const noexcept
+	{
+		return m_components[3];
+	}
+
+	template<std::floating_point T>
+	inline T* Quaternion<T>::Data() noexcept
+	{
+		return m_components.data();
+	}
+
+	template<std::floating_point T>
+	inline const T* Quaternion<T>::Data() const noexcept
+	{
+		return m_components.data();
+	}
 
 	template<std::floating_point T>
 	inline T Quaternion<T>::Magnitude() const noexcept
