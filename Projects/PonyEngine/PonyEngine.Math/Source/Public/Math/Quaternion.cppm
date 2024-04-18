@@ -693,10 +693,27 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T>& vector) noexcept
 	{
-		const Vector3<T> u = Vector3<T>(quaternion.X(), quaternion.Y(), quaternion.Z());
-		const Vector3<T> t = Cross(u, vector) * T{2};
+		const T qx2 = quaternion.X() * T{2};
+		const T qy2 = quaternion.Y() * T{2};
+		const T qz2 = quaternion.Z() * T{2};
 
-		return vector + t * quaternion.W() + Cross(u, t);
+		const T qx2x = qx2 * quaternion.X();
+		const T qx2y = qx2 * quaternion.Y();
+		const T qx2z = qx2 * quaternion.Z();
+		const T qx2w = qx2 * quaternion.W();
+
+		const T qy2y = qy2 * quaternion.Y();
+		const T qy2z = qy2 * quaternion.Z();
+		const T qy2w = qy2 * quaternion.W();
+
+		const T qz2z = qz2 * quaternion.Z();
+		const T qz2w = qz2 * quaternion.W();
+
+		const T x = vector.X() - (qy2y + qz2z) * vector.X() + (qx2y - qz2w) * vector.Y() + (qx2z + qy2w) * vector.Z();
+		const T y = vector.Y() + (qx2y + qz2w) * vector.X() - (qx2x + qz2z) * vector.Y() + (qy2z - qx2w) * vector.Z();
+		const T z = vector.Z() + (qx2z - qy2w) * vector.X() + (qy2z + qx2w) * vector.Y() - (qx2x + qy2y) * vector.Z();
+
+		return Vector3<T>(x, y, z);
 	}
 
 	template<std::floating_point T>
