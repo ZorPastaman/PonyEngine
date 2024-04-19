@@ -96,6 +96,12 @@ namespace Math
 			Assert::AreEqual(matrixF.M01(), matrixF.Data()[2]);
 			Assert::AreEqual(matrixF.M11(), matrixF.Data()[3]);
 
+			const auto matrixCF = PonyEngine::Math::Matrix2x2<float>(m00F, m10F, m01F, m11F);
+			Assert::AreEqual(matrixCF.M00(), matrixCF.Data()[0]);
+			Assert::AreEqual(matrixCF.M10(), matrixCF.Data()[1]);
+			Assert::AreEqual(matrixCF.M01(), matrixCF.Data()[2]);
+			Assert::AreEqual(matrixCF.M11(), matrixCF.Data()[3]);
+
 			short m00I = 4;
 			short m10I = -3;
 			short m01I = 6;
@@ -105,6 +111,12 @@ namespace Math
 			Assert::AreEqual(matrixI.M10(), matrixI.Data()[1]);
 			Assert::AreEqual(matrixI.M01(), matrixI.Data()[2]);
 			Assert::AreEqual(matrixI.M11(), matrixI.Data()[3]);
+
+			const auto matrixCI = PonyEngine::Math::Matrix2x2<short>(m00I, m10I, m01I, m11I);
+			Assert::AreEqual(matrixCI.M00(), matrixCI.Data()[0]);
+			Assert::AreEqual(matrixCI.M10(), matrixCI.Data()[1]);
+			Assert::AreEqual(matrixCI.M01(), matrixCI.Data()[2]);
+			Assert::AreEqual(matrixCI.M11(), matrixCI.Data()[3]);
 		}
 
 		TEST_METHOD(DeterminantTest)
@@ -795,7 +807,7 @@ namespace Math
 			Assert::IsFalse(leftF == rightF);
 			Assert::IsTrue(leftF != rightF);
 
-			leftF.M01() = m10F;
+			leftF.M01() = m01F;
 			leftF.M10() += 1.f;
 			Assert::IsFalse(leftF == rightF);
 			Assert::IsTrue(leftF != rightF);
@@ -823,7 +835,7 @@ namespace Math
 			Assert::IsFalse(leftI == rightI);
 			Assert::IsTrue(leftI != rightI);
 
-			leftI.M01() = m10I;
+			leftI.M01() = m01I;
 			leftI.M10() += 1;
 			Assert::IsFalse(leftI == rightI);
 			Assert::IsTrue(leftI != rightI);
@@ -877,6 +889,13 @@ namespace Math
 			Assert::AreEqual(m10CF * m00F + m11CF * m10F, leftF.M10());
 			Assert::AreEqual(m00CF * m01F + m01CF * m11F, leftF.M01());
 			Assert::AreEqual(m10CF * m01F + m11CF * m11F, leftF.M11());
+
+			float xF = 2.f;
+			float yF = -3.f;
+			auto vectorF = PonyEngine::Math::Vector2<float>(xF, yF);
+			auto mulVectorF = centerF * vectorF;
+			Assert::AreEqual(m00CF * xF + m01CF * yF, mulVectorF.X());
+			Assert::AreEqual(m10CF * xF + m11CF * yF, mulVectorF.Y());
 
 			centerF = PonyEngine::Math::Matrix2x2<float>(m00CF, m10CF, m01CF, m11CF);
 			leftF = centerF / multiplierF;
@@ -939,6 +958,13 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(m10CI * m00I + m11CI * m10I), leftI.M10());
 			Assert::AreEqual(static_cast<short>(m00CI * m01I + m01CI * m11I), leftI.M01());
 			Assert::AreEqual(static_cast<short>(m10CI * m01I + m11CI * m11I), leftI.M11());
+
+			short xI = 2;
+			short yI = -3;
+			auto vectorI = PonyEngine::Math::Vector2<short>(xI, yI);
+			auto mulVectorI = centerI * vectorI;
+			Assert::AreEqual(static_cast<short>(m00CI * xI + m01CI * yI), mulVectorI.X());
+			Assert::AreEqual(static_cast<short>(m10CI * xI + m11CI * yI), mulVectorI.Y());
 
 			centerI = PonyEngine::Math::Matrix2x2<short>(m00CI, m10CI, m01CI, m11CI);
 			leftI = centerI / multiplierF;
