@@ -84,6 +84,42 @@ namespace Math
 			Assert::AreEqual(m11I, vectorMatrixI.M11());
 		}
 
+		TEST_METHOD(CreateByRotationTest)
+		{
+			PonyEngine::Math::Matrix2x2<double> rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateRotation(0.5);
+			Assert::AreEqual(0.8776, rotationMatrix.M00(), 0.0001);
+			Assert::AreEqual(0.4794, rotationMatrix.M10(), 0.0001);
+			Assert::AreEqual(-0.4794, rotationMatrix.M01(), 0.0001);
+			Assert::AreEqual(0.8776, rotationMatrix.M11(), 0.0001);
+
+			auto vector = PonyEngine::Math::Vector2<double>(2, 3);
+			PonyEngine::Math::Vector2<double> rotatedVector = rotationMatrix * vector;
+			Assert::AreEqual(0.3169, rotatedVector.X(), 0.0001);
+			Assert::AreEqual(3.5916, rotatedVector.Y(), 0.0001);
+
+			rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateRotationDegrees(-60);
+			Assert::AreEqual(0.5, rotationMatrix.M00(), 0.0001);
+			Assert::AreEqual(-0.8660, rotationMatrix.M10(), 0.0001);
+			Assert::AreEqual(0.8660, rotationMatrix.M01(), 0.0001);
+			Assert::AreEqual(0.5, rotationMatrix.M11(), 0.0001);
+
+			vector = PonyEngine::Math::Vector2<double>(2, 3);
+			rotatedVector = rotationMatrix * vector;
+			Assert::AreEqual(3.5981, rotatedVector.X(), 0.0001);
+			Assert::AreEqual(-0.2321, rotatedVector.Y(), 0.0001);
+		}
+
+		TEST_METHOD(CreateByDirectionTest)
+		{
+			auto from = PonyEngine::Math::Vector2<double>(-4, 3).Normalized();
+			auto to = PonyEngine::Math::Vector2<double>(6, 2).Normalized();
+			auto rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateByDirection(from, to);
+			Assert::AreEqual(-0.5692, rotationMatrix.M00(), 0.0001);
+			Assert::AreEqual(-0.8222, rotationMatrix.M10(), 0.0001);
+			Assert::AreEqual(0.8222, rotationMatrix.M01(), 0.0001);
+			Assert::AreEqual(-0.5692, rotationMatrix.M11(), 0.0001);
+		}
+
 		TEST_METHOD(DataTest)
 		{
 			float m00F = 4.f;

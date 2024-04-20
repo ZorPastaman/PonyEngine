@@ -10,6 +10,7 @@
 export module PonyEngine.Math:Matrix2x2;
 
 import <array>;
+import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
@@ -119,6 +120,21 @@ namespace PonyEngine::Math
 		constexpr inline Matrix2x2(const Matrix2x2& other) noexcept = default;
 
 		constexpr inline ~Matrix2x2() noexcept = default;
+
+		/// @brief Creates a rotation matrix for a vector2.
+		/// @param angle Rotation angle in radians.
+		/// @return Rotation matrix.
+		static Matrix2x2<T> CreateRotation(T angle) noexcept requires(std::is_floating_point_v<T>);
+		/// @brief Creates a rotation matrix for a vector2.
+		/// @param angle Rotation angle in degrees.
+		/// @return Rotation matrix.
+		static inline Matrix2x2<T> CreateRotationDegrees(T angle) noexcept requires(std::is_floating_point_v<T>);
+
+		/// @brief Creates a rotation matrix representing a rotation  from the vector @p fromDirection to the vector @p toDirection.
+		/// @param fromDirection From direction. Must be normalized.
+		/// @param toDirection To direction. Must be normalized.
+		/// @return Rotation matrix.
+		static inline Matrix2x2<T> CreateByDirection(const Vector2<T>& fromDirection, const Vector2<T>& toDirection) noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Gets component 00.
 		/// @return Component 00.
@@ -448,6 +464,27 @@ namespace PonyEngine::Math
 	constexpr inline Matrix2x2<T>::Matrix2x2(const Vector2<T>& column0, const Vector2<T>& column1) noexcept :
 		Matrix2x2(column0.X(), column0.Y(), column1.X(), column1.Y())
 	{
+	}
+
+	template<Arithmetic T>
+	Matrix2x2<T> Matrix2x2<T>::CreateRotation(const T angle) noexcept requires(std::is_floating_point_v<T>)
+	{
+		const T angleSin = std::sin(angle);
+		const T angleCos = std::cos(angle);
+
+		return Matrix2x2<T>(angleCos, angleSin, -angleSin, angleCos);
+	}
+
+	template<Arithmetic T>
+	inline Matrix2x2<T> Matrix2x2<T>::CreateRotationDegrees(const T angle) noexcept requires(std::is_floating_point_v<T>)
+	{
+		return CreateRotation(angle * DegToRad<T>);
+	}
+
+	template<Arithmetic T>
+	inline Matrix2x2<T> Matrix2x2<T>::CreateByDirection(const Vector2<T>& fromDirection, const Vector2<T>& toDirection) noexcept requires(std::is_floating_point_v<T>)
+	{
+		return CreateRotation(AngleSigned(fromDirection, toDirection));
 	}
 
 	template<Arithmetic T>
