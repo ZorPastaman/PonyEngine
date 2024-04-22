@@ -824,6 +824,31 @@ namespace Math
 			constexpr auto x = vector.X();
 			constexpr auto y = vector.Y();
 
+			static constexpr PonyEngine::Math::Vector2<float> StaticVector(0.f, 1.f);
+			constexpr auto pointer = StaticVector.Data();
+
+			constexpr auto up = PonyEngine::Math::Vector2<float>::CreateUp();
+			Assert::AreEqual(0.f, up.X());
+			Assert::AreEqual(1.f, up.Y());
+			constexpr auto down = PonyEngine::Math::Vector2<float>::CreateDown();
+			Assert::AreEqual(0.f, down.X());
+			Assert::AreEqual(-1.f, down.Y());
+			constexpr auto right = PonyEngine::Math::Vector2<float>::CreateRight();
+			Assert::AreEqual(1.f, right.X());
+			Assert::AreEqual(0.f, right.Y());
+			constexpr auto left = PonyEngine::Math::Vector2<float>::CreateLeft();
+			Assert::AreEqual(-1.f, left.X());
+			Assert::AreEqual(0.f, left.Y());
+			constexpr auto one = PonyEngine::Math::Vector2<float>::CreateOne();
+			Assert::AreEqual(1.f, one.X());
+			Assert::AreEqual(1.f, one.Y());
+			constexpr auto zero = PonyEngine::Math::Vector2<float>::CreateZero();
+			Assert::AreEqual(0.f, zero.X());
+			Assert::AreEqual(0.f, zero.Y());
+			constexpr auto negative = PonyEngine::Math::Vector2<float>::CreateNegative();
+			Assert::AreEqual(-1.f, negative.X());
+			Assert::AreEqual(-1.f, negative.Y());
+
 			constexpr float magnitudeSquared = vector.MagnitudeSquared();
 
 			constexpr std::size_t size = vector.ComponentCount;
@@ -843,7 +868,7 @@ namespace Math
 			constexpr bool notEqual = vector != copiedVector;
 
 			constexpr auto sum = vector + copiedVector;
-			constexpr auto negative = -vector;
+			constexpr auto negated = -vector;
 			constexpr auto sub = vector - copiedVector;
 			constexpr auto multiplied = vector * 3.f;
 			constexpr auto multipliedL = 3.f * vector;

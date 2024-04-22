@@ -1060,6 +1060,15 @@ namespace Math
 			constexpr auto z = quaternion.Z();
 			constexpr auto w = quaternion.W();
 
+			static constexpr PonyEngine::Math::Quaternion<float> StaticQuaternion(0.f, 1.f, 0.f, 0.f);
+			constexpr auto pointer = StaticQuaternion.Data();
+
+			constexpr auto identity = PonyEngine::Math::Quaternion<float>::CreateIdentity();
+			Assert::AreEqual(0.f, identity.X());
+			Assert::AreEqual(0.f, identity.Y());
+			Assert::AreEqual(0.f, identity.Z());
+			Assert::AreEqual(1.f, identity.W());
+
 			constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
 			constexpr auto conjugated = quaternion.Conjugated();
 			constexpr PonyEngine::Math::Vector4<float> vectorQ = quaternion;

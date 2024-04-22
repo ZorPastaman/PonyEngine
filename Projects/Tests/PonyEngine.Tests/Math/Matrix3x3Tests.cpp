@@ -491,15 +491,15 @@ namespace Math
 			short m02I = 10;
 			short m12I = 22;
 			short m22I = -8;
-			short m00SI = 3.f;
-			short m10SI = -2.f;
-			short m20SI = 8.f;
-			short m01SI = 4.f;
-			short m11SI = -1.f;
-			short m21SI = -9.f;
-			short m02SI = 10.f;
-			short m12SI = -11.f;
-			short m22SI = 5.f;
+			short m00SI = 3;
+			short m10SI = -2;
+			short m20SI = 8;
+			short m01SI = 4;
+			short m11SI = -1;
+			short m21SI = -9;
+			short m02SI = 10;
+			short m12SI = -11;
+			short m22SI = 5;
 			auto matrixI = PonyEngine::Math::Matrix3x3<short>(m00I, m10I, m20I, m01I, m11I, m21I, m02I, m12I, m22I);
 			auto scaleI = PonyEngine::Math::Matrix3x3<short>(m00SI, m10SI, m20SI, m01SI, m11SI, m21SI, m02SI, m12SI, m22SI);
 			auto scaledI = PonyEngine::Math::Scale(matrixI, scaleI);
@@ -1704,6 +1704,31 @@ namespace Math
 			constexpr auto m02 = matrix.M02();
 			constexpr auto m12 = matrix.M12();
 			constexpr auto m22 = matrix.M22();
+
+			static constexpr PonyEngine::Math::Matrix3x3<float> StaticMatrix(0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
+			constexpr auto pointer = StaticMatrix.Data();
+
+			constexpr auto identity = PonyEngine::Math::Matrix3x3<float>::CreateIdentity();
+			Assert::AreEqual(1.f, identity.M00());
+			Assert::AreEqual(0.f, identity.M10());
+			Assert::AreEqual(0.f, identity.M20());
+			Assert::AreEqual(0.f, identity.M01());
+			Assert::AreEqual(1.f, identity.M11());
+			Assert::AreEqual(0.f, identity.M21());
+			Assert::AreEqual(0.f, identity.M02());
+			Assert::AreEqual(0.f, identity.M12());
+			Assert::AreEqual(1.f, identity.M22());
+
+			constexpr auto zero = PonyEngine::Math::Matrix3x3<float>::CreateZero();
+			Assert::AreEqual(0.f, zero.M00());
+			Assert::AreEqual(0.f, zero.M10());
+			Assert::AreEqual(0.f, zero.M20());
+			Assert::AreEqual(0.f, zero.M01());
+			Assert::AreEqual(0.f, zero.M11());
+			Assert::AreEqual(0.f, zero.M21());
+			Assert::AreEqual(0.f, zero.M02());
+			Assert::AreEqual(0.f, zero.M12());
+			Assert::AreEqual(0.f, zero.M22());
 
 			constexpr auto determinant = matrix.Determinant();
 			constexpr auto adjugate = matrix.Adjugate();

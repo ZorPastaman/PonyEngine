@@ -941,6 +941,25 @@ namespace Math
 			constexpr auto z = vector.Z();
 			constexpr auto w = vector.W();
 
+			static constexpr PonyEngine::Math::Vector4<float> StaticVector(0.f, 1.f, 0.f, 0.f);
+			constexpr auto pointer = StaticVector.Data();
+
+			constexpr auto one = PonyEngine::Math::Vector4<float>::CreateOne();
+			Assert::AreEqual(1.f, one.X());
+			Assert::AreEqual(1.f, one.Y());
+			Assert::AreEqual(1.f, one.Z());
+			Assert::AreEqual(1.f, one.W());
+			constexpr auto zero = PonyEngine::Math::Vector4<float>::CreateZero();
+			Assert::AreEqual(0.f, zero.X());
+			Assert::AreEqual(0.f, zero.Y());
+			Assert::AreEqual(0.f, zero.Z());
+			Assert::AreEqual(0.f, zero.W());
+			constexpr auto negative = PonyEngine::Math::Vector4<float>::CreateNegative();
+			Assert::AreEqual(-1.f, negative.X());
+			Assert::AreEqual(-1.f, negative.Y());
+			Assert::AreEqual(-1.f, negative.Z());
+			Assert::AreEqual(-1.f, negative.W());
+
 			constexpr float magnitudeSquared = vector.MagnitudeSquared();
 
 			constexpr std::size_t size = vector.ComponentCount;
@@ -957,7 +976,7 @@ namespace Math
 			constexpr bool notEqual = vector != copiedVector;
 
 			constexpr auto sum = vector + copiedVector;
-			constexpr auto negative = -vector;
+			constexpr auto negated = -vector;
 			constexpr auto sub = vector - copiedVector;
 			constexpr auto multiplied = vector * 3.f;
 			constexpr auto multipliedL = 3.f * vector;

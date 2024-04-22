@@ -20,398 +20,500 @@ import <type_traits>;
 
 import :Common;
 
-namespace PonyEngine::Math
+export namespace PonyEngine::Math
 {
 	/// @brief 3D vector implementation.
 	/// @tparam T Component type.
-	export template<Arithmetic T>
+	template<Arithmetic T>
 	class Vector3 final
 	{
 	public:
-		using ValueType = T; /// @brief Component type.
-		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
+		using ValueType = T; ///< Component type.
+		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
-		/// @brief Creates a @p Vector3 and sets its components to zero.
+		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector3() noexcept;
-		/// @brief Creates a @p Vector3 and assigns its components from the arguments.
-		/// @param x Value to assign to the @p x component.
-		/// @param y Value to assign to the @p y component.
-		/// @param z Value to assign to the @p z component.
+		constexpr Vector3() noexcept;
+		/// @brief Creates a vector and assigns its components from the arguments.
+		/// @param x X-component.
+		/// @param y Y-component.
+		/// @param z Z-component.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector3(T x, T y, T z) noexcept;
+		constexpr Vector3(T x, T y, T z) noexcept;
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector3(const Vector3<T>& other) noexcept = default;
+		constexpr Vector3(const Vector3& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		constexpr Vector3(Vector3&& other) noexcept = default;
 
-		constexpr inline ~Vector3() noexcept = default;
+		constexpr ~Vector3() noexcept = default;
 
-		/// @brief Gets a reference to the @p x component.
-		/// @return @p X component reference.
+		/// @brief Creates a Vector3(0, 0, 1).
+		/// @return Up vector.
+		///	@remark For non-constexpr execution use @p Vector3::Forward variable.
 		[[nodiscard("Pure function")]]
-		inline T& X() noexcept;
-		/// @brief Gets a reference to the const @p x component.
-		/// @return Const @p x component reference.
+		static consteval Vector3 CreateForward();
+		/// @brief Creates a Vector3(0, 0, -1).
+		/// @return Down vector.
+		///	@remark For non-constexpr execution use @p Vector3::Back variable.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& X() const noexcept;
-		/// @brief Gets a reference to the @p y component.
-		/// @return @p Y component reference.
+		static consteval Vector3 CreateBack();
+		/// @brief Creates a Vector3(0, 1, 0).
+		/// @return Up vector.
+		///	@remark For non-constexpr execution use @p Vector3::Up variable.
 		[[nodiscard("Pure function")]]
-		inline T& Y() noexcept;
-		/// @brief Gets a reference to the const @p y component.
-		/// @return Const @p y component reference.
+		static consteval Vector3 CreateUp();
+		/// @brief Creates a Vector3(0, -1, 0).
+		/// @return Down vector.
+		///	@remark For non-constexpr execution use @p Vector3::Down variable.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& Y() const noexcept;
-		/// @brief Gets a reference to the @p z component.
-		/// @return @p Z component reference.
+		static consteval Vector3 CreateDown();
+		/// @brief Creates a Vector3(1, 0, 0).
+		/// @return Right vector.
+		///	@remark For non-constexpr execution use @p Vector3::Right variable.
 		[[nodiscard("Pure function")]]
-		inline T& Z() noexcept;
-		/// @brief Gets a reference to the const @p z component.
-		/// @return Const @p z component reference.
+		static consteval Vector3 CreateRight();
+		/// @brief Creates a Vector3(-1, 0, 0).
+		/// @return Left vector.
+		///	@remark For non-constexpr execution use @p Vector3::Left variable.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& Z() const noexcept;
-		/// @brief Gets a pointer to the data array. The order is x, y, z.
+		static consteval Vector3 CreateLeft();
+		/// @brief Creates a Vector3(1, 1, 1).
+		/// @return One vector.
+		///	@remark For non-constexpr execution use @p Vector3::One variable.
+		[[nodiscard("Pure function")]]
+		static consteval Vector3 CreateOne();
+		/// @brief Creates a Vector3(0, 0, 0).
+		/// @return Zero vector.
+		///	@remark For non-constexpr execution use @p Vector3::Zero variable.
+		[[nodiscard("Pure function")]]
+		static consteval Vector3 CreateZero();
+		/// @brief Creates a Vector3(-1, -1, -1).
+		/// @return Negative vector.
+		///	@remark For non-constexpr execution use @p Vector3::Negative variable.
+		[[nodiscard("Pure function")]]
+		static consteval Vector3 CreateNegative();
+
+		/// @brief Gets an x-component.
+		/// @return X-component.
+		[[nodiscard("Pure function")]]
+		T& X() noexcept;
+		/// @brief Gets an x-component.
+		/// @return X-component.
+		[[nodiscard("Pure function")]]
+		constexpr const T& X() const noexcept;
+		/// @brief Gets a y-component.
+		/// @return Y-component.
+		[[nodiscard("Pure function")]]
+		T& Y() noexcept;
+		/// @brief Gets a y-component.
+		/// @return Y-component.
+		[[nodiscard("Pure function")]]
+		constexpr const T& Y() const noexcept;
+		/// @brief Gets a z-component.
+		/// @return Z-component.
+		[[nodiscard("Pure function")]]
+		T& Z() noexcept;
+		/// @brief Gets a z-component.
+		/// @return Z-component.
+		[[nodiscard("Pure function")]]
+		constexpr const T& Z() const noexcept;
+		/// @brief Gets a data pointer - an array of 3 elements. The order is x, y, z.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		inline T* Data() noexcept;
-		/// @brief Gets a pointer to the const data array. The order is x, y, z.
-		/// @return Const data pointer.
+		T* Data() noexcept;
+		/// @brief Gets a data pointer - an array of 3 elements. The order is x, y, z.
+		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		inline const T* Data() const noexcept;
+		constexpr const T* Data() const noexcept;
 
-		/// @brief Computes a magnitude of a @p Vector.
+		/// @brief Computes a magnitude of the vector.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		ComputationalType Magnitude() const noexcept;
-		/// @brief Computes a squared magnitude of a @p Vector.
+		/// @brief Computes a squared magnitude of the vector.
 		/// @details This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
-		constexpr inline T MagnitudeSquared() const noexcept;
+		constexpr T MagnitudeSquared() const noexcept;
 
-		/// @brief Computes a @p Vector normalized from this one.
+		/// @brief Computes a vector normalized from this one.
 		/// @details This vector must be non-zero.
-		/// @return Normalized @p Vector.
+		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector3<T> Normalized() const noexcept;
-		/// @brief Normalizes a @p Vector.
+		Vector3 Normalized() const noexcept;
+		/// @brief Normalizes the vector.
 		/// @details This vector must be non-zero.
-		inline void Normalize() noexcept;
+		void Normalize() noexcept;
 
-		/// @brief Computed a @p Vector inversed to this one.
-		/// @return Inversed @p Vector.
+		/// @brief Computes a vector inversed to this one.
+		/// @return Inversed vector.
 		[[nodiscard("Pure function")]]
-		constexpr inline Vector3<T> Inversed() const noexcept;
-		/// @brief Inverses a @p Vector.
-		inline void Inverse() noexcept;
+		constexpr Vector3 Inversed() const noexcept;
+		/// @brief Inverses the vector.
+		void Inverse() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
-		/// @brief Assigns arguments to @p Vector components.
-		/// @param x X component.
-		/// @param y Y component.
-		/// @param z Z component.
-		inline void Set(T x, T y, T z) noexcept;
+		/// @brief Assigns arguments to the vector components.
+		/// @param x X-component.
+		/// @param y Y-component.
+		/// @param z Z-component.
+		void Set(T x, T y, T z) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
-		/// @param scale @p Vector to multiply by.
-		inline void Scale(const Vector3<T>& scale) noexcept;
+		/// @param scale Vector to multiply by.
+		void Scale(const Vector3& scale) noexcept;
 
-		/// @brief Creates a string representing a state of a @p Vector.
-		///        The format is '(x, y, z)'.
+		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
+		std::string ToString() const;
 
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
 		[[nodiscard("Pure operator")]]
-		inline T& operator [](std::size_t index) noexcept;
+		T& operator [](std::size_t index) noexcept;
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
 		[[nodiscard("Pure operator")]]
-		constexpr inline const T& operator [](std::size_t index) const noexcept;
+		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		inline Vector3<T>& operator =(const Vector3<T>& other) noexcept = default;
+		Vector3& operator =(const Vector3& other) noexcept = default;
+		Vector3& operator =(Vector3&& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
-		/// @param other @p Vector to add.
+		/// @param other Vector to add.
 		/// @return @a This.
-		inline Vector3<T>& operator +=(const Vector3<T>& other) noexcept;
+		Vector3& operator +=(const Vector3& other) noexcept;
 		/// @brief Subtracts the @p other from @a this.
-		/// @param other @p Vector to subtract.
+		/// @param other Vector to subtract.
 		/// @return @a This.
-		inline Vector3<T>& operator -=(const Vector3<T>& other) noexcept;
+		Vector3& operator -=(const Vector3& other) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
-		/// @param multiplier @p Vector multiplier.
+		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		inline Vector3<T>& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		Vector3& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p multiplier.
-		/// @param multiplier @p Vector multiplier.
+		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		inline Vector3<T>& operator *=(ComputationalType multiplier) noexcept;
+		Vector3& operator *=(ComputationalType multiplier) noexcept;
 		/// @brief Divides @a this by the @p divisor.
-		/// @param divisor @p Vector divisor.
+		/// @param divisor Vector divisor.
 		/// @return @a This.
-		inline Vector3<T>& operator /=(ComputationalType divisor) noexcept;
+		Vector3& operator /=(ComputationalType divisor) noexcept;
 
 		[[nodiscard("Pure operator")]]
-		constexpr inline bool operator ==(const Vector3<T>& other) const noexcept = default;
+		constexpr bool operator ==(const Vector3& other) const noexcept;
 
-		static const Vector3<T> Forward; /// @brief Vector3(0, 0, 1).
-		static const Vector3<T> Back; /// @brief Vector3(0, 0, -1).
-		static const Vector3<T> Up; /// @brief Vector3(0, 1, 0).
-		static const Vector3<T> Down; /// @brief Vector3(0, -1, 0).
-		static const Vector3<T> Right; /// @brief Vector3(1, 0, 0).
-		static const Vector3<T> Left; /// @brief Vector3(-1, 0, 0).
-		static const Vector3<T> One; /// @brief Vector3(1, 1, 1).
-		static const Vector3<T> Zero; /// @brief Vector3(0, 0, 0).
-		static const Vector3<T> Negative; /// @brief Vector3(-1, -1, -1).
+		static const Vector3 Forward; ///< Vector3(0, 0, 1).
+		static const Vector3 Back; ///< Vector3(0, 0, -1).
+		static const Vector3 Up; ///< Vector3(0, 1, 0).
+		static const Vector3 Down; ///< Vector3(0, -1, 0).
+		static const Vector3 Right; ///< Vector3(1, 0, 0).
+		static const Vector3 Left; ///< Vector3(-1, 0, 0).
+		static const Vector3 One; ///< Vector3(1, 1, 1).
+		static const Vector3 Zero; ///< Vector3(0, 0, 0).
+		static const Vector3 Negative; ///< Vector3(-1, -1, -1).
 
-		constexpr inline static const std::size_t ComponentCount = 3; /// @brief Component count. For any @p Vector3, it's always 3.
+		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any Vector3, it's always 3.
 
 	private:
-		std::array<T, ComponentCount> m_components; /// @brief Component array in order x, y, z.
+		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z.
 	};
 
-	/// @brief Computes a dot product of two @p Vectors.
+	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
+	/// @param left Left vector.
+	/// @param right Right vector.
 	/// @return Dot product.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr inline T Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
-	/// @brief Computes a cross product of two @p Vectors.
+	/// @brief Computes a cross product of two vectors.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
+	/// @param left Left vector.
+	/// @param right Right vector.
 	/// @return Cross product.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Cross(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
-	/// @brief Computes an angle between two @p Vectors.
+	/// @brief Computes an angle between two vectors.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector. Must be normalized.
-	/// @param right Right @p Vector. Must be normalized.
+	/// @param left Left vector. Must be normalized.
+	/// @param right Right vector. Must be normalized.
 	/// @return Angle in radians.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
-	/// @brief Computes a signed angle between two @p Vectors.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	typename Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Computes a signed angle between two vectors.
 	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector. Must be normalized.
-	/// @param right Right @p Vector. Must be normalized.
+	/// @param left Left vector. Must be normalized.
+	/// @param right Right vector. Must be normalized.
 	/// @param axis Sign reference.
 	/// @return Angle in radians.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
-	/// @brief Computes an angle between two @p Vectors.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	typename Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
+	/// @brief Computes an angle between two vectors.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector. Must be normalized.
-	/// @param right Right @p Vector. Must be normalized.
+	/// @param left Left vector. Must be normalized.
+	/// @param right Right vector. Must be normalized.
 	/// @return Angle in degrees.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	inline Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept;
-	/// @brief Computes a signed angle between two @p Vectors.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	typename Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Computes a signed angle between two vectors.
 	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector. Must be normalized.
-	/// @param right Right @p Vector. Must be normalized.
+	/// @param left Left vector. Must be normalized.
+	/// @param right Right vector. Must be normalized.
 	/// @param axis Sign reference.
 	/// @return Angle in degrees.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	inline Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	typename Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
 
 	/// @brief Projects the @p vector onto the @p target.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param target Projection target.
-	/// @return Projected @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	/// @return Projected vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept;
 	/// @brief Projects the @p vector onto a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
-	/// @return Projected @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	/// @return Projected vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 
 	/// @brief Reflects the @p vector off a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
-	/// @return Reflected @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	/// @return Reflected vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 
 	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
-	/// @param left Multiplicand @p Vector.
-	/// @param right Multiplier @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr inline Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @param left Multiplicand.
+	/// @param right Multiplier.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
-	/// @brief Linear interpolation between two @p Vectors if the @p time is in range [0, 1].
-	///        Linear extrapolation between two @p Vectors if the @p time is out of range [0, 1].
+	/// @brief Linear interpolation between two vectors if the @p time is in range [0, 1].
+	///        Linear extrapolation between two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
 	/// @param to Interpolation/Extrapolation target point.
 	/// @param time Interpolation/Extrapolation time. It can be negative.
-	/// @return Interpolated/Extrapolated @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	/// @return Interpolated/Extrapolated vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Lerp(const Vector3<T>& from, const Vector3<T>& to, typename Vector3<T>::ComputationalType time) noexcept;
 
-	/// @brief Checks if two @p Vectors are almost equal with a tolerance value.
+	/// @brief Checks if two vectors are almost equal with a tolerance value.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
+	/// @param left Left vector.
+	/// @param right Right vector.
 	/// @param tolerance Tolerance value. Must be positive.
-	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
-	export template<std::floating_point T> [[nodiscard("Pure function")]]
+	/// @return @a True if the vectors are almost equal; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, typename Vector3<T>::ComputationalType tolerance = typename Vector3<T>::ComputationalType{0.00001}) noexcept;
 
-	/// @brief Addition operator for two @p Vectors.
+	/// @brief Addition operator for two vectors.
 	/// @tparam T Component type.
-	/// @param left Augend @p Vector.
-	/// @param right Addend @p Vector.
-	/// @return Sum @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @param left Augend.
+	/// @param right Addend.
+	/// @return Sum.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
 	/// @brief Negates the @p vector.
 	/// @tparam T Component type.
-	/// @param vector @p Vector to negate.
-	/// @return Negated @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator -(const Vector3<T>& vector) noexcept;
+	/// @param vector Vector to negate.
+	/// @return Negated vector.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept;
 
 	/// @brief Subtracts the @p right vector from the @p left vector.
 	/// @tparam T Component type.
-	/// @param left Minuend @p Vector.
-	/// @param right Subtrahend @p Vector.
-	/// @return Difference @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @param left Minuend.
+	/// @param right Subtrahend.
+	/// @return Difference.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
-	/// @param vector Multiplicand @p Vector.
+	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator *(const Vector3<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
-	/// @param vector Multiplicand @p Vector.
+	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator *(const Vector3<T>& vector, typename Vector3<T>::ComputationalType multiplier) noexcept;
-	/// @brief Multiplies the @p vector components by the @p multiplier.
-	/// @tparam T Component type.
-	/// @param multiplier Multiplier.
-	/// @param vector Multiplicand @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator *(T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>);
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, typename Vector3<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
-	/// @param vector Multiplicand @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator *(typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept;
+	/// @param vector Multiplicand.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>);
+	/// @brief Multiplies the @p vector components by the @p multiplier.
+	/// @tparam T Component type.
+	/// @param multiplier Multiplier.
+	/// @param vector Multiplicand.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
-	/// @param vector Dividend @p Vector.
+	/// @param vector Dividend.
 	/// @param divisor Divisor.
-	/// @return Quotient @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector3<T> operator /(const Vector3<T>& vector, typename Vector3<T>::ComputationalType divisor) noexcept;
+	/// @return Quotient.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator /(const Vector3<T>& vector, typename Vector3<T>::ComputationalType divisor) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
 	/// @tparam T Component type.
 	/// @param stream Target stream.
 	/// @param vector Input source.
 	/// @return @p stream.
-	export template<Arithmetic T>
-	inline std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector);
+	template<Arithmetic T>
+	std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector);
 
 	template<Arithmetic T>
-	constexpr inline Vector3<T>::Vector3() noexcept :
+	constexpr Vector3<T>::Vector3() noexcept :
 		Vector3(T{}, T{}, T{})
 	{
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector3<T>::Vector3(const T x, const T y, const T z) noexcept :
+	constexpr Vector3<T>::Vector3(const T x, const T y, const T z) noexcept :
 		m_components{x, y, z}
 	{
 	}
 
 	template<Arithmetic T>
-	inline T& Vector3<T>::X() noexcept
+	consteval Vector3<T> Vector3<T>::CreateForward()
+	{
+		return Vector3(T{0}, T{0}, T{1});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateBack()
+	{
+		return Vector3(T{0}, T{0}, T{-1});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateUp()
+	{
+		return Vector3(T{0}, T{1}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateDown()
+	{
+		return Vector3(T{0}, T{-1}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateRight()
+	{
+		return Vector3(T{1}, T{0}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateLeft()
+	{
+		return Vector3(T{-1}, T{0}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateOne()
+	{
+		return Vector3(T{1}, T{1}, T{1});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateZero()
+	{
+		return Vector3(T{0}, T{0}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector3<T> Vector3<T>::CreateNegative()
+	{
+		return Vector3(T{-1}, T{-1}, T{-1});
+	}
+
+	template<Arithmetic T>
+	T& Vector3<T>::X() noexcept
 	{
 		return m_components[0];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector3<T>::X() const noexcept
+	constexpr const T& Vector3<T>::X() const noexcept
 	{
 		return m_components[0];
 	}
 
 	template<Arithmetic T>
-	inline T& Vector3<T>::Y() noexcept
+	T& Vector3<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector3<T>::Y() const noexcept
+	constexpr const T& Vector3<T>::Y() const noexcept
 	{
 		return m_components[1];
 	}
 
 	template<Arithmetic T>
-	inline T& Vector3<T>::Z() noexcept
+	T& Vector3<T>::Z() noexcept
 	{
 		return m_components[2];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector3<T>::Z() const noexcept
+	constexpr const T& Vector3<T>::Z() const noexcept
 	{
 		return m_components[2];
 	}
 
 	template<Arithmetic T>
-	inline T* Vector3<T>::Data() noexcept
+	T* Vector3<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
 
 	template<Arithmetic T>
-	inline const T* Vector3<T>::Data() const noexcept
+	constexpr  const T* Vector3<T>::Data() const noexcept
 	{
 		return m_components.data();
 	}
 
 	template<Arithmetic T>
-	Vector3<T>::ComputationalType Vector3<T>::Magnitude() const noexcept
+	typename Vector3<T>::ComputationalType Vector3<T>::Magnitude() const noexcept
 	{
-		return std::sqrt(static_cast<Vector3<T>::ComputationalType>(MagnitudeSquared()));
+		return std::sqrt(static_cast<ComputationalType>(MagnitudeSquared()));
 	}
 
 	template<Arithmetic T>
-	constexpr inline T Vector3<T>::MagnitudeSquared() const noexcept
+	constexpr T Vector3<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
@@ -419,23 +521,23 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T> Vector3<T>::Normalized() const noexcept
 	{
-		return *this * (Vector3<T>::ComputationalType{1} / Magnitude());
+		return *this * (ComputationalType{1} / Magnitude());
 	}
 
 	template<Arithmetic T>
-	inline void Vector3<T>::Normalize() noexcept
+	void Vector3<T>::Normalize() noexcept
 	{
 		*this = Normalized();
 	}
 
 	template<Arithmetic T>
-	inline constexpr Vector3<T> Vector3<T>::Inversed() const noexcept
+	constexpr Vector3<T> Vector3<T>::Inversed() const noexcept
 	{
-		return Vector3<T>(Z(), Y(), X());
+		return Vector3(Z(), Y(), X());
 	}
 
 	template<Arithmetic T>
-	inline void Vector3<T>::Inverse() noexcept
+	void Vector3<T>::Inverse() noexcept
 	{
 		*this = Inversed();
 	}
@@ -454,7 +556,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline void Vector3<T>::Set(const T x, const T y, const T z) noexcept
+	void Vector3<T>::Set(const T x, const T y, const T z) noexcept
 	{
 		X() = x;
 		Y() = y;
@@ -462,7 +564,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline void Vector3<T>::Scale(const Vector3<T>& scale) noexcept
+	void Vector3<T>::Scale(const Vector3& scale) noexcept
 	{
 		X() *= scale.X();
 		Y() *= scale.Y();
@@ -470,7 +572,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr inline T Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	constexpr T Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
 		return left.X() * right.X() + left.Y() * right.Y() + left.Z() * right.Z();
 	}
@@ -486,37 +588,37 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	typename Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return std::acos(static_cast<Vector3<T>::ComputationalType>(Dot(left, right)));
+		return std::acos(static_cast<typename Vector3<T>::ComputationalType>(Dot(left, right)));
 	}
 
 	template<Arithmetic T>
-	Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	typename Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
 	{
 		const Vector3<T> cross = Cross(left, right);
 		const T dot = Dot(cross, axis);
-		const Vector3<T>::ComputationalType angle = Angle(left, right);
+		const typename Vector3<T>::ComputationalType angle = Angle(left, right);
 
-		return std::copysign(angle, static_cast<Vector3<T>::ComputationalType>(dot));
+		return std::copysign(angle, static_cast<typename Vector3<T>::ComputationalType>(dot));
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	typename Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Angle(left, right) * RadToDeg<Vector3<T>::ComputationalType>;
+		return Angle(left, right) * RadToDeg<typename Vector3<T>::ComputationalType>;
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	typename Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
 	{
-		return AngleSigned(left, right, axis) * RadToDeg<Vector3<T>::ComputationalType>;
+		return AngleSigned(left, right, axis) * RadToDeg<typename Vector3<T>::ComputationalType>;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept
 	{
-		const Vector3<T>::ComputationalType multiplier = static_cast<Vector3<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
+		const typename Vector3<T>::ComputationalType multiplier = static_cast<typename Vector3<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
 
 		return target * multiplier;
 	}
@@ -554,81 +656,25 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline std::string Vector3<T>::ToString() const
+	std::string Vector3<T>::ToString() const
 	{
 		return std::format("({}, {}, {})", X(), Y(), Z());
 	}
 
 	template<Arithmetic T>
-	inline T& Vector3<T>::operator [](const std::size_t index) noexcept
+	T& Vector3<T>::operator [](const std::size_t index) noexcept
 	{
 		return m_components[index];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector3<T>::operator [](const std::size_t index) const noexcept
+	constexpr const T& Vector3<T>::operator [](const std::size_t index) const noexcept
 	{
 		return m_components[index];
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
-	{
-		return Vector3<T>(left.X() + right.X(), left.Y() + right.Y(), left.Z() + right.Z());
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator -(const Vector3<T>& vector) noexcept
-	{
-		return Vector3<T>(-vector.X(), -vector.Y(), -vector.Z());
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
-	{
-		return Vector3<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z());
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept requires(std::is_integral_v<T>)
-	{
-		return Vector3<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier);
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator *(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType multiplier) noexcept
-	{
-		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() * multiplier);
-		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() * multiplier);
-		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() * multiplier);
-
-		return Vector3<T>(x, y, z);
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator *(const T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>)
-	{
-		return vector * multiplier;
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator *(const typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept
-	{
-		return vector * multiplier;
-	}
-
-	template<Arithmetic T>
-	constexpr inline Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
-	{
-		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() / divisor);
-		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() / divisor);
-		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() / divisor);
-
-		return Vector3<T>(x, y, z);
-	}
-
-	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator +=(const Vector3<T>& other) noexcept
+	Vector3<T>& Vector3<T>::operator +=(const Vector3& other) noexcept
 	{
 		X() += other.X();
 		Y() += other.Y();
@@ -638,7 +684,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator -=(const Vector3<T>& other) noexcept
+	Vector3<T>& Vector3<T>::operator -=(const Vector3& other) noexcept
 	{
 		X() -= other.X();
 		Y() -= other.Y();
@@ -648,7 +694,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	Vector3<T>& Vector3<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
 		X() *= multiplier;
 		Y() *= multiplier;
@@ -658,7 +704,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator *=(const ComputationalType multiplier) noexcept
+	Vector3<T>& Vector3<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
 		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
 		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
@@ -668,7 +714,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept
+	Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept
 	{
 		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
 		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
@@ -678,27 +724,89 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector)
+	constexpr bool Vector3<T>::operator ==(const Vector3& other) const noexcept
+	{
+		return m_components == other.m_components;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return Vector3<T>(left.X() + right.X(), left.Y() + right.Y(), left.Z() + right.Z());
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept
+	{
+		return Vector3<T>(-vector.X(), -vector.Y(), -vector.Z());
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return Vector3<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z());
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	{
+		return Vector3<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier);
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType multiplier) noexcept
+	{
+		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() * multiplier);
+		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() * multiplier);
+		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() * multiplier);
+
+		return Vector3<T>(x, y, z);
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator *(const T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>)
+	{
+		return vector * multiplier;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator *(const typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept
+	{
+		return vector * multiplier;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
+	{
+		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() / divisor);
+		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() / divisor);
+		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() / divisor);
+
+		return Vector3<T>(x, y, z);
+	}
+
+	template<Arithmetic T>
+	std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector)
 	{
 		return stream << vector.ToString();
 	}
 
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Forward = Vector3<T>(T{0}, T{0}, T{1});
+	const Vector3<T> Vector3<T>::Forward = Vector3(T{0}, T{0}, T{1});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Back = Vector3<T>(T{0}, T{0}, T{-1});
+	const Vector3<T> Vector3<T>::Back = Vector3(T{0}, T{0}, T{-1});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Up = Vector3<T>(T{0}, T{1}, T{0});
+	const Vector3<T> Vector3<T>::Up = Vector3(T{0}, T{1}, T{0});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Down = Vector3<T>(T{0}, T{-1}, T{0});
+	const Vector3<T> Vector3<T>::Down = Vector3(T{0}, T{-1}, T{0});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Right = Vector3<T>(T{1}, T{0}, T{0});
+	const Vector3<T> Vector3<T>::Right = Vector3(T{1}, T{0}, T{0});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Left = Vector3<T>(T{-1}, T{0}, T{0});
+	const Vector3<T> Vector3<T>::Left = Vector3(T{-1}, T{0}, T{0});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::One = Vector3<T>(T{1}, T{1}, T{1});
+	const Vector3<T> Vector3<T>::One = Vector3(T{1}, T{1}, T{1});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Zero = Vector3<T>(T{0}, T{0}, T{0});
+	const Vector3<T> Vector3<T>::Zero = Vector3(T{0}, T{0}, T{0});
 	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Negative = Vector3<T>(T{-1}, T{-1}, T{-1});
+	const Vector3<T> Vector3<T>::Negative = Vector3(T{-1}, T{-1}, T{-1});
 }
