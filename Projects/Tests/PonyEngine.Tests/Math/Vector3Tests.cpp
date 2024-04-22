@@ -1053,6 +1053,46 @@ namespace Math
 			constexpr auto y = vector.Y();
 			constexpr auto z = vector.Z();
 
+			static constexpr PonyEngine::Math::Vector3<float> StaticVector(0.f, 1.f, 0.f);
+			constexpr auto pointer = StaticVector.Data();
+
+			constexpr auto forward = PonyEngine::Math::Vector3<float>::CreateForward();
+			Assert::AreEqual(0.f, forward.X());
+			Assert::AreEqual(0.f, forward.Y());
+			Assert::AreEqual(1.f, forward.Z());
+			constexpr auto back = PonyEngine::Math::Vector3<float>::CreateBack();
+			Assert::AreEqual(0.f, back.X());
+			Assert::AreEqual(0.f, back.Y());
+			Assert::AreEqual(-1.f, back.Z());
+			constexpr auto up = PonyEngine::Math::Vector3<float>::CreateUp();
+			Assert::AreEqual(0.f, up.X());
+			Assert::AreEqual(1.f, up.Y());
+			Assert::AreEqual(0.f, up.Z());
+			constexpr auto down = PonyEngine::Math::Vector3<float>::CreateDown();
+			Assert::AreEqual(0.f, down.X());
+			Assert::AreEqual(-1.f, down.Y());
+			Assert::AreEqual(0.f, down.Z());
+			constexpr auto right = PonyEngine::Math::Vector3<float>::CreateRight();
+			Assert::AreEqual(1.f, right.X());
+			Assert::AreEqual(0.f, right.Y());
+			Assert::AreEqual(0.f, right.Z());
+			constexpr auto left = PonyEngine::Math::Vector3<float>::CreateLeft();
+			Assert::AreEqual(-1.f, left.X());
+			Assert::AreEqual(0.f, left.Y());
+			Assert::AreEqual(0.f, left.Z());
+			constexpr auto one = PonyEngine::Math::Vector3<float>::CreateOne();
+			Assert::AreEqual(1.f, one.X());
+			Assert::AreEqual(1.f, one.Y());
+			Assert::AreEqual(1.f, one.Z());
+			constexpr auto zero = PonyEngine::Math::Vector3<float>::CreateZero();
+			Assert::AreEqual(0.f, zero.X());
+			Assert::AreEqual(0.f, zero.Y());
+			Assert::AreEqual(0.f, zero.Z());
+			constexpr auto negative = PonyEngine::Math::Vector3<float>::CreateNegative();
+			Assert::AreEqual(-1.f, negative.X());
+			Assert::AreEqual(-1.f, negative.Y());
+			Assert::AreEqual(-1.f, negative.Z());
+
 			constexpr float magnitudeSquared = vector.MagnitudeSquared();
 
 			constexpr std::size_t size = vector.ComponentCount;
@@ -1072,7 +1112,7 @@ namespace Math
 			constexpr bool notEqual = vector != copiedVector;
 
 			constexpr auto sum = vector + copiedVector;
-			constexpr auto negative = -vector;
+			constexpr auto negated = -vector;
 			constexpr auto sub = vector - copiedVector;
 			constexpr auto multiplied = vector * 3.f;
 			constexpr auto multipliedL = 3.f * vector;

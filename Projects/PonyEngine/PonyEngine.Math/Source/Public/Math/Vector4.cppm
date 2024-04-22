@@ -19,266 +19,284 @@ import <type_traits>;
 
 import :Common;
 
-namespace PonyEngine::Math
+export namespace PonyEngine::Math
 {
 	/// @brief 4D vector implementation.
 	/// @tparam T Component type.
-	export template<Arithmetic T>
+	template<Arithmetic T>
 	class Vector4 final
 	{
 	public:
-		using ValueType = T; /// @brief Component type.
-		using ComputationalType = ComputationalFor<T>; /// @brief Floating point type used in functions that require a floating point type.
+		using ValueType = T; ///< Component type.
+		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
-		/// @brief Creates a @p Vector4 and sets its components to zero.
+		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector4() noexcept;
-		/// @brief Creates a @p Vector4 and assigns its components from the arguments.
-		/// @param x Value to assign to the @p x component.
-		/// @param y Value to assign to the @p y component.
-		/// @param z Value to assign to the @p z component.
-		/// @param w Value to assign to the @p w component.
+		constexpr Vector4() noexcept;
+		/// @brief Creates a vector and assigns its components from the arguments.
+		/// @param x X-component.
+		/// @param y Y-component.
+		/// @param z Z-component.
+		/// @param w W-component.
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector4(T x, T y, T z, T w) noexcept;
+		constexpr Vector4(T x, T y, T z, T w) noexcept;
 		[[nodiscard("Pure constructor")]]
-		constexpr inline Vector4(const Vector4<T>& other) noexcept = default;
+		constexpr Vector4(const Vector4& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		constexpr Vector4(Vector4&& other) noexcept = default;
 
-		constexpr inline ~Vector4() noexcept = default;
+		constexpr ~Vector4() noexcept = default;
 
-		/// @brief Gets a reference to the @p x component.
-		/// @return @p X component reference.
+		/// @brief Creates a Vector4(1, 1, 1, 1).
+		/// @return One vector.
+		///	@remark For non-constexpr execution use @p Vector4::One variable.
 		[[nodiscard("Pure function")]]
-		inline T& X() noexcept;
-		/// @brief Gets a reference to the const @p x component.
-		/// @return Const @p x component reference.
+		static consteval Vector4 CreateOne();
+		/// @brief Creates a Vector4(0, 0, 0, 0).
+		/// @return Zero vector.
+		///	@remark For non-constexpr execution use @p Vector4::Zero variable.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& X() const noexcept;
-		/// @brief Gets a reference to the @p y component.
-		/// @return @p Y component reference.
+		static consteval Vector4 CreateZero();
+		/// @brief Creates a Vector4(-1, -1, -1, -1).
+		/// @return Negative vector.
+		///	@remark For non-constexpr execution use @p Vector4::Negative variable.
 		[[nodiscard("Pure function")]]
-		inline T& Y() noexcept;
-		/// @brief Gets a reference to the const @p y component.
-		/// @return Const @p y component reference.
+		static consteval Vector4 CreateNegative();
+
+		/// @brief Gets an x-component.
+		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& Y() const noexcept;
-		/// @brief Gets a reference to the @p z component.
-		/// @return @p Z component reference.
+		T& X() noexcept;
+		/// @brief Gets an x-component.
+		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		inline T& Z() noexcept;
-		/// @brief Gets a reference to the const @p z component.
-		/// @return Const @p z component reference.
+		constexpr const T& X() const noexcept;
+		/// @brief Gets a y-component.
+		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& Z() const noexcept;
-		/// @brief Gets a reference to the @p w component.
-		/// @return @p W component reference.
+		T& Y() noexcept;
+		/// @brief Gets a y-component.
+		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		inline T& W() noexcept;
-		/// @brief Gets a reference to the const @p w component.
-		/// @return Const @p w component reference.
+		constexpr const T& Y() const noexcept;
+		/// @brief Gets a z-component.
+		/// @return Z-component.
 		[[nodiscard("Pure function")]]
-		constexpr inline const T& W() const noexcept;
-		/// @brief Gets a pointer to the data array. The order is x, y, z, w.
+		T& Z() noexcept;
+		/// @brief Gets a z-component.
+		/// @return Z-component.
+		[[nodiscard("Pure function")]]
+		constexpr const T& Z() const noexcept;
+		/// @brief Gets a w-component.
+		/// @return W-component.
+		[[nodiscard("Pure function")]]
+		T& W() noexcept;
+		/// @brief Gets a w-component.
+		/// @return W-component.
+		[[nodiscard("Pure function")]]
+		constexpr const T& W() const noexcept;
+		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		inline T* Data() noexcept;
-		/// @brief Gets a pointer to the const data array. The order is x, y, z, w.
-		/// @return Const data pointer.
+		T* Data() noexcept;
+		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
+		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		inline const T* Data() const noexcept;
+		constexpr const T* Data() const noexcept;
 
-		/// @brief Computes a magnitude of a @p Vector.
+		/// @brief Computes a magnitude of the vector.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
-		inline ComputationalType Magnitude() const noexcept;
-		/// @brief Computes a squared magnitude of a @p Vector.
+		ComputationalType Magnitude() const noexcept;
+		/// @brief Computes a squared magnitude of the vector.
 		/// @details This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
-		constexpr inline T MagnitudeSquared() const noexcept;
+		constexpr T MagnitudeSquared() const noexcept;
 
-		/// @brief Computes a @p Vector normalized from this one.
-		/// @return Normalized @p Vector.
+		/// @brief Computes a vector normalized from this one.
+		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector4<T> Normalized() const noexcept;
-		/// @brief Normalizes a @p Vector.
-		inline void Normalize() noexcept;
+		Vector4 Normalized() const noexcept;
+		/// @brief Normalizes the vector.
+		void Normalize() noexcept;
 
-		/// @brief Computed a @p Vector inversed to this one.
-		/// @return Inversed @p Vector.
+		/// @brief Computes a vector inversed to this one.
+		/// @return Inversed vector.
 		[[nodiscard("Pure function")]]
-		constexpr inline Vector4<T> Inversed() const noexcept;
-		/// @brief Inverses a @p Vector.
-		inline void Inverse() noexcept;
+		constexpr Vector4 Inversed() const noexcept;
+		/// @brief Inverses the vector.
+		void Inverse() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
-		/// @brief Assigns arguments to @p Vector components.
-		/// @param x X component.
-		/// @param y Y component.
-		/// @param z Z component.
-		/// @param w W component.
-		inline void Set(T x, T y, T z, T w) noexcept;
+		/// @brief Assigns arguments to the vector components.
+		/// @param x X-component.
+		/// @param y Y-component.
+		/// @param z Z-component.
+		/// @param w W-component.
+		void Set(T x, T y, T z, T w) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
-		/// @param scale @p Vector to multiply by.
-		inline void Scale(const Vector4<T>& scale) noexcept;
+		/// @param scale Vector to multiply by.
+		void Scale(const Vector4& scale) noexcept;
 
-		/// @brief Creates a string representing a state of a @p Vector.
-		///        The format is '(x, y, z, w)'.
+		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z, w)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
-		inline std::string ToString() const;
+		std::string ToString() const;
 
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		inline T& operator [](std::size_t index) noexcept;
+		T& operator [](std::size_t index) noexcept;
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		constexpr inline const T& operator [](std::size_t index) const noexcept;
+		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		inline Vector4<T>& operator =(const Vector4<T>& other) noexcept = default;
+		Vector4& operator =(const Vector4& other) noexcept = default;
+		Vector4& operator =(Vector4&& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
-		/// @param other @p Vector to add.
+		/// @param other Vector to add.
 		/// @return @a This.
-		Vector4<T>& operator +=(const Vector4<T>& other) noexcept;
+		Vector4& operator +=(const Vector4& other) noexcept;
 		/// @brief Subtracts the @p other from @a this.
-		/// @param other @p Vector to subtract.
+		/// @param other Vector to subtract.
 		/// @return @a This.
-		Vector4<T>& operator -=(const Vector4<T>& other) noexcept;
+		Vector4& operator -=(const Vector4& other) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
-		/// @param multiplier @p Vector multiplier.
+		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		Vector4<T>& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		Vector4& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p multiplier.
-		/// @param multiplier @p Vector multiplier.
+		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		Vector4<T>& operator *=(ComputationalType multiplier) noexcept;
+		Vector4& operator *=(ComputationalType multiplier) noexcept;
 		/// @brief Divides @a this by the @p divisor.
-		/// @param divisor @p Vector divisor.
+		/// @param divisor Vector divisor.
 		/// @return @a This.
-		Vector4<T>& operator /=(ComputationalType divisor) noexcept;
+		Vector4& operator /=(ComputationalType divisor) noexcept;
 
 		[[nodiscard("Pure operator")]]
-		constexpr inline bool operator ==(const Vector4<T>& other) const noexcept = default;
+		constexpr bool operator ==(const Vector4& other) const noexcept;
 
-		static const Vector4<T> One; /// @brief Vector3(1, 1, 1, 1).
-		static const Vector4<T> Zero; /// @brief Vector3(0, 0, 0, 0).
-		static const Vector4<T> Negative; /// @brief Vector3(-1, -1, -1, -1).
+		static const Vector4 One; ///< Vector4(1, 1, 1, 1).
+		static const Vector4 Zero; ///< Vector4(0, 0, 0, 0).
+		static const Vector4 Negative; ///< Vector4(-1, -1, -1, -1).
 
-		constexpr inline static const std::size_t ComponentCount = 4; /// @brief Component count. For any @p Vector4, it's always 4.
+		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any Vector4, it's always 4.
 
 	private:
-		std::array<T, ComponentCount> m_components; /// @brief Component array in order x, y, z, w.
+		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
 
-	/// @brief Computes a dot product of two @p Vectors.
+	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
+	/// @param left Left vector.
+	/// @param right Right vector.
 	/// @return Dot product.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
 	/// @brief Projects the @p vector onto the @p target.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param target Projection target.
-	/// @return Projected @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
+	/// @return Projected vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector4<T> Project(const Vector4<T>& vector, const Vector4<T>& target) noexcept;
 
 	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
 	/// @tparam T Component type.
-	/// @param left Multiplicand @p Vector.
-	/// @param right Multiplier @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr inline Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept;
+	/// @param left Multiplicand.
+	/// @param right Multiplier.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
-	/// @brief Linear interpolation between two @p Vectors if the @p time is in range [0, 1].
-	///        Linear extrapolation between two @p Vectors if the @p time is out of range [0, 1].
+	/// @brief Linear interpolation between two vectors if the @p time is in range [0, 1].
+	///        Linear extrapolation between two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
 	/// @param to Interpolation/Extrapolation target point.
 	/// @param time Interpolation/Extrapolation time. It can be negative.
-	/// @return Interpolated/Extrapolated @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr inline Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, typename Vector4<T>::ComputationalType time) noexcept;
+	/// @return Interpolated/Extrapolated vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, typename Vector4<T>::ComputationalType time) noexcept;
 
-	/// @brief Checks if two @p Vectors are almost equal with a tolerance value.
+	/// @brief Checks if two vectors are almost equal with a tolerance value.
 	/// @tparam T Component type.
-	/// @param left Left @p Vector.
-	/// @param right Right @p Vector.
+	/// @param left Left vector.
+	/// @param right Right vector.
 	/// @param tolerance Tolerance value. Must be positive.
-	/// @return @a True if the @p Vectors are almost equal; @a false otherwise.
-	export template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr inline bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, typename Vector4<T>::ComputationalType tolerance = typename Vector4<T>::ComputationalType{0.00001}) noexcept;
+	/// @return @a True if the vectors are almost equal; @a false otherwise.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, typename Vector4<T>::ComputationalType tolerance = typename Vector4<T>::ComputationalType{0.00001}) noexcept;
 
-	/// @brief Addition operator for two @p Vectors.
+	/// @brief Addition operator for two vectors.
 	/// @tparam T Component type.
-	/// @param left Augend @p Vector.
-	/// @param right Addend @p Vector.
-	/// @return Sum @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	/// @param left Augend.
+	/// @param right Addend.
+	/// @return Sum.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector4<T> operator +(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
 	/// @brief Negates the @p vector.
 	/// @tparam T Component type.
-	/// @param vector @p Vector to negate.
-	/// @return Negated @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector4<T> operator -(const Vector4<T>& vector) noexcept;
+	/// @param vector Vector to negate.
+	/// @return Negated vector.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept;
 
 	/// @brief Subtracts the @p right vector from the @p left vector.
 	/// @tparam T Component type.
-	/// @param left Minuend @p Vector.
-	/// @param right Subtrahend @p Vector.
-	/// @return Difference @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	/// @param left Minuend.
+	/// @param right Subtrahend.
+	/// @return Difference.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector4<T> operator -(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
-	/// @param vector Multiplicand @p Vector.
+	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
-	/// @param vector Multiplicand @p Vector.
+	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, typename Vector4<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
-	/// @param vector Multiplicand @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector4<T> operator *(T multiplier, const Vector4<T>& vector) noexcept requires(std::is_integral_v<T>);
+	/// @param vector Multiplicand.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector4<T> operator *(T multiplier, const Vector4<T>& vector) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
-	/// @param vector Multiplicand @p Vector.
-	/// @return Product @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr inline Vector4<T> operator *(typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept;
+	/// @param vector Multiplicand.
+	/// @return Product.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector4<T> operator *(typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
 	/// @tparam T Component type.
-	/// @param vector Dividend @p Vector.
+	/// @param vector Dividend.
 	/// @param divisor Divisor.
-	/// @return Quotient @p Vector.
-	export template<Arithmetic T> [[nodiscard("Pure operator")]]
+	/// @return Quotient.
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector4<T> operator /(const Vector4<T>& vector, typename Vector4<T>::ComputationalType divisor) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
@@ -286,89 +304,107 @@ namespace PonyEngine::Math
 	/// @param stream Target stream.
 	/// @param vector Input source.
 	/// @return @p stream.
-	export template<Arithmetic T>
-	inline std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector);
+	template<Arithmetic T>
+	std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector);
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T>::Vector4() noexcept :
+	constexpr Vector4<T>::Vector4() noexcept :
 		Vector4(T{}, T{}, T{}, T{})
 	{
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T>::Vector4(const T x, const T y, const T z, const T w) noexcept :
+	constexpr Vector4<T>::Vector4(const T x, const T y, const T z, const T w) noexcept :
 		m_components{x, y, z, w}
 	{
 	}
 
 	template<Arithmetic T>
-	inline T& Vector4<T>::X() noexcept
+	consteval Vector4<T> Vector4<T>::CreateOne()
+	{
+		return Vector4(T{1}, T{1}, T{1}, T{1});
+	}
+
+	template<Arithmetic T>
+	consteval Vector4<T> Vector4<T>::CreateZero()
+	{
+		return Vector4(T{0}, T{0}, T{0}, T{0});
+	}
+
+	template<Arithmetic T>
+	consteval Vector4<T> Vector4<T>::CreateNegative()
+	{
+		return Vector4(T{-1}, T{-1}, T{-1}, T{-1});
+	}
+
+	template<Arithmetic T>
+	T& Vector4<T>::X() noexcept
 	{
 		return m_components[0];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector4<T>::X() const noexcept
+	constexpr const T& Vector4<T>::X() const noexcept
 	{
 		return m_components[0];
 	}
 
 	template<Arithmetic T>
-	inline T& Vector4<T>::Y() noexcept
+	T& Vector4<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector4<T>::Y() const noexcept
+	constexpr const T& Vector4<T>::Y() const noexcept
 	{
 		return m_components[1];
 	}
 
 	template<Arithmetic T>
-	inline T& Vector4<T>::Z() noexcept
+	T& Vector4<T>::Z() noexcept
 	{
 		return m_components[2];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector4<T>::Z() const noexcept
+	constexpr const T& Vector4<T>::Z() const noexcept
 	{
 		return m_components[2];
 	}
 
 	template<Arithmetic T>
-	inline T& Vector4<T>::W() noexcept
+	T& Vector4<T>::W() noexcept
 	{
 		return m_components[3];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector4<T>::W() const noexcept
+	constexpr const T& Vector4<T>::W() const noexcept
 	{
 		return m_components[3];
 	}
 
 	template<Arithmetic T>
-	inline T* Vector4<T>::Data() noexcept
+	T* Vector4<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
 
 	template<Arithmetic T>
-	inline const T* Vector4<T>::Data() const noexcept
+	constexpr const T* Vector4<T>::Data() const noexcept
 	{
 		return m_components.data();
 	}
 
 	template<Arithmetic T>
-	inline Vector4<T>::ComputationalType Vector4<T>::Magnitude() const noexcept
+	typename Vector4<T>::ComputationalType Vector4<T>::Magnitude() const noexcept
 	{
-		return std::sqrt(static_cast<Vector4<T>::ComputationalType>(MagnitudeSquared()));
+		return std::sqrt(static_cast<ComputationalType>(MagnitudeSquared()));
 	}
 
 	template<Arithmetic T>
-	constexpr inline T Vector4<T>::MagnitudeSquared() const noexcept
+	constexpr T Vector4<T>::MagnitudeSquared() const noexcept
 	{
 		return Dot(*this, *this);
 	}
@@ -377,24 +413,24 @@ namespace PonyEngine::Math
 	Vector4<T> Vector4<T>::Normalized() const noexcept
 	{
 #pragma warning(disable:4723)
-		return *this * (Vector4<T>::ComputationalType{1} / Magnitude());
+		return *this * (ComputationalType{1} / Magnitude());
 #pragma warning(default:4723)
 	}
 
 	template<Arithmetic T>
-	inline void Vector4<T>::Normalize() noexcept
+	void Vector4<T>::Normalize() noexcept
 	{
 		*this = Normalized();
 	}
 
 	template<Arithmetic T>
-	inline constexpr Vector4<T> Vector4<T>::Inversed() const noexcept
+	constexpr Vector4<T> Vector4<T>::Inversed() const noexcept
 	{
 		return Vector4<T>(W(), Z(), Y(), X());
 	}
 
 	template<Arithmetic T>
-	inline void Vector4<T>::Inverse() noexcept
+	void Vector4<T>::Inverse() noexcept
 	{
 		*this = Inversed();
 	}
@@ -413,7 +449,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline void Vector4<T>::Set(const T x, const T y, const T z, const T w) noexcept
+	void Vector4<T>::Set(const T x, const T y, const T z, const T w) noexcept
 	{
 		X() = x;
 		Y() = y;
@@ -422,7 +458,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	inline void Vector4<T>::Scale(const Vector4<T>& scale) noexcept
+	void Vector4<T>::Scale(const Vector4& scale) noexcept
 	{
 		X() *= scale.X();
 		Y() *= scale.Y();
@@ -439,7 +475,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> Project(const Vector4<T>& vector, const Vector4<T>& target) noexcept
 	{
-		const Vector4<T>::ComputationalType multiplier = static_cast<Vector4<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
+		const typename Vector4<T>::ComputationalType multiplier = static_cast<typename Vector4<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
 
 		return target * multiplier;
 	}
@@ -451,33 +487,94 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, const typename Vector4<T>::ComputationalType time) noexcept
+	constexpr Vector4<T> Lerp(const Vector4<T>& from, const Vector4<T>& to, const typename Vector4<T>::ComputationalType time) noexcept
 	{
 		return from + (to - from) * time;
 	}
 
 	template<Arithmetic T>
-	constexpr inline bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, const typename Vector4<T>::ComputationalType tolerance) noexcept
+	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, const typename Vector4<T>::ComputationalType tolerance) noexcept
 	{
 		return (left - right).MagnitudeSquared() < tolerance * tolerance;
 	}
 
 	template<Arithmetic T>
-	inline std::string Vector4<T>::ToString() const
+	std::string Vector4<T>::ToString() const
 	{
 		return std::format("({}, {}, {}, {})", X(), Y(), Z(), W());
 	}
 
 	template<Arithmetic T>
-	inline T& Vector4<T>::operator [](const std::size_t index) noexcept
+	T& Vector4<T>::operator [](const std::size_t index) noexcept
 	{
 		return m_components[index];
 	}
 
 	template<Arithmetic T>
-	constexpr inline const T& Vector4<T>::operator [](const std::size_t index) const noexcept
+	constexpr const T& Vector4<T>::operator [](const std::size_t index) const noexcept
 	{
 		return m_components[index];
+	}
+
+	template<Arithmetic T>
+	Vector4<T>& Vector4<T>::operator +=(const Vector4& other) noexcept
+	{
+		X() += other.X();
+		Y() += other.Y();
+		Z() += other.Z();
+		W() += other.W();
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Vector4<T>& Vector4<T>::operator -=(const Vector4& other) noexcept
+	{
+		X() -= other.X();
+		Y() -= other.Y();
+		Z() -= other.Z();
+		W() -= other.W();
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Vector4<T>& Vector4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	{
+		X() *= multiplier;
+		Y() *= multiplier;
+		Z() *= multiplier;
+		W() *= multiplier;
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Vector4<T>& Vector4<T>::operator *=(const ComputationalType multiplier) noexcept
+	{
+		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
+		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
+		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() * multiplier);
+		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() * multiplier);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Vector4<T>& Vector4<T>::operator /=(const ComputationalType divisor) noexcept
+	{
+		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
+		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
+		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() / divisor);
+		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() / divisor);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	constexpr bool Vector4<T>::operator ==(const Vector4& other) const noexcept
+	{
+		return m_components == other.m_components;
 	}
 
 	template<Arithmetic T>
@@ -487,7 +584,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T> operator -(const Vector4<T>& vector) noexcept
+	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept
 	{
 		return Vector4<T>(-vector.X(), -vector.Y(), -vector.Z(), -vector.W());
 	}
@@ -522,7 +619,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr inline Vector4<T> operator *(const typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept
+	constexpr Vector4<T> operator *(const typename Vector4<T>::ComputationalType multiplier, const Vector4<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
@@ -539,70 +636,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector4<T>& Vector4<T>::operator +=(const Vector4<T>& other) noexcept
-	{
-		X() += other.X();
-		Y() += other.Y();
-		Z() += other.Z();
-		W() += other.W();
-
-		return *this;
-	}
-
-	template<Arithmetic T>
-	Vector4<T>& Vector4<T>::operator -=(const Vector4<T>& other) noexcept
-	{
-		X() -= other.X();
-		Y() -= other.Y();
-		Z() -= other.Z();
-		W() -= other.W();
-
-		return *this;
-	}
-
-	template<Arithmetic T>
-	Vector4<T>& Vector4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
-	{
-		X() *= multiplier;
-		Y() *= multiplier;
-		Z() *= multiplier;
-		W() *= multiplier;
-
-		return *this;
-	}
-
-	template<Arithmetic T>
-	Vector4<T>& Vector4<T>::operator *=(const typename Vector4<T>::ComputationalType multiplier) noexcept
-	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() * multiplier);
-		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() * multiplier);
-
-		return *this;
-	}
-
-	template<Arithmetic T>
-	Vector4<T>& Vector4<T>::operator /=(const ComputationalType divisor) noexcept
-	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() / divisor);
-		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() / divisor);
-
-		return *this;
-	}
-
-	template<Arithmetic T>
-	inline std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector)
+	std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector)
 	{
 		return stream << vector.ToString();
 	}
 
 	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::One = Vector4<T>(T{1}, T{1}, T{1}, T{1});
+	const Vector4<T> Vector4<T>::One = Vector4(T{1}, T{1}, T{1}, T{1});
 	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::Zero = Vector4<T>(T{0}, T{0}, T{0}, T{0});
+	const Vector4<T> Vector4<T>::Zero = Vector4(T{0}, T{0}, T{0}, T{0});
 	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::Negative = Vector4<T>(T{-1}, T{-1}, T{-1}, T{-1});
+	const Vector4<T> Vector4<T>::Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1});
 }

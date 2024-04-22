@@ -118,6 +118,8 @@ namespace Math
 			Assert::AreEqual(-0.8222, rotationMatrix.M10(), 0.0001);
 			Assert::AreEqual(0.8222, rotationMatrix.M01(), 0.0001);
 			Assert::AreEqual(-0.5692, rotationMatrix.M11(), 0.0001);
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(to, rotationMatrix * from));
 		}
 
 		TEST_METHOD(DataTest)
@@ -1052,6 +1054,21 @@ namespace Math
 			constexpr auto m10 = matrix.M10();
 			constexpr auto m01 = matrix.M01();
 			constexpr auto m11 = matrix.M11();
+
+			static constexpr PonyEngine::Math::Matrix2x2<float> StaticMatrix(0.f, 1.f, 0.f, 0.f);
+			constexpr auto pointer = StaticMatrix.Data();
+
+			constexpr auto identity = PonyEngine::Math::Matrix2x2<float>::CreateIdentity();
+			Assert::AreEqual(1.f, identity.M00());
+			Assert::AreEqual(0.f, identity.M10());
+			Assert::AreEqual(0.f, identity.M01());
+			Assert::AreEqual(1.f, identity.M11());
+
+			constexpr auto zero = PonyEngine::Math::Matrix2x2<float>::CreateZero();
+			Assert::AreEqual(0.f, zero.M00());
+			Assert::AreEqual(0.f, zero.M10());
+			Assert::AreEqual(0.f, zero.M01());
+			Assert::AreEqual(0.f, zero.M11());
 
 			constexpr auto determinant = matrix.Determinant();
 			constexpr auto adjugate = matrix.Adjugate();
