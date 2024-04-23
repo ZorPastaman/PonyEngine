@@ -52,13 +52,11 @@ export namespace PonyEngine::Math
 
 		private:
 			/// @brief Creates a row access.
-			/// @param matrix Matrix.
-			/// @param rowIndex Row index.
+			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
-			Row(Matrix2x2& matrix, std::size_t rowIndex) noexcept;
+			explicit Row(T* row) noexcept;
 
-			Matrix2x2& m_matrix; ///< Matrix.
-			const std::size_t m_rowIndex; ///< Row index.
+			T* const m_row; ///< Row pointer.
 
 			friend Matrix2x2;
 		};
@@ -86,14 +84,12 @@ export namespace PonyEngine::Math
 			ConstRow& operator =(ConstRow&&) = delete;
 
 		private:
-			/// @brief Creates a row access.
-			/// @param matrix Matrix.
-			/// @param rowIndex Row index.
+			/// @brief Creates a const row access.
+			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
-			constexpr ConstRow(const Matrix2x2& matrix, std::size_t rowIndex) noexcept;
+			explicit constexpr ConstRow(const T* row) noexcept;
 
-			const Matrix2x2& m_matrix; ///< Matrix.
-			const std::size_t m_rowIndex; ///< Row index.
+			const T* const m_row; ///< Row pointer.
 
 			friend Matrix2x2;
 		};
@@ -276,13 +272,13 @@ export namespace PonyEngine::Math
 		std::string ToString() const;
 
 		/// @brief Row access operator.
-		/// @details Don't store it. Use the access like this: matrix[1][1].
+		/// @details Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
 		Row operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
-		/// @details Don't store it. Use the access like this: matrix[1][1].
+		/// @details Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
@@ -431,41 +427,45 @@ export namespace PonyEngine::Math
 	std::ostream& operator <<(std::ostream& stream, const Matrix2x2<T>& matrix);
 
 	template<Arithmetic T>
-	Matrix2x2<T>::Row::Row(Matrix2x2& matrix, const std::size_t rowIndex) noexcept :
-		m_matrix{matrix},
-		m_rowIndex{rowIndex}
+	Matrix2x2<T>::Row::Row(T* const row) noexcept :
+		m_row{row}
 	{
 	}
 
 	template<Arithmetic T>
 	Matrix2x2<T>::Row::operator Vector2<T>() const noexcept
 	{
-		return m_matrix.GetRow(m_rowIndex);
+		const T x = m_row[0];
+		const T y = m_row[2];
+
+		return Vector2<T>(x, y);
 	}
 
 	template<Arithmetic T>
 	T& Matrix2x2<T>::Row::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_matrix.m_components[m_rowIndex + columnIndex * std::size_t{2}];
+		return m_row[columnIndex * std::size_t{2}];
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T>::ConstRow::ConstRow(const Matrix2x2& matrix, const std::size_t rowIndex) noexcept :
-		m_matrix{matrix},
-		m_rowIndex{rowIndex}
+	constexpr Matrix2x2<T>::ConstRow::ConstRow(const T* const row) noexcept :
+		m_row{row}
 	{
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T>::ConstRow::operator Vector2<T>() const noexcept
 	{
-		return m_matrix.GetRow(m_rowIndex);
+		const T x = m_row[0];
+		const T y = m_row[2];
+
+		return Vector2<T>(x, y);
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix2x2<T>::ConstRow::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_matrix.m_components[m_rowIndex + columnIndex * std::size_t{2}];
+		return m_row[columnIndex * std::size_t{2}];
 	}
 
 	template<Arithmetic T>
@@ -732,13 +732,13 @@ export namespace PonyEngine::Math
 	template<Arithmetic T>
 	typename Matrix2x2<T>::Row Matrix2x2<T>::operator [](const std::size_t rowIndex) noexcept
 	{
-		return Row(*this, rowIndex);
+		return Row(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
 	constexpr typename Matrix2x2<T>::ConstRow Matrix2x2<T>::operator [](const std::size_t rowIndex) const noexcept
 	{
-		return ConstRow(*this, rowIndex);
+		return ConstRow(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
