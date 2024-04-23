@@ -306,7 +306,10 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector);
+}
 
+namespace PonyEngine::Math
+{
 	template<Arithmetic T>
 	constexpr Vector4<T>::Vector4() noexcept :
 		Vector4(T{}, T{}, T{}, T{})

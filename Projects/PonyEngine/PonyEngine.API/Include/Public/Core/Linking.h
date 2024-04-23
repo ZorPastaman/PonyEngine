@@ -9,6 +9,8 @@
 
 #pragma once
 
-#include <SDKDDKVer.h>
-#define WIN32_LEAN_AND_MEAN
-#include <windows.h>
+#if _MSC_VER && !__INTEL_COMPILER
+#define PONY_DLL_EXPORT __declspec(dllexport)
+#else
+#error "Unsupported compiler!"
+#endif

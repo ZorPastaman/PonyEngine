@@ -22,10 +22,10 @@ import <utility>;
 
 import PonyEngine.Debug.Log;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Debug::Log
 {
 	/// @brief Sub-logger that logs to a file.
-	export class FileSubLogger final : public ISubLogger
+	class FileSubLogger final : public ISubLogger
 	{
 	public:
 		/// @brief Creates a @p FileSubLogger.
@@ -33,41 +33,29 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure constructor")]]
 		explicit FileSubLogger(const std::filesystem::path& logPath);
 		FileSubLogger(const FileSubLogger&) = delete;
-		/// @brief Move constructor.
-		/// @param other Move source.
-		[[nodiscard("Pure constructor")]]
-		FileSubLogger(FileSubLogger&& other);
+		FileSubLogger(FileSubLogger&&) = delete;
 
-		virtual ~FileSubLogger() noexcept;
+		~FileSubLogger() noexcept;
 
 		[[nodiscard("Pure function")]]
-		inline virtual const char* GetName() const noexcept override;
+		virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
-		/// @brief Move assignment
-		/// @param other Move source.
-		/// @return @a This.
-		FileSubLogger& operator =(FileSubLogger&& other);
+		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
-		static const char* const Name; /// @brief Class name.
+		static const char* const Name; ///< Class name.
 
 	private:
-		std::ofstream m_logFile; /// @brief log file stream.
+		std::ofstream m_logFile; ///< log file stream.
 	};
+}
 
+namespace PonyEngine::Debug::Log
+{
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		m_logFile(logPath)
-	{
-		if (!m_logFile.is_open()) [[unlikely]]
-		{
-			throw std::logic_error("Log file isn't open.");
-		}
-	}
-
-	FileSubLogger::FileSubLogger(FileSubLogger&& other) :
-		m_logFile(std::move(other.m_logFile))
 	{
 		if (!m_logFile.is_open()) [[unlikely]]
 		{
@@ -90,7 +78,7 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	inline const char* FileSubLogger::GetName() const noexcept
+	const char* FileSubLogger::GetName() const noexcept
 	{
 		return Name;
 	}
@@ -105,18 +93,6 @@ namespace PonyEngine::Debug::Log
 		{
 			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a log file"));
 		}
-	}
-
-	FileSubLogger& FileSubLogger::operator =(FileSubLogger&& other)
-	{
-		m_logFile = std::move(other.m_logFile);
-
-		if (!m_logFile.is_open()) [[unlikely]]
-		{
-			throw std::logic_error("Log file isn't open.");
-		}
-
-		return *this;
 	}
 
 	const char* const FileSubLogger::Name = "PonyEngine::Debug::Log::FileSubLogger";

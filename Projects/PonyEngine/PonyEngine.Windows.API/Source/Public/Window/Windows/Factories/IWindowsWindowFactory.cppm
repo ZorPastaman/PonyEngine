@@ -13,10 +13,10 @@ import PonyEngine.Core;
 import PonyEngine.Window.Factories;
 import PonyEngine.Window.Windows;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Windows window factory.
-	export class IWindowsWindowFactory : public IWindowFactory
+	class IWindowsWindowFactory : public IWindowFactory
 	{
 	public:
 		/// @brief Creates a windows window.
@@ -34,6 +34,6 @@ namespace PonyEngine::Window
 		virtual void SetCmdShow(int cmdShow) noexcept = 0;
 
 	protected:
-		inline virtual ~IWindowsWindowFactory() noexcept = default;
+		~IWindowsWindowFactory() noexcept = default;
 	};
 }

@@ -120,7 +120,7 @@ namespace Core
 		TEST_METHOD(CreateTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::IsNotNull(engine);
 			PonyEngine::Core::DestroyEngine(engine);
@@ -129,7 +129,7 @@ namespace Core
 		TEST_METHOD(GetFrameCountTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			
 			for (std::size_t i = 0; i < 10; ++i)
@@ -145,7 +145,7 @@ namespace Core
 		TEST_METHOD(GetLoggerTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->GetLogger())));
 			PonyEngine::Core::DestroyEngine(engine);
@@ -155,7 +155,7 @@ namespace Core
 		{
 			EmptyLogger logger;
 			EmptyWindowFactory windowFactory;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			params.SetWindowFactory(&windowFactory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(windowFactory.createdWindow), reinterpret_cast<std::uintptr_t>(engine->GetWindow()));
@@ -166,7 +166,7 @@ namespace Core
 		{
 			EmptyLogger logger;
 			EmptySystemFactory systemFactory;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			params.AddSystemFactory(&systemFactory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->FindSystem([](const PonyEngine::Core::ISystem* const system) { return dynamic_cast<const EmptySystem*>(system) != nullptr; })));
@@ -177,7 +177,7 @@ namespace Core
 		TEST_METHOD(ExitTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(logger);
+			PonyEngine::Core::EngineParams params(&logger);
 			PonyEngine::Core::IEngine* engine = PonyEngine::Core::CreateEngine(params);
 			Assert::IsTrue(engine->IsRunning());
 			engine->Stop();

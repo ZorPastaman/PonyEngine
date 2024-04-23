@@ -29,10 +29,10 @@ import :IPlatformEngineParamsProvider;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Engine runner.
-	export class EngineRunner final
+	class EngineRunner final
 	{
 	public:
 		/// @brief Creates an @p EngineRunner.
@@ -53,20 +53,23 @@ namespace Launcher
 		/// @param exitCode Engine exit code. It's set only if the function returns @a false.
 		/// @return @a True if the engine is running; @a false otherwise.
 		[[nodiscard("Non-ignorable result")]]
-		bool Tick(int& exitCode);
+		bool Tick(int& exitCode) const;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
+		PonyEngine::Debug::Log::ILogger& m_logger; ///< Logger.
 
-		PonyEngine::Core::IEngine* m_engine; /// @brief Run engine.
-		Game::IGame* m_game; /// @brief Run game.
+		PonyEngine::Core::IEngine* m_engine; ///< Run engine.
+		Game::IGame* m_game; ///< Run game.
 	};
+}
 
+namespace Launcher
+{
 	EngineRunner::EngineRunner(PonyEngine::Debug::Log::ILogger& logger, const EngineParamsProvider& engineParamsProvider, const IPlatformEngineParamsProvider& platformEngineParamsProvider) :
 		m_logger{logger}
 	{
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Create engine params.");
-		PonyEngine::Core::EngineParams engineParams(m_logger);
+		PonyEngine::Core::EngineParams engineParams(&m_logger);
 
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Set engine params.");
 		engineParamsProvider.Modify(engineParams);
@@ -114,7 +117,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Engine destroyed.");
 	}
 
-	bool EngineRunner::Tick(int& exitCode)
+	bool EngineRunner::Tick(int& exitCode) const
 	{
 		PONY_LOG_PTR(m_engine, LogType::Verbose, "Pre-tick a game.");
 		m_game->PreTick();

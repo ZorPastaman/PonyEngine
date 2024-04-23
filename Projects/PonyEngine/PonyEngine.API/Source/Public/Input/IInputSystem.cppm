@@ -17,10 +17,10 @@ import PonyEngine.Core;
 import :Event;
 import :Handle;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
 	/// @brief Input system interface.
-	export class IInputSystem : public Core::ISystem
+	class IInputSystem : public Core::ISystem
 	{
 	public:
 		/// @brief Registers an action that's raised if the event meets the conditions.
@@ -34,6 +34,6 @@ namespace PonyEngine::Input
 		virtual void UnregisterAction(Handle handle) = 0;
 
 	protected:
-		inline virtual ~IInputSystem() noexcept = default;
+		~IInputSystem() noexcept = default;
 	};
 }

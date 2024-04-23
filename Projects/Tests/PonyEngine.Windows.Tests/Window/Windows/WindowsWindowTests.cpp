@@ -55,7 +55,7 @@ namespace Window
 			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
-			PonyEngine::Core::EngineParams engineParams(*logger);
+			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 
@@ -74,7 +74,7 @@ namespace Window
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			factory->SetTitle(windowTitle);
 			Assert::AreEqual(windowTitle, factory->GetTitle());
-			PonyEngine::Core::EngineParams engineParams(*logger);
+			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 
@@ -94,7 +94,7 @@ namespace Window
 			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Observer Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
-			PonyEngine::Core::EngineParams engineParams(*logger);
+			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 			TestKeyboardObserver observer;
@@ -143,7 +143,7 @@ namespace Window
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			Assert::AreEqual("PonyEngine::Window::WindowsWindow", factory->GetWindowName());
 
-			PonyEngine::Core::EngineParams engineParams(*logger);
+			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
 			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(engineParams);
 			Assert::AreEqual("PonyEngine::Window::WindowsWindow", engine->GetWindow()->GetName());

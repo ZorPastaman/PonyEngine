@@ -130,12 +130,12 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		static consteval Matrix2x2 CreateZero();
 
-		/// @brief Creates a rotation matrix for a vector2.
+		/// @brief Creates a rotation matrix for a @p Vector2.
 		/// @param angle Rotation angle in radians.
 		/// @return Rotation matrix.
 		[[nodiscard("Pure function")]]
 		static Matrix2x2 CreateRotation(T angle) noexcept requires(std::is_floating_point_v<T>);
-		/// @brief Creates a rotation matrix for a vector2.
+		/// @brief Creates a rotation matrix for a @p Vector2.
 		/// @param angle Rotation angle in degrees.
 		/// @return Rotation matrix.
 		[[nodiscard("Pure function")]]
@@ -425,7 +425,10 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix2x2<T>& matrix);
+}
 
+namespace PonyEngine::Math
+{
 	template<Arithmetic T>
 	Matrix2x2<T>::Row::Row(T* const row) noexcept :
 		m_row{row}

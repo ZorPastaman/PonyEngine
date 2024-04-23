@@ -23,10 +23,10 @@ import Launcher;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Windows quit checker.
-	export class WindowsQuitChecker : public IPlatformQuitChecker
+	class WindowsQuitChecker final : public IPlatformQuitChecker
 	{
 	public:
 		/// @brief Creates a @p WindowsQuitChecker.
@@ -36,7 +36,7 @@ namespace Launcher
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
-		virtual ~WindowsQuitChecker() noexcept = default;
+		~WindowsQuitChecker() noexcept = default;
 
 		[[nodiscard("Non-ignorable result")]]
 		virtual bool Check(int& exitCode) const override;
@@ -45,9 +45,12 @@ namespace Launcher
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
+		PonyEngine::Debug::Log::ILogger& m_logger; ///< Logger.
 	};
+}
 
+namespace Launcher
+{
 	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept :
 		m_logger{logger}
 	{

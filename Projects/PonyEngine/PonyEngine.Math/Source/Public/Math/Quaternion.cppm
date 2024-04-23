@@ -322,7 +322,10 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Quaternion<T>& quaternion);
+}
 
+namespace PonyEngine::Math
+{
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion() noexcept :
 		Quaternion(T{}, T{}, T{}, T{})

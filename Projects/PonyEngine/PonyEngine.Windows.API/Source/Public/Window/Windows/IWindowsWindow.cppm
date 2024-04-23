@@ -15,10 +15,10 @@ export module PonyEngine.Window.Windows:IWindowsWindow;
 
 import PonyEngine.Window;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Windows window interface.
-	export class IWindowsWindow : public IWindow
+	class IWindowsWindow : public IWindow
 	{
 	public:
 		/// @brief Gets a windows window handle.
@@ -33,6 +33,6 @@ namespace PonyEngine::Window
 		virtual bool IsWindowAlive() const noexcept = 0;
 
 	protected:
-		inline virtual ~IWindowsWindow() noexcept = default;
+		~IWindowsWindow() noexcept = default;
 	};
 }

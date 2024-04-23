@@ -25,10 +25,10 @@ import PonyEngine.Input.Implementation;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Platform-independent engine params provider.
-	export class EngineParamsProvider final
+	class EngineParamsProvider final
 	{
 	public:
 		/// @brief Creates an @p EngineParamsProvider.
@@ -48,16 +48,21 @@ namespace Launcher
 		EngineParamsProvider& operator =(EngineParamsProvider&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger; /// @brief Logger.
+		PonyEngine::Debug::Log::ILogger& m_logger; ///< Logger.
 
 		// Set all platform-independent factories here.
+
 		PonyEngine::Input::IInputSystemFactory* m_inputSystemFactory;
 	};
+}
 
+namespace Launcher
+{
 	EngineParamsProvider::EngineParamsProvider(PonyEngine::Debug::Log::ILogger& logger) :
 		m_logger{logger}
 	{
 		// Create all platform-independent factories here.
+
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Create an input system factory.");
 		m_inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
 		assert((m_inputSystemFactory != nullptr));
@@ -67,6 +72,7 @@ namespace Launcher
 	EngineParamsProvider::~EngineParamsProvider() noexcept
 	{
 		// Destroy all platform-independent factories here.
+
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Destroy an input system factory.");
 		PonyEngine::Input::DestroyInputSystemFactory(m_inputSystemFactory);
 		PONY_LOG_GENERAL(m_logger, LogType::Info, "Input system factory destroyed.");
@@ -75,6 +81,7 @@ namespace Launcher
 	void EngineParamsProvider::Modify(PonyEngine::Core::EngineParams& engineParams) const
 	{
 		// Set all platform-independent factories and other parameters here.
+
 		PONY_LOG_GENERAL(m_logger, LogType::Debug, "Push an input system factory.");
 		engineParams.AddSystemFactory(m_inputSystemFactory);
 	}

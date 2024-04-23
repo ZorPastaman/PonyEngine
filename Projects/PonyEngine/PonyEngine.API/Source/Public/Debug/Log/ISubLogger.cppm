@@ -13,11 +13,11 @@ import PonyEngine.Utility;
 
 import :LogEntry;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Debug::Log
 {
 	/// @brief SubLogger interface.
 	/// @details The sub-logger writes received logs to something.
-	export class ISubLogger : public Utility::INamed
+	class ISubLogger : public Utility::INamed
 	{
 	public:
 		/// @brief Logs the @p logEntry to something.
@@ -25,6 +25,6 @@ namespace PonyEngine::Debug::Log
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 
 	protected:
-		inline virtual ~ISubLogger() = default;
+		~ISubLogger() noexcept = default;
 	};
 }

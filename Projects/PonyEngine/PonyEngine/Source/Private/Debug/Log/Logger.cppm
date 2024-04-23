@@ -20,24 +20,24 @@ import <chrono>;
 import <format>;
 import <exception>;
 import <iostream>;
+import <ranges>;
 import <string>;
 import <vector>;
 
 import PonyEngine.Debug.Log;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Debug::Log
 {
 	/// @brief Default logger. It just resends logs to its sub-loggers.
-	export class Logger final : public ILogger
+	class Logger final : public ILogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		inline Logger() noexcept = default;
+		Logger() noexcept = default;
 		Logger(const Logger&) = delete;
-		[[nodiscard("Pure constructor")]]
-		inline Logger(Logger&& other) noexcept = default;
+		Logger(Logger&&) noexcept = delete;
 
-		inline virtual ~Logger() noexcept = default;
+		~Logger() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
@@ -49,14 +49,17 @@ namespace PonyEngine::Debug::Log
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
 		Logger& operator =(const Logger&) = delete;
-		inline Logger& operator =(Logger&& other) noexcept = default;
+		Logger& operator =(Logger&&) = delete;
 
-		static const char* const Name; /// @brief Class name.
+		static const char* const Name; ///< Class name.
 
 	private:
-		std::vector<ISubLogger*> m_subLoggers; /// @brief Sub-loggers container.
+		std::vector<ISubLogger*> m_subLoggers; ///< Sub-loggers container.
 	};
+}
 
+namespace PonyEngine::Debug::Log
+{
 	const char* Logger::GetName() const noexcept
 	{
 		return Name;
@@ -101,7 +104,7 @@ namespace PonyEngine::Debug::Log
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger != nullptr));
-		assert((std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger) == m_subLoggers.cend()));
+		assert((std::ranges::find(std::as_const(m_subLoggers), subLogger) == m_subLoggers.cend()));
 		PONY_CONSOLE(LogType::Info, std::format("Add a sub-logger '{}'.", subLogger->GetName()));
 		m_subLoggers.push_back(subLogger);
 	}
@@ -110,9 +113,7 @@ namespace PonyEngine::Debug::Log
 	{
 		PONY_CONSOLE_IF(subLogger == nullptr, LogType::Warning, "Tried to remove a nullptr sub-logger.");
 
-		const std::vector<ISubLogger*>::const_iterator position = std::find(m_subLoggers.cbegin(), m_subLoggers.cend(), subLogger);
-
-		if (position != m_subLoggers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(m_subLoggers), subLogger); position != m_subLoggers.cend()) [[likely]]
 		{
 			PONY_CONSOLE(LogType::Info, std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
 			m_subLoggers.erase(position);

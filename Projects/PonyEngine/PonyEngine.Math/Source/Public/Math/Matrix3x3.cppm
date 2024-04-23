@@ -457,7 +457,10 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix3x3<T>& matrix);
+}
 
+namespace PonyEngine::Math
+{
 	template<Arithmetic T>
 	Matrix3x3<T>::Row::Row(T* const row) noexcept :
 		m_row{row}

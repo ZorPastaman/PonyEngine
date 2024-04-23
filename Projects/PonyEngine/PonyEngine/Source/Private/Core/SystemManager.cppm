@@ -27,10 +27,10 @@ import PonyEngine.Core;
 import PonyEngine.Core.Factories;
 import PonyEngine.Debug.Log;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief Holder and ticker of systems.
-	export class SystemManager final
+	class SystemManager final
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
@@ -39,8 +39,7 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		SystemManager(const EngineParams& engineParams, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
-		[[nodiscard("Pure constructor")]]
-		SystemManager(SystemManager&& other) noexcept = default;
+		SystemManager(SystemManager&&) = delete;
 
 		~SystemManager() noexcept;
 
@@ -61,19 +60,19 @@ namespace PonyEngine::Core
 		void Tick() const;
 
 		SystemManager& operator =(const SystemManager&) = delete;
-		SystemManager& operator =(SystemManager&& other) noexcept = default;
+		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
-		std::vector<ISystem*> m_systems; /// @brief Systems. It's synced with the @p m_factories by index.
-		std::vector<ISystemFactory*> m_factories; /// @brief System factories. It's synced with the @p m_systems by index.
-		std::vector<ISystem*> m_tickableSystems; /// @brief Tickable systems.
-		const IEngine& m_engine; /// @brief Engine that owns the manager.
+		std::vector<ISystem*> m_systems; ///< Systems. It's synced with the @p m_factories by index.
+		std::vector<ISystemFactory*> m_factories; ///< System factories. It's synced with the @p m_systems by index.
+		std::vector<ISystem*> m_tickableSystems; ///< Tickable systems.
+		const IEngine& m_engine; ///< Engine that owns the manager.
 	};
+}
 
+namespace PonyEngine::Core
+{
 	SystemManager::SystemManager(const EngineParams& engineParams, IEngine& engine) :
-		m_systems{},
-		m_factories{},
-		m_tickableSystems{},
 		m_engine{engine}
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Create systems.");
@@ -120,7 +119,7 @@ namespace PonyEngine::Core
 
 	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
 	{
-		assert((predicate));
+		assert((static_cast<bool>(predicate)));
 
 		for (ISystem* const system : m_systems)
 		{
@@ -151,7 +150,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(m_engine, Debug::Log::LogType::Info, "End systems.");
 
-		for (std::vector<ISystem*>::const_reverse_iterator it = m_systems.crbegin(); it != m_systems.crend(); ++it)
+		for (auto it = m_systems.crbegin(); it != m_systems.crend(); ++it)
 		{
 			ISystem* const system = *it;
 

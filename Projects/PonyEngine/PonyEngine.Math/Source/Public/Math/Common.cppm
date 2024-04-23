@@ -66,7 +66,10 @@ export namespace PonyEngine::Math
 	/// @return Rounded or cast value.
 	template<Arithmetic From, Arithmetic To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegralIfPossible(From from) noexcept;
+}
 
+namespace PonyEngine::Math
+{
 	template<std::floating_point T>
 	bool AreAlmostEqual(const T left, const T right, const T tolerance) noexcept
 	{

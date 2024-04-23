@@ -11,6 +11,8 @@ module;
 
 #include <cassert>
 
+#include "Core/Linking.h"
+
 export module PonyEngine.Window.Windows.Implementation;
 
 import PonyEngine.Debug.Log;
@@ -18,17 +20,21 @@ import PonyEngine.Window.Windows.Factories;
 
 import :WindowsWindowFactory;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Creates a Windows window factory.
+	/// @param logger Logger.
 	/// @param classParams Class parameters.
 	/// @return Created factory.
-	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) IWindowsWindowFactory* CreateWindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams);
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT IWindowsWindowFactory* CreateWindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams);
 	/// @brief Destroys a previously created Windows window factory.
 	/// @param factory Previously created Windows window factory.
-	export __declspec(dllexport) void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
+	PONY_DLL_EXPORT void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
+}
 
+namespace PonyEngine::Window
+{
 	IWindowsWindowFactory* CreateWindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams)
 	{
 		return new WindowsWindowFactory(logger, classParams);

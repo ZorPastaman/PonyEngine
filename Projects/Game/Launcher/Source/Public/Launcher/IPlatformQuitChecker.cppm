@@ -9,10 +9,10 @@
 
 export module Launcher:IPlatformQuitChecker;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Platform quit checker.
-	export class IPlatformQuitChecker
+	class IPlatformQuitChecker
 	{
 	public:
 		/// @brief Checks if the application must be closed.
@@ -22,6 +22,6 @@ namespace Launcher
 		virtual bool Check(int& exitCode) const = 0;
 
 	protected:
-		inline virtual ~IPlatformQuitChecker() noexcept = default;
+		~IPlatformQuitChecker() noexcept = default;
 	};
 }

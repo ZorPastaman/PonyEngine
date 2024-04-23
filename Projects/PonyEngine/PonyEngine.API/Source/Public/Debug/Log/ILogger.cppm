@@ -17,11 +17,11 @@ import :ISubLogger;
 import :LogInput;
 import :LogType;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Debug::Log
 {
 	/// @brief Engine logger interface.
 	/// @details The logger is an entry point for logs. It translates the logs via its sub-loggers.
-	export class ILogger : public Utility::INamed
+	class ILogger : public Utility::INamed
 	{
 	public:
 		/// @brief Logs via current sub-loggers.
@@ -42,6 +42,6 @@ namespace PonyEngine::Debug::Log
 		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;
 
 	protected:
-		inline virtual ~ILogger() noexcept = default;
+		~ILogger() noexcept = default;
 	};
 }

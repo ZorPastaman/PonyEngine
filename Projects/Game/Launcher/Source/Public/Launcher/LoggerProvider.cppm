@@ -25,31 +25,40 @@ import PonyEngine.Debug.Log.Implementation;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Logger provider creates and destroys a logger and its sub-loggers.
-	export class LoggerProvider final
+	class LoggerProvider final
 	{
 	public:
 		/// @brief Creates a logger provider with a logger.
 		[[nodiscard("Pure constructor")]]
 		LoggerProvider();
+		LoggerProvider(const LoggerProvider&) = delete;
+		LoggerProvider(LoggerProvider&&) = delete;
 
 		~LoggerProvider() noexcept;
 
 		/// @brief Gets a logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		inline PonyEngine::Debug::Log::ILogger& GetLogger() const noexcept;
+		PonyEngine::Debug::Log::ILogger& GetLogger() const noexcept;
+
+		LoggerProvider& operator =(const LoggerProvider&) = delete;
+		LoggerProvider& operator =(LoggerProvider&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger* m_logger; /// @brief Logger.
+		PonyEngine::Debug::Log::ILogger* m_logger; ///< Logger.
 
 		// Set all sub-loggers here.
+
 		PonyEngine::Debug::Log::ISubLogger* m_consoleSubLogger;
 		PonyEngine::Debug::Log::ISubLogger* m_fileSubLogger;
 	};
+}
 
+namespace Launcher
+{
 	LoggerProvider::LoggerProvider()
 	{
 		PONY_CONSOLE(LogType::Info, "Create a logger.");
@@ -58,6 +67,7 @@ namespace Launcher
 		PONY_CONSOLE(LogType::Info, "Logger created.");
 
 		// Create and add all sub-loggers here.
+
 		PONY_CONSOLE(LogType::Info, "Create a console sub-logger.");
 		m_consoleSubLogger = PonyEngine::Debug::Log::CreateConsoleSubLogger();
 		assert((m_consoleSubLogger != nullptr));
@@ -74,6 +84,7 @@ namespace Launcher
 	LoggerProvider::~LoggerProvider() noexcept
 	{
 		// Remove and destroy all sub-loggers here.
+
 		PONY_CONSOLE(LogType::Info, "Destroy a file sub-logger.");
 		try
 		{
@@ -103,7 +114,7 @@ namespace Launcher
 		PONY_CONSOLE(LogType::Info, "Logger destroyed.");
 	}
 
-	inline PonyEngine::Debug::Log::ILogger& LoggerProvider::GetLogger() const noexcept
+	PonyEngine::Debug::Log::ILogger& LoggerProvider::GetLogger() const noexcept
 	{
 		return *m_logger;
 	}

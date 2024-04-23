@@ -11,37 +11,44 @@ export module PonyEngine.Input:Event;
 
 import :KeyboardMessage;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
 	/// @brief Input event.
-	export struct Event final
+	class Event final
 	{
 	public:
 		/// @brief Creates an input event.
 		/// @param expectedMessage The event is raised if the input system receives such an event.
 		[[nodiscard("Pure constructor")]]
-		explicit inline Event(const KeyboardMessage& expectedMessage) noexcept;
+		explicit Event(const KeyboardMessage& expectedMessage) noexcept;
 		[[nodiscard("Pure constructor")]]
-		inline Event(const Event& other) noexcept = default;
+		Event(const Event& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		Event(Event&& other) noexcept = default;
 
-		inline ~Event() noexcept = default;
+		~Event() noexcept = default;
 
 		/// @brief Gets an expected message.
 		/// @return Expected message.
-		inline const KeyboardMessage& GetExpectedMessage() const noexcept;
+		[[nodiscard("Pure function")]]
+		const KeyboardMessage& GetExpectedMessage() const noexcept;
 
-		inline Event& operator =(const Event& other) noexcept = default;
+		Event& operator =(const Event& other) noexcept = default;
+		Event& operator =(Event&& other) noexcept = default;
 
 	private:
-		KeyboardMessage m_expectedMessage; /// @brief The event is raised if the input system receives such an event.
+		KeyboardMessage m_expectedMessage; ///< The event is raised if the input system receives such an event.
 	};
+}
 
-	inline Event::Event(const KeyboardMessage& expectedMessage) noexcept :
+namespace PonyEngine::Input
+{
+	Event::Event(const KeyboardMessage& expectedMessage) noexcept :
 		m_expectedMessage{expectedMessage}
 	{
 	}
 
-	inline const KeyboardMessage& Event::GetExpectedMessage() const noexcept
+	const KeyboardMessage& Event::GetExpectedMessage() const noexcept
 	{
 		return m_expectedMessage;
 	}
