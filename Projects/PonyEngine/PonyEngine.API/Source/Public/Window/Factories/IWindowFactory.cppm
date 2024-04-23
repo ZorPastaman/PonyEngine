@@ -14,10 +14,10 @@ import <string>;
 import PonyEngine.Core;
 import PonyEngine.Window;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Window factory.
-	export class IWindowFactory
+	class IWindowFactory
 	{
 	public:
 		/// @brief Creates a window.
@@ -43,6 +43,6 @@ namespace PonyEngine::Window
 		virtual const char* GetWindowName() const noexcept = 0;
 
 	protected:
-		inline virtual ~IWindowFactory() noexcept = default;
+		~IWindowFactory() noexcept = default;
 	};
 }

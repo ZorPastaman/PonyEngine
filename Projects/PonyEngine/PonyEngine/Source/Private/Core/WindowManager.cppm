@@ -24,10 +24,10 @@ import PonyEngine.Debug.Log;
 import PonyEngine.Window;
 import PonyEngine.Window.Factories;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief Holder of a window.
-	export class WindowManager final
+	class WindowManager final
 	{
 	public:
 		/// @brief Creates a @p WindowManager.
@@ -36,15 +36,14 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		WindowManager(const EngineParams& engineParams, IEngine& engine);
 		WindowManager(const WindowManager&) = delete;
-		[[nodiscard("Pure constructor")]]
-		inline WindowManager(WindowManager&& other) noexcept = default;
+		WindowManager(WindowManager&&) = delete;
 
 		~WindowManager() noexcept;
 
 		/// @brief Gets a window.
 		/// @return Window. May be nullptr if the window is not created.
 		[[nodiscard("Pure function")]]
-		inline Window::IWindow* GetWindow() const noexcept;
+		Window::IWindow* GetWindow() const noexcept;
 
 		/// @brief Show a window if it exists.
 		void ShowWindow() const;
@@ -53,15 +52,18 @@ namespace PonyEngine::Core
 		void Tick() const;
 
 		WindowManager& operator =(const WindowManager&) = delete;
-		WindowManager& operator =(WindowManager&& other) noexcept = default;
+		WindowManager& operator =(WindowManager&& other) = delete;
 
 	private:
-		Window::IWindow* m_window; /// @brief Created window.
-		Window::IWindowFactory* m_windowFactory; /// @brief Factory that created the @p m_window.
+		Window::IWindow* m_window; ///< Created window.
+		Window::IWindowFactory* m_windowFactory; ///< Factory that created the @p m_window.
 
-		const IEngine& m_engine; /// @brief Engine that owns the @p WindowManager.
+		const IEngine& m_engine; ///< Engine that owns the @p WindowManager.
 	};
+}
 
+namespace PonyEngine::Core
+{
 	WindowManager::WindowManager(const EngineParams& engineParams, IEngine& engine) :
 		m_engine{engine}
 	{
@@ -91,7 +93,7 @@ namespace PonyEngine::Core
 		}
 	}
 
-	inline Window::IWindow* WindowManager::GetWindow() const noexcept
+	Window::IWindow* WindowManager::GetWindow() const noexcept
 	{
 		return m_window;
 	}

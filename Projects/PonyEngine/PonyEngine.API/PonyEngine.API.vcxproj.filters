@@ -113,6 +113,9 @@
     <ClInclude Include="Include\Public\Debug\Log\LogMacro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Public\Core\Linking.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.API.rc">

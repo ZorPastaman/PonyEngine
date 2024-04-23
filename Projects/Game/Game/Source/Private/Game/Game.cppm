@@ -24,10 +24,10 @@ import Game;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Game
+export namespace Game
 {
 	/// @brief Main game class.
-	export class Game final : public IGame
+	class Game final : public IGame
 	{
 	public:
 		/// @brief Creates a game.
@@ -37,7 +37,7 @@ namespace Game
 		Game(const Game&) = delete;
 		Game(Game&&) = delete;
 
-		virtual ~Game() noexcept = default;
+		~Game() noexcept = default;
 
 		virtual void Begin() override;
 		virtual void PreTick() override;
@@ -48,14 +48,17 @@ namespace Game
 		Game& operator =(Game&&) = delete;
 
 	private:
-		PonyEngine::Core::IEngine& m_engine; /// @brief Engine that owns the game.
+		PonyEngine::Core::IEngine& m_engine; ///< Engine that owns the game.
 
 		PonyEngine::Input::Handle m_upHandle;
 		PonyEngine::Input::Handle m_downHandle;
 		PonyEngine::Input::Handle m_rightHandle;
 		PonyEngine::Input::Handle m_leftHandle;
 	};
+}
 
+namespace Game
+{
 	Game::Game(PonyEngine::Core::IEngine& engine) :
 		m_engine{engine},
 		m_upHandle(0),
@@ -69,7 +72,7 @@ namespace Game
 	{
 		PONY_LOG(m_engine, LogType::Info, "Register inputs.");
 
-		if (auto const inputSystem = m_engine.FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = m_engine.FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(m_engine, LogType::Debug, "Register up input.");
 			const PonyEngine::Input::KeyboardMessage upMessage(PonyEngine::Input::KeyboardKeyCode::ArrowUp, true);
@@ -78,7 +81,7 @@ namespace Game
 			{ 
 				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
 				{
-					m_engine.GetWindow()->SetTitle(L"Up");
+					window->SetTitle(L"Up");
 				}
 			}));
 			PONY_LOG(m_engine, LogType::Debug, "Up input registered.");
@@ -90,7 +93,7 @@ namespace Game
 			{
 				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
 				{
-					m_engine.GetWindow()->SetTitle(L"Down");
+					window->SetTitle(L"Down");
 				}
 			}));
 			PONY_LOG(m_engine, LogType::Debug, "Down input registered.");
@@ -102,7 +105,7 @@ namespace Game
 			{
 				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
 				{
-					m_engine.GetWindow()->SetTitle(L"Right");
+					window->SetTitle(L"Right");
 				}
 			}));
 			PONY_LOG(m_engine, LogType::Debug, "Right input registered.");
@@ -114,7 +117,7 @@ namespace Game
 			{
 				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
 				{
-					m_engine.GetWindow()->SetTitle(L"Left");
+					window->SetTitle(L"Left");
 				}
 			}));
 			PONY_LOG(m_engine, LogType::Debug, "Left input registered.");
@@ -141,7 +144,7 @@ namespace Game
 	{
 		PONY_LOG(m_engine, LogType::Info, "Unregister inputs.");
 
-		if (auto const inputSystem = m_engine.FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = m_engine.FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(m_engine, LogType::Debug, "Unregister up input.");
 			inputSystem->UnregisterAction(m_upHandle);

@@ -11,6 +11,8 @@ module;
 
 #include <cassert>
 
+#include "Core/Linking.h"
+
 export module PonyEngine.Core.Implementation;
 
 import PonyEngine.Core;
@@ -18,18 +20,21 @@ import PonyEngine.Core.Factories;
 
 import :Engine;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
 	/// @return Created @p Engine.
-	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) IEngine* CreateEngine(const EngineParams& params);
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT IEngine* CreateEngine(const EngineParams& params);
 
 	/// @brief Destroy the @p engine instance.
 	/// @param engine Engine to destroy.
-	export __declspec(dllexport) void DestroyEngine(IEngine* engine) noexcept;
+	PONY_DLL_EXPORT void DestroyEngine(IEngine* engine) noexcept;
+}
 
+namespace PonyEngine::Core
+{
 	IEngine* CreateEngine(const EngineParams& params)
 	{
 		return new Engine(params);

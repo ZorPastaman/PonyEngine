@@ -43,6 +43,7 @@
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Public\Core\Linking.h" />
     <ClInclude Include="Include\Public\Debug\Log\LogMacro.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

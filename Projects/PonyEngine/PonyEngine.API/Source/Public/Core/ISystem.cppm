@@ -11,10 +11,10 @@ export module PonyEngine.Core:ISystem;
 
 import PonyEngine.Utility;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief Engine system.
-	export class ISystem : public Utility::INamed
+	class ISystem : public Utility::INamed
 	{
 	public:
 		/// @brief Begins a system.
@@ -24,7 +24,7 @@ namespace PonyEngine::Core
 		/// @details The function is called before a destruction.
 		virtual void End() = 0;
 
-		/// @brief Is the system tickable. The engine will call @p Tick() only if it returns @a true.
+		/// @brief Is the system tickable? The engine will call @p Tick() only if it returns @a true.
 		/// @return @a True if the system is tickable; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		virtual bool IsTickable() const noexcept = 0;
@@ -32,6 +32,6 @@ namespace PonyEngine::Core
 		virtual void Tick() = 0;
 
 	protected:
-		inline virtual ~ISystem() noexcept = default;
+		~ISystem() noexcept = default;
 	};
 }

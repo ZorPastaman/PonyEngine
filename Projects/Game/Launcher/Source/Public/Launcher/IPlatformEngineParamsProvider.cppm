@@ -11,10 +11,10 @@ export module Launcher:IPlatformEngineParamsProvider;
 
 import PonyEngine.Core.Factories;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Platform engine params provider.
-	export class IPlatformEngineParamsProvider
+	class IPlatformEngineParamsProvider
 	{
 	public:
 		/// @brief Modify engine params.
@@ -22,6 +22,6 @@ namespace Launcher
 		virtual void Modify(PonyEngine::Core::EngineParams& engineParams) const = 0;
 
 	protected:
-		inline virtual ~IPlatformEngineParamsProvider() noexcept = default;
+		~IPlatformEngineParamsProvider() noexcept = default;
 	};
 }

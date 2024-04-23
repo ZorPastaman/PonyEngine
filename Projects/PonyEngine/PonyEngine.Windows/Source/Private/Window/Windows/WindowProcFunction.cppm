@@ -18,15 +18,15 @@ import <stdexcept>;
 
 import :IWindowProc;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Registers a window proc manager to use a correct window proc. The used window class must point to @p WindowProc function from this file.
 	/// @param hWnd Window handle.
 	/// @param windowProc Window proc manager.
-	export void RegisterWindowProc(HWND hWnd, IWindowProc* windowProc);
+	void RegisterWindowProc(HWND hWnd, IWindowProc* windowProc);
 	/// @brief Unregister a previous registered window proc manager.
 	/// @param hWnd Window handle.
-	export void UnregisterWindowProc(HWND hWnd);
+	void UnregisterWindowProc(HWND hWnd);
 
 	/// @brief Process windowProc messages.
 	/// @details Actually, it translates invocations to a corresponding @p IWindowProc.
@@ -36,8 +36,11 @@ namespace PonyEngine::Window
 	/// @param wParam WParam.
 	/// @param lParam LParam.
 	/// @return Process result.
-	export LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+	LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+}
 
+namespace PonyEngine::Window
+{
 	void RegisterWindowProc(const HWND hWnd, IWindowProc* const windowProc)
 	{
 		SetLastError(DWORD{0});
@@ -68,9 +71,7 @@ namespace PonyEngine::Window
 	{
 		SetLastError(DWORD{0});
 
-		IWindowProc* const windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA));
-
-		if (windowProc != nullptr) [[likely]]
+		if (const auto windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA)); windowProc != nullptr) [[likely]]
 		{
 			return windowProc->WindowProc(uMsg, wParam, lParam);
 		}

@@ -32,7 +32,7 @@ namespace Debug::Log
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Debug::Log::ISubLogger* const  consoleSubLogger = PonyEngine::Debug::Log::CreateConsoleSubLogger();
+			PonyEngine::Debug::Log::ISubLogger* const consoleSubLogger = PonyEngine::Debug::Log::CreateConsoleSubLogger();
 			Assert::AreEqual("PonyEngine::Debug::Log::ConsoleSubLogger", consoleSubLogger->GetName());
 			PonyEngine::Debug::Log::DestroyConsoleSubLogger(consoleSubLogger);
 		}

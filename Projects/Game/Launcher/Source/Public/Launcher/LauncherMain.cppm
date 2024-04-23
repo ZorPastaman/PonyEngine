@@ -27,22 +27,25 @@ import :IPlatformQuitChecker;
 
 using LogType = PonyEngine::Debug::Log::LogType;
 
-namespace Launcher
+export namespace Launcher
 {
 	/// @brief Main function.
 	/// @param logger Logger to use.
 	/// @param quitChecker Platform quit checker.
 	/// @param platformEngineParamsProvider Platform engine params provider.
 	/// @return Exit code.
-	export int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& engineParamsProvider);
+	int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider);
+}
 
+namespace Launcher
+{
 	int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
 	{
 		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine params provider.");
 		const EngineParamsProvider engineParamsProvider(logger);
 		PONY_LOG_GENERAL(logger, LogType::Info, "Engine params provider created.");
 		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine runner.");
-		EngineRunner engineRunner(logger, engineParamsProvider, platformEngineParamsProvider);
+		const EngineRunner engineRunner(logger, engineParamsProvider, platformEngineParamsProvider);
 		PONY_LOG_GENERAL(logger, LogType::Info, "Engine runner created.");
 
 		PONY_LOG_GENERAL(logger, LogType::Info, "Start a main loop.");

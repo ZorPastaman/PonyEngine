@@ -34,10 +34,10 @@ import :WindowParams;
 import :WindowProcFunction;
 import :WindowsWindow;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Windows window factory.
-	export class WindowsWindowFactory final : public IWindowsWindowFactory
+	class WindowsWindowFactory final : public IWindowsWindowFactory
 	{
 	public:
 		/// @brief Creates a Windows window factory.
@@ -48,40 +48,46 @@ namespace PonyEngine::Window
 		WindowsWindowFactory(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory(WindowsWindowFactory&&) = delete;
 
-		virtual ~WindowsWindowFactory() noexcept;
+		~WindowsWindowFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
 		virtual IWindowsWindow* Create(Core::IEngine& engine) override;
 		virtual void Destroy(IWindow* window) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual const wchar_t* GetTitle() const noexcept override;
-		inline virtual void SetTitle(const wchar_t* title) noexcept override;
+		virtual const wchar_t* GetTitle() const noexcept override;
+		virtual void SetTitle(const wchar_t* title) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual const char* GetWindowName() const noexcept override;
+		virtual const char* GetWindowName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		inline virtual int GetCmdShow() const noexcept override;
-		inline virtual void SetCmdShow(int cmdShow) noexcept override;
+		virtual int GetCmdShow() const noexcept override;
+		virtual void SetCmdShow(int cmdShow) noexcept override;
 
 		WindowsWindowFactory& operator =(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory& operator =(WindowsWindowFactory&&) = delete;
 
 	private:
-		WindowParams m_windowParams; /// @brief Window parameters.
+		WindowParams m_windowParams; ///< Window parameters.
 
-		Debug::Log::ILogger& m_logger; /// @brief Logger.
+		Debug::Log::ILogger& m_logger; ///< Logger.
 
-		HINSTANCE m_hInstance; /// @brief This dll instance.
-		ATOM m_className; /// @brief Window class atom.
+		HINSTANCE m_hInstance; ///< This dll instance.
+		ATOM m_className; ///< Window class atom.
 	};
+}
 
-	/// @brief Empty function.
-	static void Dummy();
+namespace PonyEngine::Window
+{
+	namespace 
+	{
+		/// @brief Empty function.
+		void Dummy() {}
+	}
+	
 
 	WindowsWindowFactory::WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams) :
-		m_windowParams(),
 		m_logger{logger},
 		m_hInstance{NULL}		
 	{
@@ -93,7 +99,7 @@ namespace PonyEngine::Window
 		const wchar_t* const className = classParams.GetWindowClassName().c_str();
 
 		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Load a main cursor. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
-		HCURSOR cursor = static_cast<HCURSOR>(LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
+		const auto cursor = static_cast<HCURSOR>(LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (cursor == NULL)
 		{
 			throw std::logic_error(std::format("Couldn't load a class cursor. Error code: '{}'", GetLastError()));
@@ -134,7 +140,7 @@ namespace PonyEngine::Window
 
 	IWindowsWindow* WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
-		WindowsWindow* const window = new WindowsWindow(engine, m_hInstance, m_className, m_windowParams);
+		const auto window = new WindowsWindow(engine, m_hInstance, m_className, m_windowParams);
 		const HWND hWnd = window->GetWindowHandle();
 		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Register a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		RegisterWindowProc(hWnd, window);
@@ -146,7 +152,7 @@ namespace PonyEngine::Window
 	void WindowsWindowFactory::Destroy(IWindow* const window) noexcept
 	{
 		assert((dynamic_cast<WindowsWindow*>(window) != nullptr));
-		WindowsWindow* const windowsWindow = static_cast<WindowsWindow*>(window);
+		const auto windowsWindow = static_cast<WindowsWindow*>(window);
 		const HWND hWnd = windowsWindow->GetWindowHandle();
 
 		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Unregister a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
@@ -172,32 +178,28 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Windows window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 	}
 
-	inline const wchar_t* WindowsWindowFactory::GetTitle() const noexcept
+	const wchar_t* WindowsWindowFactory::GetTitle() const noexcept
 	{
 		return m_windowParams.title.c_str();
 	}
 
-	inline void WindowsWindowFactory::SetTitle(const wchar_t* const title) noexcept
+	void WindowsWindowFactory::SetTitle(const wchar_t* const title) noexcept
 	{
 		m_windowParams.title = title;
 	}
 
-	inline const char* WindowsWindowFactory::GetWindowName() const noexcept
+	const char* WindowsWindowFactory::GetWindowName() const noexcept
 	{
 		return WindowsWindow::Name;
 	}
 
-	inline int WindowsWindowFactory::GetCmdShow() const noexcept
+	int WindowsWindowFactory::GetCmdShow() const noexcept
 	{
 		return m_windowParams.cmdShow;
 	}
 
-	inline void WindowsWindowFactory::SetCmdShow(const int cmdShow) noexcept
+	void WindowsWindowFactory::SetCmdShow(const int cmdShow) noexcept
 	{
 		m_windowParams.cmdShow = cmdShow;
-	}
-
-	void Dummy()
-	{
 	}
 }

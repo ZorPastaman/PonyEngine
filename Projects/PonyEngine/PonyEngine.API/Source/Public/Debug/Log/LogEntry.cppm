@@ -25,17 +25,18 @@ import <string>;
 
 import :LogType;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Debug::Log
 {
 	/// @brief Information that must be logged.
-	export class LogEntry final
+	class LogEntry final
 	{
 	public:
 		/// @brief Creates a log entry.
 		/// @param message Log message.
+		/// @param exception Exception. Optional - can be nullptr.
 		/// @param timePoint Time when the log entry is created.
 		/// @param frameCount Frame when the log entry is created.
-		/// @param logType Log type.
+		/// @param logType Log type. It must be Exception if @p exception isn't nullptr.
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -48,23 +49,23 @@ namespace PonyEngine::Debug::Log
 		/// @brief Gets a log message.
 		/// @return Log message. May be nullptr.
 		[[nodiscard("Pure function")]]
-		inline const char* GetMessage() const noexcept;
+		const char* GetMessage() const noexcept;
 		/// @brief Gets an exception.
 		/// @return Exception. May be nullptr.
 		[[nodiscard("Pure function")]]
-		inline const std::exception* GetException() const noexcept;
+		const std::exception* GetException() const noexcept;
 		/// @brief Gets a time point.
 		/// @return Time point.
 		[[nodiscard("Pure function")]]
-		inline std::chrono::time_point<std::chrono::system_clock> GetTimePoint() const noexcept;
+		std::chrono::time_point<std::chrono::system_clock> GetTimePoint() const noexcept;
 		/// @brief Gets a frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
-		inline std::size_t GetFrameCount() const noexcept;
+		std::size_t GetFrameCount() const noexcept;
 		/// @brief Gets a log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
-		inline LogType GetLogType() const noexcept;
+		LogType GetLogType() const noexcept;
 
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Created string.
@@ -79,55 +80,57 @@ namespace PonyEngine::Debug::Log
 		[[nodiscard("Pure function")]]
 		std::string MakeString() const noexcept;
 
-		const char* const m_message; /// @brief Log message.
-		const std::exception* const m_exception; /// @brief Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
-		const std::chrono::time_point<std::chrono::system_clock> m_timePoint; /// @brief Time when the log entry is created.
-		const std::size_t m_frameCount; /// @brief Frame when the log entry is created.
-		const LogType m_logType; /// @brief Log type.
+		const char* m_message; ///< Log message.
+		const std::exception* m_exception; ///< Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
+		std::chrono::time_point<std::chrono::system_clock> m_timePoint; ///< Time when the log entry is created.
+		std::size_t m_frameCount; ///< Frame when the log entry is created.
+		LogType m_logType; ///< Log type.
 
-		mutable std::string m_stringCache; /// @brief ToString() cache.
-		mutable bool m_isDirty; /// @brief If it's @a true, the cache is invalid.
+		mutable std::string m_stringCache; ///< ToString() cache.
+		mutable bool m_isDirty; ///< If it's @a true, the cache is invalid.
 	};
 
 	/// @brief Puts logEntry.ToString() into the @p stream.
 	/// @param stream Target stream.
 	/// @param logEntry Input source.
 	/// @return @p stream.
-	export inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
+	std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
+}
 
+namespace PonyEngine::Debug::Log
+{
 	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
 		m_message(message),
 		m_exception(exception),
 		m_timePoint(timePoint),
 		m_frameCount{frameCount},
 		m_logType{logType},
-		m_stringCache(),
 		m_isDirty{true}
 	{
 		assert(((logType != LogType::Exception && exception == nullptr) || (logType == LogType::Exception && exception != nullptr)));
 	}
 
-	inline const char* LogEntry::GetMessage() const noexcept
+	const char* LogEntry::GetMessage() const noexcept
 	{
 		return m_message;
 	}
 
-	inline const std::exception* LogEntry::GetException() const noexcept
+	const std::exception* LogEntry::GetException() const noexcept
 	{
 		return m_exception;
 	}
 
-	inline std::chrono::time_point<std::chrono::system_clock> LogEntry::GetTimePoint() const noexcept
+	std::chrono::time_point<std::chrono::system_clock> LogEntry::GetTimePoint() const noexcept
 	{
 		return m_timePoint;
 	}
 
-	inline std::size_t LogEntry::GetFrameCount() const noexcept
+	std::size_t LogEntry::GetFrameCount() const noexcept
 	{
 		return m_frameCount;
 	}
 
-	inline LogType LogEntry::GetLogType() const noexcept
+	LogType LogEntry::GetLogType() const noexcept
 	{
 		return m_logType;
 	}
@@ -164,7 +167,7 @@ namespace PonyEngine::Debug::Log
 		return std::string();
 	}
 
-	inline std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
+	std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
 	{
 		return stream << logEntry.ToString();
 	}

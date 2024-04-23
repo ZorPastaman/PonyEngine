@@ -391,7 +391,10 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector);
+}
 
+namespace PonyEngine::Math
+{
 	template<Arithmetic T>
 	constexpr Vector3<T>::Vector3() noexcept :
 		Vector3(T{}, T{}, T{})
@@ -501,7 +504,7 @@ export namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr  const T* Vector3<T>::Data() const noexcept
+	constexpr const T* Vector3<T>::Data() const noexcept
 	{
 		return m_components.data();
 	}

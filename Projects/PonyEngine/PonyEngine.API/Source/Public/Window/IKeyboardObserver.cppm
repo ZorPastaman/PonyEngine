@@ -13,10 +13,10 @@ import PonyEngine.Utility;
 
 import :KeyboardMessage;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Object that accepts an input from a keyboard.
-	export class IKeyboardObserver : public Utility::INamed
+	class IKeyboardObserver : public Utility::INamed
 	{
 	public:
 		/// @brief Receives a new keyboard input.
@@ -24,6 +24,6 @@ namespace PonyEngine::Window
 		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
 
 	protected:
-		inline virtual ~IKeyboardObserver() noexcept = default;
+		~IKeyboardObserver() noexcept = default;
 	};
 }
