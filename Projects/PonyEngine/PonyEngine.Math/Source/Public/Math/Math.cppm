@@ -13,6 +13,8 @@ export import :Common;
 export import :Matrix2x2;
 export import :Matrix3x3;
 export import :Quaternion;
+export import :Transformations2D;
+export import :Transformations3D;
 export import :Vector2;
 export import :Vector3;
 export import :Vector4;

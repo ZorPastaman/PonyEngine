@@ -204,34 +204,22 @@ namespace Math
 			float zf = 7.f;
 			float wf = 14.f;
 			auto vectorF = PonyEngine::Math::Vector4<float>(xf, yf, zf, wf);
-			auto inversedF = vectorF.Inversed();
+			auto inversedF = vectorF.Swap();
 			Assert::AreEqual(wf, inversedF.X());
 			Assert::AreEqual(zf, inversedF.Y());
 			Assert::AreEqual(yf, inversedF.Z());
 			Assert::AreEqual(xf, inversedF.W());
-
-			vectorF.Inverse();
-			Assert::AreEqual(inversedF.X(), vectorF.X());
-			Assert::AreEqual(inversedF.Y(), vectorF.Y());
-			Assert::AreEqual(inversedF.Z(), vectorF.Z());
-			Assert::AreEqual(inversedF.W(), vectorF.W());
 
 			short xi = -5;
 			short yi = 15;
 			short zi = 7;
 			short wi = 14;
 			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
-			auto inversedI = vectorI.Inversed();
-			Assert::AreEqual(wi, inversedI.X());
-			Assert::AreEqual(zi, inversedI.Y());
-			Assert::AreEqual(yi, inversedI.Z());
-			Assert::AreEqual(xi, inversedI.W());
-
-			vectorI.Inverse();
-			Assert::AreEqual(inversedI.X(), vectorI.X());
-			Assert::AreEqual(inversedI.Y(), vectorI.Y());
-			Assert::AreEqual(inversedI.Z(), vectorI.Z());
-			Assert::AreEqual(inversedI.W(), vectorI.W());
+			auto swappedI = vectorI.Swap();
+			Assert::AreEqual(wi, swappedI.X());
+			Assert::AreEqual(zi, swappedI.Y());
+			Assert::AreEqual(yi, swappedI.Z());
+			Assert::AreEqual(xi, swappedI.W());
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -944,17 +932,17 @@ namespace Math
 			static constexpr PonyEngine::Math::Vector4<float> StaticVector(0.f, 1.f, 0.f, 0.f);
 			constexpr auto pointer = StaticVector.Data();
 
-			constexpr auto one = PonyEngine::Math::Vector4<float>::CreateOne();
+			constexpr auto one = PonyEngine::Math::Vector4<float>::OneConsteval();
 			Assert::AreEqual(1.f, one.X());
 			Assert::AreEqual(1.f, one.Y());
 			Assert::AreEqual(1.f, one.Z());
 			Assert::AreEqual(1.f, one.W());
-			constexpr auto zero = PonyEngine::Math::Vector4<float>::CreateZero();
+			constexpr auto zero = PonyEngine::Math::Vector4<float>::ZeroConsteval();
 			Assert::AreEqual(0.f, zero.X());
 			Assert::AreEqual(0.f, zero.Y());
 			Assert::AreEqual(0.f, zero.Z());
 			Assert::AreEqual(0.f, zero.W());
-			constexpr auto negative = PonyEngine::Math::Vector4<float>::CreateNegative();
+			constexpr auto negative = PonyEngine::Math::Vector4<float>::NegativeConsteval();
 			Assert::AreEqual(-1.f, negative.X());
 			Assert::AreEqual(-1.f, negative.Y());
 			Assert::AreEqual(-1.f, negative.Z());

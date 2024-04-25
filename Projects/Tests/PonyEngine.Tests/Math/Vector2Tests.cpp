@@ -150,24 +150,16 @@ namespace Math
 			float xf = -5.f;
 			float yf = 15.f;
 			auto vectorF = PonyEngine::Math::Vector2<float>(xf, yf);
-			auto inversedF = vectorF.Inversed();
-			Assert::AreEqual(yf, inversedF.X());
-			Assert::AreEqual(xf, inversedF.Y());
-
-			vectorF.Inverse();
-			Assert::AreEqual(inversedF.X(), vectorF.X());
-			Assert::AreEqual(inversedF.Y(), vectorF.Y());
+			auto swappedF = vectorF.Swap();
+			Assert::AreEqual(yf, swappedF.X());
+			Assert::AreEqual(xf, swappedF.Y());
 
 			short xi = -5;
 			short yi = 15;
 			auto vectorI = PonyEngine::Math::Vector2<short>(xi, yi);
-			auto inversedI = vectorI.Inversed();
-			Assert::AreEqual(yi, inversedI.X());
-			Assert::AreEqual(xi, inversedI.Y());
-
-			vectorI.Inverse();
-			Assert::AreEqual(inversedI.X(), vectorI.X());
-			Assert::AreEqual(inversedI.Y(), vectorI.Y());
+			auto swappedI = vectorI.Swap();
+			Assert::AreEqual(yi, swappedI.X());
+			Assert::AreEqual(xi, swappedI.Y());
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -428,58 +420,39 @@ namespace Math
 			auto vectorF = PonyEngine::Math::Vector2<float>(1.f, 0.f);
 			auto vectorF1 = PonyEngine::Math::Vector2<float>(1.f, 0.f);
 			Assert::AreEqual(0.f, PonyEngine::Math::Angle(vectorF, vectorF1));
-			Assert::AreEqual(0.f, PonyEngine::Math::AngleDegrees(vectorF, vectorF1));
 			Assert::AreEqual(0.f, PonyEngine::Math::AngleSigned(vectorF, vectorF1));
-			Assert::AreEqual(0.f, PonyEngine::Math::AngleSignedDegrees(vectorF, vectorF1));
 
 			vectorF1.Set(0.f, 1.f);
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.5f, PonyEngine::Math::Angle(vectorF, vectorF1));
-			Assert::AreEqual(90.f, PonyEngine::Math::AngleDegrees(vectorF, vectorF1));
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.5f, PonyEngine::Math::AngleSigned(vectorF, vectorF1));
-			Assert::AreEqual(90.f, PonyEngine::Math::AngleSignedDegrees(vectorF, vectorF1));
 			Assert::AreEqual(-std::numbers::pi_v<float> *0.5f, PonyEngine::Math::AngleSigned(vectorF1, vectorF));
-			Assert::AreEqual(-90.f, PonyEngine::Math::AngleSignedDegrees(vectorF1, vectorF));
 
 			vectorF1.Set(-1.f, 0.f);
 			Assert::AreEqual(std::numbers::pi_v<float>, PonyEngine::Math::Angle(vectorF, vectorF1));
-			Assert::AreEqual(180.f, PonyEngine::Math::AngleDegrees(vectorF, vectorF1));
 			Assert::AreEqual(std::numbers::pi_v<float>, PonyEngine::Math::AngleSigned(vectorF, vectorF1));
-			Assert::AreEqual(180.f, PonyEngine::Math::AngleSignedDegrees(vectorF, vectorF1));
 			Assert::AreEqual(std::numbers::pi_v<float>, PonyEngine::Math::AngleSigned(vectorF, vectorF1));
-			Assert::AreEqual(180.f, PonyEngine::Math::AngleSignedDegrees(vectorF, vectorF1));
 
 			vectorF.Set(1.f, 0.f);
 			vectorF1.Set(0.5f, 0.5f);
 			vectorF1.Normalize();
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.25f, PonyEngine::Math::Angle(vectorF, vectorF1));
-			Assert::AreEqual(45.f, PonyEngine::Math::AngleDegrees(vectorF, vectorF1));
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.25f, PonyEngine::Math::AngleSigned(vectorF, vectorF1));
-			Assert::AreEqual(45.f, PonyEngine::Math::AngleSignedDegrees(vectorF, vectorF1));
 			Assert::AreEqual(-std::numbers::pi_v<float> * 0.25f, PonyEngine::Math::AngleSigned(vectorF1, vectorF));
-			Assert::AreEqual(-45.f, PonyEngine::Math::AngleSignedDegrees(vectorF1, vectorF));
 
 			auto vectorI = PonyEngine::Math::Vector2<short>(1, 0);
 			auto vectorI1 = PonyEngine::Math::Vector2<short>(1, 0);
 			Assert::AreEqual(0.f, PonyEngine::Math::Angle(vectorI, vectorI1));
-			Assert::AreEqual(0.f, PonyEngine::Math::AngleDegrees(vectorI, vectorI1));
 			Assert::AreEqual(0.f, PonyEngine::Math::AngleSigned(vectorI1, vectorI));
-			Assert::AreEqual(0.f, PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI));
 
 			vectorI1.Set(0, 1);
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.5f, PonyEngine::Math::Angle(vectorI, vectorI1));
-			Assert::AreEqual(90.f, PonyEngine::Math::AngleDegrees(vectorI, vectorI1));
 			Assert::AreEqual(std::numbers::pi_v<float> * 0.5f, PonyEngine::Math::AngleSigned(vectorI, vectorI1));
-			Assert::AreEqual(90.f, PonyEngine::Math::AngleSignedDegrees(vectorI, vectorI1));
 			Assert::AreEqual(-std::numbers::pi_v<float> * 0.5f, PonyEngine::Math::AngleSigned(vectorI1, vectorI));
-			Assert::AreEqual(-90.f, PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI));
 
 			vectorI1.Set(-1, 0);
 			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::Angle(vectorI, vectorI1)));
-			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleDegrees(vectorI, vectorI1)));
 			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::AngleSigned(vectorI, vectorI1)));
-			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleSignedDegrees(vectorI, vectorI1)));
 			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(PonyEngine::Math::AngleSigned(vectorI1, vectorI)));
-			Assert::AreEqual(180.f, std::abs(PonyEngine::Math::AngleSignedDegrees(vectorI1, vectorI)));
 		}
 
 		TEST_METHOD(ProjectTest)
@@ -827,25 +800,25 @@ namespace Math
 			static constexpr PonyEngine::Math::Vector2<float> StaticVector(0.f, 1.f);
 			constexpr auto pointer = StaticVector.Data();
 
-			constexpr auto up = PonyEngine::Math::Vector2<float>::CreateUp();
+			constexpr auto up = PonyEngine::Math::Vector2<float>::UpConsteval();
 			Assert::AreEqual(0.f, up.X());
 			Assert::AreEqual(1.f, up.Y());
-			constexpr auto down = PonyEngine::Math::Vector2<float>::CreateDown();
+			constexpr auto down = PonyEngine::Math::Vector2<float>::DownConsteval();
 			Assert::AreEqual(0.f, down.X());
 			Assert::AreEqual(-1.f, down.Y());
-			constexpr auto right = PonyEngine::Math::Vector2<float>::CreateRight();
+			constexpr auto right = PonyEngine::Math::Vector2<float>::RightConsteval();
 			Assert::AreEqual(1.f, right.X());
 			Assert::AreEqual(0.f, right.Y());
-			constexpr auto left = PonyEngine::Math::Vector2<float>::CreateLeft();
+			constexpr auto left = PonyEngine::Math::Vector2<float>::LeftConsteval();
 			Assert::AreEqual(-1.f, left.X());
 			Assert::AreEqual(0.f, left.Y());
-			constexpr auto one = PonyEngine::Math::Vector2<float>::CreateOne();
+			constexpr auto one = PonyEngine::Math::Vector2<float>::OneConsteval();
 			Assert::AreEqual(1.f, one.X());
 			Assert::AreEqual(1.f, one.Y());
-			constexpr auto zero = PonyEngine::Math::Vector2<float>::CreateZero();
+			constexpr auto zero = PonyEngine::Math::Vector2<float>::ZeroConsteval();
 			Assert::AreEqual(0.f, zero.X());
 			Assert::AreEqual(0.f, zero.Y());
-			constexpr auto negative = PonyEngine::Math::Vector2<float>::CreateNegative();
+			constexpr auto negative = PonyEngine::Math::Vector2<float>::NegativeConsteval();
 			Assert::AreEqual(-1.f, negative.X());
 			Assert::AreEqual(-1.f, negative.Y());
 

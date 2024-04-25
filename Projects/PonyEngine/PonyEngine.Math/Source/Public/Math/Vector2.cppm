@@ -49,37 +49,37 @@ export namespace PonyEngine::Math
 		/// @return Up vector.
 		///	@remark For non-constexpr execution use @p Vector2::Up variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateUp();
+		static consteval Vector2 UpConsteval();
 		/// @brief Creates a Vector2(0, -1).
 		/// @return Down vector.
 		///	@remark For non-constexpr execution use @p Vector2::Down variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateDown();
+		static consteval Vector2 DownConsteval();
 		/// @brief Creates a Vector2(1, 0).
 		/// @return Right vector.
 		///	@remark For non-constexpr execution use @p Vector2::Right variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateRight();
+		static consteval Vector2 RightConsteval();
 		/// @brief Creates a Vector2(-1, 0).
 		/// @return Left vector.
 		///	@remark For non-constexpr execution use @p Vector2::Left variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateLeft();
+		static consteval Vector2 LeftConsteval();
 		/// @brief Creates a Vector2(1, 1).
 		/// @return One vector.
 		///	@remark For non-constexpr execution use @p Vector2::One variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateOne();
+		static consteval Vector2 OneConsteval();
 		/// @brief Creates a Vector2(0, 0).
 		/// @return Zero vector.
 		///	@remark For non-constexpr execution use @p Vector2::Zero variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateZero();
+		static consteval Vector2 ZeroConsteval();
 		/// @brief Creates a Vector2(-1, -1).
 		/// @return Negative vector.
 		///	@remark For non-constexpr execution use @p Vector2::Negative variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector2 CreateNegative();
+		static consteval Vector2 NegativeConsteval();
 
 		/// @brief Gets an x-component.
 		/// @return X-component.
@@ -123,12 +123,10 @@ export namespace PonyEngine::Math
 		/// @brief Normalizes the vector.
 		void Normalize() noexcept;
 
-		/// @brief Computes a vector inversed to this one.
-		/// @return Inversed vector.
+		/// @brief Swap components and return a vector in order y, x.
+		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2 Inversed() const noexcept;
-		/// @brief Inverses the vector.
-		void Inverse() noexcept;
+		constexpr Vector2 Swap() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -227,22 +225,6 @@ export namespace PonyEngine::Math
 	/// @return Angle in radians.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	typename Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-	/// @brief Computes an angle between two vectors.
-	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
-	/// @return Angle in degrees.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector2<T>::ComputationalType AngleDegrees(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-	/// @brief Computes a signed angle between two vectors.
-	///        Sign is positive if the rotation is counterclockwise.
-	///        Sign is negative if the rotation is clockwise.
-	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
-	/// @return Angle in degrees.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector2<T>::ComputationalType AngleSignedDegrees(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Projects the @p vector onto the @p target.
 	/// @tparam T Component type.
@@ -322,8 +304,8 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator *(const Vector2<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector2<T> operator *(const Vector2<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param vector Multiplicand.
@@ -336,8 +318,8 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector2<T> operator *(T multiplier, const Vector2<T>& vector) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector2<T> operator *(T multiplier, const Vector2<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
@@ -378,43 +360,43 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateUp()
+	consteval Vector2<T> Vector2<T>::UpConsteval()
 	{
 		return Vector2(T{0}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateDown()
+	consteval Vector2<T> Vector2<T>::DownConsteval()
 	{
 		return Vector2(T{0}, T{-1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateRight()
+	consteval Vector2<T> Vector2<T>::RightConsteval()
 	{
 		return Vector2(T{1}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateLeft()
+	consteval Vector2<T> Vector2<T>::LeftConsteval()
 	{
 		return Vector2(T{-1}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateOne()
+	consteval Vector2<T> Vector2<T>::OneConsteval()
 	{
 		return Vector2(T{1}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateZero()
+	consteval Vector2<T> Vector2<T>::ZeroConsteval()
 	{
 		return Vector2(T{0}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector2<T> Vector2<T>::CreateNegative()
+	consteval Vector2<T> Vector2<T>::NegativeConsteval()
 	{
 		return Vector2(T{-1}, T{-1});
 	}
@@ -480,15 +462,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Vector2<T>::Inversed() const noexcept
+	constexpr Vector2<T> Vector2<T>::Swap() const noexcept
 	{
 		return Vector2(Y(), X());
-	}
-
-	template<Arithmetic T>
-	void Vector2<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<Arithmetic T>
@@ -537,18 +513,6 @@ namespace PonyEngine::Math
 		const T zCross = left.X() * right.Y() - left.Y() * right.X();
 
 		return std::copysign(angle, static_cast<typename Vector2<T>::ComputationalType>(zCross));
-	}
-
-	template<Arithmetic T>
-	typename Vector2<T>::ComputationalType AngleDegrees(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return Angle(left, right) * RadToDeg<typename Vector2<T>::ComputationalType>;
-	}
-
-	template<Arithmetic T>
-	typename Vector2<T>::ComputationalType AngleSignedDegrees(const Vector2<T>& left, const Vector2<T>& right) noexcept
-	{
-		return AngleSigned(left, right) * RadToDeg<typename Vector2<T>::ComputationalType>;
 	}
 
 	template<Arithmetic T>
@@ -678,8 +642,8 @@ namespace PonyEngine::Math
 		return Vector2<T>(left.X() - right.X(), left.Y() - right.Y());
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T> operator *(const Vector2<T>& vector, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector2<T> operator *(const Vector2<T>& vector, const T multiplier) noexcept
 	{
 		return Vector2<T>(vector.X() * multiplier, vector.Y() * multiplier);
 	}
@@ -693,8 +657,8 @@ namespace PonyEngine::Math
 		return Vector2<T>(x, y);
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T> operator *(const T multiplier, const Vector2<T>& vector) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector2<T> operator *(const T multiplier, const Vector2<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
