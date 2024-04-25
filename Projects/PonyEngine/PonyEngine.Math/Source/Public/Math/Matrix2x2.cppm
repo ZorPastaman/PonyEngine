@@ -10,7 +10,6 @@
 export module PonyEngine.Math:Matrix2x2;
 
 import <array>;
-import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
@@ -123,30 +122,12 @@ export namespace PonyEngine::Math
 		/// @return Identity matrix.
 		///	@remark For non-constexpr execution use @p Matrix2x2::Identity variable.
 		[[nodiscard("Pure function")]]
-		static consteval Matrix2x2 CreateIdentity();
+		static consteval Matrix2x2 IdentityConsteval();
 		/// @brief Creates a Matrix2x2(0, 0, 0, 0).
 		/// @return Zero matrix.
 		///	@remark For non-constexpr execution use @p Matrix2x2::Zero variable.
 		[[nodiscard("Pure function")]]
-		static consteval Matrix2x2 CreateZero();
-
-		/// @brief Creates a rotation matrix for a @p Vector2.
-		/// @param angle Rotation angle in radians.
-		/// @return Rotation matrix.
-		[[nodiscard("Pure function")]]
-		static Matrix2x2 CreateRotation(T angle) noexcept requires(std::is_floating_point_v<T>);
-		/// @brief Creates a rotation matrix for a @p Vector2.
-		/// @param angle Rotation angle in degrees.
-		/// @return Rotation matrix.
-		[[nodiscard("Pure function")]]
-		static Matrix2x2 CreateRotationDegrees(T angle) noexcept requires(std::is_floating_point_v<T>);
-
-		/// @brief Creates a rotation matrix representing a rotation  from the vector @p fromDirection to the vector @p toDirection.
-		/// @param fromDirection From direction. Must be normalized.
-		/// @param toDirection To direction. Must be normalized.
-		/// @return Rotation matrix.
-		[[nodiscard("Pure function")]]
-		static Matrix2x2 CreateByDirection(const Vector2<T>& fromDirection, const Vector2<T>& toDirection) noexcept requires(std::is_floating_point_v<T>);
+		static consteval Matrix2x2 ZeroConsteval();
 
 		/// @brief Gets a component 00.
 		/// @return Component 00.
@@ -202,16 +183,11 @@ export namespace PonyEngine::Math
 		/// @brief Computes a transpose of the matrix.
 		/// @return Transpose.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix2x2 Transposed() const noexcept;
-		/// @brief Transposes the matrix.
-		void Transpose() noexcept;
-
+		constexpr Matrix2x2 Transpose() const noexcept;
 		/// @brief Computes an inverse of the matrix.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix2x2 Inversed() const noexcept;
-		/// @brief Inverses the matrix.
-		void Inverse() noexcept;
+		constexpr Matrix2x2 Inverse() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -372,8 +348,8 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, T multiplier) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, T multiplier) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -386,8 +362,8 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Matrix2x2<T> operator *(T multiplier, const Matrix2x2<T>& matrix) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Matrix2x2<T> operator *(T multiplier, const Matrix2x2<T>& matrix) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -490,36 +466,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Matrix2x2<T> Matrix2x2<T>::CreateIdentity()
+	consteval Matrix2x2<T> Matrix2x2<T>::IdentityConsteval()
 	{
 		return Matrix2x2(T{1}, T{0}, T{0}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Matrix2x2<T> Matrix2x2<T>::CreateZero()
+	consteval Matrix2x2<T> Matrix2x2<T>::ZeroConsteval()
 	{
 		return Matrix2x2(T{0}, T{0}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	Matrix2x2<T> Matrix2x2<T>::CreateRotation(const T angle) noexcept requires(std::is_floating_point_v<T>)
-	{
-		const T angleSin = std::sin(angle);
-		const T angleCos = std::cos(angle);
-
-		return Matrix2x2(angleCos, angleSin, -angleSin, angleCos);
-	}
-
-	template<Arithmetic T>
-	Matrix2x2<T> Matrix2x2<T>::CreateRotationDegrees(const T angle) noexcept requires(std::is_floating_point_v<T>)
-	{
-		return CreateRotation(angle * DegToRad<T>);
-	}
-
-	template<Arithmetic T>
-	Matrix2x2<T> Matrix2x2<T>::CreateByDirection(const Vector2<T>& fromDirection, const Vector2<T>& toDirection) noexcept requires(std::is_floating_point_v<T>)
-	{
-		return CreateRotation(AngleSigned(fromDirection, toDirection));
 	}
 
 	template<Arithmetic T>
@@ -595,27 +550,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2<T>::Transposed() const noexcept
+	constexpr Matrix2x2<T> Matrix2x2<T>::Transpose() const noexcept
 	{
 		return Matrix2x2(M00(), M01(), M10(), M11());
 	}
 
 	template<Arithmetic T>
-	void Matrix2x2<T>::Transpose() noexcept
-	{
-		*this = Transposed();
-	}
-
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2<T>::Inversed() const noexcept
+	constexpr Matrix2x2<T> Matrix2x2<T>::Inverse() const noexcept
 	{
 		return Adjugate() * (ComputationalType{1} / Determinant());
-	}
-
-	template<Arithmetic T>
-	void Matrix2x2<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<Arithmetic T>
@@ -829,8 +772,8 @@ namespace PonyEngine::Math
 		return Matrix2x2<T>(left.M00() - right.M00(), left.M10() - right.M10(), left.M01() - right.M01(), left.M11() - right.M11());
 	}
 
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, const T multiplier) noexcept
 	{
 		return Matrix2x2<T>(matrix.M00() * multiplier, matrix.M10() * multiplier, matrix.M01() * multiplier, matrix.M11() * multiplier);
 	}
@@ -846,8 +789,8 @@ namespace PonyEngine::Math
 		return Matrix2x2<T>(m00, m10, m01, m11);
 	}
 
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> operator *(const T multiplier, const Matrix2x2<T>& matrix) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Matrix2x2<T> operator *(const T multiplier, const Matrix2x2<T>& matrix) noexcept
 	{
 		return matrix * multiplier;
 	}

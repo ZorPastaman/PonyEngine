@@ -51,47 +51,47 @@ export namespace PonyEngine::Math
 		/// @return Up vector.
 		///	@remark For non-constexpr execution use @p Vector3::Forward variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateForward();
+		static consteval Vector3 ForwardConsteval();
 		/// @brief Creates a Vector3(0, 0, -1).
 		/// @return Down vector.
 		///	@remark For non-constexpr execution use @p Vector3::Back variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateBack();
+		static consteval Vector3 BackConsteval();
 		/// @brief Creates a Vector3(0, 1, 0).
 		/// @return Up vector.
 		///	@remark For non-constexpr execution use @p Vector3::Up variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateUp();
+		static consteval Vector3 UpConsteval();
 		/// @brief Creates a Vector3(0, -1, 0).
 		/// @return Down vector.
 		///	@remark For non-constexpr execution use @p Vector3::Down variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateDown();
+		static consteval Vector3 DownConsteval();
 		/// @brief Creates a Vector3(1, 0, 0).
 		/// @return Right vector.
 		///	@remark For non-constexpr execution use @p Vector3::Right variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateRight();
+		static consteval Vector3 RightConsteval();
 		/// @brief Creates a Vector3(-1, 0, 0).
 		/// @return Left vector.
 		///	@remark For non-constexpr execution use @p Vector3::Left variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateLeft();
+		static consteval Vector3 LeftConsteval();
 		/// @brief Creates a Vector3(1, 1, 1).
 		/// @return One vector.
 		///	@remark For non-constexpr execution use @p Vector3::One variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateOne();
+		static consteval Vector3 OneConsteval();
 		/// @brief Creates a Vector3(0, 0, 0).
 		/// @return Zero vector.
 		///	@remark For non-constexpr execution use @p Vector3::Zero variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateZero();
+		static consteval Vector3 ZeroConsteval();
 		/// @brief Creates a Vector3(-1, -1, -1).
 		/// @return Negative vector.
 		///	@remark For non-constexpr execution use @p Vector3::Negative variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector3 CreateNegative();
+		static consteval Vector3 NegativeConsteval();
 
 		/// @brief Gets an x-component.
 		/// @return X-component.
@@ -145,12 +145,10 @@ export namespace PonyEngine::Math
 		/// @details This vector must be non-zero.
 		void Normalize() noexcept;
 
-		/// @brief Computes a vector inversed to this one.
-		/// @return Inversed vector.
+		/// @brief Swap components and return a vector in order z, y, x.
+		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
-		constexpr Vector3 Inversed() const noexcept;
-		/// @brief Inverses the vector.
-		void Inverse() noexcept;
+		constexpr Vector3 Swap() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -257,22 +255,6 @@ export namespace PonyEngine::Math
 	/// @return Angle in radians.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	typename Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
-	/// @brief Computes an angle between two vectors.
-	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
-	/// @return Angle in degrees.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept;
-	/// @brief Computes a signed angle between two vectors.
-	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
-	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
-	/// @param axis Sign reference.
-	/// @return Angle in degrees.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
 
 	/// @brief Projects the @p vector onto the @p target.
 	/// @tparam T Component type.
@@ -352,8 +334,8 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector3<T> operator *(const Vector3<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param vector Multiplicand.
@@ -366,8 +348,8 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector3<T> operator *(T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator *(T multiplier, const Vector3<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
@@ -408,55 +390,55 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateForward()
+	consteval Vector3<T> Vector3<T>::ForwardConsteval()
 	{
 		return Vector3(T{0}, T{0}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateBack()
+	consteval Vector3<T> Vector3<T>::BackConsteval()
 	{
 		return Vector3(T{0}, T{0}, T{-1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateUp()
+	consteval Vector3<T> Vector3<T>::UpConsteval()
 	{
 		return Vector3(T{0}, T{1}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateDown()
+	consteval Vector3<T> Vector3<T>::DownConsteval()
 	{
 		return Vector3(T{0}, T{-1}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateRight()
+	consteval Vector3<T> Vector3<T>::RightConsteval()
 	{
 		return Vector3(T{1}, T{0}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateLeft()
+	consteval Vector3<T> Vector3<T>::LeftConsteval()
 	{
 		return Vector3(T{-1}, T{0}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateOne()
+	consteval Vector3<T> Vector3<T>::OneConsteval()
 	{
 		return Vector3(T{1}, T{1}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateZero()
+	consteval Vector3<T> Vector3<T>::ZeroConsteval()
 	{
 		return Vector3(T{0}, T{0}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::CreateNegative()
+	consteval Vector3<T> Vector3<T>::NegativeConsteval()
 	{
 		return Vector3(T{-1}, T{-1}, T{-1});
 	}
@@ -534,15 +516,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T> Vector3<T>::Inversed() const noexcept
+	constexpr Vector3<T> Vector3<T>::Swap() const noexcept
 	{
 		return Vector3(Z(), Y(), X());
-	}
-
-	template<Arithmetic T>
-	void Vector3<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<Arithmetic T>
@@ -604,18 +580,6 @@ namespace PonyEngine::Math
 		const typename Vector3<T>::ComputationalType angle = Angle(left, right);
 
 		return std::copysign(angle, static_cast<typename Vector3<T>::ComputationalType>(dot));
-	}
-
-	template<Arithmetic T>
-	typename Vector3<T>::ComputationalType AngleDegrees(const Vector3<T>& left, const Vector3<T>& right) noexcept
-	{
-		return Angle(left, right) * RadToDeg<typename Vector3<T>::ComputationalType>;
-	}
-
-	template<Arithmetic T>
-	typename Vector3<T>::ComputationalType AngleSignedDegrees(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
-	{
-		return AngleSigned(left, right, axis) * RadToDeg<typename Vector3<T>::ComputationalType>;
 	}
 
 	template<Arithmetic T>
@@ -750,8 +714,8 @@ namespace PonyEngine::Math
 		return Vector3<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z());
 	}
 
-	template<Arithmetic T>
-	constexpr Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept
 	{
 		return Vector3<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier);
 	}
@@ -766,8 +730,8 @@ namespace PonyEngine::Math
 		return Vector3<T>(x, y, z);
 	}
 
-	template<Arithmetic T>
-	constexpr Vector3<T> operator *(const T multiplier, const Vector3<T>& vector) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector3<T> operator *(const T multiplier, const Vector3<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}

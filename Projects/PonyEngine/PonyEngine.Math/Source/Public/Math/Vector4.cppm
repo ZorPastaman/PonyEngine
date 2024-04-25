@@ -51,17 +51,17 @@ export namespace PonyEngine::Math
 		/// @return One vector.
 		///	@remark For non-constexpr execution use @p Vector4::One variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector4 CreateOne();
+		static consteval Vector4 OneConsteval();
 		/// @brief Creates a Vector4(0, 0, 0, 0).
 		/// @return Zero vector.
 		///	@remark For non-constexpr execution use @p Vector4::Zero variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector4 CreateZero();
+		static consteval Vector4 ZeroConsteval();
 		/// @brief Creates a Vector4(-1, -1, -1, -1).
 		/// @return Negative vector.
 		///	@remark For non-constexpr execution use @p Vector4::Negative variable.
 		[[nodiscard("Pure function")]]
-		static consteval Vector4 CreateNegative();
+		static consteval Vector4 NegativeConsteval();
 
 		/// @brief Gets an x-component.
 		/// @return X-component.
@@ -121,12 +121,10 @@ export namespace PonyEngine::Math
 		/// @brief Normalizes the vector.
 		void Normalize() noexcept;
 
-		/// @brief Computes a vector inversed to this one.
-		/// @return Inversed vector.
+		/// @brief Swap components and return a vector in order w, z, y, x.
+		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
-		constexpr Vector4 Inversed() const noexcept;
-		/// @brief Inverses the vector.
-		void Inverse() noexcept;
+		constexpr Vector4 Swap() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -267,8 +265,8 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param vector Multiplicand.
@@ -281,8 +279,8 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Vector4<T> operator *(T multiplier, const Vector4<T>& vector) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Vector4<T> operator *(T multiplier, const Vector4<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
@@ -323,19 +321,19 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::CreateOne()
+	consteval Vector4<T> Vector4<T>::OneConsteval()
 	{
 		return Vector4(T{1}, T{1}, T{1}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::CreateZero()
+	consteval Vector4<T> Vector4<T>::ZeroConsteval()
 	{
 		return Vector4(T{0}, T{0}, T{0}, T{0});
 	}
 
 	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::CreateNegative()
+	consteval Vector4<T> Vector4<T>::NegativeConsteval()
 	{
 		return Vector4(T{-1}, T{-1}, T{-1}, T{-1});
 	}
@@ -427,15 +425,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T> Vector4<T>::Inversed() const noexcept
+	constexpr Vector4<T> Vector4<T>::Swap() const noexcept
 	{
 		return Vector4<T>(W(), Z(), Y(), X());
-	}
-
-	template<Arithmetic T>
-	void Vector4<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<Arithmetic T>
@@ -598,8 +590,8 @@ namespace PonyEngine::Math
 		return Vector4<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z(), left.W() - right.W());
 	}
 
-	template<Arithmetic T>
-	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept
 	{
 		return Vector4<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier, vector.W() * multiplier);
 	}
@@ -615,8 +607,8 @@ namespace PonyEngine::Math
 		return Vector4<T>(x, y, z, w);
 	}
 
-	template<Arithmetic T>
-	constexpr Vector4<T> operator *(const T multiplier, const Vector4<T>& vector) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Vector4<T> operator *(const T multiplier, const Vector4<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}

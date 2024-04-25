@@ -285,7 +285,7 @@ namespace Math
 			float m12F = -4.f;
 			float m22F = 2.f;
 			auto matrixF = PonyEngine::Math::Matrix3x3<float>(m00F, m10F, m20F, m01F, m11F, m21F, m02F, m12F, m22F);
-			auto transposeF = matrixF.Transposed();
+			auto transposeF = matrixF.Transpose();
 			Assert::AreEqual(3.f, transposeF.M00());
 			Assert::AreEqual(6.f, transposeF.M10());
 			Assert::AreEqual(-9.f, transposeF.M20());
@@ -295,17 +295,6 @@ namespace Math
 			Assert::AreEqual(4.f, transposeF.M02());
 			Assert::AreEqual(1.f, transposeF.M12());
 			Assert::AreEqual(2.f, transposeF.M22());
-
-			matrixF.Transpose();
-			Assert::AreEqual(transposeF.M00(), matrixF.M00());
-			Assert::AreEqual(transposeF.M10(), matrixF.M10());
-			Assert::AreEqual(transposeF.M20(), matrixF.M20());
-			Assert::AreEqual(transposeF.M01(), matrixF.M01());
-			Assert::AreEqual(transposeF.M11(), matrixF.M11());
-			Assert::AreEqual(transposeF.M21(), matrixF.M21());
-			Assert::AreEqual(transposeF.M02(), matrixF.M02());
-			Assert::AreEqual(transposeF.M12(), matrixF.M12());
-			Assert::AreEqual(transposeF.M22(), matrixF.M22());
 
 			short m00I = 3;
 			short m10I = -4;
@@ -317,7 +306,7 @@ namespace Math
 			short m12I = -4;
 			short m22I = 2;
 			auto matrixI = PonyEngine::Math::Matrix3x3<short>(m00I, m10I, m20I, m01I, m11I, m21I, m02I, m12I, m22I);
-			auto transposeI = matrixI.Transposed();
+			auto transposeI = matrixI.Transpose();
 			Assert::AreEqual(short{3}, transposeI.M00());
 			Assert::AreEqual(short{6}, transposeI.M10());
 			Assert::AreEqual(short{-9}, transposeI.M20());
@@ -327,17 +316,6 @@ namespace Math
 			Assert::AreEqual(short{4}, transposeI.M02());
 			Assert::AreEqual(short{1}, transposeI.M12());
 			Assert::AreEqual(short{2}, transposeI.M22());
-
-			matrixI.Transpose();
-			Assert::AreEqual(transposeI.M00(), matrixI.M00());
-			Assert::AreEqual(transposeI.M10(), matrixI.M10());
-			Assert::AreEqual(transposeI.M20(), matrixI.M20());
-			Assert::AreEqual(transposeI.M01(), matrixI.M01());
-			Assert::AreEqual(transposeI.M11(), matrixI.M11());
-			Assert::AreEqual(transposeI.M21(), matrixI.M21());
-			Assert::AreEqual(transposeI.M02(), matrixI.M02());
-			Assert::AreEqual(transposeI.M12(), matrixI.M12());
-			Assert::AreEqual(transposeI.M22(), matrixI.M22());
 		}
 
 		TEST_METHOD(InverseTest)
@@ -352,7 +330,7 @@ namespace Math
 			float m12F = -4.f;
 			float m22F = 2.f;
 			auto matrixF = PonyEngine::Math::Matrix3x3<float>(m00F, m10F, m20F, m01F, m11F, m21F, m02F, m12F, m22F);
-			auto inverseF = matrixF.Inversed();
+			auto inverseF = matrixF.Inverse();
 			Assert::AreEqual(static_cast<double>(2.f / 63.f), static_cast<double>(inverseF.M00()), 0.0001);
 			Assert::AreEqual(static_cast<double>(2.f / 63.f), static_cast<double>(inverseF.M10()), 0.0001);
 			Assert::AreEqual(static_cast<double>(-5.f / 63.f), static_cast<double>(inverseF.M20()), 0.0001);
@@ -364,17 +342,6 @@ namespace Math
 			Assert::AreEqual(static_cast<double>(-1.f / 42.f), static_cast<double>(inverseF.M22()), 0.0001);
 
 			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixF * inverseF, PonyEngine::Math::Matrix3x3<float>::Identity));
-
-			matrixF.Inverse();
-			Assert::AreEqual(inverseF.M00(), matrixF.M00());
-			Assert::AreEqual(inverseF.M10(), matrixF.M10());
-			Assert::AreEqual(inverseF.M20(), matrixF.M20());
-			Assert::AreEqual(inverseF.M01(), matrixF.M01());
-			Assert::AreEqual(inverseF.M11(), matrixF.M11());
-			Assert::AreEqual(inverseF.M21(), matrixF.M21());
-			Assert::AreEqual(inverseF.M02(), matrixF.M02());
-			Assert::AreEqual(inverseF.M12(), matrixF.M12());
-			Assert::AreEqual(inverseF.M22(), matrixF.M22());
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -1708,7 +1675,7 @@ namespace Math
 			static constexpr PonyEngine::Math::Matrix3x3<float> StaticMatrix(0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f);
 			constexpr auto pointer = StaticMatrix.Data();
 
-			constexpr auto identity = PonyEngine::Math::Matrix3x3<float>::CreateIdentity();
+			constexpr auto identity = PonyEngine::Math::Matrix3x3<float>::IdentityConsteval();
 			Assert::AreEqual(1.f, identity.M00());
 			Assert::AreEqual(0.f, identity.M10());
 			Assert::AreEqual(0.f, identity.M20());
@@ -1719,7 +1686,7 @@ namespace Math
 			Assert::AreEqual(0.f, identity.M12());
 			Assert::AreEqual(1.f, identity.M22());
 
-			constexpr auto zero = PonyEngine::Math::Matrix3x3<float>::CreateZero();
+			constexpr auto zero = PonyEngine::Math::Matrix3x3<float>::ZeroConsteval();
 			Assert::AreEqual(0.f, zero.M00());
 			Assert::AreEqual(0.f, zero.M10());
 			Assert::AreEqual(0.f, zero.M20());
@@ -1732,8 +1699,8 @@ namespace Math
 
 			constexpr auto determinant = matrix.Determinant();
 			constexpr auto adjugate = matrix.Adjugate();
-			constexpr auto transposed = matrix.Transposed();
-			constexpr auto inversed = matrix.Inversed();
+			constexpr auto transposed = matrix.Transpose();
+			constexpr auto inversed = matrix.Inverse();
 
 			constexpr auto row = matrix.GetRow(1);
 			constexpr auto column = matrix.GetColumn(1);

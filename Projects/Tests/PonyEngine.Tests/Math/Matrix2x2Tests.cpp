@@ -84,44 +84,6 @@ namespace Math
 			Assert::AreEqual(m11I, vectorMatrixI.M11());
 		}
 
-		TEST_METHOD(CreateByRotationTest)
-		{
-			PonyEngine::Math::Matrix2x2<double> rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateRotation(0.5);
-			Assert::AreEqual(0.8776, rotationMatrix.M00(), 0.0001);
-			Assert::AreEqual(0.4794, rotationMatrix.M10(), 0.0001);
-			Assert::AreEqual(-0.4794, rotationMatrix.M01(), 0.0001);
-			Assert::AreEqual(0.8776, rotationMatrix.M11(), 0.0001);
-
-			auto vector = PonyEngine::Math::Vector2<double>(2, 3);
-			PonyEngine::Math::Vector2<double> rotatedVector = rotationMatrix * vector;
-			Assert::AreEqual(0.3169, rotatedVector.X(), 0.0001);
-			Assert::AreEqual(3.5916, rotatedVector.Y(), 0.0001);
-
-			rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateRotationDegrees(-60);
-			Assert::AreEqual(0.5, rotationMatrix.M00(), 0.0001);
-			Assert::AreEqual(-0.8660, rotationMatrix.M10(), 0.0001);
-			Assert::AreEqual(0.8660, rotationMatrix.M01(), 0.0001);
-			Assert::AreEqual(0.5, rotationMatrix.M11(), 0.0001);
-
-			vector = PonyEngine::Math::Vector2<double>(2, 3);
-			rotatedVector = rotationMatrix * vector;
-			Assert::AreEqual(3.5981, rotatedVector.X(), 0.0001);
-			Assert::AreEqual(-0.2321, rotatedVector.Y(), 0.0001);
-		}
-
-		TEST_METHOD(CreateByDirectionTest)
-		{
-			auto from = PonyEngine::Math::Vector2<double>(-4, 3).Normalized();
-			auto to = PonyEngine::Math::Vector2<double>(6, 2).Normalized();
-			auto rotationMatrix = PonyEngine::Math::Matrix2x2<double>::CreateByDirection(from, to);
-			Assert::AreEqual(-0.5692, rotationMatrix.M00(), 0.0001);
-			Assert::AreEqual(-0.8222, rotationMatrix.M10(), 0.0001);
-			Assert::AreEqual(0.8222, rotationMatrix.M01(), 0.0001);
-			Assert::AreEqual(-0.5692, rotationMatrix.M11(), 0.0001);
-
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(to, rotationMatrix * from));
-		}
-
 		TEST_METHOD(DataTest)
 		{
 			float m00F = 4.f;
@@ -206,32 +168,22 @@ namespace Math
 			float m01F = 5.f;
 			float m11F = -2.f;
 			auto matrixF = PonyEngine::Math::Matrix2x2<float>(m00F, m10F, m01F, m11F);
-			auto adjugateF = matrixF.Transposed();
-			Assert::AreEqual(3.f, adjugateF.M00());
-			Assert::AreEqual(5.f, adjugateF.M10());
-			Assert::AreEqual(-7.f, adjugateF.M01());
-			Assert::AreEqual(-2.f, adjugateF.M11());
-			matrixF.Transpose();
-			Assert::AreEqual(adjugateF.M00(), matrixF.M00());
-			Assert::AreEqual(adjugateF.M10(), matrixF.M10());
-			Assert::AreEqual(adjugateF.M01(), matrixF.M01());
-			Assert::AreEqual(adjugateF.M11(), matrixF.M11());
+			auto transposeF = matrixF.Transpose();
+			Assert::AreEqual(3.f, transposeF.M00());
+			Assert::AreEqual(5.f, transposeF.M10());
+			Assert::AreEqual(-7.f, transposeF.M01());
+			Assert::AreEqual(-2.f, transposeF.M11());
 
 			short m00I = 3;
 			short m10I = -7;
 			short m01I = 5;
 			short m11I = -2;
 			auto matrixI = PonyEngine::Math::Matrix2x2<short>(m00I, m10I, m01I, m11I);
-			auto adjugateI = matrixI.Transposed();
-			Assert::AreEqual(short{3}, adjugateI.M00());
-			Assert::AreEqual(short{5}, adjugateI.M10());
-			Assert::AreEqual(short{-7}, adjugateI.M01());
-			Assert::AreEqual(short{-2}, adjugateI.M11());
-			matrixI.Transpose();
-			Assert::AreEqual(adjugateI.M00(), matrixI.M00());
-			Assert::AreEqual(adjugateI.M10(), matrixI.M10());
-			Assert::AreEqual(adjugateI.M01(), matrixI.M01());
-			Assert::AreEqual(adjugateI.M11(), matrixI.M11());
+			auto transposeI = matrixI.Transpose();
+			Assert::AreEqual(short{3}, transposeI.M00());
+			Assert::AreEqual(short{5}, transposeI.M10());
+			Assert::AreEqual(short{-7}, transposeI.M01());
+			Assert::AreEqual(short{-2}, transposeI.M11());
 		}
 
 		TEST_METHOD(InverseTest)
@@ -241,7 +193,7 @@ namespace Math
 			float m01F = 5.f;
 			float m11F = 20.f;
 			auto matrixF = PonyEngine::Math::Matrix2x2<float>(m00F, m10F, m01F, m11F);
-			auto inversedF = matrixF.Inversed();
+			auto inversedF = matrixF.Inverse();
 			Assert::AreEqual(static_cast<double>(-4.f / 25.f), static_cast<double>(inversedF.M00()), 0.0001);
 			Assert::AreEqual(static_cast<double>(-3.f / 25.f), static_cast<double>(inversedF.M10()), 0.0001);
 			Assert::AreEqual(static_cast<double>(1.f / 25.f), static_cast<double>(inversedF.M01()), 0.0001);
@@ -252,12 +204,6 @@ namespace Math
 			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M10()), static_cast<double>(multipliedF.M10()), 0.0001);
 			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M01()), static_cast<double>(multipliedF.M01()), 0.0001);
 			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M11()), static_cast<double>(multipliedF.M11()), 0.0001);
-
-			matrixF.Inverse();
-			Assert::AreEqual(inversedF.M00(), matrixF.M00());
-			Assert::AreEqual(inversedF.M10(), matrixF.M10());
-			Assert::AreEqual(inversedF.M01(), matrixF.M01());
-			Assert::AreEqual(inversedF.M11(), matrixF.M11());
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -1058,13 +1004,13 @@ namespace Math
 			static constexpr PonyEngine::Math::Matrix2x2<float> StaticMatrix(0.f, 1.f, 0.f, 0.f);
 			constexpr auto pointer = StaticMatrix.Data();
 
-			constexpr auto identity = PonyEngine::Math::Matrix2x2<float>::CreateIdentity();
+			constexpr auto identity = PonyEngine::Math::Matrix2x2<float>::IdentityConsteval();
 			Assert::AreEqual(1.f, identity.M00());
 			Assert::AreEqual(0.f, identity.M10());
 			Assert::AreEqual(0.f, identity.M01());
 			Assert::AreEqual(1.f, identity.M11());
 
-			constexpr auto zero = PonyEngine::Math::Matrix2x2<float>::CreateZero();
+			constexpr auto zero = PonyEngine::Math::Matrix2x2<float>::ZeroConsteval();
 			Assert::AreEqual(0.f, zero.M00());
 			Assert::AreEqual(0.f, zero.M10());
 			Assert::AreEqual(0.f, zero.M01());
@@ -1072,8 +1018,8 @@ namespace Math
 
 			constexpr auto determinant = matrix.Determinant();
 			constexpr auto adjugate = matrix.Adjugate();
-			constexpr auto transposed = matrix.Transposed();
-			constexpr auto inversed = matrix.Inversed();
+			constexpr auto transpose = matrix.Transpose();
+			constexpr auto inverse = matrix.Inverse();
 
 			constexpr auto row = matrix.GetRow(1);
 			constexpr auto column = matrix.GetColumn(1);

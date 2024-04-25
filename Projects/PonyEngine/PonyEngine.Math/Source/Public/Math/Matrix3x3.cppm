@@ -14,6 +14,7 @@ import <cstddef>;
 import <format>;
 import <ostream>;
 import <string>;
+import <type_traits>;
 
 import :Common;
 import :Matrix2x2;
@@ -128,12 +129,12 @@ export namespace PonyEngine::Math
 		/// @return Identity matrix.
 		///	@remark For non-constexpr execution use @p Matrix3x3::Identity variable.
 		[[nodiscard("Pure function")]]
-		static consteval Matrix3x3 CreateIdentity();
+		static consteval Matrix3x3 IdentityConsteval();
 		/// @brief Creates a Matrix3x3(0, 0, 0, 0, 0, 0, 0, 0, 0).
 		/// @return Zero matrix.
 		///	@remark For non-constexpr execution use @p Matrix3x3::Zero variable.
 		[[nodiscard("Pure function")]]
-		static consteval Matrix3x3 CreateZero();
+		static consteval Matrix3x3 ZeroConsteval();
 
 		/// @brief Gets a component 00.
 		/// @return Component 00.
@@ -229,16 +230,12 @@ export namespace PonyEngine::Math
 		/// @brief Computes a transpose of the matrix.
 		/// @return Transpose.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Transposed() const noexcept;
-		/// @brief Transposes the matrix.
-		void Transpose() noexcept;
+		constexpr Matrix3x3 Transpose() const noexcept;
 
 		/// @brief Computes an inverse of the matrix.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Inversed() const noexcept;
-		/// @brief Inverses the matrix.
-		void Inverse() noexcept;
+		constexpr Matrix3x3 Inverse() const noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -404,8 +401,8 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, T multiplier) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, T multiplier) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -418,8 +415,8 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
-	constexpr Matrix3x3<T> operator *(T multiplier, const Matrix3x3<T>& matrix) noexcept requires(std::is_integral_v<T>);
+	template<std::integral T> [[nodiscard("Pure operator")]]
+	constexpr Matrix3x3<T> operator *(T multiplier, const Matrix3x3<T>& matrix) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -524,21 +521,21 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix3x3<T>::M00() noexcept
-	{
-		return m_components[0];
-	}
-
-	template<Arithmetic T>
-	consteval Matrix3x3<T> Matrix3x3<T>::CreateIdentity()
+	consteval Matrix3x3<T> Matrix3x3<T>::IdentityConsteval()
 	{
 		return Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1});
 	}
 
 	template<Arithmetic T>
-	consteval Matrix3x3<T> Matrix3x3<T>::CreateZero()
+	consteval Matrix3x3<T> Matrix3x3<T>::ZeroConsteval()
 	{
 		return Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
+	}
+
+	template<Arithmetic T>
+	T& Matrix3x3<T>::M00() noexcept
+	{
+		return m_components[0];
 	}
 
 	template<Arithmetic T>
@@ -678,27 +675,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3<T>::Transposed() const noexcept
+	constexpr Matrix3x3<T> Matrix3x3<T>::Transpose() const noexcept
 	{
 		return Matrix3x3(M00(), M01(), M02(), M10(), M11(), M12(), M20(), M21(), M22());
 	}
 
 	template<Arithmetic T>
-	void Matrix3x3<T>::Transpose() noexcept
-	{
-		*this = Transposed();
-	}
-
-	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3<T>::Inversed() const noexcept
+	constexpr Matrix3x3<T> Matrix3x3<T>::Inverse() const noexcept
 	{
 		return Adjugate() * (ComputationalType{1} / Determinant());
-	}
-
-	template<Arithmetic T>
-	void Matrix3x3<T>::Inverse() noexcept
-	{
-		*this = Inversed();
 	}
 
 	template<Arithmetic T>
@@ -966,8 +951,8 @@ namespace PonyEngine::Math
 			left.M21() - right.M21(), left.M02() - right.M02(), left.M12() - right.M12(), left.M22() - right.M22());
 	}
 
-	template<Arithmetic T>
-	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const T multiplier) noexcept
 	{
 		return Matrix3x3<T>(matrix.M00() * multiplier, matrix.M10() * multiplier, matrix.M20() * multiplier, matrix.M01() * multiplier, matrix.M11() * multiplier, 
 			matrix.M21() * multiplier, matrix.M02() * multiplier, matrix.M12() * multiplier, matrix.M22() * multiplier);
@@ -989,8 +974,8 @@ namespace PonyEngine::Math
 		return Matrix3x3<T>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
 	}
 
-	template<Arithmetic T>
-	constexpr Matrix3x3<T> operator *(const T multiplier, const Matrix3x3<T>& matrix) noexcept requires(std::is_integral_v<T>)
+	template<std::integral T>
+	constexpr Matrix3x3<T> operator *(const T multiplier, const Matrix3x3<T>& matrix) noexcept
 	{
 		return matrix * multiplier;
 	}
