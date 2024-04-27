@@ -11,11 +11,11 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Math\Helpers.cppm" />
     <ClCompile Include="Source\Public\Math\Common.cppm" />
     <ClCompile Include="Source\Public\Math\Math.cppm" />
     <ClCompile Include="Source\Public\Math\Matrix2x2.cppm" />
     <ClCompile Include="Source\Public\Math\Matrix3x3.cppm" />
+    <ClCompile Include="Source\Public\Math\Matrix4x4.cppm" />
     <ClCompile Include="Source\Public\Math\Quaternion.cppm" />
     <ClCompile Include="Source\Public\Math\Transformations3D.cppm" />
     <ClCompile Include="Source\Public\Math\Transformations2D.cppm" />

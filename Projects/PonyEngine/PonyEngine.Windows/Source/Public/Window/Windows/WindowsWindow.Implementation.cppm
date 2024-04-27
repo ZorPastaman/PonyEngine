@@ -15,7 +15,7 @@ module;
 
 export module PonyEngine.Window.Windows.Implementation;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window.Windows.Factories;
 
 import :WindowsWindowFactory;
@@ -27,7 +27,7 @@ export namespace PonyEngine::Window
 	/// @param classParams Class parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT IWindowsWindowFactory* CreateWindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams);
+	PONY_DLL_EXPORT IWindowsWindowFactory* CreateWindowsWindowFactory(Log::ILogger& logger, const WindowClassParams& classParams);
 	/// @brief Destroys a previously created Windows window factory.
 	/// @param factory Previously created Windows window factory.
 	PONY_DLL_EXPORT void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
@@ -35,7 +35,7 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	IWindowsWindowFactory* CreateWindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams)
+	IWindowsWindowFactory* CreateWindowsWindowFactory(Log::ILogger& logger, const WindowClassParams& classParams)
 	{
 		return new WindowsWindowFactory(logger, classParams);
 	}

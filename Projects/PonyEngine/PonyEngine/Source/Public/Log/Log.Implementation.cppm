@@ -13,18 +13,18 @@ module;
 
 #include "Core/Linking.h"
 
-export module PonyEngine.Debug.Log.Implementation;
+export module PonyEngine.Log.Implementation;
 
 import <filesystem>;
 
 import PonyEngine.Core;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
 import :ConsoleSubLogger;
 import :FileSubLogger;
 import :Logger;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Creates a logger.
 	/// @return Created logger.
@@ -52,7 +52,7 @@ export namespace PonyEngine::Debug::Log
 	PONY_DLL_EXPORT void DestroyFileSubLogger(ISubLogger* subLogger) noexcept;
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
 	ILogger* CreateLogger()
 	{

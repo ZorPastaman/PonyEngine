@@ -11,9 +11,9 @@ module;
 
 #include <cassert>
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
-export module PonyEngine.Debug.Log.Implementation:Logger;
+export module PonyEngine.Log.Implementation:Logger;
 
 import <algorithm>;
 import <chrono>;
@@ -24,9 +24,9 @@ import <ranges>;
 import <string>;
 import <vector>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Default logger. It just resends logs to its sub-loggers.
 	class Logger final : public ILogger
@@ -58,7 +58,7 @@ export namespace PonyEngine::Debug::Log
 	};
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
 	const char* Logger::GetName() const noexcept
 	{
@@ -124,5 +124,5 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	const char* const Logger::Name = "PonyEngine::Debug::Logger";
+	const char* const Logger::Name = "PonyEngine::Logger";
 }

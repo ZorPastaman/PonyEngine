@@ -12,7 +12,7 @@ module;
 #include <cassert>
 
 #include "Platform/Windows/Framework.h"
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindowFactory;
 
@@ -23,7 +23,7 @@ import <stdexcept>;
 import <string>;
 
 import PonyEngine.Core;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
@@ -44,7 +44,7 @@ export namespace PonyEngine::Window
 		/// @param logger Logger.
 		/// @param classParams Window class parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams);
+		WindowsWindowFactory(Log::ILogger& logger, const WindowClassParams& classParams);
 		WindowsWindowFactory(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory(WindowsWindowFactory&&) = delete;
 
@@ -71,7 +71,7 @@ export namespace PonyEngine::Window
 	private:
 		WindowParams m_windowParams; ///< Window parameters.
 
-		Debug::Log::ILogger& m_logger; ///< Logger.
+		Log::ILogger& m_logger; ///< Logger.
 
 		HINSTANCE m_hInstance; ///< This dll instance.
 		ATOM m_className; ///< Window class atom.
@@ -80,14 +80,10 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	namespace 
-	{
-		/// @brief Empty function.
-		void Dummy() {}
-	}
-	
+	/// @brief Empty function.
+	void Dummy();
 
-	WindowsWindowFactory::WindowsWindowFactory(Debug::Log::ILogger& logger, const WindowClassParams& classParams) :
+	WindowsWindowFactory::WindowsWindowFactory(Log::ILogger& logger, const WindowClassParams& classParams) :
 		m_logger{logger},
 		m_hInstance{NULL}		
 	{
@@ -98,13 +94,13 @@ namespace PonyEngine::Window
 
 		const wchar_t* const className = classParams.GetWindowClassName().c_str();
 
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Load a main cursor. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Load a main cursor. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
 		const auto cursor = static_cast<HCURSOR>(LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (cursor == NULL)
 		{
 			throw std::logic_error(std::format("Couldn't load a class cursor. Error code: '{}'", GetLastError()));
 		}
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Main cursor loaded. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Main cursor loaded. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
 
 		WNDCLASS wc{};
 		wc.hCursor = cursor;
@@ -112,18 +108,18 @@ namespace PonyEngine::Window
 		wc.hInstance = m_hInstance;
 		wc.lpszClassName = className;
 
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Register a window class '{}'.", Utility::ConvertToString(className)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Register a window class '{}'.", Utility::ConvertToString(className)).c_str());
 		m_className = RegisterClass(&wc);
 		if (!m_className)
 		{
 			throw std::logic_error(std::format("Couldn't register a class. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window class '{}' registered with id '{}'.", Utility::ConvertToString(className), m_className).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window class '{}' registered with id '{}'.", Utility::ConvertToString(className), m_className).c_str());
 	}
 
 	WindowsWindowFactory::~WindowsWindowFactory() noexcept
 	{
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Unregister a window class with id '{}'.", m_className).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Unregister a window class with id '{}'.", m_className).c_str());
 		try
 		{
 			if (!UnregisterClass(reinterpret_cast<LPCTSTR>(m_className), m_hInstance))
@@ -135,16 +131,16 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG_E_GENERAL(m_logger, e, "On unregistering a window class");
 		}
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window class with id '{}' unregistered.", m_className).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window class with id '{}' unregistered.", m_className).c_str());
 	}
 
 	IWindowsWindow* WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
 		const auto window = new WindowsWindow(engine, m_hInstance, m_className, m_windowParams);
 		const HWND hWnd = window->GetWindowHandle();
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Register a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Register a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		RegisterWindowProc(hWnd, window);
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		return window;
 	}
@@ -155,7 +151,7 @@ namespace PonyEngine::Window
 		const auto windowsWindow = static_cast<WindowsWindow*>(window);
 		const HWND hWnd = windowsWindow->GetWindowHandle();
 
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Unregister a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Unregister a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		if (windowsWindow->IsWindowAlive())
 		{
 			try
@@ -169,13 +165,13 @@ namespace PonyEngine::Window
 		}
 		else
 		{
-			PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window is already destroyed. No unregistering a window proc required. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+			PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window is already destroyed. No unregistering a window proc required. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		}
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Window proc unregistered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window proc unregistered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Destroy a windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Destroy a windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		delete windowsWindow;
-		PONY_LOG_GENERAL(m_logger, Debug::Log::LogType::Info, std::format("Windows window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Windows window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 	}
 
 	const wchar_t* WindowsWindowFactory::GetTitle() const noexcept
@@ -201,5 +197,9 @@ namespace PonyEngine::Window
 	void WindowsWindowFactory::SetCmdShow(const int cmdShow) noexcept
 	{
 		m_windowParams.cmdShow = cmdShow;
+	}
+
+	void Dummy()
+	{
 	}
 }
