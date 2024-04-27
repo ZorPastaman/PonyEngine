@@ -10,47 +10,47 @@
 #pragma once
 
 #if PONY_LOG_VERBOSE
-#define PONY_LOG_VERBOSE_MASK PonyEngine::Debug::Log::LogType::Verbose
+#define PONY_LOG_VERBOSE_MASK PonyEngine::Log::LogType::Verbose
 #else
-#define PONY_LOG_VERBOSE_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_VERBOSE_MASK PonyEngine::Log::LogType::None
 #endif
 
 #if PONY_LOG_DEBUG
-#define PONY_LOG_DEBUG_MASK PonyEngine::Debug::Log::LogType::Debug
+#define PONY_LOG_DEBUG_MASK PonyEngine::Log::LogType::Debug
 #else
-#define PONY_LOG_DEBUG_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_DEBUG_MASK PonyEngine::Log::LogType::None
 #endif
 
 #if PONY_LOG_INFO
-#define PONY_LOG_INFO_MASK PonyEngine::Debug::Log::LogType::Info
+#define PONY_LOG_INFO_MASK PonyEngine::Log::LogType::Info
 #else
-#define PONY_LOG_INFO_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_INFO_MASK PonyEngine::Log::LogType::None
 #endif
 
 #if PONY_LOG_WARNING
-#define PONY_LOG_WARNING_MASK PonyEngine::Debug::Log::LogType::Warning
+#define PONY_LOG_WARNING_MASK PonyEngine::Log::LogType::Warning
 #else
-#define PONY_LOG_WARNING_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_WARNING_MASK PonyEngine::Log::LogType::None
 #endif
 
 #if PONY_LOG_ERROR
-#define PONY_LOG_ERROR_MASK PonyEngine::Debug::Log::LogType::Error
+#define PONY_LOG_ERROR_MASK PonyEngine::Log::LogType::Error
 #else
-#define PONY_LOG_ERROR_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_ERROR_MASK PonyEngine::Log::LogType::None
 #endif
 
 #if PONY_LOG_EXCEPTION
-#define PONY_LOG_EXCEPTION_MASK PonyEngine::Debug::Log::LogType::Exception
+#define PONY_LOG_EXCEPTION_MASK PonyEngine::Log::LogType::Exception
 #else
-#define PONY_LOG_EXCEPTION_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_LOG_EXCEPTION_MASK PonyEngine::Log::LogType::None
 #endif
 
 #define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK)
 
 #if PONY_CONSOLE_LOG
-#define PONY_CONSOLE_LOG_MASK PonyEngine::Debug::Log::LogType::All
+#define PONY_CONSOLE_LOG_MASK PonyEngine::Log::LogType::All
 #else
-#define PONY_CONSOLE_LOG_MASK PonyEngine::Debug::Log::LogType::None
+#define PONY_CONSOLE_LOG_MASK PonyEngine::Log::LogType::None
 #endif
 
 #define PONY_COUT_MASK ((PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK) & PONY_CONSOLE_LOG_MASK)
@@ -82,86 +82,86 @@
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param engine PonyEngine::Core::IEngine reference.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG(engine, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine).GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, (engine).GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetFrameCount()))); \
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param engine PonyEngine::Core::IEngine pointer.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_PTR(engine, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, (engine)->GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount()))); \
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Debug::Log::ILogger reference.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_GENERAL(logger, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger).Log(logType, PonyEngine::Debug::Log::LogInput(message, 0))); \
+		PONY_LOG_TRY_CATCH((logger).Log(logType, PonyEngine::Log::LogInput(message, 0))); \
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Debug::Log::ILogger pointer.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logger PonyEngine::Log::ILogger pointer.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_GENERAL_PTR(logger, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger)->Log(logType, PonyEngine::Debug::Log::LogInput(message, 0))); \
+		PONY_LOG_TRY_CATCH((logger)->Log(logType, PonyEngine::Log::LogInput(message, 0))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
 /// @param engine PonyEngine::Core::IEngine reference.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_IF(condition, engine, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, (engine).GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetFrameCount())))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
 /// @param engine PonyEngine::Core::IEngine pointer.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_IF_PTR(condition, engine, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().Log(logType, PonyEngine::Debug::Log::LogInput(message, (engine)->GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount())))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Debug::Log::ILogger reference.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logger PonyEngine::Log::ILogger reference.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_IF_GENERAL(condition, logger, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger).Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger).Log(logType, PonyEngine::Log::LogInput(message, 0)))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Debug::Log::ILogger pointer.
-/// @param logType PonyEngine::Debug::Log::LogType value.
+/// @param logger PonyEngine::Log::ILogger pointer.
+/// @param logType PonyEngine::Log::LogType value.
 /// @param message const char* as a message.
 #define PONY_LOG_IF_GENERAL_PTR(condition, logger, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->Log(logType, PonyEngine::Debug::Log::LogInput(message, 0)))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->Log(logType, PonyEngine::Log::LogInput(message, 0)))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -169,9 +169,9 @@
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E(engine, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine).GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, (engine).GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetFrameCount()))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -179,29 +179,29 @@
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_PTR(engine, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, (engine)->GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount()))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Debug::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_GENERAL(logger, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger).LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0))); \
+		PONY_LOG_TRY_CATCH((logger).LogException(exception, PonyEngine::Log::LogInput(message, 0))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyEngine::Debug::Log::ILogger pointer.
+/// @param logger PonyEngine::Log::ILogger pointer.
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_GENERAL_PTR(logger, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger)->LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0))); \
+		PONY_LOG_TRY_CATCH((logger)->LogException(exception, PonyEngine::Log::LogInput(message, 0))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -210,9 +210,9 @@
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_IF(condition, engine, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, (engine).GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetFrameCount())))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -221,31 +221,31 @@
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_IF_PTR(condition, engine, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, (engine)->GetLogger().LogException(exception, PonyEngine::Debug::Log::LogInput(message, (engine)->GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, (engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount())))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Debug::Log::ILogger reference.
+/// @param logger PonyEngine::Log::ILogger reference.
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_IF_GENERAL(condition, logger, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger).LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger).LogException(exception, PonyEngine::Log::LogInput(message, 0)))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyEngine::Debug::Log::ILogger pointer.
+/// @param logger PonyEngine::Log::ILogger pointer.
 /// @param exception std::exception reference.
 /// @param message const char* as a message.
 #define PONY_LOG_E_IF_GENERAL_PTR(condition, logger, exception, message) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->LogException(exception, PonyEngine::Debug::Log::LogInput(message, 0)))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->LogException(exception, PonyEngine::Log::LogInput(message, 0)))); \
 	}
 
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
@@ -253,19 +253,19 @@
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE(logType, message) \
-	if constexpr (((logType) & PONY_COUT_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_COUT_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(std::cout << (message) << std::endl); \
 	} \
-	else if constexpr (((logType) & PONY_CLOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CLOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(std::clog << (message) << std::endl); \
 	} \
-	else if constexpr (((logType) & PONY_CERR_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CERR_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(std::cerr << (message) << std::endl); \
 	} \
-	else if constexpr (((logType) & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CEXC_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(std::cerr << (message) << std::endl); \
 	}
@@ -276,19 +276,19 @@
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE_IF(condition, logType, message) \
-	if constexpr (((logType) & PONY_COUT_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	if constexpr (((logType) & PONY_COUT_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, std::cout << (message) << std::endl)); \
 	} \
-	else if constexpr (((logType) & PONY_CLOG_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CLOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, std::clog << (message) << std::endl)); \
 	} \
-	else if constexpr (((logType) & PONY_CERR_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CERR_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, std::cerr << (message) << std::endl)); \
 	} \
-	else if constexpr (((logType) & PONY_CEXC_MASK) != PonyEngine::Debug::Log::LogType::None) \
+	else if constexpr (((logType) & PONY_CEXC_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
 		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, std::cerr << (message) << std::endl)); \
 	}

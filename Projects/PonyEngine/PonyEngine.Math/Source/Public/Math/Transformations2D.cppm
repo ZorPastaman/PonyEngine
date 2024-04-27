@@ -69,16 +69,8 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	namespace
-	{
-		template<std::floating_point T> [[nodiscard("Pure function")]]
-		Vector2<T> TransformVector(const Matrix3x3<T>& matrix, const Vector2<T>& vector, const T z)
-		{
-			const Vector3<T> transformed = matrix * Vector3<T>(vector.X(), vector.Y(), z);
-
-			return Vector2<T>(transformed.X(), transformed.Y());
-		}
-	}
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector2<T> TransformVector(const Matrix3x3<T>& matrix, const Vector2<T>& vector, T z);
 
 	template<std::floating_point T>
 	Vector2<T> Translation(const Matrix3x3<T>& matrix) noexcept
@@ -201,5 +193,13 @@ namespace PonyEngine::Math
 	Vector2<T> TransformDirection(const Matrix3x3<T>& matrix, const Vector2<T>& vector)
 	{
 		return TransformVector(matrix, vector, T{0});
+	}
+
+	template<std::floating_point T>
+	Vector2<T> TransformVector(const Matrix3x3<T>& matrix, const Vector2<T>& vector, const T z)
+	{
+		const Vector3<T> transformed = matrix * Vector3<T>(vector.X(), vector.Y(), z);
+
+		return Vector2<T>(transformed.X(), transformed.Y());
 	}
 }

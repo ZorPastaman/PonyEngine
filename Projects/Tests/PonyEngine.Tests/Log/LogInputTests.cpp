@@ -11,11 +11,11 @@
 
 import <cstddef>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Debug::Log
+namespace Log
 {
 	TEST_CLASS(LogInputTests)
 	{
@@ -25,7 +25,7 @@ namespace Debug::Log
 			const char* const message = "Message.";
 			const std::size_t frame = 106850;
 
-			const PonyEngine::Debug::Log::LogInput logInput(message, frame);
+			const PonyEngine::Log::LogInput logInput(message, frame);
 			Assert::AreEqual(message, logInput.GetMessage());
 			Assert::AreEqual(frame, logInput.GetFrameCount());
 		}

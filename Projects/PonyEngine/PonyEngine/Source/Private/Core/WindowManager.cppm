@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
 export module PonyEngine.Core.Implementation:WindowManager;
 
@@ -20,7 +20,7 @@ import <string>;
 
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window;
 import PonyEngine.Window.Factories;
 
@@ -71,15 +71,15 @@ namespace PonyEngine::Core
 		
 		if (m_windowFactory != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Create a window '{}'.", m_windowFactory->GetWindowName()).c_str());
+			PONY_LOG(m_engine, Log::LogType::Info, std::format("Create a window '{}'.", m_windowFactory->GetWindowName()).c_str());
 			m_window = m_windowFactory->Create(engine);
 			assert((m_window != nullptr));
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window '{}' created.", m_window->GetName()).c_str());
+			PONY_LOG(m_engine, Log::LogType::Info, std::format("Window '{}' created.", m_window->GetName()).c_str());
 		}
 		else
 		{
 			m_window = nullptr;
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window creation skipped.");
+			PONY_LOG(m_engine, Log::LogType::Info, "Window creation skipped.");
 		}
 	}
 
@@ -87,9 +87,9 @@ namespace PonyEngine::Core
 	{
 		if (m_windowFactory != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Destroy a window '{}'.", m_window->GetName()).c_str());
+			PONY_LOG(m_engine, Log::LogType::Info, std::format("Destroy a window '{}'.", m_window->GetName()).c_str());
 			m_windowFactory->Destroy(m_window);
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Window destroyed '{}'.", m_windowFactory->GetWindowName()).c_str());
+			PONY_LOG(m_engine, Log::LogType::Info, std::format("Window destroyed '{}'.", m_windowFactory->GetWindowName()).c_str());
 		}
 	}
 
@@ -102,9 +102,9 @@ namespace PonyEngine::Core
 	{
 		if (m_window != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Show a window.");
+			PONY_LOG(m_engine, Log::LogType::Info, "Show a window.");
 			m_window->ShowWindow();
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Window shown.");
+			PONY_LOG(m_engine, Log::LogType::Info, "Window shown.");
 		}
 	}
 
@@ -112,7 +112,7 @@ namespace PonyEngine::Core
 	{
 		if (m_window != nullptr)
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Verbose, "Tick a window.");
+			PONY_LOG(m_engine, Log::LogType::Verbose, "Tick a window.");
 			m_window->Tick();
 		}
 	}

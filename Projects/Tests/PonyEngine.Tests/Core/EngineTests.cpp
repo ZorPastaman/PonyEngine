@@ -17,7 +17,7 @@ import <exception>;
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
 import PonyEngine.Core.Implementation;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window;
 import PonyEngine.Window.Factories;
 
@@ -27,17 +27,17 @@ namespace Core
 {
 	TEST_CLASS(EngineTests)
 	{
-		class EmptyLogger final : public PonyEngine::Debug::Log::ILogger
+		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void Log(PonyEngine::Debug::Log::LogType, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
-			virtual void LogException(const std::exception&, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
+			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override { }
+			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override { }
 
-			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
-			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
+			virtual void AddSubLogger(PonyEngine::Log::ISubLogger*) override { }
+			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override { }
 		};
 
 		class EmptyWindow final : public PonyEngine::Window::IWindow

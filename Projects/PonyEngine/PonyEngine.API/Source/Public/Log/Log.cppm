@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log;
+export module PonyEngine.Log;
 
 export import :ILogger;
 export import :ISubLogger;

@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
 export module PonyEngine.Core.Factories:EngineParams;
 
@@ -21,7 +21,7 @@ import <ranges>;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window.Factories;
 
 import :ISystemFactory;
@@ -81,7 +81,7 @@ export namespace PonyEngine::Core
 		/// @brief Create an engine params.
 		/// @param logger Logger to use. Mustn't be nullptr.
 		[[nodiscard("Pure constructor")]]
-		explicit EngineParams(Debug::Log::ILogger* logger) noexcept;
+		explicit EngineParams(Log::ILogger* logger) noexcept;
 		[[nodiscard("Pure constructor")]]
 		EngineParams(const EngineParams& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -92,7 +92,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets a logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		Debug::Log::ILogger& GetLogger() const noexcept;
+		Log::ILogger& GetLogger() const noexcept;
 
 		/// @brief Adds a system factory.
 		/// @param systemFactory System factory. It must be unique in one @p EngineParams.
@@ -116,7 +116,7 @@ export namespace PonyEngine::Core
 
 	private:
 		std::vector<ISystemFactory*> m_systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
-		Debug::Log::ILogger* m_logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
+		Log::ILogger* m_logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
 		Window::IWindowFactory* m_windowFactory; ///< Window factory. It's optional and can be nullptr. If it's not nullptr, its lifetime must exceed the engine lifetime.
 	};
 }
@@ -154,14 +154,14 @@ namespace PonyEngine::Core
 		return temp;
 	}
 
-	EngineParams::EngineParams(Debug::Log::ILogger* const logger) noexcept :
+	EngineParams::EngineParams(Log::ILogger* const logger) noexcept :
 		m_logger{logger},
 		m_windowFactory{}
 	{
 		assert((m_logger != nullptr));
 	}
 
-	Debug::Log::ILogger& EngineParams::GetLogger() const noexcept
+	Log::ILogger& EngineParams::GetLogger() const noexcept
 	{
 		return *m_logger;
 	}
@@ -185,8 +185,8 @@ namespace PonyEngine::Core
 
 	void EngineParams::SetWindowFactory(Window::IWindowFactory* const windowFactory) noexcept
 	{
-		PONY_LOG_IF_GENERAL_PTR(m_windowFactory != nullptr, m_logger, Debug::Log::LogType::Warning, "Set a new window factory when the other window factory was already set.");
-		PONY_LOG_IF_GENERAL_PTR(windowFactory == nullptr, m_logger, Debug::Log::LogType::Warning, "Set a nullptr window factory.");
+		PONY_LOG_IF_GENERAL_PTR(m_windowFactory != nullptr, m_logger, Log::LogType::Warning, "Set a new window factory when the other window factory was already set.");
+		PONY_LOG_IF_GENERAL_PTR(windowFactory == nullptr, m_logger, Log::LogType::Warning, "Set a nullptr window factory.");
 		m_windowFactory = windowFactory;
 	}
 }

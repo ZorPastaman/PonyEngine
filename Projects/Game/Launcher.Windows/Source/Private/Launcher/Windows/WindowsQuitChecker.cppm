@@ -9,7 +9,7 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 #include "Platform/Windows/Framework.h"
 
 export module Launcher.Windows:WindowsQuitChecker;
@@ -17,11 +17,9 @@ export module Launcher.Windows:WindowsQuitChecker;
 import <format>;
 import <iostream>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
 import Launcher;
-
-using LogType = PonyEngine::Debug::Log::LogType;
 
 export namespace Launcher
 {
@@ -32,7 +30,7 @@ export namespace Launcher
 		/// @brief Creates a @p WindowsQuitChecker.
 		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept;
+		explicit WindowsQuitChecker(PonyEngine::Log::ILogger& logger) noexcept;
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
@@ -45,20 +43,20 @@ export namespace Launcher
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Debug::Log::ILogger& m_logger; ///< Logger.
+		PonyEngine::Log::ILogger& m_logger; ///< Logger.
 	};
 }
 
 namespace Launcher
 {
-	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Debug::Log::ILogger& logger) noexcept :
+	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Log::ILogger& logger) noexcept :
 		m_logger{logger}
 	{
 	}
 
 	bool WindowsQuitChecker::Check(int& exitCode) const
 	{
-		PONY_LOG_GENERAL(m_logger, LogType::Verbose, "Check for a quit message.");
+		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Verbose, "Check for a quit message.");
 
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -69,7 +67,7 @@ namespace Launcher
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(m_logger, LogType::Info, std::format("Received the exit code '{}' from the platform.", exitCode).c_str());
+				PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from the platform.", exitCode).c_str());
 
 				return false;
 			}

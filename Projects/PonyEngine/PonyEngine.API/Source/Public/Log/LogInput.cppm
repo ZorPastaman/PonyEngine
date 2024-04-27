@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log:LogInput;
+export module PonyEngine.Log:LogInput;
 
 import <cstddef>;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Log data input.
 	class LogInput final
@@ -47,7 +47,7 @@ export namespace PonyEngine::Debug::Log
 	};
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
 	LogInput::LogInput(const char* const message, const std::size_t frameCount) noexcept :
 		m_message{message},

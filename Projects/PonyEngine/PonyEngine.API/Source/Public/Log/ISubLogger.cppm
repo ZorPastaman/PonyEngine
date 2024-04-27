@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log:ISubLogger;
+export module PonyEngine.Log:ISubLogger;
 
 import PonyEngine.Utility;
 
 import :LogEntry;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief SubLogger interface.
 	/// @details The sub-logger writes received logs to something.

@@ -14,22 +14,22 @@ import <cstdint>;
 import <exception>;
 import <type_traits>;
 
-import PonyEngine.Debug.Log;
-import PonyEngine.Debug.Log.Implementation;
+import PonyEngine.Log;
+import PonyEngine.Log.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Debug::Log
+namespace Log
 {
 	TEST_CLASS(LoggerTests)
 	{
-		class TestSubLogger : public PonyEngine::Debug::Log::ISubLogger
+		class TestSubLogger : public PonyEngine::Log::ISubLogger
 		{
 		public:
 			const char* expectedMessage;
 			const std::exception* expectedException;
 			std::size_t expectedFrameCount;
-			PonyEngine::Debug::Log::LogType expectedLogType;
+			PonyEngine::Log::LogType expectedLogType;
 			bool expectMessages;
 			std::size_t count = 0;
 
@@ -39,29 +39,29 @@ namespace Debug::Log
 				return "";
 			}
 
-			virtual void Log(const PonyEngine::Debug::Log::LogEntry& logEntry) noexcept override
+			virtual void Log(const PonyEngine::Log::LogEntry& logEntry) noexcept override
 			{
 				Assert::IsTrue(expectMessages);
 				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedMessage), reinterpret_cast<std::uintptr_t>(logEntry.GetMessage()));
 				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedException), reinterpret_cast<std::uintptr_t>(logEntry.GetException()));
 				Assert::AreEqual(expectedFrameCount, logEntry.GetFrameCount());
-				Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Debug::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyEngine::Debug::Log::LogType>>(logEntry.GetLogType()));
+				Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logEntry.GetLogType()));
 				++count;
 			}
 		};
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			Assert::IsNotNull(logger);
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
-			Assert::AreEqual("PonyEngine::Debug::Logger", logger->GetName());
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
+			Assert::AreEqual("PonyEngine::Logger", logger->GetName());
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 
 		TEST_METHOD(LogTest)
@@ -69,30 +69,30 @@ namespace Debug::Log
 			const char* const message = "Message!";
 			const std::exception exception("Exception");
 			const std::size_t frameCount = 84136;
-			const PonyEngine::Debug::Log::LogInput logInput(message, frameCount);
+			const PonyEngine::Log::LogInput logInput(message, frameCount);
 
 			TestSubLogger testSubLogger;
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			logger->AddSubLogger(&testSubLogger);
 			testSubLogger.expectedMessage = message;
 			testSubLogger.expectedException = nullptr;
 			testSubLogger.expectedFrameCount = frameCount;
 			testSubLogger.expectMessages = true;
-			testSubLogger.expectedLogType = PonyEngine::Debug::Log::LogType::Info;
-			logger->Log(PonyEngine::Debug::Log::LogType::Info, logInput);
+			testSubLogger.expectedLogType = PonyEngine::Log::LogType::Info;
+			logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{1}, testSubLogger.count);
 
 			testSubLogger.expectedException = &exception;
-			testSubLogger.expectedLogType = PonyEngine::Debug::Log::LogType::Exception;
+			testSubLogger.expectedLogType = PonyEngine::Log::LogType::Exception;
 			logger->LogException(exception, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
 			logger->RemoveSubLogger(&testSubLogger);
 			testSubLogger.expectMessages = false;
-			logger->Log(PonyEngine::Debug::Log::LogType::Info, logInput);
+			logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 	};
 }

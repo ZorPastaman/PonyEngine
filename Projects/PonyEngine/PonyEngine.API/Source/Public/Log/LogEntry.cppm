@@ -11,9 +11,9 @@ module;
 
 #include <cassert>
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
-export module PonyEngine.Debug.Log:LogEntry;
+export module PonyEngine.Log:LogEntry;
 
 import <chrono>;
 import <cstddef>;
@@ -25,7 +25,7 @@ import <string>;
 
 import :LogType;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Information that must be logged.
 	class LogEntry final
@@ -97,7 +97,7 @@ export namespace PonyEngine::Debug::Log
 	std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
 	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
 		m_message(message),

@@ -9,7 +9,7 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
 export module Launcher:LauncherMain;
 
@@ -17,15 +17,13 @@ import <format>;
 import <iostream>;
 
 import PonyEngine.Core.Factories;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window.Factories;
 
 import :EngineParamsProvider;
 import :EngineRunner;
 import :IPlatformEngineParamsProvider;
 import :IPlatformQuitChecker;
-
-using LogType = PonyEngine::Debug::Log::LogType;
 
 export namespace Launcher
 {
@@ -34,21 +32,21 @@ export namespace Launcher
 	/// @param quitChecker Platform quit checker.
 	/// @param platformEngineParamsProvider Platform engine params provider.
 	/// @return Exit code.
-	int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider);
+	int LauncherMain(PonyEngine::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider);
 }
 
 namespace Launcher
 {
-	int LauncherMain(PonyEngine::Debug::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
+	int LauncherMain(PonyEngine::Log::ILogger& logger, const IPlatformQuitChecker& quitChecker, const IPlatformEngineParamsProvider& platformEngineParamsProvider)
 	{
-		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine params provider.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create an engine params provider.");
 		const EngineParamsProvider engineParamsProvider(logger);
-		PONY_LOG_GENERAL(logger, LogType::Info, "Engine params provider created.");
-		PONY_LOG_GENERAL(logger, LogType::Info, "Create an engine runner.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine params provider created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create an engine runner.");
 		const EngineRunner engineRunner(logger, engineParamsProvider, platformEngineParamsProvider);
-		PONY_LOG_GENERAL(logger, LogType::Info, "Engine runner created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine runner created.");
 
-		PONY_LOG_GENERAL(logger, LogType::Info, "Start a main loop.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Start a main loop.");
 
 		int exitCode = 0;
 		bool isRunning = true;
@@ -58,7 +56,7 @@ namespace Launcher
 			isRunning = engineRunner.Tick(exitCode) && quitChecker.Check(exitCode);
 		}
 
-		PONY_LOG_GENERAL(logger, LogType::Info, std::format("Main loop ended with the exit code '{}'.", exitCode).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Main loop ended with the exit code '{}'.", exitCode).c_str());
 
 		return exitCode;
 	}

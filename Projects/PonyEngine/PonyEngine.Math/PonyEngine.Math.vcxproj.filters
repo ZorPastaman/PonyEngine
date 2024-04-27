@@ -39,13 +39,13 @@
     <ClCompile Include="Source\Public\Math\Matrix2x2.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Math\Helpers.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Math\Transformations2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Math\Transformations3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Math\Matrix4x4.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

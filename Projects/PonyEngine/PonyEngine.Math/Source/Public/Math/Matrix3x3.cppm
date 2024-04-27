@@ -99,7 +99,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Creates a matrix and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr Matrix3x3() noexcept;
+		constexpr Matrix3x3() noexcept = default;
 		/// @brief Creates a matrix and assigns its components from the arguments.
 		/// @param m00 Component 00.
 		/// @param m10 Component 10.
@@ -201,7 +201,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr const T& M12() const noexcept;
 		/// @brief Gets a component 22.
-		/// @return Component 00.
+		/// @return Component 22.
 		[[nodiscard("Pure function")]]
 		T& M22() noexcept;
 		/// @brief Gets a component 22.
@@ -256,7 +256,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
-		void Scale(const Matrix3x3<T>& scale) noexcept;
+		void Scale(const Matrix3x3& scale) noexcept;
 
 		/// @brief Gets a row.
 		/// @param rowIndex Row index.
@@ -477,7 +477,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	T& Matrix3x3<T>::Row::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * std::size_t{3}];
+		return m_row[columnIndex * 3];
 	}
 
 	template<Arithmetic T>
@@ -499,13 +499,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::ConstRow::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * std::size_t{3}];
-	}
-
-	template<Arithmetic T>
-	constexpr Matrix3x3<T>::Matrix3x3() noexcept :
-		Matrix3x3(T{}, T{}, T{}, T{}, T{}, T{}, T{}, T{}, T{})
-	{
+		return m_row[columnIndex * 3];
 	}
 
 	template<Arithmetic T>
@@ -748,7 +742,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> Matrix3x3<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const std::size_t begin = columnIndex * std::size_t{3};
+		const std::size_t begin = columnIndex * 3;
 
 		const T x = m_components[begin];
 		const T y = m_components[begin + 1];
@@ -760,7 +754,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	void Matrix3x3<T>::SetColumn(const std::size_t columnIndex, const Vector3<T>& value) noexcept
 	{
-		const std::size_t begin = columnIndex * std::size_t{3};
+		const std::size_t begin = columnIndex * 3;
 
 		m_components[begin] = value.X();
 		m_components[begin + 1] = value.Y();

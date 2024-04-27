@@ -17,8 +17,8 @@ import <type_traits>;
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
 import PonyEngine.Core.Implementation;
-import PonyEngine.Debug.Log;
-import PonyEngine.Debug.Log.Implementation;
+import PonyEngine.Log;
+import PonyEngine.Log.Implementation;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 import PonyEngine.Window.Windows.Factories;
@@ -52,7 +52,7 @@ namespace Window
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(logger);
@@ -63,13 +63,13 @@ namespace Window
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 
 		TEST_METHOD(TitleTest)
 		{
 			const wchar_t* const windowTitle = L"Title";
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Title Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			factory->SetTitle(windowTitle);
@@ -86,12 +86,12 @@ namespace Window
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 
 		TEST_METHOD(KeyboardMessageObserverTest)
 		{
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Observer Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(logger);
@@ -133,12 +133,12 @@ namespace Window
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Debug::Log::ILogger* const logger = PonyEngine::Debug::Log::CreateLogger();
+			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
 			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			Assert::AreEqual("PonyEngine::Window::WindowsWindow", factory->GetWindowName());
@@ -150,7 +150,7 @@ namespace Window
 
 			PonyEngine::Core::DestroyEngine(engine);
 			PonyEngine::Window::DestroyWindowsWindowFactory(factory);
-			PonyEngine::Debug::Log::DestroyLogger(logger);
+			PonyEngine::Log::DestroyLogger(logger);
 		}
 	};
 }

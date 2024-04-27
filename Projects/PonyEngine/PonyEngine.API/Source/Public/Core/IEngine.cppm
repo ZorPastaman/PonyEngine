@@ -12,7 +12,7 @@ export module PonyEngine.Core:IEngine;
 import <cstddef>;
 import <functional>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window;
 
 import :ISystem;
@@ -31,7 +31,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets an engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual Debug::Log::ILogger& GetLogger() const noexcept = 0;
+		virtual Log::ILogger& GetLogger() const noexcept = 0;
 		/// @brief Gets an engine window. The window is optional.
 		/// @return Engine window. Can be @a nullptr.
 		[[nodiscard("Pure function")]]

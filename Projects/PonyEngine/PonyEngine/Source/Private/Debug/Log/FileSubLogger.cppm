@@ -9,9 +9,9 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
-export module PonyEngine.Debug.Log.Implementation:FileSubLogger;
+export module PonyEngine.Log.Implementation:FileSubLogger;
 
 import <filesystem>;
 import <fstream>;
@@ -20,9 +20,9 @@ import <stdexcept>;
 import <string>;
 import <utility>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger that logs to a file.
 	class FileSubLogger final : public ISubLogger
@@ -52,7 +52,7 @@ export namespace PonyEngine::Debug::Log
 	};
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		m_logFile(logPath)
@@ -95,5 +95,5 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	const char* const FileSubLogger::Name = "PonyEngine::Debug::Log::FileSubLogger";
+	const char* const FileSubLogger::Name = "PonyEngine::Log::FileSubLogger";
 }

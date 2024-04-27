@@ -33,7 +33,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr Vector3() noexcept;
+		constexpr Vector3() noexcept = default;
 		/// @brief Creates a vector and assigns its components from the arguments.
 		/// @param x X-component.
 		/// @param y Y-component.
@@ -377,12 +377,6 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	template<Arithmetic T>
-	constexpr Vector3<T>::Vector3() noexcept :
-		Vector3(T{}, T{}, T{})
-	{
-	}
-
 	template<Arithmetic T>
 	constexpr Vector3<T>::Vector3(const T x, const T y, const T z) noexcept :
 		m_components{x, y, z}

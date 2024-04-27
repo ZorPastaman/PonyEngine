@@ -98,7 +98,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Creates a matrix and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr Matrix2x2() noexcept;
+		constexpr Matrix2x2() noexcept = default;
 		/// @brief Creates a matrix and assigns its components from the arguments.
 		/// @param m00 Component 00.
 		/// @param m10 Component 10.
@@ -423,7 +423,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	T& Matrix2x2<T>::Row::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * std::size_t{2}];
+		return m_row[columnIndex * 2];
 	}
 
 	template<Arithmetic T>
@@ -444,13 +444,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr const T& Matrix2x2<T>::ConstRow::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * std::size_t{2}];
-	}
-
-	template<Arithmetic T>
-	constexpr Matrix2x2<T>::Matrix2x2() noexcept :
-		Matrix2x2(T{}, T{}, T{}, T{})
-	{
+		return m_row[columnIndex * 2];
 	}
 
 	template<Arithmetic T>
@@ -611,7 +605,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T> Matrix2x2<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const std::size_t begin = columnIndex * std::size_t{2};
+		const std::size_t begin = columnIndex * 2;
 
 		const T x = m_components[begin];
 		const T y = m_components[begin + 1];
@@ -622,7 +616,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	void Matrix2x2<T>::SetColumn(const std::size_t columnIndex, const Vector2<T>& value) noexcept
 	{
-		const std::size_t begin = columnIndex * std::size_t{2};
+		const std::size_t begin = columnIndex * 2;
 
 		m_components[begin] = value.X();
 		m_components[begin + 1] = value.Y();

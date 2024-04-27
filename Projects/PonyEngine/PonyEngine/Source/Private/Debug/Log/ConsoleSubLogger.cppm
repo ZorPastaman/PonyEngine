@@ -9,9 +9,9 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "Log/LogMacro.h"
 
-export module PonyEngine.Debug.Log.Implementation:ConsoleSubLogger;
+export module PonyEngine.Log.Implementation:ConsoleSubLogger;
 
 import <format>;
 import <exception>;
@@ -19,9 +19,9 @@ import <iostream>;
 import <stdexcept>;
 import <string>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
 	class ConsoleSubLogger final : public ISubLogger
@@ -46,32 +46,13 @@ export namespace PonyEngine::Debug::Log
 	};
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
-	namespace
-	{
-		/// @brief Chooses a console output stream by the @p logType.
-		/// @param logType Log type.
-		/// @return Chosen stream.
-		[[nodiscard("Pure function")]]
-		std::ostream& ChooseStream(const LogType logType)
-		{
-			switch (logType)
-			{
-			case LogType::Verbose:
-			case LogType::Debug:
-			case LogType::Info:
-				return std::cout;
-			case LogType::Warning:
-				return std::clog;
-			case LogType::Error:
-			case LogType::Exception:
-				return std::cerr;
-			default:
-				throw std::invalid_argument("logType has an incorrect value.");
-			}
-		}
-	}
+	/// @brief Chooses a console output stream by the @p logType.
+	/// @param logType Log type.
+	/// @return Chosen stream.
+	[[nodiscard("Pure function")]]
+	std::ostream& ChooseStream(const LogType logType);
 
 	const char* ConsoleSubLogger::GetName() const noexcept
 	{
@@ -91,5 +72,23 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	const char* const ConsoleSubLogger::Name = "PonyEngine::Debug::Log::ConsoleSubLogger";
+	std::ostream& ChooseStream(const LogType logType)
+	{
+		switch (logType)
+		{
+		case LogType::Verbose:
+		case LogType::Debug:
+		case LogType::Info:
+			return std::cout;
+		case LogType::Warning:
+			return std::clog;
+		case LogType::Error:
+		case LogType::Exception:
+			return std::cerr;
+		default:
+			throw std::invalid_argument("logType has an incorrect value.");
+		}
+	}
+
+	const char* const ConsoleSubLogger::Name = "PonyEngine::Log::ConsoleSubLogger";
 }

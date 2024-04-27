@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log:ILogger;
+export module PonyEngine.Log:ILogger;
 
 import <exception>;
 
@@ -17,7 +17,7 @@ import :ISubLogger;
 import :LogInput;
 import :LogType;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Engine logger interface.
 	/// @details The logger is an entry point for logs. It translates the logs via its sub-loggers.

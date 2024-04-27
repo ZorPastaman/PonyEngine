@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Debug.Log:LogType;
+export module PonyEngine.Log:LogType;
 
 import <algorithm>;
 import <array>;
@@ -17,7 +17,7 @@ import <string>;
 import <ostream>;
 import <type_traits>;
 
-export namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Severity of a log.
 	enum class LogType : std::uint_fast8_t
@@ -66,55 +66,25 @@ export namespace PonyEngine::Debug::Log
 	std::ostream& operator <<(std::ostream& stream, LogType logType);
 }
 
-namespace PonyEngine::Debug::Log
+namespace PonyEngine::Log
 {
-	namespace
+	/// @brief Log type names by index.
+	constexpr std::array<const char*, 7> LogTypeNames
 	{
-		/// @brief Log type names by index.
-		constexpr std::array<const char*, 7> LogTypeNames
-		{
-			"Verbose",
-			"Debug",
-			"Info",
-			"Warning",
-			"Error",
-			"Exception",
-			"Unknown"
-		};
+		"Verbose",
+		"Debug",
+		"Info",
+		"Warning",
+		"Error",
+		"Exception",
+		"Unknown"
+	};
 
-		/// @brief Creates a string representing the @p logType.
-		/// @param logType Log type.
-		/// @return Created string.
-		[[nodiscard("Pure function")]]
-		std::string ToStringInternal(LogType logType)
-		{
-			std::string answer;
-
-			if (logType == LogType::None)
-			{
-				answer = "None";
-			}
-			else
-			{
-				for (auto number = static_cast<std::underlying_type_t<LogType>>(logType), steps = std::underlying_type_t<LogType>{0};
-					number != std::underlying_type_t<LogType>{0};
-					number >>= 1, steps = std::min(static_cast<std::underlying_type_t<LogType>>(steps + 1), static_cast<std::underlying_type_t<LogType>>(LogTypeNames.size() - 1)))
-				{
-					if (number & std::underlying_type_t<LogType>{1})
-					{
-						answer += LogTypeNames[steps];
-
-						if (number >> 1)
-						{
-							answer += " | ";
-						}
-					}
-				}
-			}
-
-			return answer;
-		}
-	}
+	/// @brief Creates a string representing the @p logType.
+	/// @param logType Log type.
+	/// @return Created string.
+	[[nodiscard("Pure function")]]
+	std::string ToStringInternal(LogType logType);
 
 	std::string ToString(const LogType logType, const bool addNumber)
 	{
@@ -127,6 +97,35 @@ namespace PonyEngine::Debug::Log
 
 		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
 		return std::format("{} ({})", answer, number);
+	}
+
+	std::string ToStringInternal(LogType logType)
+	{
+		std::string answer;
+
+		if (logType == LogType::None)
+		{
+			answer = "None";
+		}
+		else
+		{
+			for (auto number = static_cast<std::underlying_type_t<LogType>>(logType), steps = std::underlying_type_t<LogType>{ 0 };
+				number != std::underlying_type_t<LogType>{0};
+				number >>= 1, steps = std::min(static_cast<std::underlying_type_t<LogType>>(steps + 1), static_cast<std::underlying_type_t<LogType>>(LogTypeNames.size() - 1)))
+			{
+				if (number & std::underlying_type_t<LogType>{1})
+				{
+					answer += LogTypeNames[steps];
+
+					if (number >> 1)
+					{
+						answer += " | ";
+					}
+				}
+			}
+		}
+
+		return answer;
 	}
 
 	constexpr LogType operator ~(const LogType logType) noexcept
