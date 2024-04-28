@@ -97,7 +97,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Creates a matrix and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr Matrix4x4() noexcept = default;
+		constexpr Matrix4x4() noexcept = default; // TODO: empty default constructor.
 		/// @brief Creates a matrix and assigns its components from the arguments.
 		/// @param m00 Component 00.
 		/// @param m10 Component 10.
@@ -364,7 +364,7 @@ export namespace PonyEngine::Math
 		void SetCounterDiagonal(const Vector4<T>& value) noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
-		///        The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
+		///        The format is '(m00, m01, m02, m03)(m10, m11, m12, m13)(m20, m21, m22, m23)(m30, m31, m32, m33)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
@@ -471,7 +471,7 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @return Product.
 	template<std::integral T> [[nodiscard("Pure operator")]]
-	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, T multiplier) noexcept;
+	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, T multiplier) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -485,7 +485,7 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @return Product.
 	template<std::integral T> [[nodiscard("Pure operator")]]
-	constexpr Matrix4x4<T> operator *(T multiplier, const Matrix4x4<T>& matrix) noexcept;
+	constexpr Matrix4x4<T> operator *(T multiplier, const Matrix4x4<T>& matrix) noexcept requires(std::is_integral_v<T>);
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
@@ -949,4 +949,393 @@ namespace PonyEngine::Math
 		m_components[begin + 2] = value.Z();
 		m_components[begin + 3] = value.W();
 	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetDiagonal() const noexcept
+	{
+		return Vector4<T>(M00(), M11(), M22(), M33());
+	}
+
+	template<Arithmetic T>
+	void Matrix4x4<T>::SetDiagonal(const Vector4<T>& value) noexcept
+	{
+		M00() = value.X();
+		M11() = value.Y();
+		M22() = value.Z();
+		M33() = value.W();
+	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetCounterDiagonal() const noexcept
+	{
+		return Vector4<T>(M03(), M12(), M21(), M30());
+	}
+
+	template<Arithmetic T>
+	void Matrix4x4<T>::SetCounterDiagonal(const Vector4<T>& value) noexcept
+	{
+		M03() = value.X();
+		M12() = value.Y();
+		M21() = value.Z();
+		M30() = value.W();
+	}
+
+	template<Arithmetic T>
+	std::string Matrix4x4<T>::ToString() const
+	{
+		return std::format("({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})", M00(), M01(), M02(), M03(), M10(), M11(), M12(), M13(), M20(), M21(), M22(), M23(), M30(), M31(), M32(), M33());
+	}
+
+	template<Arithmetic T>
+	typename Matrix4x4<T>::Row Matrix4x4<T>::operator [](const std::size_t rowIndex) noexcept
+	{
+		return Row(Data()[rowIndex]);
+	}
+
+	template<Arithmetic T>
+	constexpr typename Matrix4x4<T>::ConstRow Matrix4x4<T>::operator [](const std::size_t rowIndex) const noexcept
+	{
+		return ConstRow(Data()[rowIndex]);
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator +=(const Matrix4x4& other) noexcept
+	{
+		M00() += other.M00();
+		M10() += other.M10();
+		M20() += other.M20();
+		M30() += other.M30();
+		M10() += other.M10();
+		M11() += other.M11();
+		M21() += other.M21();
+		M31() += other.M31();
+		M02() += other.M02();
+		M12() += other.M12();
+		M22() += other.M22();
+		M32() += other.M32();
+		M03() += other.M03();
+		M13() += other.M13();
+		M23() += other.M23();
+		M33() += other.M33();
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator -=(const Matrix4x4& other) noexcept
+	{
+		M00() -= other.M00();
+		M10() -= other.M10();
+		M20() -= other.M20();
+		M30() -= other.M30();
+		M10() -= other.M10();
+		M11() -= other.M11();
+		M21() -= other.M21();
+		M31() -= other.M31();
+		M02() -= other.M02();
+		M12() -= other.M12();
+		M22() -= other.M22();
+		M32() -= other.M32();
+		M03() -= other.M03();
+		M13() -= other.M13();
+		M23() -= other.M23();
+		M33() -= other.M33();
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	{
+		M00() *= multiplier;
+		M10() *= multiplier;
+		M20() *= multiplier;
+		M30() *= multiplier;
+		M10() *= multiplier;
+		M11() *= multiplier;
+		M21() *= multiplier;
+		M31() *= multiplier;
+		M02() *= multiplier;
+		M12() *= multiplier;
+		M22() *= multiplier;
+		M32() *= multiplier;
+		M03() *= multiplier;
+		M13() *= multiplier;
+		M23() *= multiplier;
+		M33() *= multiplier;
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator *=(const ComputationalType multiplier) noexcept
+	{
+		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() * multiplier);
+		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() * multiplier);
+		M20() = RoundToIntegralIfPossible<ComputationalType, T>(M20() * multiplier);
+		M30() = RoundToIntegralIfPossible<ComputationalType, T>(M30() * multiplier);
+		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() * multiplier);
+		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() * multiplier);
+		M21() = RoundToIntegralIfPossible<ComputationalType, T>(M21() * multiplier);
+		M31() = RoundToIntegralIfPossible<ComputationalType, T>(M31() * multiplier);
+		M02() = RoundToIntegralIfPossible<ComputationalType, T>(M02() * multiplier);
+		M12() = RoundToIntegralIfPossible<ComputationalType, T>(M12() * multiplier);
+		M22() = RoundToIntegralIfPossible<ComputationalType, T>(M22() * multiplier);
+		M32() = RoundToIntegralIfPossible<ComputationalType, T>(M32() * multiplier);
+		M03() = RoundToIntegralIfPossible<ComputationalType, T>(M03() * multiplier);
+		M13() = RoundToIntegralIfPossible<ComputationalType, T>(M13() * multiplier);
+		M23() = RoundToIntegralIfPossible<ComputationalType, T>(M23() * multiplier);
+		M33() = RoundToIntegralIfPossible<ComputationalType, T>(M33() * multiplier);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator *=(const Matrix4x4& other) noexcept
+	{
+		return *this = *this * other;
+	}
+
+	template<Arithmetic T>
+	Matrix4x4<T>& Matrix4x4<T>::operator /=(const ComputationalType divisor) noexcept
+	{
+		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() / divisor);
+		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() / divisor);
+		M20() = RoundToIntegralIfPossible<ComputationalType, T>(M20() / divisor);
+		M30() = RoundToIntegralIfPossible<ComputationalType, T>(M30() / divisor);
+		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() / divisor);
+		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() / divisor);
+		M21() = RoundToIntegralIfPossible<ComputationalType, T>(M21() / divisor);
+		M31() = RoundToIntegralIfPossible<ComputationalType, T>(M31() / divisor);
+		M02() = RoundToIntegralIfPossible<ComputationalType, T>(M02() / divisor);
+		M12() = RoundToIntegralIfPossible<ComputationalType, T>(M12() / divisor);
+		M22() = RoundToIntegralIfPossible<ComputationalType, T>(M22() / divisor);
+		M32() = RoundToIntegralIfPossible<ComputationalType, T>(M32() / divisor);
+		M03() = RoundToIntegralIfPossible<ComputationalType, T>(M03() / divisor);
+		M13() = RoundToIntegralIfPossible<ComputationalType, T>(M13() / divisor);
+		M23() = RoundToIntegralIfPossible<ComputationalType, T>(M23() / divisor);
+		M33() = RoundToIntegralIfPossible<ComputationalType, T>(M33() / divisor);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	constexpr bool Matrix4x4<T>::operator ==(const Matrix4x4& other) const noexcept
+	{
+		return m_components == other.m_components;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> Scale(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
+	{
+		const T m00 = left.M00() * right.M00();
+		const T m10 = left.M10() * right.M10();
+		const T m20 = left.M20() * right.M20();
+		const T m30 = left.M30() * right.M30();
+		const T m01 = left.M01() * right.M01();
+		const T m11 = left.M11() * right.M11();
+		const T m21 = left.M21() * right.M21();
+		const T m31 = left.M31() * right.M31();
+		const T m02 = left.M02() * right.M02();
+		const T m12 = left.M12() * right.M12();
+		const T m22 = left.M22() * right.M22();
+		const T m32 = left.M32() * right.M32();
+		const T m03 = left.M03() * right.M03();
+		const T m13 = left.M13() * right.M13();
+		const T m23 = left.M23() * right.M23();
+		const T m33 = left.M33() * right.M33();
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<Arithmetic T>
+	constexpr bool AreAlmostEqual(const Matrix4x4<T>& left, const Matrix4x4<T>& right, const typename Matrix4x4<T>::ComputationalType tolerance) noexcept
+	{
+		const Matrix4x4<T> diff = left - right;
+		const T kindOfMagnitudeSquared = diff.M00() * diff.M00() + diff.M10() * diff.M10() + diff.M20() * diff.M20() + diff.M30() * diff.M30() + 
+			diff.M01() * diff.M01() + diff.M11() * diff.M11() + diff.M21() * diff.M21() + diff.M31() * diff.M31() + 
+			diff.M02() * diff.M02() + diff.M12() * diff.M12() + diff.M22() * diff.M22() + diff.M32() * diff.M32() +
+			diff.M03() * diff.M03() + diff.M13() * diff.M13() + diff.M23() * diff.M23() + diff.M33() * diff.M33();
+
+		return kindOfMagnitudeSquared < tolerance * tolerance;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator +(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
+	{
+		const T m00 = left.M00() + right.M00();
+		const T m10 = left.M10() + right.M10();
+		const T m20 = left.M20() + right.M20();
+		const T m30 = left.M30() + right.M30();
+		const T m01 = left.M01() + right.M01();
+		const T m11 = left.M11() + right.M11();
+		const T m21 = left.M21() + right.M21();
+		const T m31 = left.M31() + right.M31();
+		const T m02 = left.M02() + right.M02();
+		const T m12 = left.M12() + right.M12();
+		const T m22 = left.M22() + right.M22();
+		const T m32 = left.M32() + right.M32();
+		const T m03 = left.M03() + right.M03();
+		const T m13 = left.M13() + right.M13();
+		const T m23 = left.M23() + right.M23();
+		const T m33 = left.M33() + right.M33();
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator -(const Matrix4x4<T>& matrix) noexcept
+	{
+		return Matrix4x4(-matrix.M00(), -matrix.M10(), -matrix.M20(), -matrix.M30(), -matrix.M01(), -matrix.M11(), -matrix.M21(), -matrix.M31(), 
+			-matrix.M02(), -matrix.M12(), -matrix.M22(), -matrix.M32(), -matrix.M03(), -matrix.M13(), -matrix.M23(), -matrix.M33());
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator -(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
+	{
+		const T m00 = left.M00() - right.M00();
+		const T m10 = left.M10() - right.M10();
+		const T m20 = left.M20() - right.M20();
+		const T m30 = left.M30() - right.M30();
+		const T m01 = left.M01() - right.M01();
+		const T m11 = left.M11() - right.M11();
+		const T m21 = left.M21() - right.M21();
+		const T m31 = left.M31() - right.M31();
+		const T m02 = left.M02() - right.M02();
+		const T m12 = left.M12() - right.M12();
+		const T m22 = left.M22() - right.M22();
+		const T m32 = left.M32() - right.M32();
+		const T m03 = left.M03() - right.M03();
+		const T m13 = left.M13() - right.M13();
+		const T m23 = left.M23() - right.M23();
+		const T m33 = left.M33() - right.M33();
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<std::integral T>
+	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, const T multiplier) noexcept requires(std::is_integral_v<T>)
+	{
+		const T m00 = matrix.M00() * multiplier;
+		const T m10 = matrix.M10() * multiplier;
+		const T m20 = matrix.M20() * multiplier;
+		const T m30 = matrix.M30() * multiplier;
+		const T m01 = matrix.M01() * multiplier;
+		const T m11 = matrix.M11() * multiplier;
+		const T m21 = matrix.M21() * multiplier;
+		const T m31 = matrix.M31() * multiplier;
+		const T m02 = matrix.M02() * multiplier;
+		const T m12 = matrix.M12() * multiplier;
+		const T m22 = matrix.M22() * multiplier;
+		const T m32 = matrix.M32() * multiplier;
+		const T m03 = matrix.M03() * multiplier;
+		const T m13 = matrix.M13() * multiplier;
+		const T m23 = matrix.M23() * multiplier;
+		const T m33 = matrix.M33() * multiplier;
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, const typename Matrix4x4<T>::ComputationalType multiplier) noexcept
+	{
+		const T m00 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M00() * multiplier);
+		const T m10 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M10() * multiplier);
+		const T m20 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M20() * multiplier);
+		const T m30 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M30() * multiplier);
+		const T m01 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M01() * multiplier);
+		const T m11 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M11() * multiplier);
+		const T m21 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M21() * multiplier);
+		const T m31 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M31() * multiplier);
+		const T m02 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M02() * multiplier);
+		const T m12 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M12() * multiplier);
+		const T m22 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M22() * multiplier);
+		const T m32 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M32() * multiplier);
+		const T m03 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M03() * multiplier);
+		const T m13 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M13() * multiplier);
+		const T m23 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M23() * multiplier);
+		const T m33 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M33() * multiplier);
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<std::integral T>
+	constexpr Matrix4x4<T> operator *(const T multiplier, const Matrix4x4<T>& matrix) noexcept requires(std::is_integral_v<T>)
+	{
+		return matrix * multiplier;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator *(const typename Matrix4x4<T>::ComputationalType multiplier, const Matrix4x4<T>& matrix) noexcept
+	{
+		return matrix * multiplier;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
+	{
+		const T m00 = left.M00() * right.M00() + left.M01() * right.M10() + left.M02() * right.M20() + left.M03() * right.M30();
+		const T m10 = left.M10() * right.M00() + left.M11() * right.M10() + left.M12() * right.M20() + left.M13() * right.M30();
+		const T m20 = left.M20() * right.M00() + left.M21() * right.M10() + left.M22() * right.M20() + left.M23() * right.M30();
+		const T m30 = left.M30() * right.M00() + left.M31() * right.M10() + left.M32() * right.M20() + left.M33() * right.M30();
+		const T m01 = left.M00() * right.M01() + left.M01() + right.M11() + left.M02() * right.M21() + left.M03() * right.M31();
+		const T m11 = left.M10() * right.M01() + left.M11() * right.M11() + left.M12() * right.M21() + left.M13() * right.M31();
+		const T m21 = left.M20() * right.M01() + left.M21() * right.M11() + left.M22() * right.M21() + left.M23() * right.M31();
+		const T m31 = left.M30() * right.M01() + left.M31() * right.M11() + left.M32() * right.M21() + left.M33() * right.M31();
+		const T m02 = left.M00() * right.M02() + left.M01() * right.M12() + left.M02() * right.M22() + left.M03() * right.M32();
+		const T m12 = left.M10() * right.M02() + left.M11() * right.M12() + left.M12() * right.M22() + left.M13() * right.M32();
+		const T m22 = left.M20() * right.M02() + left.M21() * right.M12() + left.M22() * right.M22() + left.M23() * right.M32();
+		const T m32 = left.M30() * right.M02() + left.M31() * right.M12() + left.M32() * right.M22() + left.M33() * right.M32();
+		const T m03 = left.M00() * right.M03() + left.M01() * right.M13() + left.M02() * right.M23() + left.M03() * right.M33();
+		const T m13 = left.M10() * right.M03() + left.M11() * right.M13() + left.M12() * right.M23() + left.M13() * right.M33();
+		const T m23 = left.M20() * right.M03() + left.M21() * right.M13() + left.M22() * right.M23() + left.M23() * right.M33();
+		const T m33 = left.M30() * right.M03() + left.M31() * right.M13() + left.M32() * right.M23() + left.M33() * right.M33();
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> operator *(const Matrix4x4<T>& matrix, const Vector4<T>& vector) noexcept
+	{
+		const T x = matrix.M00() * vector.X() + matrix.M01() * vector.Y() + matrix.M02() * vector.Z() + matrix.M03() * vector.W();
+		const T y = matrix.M10() * vector.X() + matrix.M11() * vector.Y() + matrix.M12() * vector.Z() + matrix.M13() * vector.W();
+		const T z = matrix.M20() * vector.X() + matrix.M21() * vector.Y() + matrix.M22() * vector.Z() + matrix.M23() * vector.W();
+		const T w = matrix.M30() * vector.X() + matrix.M31() * vector.Y() + matrix.M32() * vector.Z() + matrix.M33() * vector.W();
+
+		return Vector4<T>(x, y, z, w);
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> operator /(const Matrix4x4<T>& matrix, const typename Matrix4x4<T>::ComputationalType divisor) noexcept
+	{
+		const T m00 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M00() / divisor);
+		const T m10 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M10() / divisor);
+		const T m20 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M20() / divisor);
+		const T m30 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M30() / divisor);
+		const T m01 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M01() / divisor);
+		const T m11 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M11() / divisor);
+		const T m21 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M21() / divisor);
+		const T m31 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M31() / divisor);
+		const T m02 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M02() / divisor);
+		const T m12 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M12() / divisor);
+		const T m22 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M22() / divisor);
+		const T m32 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M32() / divisor);
+		const T m03 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M03() / divisor);
+		const T m13 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M13() / divisor);
+		const T m23 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M23() / divisor);
+		const T m33 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M33() / divisor);
+
+		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+	}
+
+	template<Arithmetic T>
+	std::ostream& operator <<(std::ostream& stream, const Matrix4x4<T>& matrix)
+	{
+		return stream << matrix.ToString();
+	}
+
+	template<Arithmetic T>
+	const Matrix4x4<T> Matrix4x4<T>::Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1});
+	template<Arithmetic T>
+	const Matrix4x4<T> Matrix4x4<T>::Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
 }
