@@ -88,8 +88,8 @@ namespace Math
 			Assert::AreEqual(magnitudeSquaredF, vectorF.MagnitudeSquared());
 			Assert::AreEqual(magnitudeF, vectorF.Magnitude());
 
-			Assert::AreEqual(0.f, PonyEngine::Math::Vector2<float>::Zero.MagnitudeSquared());
-			Assert::AreEqual(0.f, PonyEngine::Math::Vector2<float>::Zero.Magnitude());
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector2Zero<float>.MagnitudeSquared());
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector2Zero<float>.Magnitude());
 
 			short xi = 7;
 			short yi = -17;
@@ -100,8 +100,8 @@ namespace Math
 			Assert::AreEqual(magnitudeSquaredI, vectorI.MagnitudeSquared());
 			Assert::AreEqual(magnitudeI, vectorI.Magnitude());
 
-			Assert::AreEqual(short{0}, PonyEngine::Math::Vector2<short>::Zero.MagnitudeSquared());
-			Assert::AreEqual(0.f, PonyEngine::Math::Vector2<short>::Zero.Magnitude());
+			Assert::AreEqual(short{0}, PonyEngine::Math::Vector2Zero<short>.MagnitudeSquared());
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector2Zero<short>.Magnitude());
 		}
 
 		TEST_METHOD(NormalizationTest)
@@ -121,7 +121,7 @@ namespace Math
 			Assert::AreEqual(normVectorF.X(), vectorF.X());
 			Assert::AreEqual(normVectorF.Y(), vectorF.Y());
 
-			auto zeroNormalizedF = PonyEngine::Math::Vector2<float>::Zero.Normalized();
+			auto zeroNormalizedF = PonyEngine::Math::Vector2Zero<float>.Normalized();
 			Assert::IsFalse(std::isnormal(zeroNormalizedF.X()));
 			Assert::IsFalse(std::isnormal(zeroNormalizedF.Y()));
 
@@ -129,8 +129,8 @@ namespace Math
 			short yi = 15;
 			auto vectorI = PonyEngine::Math::Vector2<short>(xi, yi);
 			float magnitudeI = vectorI.Magnitude();
-			short normXI = PonyEngine::Math::RoundToIntegral<float, short>(xi / magnitudeI);
-			short normYI = PonyEngine::Math::RoundToIntegral<float, short>(yi / magnitudeI);
+			short normXI = static_cast<short>(xi / magnitudeI);
+			short normYI = static_cast<short>(yi / magnitudeI);
 			auto normVectorI = vectorI.Normalized();
 
 			Assert::AreEqual(normXI, normVectorI.X());
@@ -140,7 +140,7 @@ namespace Math
 			Assert::AreEqual(normVectorI.X(), vectorI.X());
 			Assert::AreEqual(normVectorI.Y(), vectorI.Y());
 
-			auto zeroNormalizedI = PonyEngine::Math::Vector2<short>::Zero.Normalized();
+			auto zeroNormalizedI = PonyEngine::Math::Vector2Zero<short>.Normalized();
 			Assert::AreEqual(short{0}, zeroNormalizedI.X());
 			Assert::AreEqual(short{0}, zeroNormalizedI.Y());
 		}
@@ -164,8 +164,8 @@ namespace Math
 
 		TEST_METHOD(IsFiniteTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Zero.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::One.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Vector2Zero<float>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Vector2One<float>.IsFinite());
 			float nan = std::numeric_limits<float>::quiet_NaN();
 			auto vector = PonyEngine::Math::Vector2<float>(nan, 0.f);
 			Assert::IsFalse(vector.IsFinite());
@@ -173,8 +173,8 @@ namespace Math
 			vector.Y() = nan;
 			Assert::IsFalse(vector.IsFinite());
 
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Zero.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::One.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Vector2Zero<short>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Vector2One<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetTest)
@@ -352,34 +352,29 @@ namespace Math
 
 			leftI = centralI = PonyEngine::Math::Vector2<short>(xi, yi);
 			leftI = centralI /= multiplier;
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(xi / multiplier), leftI.X());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(yi / multiplier), leftI.Y());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(xi / multiplier), centralI.X());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(yi / multiplier), centralI.Y());
+			Assert::AreEqual(static_cast<short>(xi / multiplier), leftI.X());
+			Assert::AreEqual(static_cast<short>(yi / multiplier), leftI.Y());
+			Assert::AreEqual(static_cast<short>(xi / multiplier), centralI.X());
+			Assert::AreEqual(static_cast<short>(yi / multiplier), centralI.Y());
 		}
 
 		TEST_METHOD(DefaultsTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Up == PonyEngine::Math::Vector2<float>(0.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Down == PonyEngine::Math::Vector2<float>(0.f, -1.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Right == PonyEngine::Math::Vector2<float>(1.f, 0.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Left == PonyEngine::Math::Vector2<float>(-1.f, 0.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::One == PonyEngine::Math::Vector2<float>(1.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Zero == PonyEngine::Math::Vector2<float>(0.f, 0.f));
-			Assert::IsTrue(PonyEngine::Math::Vector2<float>::Negative == PonyEngine::Math::Vector2<float>(-1.f, -1.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Up<float> == PonyEngine::Math::Vector2<float>(0.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Down<float> == PonyEngine::Math::Vector2<float>(0.f, -1.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Right<float> == PonyEngine::Math::Vector2<float>(1.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Left<float> == PonyEngine::Math::Vector2<float>(-1.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2One<float> == PonyEngine::Math::Vector2<float>(1.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Zero<float> == PonyEngine::Math::Vector2<float>(0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Vector2Negative<float> == PonyEngine::Math::Vector2<float>(-1.f, -1.f));
 
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Up == PonyEngine::Math::Vector2<short>(0, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Down == PonyEngine::Math::Vector2<short>(0, -1));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Right == PonyEngine::Math::Vector2<short>(1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Left == PonyEngine::Math::Vector2<short>(-1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::One == PonyEngine::Math::Vector2<short>(1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Zero == PonyEngine::Math::Vector2<short>(0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector2<short>::Negative == PonyEngine::Math::Vector2<short>(-1, -1));
-
-			Assert::IsTrue(PonyEngine::Math::Vector2<unsigned char>::Up == PonyEngine::Math::Vector2<unsigned char>(0, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector2<unsigned char>::Right == PonyEngine::Math::Vector2<unsigned char>(1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector2<unsigned char>::One == PonyEngine::Math::Vector2<unsigned char>(1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector2<unsigned char>::Zero == PonyEngine::Math::Vector2<unsigned char>(0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector2Up<short> == PonyEngine::Math::Vector2<short>(0, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector2Down<short> == PonyEngine::Math::Vector2<short>(0, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector2Right<short> == PonyEngine::Math::Vector2<short>(1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector2Left<short> == PonyEngine::Math::Vector2<short>(-1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector2One<short> == PonyEngine::Math::Vector2<short>(1, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector2Zero<short> == PonyEngine::Math::Vector2<short>(0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector2Negative<short> == PonyEngine::Math::Vector2<short>(-1, -1));
 		}
 
 		TEST_METHOD(DotTest)
@@ -395,9 +390,9 @@ namespace Math
 			float vectorDotF = PonyEngine::Math::Dot(vectorF, vectorF1);
 			Assert::AreEqual(dotF, vectorDotF);
 
-			Assert::AreEqual(0.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<float>::Zero, PonyEngine::Math::Vector2<float>::Zero));
-			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<float>::Up, PonyEngine::Math::Vector2<float>::Up));
-			Assert::AreEqual(-1.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<float>::Up, PonyEngine::Math::Vector2<float>::Down));
+			Assert::AreEqual(0.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Zero<float>, PonyEngine::Math::Vector2Zero<float>));
+			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Up<float>, PonyEngine::Math::Vector2Up<float>));
+			Assert::AreEqual(-1.f, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Up<float>, PonyEngine::Math::Vector2Down<float>));
 
 			short xi = 5;
 			short yi = -1;
@@ -410,9 +405,9 @@ namespace Math
 			short vectorDotI = PonyEngine::Math::Dot(vectorI, vectorI1);
 			Assert::AreEqual(dotI, vectorDotI);
 
-			Assert::AreEqual(short{0}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<short>::Zero, PonyEngine::Math::Vector2<short>::Zero));
-			Assert::AreEqual(short{1}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<short>::Up, PonyEngine::Math::Vector2<short>::Up));
-			Assert::AreEqual(short{-1}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2<short>::Up, PonyEngine::Math::Vector2<short>::Down));
+			Assert::AreEqual(short{0}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Zero<short>, PonyEngine::Math::Vector2Zero<short>));
+			Assert::AreEqual(short{1}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Up<short>, PonyEngine::Math::Vector2Up<short>));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::Dot(PonyEngine::Math::Vector2Up<short>, PonyEngine::Math::Vector2Down<short>));
 		}
 
 		TEST_METHOD(AngleTest)
@@ -475,7 +470,7 @@ namespace Math
 			vectorI1.Set(3, 1);
 			auto projectedI = PonyEngine::Math::Project(vectorI, vectorI1);
 			Assert::AreEqual(short{2}, projectedI.X());
-			Assert::AreEqual(short{1}, projectedI.Y());
+			Assert::AreEqual(short{0}, projectedI.Y());
 		}
 
 		TEST_METHOD(ProjectOnPlaneTest)
@@ -799,27 +794,13 @@ namespace Math
 			static constexpr PonyEngine::Math::Vector2<float> StaticVector(0.f, 1.f);
 			constexpr auto pointer = StaticVector.Data();
 
-			constexpr auto up = PonyEngine::Math::Vector2<float>::UpConsteval();
-			Assert::AreEqual(0.f, up.X());
-			Assert::AreEqual(1.f, up.Y());
-			constexpr auto down = PonyEngine::Math::Vector2<float>::DownConsteval();
-			Assert::AreEqual(0.f, down.X());
-			Assert::AreEqual(-1.f, down.Y());
-			constexpr auto right = PonyEngine::Math::Vector2<float>::RightConsteval();
-			Assert::AreEqual(1.f, right.X());
-			Assert::AreEqual(0.f, right.Y());
-			constexpr auto left = PonyEngine::Math::Vector2<float>::LeftConsteval();
-			Assert::AreEqual(-1.f, left.X());
-			Assert::AreEqual(0.f, left.Y());
-			constexpr auto one = PonyEngine::Math::Vector2<float>::OneConsteval();
-			Assert::AreEqual(1.f, one.X());
-			Assert::AreEqual(1.f, one.Y());
-			constexpr auto zero = PonyEngine::Math::Vector2<float>::ZeroConsteval();
-			Assert::AreEqual(0.f, zero.X());
-			Assert::AreEqual(0.f, zero.Y());
-			constexpr auto negative = PonyEngine::Math::Vector2<float>::NegativeConsteval();
-			Assert::AreEqual(-1.f, negative.X());
-			Assert::AreEqual(-1.f, negative.Y());
+			constexpr auto up = PonyEngine::Math::Vector2Up<float>;
+			constexpr auto down = PonyEngine::Math::Vector2Down<float>;
+			constexpr auto right = PonyEngine::Math::Vector2Right<float>;
+			constexpr auto left = PonyEngine::Math::Vector2Left<float>;
+			constexpr auto one = PonyEngine::Math::Vector2One<float>;
+			constexpr auto zero = PonyEngine::Math::Vector2Zero<float>;
+			constexpr auto negative = PonyEngine::Math::Vector2Negative<float>;
 
 			constexpr float magnitudeSquared = vector.MagnitudeSquared();
 

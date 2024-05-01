@@ -71,13 +71,6 @@ export namespace PonyEngine::Math
 	/// @return Rounded integral.
 	template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
-	/// @brief Calls @p RoundToIntegral if @p From is a floating point type and @p To is an integral type; otherwise it just does @a static_cast<To>(from).
-	/// @tparam From From type.
-	/// @tparam To To type.
-	/// @param from from value.
-	/// @return Rounded or cast value.
-	template<Arithmetic From, Arithmetic To> [[nodiscard("Pure function")]]
-	constexpr To RoundToIntegralIfPossible(From from) noexcept;
 }
 
 namespace PonyEngine::Math
@@ -98,18 +91,5 @@ namespace PonyEngine::Math
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
 		return static_cast<To>(from + From{0.5} - (from < From{0}));
-	}
-
-	template<Arithmetic From, Arithmetic To>
-	constexpr To RoundToIntegralIfPossible(const From from) noexcept
-	{
-		if constexpr (std::is_floating_point_v<From> && std::is_integral_v<To>)
-		{
-			return RoundToIntegral<From, To>(from);
-		}
-		else
-		{
-			return static_cast<To>(from);
-		}
 	}
 }

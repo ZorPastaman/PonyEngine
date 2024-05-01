@@ -269,6 +269,14 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m01, m11.
 	};
 
+	template<Arithmetic T>
+	constexpr Matrix2x2<T> Matrix2x2Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1});
+	template<Arithmetic T>
+	constexpr Matrix2x2<T> Matrix2x2Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0});
+
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Dot(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept;
+
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
 	/// @param left Multiplicand.
@@ -366,11 +374,6 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix2x2<T>& matrix);
-
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1});
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0});
 }
 
 namespace PonyEngine::Math
@@ -423,7 +426,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix2x2<T>::Matrix2x2(const T* components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, m_components.data());
+		std::ranges::copy(components, components + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
@@ -541,7 +544,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	void Matrix2x2<T>::Set(const T* components) noexcept
 	{
-		std::ranges::copy(components, ComponentCount, m_components.data());
+		std::ranges::copy(components, ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
@@ -565,7 +568,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T> Matrix2x2<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const T* const columnBegin = m_components.data() + columnIndex * Dimension;
+		const T* const columnBegin = Data() + columnIndex * Dimension;
 
 		return Vector2<T>(columnBegin);
 	}
@@ -573,7 +576,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	void Matrix2x2<T>::SetColumn(const std::size_t columnIndex, const Vector2<T>& value) noexcept
 	{
-		T* const columnBegin = m_components.data() + columnIndex * Dimension;
+		T* const columnBegin = Data() + columnIndex * Dimension;
 		std::ranges::copy(value.Data(), value.Data() + Dimension, columnBegin);
 	}
 
@@ -610,6 +613,12 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr T Dot(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
+	{
+		return left.M00() * right.M00() + left.M10() * right.M10() + left.M01() * right.M01() + left.M11() * right.M11();
+	}
+
+	template<Arithmetic T>
 	constexpr Matrix2x2<T> Scale(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
 		Matrix2x2<T> scaled;
@@ -622,9 +631,8 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const Matrix2x2<T>& left, const Matrix2x2<T>& right, const typename Matrix2x2<T>::ComputationalType tolerance) noexcept
 	{
 		const Matrix2x2<T> diff = left - right;
-		const T magnitudeSquared = Dot(diff.Data(), Matrix2x2<T>::ComponentCount);
 
-		return magnitudeSquared < tolerance * tolerance;
+		return Dot(diff, diff) < tolerance * tolerance;
 	}
 
 	template<Arithmetic T>
