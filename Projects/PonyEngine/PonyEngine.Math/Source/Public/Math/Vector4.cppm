@@ -9,14 +9,17 @@
 
 export module PonyEngine.Math:Vector4;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <type_traits>;
 
+import :ArrayArithmetics;
 import :Common;
 
 export namespace PonyEngine::Math
@@ -30,6 +33,8 @@ export namespace PonyEngine::Math
 		using ValueType = T; ///< Component type.
 		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
+		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any Vector4, it's always 4.
+
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4() noexcept = default;
@@ -41,32 +46,18 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(T x, T y, T z, T w) noexcept;
 		[[nodiscard("Pure constructor")]]
+		explicit constexpr Vector4(const T* components) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(const Vector4& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(Vector4&& other) noexcept = default;
 
 		constexpr ~Vector4() noexcept = default;
 
-		/// @brief Creates a Vector4(1, 1, 1, 1).
-		/// @return One vector.
-		///	@remark For non-constexpr execution use @p Vector4::One variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector4 OneConsteval();
-		/// @brief Creates a Vector4(0, 0, 0, 0).
-		/// @return Zero vector.
-		///	@remark For non-constexpr execution use @p Vector4::Zero variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector4 ZeroConsteval();
-		/// @brief Creates a Vector4(-1, -1, -1, -1).
-		/// @return Negative vector.
-		///	@remark For non-constexpr execution use @p Vector4::Negative variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector4 NegativeConsteval();
-
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		T& X() noexcept;
+		constexpr T& X() noexcept;
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
@@ -74,7 +65,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		T& Y() noexcept;
+		constexpr T& Y() noexcept;
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
@@ -82,7 +73,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
-		T& Z() noexcept;
+		constexpr T& Z() noexcept;
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
@@ -90,7 +81,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
-		T& W() noexcept;
+		constexpr T& W() noexcept;
 		/// @brief Gets a w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
@@ -98,7 +89,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -137,6 +128,7 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		/// @param w W-component.
 		void Set(T x, T y, T z, T w) noexcept;
+		void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
@@ -151,7 +143,7 @@ export namespace PonyEngine::Math
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		T& operator [](std::size_t index) noexcept;
+		constexpr T& operator [](std::size_t index) noexcept;
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
@@ -184,15 +176,16 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Vector4& other) const noexcept;
 
-		static const Vector4 One; ///< Vector4(1, 1, 1, 1).
-		static const Vector4 Zero; ///< Vector4(0, 0, 0, 0).
-		static const Vector4 Negative; ///< Vector4(-1, -1, -1, -1).
-
-		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any Vector4, it's always 4.
-
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Vector4One = Vector4(T{1}, T{1}, T{1}, T{1});
+	template<Arithmetic T>
+	constexpr Vector4<T> Vector4Zero = Vector4(T{0}, T{0}, T{0}, T{0});
+	template<Arithmetic T>
+	constexpr Vector4<T> Vector4Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1});
 
 	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
@@ -315,25 +308,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::OneConsteval()
+	constexpr Vector4<T>::Vector4(const T* const components) noexcept
 	{
-		return Vector4(T{1}, T{1}, T{1}, T{1});
+		std::ranges::copy(components, components + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::ZeroConsteval()
-	{
-		return Vector4(T{0}, T{0}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector4<T> Vector4<T>::NegativeConsteval()
-	{
-		return Vector4(T{-1}, T{-1}, T{-1}, T{-1});
-	}
-
-	template<Arithmetic T>
-	T& Vector4<T>::X() noexcept
+	constexpr T& Vector4<T>::X() noexcept
 	{
 		return m_components[0];
 	}
@@ -345,7 +326,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector4<T>::Y() noexcept
+	constexpr T& Vector4<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
@@ -357,7 +338,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector4<T>::Z() noexcept
+	constexpr T& Vector4<T>::Z() noexcept
 	{
 		return m_components[2];
 	}
@@ -369,7 +350,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector4<T>::W() noexcept
+	constexpr T& Vector4<T>::W() noexcept
 	{
 		return m_components[3];
 	}
@@ -381,7 +362,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T* Vector4<T>::Data() noexcept
+	constexpr T* Vector4<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
@@ -427,7 +408,7 @@ namespace PonyEngine::Math
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
+			return Math::IsFinite(Data(), ComponentCount);
 		}
 		else
 		{
@@ -445,12 +426,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	void Vector4<T>::Set(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, Data());
+	}
+
+	template<Arithmetic T>
 	void Vector4<T>::Scale(const Vector4& scale) noexcept
 	{
-		X() *= scale.X();
-		Y() *= scale.Y();
-		Z() *= scale.Z();
-		W() *= scale.W();
+		Multiply(Data(), scale.Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -470,7 +454,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.X() * right.X(), left.Y() * right.Y(), left.Z() * right.Z(), left.W() * right.W());
+		Vector4<T> scaled;
+		Multiply(scaled.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+
+		return scaled;
 	}
 
 	template<Arithmetic T>
@@ -492,7 +479,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector4<T>::operator [](const std::size_t index) noexcept
+	constexpr T& Vector4<T>::operator [](const std::size_t index) noexcept
 	{
 		return m_components[index];
 	}
@@ -506,10 +493,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator +=(const Vector4& other) noexcept
 	{
-		X() += other.X();
-		Y() += other.Y();
-		Z() += other.Z();
-		W() += other.W();
+		Add(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -517,10 +501,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator -=(const Vector4& other) noexcept
 	{
-		X() -= other.X();
-		Y() -= other.Y();
-		Z() -= other.Z();
-		W() -= other.W();
+		Subtract(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -528,10 +509,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		X() *= multiplier;
-		Y() *= multiplier;
-		Z() *= multiplier;
-		W() *= multiplier;
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -539,10 +517,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() * multiplier);
-		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() * multiplier);
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -550,10 +525,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T>& Vector4<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() / divisor);
-		W() = RoundToIntegralIfPossible<ComputationalType, T>(W() / divisor);
+		Divide(Data(), divisor, ComponentCount);
 
 		return *this;
 	}
@@ -567,36 +539,46 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> operator +(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.X() + right.X(), left.Y() + right.Y(), left.Z() + right.Z(), left.W() + right.W());
+		Vector4<T> sum;
+		Add(sum.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+
+		return sum;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept
 	{
-		return Vector4<T>(-vector.X(), -vector.Y(), -vector.Z(), -vector.W());
+		Vector4<T> negated;
+		Negate(negated.Data(), vector.Data(), Vector4<T>::ComponentCount);
+
+		return negated;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator -(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return Vector4<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z(), left.W() - right.W());
+		Vector4<T> difference;
+		Subtract(difference.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+
+		return difference;
 	}
 
 	template<std::integral T>
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept
 	{
-		return Vector4<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier, vector.W() * multiplier);
+		Vector4<T> product;
+		Multiply(product.Data(), vector.Data(), multiplier, Vector4<T>::ComponentCount);
+
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType multiplier) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.X() * multiplier);
-		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Y() * multiplier);
-		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Z() * multiplier);
-		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.W() * multiplier);
+		Vector4<T> product;
+		Multiply(product.Data(), vector.Data(), multiplier, Vector4<T>::ComponentCount);
 
-		return Vector4<T>(x, y, z, w);
+		return product;
 	}
 
 	template<std::integral T>
@@ -614,12 +596,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> operator /(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType divisor) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.X() / divisor);
-		const T y = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Y() / divisor);
-		const T z = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.Z() / divisor);
-		const T w = RoundToIntegralIfPossible<Vector4<T>::ComputationalType, T>(vector.W() / divisor);
+		Vector4<T> quotient;
+		Divide(quotient.Data(), vector.Data(), divisor, Vector4<T>::ComponentCount);
 
-		return Vector4<T>(x, y, z, w);
+		return quotient;
 	}
 
 	template<Arithmetic T>
@@ -627,11 +607,4 @@ namespace PonyEngine::Math
 	{
 		return stream << vector.ToString();
 	}
-
-	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::One = Vector4(T{1}, T{1}, T{1}, T{1});
-	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::Zero = Vector4(T{0}, T{0}, T{0}, T{0});
-	template<Arithmetic T>
-	const Vector4<T> Vector4<T>::Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1});
 }

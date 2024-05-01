@@ -20,6 +20,7 @@ import <ranges>;
 import <string>;
 import <type_traits>;
 
+import :ArrayArithmetics;
 import :Common;
 
 export namespace PonyEngine::Math
@@ -32,6 +33,8 @@ export namespace PonyEngine::Math
 	public:
 		using ValueType = T; ///< Component type.
 		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
+
+		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any Vector3, it's always 3.
 
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
@@ -50,52 +53,6 @@ export namespace PonyEngine::Math
 		constexpr Vector3(Vector3&& other) noexcept = default;
 
 		constexpr ~Vector3() noexcept = default;
-
-		/// @brief Creates a Vector3(0, 0, 1).
-		/// @return Up vector.
-		///	@remark For non-constexpr execution use @p Vector3::Forward variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 ForwardConsteval();
-		/// @brief Creates a Vector3(0, 0, -1).
-		/// @return Down vector.
-		///	@remark For non-constexpr execution use @p Vector3::Back variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 BackConsteval();
-		/// @brief Creates a Vector3(0, 1, 0).
-		/// @return Up vector.
-		///	@remark For non-constexpr execution use @p Vector3::Up variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 UpConsteval();
-		/// @brief Creates a Vector3(0, -1, 0).
-		/// @return Down vector.
-		///	@remark For non-constexpr execution use @p Vector3::Down variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 DownConsteval();
-		/// @brief Creates a Vector3(1, 0, 0).
-		/// @return Right vector.
-		///	@remark For non-constexpr execution use @p Vector3::Right variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 RightConsteval();
-		/// @brief Creates a Vector3(-1, 0, 0).
-		/// @return Left vector.
-		///	@remark For non-constexpr execution use @p Vector3::Left variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 LeftConsteval();
-		/// @brief Creates a Vector3(1, 1, 1).
-		/// @return One vector.
-		///	@remark For non-constexpr execution use @p Vector3::One variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 OneConsteval();
-		/// @brief Creates a Vector3(0, 0, 0).
-		/// @return Zero vector.
-		///	@remark For non-constexpr execution use @p Vector3::Zero variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 ZeroConsteval();
-		/// @brief Creates a Vector3(-1, -1, -1).
-		/// @return Negative vector.
-		///	@remark For non-constexpr execution use @p Vector3::Negative variable.
-		[[nodiscard("Pure function")]]
-		static consteval Vector3 NegativeConsteval();
 
 		/// @brief Gets an x-component.
 		/// @return X-component.
@@ -164,6 +121,7 @@ export namespace PonyEngine::Math
 		/// @param y Y-component.
 		/// @param z Z-component.
 		void Set(T x, T y, T z) noexcept;
+		void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
@@ -178,7 +136,7 @@ export namespace PonyEngine::Math
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
 		[[nodiscard("Pure operator")]]
-		T& operator [](std::size_t index) noexcept;
+		constexpr T& operator [](std::size_t index) noexcept;
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
@@ -211,21 +169,28 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Vector3& other) const noexcept;
 
-		static const Vector3 Forward; ///< Vector3(0, 0, 1).
-		static const Vector3 Back; ///< Vector3(0, 0, -1).
-		static const Vector3 Up; ///< Vector3(0, 1, 0).
-		static const Vector3 Down; ///< Vector3(0, -1, 0).
-		static const Vector3 Right; ///< Vector3(1, 0, 0).
-		static const Vector3 Left; ///< Vector3(-1, 0, 0).
-		static const Vector3 One; ///< Vector3(1, 1, 1).
-		static const Vector3 Zero; ///< Vector3(0, 0, 0).
-		static const Vector3 Negative; ///< Vector3(-1, -1, -1).
-
-		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any Vector3, it's always 3.
-
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z.
 	};
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Forward = Vector3(T{0}, T{0}, T{1});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Back = Vector3(T{0}, T{0}, T{-1});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Up = Vector3(T{0}, T{1}, T{0});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Down = Vector3(T{0}, T{-1}, T{0});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Right = Vector3(T{1}, T{0}, T{0});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Left = Vector3(T{-1}, T{0}, T{0});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3One = Vector3(T{1}, T{1}, T{1});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Zero = Vector3(T{0}, T{0}, T{0});
+	template<Arithmetic T>
+	constexpr Vector3<T> Vector3Negative = Vector3(T{-1}, T{-1}, T{-1});
 
 	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
@@ -390,61 +355,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T>::Vector3(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, m_components.data());
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::ForwardConsteval()
-	{
-		return Vector3(T{0}, T{0}, T{1});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::BackConsteval()
-	{
-		return Vector3(T{0}, T{0}, T{-1});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::UpConsteval()
-	{
-		return Vector3(T{0}, T{1}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::DownConsteval()
-	{
-		return Vector3(T{0}, T{-1}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::RightConsteval()
-	{
-		return Vector3(T{1}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::LeftConsteval()
-	{
-		return Vector3(T{-1}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::OneConsteval()
-	{
-		return Vector3(T{1}, T{1}, T{1});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::ZeroConsteval()
-	{
-		return Vector3(T{0}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	consteval Vector3<T> Vector3<T>::NegativeConsteval()
-	{
-		return Vector3(T{-1}, T{-1}, T{-1});
+		std::ranges::copy(components, components + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
@@ -530,7 +441,7 @@ namespace PonyEngine::Math
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z());
+			return Math::IsFinite(Data(), ComponentCount);
 		}
 		else
 		{
@@ -547,11 +458,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	void Vector3<T>::Set(const T* components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, Data());
+	}
+
+	template<Arithmetic T>
 	void Vector3<T>::Scale(const Vector3& scale) noexcept
 	{
-		X() *= scale.X();
-		Y() *= scale.Y();
-		Z() *= scale.Z();
+		Multiply(Data(), scale.Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -563,11 +478,12 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> Cross(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		const T x = left.Y() * right.Z() - left.Z() * right.Y();
-		const T y = left.Z() * right.X() - left.X() * right.Z();
-		const T z = left.X() * right.Y() - left.Y() * right.X();
+		Vector3<T> cross;
+		cross.X() = left.Y() * right.Z() - left.Z() * right.Y();
+		cross.Y() = left.Z() * right.X() - left.X() * right.Z();
+		cross.Z() = left.X() * right.Y() - left.Y() * right.X();
 
-		return Vector3<T>(x, y, z);
+		return cross;
 	}
 
 	template<Arithmetic T>
@@ -611,7 +527,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Vector3<T>(left.X() * right.X(), left.Y() * right.Y(), left.Z() * right.Z());
+		Vector3<T> scaled;
+		Multiply(scaled.Data(), left.Data(), right.Data(), Vector3<T>::ComponentCount);
+
+		return scaled;
 	}
 
 	template<Arithmetic T>
@@ -633,7 +552,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector3<T>::operator [](const std::size_t index) noexcept
+	constexpr T& Vector3<T>::operator [](const std::size_t index) noexcept
 	{
 		return m_components[index];
 	}
@@ -647,9 +566,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T>& Vector3<T>::operator +=(const Vector3& other) noexcept
 	{
-		X() += other.X();
-		Y() += other.Y();
-		Z() += other.Z();
+		Add(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -657,9 +574,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T>& Vector3<T>::operator -=(const Vector3& other) noexcept
 	{
-		X() -= other.X();
-		Y() -= other.Y();
-		Z() -= other.Z();
+		Subtract(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -667,9 +582,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T>& Vector3<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		X() *= multiplier;
-		Y() *= multiplier;
-		Z() *= multiplier;
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -677,9 +590,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T>& Vector3<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() * multiplier);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() * multiplier);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() * multiplier);
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -687,9 +598,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		X() = RoundToIntegralIfPossible<ComputationalType, T>(X() / divisor);
-		Y() = RoundToIntegralIfPossible<ComputationalType, T>(Y() / divisor);
-		Z() = RoundToIntegralIfPossible<ComputationalType, T>(Z() / divisor);
+		Divide(Data(), divisor, ComponentCount);
 
 		return *this;
 	}
@@ -703,35 +612,46 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> operator +(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Vector3<T>(left.X() + right.X(), left.Y() + right.Y(), left.Z() + right.Z());
+		Vector3<T> sum;
+		Add(sum.Data(), left.Data(), right.Data(), Vector3<T>::ComponentCount);
+
+		return sum;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector3<T> operator -(const Vector3<T>& vector) noexcept
 	{
-		return Vector3<T>(-vector.X(), -vector.Y(), -vector.Z());
+		Vector3<T> negated;
+		Negate(negated.Data(), vector.Data(), Vector3<T>::ComponentCount);
+
+		return negated;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector3<T> operator -(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return Vector3<T>(left.X() - right.X(), left.Y() - right.Y(), left.Z() - right.Z());
+		Vector3<T> difference;
+		Subtract(difference.Data(), left.Data(), right.Data(), Vector3<T>::ComponentCount);
+
+		return difference;
 	}
 
 	template<std::integral T>
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept
 	{
-		return Vector3<T>(vector.X() * multiplier, vector.Y() * multiplier, vector.Z() * multiplier);
+		Vector3<T> product;
+		Multiply(product.Data(), vector.Data(), multiplier, Vector3<T>::ComponentCount);
+
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType multiplier) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() * multiplier);
-		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() * multiplier);
-		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() * multiplier);
+		Vector3<T> product;
+		Multiply(product.Data(), vector.Data(), multiplier, Vector3<T>::ComponentCount);
 
-		return Vector3<T>(x, y, z);
+		return product;
 	}
 
 	template<std::integral T>
@@ -749,11 +669,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
 	{
-		const T x = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.X() / divisor);
-		const T y = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Y() / divisor);
-		const T z = RoundToIntegralIfPossible<Vector3<T>::ComputationalType, T>(vector.Z() / divisor);
+		Vector3<T> quotient;
+		Divide(quotient.Data(), vector.Data(), divisor, Vector3<T>::ComponentCount);
 
-		return Vector3<T>(x, y, z);
+		return quotient;
 	}
 
 	template<Arithmetic T>
@@ -761,23 +680,4 @@ namespace PonyEngine::Math
 	{
 		return stream << vector.ToString();
 	}
-
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Forward = Vector3(T{0}, T{0}, T{1});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Back = Vector3(T{0}, T{0}, T{-1});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Up = Vector3(T{0}, T{1}, T{0});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Down = Vector3(T{0}, T{-1}, T{0});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Right = Vector3(T{1}, T{0}, T{0});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Left = Vector3(T{-1}, T{0}, T{0});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::One = Vector3(T{1}, T{1}, T{1});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Zero = Vector3(T{0}, T{0}, T{0});
-	template<Arithmetic T>
-	const Vector3<T> Vector3<T>::Negative = Vector3(T{-1}, T{-1}, T{-1});
 }

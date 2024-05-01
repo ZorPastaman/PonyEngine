@@ -9,13 +9,16 @@
 
 export module PonyEngine.Math:Matrix4x4;
 
+import <algorithm>;
 import <array>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <type_traits>;
 
+import :ArrayArithmetics;
 import :Common;
 import :Matrix3x3;
 import :Vector4;
@@ -26,47 +29,24 @@ export namespace PonyEngine::Math
 	class Matrix4x4 final
 	{
 	public:
+		using ValueType = T; ///< Component type.
+		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
+
+		static constexpr std::size_t Dimension = 4; ///< Row and column count. For any Matrix4x4 it's always 4.
+		static constexpr std::size_t ComponentCount = Dimension * Dimension; ///< Component count. For any Matrix4x4 it's always 16.
+
 		/// @brief Row access.
+		/// @tparam IsConstant Is the underlying value const?
+		template<bool IsConstant>
 		class Row final
 		{
 		public:
+			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
+
 			Row(const Row&) = delete;
 			Row(Row&&) = delete;
 
-			~Row() noexcept = default;
-
-			/// @brief Converts a row to a vector.
-			[[nodiscard("Pure operator")]]
-			operator Vector4<T>() const noexcept;
-
-			/// @brief Gets a component in a row by a column index.
-			/// @param columnIndex Column index.
-			/// @return Component.
-			[[nodiscard("Pure operator")]]
-			T& operator [](std::size_t columnIndex) const noexcept;
-
-			Row& operator =(const Row&) = delete;
-			Row& operator =(Row&&) = delete;
-
-		private:
-			/// @brief Creates a row access.
-			/// @param row First element in a row.
-			[[nodiscard("Pure constructor")]]
-			explicit Row(T* row) noexcept;
-
-			T* const m_row; ///< Row pointer.
-
-			friend Matrix4x4;
-		};
-
-		/// @brief Const row access.
-		class ConstRow final
-		{
-		public:
-			ConstRow(const ConstRow&) = delete;
-			ConstRow(ConstRow&&) = delete;
-
-			constexpr ~ConstRow() noexcept = default;
+			constexpr ~Row() noexcept = default;
 
 			/// @brief Converts a row to a vector.
 			[[nodiscard("Pure operator")]]
@@ -76,18 +56,20 @@ export namespace PonyEngine::Math
 			/// @param columnIndex Column index.
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
-			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
+			constexpr RowValueType& operator [](std::size_t columnIndex) const noexcept;
 
-			ConstRow& operator =(const ConstRow&) = delete;
-			ConstRow& operator =(ConstRow&&) = delete;
+			Row& operator =(const Row&) = delete;
+			Row& operator =(Row&&) = delete;
+
+			Row& operator =(const Vector4<T>& row) noexcept requires(!IsConstant);
 
 		private:
-			/// @brief Creates a const row access.
+			/// @brief Creates a row access.
 			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
-			explicit constexpr ConstRow(const T* row) noexcept;
+			explicit constexpr Row(RowValueType* row) noexcept;
 
-			const T* const m_row; ///< Row pointer.
+			RowValueType* const m_row; ///< Row pointer.
 
 			friend Matrix4x4;
 		};
@@ -125,27 +107,18 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
 		[[nodiscard("Pure constructor")]]
+		explicit constexpr Matrix4x4(const T* components) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(const Matrix4x4& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(Matrix4x4&& other) noexcept = default;
 
 		constexpr ~Matrix4x4() noexcept = default;
 
-		/// @brief Creates a Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).
-		/// @return Identity matrix.
-		///	@remark For non-constexpr execution use @p Matrix4x4::Identity variable.
-		[[nodiscard("Pure function")]]
-		static consteval Matrix4x4 IdentityConsteval();
-		/// @brief Creates a Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).
-		/// @return Zero matrix.
-		///	@remark For non-constexpr execution use @p Matrix4x4::Zero variable.
-		[[nodiscard("Pure function")]]
-		static consteval Matrix4x4 ZeroConsteval();
-
 		/// @brief Gets a component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
-		T& M00() noexcept;
+		constexpr T& M00() noexcept;
 		/// @brief Gets a component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
@@ -153,7 +126,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
-		T& M10() noexcept;
+		constexpr T& M10() noexcept;
 		/// @brief Gets a component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
@@ -161,7 +134,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 20.
 		/// @return Component 20.
 		[[nodiscard("Pure function")]]
-		T& M20() noexcept;
+		constexpr T& M20() noexcept;
 		/// @brief Gets a component 20.
 		/// @return Component 20.
 		[[nodiscard("Pure function")]]
@@ -169,7 +142,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 30.
 		/// @return Component 30.
 		[[nodiscard("Pure function")]]
-		T& M30() noexcept;
+		constexpr T& M30() noexcept;
 		/// @brief Gets a component 30.
 		/// @return Component 30.
 		[[nodiscard("Pure function")]]
@@ -177,7 +150,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
-		T& M01() noexcept;
+		constexpr T& M01() noexcept;
 		/// @brief Gets a component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
@@ -185,7 +158,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
-		T& M11() noexcept;
+		constexpr T& M11() noexcept;
 		/// @brief Gets a component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
@@ -193,7 +166,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 21.
 		/// @return Component 21.
 		[[nodiscard("Pure function")]]
-		T& M21() noexcept;
+		constexpr T& M21() noexcept;
 		/// @brief Gets a component 21.
 		/// @return Component 21.
 		[[nodiscard("Pure function")]]
@@ -201,7 +174,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 31.
 		/// @return Component 31.
 		[[nodiscard("Pure function")]]
-		T& M31() noexcept;
+		constexpr T& M31() noexcept;
 		/// @brief Gets a component 31.
 		/// @return Component 31.
 		[[nodiscard("Pure function")]]
@@ -209,7 +182,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 02.
 		/// @return Component 02.
 		[[nodiscard("Pure function")]]
-		T& M02() noexcept;
+		constexpr T& M02() noexcept;
 		/// @brief Gets a component 02.
 		/// @return Component 02.
 		[[nodiscard("Pure function")]]
@@ -217,7 +190,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 12.
 		/// @return Component 12.
 		[[nodiscard("Pure function")]]
-		T& M12() noexcept;
+		constexpr T& M12() noexcept;
 		/// @brief Gets a component 12.
 		/// @return Component 12.
 		[[nodiscard("Pure function")]]
@@ -225,7 +198,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 22.
 		/// @return Component 22.
 		[[nodiscard("Pure function")]]
-		T& M22() noexcept;
+		constexpr T& M22() noexcept;
 		/// @brief Gets a component 22.
 		/// @return Component 22.
 		[[nodiscard("Pure function")]]
@@ -233,7 +206,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 32.
 		/// @return Component 32.
 		[[nodiscard("Pure function")]]
-		T& M32() noexcept;
+		constexpr T& M32() noexcept;
 		/// @brief Gets a component 32.
 		/// @return Component 32.
 		[[nodiscard("Pure function")]]
@@ -241,7 +214,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 03.
 		/// @return Component 03.
 		[[nodiscard("Pure function")]]
-		T& M03() noexcept;
+		constexpr T& M03() noexcept;
 		/// @brief Gets a component 03.
 		/// @return Component 03.
 		[[nodiscard("Pure function")]]
@@ -249,7 +222,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 13.
 		/// @return Component 13.
 		[[nodiscard("Pure function")]]
-		T& M13() noexcept;
+		constexpr T& M13() noexcept;
 		/// @brief Gets a component 13.
 		/// @return Component 13.
 		[[nodiscard("Pure function")]]
@@ -257,7 +230,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 23.
 		/// @return Component 23.
 		[[nodiscard("Pure function")]]
-		T& M23() noexcept;
+		constexpr T& M23() noexcept;
 		/// @brief Gets a component 23.
 		/// @return Component 23.
 		[[nodiscard("Pure function")]]
@@ -265,7 +238,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 33.
 		/// @return Component 33.
 		[[nodiscard("Pure function")]]
-		T& M33() noexcept;
+		constexpr T& M33() noexcept;
 		/// @brief Gets a component 33.
 		/// @return Component 33.
 		[[nodiscard("Pure function")]]
@@ -273,7 +246,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 16 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 16 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -322,6 +295,8 @@ export namespace PonyEngine::Math
 		/// @param m23 Component 23.
 		/// @param m33 Component 33.
 		void Set(T m00, T m10, T m20, T m30, T m01, T m11, T m21, T m31, T m02, T m12, T m22, T m32, T m03, T m13, T m23, T m33) noexcept;
+		void Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
+		void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
@@ -374,13 +349,13 @@ export namespace PonyEngine::Math
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		Row operator [](std::size_t rowIndex) noexcept;
+		constexpr Row<false> operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
 		/// @details Don't store it. Use the access like this matrix[1][1].
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		constexpr ConstRow operator [](std::size_t rowIndex) const noexcept;
+		constexpr Row<true> operator [](std::size_t rowIndex) const noexcept;
 
 		Matrix4x4& operator =(const Matrix4x4& other) noexcept = default;
 		Matrix4x4& operator =(Matrix4x4&& other) noexcept = default;
@@ -415,16 +390,17 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Matrix4x4& other) const noexcept;
 
-		static const Matrix4x4 Identity; ///< Matrix4x4(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1).
-		static const Matrix4x4 Zero; ///< Matrix4x4(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0).
-
-		static constexpr std::size_t RowCount = 4; ///< Row count. For any Matrix4x4 it's always 4.
-		static constexpr std::size_t ColumnCount = 4; ///< Column count. For any Matrix4x4 it's always 4.
-		static constexpr std::size_t ComponentCount = RowCount * ColumnCount; ///< Component count. For any Matrix4x4 it's always 16.
-
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33.
 	};
+
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> Matrix4x4Identity = Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1});
+	template<Arithmetic T>
+	constexpr Matrix4x4<T> Matrix4x4Zero = Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
+
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept;
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
@@ -528,49 +504,36 @@ export namespace PonyEngine::Math
 namespace PonyEngine::Math
 {
 	template<Arithmetic T>
-	Matrix4x4<T>::Row::Row(T* const row) noexcept :
-		m_row(row)
-	{
-	}
-
-	template<Arithmetic T>
-	Matrix4x4<T>::Row::operator Vector4<T>() const noexcept
-	{
-		const T x = m_row[0];
-		const T y = m_row[4];
-		const T z = m_row[8];
-		const T w = m_row[12];
-
-		return Vector4<T>(x, y, z, w);
-	}
-
-	template<Arithmetic T>
-	T& Matrix4x4<T>::Row::operator [](const std::size_t columnIndex) const noexcept
-	{
-		return m_row[columnIndex * 4];
-	}
-
-	template<Arithmetic T>
-	constexpr Matrix4x4<T>::ConstRow::ConstRow(const T* const row) noexcept :
+	template<bool IsConstant>
+	constexpr Matrix4x4<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
 		m_row{row}
 	{
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix4x4<T>::ConstRow::operator Vector4<T>() const noexcept
+	template<bool IsConstant>
+	constexpr Matrix4x4<T>::Row<IsConstant>::operator Vector4<T>() const noexcept
 	{
-		const T x = m_row[0];
-		const T y = m_row[4];
-		const T z = m_row[8];
-		const T w = m_row[12];
+		Vector4<T> row;
+		AssignWithSourceStep(row.Data(), m_row, Dimension, Dimension);
 
-		return Vector4<T>(x, y, z, w);
+		return row;
 	}
 
 	template<Arithmetic T>
-	constexpr const T& Matrix4x4<T>::ConstRow::operator [](const std::size_t columnIndex) const noexcept
+	template<bool IsConstant>
+	constexpr typename Matrix4x4<T>::template Row<IsConstant>::RowValueType& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * 4];
+		return m_row[columnIndex * Dimension];
+	}
+
+	template<Arithmetic T>
+	template<bool IsConstant>
+	typename Matrix4x4<T>::template Row<IsConstant>& Matrix4x4<T>::Row<IsConstant>::operator =(const Vector4<T>& row) noexcept requires (!IsConstant)
+	{
+		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
+
+		return *this;
 	}
 
 	template<Arithmetic T>
@@ -588,19 +551,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Matrix4x4<T> Matrix4x4<T>::IdentityConsteval()
+	constexpr Matrix4x4<T>::Matrix4x4(const T* const components) noexcept
 	{
-		return Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1});
+		std::ranges::copy(components, components + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
-	consteval Matrix4x4<T> Matrix4x4<T>::ZeroConsteval()
-	{
-		return Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	T& Matrix4x4<T>::M00() noexcept
+	constexpr T& Matrix4x4<T>::M00() noexcept
 	{
 		return m_components[0];
 	}
@@ -612,7 +569,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M10() noexcept
+	constexpr T& Matrix4x4<T>::M10() noexcept
 	{
 		return m_components[1];
 	}
@@ -624,7 +581,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M20() noexcept
+	constexpr T& Matrix4x4<T>::M20() noexcept
 	{
 		return m_components[2];
 	}
@@ -636,7 +593,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M30() noexcept
+	constexpr T& Matrix4x4<T>::M30() noexcept
 	{
 		return m_components[3];
 	}
@@ -648,7 +605,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M01() noexcept
+	constexpr T& Matrix4x4<T>::M01() noexcept
 	{
 		return m_components[4];
 	}
@@ -660,7 +617,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M11() noexcept
+	constexpr T& Matrix4x4<T>::M11() noexcept
 	{
 		return m_components[5];
 	}
@@ -672,7 +629,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M21() noexcept
+	constexpr T& Matrix4x4<T>::M21() noexcept
 	{
 		return m_components[6];
 	}
@@ -684,7 +641,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M31() noexcept
+	constexpr T& Matrix4x4<T>::M31() noexcept
 	{
 		return m_components[7];
 	}
@@ -696,7 +653,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M02() noexcept
+	constexpr T& Matrix4x4<T>::M02() noexcept
 	{
 		return m_components[8];
 	}
@@ -708,7 +665,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M12() noexcept
+	constexpr T& Matrix4x4<T>::M12() noexcept
 	{
 		return m_components[9];
 	}
@@ -720,7 +677,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M22() noexcept
+	constexpr T& Matrix4x4<T>::M22() noexcept
 	{
 		return m_components[10];
 	}
@@ -732,7 +689,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M32() noexcept
+	constexpr T& Matrix4x4<T>::M32() noexcept
 	{
 		return m_components[11];
 	}
@@ -744,7 +701,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M03() noexcept
+	constexpr T& Matrix4x4<T>::M03() noexcept
 	{
 		return m_components[12];
 	}
@@ -756,7 +713,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M13() noexcept
+	constexpr T& Matrix4x4<T>::M13() noexcept
 	{
 		return m_components[13];
 	}
@@ -768,7 +725,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M23() noexcept
+	constexpr T& Matrix4x4<T>::M23() noexcept
 	{
 		return m_components[14];
 	}
@@ -780,7 +737,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix4x4<T>::M33() noexcept
+	constexpr T& Matrix4x4<T>::M33() noexcept
 	{
 		return m_components[15];
 	}
@@ -792,7 +749,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T* Matrix4x4<T>::Data() noexcept
+	constexpr T* Matrix4x4<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
@@ -815,24 +772,25 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> Matrix4x4<T>::Adjugate() const noexcept
 	{
-		const T minor00 = Matrix3x3<T>(M11(), M21(), M31(), M12(), M22(), M32(), M13(), M23(), M33()).Determinant();
-		const T minor10 = -Matrix3x3<T>(M01(), M21(), M31(), M02(), M22(), M32(), M03(), M23(), M33()).Determinant();
-		const T minor20 = Matrix3x3<T>(M01(), M11(), M31(), M02(), M12(), M32(), M03(), M13(), M33()).Determinant();
-		const T minor30 = -Matrix3x3<T>(M01(), M11(), M21(), M02(), M12(), M22(), M03(), M13(), M23()).Determinant();
-		const T minor01 = -Matrix3x3<T>(M10(), M20(), M30(), M12(), M22(), M32(), M13(), M23(), M33()).Determinant();
-		const T minor11 = Matrix3x3<T>(M00(), M20(), M30(), M02(), M22(), M32(), M03(), M23(), M33()).Determinant();
-		const T minor21 = -Matrix3x3<T>(M00(), M10(), M30(), M02(), M12(), M32(), M03(), M13(), M33()).Determinant();
-		const T minor31 = Matrix3x3<T>(M00(), M10(), M20(), M02(), M12(), M22(), M03(), M13(), M23()).Determinant();
-		const T minor02 = Matrix3x3<T>(M10(), M20(), M30(), M11(), M21(), M31(), M13(), M23(), M33()).Determinant();
-		const T minor12 = -Matrix3x3<T>(M00(), M20(), M30(), M01(), M21(), M31(), M03(), M23(), M33()).Determinant();
-		const T minor22 = Matrix3x3<T>(M00(), M10(), M30(), M01(), M11(), M21(), M03(), M13(), M33()).Determinant();
-		const T minor32 = -Matrix3x3<T>(M00(), M10(), M20(), M01(), M11(), M21(), M03(), M13(), M23()).Determinant();
-		const T minor03 = -Matrix3x3<T>(M10(), M20(), M30(), M11(), M21(), M31(), M12(), M22(), M32()).Determinant();
-		const T minor13 = Matrix3x3<T>(M00(), M20(), M30(), M01(), M21(), M31(), M02(), M22(), M32()).Determinant();
-		const T minor23 = -Matrix3x3<T>(M00(), M10(), M30(), M01(), M11(), M31(), M02(), M12(), M32()).Determinant();
-		const T minor33 = Matrix3x3<T>(M00(), M10(), M20(), M01(), M11(), M21(), M02(), M12(), M22()).Determinant();
+		Matrix4x4 adjugate;
+		adjugate.M00() = Matrix3x3<T>(M11(), M21(), M31(), M12(), M22(), M32(), M13(), M23(), M33()).Determinant();
+		adjugate.M10() = -Matrix3x3<T>(M10(), M20(), M30(), M12(), M22(), M32(), M13(), M23(), M33()).Determinant();
+		adjugate.M20() = Matrix3x3<T>(M10(), M20(), M30(), M11(), M21(), M31(), M13(), M23(), M33()).Determinant();
+		adjugate.M30() = -Matrix3x3<T>(M10(), M20(), M30(), M11(), M21(), M31(), M12(), M22(), M32()).Determinant();
+		adjugate.M01() = -Matrix3x3<T>(M01(), M21(), M31(), M02(), M22(), M32(), M03(), M23(), M33()).Determinant();
+		adjugate.M11() = Matrix3x3<T>(M00(), M20(), M30(), M02(), M22(), M32(), M03(), M23(), M33()).Determinant();
+		adjugate.M21() = -Matrix3x3<T>(M00(), M20(), M30(), M01(), M21(), M31(), M03(), M23(), M33()).Determinant();
+		adjugate.M31() = Matrix3x3<T>(M00(), M20(), M30(), M01(), M21(), M31(), M02(), M22(), M32()).Determinant();
+		adjugate.M02() = Matrix3x3<T>(M01(), M11(), M31(), M02(), M12(), M32(), M03(), M13(), M33()).Determinant();
+		adjugate.M12() = -Matrix3x3<T>(M00(), M10(), M30(), M02(), M12(), M32(), M03(), M13(), M33()).Determinant();
+		adjugate.M22() = Matrix3x3<T>(M00(), M10(), M30(), M01(), M11(), M21(), M03(), M13(), M33()).Determinant();
+		adjugate.M32() = -Matrix3x3<T>(M00(), M10(), M30(), M01(), M11(), M31(), M02(), M12(), M32()).Determinant();
+		adjugate.M03() = -Matrix3x3<T>(M01(), M11(), M21(), M02(), M12(), M22(), M03(), M13(), M23()).Determinant();
+		adjugate.M13() = Matrix3x3<T>(M00(), M10(), M20(), M02(), M12(), M22(), M03(), M13(), M23()).Determinant();
+		adjugate.M23() = -Matrix3x3<T>(M00(), M10(), M20(), M01(), M11(), M21(), M03(), M13(), M23()).Determinant();
+		adjugate.M33() = Matrix3x3<T>(M00(), M10(), M20(), M01(), M11(), M21(), M02(), M12(), M22()).Determinant();
 
-		return Matrix4x4(minor00, minor01, minor02, minor03, minor10, minor11, minor12, minor13, minor20, minor21, minor22, minor23, minor30, minor31, minor32, minor33);
+		return adjugate;
 	}
 
 	template<Arithmetic T>
@@ -852,10 +810,7 @@ namespace PonyEngine::Math
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return std::isfinite(M00()) && std::isfinite(M10()) && std::isfinite(M20()) && std::isfinite(M30()) &&
-				std::isfinite(M01()) && std::isfinite(M11()) && std::isfinite(M21()) && std::isfinite(M31()) &&
-				std::isfinite(M02()) && std::isfinite(M12()) && std::isfinite(M22()) && std::isfinite(M32()) &&
-				std::isfinite(M03()) && std::isfinite(M13()) && std::isfinite(M23()) && std::isfinite(M33());
+			return Math::IsFinite(Data(), ComponentCount);
 		}
 		else
 		{
@@ -886,68 +841,49 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	void Matrix4x4<T>::Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept
+	{
+		Set(column0.X(), column0.Y(), column0.Z(), column0.W(), column1.X(), column1.Y(), column1.Z(), column1.W(),
+			column2.X(), column2.Y(), column2.Z(), column2.W(), column3.X(), column3.Y(), column3.Z(), column3.W());
+	}
+
+	template<Arithmetic T>
+	void Matrix4x4<T>::Set(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, Data());
+	}
+
+	template<Arithmetic T>
 	void Matrix4x4<T>::Scale(const Matrix4x4& scale) noexcept
 	{
-		M00() *= scale.M00();
-		M10() *= scale.M10();
-		M20() *= scale.M20();
-		M30() *= scale.M30();
-		M01() *= scale.M01();
-		M11() *= scale.M11();
-		M21() *= scale.M21();
-		M31() *= scale.M31();
-		M02() *= scale.M02();
-		M12() *= scale.M12();
-		M22() *= scale.M22();
-		M32() *= scale.M32();
-		M03() *= scale.M03();
-		M13() *= scale.M13();
-		M23() *= scale.M23();
-		M33() *= scale.M33();
+		Multiply(Data(), scale.Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> Matrix4x4<T>::GetRow(const std::size_t rowIndex) const noexcept
 	{
-		const T x = m_components[rowIndex];
-		const T y = m_components[rowIndex + 4];
-		const T z = m_components[rowIndex + 8];
-		const T w = m_components[rowIndex + 12];
-
-		return Vector4<T>(x, y, z, w);
+		return (*this)[rowIndex];
 	}
 
 	template<Arithmetic T>
 	void Matrix4x4<T>::SetRow(const std::size_t rowIndex, const Vector4<T>& value) noexcept
 	{
-		m_components[rowIndex] = value.X();
-		m_components[rowIndex + 4] = value.Y();
-		m_components[rowIndex + 8] = value.Z();
-		m_components[rowIndex + 12] = value.W();
+		(*this)[rowIndex] = value;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector4<T> Matrix4x4<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const std::size_t begin = columnIndex * 4;
+		const T* const columnBegin = Data() + columnIndex * Dimension;
 
-		const T x = m_components[begin];
-		const T y = m_components[begin + 1];
-		const T z = m_components[begin + 2];
-		const T w = m_components[begin + 3];
-
-		return Vector4<T>(x, y, z, w);
+		return Vector4<T>(columnBegin);
 	}
 
 	template<Arithmetic T>
 	void Matrix4x4<T>::SetColumn(const std::size_t columnIndex, const Vector4<T>& value) noexcept
 	{
-		const std::size_t begin = columnIndex * 4;
-
-		m_components[begin] = value.X();
-		m_components[begin + 1] = value.Y();
-		m_components[begin + 2] = value.Z();
-		m_components[begin + 3] = value.W();
+		T* const columnBegin = Data() + columnIndex * Dimension;
+		std::ranges::copy(value.Data(), value.Data() + Dimension, columnBegin);
 	}
 
 	template<Arithmetic T>
@@ -987,36 +923,47 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	typename Matrix4x4<T>::Row Matrix4x4<T>::operator [](const std::size_t rowIndex) noexcept
+	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
 	{
-		return Row(Data()[rowIndex]);
+		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() + left.M30() * right.M30() +
+			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() + left.M31() * right.M31() +
+			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22() + left.M32() * right.M32() +
+			left.M30() * right.M30() + left.M31() * right.M31() + left.M32() * right.M32() + left.M33() * right.M33();
 	}
 
 	template<Arithmetic T>
-	constexpr typename Matrix4x4<T>::ConstRow Matrix4x4<T>::operator [](const std::size_t rowIndex) const noexcept
+	constexpr Matrix4x4<T> Scale(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
 	{
-		return ConstRow(Data()[rowIndex]);
+		Matrix4x4<T> scaled;
+		Multiply(scaled.Data(), left.Data(), right.Data(), Matrix4x4<T>::ComponentCount);
+
+		return scaled;
+	}
+
+	template<Arithmetic T>
+	constexpr bool AreAlmostEqual(const Matrix4x4<T>& left, const Matrix4x4<T>& right, const typename Matrix4x4<T>::ComputationalType tolerance) noexcept
+	{
+		const Matrix4x4<T> diff = left - right;
+
+		return Dot(diff, diff) < tolerance * tolerance;
+	}
+
+	template<Arithmetic T>
+	constexpr typename Matrix4x4<T>::template Row<false> Matrix4x4<T>::operator [](const std::size_t rowIndex) noexcept
+	{
+		return Row<false>(Data() + rowIndex);
+	}
+
+	template<Arithmetic T>
+	constexpr typename Matrix4x4<T>::template Row<true> Matrix4x4<T>::operator [](const std::size_t rowIndex) const noexcept
+	{
+		return Row<true>(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
 	Matrix4x4<T>& Matrix4x4<T>::operator +=(const Matrix4x4& other) noexcept
 	{
-		M00() += other.M00();
-		M10() += other.M10();
-		M20() += other.M20();
-		M30() += other.M30();
-		M10() += other.M10();
-		M11() += other.M11();
-		M21() += other.M21();
-		M31() += other.M31();
-		M02() += other.M02();
-		M12() += other.M12();
-		M22() += other.M22();
-		M32() += other.M32();
-		M03() += other.M03();
-		M13() += other.M13();
-		M23() += other.M23();
-		M33() += other.M33();
+		Add(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -1024,22 +971,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix4x4<T>& Matrix4x4<T>::operator -=(const Matrix4x4& other) noexcept
 	{
-		M00() -= other.M00();
-		M10() -= other.M10();
-		M20() -= other.M20();
-		M30() -= other.M30();
-		M10() -= other.M10();
-		M11() -= other.M11();
-		M21() -= other.M21();
-		M31() -= other.M31();
-		M02() -= other.M02();
-		M12() -= other.M12();
-		M22() -= other.M22();
-		M32() -= other.M32();
-		M03() -= other.M03();
-		M13() -= other.M13();
-		M23() -= other.M23();
-		M33() -= other.M33();
+		Subtract(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -1047,22 +979,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix4x4<T>& Matrix4x4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		M00() *= multiplier;
-		M10() *= multiplier;
-		M20() *= multiplier;
-		M30() *= multiplier;
-		M10() *= multiplier;
-		M11() *= multiplier;
-		M21() *= multiplier;
-		M31() *= multiplier;
-		M02() *= multiplier;
-		M12() *= multiplier;
-		M22() *= multiplier;
-		M32() *= multiplier;
-		M03() *= multiplier;
-		M13() *= multiplier;
-		M23() *= multiplier;
-		M33() *= multiplier;
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -1070,22 +987,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix4x4<T>& Matrix4x4<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
-		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() * multiplier);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() * multiplier);
-		M20() = RoundToIntegralIfPossible<ComputationalType, T>(M20() * multiplier);
-		M30() = RoundToIntegralIfPossible<ComputationalType, T>(M30() * multiplier);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() * multiplier);
-		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() * multiplier);
-		M21() = RoundToIntegralIfPossible<ComputationalType, T>(M21() * multiplier);
-		M31() = RoundToIntegralIfPossible<ComputationalType, T>(M31() * multiplier);
-		M02() = RoundToIntegralIfPossible<ComputationalType, T>(M02() * multiplier);
-		M12() = RoundToIntegralIfPossible<ComputationalType, T>(M12() * multiplier);
-		M22() = RoundToIntegralIfPossible<ComputationalType, T>(M22() * multiplier);
-		M32() = RoundToIntegralIfPossible<ComputationalType, T>(M32() * multiplier);
-		M03() = RoundToIntegralIfPossible<ComputationalType, T>(M03() * multiplier);
-		M13() = RoundToIntegralIfPossible<ComputationalType, T>(M13() * multiplier);
-		M23() = RoundToIntegralIfPossible<ComputationalType, T>(M23() * multiplier);
-		M33() = RoundToIntegralIfPossible<ComputationalType, T>(M33() * multiplier);
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -1099,22 +1001,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix4x4<T>& Matrix4x4<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() / divisor);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() / divisor);
-		M20() = RoundToIntegralIfPossible<ComputationalType, T>(M20() / divisor);
-		M30() = RoundToIntegralIfPossible<ComputationalType, T>(M30() / divisor);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() / divisor);
-		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() / divisor);
-		M21() = RoundToIntegralIfPossible<ComputationalType, T>(M21() / divisor);
-		M31() = RoundToIntegralIfPossible<ComputationalType, T>(M31() / divisor);
-		M02() = RoundToIntegralIfPossible<ComputationalType, T>(M02() / divisor);
-		M12() = RoundToIntegralIfPossible<ComputationalType, T>(M12() / divisor);
-		M22() = RoundToIntegralIfPossible<ComputationalType, T>(M22() / divisor);
-		M32() = RoundToIntegralIfPossible<ComputationalType, T>(M32() / divisor);
-		M03() = RoundToIntegralIfPossible<ComputationalType, T>(M03() / divisor);
-		M13() = RoundToIntegralIfPossible<ComputationalType, T>(M13() / divisor);
-		M23() = RoundToIntegralIfPossible<ComputationalType, T>(M23() / divisor);
-		M33() = RoundToIntegralIfPossible<ComputationalType, T>(M33() / divisor);
+		Divide(Data(), divisor, ComponentCount);
 
 		return *this;
 	}
@@ -1126,137 +1013,48 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix4x4<T> Scale(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
-	{
-		const T m00 = left.M00() * right.M00();
-		const T m10 = left.M10() * right.M10();
-		const T m20 = left.M20() * right.M20();
-		const T m30 = left.M30() * right.M30();
-		const T m01 = left.M01() * right.M01();
-		const T m11 = left.M11() * right.M11();
-		const T m21 = left.M21() * right.M21();
-		const T m31 = left.M31() * right.M31();
-		const T m02 = left.M02() * right.M02();
-		const T m12 = left.M12() * right.M12();
-		const T m22 = left.M22() * right.M22();
-		const T m32 = left.M32() * right.M32();
-		const T m03 = left.M03() * right.M03();
-		const T m13 = left.M13() * right.M13();
-		const T m23 = left.M23() * right.M23();
-		const T m33 = left.M33() * right.M33();
-
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-	}
-
-	template<Arithmetic T>
-	constexpr bool AreAlmostEqual(const Matrix4x4<T>& left, const Matrix4x4<T>& right, const typename Matrix4x4<T>::ComputationalType tolerance) noexcept
-	{
-		const Matrix4x4<T> diff = left - right;
-		const T kindOfMagnitudeSquared = diff.M00() * diff.M00() + diff.M10() * diff.M10() + diff.M20() * diff.M20() + diff.M30() * diff.M30() + 
-			diff.M01() * diff.M01() + diff.M11() * diff.M11() + diff.M21() * diff.M21() + diff.M31() * diff.M31() + 
-			diff.M02() * diff.M02() + diff.M12() * diff.M12() + diff.M22() * diff.M22() + diff.M32() * diff.M32() +
-			diff.M03() * diff.M03() + diff.M13() * diff.M13() + diff.M23() * diff.M23() + diff.M33() * diff.M33();
-
-		return kindOfMagnitudeSquared < tolerance * tolerance;
-	}
-
-	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator +(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
 	{
-		const T m00 = left.M00() + right.M00();
-		const T m10 = left.M10() + right.M10();
-		const T m20 = left.M20() + right.M20();
-		const T m30 = left.M30() + right.M30();
-		const T m01 = left.M01() + right.M01();
-		const T m11 = left.M11() + right.M11();
-		const T m21 = left.M21() + right.M21();
-		const T m31 = left.M31() + right.M31();
-		const T m02 = left.M02() + right.M02();
-		const T m12 = left.M12() + right.M12();
-		const T m22 = left.M22() + right.M22();
-		const T m32 = left.M32() + right.M32();
-		const T m03 = left.M03() + right.M03();
-		const T m13 = left.M13() + right.M13();
-		const T m23 = left.M23() + right.M23();
-		const T m33 = left.M33() + right.M33();
+		Matrix4x4<T> sum;
+		Add(sum.Data(), left.Data(), right.Data(), Matrix4x4<T>::ComponentCount);
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return sum;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator -(const Matrix4x4<T>& matrix) noexcept
 	{
-		return Matrix4x4(-matrix.M00(), -matrix.M10(), -matrix.M20(), -matrix.M30(), -matrix.M01(), -matrix.M11(), -matrix.M21(), -matrix.M31(), 
-			-matrix.M02(), -matrix.M12(), -matrix.M22(), -matrix.M32(), -matrix.M03(), -matrix.M13(), -matrix.M23(), -matrix.M33());
+		Matrix4x4<T> negated;
+		Negate(negated.Data(), matrix.Data(), Matrix4x4<T>::ComponentCount);
+
+		return negated;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator -(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
 	{
-		const T m00 = left.M00() - right.M00();
-		const T m10 = left.M10() - right.M10();
-		const T m20 = left.M20() - right.M20();
-		const T m30 = left.M30() - right.M30();
-		const T m01 = left.M01() - right.M01();
-		const T m11 = left.M11() - right.M11();
-		const T m21 = left.M21() - right.M21();
-		const T m31 = left.M31() - right.M31();
-		const T m02 = left.M02() - right.M02();
-		const T m12 = left.M12() - right.M12();
-		const T m22 = left.M22() - right.M22();
-		const T m32 = left.M32() - right.M32();
-		const T m03 = left.M03() - right.M03();
-		const T m13 = left.M13() - right.M13();
-		const T m23 = left.M23() - right.M23();
-		const T m33 = left.M33() - right.M33();
+		Matrix4x4<T> difference;
+		Subtract(difference.Data(), left.Data(), right.Data(), Matrix4x4<T>::ComponentCount);
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return difference;
 	}
 
 	template<std::integral T>
 	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		const T m00 = matrix.M00() * multiplier;
-		const T m10 = matrix.M10() * multiplier;
-		const T m20 = matrix.M20() * multiplier;
-		const T m30 = matrix.M30() * multiplier;
-		const T m01 = matrix.M01() * multiplier;
-		const T m11 = matrix.M11() * multiplier;
-		const T m21 = matrix.M21() * multiplier;
-		const T m31 = matrix.M31() * multiplier;
-		const T m02 = matrix.M02() * multiplier;
-		const T m12 = matrix.M12() * multiplier;
-		const T m22 = matrix.M22() * multiplier;
-		const T m32 = matrix.M32() * multiplier;
-		const T m03 = matrix.M03() * multiplier;
-		const T m13 = matrix.M13() * multiplier;
-		const T m23 = matrix.M23() * multiplier;
-		const T m33 = matrix.M33() * multiplier;
+		Matrix4x4<T> product;
+		Multiply(product.Data(), matrix.Data(), multiplier, Matrix4x4<T>::ComponentCount);
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& matrix, const typename Matrix4x4<T>::ComputationalType multiplier) noexcept
 	{
-		const T m00 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M00() * multiplier);
-		const T m10 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M10() * multiplier);
-		const T m20 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M20() * multiplier);
-		const T m30 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M30() * multiplier);
-		const T m01 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M01() * multiplier);
-		const T m11 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M11() * multiplier);
-		const T m21 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M21() * multiplier);
-		const T m31 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M31() * multiplier);
-		const T m02 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M02() * multiplier);
-		const T m12 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M12() * multiplier);
-		const T m22 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M22() * multiplier);
-		const T m32 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M32() * multiplier);
-		const T m03 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M03() * multiplier);
-		const T m13 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M13() * multiplier);
-		const T m23 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M23() * multiplier);
-		const T m33 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M33() * multiplier);
+		Matrix4x4<T> product;
+		Multiply(product.Data(), matrix.Data(), multiplier, Matrix4x4<T>::ComponentCount);
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return product;
 	}
 
 	template<std::integral T>
@@ -1274,58 +1072,46 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator *(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
 	{
-		const T m00 = left.M00() * right.M00() + left.M01() * right.M10() + left.M02() * right.M20() + left.M03() * right.M30();
-		const T m10 = left.M10() * right.M00() + left.M11() * right.M10() + left.M12() * right.M20() + left.M13() * right.M30();
-		const T m20 = left.M20() * right.M00() + left.M21() * right.M10() + left.M22() * right.M20() + left.M23() * right.M30();
-		const T m30 = left.M30() * right.M00() + left.M31() * right.M10() + left.M32() * right.M20() + left.M33() * right.M30();
-		const T m01 = left.M00() * right.M01() + left.M01() + right.M11() + left.M02() * right.M21() + left.M03() * right.M31();
-		const T m11 = left.M10() * right.M01() + left.M11() * right.M11() + left.M12() * right.M21() + left.M13() * right.M31();
-		const T m21 = left.M20() * right.M01() + left.M21() * right.M11() + left.M22() * right.M21() + left.M23() * right.M31();
-		const T m31 = left.M30() * right.M01() + left.M31() * right.M11() + left.M32() * right.M21() + left.M33() * right.M31();
-		const T m02 = left.M00() * right.M02() + left.M01() * right.M12() + left.M02() * right.M22() + left.M03() * right.M32();
-		const T m12 = left.M10() * right.M02() + left.M11() * right.M12() + left.M12() * right.M22() + left.M13() * right.M32();
-		const T m22 = left.M20() * right.M02() + left.M21() * right.M12() + left.M22() * right.M22() + left.M23() * right.M32();
-		const T m32 = left.M30() * right.M02() + left.M31() * right.M12() + left.M32() * right.M22() + left.M33() * right.M32();
-		const T m03 = left.M00() * right.M03() + left.M01() * right.M13() + left.M02() * right.M23() + left.M03() * right.M33();
-		const T m13 = left.M10() * right.M03() + left.M11() * right.M13() + left.M12() * right.M23() + left.M13() * right.M33();
-		const T m23 = left.M20() * right.M03() + left.M21() * right.M13() + left.M22() * right.M23() + left.M23() * right.M33();
-		const T m33 = left.M30() * right.M03() + left.M31() * right.M13() + left.M32() * right.M23() + left.M33() * right.M33();
+		Matrix4x4<T> product;
+		product.M00() = left.M00() * right.M00() + left.M01() * right.M10() + left.M02() * right.M20() + left.M03() * right.M30();
+		product.M10() = left.M10() * right.M00() + left.M11() * right.M10() + left.M12() * right.M20() + left.M13() * right.M30();
+		product.M20() = left.M20() * right.M00() + left.M21() * right.M10() + left.M22() * right.M20() + left.M23() * right.M30();
+		product.M30() = left.M30() * right.M00() + left.M31() * right.M10() + left.M32() * right.M20() + left.M33() * right.M30();
+		product.M01() = left.M00() * right.M01() + left.M01() + right.M11() + left.M02() * right.M21() + left.M03() * right.M31();
+		product.M11() = left.M10() * right.M01() + left.M11() * right.M11() + left.M12() * right.M21() + left.M13() * right.M31();
+		product.M21() = left.M20() * right.M01() + left.M21() * right.M11() + left.M22() * right.M21() + left.M23() * right.M31();
+		product.M31() = left.M30() * right.M01() + left.M31() * right.M11() + left.M32() * right.M21() + left.M33() * right.M31();
+		product.M02() = left.M00() * right.M02() + left.M01() * right.M12() + left.M02() * right.M22() + left.M03() * right.M32();
+		product.M12() = left.M10() * right.M02() + left.M11() * right.M12() + left.M12() * right.M22() + left.M13() * right.M32();
+		product.M22() = left.M20() * right.M02() + left.M21() * right.M12() + left.M22() * right.M22() + left.M23() * right.M32();
+		product.M32() = left.M30() * right.M02() + left.M31() * right.M12() + left.M32() * right.M22() + left.M33() * right.M32();
+		product.M03() = left.M00() * right.M03() + left.M01() * right.M13() + left.M02() * right.M23() + left.M03() * right.M33();
+		product.M13() = left.M10() * right.M03() + left.M11() * right.M13() + left.M12() * right.M23() + left.M13() * right.M33();
+		product.M23() = left.M20() * right.M03() + left.M21() * right.M13() + left.M22() * right.M23() + left.M23() * right.M33();
+		product.M33() = left.M30() * right.M03() + left.M31() * right.M13() + left.M32() * right.M23() + left.M33() * right.M33();
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector3<T> operator *(const Matrix4x4<T>& matrix, const Vector4<T>& vector) noexcept
 	{
-		const T x = matrix.M00() * vector.X() + matrix.M01() * vector.Y() + matrix.M02() * vector.Z() + matrix.M03() * vector.W();
-		const T y = matrix.M10() * vector.X() + matrix.M11() * vector.Y() + matrix.M12() * vector.Z() + matrix.M13() * vector.W();
-		const T z = matrix.M20() * vector.X() + matrix.M21() * vector.Y() + matrix.M22() * vector.Z() + matrix.M23() * vector.W();
-		const T w = matrix.M30() * vector.X() + matrix.M31() * vector.Y() + matrix.M32() * vector.Z() + matrix.M33() * vector.W();
+		Vector4<T> product;
+		product.X() = matrix.M00() * vector.X() + matrix.M01() * vector.Y() + matrix.M02() * vector.Z() + matrix.M03() * vector.W();
+		product.Y() = matrix.M10() * vector.X() + matrix.M11() * vector.Y() + matrix.M12() * vector.Z() + matrix.M13() * vector.W();
+		product.Z() = matrix.M20() * vector.X() + matrix.M21() * vector.Y() + matrix.M22() * vector.Z() + matrix.M23() * vector.W();
+		product.W() = matrix.M30() * vector.X() + matrix.M31() * vector.Y() + matrix.M32() * vector.Z() + matrix.M33() * vector.W();
 
-		return Vector4<T>(x, y, z, w);
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> operator /(const Matrix4x4<T>& matrix, const typename Matrix4x4<T>::ComputationalType divisor) noexcept
 	{
-		const T m00 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M00() / divisor);
-		const T m10 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M10() / divisor);
-		const T m20 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M20() / divisor);
-		const T m30 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M30() / divisor);
-		const T m01 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M01() / divisor);
-		const T m11 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M11() / divisor);
-		const T m21 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M21() / divisor);
-		const T m31 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M31() / divisor);
-		const T m02 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M02() / divisor);
-		const T m12 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M12() / divisor);
-		const T m22 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M22() / divisor);
-		const T m32 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M32() / divisor);
-		const T m03 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M03() / divisor);
-		const T m13 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M13() / divisor);
-		const T m23 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M23() / divisor);
-		const T m33 = RoundToIntegralIfPossible<Matrix4x4<T>::ComputationalType, T>(matrix.M33() / divisor);
+		Matrix3x3<T> quotient;
+		Divide(quotient.Data(), matrix.Data(), divisor, Matrix3x3<T>::ComponentCount);
 
-		return Matrix4x4(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+		return quotient;
 	}
 
 	template<Arithmetic T>
@@ -1333,9 +1119,4 @@ namespace PonyEngine::Math
 	{
 		return stream << matrix.ToString();
 	}
-
-	template<Arithmetic T>
-	const Matrix4x4<T> Matrix4x4<T>::Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1});
-	template<Arithmetic T>
-	const Matrix4x4<T> Matrix4x4<T>::Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
 }

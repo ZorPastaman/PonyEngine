@@ -24,51 +24,36 @@ export namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	constexpr void Add(T* result, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T>
 	constexpr void Add(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
 	template<Arithmetic T>
 	constexpr void Subtract(T* result, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T>
 	constexpr void Subtract(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
 	template<Arithmetic T>
 	constexpr void Multiply(T* result, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T>
 	constexpr void Multiply(T* result, const T* left, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* result, U multiplier, std::size_t count) noexcept;
-
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* result, const T* left, U multiplier, std::size_t count) noexcept;
 
 	template<Arithmetic T>
 	constexpr void Divide(T* result, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T>
 	constexpr void Divide(T* result, const T* left, const T* right, std::size_t count) noexcept;
-
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* result, U divisor, std::size_t count) noexcept;
-
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* result, const T* left, U divisor, std::size_t count) noexcept;
 
 	template<Arithmetic T>
 	constexpr void Negate(T* result, std::size_t count) noexcept;
-
 	template<Arithmetic T>
 	constexpr void Negate(T* result, const T* right, std::size_t count) noexcept;
-
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr T Dot(const T* values, std::size_t count) noexcept;
-
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr T Dot(const T* left, const T* right, std::size_t count) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool IsFinite(const T* values, std::size_t count) noexcept;
@@ -242,32 +227,6 @@ namespace PonyEngine::Math
 		{
 			*result = -*right;
 		}
-	}
-
-	template<Arithmetic T>
-	constexpr T Dot(const T* values, const std::size_t count) noexcept
-	{
-		T dot = T{0};
-
-		for (const T* const end = values + count; values != end; ++values)
-		{
-			dot += *values * *values;
-		}
-
-		return dot;
-	}
-
-	template<Arithmetic T>
-	constexpr T Dot(const T* left, const T* right, const std::size_t count) noexcept
-	{
-		T dot = T{0};
-
-		for (const T* const end = left + count; left != end; ++left, ++right)
-		{
-			dot += *left * *right;
-		}
-
-		return dot;
 	}
 
 	template<std::floating_point T>
