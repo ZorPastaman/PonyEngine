@@ -9,11 +9,13 @@
 
 export module PonyEngine.Math:Vector2;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -38,6 +40,8 @@ export namespace PonyEngine::Math
 		/// @param y Y-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector2(T x, T y) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Vector2(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector2(const Vector2& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -84,7 +88,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		T& X() noexcept;
+		constexpr T& X() noexcept;
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
@@ -92,7 +96,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		T& Y() noexcept;
+		constexpr T& Y() noexcept;
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
@@ -100,7 +104,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 2 elements. The order is x, y.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 2 elements. The order is x, y.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -354,6 +358,12 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr Vector2<T>::Vector2(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, m_components.data());
+	}
+
+	template<Arithmetic T>
 	consteval Vector2<T> Vector2<T>::UpConsteval()
 	{
 		return Vector2(T{0}, T{1});
@@ -396,7 +406,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector2<T>::X() noexcept
+	constexpr T& Vector2<T>::X() noexcept
 	{
 		return m_components[0];
 	}
@@ -408,7 +418,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector2<T>::Y() noexcept
+	constexpr T& Vector2<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
@@ -420,7 +430,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T* Vector2<T>::Data() noexcept
+	constexpr T* Vector2<T>::Data() noexcept
 	{
 		return m_components.data();
 	}

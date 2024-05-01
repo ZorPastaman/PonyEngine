@@ -200,16 +200,16 @@ namespace Math
 			Assert::AreEqual(static_cast<double>(2.f / 25.f), static_cast<double>(inversedF.M11()), 0.0001);
 
 			auto multipliedF = matrixF * inversedF;
-			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M00()), static_cast<double>(multipliedF.M00()), 0.0001);
-			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M10()), static_cast<double>(multipliedF.M10()), 0.0001);
-			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M01()), static_cast<double>(multipliedF.M01()), 0.0001);
-			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2<float>::Identity.M11()), static_cast<double>(multipliedF.M11()), 0.0001);
+			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2Identity<float>.M00()), static_cast<double>(multipliedF.M00()), 0.0001);
+			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2Identity<float>.M10()), static_cast<double>(multipliedF.M10()), 0.0001);
+			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2Identity<float>.M01()), static_cast<double>(multipliedF.M01()), 0.0001);
+			Assert::AreEqual(static_cast<double>(PonyEngine::Math::Matrix2x2Identity<float>.M11()), static_cast<double>(multipliedF.M11()), 0.0001);
 		}
 
 		TEST_METHOD(IsFiniteTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Zero.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Identity.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<float>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<float>.IsFinite());
 			float nan = std::numeric_limits<float>::quiet_NaN();
 			auto matrix = PonyEngine::Math::Matrix2x2<float>(nan, 0.f, 0.f, 0.f);
 			Assert::IsFalse(matrix.IsFinite());
@@ -223,8 +223,8 @@ namespace Math
 			matrix.M11() = nan;
 			Assert::IsFalse(matrix.IsFinite());
 
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Zero.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Identity.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<short>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetTest)
@@ -566,8 +566,7 @@ namespace Math
 			Assert::AreEqual(m10F, constRowF.X());
 			Assert::AreEqual(m11F, constRowF.Y());
 
-			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<float>::RowCount);
-			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<float>::ColumnCount);
+			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<float>::Dimension);
 			Assert::AreEqual(std::size_t{4}, PonyEngine::Math::Matrix2x2<float>::ComponentCount);
 
 			short m00I = 4;
@@ -600,8 +599,7 @@ namespace Math
 			Assert::AreEqual(m10I, constRowI.X());
 			Assert::AreEqual(m11I, constRowI.Y());
 
-			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<short>::RowCount);
-			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<short>::ColumnCount);
+			Assert::AreEqual(std::size_t{2}, PonyEngine::Math::Matrix2x2<short>::Dimension);
 			Assert::AreEqual(std::size_t{4}, PonyEngine::Math::Matrix2x2<short>::ComponentCount);
 		}
 
@@ -761,14 +759,14 @@ namespace Math
 
 			centerI = PonyEngine::Math::Matrix2x2<short>(m00CI, m10CI, m01CI, m11CI);
 			leftI = centerI /= multiplierF;
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m00CI / multiplierF), centerI.M00());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m10CI / multiplierF), centerI.M10());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m01CI / multiplierF), centerI.M01());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m11CI / multiplierF), centerI.M11());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m00CI / multiplierF), leftI.M00());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m10CI / multiplierF), leftI.M10());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m01CI / multiplierF), leftI.M01());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m11CI / multiplierF), leftI.M11());
+			Assert::AreEqual(static_cast<short>(m00CI / multiplierF), centerI.M00());
+			Assert::AreEqual(static_cast<short>(m10CI / multiplierF), centerI.M10());
+			Assert::AreEqual(static_cast<short>(m01CI / multiplierF), centerI.M01());
+			Assert::AreEqual(static_cast<short>(m11CI / multiplierF), centerI.M11());
+			Assert::AreEqual(static_cast<short>(m00CI / multiplierF), leftI.M00());
+			Assert::AreEqual(static_cast<short>(m10CI / multiplierF), leftI.M10());
+			Assert::AreEqual(static_cast<short>(m01CI / multiplierF), leftI.M01());
+			Assert::AreEqual(static_cast<short>(m11CI / multiplierF), leftI.M11());
 		}
 
 		TEST_METHOD(EqualityOperatorsTest)
@@ -952,10 +950,10 @@ namespace Math
 
 			centerI = PonyEngine::Math::Matrix2x2<short>(m00CI, m10CI, m01CI, m11CI);
 			leftI = centerI / multiplierF;
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m00CI / multiplierF), leftI.M00());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m10CI / multiplierF), leftI.M10());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m01CI / multiplierF), leftI.M01());
-			Assert::AreEqual(PonyEngine::Math::RoundToIntegral<float, short>(m11CI / multiplierF), leftI.M11());
+			Assert::AreEqual(static_cast<short>(m00CI / multiplierF), leftI.M00());
+			Assert::AreEqual(static_cast<short>(m10CI / multiplierF), leftI.M10());
+			Assert::AreEqual(static_cast<short>(m01CI / multiplierF), leftI.M01());
+			Assert::AreEqual(static_cast<short>(m11CI / multiplierF), leftI.M11());
 		}
 
 		TEST_METHOD(TypesTest)
@@ -981,16 +979,15 @@ namespace Math
 
 		TEST_METHOD(DefaultsTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Identity == PonyEngine::Math::Matrix2x2<float>(1, 0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Zero == PonyEngine::Math::Matrix2x2<float>(0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<float> == PonyEngine::Math::Matrix2x2<float>(1, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<float> == PonyEngine::Math::Matrix2x2<float>(0, 0, 0, 0));
 
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Identity == PonyEngine::Math::Matrix2x2<short>(1, 0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Zero == PonyEngine::Math::Matrix2x2<short>(0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<short> == PonyEngine::Math::Matrix2x2<short>(1, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<short> == PonyEngine::Math::Matrix2x2<short>(0, 0, 0, 0));
 		}
 
 		TEST_METHOD(ConstexprTest)
 		{
-#pragma warning(disable:4189)
 			constexpr auto defaultMatrix = PonyEngine::Math::Matrix2x2<float>();
 			constexpr auto matrix = PonyEngine::Math::Matrix2x2<float>(2, 3, -1, 5);
 			constexpr auto columnMatrix = PonyEngine::Math::Matrix2x2<float>(PonyEngine::Math::Vector2<float>(2, 3), PonyEngine::Math::Vector2<float>(-1, 5));
@@ -1004,13 +1001,13 @@ namespace Math
 			static constexpr PonyEngine::Math::Matrix2x2<float> StaticMatrix(0.f, 1.f, 0.f, 0.f);
 			constexpr auto pointer = StaticMatrix.Data();
 
-			constexpr auto identity = PonyEngine::Math::Matrix2x2<float>::IdentityConsteval();
+			constexpr auto identity = PonyEngine::Math::Matrix2x2Identity<float>;
 			Assert::AreEqual(1.f, identity.M00());
 			Assert::AreEqual(0.f, identity.M10());
 			Assert::AreEqual(0.f, identity.M01());
 			Assert::AreEqual(1.f, identity.M11());
 
-			constexpr auto zero = PonyEngine::Math::Matrix2x2<float>::ZeroConsteval();
+			constexpr auto zero = PonyEngine::Math::Matrix2x2Zero<float>;
 			Assert::AreEqual(0.f, zero.M00());
 			Assert::AreEqual(0.f, zero.M10());
 			Assert::AreEqual(0.f, zero.M01());
@@ -1046,7 +1043,6 @@ namespace Math
 			constexpr auto multipliedRI = 3 * PonyEngine::Math::Matrix2x2<short>(2, 3, -1, 2);
 
 			constexpr auto divided = matrix / 3.f;
-#pragma warning(default:4189)
 		}
 	};
 }

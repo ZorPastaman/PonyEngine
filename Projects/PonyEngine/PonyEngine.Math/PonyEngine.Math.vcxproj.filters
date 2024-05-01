@@ -48,6 +48,9 @@
     <ClCompile Include="Source\Public\Math\Matrix4x4.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Math\ArrayArithmetics.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

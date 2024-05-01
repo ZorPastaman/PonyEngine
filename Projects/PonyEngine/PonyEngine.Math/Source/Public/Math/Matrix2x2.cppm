@@ -9,13 +9,16 @@
 
 export module PonyEngine.Math:Matrix2x2;
 
+import <algorithm>;
 import <array>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <type_traits>;
 
+import :ArrayArithmetics;
 import :Common;
 import :Vector2;
 
@@ -27,74 +30,50 @@ export namespace PonyEngine::Math
 	class Matrix2x2 final
 	{
 	public:
+		using ValueType = T; ///< Component type.
+		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
+
+		static constexpr std::size_t Dimension = 2; ///< Row and column count. For any Matrix2x2 it's always 2.
+		static constexpr std::size_t ComponentCount = Dimension * Dimension; ///< Component count. For any Matrix2x2 it's always 4.
+
 		/// @brief Row access.
+		/// @tparam IsConstant Is the underlying value const?
+		template<bool IsConstant>
 		class Row final
 		{
 		public:
+			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
+
 			Row(const Row&) = delete;
 			Row(Row&&) = delete;
 
-			~Row() noexcept = default;
-
-			/// @brief Converts a row to a vector.
-			[[nodiscard("Pure operator")]]
-			operator Vector2<T>() const noexcept;
-
-			/// @brief Gets a component in a row by the @p columnIndex.
-			/// @param columnIndex Column index.
-			/// @return Component.
-			[[nodiscard("Pure operator")]]
-			T& operator [](std::size_t columnIndex) const noexcept;
-
-			Row& operator =(const Row&) = delete;
-			Row& operator =(Row&&) = delete;
-
-		private:
-			/// @brief Creates a row access.
-			/// @param row First element in a row.
-			[[nodiscard("Pure constructor")]]
-			explicit Row(T* row) noexcept;
-
-			T* const m_row; ///< Row pointer.
-
-			friend Matrix2x2;
-		};
-
-		/// @brief Const row access.
-		class ConstRow final
-		{
-		public:
-			ConstRow(const ConstRow&) = delete;
-			ConstRow(ConstRow&&) = delete;
-
-			constexpr ~ConstRow() noexcept = default;
+			constexpr ~Row() noexcept = default;
 
 			/// @brief Converts a row to a vector.
 			[[nodiscard("Pure operator")]]
 			constexpr operator Vector2<T>() const noexcept;
 
-			/// @brief Gets a component in a row by the @p columnIndex.
+			/// @brief Gets a component in a row by a column index.
 			/// @param columnIndex Column index.
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
-			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
+			constexpr RowValueType& operator [](std::size_t columnIndex) const noexcept;
 
-			ConstRow& operator =(const ConstRow&) = delete;
-			ConstRow& operator =(ConstRow&&) = delete;
+			Row& operator =(const Row&) = delete;
+			Row& operator =(Row&&) = delete;
+
+			Row& operator =(const Vector2<T>& row) noexcept requires(!IsConstant);
 
 		private:
-			/// @brief Creates a const row access.
+			/// @brief Creates a row access.
 			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
-			explicit constexpr ConstRow(const T* row) noexcept;
+			explicit constexpr Row(RowValueType* row) noexcept;
 
-			const T* const m_row; ///< Row pointer.
+			RowValueType* const m_row; ///< Row pointer.
 
 			friend Matrix2x2;
 		};
-
-		using ValueType = T; ///< Component type.
-		using ComputationalType = ComputationalFor<T>; ///< Floating point type used in functions that require a floating point type.
 
 		/// @brief Creates a matrix and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
@@ -112,27 +91,18 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix2x2(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
 		[[nodiscard("Pure constructor")]]
+		explicit constexpr Matrix2x2(const T* components) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr Matrix2x2(const Matrix2x2& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix2x2(Matrix2x2&& other) noexcept = default;
 
 		constexpr ~Matrix2x2() noexcept = default;
 
-		/// @brief Creates a Matrix2x2(1, 0, 0, 1).
-		/// @return Identity matrix.
-		///	@remark For non-constexpr execution use @p Matrix2x2::Identity variable.
-		[[nodiscard("Pure function")]]
-		static consteval Matrix2x2 IdentityConsteval();
-		/// @brief Creates a Matrix2x2(0, 0, 0, 0).
-		/// @return Zero matrix.
-		///	@remark For non-constexpr execution use @p Matrix2x2::Zero variable.
-		[[nodiscard("Pure function")]]
-		static consteval Matrix2x2 ZeroConsteval();
-
 		/// @brief Gets a component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
-		T& M00() noexcept;
+		constexpr T& M00() noexcept;
 		/// @brief Gets a component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
@@ -140,7 +110,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
-		T& M10() noexcept;
+		constexpr T& M10() noexcept;
 		/// @brief Gets a component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
@@ -148,7 +118,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
-		T& M01() noexcept;
+		constexpr T& M01() noexcept;
 		/// @brief Gets a component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
@@ -156,7 +126,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
-		T& M11() noexcept;
+		constexpr T& M11() noexcept;
 		/// @brief Gets a component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
@@ -164,7 +134,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 4 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 4 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -200,6 +170,8 @@ export namespace PonyEngine::Math
 		/// @param m01 Component 01.
 		/// @param m11 Component 11.
 		void Set(T m00, T m10, T m01, T m11) noexcept;
+		void Set(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
+		void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
@@ -252,13 +224,13 @@ export namespace PonyEngine::Math
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		Row operator [](std::size_t rowIndex) noexcept;
+		constexpr Row<false> operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
 		/// @details Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index.
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		constexpr ConstRow operator [](std::size_t rowIndex) const noexcept;
+		constexpr Row<true> operator [](std::size_t rowIndex) const noexcept;
 
 		Matrix2x2& operator =(const Matrix2x2& other) noexcept = default;
 		Matrix2x2& operator =(Matrix2x2&& other) noexcept = default;
@@ -292,13 +264,6 @@ export namespace PonyEngine::Math
 		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Matrix2x2& other) const noexcept;
-
-		static const Matrix2x2 Identity; ///< Matrix2x2(1, 0, 0, 1).
-		static const Matrix2x2 Zero; ///< Matrix2x2(0, 0, 0, 0).
-
-		static constexpr std::size_t RowCount = 2; ///< Row count. For any Matrix2x2 it's always 2.
-		static constexpr std::size_t ColumnCount = 2; ///< Column count. For any Matrix2x2 it's always 2.
-		static constexpr std::size_t ComponentCount = RowCount * ColumnCount; ///< Component count. For any Matrix2x2 it's always 4.
 
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m01, m11.
@@ -401,50 +366,46 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix2x2<T>& matrix);
+
+	template<Arithmetic T>
+	constexpr Matrix2x2<T> Matrix2x2Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1});
+	template<Arithmetic T>
+	constexpr Matrix2x2<T> Matrix2x2Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0});
 }
 
 namespace PonyEngine::Math
 {
 	template<Arithmetic T>
-	Matrix2x2<T>::Row::Row(T* const row) noexcept :
+	template<bool IsConstant>
+	constexpr Matrix2x2<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
 		m_row{row}
 	{
 	}
 
 	template<Arithmetic T>
-	Matrix2x2<T>::Row::operator Vector2<T>() const noexcept
+	template<bool IsConstant>
+	constexpr Matrix2x2<T>::Row<IsConstant>::operator Vector2<T>() const noexcept
 	{
-		const T x = m_row[0];
-		const T y = m_row[2];
+		Vector2<T> row;
+		AssignWithSourceStep(row.Data(), m_row, Dimension, Dimension);
 
-		return Vector2<T>(x, y);
+		return row;
 	}
 
 	template<Arithmetic T>
-	T& Matrix2x2<T>::Row::operator [](const std::size_t columnIndex) const noexcept
+	template<bool IsConstant>
+	constexpr typename Matrix2x2<T>::template Row<IsConstant>::RowValueType& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * 2];
+		return m_row[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T>::ConstRow::ConstRow(const T* const row) noexcept :
-		m_row{row}
+	template<bool IsConstant>
+	typename Matrix2x2<T>::template Row<IsConstant>& Matrix2x2<T>::Row<IsConstant>::operator =(const Vector2<T>& row) noexcept requires(!IsConstant)
 	{
-	}
+		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
 
-	template<Arithmetic T>
-	constexpr Matrix2x2<T>::ConstRow::operator Vector2<T>() const noexcept
-	{
-		const T x = m_row[0];
-		const T y = m_row[2];
-
-		return Vector2<T>(x, y);
-	}
-
-	template<Arithmetic T>
-	constexpr const T& Matrix2x2<T>::ConstRow::operator [](const std::size_t columnIndex) const noexcept
-	{
-		return m_row[columnIndex * 2];
+		return *this;
 	}
 
 	template<Arithmetic T>
@@ -460,19 +421,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	consteval Matrix2x2<T> Matrix2x2<T>::IdentityConsteval()
+	constexpr Matrix2x2<T>::Matrix2x2(const T* components) noexcept
 	{
-		return Matrix2x2(T{1}, T{0}, T{0}, T{1});
+		std::ranges::copy(components, components + ComponentCount, m_components.data());
 	}
 
 	template<Arithmetic T>
-	consteval Matrix2x2<T> Matrix2x2<T>::ZeroConsteval()
-	{
-		return Matrix2x2(T{0}, T{0}, T{0}, T{0});
-	}
-
-	template<Arithmetic T>
-	T& Matrix2x2<T>::M00() noexcept
+	constexpr T& Matrix2x2<T>::M00() noexcept
 	{
 		return m_components[0];
 	}
@@ -484,7 +439,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix2x2<T>::M10() noexcept
+	constexpr T& Matrix2x2<T>::M10() noexcept
 	{
 		return m_components[1];
 	}
@@ -496,7 +451,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix2x2<T>::M01() noexcept
+	constexpr T& Matrix2x2<T>::M01() noexcept
 	{
 		return m_components[2];
 	}
@@ -508,7 +463,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Matrix2x2<T>::M11() noexcept
+	constexpr T& Matrix2x2<T>::M11() noexcept
 	{
 		return m_components[3];
 	}
@@ -520,7 +475,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T* Matrix2x2<T>::Data() noexcept
+	constexpr T* Matrix2x2<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
@@ -560,7 +515,7 @@ namespace PonyEngine::Math
 	{
 		if constexpr (std::is_floating_point_v<T>)
 		{
-			return std::isfinite(M00()) && std::isfinite(M10()) && std::isfinite(M01()) && std::isfinite(M11());
+			return Math::IsFinite(Data(), ComponentCount);
 		}
 		else
 		{
@@ -578,48 +533,48 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	void Matrix2x2<T>::Scale(const Matrix2x2<T>& scale) noexcept
+	void Matrix2x2<T>::Set(const Vector2<T>& column0, const Vector2<T>& column1) noexcept
 	{
-		M00() *= scale.M00();
-		M10() *= scale.M10();
-		M01() *= scale.M01();
-		M11() *= scale.M11();
+		Set(column0.X(), column0.Y(), column1.X(), column1.Y());
+	}
+
+	template<Arithmetic T>
+	void Matrix2x2<T>::Set(const T* components) noexcept
+	{
+		std::ranges::copy(components, ComponentCount, m_components.data());
+	}
+
+	template<Arithmetic T>
+	void Matrix2x2<T>::Scale(const Matrix2x2& scale) noexcept
+	{
+		Multiply(Data(), scale.Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
 	constexpr Vector2<T> Matrix2x2<T>::GetRow(const std::size_t rowIndex) const noexcept
 	{
-		const T x = m_components[rowIndex];
-		const T y = m_components[rowIndex + 2];
-
-		return Vector2<T>(x, y);
+		return (*this)[rowIndex];
 	}
 
 	template<Arithmetic T>
 	void Matrix2x2<T>::SetRow(const std::size_t rowIndex, const Vector2<T>& value) noexcept
 	{
-		m_components[rowIndex] = value.X();
-		m_components[rowIndex + 2] = value.Y();
+		(*this)[rowIndex] = value;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector2<T> Matrix2x2<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const std::size_t begin = columnIndex * 2;
+		const T* const columnBegin = m_components.data() + columnIndex * Dimension;
 
-		const T x = m_components[begin];
-		const T y = m_components[begin + 1];
-
-		return Vector2<T>(x, y);
+		return Vector2<T>(columnBegin);
 	}
 
 	template<Arithmetic T>
 	void Matrix2x2<T>::SetColumn(const std::size_t columnIndex, const Vector2<T>& value) noexcept
 	{
-		const std::size_t begin = columnIndex * 2;
-
-		m_components[begin] = value.X();
-		m_components[begin + 1] = value.Y();
+		T* const columnBegin = m_components.data() + columnIndex * Dimension;
+		std::ranges::copy(value.Data(), value.Data() + Dimension, columnBegin);
 	}
 
 	template<Arithmetic T>
@@ -657,37 +612,37 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> Scale(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
-		return Matrix2x2<T>(left.M00() * right.M00(), left.M10() * right.M10(), left.M01() * right.M01(), left.M11() * right.M11());
+		Matrix2x2<T> scaled;
+		Multiply(scaled.Data(), left.Data(), right.Data(), Matrix2x2<T>::ComponentCount);
+
+		return scaled;
 	}
 
 	template<Arithmetic T>
 	constexpr bool AreAlmostEqual(const Matrix2x2<T>& left, const Matrix2x2<T>& right, const typename Matrix2x2<T>::ComputationalType tolerance) noexcept
 	{
 		const Matrix2x2<T> diff = left - right;
-		const T kindOfMagnitudeSquared = diff.M00() * diff.M00() + diff.M10() * diff.M10() + diff.M01() * diff.M01() + diff.M11() * diff.M11();
+		const T magnitudeSquared = Dot(diff.Data(), Matrix2x2<T>::ComponentCount);
 
-		return kindOfMagnitudeSquared < tolerance * tolerance;
+		return magnitudeSquared < tolerance * tolerance;
 	}
 
 	template<Arithmetic T>
-	typename Matrix2x2<T>::Row Matrix2x2<T>::operator [](const std::size_t rowIndex) noexcept
+	constexpr typename Matrix2x2<T>::template Row<false> Matrix2x2<T>::operator [](const std::size_t rowIndex) noexcept
 	{
-		return Row(Data() + rowIndex);
+		return Row<false>(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
-	constexpr typename Matrix2x2<T>::ConstRow Matrix2x2<T>::operator [](const std::size_t rowIndex) const noexcept
+	constexpr typename Matrix2x2<T>::template Row<true> Matrix2x2<T>::operator [](const std::size_t rowIndex) const noexcept
 	{
-		return ConstRow(Data() + rowIndex);
+		return Row<true>(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
 	Matrix2x2<T>& Matrix2x2<T>::operator +=(const Matrix2x2& other) noexcept
 	{
-		M00() += other.M00();
-		M10() += other.M10();
-		M01() += other.M01();
-		M11() += other.M11();
+		Add(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -695,10 +650,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix2x2<T>& Matrix2x2<T>::operator -=(const Matrix2x2& other) noexcept
 	{
-		M00() -= other.M00();
-		M10() -= other.M10();
-		M01() -= other.M01();
-		M11() -= other.M11();
+		Subtract(Data(), other.Data(), ComponentCount);
 
 		return *this;
 	}
@@ -706,10 +658,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix2x2<T>& Matrix2x2<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		M00() *= multiplier;
-		M10() *= multiplier;
-		M01() *= multiplier;
-		M11() *= multiplier;
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -717,10 +666,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix2x2<T>& Matrix2x2<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
-		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() * multiplier);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() * multiplier);
-		M01() = RoundToIntegralIfPossible<ComputationalType, T>(M01() * multiplier);
-		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() * multiplier);
+		Multiply(Data(), multiplier, ComponentCount);
 
 		return *this;
 	}
@@ -734,10 +680,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Matrix2x2<T>& Matrix2x2<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		M00() = RoundToIntegralIfPossible<ComputationalType, T>(M00() / divisor);
-		M10() = RoundToIntegralIfPossible<ComputationalType, T>(M10() / divisor);
-		M01() = RoundToIntegralIfPossible<ComputationalType, T>(M01() / divisor);
-		M11() = RoundToIntegralIfPossible<ComputationalType, T>(M11() / divisor);
+		Divide(Data(), divisor, ComponentCount);
 
 		return *this;
 	}
@@ -751,36 +694,46 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator +(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
-		return Matrix2x2<T>(left.M00() + right.M00(), left.M10() + right.M10(), left.M01() + right.M01(), left.M11() + right.M11());
+		Matrix2x2<T> sum;
+		Add(sum.Data(), left.Data(), right.Data(), Matrix2x2<T>::ComponentCount);
+
+		return sum;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator -(const Matrix2x2<T>& matrix) noexcept
 	{
-		return Matrix2x2<T>(-matrix.M00(), -matrix.M10(), -matrix.M01(), -matrix.M11());
+		Matrix2x2<T> negated;
+		Negate(negated.Data(), matrix.Data(), Matrix2x2<T>::ComponentCount);
+
+		return negated;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator -(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
-		return Matrix2x2<T>(left.M00() - right.M00(), left.M10() - right.M10(), left.M01() - right.M01(), left.M11() - right.M11());
+		Matrix2x2<T> difference;
+		Subtract(difference.Data(), left.Data(), right.Data(), Matrix2x2<T>::ComponentCount);
+
+		return difference;
 	}
 
 	template<std::integral T>
 	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, const T multiplier) noexcept
 	{
-		return Matrix2x2<T>(matrix.M00() * multiplier, matrix.M10() * multiplier, matrix.M01() * multiplier, matrix.M11() * multiplier);
+		Matrix2x2<T> product;
+		Multiply(product.Data(), matrix.Data(), multiplier, Matrix2x2<T>::ComponentCount);
+
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& matrix, const typename Matrix2x2<T>::ComputationalType multiplier) noexcept
 	{
-		const T m00 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M00() * multiplier);
-		const T m10 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M10() * multiplier);
-		const T m01 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M01() * multiplier);
-		const T m11 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M11() * multiplier);
+		Matrix2x2<T> product;
+		Multiply(product.Data(), matrix.Data(), multiplier, Matrix2x2<T>::ComponentCount);
 
-		return Matrix2x2<T>(m00, m10, m01, m11);
+		return product;
 	}
 
 	template<std::integral T>
@@ -798,32 +751,32 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator *(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
-		const T m00 = left.M00() * right.M00() + left.M01() * right.M10();
-		const T m10 = left.M10() * right.M00() + left.M11() * right.M10();
-		const T m01 = left.M00() * right.M01() + left.M01() * right.M11();
-		const T m11 = left.M10() * right.M01() + left.M11() * right.M11();
+		Matrix2x2<T> product;
+		product.M00() = left.M00() * right.M00() + left.M01() * right.M10();
+		product.M10() = left.M10() * right.M00() + left.M11() * right.M10();
+		product.M01() = left.M00() * right.M01() + left.M01() * right.M11();
+		product.M11() = left.M10() * right.M01() + left.M11() * right.M11();
 
-		return Matrix2x2<T>(m00, m10, m01, m11);
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Vector2<T> operator *(const Matrix2x2<T>& matrix, const Vector2<T>& vector) noexcept
 	{
-		const T x = matrix.M00() * vector.X() + matrix.M01() * vector.Y();
-		const T y = matrix.M10() * vector.X() + matrix.M11() * vector.Y();
+		Vector2<T> product;
+		product.X() = matrix.M00() * vector.X() + matrix.M01() * vector.Y();
+		product.Y() = matrix.M10() * vector.X() + matrix.M11() * vector.Y();
 
-		return Vector2<T>(x, y);
+		return product;
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T> operator /(const Matrix2x2<T>& matrix, const typename Matrix2x2<T>::ComputationalType divisor) noexcept
 	{
-		const T m00 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M00() / divisor);
-		const T m10 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M10() / divisor);
-		const T m01 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M01() / divisor);
-		const T m11 = RoundToIntegralIfPossible<Matrix2x2<T>::ComputationalType, T>(matrix.M11() / divisor);
+		Matrix2x2<T> quotient;
+		Divide(quotient.Data(), matrix.Data(), divisor, Matrix2x2<T>::ComponentCount);
 
-		return Matrix2x2<T>(m00, m10, m01, m11);
+		return quotient;
 	}
 
 	template<Arithmetic T>
@@ -831,9 +784,4 @@ namespace PonyEngine::Math
 	{
 		return stream << matrix.ToString();
 	}
-
-	template<Arithmetic T>
-	const Matrix2x2<T> Matrix2x2<T>::Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1});
-	template<Arithmetic T>
-	const Matrix2x2<T> Matrix2x2<T>::Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0});
 }
