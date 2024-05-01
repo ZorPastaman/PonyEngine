@@ -97,7 +97,7 @@ export namespace PonyEngine::Math
 
 		/// @brief Creates a matrix and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
-		constexpr Matrix4x4() noexcept = default; // TODO: empty default constructor.
+		constexpr Matrix4x4() noexcept = default;
 		/// @brief Creates a matrix and assigns its components from the arguments.
 		/// @param m00 Component 00.
 		/// @param m10 Component 10.

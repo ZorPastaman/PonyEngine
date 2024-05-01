@@ -407,9 +407,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T> Vector4<T>::Normalized() const noexcept
 	{
-#pragma warning(disable:4723)
 		return *this * (ComputationalType{1} / Magnitude());
-#pragma warning(default:4723)
 	}
 
 	template<Arithmetic T>

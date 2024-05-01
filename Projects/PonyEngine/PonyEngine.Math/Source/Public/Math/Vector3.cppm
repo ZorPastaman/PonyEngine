@@ -9,12 +9,14 @@
 
 export module PonyEngine.Math:Vector3;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -40,6 +42,8 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector3(T x, T y, T z) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Vector3(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector3(const Vector3& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -96,7 +100,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		T& X() noexcept;
+		constexpr T& X() noexcept;
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
@@ -104,7 +108,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		T& Y() noexcept;
+		constexpr T& Y() noexcept;
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
@@ -112,7 +116,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
-		T& Z() noexcept;
+		constexpr T& Z() noexcept;
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
@@ -120,7 +124,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 3 elements. The order is x, y, z.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 3 elements. The order is x, y, z.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -384,6 +388,12 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr Vector3<T>::Vector3(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, m_components.data());
+	}
+
+	template<Arithmetic T>
 	consteval Vector3<T> Vector3<T>::ForwardConsteval()
 	{
 		return Vector3(T{0}, T{0}, T{1});
@@ -438,7 +448,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector3<T>::X() noexcept
+	constexpr T& Vector3<T>::X() noexcept
 	{
 		return m_components[0];
 	}
@@ -450,7 +460,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector3<T>::Y() noexcept
+	constexpr T& Vector3<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
@@ -462,7 +472,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T& Vector3<T>::Z() noexcept
+	constexpr T& Vector3<T>::Z() noexcept
 	{
 		return m_components[2];
 	}
@@ -474,7 +484,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	T* Vector3<T>::Data() noexcept
+	constexpr T* Vector3<T>::Data() noexcept
 	{
 		return m_components.data();
 	}

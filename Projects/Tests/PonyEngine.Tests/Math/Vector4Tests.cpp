@@ -918,7 +918,6 @@ namespace Math
 
 		TEST_METHOD(ConstexprTest)
 		{
-#pragma warning(disable:4189)
 			constexpr auto defaultVector = PonyEngine::Math::Vector4<float>();
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(3.f, 2.f, 1.f, 3.f);
 			constexpr PonyEngine::Math::Vector4<float> copiedVector = vector;
@@ -976,7 +975,6 @@ namespace Math
 			constexpr auto multipliedLI = 3 * intVector;
 			constexpr auto multipliedIF = intVector * 3.f;
 			constexpr auto multipliedLIF = 3.f * intVector;
-#pragma warning(default:4189)
 		}
 	};
 }
