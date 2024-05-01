@@ -148,7 +148,7 @@ namespace Math
 
 		TEST_METHOD(QuaternionSetTest)
 		{
-			auto quaternion = PonyEngine::Math::Quaternion<float>::Identity;
+			auto quaternion = PonyEngine::Math::QuaternionIdentity<float>;
 			float x = 5.f;
 			float y = 1.f;
 			float z = -3.f;
@@ -402,7 +402,7 @@ namespace Math
 			Assert::AreEqual(0.630, static_cast<double>(quaternion2.Z()), 0.001);
 			Assert::AreEqual(0.532, static_cast<double>(quaternion2.W()), 0.001);
 
-			quaternion2 = PonyEngine::Math::Quaternion<float>::Identity * PonyEngine::Math::Quaternion<float>::Identity;
+			quaternion2 = PonyEngine::Math::QuaternionIdentity<float> * PonyEngine::Math::QuaternionIdentity<float>;
 			Assert::AreEqual(0.f, quaternion2.X());
 			Assert::AreEqual(0.f, quaternion2.Y());
 			Assert::AreEqual(0.f, quaternion2.Z());
@@ -424,7 +424,7 @@ namespace Math
 			Assert::AreEqual(5., static_cast<double>(rotated.Y()), 0.001);
 			Assert::AreEqual(-10., static_cast<double>(rotated.Z()), 0.001);
 
-			rotated = PonyEngine::Math::Quaternion<float>::Identity * vector;
+			rotated = PonyEngine::Math::QuaternionIdentity<float> * vector;
 			Assert::AreEqual(vector.X(), rotated.X());
 			Assert::AreEqual(vector.Y(), rotated.Y());
 			Assert::AreEqual(vector.Z(), rotated.Z());
@@ -465,7 +465,7 @@ namespace Math
 				quaternion0.Z() * quaternion1.Z() + quaternion0.W() * quaternion1.W();
 			Assert::AreEqual(expected, PonyEngine::Math::Dot(quaternion0, quaternion1));
 
-			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::Quaternion<float>::Identity, PonyEngine::Math::Quaternion<float>::Identity));
+			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::QuaternionIdentity<float>, PonyEngine::Math::QuaternionIdentity<float>));
 		}
 
 		TEST_METHOD(QuaternionAngleTest)
@@ -480,13 +480,13 @@ namespace Math
 
 		TEST_METHOD(QuaternionDefaultTest)
 		{
-			auto identityF = PonyEngine::Math::Quaternion<float>::Identity;
+			auto identityF = PonyEngine::Math::QuaternionIdentity<float>;
 			Assert::AreEqual(0.f, identityF.X());
 			Assert::AreEqual(0.f, identityF.Y());
 			Assert::AreEqual(0.f, identityF.Y());
 			Assert::AreEqual(1.f, identityF.W());
 
-			auto identityD = PonyEngine::Math::Quaternion<double>::Identity;
+			auto identityD = PonyEngine::Math::QuaternionIdentity<double>;
 			Assert::AreEqual(0., identityD.X());
 			Assert::AreEqual(0., identityD.Y());
 			Assert::AreEqual(0., identityD.Y());
@@ -516,7 +516,7 @@ namespace Math
 			static constexpr PonyEngine::Math::Quaternion<float> StaticQuaternion(0.f, 1.f, 0.f, 0.f);
 			constexpr auto pointer = StaticQuaternion.Data();
 
-			constexpr auto identity = PonyEngine::Math::Quaternion<float>::IdentityConsteval();
+			constexpr auto identity = PonyEngine::Math::QuaternionIdentity<float>;
 			Assert::AreEqual(0.f, identity.X());
 			Assert::AreEqual(0.f, identity.Y());
 			Assert::AreEqual(0.f, identity.Z());

@@ -9,6 +9,7 @@
 
 export module PonyEngine.Math:Quaternion;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <cstddef>;
@@ -16,9 +17,11 @@ import <concepts>;
 import <format>;
 import <numbers>;
 import <ostream>;
+import <ranges>;
 import <string>;
 import <utility>;
 
+import :ArrayArithmetics;
 import :Common;
 import :Vector3;
 import :Vector4;
@@ -33,6 +36,8 @@ export namespace PonyEngine::Math
 	public:
 		using ValueType = T; ///< Component type.
 
+		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any quaternion, it's always 4.
+
 		/// @brief Creates a quaternion and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion() noexcept = default;
@@ -43,6 +48,8 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(T x, T y, T z, T w) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Quaternion(const T* components) noexcept;
 		/// @brief Creates a quaternion and assigns its components from the @p vector components.
 		/// @param vector Component values source.
 		[[nodiscard("Pure constructor")]]
@@ -54,16 +61,10 @@ export namespace PonyEngine::Math
 
 		constexpr ~Quaternion() noexcept = default;
 
-		/// @brief Creates a Quaternion(0, 0, 0, 1).
-		/// @return Identity quaternion.
-		///	@remark For non-constexpr execution use @p Quaternion::Identity variable.
-		[[nodiscard("Pure function")]]
-		static consteval Quaternion IdentityConsteval();
-
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
-		T& X() noexcept;
+		constexpr T& X() noexcept;
 		/// @brief Gets an x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
@@ -71,7 +72,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
-		T& Y() noexcept;
+		constexpr T& Y() noexcept;
 		/// @brief Gets a y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
@@ -79,7 +80,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
-		T& Z() noexcept;
+		constexpr T& Z() noexcept;
 		/// @brief Gets a z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
@@ -87,7 +88,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
-		T& W() noexcept;
+		constexpr T& W() noexcept;
 		/// @brief Gets a w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
@@ -95,7 +96,7 @@ export namespace PonyEngine::Math
 		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
-		T* Data() noexcept;
+		constexpr T* Data() noexcept;
 		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
@@ -135,6 +136,7 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		/// @param w W-component.
 		void Set(T x, T y, T z, T w) noexcept;
+		void Set(const T* components) noexcept;
 
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -149,7 +151,7 @@ export namespace PonyEngine::Math
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
-		T& operator [](std::size_t index) noexcept;
+		constexpr T& operator [](std::size_t index) noexcept;
 		/// @brief Gets a component by an index.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
@@ -169,13 +171,12 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Quaternion& other) const noexcept;
 
-		static const Quaternion Identity; ///< Zero rotation quaternion.
-
-		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any quaternion, it's always 4.
-
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
+
+	template<std::floating_point T>
+	constexpr Quaternion<T> QuaternionIdentity = Quaternion(T{0}, T{0}, T{0}, T{1});
 
 	/// @brief Computes a dot product of two quaternions.
 	/// @tparam T Component type.
@@ -263,19 +264,19 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	constexpr Quaternion<T>::Quaternion(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, Data());
+	}
+
+	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const Vector4<T>& vector) noexcept :
-		Quaternion(vector.X(), vector.Y(), vector.Z(), vector.W())
+		Quaternion(vector.Data())
 	{
 	}
 
 	template<std::floating_point T>
-	consteval Quaternion<T> Quaternion<T>::IdentityConsteval()
-	{
-		return Quaternion(T{0}, T{0}, T{0}, T{1});
-	}
-
-	template<std::floating_point T>
-	T& Quaternion<T>::X() noexcept
+	constexpr T& Quaternion<T>::X() noexcept
 	{
 		return m_components[0];
 	}
@@ -287,7 +288,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T& Quaternion<T>::Y() noexcept
+	constexpr T& Quaternion<T>::Y() noexcept
 	{
 		return m_components[1];
 	}
@@ -299,7 +300,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T& Quaternion<T>::Z() noexcept
+	constexpr T& Quaternion<T>::Z() noexcept
 	{
 		return m_components[2];
 	}
@@ -311,7 +312,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T& Quaternion<T>::W() noexcept
+	constexpr T& Quaternion<T>::W() noexcept
 	{
 		return m_components[3];
 	}
@@ -323,7 +324,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T* Quaternion<T>::Data() noexcept
+	constexpr T* Quaternion<T>::Data() noexcept
 	{
 		return m_components.data();
 	}
@@ -356,8 +357,10 @@ namespace PonyEngine::Math
 	Quaternion<T> Quaternion<T>::Normalized() const noexcept
 	{
 		const T inverseMagnitude = T{1} / Magnitude();
+		Quaternion normalized;
+		Multiply(normalized.Data(), Data(), inverseMagnitude, ComponentCount);
 
-		return Quaternion(X() * inverseMagnitude, Y() * inverseMagnitude, Z() * inverseMagnitude, W() * inverseMagnitude);
+		return normalized;
 	}
 
 	template<std::floating_point T>
@@ -369,7 +372,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	bool Quaternion<T>::IsFinite() const noexcept
 	{
-		return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
+		return Math::IsFinite(Data(), ComponentCount);
 	}
 
 	template<std::floating_point T>
@@ -379,6 +382,12 @@ namespace PonyEngine::Math
 		Y() = y;
 		Z() = z;
 		W() = w;
+	}
+
+	template<std::floating_point T>
+	void Quaternion<T>::Set(const T* const components) noexcept
+	{
+		std::ranges::copy(components, components + ComponentCount, Data()); 
 	}
 
 	template<std::floating_point T>
@@ -445,11 +454,11 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T>(X(), Y(), Z(), W());
+		return Vector4<T>(Data());
 	}
 
 	template<std::floating_point T>
-	T& Quaternion<T>::operator [](const std::size_t index) noexcept
+	constexpr T& Quaternion<T>::operator [](const std::size_t index) noexcept
 	{
 		return m_components[index];
 	}
@@ -461,7 +470,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T>& Quaternion<T>::operator *=(const Quaternion<T>& other) noexcept
+	Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
 	{
 		return *this = *this * other;
 	}
@@ -475,38 +484,40 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T> operator *(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
-		const T x = left.X() * right.W() + left.Y() * right.Z() - left.Z() * right.Y() + left.W() * right.X();
-		const T y = left.Y() * right.W() + left.Z() * right.X() - left.X() * right.Z() + left.W() * right.Y();
-		const T z = left.Z() * right.W() + left.X() * right.Y() - left.Y() * right.X() + left.W() * right.Z();
-		const T w = left.W() * right.W() - left.X() * right.X() - left.Y() * right.Y() - left.Z() * right.Z();
+		Quaternion<T> product;
+		product.X() = left.X() * right.W() + left.Y() * right.Z() - left.Z() * right.Y() + left.W() * right.X();
+		product.Y() = left.Y() * right.W() + left.Z() * right.X() - left.X() * right.Z() + left.W() * right.Y();
+		product.Z() = left.Z() * right.W() + left.X() * right.Y() - left.Y() * right.X() + left.W() * right.Z();
+		product.W() = left.W() * right.W() - left.X() * right.X() - left.Y() * right.Y() - left.Z() * right.Z();
 
-		return Quaternion<T>(x, y, z, w);
+		return product;
 	}
 
 	template<std::floating_point T>
 	constexpr Vector3<T> operator *(const Quaternion<T>& quaternion, const Vector3<T>& vector) noexcept
 	{
-		const T qx2 = quaternion.X() * T{2};
-		const T qy2 = quaternion.Y() * T{2};
-		const T qz2 = quaternion.Z() * T{2};
+		const T x2 = quaternion.X() * T{2};
+		const T y2 = quaternion.Y() * T{2};
+		const T z2 = quaternion.Z() * T{2};
 
-		const T qx2x = qx2 * quaternion.X();
-		const T qx2y = qx2 * quaternion.Y();
-		const T qx2z = qx2 * quaternion.Z();
-		const T qx2w = qx2 * quaternion.W();
+		const T x2x = x2 * quaternion.X();
+		const T x2y = x2 * quaternion.Y();
+		const T x2z = x2 * quaternion.Z();
+		const T x2w = x2 * quaternion.W();
 
-		const T qy2y = qy2 * quaternion.Y();
-		const T qy2z = qy2 * quaternion.Z();
-		const T qy2w = qy2 * quaternion.W();
+		const T y2y = y2 * quaternion.Y();
+		const T y2z = y2 * quaternion.Z();
+		const T y2w = y2 * quaternion.W();
 
-		const T qz2z = qz2 * quaternion.Z();
-		const T qz2w = qz2 * quaternion.W();
+		const T z2z = z2 * quaternion.Z();
+		const T z2w = z2 * quaternion.W();
 
-		const T x = vector.X() - (qy2y + qz2z) * vector.X() + (qx2y - qz2w) * vector.Y() + (qx2z + qy2w) * vector.Z();
-		const T y = vector.Y() + (qx2y + qz2w) * vector.X() - (qx2x + qz2z) * vector.Y() + (qy2z - qx2w) * vector.Z();
-		const T z = vector.Z() + (qx2z - qy2w) * vector.X() + (qy2z + qx2w) * vector.Y() - (qx2x + qy2y) * vector.Z();
+		Vector3<T> product;
+		product.X() = vector.X() - (y2y + z2z) * vector.X() + (x2y - z2w) * vector.Y() + (x2z + y2w) * vector.Z();
+		product.Y() = vector.Y() + (x2y + z2w) * vector.X() - (x2x + z2z) * vector.Y() + (y2z - x2w) * vector.Z();
+		product.Z() = vector.Z() + (x2z - y2w) * vector.X() + (y2z + x2w) * vector.Y() - (x2x + y2y) * vector.Z();
 
-		return Vector3<T>(x, y, z);
+		return product;
 	}
 
 	template<std::floating_point T>
@@ -514,7 +525,4 @@ namespace PonyEngine::Math
 	{
 		return stream << quaternion.ToString();
 	}
-
-	template<std::floating_point T>
-	const Quaternion<T> Quaternion<T>::Identity = Quaternion(T{0}, T{0}, T{0}, T{1});
 }
