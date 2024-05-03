@@ -400,7 +400,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T> Vector4<T>::Swap() const noexcept
 	{
-		return Vector4<T>(W(), Z(), Y(), X());
+		return Vector4(W(), Z(), Y(), X());
 	}
 
 	template<Arithmetic T>
