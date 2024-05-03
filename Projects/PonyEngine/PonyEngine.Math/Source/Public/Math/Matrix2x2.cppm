@@ -139,6 +139,10 @@ export namespace PonyEngine::Math
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr T* Data(std::size_t columnIndex) noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr const T* Data(std::size_t columnIndex) const noexcept;
 
 		/// @brief Computes a determinant of the matrix.
 		/// @return Determinant.
@@ -490,6 +494,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr T* Matrix2x2<T>::Data(const std::size_t columnIndex) noexcept
+	{
+		return Data() + columnIndex * Dimension;
+	}
+
+	template<Arithmetic T>
+	constexpr const T* Matrix2x2<T>::Data(const std::size_t columnIndex) const noexcept
+	{
+		return Data() + columnIndex * Dimension;
+	}
+
+	template<Arithmetic T>
 	constexpr T Matrix2x2<T>::Determinant() const noexcept
 	{
 		return M00() * M11() - M01() * M10();
@@ -568,16 +584,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T> Matrix2x2<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const T* const columnBegin = Data() + columnIndex * Dimension;
-
-		return Vector2<T>(columnBegin);
+		return Vector2<T>(Data(columnIndex));
 	}
 
 	template<Arithmetic T>
 	void Matrix2x2<T>::SetColumn(const std::size_t columnIndex, const Vector2<T>& value) noexcept
 	{
-		T* const columnBegin = Data() + columnIndex * Dimension;
-		std::ranges::copy(value.Data(), value.Data() + Dimension, columnBegin);
+		std::ranges::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
 	}
 
 	template<Arithmetic T>

@@ -23,37 +23,37 @@ export namespace PonyEngine::Math
 	constexpr void AssignWithSourceStep(T* destination, const T* source, std::size_t count, std::size_t sourceStep);
 
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* right, std::size_t count) noexcept;
+	constexpr T* Add(T* result, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr T* Add(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* right, std::size_t count) noexcept;
+	constexpr T* Subtract(T* result, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr T* Subtract(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* right, std::size_t count) noexcept;
+	constexpr T* Multiply(T* result, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr T* Multiply(T* result, const T* left, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, U multiplier, std::size_t count) noexcept;
+	constexpr T* Multiply(T* result, U multiplier, std::size_t count) noexcept;
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, const T* left, U multiplier, std::size_t count) noexcept;
+	constexpr T* Multiply(T* result, const T* left, U multiplier, std::size_t count) noexcept;
 
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* right, std::size_t count) noexcept;
+	constexpr T* Divide(T* result, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr T* Divide(T* result, const T* left, const T* right, std::size_t count) noexcept;
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, U divisor, std::size_t count) noexcept;
+	constexpr T* Divide(T* result, U divisor, std::size_t count) noexcept;
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, const T* left, U divisor, std::size_t count) noexcept;
+	constexpr T* Divide(T* result, const T* left, U divisor, std::size_t count) noexcept;
 
 	template<Arithmetic T>
-	constexpr void Negate(T* result, std::size_t count) noexcept;
+	constexpr T* Negate(T* result, std::size_t count) noexcept;
 	template<Arithmetic T>
-	constexpr void Negate(T* result, const T* right, std::size_t count) noexcept;
+	constexpr T* Negate(T* result, const T* right, std::size_t count) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool IsFinite(const T* values, std::size_t count) noexcept;
@@ -104,129 +104,157 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* right, const std::size_t count) noexcept
+	constexpr T* Add(T* result, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
 			*result += *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr T* Add(T* result, const T* left, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
 			*result = *left + *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* right, const std::size_t count) noexcept
+	constexpr T* Subtract(T* result, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
 			*result -= *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr T* Subtract(T* result, const T* left, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
 			*result = *left - *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* right, const std::size_t count) noexcept
+	constexpr T* Multiply(T* result, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
 			*result *= *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr T* Multiply(T* result, const T* left, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
 			*result = *left * *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, const U multiplier, const std::size_t count) noexcept
+	constexpr T* Multiply(T* result, const U multiplier, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
 			*result *= multiplier;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, const T* left, U multiplier, const std::size_t count) noexcept
+	constexpr T* Multiply(T* result, const T* left, U multiplier, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
 			*result = *left * multiplier;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* right, const std::size_t count) noexcept
+	constexpr T* Divide(T* result, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
 			*result /= *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr T* Divide(T* result, const T* left, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
 			*result = *left / *right;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, const U divisor, const std::size_t count) noexcept
+	constexpr T* Divide(T* result, const U divisor, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
 			*result /= divisor;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, const T* left, U divisor, const std::size_t count) noexcept
+	constexpr T* Divide(T* result, const T* left, U divisor, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
 			*result = *left / divisor;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Negate(T* result, const std::size_t count) noexcept
+	constexpr T* Negate(T* result, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
 			*result = -*result;
 		}
+
+		return result;
 	}
 
 	template<Arithmetic T>
-	constexpr void Negate(T* result, const T* right, const std::size_t count) noexcept
+	constexpr T* Negate(T* result, const T* right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
 			*result = -*right;
 		}
+
+		return result;
 	}
 
 	template<std::floating_point T>

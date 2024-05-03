@@ -186,6 +186,10 @@ export namespace PonyEngine::Math
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr T* Data(std::size_t columnIndex) noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr const T* Data(std::size_t columnIndex) const noexcept;
 
 		/// @brief Computes a determinant of the matrix.
 		/// @return Determinant.
@@ -603,6 +607,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr T* Matrix3x3<T>::Data(const std::size_t columnIndex) noexcept
+	{
+		return Data() + columnIndex * Dimension;
+	}
+
+	template<Arithmetic T>
+	constexpr const T* Matrix3x3<T>::Data(const std::size_t columnIndex) const noexcept
+	{
+		return Data() + columnIndex * Dimension;
+	}
+
+	template<Arithmetic T>
 	constexpr T Matrix3x3<T>::Determinant() const noexcept
 	{
 		return M00() * (M11() * M22() - M12() * M21()) + 
@@ -699,16 +715,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> Matrix3x3<T>::GetColumn(const std::size_t columnIndex) const noexcept
 	{
-		const T* const columnBegin = Data() + columnIndex * Dimension;
-
-		return Vector3<T>(columnBegin);
+		return Vector3<T>(Data(columnIndex));
 	}
 
 	template<Arithmetic T>
 	void Matrix3x3<T>::SetColumn(const std::size_t columnIndex, const Vector3<T>& value) noexcept
 	{
-		T* const columnBegin = Data() + columnIndex * Dimension;
-		std::ranges::copy(value.Data(), value.Data() + Dimension, columnBegin);
+		std::ranges::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
 	}
 
 	template<Arithmetic T>
