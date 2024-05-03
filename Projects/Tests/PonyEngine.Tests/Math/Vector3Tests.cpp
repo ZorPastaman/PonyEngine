@@ -177,7 +177,7 @@ namespace Math
 			float yf = 15.f;
 			float zf = 7.f;
 			auto vectorF = PonyEngine::Math::Vector3<float>(xf, yf, zf);
-			auto swappedF = vectorF.Swap();
+			auto swappedF = vectorF.Swapped();
 			Assert::AreEqual(zf, swappedF.X());
 			Assert::AreEqual(yf, swappedF.Y());
 			Assert::AreEqual(xf, swappedF.Z());
@@ -186,7 +186,7 @@ namespace Math
 			short yi = 15;
 			short zi = 7;
 			auto vectorI = PonyEngine::Math::Vector3<short>(xi, yi, zi);
-			auto swappedI = vectorI.Swap();
+			auto swappedI = vectorI.Swapped();
 			Assert::AreEqual(zi, swappedI.X());
 			Assert::AreEqual(yi, swappedI.Y());
 			Assert::AreEqual(xi, swappedI.Z());

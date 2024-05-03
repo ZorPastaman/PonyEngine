@@ -204,7 +204,7 @@ namespace Math
 			float zf = 7.f;
 			float wf = 14.f;
 			auto vectorF = PonyEngine::Math::Vector4<float>(xf, yf, zf, wf);
-			auto inversedF = vectorF.Swap();
+			auto inversedF = vectorF.Swapped();
 			Assert::AreEqual(wf, inversedF.X());
 			Assert::AreEqual(zf, inversedF.Y());
 			Assert::AreEqual(yf, inversedF.Z());
@@ -215,7 +215,7 @@ namespace Math
 			short zi = 7;
 			short wi = 14;
 			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
-			auto swappedI = vectorI.Swap();
+			auto swappedI = vectorI.Swapped();
 			Assert::AreEqual(wi, swappedI.X());
 			Assert::AreEqual(zi, swappedI.Y());
 			Assert::AreEqual(yi, swappedI.Z());

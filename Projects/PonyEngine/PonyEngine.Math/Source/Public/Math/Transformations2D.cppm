@@ -9,12 +9,10 @@
 
 export module PonyEngine.Math:Transformations2D;
 
-import <algorithm>;
 import <cmath>;
-import <ranges>;
+import <cstddef>;
 import <type_traits>;
 
-import :ArrayArithmetics;
 import :Matrix2x2;
 import :Matrix3x3;
 import :Vector2;
@@ -99,12 +97,10 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Matrix2x2<T> RsMatrix(const Matrix2x2<T>& rotationMatrix, const Vector2<T>& scaling) noexcept
 	{
-		Matrix2x2<T> rsMatrix = rotationMatrix;
-		T* rsData = rsMatrix.Data();
-		const T* scalingData = scaling.Data();
-		for (const T* const end = rsData + Matrix2x2<T>::ComponentCount; rsData != end; rsData += Matrix2x2<T>::Dimension, ++scalingData)
+		Matrix2x2<T> rsMatrix;
+		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
 		{
-			Multiply(rsData, scalingData, Matrix2x2<T>::Dimension);
+			rsMatrix.SetColumn(i, rotationMatrix.GetColumn(i) * scaling[i]);
 		}
 
 		return rsMatrix;
@@ -120,12 +116,10 @@ namespace PonyEngine::Math
 	Matrix3x3<T> TrsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
 		Matrix3x3<T> trsMatrix = Matrix3x3Identity<T>;
-		T* trsData = trsMatrix.Data();
-		const T* rsData = rsMatrix.Data();
-		for (const T* const end = rsData + Matrix2x2<T>::ComponentCount; rsData != end; trsData += Matrix3x3<T>::Dimension, rsData += Matrix2x2<T>::Dimension)
-		{
-			std::ranges::copy(rsData, rsData + Matrix2x2<T>::Dimension, trsData);
-		}
+		trsMatrix.M00() = rsMatrix.M00();
+		trsMatrix.M10() = rsMatrix.M10();
+		trsMatrix.M01() = rsMatrix.M01();
+		trsMatrix.M11() = rsMatrix.M11();
 
 		return trsMatrix;
 	}
@@ -134,7 +128,8 @@ namespace PonyEngine::Math
 	Matrix3x3<T> TrsMatrix(const Vector2<T>& translation, const Matrix2x2<T>& rsMatrix) noexcept
 	{
 		Matrix3x3 trsMatrix = TrsMatrix(rsMatrix);
-		std::ranges::copy(translation.Data(), translation.Data() + Vector2<T>::ComponentCount, trsMatrix.Data(2));
+		trsMatrix.M02() = translation.X();
+		trsMatrix.M12() = translation.Y();
 
 		return trsMatrix;
 	}
@@ -142,7 +137,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector2<T> ExtractTranslationFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept
 	{
-		return Vector2<T>(trsMatrix.Data(2));
+		return Vector2<T>(trsMatrix.M02(), trsMatrix.M12());
 	}
 
 	template<std::floating_point T>
@@ -167,8 +162,10 @@ namespace PonyEngine::Math
 	Vector2<T> ExtractScalingFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
 		Vector2<T> scaling;
-		scaling.X() = rsMatrix.GetColumn(0).Magnitude();
-		scaling.Y() = rsMatrix.GetColumn(1).Magnitude();
+		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
+		{
+			scaling[i] = rsMatrix.GetColumn(i).Magnitude();
+		}
 
 		return scaling;
 	}

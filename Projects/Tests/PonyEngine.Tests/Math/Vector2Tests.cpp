@@ -150,14 +150,14 @@ namespace Math
 			float xf = -5.f;
 			float yf = 15.f;
 			auto vectorF = PonyEngine::Math::Vector2<float>(xf, yf);
-			auto swappedF = vectorF.Swap();
+			auto swappedF = vectorF.Swapped();
 			Assert::AreEqual(yf, swappedF.X());
 			Assert::AreEqual(xf, swappedF.Y());
 
 			short xi = -5;
 			short yi = 15;
 			auto vectorI = PonyEngine::Math::Vector2<short>(xi, yi);
-			auto swappedI = vectorI.Swap();
+			auto swappedI = vectorI.Swapped();
 			Assert::AreEqual(yi, swappedI.X());
 			Assert::AreEqual(xi, swappedI.Y());
 		}

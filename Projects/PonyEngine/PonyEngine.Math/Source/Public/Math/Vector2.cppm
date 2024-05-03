@@ -97,7 +97,8 @@ export namespace PonyEngine::Math
 		/// @brief Swap components and return a vector in order y, x.
 		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2 Swap() const noexcept;
+		constexpr Vector2 Swapped() const noexcept;
+		constexpr void Swap() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -107,12 +108,12 @@ export namespace PonyEngine::Math
 		/// @brief Assigns arguments to the vector components.
 		/// @param x X-component.
 		/// @param y Y-component.
-		void Set(T x, T y) noexcept;
-		void Set(const T* components) noexcept;
+		constexpr void Set(T x, T y) noexcept;
+		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
-		void Scale(const Vector2& scale) noexcept;
+		constexpr void Scale(const Vector2& scale) noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y)'.
 		/// @return State string.
@@ -130,28 +131,28 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		Vector2& operator =(const Vector2& other) noexcept = default;
-		Vector2& operator =(Vector2&& other) noexcept = default;
+		constexpr Vector2& operator =(const Vector2& other) noexcept = default;
+		constexpr Vector2& operator =(Vector2&& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
 		/// @param other Vector to add.
 		/// @return @a This.
-		Vector2& operator +=(const Vector2& other) noexcept;
+		constexpr Vector2& operator +=(const Vector2& other) noexcept;
 		/// @brief Subtracts the @p other from @a this.
 		/// @param other Vector to subtract.
 		/// @return @a This.
-		Vector2& operator -=(const Vector2& other) noexcept;
+		constexpr Vector2& operator -=(const Vector2& other) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		Vector2& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Vector2& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		Vector2& operator *=(ComputationalType multiplier) noexcept;
+		constexpr Vector2& operator *=(ComputationalType multiplier) noexcept;
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Vector divisor.
 		/// @return @a This.
-		Vector2& operator /=(ComputationalType divisor) noexcept;
+		constexpr Vector2& operator /=(ComputationalType divisor) noexcept;
 
 		/// @brief Checks if two vectors are equal.
 		/// @param other The other vector.
@@ -397,9 +398,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Vector2<T>::Swap() const noexcept
+	constexpr Vector2<T> Vector2<T>::Swapped() const noexcept
 	{
 		return Vector2(Y(), X());
+	}
+
+	template<Arithmetic T>
+	constexpr void Vector2<T>::Swap() noexcept
+	{
+		std::swap(X(), Y());
 	}
 
 	template<Arithmetic T>
@@ -416,20 +423,20 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	void Vector2<T>::Set(const T x, const T y) noexcept
+	constexpr void Vector2<T>::Set(const T x, const T y) noexcept
 	{
 		X() = x;
 		Y() = y;
 	}
 
 	template<Arithmetic T>
-	void Vector2<T>::Set(const T* const components) noexcept
+	constexpr void Vector2<T>::Set(const T* const components) noexcept
 	{
 		std::ranges::copy(components, components + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
-	void Vector2<T>::Scale(const Vector2& scale) noexcept
+	constexpr void Vector2<T>::Scale(const Vector2& scale) noexcept
 	{
 		Multiply(Data(), scale.Data(), ComponentCount);
 	}
@@ -517,7 +524,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator +=(const Vector2& other) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator +=(const Vector2& other) noexcept
 	{
 		Add(Data(), other.Data(), ComponentCount);
 
@@ -525,7 +532,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator -=(const Vector2& other) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator -=(const Vector2& other) noexcept
 	{
 		Subtract(Data(), other.Data(), ComponentCount);
 
@@ -533,7 +540,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -541,7 +548,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -549,7 +556,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept
 	{
 		Divide(Data(), divisor, ComponentCount);
 

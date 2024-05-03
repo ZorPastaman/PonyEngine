@@ -135,8 +135,8 @@ export namespace PonyEngine::Math
 		/// @param y Y-component.
 		/// @param z Z-component.
 		/// @param w W-component.
-		void Set(T x, T y, T z, T w) noexcept;
-		void Set(const T* components) noexcept;
+		constexpr void Set(T x, T y, T z, T w) noexcept;
+		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -158,12 +158,12 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		Quaternion& operator =(const Quaternion& other) noexcept = default;
-		Quaternion& operator =(Quaternion&& other) noexcept = default;
+		constexpr Quaternion& operator =(const Quaternion& other) noexcept = default;
+		constexpr Quaternion& operator =(Quaternion&& other) noexcept = default;
 		/// @brief Combines rotations of two quaternions and assigns the result to @a this. It rotates @a this first and then the @p other.
 		/// @param other Rotation to add.
 		/// @return @a This.
-		Quaternion& operator *=(const Quaternion& other) noexcept;
+		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
 
 		/// @brief Checks if two quaternions are equal.
 		/// @param other The other quaternion.
@@ -266,7 +266,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Set(components);
 	}
 
 	template<std::floating_point T>
@@ -376,7 +376,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	void Quaternion<T>::Set(const T x, const T y, const T z, const T w) noexcept
+	constexpr void Quaternion<T>::Set(const T x, const T y, const T z, const T w) noexcept
 	{
 		X() = x;
 		Y() = y;
@@ -385,7 +385,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	void Quaternion<T>::Set(const T* const components) noexcept
+	constexpr void Quaternion<T>::Set(const T* const components) noexcept
 	{
 		std::ranges::copy(components, components + ComponentCount, Data()); 
 	}
@@ -470,7 +470,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
+	constexpr Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
 	{
 		return *this = *this * other;
 	}
