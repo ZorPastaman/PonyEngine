@@ -270,6 +270,9 @@ export namespace PonyEngine::Math
 		/// @param value Counter-diagonal components.
 		constexpr void SetCounterDiagonal(const Vector3<T>& value) noexcept;
 
+		[[nodiscard("Pure function")]]
+		constexpr T Trace() const noexcept;
+
 		/// @brief Creates a string representing a state of the matrix.
 		///        The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
 		/// @return State string.
@@ -750,6 +753,14 @@ namespace PonyEngine::Math
 		M02() = value.X();
 		M11() = value.Y();
 		M20() = value.Z();
+	}
+
+	template<Arithmetic T>
+	constexpr T Matrix3x3<T>::Trace() const noexcept
+	{
+		const Vector3<T> diagonal = GetDiagonal();
+
+		return diagonal.X() + diagonal.Y() + diagonal.Z();
 	}
 
 	template<Arithmetic T>
