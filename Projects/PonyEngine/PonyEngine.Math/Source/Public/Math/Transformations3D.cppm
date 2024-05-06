@@ -132,10 +132,18 @@ export namespace PonyEngine::Math
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& euler) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, T angle) noexcept;
+
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector3<T> TransformDirection(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
 {
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector3<T> TransformVector(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector, T w) noexcept;
+
 	template<std::floating_point T>
 	Quaternion<T> Rotation(const Matrix3x3<T>& rotationMatrix) noexcept
 	{
@@ -623,5 +631,25 @@ namespace PonyEngine::Math
 		const T cross = Cross(axis, vector);
 
 		return vector * cos + cross * sin + axis * (dot * mCos);
+	}
+
+	template<std::floating_point T>
+	Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept
+	{
+		return TransformVector(transformationMatrix, vector, T{1});
+	}
+
+	template<std::floating_point T>
+	Vector3<T> TransformDirection(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept
+	{
+		return TransformVector(transformationMatrix, vector, T{0});
+	}
+
+	template<std::floating_point T>
+	Vector3<T> TransformVector(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector, const T w) noexcept
+	{
+		const Vector4<T> transformed = transformationMatrix * Vector4<T>(vector.X(), vector.Y(), vector.Z(), w);
+
+		return Vector3<T>(transformed.X(), transformed.Y(), transformed.Z());
 	}
 }
