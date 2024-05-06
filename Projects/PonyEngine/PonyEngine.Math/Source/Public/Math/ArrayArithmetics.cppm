@@ -17,52 +17,148 @@ import :Common;
 
 export namespace PonyEngine::Math
 {
+	/// @brief Assigns the @p destination from the @p source. The @p destination is incremented by the @p destinationStep. The @p source is incremented by one.
+	/// @tparam T Value type.
+	/// @param destination Destination array. Its length must be at least @p count * @p destinationStep.
+	/// @param source Source array. Its length must be at least @p count.
+	/// @param count Step count.
+	/// @param destinationStep Destination increment.
 	template<typename T>
-	constexpr void AssignWithDestinationStep(T* destination, const T* source, std::size_t count, std::size_t destinationStep);
+	constexpr void AssignWithDestinationStep(T* destination, const T* source, std::size_t count, std::size_t destinationStep) noexcept;
+	/// @brief Assigns the @p destination from the @p source. The @p destination is incremented by one. The @p source is incremented by the @p sourceStep.
+	/// @tparam T Value type.
+	/// @param destination Destination array. Its length must be at least @p count.
+	/// @param source Source array. Its length must be at least @p count * @p sourceStep.
+	/// @param count Step count.
+	/// @param sourceStep Source increment.
 	template<typename T>
-	constexpr void AssignWithSourceStep(T* destination, const T* source, std::size_t count, std::size_t sourceStep);
+	constexpr void AssignWithSourceStep(T* destination, const T* source, std::size_t count, std::size_t sourceStep) noexcept;
 
+	/// @brief Computes result += right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Add(T* result, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result = left + right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Add(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
+	/// @brief Computes result -= right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Subtract(T* result, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result = left - right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Subtract(T* result, const T* left, const T* right, std::size_t count) noexcept;
 
+	/// @brief Computes result *= right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Multiply(T* result, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result = left * right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Multiply(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result *= multiplier on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @tparam U Multiplier type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param multiplier Multiplier.
+	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* result, U multiplier, std::size_t count) noexcept;
+	/// @brief Computes result = left * multiplier on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @tparam U Multiplier type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param multiplier Multiplier.
+	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* result, const T* left, U multiplier, std::size_t count) noexcept;
 
+	/// @brief Computes result /= right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Divide(T* result, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result = left / right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Divide(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	/// @brief Computes result /= divisor on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @tparam U Divisor type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param divisor Divisor.
+	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* result, U divisor, std::size_t count) noexcept;
+	/// @brief Computes result = left / divisor on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @tparam U Divisor type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param left Left operand array. Its length must be at least @p count.
+	/// @param divisor Divisor.
+	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* result, const T* left, U divisor, std::size_t count) noexcept;
 
+	/// @brief Computes result = -result on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Negate(T* result, std::size_t count) noexcept;
+	/// @brief Computes result = -right on every element in the sequential order.
+	/// @tparam T Value type.
+	/// @param result Result array. Its length must be at least @p count.
+	/// @param right Right operand array. Its length must be at least @p count.
+	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Negate(T* result, const T* right, std::size_t count) noexcept;
 
+	/// @brief Checks if all the values in the array are finite.
+	/// @tparam T Value type.
+	/// @param values Value array. Its length must be at least @p count.
+	/// @param count Element count.
+	/// @return @a True if all the values are finite; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool IsFinite(const T* values, std::size_t count) noexcept;
+	bool IsFinite(const T* values, std::size_t count) noexcept;
 }
 
 namespace PonyEngine::Math
 {
 	template<typename T>
-	constexpr void AssignWithDestinationStep(T* destination, const T* source, const std::size_t count, const std::size_t destinationStep)
+	constexpr void AssignWithDestinationStep(T* destination, const T* source, const std::size_t count, const std::size_t destinationStep) noexcept
 	{
 		if (std::is_constant_evaluated()) [[unlikely]]
 		{
@@ -83,7 +179,7 @@ namespace PonyEngine::Math
 	}
 
 	template<typename T>
-	constexpr void AssignWithSourceStep(T* destination, const T* source, const std::size_t count, const std::size_t sourceStep)
+	constexpr void AssignWithSourceStep(T* destination, const T* source, const std::size_t count, const std::size_t sourceStep) noexcept
 	{
 		if (std::is_constant_evaluated()) [[unlikely]]
 		{
@@ -230,7 +326,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsFinite(const T* values, const std::size_t count) noexcept
+	bool IsFinite(const T* values, const std::size_t count) noexcept
 	{
 		bool isFinite = true;
 
