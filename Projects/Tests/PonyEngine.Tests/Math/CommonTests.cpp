@@ -41,12 +41,15 @@ namespace Math
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::ComputationalFor<double>>);
 		}
 
-		TEST_METHOD(DegToRadToDegTest)
+		TEST_METHOD(DegToRadTest)
 		{
 			Assert::AreEqual(std::numbers::pi_v<double> / 180., PonyEngine::Math::DegToRad<double>);
-			Assert::AreEqual(180. / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
-
 			Assert::AreEqual(std::numbers::pi_v<float> / 180.f, PonyEngine::Math::DegToRad<float>);
+		}
+
+		TEST_METHOD(RadToDegTest)
+		{
+			Assert::AreEqual(180. / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
 			Assert::AreEqual(180.f / std::numbers::pi_v<float>, PonyEngine::Math::RadToDeg<float>);
 		}
 

@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 import <array>;
+import <cstddef>;
 
 import PonyEngine.Math;
 
@@ -19,29 +20,29 @@ namespace Math
 {
 	TEST_CLASS(ArrayArithmeticsTests)
 	{
-		TEST_METHOD(AssignmentWithDestinationStepTest)
+		TEST_METHOD(AssignmentWithDestinationStepShortTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
-			constexpr int d6 = -7;
-			constexpr int d7 = -3;
-			constexpr int d8 = -9;
-			constexpr int d9 = -5;
-			constexpr int d10 = 8;
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+			constexpr short d6 = -7;
+			constexpr short d7 = -3;
+			constexpr short d8 = -9;
+			constexpr short d9 = -5;
+			constexpr short d10 = 8;
 
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
 
-			std::array<int, 11> destination{ d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10 };
-			constexpr std::array<int, 6> source{ s0, s1, s2, s3, s4, s5 };
+			std::array<short, 11> destination{ d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
 
 			PonyEngine::Math::AssignWithDestinationStep(destination.data(), source.data(), 5, 2);
 			Assert::AreEqual(s0, destination[0]);
@@ -57,39 +58,31 @@ namespace Math
 			Assert::AreEqual(d10, destination[10]);
 		}
 
-		static constexpr std::array<int, 11> AssignmentWithDestinationStepConstexpr(const int d0, const int d1, const int d2, const int d3, const int d4, const int d5, const int d6, const int d7, const int d8, const int d9, const int d10,
-			const int s0, const int s1, const int s2, const int s3, const int s4, const int s5)
+		TEST_METHOD(AssignmentWithDestinationStepFloatTest)
 		{
-			std::array<int, 11> destination{ d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10 };
-			const std::array<int, 6> source{ s0, s1, s2, s3, s4, s5 };
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+			constexpr float d6 = -7;
+			constexpr float d7 = -3;
+			constexpr float d8 = -9;
+			constexpr float d9 = -5;
+			constexpr float d10 = 8;
+
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+
+			std::array<float, 11> destination{ d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10 };
+			constexpr std::array<float, 6> source{ s0, s1, s2, s3, s4, s5 };
 
 			PonyEngine::Math::AssignWithDestinationStep(destination.data(), source.data(), 5, 2);
-
-			return destination;
-		}
-
-		TEST_METHOD(AssignmentWithDestinationStepConstexprTest)
-		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
-			constexpr int d6 = -7;
-			constexpr int d7 = -3;
-			constexpr int d8 = -9;
-			constexpr int d9 = -5;
-			constexpr int d10 = 8;
-
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
-
-			constexpr std::array<int, 11> destination = AssignmentWithDestinationStepConstexpr(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, s0, s1, s2, s3, s4, s5);
 			Assert::AreEqual(s0, destination[0]);
 			Assert::AreEqual(d1, destination[1]);
 			Assert::AreEqual(s1, destination[2]);
@@ -103,29 +96,111 @@ namespace Math
 			Assert::AreEqual(d10, destination[10]);
 		}
 
-		TEST_METHOD(AssignmentWithSourceStepTest)
+		template<typename T>
+		static constexpr std::array<T, 11> AssignmentWithDestinationStepConstexpr(const T d0, const T d1, const T d2, const T d3, const T d4, const T d5, const T d6, const T d7, const T d8, const T d9, const T d10,
+			const T s0, const T s1, const T s2, const T s3, const T s4, const T s5)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			std::array<T, 11> destination{ d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10 };
+			const std::array<T, 6> source{ s0, s1, s2, s3, s4, s5 };
 
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
-			constexpr int s6 = -70;
-			constexpr int s7 = -30;
-			constexpr int s8 = -90;
-			constexpr int s9 = -50;
-			constexpr int s10 = 80;
+			PonyEngine::Math::AssignWithDestinationStep(destination.data(), source.data(), 5, 2);
 
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			constexpr std::array<int, 11> source{ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
+			return destination;
+		}
+
+		TEST_METHOD(AssignmentWithDestinationStepConstexprShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+			constexpr short d6 = -7;
+			constexpr short d7 = -3;
+			constexpr short d8 = -9;
+			constexpr short d9 = -5;
+			constexpr short d10 = 8;
+
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+
+			constexpr std::array<short, 11> destination = AssignmentWithDestinationStepConstexpr(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, s0, s1, s2, s3, s4, s5);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(d1, destination[1]);
+			Assert::AreEqual(s1, destination[2]);
+			Assert::AreEqual(d3, destination[3]);
+			Assert::AreEqual(s2, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+			Assert::AreEqual(s3, destination[6]);
+			Assert::AreEqual(d7, destination[7]);
+			Assert::AreEqual(s4, destination[8]);
+			Assert::AreEqual(d9, destination[9]);
+			Assert::AreEqual(d10, destination[10]);
+		}
+
+		TEST_METHOD(AssignmentWithDestinationStepConstexprFloatTest)
+		{
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+			constexpr float d6 = -7;
+			constexpr float d7 = -3;
+			constexpr float d8 = -9;
+			constexpr float d9 = -5;
+			constexpr float d10 = 8;
+
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+
+			constexpr std::array<float, 11> destination = AssignmentWithDestinationStepConstexpr(d0, d1, d2, d3, d4, d5, d6, d7, d8, d9, d10, s0, s1, s2, s3, s4, s5);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(d1, destination[1]);
+			Assert::AreEqual(s1, destination[2]);
+			Assert::AreEqual(d3, destination[3]);
+			Assert::AreEqual(s2, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+			Assert::AreEqual(s3, destination[6]);
+			Assert::AreEqual(d7, destination[7]);
+			Assert::AreEqual(s4, destination[8]);
+			Assert::AreEqual(d9, destination[9]);
+			Assert::AreEqual(d10, destination[10]);
+		}
+
+		TEST_METHOD(AssignmentWithSourceStepShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+			constexpr short s6 = -70;
+			constexpr short s7 = -30;
+			constexpr short s8 = -90;
+			constexpr short s9 = -50;
+			constexpr short s10 = 80;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 11> source{ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
 
 			PonyEngine::Math::AssignWithSourceStep(destination.data(), source.data(), 5, 2);
 			Assert::AreEqual(s0, destination[0]);
@@ -136,39 +211,73 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		static constexpr std::array<int, 6> AssignmentWithSourceStepConstexpr(const int d0, const int d1, const int d2, const int d3, const int d4, const int d5,
-			const int s0, const int s1, const int s2, const int s3, const int s4, const int s5, const int s6, const int s7, const int s8, const int s9, const int s10)
+		TEST_METHOD(AssignmentWithSourceStepFloatTest)
 		{
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			const std::array<int, 11> source{ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+			constexpr float s6 = -70;
+			constexpr float s7 = -30;
+			constexpr float s8 = -90;
+			constexpr float s9 = -50;
+			constexpr float s10 = 80;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 11> source{ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
+
+			PonyEngine::Math::AssignWithSourceStep(destination.data(), source.data(), 5, 2);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(s2, destination[1]);
+			Assert::AreEqual(s4, destination[2]);
+			Assert::AreEqual(s6, destination[3]);
+			Assert::AreEqual(s8, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		template<typename T>
+		static constexpr std::array<T, 6> AssignmentWithSourceStepConstexpr(const T d0, const T d1, const T d2, const T d3, const T d4, const T d5,
+			const T s0, const T s1, const T s2, const T s3, const T s4, const T s5, const T s6, const T s7, const T s8, const T s9, const T s10)
+		{
+			std::array<T, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			const std::array<T, 11> source{ s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10 };
 
 			PonyEngine::Math::AssignWithSourceStep(destination.data(), source.data(), 5, 2);
 
 			return destination;
 		}
 
-		TEST_METHOD(AssignmentWithSourceStepConstexprTest)
+		TEST_METHOD(AssignmentWithSourceStepConstexprShortTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
 
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
-			constexpr int s6 = -70;
-			constexpr int s7 = -30;
-			constexpr int s8 = -90;
-			constexpr int s9 = -50;
-			constexpr int s10 = 80;
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+			constexpr short s6 = -70;
+			constexpr short s7 = -30;
+			constexpr short s8 = -90;
+			constexpr short s9 = -50;
+			constexpr short s10 = 80;
 
-			constexpr std::array<int, 6> destination = AssignmentWithSourceStepConstexpr(d0, d1, d2, d3, d4, d5, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10);
+			constexpr std::array<short, 6> destination = AssignmentWithSourceStepConstexpr(d0, d1, d2, d3, d4, d5, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10);
 			Assert::AreEqual(s0, destination[0]);
 			Assert::AreEqual(s2, destination[1]);
 			Assert::AreEqual(s4, destination[2]);
@@ -177,24 +286,82 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(AddEqualTest)
+		TEST_METHOD(AssignmentWithSourceStepConstexprFloatTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
 
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+			constexpr float s6 = -70;
+			constexpr float s7 = -30;
+			constexpr float s8 = -90;
+			constexpr float s9 = -50;
+			constexpr float s10 = 80;
 
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			constexpr std::array<int, 6> source{ s0, s1, s2, s3, s4, s5 };
+			constexpr std::array<float, 6> destination = AssignmentWithSourceStepConstexpr(d0, d1, d2, d3, d4, d5, s0, s1, s2, s3, s4, s5, s6, s7, s8, s9, s10);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(s2, destination[1]);
+			Assert::AreEqual(s4, destination[2]);
+			Assert::AreEqual(s6, destination[3]);
+			Assert::AreEqual(s8, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(AddEqualShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Add(destination.data(), source.data(), 5);
+			Assert::AreEqual(static_cast<short>(d0 + s0), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 + s1), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 + s2), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 + s3), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 + s4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(AddEqualFloatTest)
+		{
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> source{ s0, s1, s2, s3, s4, s5 };
 
 			PonyEngine::Math::Add(destination.data(), source.data(), 5);
 			Assert::AreEqual(d0 + s0, destination[0]);
@@ -205,32 +372,68 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(AddTest)
+		TEST_METHOD(AddShortTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
 
-			constexpr int l0 = 30;
-			constexpr int l1 = 20;
-			constexpr int l2 = 90;
-			constexpr int l3 = 50;
-			constexpr int l4 = -10;
-			constexpr int l5 = 40;
+			constexpr short l0 = 30;
+			constexpr short l1 = 20;
+			constexpr short l2 = 90;
+			constexpr short l3 = 50;
+			constexpr short l4 = -10;
+			constexpr short l5 = 40;
 
-			constexpr int r0 = 300;
-			constexpr int r1 = 200;
-			constexpr int r2 = 900;
-			constexpr int r3 = 500;
-			constexpr int r4 = -100;
-			constexpr int r5 = 400;
+			constexpr short r0 = 300;
+			constexpr short r1 = 200;
+			constexpr short r2 = 900;
+			constexpr short r3 = 500;
+			constexpr short r4 = -100;
+			constexpr short r5 = 400;
 
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			constexpr std::array<int, 6> left{ l0, l1, l2, l3, l4, l5 };
-			constexpr std::array<int, 6> right{ r0, r1, r2, r3, r4, r5 };
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<short, 6> right{ r0, r1, r2, r3, r4, r5 };
+
+			PonyEngine::Math::Add(destination.data(), left.data(), right.data(), 5);
+			Assert::AreEqual(static_cast<short>(l0 + r0), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 + r1), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 + r2), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 + r3), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 + r4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(AddFloatTest)
+		{
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			constexpr float l0 = 30;
+			constexpr float l1 = 20;
+			constexpr float l2 = 90;
+			constexpr float l3 = 50;
+			constexpr float l4 = -10;
+			constexpr float l5 = 40;
+
+			constexpr float r0 = 300;
+			constexpr float r1 = 200;
+			constexpr float r2 = 900;
+			constexpr float r3 = 500;
+			constexpr float r4 = -100;
+			constexpr float r5 = 400;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<float, 6> right{ r0, r1, r2, r3, r4, r5 };
 
 			PonyEngine::Math::Add(destination.data(), left.data(), right.data(), 5);
 			Assert::AreEqual(l0 + r0, destination[0]);
@@ -241,24 +444,52 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(SubtractEqualTest)
+		TEST_METHOD(SubtractEqualShortTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
 
-			constexpr int s0 = 30;
-			constexpr int s1 = 20;
-			constexpr int s2 = 90;
-			constexpr int s3 = 50;
-			constexpr int s4 = -10;
-			constexpr int s5 = 40;
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
 
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			constexpr std::array<int, 6> source{ s0, s1, s2, s3, s4, s5 };
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Subtract(destination.data(), source.data(), 5);
+			Assert::AreEqual(static_cast<short>(d0 - s0), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 - s1), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 - s2), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 - s3), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 - s4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(SubtractEqualFloatTest)
+		{
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> source{ s0, s1, s2, s3, s4, s5 };
 
 			PonyEngine::Math::Subtract(destination.data(), source.data(), 5);
 			Assert::AreEqual(d0 - s0, destination[0]);
@@ -269,32 +500,68 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(SubtractTest)
+		TEST_METHOD(SubtractShortTest)
 		{
-			constexpr int d0 = 3;
-			constexpr int d1 = 2;
-			constexpr int d2 = 9;
-			constexpr int d3 = 5;
-			constexpr int d4 = -1;
-			constexpr int d5 = 4;
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
 
-			constexpr int l0 = 30;
-			constexpr int l1 = 20;
-			constexpr int l2 = 90;
-			constexpr int l3 = 50;
-			constexpr int l4 = -10;
-			constexpr int l5 = 40;
+			constexpr short l0 = 30;
+			constexpr short l1 = 20;
+			constexpr short l2 = 90;
+			constexpr short l3 = 50;
+			constexpr short l4 = -10;
+			constexpr short l5 = 40;
 
-			constexpr int r0 = 300;
-			constexpr int r1 = 200;
-			constexpr int r2 = 900;
-			constexpr int r3 = 500;
-			constexpr int r4 = -100;
-			constexpr int r5 = 400;
+			constexpr short r0 = 300;
+			constexpr short r1 = 200;
+			constexpr short r2 = 900;
+			constexpr short r3 = 500;
+			constexpr short r4 = -100;
+			constexpr short r5 = 400;
 
-			std::array<int, 6> destination{ d0, d1, d2, d3, d4, d5 };
-			constexpr std::array<int, 6> left{ l0, l1, l2, l3, l4, l5 };
-			constexpr std::array<int, 6> right{ r0, r1, r2, r3, r4, r5 };
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<short, 6> right{ r0, r1, r2, r3, r4, r5 };
+
+			PonyEngine::Math::Subtract(destination.data(), left.data(), right.data(), 5);
+			Assert::AreEqual(static_cast<short>(l0 - r0), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 - r1), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 - r2), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 - r3), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 - r4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(SubtractFloatTest)
+		{
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			constexpr float l0 = 30;
+			constexpr float l1 = 20;
+			constexpr float l2 = 90;
+			constexpr float l3 = 50;
+			constexpr float l4 = -10;
+			constexpr float l5 = 40;
+
+			constexpr float r0 = 300;
+			constexpr float r1 = 200;
+			constexpr float r2 = 900;
+			constexpr float r3 = 500;
+			constexpr float r4 = -100;
+			constexpr float r5 = 400;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<float, 6> right{ r0, r1, r2, r3, r4, r5 };
 
 			PonyEngine::Math::Subtract(destination.data(), left.data(), right.data(), 5);
 			Assert::AreEqual(l0 - r0, destination[0]);
@@ -305,7 +572,35 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(MultiplyEqualArrayTest)
+		TEST_METHOD(MultiplyEqualArrayShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Multiply(destination.data(), source.data(), 5);
+			Assert::AreEqual(static_cast<short>(d0 * s0), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 * s1), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 * s2), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 * s3), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 * s4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(MultiplyEqualArrayFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -333,7 +628,43 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(MultiplyArrayTest)
+		TEST_METHOD(MultiplyArrayShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short l0 = 30;
+			constexpr short l1 = 20;
+			constexpr short l2 = 90;
+			constexpr short l3 = 50;
+			constexpr short l4 = -10;
+			constexpr short l5 = 40;
+
+			constexpr short r0 = 300;
+			constexpr short r1 = 200;
+			constexpr short r2 = 900;
+			constexpr short r3 = 500;
+			constexpr short r4 = -100;
+			constexpr short r5 = 400;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<short, 6> right{ r0, r1, r2, r3, r4, r5 };
+
+			PonyEngine::Math::Multiply(destination.data(), left.data(), right.data(), 5);
+			Assert::AreEqual(static_cast<short>(l0 * r0), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 * r1), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 * r2), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 * r3), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 * r4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(MultiplyArrayFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -369,7 +700,29 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(MultiplyEqualTest)
+		TEST_METHOD(MultiplyEqualShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr float multiplier = 10;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+
+			PonyEngine::Math::Multiply(destination.data(), multiplier, 5);
+			Assert::AreEqual(static_cast<short>(d0 * multiplier), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 * multiplier), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 * multiplier), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 * multiplier), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 * multiplier), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(MultiplyEqualFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -391,7 +744,37 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(MultiplyTest)
+		TEST_METHOD(MultiplyShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short l0 = 30;
+			constexpr short l1 = 20;
+			constexpr short l2 = 90;
+			constexpr short l3 = 50;
+			constexpr short l4 = -10;
+			constexpr short l5 = 40;
+
+			constexpr float multiplier = 10;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+
+			PonyEngine::Math::Multiply(destination.data(), left.data(), multiplier, 5);
+			Assert::AreEqual(static_cast<short>(l0 * multiplier), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 * multiplier), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 * multiplier), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 * multiplier), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 * multiplier), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(MultiplyFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -421,13 +804,41 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(DivideEqualArrayTest)
+		TEST_METHOD(DivideEqualArrayShortTest)
 		{
-			constexpr float d0 = 3;
-			constexpr float d1 = 2;
-			constexpr float d2 = 9;
+			constexpr short d0 = 300;
+			constexpr short d1 = 250;
+			constexpr short d2 = 900;
+			constexpr short d3 = 5;
+			constexpr short d4 = -100;
+			constexpr short d5 = 4;
+
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Divide(destination.data(), source.data(), 5);
+			Assert::AreEqual(static_cast<short>(d0 / s0), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 / s1), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 / s2), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 / s3), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 / s4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(DivideEqualArrayFloatTest)
+		{
+			constexpr float d0 = 300;
+			constexpr float d1 = 250;
+			constexpr float d2 = 900;
 			constexpr float d3 = 5;
-			constexpr float d4 = -1;
+			constexpr float d4 = -100;
 			constexpr float d5 = 4;
 
 			constexpr float s0 = 30;
@@ -449,7 +860,43 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(DivideArrayTest)
+		TEST_METHOD(DivideArrayShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short l0 = 3000;
+			constexpr short l1 = 2050;
+			constexpr short l2 = 9000;
+			constexpr short l3 = 50;
+			constexpr short l4 = -1000;
+			constexpr short l5 = 40;
+
+			constexpr short r0 = 300;
+			constexpr short r1 = 200;
+			constexpr short r2 = 900;
+			constexpr short r3 = 500;
+			constexpr short r4 = -100;
+			constexpr short r5 = 400;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+			constexpr std::array<short, 6> right{ r0, r1, r2, r3, r4, r5 };
+
+			PonyEngine::Math::Divide(destination.data(), left.data(), right.data(), 5);
+			Assert::AreEqual(static_cast<short>(l0 / r0), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 / r1), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 / r2), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 / r3), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 / r4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(DivideArrayFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -458,11 +905,11 @@ namespace Math
 			constexpr float d4 = -1;
 			constexpr float d5 = 4;
 
-			constexpr float l0 = 30;
-			constexpr float l1 = 20;
-			constexpr float l2 = 90;
+			constexpr float l0 = 3000;
+			constexpr float l1 = 2050;
+			constexpr float l2 = 9000;
 			constexpr float l3 = 50;
-			constexpr float l4 = -10;
+			constexpr float l4 = -1000;
 			constexpr float l5 = 40;
 
 			constexpr float r0 = 300;
@@ -485,13 +932,35 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(DivideEqualTest)
+		TEST_METHOD(DivideEqualShortTest)
 		{
-			constexpr float d0 = 3;
-			constexpr float d1 = 2;
-			constexpr float d2 = 9;
+			constexpr short d0 = 300;
+			constexpr short d1 = 200;
+			constexpr short d2 = 900;
+			constexpr short d3 = 5;
+			constexpr short d4 = -100;
+			constexpr short d5 = 4;
+
+			constexpr float divisor = 10;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+
+			PonyEngine::Math::Divide(destination.data(), divisor, 5);
+			Assert::AreEqual(static_cast<short>(d0 / divisor), destination[0]);
+			Assert::AreEqual(static_cast<short>(d1 / divisor), destination[1]);
+			Assert::AreEqual(static_cast<short>(d2 / divisor), destination[2]);
+			Assert::AreEqual(static_cast<short>(d3 / divisor), destination[3]);
+			Assert::AreEqual(static_cast<short>(d4 / divisor), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(DivideEqualFloatTest)
+		{
+			constexpr float d0 = 300;
+			constexpr float d1 = 200;
+			constexpr float d2 = 900;
 			constexpr float d3 = 5;
-			constexpr float d4 = -1;
+			constexpr float d4 = -100;
 			constexpr float d5 = 4;
 
 			constexpr float divisor = 10;
@@ -499,15 +968,45 @@ namespace Math
 			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
 
 			PonyEngine::Math::Divide(destination.data(), divisor, 5);
-			Assert::AreEqual(static_cast<double>(d0 / divisor), static_cast<double>(destination[0]), 0.0000001);
-			Assert::AreEqual(static_cast<double>(d1 / divisor), static_cast<double>(destination[1]), 0.0000001);
-			Assert::AreEqual(static_cast<double>(d2 / divisor), static_cast<double>(destination[2]), 0.0000001);
-			Assert::AreEqual(static_cast<double>(d3 / divisor), static_cast<double>(destination[3]), 0.0000001);
-			Assert::AreEqual(static_cast<double>(d4 / divisor), static_cast<double>(destination[4]), 0.0000001);
+			Assert::AreEqual(d0 / divisor, destination[0]);
+			Assert::AreEqual(d1 / divisor, destination[1]);
+			Assert::AreEqual(d2 / divisor, destination[2]);
+			Assert::AreEqual(d3 / divisor, destination[3]);
+			Assert::AreEqual(d4 / divisor, destination[4]);
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(DivideTest)
+		TEST_METHOD(DivideShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short l0 = 300;
+			constexpr short l1 = 250;
+			constexpr short l2 = 900;
+			constexpr short l3 = 5;
+			constexpr short l4 = -100;
+			constexpr short l5 = 40;
+
+			constexpr float divisor = 10;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> left{ l0, l1, l2, l3, l4, l5 };
+
+			PonyEngine::Math::Divide(destination.data(), left.data(), divisor, 5);
+			Assert::AreEqual(static_cast<short>(l0 / divisor), destination[0]);
+			Assert::AreEqual(static_cast<short>(l1 / divisor), destination[1]);
+			Assert::AreEqual(static_cast<short>(l2 / divisor), destination[2]);
+			Assert::AreEqual(static_cast<short>(l3 / divisor), destination[3]);
+			Assert::AreEqual(static_cast<short>(l4 / divisor), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(DivideFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -516,11 +1015,11 @@ namespace Math
 			constexpr float d4 = -1;
 			constexpr float d5 = 4;
 
-			constexpr float l0 = 30;
-			constexpr float l1 = 20;
-			constexpr float l2 = 90;
-			constexpr float l3 = 50;
-			constexpr float l4 = -10;
+			constexpr float l0 = 300;
+			constexpr float l1 = 250;
+			constexpr float l2 = 900;
+			constexpr float l3 = 5;
+			constexpr float l4 = -100;
 			constexpr float l5 = 40;
 
 			constexpr float divisor = 10;
@@ -537,7 +1036,27 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(NegateTest)
+		TEST_METHOD(NegateShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = -9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+
+			PonyEngine::Math::Negate(destination.data(), 5);
+			Assert::AreEqual(static_cast<short>(-d0), destination[0]);
+			Assert::AreEqual(static_cast<short>(-d1), destination[1]);
+			Assert::AreEqual(static_cast<short>(-d2), destination[2]);
+			Assert::AreEqual(static_cast<short>(-d3), destination[3]);
+			Assert::AreEqual(static_cast<short>(-d4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(NegateFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
@@ -557,7 +1076,35 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
-		TEST_METHOD(NegateArrayTest)
+		TEST_METHOD(NegateArrayShortTest)
+		{
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = -9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			constexpr short r0 = 300;
+			constexpr short r1 = 200;
+			constexpr short r2 = 900;
+			constexpr short r3 = 500;
+			constexpr short r4 = -100;
+			constexpr short r5 = 400;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> right{ r0, r1, r2, r3, r4, r5 };
+
+			PonyEngine::Math::Negate(destination.data(), right.data(), 5);
+			Assert::AreEqual(static_cast<short>(-r0), destination[0]);
+			Assert::AreEqual(static_cast<short>(-r1), destination[1]);
+			Assert::AreEqual(static_cast<short>(-r2), destination[2]);
+			Assert::AreEqual(static_cast<short>(-r3), destination[3]);
+			Assert::AreEqual(static_cast<short>(-r4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(NegateArrayFloatTest)
 		{
 			constexpr float d0 = 3;
 			constexpr float d1 = 2;
