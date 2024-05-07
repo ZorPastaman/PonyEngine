@@ -60,7 +60,7 @@ export namespace PonyEngine::Math
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
-	/// @return 1 if the @p value is positive, -1 if the @p value is negative and 0 if the @p value is 0.
+	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
 
