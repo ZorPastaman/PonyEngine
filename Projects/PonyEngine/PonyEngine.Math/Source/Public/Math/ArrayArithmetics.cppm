@@ -9,6 +9,7 @@
 
 export module PonyEngine.Math:ArrayArithmetics;
 
+import <algorithm>;
 import <cstddef>;
 import <cmath>;
 import <type_traits>;
@@ -17,6 +18,14 @@ import :Common;
 
 export namespace PonyEngine::Math
 {
+	/// @brief Copies the @p source array to the @p destination array.
+	/// @tparam T Value type.
+	/// @param destination Destination array. Its length must be at least @p count.
+	/// @param source Source array. Its length must be at least @p count.
+	/// @param count Element count.
+	template<typename T>
+	constexpr void Copy(T* destination, const T* source, std::size_t count) noexcept;
+
 	/// @brief Assigns the @p destination from the @p source. The @p destination is incremented by the @p destinationStep. The @p source is incremented by one.
 	/// @tparam T Value type.
 	/// @param destination Destination array. Its length must be at least @p count * @p destinationStep.
@@ -157,6 +166,12 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
+	template<typename T>
+	constexpr void Copy(T* const destination, const T* const source, const std::size_t count) noexcept
+	{
+		std::ranges::copy(source, source + count, destination);
+	}
+
 	template<typename T>
 	constexpr void AssignWithDestinationStep(T* destination, const T* source, const std::size_t count, const std::size_t destinationStep) noexcept
 	{

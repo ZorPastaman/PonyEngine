@@ -9,12 +9,10 @@
 
 export module PonyEngine.Math:Matrix3x3;
 
-import <algorithm>;
 import <array>;
 import <cstddef>;
 import <format>;
 import <ostream>;
-import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -43,8 +41,6 @@ export namespace PonyEngine::Math
 		class Row final
 		{
 		public:
-			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
-
 			Row(const Row&) = delete;
 			Row(Row&&) = delete;
 
@@ -58,14 +54,24 @@ export namespace PonyEngine::Math
 			/// @param columnIndex Column index.
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
-			constexpr RowValueType& operator [](std::size_t columnIndex) const noexcept;
+			constexpr T& operator [](std::size_t columnIndex) noexcept requires(!IsConstant);
+			/// @brief Gets a component in a row by a column index.
+			/// @param columnIndex Column index.
+			/// @return Component.
+			[[nodiscard("Pure operator")]]
+			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
 
 			Row& operator =(const Row&) = delete;
 			Row& operator =(Row&&) = delete;
 
+			/// @brief Assigns a row from the @p row.
+			/// @param row Row to assign from.
+			/// @return @a This.
 			constexpr Row& operator =(const Vector3<T>& row) noexcept requires(!IsConstant);
 
 		private:
+			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
+
 			/// @brief Creates a row access.
 			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
@@ -97,6 +103,8 @@ export namespace PonyEngine::Math
 		/// @param column2 Column 2.
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
+		/// @brief Creates a matrix and assigns its components from the @p components array.
+		/// @param components Components array. Its length must be at least 9.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix3x3(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -186,53 +194,16 @@ export namespace PonyEngine::Math
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
+		/// @brief Gets a column data pointer - an array of 3 elements.
+		/// @param columnIndex Column index.
+		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data(std::size_t columnIndex) noexcept;
+		/// @brief Gets a column data pointer - an array of 3 elements.
+		/// @param columnIndex Column index.
+		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data(std::size_t columnIndex) const noexcept;
-
-		/// @brief Computes a determinant of the matrix.
-		/// @return Determinant.
-		[[nodiscard("Pure function")]]
-		constexpr T Determinant() const noexcept;
-
-		/// @brief Computes an adjugate of the matrix.
-		/// @return Adjugate.
-		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Adjugate() const noexcept;
-
-		/// @brief Computes a transpose of the matrix.
-		/// @return Transpose.
-		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Transpose() const noexcept;
-
-		/// @brief Computes an inverse of the matrix.
-		/// @return Inverse.
-		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Inverse() const noexcept;
-
-		/// @brief Checks if all the components are finite numbers.
-		/// @return @a True if all the components are finite; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept;
-
-		/// @brief Assigns arguments to the matrix components.
-		/// @param m00 Component 00.
-		/// @param m10 Component 10.
-		/// @param m20 Component 20.
-		/// @param m01 Component 01.
-		/// @param m11 Component 11.
-		/// @param m21 Component 21.
-		/// @param m02 Component 02.
-		/// @param m12 Component 12.
-		/// @param m22 Component 22.
-		constexpr void Set(T m00, T m10, T m20, T m01, T m11, T m21, T m02, T m12, T m22) noexcept;
-		constexpr void Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
-		constexpr void Set(const T* components) noexcept;
-
-		/// @brief Multiplies @a this by the @p scale component-wise.
-		/// @param scale Matrix to multiply by.
-		constexpr void Scale(const Matrix3x3& scale) noexcept;
 
 		/// @brief Gets a row.
 		/// @param rowIndex Row index.
@@ -270,8 +241,59 @@ export namespace PonyEngine::Math
 		/// @param value Counter-diagonal components.
 		constexpr void SetCounterDiagonal(const Vector3<T>& value) noexcept;
 
+		/// @brief Computes a trace of the matrix.
+		/// @return Trace of the matrix.
 		[[nodiscard("Pure function")]]
 		constexpr T Trace() const noexcept;
+
+		/// @brief Computes a determinant of the matrix.
+		/// @return Determinant.
+		[[nodiscard("Pure function")]]
+		constexpr T Determinant() const noexcept;
+
+		/// @brief Computes an adjugate of the matrix.
+		/// @return Adjugate.
+		[[nodiscard("Pure function")]]
+		constexpr Matrix3x3 Adjugate() const noexcept;
+
+		/// @brief Computes a transpose of the matrix.
+		/// @return Transpose.
+		[[nodiscard("Pure function")]]
+		constexpr Matrix3x3 Transpose() const noexcept;
+
+		/// @brief Computes an inverse of the matrix.
+		/// @return Inverse.
+		[[nodiscard("Pure function")]]
+		constexpr Matrix3x3 Inverse() const noexcept;
+
+		/// @brief Checks if all the components are finite numbers.
+		/// @return @a True if all the components are finite; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsFinite() const noexcept;
+
+		/// @brief Assigns arguments to the matrix components.
+		/// @param m00 Component 00.
+		/// @param m10 Component 10.
+		/// @param m20 Component 20.
+		/// @param m01 Component 01.
+		/// @param m11 Component 11.
+		/// @param m21 Component 21.
+		/// @param m02 Component 02.
+		/// @param m12 Component 12.
+		/// @param m22 Component 22.
+		constexpr void Set(T m00, T m10, T m20, T m01, T m11, T m21, T m02, T m12, T m22) noexcept;
+		/// @brief Assigns columns to the matrix.
+		/// @param column0 Column 0 to assign.
+		/// @param column1 Column 1 to assign.
+		/// @param column2 Column 2 to assign.
+		constexpr void Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
+		/// @brief Assigns matrix components from the @p components array.
+		/// @param components Component array. Its length must be at least 9.
+		constexpr void Set(const T* components) noexcept;
+
+		/// @brief Multiplies @a this by the @p scale component-wise.
+		/// @param scale Matrix to multiply by.
+		constexpr void Scale(const Matrix3x3& scale) noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
 		///        The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
@@ -330,12 +352,9 @@ export namespace PonyEngine::Math
 	};
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1});
+	constexpr Matrix3x3<T> Matrix3x3Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix3x3.
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
-
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr T Dot(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept;
+	constexpr Matrix3x3<T> Matrix3x3Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix3x3.
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
@@ -438,6 +457,14 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
+	/// @brief Flattens matrices and treats them as vectors, and computes a dot product of those vectors.
+	/// @tparam T Component type.
+	/// @param left Left matrix.
+	/// @param right Right matrix.
+	/// @return Dot product.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Dot(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept;
+
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix3x3<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
@@ -457,7 +484,14 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr typename Matrix3x3<T>::template Row<IsConstant>::RowValueType& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
+	constexpr T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
+	{
+		return m_row[columnIndex * Dimension];
+	}
+
+	template<Arithmetic T>
+	template<bool IsConstant>
+	constexpr const T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
 		return m_row[columnIndex * Dimension];
 	}
@@ -622,6 +656,64 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr Vector3<T> Matrix3x3<T>::GetRow(const std::size_t rowIndex) const noexcept
+	{
+		return (*this)[rowIndex];
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix3x3<T>::SetRow(const std::size_t rowIndex, const Vector3<T>& value) noexcept
+	{
+		(*this)[rowIndex] = value;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Matrix3x3<T>::GetColumn(const std::size_t columnIndex) const noexcept
+	{
+		return Vector3<T>(Data(columnIndex));
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix3x3<T>::SetColumn(const std::size_t columnIndex, const Vector3<T>& value) noexcept
+	{
+		Copy(Data(columnIndex), value.Data(), Dimension);
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Matrix3x3<T>::GetDiagonal() const noexcept
+	{
+		return Vector3<T>(M00(), M11(), M22());
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix3x3<T>::SetDiagonal(const Vector3<T>& value) noexcept
+	{
+		M00() = value.X();
+		M11() = value.Y();
+		M22() = value.Z();
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Matrix3x3<T>::GetCounterDiagonal() const noexcept
+	{
+		return Vector3<T>(M02(), M11(), M20());
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix3x3<T>::SetCounterDiagonal(const Vector3<T>& value) noexcept
+	{
+		M02() = value.X();
+		M11() = value.Y();
+		M20() = value.Z();
+	}
+
+	template<Arithmetic T>
+	constexpr T Matrix3x3<T>::Trace() const noexcept
+	{
+		return M00() + M11() + M22();
+	}
+
+	template<Arithmetic T>
 	constexpr T Matrix3x3<T>::Determinant() const noexcept
 	{
 		return M00() * (M11() * M22() - M12() * M21()) + 
@@ -694,7 +786,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Set(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Copy(Data(), components, Dimension);
 	}
 
 	template<Arithmetic T>
@@ -704,71 +796,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T> Matrix3x3<T>::GetRow(const std::size_t rowIndex) const noexcept
+	std::string Matrix3x3<T>::ToString() const
 	{
-		return (*this)[rowIndex];
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::SetRow(const std::size_t rowIndex, const Vector3<T>& value) noexcept
-	{
-		(*this)[rowIndex] = value;
-	}
-
-	template<Arithmetic T>
-	constexpr Vector3<T> Matrix3x3<T>::GetColumn(const std::size_t columnIndex) const noexcept
-	{
-		return Vector3<T>(Data(columnIndex));
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::SetColumn(const std::size_t columnIndex, const Vector3<T>& value) noexcept
-	{
-		std::ranges::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
-	}
-
-	template<Arithmetic T>
-	constexpr Vector3<T> Matrix3x3<T>::GetDiagonal() const noexcept
-	{
-		return Vector3<T>(M00(), M11(), M22());
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::SetDiagonal(const Vector3<T>& value) noexcept
-	{
-		M00() = value.X();
-		M11() = value.Y();
-		M22() = value.Z();
-	}
-
-	template<Arithmetic T>
-	constexpr Vector3<T> Matrix3x3<T>::GetCounterDiagonal() const noexcept
-	{
-		return Vector3<T>(M02(), M11(), M20());
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::SetCounterDiagonal(const Vector3<T>& value) noexcept
-	{
-		M02() = value.X();
-		M11() = value.Y();
-		M20() = value.Z();
-	}
-
-	template<Arithmetic T>
-	constexpr T Matrix3x3<T>::Trace() const noexcept
-	{
-		const Vector3<T> diagonal = GetDiagonal();
-
-		return diagonal.X() + diagonal.Y() + diagonal.Z();
-	}
-
-	template<Arithmetic T>
-	constexpr T Dot(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
-	{
-		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() +
-			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() +
-			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22();
+		return std::format("({}, {}, {})({}, {}, {})({}, {}, {})", M00(), M01(), M02(), M10(), M11(), M12(), M20(), M21(), M22());
 	}
 
 	template<Arithmetic T>
@@ -789,9 +819,11 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	std::string Matrix3x3<T>::ToString() const
+	constexpr T Dot(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
 	{
-		return std::format("({}, {}, {})({}, {}, {})({}, {}, {})", M00(), M01(), M02(), M10(), M11(), M12(), M20(), M21(), M22());
+		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() +
+			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() +
+			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22();
 	}
 
 	template<Arithmetic T>

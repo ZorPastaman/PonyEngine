@@ -9,12 +9,10 @@
 
 export module PonyEngine.Math:Matrix4x4;
 
-import <algorithm>;
 import <array>;
 import <cstddef>;
 import <format>;
 import <ostream>;
-import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -41,8 +39,6 @@ export namespace PonyEngine::Math
 		class Row final
 		{
 		public:
-			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
-
 			Row(const Row&) = delete;
 			Row(Row&&) = delete;
 
@@ -56,14 +52,24 @@ export namespace PonyEngine::Math
 			/// @param columnIndex Column index.
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
-			constexpr RowValueType& operator [](std::size_t columnIndex) const noexcept;
+			constexpr T& operator [](std::size_t columnIndex) noexcept requires(!IsConstant);
+			/// @brief Gets a component in a row by a column index.
+			/// @param columnIndex Column index.
+			/// @return Component.
+			[[nodiscard("Pure operator")]]
+			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
 
 			Row& operator =(const Row&) = delete;
 			Row& operator =(Row&&) = delete;
 
+			/// @brief Assigns a row from the @p row.
+			/// @param row Row to assign from.
+			/// @return @a This.
 			constexpr Row& operator =(const Vector4<T>& row) noexcept requires(!IsConstant);
 
 		private:
+			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
+
 			/// @brief Creates a row access.
 			/// @param row First element in a row.
 			[[nodiscard("Pure constructor")]]
@@ -106,6 +112,8 @@ export namespace PonyEngine::Math
 		/// @param column3 Column 3.
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
+		/// @brief Creates a matrix and assigns its components from the @p components array.
+		/// @param components Components array. Its length must be at least 16.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix4x4(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -251,10 +259,57 @@ export namespace PonyEngine::Math
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
+		/// @brief Gets a column data pointer - an array of 4 elements.
+		/// @param columnIndex Column index.
+		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data(std::size_t columnIndex) noexcept;
+		/// @brief Gets a column data pointer - an array of 4 elements.
+		/// @param columnIndex Column index.
+		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data(std::size_t columnIndex) const noexcept;
+
+		/// @brief Gets a row.
+		/// @param rowIndex Row index.
+		/// @return Row.
+		[[nodiscard("Pure function")]]
+		constexpr Vector4<T> GetRow(std::size_t rowIndex) const noexcept;
+		/// @brief Sets a row.
+		/// @param rowIndex Row index.
+		/// @param value Row components.
+		constexpr void SetRow(std::size_t rowIndex, const Vector4<T>& value) noexcept;
+
+		/// @brief Gets a column.
+		/// @param columnIndex Column index.
+		/// @return Column.
+		[[nodiscard("Pure function")]]
+		constexpr Vector4<T> GetColumn(std::size_t columnIndex) const noexcept;
+		/// @brief Sets a column.
+		/// @param columnIndex Column index.
+		/// @param value Column components.
+		constexpr void SetColumn(std::size_t columnIndex, const Vector4<T>& value) noexcept;
+
+		/// @brief Gets a diagonal.
+		/// @return Diagonal.
+		[[nodiscard("Pure function")]]
+		constexpr Vector4<T> GetDiagonal() const noexcept;
+		/// @brief Sets a diagonal.
+		/// @param value Diagonal components.
+		constexpr void SetDiagonal(const Vector4<T>& value) noexcept;
+
+		/// @brief Gets a counter-diagonal.
+		/// @return Counter-diagonal.
+		[[nodiscard("Pure function")]]
+		constexpr Vector4<T> GetCounterDiagonal() const noexcept;
+		/// @brief Sets a counter-diagonal.
+		/// @param value Counter-diagonal components.
+		constexpr void SetCounterDiagonal(const Vector4<T>& value) noexcept;
+
+		/// @brief Computes a trace of the matrix.
+		/// @return Trace of the matrix.
+		[[nodiscard("Pure function")]]
+		constexpr T Trace() const noexcept;
 
 		/// @brief Computes a determinant of the matrix.
 		/// @return Determinant.
@@ -299,51 +354,19 @@ export namespace PonyEngine::Math
 		/// @param m23 Component 23.
 		/// @param m33 Component 33.
 		constexpr void Set(T m00, T m10, T m20, T m30, T m01, T m11, T m21, T m31, T m02, T m12, T m22, T m32, T m03, T m13, T m23, T m33) noexcept;
+		/// @brief Assigns columns to the matrix.
+		/// @param column0 Column 0 to assign.
+		/// @param column1 Column 1 to assign.
+		/// @param column2 Column 2 to assign.
+		/// @param column3 Column 3 to assign.
 		constexpr void Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
+		/// @brief Assigns matrix components from the @p components array.
+		/// @param components Component array. Its length must be at least 16.
 		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
 		constexpr void Scale(const Matrix4x4& scale) noexcept;
-
-		/// @brief Gets a row.
-		/// @param rowIndex Row index.
-		/// @return Row.
-		[[nodiscard("Pure function")]]
-		constexpr Vector4<T> GetRow(std::size_t rowIndex) const noexcept;
-		/// @brief Sets a row.
-		/// @param rowIndex Row index.
-		/// @param value Row components.
-		constexpr void SetRow(std::size_t rowIndex, const Vector4<T>& value) noexcept;
-
-		/// @brief Gets a column.
-		/// @param columnIndex Column index.
-		/// @return Column.
-		[[nodiscard("Pure function")]]
-		constexpr Vector4<T> GetColumn(std::size_t columnIndex) const noexcept;
-		/// @brief Sets a column.
-		/// @param columnIndex Column index.
-		/// @param value Column components.
-		constexpr void SetColumn(std::size_t columnIndex, const Vector4<T>& value) noexcept;
-
-		/// @brief Gets a diagonal.
-		/// @return Diagonal.
-		[[nodiscard("Pure function")]]
-		constexpr Vector4<T> GetDiagonal() const noexcept;
-		/// @brief Sets a diagonal.
-		/// @param value Diagonal components.
-		constexpr void SetDiagonal(const Vector4<T>& value) noexcept;
-
-		/// @brief Gets a counter-diagonal.
-		/// @return Counter-diagonal.
-		[[nodiscard("Pure function")]]
-		constexpr Vector4<T> GetCounterDiagonal() const noexcept;
-		/// @brief Sets a counter-diagonal.
-		/// @param value Counter-diagonal components.
-		constexpr void SetCounterDiagonal(const Vector4<T>& value) noexcept;
-
-		[[nodiscard("Pure function")]]
-		constexpr T Trace() const noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
 		///        The format is '(m00, m01, m02, m03)(m10, m11, m12, m13)(m20, m21, m22, m23)(m30, m31, m32, m33)'.
@@ -402,12 +425,9 @@ export namespace PonyEngine::Math
 	};
 
 	template<Arithmetic T>
-	constexpr Matrix4x4<T> Matrix4x4Identity = Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1});
+	constexpr Matrix4x4<T> Matrix4x4Identity = Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix4x4.
 	template<Arithmetic T>
-	constexpr Matrix4x4<T> Matrix4x4Zero = Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
-
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept;
+	constexpr Matrix4x4<T> Matrix4x4Zero = Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix4x4.
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
@@ -510,6 +530,14 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
+	/// @brief Flattens matrices and treats them as vectors, and computes a dot product of those vectors.
+	/// @tparam T Component type.
+	/// @param left Left matrix.
+	/// @param right Right matrix.
+	/// @return Dot product.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept;
+
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix4x4<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
@@ -529,7 +557,14 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr typename Matrix4x4<T>::template Row<IsConstant>::RowValueType& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
+	constexpr T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
+	{
+		return m_row[columnIndex * Dimension];
+	}
+
+	template<Arithmetic T>
+	template<bool IsConstant>
+	constexpr const T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
 		return m_row[columnIndex * Dimension];
 	}
@@ -780,6 +815,66 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetRow(const std::size_t rowIndex) const noexcept
+	{
+		return (*this)[rowIndex];
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix4x4<T>::SetRow(const std::size_t rowIndex, const Vector4<T>& value) noexcept
+	{
+		(*this)[rowIndex] = value;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetColumn(const std::size_t columnIndex) const noexcept
+	{
+		return Vector4<T>(Data(columnIndex));
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix4x4<T>::SetColumn(const std::size_t columnIndex, const Vector4<T>& value) noexcept
+	{
+		Copy(Data(columnIndex), value.Data(), Dimension);
+	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetDiagonal() const noexcept
+	{
+		return Vector4<T>(M00(), M11(), M22(), M33());
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix4x4<T>::SetDiagonal(const Vector4<T>& value) noexcept
+	{
+		M00() = value.X();
+		M11() = value.Y();
+		M22() = value.Z();
+		M33() = value.W();
+	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Matrix4x4<T>::GetCounterDiagonal() const noexcept
+	{
+		return Vector4<T>(M03(), M12(), M21(), M30());
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix4x4<T>::SetCounterDiagonal(const Vector4<T>& value) noexcept
+	{
+		M03() = value.X();
+		M12() = value.Y();
+		M21() = value.Z();
+		M30() = value.W();
+	}
+
+	template<Arithmetic T>
+	constexpr T Matrix4x4<T>::Trace() const noexcept
+	{
+		return M00() + M11() + M22() + M33();
+	}
+
+	template<Arithmetic T>
 	constexpr T Matrix4x4<T>::Determinant() const noexcept
 	{
 		return M00() * (M11() * M22() * M33() + M12() * M23() * M31() + M13() * M21() * M32() - M13() * M22() * M31() - M12() * M21() * M33() - M11() * M23() * M32()) -
@@ -869,7 +964,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix4x4<T>::Set(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Copy(Data(), components, ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -879,80 +974,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T> Matrix4x4<T>::GetRow(const std::size_t rowIndex) const noexcept
-	{
-		return (*this)[rowIndex];
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::SetRow(const std::size_t rowIndex, const Vector4<T>& value) noexcept
-	{
-		(*this)[rowIndex] = value;
-	}
-
-	template<Arithmetic T>
-	constexpr Vector4<T> Matrix4x4<T>::GetColumn(const std::size_t columnIndex) const noexcept
-	{
-		return Vector4<T>(Data(columnIndex));
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::SetColumn(const std::size_t columnIndex, const Vector4<T>& value) noexcept
-	{
-		std::ranges::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
-	}
-
-	template<Arithmetic T>
-	constexpr Vector4<T> Matrix4x4<T>::GetDiagonal() const noexcept
-	{
-		return Vector4<T>(M00(), M11(), M22(), M33());
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::SetDiagonal(const Vector4<T>& value) noexcept
-	{
-		M00() = value.X();
-		M11() = value.Y();
-		M22() = value.Z();
-		M33() = value.W();
-	}
-
-	template<Arithmetic T>
-	constexpr Vector4<T> Matrix4x4<T>::GetCounterDiagonal() const noexcept
-	{
-		return Vector4<T>(M03(), M12(), M21(), M30());
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::SetCounterDiagonal(const Vector4<T>& value) noexcept
-	{
-		M03() = value.X();
-		M12() = value.Y();
-		M21() = value.Z();
-		M30() = value.W();
-	}
-
-	template<Arithmetic T>
-	constexpr T Matrix4x4<T>::Trace() const noexcept
-	{
-		const Vector4<T> diagonal = GetDiagonal();
-
-		return diagonal.X() + diagonal.Y() + diagonal.Z() + diagonal.W();
-	}
-
-	template<Arithmetic T>
 	std::string Matrix4x4<T>::ToString() const
 	{
 		return std::format("({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})", M00(), M01(), M02(), M03(), M10(), M11(), M12(), M13(), M20(), M21(), M22(), M23(), M30(), M31(), M32(), M33());
-	}
-
-	template<Arithmetic T>
-	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
-	{
-		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() + left.M30() * right.M30() +
-			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() + left.M31() * right.M31() +
-			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22() + left.M32() * right.M32() +
-			left.M30() * right.M30() + left.M31() * right.M31() + left.M32() * right.M32() + left.M33() * right.M33();
 	}
 
 	template<Arithmetic T>
@@ -970,6 +994,15 @@ namespace PonyEngine::Math
 		const Matrix4x4<T> diff = left - right;
 
 		return Dot(diff, diff) < tolerance * tolerance;
+	}
+
+	template<Arithmetic T>
+	constexpr T Dot(const Matrix4x4<T>& left, const Matrix4x4<T>& right) noexcept
+	{
+		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() + left.M30() * right.M30() +
+			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() + left.M31() * right.M31() +
+			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22() + left.M32() * right.M32() +
+			left.M30() * right.M30() + left.M31() * right.M31() + left.M32() * right.M32() + left.M33() * right.M33();
 	}
 
 	template<Arithmetic T>

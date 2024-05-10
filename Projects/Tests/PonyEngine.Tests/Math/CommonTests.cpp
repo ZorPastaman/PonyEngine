@@ -63,12 +63,15 @@ namespace Math
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(1.f, 1.5f));
 		}
 
-		TEST_METHOD(SignumTest)
+		TEST_METHOD(SignumShortTest)
 		{
-			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{0}));
-			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{39}));
-			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{-42}));
+			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{ 0 }));
+			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{ 39 }));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{ -42 }));
+		}
 
+		TEST_METHOD(SignumFloatTest)
+		{
 			Assert::AreEqual(0.f, PonyEngine::Math::Signum(0.f));
 			Assert::AreEqual(1.f, PonyEngine::Math::Signum(39.f));
 			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(-42.f));
@@ -76,7 +79,7 @@ namespace Math
 			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(-0.3f));
 		}
 
-		TEST_METHOD(RoundToIntegralTest)
+		TEST_METHOD(RoundToIntegralShortTest)
 		{
 			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegral<float, short>(0.f));
 			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegral<float, short>(0.3f));
@@ -89,7 +92,10 @@ namespace Math
 			Assert::AreEqual(short{-10}, PonyEngine::Math::RoundToIntegral<float, short>(-10.3f));
 			Assert::AreEqual(short{11}, PonyEngine::Math::RoundToIntegral<float, short>(10.7f));
 			Assert::AreEqual(short{-11}, PonyEngine::Math::RoundToIntegral<float, short>(-10.7f));
+		}
 
+		TEST_METHOD(RoundToIntegralLongLongTest)
+		{
 			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(0.));
 			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(0.3));
 			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(-0.3));
