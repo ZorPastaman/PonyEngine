@@ -20,6 +20,62 @@ namespace Math
 {
 	TEST_CLASS(ArrayArithmeticsTests)
 	{
+		TEST_METHOD(CopyShortTest)
+		{
+			constexpr short s0 = 30;
+			constexpr short s1 = 20;
+			constexpr short s2 = 90;
+			constexpr short s3 = 50;
+			constexpr short s4 = -10;
+			constexpr short s5 = 40;
+
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			std::array<short, 6> destination { d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<short, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Copy(destination.data(), source.data(), 5);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(s1, destination[1]);
+			Assert::AreEqual(s2, destination[2]);
+			Assert::AreEqual(s3, destination[3]);
+			Assert::AreEqual(s4, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
+		TEST_METHOD(CopyFloatTest)
+		{
+			constexpr float s0 = 30;
+			constexpr float s1 = 20;
+			constexpr float s2 = 90;
+			constexpr float s3 = 50;
+			constexpr float s4 = -10;
+			constexpr float s5 = 40;
+
+			constexpr float d0 = 3;
+			constexpr float d1 = 2;
+			constexpr float d2 = 9;
+			constexpr float d3 = 5;
+			constexpr float d4 = -1;
+			constexpr float d5 = 4;
+
+			std::array<float, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Copy(destination.data(), source.data(), 5);
+			Assert::AreEqual(s0, destination[0]);
+			Assert::AreEqual(s1, destination[1]);
+			Assert::AreEqual(s2, destination[2]);
+			Assert::AreEqual(s3, destination[3]);
+			Assert::AreEqual(s4, destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
 		TEST_METHOD(AssignmentWithDestinationStepShortTest)
 		{
 			constexpr short d0 = 3;
@@ -1148,13 +1204,15 @@ namespace Math
 			Assert::IsFalse(PonyEngine::Math::IsFinite(numbers.data(), 5));
 		}
 
-		static constexpr std::array<float, 3> ArithmeticsConstexpr()
+		static constexpr std::array<int, 3> ArithmeticsConstexpr()
 		{
-			constexpr std::array<float, 3> left{ 2, 3, 4 };
-			constexpr std::array<float, 3> right{ 5, 6, 7 };
-			constexpr float value = 8;
+			constexpr std::array<int, 3> left{ 2, 3, 4 };
+			constexpr std::array<int, 3> right{ 5, 6, 7 };
+			constexpr int value = 8;
 
-			std::array<float, 3> destination{ 10, 20, 30 };
+			std::array<int, 3> destination{ 10, 20, 30 };
+
+			PonyEngine::Math::Copy(destination.data(), left.data(), 3);
 
 			PonyEngine::Math::Add(destination.data(), right.data(), 3);
 			PonyEngine::Math::Add(destination.data(), left.data(), right.data(), 3);
@@ -1180,7 +1238,7 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr std::array<float, 3> destination = ArithmeticsConstexpr();
+			constexpr std::array<int, 3> destination = ArithmeticsConstexpr();
 		}
 	};
 }
