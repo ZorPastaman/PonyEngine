@@ -327,11 +327,11 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Multiplier.
 		/// @return @a This.
-		constexpr Matrix3x3& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Matrix3x3& operator *=(T multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Multiplier.
 		/// @return @a This.
-		constexpr Matrix3x3& operator *=(ComputationalType multiplier) noexcept;
+		constexpr Matrix3x3& operator *=(ComputationalType multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p other.
 		/// @param other Matrix to multiply.
 		/// @return @a This.
@@ -339,7 +339,11 @@ export namespace PonyEngine::Math
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Divisor.
 		/// @return @a This.
-		constexpr Matrix3x3& operator /=(ComputationalType divisor) noexcept;
+		constexpr Matrix3x3& operator /=(T divisor) noexcept;
+		/// @brief Divides @a this by the @p divisor.
+		/// @param divisor Divisor.
+		/// @return @a This.
+		constexpr Matrix3x3& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
 
 		/// @brief Checks if two matrices are equal.
 		/// @param other The other matrix.
@@ -400,28 +404,28 @@ export namespace PonyEngine::Math
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, T multiplier) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, typename Matrix3x3<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Matrix3x3<T> operator *(T multiplier, const Matrix3x3<T>& matrix) noexcept;
 	/// @brief Multiplies the @p matrix components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param matrix Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Matrix3x3<T> operator *(typename Matrix3x3<T>::ComputationalType multiplier, const Matrix3x3<T>& matrix) noexcept;
 	/// @brief Multiplies two matrices.
 	/// @tparam T Component type.
@@ -444,6 +448,13 @@ export namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, T divisor) noexcept;
+	/// @brief Divides the @p matrix by the @p divisor.
+	/// @tparam T Component type.
+	/// @param matrix Dividend.
+	/// @param divisor Divisor.
+	/// @return Quotient.
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, typename Matrix3x3<T>::ComputationalType divisor) noexcept;
 
 	/// @brief Puts matrix.ToString() into the @p stream.
@@ -518,7 +529,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>::Matrix3x3(const T* components) noexcept
+	constexpr Matrix3x3<T>::Matrix3x3(const T* const components) noexcept
 	{
 		Set(components);
 	}
@@ -786,7 +797,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Set(const T* const components) noexcept
 	{
-		Copy(Data(), components, Dimension);
+		Copy(Data(), components, ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -855,7 +866,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const T multiplier) noexcept
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -863,7 +874,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const ComputationalType multiplier) noexcept
+	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -877,7 +888,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>& Matrix3x3<T>::operator /=(const ComputationalType divisor) noexcept
+	constexpr Matrix3x3<T>& Matrix3x3<T>::operator /=(const T divisor) noexcept
+	{
+		Divide(Data(), divisor, ComponentCount);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix3x3<T>& Matrix3x3<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
 	{
 		Divide(Data(), divisor, ComponentCount);
 
@@ -917,7 +936,7 @@ namespace PonyEngine::Math
 		return difference;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const T multiplier) noexcept
 	{
 		Matrix3x3<T> product;
@@ -926,7 +945,7 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const typename Matrix3x3<T>::ComputationalType multiplier) noexcept
 	{
 		Matrix3x3<T> product;
@@ -935,13 +954,13 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Matrix3x3<T> operator *(const T multiplier, const Matrix3x3<T>& matrix) noexcept
 	{
 		return matrix * multiplier;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Matrix3x3<T> operator *(const typename Matrix3x3<T>::ComputationalType multiplier, const Matrix3x3<T>& matrix) noexcept
 	{
 		return matrix * multiplier;
@@ -976,6 +995,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, const T divisor) noexcept
+	{
+		Matrix3x3<T> quotient;
+		Divide(quotient.Data(), matrix.Data(), divisor, Matrix3x3<T>::ComponentCount);
+
+		return quotient;
+	}
+
+	template<std::integral T>
 	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, const typename Matrix3x3<T>::ComputationalType divisor) noexcept
 	{
 		Matrix3x3<T> quotient;
