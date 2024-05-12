@@ -816,7 +816,7 @@ namespace Math
 			constexpr std::array<float, 4> array{ 3.f, 1.f, -5.f, 7.f };
 			auto matrix = PonyEngine::Math::Matrix2x2<float>(array.data());
 			Assert::IsTrue(matrix.IsFinite());
-			for (std::size_t i = 1; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				matrix.Data()[i] = nan;
 				Assert::IsFalse(matrix.IsFinite());
