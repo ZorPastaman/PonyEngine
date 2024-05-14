@@ -72,5 +72,8 @@
     <ClCompile Include="Math\ArrayArithmeticsTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Math\Matrix4x4Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

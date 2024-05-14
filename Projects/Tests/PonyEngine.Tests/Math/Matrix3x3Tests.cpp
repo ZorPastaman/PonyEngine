@@ -1884,7 +1884,7 @@ namespace Math
 
 			constexpr float multiplierF = 5.f;
 			matrixC = PonyEngine::Math::Matrix3x3<short>(m00C, m10C, m20C, m01C, m11C, m21C, m02C, m12C, m22C);
-			matrixL = matrixC *= multiplierF;
+			PonyEngine::Math::Matrix3x3<short>& matrixL1 = matrixC *= multiplierF;
 			Assert::AreEqual(static_cast<short>(m00C * multiplierF), matrixC.M00());
 			Assert::AreEqual(static_cast<short>(m10C * multiplierF), matrixC.M10());
 			Assert::AreEqual(static_cast<short>(m20C * multiplierF), matrixC.M20());
@@ -1894,7 +1894,7 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(m02C * multiplierF), matrixC.M02());
 			Assert::AreEqual(static_cast<short>(m12C * multiplierF), matrixC.M12());
 			Assert::AreEqual(static_cast<short>(m22C * multiplierF), matrixC.M22());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
 		TEST_METHOD(AssignmentMultiplyNumberFloatTest)
@@ -2020,7 +2020,7 @@ namespace Math
 
 			constexpr float divisorF = 5.f;
 			matrixC = PonyEngine::Math::Matrix3x3<short>(m00C, m10C, m20C, m01C, m11C, m21C, m02C, m12C, m22C);
-			matrixL = matrixC /= divisorF;
+			PonyEngine::Math::Matrix3x3<short>& matrixL1 = matrixC /= divisorF;
 			Assert::AreEqual(static_cast<short>(m00C / divisorF), matrixC.M00());
 			Assert::AreEqual(static_cast<short>(m10C / divisorF), matrixC.M10());
 			Assert::AreEqual(static_cast<short>(m20C / divisorF), matrixC.M20());
@@ -2030,7 +2030,7 @@ namespace Math
 			Assert::AreEqual(static_cast<short>(m02C / divisorF), matrixC.M02());
 			Assert::AreEqual(static_cast<short>(m12C / divisorF), matrixC.M12());
 			Assert::AreEqual(static_cast<short>(m22C / divisorF), matrixC.M22());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
 		TEST_METHOD(AssignmentDivideNumberFloatTest)
