@@ -1144,12 +1144,12 @@ namespace Math
 
 			constexpr float multiplierF = 5.f;
 			matrixC = PonyEngine::Math::Matrix2x2<short>(m00C, m10C, m01C, m11C);
-			matrixL = matrixC *= multiplierF;
+			PonyEngine::Math::Matrix2x2<short>& matrixL1 = matrixC *= multiplierF;
 			Assert::AreEqual(static_cast<short>(m00C * multiplierF), matrixC.M00());
 			Assert::AreEqual(static_cast<short>(m10C * multiplierF), matrixC.M10());
 			Assert::AreEqual(static_cast<short>(m01C * multiplierF), matrixC.M01());
 			Assert::AreEqual(static_cast<short>(m11C * multiplierF), matrixC.M11());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
 		TEST_METHOD(AssignmentMultiplyNumberFloatTest)
@@ -1225,12 +1225,12 @@ namespace Math
 
 			constexpr float divisorF = 5.f;
 			matrixC = PonyEngine::Math::Matrix2x2<short>(m00C, m10C, m01C, m11C);
-			matrixL = matrixC /= divisorF;
+			PonyEngine::Math::Matrix2x2<short>& matrixL1 = matrixC /= divisorF;
 			Assert::AreEqual(static_cast<short>(m00C / divisorF), matrixC.M00());
 			Assert::AreEqual(static_cast<short>(m10C / divisorF), matrixC.M10());
 			Assert::AreEqual(static_cast<short>(m01C / divisorF), matrixC.M01());
 			Assert::AreEqual(static_cast<short>(m11C / divisorF), matrixC.M11());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
 		TEST_METHOD(AssignmentDivideNumberFloatTest)
