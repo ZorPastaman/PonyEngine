@@ -779,20 +779,6 @@ namespace Math
 			Assert::AreEqual(m11, transpose.M11());
 		}
 
-		TEST_METHOD(InverseShortTest)
-		{
-			constexpr short m00 = 3;
-			constexpr short m10 = 5;
-			constexpr short m01 = 2;
-			constexpr short m11 = 4;
-			constexpr auto matrix = PonyEngine::Math::Matrix2x2<short>(m00, m10, m01, m11);
-			const auto inverse = matrix.Inverse();
-			Assert::AreEqual(short{2}, inverse.M00());
-			Assert::AreEqual(short{-2}, inverse.M10());
-			Assert::AreEqual(short{-1}, inverse.M01());
-			Assert::AreEqual(short{1}, inverse.M11());
-		}
-
 		TEST_METHOD(InverseFloatTest)
 		{
 			constexpr float m00 = 3;
@@ -822,9 +808,6 @@ namespace Math
 				Assert::IsFalse(matrix.IsFinite());
 				matrix.Data()[i] = array[i];
 			}
-
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<short>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetShortTest)
@@ -1681,7 +1664,7 @@ namespace Math
 			constexpr int determinant = matrix.Determinant();
 			constexpr PonyEngine::Math::Matrix2x2<int> adjugate = matrix.Adjugate();
 			constexpr PonyEngine::Math::Matrix2x2<int> transpose = matrix.Transpose();
-			constexpr PonyEngine::Math::Matrix2x2<int> inverse = matrix.Inverse();
+			constexpr PonyEngine::Math::Matrix2x2<float> inverse = PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4).Inverse();
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector2<int> columnV = matrix[0];
@@ -1693,7 +1676,7 @@ namespace Math
 			constexpr PonyEngine::Math::Matrix2x2<int> zero = PonyEngine::Math::Matrix2x2Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix2x2<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
-			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(matrix, defaultMatrix);
+			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4), PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4));
 
 			constexpr PonyEngine::Math::Matrix2x2<int> sum = matrix + columnMatrix;
 			constexpr PonyEngine::Math::Matrix2x2<int> negated = -matrix;

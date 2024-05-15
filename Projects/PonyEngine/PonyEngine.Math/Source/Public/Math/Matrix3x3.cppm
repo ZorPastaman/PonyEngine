@@ -104,7 +104,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p components array.
-		/// @param components Components array. Its length must be at least 9.
+		/// @param components Component array. Its length must be at least 9.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix3x3(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -264,12 +264,12 @@ export namespace PonyEngine::Math
 		/// @brief Computes an inverse of the matrix.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix3x3 Inverse() const noexcept;
+		constexpr Matrix3x3 Inverse() const noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept;
+		bool IsFinite() const noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Assigns arguments to the matrix components.
 		/// @param m00 Component 00.
@@ -355,10 +355,14 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m20, m01, m11, m21, m02, m12, m22.
 	};
 
+	/// @brief Identity matrix.
+	/// @tparam T Component type.
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix3x3.
+	constexpr Matrix3x3<T> Matrix3x3Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1});
+	/// @brief Zero matrix.
+	/// @tparam T Component type.
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix3x3.
+	constexpr Matrix3x3<T> Matrix3x3Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
@@ -374,8 +378,8 @@ export namespace PonyEngine::Math
 	/// @param right Right matrix.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the matrices are almost equal; @a false otherwise.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Matrix3x3<T>& left, const Matrix3x3<T>& right, typename Matrix3x3<T>::ComputationalType tolerance = typename Matrix3x3<T>::ComputationalType{0.00001}) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreAlmostEqual(const Matrix3x3<T>& left, const Matrix3x3<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Addition operator for two matrices.
 	/// @tparam T Component type.
@@ -756,22 +760,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3<T>::Inverse() const noexcept
+	constexpr Matrix3x3<T> Matrix3x3<T>::Inverse() const noexcept requires(std::is_floating_point_v<T>)
 	{
 		return Adjugate() * (ComputationalType{1} / Determinant());
 	}
 
 	template<Arithmetic T>
-	bool Matrix3x3<T>::IsFinite() const noexcept
+	bool Matrix3x3<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			return Math::IsFinite(Data(), ComponentCount);
-		}
-		else
-		{
-			return true;
-		}
+		return Math::IsFinite(Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -821,8 +818,8 @@ namespace PonyEngine::Math
 		return scaled;
 	}
 
-	template<Arithmetic T>
-	constexpr bool AreAlmostEqual(const Matrix3x3<T>& left, const Matrix3x3<T>& right, const typename Matrix3x3<T>::ComputationalType tolerance) noexcept
+	template<std::floating_point T>
+	constexpr bool AreAlmostEqual(const Matrix3x3<T>& left, const Matrix3x3<T>& right, const T tolerance) noexcept
 	{
 		const Matrix3x3<T> diff = left - right;
 		

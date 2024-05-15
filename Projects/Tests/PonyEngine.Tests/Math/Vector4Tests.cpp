@@ -166,35 +166,6 @@ namespace Math
 			Assert::IsFalse(std::isnormal(zeroNormalizedF.Y()));
 			Assert::IsFalse(std::isnormal(zeroNormalizedF.Z()));
 			Assert::IsFalse(std::isnormal(zeroNormalizedF.W()));
-
-			short xi = -5;
-			short yi = 15;
-			short zi = 7;
-			short wi = 14;
-			auto vectorI = PonyEngine::Math::Vector4<short>(xi, yi, zi, wi);
-			float magnitudeI = vectorI.Magnitude();
-			short normXI = static_cast<short>(xi / magnitudeI);
-			short normYI = static_cast<short>(yi / magnitudeI);
-			short normZI = static_cast<short>(zi / magnitudeI);
-			short normWI = static_cast<short>(wi / magnitudeI);
-			auto normVectorI = vectorI.Normalized();
-
-			Assert::AreEqual(normXI, normVectorI.X());
-			Assert::AreEqual(normYI, normVectorI.Y());
-			Assert::AreEqual(normZI, normVectorI.Z());
-			Assert::AreEqual(normWI, normVectorI.W());
-
-			vectorI.Normalize();
-			Assert::AreEqual(normVectorI.X(), vectorI.X());
-			Assert::AreEqual(normVectorI.Y(), vectorI.Y());
-			Assert::AreEqual(normVectorI.Z(), vectorI.Z());
-			Assert::AreEqual(normVectorI.W(), vectorI.W());
-
-			auto zeroNormalizedI = PonyEngine::Math::Vector4Zero<short>.Normalized();
-			Assert::AreEqual(short{0}, zeroNormalizedI.X());
-			Assert::AreEqual(short{0}, zeroNormalizedI.Y());
-			Assert::AreEqual(short{0}, zeroNormalizedI.Z());
-			Assert::AreEqual(short{0}, zeroNormalizedI.W());
 		}
 
 		TEST_METHOD(InverseTest)
@@ -238,9 +209,6 @@ namespace Math
 			vector.Z() = 0.f;
 			vector.W() = nan;
 			Assert::IsFalse(vector.IsFinite());
-
-			Assert::IsTrue(PonyEngine::Math::Vector4Zero<short>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Vector4One<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetTest)
@@ -576,23 +544,11 @@ namespace Math
 
 			vectorF.Set(-4.f, 2.f, 7.f, 10.f);
 			vectorF1.Set(3.f, 1.f, 2.f, 5.f);
-			auto projectedF = PonyEngine::Math::Project(vectorF, vectorF1);
+			auto projectedF = PonyEngine::Math::Project(vectorF, vectorF1.Normalized());
 			Assert::AreEqual(4.154, static_cast<double>(projectedF.X()), 0.001);
 			Assert::AreEqual(1.385, static_cast<double>(projectedF.Y()), 0.001);
 			Assert::AreEqual(2.769, static_cast<double>(projectedF.Z()), 0.001);
 			Assert::AreEqual(6.923, static_cast<double>(projectedF.W()), 0.001);
-
-			auto vectorI = PonyEngine::Math::Vector4<short>(3, 0, 0, 0);
-			auto vectorI1 = PonyEngine::Math::Vector4<short>(0, 0, 3, 0);
-			Assert::AreEqual(0.f, PonyEngine::Math::Project(vectorI, vectorI1).Magnitude());
-
-			vectorI.Set(2, 2, 7, 10);
-			vectorI1.Set(3, 1, 0, 5);
-			auto projectedI = PonyEngine::Math::Project(vectorI, vectorI1);
-			Assert::AreEqual(short{4}, projectedI.X());
-			Assert::AreEqual(short{1}, projectedI.Y());
-			Assert::AreEqual(short{0}, projectedI.Z());
-			Assert::AreEqual(short{8}, projectedI.W());
 		}
 
 		TEST_METHOD(ScaleTest)
