@@ -90,9 +90,9 @@ export namespace PonyEngine::Math
 		/// @brief Computes a vector normalized from this one.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector2 Normalized() const noexcept;
+		Vector2 Normalized() const noexcept requires(std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
-		void Normalize() noexcept;
+		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Swap components and return a vector in order y, x.
 		/// @return Swapped vector.
@@ -103,7 +103,7 @@ export namespace PonyEngine::Math
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept;
+		bool IsFinite() const noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Assigns arguments to the vector components.
 		/// @param x X-component.
@@ -204,19 +204,19 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	typename Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
-	/// @brief Projects the @p vector onto the @p target.
+	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param target Projection target.
+	/// @param normal Projection target. Must be normalized.
 	/// @return Projected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& target) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& normal) noexcept;
 	/// @brief Projects the @p vector onto a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Projected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> ProjectOnPlane(const Vector2<T>& vector, const Vector2<T>& normal) noexcept;
 
 	/// @brief Reflects the @p vector off a plane defined by the @p normal vector.
@@ -224,7 +224,7 @@ export namespace PonyEngine::Math
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Reflected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Reflect(const Vector2<T>& vector, const Vector2<T>& normal) noexcept;
 
 	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
@@ -251,8 +251,8 @@ export namespace PonyEngine::Math
 	/// @param right Right vector.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the vectors are almost equal; @a false otherwise.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, typename Vector2<T>::ComputationalType tolerance = typename Vector2<T>::ComputationalType{0.00001}) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Addition operator for two vectors.
 	/// @tparam T Component type.
@@ -386,13 +386,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T> Vector2<T>::Normalized() const noexcept
+	Vector2<T> Vector2<T>::Normalized() const noexcept requires(std::is_floating_point_v<T>)
 	{
 		return *this / Magnitude();
 	}
 
 	template<Arithmetic T>
-	void Vector2<T>::Normalize() noexcept
+	void Vector2<T>::Normalize() noexcept requires(std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
 	}
@@ -410,16 +410,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	bool Vector2<T>::IsFinite() const noexcept
+	bool Vector2<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			return Math::IsFinite(Data(), ComponentCount);
-		}
-		else
-		{
-			return true;
-		}
+		return Math::IsFinite(Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -439,6 +432,12 @@ namespace PonyEngine::Math
 	constexpr void Vector2<T>::Scale(const Vector2& scale) noexcept
 	{
 		Multiply(Data(), scale.Data(), ComponentCount);
+	}
+
+	template<Arithmetic T>
+	std::string Vector2<T>::ToString() const
+	{
+		return std::format("({}, {})", X(), Y());
 	}
 
 	template<Arithmetic T>
@@ -462,21 +461,19 @@ namespace PonyEngine::Math
 		return std::copysign(angle, static_cast<typename Vector2<T>::ComputationalType>(zCross));
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& target) noexcept
+	template<std::floating_point T>
+	constexpr Vector2<T> Project(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
-		const typename Vector2<T>::ComputationalType multiplier = static_cast<typename Vector2<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
-
-		return target * multiplier;
+		return normal * Dot(vector, normal);
 	}
 
-	template<Arithmetic T>
+	template<std::floating_point T>
 	constexpr Vector2<T> ProjectOnPlane(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
 		return vector - normal * Dot(vector, normal);
 	}
 
-	template<Arithmetic T>
+	template<std::floating_point T>
 	constexpr Vector2<T> Reflect(const Vector2<T>& vector, const Vector2<T>& normal) noexcept
 	{
 		const T multiplier = T{-2} * Dot(vector, normal);
@@ -499,16 +496,10 @@ namespace PonyEngine::Math
 		return from + (to - from) * time;
 	}
 
-	template<Arithmetic T>
-	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, const typename Vector2<T>::ComputationalType tolerance) noexcept
+	template<std::floating_point T>
+	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, const T tolerance) noexcept
 	{
 		return (left - right).MagnitudeSquared() < tolerance * tolerance;
-	}
-
-	template<Arithmetic T>
-	std::string Vector2<T>::ToString() const
-	{
-		return std::format("({}, {})", X(), Y());
 	}
 
 	template<Arithmetic T>

@@ -9,14 +9,12 @@
 
 export module PonyEngine.Math:Vector3;
 
-import <algorithm>;
 import <array>;
 import <cmath>;
 import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
-import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -45,6 +43,8 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector3(T x, T y, T z) noexcept;
+		/// @brief Creates a vector and assign its components from the @p components array.
+		/// @param components Component array. Its length must be at least 3.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Vector3(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -101,27 +101,30 @@ export namespace PonyEngine::Math
 		/// @details This vector must be non-zero.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector3 Normalized() const noexcept;
+		Vector3 Normalized() const noexcept requires(std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
 		/// @details This vector must be non-zero.
-		void Normalize() noexcept;
+		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
-		/// @brief Swap components and return a vector in order z, y, x.
+		/// @brief Swaps components and return a vector in order z, y, x.
 		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
 		constexpr Vector3 Swapped() const noexcept;
+		/// @brief Swaps components in @this vector. The order is z, y, x.
 		constexpr void Swap() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept;
+		bool IsFinite() const noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Assigns arguments to the vector components.
 		/// @param x X-component.
 		/// @param y Y-component.
 		/// @param z Z-component.
 		constexpr void Set(T x, T y, T z) noexcept;
+		/// @brief Assigns arguments from the @p components array.
+		/// @param components Component array. Its length must be at least 3.
 		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
@@ -157,16 +160,23 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		constexpr Vector3& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Vector3& operator *=(T multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		constexpr Vector3& operator *=(ComputationalType multiplier) noexcept;
+		constexpr Vector3& operator *=(ComputationalType multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Vector divisor.
 		/// @return @a This.
-		constexpr Vector3& operator /=(ComputationalType divisor) noexcept;
+		constexpr Vector3& operator /=(T divisor) noexcept;
+		/// @brief Divides @a this by the @p divisor.
+		/// @param divisor Vector divisor.
+		/// @return @a This.
+		constexpr Vector3& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
 
+		/// @brief Checks if all the components of vectors are equal.
+		/// @param other Vector to compare.
+		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Vector3& other) const noexcept;
 
@@ -174,22 +184,40 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z.
 	};
 
+	/// @brief Vector3(0, 0, 1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Forward = Vector3(T{0}, T{0}, T{1});
+	/// @brief Vector3(0, 0, -1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Back = Vector3(T{0}, T{0}, T{-1});
+	/// @brief Vector3(0, 1, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Up = Vector3(T{0}, T{1}, T{0});
+	/// @brief Vector3(0, -1, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Down = Vector3(T{0}, T{-1}, T{0});
+	/// @brief Vector3(1, 0, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Right = Vector3(T{1}, T{0}, T{0});
+	/// @brief Vector3(-1, 0, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Left = Vector3(T{-1}, T{0}, T{0});
+	/// @brief Vector3(1, 1, 1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3One = Vector3(T{1}, T{1}, T{1});
+	/// @brief Vector3(0, 0, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Zero = Vector3(T{0}, T{0}, T{0});
+	/// @brief Vector3(-1, -1, -1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector3<T> Vector3Negative = Vector3(T{-1}, T{-1}, T{-1});
 
@@ -214,8 +242,8 @@ export namespace PonyEngine::Math
 	/// @param left Left vector. Must be normalized.
 	/// @param right Right vector. Must be normalized.
 	/// @return Angle in radians.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 	/// @brief Computes a signed angle between two vectors.
 	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
 	/// @tparam T Component type.
@@ -223,22 +251,22 @@ export namespace PonyEngine::Math
 	/// @param right Right vector. Must be normalized.
 	/// @param axis Sign reference.
 	/// @return Angle in radians.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept;
 
-	/// @brief Projects the @p vector onto the @p target.
+	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param target Projection target.
+	/// @param normal Projection target. Must be normalized.
 	/// @return Projected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 	/// @brief Projects the @p vector onto a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Projected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 
 	/// @brief Reflects the @p vector off a plane defined by the @p normal vector.
@@ -246,7 +274,7 @@ export namespace PonyEngine::Math
 	/// @param vector Projection source.
 	/// @param normal Normal of a projection target plane. Must be normalized.
 	/// @return Reflected vector.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 
 	/// @brief Multiplies the @p left vector by the @p right vector component-wise.
@@ -274,7 +302,7 @@ export namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the vectors are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, typename Vector3<T>::ComputationalType tolerance = typename Vector3<T>::ComputationalType{0.00001}) noexcept;
+	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Addition operator for two vectors.
 	/// @tparam T Component type.
@@ -304,28 +332,28 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, typename Vector3<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(T multiplier, const Vector3<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator *(typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
@@ -334,6 +362,13 @@ export namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector3<T> operator /(const Vector3<T>& vector, T divisor) noexcept;
+	/// @brief Divides the @p vector components by the @p divisor.
+	/// @tparam T Component type.
+	/// @param vector Dividend.
+	/// @param divisor Divisor.
+	/// @return Quotient.
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector3<T> operator /(const Vector3<T>& vector, typename Vector3<T>::ComputationalType divisor) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
@@ -420,13 +455,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector3<T> Vector3<T>::Normalized() const noexcept
+	Vector3<T> Vector3<T>::Normalized() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		return *this * (ComputationalType{1} / Magnitude());
+		return *this * (T{1} / Magnitude());
 	}
 
 	template<Arithmetic T>
-	void Vector3<T>::Normalize() noexcept
+	void Vector3<T>::Normalize() noexcept requires(std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
 	}
@@ -444,16 +479,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	bool Vector3<T>::IsFinite() const noexcept
+	bool Vector3<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		if constexpr (std::is_floating_point_v<T>)
-		{
-			return Math::IsFinite(Data(), ComponentCount);
-		}
-		else
-		{
-			return true;
-		}
+		return Math::IsFinite(Data(), ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -465,15 +493,21 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Vector3<T>::Set(const T* components) noexcept
+	constexpr void Vector3<T>::Set(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Copy(Data(), components, ComponentCount);
 	}
 
 	template<Arithmetic T>
 	constexpr void Vector3<T>::Scale(const Vector3& scale) noexcept
 	{
 		Multiply(Data(), scale.Data(), ComponentCount);
+	}
+
+	template<Arithmetic T>
+	std::string Vector3<T>::ToString() const
+	{
+		return std::format("({}, {}, {})", X(), Y(), Z());
 	}
 
 	template<Arithmetic T>
@@ -493,37 +527,35 @@ namespace PonyEngine::Math
 		return cross;
 	}
 
-	template<Arithmetic T>
-	typename Vector3<T>::ComputationalType Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	template<std::floating_point T>
+	T Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept
 	{
-		return std::acos(static_cast<typename Vector3<T>::ComputationalType>(Dot(left, right)));
+		return std::acos(Dot(left, right));
 	}
 
-	template<Arithmetic T>
-	typename Vector3<T>::ComputationalType AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
+	template<std::floating_point T>
+	T AngleSigned(const Vector3<T>& left, const Vector3<T>& right, const Vector3<T>& axis) noexcept
 	{
 		const Vector3<T> cross = Cross(left, right);
 		const T dot = Dot(cross, axis);
-		const typename Vector3<T>::ComputationalType angle = Angle(left, right);
+		const T angle = Angle(left, right);
 
-		return std::copysign(angle, static_cast<typename Vector3<T>::ComputationalType>(dot));
+		return std::copysign(angle, dot);
 	}
 
-	template<Arithmetic T>
-	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& target) noexcept
+	template<std::floating_point T>
+	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
 	{
-		const typename Vector3<T>::ComputationalType multiplier = static_cast<typename Vector3<T>::ComputationalType>(Dot(vector, target)) / Dot(target, target);
-
-		return target * multiplier;
+		return normal * Dot(vector, normal);
 	}
 
-	template<Arithmetic T>
+	template<std::floating_point T>
 	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
 	{
 		return vector - normal * Dot(vector, normal);
 	}
 
-	template<Arithmetic T>
+	template<std::floating_point T>
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept
 	{
 		const T multiplier = T{-2} * Dot(vector, normal);
@@ -547,15 +579,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, const typename Vector3<T>::ComputationalType tolerance) noexcept
+	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, const T tolerance) noexcept
 	{
 		return (left - right).MagnitudeSquared() < tolerance * tolerance;
-	}
-
-	template<Arithmetic T>
-	std::string Vector3<T>::ToString() const
-	{
-		return std::format("({}, {}, {})", X(), Y(), Z());
 	}
 
 	template<Arithmetic T>
@@ -587,7 +613,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T>& Vector3<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Vector3<T>& Vector3<T>::operator *=(const T multiplier) noexcept
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -595,7 +621,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T>& Vector3<T>::operator *=(const ComputationalType multiplier) noexcept
+	constexpr Vector3<T>& Vector3<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -603,7 +629,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept
+	constexpr Vector3<T>& Vector3<T>::operator /=(const T divisor) noexcept
+	{
+		Divide(Data(), divisor, ComponentCount);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T>& Vector3<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
 	{
 		Divide(Data(), divisor, ComponentCount);
 
@@ -643,7 +677,7 @@ namespace PonyEngine::Math
 		return difference;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, const T multiplier) noexcept
 	{
 		Vector3<T> product;
@@ -652,7 +686,7 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Vector3<T> operator *(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType multiplier) noexcept
 	{
 		Vector3<T> product;
@@ -661,19 +695,28 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Vector3<T> operator *(const T multiplier, const Vector3<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Vector3<T> operator *(const typename Vector3<T>::ComputationalType multiplier, const Vector3<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
 
 	template<Arithmetic T>
+	constexpr Vector3<T> operator /(const Vector3<T>& vector, const T divisor) noexcept
+	{
+		Vector3<T> quotient;
+		Divide(quotient.Data(), vector.Data(), divisor, Vector3<T>::ComponentCount);
+
+		return quotient;
+	}
+
+	template<std::integral T>
 	constexpr Vector3<T> operator /(const Vector3<T>& vector, const typename Vector3<T>::ComputationalType divisor) noexcept
 	{
 		Vector3<T> quotient;

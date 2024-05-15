@@ -1987,44 +1987,6 @@ namespace Math
 			Assert::AreEqual(m33, transpose.M33());
 		}
 
-		TEST_METHOD(InverseShortTest)
-		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 5;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 5;
-			constexpr short m11 = 2;
-			constexpr short m21 = 3;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 2;
-			constexpr short m03 = 3;
-			constexpr short m13 = 1;
-			constexpr short m23 = 1;
-			constexpr short m33 = 1;
-			constexpr auto matrix = PonyEngine::Math::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			const auto inverse = matrix.Inverse();
-			Assert::AreEqual(short{0}, inverse.M00());
-			Assert::AreEqual(short{1}, inverse.M10());
-			Assert::AreEqual(short{0}, inverse.M20());
-			Assert::AreEqual(short{-2}, inverse.M30());
-			Assert::AreEqual(short{1}, inverse.M01());
-			Assert::AreEqual(short{3}, inverse.M11());
-			Assert::AreEqual(short{0}, inverse.M21());
-			Assert::AreEqual(short{-11}, inverse.M31());
-			Assert::AreEqual(short{-1}, inverse.M02());
-			Assert::AreEqual(short{-2}, inverse.M12());
-			Assert::AreEqual(short{0}, inverse.M22());
-			Assert::AreEqual(short{7}, inverse.M32());
-			Assert::AreEqual(short{-1}, inverse.M03());
-			Assert::AreEqual(short{-4}, inverse.M13());
-			Assert::AreEqual(short{0}, inverse.M23());
-			Assert::AreEqual(short{12}, inverse.M33());
-		}
-
 		TEST_METHOD(InverseFloatTest)
 		{
 			constexpr float m00 = 11;
@@ -2078,9 +2040,6 @@ namespace Math
 				Assert::IsFalse(matrix.IsFinite());
 				matrix.Data()[i] = array[i];
 			}
-
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Zero<short>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Identity<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetShortTest)
@@ -4164,7 +4123,7 @@ namespace Math
 			constexpr int determinant = matrix.Determinant();
 			constexpr PonyEngine::Math::Matrix4x4<int> adjugate = matrix.Adjugate();
 			constexpr PonyEngine::Math::Matrix4x4<int> transpose = matrix.Transpose();
-			constexpr PonyEngine::Math::Matrix4x4<int> inverse = matrix.Inverse();
+			constexpr PonyEngine::Math::Matrix4x4<float> inverse = PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8).Inverse();
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector4<int> columnV = matrix[0];
@@ -4176,7 +4135,7 @@ namespace Math
 			constexpr PonyEngine::Math::Matrix4x4<int> zero = PonyEngine::Math::Matrix4x4Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix4x4<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
-			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(matrix, defaultMatrix);
+			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8), PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8));
 
 			constexpr PonyEngine::Math::Matrix4x4<int> sum = matrix + columnMatrix;
 			constexpr PonyEngine::Math::Matrix4x4<int> negated = -matrix;

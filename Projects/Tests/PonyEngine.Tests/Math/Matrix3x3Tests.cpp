@@ -1287,30 +1287,6 @@ namespace Math
 			Assert::AreEqual(m22, transpose.M22());
 		}
 
-		TEST_METHOD(InverseShortTest)
-		{
-			constexpr short m00 = 1;
-			constexpr short m10 = 3;
-			constexpr short m20 = 2;
-			constexpr short m01 = 4;
-			constexpr short m11 = 6;
-			constexpr short m21 = 5;
-			constexpr short m02 = 8;
-			constexpr short m12 = -4;
-			constexpr short m22 = -3;
-			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto inverse = matrix.Inverse();
-			Assert::AreEqual(short{0}, inverse.M00());
-			Assert::AreEqual(short{0}, inverse.M10());
-			Assert::AreEqual(short{0}, inverse.M20());
-			Assert::AreEqual(short{1}, inverse.M01());
-			Assert::AreEqual(short{0}, inverse.M11());
-			Assert::AreEqual(short{0}, inverse.M21());
-			Assert::AreEqual(short{-2}, inverse.M02());
-			Assert::AreEqual(short{0}, inverse.M12());
-			Assert::AreEqual(short{0}, inverse.M22());
-		}
-
 		TEST_METHOD(InverseFloatTest)
 		{
 			constexpr float m00 = 1;
@@ -1350,9 +1326,6 @@ namespace Math
 				Assert::IsFalse(matrix.IsFinite());
 				matrix.Data()[i] = array[i];
 			}
-
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Zero<short>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Identity<short>.IsFinite());
 		}
 
 		TEST_METHOD(SetShortTest)
@@ -2720,7 +2693,7 @@ namespace Math
 			constexpr int determinant = matrix.Determinant();
 			constexpr PonyEngine::Math::Matrix3x3<int> adjugate = matrix.Adjugate();
 			constexpr PonyEngine::Math::Matrix3x3<int> transpose = matrix.Transpose();
-			constexpr PonyEngine::Math::Matrix3x3<int> inverse = matrix.Inverse();
+			constexpr PonyEngine::Math::Matrix3x3<float> inverse = PonyEngine::Math::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0).Inverse();
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector3<int> columnV = matrix[0];
@@ -2732,7 +2705,7 @@ namespace Math
 			constexpr PonyEngine::Math::Matrix3x3<int> zero = PonyEngine::Math::Matrix3x3Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix3x3<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
-			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(matrix, defaultMatrix);
+			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0), PonyEngine::Math::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0));
 
 			constexpr PonyEngine::Math::Matrix3x3<int> sum = matrix + columnMatrix;
 			constexpr PonyEngine::Math::Matrix3x3<int> negated = -matrix;
