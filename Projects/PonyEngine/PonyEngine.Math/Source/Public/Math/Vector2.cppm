@@ -9,13 +9,11 @@
 
 export module PonyEngine.Math:Vector2;
 
-import <algorithm>;
 import <array>;
 import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
-import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -43,6 +41,8 @@ export namespace PonyEngine::Math
 		/// @param y Y-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector2(T x, T y) noexcept;
+		/// @brief Creates a vector and assigns its components from the @p components array.
+		/// @param components Component array. Its length must be at least 2.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Vector2(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -98,6 +98,7 @@ export namespace PonyEngine::Math
 		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2 Swapped() const noexcept;
+		/// @brief Swaps components in @this vector. The order is y, x.
 		constexpr void Swap() noexcept;
 
 		/// @brief Checks if all the components are finite numbers.
@@ -109,6 +110,8 @@ export namespace PonyEngine::Math
 		/// @param x X-component.
 		/// @param y Y-component.
 		constexpr void Set(T x, T y) noexcept;
+		/// @brief Assigns arguments from the @p components array.
+		/// @param components Component array. Its length must be at least 2.
 		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
@@ -144,15 +147,19 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		constexpr Vector2& operator *=(T multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Vector2& operator *=(T multiplier) noexcept;
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		constexpr Vector2& operator *=(ComputationalType multiplier) noexcept;
+		constexpr Vector2& operator *=(ComputationalType multiplier) noexcept requires(std::is_integral_v<T>);
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Vector divisor.
 		/// @return @a This.
-		constexpr Vector2& operator /=(ComputationalType divisor) noexcept;
+		constexpr Vector2& operator /=(T divisor) noexcept;
+		/// @brief Divides @a this by the @p divisor.
+		/// @param divisor Vector divisor.
+		/// @return @a This.
+		constexpr Vector2& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
 
 		/// @brief Checks if two vectors are equal.
 		/// @param other The other vector.
@@ -164,18 +171,32 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y.
 	};
 
+	/// @brief Vector2(0, 1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Up = Vector2(T{0}, T{1});
+	/// @brief Vector2(0, -1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Down = Vector2(T{0}, T{-1});
+	/// @brief Vector2(1, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Right = Vector2(T{1}, T{0});
+	/// @brief Vector2(-1, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Left = Vector2(T{-1}, T{0});
+	/// @brief Vector2(1, 1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2One = Vector2(T{1}, T{1});
+	/// @brief Vector2(0, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Zero = Vector2(T{0}, T{0});
+	/// @brief Vector2(-1, -1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector2<T> Vector2Negative = Vector2(T{-1}, T{-1});
 
@@ -192,8 +213,8 @@ export namespace PonyEngine::Math
 	/// @param left Left vector. Must be normalized.
 	/// @param right Right vector. Must be normalized.
 	/// @return Angle in radians.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a signed angle between two vectors.
 	///        Sign is positive if the rotation is counterclockwise.
 	///        Sign is negative if the rotation is clockwise.
@@ -201,8 +222,8 @@ export namespace PonyEngine::Math
 	/// @param left Left vector. Must be normalized.
 	/// @param right Right vector. Must be normalized.
 	/// @return Angle in radians.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	typename Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
 	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
@@ -282,28 +303,28 @@ export namespace PonyEngine::Math
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, T multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param vector Multiplicand.
 	/// @param multiplier Multiplier.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, typename Vector2<T>::ComputationalType multiplier) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<std::integral T> [[nodiscard("Pure operator")]]
+	template<Arithmetic T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(T multiplier, const Vector2<T>& vector) noexcept;
 	/// @brief Multiplies the @p vector components by the @p multiplier.
 	/// @tparam T Component type.
 	/// @param multiplier Multiplier.
 	/// @param vector Multiplicand.
 	/// @return Product.
-	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator *(typename Vector2<T>::ComputationalType multiplier, const Vector2<T>& vector) noexcept;
 
 	/// @brief Divides the @p vector components by the @p divisor.
@@ -312,6 +333,13 @@ export namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure operator")]]
+	constexpr Vector2<T> operator /(const Vector2<T>& vector, T divisor) noexcept;
+	/// @brief Divides the @p vector components by the @p divisor.
+	/// @tparam T Component type.
+	/// @param vector Dividend.
+	/// @param divisor Divisor.
+	/// @return Quotient.
+	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Vector2<T> operator /(const Vector2<T>& vector, typename Vector2<T>::ComputationalType divisor) noexcept;
 
 	/// @brief Puts @p Vector.ToString() into the @p stream.
@@ -334,7 +362,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector2<T>::Vector2(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Set(components);
 	}
 
 	template<Arithmetic T>
@@ -425,7 +453,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Vector2<T>::Set(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Copy(Data(), components, ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -446,19 +474,19 @@ namespace PonyEngine::Math
 		return left.X() * right.X() + left.Y() * right.Y();
 	}
 
-	template<Arithmetic T>
-	typename Vector2<T>::ComputationalType Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	template<std::floating_point T>
+	T Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return std::acos(static_cast<typename Vector2<T>::ComputationalType>(Dot(left, right)));
+		return std::acos(Dot(left, right));
 	}
 
-	template<Arithmetic T>
-	typename Vector2<T>::ComputationalType AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	template<std::floating_point T>
+	T AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		const typename Vector2<T>::ComputationalType angle = Angle(left, right);
+		const T angle = Angle(left, right);
 		const T zCross = left.X() * right.Y() - left.Y() * right.X();
 
-		return std::copysign(angle, static_cast<typename Vector2<T>::ComputationalType>(zCross));
+		return std::copysign(angle, zCross);
 	}
 
 	template<std::floating_point T>
@@ -531,7 +559,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Vector2<T>& Vector2<T>::operator *=(const T multiplier) noexcept
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -539,7 +567,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
 	{
 		Multiply(Data(), multiplier, ComponentCount);
 
@@ -547,7 +575,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept
+	constexpr Vector2<T>& Vector2<T>::operator /=(const T divisor) noexcept
+	{
+		Divide(Data(), divisor, ComponentCount);
+
+		return *this;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
 	{
 		Divide(Data(), divisor, ComponentCount);
 
@@ -587,7 +623,7 @@ namespace PonyEngine::Math
 		return difference;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, const T multiplier) noexcept
 	{
 		Vector2<T> product;
@@ -596,7 +632,7 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Vector2<T> operator *(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType multiplier) noexcept
 	{
 		Vector2<T> product;
@@ -605,19 +641,28 @@ namespace PonyEngine::Math
 		return product;
 	}
 
-	template<std::integral T>
+	template<Arithmetic T>
 	constexpr Vector2<T> operator *(const T multiplier, const Vector2<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
 
-	template<Arithmetic T>
+	template<std::integral T>
 	constexpr Vector2<T> operator *(const typename Vector2<T>::ComputationalType multiplier, const Vector2<T>& vector) noexcept
 	{
 		return vector * multiplier;
 	}
 
 	template<Arithmetic T>
+	constexpr Vector2<T> operator /(const Vector2<T>& vector, const T divisor) noexcept
+	{
+		Vector2<T> quotient;
+		Divide(quotient.Data(), vector.Data(), divisor, Vector2<T>::ComponentCount);
+
+		return quotient;
+	}
+
+	template<std::integral T>
 	constexpr Vector2<T> operator /(const Vector2<T>& vector, const typename Vector2<T>::ComputationalType divisor) noexcept
 	{
 		Vector2<T> quotient;
