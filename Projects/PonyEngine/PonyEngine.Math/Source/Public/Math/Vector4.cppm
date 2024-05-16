@@ -9,13 +9,11 @@
 
 export module PonyEngine.Math:Vector4;
 
-import <algorithm>;
 import <array>;
 import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
-import <ranges>;
 import <string>;
 import <type_traits>;
 
@@ -45,6 +43,8 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(T x, T y, T z, T w) noexcept;
+		/// @brief Creates a vector and assign its components from the @p components array.
+		/// @param components Component array. Its length must be at least 4.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Vector4(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -115,6 +115,7 @@ export namespace PonyEngine::Math
 		/// @brief Swap components and return a vector in order w, z, y, x.
 		/// @return Swapped vector.
 		constexpr Vector4 Swapped() const noexcept;
+		/// @brief Swaps components in @this vector. The order is w, z, y, x.
 		[[nodiscard("Pure function")]]
 		constexpr void Swap() noexcept;
 
@@ -129,6 +130,8 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		/// @param w W-component.
 		constexpr void Set(T x, T y, T z, T w) noexcept;
+		/// @brief Assigns arguments from the @p components array.
+		/// @param components Component array. Its length must be at least 4.
 		constexpr void Set(const T* components) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
@@ -174,6 +177,9 @@ export namespace PonyEngine::Math
 		/// @return @a This.
 		constexpr Vector4& operator /=(ComputationalType divisor) noexcept;
 
+		/// @brief Checks if all the components of vectors are equal.
+		/// @param other Vector to compare.
+		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Vector4& other) const noexcept;
 
@@ -181,10 +187,16 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
 
+	/// @brief Vector(1, 1, 1, 1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector4<T> Vector4One = Vector4(T{1}, T{1}, T{1}, T{1});
+	/// @brief Vector(0, 0, 0, 0).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector4<T> Vector4Zero = Vector4(T{0}, T{0}, T{0}, T{0});
+	/// @brief Vector(-1, -1, -1, -1).
+	/// @tparam T Component type.
 	template<Arithmetic T>
 	constexpr Vector4<T> Vector4Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1});
 
@@ -195,6 +207,14 @@ export namespace PonyEngine::Math
 	/// @return Dot product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector4<T>& left, const Vector4<T>& right) noexcept;
+
+	/// @brief Computes an angle between two vectors.
+	/// @tparam T Component type.
+	/// @param left Left vector. Must be normalized.
+	/// @param right Right vector. Must be normalized.
+	/// @return Angle in radians.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T Angle(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
 	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
@@ -389,7 +409,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector4<T> Vector4<T>::Normalized() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		return *this * (ComputationalType{1} / Magnitude());
+		return *this * (T{1} / Magnitude());
 	}
 
 	template<Arithmetic T>
@@ -429,7 +449,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Vector4<T>::Set(const T* const components) noexcept
 	{
-		std::ranges::copy(components, components + ComponentCount, Data());
+		Copy(Data(), components, ComponentCount);
 	}
 
 	template<Arithmetic T>
@@ -448,6 +468,12 @@ namespace PonyEngine::Math
 	constexpr T Dot(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
 		return left.X() * right.X() + left.Y() * right.Y() + left.Z() * right.Z() + left.W() * right.W();
+	}
+
+	template<std::floating_point T>
+	T Angle(const Vector4<T>& left, const Vector4<T>& right) noexcept
+	{
+		return std::acos(Dot(left, right));
 	}
 
 	template<std::floating_point T>
@@ -563,7 +589,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::integral T>
-	constexpr Vector4<T> operator *(const Vector4<T>& vector, T multiplier) noexcept
+	constexpr Vector4<T> operator *(const Vector4<T>& vector, const T multiplier) noexcept
 	{
 		Vector4<T> product;
 		Multiply(product.Data(), vector.Data(), multiplier, Vector4<T>::ComponentCount);
