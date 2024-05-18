@@ -473,7 +473,9 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	T Angle(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		return std::acos(Dot(left, right));
+		const T dot = std::clamp(Dot(left, right), T{-1}, T{1});
+
+		return std::acos(dot);
 	}
 
 	template<std::floating_point T>

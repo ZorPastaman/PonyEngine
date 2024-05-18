@@ -416,7 +416,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	Vector2<T> Vector2<T>::Normalized() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		return *this / Magnitude();
+		return *this * (T{1} / Magnitude());
 	}
 
 	template<Arithmetic T>
@@ -477,7 +477,9 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	T Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
-		return std::acos(Dot(left, right));
+		const T dot = std::clamp(Dot(left, right), T{-1}, T{1});
+
+		return std::acos(dot);
 	}
 
 	template<std::floating_point T>
