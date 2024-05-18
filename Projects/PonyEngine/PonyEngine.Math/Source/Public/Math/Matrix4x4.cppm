@@ -49,12 +49,12 @@ export namespace PonyEngine::Math
 			constexpr operator Vector4<T>() const noexcept;
 
 			/// @brief Gets a component in a row by a column index.
-			/// @param columnIndex Column index.
+			/// @param columnIndex Column index. Must be in range [0, 3].
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
 			constexpr T& operator [](std::size_t columnIndex) noexcept requires(!IsConstant);
 			/// @brief Gets a component in a row by a column index.
-			/// @param columnIndex Column index.
+			/// @param columnIndex Column index. Must be in range [0, 3].
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
 			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
@@ -376,13 +376,13 @@ export namespace PonyEngine::Math
 
 		/// @brief Row access operator.
 		/// @details Don't store it. Use the access like this matrix[1][1].
-		/// @param rowIndex Row index.
+		/// @param rowIndex Row index. Must be in range [0, 3].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
 		constexpr Row<false> operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
 		/// @details Don't store it. Use the access like this matrix[1][1].
-		/// @param rowIndex Row index.
+		/// @param rowIndex Row index. Must be in range [0, 3].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
 		constexpr Row<true> operator [](std::size_t rowIndex) const noexcept;

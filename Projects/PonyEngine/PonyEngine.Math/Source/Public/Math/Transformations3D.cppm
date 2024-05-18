@@ -348,7 +348,7 @@ namespace PonyEngine::Math
 
 		Vector3<T> euler;
 
-		if (std::abs(halfSin) > T{0.49999}) [[unlikely]] // singularity in the North Pole (+) or in the South Pole (-)
+		if (std::abs(halfSin) > T{0.4999}) [[unlikely]] // singularity in the North Pole (+) or in the South Pole (-)
 		{
 			euler.X() = std::copysign(std::numbers::pi_v<T> * T{0.5}, halfSin);
 			euler.Y() = std::copysign(T{2}, halfSin) * std::atan2(quaternion.Y(), quaternion.X());
@@ -369,7 +369,7 @@ namespace PonyEngine::Math
 	{
 		Vector3<T> euler;
 
-		if (std::abs(rotationMatrix.M21()) > T{0.99999}) [[unlikely]] // singularity in the North Pole (+) or in the South Pole (-)
+		if (std::abs(rotationMatrix.M21()) > T{0.9999}) [[unlikely]] // singularity in the North Pole (+) or in the South Pole (-)
 		{
 			euler.X() = std::copysign(std::numbers::pi_v<T> * T{0.5}, rotationMatrix.M21());
 			euler.Y() = std::atan2(rotationMatrix.M10(), rotationMatrix.M00());
@@ -430,23 +430,24 @@ namespace PonyEngine::Math
 
 		std::pair<Vector3<T>, T> axisAngle;
 
-		if (AreAlmostEqual(dot, T{1})) [[unlikely]]
+		if (dot > T{0.9999}) [[unlikely]]
 		{
 			axisAngle.first = Vector3<T>::Forward;
+			axisAngle.second = T{0};
 		}
-		else if (AreAlmostEqual(dot, T{-1})) [[unlikely]]
+		else if (dot < T{-0.9999}) [[unlikely]]
 		{
 			axisAngle.first = std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.5}
 				? Cross(fromDirection, Vector3<T>::Forward)
 				: Cross(fromDirection, Vector3<T>::Up);
+			axisAngle.first.Normalize();
+			axisAngle.second = std::numbers::pi_v<T>;
 		}
 		else [[likely]]
 		{
-			axisAngle.first = Cross(fromDirection, toDirection);
+			axisAngle.first = Cross(fromDirection, toDirection).Normalized();
+			axisAngle.second = std::acos(dot);
 		}
-		axisAngle.first.Normalize();
-
-		axisAngle.second = std::acos(dot);
 
 		return axisAngle;
 	}
