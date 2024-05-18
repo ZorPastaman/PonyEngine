@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 import <format>;
+import <numbers>;
 
 import PonyEngine.Math;
 
@@ -407,6 +408,9 @@ namespace Math
 			constexpr float wL = 2;
 			const auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
 			Assert::AreEqual(1.178, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			Assert::AreEqual(0., static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionL)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(PonyEngine::Math::Angle(quaternionL, PonyEngine::Math::Quaternion<float>(quaternionL.Y(), -quaternionL.X(), quaternionL.W(), -quaternionL.Z()))), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(PonyEngine::Math::Angle(quaternionL, PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f))), 0.001);
 		}
 
 		TEST_METHOD(LerpTest)

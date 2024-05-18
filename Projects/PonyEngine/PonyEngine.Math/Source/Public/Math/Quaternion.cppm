@@ -196,7 +196,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
-	/// @brief Computes an angle between two quaternions.
+	/// @brief Computes the shortest angle between two quaternions.
 	/// @tparam T Component type.
 	/// @param left Left quaternion. Must be normalized.
 	/// @param right Right quaternion. Must be normalized.
