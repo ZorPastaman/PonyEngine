@@ -130,7 +130,7 @@ export namespace PonyEngine::Math
 	/// @param angle Rotation angle in radians.
 	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Vector2<T> Rotate(const Vector2<T>& vector, T angle);
+	Vector2<T> Rotate(const Vector2<T>& vector, T angle) noexcept;
 
 	/// @brief Applies a 2D transformation matrix to a pointer vector.
 	/// @tparam T Value type.
@@ -138,14 +138,14 @@ export namespace PonyEngine::Math
 	/// @param vector Point.
 	/// @return Transformed point.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T> TransformPoint(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector);
+	constexpr Vector2<T> TransformPoint(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector) noexcept;
 	/// @brief Applies a 2D transformation matrix to a direction vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix. 
 	/// @param vector Direction.
 	/// @return Transformed direction.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T> TransformDirection(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector);
+	constexpr Vector2<T> TransformDirection(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
@@ -157,7 +157,7 @@ namespace PonyEngine::Math
 	/// @param z Z component. It determines how to treat the @p vector.
 	/// @return Transformed vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T> TransformVector(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector, T z);
+	constexpr Vector2<T> TransformVector(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector, T z) noexcept;
 
 	template<std::floating_point T>
 	T Angle(const Matrix2x2<T>& rotationMatrix) noexcept
@@ -284,25 +284,25 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Vector2<T> Rotate(const Vector2<T>& vector, const T angle)
+	Vector2<T> Rotate(const Vector2<T>& vector, const T angle) noexcept
 	{
 		return RotationMatrix(angle) * vector;
 	}
 
 	template<std::floating_point T>
-	constexpr Vector2<T> TransformPoint(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector)
+	constexpr Vector2<T> TransformPoint(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector) noexcept
 	{
 		return TransformVector(transformationMatrix, vector, T{1});
 	}
 
 	template<std::floating_point T>
-	constexpr Vector2<T> TransformDirection(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector)
+	constexpr Vector2<T> TransformDirection(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector) noexcept
 	{
 		return TransformVector(transformationMatrix, vector, T{0});
 	}
 
 	template<std::floating_point T>
-	constexpr Vector2<T> TransformVector(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector, const T z)
+	constexpr Vector2<T> TransformVector(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector, const T z) noexcept
 	{
 		const Vector3<T> transformed = transformationMatrix * Vector3<T>(vector.X(), vector.Y(), z);
 
