@@ -595,5 +595,7 @@ namespace Math
 			Assert::AreEqual(-2.556, static_cast<double>(product.Y()), 0.001);
 			Assert::AreEqual(-0.778, static_cast<double>(product.Z()), 0.001);
 		}
+
+		// TODO: add constexpr test
 	};
 }

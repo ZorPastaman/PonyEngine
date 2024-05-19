@@ -103,12 +103,12 @@ export namespace PonyEngine::Math
 		constexpr const T* Data() const noexcept;
 
 		/// @brief Computes a magnitude of the quaternion.
-		/// @details The pure rotation quaternion always has a magnitude of 1.
+		/// @details The rotation quaternion always has a magnitude of 1.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		T Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of the quaternion.
-		/// @details The pure rotation quaternion always has a magnitude of 1. This function is much faster than @p Magnitude() because it doesn't compute a square root.
+		/// @details The rotation quaternion always has a magnitude of 1. This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		constexpr T MagnitudeSquared() const noexcept;
@@ -118,7 +118,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Conjugate() const noexcept;
 		/// @brief Computes an inverse of the quaternion.
-		///	@details If you have a pure rotation quaternion, you should use @p Conjugate() 'cause it's more efficient.
+		///	@details If you have a rotation quaternion, you should use @p Conjugate() 'cause it's more efficient.
 		/// @return Quaternion inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Inverse() const noexcept;
@@ -451,7 +451,7 @@ namespace PonyEngine::Math
 		const T dot = Dot(from, to);
 		const T halfCos = std::min(std::abs(dot), T{1});
 
-		if (halfCos > T{0.9999})
+		if (halfCos > T{0.9999}) [[unlikely]]
 		{
 			return Lerp(from, to * Signum(dot), time).Normalized();
 		}
