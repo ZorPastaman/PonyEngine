@@ -281,5 +281,17 @@ namespace Math
 			Assert::AreEqual(-1.252, static_cast<double>(transformed.X()), 0.005);
 			Assert::AreEqual(-8.452, static_cast<double>(transformed.Y()), 0.005);
 		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			constexpr auto rsMatrix = PonyEngine::Math::Matrix2x2<float>(-0.97f, -1.75f, -2.625f, 1.455f);
+			constexpr PonyEngine::Math::Matrix3x3<float> trsMatrix = PonyEngine::Math::TrsMatrix(rsMatrix);
+			constexpr auto translation = PonyEngine::Math::Vector2<float>(-3, 7);
+			constexpr PonyEngine::Math::Matrix3x3<float> trsMatrixT = PonyEngine::Math::TrsMatrix(translation, rsMatrix);
+			constexpr PonyEngine::Math::Vector2<float> translationE = PonyEngine::Math::ExtractTranslationFromTrsMatrix(trsMatrixT);
+			constexpr PonyEngine::Math::Matrix2x2<float> rsMatrixE = PonyEngine::Math::ExtractRsMatrixFromTrsMatrix(trsMatrixT);
+			constexpr PonyEngine::Math::Vector2<float> point = PonyEngine::Math::TransformPoint(trsMatrixT, translation);
+			constexpr PonyEngine::Math::Vector2<float> direction = PonyEngine::Math::TransformDirection(trsMatrixT, translation);
+		}
 	};
 }
