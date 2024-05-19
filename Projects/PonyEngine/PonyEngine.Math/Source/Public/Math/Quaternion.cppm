@@ -231,7 +231,7 @@ export namespace PonyEngine::Math
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if the quaternions are almost equal; @a false otherwise.
 	template<std::floating_point T, bool Normalized = true> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, T tolerance = T{0.00001}) noexcept;
+	bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Combines two quaternions.
 	/// @tparam T Component type.
@@ -465,7 +465,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T, bool Normalized>
-	constexpr bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance) noexcept
+	bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, const T tolerance) noexcept
 	{
 		if constexpr (Normalized)
 		{

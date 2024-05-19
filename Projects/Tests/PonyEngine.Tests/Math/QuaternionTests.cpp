@@ -596,6 +596,64 @@ namespace Math
 			Assert::AreEqual(-0.778, static_cast<double>(product.Z()), 0.001);
 		}
 
-		// TODO: add constexpr test
+		static constexpr PonyEngine::Math::Quaternion<float> QuaternionConstexpr()
+		{
+			auto quaternionToMove = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			PonyEngine::Math::Quaternion<float> movedQuaternion = std::move(quaternionToMove);
+
+			auto quaternion = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			quaternion.X() *= 3.f;
+			quaternion.Y() /= 4.f;
+			quaternion.Z() += 2.f;
+			quaternion.W() -= 1.f;
+			quaternion.Data()[2] -= 6.f;
+
+			const auto quaternionC = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			const float y = quaternionC.Data()[1];
+
+			quaternion.Set(1.f, 6.f, 7.f, -1.f);
+			quaternion.Set(quaternion.Data());
+
+			quaternion[0] *= 5.f;
+
+			movedQuaternion = quaternionC;
+			movedQuaternion = std::move(quaternion);
+
+			movedQuaternion *= movedQuaternion;
+
+			return movedQuaternion;
+		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			constexpr auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			constexpr auto vectorQuaternion = PonyEngine::Math::Quaternion<float>(PonyEngine::Math::Vector4<float>(0, 4, 5, 1));
+			constexpr PonyEngine::Math::Quaternion<float> copiedQuaternion = quaternion;
+			constexpr PonyEngine::Math::Quaternion<float> movedQuaternion = QuaternionConstexpr();
+
+			constexpr float x = quaternion.X();
+			constexpr float y = quaternion.Y();
+			constexpr float z = quaternion.Z();
+			constexpr float w = quaternion.W();
+
+			constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
+
+			constexpr PonyEngine::Math::Quaternion<float> conjugate = quaternion.Conjugate();
+			constexpr PonyEngine::Math::Quaternion<float> inverse = quaternion.Inverse();
+
+			constexpr PonyEngine::Math::Vector4<float> vector = quaternion;
+
+			constexpr float component = quaternion[2];
+
+			constexpr bool equal = quaternion == defaultQuaternion;
+			constexpr bool notEqual = quaternion != defaultQuaternion;
+
+			constexpr float dot = PonyEngine::Math::Dot(quaternion, vectorQuaternion);
+			constexpr PonyEngine::Math::Quaternion<float> lerped = PonyEngine::Math::Lerp(defaultQuaternion, quaternion, 0.5f);
+
+			constexpr PonyEngine::Math::Quaternion<float> product = quaternion * vectorQuaternion;
+			constexpr PonyEngine::Math::Vector3<float> productV = quaternion * PonyEngine::Math::Vector3<float>(0, 4, 5);
+		}
 	};
 }
