@@ -18,70 +18,149 @@ import :Matrix3x3;
 import :Vector2;
 import :Vector3;
 
+// TODO: add planar rotor
+
 export namespace PonyEngine::Math
 {
+	/// @brief Converts a 2D rotation matrix to a rotation angle.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix. 
+	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T Rotation(const Matrix2x2<T>& rotationMatrix) noexcept;
+	T Angle(const Matrix2x2<T>& rotationMatrix) noexcept;
 
-	/// @brief s a rotation matrix for a @p Vector2.
+	/// @brief Converts a rotation angle to a 2D rotation matrix.
 	/// @param angle Rotation angle in radians.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> RotationMatrix(T angle) noexcept;
 
-	/// @brief s a rotation-scaling matrix for a @p Vector2.
+	/// @brief Creates a 2D rotation-scaling matrix from an angle and scaling.
 	/// @param angle Rotation angle in radians.
 	/// @param scaling Component-wise scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> RsMatrix(T angle, const Vector2<T>& scaling) noexcept;
+	/// @brief Creates a 2D rotation-scaling matrix from a 2D rotation matrix and scaling.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix. 
+	/// @param scaling Scaling.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> RsMatrix(const Matrix2x2<T>& rotationMatrix, const Vector2<T>& scaling) noexcept;
 
+	/// @brief Creates a 2D translation-rotation-scaling matrix from a 2D translation, rotation angle and scaling.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param angle Rotation angle in radians.
+	/// @param scaling Scaling.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> TrsMatrix(const Vector2<T>& translation, T angle, const Vector2<T>& scaling) noexcept;
+	/// @brief Creates a 2D translation-rotation scaling matrix from a 2D rotation scaling matrix. The translation part will be zero.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> TrsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
+	/// @brief Creates a 2D translation-rotation-scaling matrix from a 2D translation and rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> TrsMatrix(const Vector2<T>& translation, const Matrix2x2<T>& rsMatrix) noexcept;
 
+	/// @brief Extracts a 2D translation from a 2D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Translation.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> ExtractTranslationFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
+	/// @brief Extracts a rotation angle from a 2D rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ExtractRotationFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
+	T ExtractAngleFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
+	/// @brief Extracts a rotation angle from a 2D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ExtractRotationFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
+	T ExtractAngleFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
+	/// @brief Extracts a 2D rotation matrix from a 2D rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> ExtractRotationMatrixFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
+	/// @brief Extracts a 2D rotation matrix from a 2D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> ExtractRotationMatrixFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
+	/// @brief Extracts a 2D scaling from a 2D rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> ExtractScalingFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
+	/// @brief Extracts a 2D scaling from a 2D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> ExtractScalingFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
+	/// @brief Extracts a 2D rotation-scaling matrix from a 2D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> ExtractRsMatrixFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
+	/// @brief Rotates the @p vector by the @p angle counterclockwise.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param angle Rotation angle in radians.
+	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> Rotate(const Vector2<T>& vector, T angle);
 
+	/// @brief Applies a 2D transformation matrix to a pointer vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix. 
+	/// @param vector Point.
+	/// @return Transformed point.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> TransformPoint(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector);
+	/// @brief Applies a 2D transformation matrix to a direction vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix. 
+	/// @param vector Direction.
+	/// @return Transformed direction.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> TransformDirection(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector);
 }
 
 namespace PonyEngine::Math
 {
+	/// @brief Applies a transformation matrix to a vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix. 
+	/// @param vector Vector.
+	/// @param z Z component. It determines how to treat the @p vector.
+	/// @return Transformed vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> TransformVector(const Matrix3x3<T>& transformationMatrix, const Vector2<T>& vector, T z);
 
 	template<std::floating_point T>
-	T Rotation(const Matrix2x2<T>& rotationMatrix) noexcept
+	T Angle(const Matrix2x2<T>& rotationMatrix) noexcept
 	{
 		return std::atan2(rotationMatrix.M10(), rotationMatrix.M00());
 	}
@@ -148,25 +227,30 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	T ExtractRotationFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
+	T ExtractAngleFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
-		return Rotation(ExtractRotationMatrixFromRsMatrix(rsMatrix));
+		return Angle(rsMatrix);
 	}
 
 	template<std::floating_point T>
-	T ExtractRotationFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept
+	T ExtractAngleFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept
 	{
-		return ExtractRotationFromRsMatrix(ExtractRsMatrixFromTrsMatrix(trsMatrix));
+		return ExtractAngleFromRsMatrix(ExtractRsMatrixFromTrsMatrix(trsMatrix));
 	}
 
 	template<std::floating_point T>
 	Matrix2x2<T> ExtractRotationMatrixFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
 		const Vector2<T> scaling = ExtractScalingFromRsMatrix(rsMatrix);
-		Matrix2x2<T> scalingMatrix = Matrix2x2Identity<T>;
-		scalingMatrix.SetDiagonal(scaling);
 
-		return rsMatrix * scalingMatrix.Inverse();
+		Matrix2x2<T> rotationMatrix;
+		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
+		{
+			const T inverseScaling = T{1} / scaling[i];
+			rotationMatrix.SetColumn(i, rsMatrix.GetColumn(i) * inverseScaling);
+		}
+
+		return rotationMatrix;
 	}
 
 	template<std::floating_point T>
@@ -178,11 +262,11 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector2<T> ExtractScalingFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
+		const T ySign = (std::signbit(rsMatrix.M10()) != std::signbit(rsMatrix.M01())) - T{0.5}; // The scale may have different signs in its components, but we can't know which component has a different sign, so we always apply it to y.
+
 		Vector2<T> scaling;
-		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
-		{
-			scaling[i] = rsMatrix.GetColumn(i).Magnitude();
-		}
+		scaling.X() = rsMatrix.GetColumn(0).Magnitude();
+		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign);
 
 		return scaling;
 	}
@@ -190,7 +274,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector2<T> ExtractScalingFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept
 	{
-		return ExtractScalingMatrixFromRsMatrix(ExtractRsMatrixFromTrsMatrix(trsMatrix));
+		return ExtractScalingFromRsMatrix(ExtractRsMatrixFromTrsMatrix(trsMatrix));
 	}
 
 	template<std::floating_point T>
