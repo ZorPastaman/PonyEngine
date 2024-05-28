@@ -267,6 +267,12 @@ namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Quaternion<T> operator +(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
+	/// @brief Negates a quaternion treating it as a vector.
+	/// @tparam T Component type.
+	///	@param quaternion Quaternion to negate.
+	/// @return Negated quaternion.
+	template<std::floating_point T> [[nodiscard("Pure operator")]]
+	constexpr Quaternion<T> operator -(const Quaternion<T>& quaternion) noexcept;
 	/// @brief Subtracts the @p right from the @p left treating the quaternions as vectors.
 	/// @tparam T Component type.
 	/// @param left Minuend.
@@ -453,7 +459,7 @@ namespace PonyEngine::Math
 
 		if (halfCos > T{0.9999}) [[unlikely]]
 		{
-			return Lerp(from, to * Signum(dot), time).Normalized();
+			return Lerp(from, dot < T{0} ? -to : to, time).Normalized();
 		}
 
 		const T halfAngle = std::acos(halfCos);
@@ -520,6 +526,15 @@ namespace PonyEngine::Math
 		Add(sum.Data(), left.Data(), right.Data(), Quaternion<T>::ComponentCount);
 
 		return sum;
+	}
+
+	template<std::floating_point T>
+	constexpr Quaternion<T> operator -(const Quaternion<T>& quaternion) noexcept
+	{
+		Quaternion<T> negated;
+		Negate(negated.Data(), quaternion.Data(), Quaternion<T>::ComponentCount);
+
+		return negated;
 	}
 
 	template<std::floating_point T>
