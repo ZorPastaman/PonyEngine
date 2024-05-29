@@ -509,7 +509,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Matrix4x4<T> TrsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
 	{
-		Matrix4x4<T> trsMatrix = Matrix4x4Identity<T>;
+		Matrix4x4<T> trsMatrix = Matrix4x4<T>::Predefined::Identity;
 		trsMatrix.M00() = rsMatrix.M00();
 		trsMatrix.M10() = rsMatrix.M10();
 		trsMatrix.M20() = rsMatrix.M20();
@@ -556,7 +556,7 @@ namespace PonyEngine::Math
 	Matrix3x3<T> ExtractRotationMatrixFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
 	{
 		const Vector3<T> scaling = ExtractScalingFromRsMatrix(rsMatrix);
-		Matrix3x3<T> scalingMatrix = Matrix3x3Identity<T>;
+		Matrix3x3<T> scalingMatrix = Matrix3x3<T>::Predefined::Identity;
 		scalingMatrix.SetDiagonal(scaling);
 
 		return rsMatrix * scalingMatrix.Inverse();

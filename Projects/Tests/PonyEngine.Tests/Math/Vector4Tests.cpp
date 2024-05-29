@@ -806,13 +806,13 @@ namespace Math
 
 		TEST_METHOD(DefaultsTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Vector4One<float> == PonyEngine::Math::Vector4<float>(1, 1, 1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector4Zero<float> == PonyEngine::Math::Vector4<float>(0, 0, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector4Negative<float> == PonyEngine::Math::Vector4<float>(-1, -1, -1, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One == PonyEngine::Math::Vector4<float>(1, 1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero == PonyEngine::Math::Vector4<float>(0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Negative == PonyEngine::Math::Vector4<float>(-1, -1, -1, -1));
 
-			Assert::IsTrue(PonyEngine::Math::Vector4One<short> == PonyEngine::Math::Vector4<short>(1, 1, 1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector4Zero<short> == PonyEngine::Math::Vector4<short>(0, 0, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector4Negative<short> == PonyEngine::Math::Vector4<short>(-1, -1, -1, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::One == PonyEngine::Math::Vector4<short>(1, 1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::Zero == PonyEngine::Math::Vector4<short>(0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::Negative == PonyEngine::Math::Vector4<short>(-1, -1, -1, -1));
 		}
 
 		TEST_METHOD(DotShortTest)
@@ -1260,6 +1260,10 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr auto one = PonyEngine::Math::Vector4<float>::Predefined::One;
+			constexpr auto zero = PonyEngine::Math::Vector4<float>::Predefined::Zero;
+			constexpr auto negative = PonyEngine::Math::Vector4<float>::Predefined::Negative;
+
 			constexpr auto defaultVector = PonyEngine::Math::Vector4<float>();
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(4, 5, 1, 6);
 			constexpr auto arrayVector = PonyEngine::Math::Vector4<float>(std::array<float, 4>{4, 5, 1, 6}.data());

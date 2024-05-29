@@ -33,6 +33,8 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t ComponentCount = 2; ///< Component count. For any vector, it's always 2.
 
+		struct Predefined; ///< Predefined vectors.
+
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector2() noexcept = default;
@@ -170,35 +172,6 @@ export namespace PonyEngine::Math
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y.
 	};
-
-	/// @brief Vector2(0, 1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Up = Vector2(T{0}, T{1});
-	/// @brief Vector2(0, -1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Down = Vector2(T{0}, T{-1});
-	/// @brief Vector2(1, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Right = Vector2(T{1}, T{0});
-	/// @brief Vector2(-1, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Left = Vector2(T{-1}, T{0});
-	/// @brief Vector2(1, 1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2One = Vector2(T{1}, T{1});
-	/// @brief Vector2(0, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Zero = Vector2(T{0}, T{0});
-	/// @brief Vector2(-1, -1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector2<T> Vector2Negative = Vector2(T{-1}, T{-1});
 
 	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
@@ -349,6 +322,20 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector2<T>& vector);
+
+	template<Arithmetic T>
+	struct Vector2<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Vector2 Up = Vector2(T{0}, T{1}); ///< Vector2(0, 1).
+		static constexpr Vector2 Down = Vector2(T{0}, T{-1}); ///< Vector2(0, -1).
+		static constexpr Vector2 Right = Vector2(T{1}, T{0}); /// Vector2(1, 0).
+		static constexpr Vector2 Left = Vector2(T{-1}, T{0}); ///< Vector2(-1, 0).
+		static constexpr Vector2 One = Vector2(T{1}, T{1}); ///< Vector2(1, 1).
+		static constexpr Vector2 Zero = Vector2(T{0}, T{0}); ///< Vector2(0, 0).
+		static constexpr Vector2 Negative = Vector2(T{-1}, T{-1}); ///< Vector2(-1, -1).
+	};
 }
 
 namespace PonyEngine::Math

@@ -375,9 +375,9 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::QuaternionIdentity<float> == PonyEngine::Math::Quaternion<float>(0, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity == PonyEngine::Math::Quaternion<float>(0, 0, 0, 1));
 		}
 
 		TEST_METHOD(DotTest)
@@ -626,6 +626,8 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr auto identity = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
+
 			constexpr auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
 			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
 			constexpr auto vectorQuaternion = PonyEngine::Math::Quaternion<float>(PonyEngine::Math::Vector4<float>(0, 4, 5, 1));

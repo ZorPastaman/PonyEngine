@@ -201,7 +201,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Matrix3x3<T> TrsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
-		Matrix3x3<T> trsMatrix = Matrix3x3Identity<T>;
+		Matrix3x3<T> trsMatrix = Matrix3x3<T>::Predefined::Identity;
 		trsMatrix.M00() = rsMatrix.M00();
 		trsMatrix.M10() = rsMatrix.M10();
 		trsMatrix.M01() = rsMatrix.M01();

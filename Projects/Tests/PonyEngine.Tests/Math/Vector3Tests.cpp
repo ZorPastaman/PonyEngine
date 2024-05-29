@@ -703,27 +703,27 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Vector3Forward<float> == PonyEngine::Math::Vector3<float>(0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Back<float> == PonyEngine::Math::Vector3<float>(0, 0, -1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Up<float> == PonyEngine::Math::Vector3<float>(0, 1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Down<float> == PonyEngine::Math::Vector3<float>(0, -1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Right<float> == PonyEngine::Math::Vector3<float>(1, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Left<float> == PonyEngine::Math::Vector3<float>(-1, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3One<float> == PonyEngine::Math::Vector3<float>(1, 1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Zero<float> == PonyEngine::Math::Vector3<float>(0, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Negative<float> == PonyEngine::Math::Vector3<float>(-1, -1, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Forward == PonyEngine::Math::Vector3<float>(0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Back == PonyEngine::Math::Vector3<float>(0, 0, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Up == PonyEngine::Math::Vector3<float>(0, 1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Down == PonyEngine::Math::Vector3<float>(0, -1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Right == PonyEngine::Math::Vector3<float>(1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Left == PonyEngine::Math::Vector3<float>(-1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::One == PonyEngine::Math::Vector3<float>(1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Zero == PonyEngine::Math::Vector3<float>(0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<float>::Predefined::Negative == PonyEngine::Math::Vector3<float>(-1, -1, -1));
 
-			Assert::IsTrue(PonyEngine::Math::Vector3Forward<short> == PonyEngine::Math::Vector3<short>(0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Back<short> == PonyEngine::Math::Vector3<short>(0, 0, -1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Up<short> == PonyEngine::Math::Vector3<short>(0, 1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Down<short> == PonyEngine::Math::Vector3<short>(0, -1, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Right<short> == PonyEngine::Math::Vector3<short>(1, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Left<short> == PonyEngine::Math::Vector3<short>(-1, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3One<short> == PonyEngine::Math::Vector3<short>(1, 1, 1));
-			Assert::IsTrue(PonyEngine::Math::Vector3Zero<short> == PonyEngine::Math::Vector3<short>(0, 0, 0));
-			Assert::IsTrue(PonyEngine::Math::Vector3Negative<short> == PonyEngine::Math::Vector3<short>(-1, -1, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Forward == PonyEngine::Math::Vector3<short>(0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Back == PonyEngine::Math::Vector3<short>(0, 0, -1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Up == PonyEngine::Math::Vector3<short>(0, 1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Down == PonyEngine::Math::Vector3<short>(0, -1, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Right == PonyEngine::Math::Vector3<short>(1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Left == PonyEngine::Math::Vector3<short>(-1, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::One == PonyEngine::Math::Vector3<short>(1, 1, 1));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Zero == PonyEngine::Math::Vector3<short>(0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Vector3<short>::Predefined::Negative == PonyEngine::Math::Vector3<short>(-1, -1, -1));
 		}
 
 		TEST_METHOD(DotShortTest)
@@ -810,11 +810,11 @@ namespace Math
 			constexpr float yL = 4;
 			constexpr float zL = -2;
 			const auto vectorL = PonyEngine::Math::Vector3<float>(xL, yL, zL).Normalized();
-			float angle = PonyEngine::Math::AngleSigned(vectorL, vectorR, PonyEngine::Math::Vector3Up<float>);
+			float angle = PonyEngine::Math::AngleSigned(vectorL, vectorR, PonyEngine::Math::Vector3<float>::Predefined::Up);
 			Assert::AreEqual(-1.789, static_cast<double>(angle), 0.001);
-			angle = PonyEngine::Math::AngleSigned(vectorR, vectorL, PonyEngine::Math::Vector3Up<float>);
+			angle = PonyEngine::Math::AngleSigned(vectorR, vectorL, PonyEngine::Math::Vector3<float>::Predefined::Up);
 			Assert::AreEqual(1.789, static_cast<double>(angle), 0.001);
-			angle = PonyEngine::Math::AngleSigned(vectorL, vectorR, PonyEngine::Math::Vector3Down<float>);
+			angle = PonyEngine::Math::AngleSigned(vectorL, vectorR, PonyEngine::Math::Vector3<float>::Predefined::Down);
 			Assert::AreEqual(1.789, static_cast<double>(angle), 0.001);
 		}
 
@@ -1198,6 +1198,16 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr auto forward = PonyEngine::Math::Vector3<float>::Predefined::Forward;
+			constexpr auto back = PonyEngine::Math::Vector3<float>::Predefined::Back;
+			constexpr auto up = PonyEngine::Math::Vector3<float>::Predefined::Up;
+			constexpr auto down = PonyEngine::Math::Vector3<float>::Predefined::Down;
+			constexpr auto right = PonyEngine::Math::Vector3<float>::Predefined::Right;
+			constexpr auto left = PonyEngine::Math::Vector3<float>::Predefined::Left;
+			constexpr auto one = PonyEngine::Math::Vector3<float>::Predefined::One;
+			constexpr auto zero = PonyEngine::Math::Vector3<float>::Predefined::Zero;
+			constexpr auto negative = PonyEngine::Math::Vector3<float>::Predefined::Negative;
+
 			constexpr auto defaultVector = PonyEngine::Math::Vector3<float>();
 			constexpr auto vector = PonyEngine::Math::Vector3<float>(4, 5, 1);
 			constexpr auto arrayVector = PonyEngine::Math::Vector3<float>(std::array<float, 3>{4, 5, 1}.data());
@@ -1219,10 +1229,10 @@ namespace Math
 			constexpr float dot = PonyEngine::Math::Dot(vector, arrayVector);
 			constexpr PonyEngine::Math::Vector3<float> cross = PonyEngine::Math::Cross(vector, arrayVector);
 
-			constexpr PonyEngine::Math::Vector3<float> project = PonyEngine::Math::Project(vector, PonyEngine::Math::Vector3Back<float>);
-			constexpr PonyEngine::Math::Vector3<float> projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, PonyEngine::Math::Vector3Left<float>);
+			constexpr PonyEngine::Math::Vector3<float> project = PonyEngine::Math::Project(vector, PonyEngine::Math::Vector3<float>::Predefined::Back);
+			constexpr PonyEngine::Math::Vector3<float> projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, PonyEngine::Math::Vector3<float>::Predefined::Left);
 
-			constexpr PonyEngine::Math::Vector3<float> reflect = PonyEngine::Math::Reflect(vector, PonyEngine::Math::Vector3Forward<float>);
+			constexpr PonyEngine::Math::Vector3<float> reflect = PonyEngine::Math::Reflect(vector, PonyEngine::Math::Vector3<float>::Predefined::Forward);
 
 			constexpr PonyEngine::Math::Vector3<float> scale = PonyEngine::Math::Scale(vector, arrayVector);
 
