@@ -397,20 +397,51 @@ namespace Math
 
 		TEST_METHOD(AngleTest)
 		{
-			constexpr float xR = 2;
-			constexpr float yR = -3;
-			constexpr float zR = 5;
-			constexpr float wR = -5;
-			const auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
-			constexpr float xL = -2;
-			constexpr float yL = 3;
-			constexpr float zL = -1;
-			constexpr float wL = 2;
-			const auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			float xR = 2;
+			float yR = -3;
+			float zR = 5;
+			float wR = -5;
+			auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			float xL = -2;
+			float yL = 3;
+			float zL = -1;
+			float wL = 2;
+			auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
 			Assert::AreEqual(1.178, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = -5;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = 2;
+			yL = 3;
+			zL = 1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(2.662, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
 			Assert::AreEqual(0., static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionL)), 0.001);
-			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(PonyEngine::Math::Angle(quaternionL, PonyEngine::Math::Quaternion<float>(quaternionL.Y(), -quaternionL.X(), quaternionL.W(), -quaternionL.Z()))), 0.001);
-			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(PonyEngine::Math::Angle(quaternionL, PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f))), 0.001);
+			xR = 3;
+			yR = 2;
+			zR = 2;
+			wR = 1;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = -2;
+			yL = 3;
+			zL = -1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			xR = 0;
+			yR = 1;
+			zR = 0;
+			wR = 0;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = -2;
+			yL = 3;
+			zL = -1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
 		}
 
 		TEST_METHOD(LerpTest)
@@ -459,16 +490,16 @@ namespace Math
 
 		TEST_METHOD(SlerpTest)
 		{
-			constexpr float xR = 2;
-			constexpr float yR = 3;
-			constexpr float zR = 5;
-			constexpr float wR = 5;
-			const auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
-			constexpr float xL = 2;
-			constexpr float yL = 3;
-			constexpr float zL = 1;
-			constexpr float wL = 2;
-			const auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			float xR = 2;
+			float yR = 3;
+			float zR = 5;
+			float wR = 5;
+			auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			float xL = 2;
+			float yL = 3;
+			float zL = 1;
+			float wL = 2;
+			auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
 
 			PonyEngine::Math::Quaternion<float> slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.f);
 			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
@@ -505,6 +536,22 @@ namespace Math
 			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
 			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
 			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 5;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = 3;
+			yL = -2;
+			zL = -5;
+			wL = 5;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f);
+			Assert::AreEqual(0.445, static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(0.089, static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(0.891, static_cast<double>(slerped.W()), 0.001);
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)
