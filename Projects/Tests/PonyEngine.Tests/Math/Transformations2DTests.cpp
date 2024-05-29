@@ -21,7 +21,7 @@ namespace Math
 	{
 		TEST_METHOD(AngleFromMatrixTest)
 		{
-			auto matrix = PonyEngine::Math::Matrix2x2Identity<float>;
+			auto matrix = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity;
 			float angle = PonyEngine::Math::Angle(matrix);
 			Assert::AreEqual(0., static_cast<double>(angle), 0.001);
 
@@ -29,7 +29,7 @@ namespace Math
 			angle = PonyEngine::Math::Angle(matrix);
 			Assert::AreEqual(std::numbers::pi_v<double> / 2, static_cast<double>(angle), 0.001);
 
-			matrix = -PonyEngine::Math::Matrix2x2Identity<float>;
+			matrix = -PonyEngine::Math::Matrix2x2<float>::Predefined::Identity;
 			angle = PonyEngine::Math::Angle(matrix);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(angle)), 0.001);
 

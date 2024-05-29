@@ -2027,8 +2027,8 @@ namespace Math
 
 		TEST_METHOD(IsFiniteTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Zero<float>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Identity<float>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<float>::Predefined::Zero.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.IsFinite());
 
 			const float nan = std::numeric_limits<float>::quiet_NaN();
 			constexpr std::array<float, 16> array{ 3.f, 1.f, -5.f, 7.f, 4.f, -6.f, -7.f, 10.f, 20.f, -13.f, 14.f, 18.f, 9.f, 12.f, -11.f, 21.f };
@@ -3209,13 +3209,13 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Identity<float> == PonyEngine::Math::Matrix4x4<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Zero<float> == PonyEngine::Math::Matrix4x4<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<float>::Predefined::Identity == PonyEngine::Math::Matrix4x4<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<float>::Predefined::Zero == PonyEngine::Math::Matrix4x4<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
 
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Identity<short> == PonyEngine::Math::Matrix4x4<short>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Matrix4x4Zero<short> == PonyEngine::Math::Matrix4x4<short>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<short>::Predefined::Identity == PonyEngine::Math::Matrix4x4<short>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Matrix4x4<short>::Predefined::Zero == PonyEngine::Math::Matrix4x4<short>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 		}
 
 		TEST_METHOD(ScaleShortTest)
@@ -4090,6 +4090,9 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr PonyEngine::Math::Matrix4x4<int> identity = PonyEngine::Math::Matrix4x4<int>::Predefined::Identity;
+			constexpr PonyEngine::Math::Matrix4x4<int> zero = PonyEngine::Math::Matrix4x4<int>::Predefined::Zero;
+
 			constexpr auto defaultMatrix = PonyEngine::Math::Matrix4x4<int>();
 			constexpr auto matrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
 			constexpr auto columnMatrix = PonyEngine::Math::Matrix4x4<int>(PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5));
@@ -4130,9 +4133,6 @@ namespace Math
 
 			constexpr bool equal = matrix == defaultMatrix;
 			constexpr bool notEqual = matrix != defaultMatrix;
-
-			constexpr PonyEngine::Math::Matrix4x4<int> identity = PonyEngine::Math::Matrix4x4Identity<int>;
-			constexpr PonyEngine::Math::Matrix4x4<int> zero = PonyEngine::Math::Matrix4x4Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix4x4<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
 			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8), PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8));

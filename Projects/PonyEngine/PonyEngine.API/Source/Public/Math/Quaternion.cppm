@@ -36,6 +36,8 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any quaternion, it's always 4.
 
+		struct Predefined; ///< Predefined quaternions.
+
 		/// @brief Creates a quaternion and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion() noexcept = default;
@@ -183,11 +185,6 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
 
-	/// @brief Identity quaternion.
-	/// @tparam T Component type.
-	template<std::floating_point T>
-	constexpr Quaternion<T> QuaternionIdentity = Quaternion(T{0}, T{0}, T{0}, T{1});
-
 	/// @brief Computes a dot product of two quaternions.
 	/// @tparam T Component type.
 	/// @param left Left quaternion.
@@ -255,6 +252,14 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Quaternion<T>& quaternion);
+
+	template<std::floating_point T>
+	struct Quaternion<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Quaternion Identity = Quaternion(T{0}, T{0}, T{0}, T{1}); ///< Identity quaternion.
+	};
 }
 
 namespace PonyEngine::Math

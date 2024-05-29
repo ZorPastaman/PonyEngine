@@ -1313,8 +1313,8 @@ namespace Math
 
 		TEST_METHOD(IsFiniteTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Zero<float>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Identity<float>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.IsFinite());
 
 			const float nan = std::numeric_limits<float>::quiet_NaN();
 			constexpr std::array<float, 9> array{ 3.f, 1.f, -5.f, 7.f, 4.f, -6.f, -7.f, 10.f, 20.f };
@@ -2087,13 +2087,13 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Identity<float> == PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Zero<float> == PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<float>::Predefined::Identity == PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<float>::Predefined::Zero == PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
 
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Identity<short> == PonyEngine::Math::Matrix3x3<short>(1, 0, 0, 0, 1, 0, 0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Matrix3x3Zero<short> == PonyEngine::Math::Matrix3x3<short>(0, 0, 0, 0, 0, 0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<short>::Predefined::Identity == PonyEngine::Math::Matrix3x3<short>(1, 0, 0, 0, 1, 0, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Matrix3x3<short>::Predefined::Zero == PonyEngine::Math::Matrix3x3<short>(0, 0, 0, 0, 0, 0, 0, 0, 0));
 		}
 
 		TEST_METHOD(ScaleShortTest)
@@ -2667,6 +2667,9 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr PonyEngine::Math::Matrix3x3<int> identity = PonyEngine::Math::Matrix3x3<int>::Predefined::Identity;
+			constexpr PonyEngine::Math::Matrix3x3<int> zero = PonyEngine::Math::Matrix3x3<int>::Predefined::Zero;
+
 			constexpr auto defaultMatrix = PonyEngine::Math::Matrix3x3<int>();
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<int>(0, 2, 3, 4, -1, -8, 1, 5, 0);
 			constexpr auto columnMatrix = PonyEngine::Math::Matrix3x3<int>(PonyEngine::Math::Vector3<int>(4, 6, -1), PonyEngine::Math::Vector3<int>(9, 4, -1), PonyEngine::Math::Vector3<int>(9, 4, -1));
@@ -2700,9 +2703,6 @@ namespace Math
 
 			constexpr bool equal = matrix == defaultMatrix;
 			constexpr bool notEqual = matrix != defaultMatrix;
-
-			constexpr PonyEngine::Math::Matrix3x3<int> identity = PonyEngine::Math::Matrix3x3Identity<int>;
-			constexpr PonyEngine::Math::Matrix3x3<int> zero = PonyEngine::Math::Matrix3x3Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix3x3<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
 			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0), PonyEngine::Math::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0));

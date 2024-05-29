@@ -35,6 +35,8 @@ export namespace PonyEngine::Math
 		static constexpr std::size_t Dimension = 3; ///< Row and column count. For any Matrix3x3 it's always 3.
 		static constexpr std::size_t ComponentCount = Dimension * Dimension; ///< Component count. For any Matrix3x3 it's always 9.
 
+		struct Predefined; ///< Predefined matrices.
+
 		/// @brief Row access.
 		/// @tparam IsConstant Is the underlying value const?
 		template<bool IsConstant>
@@ -355,15 +357,6 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m20, m01, m11, m21, m02, m12, m22.
 	};
 
-	/// @brief Identity matrix.
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1});
-	/// @brief Zero matrix.
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Matrix3x3<T> Matrix3x3Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0});
-
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
 	/// @param left Multiplicand.
@@ -468,6 +461,15 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix3x3<T>& matrix);
+
+	template<Arithmetic T>
+	struct Matrix3x3<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Matrix3x3 Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix.
+		static constexpr Matrix3x3 Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+	};
 }
 
 namespace PonyEngine::Math
@@ -499,7 +501,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
+	constexpr T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
 	{
 		return m_row[columnIndex * Dimension];
 	}
@@ -513,7 +515,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr typename Matrix3x3<T>::template Row<IsConstant>& Matrix3x3<T>::Row<IsConstant>::operator =(const Vector3<T>& row) noexcept requires (!IsConstant)
+	constexpr typename Matrix3x3<T>::template Row<IsConstant>& Matrix3x3<T>::Row<IsConstant>::operator =(const Vector3<T>& row) noexcept requires(!IsConstant)
 	{
 		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
 

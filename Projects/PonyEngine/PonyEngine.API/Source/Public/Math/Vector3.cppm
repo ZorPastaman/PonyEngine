@@ -34,6 +34,8 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any Vector3, it's always 3.
 
+		struct Predefined; ///< Predefined vectors.
+
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector3() noexcept = default;
@@ -183,43 +185,6 @@ export namespace PonyEngine::Math
 	private:
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z.
 	};
-
-	/// @brief Vector3(0, 0, 1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Forward = Vector3(T{0}, T{0}, T{1});
-	/// @brief Vector3(0, 0, -1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Back = Vector3(T{0}, T{0}, T{-1});
-	/// @brief Vector3(0, 1, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Up = Vector3(T{0}, T{1}, T{0});
-	/// @brief Vector3(0, -1, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Down = Vector3(T{0}, T{-1}, T{0});
-	/// @brief Vector3(1, 0, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Right = Vector3(T{1}, T{0}, T{0});
-	/// @brief Vector3(-1, 0, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Left = Vector3(T{-1}, T{0}, T{0});
-	/// @brief Vector3(1, 1, 1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3One = Vector3(T{1}, T{1}, T{1});
-	/// @brief Vector3(0, 0, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Zero = Vector3(T{0}, T{0}, T{0});
-	/// @brief Vector3(-1, -1, -1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector3<T> Vector3Negative = Vector3(T{-1}, T{-1}, T{-1});
 
 	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
@@ -378,6 +343,22 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector3<T>& vector);
+
+	template<Arithmetic T>
+	struct Vector3<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Vector3 Forward = Vector3(T{0}, T{0}, T{1}); ///< Vector3(0, 0, 1).
+		static constexpr Vector3 Back = Vector3(T{0}, T{0}, T{-1}); ///< Vector3(0, 0, -1).
+		static constexpr Vector3 Up = Vector3(T{0}, T{1}, T{0}); ///< Vector3(0, 1, 0).
+		static constexpr Vector3 Down = Vector3(T{0}, T{-1}, T{0}); ///< Vector3(0, -1, 0).
+		static constexpr Vector3 Right = Vector3(T{1}, T{0}, T{0}); /// Vector3(1, 0, 0).
+		static constexpr Vector3 Left = Vector3(T{-1}, T{0}, T{0}); ///< Vector3(-1, 0, 0).
+		static constexpr Vector3 One = Vector3(T{1}, T{1}, T{1}); ///< Vector3(1, 1, 1).
+		static constexpr Vector3 Zero = Vector3(T{0}, T{0}, T{0}); ///< Vector3(0, 0, 0).
+		static constexpr Vector3 Negative = Vector3(T{-1}, T{-1}, T{-1}); ///< Vector3(-1, -1, -1).
+	};
 }
 
 namespace PonyEngine::Math

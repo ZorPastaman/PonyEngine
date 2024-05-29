@@ -795,8 +795,8 @@ namespace Math
 
 		TEST_METHOD(IsFiniteTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<float>.IsFinite());
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<float>.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsFinite());
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.IsFinite());
 
 			const float nan = std::numeric_limits<float>::quiet_NaN();
 			constexpr std::array<float, 4> array{ 3.f, 1.f, -5.f, 7.f };
@@ -1279,11 +1279,11 @@ namespace Math
 
 		TEST_METHOD(DefaultsTest)
 		{
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<float> == PonyEngine::Math::Matrix2x2<float>(1.f, 0.f, 0.f, 1.f));
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<float> == PonyEngine::Math::Matrix2x2<float>(0.f, 0.f, 0.f, 0.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Identity == PonyEngine::Math::Matrix2x2<float>(1.f, 0.f, 0.f, 1.f));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero == PonyEngine::Math::Matrix2x2<float>(0.f, 0.f, 0.f, 0.f));
 
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Identity<short> == PonyEngine::Math::Matrix2x2<short>(1, 0, 0, 1));
-			Assert::IsTrue(PonyEngine::Math::Matrix2x2Zero<short> == PonyEngine::Math::Matrix2x2<short>(0, 0, 0, 0));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Predefined::Identity == PonyEngine::Math::Matrix2x2<short>(1, 0, 0, 1));
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Predefined::Zero == PonyEngine::Math::Matrix2x2<short>(0, 0, 0, 0));
 		}
 
 		TEST_METHOD(ScaleShortTest)
@@ -1643,6 +1643,9 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
+			constexpr PonyEngine::Math::Matrix2x2<int> identity = PonyEngine::Math::Matrix2x2<int>::Predefined::Identity;
+			constexpr PonyEngine::Math::Matrix2x2<int> zero = PonyEngine::Math::Matrix2x2<int>::Predefined::Zero;
+
 			constexpr auto defaultMatrix = PonyEngine::Math::Matrix2x2<int>();
 			constexpr auto matrix = PonyEngine::Math::Matrix2x2<int>(0, 2, 3, 4);
 			constexpr auto columnMatrix = PonyEngine::Math::Matrix2x2<int>(PonyEngine::Math::Vector2<int>(4, 6), PonyEngine::Math::Vector2<int>(9, 4));
@@ -1671,9 +1674,6 @@ namespace Math
 
 			constexpr bool equal = matrix == defaultMatrix;
 			constexpr bool notEqual = matrix != defaultMatrix;
-
-			constexpr PonyEngine::Math::Matrix2x2<int> identity = PonyEngine::Math::Matrix2x2Identity<int>;
-			constexpr PonyEngine::Math::Matrix2x2<int> zero = PonyEngine::Math::Matrix2x2Zero<int>;
 
 			constexpr PonyEngine::Math::Matrix2x2<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
 			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4), PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4));

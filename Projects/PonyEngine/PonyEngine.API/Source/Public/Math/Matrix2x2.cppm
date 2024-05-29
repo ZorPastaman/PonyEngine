@@ -34,6 +34,8 @@ export namespace PonyEngine::Math
 		static constexpr std::size_t Dimension = 2; ///< Row and column count. For any Matrix2x2 it's always 2.
 		static constexpr std::size_t ComponentCount = Dimension * Dimension; ///< Component count. For any Matrix2x2 it's always 4.
 
+		struct Predefined; ///< Predefined matrices.
+
 		/// @brief Row access.
 		/// @tparam IsConstant Is the underlying value const?
 		template<bool IsConstant>
@@ -302,15 +304,6 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m01, m11.
 	};
 
-	/// @brief Identity matrix.
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1});
-	/// @brief Zero matrix.
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0});
-
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
 	/// @tparam T Component type.
 	/// @param left Multiplicand.
@@ -415,6 +408,15 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Matrix2x2<T>& matrix);
+
+	template<Arithmetic T>
+	struct Matrix2x2<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Matrix2x2 Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1}); ///< Identity matrix.
+		static constexpr Matrix2x2 Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+	};
 }
 
 namespace PonyEngine::Math

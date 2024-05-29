@@ -33,6 +33,8 @@ export namespace PonyEngine::Math
 
 		static constexpr std::size_t ComponentCount = 4; ///< Component count. For any Vector4, it's always 4.
 
+		struct Predefined; ///< Predefined vectors.
+
 		/// @brief Creates a vector and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4() noexcept = default;
@@ -187,19 +189,6 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
 	};
 
-	/// @brief Vector(1, 1, 1, 1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector4<T> Vector4One = Vector4(T{1}, T{1}, T{1}, T{1});
-	/// @brief Vector(0, 0, 0, 0).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector4<T> Vector4Zero = Vector4(T{0}, T{0}, T{0}, T{0});
-	/// @brief Vector(-1, -1, -1, -1).
-	/// @tparam T Component type.
-	template<Arithmetic T>
-	constexpr Vector4<T> Vector4Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1});
-
 	/// @brief Computes a dot product of two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
@@ -318,6 +307,16 @@ export namespace PonyEngine::Math
 	/// @return @p stream.
 	template<Arithmetic T>
 	std::ostream& operator <<(std::ostream& stream, const Vector4<T>& vector);
+
+	template<Arithmetic T>
+	struct Vector4<T>::Predefined final
+	{
+		Predefined() = delete;
+
+		static constexpr Vector4 One = Vector4(T{1}, T{1}, T{1}, T{1}); ///< Vector4(1, 1, 1, 1).
+		static constexpr Vector4 Zero = Vector4(T{0}, T{0}, T{0}, T{0}); ///< Vector4(0, 0, 0, 0).
+		static constexpr Vector4 Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1}); ///< Vector4(-1, -1, -1, -1).
+	};
 }
 
 namespace PonyEngine::Math
