@@ -1277,7 +1277,7 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Identity == PonyEngine::Math::Matrix2x2<float>(1.f, 0.f, 0.f, 1.f));
 			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero == PonyEngine::Math::Matrix2x2<float>(0.f, 0.f, 0.f, 0.f));

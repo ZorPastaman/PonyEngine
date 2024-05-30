@@ -258,6 +258,8 @@ namespace Math
 			constexpr short w = -2;
 			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
 			Assert::AreEqual(6.481, static_cast<double>(vector.Magnitude()), 0.001);
+
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector4<short>::Predefined::Zero.Magnitude());
 		}
 
 		TEST_METHOD(MagnitudeFloatTest)
@@ -268,6 +270,8 @@ namespace Math
 			constexpr float w = -2;
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
 			Assert::AreEqual(6.481, static_cast<double>(vector.Magnitude()), 0.001);
+
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector4<float>::Predefined::Zero.Magnitude());
 		}
 
 		TEST_METHOD(MagnitudeSquaredShortTest)
@@ -278,6 +282,8 @@ namespace Math
 			constexpr short w = -2;
 			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
 			Assert::AreEqual(short{42}, vector.MagnitudeSquared());
+
+			Assert::AreEqual(short{0}, PonyEngine::Math::Vector4<short>::Predefined::Zero.MagnitudeSquared());
 		}
 
 		TEST_METHOD(MagnitudeSquaredFloatTest)
@@ -288,6 +294,8 @@ namespace Math
 			constexpr float w = -2;
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
 			Assert::AreEqual(42.f, vector.MagnitudeSquared());
+
+			Assert::AreEqual(0.f, PonyEngine::Math::Vector4<float>::Predefined::Zero.MagnitudeSquared());
 		}
 
 		TEST_METHOD(NormalizeFloatTest)
@@ -804,7 +812,7 @@ namespace Math
 			}
 		}
 
-		TEST_METHOD(DefaultsTest)
+		TEST_METHOD(PredefinedTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One == PonyEngine::Math::Vector4<float>(1, 1, 1, 1));
 			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero == PonyEngine::Math::Vector4<float>(0, 0, 0, 0));
@@ -817,69 +825,191 @@ namespace Math
 
 		TEST_METHOD(DotShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr short zR = 5;
-			constexpr short wR = -2;
-			constexpr auto vectorR = PonyEngine::Math::Vector4<short>(xR, yR, zR, wR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr short zL = -3;
-			constexpr short wL = -5;
-			constexpr auto vectorL = PonyEngine::Math::Vector4<short>(xL, yL, zL, wL);
-			const short dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			short xR = 2;
+			short yR = -3;
+			short zR = 5;
+			short wR = -2;
+			auto vectorR = PonyEngine::Math::Vector4<short>(xR, yR, zR, wR);
+			short xL = 6;
+			short yL = 4;
+			short zL = -3;
+			short wL = -5;
+			auto vectorL = PonyEngine::Math::Vector4<short>(xL, yL, zL, wL);
+			short dot = PonyEngine::Math::Dot(vectorL, vectorR);
 			Assert::AreEqual(short{-5}, dot);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<short>(xR, yR, zR, wR);
+			xL = 6;
+			yL = 4;
+			zL = 3;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<short>(xL, yL, zL, wL);
+			dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			Assert::AreEqual(short{49}, dot);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<short>(xR, yR, zR, wR);
+			xL = 3;
+			yL = -2;
+			zL = -2;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<short>(xL, yL, zL, wL);
+			dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			Assert::AreEqual(short{0}, dot);
 		}
 
 		TEST_METHOD(DotFloatTest)
 		{
-			constexpr float xR = 2;
-			constexpr float yR = -3;
-			constexpr float zR = 5;
-			constexpr float wR = -2;
-			constexpr auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR);
-			constexpr float xL = 6;
-			constexpr float yL = 4;
-			constexpr float zL = -3;
-			constexpr float wL = -5;
-			constexpr auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
-			const float dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			float xR = 2;
+			float yR = -3;
+			float zR = 5;
+			float wR = -2;
+			auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR);
+			float xL = 6;
+			float yL = 4;
+			float zL = -3;
+			float wL = -5;
+			auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			float dot = PonyEngine::Math::Dot(vectorL, vectorR);
 			Assert::AreEqual(-5.f, dot);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR);
+			xL = 6;
+			yL = 4;
+			zL = 3;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			Assert::AreEqual(49.f, dot);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR);
+			xL = 3;
+			yL = -2;
+			zL = -2;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			dot = PonyEngine::Math::Dot(vectorL, vectorR);
+			Assert::AreEqual(0.f, dot);
 		}
 
 		TEST_METHOD(AngleTest)
 		{
-			constexpr float xR = 2;
-			constexpr float yR = -3;
-			constexpr float zR = 5;
-			constexpr float wR = -2;
-			const auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
-			constexpr float xL = 6;
-			constexpr float yL = 4;
-			constexpr float zL = -2;
-			constexpr float wL = -5;
-			const auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL).Normalized();
-			const float angle = PonyEngine::Math::Angle(vectorL, vectorR);
-			Assert::AreEqual(1.571, static_cast<double>(angle), 0.001);
+			float xR = 2;
+			float yR = -3;
+			float zR = 5;
+			float wR = -2;
+			auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			float xL = 6;
+			float yL = 4;
+			float zL = -3;
+			float wL = -5;
+			auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL).Normalized();
+			float angle = PonyEngine::Math::Angle(vectorL, vectorR);
+			Assert::AreEqual(1.654, static_cast<double>(angle), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			xL = 6;
+			yL = 4;
+			zL = 3;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL).Normalized();
+			angle = PonyEngine::Math::Angle(vectorL, vectorR);
+			Assert::AreEqual(0.618, static_cast<double>(angle), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			xL = 3;
+			yL = -2;
+			zL = -2;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL).Normalized();
+			angle = PonyEngine::Math::Angle(vectorL, vectorR);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(angle), 0.001);
+
+			angle = PonyEngine::Math::Angle(vectorL, vectorL);
+			Assert::AreEqual(0., static_cast<double>(angle), 0.001);
+
+			angle = PonyEngine::Math::Angle(vectorL, -vectorL);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(angle), 0.001);
 		}
 
 		TEST_METHOD(ProjectTest)
 		{
-			constexpr float xR = 2;
-			constexpr float yR = -3;
-			constexpr float zR = 5;
-			constexpr float wR = -2;
-			const auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
-			constexpr float xL = 6;
-			constexpr float yL = 4;
-			constexpr float zL = -1;
-			constexpr float wL = -5;
-			constexpr auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
-			const PonyEngine::Math::Vector4<float> projected = PonyEngine::Math::Project(vectorL, vectorR);
-			Assert::AreEqual(0.238, static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(-0.357, static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(0.595, static_cast<double>(projected.Z()), 0.001);
-			Assert::AreEqual(-0.238, static_cast<double>(projected.W()), 0.001);
+			float xR = 2;
+			float yR = -3;
+			float zR = 5;
+			float wR = -2;
+			auto vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			float xL = 6;
+			float yL = 4;
+			float zL = -3;
+			float wL = -5;
+			auto vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			PonyEngine::Math::Vector4<float> projected = PonyEngine::Math::Project(vectorL, vectorR);
+			Assert::AreEqual(-0.238, static_cast<double>(projected.X()), 0.001);
+			Assert::AreEqual(0.357, static_cast<double>(projected.Y()), 0.001);
+			Assert::AreEqual(-0.595, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(0.238, static_cast<double>(projected.W()), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			xL = 6;
+			yL = 4;
+			zL = 3;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			projected = PonyEngine::Math::Project(vectorL, vectorR);
+			Assert::AreEqual(2.333, static_cast<double>(projected.X()), 0.001);
+			Assert::AreEqual(3.5, static_cast<double>(projected.Y()), 0.001);
+			Assert::AreEqual(5.833, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(2.333, static_cast<double>(projected.W()), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 2;
+			vectorR = PonyEngine::Math::Vector4<float>(xR, yR, zR, wR).Normalized();
+			xL = 3;
+			yL = -2;
+			zL = -2;
+			wL = 5;
+			vectorL = PonyEngine::Math::Vector4<float>(xL, yL, zL, wL);
+			projected = PonyEngine::Math::Project(vectorL, vectorR);
+			Assert::AreEqual(0., static_cast<double>(projected.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(projected.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(projected.W()), 0.001);
+
+			projected = PonyEngine::Math::Project(vectorL, vectorL.Normalized());
+			Assert::AreEqual(3., static_cast<double>(projected.X()), 0.001);
+			Assert::AreEqual(-2., static_cast<double>(projected.Y()), 0.001);
+			Assert::AreEqual(-2., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(5., static_cast<double>(projected.W()), 0.001);
 		}
 
 		TEST_METHOD(ScaleShortTest)
