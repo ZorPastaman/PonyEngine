@@ -26,23 +26,6 @@ export namespace PonyEngine::Math
 	template<typename T>
 	constexpr void Copy(T* destination, const T* source, std::size_t count) noexcept;
 
-	/// @brief Assigns the @p destination from the @p source. The @p destination is incremented by the @p destinationStep. The @p source is incremented by one.
-	/// @tparam T Value type.
-	/// @param destination Destination array. Its length must be at least @p count * @p destinationStep.
-	/// @param source Source array. Its length must be at least @p count.
-	/// @param count Step count.
-	/// @param destinationStep Destination increment.
-	template<typename T>
-	constexpr void AssignWithDestinationStep(T* destination, const T* source, std::size_t count, std::size_t destinationStep) noexcept;
-	/// @brief Assigns the @p destination from the @p source. The @p destination is incremented by one. The @p source is incremented by the @p sourceStep.
-	/// @tparam T Value type.
-	/// @param destination Destination array. Its length must be at least @p count.
-	/// @param source Source array. Its length must be at least @p count * @p sourceStep.
-	/// @param count Step count.
-	/// @param sourceStep Source increment.
-	template<typename T>
-	constexpr void AssignWithSourceStep(T* destination, const T* source, std::size_t count, std::size_t sourceStep) noexcept;
-
 	/// @brief Computes result += right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -169,49 +152,7 @@ namespace PonyEngine::Math
 	template<typename T>
 	constexpr void Copy(T* const destination, const T* const source, const std::size_t count) noexcept
 	{
-		std::ranges::copy(source, source + count, destination);
-	}
-
-	template<typename T>
-	constexpr void AssignWithDestinationStep(T* destination, const T* source, const std::size_t count, const std::size_t destinationStep) noexcept
-	{
-		if (std::is_constant_evaluated()) [[unlikely]]
-		{
-			for (const T* const end = source + count - 1; source != end; destination += destinationStep, ++source)
-			{
-				*destination = *source;
-			}
-
-			*destination = *source;
-		}
-		else [[likely]]
-		{
-			for (const T* const end = source + count; source != end; destination += destinationStep, ++source)
-			{
-				*destination = *source;
-			}
-		}
-	}
-
-	template<typename T>
-	constexpr void AssignWithSourceStep(T* destination, const T* source, const std::size_t count, const std::size_t sourceStep) noexcept
-	{
-		if (std::is_constant_evaluated()) [[unlikely]]
-		{
-			for (const T* const end = destination + count - 1; destination != end; ++destination, source += sourceStep)
-			{
-				*destination = *source;
-			}
-
-			*destination = *source;
-		}
-		else [[likely]]
-		{
-			for (const T* const end = destination + count; destination != end; ++destination, source += sourceStep)
-			{
-				*destination = *source;
-			}
-		}
+		std::copy(source, source + count, destination);
 	}
 
 	template<Arithmetic T>
@@ -343,13 +284,14 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	bool IsFinite(const T* values, const std::size_t count) noexcept
 	{
-		bool isFinite = true;
-
-		for (const T* const end = values + count; values != end && isFinite; ++values)
+		for (const T* const end = values + count; values != end; ++values)
 		{
-			isFinite = std::isfinite(*values);
+			if (!std::isfinite(*values))
+			{
+				return false;
+			}
 		}
 
-		return isFinite;
+		return true;
 	}
 }

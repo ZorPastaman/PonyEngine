@@ -494,7 +494,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T>::Row<IsConstant>::operator Vector3<T>() const noexcept
 	{
 		Vector3<T> row;
-		AssignWithSourceStep(row.Data(), m_row, Dimension, Dimension);
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			row[i] = (*this)[i];
+		}
 
 		return row;
 	}
@@ -517,7 +520,10 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr typename Matrix3x3<T>::template Row<IsConstant>& Matrix3x3<T>::Row<IsConstant>::operator =(const Vector3<T>& row) noexcept requires(!IsConstant)
 	{
-		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			(*this)[i] = row[i];
+		}
 
 		return *this;
 	}
@@ -727,15 +733,15 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T Matrix3x3<T>::Trace() const noexcept
 	{
-		return M00() + M11() + M22();
+		return GetDiagonal().Sum();
 	}
 
 	template<Arithmetic T>
 	constexpr T Matrix3x3<T>::Determinant() const noexcept
 	{
-		return M00() * (M11() * M22() - M12() * M21()) + 
-			M01() * (M12() * M20() - M10() * M22()) + 
-			M02() * (M10() * M21() - M11() * M20());
+		return M00() * Matrix2x2<T>(M11(), M21(), M12(), M22()).Determinant() -
+			M10() * Matrix2x2<T>(M01(), M21(), M02(), M22()).Determinant() +
+			M20() * Matrix2x2<T>(M01(), M11(), M02(), M12()).Determinant();
 	}
 
 	template<Arithmetic T>
