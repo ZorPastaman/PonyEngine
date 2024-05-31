@@ -441,7 +441,10 @@ namespace PonyEngine::Math
 	constexpr Matrix2x2<T>::Row<IsConstant>::operator Vector2<T>() const noexcept
 	{
 		Vector2<T> row;
-		AssignWithSourceStep(row.Data(), m_row, Dimension, Dimension);
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			row[i] = (*this)[i];
+		}
 
 		return row;
 	}
@@ -464,7 +467,10 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr typename Matrix2x2<T>::template Row<IsConstant>& Matrix2x2<T>::Row<IsConstant>::operator =(const Vector2<T>& row) noexcept requires(!IsConstant)
 	{
-		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			(*this)[i] = row[i];
+		}
 
 		return *this;
 	}
@@ -484,7 +490,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix2x2<T>::Matrix2x2(const T* const components) noexcept
 	{
-		Copy(Data(), components, ComponentCount);
+		Set(components);
 	}
 
 	template<Arithmetic T>
@@ -612,7 +618,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T Matrix2x2<T>::Trace() const noexcept
 	{
-		return M00() + M11();
+		return GetDiagonal().Sum();
 	}
 
 	template<Arithmetic T>

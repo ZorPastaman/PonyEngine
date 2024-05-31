@@ -567,7 +567,11 @@ namespace PonyEngine::Math
 	constexpr Matrix4x4<T>::Row<IsConstant>::operator Vector4<T>() const noexcept
 	{
 		Vector4<T> row;
-		AssignWithSourceStep(row.Data(), m_row, Dimension, Dimension);
+
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			row[i] = (*this)[i];
+		}
 
 		return row;
 	}
@@ -590,7 +594,10 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr typename Matrix4x4<T>::template Row<IsConstant>& Matrix4x4<T>::Row<IsConstant>::operator =(const Vector4<T>& row) noexcept requires(!IsConstant)
 	{
-		AssignWithDestinationStep(m_row, row.Data(), Dimension, Dimension);
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			(*this)[i] = row[i];
+		}
 
 		return *this;
 	}
@@ -888,16 +895,16 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T Matrix4x4<T>::Trace() const noexcept
 	{
-		return M00() + M11() + M22() + M33();
+		return GetDiagonal().Sum();
 	}
 
 	template<Arithmetic T>
 	constexpr T Matrix4x4<T>::Determinant() const noexcept
 	{
-		return M00() * (M11() * M22() * M33() + M12() * M23() * M31() + M13() * M21() * M32() - M13() * M22() * M31() - M12() * M21() * M33() - M11() * M23() * M32()) -
-			M10() * (M01() * M22() * M33() + M02() * M23() * M31() + M03() * M21() * M32() - M03() * M22() * M31() - M02() * M21() * M33() - M01() * M23() * M32()) +
-			M20() * (M01() * M12() * M33() + M02() * M13() * M31() + M03() * M11() * M32() - M03() * M12() * M31() - M02() * M11() * M33() - M01() * M13() * M32()) -
-			M30() * (M01() * M12() * M23() + M02() * M13() * M21() + M03() * M11() * M22() - M03() * M12() * M21() - M02() * M11() * M23() - M01() * M13() * M22());
+		return M00() * Matrix3x3<T>(M11(), M21(), M31(), M12(), M22(), M32(), M13(), M23(), M33()).Determinant() -
+			M10() * Matrix3x3<T>(M01(), M21(), M31(), M02(), M22(), M32(), M03(), M23(), M33()).Determinant() +
+			M20() * Matrix3x3<T>(M01(), M11(), M31(), M02(), M12(), M32(), M03(), M13(), M33()).Determinant() -
+			M30() * Matrix3x3<T>(M01(), M11(), M21(), M02(), M12(), M22(), M03(), M13(), M23()).Determinant();
 	}
 
 	template<Arithmetic T>

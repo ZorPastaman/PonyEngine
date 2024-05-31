@@ -314,6 +314,28 @@ namespace Math
 			Assert::IsTrue(vector == normalized);
 		}
 
+		TEST_METHOD(SumThisShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr short z = 5;
+			constexpr short w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			const short sum = vector.Sum();
+			Assert::AreEqual(short{2}, sum);
+		}
+
+		TEST_METHOD(SumThisFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			const float sum = vector.Sum();
+			Assert::AreEqual(2.f, sum);
+		}
+
 		TEST_METHOD(SwapShortTest)
 		{
 			constexpr short x = 2;

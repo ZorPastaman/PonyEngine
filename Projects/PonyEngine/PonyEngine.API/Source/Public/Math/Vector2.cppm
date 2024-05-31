@@ -96,7 +96,12 @@ export namespace PonyEngine::Math
 		/// @brief Normalizes the vector.
 		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
-		/// @brief Swap components and return a vector in order y, x.
+		/// @brief Sums all the components and returns the result.
+		/// @return Sum.
+		[[nodiscard("Pure function")]]
+		constexpr T Sum() const noexcept;
+
+		/// @brief Swaps components and returns a vector in order y, x.
 		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2 Swapped() const noexcept;
@@ -410,6 +415,12 @@ namespace PonyEngine::Math
 	void Vector2<T>::Normalize() noexcept requires(std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
+	}
+
+	template<Arithmetic T>
+	constexpr T Vector2<T>::Sum() const noexcept
+	{
+		return X() + Y();
 	}
 
 	template<Arithmetic T>

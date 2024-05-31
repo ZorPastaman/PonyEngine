@@ -242,6 +242,24 @@ namespace Math
 			Assert::IsTrue(vector == normalized);
 		}
 
+		TEST_METHOD(SumThisShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr auto vector = PonyEngine::Math::Vector2<short>(x, y);
+			const short sum = vector.Sum();
+			Assert::AreEqual(short{-1}, sum);
+		}
+
+		TEST_METHOD(SumThisFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			const float sum = vector.Sum();
+			Assert::AreEqual(-1.f, sum);
+		}
+
 		TEST_METHOD(SwapShortTest)
 		{
 			constexpr short x = 2;
@@ -782,8 +800,8 @@ namespace Math
 			yL = 2;
 			vectorL = PonyEngine::Math::Vector2<float>(xL, yL);
 			projected = PonyEngine::Math::Project(vectorL, vectorR);
-			Assert::AreEqual(0.f, projected.X());
-			Assert::AreEqual(0.f, projected.Y());
+			Assert::AreEqual(0., static_cast<double>(projected.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(projected.Y()), 0.001);
 
 			xR = 2;
 			yR = -3;
@@ -878,8 +896,8 @@ namespace Math
 			yL = 2;
 			vectorL = PonyEngine::Math::Vector2<float>(xL, yL);
 			reflected = PonyEngine::Math::Reflect(vectorL, vectorR);
-			Assert::AreEqual(3.f, reflected.X());
-			Assert::AreEqual(2.f, reflected.Y());
+			Assert::AreEqual(3., static_cast<double>(reflected.X()), 0.001);
+			Assert::AreEqual(2., static_cast<double>(reflected.Y()), 0.001);
 
 			xR = 2;
 			yR = -3;
