@@ -1,9 +1,6 @@
 MIT License
 
-Copyright (c) 2023-present Vladimir Popov 
-
-Email: zor1994@gmail.com 
-Repo: https://github.com/ZorPastaman/PonyEngine
+Copyright (c) 2023-present Vladimir Popov, Email: zor1994@gmail.com, Repo: https://github.com/ZorPastaman/PonyEngine
 
 Permission is hereby granted, free of charge, to any person obtaining a copy
 of this software and associated documentation files (the "Software"), to deal
