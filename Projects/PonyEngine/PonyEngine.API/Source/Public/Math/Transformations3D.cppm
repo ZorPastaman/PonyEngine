@@ -21,21 +21,25 @@ import :Vector4;
 
 export namespace PonyEngine::Math
 {
+	/// @brief Converts a 3D rotation matrix to a 3D rotation quaternion.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix. 
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> Rotation(const Matrix3x3<T>& rotationMatrix) noexcept;
+	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
 	/// @brief Creates a rotation quaternion by Euler angles. The rotation order is ZXY.
 	/// @param euler Rotations in radians around x, y and z axis component-wise.
 	/// @return Created quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> Rotation(const Vector3<T>& euler) noexcept;
+	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept;
 	/// @brief Creates a rotation quaternion by the rotation of @p angle around the @p axis.
 	/// @param axis Rotation axis. Must be normalized.
 	/// @param angle Rotation angle in radians.
 	/// @return Created quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> Rotation(const Vector3<T>& axis, T angle) noexcept;
+	Quaternion<T> RotationQuaternion(const Vector3<T>& axis, T angle) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> Rotation(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
+	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Quaternion<T>& quaternion) noexcept;
@@ -145,12 +149,11 @@ namespace PonyEngine::Math
 	Vector3<T> TransformVector(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector, T w) noexcept;
 
 	template<std::floating_point T>
-	Quaternion<T> Rotation(const Matrix3x3<T>& rotationMatrix) noexcept
+	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept
 	{
 		Quaternion<T> quaternion;
-		const T trace = rotationMatrix.Trace();
 
-		if (trace > T{0}) [[likely]]
+		if (const T trace = rotationMatrix.Trace(); trace > T{0})
 		{
 			const T s = std::sqrt(trace + T{1}) * T{2};
 			const T inverseS = T{1} / s;
@@ -160,7 +163,7 @@ namespace PonyEngine::Math
 			quaternion.Z() = (rotationMatrix.M10() - rotationMatrix.M01()) * inverseS;
 			quaternion.W() = s * T{0.25};
 		}
-		else if (rotationMatrix.M00() > rotationMatrix.M11() && rotationMatrix.M00() > rotationMatrix.M22()) [[unlikely]]
+		else if (rotationMatrix.M00() > rotationMatrix.M11() && rotationMatrix.M00() > rotationMatrix.M22())
 		{
 			const T s = std::sqrt(T{1} + rotationMatrix.M00() - rotationMatrix.M11() - rotationMatrix.M22()) * T{2};
 			const T inverseS = T{1} / s;
@@ -170,17 +173,17 @@ namespace PonyEngine::Math
 			quaternion.Z() = (rotationMatrix.M02() + rotationMatrix.M20()) * inverseS;
 			quaternion.W() = (rotationMatrix.M21() - rotationMatrix.M12()) * inverseS;
 		}
-		else if (rotationMatrix.M11() > rotationMatrix.M22()) [[unlikely]]
+		else if (rotationMatrix.M11() > rotationMatrix.M22())
 		{
 			const T s = std::sqrt(T{1} + rotationMatrix.M11() - rotationMatrix.M00() - rotationMatrix.M22()) * T{2};
 			const T inverseS = T{1} / s;
 
-			quaternion.X() = (rotationMatrix.M01 + rotationMatrix.M10()) * inverseS;
+			quaternion.X() = (rotationMatrix.M01() + rotationMatrix.M10()) * inverseS;
 			quaternion.Y() = s * T{0.25};
-			quaternion.Z() = (rotationMatrix.m12() + rotationMatrix.M21()) * inverseS;
+			quaternion.Z() = (rotationMatrix.M12() + rotationMatrix.M21()) * inverseS;
 			quaternion.W() = (rotationMatrix.M02() - rotationMatrix.M20()) * inverseS;
 		}
-		else [[unlikely]]
+		else
 		{
 			const T s = std::sqrt(T{1} + rotationMatrix.M22() - rotationMatrix.M00() - rotationMatrix.M11()) * T{2};
 			const T inverseS = T{1} / s;
@@ -195,7 +198,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> Rotation(const Vector3<T>& euler) noexcept
+	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept
 	{
 		const T xHalf = euler.X() * T{0.5};
 		const T yHalf = euler.Y() * T{0.5};
@@ -219,7 +222,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> Rotation(const Vector3<T>& axis, const T angle) noexcept
+	Quaternion<T> RotationQuaternion(const Vector3<T>& axis, const T angle) noexcept
 	{
 		const T halfAngle = angle * T{0.5};
 
@@ -236,11 +239,11 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> Rotation(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept
+	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept
 	{
 		const std::pair<Vector3<T>, T> axisAngle = AxisAngle(fromDirection, toDirection);
 
-		return Rotation(axisAngle.first, axisAngle.second);
+		return RotationQuaternion(axisAngle.first, axisAngle.second);
 	}
 
 	template<std::floating_point T>
@@ -388,7 +391,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector3<T> Euler(const Vector3<T>& axis, T angle) noexcept
 	{
-		return Euler(Rotation(axis, angle));
+		return Euler(RotationQuaternion(axis, angle));
 	}
 
 	template<std::floating_point T>
@@ -414,13 +417,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	std::pair<Vector3<T>, T> AxisAngle(const Matrix3x3<T>& rotationMatrix) noexcept
 	{
-		return AxisAngle(Rotation(rotationMatrix));
+		return AxisAngle(RotationQuaternion(rotationMatrix));
 	}
 
 	template<std::floating_point T>
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& euler) noexcept
 	{
-		return AxisAngle(Rotation(euler));
+		return AxisAngle(RotationQuaternion(euler));
 	}
 
 	template<std::floating_point T>
@@ -543,13 +546,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Quaternion<T> ExtractRotationFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
 	{
-		return Rotation(ExtractRotationMatrixFromRsMatrix(rsMatrix));
+		return RotationQuaternion(ExtractRotationMatrixFromRsMatrix(rsMatrix));
 	}
 
 	template<std::floating_point T>
 	Quaternion<T> ExtractRotationFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept
 	{
-		return Rotation(ExtractRotationMatrixFromTrsMatrix(trsMatrix));
+		return RotationQuaternion(ExtractRotationMatrixFromTrsMatrix(trsMatrix));
 	}
 
 	template<std::floating_point T>

@@ -86,6 +86,7 @@
     <ClCompile Include="Math\Matrix4x4Tests.cpp" />
     <ClCompile Include="Math\QuaternionTests.cpp" />
     <ClCompile Include="Math\Transformations2DTests.cpp" />
+    <ClCompile Include="Math\Transformations3DTests.cpp" />
     <ClCompile Include="Math\Vector2Tests.cpp" />
     <ClCompile Include="Math\Vector3Tests.cpp" />
     <ClCompile Include="Math\Vector4Tests.cpp" />
