@@ -536,5 +536,509 @@ namespace Math
 			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
 			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
 		}
+
+		TEST_METHOD(QuaternionFromEulerTest)
+		{
+			auto euler = PonyEngine::Math::Vector3<float>::Predefined::Zero;
+			auto quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float>);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float> / 2.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float> / 2.f, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float>, 0.f, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(1., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float> / 2.f, 0.f, 0.f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 0.75f, 1.15f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.549, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.027, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.297, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.781, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 0.75f, 2.15f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.495, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.239, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.635, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.543, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 0.75f, -2.15f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.071, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.545, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.802, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.234, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 0.75f, -1.15f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.2, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.512, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.591, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.59, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 2.75f, 1.35f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.611, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.614, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.26, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.427, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 2.75f, 2.35f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.83, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.246, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.024, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.5, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 2.75f, -2.35f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.758, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.418, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.339, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.368, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 2.75f, -1.35f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.465, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.73, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.474, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.161, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, -2.75f, 0.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.29, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.816, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.498, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.051, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, -2.75f, 2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.843, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.196, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.226, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.446, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, -2.75f, -2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.866, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.011, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.113, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.487, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, -2.75f, -0.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.458, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.735, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.349, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.358, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.1f, -0.8f, 0.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.362, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.459, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.427, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.69, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.1f, -0.8f, 2.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.191, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.553, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.811, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.014, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.1f, -0.8f, -2.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.449, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.375, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.702, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.406, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.1f, -0.8f, -0.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.558, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.175, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.038, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.81, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 0.75f, 0.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.806, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.187, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.085, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.555, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 0.75f, 2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.278, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.779, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.421, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.371, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 0.75f, -2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.084, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.823, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.498, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.26, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 0.75f, -0.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.648, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.515, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.487, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.279, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 2.75f, 0.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.364, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.366, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.724, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.457, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 2.75f, 2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.505, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.109, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.006, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.856, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, 2.75f, -2.9f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.464, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.226, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.199, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.833, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -2.75f, 1.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.161, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.491, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.736, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.438, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -2.75f, 2.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.377, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.353, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.436, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.737, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -2.75f, -2.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.514, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.045, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.259, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.816, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -2.75f, -1.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.43, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.286, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.619, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.592, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -0.75f, 0.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.771, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.301, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.383, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.41, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -0.75f, 2.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.163, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.811, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.552, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.101, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -0.75f, -2.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.496, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.662, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.293, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(2.1f, -0.75f, -0.3f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.825, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.06, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.245, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.505, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 0.75f, 1.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.5, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.659, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.541, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.149, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 0.75f, 2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.123, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.818, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.547, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.128, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 0.75f, -2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.462, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.686, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.316, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.464, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 0.75f, -1.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.735, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.381, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.055, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.559, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, 0.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.068, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.512, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.853, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.074, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, 2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.394, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.334, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.399, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.758, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, -2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.516, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.02, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.218, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.828, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, 2.75f, -0.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.262, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.445, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.815, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.264, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -2.75f, 0.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.305, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.416, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.784, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.344, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -2.75f, 2.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.515, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.032, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.134, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.846, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -2.75f, -2.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.425, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.293, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.321, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.794, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -2.75f, -0.6f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.017, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.516, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.841, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.159, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -0.75f, 2.68f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.362, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.744, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.378, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.415, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -0.75f, -2.68f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.007, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.827, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.523, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(-0.203, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-2.1f, -0.75f, -0.68f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.7, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.441, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.454, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.331, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 1.2f, 0.73f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.163, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.542, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.321, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.76, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 1.2f, 2.73f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.544, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.156, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.813, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.141, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 1.2f, -2.73f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.56, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.075, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.801, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.196, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 1.2f, -0.73f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.24, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.512, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.268, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.78, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, 0.89f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.363, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.813, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.235, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.39, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, 2.89f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.88, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.134, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.455, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.013, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, -2.89f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.886, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.089, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.444, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.101, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, 2.2f, -0.89f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.404, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.794, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.155, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.428, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, 1.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.591, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.666, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.258, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.375, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, 2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.838, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.301, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.406, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.206, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, -2.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.821, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.344, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.438, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.123, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -2.2f, -1.4f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.556, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.696, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.326, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.318, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, 1.2f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.097, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.054, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.557, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.823, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, 2.2f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(-0.111, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.001, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.883, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.455, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, -2.2f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.066, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.09, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.888, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.446, static_cast<double>(quaternion.W()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.1f, -0.2f, -1.2f);
+			quaternion = PonyEngine::Math::RotationQuaternion(euler);
+			Assert::AreEqual(0.015, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.11, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.565, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.817, static_cast<double>(quaternion.W()), 0.001);
+		}
 	};
 }

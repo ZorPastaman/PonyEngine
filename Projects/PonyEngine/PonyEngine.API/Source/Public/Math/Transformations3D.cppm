@@ -27,9 +27,10 @@ export namespace PonyEngine::Math
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Creates a rotation quaternion by Euler angles. The rotation order is ZXY.
+	/// @brief Converts 3D euler angles to a 3D rotation quaternion.
+	///	@tparam T Value type.
 	/// @param euler Rotations in radians around x, y and z axis component-wise.
-	/// @return Created quaternion.
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept;
 	/// @brief Creates a rotation quaternion by the rotation of @p angle around the @p axis.
@@ -50,7 +51,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Computes Euler angles. The rotation order is ZXY.
+	/// @brief Computes Euler angles.
 	///	@param quaternion Rotation.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -155,7 +156,7 @@ namespace PonyEngine::Math
 
 		if (const T trace = rotationMatrix.Trace(); trace > T{0})
 		{
-			const T s = std::sqrt(trace + T{1}) * T{2};
+			const T s = std::sqrt(T{1} + trace) * T{2};
 			const T inverseS = T{1} / s;
 
 			quaternion.X() = (rotationMatrix.M21() - rotationMatrix.M12()) * inverseS;
@@ -212,11 +213,16 @@ namespace PonyEngine::Math
 		const T yCos = std::cos(yHalf);
 		const T zCos = std::cos(zHalf);
 
+		const T xSyS = xSin * ySin;
+		const T xSyC = xSin * yCos;
+		const T xCyS = xCos * ySin;
+		const T xCyC = xCos * yCos;
+
 		Quaternion<T> quaternion;
-		quaternion.X() = xSin * yCos * zCos + xCos * ySin * zSin;
-		quaternion.Y() = xCos * ySin * zCos - xSin * yCos * zSin;
-		quaternion.Z() = xCos * yCos * zSin - xSin * ySin * zCos;
-		quaternion.W() = xCos * yCos * zCos + xSin * ySin * zSin;
+		quaternion.X() = xSyC * zCos + xCyS * zSin;
+		quaternion.Y() = xCyS * zCos - xSyC * zSin;
+		quaternion.Z() = xCyC * zSin - xSyS * zCos;
+		quaternion.W() = xCyC * zCos + xSyS * zSin;
 
 		return quaternion;
 	}
