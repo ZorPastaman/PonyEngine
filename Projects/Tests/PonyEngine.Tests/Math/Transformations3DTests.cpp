@@ -1040,5 +1040,382 @@ namespace Math
 			Assert::AreEqual(-0.565, static_cast<double>(quaternion.Z()), 0.001);
 			Assert::AreEqual(0.817, static_cast<double>(quaternion.W()), 0.001);
 		}
+
+		TEST_METHOD(QuaternionFromAngleAxisTest)
+		{
+			auto axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			float angle = 0.f;
+			auto quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = 0.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.479, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.479, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.284, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.309, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.232, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+			angle = 0.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.242, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.162, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.323, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+			angle = 1.1f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.312, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.156, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.39, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.853, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+			angle = 0.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.243, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.243, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.182, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+			angle = 1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.284, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.309, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.232, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+			angle = 0.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.242, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.162, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.323, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+			angle = 1.1f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.312, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.156, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.39, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.853, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+			angle = 0.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.243, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.243, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.182, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+			angle = 2.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.674, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.449, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.562, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.17, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+			angle = 3.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.682, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.455, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.568, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.071, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+			angle = 2.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.657, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.438, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.602, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.121, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+			angle = 2.7f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.538, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.658, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.219, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+			angle = 2.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.674, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.449, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.562, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.17, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+			angle = 3.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.682, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.455, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.568, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.071, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+			angle = 2.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.657, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.438, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.602, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.121, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+			angle = 2.7f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.538, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.658, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.219, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(12.f, 8.f, 10.f).Normalized();
+			angle = -2.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.674, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.449, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.562, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.17, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, 10.f).Normalized();
+			angle = -3.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.682, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.455, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.568, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.071, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, 8.f, -11.f).Normalized();
+			angle = -2.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.657, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.438, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.602, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.121, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(9.f, 8.f, -11.f).Normalized();
+			angle = -2.7f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.538, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.658, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.219, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(12.f, -8.f, 10.f).Normalized();
+			angle = -2.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.674, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.449, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.562, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.17, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, 10.f).Normalized();
+			angle = -3.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.682, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.455, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.568, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.071, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-12.f, -8.f, -11.f).Normalized();
+			angle = -2.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.657, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.438, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.602, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.121, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(9.f, -8.f, -11.f).Normalized();
+			angle = -2.7f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.538, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.479, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.658, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.219, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.1f, 1.2f, 0.9f).Normalized();
+			angle = -1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.284, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.309, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.232, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-3.f, 2.f, 4.f).Normalized();
+			angle = -0.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.242, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.162, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.323, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-4.f, 2.f, -5.f).Normalized();
+			angle = -1.1f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.312, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.156, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.39, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.853, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(4.f, 4.f, -3.f).Normalized();
+			angle = -0.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.243, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.243, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.182, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.1f, -1.2f, 0.9f).Normalized();
+			angle = -1.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.284, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.309, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.232, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.878, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-3.f, -2.f, 4.f).Normalized();
+			angle = -0.9f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.242, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.162, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.323, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-4.f, -2.f, -5.f).Normalized();
+			angle = -1.1f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.312, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.156, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.39, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.853, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(4.f, -4.f, -3.f).Normalized();
+			angle = -0.8f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.243, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.243, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.182, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
+		}
 	};
 }
