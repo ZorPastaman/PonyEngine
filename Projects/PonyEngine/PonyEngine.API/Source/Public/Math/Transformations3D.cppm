@@ -29,14 +29,15 @@ export namespace PonyEngine::Math
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
 	/// @brief Converts 3D euler angles to a 3D rotation quaternion.
 	///	@tparam T Value type.
-	/// @param euler Rotations in radians around x, y and z axis component-wise.
+	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept;
-	/// @brief Creates a rotation quaternion by the rotation of @p angle around the @p axis.
+	/// @brief Converts a 3D axis-angle rotation to a 3D rotation quaternion.
+	/// @tparam T Value type.
 	/// @param axis Rotation axis. Must be normalized.
 	/// @param angle Rotation angle in radians.
-	/// @return Created quaternion.
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& axis, T angle) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
