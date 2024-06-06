@@ -40,6 +40,11 @@ export namespace PonyEngine::Math
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& axis, T angle) noexcept;
+	/// @brief Creates a 3D rotation quaternion representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @tparam T Value type.
+	/// @param fromDirection From direction. Must be normalized.
+	/// @param toDirection To direction. Must be normalized.
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
@@ -442,14 +447,14 @@ namespace PonyEngine::Math
 
 		if (dot > T{0.9999}) [[unlikely]]
 		{
-			axisAngle.first = Vector3<T>::Forward;
+			axisAngle.first = Vector3<T>::Predefined::Forward;
 			axisAngle.second = T{0};
 		}
 		else if (dot < T{-0.9999}) [[unlikely]]
 		{
-			axisAngle.first = std::abs(Dot(fromDirection, Vector3<T>::Up)) > T{0.5}
-				? Cross(fromDirection, Vector3<T>::Forward)
-				: Cross(fromDirection, Vector3<T>::Up);
+			axisAngle.first = std::abs(Dot(fromDirection, Vector3<T>::Predefined::Up)) > T{0.5}
+				? Cross(fromDirection, Vector3<T>::Predefined::Forward)
+				: Cross(fromDirection, Vector3<T>::Predefined::Up);
 			axisAngle.first.Normalize();
 			axisAngle.second = std::numbers::pi_v<T>;
 		}
