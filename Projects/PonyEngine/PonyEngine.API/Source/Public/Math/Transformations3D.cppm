@@ -48,6 +48,10 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
+	/// @brief Converts a 3D rotation quaternion to a 3D rotation matrix.
+	/// @tparam T Value type.
+	/// @param quaternion Rotation quaternion.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Quaternion<T>& quaternion) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -264,7 +268,7 @@ namespace PonyEngine::Math
 		const T xx = quaternion.X() * quaternion.X();
 		const T xy = quaternion.X() * quaternion.Y();
 		const T xz = quaternion.X() * quaternion.Z();
-		const T xw = quaternion.W() * quaternion.W();
+		const T xw = quaternion.X() * quaternion.W();
 
 		const T yy = quaternion.Y() * quaternion.Y();
 		const T yz = quaternion.Y() * quaternion.Z();
