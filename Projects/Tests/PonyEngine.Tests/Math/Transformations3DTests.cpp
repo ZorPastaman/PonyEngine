@@ -1417,5 +1417,66 @@ namespace Math
 			Assert::AreEqual(0.182, static_cast<double>(quaternion.Z()), 0.001);
 			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
 		}
+
+		TEST_METHOD(QuaternionFromDirectionsTest)
+		{
+			auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			auto to = from;
+			auto quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+			to = from;
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::IsTrue(quaternion == PonyEngine::Math::Quaternion<float>::Predefined::Identity);
+
+			from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			to = -from;
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+			to = -from;
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+			to = -from;
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(1., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = -from;
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(0.981, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.196, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(0.122, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.037, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.305, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.944, static_cast<double>(quaternion.W()), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+			quaternion = PonyEngine::Math::RotationQuaternion(from, to);
+			Assert::AreEqual(0.545, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.245, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.682, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.422, static_cast<double>(quaternion.W()), 0.001);
+		}
 	};
 }
