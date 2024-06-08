@@ -54,6 +54,10 @@ export namespace PonyEngine::Math
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Quaternion<T>& quaternion) noexcept;
+	/// @brief Converts a 3D euler angles to a 3D rotation matrix.
+	/// @tparam T Value type.
+	/// @param euler Rotation angles around x, y and z axes in radians.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& euler) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -303,14 +307,14 @@ namespace PonyEngine::Math
 		const T zCos = std::cos(euler.Z());
 
 		Matrix3x3<T> rotationMatrix;
-		rotationMatrix.M00() = yCos * zCos - xSin * ySin * zSin;
-		rotationMatrix.M10() = yCos * zSin + xSin * ySin * zCos;
-		rotationMatrix.M20() = -xCos * ySin;
-		rotationMatrix.M01() = -xCos * zSin;
+		rotationMatrix.M00() = xSin * ySin * zSin + yCos * zCos;
+		rotationMatrix.M10() = xCos * zSin;
+		rotationMatrix.M20() = xSin * yCos * zSin - ySin * zCos;
+		rotationMatrix.M01() = xSin * ySin * zCos - yCos * zSin;
 		rotationMatrix.M11() = xCos * zCos;
-		rotationMatrix.M21() = xSin;
-		rotationMatrix.M02() = ySin * zCos + xSin * yCos * zSin;
-		rotationMatrix.M12() = ySin * zSin - xSin * yCos * zCos;
+		rotationMatrix.M21() = xSin * yCos * zCos + ySin * zSin;
+		rotationMatrix.M02() = xCos * ySin;
+		rotationMatrix.M12() = -xSin;
 		rotationMatrix.M22() = xCos * yCos;
 
 		return rotationMatrix;
