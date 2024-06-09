@@ -9,6 +9,7 @@
 
 export module PonyEngine.Math:Vector3;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <concepts>;
@@ -108,6 +109,14 @@ export namespace PonyEngine::Math
 		/// @details This vector must be non-zero.
 		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
+		/// @brief Gets a minimum value among components.
+		/// @return Minimum component value.
+		[[nodiscard("Pure function")]]
+		constexpr T Min() const noexcept;
+		/// @brief Gets a maximum value among components.
+		/// @return Maximum component value.
+		[[nodiscard("Pure function")]]
+		constexpr T Max() const noexcept;
 		/// @brief Sums all the components and returns the result.
 		/// @return Sum.
 		[[nodiscard("Pure function")]]
@@ -119,6 +128,34 @@ export namespace PonyEngine::Math
 		constexpr Vector3 Swapped() const noexcept;
 		/// @brief Swaps components in @this vector. The order is z, y, x.
 		constexpr void Swap() noexcept;
+
+		/// @brief Checks if all the components are zero.
+		/// @return @a True if this vector components are zero; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsZero() const noexcept;
+		/// @brief Checks if all the components are almost zero with a tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return  @a True if this vector components are almost zero; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		/// @brief Checks if this vector is unit.
+		/// @return @a True if this vector is unit; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsUnit() const noexcept;
+		/// @brief Checks if this vector is almost unit with a tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return @a True if this vector is almost unit; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsAlmostUnit(T tolerance = T{ 0.00001 }) const noexcept requires(std::is_floating_point_v<T>);
+		/// @brief Checks if this vector is uniform.
+		/// @return @a True if this vector is uniform; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsUniform() const noexcept;
+		/// @brief Checks if this vector is almost uniform with a tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return @a True if this vector is almost uniform; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsAlmostUniform(T tolerance = T{ 0.00001 }) const noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -453,6 +490,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr T Vector3<T>::Min() const noexcept
+	{
+		return *std::ranges::min_element(m_components);
+	}
+
+	template<Arithmetic T>
+	constexpr T Vector3<T>::Max() const noexcept
+	{
+		return *std::ranges::max_element(m_components);
+	}
+
+	template<Arithmetic T>
 	constexpr T Vector3<T>::Sum() const noexcept
 	{
 		return X() + Y() + Z();
@@ -468,6 +517,46 @@ namespace PonyEngine::Math
 	constexpr void Vector3<T>::Swap() noexcept
 	{
 		std::swap(X(), Z());
+	}
+
+	template<Arithmetic T>
+	constexpr bool Vector3<T>::IsZero() const noexcept
+	{
+		return *this == Predefined::Zero;
+	}
+
+	template<Arithmetic T>
+	constexpr bool Vector3<T>::IsAlmostZero(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	{
+		return AreAlmostEqual(*this, Predefined::Zero, tolerance);
+	}
+
+	template<Arithmetic T>
+	constexpr bool Vector3<T>::IsUnit() const noexcept
+	{
+		return MagnitudeSquared() == T{1};
+	}
+
+	template<Arithmetic T>
+	bool Vector3<T>::IsAlmostUnit(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	{
+		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
+	}
+
+	template<Arithmetic T>
+	constexpr bool Vector3<T>::IsUniform() const noexcept
+	{
+		const auto [min, max] = std::ranges::minmax_element(m_components);
+
+		return *min == *max;
+	}
+
+	template<Arithmetic T>
+	bool Vector3<T>::IsAlmostUniform(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	{
+		const auto [min, max] = std::ranges::minmax_element(m_components);
+
+		return AreAlmostEqual(*min, *max, tolerance);
 	}
 
 	template<Arithmetic T>
