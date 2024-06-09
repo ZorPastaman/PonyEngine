@@ -314,6 +314,50 @@ namespace Math
 			Assert::IsTrue(vector == normalized);
 		}
 
+		TEST_METHOD(MinShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr short z = 5;
+			constexpr short w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			const short min = vector.Min();
+			Assert::AreEqual(short{-3}, min);
+		}
+
+		TEST_METHOD(MinFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			const float min = vector.Min();
+			Assert::AreEqual(-3.f, min);
+		}
+
+		TEST_METHOD(MaxShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr short z = 5;
+			constexpr short w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			const short max = vector.Max();
+			Assert::AreEqual(short{5}, max);
+		}
+
+		TEST_METHOD(MaxFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			const float max = vector.Max();
+			Assert::AreEqual(5.f, max);
+		}
+
 		TEST_METHOD(SumThisShortTest)
 		{
 			constexpr short x = 2;
@@ -366,6 +410,124 @@ namespace Math
 			Assert::AreEqual(x, swapped.W());
 			vector.Swap();
 			Assert::IsTrue(vector == swapped);
+		}
+
+		TEST_METHOD(IsZeroShortTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::Zero.IsZero());
+
+			auto matrix = PonyEngine::Math::Vector4<short>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Vector4<float>::ComponentCount; ++i)
+			{
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] = PonyEngine::Math::Vector4<short>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsZeroFloatTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsZero());
+
+			auto matrix = PonyEngine::Math::Vector4<float>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Vector4<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsZero());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] = PonyEngine::Math::Vector4<float>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsAlmostZeroTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsAlmostZero());
+
+			auto matrix = PonyEngine::Math::Vector4<float>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsAlmostZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Vector4<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsAlmostZero());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsTrue(matrix.IsAlmostZero());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsAlmostZero());
+				Assert::IsTrue(matrix.IsAlmostZero(5.f));
+				matrix.Data()[i] = PonyEngine::Math::Vector4<float>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsUnitShortTest)
+		{
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>::Predefined::Zero.IsUnit());
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>::Predefined::One.IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>(1, 0, 0, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>(0, 1, 0, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>(0, 0, 1, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>(0, 0, 0, 1).IsUnit());
+		}
+
+		TEST_METHOD(IsUnitFloatTest)
+		{
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsUnit());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>::Predefined::One.IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(1, 0, 0, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 1, 0, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 0, 1, 0).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 0, 0, 1).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.Normalized().IsUnit());
+		}
+
+		TEST_METHOD(IsAlmostUnitTest)
+		{
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsAlmostUnit());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>::Predefined::One.IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(1, 0, 0, 0).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 1, 0, 0).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 0, 1, 0).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(0, 0, 0, 1).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.Normalized().IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.IsAlmostUnit(5.f));
+		}
+
+		TEST_METHOD(IsUniformShortTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::Zero.IsUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<short>::Predefined::One.IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>(1, 0, 0, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>(0, 1, 0, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>(0, 0, 1, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<short>(0, 0, 0, 1).IsUniform());
+		}
+
+		TEST_METHOD(IsUniformFloatTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(1, 0, 0, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 1, 0, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 0, 1, 0).IsUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 0, 0, 1).IsUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.Normalized().IsUniform());
+		}
+
+		TEST_METHOD(IsAlmostUniformyTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::Zero.IsAlmostUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.IsAlmostUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(1, 0, 0, 0).IsAlmostUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 1, 0, 0).IsAlmostUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 0, 1, 0).IsAlmostUniform());
+			Assert::IsFalse(PonyEngine::Math::Vector4<float>(0, 0, 0, 1).IsAlmostUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>::Predefined::One.Normalized().IsAlmostUniform());
+			Assert::IsTrue(PonyEngine::Math::Vector4<float>(1, 0, 0, 0).IsAlmostUniform(5.f));
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -1427,7 +1589,15 @@ namespace Math
 			constexpr float z = vector.Z();
 
 			constexpr float magnitudeSquared = vector.MagnitudeSquared();
+			constexpr float min = vector.Min();
+			constexpr float max = vector.Max();
+			constexpr float thisSum = vector.Sum();
 			constexpr PonyEngine::Math::Vector4<float> swapped = vector.Swapped();
+
+			constexpr bool isZero = vector.IsZero();
+			constexpr bool isAlmostZero = vector.IsAlmostZero();
+			constexpr bool isUnit = vector.IsUnit();
+			constexpr bool isUniform = vector.IsUniform();
 
 			constexpr float value = vector[0];
 

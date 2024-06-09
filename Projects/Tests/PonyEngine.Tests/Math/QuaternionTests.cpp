@@ -201,6 +201,68 @@ namespace Math
 			Assert::IsTrue(quaternion == normalized);
 		}
 
+		TEST_METHOD(IsIdentityTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsIdentity());
+
+			auto quaternion = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
+			Assert::IsTrue(quaternion.IsIdentity());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(quaternion.IsIdentity());
+				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				Assert::IsFalse(quaternion.IsIdentity());
+				quaternion.Data()[i] += 1;
+				Assert::IsFalse(quaternion.IsIdentity());
+				quaternion.Data()[i] = PonyEngine::Math::Quaternion<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsAlmostIdentityTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostIdentity());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostIdentity<false>());
+
+			auto quaternion = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
+			Assert::IsTrue(quaternion.IsAlmostIdentity());
+			Assert::IsTrue(quaternion.IsAlmostIdentity<false>());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(quaternion.IsAlmostIdentity());
+				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				Assert::IsTrue(quaternion.IsAlmostIdentity());
+				quaternion.Data()[i] += 1;
+				Assert::IsFalse(quaternion.IsAlmostIdentity<false>());
+				Assert::IsTrue(quaternion.IsAlmostIdentity<false>(5.f));
+				quaternion.Data()[i] = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsUnitTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f).IsUnit());
+
+			Assert::IsFalse(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).Normalized().IsUnit());
+		}
+
+		TEST_METHOD(IsAlmostUnitTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f).IsAlmostUnit());
+
+			Assert::IsFalse(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsAlmostUnit(20.f));
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).Normalized().IsAlmostUnit());
+		}
+
 		TEST_METHOD(IsFiniteTest)
 		{
 			constexpr float x = 4;
@@ -690,6 +752,9 @@ namespace Math
 
 			constexpr PonyEngine::Math::Quaternion<float> conjugate = quaternion.Conjugate();
 			constexpr PonyEngine::Math::Quaternion<float> inverse = quaternion.Inverse();
+
+			constexpr bool isIdentity = quaternion.IsIdentity();
+			constexpr bool isUnit = quaternion.IsUnit();
 
 			constexpr PonyEngine::Math::Vector4<float> vector = quaternion;
 

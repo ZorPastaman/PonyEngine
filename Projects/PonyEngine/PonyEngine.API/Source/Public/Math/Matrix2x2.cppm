@@ -221,6 +221,25 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Matrix2x2 Inverse() const noexcept requires(std::is_floating_point_v<T>);
 
+		/// @brief Checks if this matrix is equal to a zero matrix.
+		/// @return @a True if this matrix is equal to a zero matrix; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsZero() const noexcept;
+		/// @brief Checks if this matrix is almost equal to a zero matrix with a tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return @a True if this matrix is almost equal to a zero matrix; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		/// @brief Checks if this matrix is equal to an identity matrix.
+		/// @return @a True if this matrix is equal to an identity matrix; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsIdentity() const noexcept;
+		/// @brief Checks if this matrix is almost equal to an identity matrix with a tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return @a True if this matrix is almost equal to an identity matrix; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -643,6 +662,30 @@ namespace PonyEngine::Math
 	constexpr Matrix2x2<T> Matrix2x2<T>::Inverse() const noexcept requires(std::is_floating_point_v<T>)
 	{
 		return Adjugate() * (ComputationalType{1} / Determinant());
+	}
+
+	template<Arithmetic T>
+	constexpr bool Matrix2x2<T>::IsZero() const noexcept
+	{
+		return *this == Predefined::Zero;
+	}
+
+	template<Arithmetic T>
+	constexpr bool Matrix2x2<T>::IsAlmostZero(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	{
+		return AreAlmostEqual(*this, Predefined::Zero, tolerance);
+	}
+
+	template<Arithmetic T>
+	constexpr bool Matrix2x2<T>::IsIdentity() const noexcept
+	{
+		return *this == Predefined::Identity;
+	}
+
+	template<Arithmetic T>
+	constexpr bool Matrix2x2<T>::IsAlmostIdentity(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	{
+		return AreAlmostEqual(*this, Predefined::Identity, tolerance);
 	}
 
 	template<Arithmetic T>

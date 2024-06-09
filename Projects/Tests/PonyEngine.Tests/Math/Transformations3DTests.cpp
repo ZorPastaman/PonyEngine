@@ -2265,7 +2265,7 @@ namespace Math
 
 			quaternion = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
 			matrix = PonyEngine::Math::RotationMatrix(quaternion);
-			Assert::IsTrue(matrix == PonyEngine::Math::Matrix3x3<float>::Predefined::Identity);
+			Assert::IsTrue(matrix.IsIdentity());
 
 			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.707f, 0.707f);
 			matrix = PonyEngine::Math::RotationMatrix(quaternion);
@@ -2387,7 +2387,7 @@ namespace Math
 		{
 			auto euler = PonyEngine::Math::Vector3<float>::Predefined::Zero;
 			auto matrix = PonyEngine::Math::RotationMatrix(euler);
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrix, PonyEngine::Math::Matrix3x3<float>::Predefined::Identity));
+			Assert::IsTrue(matrix.IsAlmostIdentity());
 
 			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f);
 			matrix = PonyEngine::Math::RotationMatrix(euler);

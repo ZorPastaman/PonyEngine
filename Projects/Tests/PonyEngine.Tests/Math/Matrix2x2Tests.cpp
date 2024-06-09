@@ -793,6 +793,110 @@ namespace Math
 			Assert::AreEqual(1.5f, inverse.M11());
 		}
 
+		TEST_METHOD(IsZeroShortTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Predefined::Zero.IsZero());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<short>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsZeroFloatTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsZero());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsZero());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsZero());
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsAlmostZeroTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsAlmostZero());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero;
+			Assert::IsTrue(matrix.IsAlmostZero());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsAlmostZero());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsTrue(matrix.IsAlmostZero());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsAlmostZero());
+				Assert::IsTrue(matrix.IsAlmostZero(5.f));
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsIdentityShortTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<short>::Predefined::Identity.IsIdentity());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<short>::Predefined::Identity;
+			Assert::IsTrue(matrix.IsIdentity());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsIdentity());
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsIdentityFloatTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.IsIdentity());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity;
+			Assert::IsTrue(matrix.IsIdentity());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsIdentity());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsFalse(matrix.IsIdentity());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsIdentity());
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsAlmostIdentityTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.IsAlmostIdentity());
+
+			auto matrix = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity;
+			Assert::IsTrue(matrix.IsAlmostIdentity());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(matrix.IsAlmostIdentity());
+				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				Assert::IsTrue(matrix.IsAlmostIdentity());
+				matrix.Data()[i] += 1;
+				Assert::IsFalse(matrix.IsAlmostIdentity());
+				Assert::IsTrue(matrix.IsAlmostIdentity(5.f));
+				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
 		TEST_METHOD(IsFiniteTest)
 		{
 			Assert::IsTrue(PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsFinite());
@@ -1671,6 +1775,11 @@ namespace Math
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector2<int> columnV = matrix[0];
+
+			constexpr bool isZero = matrix.IsZero();
+			constexpr bool isAlmostZero = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsAlmostZero();
+			constexpr bool isIdentity = matrix.IsIdentity();
+			constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.IsAlmostIdentity();
 
 			constexpr bool equal = matrix == defaultMatrix;
 			constexpr bool notEqual = matrix != defaultMatrix;
