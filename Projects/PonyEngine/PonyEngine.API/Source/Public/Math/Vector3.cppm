@@ -246,16 +246,16 @@ export namespace PonyEngine::Math
 
 	/// @brief Computes an angle between two vectors.
 	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
+	/// @param left Left vector. Must be unit.
+	/// @param right Right vector. Must be unit.
 	/// @return Angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 	/// @brief Computes a signed angle between two vectors.
 	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
 	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
+	/// @param left Left vector. Must be unit.
+	/// @param right Right vector. Must be unit.
 	/// @param axis Sign reference.
 	/// @return Angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -264,14 +264,14 @@ export namespace PonyEngine::Math
 	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param normal Projection target. Must be normalized.
+	/// @param normal Projection target. Must be unit.
 	/// @return Projected vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Project(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
 	/// @brief Projects the @p vector onto a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param normal Normal of a projection target plane. Must be normalized.
+	/// @param normal Normal of a projection target plane. Must be unit.
 	/// @return Projected vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> ProjectOnPlane(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;
@@ -279,7 +279,7 @@ export namespace PonyEngine::Math
 	/// @brief Reflects the @p vector off a plane defined by the @p normal vector.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param normal Normal of a projection target plane. Must be normalized.
+	/// @param normal Normal of a projection target plane. Must be unit.
 	/// @return Reflected vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Reflect(const Vector3<T>& vector, const Vector3<T>& normal) noexcept;

@@ -35,15 +35,15 @@ export namespace PonyEngine::Math
 	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept;
 	/// @brief Converts a 3D axis-angle rotation to a 3D rotation quaternion.
 	/// @tparam T Value type.
-	/// @param axis Rotation axis. Must be normalized.
+	/// @param axis Rotation axis. Must be unit.
 	/// @param angle Rotation angle in radians.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& axis, T angle) noexcept;
 	/// @brief Creates a 3D rotation quaternion representing a rotation from the @p fromDirection to the @p toDirection.
 	/// @tparam T Value type.
-	/// @param fromDirection From direction. Must be normalized.
-	/// @param toDirection To direction. Must be normalized.
+	/// @param fromDirection From direction. Must be unit.
+	/// @param toDirection To direction. Must be unit.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
@@ -88,8 +88,8 @@ export namespace PonyEngine::Math
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& euler) noexcept;
 	/// @brief Computes an axis and an angle of a rotation from @p fromDirection to @p toDirection.
 	/// @tparam T Component type.
-	/// @param fromDirection From direction. Must be normalized.
-	/// @param toDirection To direction. Must be normalized.
+	/// @param fromDirection From direction. Must be unit.
+	/// @param toDirection To direction. Must be unit.
 	/// @return Axis and angle of a rotation.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
