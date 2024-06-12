@@ -60,8 +60,18 @@ export namespace PonyEngine::Math
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& euler) noexcept;
+	/// @brief Converts a 3D axis-angle rotation a 3D rotation matrix.
+	/// @tparam T Value type.
+	/// @param axis Rotation axis. Must be unit.
+	/// @param angle Rotation angle in radians.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& axis, T angle) noexcept;
+	/// @brief Creates a 3D rotation matrix representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @tparam T Value type.
+	/// @param fromDirection From direction. Must be unit.
+	/// @param toDirection To direction. Must be unit.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 

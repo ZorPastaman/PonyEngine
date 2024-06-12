@@ -3832,5 +3832,96 @@ namespace Math
 			Assert::AreEqual(0.537, static_cast<double>(matrix.M12()), 0.001);
 			Assert::AreEqual(0.763, static_cast<double>(matrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(RotationMatrixFromDirectionsTest)
+		{
+			auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			auto to = from;
+			auto matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::IsTrue(matrix.IsIdentity());
+
+			from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+			to = from;
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::IsTrue(matrix.IsIdentity());
+			
+			from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			to = -from;
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+			to = -from;
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+			to = -from;
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = -from;
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(0.923, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.384, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.384, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.923, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(0.811, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.567, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.144, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.584, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.784, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.208, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.005, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.253, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.968, static_cast<double>(matrix.M22()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+			matrix = PonyEngine::Math::RotationMatrix(from, to);
+			Assert::AreEqual(-0.05, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.308, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.95, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.842, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.524, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.126, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.536, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.794, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.285, static_cast<double>(matrix.M22()), 0.001);
+		}
 	};
 }
