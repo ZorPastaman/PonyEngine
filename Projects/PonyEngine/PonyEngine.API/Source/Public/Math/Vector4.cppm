@@ -241,8 +241,8 @@ export namespace PonyEngine::Math
 
 	/// @brief Computes an angle between two vectors.
 	/// @tparam T Component type.
-	/// @param left Left vector. Must be normalized.
-	/// @param right Right vector. Must be normalized.
+	/// @param left Left vector. Must be unit.
+	/// @param right Right vector. Must be unit.
 	/// @return Angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Vector4<T>& left, const Vector4<T>& right) noexcept;
@@ -250,7 +250,7 @@ export namespace PonyEngine::Math
 	/// @brief Projects the @p vector onto the @p normal.
 	/// @tparam T Component type.
 	/// @param vector Projection source.
-	/// @param normal Projection target. Must be normalized.
+	/// @param normal Projection target. Must be unit.
 	/// @return Projected vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector4<T> Project(const Vector4<T>& vector, const Vector4<T>& normal) noexcept;
