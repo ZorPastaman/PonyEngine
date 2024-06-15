@@ -75,8 +75,9 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Computes Euler angles.
-	///	@param quaternion Rotation.
+	/// @brief Converts a 3D rotation quaternion to a 3D euler angles.
+	/// @tparam T Value type.
+	/// @param quaternion Rotation quaternion.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Quaternion<T>& quaternion) noexcept;
@@ -390,8 +391,8 @@ namespace PonyEngine::Math
 		else [[likely]]
 		{
 			euler.X() = std::asin(T{2} * halfSin);
-			euler.Y() = std::atan2(T{2} * (quaternion.Y() * quaternion.W() + quaternion.Z() * quaternion.X()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Y() * quaternion.Y()));
-			euler.Z() = std::atan2(T{2} * (quaternion.Z() * quaternion.W() + quaternion.X() * quaternion.Y()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Z() * quaternion.Z()));
+			euler.Y() = std::atan2(T{2} * (quaternion.X() * quaternion.Z() + quaternion.Y() * quaternion.W()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Y() * quaternion.Y()));
+			euler.Z() = std::atan2(T{2} * (quaternion.X() * quaternion.Y() + quaternion.Z() * quaternion.W()), T{1} - T{2} * (quaternion.X() * quaternion.X() + quaternion.Z() * quaternion.Z()));
 		}
 
 		return euler;
@@ -419,7 +420,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Vector3<T> Euler(const Vector3<T>& axis, T angle) noexcept
+	Vector3<T> Euler(const Vector3<T>& axis, const T angle) noexcept
 	{
 		return Euler(RotationQuaternion(axis, angle));
 	}
