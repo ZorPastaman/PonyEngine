@@ -81,6 +81,10 @@ export namespace PonyEngine::Math
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Quaternion<T>& quaternion) noexcept;
+	/// @brief Converts a 3D rotation matrix to a 3D euler angles.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix.
+	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Matrix3x3<T>& rotationMatrix) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -403,17 +407,17 @@ namespace PonyEngine::Math
 	{
 		Vector3<T> euler;
 
-		if (std::abs(rotationMatrix.M21()) > T{0.9999}) [[unlikely]] // singularity in the North Pole (+) or in the South Pole (-)
+		if (std::abs(rotationMatrix.M12()) > T{0.9999}) [[unlikely]] // singularity in the North Pole (-) or in the South Pole (+)
 		{
-			euler.X() = std::copysign(std::numbers::pi_v<T> * T{0.5}, rotationMatrix.M21());
-			euler.Y() = std::atan2(rotationMatrix.M10(), rotationMatrix.M00());
+			euler.X() = std::copysign(std::numbers::pi_v<T> * T{0.5}, -rotationMatrix.M12());
+			euler.Y() = std::atan2(-rotationMatrix.M20(), rotationMatrix.M00());
 			euler.Z() = T{0};
 		}
 		else [[likely]]
 		{
-			euler.X() = std::asin(rotationMatrix.M21());
-			euler.Y() = std::atan2(-rotationMatrix.M20(), rotationMatrix.M22());
-			euler.Z() = std::atan2(-rotationMatrix.M01(), rotationMatrix.M11());
+			euler.X() = std::asin(-rotationMatrix.M12());
+			euler.Y() = std::atan2(rotationMatrix.M02(), rotationMatrix.M22());
+			euler.Z() = std::atan2(rotationMatrix.M10(), rotationMatrix.M11());
 		}
 
 		return euler;
