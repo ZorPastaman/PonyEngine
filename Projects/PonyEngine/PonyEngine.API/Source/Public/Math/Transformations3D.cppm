@@ -94,6 +94,11 @@ export namespace PonyEngine::Math
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Vector3<T>& axis, T angle) noexcept;
+	/// @brief Creates 3D euler angles representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @tparam T Value type.
+	/// @param fromDirection From direction. Must be unit.
+	/// @param toDirection To direction. Must be unit.
+	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 

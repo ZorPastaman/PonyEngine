@@ -5362,5 +5362,60 @@ namespace Math
 			Assert::AreEqual(0.44, static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(0.261, static_cast<double>(euler.Z()), 0.001);
 		}
+
+		TEST_METHOD(EulerFromDirectionsTest)
+		{
+			auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			auto to = from;
+			auto euler = PonyEngine::Math::Euler(from, to);
+			Assert::IsTrue(euler.IsAlmostZero());
+			
+			from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+			to = from;
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::IsTrue(euler.IsAlmostZero());
+			
+			from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			to = -from;
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<double>, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<double>, static_cast<double>(euler.Z()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+			to = -from;
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<double> / 2., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<double>, static_cast<double>(euler.Z()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+			to = -from;
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(euler.Z()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = -from;
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-2.747, static_cast<double>(euler.Z()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0.255, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-0.005, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.625, static_cast<double>(euler.Z()), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+			euler = PonyEngine::Math::Euler(from, to);
+			Assert::AreEqual(0.918, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(1.082, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(2.611, static_cast<double>(euler.Z()), 0.001);
+		}
 	};
 }
