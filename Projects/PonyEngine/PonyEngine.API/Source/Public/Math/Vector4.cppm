@@ -228,7 +228,7 @@ export namespace PonyEngine::Math
 		constexpr bool operator ==(const Vector4& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
+		std::array<T, ComponentCount> components; ///< Component array in order x, y, z, w.
 	};
 
 	/// @brief Computes a dot product of two vectors.
@@ -365,7 +365,7 @@ namespace PonyEngine::Math
 {
 	template<Arithmetic T>
 	constexpr Vector4<T>::Vector4(const T x, const T y, const T z, const T w) noexcept :
-		m_components{x, y, z, w}
+		components{x, y, z, w}
 	{
 	}
 
@@ -378,61 +378,61 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Vector4<T>::X() noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector4<T>::X() const noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Vector4<T>::Y() noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector4<T>::Y() const noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Vector4<T>::Z() noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector4<T>::Z() const noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Vector4<T>::W() noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector4<T>::W() const noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr T* Vector4<T>::Data() noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
 	constexpr const T* Vector4<T>::Data() const noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
@@ -462,13 +462,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T Vector4<T>::Min() const noexcept
 	{
-		return *std::ranges::min_element(m_components);
+		return *std::ranges::min_element(components);
 	}
 
 	template<Arithmetic T>
 	constexpr T Vector4<T>::Max() const noexcept
 	{
-		return *std::ranges::max_element(m_components);
+		return *std::ranges::max_element(components);
 	}
 
 	template<Arithmetic T>
@@ -517,7 +517,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Vector4<T>::IsUniform() const noexcept
 	{
-		const auto [min, max] = std::ranges::minmax_element(m_components);
+		const auto [min, max] = std::ranges::minmax_element(components);
 
 		return *min == *max;
 	}
@@ -525,7 +525,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Vector4<T>::IsAlmostUniform(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
 	{
-		const auto [min, max] = std::ranges::minmax_element(m_components);
+		const auto [min, max] = std::ranges::minmax_element(components);
 
 		return AreAlmostEqual(*min, *max, tolerance);
 	}
@@ -607,13 +607,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Vector4<T>::operator [](const std::size_t index) noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector4<T>::operator [](const std::size_t index) const noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<Arithmetic T>
@@ -659,7 +659,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Vector4<T>::operator ==(const Vector4& other) const noexcept
 	{
-		return m_components == other.m_components;
+		return components == other.components;
 	}
 
 	template<Arithmetic T>

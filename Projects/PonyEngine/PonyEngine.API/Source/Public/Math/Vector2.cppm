@@ -212,7 +212,7 @@ export namespace PonyEngine::Math
 		constexpr bool operator ==(const Vector2& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> m_components; ///< Component array in order x, y.
+		std::array<T, ComponentCount> components; ///< Component array in order x, y.
 	};
 
 	/// @brief Computes a dot product of two vectors.
@@ -384,7 +384,7 @@ namespace PonyEngine::Math
 {
 	template<Arithmetic T>
 	constexpr Vector2<T>::Vector2(const T x, const T y) noexcept :
-		m_components{x, y}
+		components{x, y}
 	{
 	}
 
@@ -397,37 +397,37 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Vector2<T>::X() noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector2<T>::X() const noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Vector2<T>::Y() noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector2<T>::Y() const noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr T* Vector2<T>::Data() noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
 	constexpr const T* Vector2<T>::Data() const noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
@@ -618,13 +618,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Vector2<T>::operator [](const std::size_t index) noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Vector2<T>::operator [](const std::size_t index) const noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<Arithmetic T>
@@ -678,7 +678,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Vector2<T>::operator ==(const Vector2& other) const noexcept
 	{
-		return m_components == other.m_components;
+		return components == other.components;
 	}
 
 	template<Arithmetic T>

@@ -79,7 +79,7 @@ export namespace PonyEngine::Math
 			[[nodiscard("Pure constructor")]]
 			explicit constexpr Row(RowValueType* row) noexcept;
 
-			RowValueType* const m_row; ///< Row pointer.
+			RowValueType* const row; ///< Row pointer.
 
 			friend Matrix3x3;
 		};
@@ -373,7 +373,7 @@ export namespace PonyEngine::Math
 		constexpr bool operator ==(const Matrix3x3& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m20, m01, m11, m21, m02, m12, m22.
+		std::array<T, ComponentCount> components; ///< Component array in order m00, m10, m20, m01, m11, m21, m02, m12, m22.
 	};
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
@@ -504,7 +504,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix3x3<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
-		m_row{row}
+		row{row}
 	{
 	}
 
@@ -525,14 +525,14 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
 	{
-		return m_row[columnIndex * Dimension];
+		return row[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr const T& Matrix3x3<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * Dimension];
+		return row[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
@@ -549,7 +549,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>::Matrix3x3(const T m00, const T m10, const T m20, const T m01, const T m11, const T m21, const T m02, const T m12, const T m22) noexcept :
-		m_components{m00, m10, m20, m01, m11, m21, m02, m12, m22}
+		components{m00, m10, m20, m01, m11, m21, m02, m12, m22}
 	{
 	}
 
@@ -568,121 +568,121 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M00() noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M00() const noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M10() noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M10() const noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M20() noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M20() const noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M01() noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M01() const noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M11() noexcept
 	{
-		return m_components[4];
+		return components[4];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M11() const noexcept
 	{
-		return m_components[4];
+		return components[4];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M21() noexcept
 	{
-		return m_components[5];
+		return components[5];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M21() const noexcept
 	{
-		return m_components[5];
+		return components[5];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M02() noexcept
 	{
-		return m_components[6];
+		return components[6];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M02() const noexcept
 	{
-		return m_components[6];
+		return components[6];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M12() noexcept
 	{
-		return m_components[7];
+		return components[7];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M12() const noexcept
 	{
-		return m_components[7];
+		return components[7];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix3x3<T>::M22() noexcept
 	{
-		return m_components[8];
+		return components[8];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix3x3<T>::M22() const noexcept
 	{
-		return m_components[8];
+		return components[8];
 	}
 
 	template<Arithmetic T>
 	constexpr T* Matrix3x3<T>::Data() noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
 	constexpr const T* Matrix3x3<T>::Data() const noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
@@ -954,7 +954,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Matrix3x3<T>::operator ==(const Matrix3x3& other) const noexcept
 	{
-		return m_components == other.m_components;
+		return components == other.components;
 	}
 
 	template<Arithmetic T>
