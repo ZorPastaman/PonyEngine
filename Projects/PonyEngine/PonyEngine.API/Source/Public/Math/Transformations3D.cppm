@@ -102,9 +102,10 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Computes a rotation axis and angle.
-	///	@param quaternion Rotation.
-	/// @return Axis and angle in radians.
+	/// @brief Converts a 3D rotation quaternion to a 3D axis-angle rotation.
+	/// @tparam T Value type.
+	/// @param quaternion Rotation quaternion.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -450,11 +451,18 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept
 	{
-		const T halfAngle = std::acos(quaternion.W());
-
 		std::pair<Vector3<T>, T> axisAngle;
-		axisAngle.first = Vector3<T>(quaternion.X(), quaternion.Y(), quaternion.Z()) * (T{1} / std::sin(halfAngle));
-		axisAngle.second = halfAngle * T{2};
+
+		if (const T halfAngle = std::acos(quaternion.W()); halfAngle > T{0.0001}) [[likely]]
+		{
+			axisAngle.first = Vector3<T>(quaternion.X(), quaternion.Y(), quaternion.Z()) * (T{1} / std::sin(halfAngle));
+			axisAngle.second = halfAngle * T{2};
+		}
+		else [[unlikely]]
+		{
+			axisAngle.first = Vector3<T>::Predefined::Forward;
+			axisAngle.second = T{0};
+		}
 
 		return axisAngle;
 	}
