@@ -202,7 +202,7 @@ export namespace PonyEngine::Math
 		constexpr bool operator ==(const Quaternion& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> m_components; ///< Component array in order x, y, z, w.
+		std::array<T, ComponentCount> components; ///< Component array in order x, y, z, w.
 	};
 
 	/// @brief Computes a dot product of two quaternions.
@@ -316,7 +316,7 @@ namespace PonyEngine::Math
 
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const T x, const T y, const T z, const T w) noexcept :
-		m_components{x, y, z, w}
+		components{x, y, z, w}
 	{
 	}
 
@@ -335,61 +335,61 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T& Quaternion<T>::X() noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<std::floating_point T>
 	constexpr const T& Quaternion<T>::X() const noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<std::floating_point T>
 	constexpr T& Quaternion<T>::Y() noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<std::floating_point T>
 	constexpr const T& Quaternion<T>::Y() const noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<std::floating_point T>
 	constexpr T& Quaternion<T>::Z() noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<std::floating_point T>
 	constexpr const T& Quaternion<T>::Z() const noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<std::floating_point T>
 	constexpr T& Quaternion<T>::W() noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<std::floating_point T>
 	constexpr const T& Quaternion<T>::W() const noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<std::floating_point T>
 	constexpr T* Quaternion<T>::Data() noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<std::floating_point T>
 	constexpr const T* Quaternion<T>::Data() const noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<std::floating_point T>
@@ -548,13 +548,13 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T& Quaternion<T>::operator [](const std::size_t index) noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<std::floating_point T>
 	constexpr const T& Quaternion<T>::operator [](const std::size_t index) const noexcept
 	{
-		return m_components[index];
+		return components[index];
 	}
 
 	template<std::floating_point T>
@@ -566,7 +566,7 @@ namespace PonyEngine::Math
 	template <std::floating_point T>
 	constexpr bool Quaternion<T>::operator ==(const Quaternion& other) const noexcept
 	{
-		return m_components == other.m_components;
+		return components == other.components;
 	}
 
 	template<std::floating_point T>

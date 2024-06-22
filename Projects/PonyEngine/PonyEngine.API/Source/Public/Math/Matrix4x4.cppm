@@ -77,7 +77,7 @@ export namespace PonyEngine::Math
 			[[nodiscard("Pure constructor")]]
 			explicit constexpr Row(RowValueType* row) noexcept;
 
-			RowValueType* const m_row; ///< Row pointer.
+			RowValueType* const row; ///< Row pointer.
 
 			friend Matrix4x4;
 		};
@@ -446,7 +446,7 @@ export namespace PonyEngine::Math
 		constexpr bool operator ==(const Matrix4x4& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> m_components; ///< Component array in order m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33.
+		std::array<T, ComponentCount> components; ///< Component array in order m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33.
 	};
 
 	/// @brief Multiplies the @p left matrix by the @p right matrix component-wise.
@@ -577,7 +577,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix4x4<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
-		m_row{row}
+		row{row}
 	{
 	}
 
@@ -599,14 +599,14 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
 	{
-		return m_row[columnIndex * Dimension];
+		return row[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr const T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return m_row[columnIndex * Dimension];
+		return row[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
@@ -624,7 +624,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix4x4<T>::Matrix4x4(const T m00, const T m10, const T m20, const T m30, const T m01, const T m11, const T m21, const T m31, 
 		const T m02, const T m12, const T m22, const T m32, const T m03, const T m13, const T m23, const T m33) noexcept :
-		m_components{m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33}
+		components{m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33}
 	{
 	}
 
@@ -644,205 +644,205 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M00() noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M00() const noexcept
 	{
-		return m_components[0];
+		return components[0];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M10() noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M10() const noexcept
 	{
-		return m_components[1];
+		return components[1];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M20() noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M20() const noexcept
 	{
-		return m_components[2];
+		return components[2];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M30() noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M30() const noexcept
 	{
-		return m_components[3];
+		return components[3];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M01() noexcept
 	{
-		return m_components[4];
+		return components[4];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M01() const noexcept
 	{
-		return m_components[4];
+		return components[4];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M11() noexcept
 	{
-		return m_components[5];
+		return components[5];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M11() const noexcept
 	{
-		return m_components[5];
+		return components[5];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M21() noexcept
 	{
-		return m_components[6];
+		return components[6];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M21() const noexcept
 	{
-		return m_components[6];
+		return components[6];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M31() noexcept
 	{
-		return m_components[7];
+		return components[7];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M31() const noexcept
 	{
-		return m_components[7];
+		return components[7];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M02() noexcept
 	{
-		return m_components[8];
+		return components[8];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M02() const noexcept
 	{
-		return m_components[8];
+		return components[8];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M12() noexcept
 	{
-		return m_components[9];
+		return components[9];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M12() const noexcept
 	{
-		return m_components[9];
+		return components[9];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M22() noexcept
 	{
-		return m_components[10];
+		return components[10];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M22() const noexcept
 	{
-		return m_components[10];
+		return components[10];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M32() noexcept
 	{
-		return m_components[11];
+		return components[11];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M32() const noexcept
 	{
-		return m_components[11];
+		return components[11];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M03() noexcept
 	{
-		return m_components[12];
+		return components[12];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M03() const noexcept
 	{
-		return m_components[12];
+		return components[12];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M13() noexcept
 	{
-		return m_components[13];
+		return components[13];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M13() const noexcept
 	{
-		return m_components[13];
+		return components[13];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M23() noexcept
 	{
-		return m_components[14];
+		return components[14];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M23() const noexcept
 	{
-		return m_components[14];
+		return components[14];
 	}
 
 	template<Arithmetic T>
 	constexpr T& Matrix4x4<T>::M33() noexcept
 	{
-		return m_components[15];
+		return components[15];
 	}
 
 	template<Arithmetic T>
 	constexpr const T& Matrix4x4<T>::M33() const noexcept
 	{
-		return m_components[15];
+		return components[15];
 	}
 
 	template<Arithmetic T>
 	constexpr T* Matrix4x4<T>::Data() noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
 	constexpr const T* Matrix4x4<T>::Data() const noexcept
 	{
-		return m_components.data();
+		return components.data();
 	}
 
 	template<Arithmetic T>
@@ -1134,7 +1134,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Matrix4x4<T>::operator ==(const Matrix4x4& other) const noexcept
 	{
-		return m_components == other.m_components;
+		return components == other.components;
 	}
 
 	template<Arithmetic T>
