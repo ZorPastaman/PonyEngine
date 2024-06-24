@@ -108,6 +108,10 @@ export namespace PonyEngine::Math
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept;
+	/// @brief Converts a 3D rotation matrix to a 3D axis angle rotation.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Matrix3x3<T>& rotationMatrix) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
