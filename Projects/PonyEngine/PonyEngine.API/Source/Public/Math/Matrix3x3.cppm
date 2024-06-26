@@ -263,7 +263,10 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Matrix3x3 Transpose() const noexcept;
 
+		// TODO: Add undefined behaviors as here.
+
 		/// @brief Computes an inverse of the matrix.
+		///	@details If the determinant is zero, the result is undefined.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix3x3 Inverse() const noexcept requires(std::is_floating_point_v<T>);

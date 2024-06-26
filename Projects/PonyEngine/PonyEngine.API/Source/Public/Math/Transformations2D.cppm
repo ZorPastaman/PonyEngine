@@ -246,7 +246,7 @@ namespace PonyEngine::Math
 		Matrix2x2<T> rotationMatrix;
 		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
 		{
-			const T inverseScaling = T{1} / scaling[i];
+			const T inverseScaling = T{1} / scaling[i]; // TODO: check for zero scaling.
 			rotationMatrix.SetColumn(i, rsMatrix.GetColumn(i) * inverseScaling);
 		}
 
@@ -266,7 +266,7 @@ namespace PonyEngine::Math
 
 		Vector2<T> scaling;
 		scaling.X() = rsMatrix.GetColumn(0).Magnitude();
-		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign);
+		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign); // TODO: remove it - unnecessary work
 
 		return scaling;
 	}
