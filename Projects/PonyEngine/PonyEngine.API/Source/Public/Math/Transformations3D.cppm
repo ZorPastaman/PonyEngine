@@ -28,7 +28,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
 	/// @brief Converts 3D Euler angles to a 3D rotation quaternion.
-	///	@tparam T Value type.
+	/// @tparam T Value type.
 	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -620,7 +620,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> scalingMatrix = Matrix3x3<T>::Predefined::Identity;
 		scalingMatrix.SetDiagonal(scaling);
 
-		return rsMatrix * scalingMatrix.Inverse(); // TODO: check for a zero determinant
+		return rsMatrix * scalingMatrix.Inverse(); // TODO: add undefined behavior to the docs if the scaling is 0.
 	}
 
 	template<std::floating_point T>
@@ -680,7 +680,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& euler) noexcept
 	{
-		return RotationMatrix(euler) * vector;
+		return RotationQuaternion(euler) * vector;
 	}
 
 	template<std::floating_point T>

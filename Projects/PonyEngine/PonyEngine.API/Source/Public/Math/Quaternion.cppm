@@ -120,16 +120,19 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Conjugate() const noexcept;
 		/// @brief Computes an inverse of the quaternion.
-		///	@details If this is a rotation quaternion, use @p Conjugate() 'cause it's more efficient.
+		/// @details If this is a rotation quaternion, use @p Conjugate() 'cause it's more efficient.
+		/// @details If the magnitude of the quaternion is 0, the result is undefined.
 		/// @return Quaternion inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Inverse() const noexcept;
 
 		/// @brief Computes a quaternion normalized from this one.
+		/// @details If the magnitude of the quaternion is 0, the result is undefined.
 		/// @return Normalized quaternion.
 		[[nodiscard("Pure function")]]
 		Quaternion Normalized() const noexcept;
 		/// @brief Normalizes the quaternion.
+		/// @details If the magnitude of the quaternion is 0, the result is undefined.
 		void Normalize() noexcept;
 
 		/// @brief Checks if this quaternion is equal to an identity quaternion.
@@ -137,7 +140,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr bool IsIdentity() const noexcept;
 		/// @brief Checks if this quaternion is almost equal to an identity quaternion with a tolerance value.
-		///	@tparam IsUnit Is this quaternion unit? If it's @a true, the code is more efficient.
+		/// @tparam IsUnit Is this quaternion unit? If it's @a true, the code is more efficient.
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this quaternion is almost equal to an identity quaternion; @a false otherwise.
 		template<bool IsUnit = true> [[nodiscard("Pure function")]]
@@ -190,7 +193,7 @@ export namespace PonyEngine::Math
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept = default;
 		constexpr Quaternion& operator =(Quaternion&& other) noexcept = default;
 		/// @brief Combines two quaternions and assigns the result to @a this.
-		///	@details Internal formula is 'this = this * other'.
+		/// @details Internal formula is 'this = this * other'.
 		/// @param other Other quaternion.
 		/// @return @a This.
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
@@ -242,7 +245,7 @@ export namespace PonyEngine::Math
 
 	/// @brief Checks if two quaternions are almost equal with a tolerance value.
 	/// @tparam T Component type.
-	///	@tparam AreUnit Are the quaternions unit? If it's @a true, the code is more efficient.
+	/// @tparam AreUnit Are the quaternions unit? If it's @a true, the code is more efficient.
 	/// @param left Left quaternion.
 	/// @param right Right quaternion.
 	/// @param tolerance Tolerance value. Must be positive.
@@ -294,7 +297,7 @@ namespace PonyEngine::Math
 
 	/// @brief Negates a quaternion treating it as a vector.
 	/// @tparam T Component type.
-	///	@param quaternion Quaternion to negate.
+	/// @param quaternion Quaternion to negate.
 	/// @return Negated quaternion.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Quaternion<T> operator -(const Quaternion<T>& quaternion) noexcept;

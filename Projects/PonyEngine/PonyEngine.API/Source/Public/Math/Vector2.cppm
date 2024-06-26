@@ -91,10 +91,12 @@ export namespace PonyEngine::Math
 		constexpr T MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a vector normalized from this one.
+		/// @details If the magnitude of the vector is 0, the result is undefined.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
 		Vector2 Normalized() const noexcept requires(std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
+		/// @details If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Gets a minimum value among components.
