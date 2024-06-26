@@ -27,7 +27,7 @@ export namespace PonyEngine::Math
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Converts 3D euler angles to a 3D rotation quaternion.
+	/// @brief Converts 3D Euler angles to a 3D rotation quaternion.
 	///	@tparam T Value type.
 	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation quaternion.
@@ -54,7 +54,7 @@ export namespace PonyEngine::Math
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D euler angles to a 3D rotation matrix.
+	/// @brief Converts a 3D Euler angles to a 3D rotation matrix.
 	/// @tparam T Value type.
 	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation matrix.
@@ -75,26 +75,26 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Converts a 3D rotation quaternion to a 3D euler angles.
+	/// @brief Converts a 3D rotation quaternion to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D rotation matrix to a 3D euler angles.
+	/// @brief Converts a 3D rotation matrix to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Converts a 3D axis-angle rotation to a 3D euler angles.
+	/// @brief Converts a 3D axis-angle rotation to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis. Must be unit.
 	/// @param angle Rotation angle in radians.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Vector3<T>& axis, T angle) noexcept;
-	/// @brief Creates 3D euler angles representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @brief Creates 3D Euler angles representing a rotation from the @p fromDirection to the @p toDirection.
 	/// @tparam T Value type.
 	/// @param fromDirection From direction. Must be unit.
 	/// @param toDirection To direction. Must be unit.
@@ -108,7 +108,7 @@ export namespace PonyEngine::Math
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D rotation matrix to a 3D axis angle rotation.
+	/// @brief Converts a 3D rotation matrix to a 3D axis-angle rotation.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
@@ -457,15 +457,16 @@ namespace PonyEngine::Math
 	{
 		std::pair<Vector3<T>, T> axisAngle;
 
-		if (const T halfAngle = std::acos(quaternion.W()); halfAngle > T{0.0001}) [[likely]]
-		{
-			axisAngle.first = Vector3<T>(quaternion.X(), quaternion.Y(), quaternion.Z()) * (T{1} / std::sin(halfAngle));
-			axisAngle.second = halfAngle * T{2};
-		}
-		else [[unlikely]]
+		if (std::abs(quaternion.W()) > T{0.9999}) [[unlikely]]
 		{
 			axisAngle.first = Vector3<T>::Predefined::Forward;
 			axisAngle.second = T{0};
+		}
+		else [[likely]]
+		{
+			const T halfAngle = std::acos(quaternion.W());
+			axisAngle.first = Vector3<T>(quaternion.X(), quaternion.Y(), quaternion.Z()) * (T{1} / std::sin(halfAngle));
+			axisAngle.second = halfAngle * T{2};
 		}
 
 		return axisAngle;
@@ -619,7 +620,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> scalingMatrix = Matrix3x3<T>::Predefined::Identity;
 		scalingMatrix.SetDiagonal(scaling);
 
-		return rsMatrix * scalingMatrix.Inverse();
+		return rsMatrix * scalingMatrix.Inverse(); // TODO: check for a zero determinant
 	}
 
 	template<std::floating_point T>

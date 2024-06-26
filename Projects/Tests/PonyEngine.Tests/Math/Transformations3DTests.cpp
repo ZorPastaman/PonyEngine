@@ -1128,6 +1128,342 @@ namespace Math
 			Assert::IsTrue(quaternion.IsIdentity());
 
 			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-1., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.577, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
+			Assert::AreEqual(-0.408, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(0.408, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(quaternion.W()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
 			angle = 1.f;
 			quaternion = PonyEngine::Math::RotationQuaternion(axis, angle);
 			Assert::AreEqual(0., static_cast<double>(quaternion.X()), 0.001);
@@ -3337,6 +3673,552 @@ namespace Math
 			angle = 0.f;
 			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
 			Assert::IsTrue(matrix.IsIdentity());
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.667, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(-0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			matrix = PonyEngine::Math::RotationMatrix(axis, angle);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.911, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.244, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.244, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.911, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.333, static_cast<double>(matrix.M22()), 0.001);
 			
 			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
 			angle = 1.f;
@@ -5095,6 +5977,300 @@ namespace Math
 			angle = 0.f;
 			euler = PonyEngine::Math::Euler(axis, angle);
 			Assert::IsTrue(euler.IsAlmostZero());
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Y(), std::numbers::pi_v<float> * 2.f)), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Z(), std::numbers::pi_v<float> * 2.f)), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(2.034, static_cast<double>(euler.Z()), 0.001);
+			
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = std::numbers::pi_v<float>;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.73, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-2.034, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Y(), std::numbers::pi_v<float> * 2.f)), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Z(), std::numbers::pi_v<float> * 2.f)), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Y(), std::numbers::pi_v<float> * 2.f)), 0.001);
+			Assert::AreEqual(0., static_cast<double>(std::fmod(euler.Z(), std::numbers::pi_v<float> * 2.f)), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, 1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-1.22, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, 1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.632, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(0.247, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.22, static_cast<double>(euler.Z()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(1.f, -1.f, -1.f).Normalized();
+			angle = -std::numbers::pi_v<float> / 2.f;
+			euler = PonyEngine::Math::Euler(axis, angle);
+			Assert::AreEqual(-1.145, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(0.632, static_cast<double>(euler.Z()), 0.001);
 			
 			axis = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
 			angle = 1.f;
@@ -5427,6 +6603,202 @@ namespace Math
 			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
 
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.7071068f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, -0.7071068f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.7071068f, 0.f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, -0.7071068f, 0.f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.7071068f, 0.f, 0.f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.7071068f, 0.f, 0.f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.4082483f, 0.4082483f, 0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.4082483f, 0.4082483f, 0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.4082483f, 0.4082483f, -0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.4082483f, 0.4082483f, -0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.4082483f, -0.4082483f, 0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.4082483f, -0.4082483f, 0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.4082483f, -0.4082483f, -0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.4082483f, -0.4082483f, -0.4082483f, 0.7071068f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, -1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.f, -1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-1.f, 0.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.5773503f, 0.5773503f, 0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.5773503f, 0.5773503f, 0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.5773503f, 0.5773503f, -0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.5773503f, 0.5773503f, -0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.5773503f, -0.5773503f, 0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.5773503f, -0.5773503f, 0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.5773503f, -0.5773503f, -0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			quaternion = PonyEngine::Math::Quaternion<float>(0.5773503f, -0.5773503f, -0.5773503f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
+			Assert::AreEqual(0.577, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.577, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
 			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 0.f, 0.4794255f, 0.8775826f);
 			axisAngle = PonyEngine::Math::AxisAngle(quaternion);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
@@ -5702,6 +7074,181 @@ namespace Math
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.f, 1.f, 0.f, -1.f, 0.f, 0.f, 0.f, 0.f, 1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.f, -1.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, -1.f, 0.f, 1.f, 0.f, 1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.f, 0.f, 1.f, 0.f, 1.f, 0.f, -1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, -1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0.f, 0.f, -1.f, 0.f, 1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, -0.244f, -0.244f, 0.333f, 0.911f, 0.911f, -0.244f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, -0.911f, -0.911f, 0.333f, -0.244f, 0.244f, 0.911f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, -0.244f, 0.244f, 0.333f, -0.911f, 0.911f, 0.244f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, -0.911f, 0.911f, 0.333f, 0.244f, 0.244f, -0.911f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, 0.244f, 0.911f, -0.911f, 0.333f, 0.244f, -0.244f, -0.911f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, 0.911f, 0.244f, -0.244f, 0.333f, -0.911f, -0.911f, 0.244f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, -0.244f, 0.911f, 0.911f, 0.333f, -0.244f, -0.244f, 0.911f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(0.333f, -0.911f, 0.244f, 0.244f, 0.333f, 0.911f, -0.911f, -0.244f, 0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0., -1.f, 0.f, 0.f, 0.f, 1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-1.f, 0.f, 0.f, 0., 1.f, 0.f, 0.f, 0.f, -1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(1.f, 0.f, 0.f, 0., -1.f, 0.f, 0.f, 0.f, -1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, 0.667f, 0.667, -0.333f, 0.667f, 0.667f, 0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, -0.667f, -0.667, -0.333f, 0.667f, -0.667f, 0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, 0.667f, -0.667, -0.333f, -0.667f, 0.667f, -0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, -0.667f, 0.667, -0.333f, -0.667f, -0.667f, -0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, 0.667f, -0.667, -0.333f, -0.667f, 0.667f, -0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, -0.667f, 0.667, -0.333f, -0.667f, -0.667f, -0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, 0.667f, 0.667f, 0.667, -0.333f, 0.667f, 0.667f, 0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.333f, -0.667f, -0.667f, -0.667, -0.333f, 0.667f, -0.667f, 0.667f, -0.333f);
+			axisAngle = PonyEngine::Math::AxisAngle(matrix);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
 
 			matrix = PonyEngine::Math::Matrix3x3<float>(0.54f, 0.841f, 0.f, -0.841f, 0.54f, 0.f, 0.f, 0.f, 1.f);
 			axisAngle = PonyEngine::Math::AxisAngle(matrix);
