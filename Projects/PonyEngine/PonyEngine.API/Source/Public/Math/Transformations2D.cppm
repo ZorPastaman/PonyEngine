@@ -92,6 +92,7 @@ export namespace PonyEngine::Math
 	T ExtractAngleFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
 	/// @brief Extracts a 2D rotation matrix from a 2D rotation-scaling matrix.
+	/// @details If the matrix has a zero column, the result is undefined.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation matrix.
@@ -246,7 +247,7 @@ namespace PonyEngine::Math
 		Matrix2x2<T> rotationMatrix;
 		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
 		{
-			const T inverseScaling = T{1} / scaling[i]; // TODO: check for zero scaling.
+			const T inverseScaling = T{1} / scaling[i];
 			rotationMatrix.SetColumn(i, rsMatrix.GetColumn(i) * inverseScaling);
 		}
 
@@ -266,7 +267,7 @@ namespace PonyEngine::Math
 
 		Vector2<T> scaling;
 		scaling.X() = rsMatrix.GetColumn(0).Magnitude();
-		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign); // TODO: remove it - unnecessary work
+		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign);
 
 		return scaling;
 	}

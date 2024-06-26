@@ -329,7 +329,7 @@ export namespace PonyEngine::Math
 		constexpr Matrix4x4 Transpose() const noexcept;
 
 		/// @brief Computes an inverse of the matrix.
-		///	@details If the determinant is zero, the result is undefined.
+		/// @details If the determinant is zero, the result is undefined.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix4x4 Inverse() const noexcept requires(std::is_floating_point_v<T>);
