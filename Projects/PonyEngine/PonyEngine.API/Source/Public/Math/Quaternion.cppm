@@ -105,12 +105,13 @@ export namespace PonyEngine::Math
 		constexpr const T* Data() const noexcept;
 
 		/// @brief Computes a magnitude of the quaternion.
-		/// @details The rotation quaternion always has a magnitude of 1.
+		/// @remark The rotation quaternion always has a magnitude of 1.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		T Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of the quaternion.
-		/// @details The rotation quaternion always has a magnitude of 1. This function is much faster than @p Magnitude() because it doesn't compute a square root.
+		/// @remark The rotation quaternion always has a magnitude of 1.
+		/// @remark This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		constexpr T MagnitudeSquared() const noexcept;
@@ -120,19 +121,19 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Conjugate() const noexcept;
 		/// @brief Computes an inverse of the quaternion.
-		/// @details If this is a rotation quaternion, use @p Conjugate() 'cause it's more efficient.
-		/// @details If the magnitude of the quaternion is 0, the result is undefined.
+		/// @note If this is a rotation quaternion, use @p Conjugate() 'cause it's more efficient.
+		/// @note If the magnitude of the quaternion is 0, the result is undefined.
 		/// @return Quaternion inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Quaternion Inverse() const noexcept;
 
 		/// @brief Computes a quaternion normalized from this one.
-		/// @details If the magnitude of the quaternion is 0, the result is undefined.
+		/// @note If the magnitude of the quaternion is 0, the result is undefined.
 		/// @return Normalized quaternion.
 		[[nodiscard("Pure function")]]
 		Quaternion Normalized() const noexcept;
 		/// @brief Normalizes the quaternion.
-		/// @details If the magnitude of the quaternion is 0, the result is undefined.
+		/// @note If the magnitude of the quaternion is 0, the result is undefined.
 		void Normalize() noexcept;
 
 		/// @brief Checks if this quaternion is equal to an identity quaternion.
@@ -193,7 +194,7 @@ export namespace PonyEngine::Math
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept = default;
 		constexpr Quaternion& operator =(Quaternion&& other) noexcept = default;
 		/// @brief Combines two quaternions and assigns the result to @a this.
-		/// @details Internal formula is 'this = this * other'.
+		/// @remark Internal formula is 'this = this * other'.
 		/// @param other Other quaternion.
 		/// @return @a This.
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
@@ -226,7 +227,7 @@ export namespace PonyEngine::Math
 
 	/// @brief Linear interpolation between two quaternions if the @p time is in range [0, 1].
 	///        Linear extrapolation between two quaternions if the @p time is out of range [0, 1].
-	/// @details The function treats a quaternion as a @p Vector4.
+	/// @remark The function treats a quaternion as a @p Vector4.
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
 	/// @param to Interpolation/Extrapolation target point.

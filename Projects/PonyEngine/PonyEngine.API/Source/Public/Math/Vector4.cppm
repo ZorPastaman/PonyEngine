@@ -103,18 +103,18 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		ComputationalType Magnitude() const noexcept;
 		/// @brief Computes a squared magnitude of the vector.
-		/// @details This function is much faster than @p Magnitude() because it doesn't compute a square root.
+		/// @remark This function is much faster than @p Magnitude() because it doesn't compute a square root.
 		/// @return Computed magnitude.
 		[[nodiscard("Pure function")]]
 		constexpr T MagnitudeSquared() const noexcept;
 
 		/// @brief Computes a vector normalized from this one.
-		/// @details If the magnitude of the vector is 0, the result is undefined.
+		/// @note If the magnitude of the vector is 0, the result is undefined.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
 		Vector4 Normalized() const noexcept requires(std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
-		/// @details If the magnitude of the vector is 0, the result is undefined.
+		/// @note If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
 		/// @brief Gets a minimum value among components.

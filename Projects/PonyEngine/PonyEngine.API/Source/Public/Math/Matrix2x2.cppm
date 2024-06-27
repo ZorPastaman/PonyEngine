@@ -217,7 +217,7 @@ export namespace PonyEngine::Math
 		constexpr Matrix2x2 Transpose() const noexcept;
 
 		/// @brief Computes an inverse of the matrix.
-		/// @details If the determinant is zero, the result is undefined.
+		/// @note If the determinant is zero, the result is undefined.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
 		constexpr Matrix2x2 Inverse() const noexcept requires(std::is_floating_point_v<T>);
@@ -271,13 +271,13 @@ export namespace PonyEngine::Math
 		std::string ToString() const;
 
 		/// @brief Row access operator.
-		/// @details Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
+		/// @remark Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index. Must be in range [0, 1].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
 		constexpr Row<false> operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
-		/// @details Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
+		/// @remark Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index. Must be in range [0, 1].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]

@@ -78,40 +78,47 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> ExtractTranslationFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
-	/// @brief Extracts a rotation angle from a 2D rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation angle from a 2D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T ExtractAngleFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
-	/// @brief Extracts a rotation angle from a 2D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation angle from a 2D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T ExtractAngleFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
-	/// @brief Extracts a 2D rotation matrix from a 2D rotation-scaling matrix.
-	/// @details If the matrix has a zero column, the result is undefined.
+	/// @brief Attempts to extract a 2D rotation matrix from a 2D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @note If the matrix has a zero column, the result is undefined.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> ExtractRotationMatrixFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
-	/// @brief Extracts a 2D rotation matrix from a 2D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a 2D rotation matrix from a 2D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @note If the rotation-scaling part of the matrix has a zero column, the result is undefined.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> ExtractRotationMatrixFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
-	/// @brief Extracts a 2D scaling from a 2D rotation-scaling matrix.
+	/// @brief Attempts to extract a 2D scaling from a 2D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> ExtractScalingFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept;
-	/// @brief Extracts a 2D scaling from a 2D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a 2D scaling from a 2D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Scaling.
@@ -263,11 +270,11 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector2<T> ExtractScalingFromRsMatrix(const Matrix2x2<T>& rsMatrix) noexcept
 	{
-		const T ySign = (std::signbit(rsMatrix.M10()) != std::signbit(rsMatrix.M01())) - T{0.5}; // The scale may have different signs in its components, but we can't know which component has a different sign, so we always apply it to y.
-
 		Vector2<T> scaling;
-		scaling.X() = rsMatrix.GetColumn(0).Magnitude();
-		scaling.Y() = std::copysign(rsMatrix.GetColumn(1).Magnitude(), ySign);
+		for (std::size_t i = 0; i < Matrix2x2<T>::Dimension; ++i)
+		{
+			scaling[i] = rsMatrix.GetColumn(i).Magnitude();
+		}
 
 		return scaling;
 	}

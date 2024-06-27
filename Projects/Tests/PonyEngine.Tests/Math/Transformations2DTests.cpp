@@ -278,19 +278,19 @@ namespace Math
 			Assert::AreEqual(-0.875, static_cast<double>(matrix.M01()), 0.001);
 			Assert::AreEqual(0.485, static_cast<double>(matrix.M11()), 0.001);
 
-			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-1.94f, -3.5f, -5.25f, 2.91f);
+			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-1.94f, -3.5f, 5.25f, -2.91f);
 			matrix = PonyEngine::Math::ExtractRotationMatrixFromRsMatrix(rsMatrix);
 			Assert::AreEqual(-0.485, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(-0.875, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(0.875, static_cast<double>(matrix.M01()), 0.001);
 			Assert::AreEqual(-0.485, static_cast<double>(matrix.M11()), 0.001);
 
-			rsMatrix = PonyEngine::Math::Matrix2x2<float>(1.455f, 2.625f, 1.75f, -0.97f);
+			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-1.455f, 2.625f, -1.75f, -0.97f);
 			matrix = PonyEngine::Math::ExtractRotationMatrixFromRsMatrix(rsMatrix);
-			Assert::AreEqual(0.485, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.485, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0.875, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(-0.875, static_cast<double>(matrix.M01()), 0.001);
-			Assert::AreEqual(0.485, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(-0.485, static_cast<double>(matrix.M11()), 0.001);
 
 			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-0.243f, -0.438f, 0.875f, -0.485f);
 			matrix = PonyEngine::Math::ExtractRotationMatrixFromRsMatrix(rsMatrix);
@@ -302,12 +302,12 @@ namespace Math
 
 		TEST_METHOD(RotationMatrixFromTrsMatrixTest)
 		{
-			constexpr auto trsMatrix = PonyEngine::Math::Matrix3x3<float>(-0.97f, -1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f);
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix3x3<float>(0.97f, 1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f);
 			PonyEngine::Math::Matrix2x2<float> matrix = PonyEngine::Math::ExtractRotationMatrixFromTrsMatrix(trsMatrix);
-			Assert::AreEqual(-0.485, static_cast<double>(matrix.M00()), 0.001);
-			Assert::AreEqual(-0.875, static_cast<double>(matrix.M10()), 0.001);
-			Assert::AreEqual(0.875, static_cast<double>(matrix.M01()), 0.001);
-			Assert::AreEqual(-0.485, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.485, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.875, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.875, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.485, static_cast<double>(matrix.M11()), 0.001);
 		}
 
 		TEST_METHOD(ScalingFromRsMatrixTest)
@@ -317,16 +317,6 @@ namespace Math
 			Assert::AreEqual(2., static_cast<double>(scaling.X()), 0.005);
 			Assert::AreEqual(3., static_cast<double>(scaling.Y()), 0.005);
 
-			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-1.94f, -3.5f, -5.25f, 2.91f);
-			scaling = PonyEngine::Math::ExtractScalingFromRsMatrix(rsMatrix);
-			Assert::AreEqual(4., static_cast<double>(scaling.X()), 0.005);
-			Assert::AreEqual(-6., static_cast<double>(scaling.Y()), 0.005);
-
-			rsMatrix = PonyEngine::Math::Matrix2x2<float>(1.455f, 2.625f, 1.75f, -0.97f);
-			scaling = PonyEngine::Math::ExtractScalingFromRsMatrix(rsMatrix);
-			Assert::AreEqual(3., static_cast<double>(scaling.X()), 0.005);
-			Assert::AreEqual(-2., static_cast<double>(scaling.Y()), 0.005);
-
 			rsMatrix = PonyEngine::Math::Matrix2x2<float>(-0.243f, -0.438f, 0.875f, -0.485f);
 			scaling = PonyEngine::Math::ExtractScalingFromRsMatrix(rsMatrix);
 			Assert::AreEqual(0.5, static_cast<double>(scaling.X()), 0.005);
@@ -335,10 +325,10 @@ namespace Math
 
 		TEST_METHOD(ScalingFromTrsMatrixTest)
 		{
-			constexpr auto trsMatrix = PonyEngine::Math::Matrix3x3<float>(-0.97f, -1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f);
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix3x3<float>(0.97f, 1.75f, 0.f, -2.625f, 1.455f, 0.f, -3.f, 7.f, 1.f);
 			PonyEngine::Math::Vector2<float> scaling = PonyEngine::Math::ExtractScalingFromTrsMatrix(trsMatrix);
 			Assert::AreEqual(2., static_cast<double>(scaling.X()), 0.005);
-			Assert::AreEqual(-3., static_cast<double>(scaling.Y()), 0.005);
+			Assert::AreEqual(3., static_cast<double>(scaling.Y()), 0.005);
 		}
 
 		TEST_METHOD(RsMatrixFromTrsMatrixTest)
