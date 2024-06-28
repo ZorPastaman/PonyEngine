@@ -114,13 +114,17 @@ export namespace PonyEngine::Math
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Matrix3x3<T>& rotationMatrix) noexcept;
+	/// @brief Converts a 3D Euler angles to a 3D axis-angle rotation.
+	/// @tparam T Value type.
+	/// @param euler Euler angles in radians.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& euler) noexcept;
-	/// @brief Computes an axis and an angle of a rotation from @p fromDirection to @p toDirection.
-	/// @tparam T Component type.
+	/// @brief Creates 3D axis-angle rotation representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @tparam T Value type.
 	/// @param fromDirection From direction. Must be unit.
 	/// @param toDirection To direction. Must be unit.
-	/// @return Axis and angle of a rotation.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
@@ -686,11 +690,11 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, const T angle) noexcept
 	{
+		const Vector3<T> cross = Cross(axis, vector);
+		const T dot = Dot(axis, vector);
 		const T sin = std::sin(angle);
 		const T cos = std::cos(angle);
 		const T mCos = T{1} - cos;
-		const T dot = Dot(axis, vector);
-		const T cross = Cross(axis, vector);
 
 		return vector * cos + cross * sin + axis * (dot * mCos);
 	}
