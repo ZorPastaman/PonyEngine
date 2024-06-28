@@ -8001,5 +8001,65 @@ namespace Math
 			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
 			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(RsMatrixFromEulerScalingTest)
+		{
+			auto euler = PonyEngine::Math::Vector3<float>(-0.039817f, 0.7135064f, 1.0340416f);
+			auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			auto rsMatrix = PonyEngine::Math::RsMatrix(euler, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-1.1331166f, -0.1587523f, -1.9655011f);
+			scaling = PonyEngine::Math::Vector3<float>(-5.6f, -4.5f, -0.3f);
+			rsMatrix = PonyEngine::Math::RsMatrix(euler, scaling);
+			Assert::AreEqual(2.867, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.191, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-4.283, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-3.854, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(0.733, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(-2.204, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(0.02, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
+		}
+
+		TEST_METHOD(RsMatrixFromAxisAngleScalingTest)
+		{
+			auto axis = PonyEngine::Math::Vector3<float>(0.2672612f, 0.5345224f, 0.8017838f);
+			float angle = 1.25f;
+			auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			auto rsMatrix = PonyEngine::Math::RsMatrix(axis, angle, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
+
+			axis = PonyEngine::Math::Vector3<float>(-0.2672613f, -0.5345225f, -0.8017837f);
+			angle = 2.25f;
+			scaling = PonyEngine::Math::Vector3<float>(-5.6f, -4.5f, -0.3f);
+			rsMatrix = PonyEngine::Math::RsMatrix(axis, angle, scaling);
+			Assert::AreEqual(2.867, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.191, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-4.283, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-3.854, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(0.733, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(-2.204, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(0.02, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
+		}
 	};
 }
