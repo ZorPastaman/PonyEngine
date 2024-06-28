@@ -128,6 +128,11 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
+	/// @brief Creates a 3D rotation-scaling matrix from a rotation quaternion and scaling.
+	/// @tparam T Value type.
+	/// @param quaternion Rotation quaternion.
+	/// @param scaling Scaling.
+	/// @return Rotation scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -526,7 +531,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Matrix3x3<T> RsMatrix(const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept
 	{
-		Matrix3x3<T> rsMatrix = rotationMatrix;
+		Matrix3x3<T> rsMatrix;
 		for (std::size_t i = 0; i < Matrix3x3<T>::Dimension; ++i)
 		{
 			rsMatrix.SetColumn(i, rotationMatrix.GetColumn(i) * scaling[i]);
