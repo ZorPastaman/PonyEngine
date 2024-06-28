@@ -7943,5 +7943,34 @@ namespace Math
 			Assert::AreEqual(0.752, static_cast<double>(axisAngle.first.Z()), 0.001);
 			Assert::AreEqual(2.271, static_cast<double>(axisAngle.second), 0.001);
 		}
+
+		TEST_METHOD(RsMatrixFromQuaternionScalingTest)
+		{
+			auto quaternion = PonyEngine::Math::Quaternion<float>(0.1563738f, 0.3127476f, 0.4691215f, 0.8109631f);
+			auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			auto rsMatrix = PonyEngine::Math::RsMatrix(quaternion, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
+
+			quaternion = PonyEngine::Math::Quaternion<float>(-0.2411412f, -0.4822823f, -0.7234235f, 0.4311765f);
+			scaling = PonyEngine::Math::Vector3<float>(-5.6f, -4.5f, -0.3f);
+			rsMatrix = PonyEngine::Math::RsMatrix(quaternion, scaling);
+			Assert::AreEqual(2.867, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.191, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-4.283, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-3.854, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(0.733, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(-2.204, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(0.02, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
+		}
 	};
 }
