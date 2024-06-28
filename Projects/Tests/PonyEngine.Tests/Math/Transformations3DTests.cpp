@@ -7516,5 +7516,432 @@ namespace Math
 			Assert::AreEqual(0.469, static_cast<double>(axisAngle.first.Z()), 0.001);
 			Assert::AreEqual(0.8, static_cast<double>(axisAngle.second), 0.001);
 		}
+
+		TEST_METHOD(AxisAngleFromEulerTest)
+		{
+			auto euler = PonyEngine::Math::Vector3<float>::Predefined::Zero;
+			std::pair<PonyEngine::Math::Vector3<float>, float> axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float> / 2.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float> / 2.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float> / 2.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float> / 2.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float> / 2.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+			
+			euler = PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float> / 2.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.247f, 1.22f, 1.22f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-1.145f, 0.632f, 0.632f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.247f, 1.22f, -1.22f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.145f, 0.632f, -0.632f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.145f, -0.632f, 0.632f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.247f, -1.22f, 1.22f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-1.145f, -0.632f, -0.632f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.247f, -1.22f, -1.22f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, std::numbers::pi_v<float>);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, -std::numbers::pi_v<float>);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, std::numbers::pi_v<float>, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, -std::numbers::pi_v<float>, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(std::numbers::pi_v<float>, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-std::numbers::pi_v<float>, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.73f, 2.034f, 2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.73f, -2.034f, -2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.73f, 2.034f, -2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.73f, -2.034f, 2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.73f, 2.034f, -2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.73f, -2.034f, 2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.73f, 2.034f, 2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.73f, -2.034f, -2.034f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.578, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.578, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 0.f, -1.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.f, -1.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-1.f, 0.f, 0.f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.362f, 0.805f, 0.672f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.591, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.645, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.484, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.571f, 0.16f, 0.642f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.557, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.371, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.743, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.422f, 0.591f, -0.988f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.596, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.298, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.746, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1.1, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.567f, 0.44f, -0.261f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.625, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.625, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.468, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0.8, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.696f, -0.566f, 0.307f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.591, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.645, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.484, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.338f, -0.494f, 0.775f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.557, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.371, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.743, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0.9, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.711f, -0.03f, -0.846f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.596, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.298, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.745, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1.1, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.368f, -0.613f, -0.509f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.625, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.624, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.469, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0.8, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.279f, 1.9f, 2.166f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.684, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.456, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.57, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(2.8, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.66f, -2.021f, -2.389f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.684, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.456, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.57, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(3.283, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.378f, 1.839f, -2.255f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.662, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.441, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.606, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(2.9, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(1.047f, -1.647f, 2.671f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.552, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.49, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.674, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(3.584, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.823f, 2.047f, -2.486f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.684, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.456, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.57, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(3.483, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(0.434f, -1.96f, 2.259f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(-0.684, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.456, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.57, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(3., static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.755f, 1.916f, 2.51f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.662, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.441, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.606, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(3.383, static_cast<double>(axisAngle.second), 0.001);
+
+			euler = PonyEngine::Math::Vector3<float>(-0.405f, -1.612f, -2.077f);
+			axisAngle = PonyEngine::Math::AxisAngle(euler);
+			Assert::AreEqual(0.552, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.491, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.674, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(2.7, static_cast<double>(axisAngle.second), 0.001);
+		}
+
+		TEST_METHOD(AxisAngleFromDirectionsTest)
+		{
+			auto from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f);
+			auto to = from;
+			auto axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
+			to = from;
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(0.f, 0.f, 1.f).Normalized();
+			to = -from;
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+
+			from = PonyEngine::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
+			to = -from;
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(-0.707, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.707, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
+			to = -from;
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = -from;
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(0.98, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.196, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(axisAngle.second), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(0.369, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(0.111, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.922, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(0.673, static_cast<double>(axisAngle.second), 0.001);
+			
+			from = PonyEngine::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
+			to = PonyEngine::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
+			axisAngle = PonyEngine::Math::AxisAngle(from, to);
+			Assert::AreEqual(0.601, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.271, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(0.752, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(2.271, static_cast<double>(axisAngle.second), 0.001);
+		}
 	};
 }
