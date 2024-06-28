@@ -7972,5 +7972,34 @@ namespace Math
 			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
 			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(RsMatrixFromRotationMatrixScalingTest)
+		{
+			auto matrix = PonyEngine::Math::Matrix3x3<float>(0.3642279f, 0.8586916f, -0.3605369f, -0.6630694f, 0.5109445f, 0.5470600f, 0.6539702f, 0.0398065f, 0.7554724f);
+			auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			auto rsMatrix = PonyEngine::Math::RsMatrix(matrix, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
+
+			matrix = PonyEngine::Math::Matrix3x3<float>(-0.5118755f, -0.3912502f, 0.7647920f, 0.8564427f, -0.1629812f, 0.4898399f, -0.0670032f, 0.9057375f, 0.4185094f);
+			scaling = PonyEngine::Math::Vector3<float>(-5.6f, -4.5f, -0.3f);
+			rsMatrix = PonyEngine::Math::RsMatrix(matrix, scaling);
+			Assert::AreEqual(2.867, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.191, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-4.283, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-3.854, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(0.733, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(-2.204, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(0.02, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
+		}
 	};
 }

@@ -132,9 +132,14 @@ export namespace PonyEngine::Math
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @param scaling Scaling.
-	/// @return Rotation scaling matrix.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D rotation-scaling matrix from a rotation matrix and scaling.
+	/// @tparam T Value type.
+	/// @param rotationMatrix Rotation matrix.
+	/// @param scaling Scaling.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
