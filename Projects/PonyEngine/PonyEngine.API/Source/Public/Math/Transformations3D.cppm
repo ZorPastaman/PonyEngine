@@ -142,8 +142,19 @@ export namespace PonyEngine::Math
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D rotation-scaling matrix from Euler angles and scaling.
+	/// @tparam T Value type.
+	/// @param euler Euler angles in radians.
+	/// @param scaling Scaling.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D rotation-scaling matrix from an axis-angle rotation and scaling.
+	/// @tparam T Value type.
+	/// @param axis Rotation axis.
+	/// @param angle Rotation angle in radians.
+	/// @param scaling Scaling.
+	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 
