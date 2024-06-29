@@ -158,16 +158,50 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 
+	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, rotation quaternion and scaling.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param quaternion Rotation quaternion.
+	/// @param scaling Scaling.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, rotation matrix and scaling.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param rotationMatrix Rotation matrix.
+	/// @param scaling Scaling.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, Euler angles and scaling.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param euler Euler angles in radians.
+	/// @param scaling Scaling.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, axis-angle rotation and scaling.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param axis Axis. Must be unit.
+	/// @param angle Rotation angle in radians.
+	/// @param scaling Scaling.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
+	/// @brief Creates a 3D translation-rotation-scaling matrix with a zero translation from a rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation and rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param translation Translation.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rsMatrix) noexcept;
 
