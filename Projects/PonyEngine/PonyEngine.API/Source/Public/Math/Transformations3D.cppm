@@ -205,6 +205,10 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rsMatrix) noexcept;
 
+	/// @brief Extracts a translation from a 3D translation-rotation-scaling matrix.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Translation.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractTranslationFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 

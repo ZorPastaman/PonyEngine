@@ -8203,5 +8203,14 @@ namespace Math
 			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
 			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
 		}
+
+		TEST_METHOD(TranslationFromTrsMatrixTest)
+		{
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, -4.2f, -6.4f, 3.1f, 1.f);
+			const auto translation = PonyEngine::Math::ExtractTranslationFromTrsMatrix(trsMatrix);
+			Assert::AreEqual(-4.2, static_cast<double>(translation.X()), 0.001);
+			Assert::AreEqual(-6.4, static_cast<double>(translation.Y()), 0.001);
+			Assert::AreEqual(3.1, static_cast<double>(translation.Z()), 0.001);
+		}
 	};
 }
