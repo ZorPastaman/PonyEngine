@@ -212,10 +212,20 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractTranslationFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Attempts to extract a rotation quaternion from a 3D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> ExtractRotationFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	Quaternion<T> ExtractRotationQuaternionFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Attempts to extract a rotation quaternion from a 3D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	Quaternion<T> ExtractRotationFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
+	Quaternion<T> ExtractRotationQuaternionFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrixFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
@@ -665,13 +675,13 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> ExtractRotationFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
+	Quaternion<T> ExtractRotationQuaternionFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
 	{
 		return RotationQuaternion(ExtractRotationMatrixFromRsMatrix(rsMatrix));
 	}
 
 	template<std::floating_point T>
-	Quaternion<T> ExtractRotationFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept
+	Quaternion<T> ExtractRotationQuaternionFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept
 	{
 		return RotationQuaternion(ExtractRotationMatrixFromTrsMatrix(trsMatrix));
 	}
