@@ -8061,5 +8061,147 @@ namespace Math
 			Assert::AreEqual(-0.272, static_cast<double>(rsMatrix.M12()), 0.001);
 			Assert::AreEqual(-0.126, static_cast<double>(rsMatrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(TrsMatrixFromTranslationQuaternionScalingTest)
+		{
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.1f, 4.6f, 9.5f);
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(0.1563738f, 0.3127476f, 0.4691215f, 0.8109631f);
+			constexpr auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, quaternion, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(-3.1, static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(TrsMatrixFromTranslationRotationMatrixScalingTest)
+		{
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.1f, 4.6f, 9.5f);
+			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(0.3642279f, 0.8586916f, -0.3605369f, -0.6630694f, 0.5109445f, 0.5470600f, 0.6539702f, 0.0398065f, 0.7554724f);
+			constexpr auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, matrix, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(-3.1, static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(TrsMatrixFromTranslationEulerScalingTest)
+		{
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.1f, 4.6f, 9.5f);
+			constexpr auto euler = PonyEngine::Math::Vector3<float>(-0.039817f, 0.7135064f, 1.0340416f);
+			constexpr auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, euler, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(-3.1, static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(TrsMatrixFromTranslationAxisAngleScalingTest)
+		{
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.1f, 4.6f, 9.5f);
+			constexpr auto axis = PonyEngine::Math::Vector3<float>(0.2672612f, 0.5345224f, 0.8017838f);
+			constexpr auto angle = 1.25f;
+			constexpr auto scaling = PonyEngine::Math::Vector3<float>(3.3f, 4.2f, 2.4f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, axis, angle, scaling);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(-3.1, static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(TrsMatrixFromRsMatrixTest)
+		{
+			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(rsMatrix);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(TrsMatrixFromTranslationRsMatrixTest)
+		{
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.1f, 4.6f, 9.5f);
+			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
+			const auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, rsMatrix);
+			Assert::AreEqual(1.202, static_cast<double>(trsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(trsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(trsMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M30()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(trsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(trsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(trsMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M31()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(trsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(trsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(trsMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(trsMatrix.M32()), 0.001);
+			Assert::AreEqual(-3.1, static_cast<double>(trsMatrix.M03()), 0.001);
+			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
+			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
 	};
 }
