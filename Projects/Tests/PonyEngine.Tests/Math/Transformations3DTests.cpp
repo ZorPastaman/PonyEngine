@@ -8318,5 +8318,20 @@ namespace Math
 			Assert::AreEqual(4.2, static_cast<double>(scaling.Y()), 0.001);
 			Assert::AreEqual(2.4, static_cast<double>(scaling.Z()), 0.001);
 		}
+
+		TEST_METHOD(RsMatrixFromTrsMatrixTest)
+		{
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
+			const auto rsMatrix = PonyEngine::Math::ExtractRsMatrixFromTrsMatrix(trsMatrix);
+			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
+			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
+			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
+			Assert::AreEqual(-2.785, static_cast<double>(rsMatrix.M01()), 0.001);
+			Assert::AreEqual(2.146, static_cast<double>(rsMatrix.M11()), 0.001);
+			Assert::AreEqual(2.298, static_cast<double>(rsMatrix.M21()), 0.001);
+			Assert::AreEqual(1.57, static_cast<double>(rsMatrix.M02()), 0.001);
+			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
+			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
+		}
 	};
 }
