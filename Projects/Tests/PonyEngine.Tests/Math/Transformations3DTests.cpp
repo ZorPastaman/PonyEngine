@@ -8207,7 +8207,7 @@ namespace Math
 		TEST_METHOD(TranslationFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, -4.2f, -6.4f, 3.1f, 1.f);
-			const auto translation = PonyEngine::Math::ExtractTranslationFromTrsMatrix(trsMatrix);
+			const auto translation = PonyEngine::Math::ExtractTranslation(trsMatrix);
 			Assert::AreEqual(-4.2, static_cast<double>(translation.X()), 0.001);
 			Assert::AreEqual(-6.4, static_cast<double>(translation.Y()), 0.001);
 			Assert::AreEqual(3.1, static_cast<double>(translation.Z()), 0.001);
@@ -8216,7 +8216,7 @@ namespace Math
 		TEST_METHOD(QuaternionFromRsMatrixTest)
 		{
 			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
-			const auto quaternion = PonyEngine::Math::ExtractRotationQuaternionFromRsMatrix(rsMatrix);
+			const auto quaternion = PonyEngine::Math::ExtractRotationQuaternion(rsMatrix);
 			Assert::AreEqual(0.156, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0.313, static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0.469, static_cast<double>(quaternion.Z()), 0.001);
@@ -8226,7 +8226,7 @@ namespace Math
 		TEST_METHOD(QuaternionFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, -4.2f, -6.4f, 3.1f, 1.f);
-			const auto quaternion = PonyEngine::Math::ExtractRotationQuaternionFromTrsMatrix(trsMatrix);
+			const auto quaternion = PonyEngine::Math::ExtractRotationQuaternion(trsMatrix);
 			Assert::AreEqual(0.156, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0.313, static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0.469, static_cast<double>(quaternion.Z()), 0.001);
@@ -8236,7 +8236,7 @@ namespace Math
 		TEST_METHOD(RotationMatrixFromRsMatrixTest)
 		{
 			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
-			const auto matrix = PonyEngine::Math::ExtractRotationMatrixFromRsMatrix(rsMatrix);
+			const auto matrix = PonyEngine::Math::ExtractRotationMatrix3D(rsMatrix);
 			Assert::AreEqual(0.364, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0.859, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(-0.361, static_cast<double>(matrix.M20()), 0.001);
@@ -8251,7 +8251,7 @@ namespace Math
 		TEST_METHOD(RotationMatrixFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-			const auto matrix = PonyEngine::Math::ExtractRotationMatrixFromTrsMatrix(trsMatrix);
+			const auto matrix = PonyEngine::Math::ExtractRotationMatrix3D(trsMatrix);
 			Assert::AreEqual(0.364, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0.859, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(-0.361, static_cast<double>(matrix.M20()), 0.001);
@@ -8266,7 +8266,7 @@ namespace Math
 		TEST_METHOD(EulerFromRsMatrixTest)
 		{
 			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
-			const auto euler = PonyEngine::Math::ExtractEulerFromRsMatrix(rsMatrix);
+			const auto euler = PonyEngine::Math::ExtractEuler(rsMatrix);
 			Assert::AreEqual(-0.04, static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(0.714, static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(1.034, static_cast<double>(euler.Z()), 0.001);
@@ -8275,7 +8275,7 @@ namespace Math
 		TEST_METHOD(EulerFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-			const auto euler = PonyEngine::Math::ExtractEulerFromTrsMatrix(trsMatrix);
+			const auto euler = PonyEngine::Math::ExtractEuler(trsMatrix);
 			Assert::AreEqual(-0.04, static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(0.714, static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(1.034, static_cast<double>(euler.Z()), 0.001);
@@ -8284,7 +8284,7 @@ namespace Math
 		TEST_METHOD(AxisAngleFromRsMatrixTest)
 		{
 			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
-			const auto [axis, angle] = PonyEngine::Math::ExtractAxisAngleFromRsMatrix(rsMatrix);
+			const auto [axis, angle] = PonyEngine::Math::ExtractAxisAngle(rsMatrix);
 			Assert::AreEqual(0.267, static_cast<double>(axis.X()), 0.001);
 			Assert::AreEqual(0.535, static_cast<double>(axis.Y()), 0.001);
 			Assert::AreEqual(0.802, static_cast<double>(axis.Z()), 0.001);
@@ -8294,7 +8294,7 @@ namespace Math
 		TEST_METHOD(AxisAngleFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-			const auto [axis, angle] = PonyEngine::Math::ExtractAxisAngleFromTrsMatrix(trsMatrix);
+			const auto [axis, angle] = PonyEngine::Math::ExtractAxisAngle(trsMatrix);
 			Assert::AreEqual(0.267, static_cast<double>(axis.X()), 0.001);
 			Assert::AreEqual(0.535, static_cast<double>(axis.Y()), 0.001);
 			Assert::AreEqual(0.802, static_cast<double>(axis.Z()), 0.001);
@@ -8304,7 +8304,7 @@ namespace Math
 		TEST_METHOD(ScalingFromRsMatrixTest)
 		{
 			constexpr auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
-			const auto scaling = PonyEngine::Math::ExtractScalingFromRsMatrix(rsMatrix);
+			const auto scaling = PonyEngine::Math::ExtractScaling3D(rsMatrix);
 			Assert::AreEqual(3.3, static_cast<double>(scaling.X()), 0.001);
 			Assert::AreEqual(4.2, static_cast<double>(scaling.Y()), 0.001);
 			Assert::AreEqual(2.4, static_cast<double>(scaling.Z()), 0.001);
@@ -8313,7 +8313,7 @@ namespace Math
 		TEST_METHOD(ScalingFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-			const auto scaling = PonyEngine::Math::ExtractScalingFromTrsMatrix(trsMatrix);
+			const auto scaling = PonyEngine::Math::ExtractScaling3D(trsMatrix);
 			Assert::AreEqual(3.3, static_cast<double>(scaling.X()), 0.001);
 			Assert::AreEqual(4.2, static_cast<double>(scaling.Y()), 0.001);
 			Assert::AreEqual(2.4, static_cast<double>(scaling.Z()), 0.001);
@@ -8322,7 +8322,7 @@ namespace Math
 		TEST_METHOD(RsMatrixFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
-			const auto rsMatrix = PonyEngine::Math::ExtractRsMatrixFromTrsMatrix(trsMatrix);
+			const auto rsMatrix = PonyEngine::Math::ExtractRsMatrix(trsMatrix);
 			Assert::AreEqual(1.202, static_cast<double>(rsMatrix.M00()), 0.001);
 			Assert::AreEqual(2.834, static_cast<double>(rsMatrix.M10()), 0.001);
 			Assert::AreEqual(-1.19, static_cast<double>(rsMatrix.M20()), 0.001);
