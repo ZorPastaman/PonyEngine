@@ -276,8 +276,18 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Attempts to extract a 3D scaling from a 3D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is non-negative.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractScalingFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Attempts to extract a 3D scaling from a 3D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is non-negative.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractScalingFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
