@@ -298,19 +298,46 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRsMatrixFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Rotates the @p vector with the @p euler.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param euler Euler angles in radians.
+	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& euler) noexcept;
+	/// @brief Rotates the @p vector with the @p axis and @p angle.
+	/// @tparam T Value type.
+	/// @param vector Vector to rotate.
+	/// @param axis Rotation axis.
+	/// @param angle Rotation angle in radians.
+	/// @return Rotated vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, T angle) noexcept;
 
+	/// @brief Applies a 3D transformation matrix to a point vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix.
+	/// @param vector Point.
+	/// @return Transformed point.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
+	/// @brief Applies a 3D transformation matrix to a direction vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix.
+	/// @param vector Direction.
+	/// @return Transformed direction.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> TransformDirection(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
 }
 
 namespace PonyEngine::Math
 {
+	/// @brief Applies a 3D transformation matrix to a vector.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix.
+	/// @param vector Vector.
+	/// @param w W component. It determines how to treat the @p vector.
+	/// @return Transformed vector.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> TransformVector(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector, T w) noexcept;
 

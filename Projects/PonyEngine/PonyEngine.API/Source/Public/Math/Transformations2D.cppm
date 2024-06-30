@@ -132,7 +132,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix2x2<T> ExtractRsMatrixFromTrsMatrix(const Matrix3x3<T>& trsMatrix) noexcept;
 
-	/// @brief Rotates the @p vector by the @p angle counterclockwise.
+	/// @brief Rotates the @p vector by the @p angle.
 	/// @tparam T Value type.
 	/// @param vector Vector to rotate.
 	/// @param angle Rotation angle in radians.
@@ -140,7 +140,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector2<T> Rotate(const Vector2<T>& vector, T angle) noexcept;
 
-	/// @brief Applies a 2D transformation matrix to a pointer vector.
+	/// @brief Applies a 2D transformation matrix to a point vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix. 
 	/// @param vector Point.
@@ -158,7 +158,7 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	/// @brief Applies a transformation matrix to a vector.
+	/// @brief Applies a 2D transformation matrix to a vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix. 
 	/// @param vector Vector.

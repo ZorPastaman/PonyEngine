@@ -233,8 +233,6 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a signed angle between two vectors.
-	///        The sign is positive if the rotation is counterclockwise.
-	///        The sign is negative if the rotation is clockwise.
 	/// @tparam T Component type.
 	/// @param left Left vector. Must be unit.
 	/// @param right Right vector. Must be unit.

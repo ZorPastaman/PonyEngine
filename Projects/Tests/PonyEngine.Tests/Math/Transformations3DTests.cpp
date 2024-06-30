@@ -8333,5 +8333,46 @@ namespace Math
 			Assert::AreEqual(0.096, static_cast<double>(rsMatrix.M12()), 0.001);
 			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(RotateWithEulerTest)
+		{
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+			constexpr auto euler = PonyEngine::Math::Vector3<float>(1.2f, -2.9f, -0.2f);
+			const auto rotated = PonyEngine::Math::Rotate(vector, euler);
+			Assert::AreEqual(-7.168, static_cast<double>(rotated.X()), 0.001);
+			Assert::AreEqual(6.18, static_cast<double>(rotated.Y()), 0.001);
+			Assert::AreEqual(-3.521, static_cast<double>(rotated.Z()), 0.001);
+		}
+
+		TEST_METHOD(RotateWithAxisAngleTest)
+		{
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+			constexpr auto axis = PonyEngine::Math::Vector3<float>(0.1513236f, -0.8183146f, 0.5544928f);
+			constexpr float angle = 2.8305042f;
+			const auto rotated = PonyEngine::Math::Rotate(vector, axis, angle);
+			Assert::AreEqual(-7.168, static_cast<double>(rotated.X()), 0.001);
+			Assert::AreEqual(6.18, static_cast<double>(rotated.Y()), 0.001);
+			Assert::AreEqual(-3.521, static_cast<double>(rotated.Z()), 0.001);
+		}
+
+		TEST_METHOD(TransformPointTest)
+		{
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
+			const auto transformed = PonyEngine::Math::TransformPoint(trsMatrix, vector);
+			Assert::AreEqual(-21.15, static_cast<double>(transformed.X()), 0.001);
+			Assert::AreEqual(27.045, static_cast<double>(transformed.Y()), 0.001);
+			Assert::AreEqual(11.067, static_cast<double>(transformed.Z()), 0.001);
+		}
+
+		TEST_METHOD(TransformDirectionTest)
+		{
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(4.6f, 8.1f, -3.9f);
+			constexpr auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
+			const auto transformed = PonyEngine::Math::TransformDirection(trsMatrix, vector);
+			Assert::AreEqual(-23.15, static_cast<double>(transformed.X()), 0.001);
+			Assert::AreEqual(30.045, static_cast<double>(transformed.Y()), 0.001);
+			Assert::AreEqual(6.067, static_cast<double>(transformed.Z()), 0.001);
+		}
 	};
 }

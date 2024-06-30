@@ -252,7 +252,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 	/// @brief Computes a signed angle between two vectors.
-	///        Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
+	/// @remark Sign is copied from the sign of the dot product of the @p axis and the cross product of the @p left and @p right.
 	/// @tparam T Component type.
 	/// @param left Left vector. Must be unit.
 	/// @param right Right vector. Must be unit.
