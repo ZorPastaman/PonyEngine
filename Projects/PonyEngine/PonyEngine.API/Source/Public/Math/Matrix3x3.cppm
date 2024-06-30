@@ -318,7 +318,7 @@ export namespace PonyEngine::Math
 		constexpr void Scale(const Matrix3x3& scale) noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
-		///        The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
+		/// @remark The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
