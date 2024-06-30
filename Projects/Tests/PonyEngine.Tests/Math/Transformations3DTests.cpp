@@ -8374,5 +8374,22 @@ namespace Math
 			Assert::AreEqual(30.045, static_cast<double>(transformed.Y()), 0.001);
 			Assert::AreEqual(6.067, static_cast<double>(transformed.Z()), 0.001);
 		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(0.541f, 0.021f, 0.291f, 0.789f);
+			constexpr auto matrix = PonyEngine::Math::RotationMatrix(quaternion);
+			constexpr auto scaling = PonyEngine::Math::Vector3<float>(2.f, -3.f, 5.f);
+			constexpr auto rsMatrix = PonyEngine::Math::RsMatrix(quaternion, scaling);
+			constexpr auto rsMatrix1 = PonyEngine::Math::RsMatrix(matrix, scaling);
+			constexpr auto translation = PonyEngine::Math::Vector3<float>(-3.f, 5.f, -6.f);
+			constexpr auto trsMatrix = PonyEngine::Math::TrsMatrix(translation, quaternion, scaling);
+			constexpr auto trsMatrix1 = PonyEngine::Math::TrsMatrix(rsMatrix);
+			constexpr auto trsMatrix2 = PonyEngine::Math::TrsMatrix(translation, rsMatrix);
+			constexpr auto translation1 = PonyEngine::Math::ExtractTranslation(trsMatrix);
+			constexpr auto rsMatrix2 = PonyEngine::Math::ExtractRsMatrix(trsMatrix);
+			constexpr auto point = PonyEngine::Math::TransformPoint(trsMatrix, scaling);
+			constexpr auto direction = PonyEngine::Math::TransformDirection(trsMatrix, scaling);
+		}
 	};
 }
