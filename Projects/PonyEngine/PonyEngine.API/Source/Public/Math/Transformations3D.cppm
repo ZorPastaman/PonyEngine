@@ -205,6 +205,8 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rsMatrix) noexcept;
 
+	// TODO: shorten names. Simply ExtractSomething();
+
 	/// @brief Extracts a translation from a 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -242,8 +244,18 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrixFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Attempts to extract Euler angles from a 3D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractEulerFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Attempts to extract Euler angles from a 3D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param trsMatrix Rotation-scaling matrix.
+	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractEulerFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
