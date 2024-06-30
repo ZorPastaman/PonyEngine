@@ -8232,5 +8232,35 @@ namespace Math
 			Assert::AreEqual(0.469, static_cast<double>(quaternion.Z()), 0.001);
 			Assert::AreEqual(0.811, static_cast<double>(quaternion.W()), 0.001);
 		}
+
+		TEST_METHOD(RotationMatrixFromRsMatrixTest)
+		{
+			auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
+			auto matrix = PonyEngine::Math::ExtractRotationMatrixFromRsMatrix(rsMatrix);
+			Assert::AreEqual(0.364, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.859, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.361, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.663, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.511, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.547, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.654, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.04, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.755, static_cast<double>(matrix.M22()), 0.001);
+		}
+
+		TEST_METHOD(RotationMatrixFromTrsMatrixTest)
+		{
+			auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
+			auto matrix = PonyEngine::Math::ExtractRotationMatrixFromTrsMatrix(trsMatrix);
+			Assert::AreEqual(0.364, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(0.859, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(-0.361, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(-0.663, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.511, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.547, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(0.654, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.04, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.755, static_cast<double>(matrix.M22()), 0.001);
+		}
 	};
 }

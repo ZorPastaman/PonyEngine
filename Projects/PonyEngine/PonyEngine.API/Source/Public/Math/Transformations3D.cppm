@@ -227,8 +227,18 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> ExtractRotationQuaternionFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Attempts to extract a rotation matrix from a 3D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrixFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Attempts to extract a rotation matrix from a 3D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrixFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
@@ -690,10 +700,15 @@ namespace PonyEngine::Math
 	Matrix3x3<T> ExtractRotationMatrixFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept
 	{
 		const Vector3<T> scaling = ExtractScalingFromRsMatrix(rsMatrix);
-		Matrix3x3<T> scalingMatrix = Matrix3x3<T>::Predefined::Identity;
-		scalingMatrix.SetDiagonal(scaling);
 
-		return rsMatrix * scalingMatrix.Inverse(); // TODO: add undefined behavior to the docs if the scaling is 0.
+		Matrix3x3<T> rotationMatrix;
+		for (std::size_t i = 0; i < Matrix3x3<T>::Dimension; ++i)
+		{
+			const T inverseScaling = T{1} / scaling[i];
+			rotationMatrix.SetColumn(i, rsMatrix.GetColumn(i) * inverseScaling);
+		}
+
+		return rotationMatrix;
 	}
 
 	template<std::floating_point T>
