@@ -21,6 +21,8 @@ import :Vector4;
 
 export namespace PonyEngine::Math
 {
+	// TODO: add constexpr where possible
+
 	/// @brief Converts a 3D rotation matrix to a 3D rotation quaternion.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix. 
@@ -254,13 +256,23 @@ export namespace PonyEngine::Math
 	/// @brief Attempts to extract Euler angles from a 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
-	/// @param trsMatrix Rotation-scaling matrix.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractEulerFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Attempts to extract an axis-angle rotation from a 3D rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param rsMatrix Rotation-scaling matrix.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> ExtractAxisAngleFromRsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
+	/// @brief Attempts to extract an axis-angle rotation from a 3D translation-rotation-scaling matrix.
+	/// @note It works correctly if the scaling is positive.
+	/// @tparam T Value type.
+	/// @param trsMatrix Translation-rotation-scaling matrix.
+	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> ExtractAxisAngleFromTrsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
