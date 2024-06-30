@@ -8262,5 +8262,23 @@ namespace Math
 			Assert::AreEqual(0.04, static_cast<double>(matrix.M12()), 0.001);
 			Assert::AreEqual(0.755, static_cast<double>(matrix.M22()), 0.001);
 		}
+
+		TEST_METHOD(EulerFromRsMatrixTest)
+		{
+			auto rsMatrix = PonyEngine::Math::Matrix3x3<float>(1.20195207f, 2.83368228f, -1.18977177f, -2.78489148f, 2.1459669f, 2.297652f, 1.56952848f, 0.0955356f, 1.81313376f);
+			auto euler = PonyEngine::Math::ExtractEulerFromRsMatrix(rsMatrix);
+			Assert::AreEqual(-0.04, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.714, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.034, static_cast<double>(euler.Z()), 0.001);
+		}
+
+		TEST_METHOD(EulerFromTrsMatrixTest)
+		{
+			auto trsMatrix = PonyEngine::Math::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, 2.f, -3.f, 5.f, 1.f);
+			auto euler = PonyEngine::Math::ExtractEulerFromTrsMatrix(trsMatrix);
+			Assert::AreEqual(-0.04, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(0.714, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(1.034, static_cast<double>(euler.Z()), 0.001);
+		}
 	};
 }
