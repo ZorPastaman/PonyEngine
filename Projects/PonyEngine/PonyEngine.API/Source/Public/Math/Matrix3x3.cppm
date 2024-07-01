@@ -323,6 +323,11 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Casts all the components to the @p U and returns a new matrix with those components.
+		/// @tparam U Target component type.
+		template<Arithmetic U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Matrix3x3<U>() const noexcept;
+
 		/// @brief Row access operator.
 		/// @remark Don't store it. Use the access like this matrix[1][1].
 		/// @param rowIndex Row index. Must be in range [0, 2].
@@ -884,6 +889,16 @@ namespace PonyEngine::Math
 		return left.M00() * right.M00() + left.M10() * right.M10() + left.M20() * right.M20() +
 			left.M01() * right.M01() + left.M11() * right.M11() + left.M21() * right.M21() +
 			left.M02() * right.M02() + left.M12() * right.M12() + left.M22() * right.M22();
+	}
+
+	template<Arithmetic T>
+	template<Arithmetic U>
+	constexpr Matrix3x3<T>::operator Matrix3x3<U>() const noexcept
+	{
+		Matrix3x3<U> cast;
+		Cast(cast.Data(), Data(), ComponentCount);
+
+		return cast;
 	}
 
 	template<Arithmetic T>

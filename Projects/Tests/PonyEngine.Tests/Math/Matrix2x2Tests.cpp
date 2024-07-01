@@ -85,6 +85,16 @@ namespace Math
 			Assert::AreEqual(m11, row1.Y());
 		}
 
+		TEST_METHOD(CastTest)
+		{
+			constexpr auto floatMatrix = PonyEngine::Math::Matrix2x2<float>(3.1f, -2.2f, -5.9f, 4.8f);
+			const auto intMatrix = static_cast<PonyEngine::Math::Matrix2x2<int>>(floatMatrix);
+			Assert::AreEqual(3, intMatrix.M00());
+			Assert::AreEqual(-2, intMatrix.M10());
+			Assert::AreEqual(-5, intMatrix.M01());
+			Assert::AreEqual(4, intMatrix.M11());
+		}
+
 		TEST_METHOD(AccessOperatorReadShortTest)
 		{
 			constexpr short m00 = 10;
@@ -1772,6 +1782,8 @@ namespace Math
 			constexpr PonyEngine::Math::Matrix2x2<int> adjugate = matrix.Adjugate();
 			constexpr PonyEngine::Math::Matrix2x2<int> transpose = matrix.Transpose();
 			constexpr PonyEngine::Math::Matrix2x2<float> inverse = PonyEngine::Math::Matrix2x2<float>(0, 2, 3, 4).Inverse();
+
+			constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix2x2<float>>(matrix);
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector2<int> columnV = matrix[0];

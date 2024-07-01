@@ -18,8 +18,6 @@ import :Matrix3x3;
 import :Vector2;
 import :Vector3;
 
-// TODO: add planar rotor
-
 export namespace PonyEngine::Math
 {
 	/// @brief Converts a 2D rotation matrix to a rotation angle.

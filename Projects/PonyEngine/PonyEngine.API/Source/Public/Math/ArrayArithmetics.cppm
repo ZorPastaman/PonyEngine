@@ -26,6 +26,15 @@ export namespace PonyEngine::Math
 	template<typename T>
 	constexpr void Copy(T* destination, const T* source, std::size_t count) noexcept;
 
+	/// @brief Casts every element in the @p source array to @p U and puts the result to the @p destination array.
+	/// @tparam T Source type.
+	/// @tparam U Target type.
+	/// @param destination Destination array.Its length must be at least @p count.
+	/// @param source Source array. Its length must be at least @p count.
+	/// @param count Element count.
+	template<Arithmetic T, Arithmetic U>
+	constexpr void Cast(U* destination, const T* source, std::size_t count) noexcept;
+
 	/// @brief Computes result += right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -153,6 +162,15 @@ namespace PonyEngine::Math
 	constexpr void Copy(T* const destination, const T* const source, const std::size_t count) noexcept
 	{
 		std::copy(source, source + count, destination);
+	}
+
+	template<Arithmetic T, Arithmetic U>
+	constexpr void Cast(U* destination, const T* source, const std::size_t count) noexcept
+	{
+		for (const U* const end = destination + count; destination != end; ++destination, ++source)
+		{
+			*destination = static_cast<U>(*source);
+		}
 	}
 
 	template<Arithmetic T>

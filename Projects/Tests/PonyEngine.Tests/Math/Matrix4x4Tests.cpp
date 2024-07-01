@@ -141,6 +141,28 @@ namespace Math
 			Assert::AreEqual(m33, row3.W());
 		}
 
+		TEST_METHOD(CastTest)
+		{
+			constexpr auto floatMatrix = PonyEngine::Math::Matrix4x4<float>(3.1f, -2.2f, 4.4f, -2.1f, -5.9f, 4.8f, 7.1f, -6.5f, 12.f, 11.5f, -13.4f, -12.1f, 15.8f, -16.9f, 10.f, -1.f);
+			const auto intMatrix = static_cast<PonyEngine::Math::Matrix4x4<int>>(floatMatrix);
+			Assert::AreEqual(3, intMatrix.M00());
+			Assert::AreEqual(-2, intMatrix.M10());
+			Assert::AreEqual(4, intMatrix.M20());
+			Assert::AreEqual(-2, intMatrix.M30());
+			Assert::AreEqual(-5, intMatrix.M01());
+			Assert::AreEqual(4, intMatrix.M11());
+			Assert::AreEqual(7, intMatrix.M21());
+			Assert::AreEqual(-6, intMatrix.M31());
+			Assert::AreEqual(12, intMatrix.M02());
+			Assert::AreEqual(11, intMatrix.M12());
+			Assert::AreEqual(-13, intMatrix.M22());
+			Assert::AreEqual(-12, intMatrix.M32());
+			Assert::AreEqual(15, intMatrix.M03());
+			Assert::AreEqual(-16, intMatrix.M13());
+			Assert::AreEqual(10, intMatrix.M23());
+			Assert::AreEqual(-1, intMatrix.M33());
+		}
+
 		TEST_METHOD(AccessOperatorReadShortTest)
 		{
 			constexpr short m00 = 10;
@@ -4237,6 +4259,8 @@ namespace Math
 			constexpr bool isAlmostZero = PonyEngine::Math::Matrix4x4<float>::Predefined::Zero.IsAlmostZero();
 			constexpr bool isIdentity = matrix.IsIdentity();
 			constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.IsAlmostIdentity();
+
+			constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix4x4<float>>(matrix);
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector4<int> columnV = matrix[0];

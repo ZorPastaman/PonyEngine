@@ -109,6 +109,21 @@ namespace Math
 			Assert::AreEqual(m22, row2.Z());
 		}
 
+		TEST_METHOD(CastTest)
+		{
+			constexpr auto floatMatrix = PonyEngine::Math::Matrix3x3<float>(3.1f, -2.2f, 4.4f, -5.9f, 4.8f, 7.1f, 12.f, 11.5f, -13.4f);
+			const auto intMatrix = static_cast<PonyEngine::Math::Matrix3x3<int>>(floatMatrix);
+			Assert::AreEqual(3, intMatrix.M00());
+			Assert::AreEqual(-2, intMatrix.M10());
+			Assert::AreEqual(4, intMatrix.M20());
+			Assert::AreEqual(-5, intMatrix.M01());
+			Assert::AreEqual(4, intMatrix.M11());
+			Assert::AreEqual(7, intMatrix.M21());
+			Assert::AreEqual(12, intMatrix.M02());
+			Assert::AreEqual(11, intMatrix.M12());
+			Assert::AreEqual(-13, intMatrix.M22());
+		}
+
 		TEST_METHOD(AccessOperatorReadShortTest)
 		{
 			constexpr short m00 = 10;
@@ -2806,6 +2821,8 @@ namespace Math
 			constexpr bool isAlmostZero = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.IsAlmostZero();
 			constexpr bool isIdentity = matrix.IsIdentity();
 			constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.IsAlmostIdentity();
+
+			constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix3x3<float>>(matrix);
 
 			constexpr int m10A = matrix[1][0];
 			constexpr PonyEngine::Math::Vector3<int> columnV = matrix[0];

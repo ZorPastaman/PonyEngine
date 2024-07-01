@@ -180,6 +180,11 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Casts all the components to the @p U and returns a new vector with those components.
+		/// @tparam U Target component type.
+		template<Arithmetic U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Vector3<U>() const noexcept;
+
 		/// @brief Access to a component operator.
 		/// @param index Component index. Must be in range [0, 2].
 		/// @return Component dependent on the @p index. 0 -> x, 1 -> y, 2 -> z.
@@ -665,6 +670,16 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const Vector3<T>& left, const Vector3<T>& right, const T tolerance) noexcept
 	{
 		return (left - right).MagnitudeSquared() < tolerance * tolerance;
+	}
+
+	template<Arithmetic T>
+	template<Arithmetic U>
+	constexpr Vector3<T>::operator Vector3<U>() const noexcept
+	{
+		Vector3<U> cast;
+		Cast(cast.Data(), Data(), ComponentCount);
+
+		return cast;
 	}
 
 	template<Arithmetic T>

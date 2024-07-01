@@ -539,6 +539,14 @@ namespace Math
 			Assert::AreEqual(expectedString, ss.str());
 		}
 
+		TEST_METHOD(CastTest)
+		{
+			constexpr auto floatVector = PonyEngine::Math::Vector2<float>(3.1f, -2.2f);
+			const auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(floatVector);
+			Assert::AreEqual(3, intVector.X());
+			Assert::AreEqual(-2, intVector.Y());
+		}
+
 		TEST_METHOD(AccessShortTest)
 		{
 			constexpr short x = 2;
@@ -1362,6 +1370,8 @@ namespace Math
 			constexpr bool isAlmostZero = vector.IsAlmostZero();
 			constexpr bool isUnit = vector.IsUnit();
 			constexpr bool isUniform = vector.IsUniform();
+
+			constexpr auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(vector);
 
 			constexpr float value = vector[0];
 
