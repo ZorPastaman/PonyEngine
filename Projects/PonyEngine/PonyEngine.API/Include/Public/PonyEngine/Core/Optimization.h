@@ -9,8 +9,8 @@
 
 #pragma once
 
-#if _MSC_VER && !__INTEL_COMPILER
-#define PONY_DLL_EXPORT __declspec(dllexport)
+#if _MSC_VER
+#define PONY_RESTRICT __restrict
 #else
 #error "Unsupported compiler!"
 #endif

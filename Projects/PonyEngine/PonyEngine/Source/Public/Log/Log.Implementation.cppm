@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "Core/Linking.h"
+#include "PonyEngine/Core/Linking.h"
 
 export module PonyEngine.Log.Implementation;
 
