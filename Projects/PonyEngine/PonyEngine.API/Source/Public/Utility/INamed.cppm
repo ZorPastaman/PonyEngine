@@ -9,10 +9,10 @@
 
 export module PonyEngine.Utility:INamed;
 
-namespace PonyEngine::Utility
+export namespace PonyEngine::Utility
 {
 	/// @brief Object that has a name.
-	export class INamed
+	class INamed
 	{
 	public:
 		/// @brief Gets a name of an object.
@@ -21,6 +21,6 @@ namespace PonyEngine::Utility
 		virtual const char* GetName() const noexcept = 0;
 
 	protected:
-		inline virtual ~INamed() noexcept = default;
+		~INamed() noexcept = default;
 	};
 }

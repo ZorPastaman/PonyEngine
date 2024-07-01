@@ -15,10 +15,10 @@ import PonyEngine.Utility;
 
 import :IKeyboardObserver;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Engine window interface.
-	export class IWindow : public Utility::INamed
+	class IWindow : public Utility::INamed
 	{
 	public:
 		/// @brief Gets a window title.
@@ -43,6 +43,6 @@ namespace PonyEngine::Window
 		virtual void Tick() = 0;
 
 	protected:
-		inline virtual ~IWindow() noexcept = default;
+		~IWindow() noexcept = default;
 	};
 }

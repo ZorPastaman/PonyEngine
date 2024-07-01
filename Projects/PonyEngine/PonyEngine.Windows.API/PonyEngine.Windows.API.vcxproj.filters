@@ -32,7 +32,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\Platform\Windows\Framework.h">
+    <ClInclude Include="Include\Public\PonyEngine\Platform\Windows\Framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

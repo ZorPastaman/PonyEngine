@@ -41,12 +41,15 @@ namespace Math
 			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::ComputationalFor<double>>);
 		}
 
-		TEST_METHOD(DegToRadToDegTest)
+		TEST_METHOD(DegToRadTest)
 		{
 			Assert::AreEqual(std::numbers::pi_v<double> / 180., PonyEngine::Math::DegToRad<double>);
-			Assert::AreEqual(180. / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
-
 			Assert::AreEqual(std::numbers::pi_v<float> / 180.f, PonyEngine::Math::DegToRad<float>);
+		}
+
+		TEST_METHOD(RadToDegTest)
+		{
+			Assert::AreEqual(180. / std::numbers::pi_v<double>, PonyEngine::Math::RadToDeg<double>);
 			Assert::AreEqual(180.f / std::numbers::pi_v<float>, PonyEngine::Math::RadToDeg<float>);
 		}
 
@@ -60,16 +63,15 @@ namespace Math
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(1.f, 1.5f));
 		}
 
-		TEST_METHOD(SignumTest)
+		TEST_METHOD(SignumShortTest)
 		{
-			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{0}));
-			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{39}));
-			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{-42}));
+			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{ 0 }));
+			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{ 39 }));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{ -42 }));
+		}
 
-			Assert::AreEqual(0, PonyEngine::Math::Signum(0));
-			Assert::AreEqual(1, PonyEngine::Math::Signum(39));
-			Assert::AreEqual(-1, PonyEngine::Math::Signum(-42));
-
+		TEST_METHOD(SignumFloatTest)
+		{
 			Assert::AreEqual(0.f, PonyEngine::Math::Signum(0.f));
 			Assert::AreEqual(1.f, PonyEngine::Math::Signum(39.f));
 			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(-42.f));
@@ -77,73 +79,42 @@ namespace Math
 			Assert::AreEqual(-1.f, PonyEngine::Math::Signum(-0.3f));
 		}
 
-		TEST_METHOD(RoundToIntegralTest)
+		TEST_METHOD(RoundToIntegralShortTest)
 		{
+			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegral<float, short>(0.f));
 			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegral<float, short>(0.3f));
 			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegral<float, short>(-0.3f));
 			Assert::AreEqual(short{1}, PonyEngine::Math::RoundToIntegral<float, short>(0.7f));
 			Assert::AreEqual(short{-1}, PonyEngine::Math::RoundToIntegral<float, short>(-0.7f));
+			Assert::AreEqual(short{1}, PonyEngine::Math::RoundToIntegral<float, short>(1.2f));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::RoundToIntegral<float, short>(-1.2f));
 			Assert::AreEqual(short{10}, PonyEngine::Math::RoundToIntegral<float, short>(10.3f));
 			Assert::AreEqual(short{-10}, PonyEngine::Math::RoundToIntegral<float, short>(-10.3f));
 			Assert::AreEqual(short{11}, PonyEngine::Math::RoundToIntegral<float, short>(10.7f));
 			Assert::AreEqual(short{-11}, PonyEngine::Math::RoundToIntegral<float, short>(-10.7f));
-			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(0.3f));
-			Assert::AreEqual(short{0}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(-0.3f));
-			Assert::AreEqual(short{1}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(0.7f));
-			Assert::AreEqual(short{-1}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(-0.7f));
-			Assert::AreEqual(short{10}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(10.3f));
-			Assert::AreEqual(short{-10}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(-10.3f));
-			Assert::AreEqual(short{11}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(10.7f));
-			Assert::AreEqual(short{-11}, PonyEngine::Math::RoundToIntegralIfPossible<float, short>(-10.7f));
+		}
 
-			Assert::AreEqual(0, PonyEngine::Math::RoundToIntegral<float, int>(0.3f));
-			Assert::AreEqual(0, PonyEngine::Math::RoundToIntegral<float, int>(-0.3f));
-			Assert::AreEqual(1, PonyEngine::Math::RoundToIntegral<float, int>(0.7f));
-			Assert::AreEqual(-1, PonyEngine::Math::RoundToIntegral<float, int>(-0.7f));
-			Assert::AreEqual(10, PonyEngine::Math::RoundToIntegral<float, int>(10.3f));
-			Assert::AreEqual(-10, PonyEngine::Math::RoundToIntegral<float, int>(-10.3f));
-			Assert::AreEqual(11, PonyEngine::Math::RoundToIntegral<float, int>(10.7f));
-			Assert::AreEqual(-11, PonyEngine::Math::RoundToIntegral<float, int>(-10.7f));
-			Assert::AreEqual(0, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(0.3f));
-			Assert::AreEqual(0, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-0.3f));
-			Assert::AreEqual(1, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(0.7f));
-			Assert::AreEqual(-1, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-0.7f));
-			Assert::AreEqual(10, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(10.3f));
-			Assert::AreEqual(-10, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-10.3f));
-			Assert::AreEqual(11, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(10.7f));
-			Assert::AreEqual(-11, PonyEngine::Math::RoundToIntegralIfPossible<float, int>(-10.7f));
-
+		TEST_METHOD(RoundToIntegralLongLongTest)
+		{
+			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(0.));
 			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(0.3));
 			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegral<double, long long>(-0.3));
 			Assert::AreEqual(1LL, PonyEngine::Math::RoundToIntegral<double, long long>(0.7));
 			Assert::AreEqual(-1LL, PonyEngine::Math::RoundToIntegral<double, long long>(-0.7));
+			Assert::AreEqual(1LL, PonyEngine::Math::RoundToIntegral<double, long long>(1.2));
+			Assert::AreEqual(-1LL, PonyEngine::Math::RoundToIntegral<double, long long>(-1.2));
 			Assert::AreEqual(10LL, PonyEngine::Math::RoundToIntegral<double, long long>(10.3));
 			Assert::AreEqual(-10LL, PonyEngine::Math::RoundToIntegral<double, long long>(-10.3));
 			Assert::AreEqual(11LL, PonyEngine::Math::RoundToIntegral<double, long long>(10.7));
 			Assert::AreEqual(-11LL, PonyEngine::Math::RoundToIntegral<double, long long>(-10.7));
-			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(0.3));
-			Assert::AreEqual(0LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(-0.3));
-			Assert::AreEqual(1LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(0.7));
-			Assert::AreEqual(-1LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(-0.7));
-			Assert::AreEqual(10LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(10.3));
-			Assert::AreEqual(-10LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(-10.3));
-			Assert::AreEqual(11LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(10.7));
-			Assert::AreEqual(-11LL, PonyEngine::Math::RoundToIntegralIfPossible<double, long long>(-10.7));
-
-			Assert::AreEqual(5.7f, PonyEngine::Math::RoundToIntegralIfPossible<float, float>(5.7f));
-			Assert::AreEqual(5.7, PonyEngine::Math::RoundToIntegralIfPossible<double, double>(5.7));
 		}
 
-		TEST_METHOD(CommonConstexprTest)
+		TEST_METHOD(ConstexprCompilationTest)
 		{
-#pragma warning(disable:4189)
 			constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
 			constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
 			constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
 			constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
-			constexpr int round1 = PonyEngine::Math::RoundToIntegralIfPossible<float, int>(3.6f);
-			constexpr float round2 = PonyEngine::Math::RoundToIntegralIfPossible<float, float>(3.7f);
-#pragma warning(default:4189)
 		}
 	};
 }

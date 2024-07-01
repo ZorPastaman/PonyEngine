@@ -18,16 +18,16 @@ import PonyEngine.Input.Factories;
 
 import :InputSystem;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
-	export class InputSystemFactory final : public IInputSystemFactory
+	class InputSystemFactory final : public IInputSystemFactory
 	{
 	public:
-		inline InputSystemFactory() noexcept = default;
+		InputSystemFactory() noexcept = default;
 		InputSystemFactory(const InputSystemFactory&) = delete;
 		InputSystemFactory(InputSystemFactory&&) = delete;
 
-		inline virtual ~InputSystemFactory() noexcept = default;
+		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		virtual IInputSystem* Create(Core::IEngine& engine) override;
@@ -39,7 +39,10 @@ namespace PonyEngine::Input
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 	};
+}
 
+namespace PonyEngine::Input
+{
 	IInputSystem* InputSystemFactory::Create(Core::IEngine& engine)
 	{
 		return new InputSystem(engine);

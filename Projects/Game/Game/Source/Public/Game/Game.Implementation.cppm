@@ -11,6 +11,8 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Core/Linking.h"
+
 export module Game.Implementation;
 
 import PonyEngine.Core;
@@ -19,17 +21,20 @@ import Game;
 
 import :Game;
 
-namespace Game
+export namespace Game
 {
 	/// @brief Creates a game.
 	/// @param engine Engine that owns the game.
 	/// @return Created game.
-	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) IGame* CreateGame(PonyEngine::Core::IEngine& engine);
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT IGame* CreateGame(PonyEngine::Core::IEngine& engine);
 	/// @brief Destroys a previously created game.
 	/// @param game Game to destroy.
-	export __declspec(dllexport) void DestroyGame(IGame* game) noexcept;
+	PONY_DLL_EXPORT void DestroyGame(IGame* game) noexcept;
+}
 
+namespace Game
+{
 	IGame* CreateGame(PonyEngine::Core::IEngine& engine)
 	{
 		return new Game(engine);

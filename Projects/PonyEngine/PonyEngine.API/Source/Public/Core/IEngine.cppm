@@ -12,15 +12,15 @@ export module PonyEngine.Core:IEngine;
 import <cstddef>;
 import <functional>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window;
 
 import :ISystem;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief Main Pony Engine interface.
-	export class IEngine
+	class IEngine
 	{
 	public:
 		/// @brief Gets current frame count.
@@ -31,7 +31,7 @@ namespace PonyEngine::Core
 		/// @brief Gets an engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual Debug::Log::ILogger& GetLogger() const noexcept = 0;
+		virtual Log::ILogger& GetLogger() const noexcept = 0;
 		/// @brief Gets an engine window. The window is optional.
 		/// @return Engine window. Can be @a nullptr.
 		[[nodiscard("Pure function")]]
@@ -59,7 +59,7 @@ namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual int GetExitCode() const noexcept = 0;
 		/// @brief Stops the engine with the @p exitCode.
-		/// @details If the engine is already stopped, the invocation of this functions is ignored.
+		/// @details If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = 0) noexcept = 0;
 
@@ -67,13 +67,16 @@ namespace PonyEngine::Core
 		virtual void Tick() = 0;
 
 	protected:
-		inline virtual ~IEngine() noexcept = default;
+		~IEngine() noexcept = default;
 	};
+}
 
+namespace PonyEngine::Core
+{
 	template<typename T>
 	T* IEngine::FindSystem() const
 	{
-		ISystem* const system = FindSystem([](const ISystem* const system) { return dynamic_cast<const T*>(system) != nullptr; });
+		ISystem* const system = FindSystem([](const ISystem* const systemCandidate) { return dynamic_cast<const T*>(systemCandidate) != nullptr; });
 
 		return dynamic_cast<T*>(system);
 	}

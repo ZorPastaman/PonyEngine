@@ -11,10 +11,10 @@ export module PonyEngine.Core.Factories:ISystemFactory;
 
 import PonyEngine.Core;
 
-namespace PonyEngine::Core
+export namespace PonyEngine::Core
 {
 	/// @brief System factory.
-	export class ISystemFactory
+	class ISystemFactory
 	{
 	public:
 		/// @brief Creates a system.
@@ -32,6 +32,6 @@ namespace PonyEngine::Core
 		virtual const char* GetSystemName() const noexcept = 0;
 
 	protected:
-		inline virtual ~ISystemFactory() noexcept = default;
+		~ISystemFactory() noexcept = default;
 	};
 }

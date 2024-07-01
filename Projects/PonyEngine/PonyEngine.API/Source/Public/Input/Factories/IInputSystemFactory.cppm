@@ -13,10 +13,10 @@ import PonyEngine.Core;
 import PonyEngine.Core.Factories;
 import PonyEngine.Input;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
 	/// @brief Input system factory.
-	export class IInputSystemFactory : public Core::ISystemFactory
+	class IInputSystemFactory : public Core::ISystemFactory
 	{
 	public:
 		/// @brief Creates an input system.
@@ -26,6 +26,6 @@ namespace PonyEngine::Input
 		virtual IInputSystem* Create(Core::IEngine& engine) override = 0;
 
 	protected:
-		inline virtual ~IInputSystemFactory() noexcept = default;
+		~IInputSystemFactory() noexcept = default;
 	};
 }

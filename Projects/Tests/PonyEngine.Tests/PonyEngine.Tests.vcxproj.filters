@@ -33,13 +33,13 @@
     <ClCompile Include="Utility\StringUtilityTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\LogEntryTests.cpp">
+    <ClCompile Include="Log\LogEntryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\LogInputTests.cpp">
+    <ClCompile Include="Log\LogInputTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\LogTypeTests.cpp">
+    <ClCompile Include="Log\LogTypeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Window\KeyboardKeyCodeTests.cpp">
@@ -51,16 +51,34 @@
     <ClCompile Include="Core\EngineParamsTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\ConsoleSubLoggerTests.cpp">
+    <ClCompile Include="Log\ConsoleSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\FileSubLoggerTests.cpp">
+    <ClCompile Include="Log\FileSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Debug\Log\LoggerTests.cpp">
+    <ClCompile Include="Log\LoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\EngineTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix3x3Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix2x2Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\ArrayArithmeticsTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Matrix4x4Tests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Transformations2DTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Math\Transformations3DTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
