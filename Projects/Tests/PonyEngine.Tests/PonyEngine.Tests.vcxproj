@@ -73,14 +73,20 @@
   <ItemGroup>
     <ClCompile Include="Core\EngineParamsTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
-    <ClCompile Include="Debug\Log\ConsoleSubLoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\FileSubLoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\LogEntryTests.cpp" />
-    <ClCompile Include="Debug\Log\LoggerTests.cpp" />
-    <ClCompile Include="Debug\Log\LogInputTests.cpp" />
-    <ClCompile Include="Debug\Log\LogTypeTests.cpp" />
+    <ClCompile Include="Log\ConsoleSubLoggerTests.cpp" />
+    <ClCompile Include="Log\FileSubLoggerTests.cpp" />
+    <ClCompile Include="Log\LogEntryTests.cpp" />
+    <ClCompile Include="Log\LoggerTests.cpp" />
+    <ClCompile Include="Log\LogInputTests.cpp" />
+    <ClCompile Include="Log\LogTypeTests.cpp" />
+    <ClCompile Include="Math\ArrayArithmeticsTests.cpp" />
     <ClCompile Include="Math\CommonTests.cpp" />
+    <ClCompile Include="Math\Matrix2x2Tests.cpp" />
+    <ClCompile Include="Math\Matrix3x3Tests.cpp" />
+    <ClCompile Include="Math\Matrix4x4Tests.cpp" />
     <ClCompile Include="Math\QuaternionTests.cpp" />
+    <ClCompile Include="Math\Transformations2DTests.cpp" />
+    <ClCompile Include="Math\Transformations3DTests.cpp" />
     <ClCompile Include="Math\Vector2Tests.cpp" />
     <ClCompile Include="Math\Vector3Tests.cpp" />
     <ClCompile Include="Math\Vector4Tests.cpp" />
@@ -89,9 +95,6 @@
     <ClCompile Include="Window\KeyboardMessageTests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
-      <Project>{933d1110-b95b-4df9-8584-3d39bc307a67}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>

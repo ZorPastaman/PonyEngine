@@ -10,20 +10,24 @@
 export module PonyEngine.Utility:StringUtility;
 
 import <algorithm>;
+import <ranges>;
 import <string>;
 
-namespace PonyEngine::Utility
+export namespace PonyEngine::Utility
 {
 	/// @brief Converts std::wstring to std::string. It just casts every wchar to char.
 	/// @param source Source.
 	/// @return Converted string.
-	export [[nodiscard("Pure function")]]
-	inline std::string ConvertToString(const std::wstring& source);
+	[[nodiscard("Pure function")]]
+	std::string ConvertToString(const std::wstring& source);
+}
 
-	inline std::string ConvertToString(const std::wstring& source)
+namespace PonyEngine::Utility
+{
+	std::string ConvertToString(const std::wstring& source)
 	{
 		std::string answer(source.length(), 0);
-		std::transform(source.cbegin(), source.cend(), answer.begin(), [](const wchar_t c) { return static_cast<std::string::value_type>(c); });
+		std::ranges::transform(source, answer.begin(), [](const wchar_t c) { return static_cast<std::string::value_type>(c); });
 
 		return answer;
 	}

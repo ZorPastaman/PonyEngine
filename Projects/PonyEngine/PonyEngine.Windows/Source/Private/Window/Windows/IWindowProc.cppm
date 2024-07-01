@@ -9,14 +9,14 @@
 
 module;
 
-#include "Platform/Windows/Framework.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows.Implementation:IWindowProc;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Window proc manager.
-	export class IWindowProc
+	class IWindowProc
 	{
 	public:
 		/// @brief Window proc function.
@@ -27,6 +27,6 @@ namespace PonyEngine::Window
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
 	protected:
-		inline virtual ~IWindowProc() noexcept = default;
+		~IWindowProc() noexcept = default;
 	};
 }

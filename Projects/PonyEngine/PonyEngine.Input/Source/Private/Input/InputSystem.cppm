@@ -9,7 +9,7 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "PonyEngine/Log/LogMacro.h"
 
 export module PonyEngine.Input.Implementation:InputSystem;
 
@@ -20,14 +20,14 @@ import <unordered_map>;
 import <utility>;
 
 import PonyEngine.Core;
-import PonyEngine.Debug.Log;
 import PonyEngine.Input;
+import PonyEngine.Log;
 import PonyEngine.Window;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
 	/// @brief Default Pony Engine input system.
-	export class InputSystem final : public IInputSystem, public Window::IKeyboardObserver
+	class InputSystem final : public IInputSystem, public Window::IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -37,15 +37,16 @@ namespace PonyEngine::Input
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
-		virtual ~InputSystem() noexcept = default;
+		~InputSystem() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		inline virtual const char* GetName() const noexcept override;
+		virtual const char* GetName() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
 
-		inline virtual bool IsTickable() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsTickable() const noexcept override;
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
@@ -60,38 +61,39 @@ namespace PonyEngine::Input
 		static const char* const Name;
 
 	private:
-		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> m_events; /// @brief Input event action map.
-		std::size_t m_currentId; /// @brief Id that will be given to a new event. It's incremented every time.
-		std::queue<KeyboardMessage> m_queue; /// @brief Message queue.
+		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> m_events; ///< Input event action map.
+		std::size_t m_currentId; ///< ID that will be given to a new event. It's incremented every time.
+		std::queue<KeyboardMessage> m_queue; ///< Message queue.
 
-		const Core::IEngine& m_engine; /// @brief Engine that owns the input system.
+		const Core::IEngine& m_engine; ///< Engine that owns the input system.
 	};
+}
 
+namespace PonyEngine::Input
+{
 	InputSystem::InputSystem(Core::IEngine& engine) noexcept :
-		m_engine{engine},
-		m_events{},
 		m_currentId{1},
-		m_queue{}
+		m_engine{engine}
 	{
 	}
 
-	inline const char* InputSystem::GetName() const noexcept
+	const char* InputSystem::GetName() const noexcept
 	{
 		return Name;
 	}
 
 	void InputSystem::Begin()
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, "Try to subscribe to keyboard messages.");
+		PONY_LOG(m_engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
 
 		if (Window::IWindow* window = m_engine.GetWindow())
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Subscribe to keyboard messages.");
+			PONY_LOG(m_engine, Log::LogType::Info, "Subscribe to keyboard messages.");
 			window->AddKeyboardMessageObserver(this);
 		}
 		else
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Warning, "Couldn't find a window, the input system won't work.");
+			PONY_LOG(m_engine, Log::LogType::Warning, "Couldn't find a window, the input system won't work.");
 		}
 	}
 
@@ -99,12 +101,12 @@ namespace PonyEngine::Input
 	{
 		if (Window::IWindow* window = m_engine.GetWindow())
 		{
-			PONY_LOG(m_engine, Debug::Log::LogType::Info, "Unsubscribe to keyboard messages.");
+			PONY_LOG(m_engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
 			window->RemoveKeyboardMessageObserver(this);
 		}
 	}
 
-	inline bool InputSystem::IsTickable() const noexcept
+	bool InputSystem::IsTickable() const noexcept
 	{
 		return true;
 	}
@@ -118,11 +120,9 @@ namespace PonyEngine::Input
 			
 			for (const auto& [handle, eventPair] : m_events)
 			{
-				const KeyboardMessage expectedMessage = eventPair.first.GetExpectedMessage();
-
-				if (expectedMessage == message)
+				if (const KeyboardMessage expectedMessage = eventPair.first.GetExpectedMessage(); expectedMessage == message)
 				{
-					PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
+					PONY_LOG(m_engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
 					eventPair.second();
 				}
 			}
@@ -132,7 +132,7 @@ namespace PonyEngine::Input
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
 		const Handle handle(m_currentId++);
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'.", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
+		PONY_LOG(m_engine, Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'.", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		m_events.insert(std::pair(handle, eventAction));
 
@@ -141,13 +141,13 @@ namespace PonyEngine::Input
 
 	void InputSystem::UnregisterAction(const Handle handle)
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Info, std::format("Unregister an action. ID: '{}'.", handle.GetId()).c_str());
+		PONY_LOG(m_engine, Log::LogType::Info, std::format("Unregister an action. ID: '{}'.", handle.GetId()).c_str());
 		m_events.erase(handle);
 	}
 
 	void InputSystem::Observe(const Window::KeyboardMessage& keyboardMessage) noexcept
 	{
-		PONY_LOG(m_engine, Debug::Log::LogType::Verbose, std::format("Received an keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
+		PONY_LOG(m_engine, Log::LogType::Verbose, std::format("Received an keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
 		m_queue.push(KeyboardMessage(static_cast<KeyboardKeyCode>(keyboardMessage.GetKeyCode()), keyboardMessage.GetIsDown()));
 	}
 

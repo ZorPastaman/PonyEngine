@@ -14,7 +14,7 @@ import <exception>;
 
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 import PonyEngine.Window;
 import PonyEngine.Window.Factories;
 
@@ -24,17 +24,17 @@ namespace Core
 {
 	TEST_CLASS(EngineParamsTests)
 	{
-		class EmptyLogger final : public PonyEngine::Debug::Log::ILogger
+		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void Log(PonyEngine::Debug::Log::LogType, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
-			virtual void LogException(const std::exception&, const PonyEngine::Debug::Log::LogInput&) noexcept override { }
+			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override { }
+			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override { }
 
-			virtual void AddSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
-			virtual void RemoveSubLogger(PonyEngine::Debug::Log::ISubLogger*) override { }
+			virtual void AddSubLogger(PonyEngine::Log::ISubLogger*) override { }
+			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override { }
 		};
 
 		class EmptyWindow final : public PonyEngine::Window::IWindow
@@ -156,14 +156,14 @@ namespace Core
 		TEST_METHOD(ContructorTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams engineParams(logger);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Debug::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
+			PonyEngine::Core::EngineParams engineParams(&logger);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
 		}
 
 		TEST_METHOD(GetWindowFactoryTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams engineParams(logger);
+			PonyEngine::Core::EngineParams engineParams(&logger);
 			EmptyWindowFactory windowFactory;
 			engineParams.SetWindowFactory(&windowFactory);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Window::IWindowFactory*>(&windowFactory)), reinterpret_cast<std::uintptr_t>(engineParams.GetWindowFactory()));
@@ -172,7 +172,7 @@ namespace Core
 		TEST_METHOD(GetSystemFactoriesTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams engineParams(logger);
+			PonyEngine::Core::EngineParams engineParams(&logger);
 			EmptySystemFactory factory0;
 			EmptySystemFactory factory1;
 			EmptySystemFactory factory2;

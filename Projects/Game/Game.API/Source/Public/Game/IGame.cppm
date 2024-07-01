@@ -9,10 +9,10 @@
 
 export module Game:IGame;
 
-namespace Game
+export namespace Game
 {
 	/// @brief Game interface.
-	export class IGame
+	class IGame
 	{
 	public:
 		/// @brief Called before a first tick.
@@ -25,6 +25,6 @@ namespace Game
 		virtual void End() = 0;
 
 	protected:
-		inline virtual ~IGame() noexcept = default;
+		~IGame() noexcept = default;
 	};
 }

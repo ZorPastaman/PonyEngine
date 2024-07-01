@@ -15,10 +15,10 @@ import <string>;
 import <type_traits>;
 import <unordered_map>;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Keyboard key codes.
-	export enum class KeyboardKeyCode : std::uint_fast8_t
+	enum class KeyboardKeyCode : std::uint_fast8_t
 	{
 		// Special
 		None,
@@ -135,17 +135,20 @@ namespace PonyEngine::Window
 	/// @brief Creates a string representing the @p keyCode.
 	/// @param keyCode Key code.
 	/// @return Created string.
-	export [[nodiscard("Pure function")]]
+	[[nodiscard("Pure function")]]
 	std::string ToString(KeyboardKeyCode keyCode);
 
 	/// @brief Puts a string representing the @p keyCode into the @p stream.
 	/// @param stream Target.
 	/// @param keyCode Key code.
 	/// @return @p stream.
-	export inline std::ostream& operator <<(std::ostream& stream, KeyboardKeyCode keyCode);
+	std::ostream& operator <<(std::ostream& stream, KeyboardKeyCode keyCode);
+}
 
+namespace PonyEngine::Window
+{
 	/// @brief Key code to its name map.
-	static const std::unordered_map<KeyboardKeyCode, const char*> s_keyCodeStrings
+	const std::unordered_map<KeyboardKeyCode, const char*> KeyCodeStrings
 	{
 		// Special
 		{ KeyboardKeyCode::None, "None" },
@@ -261,9 +264,7 @@ namespace PonyEngine::Window
 
 	std::string ToString(const KeyboardKeyCode keyCode)
 	{
-		const std::unordered_map<KeyboardKeyCode, const char*>::const_iterator position = s_keyCodeStrings.find(keyCode);
-
-		if (position != s_keyCodeStrings.end()) [[likely]]
+		if (const auto position = KeyCodeStrings.find(keyCode); position != KeyCodeStrings.end()) [[likely]]
 		{
 			return position->second;
 		}
@@ -273,7 +274,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	inline std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
+	std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
 	{
 		return stream << ToString(keyCode);
 	}

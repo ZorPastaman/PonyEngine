@@ -9,48 +9,52 @@
 
 module;
 
-#include "Debug/Log/LogMacro.h"
+#include "PonyEngine/Log/LogMacro.h"
 
-export module PonyEngine.Debug.Log.Implementation:ConsoleSubLogger;
+export module PonyEngine.Log.Implementation:ConsoleSubLogger;
 
+import <format>;
 import <exception>;
 import <iostream>;
 import <stdexcept>;
 import <string>;
 
-import PonyEngine.Debug.Log;
+import PonyEngine.Log;
 
-namespace PonyEngine::Debug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
-	export class ConsoleSubLogger final : public ISubLogger
+	class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		inline ConsoleSubLogger() noexcept = default;
+		ConsoleSubLogger() noexcept = default;
 		ConsoleSubLogger(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger(ConsoleSubLogger&&) = delete;
 
-		inline virtual ~ConsoleSubLogger() noexcept = default;
+		~ConsoleSubLogger() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		inline virtual const char* GetName() const noexcept override;
+		virtual const char* GetName() const noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
 
-		static const char* const Name; /// @brief Class name.
+		static const char* const Name; ///< Class name.
 	};
+}
 
+namespace PonyEngine::Log
+{
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
 	/// @return Chosen stream.
 	[[nodiscard("Pure function")]]
-	static std::ostream& ChooseStream(LogType logType);
+	std::ostream& ChooseStream(const LogType logType);
 
-	inline const char* ConsoleSubLogger::GetName() const noexcept
+	const char* ConsoleSubLogger::GetName() const noexcept
 	{
 		return Name;
 	}
@@ -68,7 +72,7 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	static std::ostream& ChooseStream(const LogType logType)
+	std::ostream& ChooseStream(const LogType logType)
 	{
 		switch (logType)
 		{
@@ -86,5 +90,5 @@ namespace PonyEngine::Debug::Log
 		}
 	}
 
-	const char* const ConsoleSubLogger::Name = "PonyEngine::Debug::Log::ConsoleSubLogger";
+	const char* const ConsoleSubLogger::Name = "PonyEngine::Log::ConsoleSubLogger";
 }

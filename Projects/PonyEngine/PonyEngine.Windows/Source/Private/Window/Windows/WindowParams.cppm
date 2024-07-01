@@ -9,18 +9,17 @@
 
 module;
 
-#include "Platform/Windows/Framework.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowParams;
 
 import <string>;
 
-namespace PonyEngine::Window
+export namespace PonyEngine::Window
 {
 	/// @brief Window parameters.
-	export struct WindowParams final
+	struct WindowParams final
 	{
-	public:
 		WindowParams() = default;
 		WindowParams(const WindowParams& other) = default;
 		WindowParams(WindowParams&& other) = default;
@@ -30,7 +29,7 @@ namespace PonyEngine::Window
 		WindowParams& operator =(const WindowParams& other) = default;
 		WindowParams& operator =(WindowParams&& other) = default;
 
-		std::wstring title; /// @brief Window title.
-		int cmdShow = SW_NORMAL; /// @brief Window cmdShow.
+		std::wstring title; ///< Window title.
+		int cmdShow = SW_NORMAL; ///< Window cmdShow.
 	};
 }

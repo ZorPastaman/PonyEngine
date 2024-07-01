@@ -11,22 +11,27 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Core/Linking.h"
+
 export module PonyEngine.Input.Implementation;
 
 import PonyEngine.Input.Factories;
 
 import :InputSystemFactory;
 
-namespace PonyEngine::Input
+export namespace PonyEngine::Input
 {
 	/// @brief Creates an input system factory.
 	/// @return Input system factory.
-	export [[nodiscard("Pure function")]]
-	__declspec(dllexport) IInputSystemFactory* CreateInputSystemFactory();
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT IInputSystemFactory* CreateInputSystemFactory();
 	/// @brief Destroys a previously created input system factory.
 	/// @param factory Input system factory to destroy.
-	export __declspec(dllexport) void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept;
+	PONY_DLL_EXPORT void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept;
+}
 
+namespace PonyEngine::Input
+{
 	IInputSystemFactory* CreateInputSystemFactory()
 	{
 		return new InputSystemFactory();

@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 import <format>;
+import <numbers>;
 
 import PonyEngine.Math;
 
@@ -19,1041 +20,765 @@ namespace Math
 {
 	TEST_CLASS(QuaternionTests)
 	{
-		TEST_METHOD(QuaternionConstructionTest)
+		TEST_METHOD(TypesTest)
 		{
-			auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
-			Assert::AreEqual(0.f, defaultQuaternion.x);
-			Assert::AreEqual(0.f, defaultQuaternion.y);
-			Assert::AreEqual(0.f, defaultQuaternion.z);
-			Assert::AreEqual(0.f, defaultQuaternion.w);
-
-			float x = 4.f;
-			float y = 8.f;
-			float z = 10.f;
-			float w = -13.f;
-			auto setQuaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			Assert::AreEqual(x, setQuaternion.x);
-			Assert::AreEqual(y, setQuaternion.y);
-			Assert::AreEqual(z, setQuaternion.z);
-			Assert::AreEqual(w, setQuaternion.w);
-
-			auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
-			auto vectorQuaternion = PonyEngine::Math::Quaternion<float>(vector);
-			Assert::AreEqual(x, setQuaternion.x);
-			Assert::AreEqual(y, setQuaternion.y);
-			Assert::AreEqual(z, setQuaternion.z);
-			Assert::AreEqual(w, setQuaternion.w);
-
-			PonyEngine::Math::Quaternion<float> copiedQuaternion = vectorQuaternion;
-			Assert::AreEqual(x, copiedQuaternion.x);
-			Assert::AreEqual(y, copiedQuaternion.y);
-			Assert::AreEqual(z, copiedQuaternion.z);
-			Assert::AreEqual(w, copiedQuaternion.w);
-
-			PonyEngine::Math::Quaternion<float> movedQuaternion = std::move(vectorQuaternion);
-			Assert::AreEqual(x, movedQuaternion.x);
-			Assert::AreEqual(y, movedQuaternion.y);
-			Assert::AreEqual(z, movedQuaternion.z);
-			Assert::AreEqual(w, movedQuaternion.w);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::Quaternion<float>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::Quaternion<double>::ValueType>);
 		}
 
-		TEST_METHOD(QuaternionEulerTest)
+		TEST_METHOD(StaticDataTest)
 		{
-			float x = 0.f;
-			float y = 0.f;
-			float z = 0.f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>::CreateByEuler(x, y, z);
-			Assert::AreEqual(0.f, quaternion.x);
-			Assert::AreEqual(0.f, quaternion.y);
-			Assert::AreEqual(0.f, quaternion.z);
-			Assert::AreEqual(1.f, quaternion.w);
-			auto euler = quaternion.Euler();
-			Assert::AreEqual(x, euler.x);
-			Assert::AreEqual(y, euler.y);
-			Assert::AreEqual(z, euler.z);
-
-			x = 90.f;
-			y = 0.f;
-			z = 0.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = 90.f;
-			y = 60.f;
-			z = 45.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.701, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.092, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.092, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.701, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(90., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(15., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(euler.z), 0.001);
-
-			x = 0.f;
-			y = 90.f;
-			z = 0.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = 0.f;
-			y = 0.f;
-			z = 90.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = -90.f;
-			y = 0.f;
-			z = 0.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.707, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = -90.f;
-			y = -60.f;
-			z = -45.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.430, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.561, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.561, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.430, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(-90., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(-105., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(euler.z), 0.001);
-
-			x = 0.f;
-			y = -90.f;
-			z = 0.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.707, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = 0.f;
-			y = 0.f;
-			z = -90.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.707, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = 46.f;
-			y = 78.f;
-			z = 32.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.452, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.473, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.039, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.755, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = -46.f;
-			y = -78.f;
-			z = -32.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.132, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.640, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.434, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.620, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(euler.z), 0.001);
-
-			x = 146.f;
-			y = 178.f;
-			z = 132.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.274, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.104, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.384, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.876, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(34., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(-2., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(-48., static_cast<double>(euler.z), 0.001);
-
-			x = -146.f;
-			y = -178.f;
-			z = -132.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.260, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.134, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.393, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.871, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(-34., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(2., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(48., static_cast<double>(euler.z), 0.001);
-
-			x = 200.f;
-			y = 220.f;
-			z = 265.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.107, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.359, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.669, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.642, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(-20., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(40., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(85., static_cast<double>(euler.z), 0.001);
-
-			x = -200.f;
-			y = -220.f;
-			z = -265.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.348, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.138, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.581, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.722, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(20., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(-40., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(-85., static_cast<double>(euler.z), 0.001);
-
-			x = 300.f;
-			y = 320.f;
-			z = 285.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(0.192, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.521, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.631, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.541, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(-60., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(-40., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(-75., static_cast<double>(euler.z), 0.001);
-
-			x = -300.f;
-			y = -320.f;
-			z = -285.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.553, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.051, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.360, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.750, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(60., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(40., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(75., static_cast<double>(euler.z), 0.001);
-
-			x = 400.f;
-			y = 500.f;
-			z = 600.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.706, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.543, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.439, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.118, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(40., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(140., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(-120., static_cast<double>(euler.z), 0.001);
-
-			x = -400.f;
-			y = -500.f;
-			z = -600.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x, y, z);
-			Assert::AreEqual(-0.823, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.340, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.118, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.439, static_cast<double>(quaternion.w), 0.001);
-			euler = quaternion.EulerDegrees();
-			Assert::AreEqual(-40., static_cast<double>(euler.x), 0.001);
-			Assert::AreEqual(-140., static_cast<double>(euler.y), 0.001);
-			Assert::AreEqual(120., static_cast<double>(euler.z), 0.001);
-
-			x = 1.f;
-			y = 2.f;
-			z = 3.f;
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>::CreateByEuler(x, y, z);
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(x * PonyEngine::Math::RadToDeg<float>, y * PonyEngine::Math::RadToDeg<float>, z * PonyEngine::Math::RadToDeg<float>);
-			auto quaternion2 = PonyEngine::Math::Quaternion<float>::CreateByEuler(PonyEngine::Math::Vector3<float>(x, y, z));
-			auto quaternion3 = PonyEngine::Math::Quaternion<float>::CreateByEulerDegrees(PonyEngine::Math::Vector3<float>(x, y, z) * PonyEngine::Math::RadToDeg<float>);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(quaternion1.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(quaternion1.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(quaternion1.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(quaternion1.w), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(quaternion2.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(quaternion2.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(quaternion2.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(quaternion2.w), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(quaternion3.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(quaternion3.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(quaternion3.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(quaternion3.w), 0.001);
-
-			auto radVector = quaternion0.Euler();
-			auto degVector = quaternion0.EulerDegrees();
-			Assert::AreEqual(radVector.x * PonyEngine::Math::RadToDeg<float>, degVector.x);
-			Assert::AreEqual(radVector.y * PonyEngine::Math::RadToDeg<float>, degVector.y);
-			Assert::AreEqual(radVector.z * PonyEngine::Math::RadToDeg<float>, degVector.z);
+			Assert::AreEqual(std::size_t{4}, PonyEngine::Math::Quaternion<float>::ComponentCount);
 		}
 
-		TEST_METHOD(QuaternionAxisAngleTest)
-		{
-			float x = 1.f;
-			float y = 2.f;
-			float z = 3.f;
-			auto axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			float angle = 1.5f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngle(axis, angle);
-			Assert::AreEqual(0.182, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.364, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.547, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.732, static_cast<double>(quaternion.w), 0.001);
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle * PonyEngine::Math::RadToDeg<float>);
-			Assert::AreEqual(0.182, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.364, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.547, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.732, static_cast<double>(quaternion.w), 0.001);
-			auto axisAngle = quaternion.AxisAngle();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(angle), static_cast<double>(axisAngle.second), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(angle * PonyEngine::Math::RadToDeg<float>), static_cast<double>(axisAngle.second), 0.001);
-
-			x = -x;
-			y = -y;
-			z = -z;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = -angle;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngle(axis, angle);
-			Assert::AreEqual(0.182, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.364, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.547, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.732, static_cast<double>(quaternion.w), 0.001);
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle * PonyEngine::Math::RadToDeg<float>);
-			Assert::AreEqual(0.182, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.364, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.547, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.732, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngle();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(-angle), static_cast<double>(axisAngle.second), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(-angle * PonyEngine::Math::RadToDeg<float>), static_cast<double>(axisAngle.second), 0.001);
-
-			x = -2.f;
-			y = 4.f;
-			z = 1.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = 120.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(-0.378, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.756, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.189, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.5, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(angle), static_cast<double>(axisAngle.second), 0.001);
-
-			x = 3.f;
-			y = -4.f;
-			z = 3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = 220.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(0.483, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.644, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.483, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.342, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(-140., static_cast<double>(axisAngle.second), 0.001);
-
-			x = 5.f;
-			y = 4.f;
-			z = -3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = 300.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(0.354, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.282, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.212, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.866, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(-60., static_cast<double>(axisAngle.second), 0.001);
-
-			x = 5.f;
-			y = -4.f;
-			z = -3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = -60.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(-0.353, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.283, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.212, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.866, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(-angle), static_cast<double>(axisAngle.second), 0.001);
-
-			x = -5.f;
-			y = -4.f;
-			z = 3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = -160.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(0.696, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.557, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.418, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.173, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(static_cast<double>(-angle), static_cast<double>(axisAngle.second), 0.001);
-
-			x = -5.f;
-			y = -4.f;
-			z = -3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = -260.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(0.542, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.433, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.325, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.643, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(-100., static_cast<double>(axisAngle.second), 0.001);
-
-			x = 5.f;
-			y = 4.f;
-			z = 3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = -300.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(-0.354, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.283, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-0.212, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(-0.866, static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::AreEqual(static_cast<double>(-x), static_cast<double>(axisAngle.first.x), 0.001);
-			Assert::AreEqual(static_cast<double>(-y), static_cast<double>(axisAngle.first.y), 0.001);
-			Assert::AreEqual(static_cast<double>(-z), static_cast<double>(axisAngle.first.z), 0.001);
-			Assert::AreEqual(-60., static_cast<double>(axisAngle.second), 0.001);
-
-			x = 5.f;
-			y = 4.f;
-			z = 3.f;
-			axis = PonyEngine::Math::Vector3<float>(x, y, z);
-			axis.Normalize();
-			x = axis.x;
-			y = axis.y;
-			z = axis.z;
-			angle = 0.f;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngleDegrees(axis, angle);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
-			axisAngle = quaternion.AxisAngleDegrees();
-			Assert::IsTrue(std::isnan(axisAngle.first.x) || axisAngle.first.x == 0.f);
-			Assert::IsTrue(std::isnan(axisAngle.first.y) || axisAngle.first.y == 0.f);
-			Assert::IsTrue(std::isnan(axisAngle.first.z) || axisAngle.first.z == 0.f);
-			Assert::AreEqual(0., static_cast<double>(axisAngle.second), 0.001);
-		}
-
-		TEST_METHOD(QuaternionDirectionTest)
-		{
-			auto from = PonyEngine::Math::Vector3<float>(1.f, 4.f, -3.f).Normalized();
-			auto to = PonyEngine::Math::Vector3<float>(-4.f, 2.f, 1.f).Normalized();
-			auto quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(from, to);
-			Assert::AreEqual(0.296, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0.326, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0.533, static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0.722, static_cast<double>(quaternion.w), 0.001);
-
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Down, PonyEngine::Math::Vector3<float>::Up);
-			Assert::AreEqual(-1., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
-
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Left, PonyEngine::Math::Vector3<float>::Right);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(-1., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
-
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(PonyEngine::Math::Vector3<float>::Down, PonyEngine::Math::Vector3<float>::Down);
-			Assert::AreEqual(0., static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(1., static_cast<double>(quaternion.w), 0.001);
-
-			from = PonyEngine::Math::Vector3<float>(1.f, 1.f, 1.f).Normalized();
-			auto axis = PonyEngine::Math::Cross(from, PonyEngine::Math::Vector3<float>::Right).Normalized();
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByAxisAngle(axis, std::acos(std::nextafter(-1.f, 0.f)));
-			to = quaternion * from;
-			quaternion = PonyEngine::Math::Quaternion<float>::CreateByDirection(from, to);
-			Assert::AreEqual(0.707, static_cast<double>(quaternion.x), 0.001);
-			Assert::AreEqual(-0.707, static_cast<double>(quaternion.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.z), 0.001);
-			Assert::AreEqual(0., static_cast<double>(quaternion.w), 0.001);
-		}
-
-		TEST_METHOD(QuaternionMagnutudeTest)
-		{
-			float x = 4.f;
-			float y = 3.f;
-			float z = 1.f;
-			float w = -3.f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			float expectedMagnitudeSquared = x * x + y * y + z * z + w * w;
-			Assert::AreEqual(expectedMagnitudeSquared, quaternion.MagnitudeSquared());
-			Assert::AreEqual(std::sqrt(expectedMagnitudeSquared), quaternion.Magnitude());
-
-			quaternion = PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f);
-			Assert::AreEqual(1.f, quaternion.MagnitudeSquared());
-			Assert::AreEqual(1.f, quaternion.Magnitude());
-		}
-
-		TEST_METHOD(QuaternionConjugationTest)
-		{
-			float x = 4.f;
-			float y = 3.f;
-			float z = 1.f;
-			float w = -3.f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			auto conjugated = quaternion.Conjugated();
-			Assert::AreEqual(-x, conjugated.x);
-			Assert::AreEqual(-y, conjugated.y);
-			Assert::AreEqual(-z, conjugated.z);
-			Assert::AreEqual(w, conjugated.w);
-
-			quaternion.Conjugate();
-			Assert::AreEqual(conjugated.x, quaternion.x);
-			Assert::AreEqual(conjugated.y, quaternion.y);
-			Assert::AreEqual(conjugated.z, quaternion.z);
-			Assert::AreEqual(conjugated.w, quaternion.w);
-
-			quaternion.Normalize();
-			conjugated = quaternion.Conjugated();
-			auto multiplied = quaternion * conjugated;
-			Assert::AreEqual(0., static_cast<double>(multiplied.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(multiplied.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(multiplied.z), 0.001);
-			Assert::AreEqual(1., static_cast<double>(multiplied.w), 0.001);
-		}
-
-		TEST_METHOD(QuaternionNormalizationTest)
-		{
-			float x = 4.f;
-			float y = 3.f;
-			float z = 1.f;
-			float w = -3.f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			auto normalized = quaternion.Normalized();
-			Assert::AreEqual(0.676, static_cast<double>(normalized.x), 0.001);
-			Assert::AreEqual(0.507, static_cast<double>(normalized.y), 0.001);
-			Assert::AreEqual(0.169, static_cast<double>(normalized.z), 0.001);
-			Assert::AreEqual(-0.507, static_cast<double>(normalized.w), 0.001);
-
-			quaternion.Normalize();
-			Assert::AreEqual(normalized.x, quaternion.x);
-			Assert::AreEqual(normalized.y, quaternion.y);
-			Assert::AreEqual(normalized.z, quaternion.z);
-			Assert::AreEqual(normalized.w, quaternion.w);
-		}
-
-		TEST_METHOD(QuaternionIsFiniteTest)
+		TEST_METHOD(DefaultConstructorTest)
 		{
 			auto quaternion = PonyEngine::Math::Quaternion<float>();
-			Assert::IsTrue(quaternion.IsFinite());
-			float nan = std::numeric_limits<float>::quiet_NaN();
-			quaternion = PonyEngine::Math::Quaternion<float>(nan, 0.f, 0.f, 0.f);
-			Assert::IsFalse(quaternion.IsFinite());
-			quaternion.x = 0.f;
-			quaternion.y = nan;
-			Assert::IsFalse(quaternion.IsFinite());
-			quaternion.y = 0.f;
-			quaternion.z = nan;
-			Assert::IsFalse(quaternion.IsFinite());
-			quaternion.z = 0.f;
-			quaternion.w = nan;
-			Assert::IsFalse(quaternion.IsFinite());
+			Assert::AreEqual(float{}, quaternion.X());
+			Assert::AreEqual(float{}, quaternion.Y());
+			Assert::AreEqual(float{}, quaternion.Z());
+			Assert::AreEqual(float{}, quaternion.W());
 		}
 
-		TEST_METHOD(QuaternionSetTest)
+		TEST_METHOD(ConstructorTest)
 		{
-			auto quaternion = PonyEngine::Math::Quaternion<float>::Identity;
-			float x = 5.f;
-			float y = 1.f;
-			float z = -3.f;
-			float w = 4.f;
-			quaternion.Set(x, y, z, w);
-			Assert::AreEqual(x, quaternion.x);
-			Assert::AreEqual(y, quaternion.y);
-			Assert::AreEqual(z, quaternion.z);
-			Assert::AreEqual(w, quaternion.w);
-		}
-
-		TEST_METHOD(QuaternionToStringTest)
-		{
-			float x = -3.f;
-			float y = 3.f;
-			float z = 2.f;
-			float w = -2.f;
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
 			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			std::string expected = std::format("({}, {}, {}, {})", x, y, z, w);
-			Assert::AreEqual(expected, quaternion.ToString());
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(ConstructorPointerTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(std::array<float, 4>{x, y, z, w}.data());
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(ConstructorVectorTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			auto quaternion = static_cast<PonyEngine::Math::Quaternion<float>>(vector);
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(CopyConstructorTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> copiedQuaternion = quaternion;
+			Assert::AreEqual(x, copiedQuaternion.X());
+			Assert::AreEqual(y, copiedQuaternion.Y());
+			Assert::AreEqual(z, copiedQuaternion.Z());
+			Assert::AreEqual(w, copiedQuaternion.W());
+		}
+
+		TEST_METHOD(MoveConstructorTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> copiedQuaternion = std::move(quaternion);
+			Assert::AreEqual(x, copiedQuaternion.X());
+			Assert::AreEqual(y, copiedQuaternion.Y());
+			Assert::AreEqual(z, copiedQuaternion.Z());
+			Assert::AreEqual(w, copiedQuaternion.W());
+		}
+
+		TEST_METHOD(ComponentAccessTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+
+			constexpr auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternionC.X());
+			Assert::AreEqual(y, quaternionC.Y());
+			Assert::AreEqual(z, quaternionC.Z());
+			Assert::AreEqual(w, quaternionC.W());
+		}
+
+		TEST_METHOD(DataTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternion.Data()[0]);
+			Assert::AreEqual(y, quaternion.Data()[1]);
+			Assert::AreEqual(z, quaternion.Data()[2]);
+			Assert::AreEqual(w, quaternion.Data()[3]);
+
+			constexpr auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(x, quaternionC.Data()[0]);
+			Assert::AreEqual(y, quaternionC.Data()[1]);
+			Assert::AreEqual(z, quaternionC.Data()[2]);
+			Assert::AreEqual(w, quaternionC.Data()[3]);
+		}
+
+		TEST_METHOD(MagnitudeTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			Assert::AreEqual(22.f, quaternion.MagnitudeSquared());
+			Assert::AreEqual(4.69, static_cast<double>(quaternion.Magnitude()), 0.001);
+		}
+
+		TEST_METHOD(ConjugateTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> conjugate = quaternion.Conjugate();
+			Assert::AreEqual(-x, conjugate.X());
+			Assert::AreEqual(-y, conjugate.Y());
+			Assert::AreEqual(-z, conjugate.Z());
+			Assert::AreEqual(w, conjugate.W());
+		}
+
+		TEST_METHOD(InverseTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> inverse = quaternion.Inverse();
+			Assert::AreEqual(-0.182, static_cast<double>(inverse.X()), 0.001);
+			Assert::AreEqual(0.045, static_cast<double>(inverse.Y()), 0.001);
+			Assert::AreEqual(-0.045, static_cast<double>(inverse.Z()), 0.001);
+			Assert::AreEqual(0.091, static_cast<double>(inverse.W()), 0.001);
+		}
+
+		TEST_METHOD(NormalizeTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> normalized = quaternion.Normalized();
+			Assert::AreEqual(0.853, static_cast<double>(normalized.X()), 0.001);
+			Assert::AreEqual(-0.213, static_cast<double>(normalized.Y()), 0.001);
+			Assert::AreEqual(0.213, static_cast<double>(normalized.Z()), 0.001);
+			Assert::AreEqual(0.426, static_cast<double>(normalized.W()), 0.001);
+			quaternion.Normalize();
+			Assert::IsTrue(quaternion == normalized);
+		}
+
+		TEST_METHOD(IsIdentityTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsIdentity());
+
+			auto quaternion = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
+			Assert::IsTrue(quaternion.IsIdentity());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(quaternion.IsIdentity());
+				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				Assert::IsFalse(quaternion.IsIdentity());
+				quaternion.Data()[i] += 1;
+				Assert::IsFalse(quaternion.IsIdentity());
+				quaternion.Data()[i] = PonyEngine::Math::Quaternion<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsAlmostIdentityTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostIdentity());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostIdentity<false>());
+
+			auto quaternion = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
+			Assert::IsTrue(quaternion.IsAlmostIdentity());
+			Assert::IsTrue(quaternion.IsAlmostIdentity<false>());
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				Assert::IsTrue(quaternion.IsAlmostIdentity());
+				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				Assert::IsTrue(quaternion.IsAlmostIdentity());
+				quaternion.Data()[i] += 1;
+				Assert::IsFalse(quaternion.IsAlmostIdentity<false>());
+				Assert::IsTrue(quaternion.IsAlmostIdentity<false>(5.f));
+				quaternion.Data()[i] = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.Data()[i];
+			}
+		}
+
+		TEST_METHOD(IsUnitTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f).IsUnit());
+
+			Assert::IsFalse(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).Normalized().IsUnit());
+		}
+
+		TEST_METHOD(IsAlmostUnitTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity.IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 0.f, 0.f, 0.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 1.f, 0.f, 0.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(0.f, 0.f, 1.f, 0.f).IsAlmostUnit());
+
+			Assert::IsFalse(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsAlmostUnit());
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).IsAlmostUnit(20.f));
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>(1.f, 2.f, 1.f, 3.f).Normalized().IsAlmostUnit());
+		}
+
+		TEST_METHOD(IsFiniteTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			const float nan = std::numeric_limits<float>::quiet_NaN();
+			Assert::IsTrue(quaternion.IsFinite());
+			quaternion.X() = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.X() = x;
+			quaternion.Y() = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.Y() = y;
+			quaternion.Z() = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+			quaternion.Z() = z;
+			quaternion.W() = nan;
+			Assert::IsFalse(quaternion.IsFinite());
+		}
+
+		TEST_METHOD(SetTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>();
+			quaternion.Set(x, y, z, w);
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(SetArrayTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternion = PonyEngine::Math::Quaternion<float>();
+			quaternion.Set(std::array<float, 4>{x, y, z, w}.data());
+			Assert::AreEqual(x, quaternion.X());
+			Assert::AreEqual(y, quaternion.Y());
+			Assert::AreEqual(z, quaternion.Z());
+			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(ToStringTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			const std::string expectedString = std::format("({}, {}, {}, {})", x, y, z, w);
+			Assert::AreEqual(expectedString, quaternion.ToString());
 
 			std::ostringstream ss;
 			ss << quaternion;
-			Assert::AreEqual(expected, ss.str());
+			Assert::AreEqual(expectedString, ss.str());
 		}
 
-		TEST_METHOD(QuaternionToVector4Test)
+		TEST_METHOD(ToVector4Test)
 		{
-			float x = 5.f;
-			float y = 1.f;
-			float z = -3.f;
-			float w = 4.f;
-			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			PonyEngine::Math::Vector4<float> vector = quaternion;
-			Assert::AreEqual(x, vector.x);
-			Assert::AreEqual(y, vector.y);
-			Assert::AreEqual(z, vector.z);
-			Assert::AreEqual(w, vector.w);
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
+			Assert::AreEqual(x, vector.X());
+			Assert::AreEqual(y, vector.Y());
+			Assert::AreEqual(z, vector.Z());
+			Assert::AreEqual(w, vector.W());
 		}
 
-		TEST_METHOD(QuaternionAccessOperatorTest)
+		TEST_METHOD(CastTest)
 		{
-			float x = 2.f;
-			float y = 5.f;
-			float z = 10.f;
-			float w = 3.f;
+			constexpr auto floatQuaternion = PonyEngine::Math::Quaternion<float>(3.1f, -2.2f, 4.4f, -2.1f);
+			const auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(floatQuaternion);
+			Assert::AreEqual(3.1, doubleQuaternion.X(), 0.0001);
+			Assert::AreEqual(-2.2, doubleQuaternion.Y(), 0.0001);
+			Assert::AreEqual(4.4, doubleQuaternion.Z(), 0.0001);
+			Assert::AreEqual(-2.1, doubleQuaternion.W(), 0.0001);
+		}
+
+		TEST_METHOD(AccessByIndexTest)
+		{
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
 			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 			Assert::AreEqual(x, quaternion[0]);
 			Assert::AreEqual(y, quaternion[1]);
 			Assert::AreEqual(z, quaternion[2]);
 			Assert::AreEqual(w, quaternion[3]);
 
-			float x1 = 20.f;
-			float y1 = 34.f;
-			float z1 = 55.f;
-			float w1 = 33.f;
-			quaternion[0] = x1;
-			quaternion[1] = y1;
-			quaternion[2] = z1;
-			quaternion[3] = w1;
-			Assert::AreEqual(x1, quaternion[0]);
-			Assert::AreEqual(y1, quaternion[1]);
-			Assert::AreEqual(z1, quaternion[2]);
-			Assert::AreEqual(w1, quaternion[3]);
-
-			const auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			constexpr auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 			Assert::AreEqual(x, quaternionC[0]);
 			Assert::AreEqual(y, quaternionC[1]);
 			Assert::AreEqual(z, quaternionC[2]);
 			Assert::AreEqual(w, quaternionC[3]);
-
-			Assert::AreEqual(std::size_t{4}, PonyEngine::Math::Quaternion<float>::ComponentCount);
 		}
 
-		TEST_METHOD(QuaternionLerpTest)
+		TEST_METHOD(CopyAssignmentTest)
 		{
-			auto vector0 = PonyEngine::Math::Quaternion<float>(-2.f, 2.f, 4.f, 1.f);
-			auto vector1 = PonyEngine::Math::Quaternion<float>(2.f, 4.f, -8.f, 3.f);
-			auto lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.f);
-			Assert::AreEqual(vector0.x, lerped.x);
-			Assert::AreEqual(vector0.y, lerped.y);
-			Assert::AreEqual(vector0.z, lerped.z);
-			Assert::AreEqual(vector0.w, lerped.w);
-
-			lerped = PonyEngine::Math::Lerp(vector0, vector1, 1.f);
-			Assert::AreEqual(vector1.x, lerped.x);
-			Assert::AreEqual(vector1.y, lerped.y);
-			Assert::AreEqual(vector1.z, lerped.z);
-			Assert::AreEqual(vector1.w, lerped.w);
-
-			lerped = PonyEngine::Math::Lerp(vector0, vector1, 0.5f);
-			Assert::AreEqual(0.f, lerped.x);
-			Assert::AreEqual(3.f, lerped.y);
-			Assert::AreEqual(-2.f, lerped.z);
-			Assert::AreEqual(2.f, lerped.w);
-
-			lerped = PonyEngine::Math::Lerp(vector0, vector1, 2.f);
-			Assert::AreEqual(6.f, lerped.x);
-			Assert::AreEqual(6.f, lerped.y);
-			Assert::AreEqual(-20.f, lerped.z);
-			Assert::AreEqual(5.f, lerped.w);
-
-			lerped = PonyEngine::Math::Lerp(vector0, vector1, -1.f);
-			Assert::AreEqual(-6.f, lerped.x);
-			Assert::AreEqual(0.f, lerped.y);
-			Assert::AreEqual(16.f, lerped.z);
-			Assert::AreEqual(-1.f, lerped.w);
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto quaternionR = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto quaternionC = PonyEngine::Math::Quaternion<float>();
+			PonyEngine::Math::Quaternion<float>& quaternionL = quaternionC = quaternionR;
+			Assert::AreEqual(x, quaternionC.X());
+			Assert::AreEqual(y, quaternionC.Y());
+			Assert::AreEqual(z, quaternionC.Z());
+			Assert::AreEqual(w, quaternionC.W());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&quaternionC), reinterpret_cast<std::uintptr_t>(&quaternionL));
 		}
 
-		TEST_METHOD(QuaternionSlerpTest)
+		TEST_METHOD(MoveAssignmentTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(4.f, 4.f, 4.f, 7.f).Normalized();
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(1.f, 1.f, 10.f, 3.f).Normalized();
-			auto slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.f);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 1.f);
-			Assert::AreEqual(static_cast<double>(quaternion1.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.5f);
-			Assert::AreEqual(0.275, static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(0.275, static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(0.743, static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(0.546, static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 0.5f);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 0.f);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion0, 1.f);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
-
-			quaternion1 = quaternion0.Conjugated();
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.f);
-			Assert::AreEqual(static_cast<double>(quaternion0.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion0.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 1.f);
-			Assert::AreEqual(static_cast<double>(quaternion1.x), static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.y), static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.z), static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternion1.w), static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.5f);
-			Assert::AreEqual(0., static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(0., static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(0., static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(1., static_cast<double>(slerped.w), 0.001);
-
-			slerped = PonyEngine::Math::Slerp(quaternion0, quaternion1, 0.7f);
-			Assert::AreEqual(-0.177, static_cast<double>(slerped.x), 0.001);
-			Assert::AreEqual(-0.177, static_cast<double>(slerped.y), 0.001);
-			Assert::AreEqual(-0.177, static_cast<double>(slerped.z), 0.001);
-			Assert::AreEqual(0.952, static_cast<double>(slerped.w), 0.001);
+			constexpr float x = 4;
+			constexpr float y = -1;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			auto quaternionR = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			auto quaternionC = PonyEngine::Math::Quaternion<float>();
+			PonyEngine::Math::Quaternion<float>& quaternionL = quaternionC = std::move(quaternionR);
+			Assert::AreEqual(x, quaternionC.X());
+			Assert::AreEqual(y, quaternionC.Y());
+			Assert::AreEqual(z, quaternionC.Z());
+			Assert::AreEqual(w, quaternionC.W());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&quaternionC), reinterpret_cast<std::uintptr_t>(&quaternionL));
 		}
 
-		TEST_METHOD(QuaternionAreAlmostEqual)
+		TEST_METHOD(MultiplyAssignmentTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(1.f, 1.f, 1.f, 1.f);
-			auto quaternion1 = quaternion0;
-
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
-
-			quaternion1.x = std::nextafter(quaternion1.x, 0.f);
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
-
-			quaternion1.x = 0.f;
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1, 5.f));
-
-			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(quaternion0, quaternion1));
-
-			quaternion0.Normalize();
-			quaternion1 = quaternion0;
-
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
-
-			quaternion1.x = std::nextafter(quaternion1.x, 0.f);
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
-
-			quaternion1.x = 0.f;
-			Assert::IsTrue(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1, 5.f));
-
-			Assert::IsFalse(PonyEngine::Math::AreAlmostEqualNormalized(quaternion0, quaternion1));
+			constexpr float xR = 4;
+			constexpr float yR = -1;
+			constexpr float zR = 1;
+			constexpr float wR = 2;
+			constexpr auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR);
+			constexpr float xC = -2;
+			constexpr float yC = 3;
+			constexpr float zC = -1;
+			constexpr float wC = 2;
+			auto quaternionC = PonyEngine::Math::Quaternion<float>(xC, yC, zC, wC);
+			PonyEngine::Math::Quaternion<float>& quaternionL = quaternionC *= quaternionR;
+			Assert::AreEqual(6.f, quaternionC.X());
+			Assert::AreEqual(2.f, quaternionC.Y());
+			Assert::AreEqual(-10.f, quaternionC.Z());
+			Assert::AreEqual(16.f, quaternionC.W());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&quaternionC), reinterpret_cast<std::uintptr_t>(&quaternionL));
 		}
 
-		TEST_METHOD(QuaternionEqualityOperatorsTest)
+		TEST_METHOD(EqualityTest)
 		{
-			float x = 3.f;
-			float y = 4.f;
-			float z = 1.f;
-			float w = 2.f;
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			Assert::IsTrue(quaternion0 == quaternion1);
-			Assert::IsFalse(quaternion0 != quaternion1);
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -5;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> otherQuaternion = quaternion;
 
-			quaternion1.x += 1.f;
-			Assert::IsFalse(quaternion0 == quaternion1);
-			Assert::IsTrue(quaternion0 != quaternion1);
+			Assert::IsTrue(quaternion == otherQuaternion);
+			Assert::IsFalse(quaternion != otherQuaternion);
 
-			quaternion1.x = x;
-			quaternion1.y += 1.f;
-			Assert::IsFalse(quaternion0 == quaternion1);
-			Assert::IsTrue(quaternion0 != quaternion1);
-
-			quaternion1.y = y;
-			quaternion1.z += 1.f;
-			Assert::IsFalse(quaternion0 == quaternion1);
-			Assert::IsTrue(quaternion0 != quaternion1);
-
-			quaternion1.z = z;
-			quaternion1.w += 1.f;
-			Assert::IsFalse(quaternion0 == quaternion1);
-			Assert::IsTrue(quaternion0 != quaternion1);
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				Assert::IsFalse(quaternion == otherQuaternion);
+				Assert::IsTrue(quaternion != otherQuaternion);
+				otherQuaternion.Data()[i] += 1;
+				Assert::IsFalse(quaternion == otherQuaternion);
+				Assert::IsTrue(quaternion != otherQuaternion);
+				otherQuaternion.Data()[i] = quaternion.Data()[i];
+			}
 		}
 
-		TEST_METHOD(QuaternionMultiplicationTest)
+		TEST_METHOD(PredefinedTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(0.5f, 1.f, 2.f, -1.f);
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-0.7f, 2.f, -5.f, 1.f);
-			auto quaternion2 = quaternion0 * quaternion1;
-			Assert::AreEqual(-7.8, static_cast<double>(quaternion2.x), 0.001);
-			Assert::AreEqual(0.1, static_cast<double>(quaternion2.y), 0.001);
-			Assert::AreEqual(8.7, static_cast<double>(quaternion2.z), 0.001);
-			Assert::AreEqual(7.35, static_cast<double>(quaternion2.w), 0.001);
-
-			quaternion0.Normalize();
-			quaternion1.Normalize();
-			quaternion2 = quaternion0 * quaternion1;
-			Assert::AreEqual(-0.565, static_cast<double>(quaternion2.x), 0.001);
-			Assert::AreEqual(0.007, static_cast<double>(quaternion2.y), 0.001);
-			Assert::AreEqual(0.630, static_cast<double>(quaternion2.z), 0.001);
-			Assert::AreEqual(0.532, static_cast<double>(quaternion2.w), 0.001);
-
-			quaternion2 = PonyEngine::Math::Quaternion<float>::Identity * PonyEngine::Math::Quaternion<float>::Identity;
-			Assert::AreEqual(0.f, quaternion2.x);
-			Assert::AreEqual(0.f, quaternion2.y);
-			Assert::AreEqual(0.f, quaternion2.z);
-			Assert::AreEqual(1.f, quaternion2.w);
+			Assert::IsTrue(PonyEngine::Math::Quaternion<float>::Predefined::Identity == PonyEngine::Math::Quaternion<float>(0, 0, 0, 1));
 		}
 
-		TEST_METHOD(QuaternionVectorMultiplicationTest)
+		TEST_METHOD(DotTest)
 		{
-			auto quaternion = PonyEngine::Math::Quaternion<float>(4.f, 3.f, 1.f, -3.f);
-			auto vector = PonyEngine::Math::Vector3<float>(-4.f, 7.f, 8.f);
-			auto rotated = quaternion * vector;
-			Assert::AreEqual(206., static_cast<double>(rotated.x), 0.001);
-			Assert::AreEqual(-63., static_cast<double>(rotated.y), 0.001);
-			Assert::AreEqual(-622., static_cast<double>(rotated.z), 0.001);
+			constexpr float xR = 2;
+			constexpr float yR = -3;
+			constexpr float zR = 5;
+			constexpr float wR = -5;
+			constexpr auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR);
+			constexpr float xL = -2;
+			constexpr float yL = 3;
+			constexpr float zL = -1;
+			constexpr float wL = 2;
+			constexpr auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL);
+			Assert::AreEqual(-28.f, PonyEngine::Math::Dot(quaternionL, quaternionR));
+		}
+
+		TEST_METHOD(AngleTest)
+		{
+			float xR = 2;
+			float yR = -3;
+			float zR = 5;
+			float wR = -5;
+			auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			float xL = -2;
+			float yL = 3;
+			float zL = -1;
+			float wL = 2;
+			auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(1.178, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = -5;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = 2;
+			yL = 3;
+			zL = 1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(2.662, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			Assert::AreEqual(0., static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionL)), 0.001);
+			xR = 3;
+			yR = 2;
+			zR = 2;
+			wR = 1;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = -2;
+			yL = 3;
+			zL = -1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+			xR = 0;
+			yR = 1;
+			zR = 0;
+			wR = 0;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = -2;
+			yL = 3;
+			zL = -1;
+			wL = 2;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(PonyEngine::Math::Angle(quaternionL, quaternionR)), 0.001);
+		}
+
+		TEST_METHOD(LerpTest)
+		{
+			constexpr float xR = 2;
+			constexpr float yR = -3;
+			constexpr float zR = 5;
+			constexpr float wR = -5;
+			constexpr auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR);
+			constexpr float xL = -2;
+			constexpr float yL = 3;
+			constexpr float zL = -1;
+			constexpr float wL = 2;
+			constexpr auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL);
+
+			PonyEngine::Math::Quaternion<float> lerped = PonyEngine::Math::Lerp(quaternionL, quaternionR, 0.f);
+			Assert::AreEqual(xL, lerped.X());
+			Assert::AreEqual(yL, lerped.Y());
+			Assert::AreEqual(zL, lerped.Z());
+			Assert::AreEqual(wL, lerped.W());
+
+			lerped = PonyEngine::Math::Lerp(quaternionL, quaternionR, 1.f);
+			Assert::AreEqual(xR, lerped.X());
+			Assert::AreEqual(yR, lerped.Y());
+			Assert::AreEqual(zR, lerped.Z());
+			Assert::AreEqual(wR, lerped.W());
+
+			lerped = PonyEngine::Math::Lerp(quaternionL, quaternionR, 0.5f);
+			Assert::AreEqual(0.f, lerped.X());
+			Assert::AreEqual(0.f, lerped.Y());
+			Assert::AreEqual(2.f, lerped.Z());
+			Assert::AreEqual(-1.5f, lerped.W());
+
+			lerped = PonyEngine::Math::Lerp(quaternionL, quaternionR, 2.f);
+			Assert::AreEqual(6.f, lerped.X());
+			Assert::AreEqual(-9.f, lerped.Y());
+			Assert::AreEqual(11.f, lerped.Z());
+			Assert::AreEqual(-12.f, lerped.W());
+
+			lerped = PonyEngine::Math::Lerp(quaternionL, quaternionR, -1.f);
+			Assert::AreEqual(-6.f, lerped.X());
+			Assert::AreEqual(9.f, lerped.Y());
+			Assert::AreEqual(-7.f, lerped.Z());
+			Assert::AreEqual(9.f, lerped.W());
+		}
+
+		TEST_METHOD(SlerpTest)
+		{
+			float xR = 2;
+			float yR = 3;
+			float zR = 5;
+			float wR = 5;
+			auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			float xL = 2;
+			float yL = 3;
+			float zL = 1;
+			float wL = 2;
+			auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+
+			PonyEngine::Math::Quaternion<float> slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.f);
+			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 1.f);
+			Assert::AreEqual(static_cast<double>(quaternionR.X()), static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionR.Y()), static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionR.Z()), static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionR.W()), static_cast<double>(slerped.W()), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f);
+			Assert::AreEqual(0.378, static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(0.567, static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(0.452, static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(0.575, static_cast<double>(slerped.W()), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR.Conjugate(), 0.5f);
+			Assert::AreEqual(0.46, static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(0.69, static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(0.55, static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(-0.1, static_cast<double>(slerped.W()), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionL, 0.5f);
+			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+
+			slerped = PonyEngine::Math::Slerp(quaternionL, static_cast<PonyEngine::Math::Quaternion<float>>(-static_cast<PonyEngine::Math::Vector4<float>>(quaternionL)), 0.5f);
+			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+
+			xR = 2;
+			yR = 3;
+			zR = 5;
+			wR = 5;
+			quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR).Normalized();
+			xL = 3;
+			yL = -2;
+			zL = -5;
+			wL = 5;
+			quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL).Normalized();
+			slerped = PonyEngine::Math::Slerp(quaternionL, quaternionR, 0.5f);
+			Assert::AreEqual(0.445, static_cast<double>(slerped.X()), 0.001);
+			Assert::AreEqual(0.089, static_cast<double>(slerped.Y()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(slerped.Z()), 0.001);
+			Assert::AreEqual(0.891, static_cast<double>(slerped.W()), 0.001);
+		}
+
+		TEST_METHOD(AreAlmostEqualTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -5;
+			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			PonyEngine::Math::Quaternion<float> otherQuaternion = quaternion;
+
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion));
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion));
+				otherQuaternion.Data()[i] += 1;
+				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion));
+				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion, 5.f));
+				otherQuaternion.Data()[i] = quaternion.Data()[i];
+			}
 
 			quaternion.Normalize();
-			rotated = quaternion * vector;
-			Assert::AreEqual(2., static_cast<double>(rotated.x), 0.001);
-			Assert::AreEqual(5., static_cast<double>(rotated.y), 0.001);
-			Assert::AreEqual(-10., static_cast<double>(rotated.z), 0.001);
+			otherQuaternion = quaternion;
 
-			rotated = PonyEngine::Math::Quaternion<float>::Identity * vector;
-			Assert::AreEqual(vector.x, rotated.x);
-			Assert::AreEqual(vector.y, rotated.y);
-			Assert::AreEqual(vector.z, rotated.z);
+			Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion));
+
+			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
+			{
+				otherQuaternion = quaternion;
+				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				otherQuaternion.Normalize();
+				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion));
+				otherQuaternion.Data()[i] += 1;
+				otherQuaternion.Normalize();
+				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion));
+				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion, 1.f));
+				otherQuaternion.Data()[i] = quaternion.Data()[i];
+			}
 		}
 
-		TEST_METHOD(QuaternionAssignmentTest)
+		TEST_METHOD(MultiplicationTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>();
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-0.7f, 2.f, -5.f, 1.f);
-			auto quaternion2 = quaternion0 = quaternion1;
-			Assert::AreEqual(quaternion1.x, quaternion0.x);
-			Assert::AreEqual(quaternion1.y, quaternion0.y);
-			Assert::AreEqual(quaternion1.z, quaternion0.z);
-			Assert::AreEqual(quaternion1.w, quaternion0.w);
-			Assert::AreEqual(quaternion2.x, quaternion0.x);
-			Assert::AreEqual(quaternion2.y, quaternion0.y);
-			Assert::AreEqual(quaternion2.z, quaternion0.z);
-			Assert::AreEqual(quaternion2.w, quaternion0.w);
+			constexpr float xR = 2;
+			constexpr float yR = -3;
+			constexpr float zR = 5;
+			constexpr float wR = -5;
+			constexpr auto quaternionR = PonyEngine::Math::Quaternion<float>(xR, yR, zR, wR);
+			constexpr float xL = -2;
+			constexpr float yL = 3;
+			constexpr float zL = -1;
+			constexpr float wL = 2;
+			constexpr auto quaternionL = PonyEngine::Math::Quaternion<float>(xL, yL, zL, wL);
 
-			quaternion0 = PonyEngine::Math::Quaternion<float>(4.f, 3.f, 1.f, -3.f);
-			quaternion2 = quaternion0 * quaternion1;
-			auto quaternion3 = quaternion0 *= quaternion1;
-			Assert::AreEqual(quaternion0.x, quaternion2.x);
-			Assert::AreEqual(quaternion0.y, quaternion2.y);
-			Assert::AreEqual(quaternion0.z, quaternion2.z);
-			Assert::AreEqual(quaternion0.w, quaternion2.w);
-			Assert::AreEqual(quaternion3.x, quaternion2.x);
-			Assert::AreEqual(quaternion3.y, quaternion2.y);
-			Assert::AreEqual(quaternion3.z, quaternion2.z);
-			Assert::AreEqual(quaternion3.w, quaternion2.w);
+			PonyEngine::Math::Quaternion<float> product = quaternionL * quaternionR;
+			Assert::AreEqual(26.f, product.X());
+			Assert::AreEqual(-13.f, product.Y());
+			Assert::AreEqual(15.f, product.Z());
+			Assert::AreEqual(8.f, product.W());
+
+			product = quaternionL.Normalized() * quaternionR.Normalized();
+			Assert::AreEqual(0.772, static_cast<double>(product.X()), 0.001);
+			Assert::AreEqual(-0.386, static_cast<double>(product.Y()), 0.001);
+			Assert::AreEqual(0.445, static_cast<double>(product.Z()), 0.001);
+			Assert::AreEqual(0.238, static_cast<double>(product.W()), 0.001);
 		}
 
-		TEST_METHOD(QuaternionDotTest)
+		TEST_METHOD(MultiplicationVectorTest)
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<float>(2.f, 3.f, -1.f, 7.f);
-			auto quaternion1 = PonyEngine::Math::Quaternion<float>(-2.f, -5.f, 2.f, 10.f);
-			float expected = quaternion0.x * quaternion1.x + quaternion0.y * quaternion1.y +
-				quaternion0.z * quaternion1.z + quaternion0.w * quaternion1.w;
-			Assert::AreEqual(expected, PonyEngine::Math::Dot(quaternion0, quaternion1));
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr auto vector = PonyEngine::Math::Vector3<float>(x, y, z);
+			constexpr float xQ = -2;
+			constexpr float yQ = 3;
+			constexpr float zQ = -1;
+			constexpr float wQ = 2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(xQ, yQ, zQ, wQ);
 
-			Assert::AreEqual(1.f, PonyEngine::Math::Dot(PonyEngine::Math::Quaternion<float>::Identity, PonyEngine::Math::Quaternion<float>::Identity));
+			PonyEngine::Math::Vector3<float> product = quaternion * vector;
+			Assert::AreEqual(66.f, product.X());
+			Assert::AreEqual(5.f, product.Y());
+			Assert::AreEqual(-99.f, product.Z());
+
+			product = quaternion.Normalized() * vector;
+			Assert::AreEqual(5.556, static_cast<double>(product.X()), 0.001);
+			Assert::AreEqual(-2.556, static_cast<double>(product.Y()), 0.001);
+			Assert::AreEqual(-0.778, static_cast<double>(product.Z()), 0.001);
 		}
 
-		TEST_METHOD(QuaternionAngleTest)
+		static constexpr PonyEngine::Math::Quaternion<float> QuaternionConstexpr()
 		{
-			auto quaternion0 = PonyEngine::Math::Quaternion<double>(3.f, 2.f, -9.f, -6.f).Normalized();
-			auto quaternion1 = PonyEngine::Math::Quaternion<double>(1.f, -2.f, -7.f, 3.f).Normalized();
-			Assert::AreEqual(2.126, PonyEngine::Math::Angle(quaternion0, quaternion1), 0.001);
-			Assert::AreEqual(121.818, PonyEngine::Math::AngleDegrees(quaternion0, quaternion1), 0.001);
+			auto quaternionToMove = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			PonyEngine::Math::Quaternion<float> movedQuaternion = std::move(quaternionToMove);
 
-			quaternion1 = quaternion0;
-			Assert::AreEqual(0., PonyEngine::Math::Angle(quaternion0, quaternion1));
-			Assert::AreEqual(0., PonyEngine::Math::AngleDegrees(quaternion0, quaternion1));
+			auto quaternion = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			quaternion.X() *= 3.f;
+			quaternion.Y() /= 4.f;
+			quaternion.Z() += 2.f;
+			quaternion.W() -= 1.f;
+			quaternion.Data()[2] -= 6.f;
+
+			const auto quaternionC = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			const float y = quaternionC.Data()[1];
+
+			quaternion.Set(1.f, 6.f, 7.f, -1.f);
+			quaternion.Set(quaternion.Data());
+
+			quaternion[0] *= 5.f;
+
+			movedQuaternion = quaternionC;
+			movedQuaternion = std::move(quaternion);
+
+			movedQuaternion *= movedQuaternion;
+
+			return movedQuaternion;
 		}
 
-		TEST_METHOD(QuaternionDefaultTest)
+		TEST_METHOD(ConstexprCompilationTest)
 		{
-			auto identityF = PonyEngine::Math::Quaternion<float>::Identity;
-			Assert::AreEqual(0.f, identityF.x);
-			Assert::AreEqual(0.f, identityF.y);
-			Assert::AreEqual(0.f, identityF.y);
-			Assert::AreEqual(1.f, identityF.w);
+			constexpr auto identity = PonyEngine::Math::Quaternion<float>::Predefined::Identity;
 
-			auto identityD = PonyEngine::Math::Quaternion<double>::Identity;
-			Assert::AreEqual(0., identityD.x);
-			Assert::AreEqual(0., identityD.y);
-			Assert::AreEqual(0., identityD.y);
-			Assert::AreEqual(1., identityD.w);
-		}
-
-		TEST_METHOD(QuaternionValueTypeTest)
-		{
-			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<float>::ValueType, float>);
-			Assert::IsTrue(std::is_same_v<PonyEngine::Math::Quaternion<double>::ValueType, double>);
-		}
-
-		TEST_METHOD(QuaternionConstexprTest)
-		{
-#pragma warning(disable:4189)
-			constexpr auto vector3 = PonyEngine::Math::Vector3<float>(3.f, 2.f, 1.f);
-			constexpr auto vector4 = PonyEngine::Math::Vector4<float>(1.f, 1.f, 1.f, 2.f);
 			constexpr auto defaultQuaternion = PonyEngine::Math::Quaternion<float>();
-			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(1.f, 2.f, 3.f, 4.f);
-			constexpr auto quaternionV = PonyEngine::Math::Quaternion<float>(vector4);
-			constexpr auto copiedQuaternion = quaternion;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
+			constexpr auto vectorQuaternion = PonyEngine::Math::Quaternion<float>(PonyEngine::Math::Vector4<float>(0, 4, 5, 1));
+			constexpr PonyEngine::Math::Quaternion<float> copiedQuaternion = quaternion;
+			constexpr PonyEngine::Math::Quaternion<float> movedQuaternion = QuaternionConstexpr();
+
+			constexpr float x = quaternion.X();
+			constexpr float y = quaternion.Y();
+			constexpr float z = quaternion.Z();
+			constexpr float w = quaternion.W();
 
 			constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
-			constexpr auto conjugated = quaternion.Conjugated();
-			constexpr PonyEngine::Math::Vector4<float> vectorQ = quaternion;
 
-			constexpr float dot = PonyEngine::Math::Dot(quaternion, quaternionV);
+			constexpr PonyEngine::Math::Quaternion<float> conjugate = quaternion.Conjugate();
+			constexpr PonyEngine::Math::Quaternion<float> inverse = quaternion.Inverse();
 
-			constexpr bool equal = quaternion == copiedQuaternion;
-			constexpr bool notEqual = quaternion != copiedQuaternion;
+			constexpr bool isIdentity = quaternion.IsIdentity();
+			constexpr bool isUnit = quaternion.IsUnit();
 
-			constexpr auto rotatedQ = quaternion * copiedQuaternion;
-			constexpr auto rotatedV = quaternion * vector3;
-#pragma warning(default:4189)
+			constexpr auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
+			constexpr auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(quaternion);
+
+			constexpr float component = quaternion[2];
+
+			constexpr bool equal = quaternion == defaultQuaternion;
+			constexpr bool notEqual = quaternion != defaultQuaternion;
+
+			constexpr float dot = PonyEngine::Math::Dot(quaternion, vectorQuaternion);
+			constexpr PonyEngine::Math::Quaternion<float> lerped = PonyEngine::Math::Lerp(defaultQuaternion, quaternion, 0.5f);
+
+			constexpr PonyEngine::Math::Quaternion<float> product = quaternion * vectorQuaternion;
+			constexpr PonyEngine::Math::Vector3<float> productV = quaternion * PonyEngine::Math::Vector3<float>(0, 4, 5);
 		}
 	};
 }
