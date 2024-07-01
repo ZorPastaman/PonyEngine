@@ -636,7 +636,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T>::Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept :
-		Matrix4x4(column0.X(), column0.Y(), column0.Z(), column0.W(), column1.X(), column1.Y(), column1.Z(), column1.W(), 
+		Matrix4x4(column0.X(), column0.Y(), column0.Z(), column0.W(), column1.X(), column1.Y(), column1.Z(), column1.W(),
 			column2.X(), column2.Y(), column2.Z(), column2.W(), column3.X(), column3.Y(), column3.Z(), column3.W())
 	{
 	}

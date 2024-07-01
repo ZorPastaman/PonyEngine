@@ -582,7 +582,7 @@ namespace PonyEngine::Math
 		return *this = *this * other;
 	}
 
-	template <std::floating_point T>
+	template<std::floating_point T>
 	constexpr bool Quaternion<T>::operator ==(const Quaternion& other) const noexcept
 	{
 		return components == other.components;

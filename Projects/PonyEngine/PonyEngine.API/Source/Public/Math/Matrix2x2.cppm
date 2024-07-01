@@ -832,7 +832,7 @@ namespace PonyEngine::Math
 		return *this;
 	}
 
-	template <Arithmetic T>
+	template<Arithmetic T>
 	constexpr bool Matrix2x2<T>::operator ==(const Matrix2x2& other) const noexcept
 	{
 		return components == other.components;

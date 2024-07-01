@@ -879,7 +879,7 @@ namespace PonyEngine::Math
 	constexpr bool AreAlmostEqual(const Matrix3x3<T>& left, const Matrix3x3<T>& right, const T tolerance) noexcept
 	{
 		const Matrix3x3<T> diff = left - right;
-		
+
 		return Dot(diff, diff) < tolerance * tolerance;
 	}
 
