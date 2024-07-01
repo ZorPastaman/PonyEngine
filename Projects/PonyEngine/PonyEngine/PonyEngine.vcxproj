@@ -20,7 +20,10 @@
     <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
     <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
     <ClCompile Include="Source\Private\Core\Engine.cppm" />
+    <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
+    <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Input\Input.Implementation.cppm" />
     <ClCompile Include="Source\Public\Log\Log.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -65,12 +68,12 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Log;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Log;$(PublicModuleDirectories)</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Log;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Log;$(PublicModuleDirectories)</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
     <LocalDebuggerWorkingDirectory>$(OutDir)</LocalDebuggerWorkingDirectory>
   </PropertyGroup>
