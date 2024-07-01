@@ -55,7 +55,7 @@ export namespace PonyEngine::Math
 		/// @brief Creates a quaternion and assigns its components from the @p vector components.
 		/// @param vector Component values source.
 		[[nodiscard("Pure constructor")]]
-		constexpr Quaternion(const Vector4<T>& vector) noexcept;
+		explicit constexpr Quaternion(const Vector4<T>& vector) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(const Quaternion& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -178,7 +178,12 @@ export namespace PonyEngine::Math
 
 		/// @brief Casts the quaternion to a @p Vector4 copying components.
 		[[nodiscard("Pure operator")]]
-		constexpr operator Vector4<T>() const noexcept;
+		explicit constexpr operator Vector4<T>() const noexcept;
+
+		/// @brief Casts all the components to the @p U and returns a new quaternion with those components.
+		/// @tparam U Target component type.
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Quaternion<U>() const noexcept;
 
 		/// @brief Gets a component by an index.
 		/// @param index Component index. Must be in range [0, 3].
@@ -547,6 +552,16 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
 	{
 		return Vector4<T>(Data());
+	}
+
+	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Quaternion<T>::operator Quaternion<U>() const noexcept
+	{
+		Quaternion<U> cast;
+		Cast(cast.Data(), Data(), ComponentCount);
+
+		return cast;
 	}
 
 	template<std::floating_point T>

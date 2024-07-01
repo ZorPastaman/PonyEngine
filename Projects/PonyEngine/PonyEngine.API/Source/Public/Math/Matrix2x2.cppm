@@ -270,6 +270,11 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Casts all the components to the @p U and returns a new matrix with those components.
+		/// @tparam U Target component type.
+		template<Arithmetic U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Matrix2x2<U>() const noexcept;
+
 		/// @brief Row access operator.
 		/// @remark Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index. Must be in range [0, 1].
@@ -749,6 +754,16 @@ namespace PonyEngine::Math
 	constexpr T Dot(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept
 	{
 		return left.M00() * right.M00() + left.M10() * right.M10() + left.M01() * right.M01() + left.M11() * right.M11();
+	}
+
+	template<Arithmetic T>
+	template<Arithmetic U>
+	constexpr Matrix2x2<T>::operator Matrix2x2<U>() const noexcept
+	{
+		Matrix2x2<U> cast;
+		Cast(cast.Data(), Data(), ComponentCount);
+
+		return cast;
 	}
 
 	template<Arithmetic T>

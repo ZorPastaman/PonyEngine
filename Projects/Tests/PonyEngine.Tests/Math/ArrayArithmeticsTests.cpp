@@ -76,6 +76,34 @@ namespace Math
 			Assert::AreEqual(d5, destination[5]);
 		}
 
+		TEST_METHOD(CastTest)
+		{
+			constexpr float s0 = 30.3;
+			constexpr float s1 = 20.2;
+			constexpr float s2 = 90.6;
+			constexpr float s3 = 50.8;
+			constexpr float s4 = -10.1;
+			constexpr float s5 = 40.7;
+
+			constexpr short d0 = 3;
+			constexpr short d1 = 2;
+			constexpr short d2 = 9;
+			constexpr short d3 = 5;
+			constexpr short d4 = -1;
+			constexpr short d5 = 4;
+
+			std::array<short, 6> destination{ d0, d1, d2, d3, d4, d5 };
+			constexpr std::array<float, 6> source{ s0, s1, s2, s3, s4, s5 };
+
+			PonyEngine::Math::Cast(destination.data(), source.data(), 5);
+			Assert::AreEqual(static_cast<short>(s0), destination[0]);
+			Assert::AreEqual(static_cast<short>(s1), destination[1]);
+			Assert::AreEqual(static_cast<short>(s2), destination[2]);
+			Assert::AreEqual(static_cast<short>(s3), destination[3]);
+			Assert::AreEqual(static_cast<short>(s4), destination[4]);
+			Assert::AreEqual(d5, destination[5]);
+		}
+
 		TEST_METHOD(AddEqualShortTest)
 		{
 			constexpr short d0 = 3;
@@ -917,6 +945,8 @@ namespace Math
 			std::array<int, 3> destination{ 10, 20, 30 };
 
 			PonyEngine::Math::Copy(destination.data(), left.data(), 3);
+
+			PonyEngine::Math::Cast(destination.data(), left.data(), 3);
 
 			PonyEngine::Math::Add(destination.data(), right.data(), 3);
 			PonyEngine::Math::Add(destination.data(), left.data(), right.data(), 3);

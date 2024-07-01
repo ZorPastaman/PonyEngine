@@ -73,7 +73,7 @@ namespace Math
 			constexpr float z = 1;
 			constexpr float w = 2;
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
-			PonyEngine::Math::Quaternion<float> quaternion = vector;
+			auto quaternion = static_cast<PonyEngine::Math::Quaternion<float>>(vector);
 			Assert::AreEqual(x, quaternion.X());
 			Assert::AreEqual(y, quaternion.Y());
 			Assert::AreEqual(z, quaternion.Z());
@@ -335,11 +335,21 @@ namespace Math
 			constexpr float z = 1;
 			constexpr float w = 2;
 			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			PonyEngine::Math::Vector4<float> vector = quaternion;
+			auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 			Assert::AreEqual(z, vector.Z());
 			Assert::AreEqual(w, vector.W());
+		}
+
+		TEST_METHOD(CastTest)
+		{
+			constexpr auto floatQuaternion = PonyEngine::Math::Quaternion<float>(3.1f, -2.2f, 4.4f, -2.1f);
+			const auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(floatQuaternion);
+			Assert::AreEqual(3.1, doubleQuaternion.X(), 0.0001);
+			Assert::AreEqual(-2.2, doubleQuaternion.Y(), 0.0001);
+			Assert::AreEqual(4.4, doubleQuaternion.Z(), 0.0001);
+			Assert::AreEqual(-2.1, doubleQuaternion.W(), 0.0001);
 		}
 
 		TEST_METHOD(AccessByIndexTest)
@@ -756,7 +766,8 @@ namespace Math
 			constexpr bool isIdentity = quaternion.IsIdentity();
 			constexpr bool isUnit = quaternion.IsUnit();
 
-			constexpr PonyEngine::Math::Vector4<float> vector = quaternion;
+			constexpr auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
+			constexpr auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(quaternion);
 
 			constexpr float component = quaternion[2];
 
