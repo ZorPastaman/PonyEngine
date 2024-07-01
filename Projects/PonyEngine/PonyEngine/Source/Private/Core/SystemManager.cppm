@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "Log/LogMacro.h"
+#include "PonyEngine/Log/LogMacro.h"
 
 export module PonyEngine.Core.Implementation:SystemManager;
 

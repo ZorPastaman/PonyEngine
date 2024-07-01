@@ -9,8 +9,8 @@
 
 module;
 
-#include "Log/LogMacro.h"
-#include "Platform/Windows/Framework.h"
+#include "PonyEngine/Log/LogMacro.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Launcher.Windows:WindowsQuitChecker;
 

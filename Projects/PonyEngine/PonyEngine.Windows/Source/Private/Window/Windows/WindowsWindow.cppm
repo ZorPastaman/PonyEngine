@@ -11,8 +11,8 @@ module;
 
 #include <cassert>
 
-#include "Platform/Windows/Framework.h"
-#include "Log/LogMacro.h"
+#include "PonyEngine/Log/LogMacro.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindow;
 

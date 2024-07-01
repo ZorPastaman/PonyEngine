@@ -7,8 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "Log/LogMacro.h"
-#include "Platform/Windows/Framework.h"
+#include "PonyEngine/Log/LogMacro.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 import <iostream>;
 

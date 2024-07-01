@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include "PonyEngine/Core/Optimization.h"
+
 export module PonyEngine.Math:ArrayArithmetics;
 
 import <algorithm>;
@@ -24,7 +26,7 @@ export namespace PonyEngine::Math
 	/// @param source Source array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<typename T>
-	constexpr void Copy(T* destination, const T* source, std::size_t count) noexcept;
+	constexpr void Copy(T* PONY_RESTRICT destination, const T* PONY_RESTRICT source, std::size_t count) noexcept;
 
 	/// @brief Casts every element in the @p source array to @p U and puts the result to the @p destination array.
 	/// @tparam T Source type.
@@ -33,7 +35,7 @@ export namespace PonyEngine::Math
 	/// @param source Source array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Cast(U* destination, const T* source, std::size_t count) noexcept;
+	constexpr void Cast(U* PONY_RESTRICT destination, const T* PONY_RESTRICT source, std::size_t count) noexcept;
 
 	/// @brief Computes result += right on every element in the sequential order.
 	/// @tparam T Value type.
@@ -41,7 +43,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* right, std::size_t count) noexcept;
+	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result = left + right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -49,7 +51,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 
 	/// @brief Computes result -= right on every element in the sequential order.
 	/// @tparam T Value type.
@@ -57,7 +59,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* right, std::size_t count) noexcept;
+	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result = left - right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -65,7 +67,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 
 	/// @brief Computes result *= right on every element in the sequential order.
 	/// @tparam T Value type.
@@ -73,7 +75,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* right, std::size_t count) noexcept;
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result = left * right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -81,7 +83,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result *= multiplier on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Multiplier type.
@@ -98,7 +100,7 @@ export namespace PonyEngine::Math
 	/// @param multiplier Multiplier.
 	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, const T* left, U multiplier, std::size_t count) noexcept;
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, U multiplier, std::size_t count) noexcept;
 
 	/// @brief Computes result /= right on every element in the sequential order.
 	/// @tparam T Value type.
@@ -106,7 +108,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* right, std::size_t count) noexcept;
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result = left / right on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -114,7 +116,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* left, const T* right, std::size_t count) noexcept;
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 	/// @brief Computes result /= divisor on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Divisor type.
@@ -131,7 +133,7 @@ export namespace PonyEngine::Math
 	/// @param divisor Divisor.
 	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, const T* left, U divisor, std::size_t count) noexcept;
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, U divisor, std::size_t count) noexcept;
 
 	/// @brief Computes result = -result on every element in the sequential order.
 	/// @tparam T Value type.
@@ -145,7 +147,7 @@ export namespace PonyEngine::Math
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
-	constexpr void Negate(T* result, const T* right, std::size_t count) noexcept;
+	constexpr void Negate(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 
 	/// @brief Checks if all the values in the array are finite.
 	/// @tparam T Value type.
@@ -159,13 +161,13 @@ export namespace PonyEngine::Math
 namespace PonyEngine::Math
 {
 	template<typename T>
-	constexpr void Copy(T* const destination, const T* const source, const std::size_t count) noexcept
+	constexpr void Copy(T* const PONY_RESTRICT destination, const T* const PONY_RESTRICT source, const std::size_t count) noexcept
 	{
 		std::copy(source, source + count, destination);
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Cast(U* destination, const T* source, const std::size_t count) noexcept
+	constexpr void Cast(U* PONY_RESTRICT destination, const T* PONY_RESTRICT source, const std::size_t count) noexcept
 	{
 		for (const U* const end = destination + count; destination != end; ++destination, ++source)
 		{
@@ -174,7 +176,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* right, const std::size_t count) noexcept
+	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
@@ -183,7 +185,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Add(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
@@ -192,7 +194,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* right, const std::size_t count) noexcept
+	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
@@ -201,7 +203,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Subtract(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
@@ -210,7 +212,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* right, const std::size_t count) noexcept
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
@@ -219,7 +221,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Multiply(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
@@ -237,7 +239,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Multiply(T* result, const T* left, const U multiplier, const std::size_t count) noexcept
+	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const U multiplier, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
@@ -246,7 +248,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* right, const std::size_t count) noexcept
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
@@ -255,7 +257,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Divide(T* result, const T* left, const T* right, const std::size_t count) noexcept
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
@@ -273,7 +275,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T, Arithmetic U>
-	constexpr void Divide(T* result, const T* left, const U divisor, const std::size_t count) noexcept
+	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const U divisor, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
@@ -291,7 +293,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Negate(T* result, const T* right, const std::size_t count) noexcept
+	constexpr void Negate(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, const std::size_t count) noexcept
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{

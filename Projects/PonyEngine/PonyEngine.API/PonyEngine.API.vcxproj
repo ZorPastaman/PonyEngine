@@ -55,8 +55,9 @@
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\Core\Linking.h" />
-    <ClInclude Include="Include\Public\Log\LogMacro.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Core\Linking.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Core\Optimization.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Log\LogMacro.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
