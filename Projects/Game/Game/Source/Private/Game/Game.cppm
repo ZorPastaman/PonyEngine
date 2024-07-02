@@ -70,14 +70,14 @@ namespace Game
 	{
 		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Register inputs.");
 
-		if (const auto inputSystem = engine.FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = engine.GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register up input.");
 			const PonyEngine::Input::KeyboardMessage upMessage(PonyEngine::Input::KeyboardKeyCode::ArrowUp, true);
 			const PonyEngine::Input::Event upEvent(upMessage);
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]() 
 			{ 
-				if (PonyEngine::Window::IWindow* const window = engine.FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine.GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Up");
 				}
@@ -89,7 +89,7 @@ namespace Game
 			const PonyEngine::Input::Event downEvent(downMessage);
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = engine.FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine.GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Down");
 				}
@@ -101,7 +101,7 @@ namespace Game
 			const PonyEngine::Input::Event rightEvent(rightMessage);
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = engine.FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine.GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Right");
 				}
@@ -113,7 +113,7 @@ namespace Game
 			const PonyEngine::Input::Event leftEvent(leftMessage);
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = engine.FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine.GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Left");
 				}
@@ -142,7 +142,7 @@ namespace Game
 	{
 		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Unregister inputs.");
 
-		if (const auto inputSystem = engine.FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = engine.GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Unregister up input.");
 			inputSystem->UnregisterAction(upHandle);

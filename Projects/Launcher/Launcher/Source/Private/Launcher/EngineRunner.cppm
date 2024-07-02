@@ -67,7 +67,7 @@ namespace Launcher
 		logger{logger}
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create engine params.");
-		PonyEngine::Core::EngineParams engineParams(&logger);
+		PonyEngine::Core::EngineParams engineParams(logger);
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set platform engine params.");
 		platformEngineParamsProvider.Modify(engineParams);

@@ -60,10 +60,10 @@ export namespace PonyEngine::Core
 			/// @param begin Interfaces begin.
 			/// @param end Interfaces end.
 			[[nodiscard("Pure constructor")]]
-			ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info&, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info&, void*>>::const_iterator& end) noexcept;
+			ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& end) noexcept;
 
-			std::vector<std::pair<const std::type_info&, void*>>::const_iterator current; ///< Current interface.
-			std::vector<std::pair<const std::type_info&, void*>>::const_iterator end; ///< Interfaces iterator end.
+			std::vector<std::pair<const std::type_info*, void*>>::const_iterator current; ///< Current interface.
+			std::vector<std::pair<const std::type_info*, void*>>::const_iterator end; ///< Interfaces iterator end.
 
 			friend ObjectInterfaces;
 		};
@@ -99,13 +99,13 @@ export namespace PonyEngine::Core
 		bool operator ==(const ObjectInterfaces& other) const noexcept = default;
 
 	private:
-		std::vector<std::pair<const std::type_info&, void*>> interfaces; ///< Interfaces.
+		std::vector<std::pair<const std::type_info*, void*>> interfaces; ///< Interfaces.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	ObjectInterfaces::ObjectInterfacesIterator::ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info&, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info&, void*>>::const_iterator& end) noexcept :
+	ObjectInterfaces::ObjectInterfacesIterator::ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& end) noexcept :
 		current(begin),
 		end(end)
 	{
@@ -118,7 +118,9 @@ namespace PonyEngine::Core
 
 	std::pair<const std::type_info&, void*> ObjectInterfaces::ObjectInterfacesIterator::operator *() const noexcept
 	{
-		return *current;
+		const auto [typeInfo, object] = *current;
+
+		return std::pair<const std::type_info&, void*>(*typeInfo, object);
 	}
 
 	ObjectInterfaces::ObjectInterfacesIterator& ObjectInterfaces::ObjectInterfacesIterator::operator ++() noexcept
@@ -140,7 +142,7 @@ namespace PonyEngine::Core
 	{
 		assert((pointer)); // TODO: Add text to asserts
 
-		const auto pair = std::pair<const std::type_info&, void*>(typeInfo, pointer);
+		const auto pair = std::pair<const std::type_info*, void*>(&typeInfo, pointer);
 		interfaces.push_back(pair);
 	}
 

@@ -7,27 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:ISystem;
+export module PonyEngine.Core:ITimeManager;
 
-import PonyEngine.Utility;
+import <cstddef>;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Engine system.
-	class ISystem : public Utility::INamed
+	/// @brief Engine time manager.
+	class ITimeManager
 	{
 	public:
-		/// @brief Begins a system.
-		/// @details The system takes its dependencies in this function.
-		virtual void Begin() = 0;
-		/// @brief Ends a system.
-		/// @details The function is called before a destruction.
-		virtual void End() = 0;
-
-		/// @brief Ticks the system.
-		virtual void Tick() = 0;
+		/// @brief Gets current frame count.
+		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
+		virtual std::size_t GetFrameCount() const noexcept = 0;
 
 	protected:
-		~ISystem() noexcept = default;
+		~ITimeManager() noexcept = default;
 	};
 }

@@ -30,10 +30,10 @@ export namespace PonyEngine::Core
 		virtual SystemInfo Create(IEngine& engine) = 0;
 		/// @brief Destroys a previously created system.
 		/// @param system System to destroy.
-		virtual void Destroy(ISystem* system) noexcept = 0;
+		virtual void Destroy(ISystem* system) noexcept = 0; // TODO: try to use std::function in the systemInfo.
 
-		/// @brief Gets a system name.
-		/// @return System name.
+		/// @brief Gets a system static name.
+		/// @return System static name.
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept = 0;
 

@@ -18,6 +18,7 @@ export module PonyEngine.Core.Implementation:SystemManager;
 import <cstddef>;
 import <exception>;
 import <format>;
+import <functional>;
 import <iostream>;
 import <string>;
 import <typeinfo>;
@@ -31,7 +32,7 @@ import PonyEngine.Log;
 export namespace PonyEngine::Core
 {
 	/// @brief Holder and ticker of systems.
-	class SystemManager final
+	class SystemManager final : public ISystemManager
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
@@ -45,7 +46,7 @@ export namespace PonyEngine::Core
 		~SystemManager() noexcept;
 
 		[[nodiscard("Pure function")]]
-		void* FindSystem(const std::type_info& typeInfo) const;
+		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
 		/// @brief Begins the systems.
 		/// @details Call this before a first tick.
@@ -92,15 +93,14 @@ namespace PonyEngine::Core
 
 		for (EngineParams::SystemFactoriesIterator it = engineParams.GetSystemFactoriesIterator(); !it.IsEnd(); ++it)
 		{
-			ISystemFactory* const factory = *it;
-			assert((factory != nullptr));
-			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
-			const SystemInfo systemInfo = factory->Create(engine);
+			ISystemFactory& factory = *it;
+			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}'.", factory.GetSystemName()).c_str());
+			const SystemInfo systemInfo = factory.Create(engine);
 			ISystem* const system = systemInfo.system;
 			assert((system != nullptr));
 			systems.push_back(system);
-			factories.push_back(factory);
-			if (system->IsTickable())
+			factories.push_back(&factory);
+			if (systemInfo.isTickable)
 			{
 				PONY_LOG(engine, Log::LogType::Info, "Add to tickable systems.");
 				tickableSystems.push_back(system);
@@ -137,7 +137,7 @@ namespace PonyEngine::Core
 		PONY_LOG(engine, Log::LogType::Info, "Systems destroyed.");
 	}
 
-	void* SystemManager::FindSystem(const std::type_info& typeInfo) const
+	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
 	{
 		if (const auto pair = systemInterfaces.find(typeInfo); pair != systemInterfaces.cend()) [[likely]]
 		{

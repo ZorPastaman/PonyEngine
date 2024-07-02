@@ -151,6 +151,7 @@ namespace PonyEngine::Window
 
 		Core::SystemInfo systemInfo;
 		systemInfo.system = window;
+		systemInfo.isTickable = true;
 
 		systemInfo.interfaces.AddObjectInterface<IWindow>(window);
 		systemInfo.interfaces.AddObjectInterface<IWindowsWindow>(window);
@@ -189,7 +190,7 @@ namespace PonyEngine::Window
 
 	const char* WindowsWindowFactory::GetSystemName() const noexcept
 	{
-		return "WindowsWindowFactory";
+		return WindowsWindow::Name;
 	}
 
 	const wchar_t* WindowsWindowFactory::GetTitle() const noexcept

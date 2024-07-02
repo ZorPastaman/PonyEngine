@@ -9,14 +9,13 @@
 
 export module PonyEngine.Core:IEngine;
 
-import <cstddef>;
-import <typeinfo>;
-
 import PonyEngine.Log;
 import PonyEngine.Utility;
 import PonyEngine.Window;
 
 import :ISystem;
+import :ISystemManager;
+import :ITimeManager;
 
 export namespace PonyEngine::Core
 {
@@ -24,30 +23,18 @@ export namespace PonyEngine::Core
 	class IEngine : public Utility::INamed
 	{
 	public:
-		// TODO: Add a time manager
-
-		/// @brief Gets current frame count.
-		/// @return Current frame count.
-		[[nodiscard("Pure function")]]
-		virtual std::size_t GetFrameCount() const noexcept = 0;
-
 		/// @brief Gets an engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept = 0;
-
-		// TODO: Add ISystemManager interface.
-
-		/// @brief Tries to find a system of the type described by the @p typeInfo.
-		/// @param typeInfo System type info.
-		/// @return Pointer to the system if it's found; nullptr if it's not found.
+		/// @brief Gets an engine time manager.
+		/// @return Engine time manager.
 		[[nodiscard("Pure function")]]
-		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept = 0;
-		/// @brief Tries to find a system of the type @p T.
-		/// @tparam T System type.
-		/// @return Pointer to the system if it's found; nullptr if it's not found.
-		template<typename T> [[nodiscard("Pure function")]]
-		T* FindSystem() const noexcept;
+		virtual ITimeManager& GetTimeManager() const noexcept = 0;
+		/// @brief Gets an engine system manager.
+		/// @return Engine system manager.
+		[[nodiscard("Pure function")]]
+		virtual ISystemManager& GetSystemManager() const noexcept = 0;
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().
@@ -70,13 +57,4 @@ export namespace PonyEngine::Core
 	protected:
 		~IEngine() noexcept = default;
 	};
-}
-
-namespace PonyEngine::Core
-{
-	template<typename T>
-	T* IEngine::FindSystem() const noexcept
-	{
-		return static_cast<T*>(FindSystem(typeid(T)));
-	}
 }

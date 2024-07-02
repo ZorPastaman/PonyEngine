@@ -28,6 +28,7 @@ import PonyEngine.Log;
 import PonyEngine.Window;
 
 import :SystemManager;
+import :TimeManager;
 
 export namespace PonyEngine::Core
 {
@@ -45,13 +46,11 @@ export namespace PonyEngine::Core
 		~Engine() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t GetFrameCount() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept override;
-
 		[[nodiscard("Pure function")]]
-		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override;
+		virtual ITimeManager& GetTimeManager() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual ISystemManager& GetSystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept override;
@@ -72,10 +71,8 @@ export namespace PonyEngine::Core
 
 	private:
 		Log::ILogger& logger; ///< Logger.
-
+		TimeManager* timeManager; ///< Time manager.
 		SystemManager* systemManager; ///< System manager.
-
-		std::size_t frameCount; ///< Current frame.
 
 		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
@@ -86,9 +83,10 @@ namespace PonyEngine::Core
 {
 	Engine::Engine(const EngineParams& params) :
 		logger{params.GetLogger()},
-		frameCount{0},
 		isRunning{true}
 	{
+		timeManager = new TimeManager();
+
 		PONY_LOG_PTR(this, Log::LogType::Info, "Create a system manager.");
 		systemManager = new SystemManager(params, *this);
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager created.");
@@ -97,7 +95,7 @@ namespace PonyEngine::Core
 		systemManager->Begin();
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager begun.");
 
-		if (const auto window = IEngine::FindSystem<Window::IWindow>())
+		if (Window::IWindow* const window = GetSystemManager().FindSystem<Window::IWindow>())
 		{
 			window->ShowWindow();
 		}
@@ -114,19 +112,19 @@ namespace PonyEngine::Core
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager destroyed.");
 	}
 
-	std::size_t Engine::GetFrameCount() const noexcept
-	{
-		return frameCount;
-	}
-
 	Log::ILogger& Engine::GetLogger() const noexcept
 	{
 		return logger;
 	}
 
-	void* Engine::FindSystem(const std::type_info& typeInfo) const noexcept
+	ITimeManager& Engine::GetTimeManager() const noexcept
 	{
-		return systemManager->FindSystem(typeInfo);
+		return *timeManager;
+	}
+
+	ISystemManager& Engine::GetSystemManager() const noexcept
+	{
+		return *systemManager;
 	}
 
 	bool Engine::IsRunning() const noexcept
@@ -163,9 +161,8 @@ namespace PonyEngine::Core
 		}
 
 		PONY_LOG_PTR(this, Log::LogType::Verbose, "Tick engine.");
+		timeManager->Tick();
 		systemManager->Tick();
-
-		++frameCount;
 	}
 
 	const char* Engine::GetName() const noexcept

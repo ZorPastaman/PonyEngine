@@ -45,8 +45,6 @@ export namespace PonyEngine::Input
 		virtual void Begin() override;
 		virtual void End() override;
 
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
@@ -86,7 +84,7 @@ namespace PonyEngine::Input
 	{
 		PONY_LOG(engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
 
-		if (Window::IWindow* window = engine.FindSystem<Window::IWindow>())
+		if (Window::IWindow* window = engine.GetSystemManager().FindSystem<Window::IWindow>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Subscribe to keyboard messages.");
 			window->AddKeyboardMessageObserver(this);
@@ -99,16 +97,11 @@ namespace PonyEngine::Input
 
 	void InputSystem::End()
 	{
-		if (Window::IWindow* window = engine.FindSystem<Window::IWindow>())
+		if (Window::IWindow* window = engine.GetSystemManager().FindSystem<Window::IWindow>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
 			window->RemoveKeyboardMessageObserver(this);
 		}
-	}
-
-	bool InputSystem::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	void InputSystem::Tick()

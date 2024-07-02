@@ -20,6 +20,7 @@ export namespace PonyEngine::Core
 	{
 		ObjectInterfaces interfaces; ///< System public interfaces.
 		ISystem* system; ///< System.
+		bool isTickable; ///< Is the system tickable?
 
 		[[nodiscard("Pure constructor")]]
 		SystemInfo() noexcept = default;

@@ -55,6 +55,7 @@ namespace PonyEngine::Input
 
 		Core::SystemInfo systemInfo;
 		systemInfo.system = inputSystem;
+		systemInfo.isTickable = true;
 
 		systemInfo.interfaces.AddObjectInterface<IInputSystem>(inputSystem);
 
