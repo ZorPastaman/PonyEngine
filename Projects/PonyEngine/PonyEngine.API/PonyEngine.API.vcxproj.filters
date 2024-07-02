@@ -144,6 +144,9 @@
     <ClCompile Include="Source\Public\Core\Factories\ObjectInterfaces.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factories\SystemInfo.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

@@ -51,7 +51,7 @@ export namespace PonyEngine::Window
 		~WindowsWindowFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual std::pair<Core::ISystem*, Core::ObjectInterfaces> Create(Core::IEngine& engine) override;
+		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
@@ -141,7 +141,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class with id '{}' unregistered.", classAtom).c_str());
 	}
 
-	std::pair<Core::ISystem*, Core::ObjectInterfaces> WindowsWindowFactory::Create(Core::IEngine& engine)
+	Core::SystemInfo WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
 		const auto window = new WindowsWindow(engine, hInstance, classAtom, windowParams);
 		const HWND hWnd = window->GetWindowHandle();
@@ -149,11 +149,13 @@ namespace PonyEngine::Window
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		Core::ObjectInterfaces interfaces;
-		interfaces.AddObjectInterface<IWindow>(window);
-		interfaces.AddObjectInterface<IWindowsWindow>(window);
+		Core::SystemInfo systemInfo;
+		systemInfo.system = window;
 
-		return std::pair<Core::ISystem*, Core::ObjectInterfaces>(window, interfaces);
+		systemInfo.interfaces.AddObjectInterface<IWindow>(window);
+		systemInfo.interfaces.AddObjectInterface<IWindowsWindow>(window);
+
+		return systemInfo;
 	}
 
 	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept

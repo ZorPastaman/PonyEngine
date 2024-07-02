@@ -31,7 +31,7 @@ export namespace PonyEngine::Input
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::pair<Core::ISystem*, Core::ObjectInterfaces> Create(Core::IEngine& engine) override;
+		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -49,14 +49,16 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	std::pair<Core::ISystem*, Core::ObjectInterfaces> InputSystemFactory::Create(Core::IEngine& engine)
+	Core::SystemInfo InputSystemFactory::Create(Core::IEngine& engine)
 	{
 		const auto inputSystem = new InputSystem(engine);
 
-		Core::ObjectInterfaces interfaces;
-		interfaces.AddObjectInterface<IInputSystem>(inputSystem);
+		Core::SystemInfo systemInfo;
+		systemInfo.system = inputSystem;
 
-		return std::pair<Core::ISystem*, Core::ObjectInterfaces>(static_cast<Core::ISystem*>(inputSystem), interfaces);
+		systemInfo.interfaces.AddObjectInterface<IInputSystem>(inputSystem);
+
+		return systemInfo;
 	}
 
 	void InputSystemFactory::Destroy(Core::ISystem* system) noexcept
