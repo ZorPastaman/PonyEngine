@@ -18,10 +18,6 @@ export namespace PonyEngine::Core
 	/// @brief System info.
 	struct SystemInfo final
 	{
-		ObjectInterfaces interfaces; ///< System public interfaces.
-		ISystem* system; ///< System.
-		bool isTickable; ///< Is the system tickable?
-
 		[[nodiscard("Pure constructor")]]
 		SystemInfo() noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -35,5 +31,9 @@ export namespace PonyEngine::Core
 		SystemInfo& operator =(SystemInfo&& other) noexcept = default;
 
 		bool operator ==(const SystemInfo& other) const noexcept = default;
+
+		ObjectInterfaces interfaces; ///< System public interfaces.
+		ISystem* system; ///< System.
+		bool isTickable; ///< Is the system tickable?
 	};
 }
