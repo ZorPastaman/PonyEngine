@@ -27,11 +27,6 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual HWND GetWindowHandle() const noexcept = 0;
 
-		/// @brief Checks if the system window is alive.
-		/// @return @a True if it's alive; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsWindowAlive() const noexcept = 0;
-
 	protected:
 		~IWindowsWindow() noexcept = default;
 	};

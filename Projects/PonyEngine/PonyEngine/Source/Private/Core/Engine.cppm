@@ -28,7 +28,6 @@ import PonyEngine.Log;
 import PonyEngine.Window;
 
 import :SystemManager;
-import :WindowManager;
 
 export namespace PonyEngine::Core
 {
@@ -50,11 +49,9 @@ export namespace PonyEngine::Core
 
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual Window::IWindow* GetWindow() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const override;
+		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept override;
@@ -70,7 +67,6 @@ export namespace PonyEngine::Core
 	private:
 		Log::ILogger& m_logger; ///< Logger.
 
-		WindowManager* m_windowManager; ///< Engine window. It can be nullptr.
 		SystemManager* m_systemManager; ///< System manager.
 
 		std::size_t m_frameCount; ///< Current frame.
@@ -87,19 +83,18 @@ namespace PonyEngine::Core
 		m_frameCount{0},
 		m_isRunning{true}
 	{
-		PONY_LOG_PTR(this, Log::LogType::Info, "Create a window manager.");
-		m_windowManager = new WindowManager(params, *this);
-		PONY_LOG_PTR(this, Log::LogType::Info, "Window manager created.");
-
 		PONY_LOG_PTR(this, Log::LogType::Info, "Create a system manager.");
 		m_systemManager = new SystemManager(params, *this);
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager created.");
 
-		m_windowManager->ShowWindow();
-
 		PONY_LOG_PTR(this, Log::LogType::Info, "Begin a system manager.");
 		m_systemManager->Begin();
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager begun.");
+
+		if (const auto window = IEngine::FindSystem<Window::IWindow>())
+		{
+			window->ShowWindow();
+		}
 	}
 
 	Engine::~Engine() noexcept
@@ -111,10 +106,6 @@ namespace PonyEngine::Core
 		PONY_LOG_PTR(this, Log::LogType::Info, "Destroy a system manager.");
 		delete m_systemManager;
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager destroyed.");
-
-		PONY_LOG_PTR(this, Log::LogType::Info, "Destroy a window manager.");
-		delete m_windowManager;
-		PONY_LOG_PTR(this, Log::LogType::Info, "Window manager destroyed.");
 	}
 
 	std::size_t Engine::GetFrameCount() const noexcept
@@ -127,14 +118,9 @@ namespace PonyEngine::Core
 		return m_logger;
 	}
 
-	Window::IWindow* Engine::GetWindow() const noexcept
+	void* Engine::FindSystem(const std::type_info& typeInfo) const noexcept
 	{
-		return m_windowManager->GetWindow();
-	}
-
-	ISystem* Engine::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
-	{
-		return m_systemManager->FindSystem(predicate);
+		return m_systemManager->FindSystem(typeInfo);
 	}
 
 	bool Engine::IsRunning() const noexcept
@@ -171,7 +157,6 @@ namespace PonyEngine::Core
 		}
 
 		PONY_LOG_PTR(this, Log::LogType::Verbose, "Tick engine.");
-		m_windowManager->Tick();
 		m_systemManager->Tick();
 
 		++m_frameCount;

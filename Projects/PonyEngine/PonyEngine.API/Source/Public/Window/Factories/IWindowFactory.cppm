@@ -12,23 +12,15 @@ export module PonyEngine.Window.Factories:IWindowFactory;
 import <string>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factories;
 import PonyEngine.Window;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window factory.
-	class IWindowFactory
+	class IWindowFactory : public Core::ISystemFactory
 	{
 	public:
-		/// @brief Creates a window.
-		/// @param engine Engine that owns the window.
-		/// @return Created window.
-		[[nodiscard("Pure function")]]
-		virtual IWindow* Create(Core::IEngine& engine) = 0;
-		/// @brief Destroys a previously created window.
-		/// @param window Window to destroy.
-		virtual void Destroy(IWindow* window) noexcept = 0;
-
 		/// @brief Gets a title of the next created window.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]

@@ -37,7 +37,7 @@ import :WindowsKeyCodeUtility;
 export namespace PonyEngine::Window
 {
 	/// @brief Engine window for @p Windows platform.
-	class WindowsWindow final : public IWindowsWindow, public IWindowProc
+	class WindowsWindow final : public Core::ISystem, public IWindowsWindow, public IWindowProc
 	{
 	public:
 		/// @brief Creates a @p WindowsWindow.
@@ -51,6 +51,11 @@ export namespace PonyEngine::Window
 		WindowsWindow(WindowsWindow&&) = delete;
 
 		~WindowsWindow() noexcept;
+
+		virtual void Begin() override;
+		virtual void End() override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsTickable() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
@@ -143,6 +148,19 @@ namespace PonyEngine::Window
 			PONY_LOG_E(m_engine, e, "On a window destroy.");
 		}
 		PONY_LOG(m_engine, Log::LogType::Info, std::format("System window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(m_hWnd)).c_str());
+	}
+
+	void WindowsWindow::Begin()
+	{
+	}
+
+	void WindowsWindow::End()
+	{
+	}
+
+	bool WindowsWindow::IsTickable() const noexcept
+	{
+		return true;
 	}
 
 	const char* WindowsWindow::GetName() const noexcept

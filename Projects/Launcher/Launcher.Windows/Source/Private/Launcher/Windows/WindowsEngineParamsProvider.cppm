@@ -83,6 +83,6 @@ namespace Launcher
 		// Set platform-dependent engine parameters here.
 
 		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Debug, "Push a Windows window factory.");
-		engineParams.SetWindowFactory(m_windowsWindowFactory);
+		engineParams.AddSystemFactory(m_windowsWindowFactory);
 	}
 }

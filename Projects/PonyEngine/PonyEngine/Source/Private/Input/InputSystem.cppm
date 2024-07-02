@@ -27,7 +27,7 @@ import PonyEngine.Window;
 export namespace PonyEngine::Input
 {
 	/// @brief Default Pony Engine input system.
-	class InputSystem final : public IInputSystem, public Window::IKeyboardObserver
+	class InputSystem final : public Core::ISystem, public IInputSystem, public Window::IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -86,7 +86,7 @@ namespace PonyEngine::Input
 	{
 		PONY_LOG(m_engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
 
-		if (Window::IWindow* window = m_engine.GetWindow())
+		if (Window::IWindow* window = m_engine.FindSystem<Window::IWindow>())
 		{
 			PONY_LOG(m_engine, Log::LogType::Info, "Subscribe to keyboard messages.");
 			window->AddKeyboardMessageObserver(this);
@@ -99,7 +99,7 @@ namespace PonyEngine::Input
 
 	void InputSystem::End()
 	{
-		if (Window::IWindow* window = m_engine.GetWindow())
+		if (Window::IWindow* window = m_engine.FindSystem<Window::IWindow>())
 		{
 			PONY_LOG(m_engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
 			window->RemoveKeyboardMessageObserver(this);

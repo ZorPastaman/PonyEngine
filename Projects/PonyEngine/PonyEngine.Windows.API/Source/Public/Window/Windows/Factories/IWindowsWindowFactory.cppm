@@ -19,12 +19,6 @@ export namespace PonyEngine::Window
 	class IWindowsWindowFactory : public IWindowFactory
 	{
 	public:
-		/// @brief Creates a windows window.
-		/// @param engine Engine that owns the window.
-		/// @return Created windows window.
-		[[nodiscard("Pure function")]]
-		virtual IWindowsWindow* Create(Core::IEngine& engine) override = 0;
-
 		/// @brief Gets a cmdShow of the next window.
 		/// @return CmdShow.
 		[[nodiscard("Pure function")]]

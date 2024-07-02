@@ -15,8 +15,6 @@ module;
 
 export module PonyEngine.Input.Implementation;
 
-import PonyEngine.Input.Factories;
-
 import :InputSystemFactory;
 
 export namespace PonyEngine::Input

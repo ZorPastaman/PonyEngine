@@ -77,7 +77,7 @@ namespace Game
 			const PonyEngine::Input::Event upEvent(upMessage);
 			m_upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]() 
 			{ 
-				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
+				if (PonyEngine::Window::IWindow* const window = m_engine.FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Up");
 				}
@@ -89,7 +89,7 @@ namespace Game
 			const PonyEngine::Input::Event downEvent(downMessage);
 			m_downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
+				if (PonyEngine::Window::IWindow* const window = m_engine.FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Down");
 				}
@@ -101,7 +101,7 @@ namespace Game
 			const PonyEngine::Input::Event rightEvent(rightMessage);
 			m_rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
+				if (PonyEngine::Window::IWindow* const window = m_engine.FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Right");
 				}
@@ -113,7 +113,7 @@ namespace Game
 			const PonyEngine::Input::Event leftEvent(leftMessage);
 			m_leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]()
 			{
-				if (PonyEngine::Window::IWindow* const window = m_engine.GetWindow())
+				if (PonyEngine::Window::IWindow* const window = m_engine.FindSystem<PonyEngine::Window::IWindow>())
 				{
 					window->SetTitle(L"Left");
 				}
