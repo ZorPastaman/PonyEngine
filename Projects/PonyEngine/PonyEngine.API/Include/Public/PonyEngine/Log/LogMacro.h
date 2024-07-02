@@ -80,6 +80,8 @@
 		expression; \
 	}
 
+// TODO: use engine pointer only
+
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param engine PonyEngine::Core::IEngine reference.
 /// @param logType PonyEngine::Log::LogType value.
@@ -87,7 +89,7 @@
 #define PONY_LOG(engine, logType, message) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetTimeManager().GetFrameCount()))); \
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -97,7 +99,7 @@
 #define PONY_LOG_PTR(engine, logType, message) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetTimeManager().GetFrameCount()))); \
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -128,7 +130,7 @@
 #define PONY_LOG_IF(condition, engine, logType, message) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetTimeManager().GetFrameCount())))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -139,7 +141,7 @@
 #define PONY_LOG_IF_PTR(condition, engine, logType, message) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine)->GetTimeManager().GetFrameCount())))); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -171,7 +173,7 @@
 #define PONY_LOG_E(engine, exception, message) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetTimeManager().GetFrameCount()))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -181,7 +183,7 @@
 #define PONY_LOG_E_PTR(engine, exception, message) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount()))); \
+		PONY_LOG_TRY_CATCH((engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetTimeManager().GetFrameCount()))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -212,7 +214,7 @@
 #define PONY_LOG_E_IF(condition, engine, exception, message) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine).GetTimeManager().GetFrameCount())))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -223,7 +225,7 @@
 #define PONY_LOG_E_IF_PTR(condition, engine, exception, message) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, (engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetFrameCount())))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine).GetLogger().LogException(exception, (engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput(message, (engine)->GetTimeManager().GetFrameCount())))); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.

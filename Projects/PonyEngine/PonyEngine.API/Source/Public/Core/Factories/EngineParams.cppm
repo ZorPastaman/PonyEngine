@@ -15,7 +15,6 @@ export module PonyEngine.Core.Factories:EngineParams;
 
 import <algorithm>;
 import <cstddef>;
-import <ranges>;
 import <utility>;
 import <vector>;
 
@@ -48,7 +47,7 @@ export namespace PonyEngine::Core
 			/// @brief Gets a currently pointed system factory.
 			/// @return Currently pointed system factory.
 			[[nodiscard("Pure operator")]]
-			ISystemFactory* operator *() const noexcept;
+			ISystemFactory& operator *() const noexcept;
 			/// @brief Moves a pointer to the next system factory.
 			/// @return New iterator.
 			SystemFactoriesIterator& operator ++() noexcept;
@@ -76,9 +75,9 @@ export namespace PonyEngine::Core
 		};
 
 		/// @brief Creates an engine params.
-		/// @param logger Logger to use. Mustn't be nullptr. Its lifetime must exceed the engine lifetime.
+		/// @param logger Logger to use. Its lifetime must exceed the engine lifetime.
 		[[nodiscard("Pure constructor")]]
-		explicit EngineParams(Log::ILogger* logger) noexcept;
+		explicit EngineParams(Log::ILogger& logger) noexcept;
 		[[nodiscard("Pure constructor")]]
 		EngineParams(const EngineParams& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -93,7 +92,7 @@ export namespace PonyEngine::Core
 
 		/// @brief Adds a system factory.
 		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
-		void AddSystemFactory(ISystemFactory* systemFactory);
+		void AddSystemFactory(ISystemFactory& systemFactory);
 		/// @brief Gets a system factories iterator.
 		/// @return System factories iterator.
 		[[nodiscard("Pure function")]]
@@ -103,8 +102,6 @@ export namespace PonyEngine::Core
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
 	private:
-		// TODO: Try to use references here.
-
 		std::vector<ISystemFactory*> systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
 		Log::ILogger* logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
 	};
@@ -123,9 +120,9 @@ namespace PonyEngine::Core
 		return current == end;
 	}
 
-	ISystemFactory* EngineParams::SystemFactoriesIterator::operator *() const noexcept
+	ISystemFactory& EngineParams::SystemFactoriesIterator::operator *() const noexcept
 	{
-		return *current;
+		return **current;
 	}
 
 	EngineParams::SystemFactoriesIterator& EngineParams::SystemFactoriesIterator::operator ++() noexcept
@@ -143,10 +140,9 @@ namespace PonyEngine::Core
 		return temp;
 	}
 
-	EngineParams::EngineParams(Log::ILogger* const logger) noexcept :
-		logger{logger}
+	EngineParams::EngineParams(Log::ILogger& logger) noexcept :
+		logger{&logger}
 	{
-		assert((logger != nullptr));
 	}
 
 	Log::ILogger& EngineParams::GetLogger() const noexcept
@@ -154,11 +150,10 @@ namespace PonyEngine::Core
 		return *logger;
 	}
 
-	void EngineParams::AddSystemFactory(ISystemFactory* const systemFactory)
+	void EngineParams::AddSystemFactory(ISystemFactory& systemFactory)
 	{
-		assert((systemFactory != nullptr));
-		assert((std::ranges::find(std::as_const(systemFactories), systemFactory) == systemFactories.cend()));
-		systemFactories.push_back(systemFactory);
+		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend()));
+		systemFactories.push_back(&systemFactory);
 	}
 
 	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept

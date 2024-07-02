@@ -18,6 +18,8 @@
     <ClCompile Include="Source\Public\Core\Factories\SystemInfo.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
     <ClCompile Include="Source\Public\Core\Factories\ISystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
+    <ClCompile Include="Source\Public\Core\ITimeManager.cppm" />
     <ClCompile Include="Source\Public\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\IInputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Factories\Input.Factories.cppm" />

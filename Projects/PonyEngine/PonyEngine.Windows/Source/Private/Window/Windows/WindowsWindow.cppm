@@ -54,8 +54,6 @@ export namespace PonyEngine::Window
 
 		virtual void Begin() override;
 		virtual void End() override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
@@ -156,11 +154,6 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::End()
 	{
-	}
-
-	bool WindowsWindow::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	const char* WindowsWindow::GetName() const noexcept
