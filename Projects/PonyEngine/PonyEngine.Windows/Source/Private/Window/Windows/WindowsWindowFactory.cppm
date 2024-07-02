@@ -51,8 +51,10 @@ export namespace PonyEngine::Window
 		~WindowsWindowFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual IWindowsWindow* Create(Core::IEngine& engine) override;
-		virtual void Destroy(IWindow* window) noexcept override;
+		virtual std::pair<Core::ISystem*, Core::ObjectInterfaces> Create(Core::IEngine& engine) override;
+		virtual void Destroy(Core::ISystem* system) noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const char* GetSystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const wchar_t* GetTitle() const noexcept override;
@@ -134,7 +136,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window class with id '{}' unregistered.", m_className).c_str());
 	}
 
-	IWindowsWindow* WindowsWindowFactory::Create(Core::IEngine& engine)
+	std::pair<Core::ISystem*, Core::ObjectInterfaces> WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
 		const auto window = new WindowsWindow(engine, m_hInstance, m_className, m_windowParams);
 		const HWND hWnd = window->GetWindowHandle();
@@ -142,13 +144,19 @@ namespace PonyEngine::Window
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		return window;
+		Core::ObjectInterfaces interfaces;
+		IWindow* windowInterface = window;
+		interfaces.AddObjectInterface(typeid(IWindow), windowInterface);
+		IWindowsWindow* windowsWindowInterface = window;
+		interfaces.AddObjectInterface(typeid(IWindowsWindow), windowsWindowInterface);
+
+		return std::pair<Core::ISystem*, Core::ObjectInterfaces>(window, interfaces);
 	}
 
-	void WindowsWindowFactory::Destroy(IWindow* const window) noexcept
+	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept
 	{
-		assert((dynamic_cast<WindowsWindow*>(window) != nullptr));
-		const auto windowsWindow = static_cast<WindowsWindow*>(window);
+		assert((dynamic_cast<WindowsWindow*>(system) != nullptr));
+		const auto windowsWindow = static_cast<WindowsWindow*>(system);
 		const HWND hWnd = windowsWindow->GetWindowHandle();
 
 		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Unregister a window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
@@ -172,6 +180,11 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Destroy a windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		delete windowsWindow;
 		PONY_LOG_GENERAL(m_logger, Log::LogType::Info, std::format("Windows window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+	}
+
+	const char* WindowsWindowFactory::GetSystemName() const noexcept
+	{
+		return "WindowsWindowFactory";
 	}
 
 	const wchar_t* WindowsWindowFactory::GetTitle() const noexcept

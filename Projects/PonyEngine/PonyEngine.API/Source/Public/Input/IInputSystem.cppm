@@ -20,7 +20,7 @@ import :Handle;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system interface.
-	class IInputSystem : public Core::ISystem
+	class IInputSystem
 	{
 	public:
 		/// @brief Registers an action that's raised if the event meets the conditions.

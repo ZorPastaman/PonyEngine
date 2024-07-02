@@ -17,10 +17,12 @@ export module PonyEngine.Core.Implementation:SystemManager;
 
 import <cstddef>;
 import <exception>;
-import <format>;
 import <functional>;
+import <format>;
 import <iostream>;
 import <string>;
+import <typeinfo>;
+import <unordered_map>;
 import <vector>;
 
 import PonyEngine.Core;
@@ -43,11 +45,8 @@ export namespace PonyEngine::Core
 
 		~SystemManager() noexcept;
 
-		/// @brief Finds a system with the @p predicate.
-		/// @param predicate Predicate.
-		/// @return Found system. May be nullptr.
 		[[nodiscard("Pure function")]]
-		ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const;
+		void* FindSystem(const std::type_info& typeInfo) const;
 
 		/// @brief Begins the systems.
 		/// @details Call this before a first tick.
@@ -63,9 +62,28 @@ export namespace PonyEngine::Core
 		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
+		struct TypeInfoHash final
+		{
+			[[nodiscard("Pure operator")]]
+			std::size_t operator ()(const std::type_info& ti) const noexcept
+			{
+				return ti.hash_code();
+			}
+		};
+
+		struct TypeInfoEqual final
+		{
+			[[nodiscard("Pure operator")]]
+			bool operator ()(const std::type_info& left, const std::type_info& right) const noexcept
+			{
+				return left == right;
+			}
+		};
+
 		std::vector<ISystem*> m_systems; ///< Systems. It's synced with the @p m_factories by index.
 		std::vector<ISystemFactory*> m_factories; ///< System factories. It's synced with the @p m_systems by index.
 		std::vector<ISystem*> m_tickableSystems; ///< Tickable systems.
+		std::unordered_map<std::reference_wrapper<const type_info>, void*, TypeInfoHash, TypeInfoEqual> systemInterfaces;
 		const IEngine& m_engine; ///< Engine that owns the manager.
 	};
 }
@@ -82,7 +100,7 @@ namespace PonyEngine::Core
 			ISystemFactory* const factory = *it;
 			assert((factory != nullptr));
 			PONY_LOG(m_engine, Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
-			ISystem* const system = factory->Create(engine);
+			const auto [system, interfaces] = factory->Create(engine);
 			assert((system != nullptr));
 			m_systems.push_back(system);
 			m_factories.push_back(factory);
@@ -95,6 +113,12 @@ namespace PonyEngine::Core
 			{
 				PONY_LOG(m_engine, Log::LogType::Info, "The system is not tickable.");
 			}
+
+			for (auto interfacesIterator = interfaces.GetObjectInterfacesIterator(); !interfacesIterator.IsEnd(); ++interfacesIterator)
+			{
+				systemInterfaces.insert(*interfacesIterator);
+			}
+
 			PONY_LOG(m_engine, Log::LogType::Info, std::format("'{}' created.", system->GetName()).c_str());
 		}
 
@@ -117,16 +141,11 @@ namespace PonyEngine::Core
 		PONY_LOG(m_engine, Log::LogType::Info, "Systems destroyed.");
 	}
 
-	ISystem* SystemManager::FindSystem(const std::function<bool(const ISystem*)>& predicate) const
+	void* SystemManager::FindSystem(const std::type_info& typeInfo) const
 	{
-		assert((static_cast<bool>(predicate)));
-
-		for (ISystem* const system : m_systems)
+		if (const auto pair = systemInterfaces.find(typeInfo); pair != systemInterfaces.cend()) [[likely]]
 		{
-			if (predicate(system))
-			{
-				return system;
-			}
+			return pair->second;
 		}
 
 		return nullptr;

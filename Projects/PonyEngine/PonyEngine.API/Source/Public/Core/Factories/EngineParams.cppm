@@ -11,8 +11,6 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/LogMacro.h"
-
 export module PonyEngine.Core.Factories:EngineParams;
 
 import <algorithm>;
@@ -22,7 +20,6 @@ import <utility>;
 import <vector>;
 
 import PonyEngine.Log;
-import PonyEngine.Window.Factories;
 
 import :ISystemFactory;
 
@@ -43,6 +40,11 @@ export namespace PonyEngine::Core
 
 			~SystemFactoriesIterator() noexcept = default;
 
+			/// @brief Checks if the currently pointed system factory is actually an end.
+			/// @return @a True if the end is reached; @false otherwise.
+			[[nodiscard("Pure function")]]
+			bool IsEnd() const noexcept;
+
 			/// @brief Gets a currently pointed system factory.
 			/// @return Currently pointed system factory.
 			[[nodiscard("Pure operator")]]
@@ -53,11 +55,6 @@ export namespace PonyEngine::Core
 			/// @brief Moves a pointer to the next system factory.
 			/// @return Previous iterator.
 			SystemFactoriesIterator operator ++(int) noexcept;
-
-			/// @brief Checks if the currently pointed system factory is actually an end.
-			/// @return @a True if the end is reached; @false otherwise.
-			[[nodiscard("Pure function")]]
-			bool IsEnd() const noexcept;
 
 			SystemFactoriesIterator& operator =(const SystemFactoriesIterator& other) noexcept = default;
 			SystemFactoriesIterator& operator =(SystemFactoriesIterator&& other) noexcept = default;
@@ -102,36 +99,26 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		SystemFactoriesIterator GetSystemFactoriesIterator() const noexcept;
 
-		/// @brief Gets a window factory.
-		/// @return Window factory.
-		[[nodiscard("Pure function")]]
-		Window::IWindowFactory* GetWindowFactory() const noexcept;
-		/// @brief Sets a window factory.
-		/// @details This function is expected to be called once.
-		/// @param windowFactory Window factory.
-		void SetWindowFactory(Window::IWindowFactory* windowFactory) noexcept;
-
 		EngineParams& operator =(const EngineParams& other) = default;
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
 	private:
 		std::vector<ISystemFactory*> m_systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
 		Log::ILogger* m_logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
-		Window::IWindowFactory* m_windowFactory; ///< Window factory. It's optional and can be nullptr. If it's not nullptr, its lifetime must exceed the engine lifetime.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	bool EngineParams::SystemFactoriesIterator::IsEnd() const noexcept
-	{
-		return m_current == m_end;
-	}
-
 	EngineParams::SystemFactoriesIterator::SystemFactoriesIterator(const std::vector<ISystemFactory*>::const_iterator& begin, const std::vector<ISystemFactory*>::const_iterator& end) noexcept :
 		m_current(begin),
 		m_end(end)
 	{
+	}
+
+	bool EngineParams::SystemFactoriesIterator::IsEnd() const noexcept
+	{
+		return m_current == m_end;
 	}
 
 	ISystemFactory* EngineParams::SystemFactoriesIterator::operator *() const noexcept
@@ -155,8 +142,7 @@ namespace PonyEngine::Core
 	}
 
 	EngineParams::EngineParams(Log::ILogger* const logger) noexcept :
-		m_logger{logger},
-		m_windowFactory{}
+		m_logger{logger}
 	{
 		assert((m_logger != nullptr));
 	}
@@ -176,17 +162,5 @@ namespace PonyEngine::Core
 	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept
 	{
 		return SystemFactoriesIterator(m_systemFactories.cbegin(), m_systemFactories.cend());
-	}
-
-	Window::IWindowFactory* EngineParams::GetWindowFactory() const noexcept
-	{
-		return m_windowFactory;
-	}
-
-	void EngineParams::SetWindowFactory(Window::IWindowFactory* const windowFactory) noexcept
-	{
-		PONY_LOG_IF_GENERAL_PTR(m_windowFactory != nullptr, m_logger, Log::LogType::Warning, "Set a new window factory when the other window factory was already set.");
-		PONY_LOG_IF_GENERAL_PTR(windowFactory == nullptr, m_logger, Log::LogType::Warning, "Set a nullptr window factory.");
-		m_windowFactory = windowFactory;
 	}
 }

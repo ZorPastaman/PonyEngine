@@ -21,6 +21,11 @@ export namespace PonyEngine::Window
 	class IWindow : public Utility::INamed
 	{
 	public:
+		/// @brief Checks if the system window is alive.
+		/// @return @a True if it's alive; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsWindowAlive() const noexcept = 0;
+
 		/// @brief Gets a window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
@@ -38,9 +43,6 @@ export namespace PonyEngine::Window
 
 		/// @brief Shows a window.
 		virtual void ShowWindow() = 0;
-
-		/// @brief Ticks a window message queue.
-		virtual void Tick() = 0;
 
 	protected:
 		~IWindow() noexcept = default;

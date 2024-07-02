@@ -10,7 +10,7 @@
 export module PonyEngine.Core:IEngine;
 
 import <cstddef>;
-import <functional>;
+import <typeinfo>;
 
 import PonyEngine.Log;
 import PonyEngine.Window;
@@ -32,21 +32,17 @@ export namespace PonyEngine::Core
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept = 0;
-		/// @brief Gets an engine window. The window is optional.
-		/// @return Engine window. Can be @a nullptr.
-		[[nodiscard("Pure function")]]
-		virtual Window::IWindow* GetWindow() const noexcept = 0;
 
-		/// @brief Finds a system by the @p predicate.
-		/// @param predicate Predicate.
-		/// @return Found system. It's nullptr if no system is found.
+		/// @brief Tries to find a system of the type described by the @p typeInfo.
+		/// @param typeInfo System type info.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		[[nodiscard("Pure function")]]
-		virtual ISystem* FindSystem(const std::function<bool(const ISystem*)>& predicate) const = 0;
-		/// @brief Finds a system of the type @p T.
-		/// @tparam T System type to find.
-		/// @return Found system. It's nullptr if no system is found.
+		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept = 0;
+		/// @brief Tries to find a system of the type @p T.
+		/// @tparam T System type.
+		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		template<typename T> [[nodiscard("Pure function")]]
-		T* FindSystem() const;
+		T* FindSystem() const noexcept;
 
 		/// @brief Checks if the engine received an exit code.
 		/// @details Exit code can be gotten via @p GetExitCode().
@@ -74,10 +70,8 @@ export namespace PonyEngine::Core
 namespace PonyEngine::Core
 {
 	template<typename T>
-	T* IEngine::FindSystem() const
+	T* IEngine::FindSystem() const noexcept
 	{
-		ISystem* const system = FindSystem([](const ISystem* const systemCandidate) { return dynamic_cast<const T*>(systemCandidate) != nullptr; });
-
-		return dynamic_cast<T*>(system);
+		return static_cast<T*>(FindSystem(typeid(T)));
 	}
 }
