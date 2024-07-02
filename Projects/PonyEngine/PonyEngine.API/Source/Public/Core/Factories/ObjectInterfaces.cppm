@@ -7,12 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
- // TODO: Add text to asserts
-
 #include <cassert>
 
 export module PonyEngine.Core.Factories:ObjectInterfaces;
 
+import <concepts>;
 import <typeinfo>;
 import <utility>;
 import <vector>;
@@ -78,12 +77,16 @@ export namespace PonyEngine::Core
 
 		~ObjectInterfaces() noexcept = default;
 
-		// TODO: Add a template function.
-
 		/// @brief Adds an interface.
 		/// @param typeInfo Interface type info.
 		/// @param pointer Pointer to the interface object.
 		void AddObjectInterface(const std::type_info& typeInfo, void* pointer);
+		/// @brief Adds an interface.
+		/// @tparam Target Interface type.
+		/// @tparam Source Object source type.
+		/// @param object Object source.
+		template<typename Target, typename Source>
+		void AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>);
 		/// @brief Gets an interfaces iterator.
 		/// @return Interfaces iterator.
 		[[nodiscard("Pure function")]]
@@ -135,10 +138,16 @@ namespace PonyEngine::Core
 
 	void ObjectInterfaces::AddObjectInterface(const std::type_info& typeInfo, void* const pointer)
 	{
-		assert((pointer));
+		assert((pointer)); // TODO: Add text to asserts
 
 		const auto pair = std::pair<const std::type_info&, void*>(typeInfo, pointer);
 		interfaces.push_back(pair);
+	}
+
+	template<typename Target, typename Source>
+	void ObjectInterfaces::AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>)
+	{
+		AddObjectInterface(typeid(Target), static_cast<Target*>(object));
 	}
 
 	ObjectInterfaces::ObjectInterfacesIterator ObjectInterfaces::GetObjectInterfacesIterator() const noexcept
