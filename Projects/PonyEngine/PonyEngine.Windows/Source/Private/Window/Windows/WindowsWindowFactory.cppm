@@ -150,10 +150,8 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		Core::ObjectInterfaces interfaces;
-		IWindow* windowInterface = window;
-		interfaces.AddObjectInterface(typeid(IWindow), windowInterface);
-		IWindowsWindow* windowsWindowInterface = window;
-		interfaces.AddObjectInterface(typeid(IWindowsWindow), windowsWindowInterface);
+		interfaces.AddObjectInterface<IWindow>(window);
+		interfaces.AddObjectInterface<IWindowsWindow>(window);
 
 		return std::pair<Core::ISystem*, Core::ObjectInterfaces>(window, interfaces);
 	}

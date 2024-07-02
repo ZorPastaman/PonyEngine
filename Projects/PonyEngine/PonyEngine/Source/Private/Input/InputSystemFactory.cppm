@@ -54,8 +54,7 @@ namespace PonyEngine::Input
 		const auto inputSystem = new InputSystem(engine);
 
 		Core::ObjectInterfaces interfaces;
-		IInputSystem* inputSystemInterface = inputSystem;
-		interfaces.AddObjectInterface(typeid(IInputSystem), inputSystemInterface);
+		interfaces.AddObjectInterface<IInputSystem>(inputSystem);
 
 		return std::pair<Core::ISystem*, Core::ObjectInterfaces>(static_cast<Core::ISystem*>(inputSystem), interfaces);
 	}
