@@ -12,3 +12,4 @@ export module PonyEngine.Core.Factories;
 export import :EngineParams;
 export import :ISystemFactory;
 export import :ObjectInterfaces;
+export import :SystemInfo;

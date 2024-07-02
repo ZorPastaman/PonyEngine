@@ -15,6 +15,7 @@ import PonyEngine.Core;
 import PonyEngine.Utility;
 
 import :ObjectInterfaces;
+import :SystemInfo;
 
 export namespace PonyEngine::Core
 {
@@ -22,14 +23,11 @@ export namespace PonyEngine::Core
 	class ISystemFactory : public Utility::INamed
 	{
 	public:
-		// TODO: return std::unique_ptr with a custom deleter.
-		// TODO: add special return type to create to avoid std::pair.
-
 		/// @brief Creates a system.
 		/// @param engine Engine that owns the system.
-		/// @return Created system and its public interfaces.
+		/// @return Created system info.
 		[[nodiscard("Pure function")]]
-		virtual std::pair<ISystem*, ObjectInterfaces> Create(IEngine& engine) = 0;
+		virtual SystemInfo Create(IEngine& engine) = 0;
 		/// @brief Destroys a previously created system.
 		/// @param system System to destroy.
 		virtual void Destroy(ISystem* system) noexcept = 0;

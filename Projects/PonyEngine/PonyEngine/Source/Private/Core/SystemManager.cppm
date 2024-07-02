@@ -17,7 +17,6 @@ export module PonyEngine.Core.Implementation:SystemManager;
 
 import <cstddef>;
 import <exception>;
-import <functional>;
 import <format>;
 import <iostream>;
 import <string>;
@@ -62,12 +61,14 @@ export namespace PonyEngine::Core
 		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
+		/// @brief @p std::type_info hash function.
 		struct TypeInfoHash final
 		{
 			[[nodiscard("Pure operator")]]
 			std::size_t operator ()(const std::type_info& typeInfo) const noexcept;
 		};
 
+		/// @brief @p std::type_info equal function.
 		struct TypeInfoEqual final
 		{
 			[[nodiscard("Pure operator")]]
@@ -94,7 +95,8 @@ namespace PonyEngine::Core
 			ISystemFactory* const factory = *it;
 			assert((factory != nullptr));
 			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}'.", factory->GetSystemName()).c_str());
-			const auto [system, interfaces] = factory->Create(engine);
+			const SystemInfo systemInfo = factory->Create(engine);
+			ISystem* const system = systemInfo.system;
 			assert((system != nullptr));
 			systems.push_back(system);
 			factories.push_back(factory);
@@ -108,7 +110,7 @@ namespace PonyEngine::Core
 				PONY_LOG(engine, Log::LogType::Info, "The system is not tickable.");
 			}
 
-			for (auto interfacesIterator = interfaces.GetObjectInterfacesIterator(); !interfacesIterator.IsEnd(); ++interfacesIterator)
+			for (auto interfacesIterator = systemInfo.interfaces.GetObjectInterfacesIterator(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
 				systemInterfaces.insert(*interfacesIterator);
 			}
