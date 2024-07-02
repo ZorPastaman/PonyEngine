@@ -61,34 +61,40 @@ export namespace PonyEngine::Core
 
 		virtual void Tick() override;
 
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
+
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
 
+		// TODO: set unique name
+		static constexpr const char* Name = "PonyEngine::Engine";
+
 	private:
-		Log::ILogger& m_logger; ///< Logger.
+		Log::ILogger& logger; ///< Logger.
 
-		SystemManager* m_systemManager; ///< System manager.
+		SystemManager* systemManager; ///< System manager.
 
-		std::size_t m_frameCount; ///< Current frame.
+		std::size_t frameCount; ///< Current frame.
 
-		int m_exitCode; ///< Exit code. It's defined only if @p m_isRunning is @a true.
-		bool m_isRunning; ///< @a True if the engine is running; @a false otherwise.
+		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
+		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 	};
 }
 
 namespace PonyEngine::Core
 {
 	Engine::Engine(const EngineParams& params) :
-		m_logger{params.GetLogger()},
-		m_frameCount{0},
-		m_isRunning{true}
+		logger{params.GetLogger()},
+		frameCount{0},
+		isRunning{true}
 	{
 		PONY_LOG_PTR(this, Log::LogType::Info, "Create a system manager.");
-		m_systemManager = new SystemManager(params, *this);
+		systemManager = new SystemManager(params, *this);
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager created.");
 
 		PONY_LOG_PTR(this, Log::LogType::Info, "Begin a system manager.");
-		m_systemManager->Begin();
+		systemManager->Begin();
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager begun.");
 
 		if (const auto window = IEngine::FindSystem<Window::IWindow>())
@@ -100,48 +106,48 @@ namespace PonyEngine::Core
 	Engine::~Engine() noexcept
 	{
 		PONY_LOG_PTR(this, Log::LogType::Info, "End a system manager.");
-		m_systemManager->End();
+		systemManager->End();
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager ended.");
 
 		PONY_LOG_PTR(this, Log::LogType::Info, "Destroy a system manager.");
-		delete m_systemManager;
+		delete systemManager;
 		PONY_LOG_PTR(this, Log::LogType::Info, "System manager destroyed.");
 	}
 
 	std::size_t Engine::GetFrameCount() const noexcept
 	{
-		return m_frameCount;
+		return frameCount;
 	}
 
 	Log::ILogger& Engine::GetLogger() const noexcept
 	{
-		return m_logger;
+		return logger;
 	}
 
 	void* Engine::FindSystem(const std::type_info& typeInfo) const noexcept
 	{
-		return m_systemManager->FindSystem(typeInfo);
+		return systemManager->FindSystem(typeInfo);
 	}
 
 	bool Engine::IsRunning() const noexcept
 	{
-		return m_isRunning;
+		return isRunning;
 	}
 
 	int Engine::GetExitCode() const noexcept
 	{
-		PONY_LOG_IF_PTR(m_isRunning, this, Log::LogType::Warning, "Tried to get an exit code when the engine is still running.");
+		PONY_LOG_IF_PTR(isRunning, this, Log::LogType::Warning, "Tried to get an exit code when the engine is still running.");
 
-		return m_exitCode;
+		return exitCode;
 	}
 
 	void Engine::Stop(const int exitCode) noexcept
 	{
-		if (m_isRunning)
+		if (isRunning)
 		{
 			PONY_LOG_PTR(this, Log::LogType::Info, std::format("Stop an engine with the exit code '{}'.", exitCode).c_str());
-			m_isRunning = false;
-			m_exitCode = exitCode;
+			isRunning = false;
+			this->exitCode = exitCode;
 		}
 		else
 		{
@@ -151,14 +157,19 @@ namespace PonyEngine::Core
 
 	void Engine::Tick()
 	{
-		if (!m_isRunning)
+		if (!isRunning)
 		{
 			throw std::logic_error("The engine is ticked when it's already stopped.");
 		}
 
 		PONY_LOG_PTR(this, Log::LogType::Verbose, "Tick engine.");
-		m_systemManager->Tick();
+		systemManager->Tick();
 
-		++m_frameCount;
+		++frameCount;
+	}
+
+	const char* Engine::GetName() const noexcept
+	{
+		return Name;
 	}
 }

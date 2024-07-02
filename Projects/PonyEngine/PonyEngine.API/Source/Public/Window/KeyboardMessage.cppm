@@ -54,8 +54,8 @@ export namespace PonyEngine::Window
 		std::string ToString() const;
 
 	private:
-		KeyboardKeyCode m_keyCode; ///< Key code.
-		bool m_isDown; ///< @a True if the key is pressed; @a false if it's unpressed.
+		KeyboardKeyCode keyCode; ///< Key code.
+		bool isDown; ///< @a True if the key is pressed; @a false if it's unpressed.
 	};
 
 	/// @brief Puts message.ToString into the @p stream.
@@ -68,24 +68,24 @@ export namespace PonyEngine::Window
 namespace PonyEngine::Window
 {
 	KeyboardMessage::KeyboardMessage(const KeyboardKeyCode keyCode, const bool isDown) noexcept :
-		m_keyCode{keyCode},
-		m_isDown{isDown}
+		keyCode{keyCode},
+		isDown{isDown}
 	{
 	}
 
 	KeyboardKeyCode KeyboardMessage::GetKeyCode() const noexcept
 	{
-		return m_keyCode;
+		return keyCode;
 	}
 
 	bool KeyboardMessage::GetIsDown() const noexcept
 	{
-		return m_isDown;
+		return isDown;
 	}
 
 	std::string KeyboardMessage::ToString() const
 	{
-		return std::format("(KeyCode: {}, IsDown: {})", Window::ToString(m_keyCode), m_isDown);
+		return std::format("(KeyCode: {}, IsDown: {})", Window::ToString(keyCode), isDown);
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const KeyboardMessage& message)

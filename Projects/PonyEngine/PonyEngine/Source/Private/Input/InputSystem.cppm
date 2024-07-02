@@ -61,19 +61,19 @@ export namespace PonyEngine::Input
 		static const char* const Name;
 
 	private:
-		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> m_events; ///< Input event action map.
-		std::size_t m_currentId; ///< ID that will be given to a new event. It's incremented every time.
-		std::queue<KeyboardMessage> m_queue; ///< Message queue.
+		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> events; ///< Input event action map.
+		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
+		std::queue<KeyboardMessage> queue; ///< Message queue.
 
-		const Core::IEngine& m_engine; ///< Engine that owns the input system.
+		const Core::IEngine& engine; ///< Engine that owns the input system.
 	};
 }
 
 namespace PonyEngine::Input
 {
 	InputSystem::InputSystem(Core::IEngine& engine) noexcept :
-		m_currentId{1},
-		m_engine{engine}
+		currentId{1},
+		engine{engine}
 	{
 	}
 
@@ -84,24 +84,24 @@ namespace PonyEngine::Input
 
 	void InputSystem::Begin()
 	{
-		PONY_LOG(m_engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
+		PONY_LOG(engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
 
-		if (Window::IWindow* window = m_engine.FindSystem<Window::IWindow>())
+		if (Window::IWindow* window = engine.FindSystem<Window::IWindow>())
 		{
-			PONY_LOG(m_engine, Log::LogType::Info, "Subscribe to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, "Subscribe to keyboard messages.");
 			window->AddKeyboardMessageObserver(this);
 		}
 		else
 		{
-			PONY_LOG(m_engine, Log::LogType::Warning, "Couldn't find a window, the input system won't work.");
+			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find a window, the input system won't work.");
 		}
 	}
 
 	void InputSystem::End()
 	{
-		if (Window::IWindow* window = m_engine.FindSystem<Window::IWindow>())
+		if (Window::IWindow* window = engine.FindSystem<Window::IWindow>())
 		{
-			PONY_LOG(m_engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
 			window->RemoveKeyboardMessageObserver(this);
 		}
 	}
@@ -113,16 +113,16 @@ namespace PonyEngine::Input
 
 	void InputSystem::Tick()
 	{
-		while (!m_queue.empty())
+		while (!queue.empty())
 		{
-			const KeyboardMessage message = m_queue.front();
-			m_queue.pop();
+			const KeyboardMessage message = queue.front();
+			queue.pop();
 			
-			for (const auto& [handle, eventPair] : m_events)
+			for (const auto& [handle, eventPair] : events)
 			{
 				if (const KeyboardMessage expectedMessage = eventPair.first.GetExpectedMessage(); expectedMessage == message)
 				{
-					PONY_LOG(m_engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
+					PONY_LOG(engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
 					eventPair.second();
 				}
 			}
@@ -131,24 +131,24 @@ namespace PonyEngine::Input
 
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
-		const Handle handle(m_currentId++);
-		PONY_LOG(m_engine, Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'.", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
+		const Handle handle(currentId++);
+		PONY_LOG(engine, Log::LogType::Info, std::format("Register an action. ExpectedMessage: '{}', ID: '{}'.", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
-		m_events.insert(std::pair(handle, eventAction));
+		events.insert(std::pair(handle, eventAction));
 
 		return handle;
 	}
 
 	void InputSystem::UnregisterAction(const Handle handle)
 	{
-		PONY_LOG(m_engine, Log::LogType::Info, std::format("Unregister an action. ID: '{}'.", handle.GetId()).c_str());
-		m_events.erase(handle);
+		PONY_LOG(engine, Log::LogType::Info, std::format("Unregister an action. ID: '{}'.", handle.GetId()).c_str());
+		events.erase(handle);
 	}
 
 	void InputSystem::Observe(const Window::KeyboardMessage& keyboardMessage) noexcept
 	{
-		PONY_LOG(m_engine, Log::LogType::Verbose, std::format("Received an keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
-		m_queue.push(KeyboardMessage(static_cast<KeyboardKeyCode>(keyboardMessage.GetKeyCode()), keyboardMessage.GetIsDown()));
+		PONY_LOG(engine, Log::LogType::Verbose, std::format("Received an keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
+		queue.push(KeyboardMessage(static_cast<KeyboardKeyCode>(keyboardMessage.GetKeyCode()), keyboardMessage.GetIsDown()));
 	}
 
 	const char* const InputSystem::Name = "PonyEngine::Input::InputSystem";

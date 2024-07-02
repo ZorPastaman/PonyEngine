@@ -42,26 +42,26 @@ export namespace PonyEngine::Log
 		LogInput& operator =(LogInput&& other) noexcept = default;
 
 	private:
-		const char* m_message; ///< Log message.
-		std::size_t m_frameCount; ///< Engine frame count.
+		const char* message; ///< Log message.
+		std::size_t frameCount; ///< Engine frame count.
 	};
 }
 
 namespace PonyEngine::Log
 {
 	LogInput::LogInput(const char* const message, const std::size_t frameCount) noexcept :
-		m_message{message},
-		m_frameCount{frameCount}
+		message{message},
+		frameCount{frameCount}
 	{
 	}
 
 	const char* LogInput::GetMessage() const noexcept
 	{
-		return m_message;
+		return message;
 	}
 
 	std::size_t LogInput::GetFrameCount() const noexcept
 	{
-		return m_frameCount;
+		return frameCount;
 	}
 }

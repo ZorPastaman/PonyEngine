@@ -262,10 +262,8 @@ namespace PonyEngine::Input
 		{
 			return position->second;
 		}
-		else [[unlikely]]
-		{
-			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
-		}
+
+		return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)

@@ -13,6 +13,8 @@ import PonyEngine.Core.Factories;
 
 export namespace Launcher
 {
+	// TODO: no platform params. Provide everything via one provider
+
 	/// @brief Platform engine params provider.
 	class IPlatformEngineParamsProvider
 	{

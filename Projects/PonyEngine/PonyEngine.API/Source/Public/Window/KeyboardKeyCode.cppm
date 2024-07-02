@@ -17,6 +17,8 @@ import <unordered_map>;
 
 export namespace PonyEngine::Window
 {
+	// TODO: remove it - use the object from PonyEngine::Input
+
 	/// @brief Keyboard key codes.
 	enum class KeyboardKeyCode : std::uint_fast8_t
 	{

@@ -43,20 +43,20 @@ export namespace Launcher
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Log::ILogger& m_logger; ///< Logger.
+		PonyEngine::Log::ILogger& logger; ///< Logger.
 	};
 }
 
 namespace Launcher
 {
 	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Log::ILogger& logger) noexcept :
-		m_logger{logger}
+		logger{logger}
 	{
 	}
 
 	bool WindowsQuitChecker::Check(int& exitCode) const
 	{
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Verbose, "Check for a quit message.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Check for a quit message.");
 
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -67,7 +67,7 @@ namespace Launcher
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from the platform.", exitCode).c_str());
+				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from the platform.", exitCode).c_str());
 
 				return false;
 			}

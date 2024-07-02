@@ -19,6 +19,8 @@ export namespace PonyEngine::Window
 	class IWindowsWindowFactory : public IWindowFactory
 	{
 	public:
+		// TODO: move these functions to window params.
+
 		/// @brief Gets a cmdShow of the next window.
 		/// @return CmdShow.
 		[[nodiscard("Pure function")]]

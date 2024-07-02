@@ -21,6 +21,8 @@ export namespace PonyEngine::Window
 	class IWindowFactory : public Core::ISystemFactory
 	{
 	public:
+		// TODO: think about moving these title functions to a window params.
+
 		/// @brief Gets a title of the next created window.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]

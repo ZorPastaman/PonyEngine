@@ -46,41 +46,41 @@ export namespace Launcher
 		EngineParamsProvider& operator =(EngineParamsProvider&&) = delete;
 
 	private:
-		PonyEngine::Log::ILogger& m_logger; ///< Logger.
+		PonyEngine::Log::ILogger& logger; ///< Logger.
 
 		// Set all platform-independent factories here.
 
-		PonyEngine::Input::IInputSystemFactory* m_inputSystemFactory;
+		PonyEngine::Input::IInputSystemFactory* inputSystemFactory;
 	};
 }
 
 namespace Launcher
 {
 	EngineParamsProvider::EngineParamsProvider(PonyEngine::Log::ILogger& logger) :
-		m_logger{logger}
+		logger{logger}
 	{
 		// Create all platform-independent factories here.
 
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, "Create an input system factory.");
-		m_inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
-		assert((m_inputSystemFactory != nullptr));
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create an input system factory.");
+		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
+		assert((inputSystemFactory != nullptr));
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
 	}
 
 	EngineParamsProvider::~EngineParamsProvider() noexcept
 	{
 		// Destroy all platform-independent factories here.
 
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, "Destroy an input system factory.");
-		PonyEngine::Input::DestroyInputSystemFactory(m_inputSystemFactory);
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Info, "Input system factory destroyed.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy an input system factory.");
+		PonyEngine::Input::DestroyInputSystemFactory(inputSystemFactory);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory destroyed.");
 	}
 
 	void EngineParamsProvider::Modify(PonyEngine::Core::EngineParams& engineParams) const
 	{
 		// Set all platform-independent factories and other parameters here.
 
-		PONY_LOG_GENERAL(m_logger, PonyEngine::Log::LogType::Debug, "Push an input system factory.");
-		engineParams.AddSystemFactory(m_inputSystemFactory);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Push an input system factory.");
+		engineParams.AddSystemFactory(inputSystemFactory);
 	}
 }

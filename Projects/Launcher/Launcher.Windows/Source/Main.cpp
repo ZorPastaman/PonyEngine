@@ -25,7 +25,7 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a logger provider");
-	const Launcher::LoggerProvider loggerProvider;
+	const Launcher::LoggerProvider loggerProvider;	// TODO: Add struct wrapper over early providers.
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
 
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Create a Windows quit checker.");

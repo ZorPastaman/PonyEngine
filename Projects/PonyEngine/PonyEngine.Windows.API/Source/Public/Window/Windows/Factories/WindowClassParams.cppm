@@ -37,24 +37,24 @@ export namespace PonyEngine::Window
 		WindowClassParams& operator =(WindowClassParams&& other) = default;
 
 	private:
-		std::wstring m_className; ///< Class name.
+		std::wstring className; ///< Class name.
 	};
 }
 
 namespace PonyEngine::Window
 {
 	WindowClassParams::WindowClassParams(const std::wstring& className) :
-		m_className(className)
+		className(className)
 	{
 	}
 
 	WindowClassParams::WindowClassParams(const wchar_t* className) noexcept :
-		m_className(className)
+		className(className)
 	{
 	}
 
 	const std::wstring& WindowClassParams::GetWindowClassName() const noexcept
 	{
-		return m_className;
+		return className;
 	}
 }

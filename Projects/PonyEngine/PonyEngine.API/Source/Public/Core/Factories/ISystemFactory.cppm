@@ -12,15 +12,19 @@ export module PonyEngine.Core.Factories:ISystemFactory;
 import <utility>;
 
 import PonyEngine.Core;
+import PonyEngine.Utility;
 
 import :ObjectInterfaces;
 
 export namespace PonyEngine::Core
 {
 	/// @brief System factory.
-	class ISystemFactory
+	class ISystemFactory : public Utility::INamed
 	{
 	public:
+		// TODO: return std::unique_ptr with a custom deleter.
+		// TODO: add special return type to create to avoid std::pair.
+
 		/// @brief Creates a system.
 		/// @param engine Engine that owns the system.
 		/// @return Created system and its public interfaces.
