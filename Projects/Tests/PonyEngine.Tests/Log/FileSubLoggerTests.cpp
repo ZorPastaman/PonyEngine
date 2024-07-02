@@ -24,27 +24,27 @@ namespace Log
 {
 	TEST_CLASS(FileSubLoggerTests)
 	{
-		const std::filesystem::path m_testLogPath = "TestLog.log";
+		const std::filesystem::path testLogPath = "TestLog.log";
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(m_testLogPath);
+			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
 			Assert::IsNotNull(fileSubLogger);
 			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
-			std::filesystem::remove(m_testLogPath);
+			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(m_testLogPath);
+			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
 			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger->GetName());
 			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
-			std::filesystem::remove(m_testLogPath);
+			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(LogTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(m_testLogPath);
+			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
 			const char* const message = "Message!";
 			const std::chrono::time_point<std::chrono::system_clock> timePoint(std::chrono::seconds(5691338));
 			const std::size_t frameCount = 84136;
@@ -52,13 +52,13 @@ namespace Log
 			fileSubLogger->Log(infoLogEntry);
 			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
 
-			std::ifstream logFile(m_testLogPath);
+			std::ifstream logFile(testLogPath);
 			std::string line;
 			std::getline(logFile, line);
 			Assert::AreEqual(infoLogEntry.ToString(), line);
 			logFile.close();
 
-			std::filesystem::remove(m_testLogPath);
+			std::filesystem::remove(testLogPath);
 		}
 	};
 }

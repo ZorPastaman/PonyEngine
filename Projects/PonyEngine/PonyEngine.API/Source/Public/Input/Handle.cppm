@@ -41,20 +41,20 @@ export namespace PonyEngine::Input
 		bool operator ==(const Handle& other) const noexcept = default;
 
 	private:
-		std::size_t m_id; ///< Unique event ID.
+		std::size_t id; ///< Unique event ID.
 	};
 }
 
 namespace PonyEngine::Input
 {
 	Handle::Handle(const std::size_t id) noexcept :
-		m_id{id}
+		id{id}
 	{
 	}
 
 	std::size_t Handle::GetId() const noexcept
 	{
-		return m_id;
+		return id;
 	}
 }
 

@@ -48,16 +48,16 @@ export namespace PonyEngine::Log
 		static const char* const Name; ///< Class name.
 
 	private:
-		std::ofstream m_logFile; ///< log file stream.
+		std::ofstream logFile; ///< log file stream.
 	};
 }
 
 namespace PonyEngine::Log
 {
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
-		m_logFile(logPath)
+		logFile(logPath)
 	{
-		if (!m_logFile.is_open()) [[unlikely]]
+		if (!logFile.is_open()) [[unlikely]]
 		{
 			throw std::logic_error("Log file isn't open.");
 		}
@@ -65,11 +65,11 @@ namespace PonyEngine::Log
 
 	FileSubLogger::~FileSubLogger() noexcept
 	{
-		if (m_logFile.is_open())
+		if (logFile.is_open())
 		{
 			try
 			{
-				m_logFile.close();
+				logFile.close();
 			}
 			catch (const std::exception& e)
 			{
@@ -87,7 +87,7 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			m_logFile << logEntry << std::endl;
+			logFile << logEntry << std::endl;
 		}
 		catch (const std::exception& e)
 		{

@@ -54,7 +54,7 @@ export namespace PonyEngine::Log
 		static const char* const Name; ///< Class name.
 
 	private:
-		std::vector<ISubLogger*> m_subLoggers; ///< Sub-loggers container.
+		std::vector<ISubLogger*> subLoggers; ///< Sub-loggers container.
 	};
 }
 
@@ -73,7 +73,7 @@ namespace PonyEngine::Log
 		{
 			const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
 
-			for (ISubLogger* const subLogger : m_subLoggers)
+			for (ISubLogger* const subLogger : subLoggers)
 			{
 				subLogger->Log(logEntry);
 			}
@@ -90,7 +90,7 @@ namespace PonyEngine::Log
 		{
 			const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
 
-			for (ISubLogger* const subLogger : m_subLoggers)
+			for (ISubLogger* const subLogger : subLoggers)
 			{
 				subLogger->Log(logEntry);
 			}
@@ -104,19 +104,19 @@ namespace PonyEngine::Log
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger != nullptr));
-		assert((std::ranges::find(std::as_const(m_subLoggers), subLogger) == m_subLoggers.cend()));
+		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend()));
 		PONY_CONSOLE(LogType::Info, std::format("Add a sub-logger '{}'.", subLogger->GetName()));
-		m_subLoggers.push_back(subLogger);
+		subLoggers.push_back(subLogger);
 	}
 
 	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
 		PONY_CONSOLE_IF(subLogger == nullptr, LogType::Warning, "Tried to remove a nullptr sub-logger.");
 
-		if (const auto position = std::ranges::find(std::as_const(m_subLoggers), subLogger); position != m_subLoggers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
 		{
 			PONY_CONSOLE(LogType::Info, std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
-			m_subLoggers.erase(position);
+			subLoggers.erase(position);
 		}
 		else [[unlikely]]
 		{

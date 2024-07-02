@@ -35,10 +35,15 @@ export namespace PonyEngine::Input
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
 
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
+
+		static constexpr const char* Name = "PonyEngine::Input::InputSystemFactory";
 	};
 }
 
@@ -59,6 +64,11 @@ namespace PonyEngine::Input
 	{
 		assert((dynamic_cast<InputSystem*>(system) != nullptr));
 		delete static_cast<InputSystem*>(system);
+	}
+
+	const char* InputSystemFactory::GetName() const noexcept
+	{
+		return Name;
 	}
 
 	const char* InputSystemFactory::GetSystemName() const noexcept

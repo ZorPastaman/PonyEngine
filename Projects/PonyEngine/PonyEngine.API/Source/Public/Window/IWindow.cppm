@@ -34,6 +34,8 @@ export namespace PonyEngine::Window
 		/// @param title Window title to set.
 		virtual void SetTitle(const wchar_t* title) = 0;
 
+		// TODO: move to another interface message observer functions.
+
 		/// @brief Adds a keyboard input observer.
 		/// @param keyboardMessageObserver Keyboard input observer. Mustn't be nullptr.
 		virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;

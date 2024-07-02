@@ -37,19 +37,19 @@ export namespace PonyEngine::Input
 		Event& operator =(Event&& other) noexcept = default;
 
 	private:
-		KeyboardMessage m_expectedMessage; ///< The event is raised if the input system receives such an event.
+		KeyboardMessage expectedMessage; ///< The event is raised if the input system receives such an event.
 	};
 }
 
 namespace PonyEngine::Input
 {
 	Event::Event(const KeyboardMessage& expectedMessage) noexcept :
-		m_expectedMessage{expectedMessage}
+		expectedMessage{expectedMessage}
 	{
 	}
 
 	const KeyboardMessage& Event::GetExpectedMessage() const noexcept
 	{
-		return m_expectedMessage;
+		return expectedMessage;
 	}
 }

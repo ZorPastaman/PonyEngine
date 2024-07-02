@@ -35,6 +35,8 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
+	// TODO: return std::unique_ptr with custom deleter in functions like this.
+
 	IEngine* CreateEngine(const EngineParams& params)
 	{
 		return new Engine(params);

@@ -80,14 +80,14 @@ export namespace PonyEngine::Log
 		[[nodiscard("Pure function")]]
 		std::string MakeString() const noexcept;
 
-		const char* m_message; ///< Log message.
-		const std::exception* m_exception; ///< Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
-		std::chrono::time_point<std::chrono::system_clock> m_timePoint; ///< Time when the log entry is created.
-		std::size_t m_frameCount; ///< Frame when the log entry is created.
-		LogType m_logType; ///< Log type.
+		const char* message; ///< Log message.
+		const std::exception* exception; ///< Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
+		std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
+		std::size_t frameCount; ///< Frame when the log entry is created.
+		LogType logType; ///< Log type.
 
-		mutable std::string m_stringCache; ///< ToString() cache.
-		mutable bool m_isDirty; ///< If it's @a true, the cache is invalid.
+		mutable std::string stringCache; ///< ToString() cache.
+		mutable bool isDirty; ///< If it's @a true, the cache is invalid.
 	};
 
 	/// @brief Puts logEntry.ToString() into the @p stream.
@@ -100,64 +100,64 @@ export namespace PonyEngine::Log
 namespace PonyEngine::Log
 {
 	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
-		m_message(message),
-		m_exception(exception),
-		m_timePoint(timePoint),
-		m_frameCount{frameCount},
-		m_logType{logType},
-		m_isDirty{true}
+		message(message),
+		exception(exception),
+		timePoint(timePoint),
+		frameCount{frameCount},
+		logType{logType},
+		isDirty{true}
 	{
 		assert(((logType != LogType::Exception && exception == nullptr) || (logType == LogType::Exception && exception != nullptr)));
 	}
 
 	const char* LogEntry::GetMessage() const noexcept
 	{
-		return m_message;
+		return message;
 	}
 
 	const std::exception* LogEntry::GetException() const noexcept
 	{
-		return m_exception;
+		return exception;
 	}
 
 	std::chrono::time_point<std::chrono::system_clock> LogEntry::GetTimePoint() const noexcept
 	{
-		return m_timePoint;
+		return timePoint;
 	}
 
 	std::size_t LogEntry::GetFrameCount() const noexcept
 	{
-		return m_frameCount;
+		return frameCount;
 	}
 
 	LogType LogEntry::GetLogType() const noexcept
 	{
-		return m_logType;
+		return logType;
 	}
 
 	std::string LogEntry::ToString() const noexcept
 	{
-		if (m_isDirty)
+		if (isDirty)
 		{
-			m_stringCache = MakeString();
-			m_isDirty = false;
+			stringCache = MakeString();
+			isDirty = false;
 		}
 
-		return m_stringCache;
+		return stringCache;
 	}
 
 	std::string LogEntry::MakeString() const noexcept
 	{
 		try
 		{
-			const std::string logTypeString = Log::ToString(m_logType, false);
-			const std::string messageToFormat = m_exception == nullptr
-				? m_message
-				: m_message == nullptr || *m_message == '\0'
-				? m_exception->what()
-				: std::format("{} - {}", m_exception->what(), m_message);
+			const std::string logTypeString = Log::ToString(logType, false);
+			const std::string messageToFormat = exception == nullptr
+				? message
+				: message == nullptr || *message == '\0'
+				? exception->what()
+				: std::format("{} - {}", exception->what(), message);
 
-			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, m_timePoint, m_frameCount, messageToFormat);
+			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, timePoint, frameCount, messageToFormat);
 		}
 		catch (const std::exception& e)
 		{

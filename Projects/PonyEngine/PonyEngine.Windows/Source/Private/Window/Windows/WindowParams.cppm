@@ -17,6 +17,8 @@ import <string>;
 
 export namespace PonyEngine::Window
 {
+	// TODO: move this window params to platform independent.
+
 	/// @brief Window parameters.
 	struct WindowParams final
 	{

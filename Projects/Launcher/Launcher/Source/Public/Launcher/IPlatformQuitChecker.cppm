@@ -11,6 +11,8 @@ export module Launcher:IPlatformQuitChecker;
 
 export namespace Launcher
 {
+	// TODO: Make loop and loop elements to abstract this code.
+
 	/// @brief Platform quit checker.
 	class IPlatformQuitChecker
 	{

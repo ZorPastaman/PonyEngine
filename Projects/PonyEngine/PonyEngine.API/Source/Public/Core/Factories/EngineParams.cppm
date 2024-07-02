@@ -69,14 +69,14 @@ export namespace PonyEngine::Core
 			[[nodiscard("Pure constructor")]]
 			SystemFactoriesIterator(const std::vector<ISystemFactory*>::const_iterator& begin, const std::vector<ISystemFactory*>::const_iterator& end) noexcept;
 
-			std::vector<ISystemFactory*>::const_iterator m_current; ///< Current system factory.
-			std::vector<ISystemFactory*>::const_iterator m_end; ///< System factories iterator end.
+			std::vector<ISystemFactory*>::const_iterator current; ///< Current system factory.
+			std::vector<ISystemFactory*>::const_iterator end; ///< System factories iterator end.
 
 			friend EngineParams;
 		};
 
-		/// @brief Create an engine params.
-		/// @param logger Logger to use. Mustn't be nullptr.
+		/// @brief Creates an engine params.
+		/// @param logger Logger to use. Mustn't be nullptr. Its lifetime must exceed the engine lifetime.
 		[[nodiscard("Pure constructor")]]
 		explicit EngineParams(Log::ILogger* logger) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -92,7 +92,7 @@ export namespace PonyEngine::Core
 		Log::ILogger& GetLogger() const noexcept;
 
 		/// @brief Adds a system factory.
-		/// @param systemFactory System factory. It must be unique in one @p EngineParams.
+		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
 		void AddSystemFactory(ISystemFactory* systemFactory);
 		/// @brief Gets a system factories iterator.
 		/// @return System factories iterator.
@@ -103,64 +103,66 @@ export namespace PonyEngine::Core
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
 	private:
-		std::vector<ISystemFactory*> m_systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
-		Log::ILogger* m_logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
+		// TODO: Try to use references here.
+
+		std::vector<ISystemFactory*> systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
+		Log::ILogger* logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
 	};
 }
 
 namespace PonyEngine::Core
 {
 	EngineParams::SystemFactoriesIterator::SystemFactoriesIterator(const std::vector<ISystemFactory*>::const_iterator& begin, const std::vector<ISystemFactory*>::const_iterator& end) noexcept :
-		m_current(begin),
-		m_end(end)
+		current(begin),
+		end(end)
 	{
 	}
 
 	bool EngineParams::SystemFactoriesIterator::IsEnd() const noexcept
 	{
-		return m_current == m_end;
+		return current == end;
 	}
 
 	ISystemFactory* EngineParams::SystemFactoriesIterator::operator *() const noexcept
 	{
-		return *m_current;
+		return *current;
 	}
 
 	EngineParams::SystemFactoriesIterator& EngineParams::SystemFactoriesIterator::operator ++() noexcept
 	{
-		++m_current;
+		++current;
 
 		return *this;
 	}
 
 	EngineParams::SystemFactoriesIterator EngineParams::SystemFactoriesIterator::operator ++(int) noexcept
 	{
-		SystemFactoriesIterator temp = *this;
+		const SystemFactoriesIterator temp = *this;
 		++(*this);
 
 		return temp;
 	}
 
 	EngineParams::EngineParams(Log::ILogger* const logger) noexcept :
-		m_logger{logger}
+		logger{logger}
 	{
-		assert((m_logger != nullptr));
+		assert((logger != nullptr));
 	}
 
 	Log::ILogger& EngineParams::GetLogger() const noexcept
 	{
-		return *m_logger;
+		return *logger;
 	}
 
 	void EngineParams::AddSystemFactory(ISystemFactory* const systemFactory)
 	{
 		assert((systemFactory != nullptr));
-		assert((std::ranges::find(std::as_const(m_systemFactories), systemFactory) == m_systemFactories.cend()));
-		m_systemFactories.push_back(systemFactory);
+		assert((std::ranges::find(std::as_const(systemFactories), systemFactory) == systemFactories.cend()));
+		systemFactories.push_back(systemFactory);
 	}
 
 	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept
 	{
-		return SystemFactoriesIterator(m_systemFactories.cbegin(), m_systemFactories.cend());
+		return SystemFactoriesIterator(systemFactories.cbegin(), systemFactories.cend());
 	}
 }

@@ -13,6 +13,7 @@ import <cstddef>;
 import <typeinfo>;
 
 import PonyEngine.Log;
+import PonyEngine.Utility;
 import PonyEngine.Window;
 
 import :ISystem;
@@ -20,9 +21,11 @@ import :ISystem;
 export namespace PonyEngine::Core
 {
 	/// @brief Main Pony Engine interface.
-	class IEngine
+	class IEngine : public Utility::INamed
 	{
 	public:
+		// TODO: Add a time manager
+
 		/// @brief Gets current frame count.
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
@@ -32,6 +35,8 @@ export namespace PonyEngine::Core
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept = 0;
+
+		// TODO: Add ISystemManager interface.
 
 		/// @brief Tries to find a system of the type described by the @p typeInfo.
 		/// @param typeInfo System type info.
