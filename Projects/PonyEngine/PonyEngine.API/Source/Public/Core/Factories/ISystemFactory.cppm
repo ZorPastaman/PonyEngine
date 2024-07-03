@@ -9,12 +9,8 @@
 
 export module PonyEngine.Core.Factories:ISystemFactory;
 
-import <utility>;
-
-import PonyEngine.Core;
 import PonyEngine.Utility;
 
-import :ObjectInterfaces;
 import :SystemInfo;
 
 export namespace PonyEngine::Core
@@ -28,9 +24,6 @@ export namespace PonyEngine::Core
 		/// @return Created system info.
 		[[nodiscard("Pure function")]]
 		virtual SystemInfo Create(IEngine& engine) = 0;
-		/// @brief Destroys a previously created system.
-		/// @param system System to destroy.
-		virtual void Destroy(ISystem* system) noexcept = 0; // TODO: try to use std::function in the systemInfo.
 
 		/// @brief Gets a system static name.
 		/// @return System static name.
