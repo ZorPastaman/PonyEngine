@@ -9,7 +9,6 @@
 
 export module PonyEngine.Input:IInputSystem;
 
-import <cstddef>;
 import <functional>;
 
 import PonyEngine.Core;

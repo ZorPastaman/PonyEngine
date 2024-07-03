@@ -27,7 +27,7 @@ import PonyEngine.Window;
 export namespace PonyEngine::Input
 {
 	/// @brief Default Pony Engine input system.
-	class InputSystem final : public Core::ISystem, public IInputSystem, public Window::IKeyboardObserver
+	class InputSystem final : public Core::ISystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -51,7 +51,7 @@ export namespace PonyEngine::Input
 		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) override;
 		virtual void UnregisterAction(Handle handle) override;
 
-		virtual void Observe(const Window::KeyboardMessage& keyboardMessage) noexcept override;
+		virtual void Observe(const KeyboardMessage& keyboardMessage) noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
@@ -84,10 +84,10 @@ namespace PonyEngine::Input
 	{
 		PONY_LOG(engine, Log::LogType::Info, "Try to subscribe to keyboard messages.");
 
-		if (Window::IWindow* window = engine.GetSystemManager().FindSystem<Window::IWindow>())
+		if (IKeyboardProvider* const keyboardProvider = engine.GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Subscribe to keyboard messages.");
-			window->AddKeyboardMessageObserver(this);
+			keyboardProvider->AddKeyboardObserver(*this);
 		}
 		else
 		{
@@ -97,10 +97,10 @@ namespace PonyEngine::Input
 
 	void InputSystem::End()
 	{
-		if (Window::IWindow* window = engine.GetSystemManager().FindSystem<Window::IWindow>())
+		if (IKeyboardProvider* const keyboardProvider = engine.GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
-			window->RemoveKeyboardMessageObserver(this);
+			keyboardProvider->RemoveKeyboardObserver(*this);
 		}
 	}
 
@@ -138,10 +138,10 @@ namespace PonyEngine::Input
 		events.erase(handle);
 	}
 
-	void InputSystem::Observe(const Window::KeyboardMessage& keyboardMessage) noexcept
+	void InputSystem::Observe(const KeyboardMessage& keyboardMessage) noexcept
 	{
 		PONY_LOG(engine, Log::LogType::Verbose, std::format("Received an keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
-		queue.push(KeyboardMessage(static_cast<KeyboardKeyCode>(keyboardMessage.GetKeyCode()), keyboardMessage.GetIsDown()));
+		queue.push(KeyboardMessage(keyboardMessage.GetKeyCode(), keyboardMessage.GetIsDown()));
 	}
 
 	const char* const InputSystem::Name = "PonyEngine::Input::InputSystem";
