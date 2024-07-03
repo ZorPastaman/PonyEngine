@@ -19,6 +19,7 @@ export module PonyEngine.Window.Windows.Implementation:WindowsWindowFactory;
 import <cstdint>;
 import <exception>;
 import <format>;
+import <functional>;
 import <stdexcept>;
 import <string>;
 
@@ -52,7 +53,6 @@ export namespace PonyEngine::Window
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
 
@@ -76,6 +76,8 @@ export namespace PonyEngine::Window
 		static constexpr const char* Name = "PonyEngine::Window::WindowsWindowFactory"; ///< Class name.
 
 	private:
+		void Destroy(Core::ISystem* system) const noexcept;
+
 		WindowParams windowParams; ///< Window parameters.
 
 		Log::ILogger& logger; ///< Logger.
@@ -150,16 +152,12 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		Core::SystemInfo systemInfo;
-		systemInfo.system = window;
-		systemInfo.isTickable = true;
-
-		systemInfo.interfaces.AddObjectInterface<IWindow>(window);
-		systemInfo.interfaces.AddObjectInterface<IWindowsWindow>(window);
+		systemInfo.Set<WindowsWindow, IWindow, IWindowsWindow>(window, std::bind(&WindowsWindowFactory::Destroy, this, std::placeholders::_1), true);
 
 		return systemInfo;
 	}
 
-	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept
+	void WindowsWindowFactory::Destroy(Core::ISystem* const system) const noexcept
 	{
 		assert((dynamic_cast<WindowsWindow*>(system) != nullptr));
 		const auto windowsWindow = static_cast<WindowsWindow*>(system);

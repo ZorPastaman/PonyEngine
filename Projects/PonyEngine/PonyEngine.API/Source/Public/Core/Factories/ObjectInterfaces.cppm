@@ -7,12 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
 #include <cassert>
 
 export module PonyEngine.Core.Factories:ObjectInterfaces;
 
-import <concepts>;
 import <typeinfo>;
+import <type_traits>;
 import <utility>;
 import <vector>;
 
@@ -87,6 +89,12 @@ export namespace PonyEngine::Core
 		/// @param object Object source.
 		template<typename Target, typename Source>
 		void AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>);
+		/// @brief Add interfaces.
+		/// @tparam Source Object source type.
+		/// @tparam Targets Interface types.
+		/// @param object Object source.
+		template<typename Source, typename... Targets>
+		void AddObjectInterfaces(Source* object) requires(std::is_convertible_v<Source*, Targets*> && ...);
 		/// @brief Gets an interfaces iterator.
 		/// @return Interfaces iterator.
 		[[nodiscard("Pure function")]]
@@ -140,16 +148,20 @@ namespace PonyEngine::Core
 
 	void ObjectInterfaces::AddObjectInterface(const std::type_info& typeInfo, void* const pointer)
 	{
-		assert((pointer)); // TODO: Add text to asserts
-
-		const auto pair = std::pair<const std::type_info*, void*>(&typeInfo, pointer);
-		interfaces.push_back(pair);
+		assert((pointer && "The object pointer is nullptr."));
+		interfaces.emplace_back(&typeInfo, pointer);
 	}
 
 	template<typename Target, typename Source>
-	void ObjectInterfaces::AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>)
+	void ObjectInterfaces::AddObjectInterface(Source* const object) requires(std::is_convertible_v<Source*, Target*>)
 	{
 		AddObjectInterface(typeid(Target), static_cast<Target*>(object));
+	}
+
+	template<typename Source, typename... Targets>
+	void ObjectInterfaces::AddObjectInterfaces(Source* const object) requires(std::is_convertible_v<Source*, Targets*> && ...)
+	{
+		(AddObjectInterface<Targets, Source>(object),...);
 	}
 
 	ObjectInterfaces::ObjectInterfacesIterator ObjectInterfaces::GetObjectInterfacesIterator() const noexcept

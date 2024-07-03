@@ -20,9 +20,11 @@ import <exception>;
 import <format>;
 import <functional>;
 import <iostream>;
+import <memory>;
 import <string>;
 import <typeinfo>;
 import <unordered_map>;
+import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
@@ -76,8 +78,7 @@ export namespace PonyEngine::Core
 			bool operator ()(const std::type_info& left, const std::type_info& right) const noexcept;
 		};
 
-		std::vector<ISystem*> systems; ///< Systems. It's synced with the @p factories by index.
-		std::vector<ISystemFactory*> factories; ///< System factories. It's synced with the @p systems by index.
+		std::vector<std::unique_ptr<ISystem, std::function<void(ISystem*)>>> systems; ///< Systems. It's synced with the @p factories by index.
 		std::vector<ISystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::reference_wrapper<const type_info>, void*, TypeInfoHash, TypeInfoEqual> systemInterfaces; ///< System interfaces.
 		const IEngine& engine; ///< Engine that owns the manager.
@@ -95,27 +96,27 @@ namespace PonyEngine::Core
 		{
 			ISystemFactory& factory = *it;
 			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}'.", factory.GetSystemName()).c_str());
-			const SystemInfo systemInfo = factory.Create(engine);
-			ISystem* const system = systemInfo.system;
-			assert((system != nullptr));
-			systems.push_back(system);
-			factories.push_back(&factory);
-			if (systemInfo.isTickable)
+			SystemInfo systemInfo = factory.Create(engine);
+			auto system = std::move(systemInfo.GetSystem());
+			const auto systemPointer = system.get();
+			assert((systemPointer));
+			systems.push_back(std::move(system));
+			if (systemInfo.GetIsTickable())
 			{
 				PONY_LOG(engine, Log::LogType::Info, "Add to tickable systems.");
-				tickableSystems.push_back(system);
+				tickableSystems.push_back(systemPointer);
 			}
 			else
 			{
 				PONY_LOG(engine, Log::LogType::Info, "The system is not tickable.");
 			}
 
-			for (auto interfacesIterator = systemInfo.interfaces.GetObjectInterfacesIterator(); !interfacesIterator.IsEnd(); ++interfacesIterator)
+			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
 				systemInterfaces.insert(*interfacesIterator);
 			}
 
-			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' created.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, "Systems created.");
@@ -127,11 +128,9 @@ namespace PonyEngine::Core
 
 		for (std::size_t i = systems.size() - 1; i != std::size_t{0} - 1; --i)
 		{
-			ISystem* const system = systems[i];
-			ISystemFactory* const factory = factories[i];
+			auto system = std::move(systems[i]);
 			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy '{}'.", system->GetName()).c_str());
-			factory->Destroy(system);
-			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' destroyed.", factory->GetSystemName()).c_str());
+			system.reset();
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, "Systems destroyed.");
@@ -151,7 +150,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(engine, Log::LogType::Info, "Begin systems.");
 
-		for (ISystem* const system : systems)
+		for (const auto& system : systems)
 		{
 			PONY_LOG(engine, Log::LogType::Info, std::format("Begin '{}'.", system->GetName()).c_str());
 			system->Begin();
@@ -167,7 +166,7 @@ namespace PonyEngine::Core
 
 		for (auto it = systems.crbegin(); it != systems.crend(); ++it)
 		{
-			ISystem* const system = *it;
+			const auto system = it->get();
 
 			PONY_LOG(engine, Log::LogType::Info, std::format("End '{}'.", system->GetName()).c_str());
 			try

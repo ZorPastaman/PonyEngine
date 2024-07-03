@@ -14,7 +14,6 @@ module;
 export module PonyEngine.Core.Factories:EngineParams;
 
 import <algorithm>;
-import <cstddef>;
 import <utility>;
 import <vector>;
 
@@ -152,7 +151,7 @@ namespace PonyEngine::Core
 
 	void EngineParams::AddSystemFactory(ISystemFactory& systemFactory)
 	{
-		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend()));
+		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory is already added."));
 		systemFactories.push_back(&systemFactory);
 	}
 

@@ -11,9 +11,7 @@ export module PonyEngine.Core:IEngine;
 
 import PonyEngine.Log;
 import PonyEngine.Utility;
-import PonyEngine.Window;
 
-import :ISystem;
 import :ISystemManager;
 import :ITimeManager;
 
@@ -37,17 +35,17 @@ export namespace PonyEngine::Core
 		virtual ISystemManager& GetSystemManager() const noexcept = 0;
 
 		/// @brief Checks if the engine received an exit code.
-		/// @details Exit code can be gotten via @p GetExitCode().
+		/// @remark Exit code can be gotten via @p GetExitCode().
 		/// @return @a False if the engine received an exit code; @a true otherwise;
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept = 0;
 		/// @brief Gets an exit code of the engine.
-		/// @details Mustn't be called if @p IsRunning() returns @a true.
+		/// @note Mustn't be called if @p IsRunning() returns @a true.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		virtual int GetExitCode() const noexcept = 0;
 		/// @brief Stops the engine with the @p exitCode.
-		/// @details If the engine is already stopped, the invocation of this function is ignored.
+		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = 0) noexcept = 0;
 

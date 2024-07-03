@@ -109,7 +109,7 @@ namespace PonyEngine::Log
 		}
 		else
 		{
-			for (auto number = static_cast<std::underlying_type_t<LogType>>(logType), steps = std::underlying_type_t<LogType>{ 0 };
+			for (auto number = static_cast<std::underlying_type_t<LogType>>(logType), steps = std::underlying_type_t<LogType>{0};
 				number != std::underlying_type_t<LogType>{0};
 				number >>= 1, steps = std::min(static_cast<std::underlying_type_t<LogType>>(steps + 1), static_cast<std::underlying_type_t<LogType>>(LogTypeNames.size() - 1)))
 			{
