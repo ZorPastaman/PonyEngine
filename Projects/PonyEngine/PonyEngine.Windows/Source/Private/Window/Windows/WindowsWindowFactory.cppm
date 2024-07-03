@@ -25,6 +25,7 @@ import <string>;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
+import PonyEngine.Input;
 import PonyEngine.Utility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
@@ -152,7 +153,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		Core::SystemInfo systemInfo;
-		systemInfo.Set<WindowsWindow, IWindow, IWindowsWindow>(window, std::bind(&WindowsWindowFactory::Destroy, this, std::placeholders::_1), true);
+		systemInfo.Set<WindowsWindow, IWindow, IWindowsWindow, Input::IKeyboardProvider>(window, std::bind(&WindowsWindowFactory::Destroy, this, std::placeholders::_1), true);
 
 		return systemInfo;
 	}

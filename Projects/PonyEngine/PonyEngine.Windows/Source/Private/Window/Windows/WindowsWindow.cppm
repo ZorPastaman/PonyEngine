@@ -27,6 +27,7 @@ import <vector>;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
+import PonyEngine.Input;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 
@@ -37,7 +38,7 @@ import :WindowsKeyCodeUtility;
 export namespace PonyEngine::Window
 {
 	/// @brief Engine window for @p Windows platform.
-	class WindowsWindow final : public Core::ISystem, public IWindowsWindow, public IWindowProc
+	class WindowsWindow final : public Core::ISystem, public IWindowsWindow, public IWindowProc, public Input::IKeyboardProvider
 	{
 	public:
 		/// @brief Creates a @p WindowsWindow.
@@ -62,8 +63,8 @@ export namespace PonyEngine::Window
 		virtual const wchar_t* GetTitle() const noexcept override;
 		virtual void SetTitle(const wchar_t* title) override;
 
-		virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) override;
-		virtual void RemoveKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) override;
+		virtual void AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
+		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 
 		virtual void ShowWindow() override;
 
@@ -93,7 +94,7 @@ export namespace PonyEngine::Window
 		static const char* const Name; ///< WindowsWindow class name.
 
 	private:
-		std::vector<IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
+		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
 
 		std::wstring title; ///< Window title.
 		HWND hWnd; ///< Window handler.
@@ -176,29 +177,27 @@ namespace PonyEngine::Window
 		this->title = title;
 	}
 
-	void WindowsWindow::AddKeyboardMessageObserver(IKeyboardObserver* const keyboardMessageObserver)
+	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
 	{
-		assert((keyboardMessageObserver != nullptr));
-		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend()));
-		PONY_LOG(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+		assert((std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend()));
+		PONY_LOG(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver.GetName()).c_str());
 
-		keyboardMessageObservers.push_back(keyboardMessageObserver);
+		keyboardMessageObservers.push_back(&keyboardMessageObserver);
 	}
 
-	void WindowsWindow::RemoveKeyboardMessageObserver(IKeyboardObserver* const keyboardMessageObserver)
+	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
 	{
-		PONY_LOG_IF(keyboardMessageObserver == nullptr, engine, Log::LogType::Warning, "Tried to remove a nullptr keyboard message observer.");
-
-		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver.GetName()).c_str());
 			keyboardMessageObservers.erase(position);
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageObserver != nullptr, engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver.GetName()).c_str());
 		}
 	}
+
 
 	void WindowsWindow::ShowWindow()
 	{
@@ -262,12 +261,12 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::PushKeyboardKeyMessage(const LPARAM lParam, const bool isDown) const
 	{
-		if (const KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != KeyboardKeyCode::None)
+		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
 		{
-			const KeyboardMessage keyboardMessage(keyCode, isDown);
+			const Input::KeyboardMessage keyboardMessage(keyCode, isDown);
 			PONY_LOG(engine, Log::LogType::Verbose, std::format("Push a keyboard message '{}' to the observers.", keyboardMessage.ToString()).c_str());
 
-			for (IKeyboardObserver* const observer : keyboardMessageObservers)
+			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
 			{
 				try
 				{

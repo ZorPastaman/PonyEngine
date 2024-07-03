@@ -7,13 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window:IKeyboardObserver;
+export module PonyEngine.Input:IKeyboardObserver;
 
 import PonyEngine.Utility;
 
 import :KeyboardMessage;
 
-export namespace PonyEngine::Window
+export namespace PonyEngine::Input
 {
 	/// @brief Object that accepts an input from a keyboard.
 	class IKeyboardObserver : public Utility::INamed

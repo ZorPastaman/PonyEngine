@@ -45,13 +45,7 @@
     <ClCompile Include="Source\Public\Window\Window.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window\KeyboardMessage.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Window\KeyboardKeyCode.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Window\IKeyboardObserver.cppm">
+    <ClCompile Include="Source\Public\Input\IKeyboardObserver.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\ISystem.cppm">
@@ -93,10 +87,10 @@
     <ClCompile Include="Source\Public\Utility\StringUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\InputKeyboardKeyCode.cppm">
+    <ClCompile Include="Source\Public\Input\KeyboardKeyCode.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\InputKeyboardMessage.cppm">
+    <ClCompile Include="Source\Public\Input\KeyboardMessage.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input\Handle.cppm">
@@ -151,6 +145,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\ITimeManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input\IKeyboardProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -9,7 +9,4 @@
 
 export module PonyEngine.Window;
 
-export import :IKeyboardObserver;
 export import :IWindow;
-export import :KeyboardKeyCode;
-export import :KeyboardMessage;

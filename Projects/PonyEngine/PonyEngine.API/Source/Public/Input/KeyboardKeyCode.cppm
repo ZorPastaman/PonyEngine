@@ -7,18 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window:KeyboardKeyCode;
+export module PonyEngine.Input:KeyboardKeyCode;
 
-import <cstdint>;
 import <ostream>;
 import <string>;
-import <type_traits>;
 import <unordered_map>;
 
-export namespace PonyEngine::Window
+export namespace PonyEngine::Input
 {
-	// TODO: remove it - use the object from PonyEngine::Input
-
 	/// @brief Keyboard key codes.
 	enum class KeyboardKeyCode : std::uint_fast8_t
 	{
@@ -129,8 +125,8 @@ export namespace PonyEngine::Window
 		NumpadMinus,
 		NumpadStar,
 		NumpadSlash,
+		NumpadComma,
 		NumpadPeriod,
-		// Numpad system keys
 		NumpadEnter
 	};
 
@@ -147,7 +143,7 @@ export namespace PonyEngine::Window
 	std::ostream& operator <<(std::ostream& stream, KeyboardKeyCode keyCode);
 }
 
-namespace PonyEngine::Window
+namespace PonyEngine::Input
 {
 	/// @brief Key code to its name map.
 	const std::unordered_map<KeyboardKeyCode, const char*> KeyCodeStrings
@@ -244,23 +240,23 @@ namespace PonyEngine::Window
 		{ KeyboardKeyCode::PageUp, "Page up" },
 		{ KeyboardKeyCode::PageDown, "Page down" },
 		// Numpad numbers
-		{ KeyboardKeyCode::Numpad0, "Numpad 0" },
-		{ KeyboardKeyCode::Numpad1, "Numpad 1" },
-		{ KeyboardKeyCode::Numpad2, "Numpad 2" },
-		{ KeyboardKeyCode::Numpad3, "Numpad 3" },
-		{ KeyboardKeyCode::Numpad4, "Numpad 4" },
-		{ KeyboardKeyCode::Numpad5, "Numpad 5" },
-		{ KeyboardKeyCode::Numpad6, "Numpad 6" },
-		{ KeyboardKeyCode::Numpad7, "Numpad 7" },
-		{ KeyboardKeyCode::Numpad8, "Numpad 8" },
-		{ KeyboardKeyCode::Numpad9, "Numpad 9" },
+		{ KeyboardKeyCode::Numpad0, "Numpad 0", },
+		{ KeyboardKeyCode::Numpad1, "Numpad 1", },
+		{ KeyboardKeyCode::Numpad2, "Numpad 2", },
+		{ KeyboardKeyCode::Numpad3, "Numpad 3", },
+		{ KeyboardKeyCode::Numpad4, "Numpad 4", },
+		{ KeyboardKeyCode::Numpad5, "Numpad 5", },
+		{ KeyboardKeyCode::Numpad6, "Numpad 6", },
+		{ KeyboardKeyCode::Numpad7, "Numpad 7", },
+		{ KeyboardKeyCode::Numpad8, "Numpad 8", },
+		{ KeyboardKeyCode::Numpad9, "Numpad 9", },
 		// Numpad signs
 		{ KeyboardKeyCode::NumpadPlus, "Numpad +" },
 		{ KeyboardKeyCode::NumpadMinus, "Numpad -" },
 		{ KeyboardKeyCode::NumpadStar, "Numpad *" },
 		{ KeyboardKeyCode::NumpadSlash, "Numpad /" },
+		{ KeyboardKeyCode::NumpadComma, "Numpad ," },
 		{ KeyboardKeyCode::NumpadPeriod, "Numpad ." },
-		// Numpad system keys
 		{ KeyboardKeyCode::NumpadEnter, "Numpad Enter" }
 	};
 
@@ -270,10 +266,8 @@ namespace PonyEngine::Window
 		{
 			return position->second;
 		}
-		else [[unlikely]]
-		{
-			return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
-		}
+
+		return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)

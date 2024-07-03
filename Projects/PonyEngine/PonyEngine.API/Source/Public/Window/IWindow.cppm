@@ -13,8 +13,6 @@ import <string>;
 
 import PonyEngine.Utility;
 
-import :IKeyboardObserver;
-
 export namespace PonyEngine::Window
 {
 	/// @brief Engine window interface.
@@ -33,15 +31,6 @@ export namespace PonyEngine::Window
 		/// @brief Sets a window title.
 		/// @param title Window title to set.
 		virtual void SetTitle(const wchar_t* title) = 0;
-
-		// TODO: move to another interface message observer functions.
-
-		/// @brief Adds a keyboard input observer.
-		/// @param keyboardMessageObserver Keyboard input observer. Mustn't be nullptr.
-		virtual void AddKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
-		/// @brief Removes a keyboard input observer.
-		/// @param keyboardMessageObserver Keyboard input observer.
-		virtual void RemoveKeyboardMessageObserver(IKeyboardObserver* keyboardMessageObserver) = 0;
 
 		/// @brief Shows a window.
 		virtual void ShowWindow() = 0;
