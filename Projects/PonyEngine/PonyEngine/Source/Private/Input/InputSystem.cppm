@@ -87,7 +87,7 @@ namespace PonyEngine::Input
 		if (IKeyboardProvider* const keyboardProvider = engine.GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Subscribe to keyboard messages.");
-			keyboardProvider->AddKeyboardObserver(*this);
+			keyboardProvider->AddKeyboardObserver(this);
 		}
 		else
 		{
@@ -100,7 +100,7 @@ namespace PonyEngine::Input
 		if (IKeyboardProvider* const keyboardProvider = engine.GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
-			keyboardProvider->RemoveKeyboardObserver(*this);
+			keyboardProvider->RemoveKeyboardObserver(this);
 		}
 	}
 
