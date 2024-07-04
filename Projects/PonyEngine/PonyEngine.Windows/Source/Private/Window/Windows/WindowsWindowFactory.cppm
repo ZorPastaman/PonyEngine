@@ -62,9 +62,6 @@ export namespace PonyEngine::Window
 		virtual void SetTitle(const wchar_t* title) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetWindowName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual int GetCmdShow() const noexcept override;
 		virtual void SetCmdShow(int cmdShow) noexcept override;
 
@@ -200,11 +197,6 @@ namespace PonyEngine::Window
 	void WindowsWindowFactory::SetTitle(const wchar_t* const title) noexcept
 	{
 		windowParams.title = title;
-	}
-
-	const char* WindowsWindowFactory::GetWindowName() const noexcept
-	{
-		return WindowsWindow::Name;
 	}
 
 	int WindowsWindowFactory::GetCmdShow() const noexcept

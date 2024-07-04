@@ -7,6 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
 #include "PonyEngine/Core/Optimization.h"
 
 export module PonyEngine.Math:ArrayArithmetics;
