@@ -78,7 +78,7 @@ export namespace PonyEngine::Core
 			bool operator ()(const std::type_info& left, const std::type_info& right) const noexcept;
 		};
 
-		std::vector<std::unique_ptr<ISystem, std::function<void(ISystem*)>>> systems; ///< Systems. It's synced with the @p factories by index.
+		std::vector<SystemUniquePtr> systems; ///< Systems. It's synced with the @p factories by index.
 		std::vector<ISystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::reference_wrapper<const type_info>, void*, TypeInfoHash, TypeInfoEqual> systemInterfaces; ///< System interfaces.
 		const IEngine& engine; ///< Engine that owns the manager.
@@ -113,7 +113,7 @@ namespace PonyEngine::Core
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
-				systemInterfaces.insert(*interfacesIterator);
+				systemInterfaces.insert_or_assign((*interfacesIterator).first, (*interfacesIterator).second);
 			}
 
 			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());

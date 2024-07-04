@@ -46,12 +46,12 @@ export namespace Launcher
 		LoggerProvider& operator =(LoggerProvider&&) = delete;
 
 	private:
-		PonyEngine::Log::ILogger* logger; ///< Logger.
+		PonyEngine::Log::LoggerUniquePtr logger; ///< Logger.
 
 		// Set all sub-loggers here.
 
-		PonyEngine::Log::ISubLogger* consoleSubLogger;
-		PonyEngine::Log::ISubLogger* fileSubLogger;
+		PonyEngine::Log::SubLoggerUniquePtr consoleSubLogger;
+		PonyEngine::Log::SubLoggerUniquePtr fileSubLogger;
 	};
 }
 
@@ -69,13 +69,13 @@ namespace Launcher
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a console sub-logger.");
 		consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
 		assert((consoleSubLogger != nullptr));
-		logger->AddSubLogger(consoleSubLogger);
+		logger->AddSubLogger(consoleSubLogger.get());
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger created.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a file sub-logger.");
 		fileSubLogger = PonyEngine::Log::CreateFileSubLogger("Log.log");
 		assert((fileSubLogger != nullptr));
-		logger->AddSubLogger(fileSubLogger);
+		logger->AddSubLogger(fileSubLogger.get());
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger created.");
 	}
 
@@ -86,29 +86,29 @@ namespace Launcher
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy a file sub-logger.");
 		try
 		{
-			logger->RemoveSubLogger(fileSubLogger);
+			logger->RemoveSubLogger(fileSubLogger.get());
 		}
 		catch (std::exception& e)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - {}", e.what(), "On removing a file sub-logger.").c_str());
 		}
-		PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
+		fileSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy a console sub-logger.");
 		try
 		{
-			logger->RemoveSubLogger(consoleSubLogger);
+			logger->RemoveSubLogger(consoleSubLogger.get());
 		}
 		catch (std::exception& e)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - {}", e.what(), "On removing a console sub-logger.").c_str());
 		}
-		PonyEngine::Log::DestroyConsoleSubLogger(consoleSubLogger);
+		consoleSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger destroyed.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy a logger.");
-		PonyEngine::Log::DestroyLogger(logger);
+		logger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
 	}
 

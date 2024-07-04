@@ -50,7 +50,7 @@ export namespace Launcher
 
 		// Set all platform-independent factories here.
 
-		PonyEngine::Input::IInputSystemFactory* inputSystemFactory;
+		PonyEngine::Input::InputUniquePtr inputSystemFactory;
 	};
 }
 
@@ -72,7 +72,7 @@ namespace Launcher
 		// Destroy all platform-independent factories here.
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy an input system factory.");
-		PonyEngine::Input::DestroyInputSystemFactory(inputSystemFactory);
+		inputSystemFactory.reset();
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory destroyed.");
 	}
 

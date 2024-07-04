@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Core.Factories:EngineParams;
 
 import <algorithm>;
@@ -90,7 +86,7 @@ export namespace PonyEngine::Core
 		Log::ILogger& GetLogger() const noexcept;
 
 		/// @brief Adds a system factory.
-		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
+		/// @param systemFactory System factory. Its lifetime must exceed the engine lifetime.
 		void AddSystemFactory(ISystemFactory& systemFactory);
 		/// @brief Gets a system factories iterator.
 		/// @return System factories iterator.
@@ -102,7 +98,7 @@ export namespace PonyEngine::Core
 
 	private:
 		std::vector<ISystemFactory*> systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
-		Log::ILogger* logger; ///< Logger. It mustn't be nullptr. Its lifetime must exceed the engine lifetime.
+		Log::ILogger* logger; ///< Logger. Its lifetime must exceed the engine lifetime.
 	};
 }
 
@@ -151,7 +147,6 @@ namespace PonyEngine::Core
 
 	void EngineParams::AddSystemFactory(ISystemFactory& systemFactory)
 	{
-		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory is already added."));
 		systemFactories.push_back(&systemFactory);
 	}
 

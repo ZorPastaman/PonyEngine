@@ -56,7 +56,7 @@ export namespace Launcher
 	private:
 		PonyEngine::Log::ILogger& logger; ///< Logger.
 
-		PonyEngine::Core::IEngine* engine; ///< Run engine.
+		PonyEngine::Core::EngineUniquePtr engine; ///< Run engine.
 		Game::IGame* game; ///< Run game.
 	};
 }
@@ -111,7 +111,7 @@ namespace Launcher
 		Game::DestroyGame(game);
 		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Game destroyed.");
 		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Destroy an engine.");
-		PonyEngine::Core::DestroyEngine(engine);
+		engine.reset();
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine destroyed.");
 	}
 
