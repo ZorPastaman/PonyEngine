@@ -9,9 +9,7 @@
 
 export module PonyEngine.Input.Factories:IInputSystemFactory;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factories;
-import PonyEngine.Input;
 
 export namespace PonyEngine::Input
 {

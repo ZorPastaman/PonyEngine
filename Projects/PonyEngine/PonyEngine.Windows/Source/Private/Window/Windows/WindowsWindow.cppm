@@ -67,6 +67,7 @@ export namespace PonyEngine::Window
 		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 
 		virtual void ShowWindow() override;
+		virtual void HideWindow() override;
 
 		virtual void Tick() override;
 
@@ -201,7 +202,12 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::ShowWindow()
 	{
-		::ShowWindow(hWnd, nCmdShow);
+		::ShowWindow(hWnd, SW_SHOW);
+	}
+
+	void WindowsWindow::HideWindow()
+	{
+		::ShowWindow(hWnd, SW_HIDE);
 	}
 
 	void WindowsWindow::Tick()
