@@ -63,8 +63,8 @@ export namespace PonyEngine::Window
 		virtual const wchar_t* GetTitle() const noexcept override;
 		virtual void SetTitle(const wchar_t* title) override;
 
-		virtual void AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
-		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
+		virtual void AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
+		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
 
 		virtual void ShowWindow() override;
 		virtual void HideWindow() override;
@@ -178,24 +178,24 @@ namespace PonyEngine::Window
 		this->title = title;
 	}
 
-	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
+	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver)
 	{
-		assert((std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend()));
-		PONY_LOG(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver.GetName()).c_str());
+		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend()));
+		PONY_LOG(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 
-		keyboardMessageObservers.push_back(&keyboardMessageObserver);
+		keyboardMessageObservers.push_back(keyboardMessageObserver);
 	}
 
-	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
+	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver)
 	{
-		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver.GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver->GetName()).c_str());
 			keyboardMessageObservers.erase(position);
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver.GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 		}
 	}
 
