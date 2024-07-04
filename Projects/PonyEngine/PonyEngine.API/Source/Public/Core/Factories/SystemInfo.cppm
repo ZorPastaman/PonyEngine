@@ -22,6 +22,8 @@ import :ObjectInterfaces;
 
 export namespace PonyEngine::Core
 {
+	using SystemUniquePtr = std::unique_ptr<ISystem, std::function<void(ISystem*)>>; ///< Engine system unique_ptr typedef.
+
 	/// @brief System info.
 	class SystemInfo final
 	{
@@ -40,7 +42,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets a system.
 		/// @return System.
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<ISystem, std::function<void(ISystem*)>>& GetSystem() noexcept;
+		SystemUniquePtr& GetSystem() noexcept;
 		/// @brief Gets system public interfaces.
 		/// @return System public interfaces.
 		[[nodiscard("Pure function")]]
@@ -68,7 +70,7 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	std::unique_ptr<ISystem, std::function<void(ISystem*)>>& SystemInfo::GetSystem() noexcept
+	SystemUniquePtr& SystemInfo::GetSystem() noexcept
 	{
 		return system;
 	}

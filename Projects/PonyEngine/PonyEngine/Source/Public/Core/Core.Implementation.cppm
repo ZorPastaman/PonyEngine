@@ -15,6 +15,9 @@ module;
 
 export module PonyEngine.Core.Implementation;
 
+import <functional>;
+import <memory>;
+
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
 
@@ -22,29 +25,29 @@ import :Engine;
 
 export namespace PonyEngine::Core
 {
+	using EngineUniquePtr = std::unique_ptr<IEngine, std::function<void(IEngine*)>>; ///< Pony Engine unique_ptr typedef.
+
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
 	/// @return Created @p Engine.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT IEngine* CreateEngine(const EngineParams& params);
-
-	/// @brief Destroy the @p engine instance.
-	/// @param engine Engine to destroy.
-	PONY_DLL_EXPORT void DestroyEngine(IEngine* engine) noexcept;
+	PONY_DLL_EXPORT EngineUniquePtr CreateEngine(const EngineParams& params);
 }
 
 namespace PonyEngine::Core
 {
-	// TODO: return std::unique_ptr with custom deleter in functions like this.
+	/// @brief Destroy the @p engine instance.
+	/// @param engine Engine to destroy.
+	void DestroyEngine(IEngine* engine) noexcept;
 
-	IEngine* CreateEngine(const EngineParams& params)
+	EngineUniquePtr CreateEngine(const EngineParams& params)
 	{
-		return new Engine(params);
+		return std::unique_ptr<IEngine, std::function<void(IEngine*)>>(new Engine(params), DestroyEngine);
 	}
 
 	void DestroyEngine(IEngine* const engine) noexcept
 	{
-		assert((dynamic_cast<Engine*>(engine) != nullptr));
+		assert((dynamic_cast<Engine*>(engine) && "An engine of the wrong type is tried to be destroyed."));
 		delete static_cast<Engine*>(engine);
 	}
 }
