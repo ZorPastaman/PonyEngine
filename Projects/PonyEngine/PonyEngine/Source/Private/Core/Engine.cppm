@@ -15,7 +15,6 @@ module;
 
 export module PonyEngine.Core.Implementation:Engine;
 
-import <cstddef>;
 import <format>;
 import <memory>;
 import <stdexcept>;
@@ -83,33 +82,32 @@ namespace PonyEngine::Core
 		logger{&params.GetLogger()},
 		isRunning{true}
 	{
-		logger->Log(Log::LogType::Info, Log::LogInput("Create time manager", 0)); // TODO: Add log action wrappers
+		PONY_LOG_GENERAL_PTR(logger, Log::LogType::Info, "Create time manager");
 		timeManager.reset(new TimeManager());
-		PONY_LOG_PTR(this, Log::LogType::Info, "Time manager created.");
+		PONY_LOG(this, Log::LogType::Info, "Time manager created.");
 
-		PONY_LOG_PTR(this, Log::LogType::Info, "Create system manager.");
+		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
 		systemManager.reset(new SystemManager(params, *this));
-		PONY_LOG_PTR(this, Log::LogType::Info, "System manager created.");
+		PONY_LOG(this, Log::LogType::Info, "System manager created.");
 
-		PONY_LOG_PTR(this, Log::LogType::Info, "Begin system manager.");
+		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
 		systemManager->Begin();
-		PONY_LOG_PTR(this, Log::LogType::Info, "System manager begun.");
+		PONY_LOG(this, Log::LogType::Info, "System manager begun.");
 	}
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG_PTR(this, Log::LogType::Info, "End system manager.");
+		PONY_LOG(this, Log::LogType::Info, "End system manager.");
 		systemManager->End();
-		PONY_LOG_PTR(this, Log::LogType::Info, "System manager ended.");
+		PONY_LOG(this, Log::LogType::Info, "System manager ended.");
 
-		PONY_LOG_PTR(this, Log::LogType::Info, "Destroy system manager.");
+		PONY_LOG(this, Log::LogType::Info, "Destroy system manager.");
 		systemManager.reset();
-		PONY_LOG_PTR(this, Log::LogType::Info, "System manager destroyed.");
+		PONY_LOG(this, Log::LogType::Info, "System manager destroyed.");
 
-		PONY_LOG_PTR(this, Log::LogType::Info, "Destroy time manager.");
-		const std::size_t lastFrame = timeManager->GetFrameCount();
+		PONY_LOG(this, Log::LogType::Info, "Destroy time manager.");
 		timeManager.reset();
-		logger->Log(Log::LogType::Info, Log::LogInput("Time manager destroyed.", lastFrame));
+		PONY_LOG_GENERAL_PTR(logger, Log::LogType::Info, "Time manager destroyed.");
 	}
 
 	Log::ILogger& Engine::GetLogger() const noexcept
@@ -134,7 +132,7 @@ namespace PonyEngine::Core
 
 	int Engine::GetExitCode() const noexcept
 	{
-		PONY_LOG_IF_PTR(isRunning, this, Log::LogType::Warning, "Tried to get an exit code when the engine is still running.");
+		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get an exit code when the engine is still running.");
 
 		return exitCode;
 	}
@@ -143,13 +141,13 @@ namespace PonyEngine::Core
 	{
 		if (isRunning)
 		{
-			PONY_LOG_PTR(this, Log::LogType::Info, std::format("Stop an engine with the exit code '{}'.", exitCode).c_str());
+			PONY_LOG(this, Log::LogType::Info, std::format("Stop an engine with the exit code '{}'.", exitCode).c_str());
 			isRunning = false;
 			this->exitCode = exitCode;
 		}
 		else
 		{
-			PONY_LOG_PTR(this, Log::LogType::Info, "Tried to stop an already stopped engine. Ignore it.");
+			PONY_LOG(this, Log::LogType::Info, "Tried to stop an already stopped engine. Ignore it.");
 		}
 	}
 
@@ -160,9 +158,9 @@ namespace PonyEngine::Core
 			throw std::logic_error("The engine is ticked when it's already stopped.");
 		}
 
-		PONY_LOG_PTR(this, Log::LogType::Verbose, "Tick time manager.");
+		PONY_LOG(this, Log::LogType::Verbose, "Tick time manager.");
 		timeManager->Tick();
-		PONY_LOG_PTR(this, Log::LogType::Verbose, "Tick system manager.");
+		PONY_LOG(this, Log::LogType::Verbose, "Tick system manager.");
 		systemManager->Tick();
 	}
 
