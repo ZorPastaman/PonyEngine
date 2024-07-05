@@ -20,7 +20,6 @@ import <chrono>;
 import <format>;
 import <exception>;
 import <iostream>;
-import <ranges>;
 import <string>;
 import <vector>;
 
@@ -39,19 +38,19 @@ export namespace PonyEngine::Log
 
 		~Logger() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
-
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
 
 		virtual void AddSubLogger(ISubLogger* subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
+
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
 
-		static const char* const Name; ///< Class name.
+		static constexpr const char* StaticName = "PonyEngine::Log::Logger"; ///< Class name.
 
 	private:
 		std::vector<ISubLogger*> subLoggers; ///< Sub-loggers container.
@@ -60,53 +59,49 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	const char* Logger::GetName() const noexcept
-	{
-		return Name;
-	}
-
 	void Logger::Log(const LogType logType, const LogInput& logInput) noexcept
 	{
 		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
 
-		try
-		{
-			const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
+		const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
 
-			for (ISubLogger* const subLogger : subLoggers)
+		for (ISubLogger* const subLogger : subLoggers)
+		{
+			try
 			{
 				subLogger->Log(logEntry);
 			}
-		}
-		catch (const std::exception& e)
-		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to the log"));
+			catch (const std::exception& e)
+			{
+				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the sublogger '{}'.", e.what(), subLogger->GetName()));
+			}
 		}
 	}
 
 	void Logger::LogException(const std::exception& exception, const LogInput& logInput) noexcept
 	{
-		try
-		{
-			const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
+		const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
 
-			for (ISubLogger* const subLogger : subLoggers)
+		for (ISubLogger* const subLogger : subLoggers)
+		{
+			try
 			{
 				subLogger->Log(logEntry);
 			}
-		}
-		catch (const std::exception& e)
-		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to the log"));
+			catch (const std::exception& e)
+			{
+				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the log.", e.what()));
+			}
 		}
 	}
 
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
-		assert((subLogger != nullptr));
-		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend()));
-		PONY_CONSOLE(LogType::Info, std::format("Add a sub-logger '{}'.", subLogger->GetName()));
+		assert((subLogger && "The sub-logger is nullptr."));
+		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger is already added."));
+		PONY_CONSOLE(LogType::Info, std::format("Add sub-logger '{}'.", subLogger->GetName()));
 		subLoggers.push_back(subLogger);
+		PONY_CONSOLE(LogType::Info, "Sub-logger added.");
 	}
 
 	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
@@ -117,6 +112,7 @@ namespace PonyEngine::Log
 		{
 			PONY_CONSOLE(LogType::Info, std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
 			subLoggers.erase(position);
+			PONY_CONSOLE(LogType::Info, "Sub-logger removed.");
 		}
 		else [[unlikely]]
 		{
@@ -124,5 +120,8 @@ namespace PonyEngine::Log
 		}
 	}
 
-	const char* const Logger::Name = "PonyEngine::Logger";
+	const char* Logger::GetName() const noexcept
+	{
+		return StaticName;
+	}
 }
