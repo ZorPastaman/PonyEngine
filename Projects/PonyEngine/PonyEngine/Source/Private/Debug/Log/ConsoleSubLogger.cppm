@@ -34,15 +34,15 @@ export namespace PonyEngine::Log
 
 		~ConsoleSubLogger() noexcept = default;
 
+		virtual void Log(const LogEntry& logEntry) noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
-
-		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
 
-		static const char* const Name; ///< Class name.
+		static constexpr const char* StaticName = "PonyEngine::Log::ConsoleSubLogger"; ///< Class name.
 	};
 }
 
@@ -52,12 +52,7 @@ namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @return Chosen stream.
 	[[nodiscard("Pure function")]]
-	std::ostream& ChooseStream(const LogType logType);
-
-	const char* ConsoleSubLogger::GetName() const noexcept
-	{
-		return Name;
-	}
+	std::ostream& ChooseStream(LogType logType);
 
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
@@ -68,8 +63,13 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a console"));
+			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a console.", e.what()));
 		}
+	}
+
+	const char* ConsoleSubLogger::GetName() const noexcept
+	{
+		return StaticName;
 	}
 
 	std::ostream& ChooseStream(const LogType logType)
@@ -89,6 +89,4 @@ namespace PonyEngine::Log
 			throw std::invalid_argument("logType has an incorrect value.");
 		}
 	}
-
-	const char* const ConsoleSubLogger::Name = "PonyEngine::Log::ConsoleSubLogger";
 }

@@ -37,15 +37,15 @@ export namespace PonyEngine::Log
 
 		~FileSubLogger() noexcept;
 
+		virtual void Log(const LogEntry& logEntry) noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
-
-		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
-		static const char* const Name; ///< Class name.
+		static constexpr const char* StaticName = "PonyEngine::Log::FileSubLogger"; ///< Class name.
 
 	private:
 		std::ofstream logFile; ///< log file stream.
@@ -73,14 +73,9 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On closing a log file"));
+				PONY_CONSOLE(LogType::Exception, std::format("{} - On closing a log file.", e.what()));
 			}
 		}
-	}
-
-	const char* FileSubLogger::GetName() const noexcept
-	{
-		return Name;
 	}
 
 	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
@@ -91,9 +86,12 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - {}.", e.what(), "On writing to a log file"));
+			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a log file.", e.what()));
 		}
 	}
 
-	const char* const FileSubLogger::Name = "PonyEngine::Log::FileSubLogger";
+	const char* FileSubLogger::GetName() const noexcept
+	{
+		return StaticName;
+	}
 }
