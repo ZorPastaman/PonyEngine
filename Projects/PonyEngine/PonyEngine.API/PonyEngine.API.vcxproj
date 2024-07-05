@@ -40,6 +40,7 @@
     <ClCompile Include="Source\Public\Math\Vector3.cppm" />
     <ClCompile Include="Source\Public\Math\Vector4.cppm" />
     <ClCompile Include="Source\Public\Utility\StringUtility.cppm" />
+    <ClCompile Include="Source\Public\Utility\TypeInfoUtility.cppm" />
     <ClCompile Include="Source\Public\Window\Factories\IWindowFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Event.cppm" />
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
@@ -58,8 +59,8 @@
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\PonyEngine\Core\Linking.h" />
-    <ClInclude Include="Include\Public\PonyEngine\Core\Optimization.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Compiler\Linking.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Compiler\Optimization.h" />
     <ClInclude Include="Include\Public\PonyEngine\Log\LogMacro.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>

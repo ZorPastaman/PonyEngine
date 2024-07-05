@@ -150,6 +150,9 @@
     <ClCompile Include="Source\Public\Input\IKeyboardProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Utility\TypeInfoUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
@@ -158,10 +161,10 @@
     <ClInclude Include="Include\Public\PonyEngine\Log\LogMacro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Core\Linking.h">
+    <ClInclude Include="Include\Public\PonyEngine\Compiler\Linking.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Core\Optimization.h">
+    <ClInclude Include="Include\Public\PonyEngine\Compiler\Optimization.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -134,6 +134,7 @@ namespace PonyEngine::Window
 
 		isAlive = true;
 		PONY_LOG(engine, Log::LogType::Info, std::format("System window of the class id '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		ShowWindow();
 	}
 
 	WindowsWindow::~WindowsWindow() noexcept
