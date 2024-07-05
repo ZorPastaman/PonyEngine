@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Core.Factories:EngineParams;
 
 import <algorithm>;
+import <string>;
 import <utility>;
 import <vector>;
 
@@ -89,13 +90,13 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		Log::ILogger& GetLogger() const noexcept;
 
-		/// @brief Adds a system factory.
-		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
-		void AddSystemFactory(ISystemFactory& systemFactory);
 		/// @brief Gets a system factories iterator.
 		/// @return System factories iterator.
 		[[nodiscard("Pure function")]]
 		SystemFactoriesIterator GetSystemFactoriesIterator() const noexcept;
+		/// @brief Adds a system factory.
+		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
+		void AddSystemFactory(ISystemFactory& systemFactory);
 
 		EngineParams& operator =(const EngineParams& other) = default;
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
@@ -149,14 +150,14 @@ namespace PonyEngine::Core
 		return *logger;
 	}
 
+	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept
+	{
+		return SystemFactoriesIterator(systemFactories.cbegin(), systemFactories.cend());
+	}
+
 	void EngineParams::AddSystemFactory(ISystemFactory& systemFactory)
 	{
 		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory is already added."));
 		systemFactories.push_back(&systemFactory);
-	}
-
-	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept
-	{
-		return SystemFactoriesIterator(systemFactories.cbegin(), systemFactories.cend());
 	}
 }

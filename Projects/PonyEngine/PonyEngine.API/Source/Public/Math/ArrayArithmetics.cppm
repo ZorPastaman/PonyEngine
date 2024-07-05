@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Core/Optimization.h"
+#include "PonyEngine/Compiler/Optimization.h"
 
 export module PonyEngine.Math:ArrayArithmetics;
 
