@@ -114,7 +114,7 @@ namespace PonyEngine::Window
 		isAlive{false},
 		engine{engine}
 	{
-		PONY_LOG(engine, Log::LogType::Info, std::format("Create a system window of the class id '{}'.", className).c_str());
+		PONY_LOG_REF(engine, Log::LogType::Info, std::format("Create a system window of the class id '{}'.", className).c_str());
 		hWnd = CreateWindowEx(
 			0,
 			reinterpret_cast<LPCTSTR>(className),
@@ -133,22 +133,22 @@ namespace PonyEngine::Window
 		}
 
 		isAlive = true;
-		PONY_LOG(engine, Log::LogType::Info, std::format("System window of the class id '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_REF(engine, Log::LogType::Info, std::format("System window of the class id '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		ShowWindow();
 	}
 
 	WindowsWindow::~WindowsWindow() noexcept
 	{
-		PONY_LOG(engine, Log::LogType::Info, std::format("Destroy a system window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_REF(engine, Log::LogType::Info, std::format("Destroy a system window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		try
 		{
 			DestroyWindow(hWnd);
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(engine, e, "On a window destroy.");
+			PONY_LOG_E_REF(engine, e, "On a window destroy.");
 		}
-		PONY_LOG(engine, Log::LogType::Info, std::format("System window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG_REF(engine, Log::LogType::Info, std::format("System window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 	}
 
 	void WindowsWindow::Begin()
@@ -182,7 +182,7 @@ namespace PonyEngine::Window
 	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver)
 	{
 		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend()));
-		PONY_LOG(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+		PONY_LOG_REF(engine, Log::LogType::Info, std::format("Add a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 
 		keyboardMessageObservers.push_back(keyboardMessageObserver);
 	}
@@ -191,12 +191,12 @@ namespace PonyEngine::Window
 	{
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG_REF(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'", keyboardMessageObserver->GetName()).c_str());
 			keyboardMessageObservers.erase(position);
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG_REF(engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 		}
 	}
 
@@ -213,7 +213,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::Tick()
 	{
-		PONY_LOG(engine, Log::LogType::Verbose, "Dispatch messages.");
+		PONY_LOG_REF(engine, Log::LogType::Verbose, "Dispatch messages.");
 
 		MSG message;
 		while (PeekMessage(&message, hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -239,18 +239,18 @@ namespace PonyEngine::Window
 		{
 		// Main
 		case WM_DESTROY:
-			PONY_LOG(engine, Log::LogType::Info, "Received a destroy command.");
+			PONY_LOG_REF(engine, Log::LogType::Info, "Received a destroy command.");
 			Destroy();
 			break;
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(engine, Log::LogType::Verbose, std::format("Received a key down command with the code '{}' and param '{}'.", wParam, lParam).c_str());
+			PONY_LOG_REF(engine, Log::LogType::Verbose, std::format("Received a key down command with the code '{}' and param '{}'.", wParam, lParam).c_str());
 			PushKeyboardKeyMessage(lParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(engine, Log::LogType::Verbose, std::format("Received a key up command with the code '{}' and param '{}'.", wParam, lParam).c_str());
+			PONY_LOG_REF(engine, Log::LogType::Verbose, std::format("Received a key up command with the code '{}' and param '{}'.", wParam, lParam).c_str());
 			PushKeyboardKeyMessage(lParam, false);
 			break;
 		default: 
@@ -271,7 +271,7 @@ namespace PonyEngine::Window
 		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
 		{
 			const Input::KeyboardMessage keyboardMessage(keyCode, isDown);
-			PONY_LOG(engine, Log::LogType::Verbose, std::format("Push a keyboard message '{}' to the observers.", keyboardMessage.ToString()).c_str());
+			PONY_LOG_REF(engine, Log::LogType::Verbose, std::format("Push a keyboard message '{}' to the observers.", keyboardMessage.ToString()).c_str());
 
 			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
 			{
@@ -281,7 +281,7 @@ namespace PonyEngine::Window
 				}
 				catch (const std::exception& e)
 				{
-					PONY_LOG_E(engine, e, "On observing to a keyboard key message.");
+					PONY_LOG_E_REF(engine, e, "On observing to a keyboard key message.");
 				}
 			}
 		}

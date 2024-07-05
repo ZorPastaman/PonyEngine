@@ -80,48 +80,48 @@ namespace Launcher
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create an engine.");
 		engine = PonyEngine::Core::CreateEngine(engineParams);
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Engine created.");
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Create a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Engine created.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Create a game.");
 		game = Game::CreateGame(*engine);
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Game created.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Game created.");
 
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Begin a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Begin a game.");
 		game->Begin();
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Game begun.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Game begun.");
 	}
 
 	EngineRunner::~EngineRunner() noexcept
 	{
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Stop an engine.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Stop an engine.");
 		engine->Stop();
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Engine stopped.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Engine stopped.");
 
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "End a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "End a game.");
 		try
 		{
 			game->End();
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_PTR(engine, e, "On ending a game.");
+			PONY_LOG_E(engine, e, "On ending a game.");
 		}
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Game ended.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Game ended.");
 
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Destroy a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Destroy a game.");
 		Game::DestroyGame(game);
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Game destroyed.");
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, "Destroy an engine.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Game destroyed.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Destroy an engine.");
 		engine.reset();
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine destroyed.");
 	}
 
 	bool EngineRunner::Tick(int& exitCode) const
 	{
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Verbose, "Pre-tick a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Pre-tick a game.");
 		game->PreTick();
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Verbose, "Tick an engine.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Tick an engine.");
 		engine->Tick();
-		PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Verbose, "Post-tick a game.");
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Post-tick a game.");
 		game->PostTick();
 
 		const bool isRunning = engine->IsRunning();
@@ -129,7 +129,7 @@ namespace Launcher
 		if (!isRunning) [[unlikely]]
 		{
 			exitCode = engine->GetExitCode();
-			PONY_LOG_PTR(engine, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from the engine.", exitCode).c_str());
+			PONY_LOG(engine, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from the engine.", exitCode).c_str());
 		}
 
 		return isRunning;

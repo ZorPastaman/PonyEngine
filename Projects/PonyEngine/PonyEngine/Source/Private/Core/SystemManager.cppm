@@ -76,11 +76,11 @@ namespace PonyEngine::Core
 	SystemManager::SystemManager(const EngineParams& engineParams, IEngine& engine) :
 		engine{&engine}
 	{
-		PONY_LOG_PTR(this->engine, Log::LogType::Info, "Create systems.");
+		PONY_LOG(this->engine, Log::LogType::Info, "Create systems.");
 
 		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactoriesIterator(); !factory.IsEnd(); ++factory)
 		{
-			PONY_LOG_PTR(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
+			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
 
 			SystemInfo systemInfo = (*factory).Create(engine);
 			auto system = std::move(systemInfo.GetSystem());
@@ -91,12 +91,12 @@ namespace PonyEngine::Core
 
 			if (systemInfo.GetIsTickable())
 			{
-				PONY_LOG_PTR(this->engine, Log::LogType::Info, "Add to tickable systems.");
+				PONY_LOG(this->engine, Log::LogType::Info, "Add to tickable systems.");
 				tickableSystems.push_back(systemPointer);
 			}
 			else
 			{
-				PONY_LOG_PTR(this->engine, Log::LogType::Info, "The system is not tickable.");
+				PONY_LOG(this->engine, Log::LogType::Info, "The system is not tickable.");
 			}
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
@@ -104,24 +104,24 @@ namespace PonyEngine::Core
 				systemInterfaces.insert_or_assign((*interfacesIterator).first, (*interfacesIterator).second);
 			}
 
-			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());
+			PONY_LOG(this->engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());
 		}
 
-		PONY_LOG(engine, Log::LogType::Info, "Systems created.");
+		PONY_LOG(this->engine, Log::LogType::Info, "Systems created.");
 	}
 
 	SystemManager::~SystemManager() noexcept
 	{
-		PONY_LOG_PTR(engine, Log::LogType::Info, "Destroy systems.");
+		PONY_LOG(engine, Log::LogType::Info, "Destroy systems.");
 
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
-			PONY_LOG_PTR(engine, Log::LogType::Info, std::format("Destroy '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy '{}'.", (*system)->GetName()).c_str());
 			system->reset();
-			PONY_LOG_PTR(engine, Log::LogType::Info, "System destroyed.");
+			PONY_LOG(engine, Log::LogType::Info, "System destroyed.");
 		}
 
-		PONY_LOG_PTR(engine, Log::LogType::Info, "Systems destroyed.");
+		PONY_LOG(engine, Log::LogType::Info, "Systems destroyed.");
 	}
 
 	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
@@ -136,46 +136,46 @@ namespace PonyEngine::Core
 
 	void SystemManager::Begin() const
 	{
-		PONY_LOG_PTR(engine, Log::LogType::Info, "Begin systems.");
+		PONY_LOG(engine, Log::LogType::Info, "Begin systems.");
 
 		for (const auto& system : systems)
 		{
-			PONY_LOG_PTR(engine, Log::LogType::Info, std::format("Begin '{}'.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Begin '{}'.", system->GetName()).c_str());
 			system->Begin();
-			PONY_LOG_PTR(engine, Log::LogType::Info, std::format("'{}' begun.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' begun.", system->GetName()).c_str());
 		}
 
-		PONY_LOG_PTR(engine, Log::LogType::Info, "Systems begun.");
+		PONY_LOG(engine, Log::LogType::Info, "Systems begun.");
 	}
 
 	void SystemManager::End() const noexcept
 	{
-		PONY_LOG_PTR(engine, Log::LogType::Info, "End systems.");
+		PONY_LOG(engine, Log::LogType::Info, "End systems.");
 
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG_PTR(engine, Log::LogType::Info, std::format("End '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("End '{}'.", (*system)->GetName()).c_str());
 			try
 			{
 				(*system)->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E_PTR(engine, e, "On ending a system.");
+				PONY_LOG_E(engine, e, "On ending a system.");
 			}
-			PONY_LOG_PTR(engine, Log::LogType::Info, std::format("'{}' ended.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' ended.", (*system)->GetName()).c_str());
 		}
 
-		PONY_LOG_PTR(engine, Log::LogType::Info, "Systems ended.");
+		PONY_LOG(engine, Log::LogType::Info, "Systems ended.");
 	}
 
 	void SystemManager::Tick() const
 	{
-		PONY_LOG_PTR(engine, Log::LogType::Verbose, "Tick systems.");
+		PONY_LOG(engine, Log::LogType::Verbose, "Tick systems.");
 
 		for (ISystem* const system : tickableSystems)
 		{
-			PONY_LOG_PTR(engine, Log::LogType::Verbose, system->GetName());
+			PONY_LOG(engine, Log::LogType::Verbose, system->GetName());
 			system->Tick();
 		}
 	}

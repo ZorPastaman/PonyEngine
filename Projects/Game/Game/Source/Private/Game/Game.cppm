@@ -68,11 +68,11 @@ namespace Game
 
 	void Game::Begin()
 	{
-		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Register inputs.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Info, "Register inputs.");
 
 		if (const auto inputSystem = engine.GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register up input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Register up input.");
 			const PonyEngine::Input::KeyboardMessage upMessage(PonyEngine::Input::KeyboardKeyCode::ArrowUp, true);
 			const PonyEngine::Input::Event upEvent(upMessage);
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]() 
@@ -82,9 +82,9 @@ namespace Game
 					window->SetTitle(L"Up");
 				}
 			}));
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Up input registered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Up input registered.");
 
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register down input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Register down input.");
 			const PonyEngine::Input::KeyboardMessage downMessage(PonyEngine::Input::KeyboardKeyCode::ArrowDown, true);
 			const PonyEngine::Input::Event downEvent(downMessage);
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]()
@@ -94,9 +94,9 @@ namespace Game
 					window->SetTitle(L"Down");
 				}
 			}));
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Down input registered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Down input registered.");
 
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register right input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Register right input.");
 			const PonyEngine::Input::KeyboardMessage rightMessage(PonyEngine::Input::KeyboardKeyCode::ArrowRight, true);
 			const PonyEngine::Input::Event rightEvent(rightMessage);
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]()
@@ -106,9 +106,9 @@ namespace Game
 					window->SetTitle(L"Right");
 				}
 			}));
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Right input registered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Right input registered.");
 
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register left input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Register left input.");
 			const PonyEngine::Input::KeyboardMessage leftMessage(PonyEngine::Input::KeyboardKeyCode::ArrowLeft, true);
 			const PonyEngine::Input::Event leftEvent(leftMessage);
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]()
@@ -118,46 +118,46 @@ namespace Game
 					window->SetTitle(L"Left");
 				}
 			}));
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Left input registered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Left input registered.");
 		}
 		else
 		{
-			PONY_LOG(engine, PonyEngine::Log::LogType::Warning, "No input system found.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Warning, "No input system found.");
 		}
 
-		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Inputs registered.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Info, "Inputs registered.");
 	}
 
 	void Game::PreTick()
 	{
-		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Game pre-tick.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Verbose, "Game pre-tick.");
 	}
 
 	void Game::PostTick()
 	{
-		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Game post-tick.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Verbose, "Game post-tick.");
 	}
 
 	void Game::End()
 	{
-		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Unregister inputs.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Info, "Unregister inputs.");
 
 		if (const auto inputSystem = engine.GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Unregister up input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Unregister up input.");
 			inputSystem->UnregisterAction(upHandle);
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Up input unregistered.");
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Unregister down input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Up input unregistered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Unregister down input.");
 			inputSystem->UnregisterAction(downHandle);
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Down input unregistered.");
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Unregister right input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Down input unregistered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Unregister right input.");
 			inputSystem->UnregisterAction(rightHandle);
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Right input unregistered.");
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Unregister left input.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Right input unregistered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Unregister left input.");
 			inputSystem->UnregisterAction(leftHandle);
-			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Left input unregistered.");
+			PONY_LOG_REF(engine, PonyEngine::Log::LogType::Debug, "Left input unregistered.");
 		}
 
-		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Inputs unregistered.");
+		PONY_LOG_REF(engine, PonyEngine::Log::LogType::Info, "Inputs unregistered.");
 	}
 }
