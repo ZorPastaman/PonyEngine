@@ -28,16 +28,20 @@ export namespace PonyEngine::Core
 	class SystemInfo final
 	{
 	public:
-		[[nodiscard("Pure constructor")]]
-		SystemInfo() noexcept = default;
 		SystemInfo(const SystemInfo& other) = delete;
 		[[nodiscard("Pure constructor")]]
 		SystemInfo(SystemInfo&& other) noexcept = default;
 
 		~SystemInfo() noexcept = default;
 
-		SystemInfo& operator =(const SystemInfo& other) = delete;
-		SystemInfo& operator =(SystemInfo&& other) noexcept = default;
+		/// @brief Creates a system info.
+		/// @tparam System System type.
+		/// @tparam Interfaces System public interface types.
+		/// @param system Engine system.
+		/// @param deleter Deleter function.
+		/// @param isTickable Is the system tickable?
+		template<typename System, typename... Interfaces>
+		static SystemInfo Create(System* system, const std::function<void(ISystem*)>& deleter, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...));
 
 		/// @brief Gets a system.
 		/// @return System.
@@ -52,16 +56,13 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		bool GetIsTickable() const noexcept;
 
-		/// @brief Sets data.
-		/// @tparam System System type.
-		/// @tparam Interfaces System public interface types.
-		/// @param system Engine system.
-		/// @param deleter Deleter function.
-		/// @param isTickable Is the system tickable?
-		template<typename System, typename... Interfaces>
-		void Set(System* system, const std::function<void(ISystem*)>& deleter, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...));
+		SystemInfo& operator =(const SystemInfo& other) = delete;
+		SystemInfo& operator =(SystemInfo&& other) noexcept = default;
 
 	private:
+		[[nodiscard("Pure constructor")]]
+		SystemInfo() noexcept = default;
+
 		std::unique_ptr<ISystem, std::function<void(ISystem*)>> system; ///< System.
 		ObjectInterfaces interfaces; ///< System public interfaces.
 		bool isTickable; ///< Is the system tickable?
@@ -70,6 +71,19 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
+	template<typename System, typename ... Interfaces>
+	SystemInfo SystemInfo::Create(System* const system, const std::function<void(ISystem*)>& deleter, const bool isTickable) requires (std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...))
+	{
+		assert((system && "The system is nullptr."));
+
+		SystemInfo info;
+		info.system = std::unique_ptr<ISystem, std::function<void(ISystem*)>>(system, deleter);
+		info.interfaces.AddObjectInterfaces<System, Interfaces...>(system);
+		info.isTickable = isTickable;
+
+		return info;
+	}
+
 	SystemUniquePtr& SystemInfo::GetSystem() noexcept
 	{
 		return system;
@@ -83,14 +97,5 @@ namespace PonyEngine::Core
 	bool SystemInfo::GetIsTickable() const noexcept
 	{
 		return isTickable;
-	}
-
-	template<typename System, typename... Interfaces>
-	void SystemInfo::Set(System* const system, const std::function<void(ISystem*)>& deleter, const bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...))
-	{
-		assert((system && "The system is nullptr."));
-		this->system = std::unique_ptr<ISystem, std::function<void(ISystem*)>>(system, deleter);
-		interfaces.AddObjectInterfaces<System, Interfaces...>(system);
-		this->isTickable = isTickable;
 	}
 }

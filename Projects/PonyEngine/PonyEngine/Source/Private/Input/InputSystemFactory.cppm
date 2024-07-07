@@ -14,7 +14,6 @@ module;
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
 import <functional>;
-import <memory>;
 
 import PonyEngine.Core;
 import PonyEngine.Core.Factories;
@@ -37,15 +36,15 @@ export namespace PonyEngine::Input
 		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* GetSystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept override;
+		virtual const char* GetName() const noexcept override;
 
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 
-		static constexpr const char* Name = "PonyEngine::Input::InputSystemFactory";
+		static constexpr const char* StaticName = "PonyEngine::Input::InputSystemFactory";
 	};
 }
 
@@ -57,25 +56,22 @@ namespace PonyEngine::Input
 	{
 		const auto inputSystem = new InputSystem(engine);
 
-		Core::SystemInfo systemInfo;
-		systemInfo.Set<InputSystem, IInputSystem>(inputSystem, DestroyInputSystem, true);
-
-		return systemInfo;
-	}
-
-	const char* InputSystemFactory::GetName() const noexcept
-	{
-		return Name;
+		return Core::SystemInfo::Create<InputSystem, IInputSystem>(inputSystem, DestroyInputSystem, true);
 	}
 
 	const char* InputSystemFactory::GetSystemName() const noexcept
 	{
-		return InputSystem::Name;
+		return InputSystem::StaticName;
 	}
 
-	void DestroyInputSystem(Core::ISystem* system) noexcept
+	const char* InputSystemFactory::GetName() const noexcept
 	{
-		assert((dynamic_cast<InputSystem*>(system)));
+		return StaticName;
+	}
+
+	void DestroyInputSystem(Core::ISystem* const system) noexcept
+	{
+		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
 		delete static_cast<InputSystem*>(system);
 	}
 }
