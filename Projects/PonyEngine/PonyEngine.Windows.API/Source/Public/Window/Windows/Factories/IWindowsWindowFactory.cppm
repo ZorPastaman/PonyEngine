@@ -11,19 +11,22 @@ export module PonyEngine.Window.Windows.Factories:IWindowsWindowFactory;
 
 import PonyEngine.Window.Factories;
 
+import :WindowsWindowParams;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window factory.
 	class IWindowsWindowFactory : public IWindowFactory
 	{
 	public:
-		/// @brief Gets a cmdShow of the next window.
-		/// @return CmdShow.
+		/// @brief Gets a next Windows window params.
+		/// @return Next Windows window params.
 		[[nodiscard("Pure function")]]
-		virtual int GetCmdShow() const noexcept = 0;
-		/// @brief Sets a cmdShow of the next window.
-		/// @param cmdShow CmdShow.
-		virtual void SetCmdShow(int cmdShow) noexcept = 0;
+		virtual WindowsWindowParams& NextWindowsWindowParams() noexcept = 0;
+		/// @brief Gets a next Windows window params.
+		/// @return Next Windows window params.
+		[[nodiscard("Pure function")]]
+		virtual const WindowsWindowParams& NextWindowsWindowParams() const noexcept = 0;
 
 	protected:
 		~IWindowsWindowFactory() noexcept = default;

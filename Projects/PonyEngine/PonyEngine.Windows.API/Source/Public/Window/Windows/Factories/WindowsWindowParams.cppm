@@ -11,27 +11,23 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowParams;
-
-import <string>;
+export module PonyEngine.Window.Windows.Factories:WindowsWindowParams;
 
 export namespace PonyEngine::Window
 {
-	// TODO: move this window params to platform independent.
-
-	/// @brief Window parameters.
-	struct WindowParams final
+	struct WindowsWindowParams final
 	{
-		WindowParams() = default;
-		WindowParams(const WindowParams& other) = default;
-		WindowParams(WindowParams&& other) = default;
+		WindowsWindowParams() noexcept = default;
+		WindowsWindowParams(const WindowsWindowParams& other) = default;
+		WindowsWindowParams(WindowsWindowParams&& other) noexcept = default;
 
-		~WindowParams() noexcept = default;
+		~WindowsWindowParams() noexcept = default;
 
-		WindowParams& operator =(const WindowParams& other) = default;
-		WindowParams& operator =(WindowParams&& other) = default;
+		WindowsWindowParams& operator =(const WindowsWindowParams& other) = default;
+		WindowsWindowParams& operator =(WindowsWindowParams&& other) noexcept = default;
 
-		std::wstring title; ///< Window title.
+		DWORD style; ///< Window style.
+		DWORD extendedStyle; ///< Extended window style.
 		int cmdShow = SW_NORMAL; ///< Window cmdShow.
 	};
 }

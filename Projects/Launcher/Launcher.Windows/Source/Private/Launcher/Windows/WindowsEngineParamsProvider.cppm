@@ -12,6 +12,7 @@ module;
 #include <cassert>
 
 #include "PonyEngine/Log/LogMacro.h"
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Launcher.Windows:WindowsEngineParamsProvider;
 
@@ -62,11 +63,16 @@ namespace Launcher
 		// Create all platform-dependent factories here.
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create a Windows window factory.");
-		auto windowClassParams = PonyEngine::Window::WindowClassParams();
-		windowClassParams.className = L"Pony Engine Game";
+		auto windowClassParams = PonyEngine::Window::WindowsClassParams();
+		windowClassParams.name = L"Pony Engine Game";
 		windowsWindowFactory = PonyEngine::Window::CreateWindowsWindowFactory(logger, windowClassParams);
 		assert((windowsWindowFactory != nullptr));
-		windowsWindowFactory->SetTitle(L"Pony Engine Game");
+		windowsWindowFactory->NextWindowParams().title = L"Pony Engine Game";
+		windowsWindowFactory->NextWindowParams().horizontalPosition = CW_USEDEFAULT;
+		windowsWindowFactory->NextWindowParams().verticalPosition = CW_USEDEFAULT;
+		windowsWindowFactory->NextWindowParams().width = CW_USEDEFAULT;
+		windowsWindowFactory->NextWindowParams().height = CW_USEDEFAULT;
+		windowsWindowFactory->NextWindowsWindowParams().style = WS_OVERLAPPEDWINDOW;
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window factory created.");
 	}
 

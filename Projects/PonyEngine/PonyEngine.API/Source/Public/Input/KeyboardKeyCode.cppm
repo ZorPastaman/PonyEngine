@@ -127,6 +127,7 @@ export namespace PonyEngine::Input
 		NumpadSlash,
 		NumpadComma,
 		NumpadPeriod,
+		// Numpad system keys
 		NumpadEnter
 	};
 
@@ -257,6 +258,7 @@ namespace PonyEngine::Input
 		{ KeyboardKeyCode::NumpadSlash, "Numpad /" },
 		{ KeyboardKeyCode::NumpadComma, "Numpad ," },
 		{ KeyboardKeyCode::NumpadPeriod, "Numpad ." },
+		// Numpad system keys
 		{ KeyboardKeyCode::NumpadEnter, "Numpad Enter" }
 	};
 

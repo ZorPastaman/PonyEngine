@@ -11,12 +11,11 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowsKeyCodeUtility;
+export module PonyEngine.Window.Windows.Implementation:KeyCodeUtility;
 
 import <unordered_map>;
 
 import PonyEngine.Input;
-import PonyEngine.Window;
 
 export namespace PonyEngine::Window
 {
@@ -29,8 +28,8 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Windows virtual key code to Pony Engine key code map.
-	const std::unordered_map<WORD, Input::KeyboardKeyCode> WindowsKeyCodeMap
+	/// @brief Virtual key code to Pony Engine key code map.
+	const std::unordered_map<WORD, Input::KeyboardKeyCode> KeyCodeMap
 	{
 		// Letters
 		{ WORD{0x001E}, Input::KeyboardKeyCode::A },
@@ -149,8 +148,8 @@ namespace PonyEngine::Window
 		const WORD extended = (keyFlags & KF_EXTENDED) == KF_EXTENDED;
 		const WORD extendedPrefix = extended << WORD{15} | extended << WORD{14} | extended << WORD{13}; // 0xE000 if it's extended; 0 otherwise.
 		const WORD key = scanCode | extendedPrefix;
-		const auto pair = WindowsKeyCodeMap.find(key);
+		const auto pair = KeyCodeMap.find(key);
 
-		return pair != WindowsKeyCodeMap.cend() ? pair->second : Input::KeyboardKeyCode::None;
+		return pair != KeyCodeMap.cend() ? pair->second : Input::KeyboardKeyCode::None;
 	}
 }
