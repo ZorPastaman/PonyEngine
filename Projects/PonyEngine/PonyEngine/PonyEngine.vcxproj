@@ -16,9 +16,9 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
     <ClCompile Include="Source\Private\Core\TimeManager.cppm" />
-    <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Debug\Log\Logger.cppm" />
-    <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\FileSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\Logger.cppm" />
+    <ClCompile Include="Source\Private\Log\ConsoleSubLogger.cppm" />
     <ClCompile Include="Source\Private\Core\Engine.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm" />

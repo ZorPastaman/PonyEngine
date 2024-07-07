@@ -10,3 +10,4 @@
 export module PonyEngine.Window.Factories;
 
 export import :IWindowFactory;
+export import :WindowParams;

@@ -11,28 +11,28 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Factories:WindowClassParams;
+export module PonyEngine.Window.Windows.Factories:WindowsClassParams;
 
 import <string>;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Window class parameters. They are used in RegisterClass() function.
-	struct WindowClassParams final
+	/// @brief Windows class parameters. They are used in RegisterClass() function.
+	struct WindowsClassParams final
 	{
-		WindowClassParams() noexcept = default;
-		WindowClassParams(const WindowClassParams& other) = default;
-		WindowClassParams(WindowClassParams&& other) noexcept = default;
+		WindowsClassParams() noexcept = default;
+		WindowsClassParams(const WindowsClassParams& other) = default;
+		WindowsClassParams(WindowsClassParams&& other) noexcept = default;
 
-		~WindowClassParams() noexcept = default;
+		~WindowsClassParams() noexcept = default;
 
-		WindowClassParams& operator =(const WindowClassParams& other) = default;
-		WindowClassParams& operator =(WindowClassParams&& other) noexcept = default;
+		WindowsClassParams& operator =(const WindowsClassParams& other) = default;
+		WindowsClassParams& operator =(WindowsClassParams&& other) noexcept = default;
 
-		std::wstring className; ///< Class name. Must be unique.
+		std::wstring name; ///< Class name. Must be unique.
 		HICON icon; ///< Class icon. The default icon is used if it's NULL.
 		HCURSOR cursor; ///< Class cursor. The default cursor is used if it's NULL.
-		int classStyle; ///< Class style;
+		UINT style; ///< Class style;
 	};
 }
 

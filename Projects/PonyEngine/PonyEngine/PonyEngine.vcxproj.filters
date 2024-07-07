@@ -23,13 +23,13 @@
     <ClCompile Include="Source\Private\Core\Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\Logger.cppm">
+    <ClCompile Include="Source\Private\Log\Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\ConsoleSubLogger.cppm">
+    <ClCompile Include="Source\Private\Log\ConsoleSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Debug\Log\FileSubLogger.cppm">
+    <ClCompile Include="Source\Private\Log\FileSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm">

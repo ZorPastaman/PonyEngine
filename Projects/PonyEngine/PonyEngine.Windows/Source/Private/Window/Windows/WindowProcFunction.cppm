@@ -69,6 +69,16 @@ namespace PonyEngine::Window
 
 	LRESULT CALLBACK WindowProc(const HWND hWnd, const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
+		if (uMsg == WM_CREATE)
+		{
+			if (const auto windowProc = reinterpret_cast<IWindowProc*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams); windowProc != nullptr) [[likely]]
+			{
+				return windowProc->WindowProc(uMsg, wParam, lParam);
+			}
+
+			throw std::logic_error("Wrong Windows window is created.");
+		}
+
 		SetLastError(DWORD{0});
 
 		if (const auto windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA)); windowProc != nullptr) [[likely]]

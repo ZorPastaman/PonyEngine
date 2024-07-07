@@ -54,6 +54,7 @@
     <ClCompile Include="Source\Public\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility.cppm" />
     <ClCompile Include="Source\Public\Window\Factories\Window.Factories.cppm" />
+    <ClCompile Include="Source\Public\Window\Factories\WindowParams.cppm" />
     <ClCompile Include="Source\Public\Window\IWindow.cppm" />
     <ClCompile Include="Source\Public\Input\IKeyboardObserver.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />

@@ -18,7 +18,7 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindow.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\WindowsKeyCodeUtility.cppm">
+    <ClCompile Include="Source\Private\Window\Windows\KeyCodeUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\WindowsWindowFactory.cppm">
@@ -30,7 +30,7 @@
     <ClCompile Include="Source\Private\Window\Windows\WindowProcFunction.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window\Windows\WindowParams.cppm">
+    <ClCompile Include="Source\Private\Window\Windows\CreateWindowParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window\Windows\IWindowProc.cppm">

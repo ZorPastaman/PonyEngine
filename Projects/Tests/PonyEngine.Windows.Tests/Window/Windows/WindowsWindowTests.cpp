@@ -53,7 +53,7 @@ namespace Window
 		TEST_METHOD(CreateTest)
 		{
 			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
+			const PonyEngine::Window::WindowsClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
@@ -70,7 +70,7 @@ namespace Window
 		{
 			const wchar_t* const windowTitle = L"Title";
 			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Title Test Params");
+			const PonyEngine::Window::WindowsClassParams windowParams(L"Title Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			factory->SetTitle(windowTitle);
 			Assert::AreEqual(windowTitle, factory->GetTitle());
@@ -92,7 +92,7 @@ namespace Window
 		TEST_METHOD(KeyboardMessageObserverTest)
 		{
 			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Observer Test Params");
+			const PonyEngine::Window::WindowsClassParams windowParams(L"Observer Test Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			PonyEngine::Core::EngineParams engineParams(logger);
 			engineParams.SetWindowFactory(factory);
@@ -139,7 +139,7 @@ namespace Window
 		TEST_METHOD(GetNameTest)
 		{
 			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			const PonyEngine::Window::WindowClassParams windowParams(L"Params");
+			const PonyEngine::Window::WindowsClassParams windowParams(L"Params");
 			PonyEngine::Window::IWindowsWindowFactory* const factory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowParams);
 			Assert::AreEqual("PonyEngine::Window::WindowsWindow", factory->GetWindowName());
 
