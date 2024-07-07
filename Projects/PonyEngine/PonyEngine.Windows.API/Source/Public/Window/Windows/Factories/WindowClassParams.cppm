@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Platform/Windows/Framework.h"
+
 export module PonyEngine.Window.Windows.Factories:WindowClassParams;
 
 import <string>;
@@ -14,47 +18,21 @@ import <string>;
 export namespace PonyEngine::Window
 {
 	/// @brief Window class parameters. They are used in RegisterClass() function.
-	class WindowClassParams final
+	struct WindowClassParams final
 	{
-	public:
-		/// @brief Create a Window class params with a predefined class name.
-		/// @param className Class name.
-		explicit WindowClassParams(const std::wstring& className);
-		/// @brief Create a Window class params with a predefined class name.
-		/// @param className Class name.
-		explicit WindowClassParams(const wchar_t* className) noexcept;
+		WindowClassParams() noexcept = default;
 		WindowClassParams(const WindowClassParams& other) = default;
-		WindowClassParams(WindowClassParams&& other) = default;
+		WindowClassParams(WindowClassParams&& other) noexcept = default;
 
 		~WindowClassParams() noexcept = default;
 
-		/// @brief Gets a class name.
-		/// @return Class name.
-		[[nodiscard("Pure function")]]
-		const std::wstring& GetWindowClassName() const noexcept;
-
 		WindowClassParams& operator =(const WindowClassParams& other) = default;
-		WindowClassParams& operator =(WindowClassParams&& other) = default;
+		WindowClassParams& operator =(WindowClassParams&& other) noexcept = default;
 
-	private:
-		std::wstring className; ///< Class name.
+		std::wstring className; ///< Class name. Must be unique.
+		HICON icon; ///< Class icon. The default icon is used if it's NULL.
+		HCURSOR cursor; ///< Class cursor. The default cursor is used if it's NULL.
+		int classStyle; ///< Class style;
 	};
 }
 
-namespace PonyEngine::Window
-{
-	WindowClassParams::WindowClassParams(const std::wstring& className) :
-		className(className)
-	{
-	}
-
-	WindowClassParams::WindowClassParams(const wchar_t* className) noexcept :
-		className(className)
-	{
-	}
-
-	const std::wstring& WindowClassParams::GetWindowClassName() const noexcept
-	{
-		return className;
-	}
-}

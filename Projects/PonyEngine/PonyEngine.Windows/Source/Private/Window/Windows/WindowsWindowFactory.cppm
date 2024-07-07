@@ -99,7 +99,7 @@ namespace PonyEngine::Window
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
 
-		const wchar_t* const className = classParams.GetWindowClassName().c_str();
+		const wchar_t* const className = classParams.className.c_str();
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Load a main cursor. Cursor id: '{}'.", reinterpret_cast<std::uintptr_t>(IDC_ARROW)).c_str());
 		const auto cursor = static_cast<HCURSOR>(LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
