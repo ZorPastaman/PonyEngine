@@ -16,7 +16,9 @@ module;
 
 export module Launcher.Windows:WindowsEngineParamsProvider;
 
+import <functional>;
 import <iostream>;
+import <memory>;
 
 import PonyEngine.Core.Factories;
 import PonyEngine.Log;
@@ -51,7 +53,7 @@ export namespace Launcher
 
 		// Set all platform-dependent factories here.
 
-		PonyEngine::Window::IWindowsWindowFactory* windowsWindowFactory;
+		PonyEngine::Window::WindowsWindowUniquePtr windowsWindowFactory;
 	};
 }
 
@@ -81,7 +83,7 @@ namespace Launcher
 		// Destroy all platform-dependent factories here.
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy a Windows window factory.");
-		PonyEngine::Window::DestroyWindowsWindowFactory(windowsWindowFactory);
+		windowsWindowFactory.reset();
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window factory destroyed.");
 	}
 
