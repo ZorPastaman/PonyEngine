@@ -20,6 +20,15 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Windows\PonyEngine.Windows.vcxproj">
       <Project>{6265aff4-a641-43f4-8553-1a41e593480a}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\Game\Game.API\Game.API.vcxproj">
+      <Project>{99fdb484-32aa-4b54-8136-4e3ae086a989}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\Game\Game\Game.vcxproj">
+      <Project>{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PonyEngine\PonyEngine\PonyEngine.vcxproj">
+      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
+    </ProjectReference>
     <ProjectReference Include="..\Launcher\Launcher.vcxproj">
       <Project>{7e5b9125-f55a-48d9-8458-b961a4eace9a}</Project>
     </ProjectReference>
@@ -27,8 +36,9 @@
   <ItemGroup>
     <ClCompile Include="Source\Main.cpp" />
     <ClCompile Include="Source\Private\Launcher\Windows\Launcher.Windows.cppm" />
-    <ClCompile Include="Source\Private\Launcher\Windows\WindowsEngineParamsProvider.cppm" />
-    <ClCompile Include="Source\Private\Launcher\Windows\WindowsQuitChecker.cppm" />
+    <ClCompile Include="Source\Private\Launcher\Windows\LoggerProvider.cppm" />
+    <ClCompile Include="Source\Private\Launcher\Windows\SystemFactoriesProvider.cppm" />
+    <ClCompile Include="Source\Private\Launcher\Windows\WindowsLoop.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

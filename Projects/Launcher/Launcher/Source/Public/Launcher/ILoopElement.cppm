@@ -7,23 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Launcher:IPlatformQuitChecker;
+export module Launcher:ILoopElement;
 
 export namespace Launcher
 {
-	// TODO: Make loop and loop elements to abstract this code.
-
-	/// @brief Platform quit checker.
-	class IPlatformQuitChecker
+	/// @brief Loop element.
+	class ILoopElement
 	{
 	public:
-		/// @brief Checks if the application must be closed.
-		/// @param exitCode Exit code.
-		/// @return @a True if the application must be closed; @a false otherwise.
-		[[nodiscard("Non-ignorable result")]]
-		virtual bool Check(int& exitCode) const = 0;
+		/// @brief Ticks the loop element.
+		/// @param exitCode Exit code. It's used only if the function returned @a true.
+		/// @return @a True if the loop should exit; @a false otherwise.
+		virtual bool Tick(int& exitCode) = 0;
 
 	protected:
-		~IPlatformQuitChecker() noexcept = default;
+		~ILoopElement() noexcept = default;
 	};
 }

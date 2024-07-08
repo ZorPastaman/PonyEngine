@@ -20,8 +20,11 @@ export namespace PonyEngine::Window
 	/// @brief Window parameters.
 	struct CreateWindowParams final
 	{
+		[[nodiscard("Pure constructor")]]
 		CreateWindowParams() = default;
+		[[nodiscard("Pure constructor")]]
 		CreateWindowParams(const CreateWindowParams& other) = default;
+		[[nodiscard("Pure constructor")]]
 		CreateWindowParams(CreateWindowParams&& other) = default;
 
 		~CreateWindowParams() noexcept = default;
