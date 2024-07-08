@@ -15,25 +15,19 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Launcher\LauncherMain.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\IPlatformQuitChecker.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Launcher\Launcher.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\EngineRunner.cppm">
+    <ClCompile Include="Source\Public\Launcher\ILoopElement.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\IPlatformEngineParamsProvider.cppm">
+    <ClCompile Include="Source\Public\Launcher\Loop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\EngineParamsProvider.cppm">
+    <ClCompile Include="Source\Public\Launcher\EngineLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\LoggerProvider.cppm">
+    <ClCompile Include="Source\Public\Launcher\ISystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

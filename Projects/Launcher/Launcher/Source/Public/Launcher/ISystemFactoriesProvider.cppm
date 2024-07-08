@@ -7,23 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Launcher:IPlatformEngineParamsProvider;
+export module Launcher:ISystemFactoriesProvider;
 
 import PonyEngine.Core.Factories;
 
 export namespace Launcher
 {
-	// TODO: no platform params. Provide everything via one provider
-
-	/// @brief Platform engine params provider.
-	class IPlatformEngineParamsProvider
+	/// @brief System factories provider.
+	class ISystemFactoriesProvider
 	{
 	public:
-		/// @brief Modify engine params.
-		/// @param engineParams Engine params to modify.
-		virtual void Modify(PonyEngine::Core::EngineParams& engineParams) const = 0;
+		/// @brief Add system factories to the @p engineParams.
+		/// @param engineParams Engine params.
+		virtual void AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const = 0;
 
 	protected:
-		~IPlatformEngineParamsProvider() noexcept = default;
+		~ISystemFactoriesProvider() noexcept = default;
 	};
 }

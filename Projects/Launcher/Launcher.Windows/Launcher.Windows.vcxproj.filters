@@ -18,13 +18,16 @@
     <ClCompile Include="Source\Main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\Windows\WindowsEngineParamsProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher\Windows\SystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\Windows\WindowsQuitChecker.cppm">
+    <ClCompile Include="Source\Private\Launcher\Windows\WindowsLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Launcher\Windows\Launcher.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher\Windows\LoggerProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

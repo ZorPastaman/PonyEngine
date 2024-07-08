@@ -81,7 +81,8 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Game\Game.cppm" />
+    <ClCompile Include="Source\Private\Game\GameSystem.cppm" />
+    <ClCompile Include="Source\Private\Game\GameSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Game\Game.Implementation.cppm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

@@ -100,6 +100,8 @@
 		PONY_LOG_TRY_CATCH((engine).GetLogger().Log(logType, PonyEngine::Log::LogInput(message, (engine).GetTimeManager().GetFrameCount()))); \
 	}
 
+// TODO: PONY_LOG_GENERAL must take pointer.
+
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param logger PonyEngine::Log::ILogger reference.
 /// @param logType PonyEngine::Log::LogType value.

@@ -7,9 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Launcher;
+export module Game:IGameSystem;
 
-export import :EngineLoop;
-export import :ILoopElement;
-export import :ISystemFactoriesProvider;
-export import :Loop;
+export namespace Game
+{
+	/// @brief Game system.
+	class IGameSystem
+	{
+	protected:
+		~IGameSystem() noexcept = default;
+	};
+}

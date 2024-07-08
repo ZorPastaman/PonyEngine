@@ -50,7 +50,7 @@ export namespace PonyEngine::Core
 		virtual void Stop(int exitCode = 0) noexcept = 0;
 
 		/// @brief Ticks the engine and increments its frame count.
-		virtual void Tick() = 0;
+		virtual void Tick() = 0; // TODO: make tick function available only to the owner.
 
 	protected:
 		~IEngine() noexcept = default;

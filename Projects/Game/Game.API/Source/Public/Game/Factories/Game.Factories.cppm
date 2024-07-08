@@ -7,24 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Game:IGame;
+export module Game.Factories;
 
-export namespace Game
-{
-	/// @brief Game interface.
-	class IGame
-	{
-	public:
-		/// @brief Called before a first tick.
-		virtual void Begin() = 0;
-		/// @brief Called before every tick.
-		virtual void PreTick() = 0;
-		/// @brief Called after every tick.
-		virtual void PostTick() = 0;
-		/// @brief Called after a last tick.
-		virtual void End() = 0;
-
-	protected:
-		~IGame() noexcept = default;
-	};
-}
+export import :IGameSystemFactory;
