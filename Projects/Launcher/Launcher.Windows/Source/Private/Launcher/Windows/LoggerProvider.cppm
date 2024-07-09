@@ -18,18 +18,17 @@ export module Launcher.Windows:LoggerProvider;
 import <exception>;
 import <format>;
 import <iostream>;
-import <string>;
 
 import PonyEngine.Log;
 import PonyEngine.Log.Implementation;
 
 export namespace Launcher
 {
-	/// @brief Logger provider creates and destroys a logger and its sub-loggers.
+	/// @brief Logger provider.
 	class LoggerProvider final
 	{
 	public:
-		/// @brief Creates a logger provider with a logger.
+		/// @brief Creates a logger provider.
 		[[nodiscard("Pure constructor")]]
 		LoggerProvider();
 		LoggerProvider(const LoggerProvider&) = delete;

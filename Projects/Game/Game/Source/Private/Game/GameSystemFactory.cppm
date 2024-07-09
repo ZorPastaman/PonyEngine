@@ -11,11 +11,14 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/LogMacro.h"
+
 export module Game.Implementation:GameSystemFactory;
 
 import PonyEngine.Core;
+import PonyEngine.Log;
 
-import Game.Factories;
+import Game.Factory;
 
 import :GameSystem;
 
@@ -26,8 +29,9 @@ export namespace Game
 	{
 	public:
 		/// @brief Creates a game system factory.
+		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		GameSystemFactory() noexcept = default;
+		explicit GameSystemFactory(PonyEngine::Log::ILogger& logger) noexcept;
 		GameSystemFactory(const GameSystemFactory&) = delete;
 		GameSystemFactory(GameSystemFactory&&) = delete;
 
@@ -45,21 +49,35 @@ export namespace Game
 		GameSystemFactory& operator =(const GameSystemFactory&) = delete;
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
-		static constexpr const char* StaticName = "Game::GameSystemFactory"; ///< Class name.
+		static constexpr auto StaticName = "Game::GameSystemFactory"; ///< Class name.
 
-		// TODO: Add logger to all the system factories.
+	private:
+		PonyEngine::Log::ILogger* const logger;
 	};
 }
 
 namespace Game
 {
+	/// @brief Destroys the game system.
+	/// @param system Game system to destroy.
 	void DestroyGameSystem(PonyEngine::Core::ISystem* system);
+
+	GameSystemFactory::GameSystemFactory(PonyEngine::Log::ILogger& logger) noexcept :
+		logger{&logger}
+	{
+	}
 
 	PonyEngine::Core::SystemInfo GameSystemFactory::Create(PonyEngine::Core::IEngine& engine)
 	{
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Create game system.");
 		const auto gameSystem = new GameSystem(engine);
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
 
-		return PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(gameSystem, DestroyGameSystem, true);
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
+		auto systemInfo = PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(gameSystem, DestroyGameSystem, true);
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
+
+		return systemInfo;
 	}
 
 	const char* GameSystemFactory::GetSystemName() const noexcept

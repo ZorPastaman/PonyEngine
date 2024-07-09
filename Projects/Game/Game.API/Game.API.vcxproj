@@ -11,7 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Game\Factories\Game.Factories.cppm" />
+    <ClCompile Include="Source\Public\Game\Factories\Game.Factory.cppm" />
     <ClCompile Include="Source\Public\Game\Game.cppm" />
     <ClCompile Include="Source\Public\Game\IGameSystem.cppm" />
     <ClCompile Include="Source\Public\Game\Factories\IGameSystemFactory.cppm" />

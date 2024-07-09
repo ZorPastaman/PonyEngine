@@ -42,7 +42,7 @@ export namespace Launcher
 		WindowsLoop& operator =(WindowsLoop&&) = delete;
 
 	private:
-		PonyEngine::Log::ILogger* logger; ///< Logger.
+		PonyEngine::Log::ILogger* const logger; ///< Logger.
 	};
 }
 
@@ -55,7 +55,7 @@ namespace Launcher
 
 	bool WindowsLoop::Tick(int& exitCode)
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Verbose, "Pick messages.");
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Verbose, "Peek messages.");
 
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))

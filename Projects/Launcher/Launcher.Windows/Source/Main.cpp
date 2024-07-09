@@ -27,27 +27,23 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	UNREFERENCED_PARAMETER(nCmdShow);
 
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a logger provider");
-	const Launcher::LoggerProvider loggerProvider;
+	const auto loggerProvider = Launcher::LoggerProvider();
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
 
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Create Windows system factories provider.");
-	const Launcher::SystemFactoriesProvider windowsEngineParamsProvider(loggerProvider.GetLogger());
+	const auto windowsSystemFactoriesProvider = Launcher::SystemFactoriesProvider(loggerProvider.GetLogger());
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
 
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
-	Launcher::EngineLoop engineLoop(loggerProvider.GetLogger(), windowsEngineParamsProvider);
+	auto engineLoop = Launcher::EngineLoop(loggerProvider.GetLogger(), windowsSystemFactoriesProvider);
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Engine loop created.");
 
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Create Windows loop.");
-	Launcher::WindowsLoop windowsLoop(loggerProvider.GetLogger());
+	auto windowsLoop = Launcher::WindowsLoop(loggerProvider.GetLogger());
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Windows loop created.");
 
-	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Create main loop.");
-	auto loop = Launcher::Loop(std::array<Launcher::ILoopElement*, 2>{static_cast<Launcher::ILoopElement*>(&engineLoop), static_cast<Launcher::ILoopElement*>(&windowsLoop)});
-	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Main loop created.");
-
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Run main loop.");
-	int exitCode = loop.Run();
+	int exitCode = Launcher::RunLoop({&engineLoop, &windowsLoop});
 	PONY_LOG_GENERAL(loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, std::format("Main loop ran with the exit code '{}'.", exitCode).c_str());
 
 	return exitCode;
