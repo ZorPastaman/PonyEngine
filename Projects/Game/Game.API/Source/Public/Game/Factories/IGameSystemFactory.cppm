@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Game.Factories:IGameSystemFactory;
+export module Game.Factory:IGameSystemFactory;
 
 import PonyEngine.Core.Factories;
 

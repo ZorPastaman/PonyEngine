@@ -7,56 +7,38 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module Launcher:Loop;
 
-import <array>;
-import <cstddef>;
+import <initializer_list>;
 
 import :ILoopElement;
 
 export namespace Launcher
 {
-	/// @brief Loop.
-	/// @tparam ElementCount Loop element count.
-	template<std::size_t ElementCount> requires(ElementCount > 0)
-	class Loop final
-	{
-	public:
-		/// @brief Creates a loop.
-		/// @param loopElements Loop elements.
-		[[nodiscard("Pure constructor")]]
-		explicit Loop(const std::array<ILoopElement*, ElementCount>& loopElements) noexcept;
-		Loop(const Loop&) = delete;
-		Loop(Loop&&) = delete;
-
-		~Loop() noexcept = default;
-
-		/// @brief Runs loop. It infinitely loops until one of the loop elements stops the loop.
-		/// @return Exit code.
-		int Run();
-
-		Loop& operator =(const Loop&) = delete;
-		Loop& operator =(Loop&&) = delete;
-
-	private:
-		std::array<ILoopElement*, ElementCount> loopElements; ///< Loop elements.
-	};
+	/// @brief Runs loop.
+	/// @param loopElements Loop elements.
+	/// @return Exit code.
+	int RunLoop(std::initializer_list<ILoopElement*> loopElements);
 }
 
 namespace Launcher
 {
-	template<std::size_t ElementCount> requires(ElementCount > 0)
-	Loop<ElementCount>::Loop(const std::array<ILoopElement*, ElementCount>& loopElements) noexcept :
-		loopElements(loopElements)
-	{
-	}
+	/// @brief Checks if the @p loopElements is valid.
+	/// @param loopElements Loop elements to check.
+	/// @return @a True if the @p loopElements is valid; @a false otherwise.
+	bool IsValid(std::initializer_list<ILoopElement*> loopElements) noexcept;
 
-	template<std::size_t ElementCount> requires(ElementCount > 0)
-	int Loop<ElementCount>::Run()
+	int RunLoop(const std::initializer_list<ILoopElement*> loopElements)
 	{
+		assert((IsValid(loopElements) && "The loop elements aren't valid."));
+
 		while (true)
 		{
-			for (auto loopElement : loopElements)
+			for (ILoopElement* const loopElement : loopElements)
 			{
 				if (int exitCode; loopElement->Tick(exitCode))
 				{
@@ -64,5 +46,18 @@ namespace Launcher
 				}
 			}
 		}
+	}
+
+	bool IsValid(const std::initializer_list<ILoopElement*> loopElements) noexcept
+	{
+		for (const ILoopElement* const loopElement : loopElements)
+		{
+			if (!loopElement)
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

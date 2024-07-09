@@ -16,13 +16,9 @@ module;
 
 export module Launcher.Windows:WindowsEngineParamsProvider;
 
-import <functional>;
-import <memory>;
-
 import PonyEngine.Core.Factories;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Log;
-import PonyEngine.Window.Factories;
 import PonyEngine.Window.Windows.Factories;
 import PonyEngine.Window.Windows.Implementation;
 
@@ -80,14 +76,14 @@ namespace Launcher
 		nextWindowParams.width = CW_USEDEFAULT;
 		nextWindowParams.height = CW_USEDEFAULT;
 		windowsWindowSystemFactory->NextWindowsWindowParams().style = WS_OVERLAPPEDWINDOW;
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
+		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
 
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
 		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
 
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
-		gameSystemFactory = Game::CreateGameSystemFactory();
+		gameSystemFactory = Game::CreateGameSystemFactory(*this->logger);
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
 	}
 
@@ -110,14 +106,14 @@ namespace Launcher
 
 	void SystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Add Windows window system factory.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Add Windows window system factory.")
 		engineParams.AddSystemFactory(*windowsWindowSystemFactory);
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Windows window system factory added.")
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Add input system factory.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Windows window system factory added.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Add input system factory.")
 		engineParams.AddSystemFactory(*inputSystemFactory);
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Input system factory added.")
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Add game system factory.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Input system factory added.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Add game system factory.")
 		engineParams.AddSystemFactory(*gameSystemFactory);
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Game system factory added.")
+		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Game system factory added.")
 	}
 }

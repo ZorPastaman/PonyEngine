@@ -30,8 +30,8 @@ export namespace Launcher
 	{
 	public:
 		/// @brief Creates an engine loop.
-		/// @param logger Logger.
-		/// @param systemFactoriesProvider System factories provider.
+		/// @param logger Logger to use.
+		/// @param systemFactoriesProvider Engine system factories provider.
 		[[nodiscard("Pure constructor")]]
 		EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider);
 		EngineLoop(const EngineLoop&) = delete;
@@ -56,9 +56,10 @@ namespace Launcher
 		logger{&logger}
 	{
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create engine params.");
-		auto engineParams = PonyEngine::Core::EngineParams(logger);
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Add system factories.");
+		auto engineParams = PonyEngine::Core::EngineParams(*this->logger);
+		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
 		systemFactoriesProvider.AddSystemFactories(engineParams);
+		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Debug, "System factories added.");
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Engine params created.");
 
 		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create engine.");

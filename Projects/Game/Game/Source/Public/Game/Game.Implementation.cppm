@@ -18,31 +18,30 @@ export module Game.Implementation;
 import <functional>;
 import <memory>;
 
-import PonyEngine.Core;
-
-import Game;
+import PonyEngine.Log;
 
 import :GameSystemFactory;
 
 export namespace Game
 {
-	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>;
+	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>; ///< Game system factory unique_ptr.
 
 	/// @brief Creates a game system factory.
-	/// @return Created game system factory.
+	///	@param logger Logger to use.
+	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameUniquePtr CreateGameSystemFactory();
+	PONY_DLL_EXPORT GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger);
 }
 
 namespace Game
 {
-	/// @brief Destroys a game system factory.
-	/// @param factory Game system factory.
+	/// @brief Destroys the game system factory.
+	/// @param factory Game system factory to destroy.
 	void DestroyGameSystemFactory(IGameSystemFactory* factory) noexcept;
 
-	GameUniquePtr CreateGameSystemFactory()
+	GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger)
 	{
-		return std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>(new GameSystemFactory(), DestroyGameSystemFactory);
+		return std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>(new GameSystemFactory(logger), DestroyGameSystemFactory);
 	}
 
 	void DestroyGameSystemFactory(IGameSystemFactory* const factory) noexcept

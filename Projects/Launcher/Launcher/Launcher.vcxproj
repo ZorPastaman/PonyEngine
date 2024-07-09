@@ -24,12 +24,6 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
       <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game.API\Game.API.vcxproj">
-      <Project>{99fdb484-32aa-4b54-8136-4e3ae086a989}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game\Game.vcxproj">
-      <Project>{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}</Project>
-    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

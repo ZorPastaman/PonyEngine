@@ -24,7 +24,7 @@
     <ClCompile Include="Source\Public\Game\Factories\IGameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\Factories\Game.Factories.cppm">
+    <ClCompile Include="Source\Public\Game\Factories\Game.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
