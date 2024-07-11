@@ -79,6 +79,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\Game\Game.API\Game.API.vcxproj">
       <Project>{99fdb484-32aa-4b54-8136-4e3ae086a989}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
+      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Game\GameSystem.cppm" />
