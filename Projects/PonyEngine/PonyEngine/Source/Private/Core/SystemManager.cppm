@@ -28,7 +28,7 @@ import <vector>;
 import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.Utility;
+import PonyEngine.TypeInfoUtility;
 
 export namespace PonyEngine::Core
 {

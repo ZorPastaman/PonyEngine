@@ -25,7 +25,7 @@ import <string>;
 import PonyEngine.Core;
 import PonyEngine.Log;
 import PonyEngine.Input;
-import PonyEngine.Utility;
+import PonyEngine.StringUtility;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
 import PonyEngine.Window.Windows.Factories;
