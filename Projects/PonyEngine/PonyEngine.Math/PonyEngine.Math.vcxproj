@@ -28,12 +28,12 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
-      <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
-    </ProjectReference>
+    <ResourceCompile Include="PonyEngine.Math.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PonyEngine.Math.rc" />
+    <ProjectReference Include="..\PonyEngine.Common\PonyEngine.Common.vcxproj">
+      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

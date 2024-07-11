@@ -125,12 +125,6 @@
     <ClInclude Include="Include\Public\PonyEngine\Log\LogMacro.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Compiler\Linking.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Compiler\Optimization.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.API.rc">
