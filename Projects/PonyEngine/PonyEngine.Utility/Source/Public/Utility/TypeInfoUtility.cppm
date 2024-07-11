@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Utility:TypeInfoUtility;
+export module PonyEngine.TypeInfoUtility;
 
 import <cstddef>;
 import <typeinfo>;

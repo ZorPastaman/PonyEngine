@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Utility:StringUtility;
+export module PonyEngine.StringUtility;
 
 import <algorithm>;
 import <ranges>;
