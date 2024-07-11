@@ -27,9 +27,9 @@ export namespace Launcher
 
 namespace Launcher
 {
-	/// @brief Checks if the @p loopElements is valid.
+	/// @brief Checks if the @p loopElements are valid.
 	/// @param loopElements Loop elements to check.
-	/// @return @a True if the @p loopElements is valid; @a false otherwise.
+	/// @return @a True if the @p loopElements are valid; @a false otherwise.
 	bool IsValid(std::initializer_list<ILoopElement*> loopElements) noexcept;
 
 	int RunLoop(const std::initializer_list<ILoopElement*> loopElements)

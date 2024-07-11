@@ -20,8 +20,11 @@ export namespace PonyEngine::Window
 	/// @brief Windows class parameters. They are used in RegisterClass() function.
 	struct WindowsClassParams final
 	{
+		[[nodiscard("Pure constructor")]]
 		WindowsClassParams() noexcept = default;
+		[[nodiscard("Pure constructor")]]
 		WindowsClassParams(const WindowsClassParams& other) = default;
+		[[nodiscard("Pure constructor")]]
 		WindowsClassParams(WindowsClassParams&& other) noexcept = default;
 
 		~WindowsClassParams() noexcept = default;

@@ -16,7 +16,7 @@ export module Launcher:EngineLoop;
 import <format>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 
@@ -55,28 +55,28 @@ namespace Launcher
 	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider) :
 		logger{&logger}
 	{
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create engine params.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine params.");
 		auto engineParams = PonyEngine::Core::EngineParams(*this->logger);
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
 		systemFactoriesProvider.AddSystemFactories(engineParams);
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Debug, "System factories added.");
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Engine params created.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, "System factories added.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine params created.");
 
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Create engine.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine.");
 		engine = PonyEngine::Core::CreateEngine(engineParams);
-		PONY_LOG_GENERAL_PTR(this->logger, PonyEngine::Log::LogType::Info, "Engine created.");
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine created.");
 	}
 
 	EngineLoop::~EngineLoop() noexcept
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Destroy engine.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy engine.");
 		engine.reset();
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, "Engine destroyed.")
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine destroyed.");
 	}
 
 	bool EngineLoop::Tick(int& exitCode)
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Verbose, "Tick engine.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Tick engine.");
 		engine->Tick();
 
 		if (engine->IsRunning()) [[likely]]
@@ -85,7 +85,7 @@ namespace Launcher
 		}
 
 		exitCode = engine->GetExitCode();
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, std::format("Engine exited with code '{}'.", exitCode).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Engine exited with code '{}'.", exitCode).c_str());
 
 		return true;
 	}

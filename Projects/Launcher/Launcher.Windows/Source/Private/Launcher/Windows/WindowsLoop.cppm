@@ -55,7 +55,7 @@ namespace Launcher
 
 	bool WindowsLoop::Tick(int& exitCode)
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Verbose, "Peek messages.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Peek messages.");
 
 		MSG message;
 		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -66,7 +66,7 @@ namespace Launcher
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from Windows.", exitCode).c_str());
+				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from Windows.", exitCode).c_str());
 
 				return true;
 			}

@@ -63,43 +63,43 @@ export namespace PonyEngine::Math
 
 		constexpr ~Quaternion() noexcept = default;
 
-		/// @brief Gets an x-component.
+		/// @brief Gets the x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& X() noexcept;
-		/// @brief Gets an x-component.
+		/// @brief Gets the x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& X() const noexcept;
-		/// @brief Gets a y-component.
+		/// @brief Gets the y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Y() noexcept;
-		/// @brief Gets a y-component.
+		/// @brief Gets the y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Y() const noexcept;
-		/// @brief Gets a z-component.
+		/// @brief Gets the z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Z() noexcept;
-		/// @brief Gets a z-component.
+		/// @brief Gets the z-component.
 		/// @return Z-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Z() const noexcept;
-		/// @brief Gets a w-component.
+		/// @brief Gets the w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& W() noexcept;
-		/// @brief Gets a w-component.
+		/// @brief Gets the w-component.
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& W() const noexcept;
-		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
+		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data() noexcept;
-		/// @brief Gets a data pointer - an array of 4 elements. The order is x, y, z, w.
+		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
@@ -136,21 +136,21 @@ export namespace PonyEngine::Math
 		/// @note If the magnitude of the quaternion is 0, the result is undefined.
 		void Normalize() noexcept;
 
-		/// @brief Checks if this quaternion is equal to an identity quaternion.
-		/// @return @a True if this quaternion is equal to an identity quaternion; @a false otherwise.
+		/// @brief Checks if this quaternion is equal to the identity quaternion.
+		/// @return @a True if this quaternion is equal to the identity quaternion; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsIdentity() const noexcept;
-		/// @brief Checks if this quaternion is almost equal to an identity quaternion with a tolerance value.
+		/// @brief Checks if this quaternion is almost equal to the identity quaternion with the tolerance value.
 		/// @tparam IsUnit Is this quaternion unit? If it's @a true, the code is more efficient.
 		/// @param tolerance Tolerance. Must be positive.
-		/// @return @a True if this quaternion is almost equal to an identity quaternion; @a false otherwise.
+		/// @return @a True if this quaternion is almost equal to the identity quaternion; @a false otherwise.
 		template<bool IsUnit = true> [[nodiscard("Pure function")]]
 		bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept;
 		/// @brief Checks if this quaternion is unit.
 		/// @return @a True if this quaternion is unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUnit() const noexcept;
-		/// @brief Checks if this quaternion is almost unit with a tolerance value.
+		/// @brief Checks if this quaternion is almost unit with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this quaternion is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -185,12 +185,12 @@ export namespace PonyEngine::Math
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Quaternion<U>() const noexcept;
 
-		/// @brief Gets a component by an index.
+		/// @brief Gets a component by the @p index.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
 		constexpr T& operator [](std::size_t index) noexcept;
-		/// @brief Gets a component by an index.
+		/// @brief Gets a component by the @p index.
 		/// @param index Component index. Must be in range [0, 3].
 		/// @return Component. 0 -> x, 1 -> y, 2 -> z, 3 -> w.
 		[[nodiscard("Pure operator")]]
@@ -198,14 +198,14 @@ export namespace PonyEngine::Math
 
 		constexpr Quaternion& operator =(const Quaternion& other) noexcept = default;
 		constexpr Quaternion& operator =(Quaternion&& other) noexcept = default;
-		/// @brief Combines two quaternions and assigns the result to @a this.
+		/// @brief Combines the two quaternions and assigns the result to @a this.
 		/// @remark Internal formula is 'this = this * other'.
 		/// @param other Other quaternion.
 		/// @return @a This.
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
 
-		/// @brief Checks if two quaternions are equal.
-		/// @param other The other quaternion.
+		/// @brief Checks if the two quaternions are equal.
+		/// @param other Other quaternion.
 		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Quaternion& other) const noexcept;
@@ -214,7 +214,7 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> components; ///< Component array in order x, y, z, w.
 	};
 
-	/// @brief Computes a dot product of two quaternions.
+	/// @brief Computes a dot product of the two quaternions.
 	/// @tparam T Component type.
 	/// @param left Left quaternion.
 	/// @param right Right quaternion.
@@ -222,7 +222,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
-	/// @brief Computes the shortest angle between two quaternions.
+	/// @brief Computes the shortest angle between the two quaternions.
 	/// @tparam T Component type.
 	/// @param left Left quaternion. Must be unit.
 	/// @param right Right quaternion. Must be unit.
@@ -230,8 +230,8 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
-	/// @brief Linear interpolation between two quaternions if the @p time is in range [0, 1].
-	///        Linear extrapolation between two quaternions if the @p time is out of range [0, 1].
+	/// @brief Linear interpolation between the two quaternions if the @p time is in range [0, 1].
+	///        Linear extrapolation between the two quaternions if the @p time is out of range [0, 1].
 	/// @remark The function treats a quaternion as a @p Vector4.
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
@@ -240,7 +240,7 @@ export namespace PonyEngine::Math
 	/// @return Interpolated/Extrapolated quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Quaternion<T> Lerp(const Quaternion<T>& from, const Quaternion<T>& to, T time) noexcept;
-	/// @brief Spherical linear interpolation between two quaternions.
+	/// @brief Spherical linear interpolation between the two quaternions.
 	/// @tparam T Component type.
 	/// @param from Interpolation start point. Must be unit.
 	/// @param to Interpolation target point. Must be unit.
@@ -249,7 +249,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> Slerp(const Quaternion<T>& from, const Quaternion<T>& to, T time) noexcept;
 
-	/// @brief Checks if two quaternions are almost equal with a tolerance value.
+	/// @brief Checks if the two quaternions are almost equal with the tolerance value.
 	/// @tparam T Component type.
 	/// @tparam AreUnit Are the quaternions unit? If it's @a true, the code is more efficient.
 	/// @param left Left quaternion.
@@ -259,7 +259,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T, bool AreUnit = true> [[nodiscard("Pure function")]]
 	bool AreAlmostEqual(const Quaternion<T>& left, const Quaternion<T>& right, T tolerance = T{0.00001}) noexcept;
 
-	/// @brief Combines two quaternions.
+	/// @brief Multiplies the @p left by the @p right.
 	/// @tparam T Component type.
 	/// @param left Multiplicand.
 	/// @param right Multiplier.
@@ -293,7 +293,7 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	/// @brief Sums two quaternions treating them as vectors.
+	/// @brief Sums the two quaternions treating them as vectors.
 	/// @tparam T Component type.
 	/// @param left Augend.
 	/// @param right Addend.
@@ -301,7 +301,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Quaternion<T> operator +(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
-	/// @brief Negates a quaternion treating it as a vector.
+	/// @brief Negates the quaternion treating it as a vector.
 	/// @tparam T Component type.
 	/// @param quaternion Quaternion to negate.
 	/// @return Negated quaternion.
@@ -315,7 +315,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr Quaternion<T> operator -(const Quaternion<T>& left, const Quaternion<T>& right) noexcept;
 
-	/// @brief Multiplies the @p quaternion by the @p multiplier treating the quaternion as a vector.
+	/// @brief Multiplies the @p quaternion by the @p multiplier treating a quaternion as a vector.
 	/// @tparam T Component type.
 	/// @param quaternion Multiplicand.
 	/// @param multiplier Multiplier.

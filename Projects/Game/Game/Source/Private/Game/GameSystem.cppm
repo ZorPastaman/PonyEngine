@@ -29,7 +29,7 @@ export namespace Game
 	{
 	public:
 		/// @brief Creates a game system.
-		/// @param engine Engine that owns the system.
+		/// @param engine Engine that owns the game system.
 		[[nodiscard("Pure constructor")]]
 		explicit GameSystem(PonyEngine::Core::IEngine& engine);
 		GameSystem(const GameSystem&) = delete;

@@ -10,6 +10,7 @@
 #pragma once
 
 #if _MSC_VER
+/// @brief Pointer restrict macro.
 #define PONY_RESTRICT __restrict
 #else
 #error "Unsupported compiler!"

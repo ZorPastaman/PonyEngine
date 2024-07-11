@@ -36,7 +36,7 @@ export namespace Launcher
 
 		~LoggerProvider() noexcept;
 
-		/// @brief Gets a logger.
+		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Log::ILogger& GetLogger() const noexcept;
@@ -89,7 +89,7 @@ namespace Launcher
 		}
 		catch (std::exception& e)
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - On removing a file sub-logger.", e.what()).c_str());
+			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - On removing the file sub-logger.", e.what()).c_str());
 		}
 		fileSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
@@ -101,7 +101,7 @@ namespace Launcher
 		}
 		catch (std::exception& e)
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - On removing a console sub-logger.", e.what()).c_str());
+			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - On removing the console sub-logger.", e.what()).c_str());
 		}
 		consoleSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger destroyed.");

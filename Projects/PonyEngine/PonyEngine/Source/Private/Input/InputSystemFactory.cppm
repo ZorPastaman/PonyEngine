@@ -16,13 +16,14 @@ export module PonyEngine.Input.Implementation:InputSystemFactory;
 import <functional>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
-import PonyEngine.Input.Factories;
+import PonyEngine.Core.Factory;
+import PonyEngine.Input.Factory;
 
 import :InputSystem;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Input system factory.
 	class InputSystemFactory final : public IInputSystemFactory
 	{
 	public:
@@ -44,12 +45,14 @@ export namespace PonyEngine::Input
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Input::InputSystemFactory";
+		static constexpr const char* StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
 	};
 }
 
 namespace PonyEngine::Input
 {
+	/// @brief Destroys the input system factory.
+	/// @param system Input system factory to destroy.
 	void DestroyInputSystem(Core::ISystem* system) noexcept;
 
 	Core::SystemInfo InputSystemFactory::Create(Core::IEngine& engine)

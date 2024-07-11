@@ -11,10 +11,9 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factories:EngineParams;
+export module PonyEngine.Core.Factory:EngineParams;
 
 import <algorithm>;
-import <string>;
 import <utility>;
 import <vector>;
 
@@ -24,7 +23,7 @@ import :ISystemFactory;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Holds engine parameters.
+	/// @brief Engine parameters.
 	class EngineParams final
 	{
 	public:
@@ -39,7 +38,7 @@ export namespace PonyEngine::Core
 
 			~SystemFactoriesIterator() noexcept = default;
 
-			/// @brief Checks if the currently pointed system factory is actually an end.
+			/// @brief Checks if the currently pointed system factory is actually the end.
 			/// @return @a True if the end is reached; @false otherwise.
 			[[nodiscard("Pure function")]]
 			bool IsEnd() const noexcept;
@@ -48,11 +47,11 @@ export namespace PonyEngine::Core
 			/// @return Currently pointed system factory.
 			[[nodiscard("Pure operator")]]
 			ISystemFactory& operator *() const noexcept;
-			/// @brief Moves a pointer to the next system factory.
+			/// @brief Iterates to the next system factory.
 			/// @return New iterator.
 			SystemFactoriesIterator& operator ++() noexcept;
-			/// @brief Moves a pointer to the next system factory.
-			/// @return Previous iterator.
+			/// @brief Iterates to the next system factory.
+			/// @return Current iterator.
 			SystemFactoriesIterator operator ++(int) noexcept;
 
 			SystemFactoriesIterator& operator =(const SystemFactoriesIterator& other) noexcept = default;
@@ -85,25 +84,25 @@ export namespace PonyEngine::Core
 
 		~EngineParams() noexcept = default;
 
-		/// @brief Gets a logger.
+		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		Log::ILogger& GetLogger() const noexcept;
 
-		/// @brief Gets a system factories iterator.
+		/// @brief Gets the system factories.
 		/// @return System factories iterator.
 		[[nodiscard("Pure function")]]
-		SystemFactoriesIterator GetSystemFactoriesIterator() const noexcept;
-		/// @brief Adds a system factory.
-		/// @param systemFactory System factory. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
+		SystemFactoriesIterator GetSystemFactories() const noexcept;
+		/// @brief Adds the @p systemFactory.
+		/// @param systemFactory System factory to add. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
 		void AddSystemFactory(ISystemFactory& systemFactory);
 
 		EngineParams& operator =(const EngineParams& other) = default;
 		EngineParams& operator =(EngineParams&& other) noexcept = default;
 
 	private:
-		std::vector<ISystemFactory*> systemFactories; ///< System factories. Their lifetimes must exceed the engine lifetime.
-		Log::ILogger* logger; ///< Logger. Its lifetime must exceed the engine lifetime.
+		std::vector<ISystemFactory*> systemFactories; ///< System factories.
+		Log::ILogger* logger; ///< Logger.
 	};
 }
 
@@ -150,7 +149,7 @@ namespace PonyEngine::Core
 		return *logger;
 	}
 
-	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactoriesIterator() const noexcept
+	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactories() const noexcept
 	{
 		return SystemFactoriesIterator(systemFactories.cbegin(), systemFactories.cend());
 	}

@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factories:ObjectInterfaces;
+export module PonyEngine.Core.Factory:ObjectInterfaces;
 
 import <typeinfo>;
 import <type_traits>;
@@ -20,52 +20,52 @@ import <vector>;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Object interfaces holder.
+	/// @brief Object interfaces.
 	class ObjectInterfaces final
 	{
 	public:
 		/// @brief Object interfaces iterator.
-		class ObjectInterfacesIterator final
+		class Iterator final
 		{
 		public:
 			[[nodiscard("Pure constructor")]]
-			ObjectInterfacesIterator(const ObjectInterfacesIterator& other) noexcept = default;
+			Iterator(const Iterator& other) noexcept = default;
 			[[nodiscard("Pure constructor")]]
-			ObjectInterfacesIterator(ObjectInterfacesIterator&& other) noexcept = default;
+			Iterator(Iterator&& other) noexcept = default;
 
-			~ObjectInterfacesIterator() noexcept = default;
+			~Iterator() noexcept = default;
 
-			/// @brief Checks if the currently pointed interface is actually an end.
+			/// @brief Checks if the currently pointed interface is actually the end.
 			/// @return @a True if the end is reached; @false otherwise.
 			[[nodiscard("Pure function")]]
 			bool IsEnd() const noexcept;
 
-			/// @brief Gets a currently pointed interface.
+			/// @brief Gets the currently pointed interface.
 			/// @return Currently pointed interface.
 			[[nodiscard("Pure operator")]]
-			std::pair<const std::type_info&, void*> operator *() const noexcept;
-			/// @brief Moves a pointer to the next interface.
+			std::pair<std::reference_wrapper<const std::type_info>, void*> operator *() const noexcept;
+			/// @brief Moves to the next interface.
 			/// @return New iterator.
-			ObjectInterfacesIterator& operator ++() noexcept;
-			/// @brief Moves a pointer to the next interface.
+			Iterator& operator ++() noexcept;
+			/// @brief Moves to the next interface.
 			/// @return Previous iterator.
-			ObjectInterfacesIterator operator ++(int) noexcept;
+			Iterator operator ++(int) noexcept;
 
-			ObjectInterfacesIterator& operator =(const ObjectInterfacesIterator& other) noexcept = default;
-			ObjectInterfacesIterator& operator =(ObjectInterfacesIterator&& other) noexcept = default;
+			Iterator& operator =(const Iterator& other) noexcept = default;
+			Iterator& operator =(Iterator&& other) noexcept = default;
 
 			[[nodiscard("Pure operator")]]
-			bool operator ==(const ObjectInterfacesIterator& other) const noexcept = default;
+			bool operator ==(const Iterator& other) const noexcept = default;
 
 		private:
-			/// @brief Creates a @p ObjectInterfacesIterator.
+			/// @brief Creates an @p Iterator.
 			/// @param begin Interfaces begin.
 			/// @param end Interfaces end.
 			[[nodiscard("Pure constructor")]]
-			ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& end) noexcept;
+			Iterator(const std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator& begin, const std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator& end) noexcept;
 
-			std::vector<std::pair<const std::type_info*, void*>>::const_iterator current; ///< Current interface.
-			std::vector<std::pair<const std::type_info*, void*>>::const_iterator end; ///< Interfaces iterator end.
+			std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator current; ///< Current interface.
+			std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator end; ///< Interfaces iterator end.
 
 			friend ObjectInterfaces;
 		};
@@ -79,26 +79,26 @@ export namespace PonyEngine::Core
 
 		~ObjectInterfaces() noexcept = default;
 
-		/// @brief Adds an interface.
+		/// @brief Adds the interface.
 		/// @param typeInfo Interface type info.
 		/// @param pointer Pointer to the interface object.
 		void AddObjectInterface(const std::type_info& typeInfo, void* pointer);
-		/// @brief Adds an interface.
+		/// @brief Adds the interface.
 		/// @tparam Target Interface type.
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename Target, typename Source>
 		void AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>);
-		/// @brief Add interfaces.
+		/// @brief Adds the interfaces.
 		/// @tparam Source Object source type.
 		/// @tparam Targets Interface types.
 		/// @param object Object source.
 		template<typename Source, typename... Targets>
 		void AddObjectInterfaces(Source* object) requires(std::is_convertible_v<Source*, Targets*> && ...);
-		/// @brief Gets an interfaces iterator.
-		/// @return Interfaces iterator.
+		/// @brief Gets the object interfaces.
+		/// @return Object interfaces iterator.
 		[[nodiscard("Pure function")]]
-		ObjectInterfacesIterator GetObjectInterfacesIterator() const noexcept;
+		Iterator GetObjectInterfaces() const noexcept;
 
 		ObjectInterfaces& operator =(const ObjectInterfaces& other) = default;
 		ObjectInterfaces& operator =(ObjectInterfaces&& other) noexcept = default;
@@ -107,40 +107,38 @@ export namespace PonyEngine::Core
 		bool operator ==(const ObjectInterfaces& other) const noexcept = default;
 
 	private:
-		std::vector<std::pair<const std::type_info*, void*>> interfaces; ///< Interfaces.
+		std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>> interfaces; ///< Interfaces.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	ObjectInterfaces::ObjectInterfacesIterator::ObjectInterfacesIterator(const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& begin, const std::vector<std::pair<const std::type_info*, void*>>::const_iterator& end) noexcept :
+	ObjectInterfaces::Iterator::Iterator(const std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator& begin, const std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator& end) noexcept :
 		current(begin),
 		end(end)
 	{
 	}
 
-	bool ObjectInterfaces::ObjectInterfacesIterator::IsEnd() const noexcept
+	bool ObjectInterfaces::Iterator::IsEnd() const noexcept
 	{
 		return current == end;
 	}
 
-	std::pair<const std::type_info&, void*> ObjectInterfaces::ObjectInterfacesIterator::operator *() const noexcept
+	std::pair<std::reference_wrapper<const std::type_info>, void*> ObjectInterfaces::Iterator::operator *() const noexcept
 	{
-		const auto [typeInfo, object] = *current;
-
-		return std::pair<const std::type_info&, void*>(*typeInfo, object);
+		return *current;
 	}
 
-	ObjectInterfaces::ObjectInterfacesIterator& ObjectInterfaces::ObjectInterfacesIterator::operator ++() noexcept
+	ObjectInterfaces::Iterator& ObjectInterfaces::Iterator::operator ++() noexcept
 	{
 		++current;
 
 		return *this;
 	}
 
-	ObjectInterfaces::ObjectInterfacesIterator ObjectInterfaces::ObjectInterfacesIterator::operator ++(int) noexcept
+	ObjectInterfaces::Iterator ObjectInterfaces::Iterator::operator ++(int) noexcept
 	{
-		const ObjectInterfacesIterator temp = *this;
+		const Iterator temp = *this;
 		++(*this);
 
 		return temp;
@@ -149,7 +147,7 @@ namespace PonyEngine::Core
 	void ObjectInterfaces::AddObjectInterface(const std::type_info& typeInfo, void* const pointer)
 	{
 		assert((pointer && "The object pointer is nullptr."));
-		interfaces.emplace_back(&typeInfo, pointer);
+		interfaces.emplace_back(typeInfo, pointer);
 	}
 
 	template<typename Target, typename Source>
@@ -164,8 +162,8 @@ namespace PonyEngine::Core
 		(AddObjectInterface<Targets, Source>(object),...);
 	}
 
-	ObjectInterfaces::ObjectInterfacesIterator ObjectInterfaces::GetObjectInterfacesIterator() const noexcept
+	ObjectInterfaces::Iterator ObjectInterfaces::GetObjectInterfaces() const noexcept
 	{
-		return ObjectInterfacesIterator(interfaces.cbegin(), interfaces.cend());
+		return Iterator(interfaces.cbegin(), interfaces.cend());
 	}
 }

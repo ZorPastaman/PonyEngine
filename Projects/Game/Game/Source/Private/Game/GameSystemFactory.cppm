@@ -69,13 +69,13 @@ namespace Game
 
 	PonyEngine::Core::SystemInfo GameSystemFactory::Create(PonyEngine::Core::IEngine& engine)
 	{
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Create game system.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system.");
 		const auto gameSystem = new GameSystem(engine);
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
 
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
 		auto systemInfo = PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(gameSystem, DestroyGameSystem, true);
-		PONY_LOG_GENERAL_PTR(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
 
 		return systemInfo;
 	}

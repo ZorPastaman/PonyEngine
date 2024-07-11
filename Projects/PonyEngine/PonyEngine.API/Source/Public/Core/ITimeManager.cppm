@@ -13,16 +13,25 @@ import <cstddef>;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Engine time manager.
+	/// @brief Time manager.
 	class ITimeManager
 	{
 	public:
-		/// @brief Gets current frame count.
+		ITimeManager(const ITimeManager&) = delete;
+		ITimeManager(ITimeManager&&) = delete;
+
+		/// @brief Gets the current frame count.
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
 		virtual std::size_t GetFrameCount() const noexcept = 0;
 
+		ITimeManager& operator =(const ITimeManager&) = delete;
+		ITimeManager& operator =(ITimeManager&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		ITimeManager() noexcept = default;
+
 		~ITimeManager() noexcept = default;
 	};
 }

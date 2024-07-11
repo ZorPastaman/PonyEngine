@@ -11,25 +11,26 @@ export module PonyEngine.Log:ILogger;
 
 import <exception>;
 
-import PonyEngine.Utility;
-
 import :ISubLogger;
 import :LogInput;
 import :LogType;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Engine logger interface.
-	/// @details The logger is an entry point for logs. It translates the logs via its sub-loggers.
-	class ILogger : public Utility::INamed
+	/// @brief Logger.
+	/// @details The logger is an entry point for logs. It translates logs via its sub-loggers.
+	class ILogger
 	{
 	public:
-		/// @brief Logs via current sub-loggers.
-		/// @details Don't log exceptions via this.
-		/// @param logType Log type. Must be a valid one-bit value.
+		ILogger(const ILogger&) noexcept = delete;
+		ILogger(ILogger&& other) noexcept = delete;
+
+		/// @brief Logs via the current sub-loggers.
+		/// @remark Don't log exceptions via this.
+		/// @param logType Log type. Must be a valid one true bit value.
 		/// @param logInput Log input.
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept = 0;
-		/// @brief Logs an exception via current sub-loggers.
+		/// @brief Logs the exception via the current sub-loggers.
 		/// @param exception Exception to log.
 		/// @param logInput Log input.
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept = 0;
@@ -41,7 +42,17 @@ export namespace PonyEngine::Log
 		/// @param subLogger Sub-logger to remove.
 		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;
 
+		/// @brief Gets the logger name.
+		/// @return Logger name.
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept = 0;
+
+		ILogger& operator =(const ILogger& other) noexcept = delete;
+		ILogger& operator =(ILogger&& other) noexcept = delete;
+
 	protected:
+		ILogger() noexcept = default;
+
 		~ILogger() noexcept = default;
 	};
 }

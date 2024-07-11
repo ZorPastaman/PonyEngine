@@ -28,7 +28,7 @@ export namespace PonyEngine::Input
 
 		~Event() noexcept = default;
 
-		/// @brief Gets an expected message.
+		/// @brief Gets the expected message.
 		/// @return Expected message.
 		[[nodiscard("Pure function")]]
 		const KeyboardMessage& GetExpectedMessage() const noexcept;

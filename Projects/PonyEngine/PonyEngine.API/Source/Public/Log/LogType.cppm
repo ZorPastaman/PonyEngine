@@ -24,13 +24,13 @@ export namespace PonyEngine::Log
 	{
 		/// @brief Special name for the zero flag state.
 		None = 0,
-		/// @brief Log only when it's totally required to log everything.
+		/// @brief Log everything.
 		Verbose = 1 << 0,
 		/// @brief Log additional debug information.
 		Debug = 1 << 1,
 		/// @brief Log a normal program execution.
 		Info = 1 << 2,
-		/// @brief Log a non-critical error or suspicion program execution.
+		/// @brief Log a non-critical error or suspicious program execution.
 		Warning = 1 << 3,
 		/// @brief Log an error.
 		Error = 1 << 4,

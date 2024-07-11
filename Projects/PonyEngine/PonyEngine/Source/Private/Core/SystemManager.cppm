@@ -26,7 +26,7 @@ import <utility>;
 import <vector>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Utility;
 
@@ -53,7 +53,7 @@ export namespace PonyEngine::Core
 		/// @details Call this before a first tick.
 		void Begin() const;
 		/// @brief Ends the systems.
-		/// @details Call this before a destruction of a @p SystemManager.
+		/// @details Call this before a destruction of the @p SystemManager.
 		void End() const noexcept;
 
 		/// @brief Ticks the systems.
@@ -64,7 +64,7 @@ export namespace PonyEngine::Core
 
 	private:
 		std::unordered_map<std::reference_wrapper<const type_info>, void*, Utility::TypeInfoHash, Utility::TypeInfoEqual> systemInterfaces; ///< System interfaces.
-		std::vector<SystemUniquePtr> systems; ///< Systems. It's synced with the @p factories by index.
+		std::vector<SystemUniquePtr> systems; ///< Systems.
 		std::vector<ISystem*> tickableSystems; ///< Tickable systems.
 
 		const IEngine* const engine; ///< Engine that owns the manager.
@@ -78,7 +78,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(this->engine, Log::LogType::Info, "Create systems.");
 
-		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactoriesIterator(); !factory.IsEnd(); ++factory)
+		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactories(); !factory.IsEnd(); ++factory)
 		{
 			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
 

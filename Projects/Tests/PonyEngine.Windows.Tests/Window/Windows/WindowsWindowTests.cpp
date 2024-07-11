@@ -15,7 +15,7 @@ import <cstddef>;
 import <type_traits>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 import PonyEngine.Log.Implementation;

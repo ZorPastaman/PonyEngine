@@ -21,10 +21,10 @@
     <ClCompile Include="Source\Public\Game\IGameSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\Factories\IGameSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Game\Factory\IGameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\Factories\Game.Factory.cppm">
+    <ClCompile Include="Source\Public\Game\Factory\Game.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,11 +15,11 @@ import <functional>;
 import <exception>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 import PonyEngine.Window;
-import PonyEngine.Window.Factories;
+import PonyEngine.Window.Factory;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

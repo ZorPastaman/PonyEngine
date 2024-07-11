@@ -27,7 +27,8 @@ import PonyEngine.Log;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Default logger. It just resends logs to its sub-loggers.
+	/// @brief Logger.
+	/// @details It just resends logs to its sub-loggers.
 	class Logger final : public ILogger
 	{
 	public:
@@ -90,7 +91,7 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the log.", e.what()));
+				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the sublogger '{}'.", e.what(), subLogger->GetName()));
 			}
 		}
 	}
@@ -110,7 +111,7 @@ namespace PonyEngine::Log
 
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
 		{
-			PONY_CONSOLE(LogType::Info, std::format("Remove a sub-logger '{}'.", subLogger->GetName()));
+			PONY_CONSOLE(LogType::Info, std::format("Remove the sub-logger '{}'.", subLogger->GetName()));
 			subLoggers.erase(position);
 			PONY_CONSOLE(LogType::Info, "Sub-logger removed.");
 		}

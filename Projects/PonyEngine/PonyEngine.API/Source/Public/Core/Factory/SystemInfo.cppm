@@ -11,10 +11,11 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factories:SystemInfo;
+export module PonyEngine.Core.Factory:SystemInfo;
 
 import <functional>;
 import <memory>;
+import <type_traits>;
 
 import PonyEngine.Core;
 
@@ -43,14 +44,14 @@ export namespace PonyEngine::Core
 		template<typename System, typename... Interfaces>
 		static SystemInfo Create(System* system, const std::function<void(ISystem*)>& deleter, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...));
 
-		/// @brief Gets a system.
+		/// @brief Gets the system.
 		/// @return System.
 		[[nodiscard("Pure function")]]
 		SystemUniquePtr& GetSystem() noexcept;
-		/// @brief Gets system public interfaces.
+		/// @brief Gets the system public interfaces.
 		/// @return System public interfaces.
 		[[nodiscard("Pure function")]]
-		ObjectInterfaces::ObjectInterfacesIterator GetInterfaces() const noexcept;
+		ObjectInterfaces::Iterator GetInterfaces() const noexcept;
 		/// @brief Is the system tickable?
 		/// @return @a True if it's tickable; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -71,8 +72,8 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	template<typename System, typename ... Interfaces>
-	SystemInfo SystemInfo::Create(System* const system, const std::function<void(ISystem*)>& deleter, const bool isTickable) requires (std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...))
+	template<typename System, typename... Interfaces>
+	SystemInfo SystemInfo::Create(System* const system, const std::function<void(ISystem*)>& deleter, const bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...))
 	{
 		assert((system && "The system is nullptr."));
 
@@ -89,9 +90,9 @@ namespace PonyEngine::Core
 		return system;
 	}
 
-	ObjectInterfaces::ObjectInterfacesIterator SystemInfo::GetInterfaces() const noexcept
+	ObjectInterfaces::Iterator SystemInfo::GetInterfaces() const noexcept
 	{
-		return interfaces.GetObjectInterfacesIterator();
+		return interfaces.GetObjectInterfaces();
 	}
 
 	bool SystemInfo::GetIsTickable() const noexcept

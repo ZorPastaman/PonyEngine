@@ -24,7 +24,7 @@ import :GameSystemFactory;
 
 export namespace Game
 {
-	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>; ///< Game system factory unique_ptr.
+	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>; ///< Game system factory unique_ptr typedef.
 
 	/// @brief Creates a game system factory.
 	///	@param logger Logger to use.

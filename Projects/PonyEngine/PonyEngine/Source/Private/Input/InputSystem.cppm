@@ -25,7 +25,7 @@ import PonyEngine.Log;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Default Pony Engine input system.
+	/// @brief Input system.
 	class InputSystem final : public Core::ISystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:

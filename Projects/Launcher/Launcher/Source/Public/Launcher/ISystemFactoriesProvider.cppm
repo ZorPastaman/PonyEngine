@@ -9,7 +9,7 @@
 
 export module Launcher:ISystemFactoriesProvider;
 
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 
 export namespace Launcher
 {
@@ -17,11 +17,20 @@ export namespace Launcher
 	class ISystemFactoriesProvider
 	{
 	public:
-		/// @brief Add system factories to the @p engineParams.
+		ISystemFactoriesProvider(const ISystemFactoriesProvider&) = delete;
+		ISystemFactoriesProvider(ISystemFactoriesProvider&&) = delete;
+
+		/// @brief Adds system factories to the @p engineParams.
 		/// @param engineParams Engine params.
 		virtual void AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const = 0;
 
+		ISystemFactoriesProvider& operator =(const ISystemFactoriesProvider&) = delete;
+		ISystemFactoriesProvider& operator =(ISystemFactoriesProvider&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		ISystemFactoriesProvider() noexcept = default;
+
 		~ISystemFactoriesProvider() noexcept = default;
 	};
 }

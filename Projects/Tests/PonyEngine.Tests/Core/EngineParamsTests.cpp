@@ -13,10 +13,10 @@ import <cstdint>;
 import <exception>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Window;
-import PonyEngine.Window.Factories;
+import PonyEngine.Window.Factory;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -180,7 +180,7 @@ namespace Core
 			engineParams.AddSystemFactory(&factory1);
 			engineParams.AddSystemFactory(&factory2);
 
-			PonyEngine::Core::EngineParams::SystemFactoriesIterator it = engineParams.GetSystemFactoriesIterator();
+			PonyEngine::Core::EngineParams::SystemFactoriesIterator it = engineParams.GetSystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemFactory*>(&factory0)), reinterpret_cast<std::uintptr_t>(*it));
 			Assert::IsFalse(it.IsEnd());
 			PonyEngine::Core::EngineParams::SystemFactoriesIterator incrementedIt = ++it;
