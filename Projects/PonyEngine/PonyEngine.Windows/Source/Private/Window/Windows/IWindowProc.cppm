@@ -19,6 +19,9 @@ export namespace PonyEngine::Window
 	class IWindowProc
 	{
 	public:
+		IWindowProc(const IWindowProc&) = delete;
+		IWindowProc(IWindowProc&&) = delete;
+
 		/// @brief Window proc function.
 		/// @param uMsg Message.
 		/// @param wParam WParam.
@@ -26,7 +29,13 @@ export namespace PonyEngine::Window
 		/// @return Result code.
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
 
+		IWindowProc& operator =(const IWindowProc&) = delete;
+		IWindowProc& operator =(IWindowProc&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IWindowProc() noexcept = default;
+
 		~IWindowProc() noexcept = default;
 	};
 }

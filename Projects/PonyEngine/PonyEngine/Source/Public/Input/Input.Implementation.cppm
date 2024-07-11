@@ -32,7 +32,7 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	/// @brief Destroys a previously created input system factory.
+	/// @brief Destroys the input system factory.
 	/// @param factory Input system factory to destroy.
 	void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept;
 

@@ -13,10 +13,13 @@ import <typeinfo>;
 
 export namespace PonyEngine::Core
 {
-	/// @brief System manager interface.
+	/// @brief System manager.
 	class ISystemManager
 	{
 	public:
+		ISystemManager(const ISystemManager&) = delete;
+		ISystemManager(ISystemManager&&) = delete;
+
 		/// @brief Tries to find a system of the type described by the @p typeInfo.
 		/// @param typeInfo System type info.
 		/// @return Pointer to the system if it's found; nullptr if it's not found.
@@ -28,7 +31,13 @@ export namespace PonyEngine::Core
 		template<typename T> [[nodiscard("Pure function")]]
 		T* FindSystem() const noexcept;
 
+		ISystemManager& operator =(const ISystemManager&) = delete;
+		ISystemManager& operator =(ISystemManager&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		ISystemManager() noexcept = default;
+
 		~ISystemManager() noexcept = default;
 	};
 }

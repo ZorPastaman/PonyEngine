@@ -21,19 +21,19 @@ import :Vector4;
 
 export namespace PonyEngine::Math
 {
-	/// @brief Converts a 3D rotation matrix to a 3D rotation quaternion.
+	/// @brief Converts the 3D rotation matrix to a 3D rotation quaternion.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix. 
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Converts 3D Euler angles to a 3D rotation quaternion.
+	/// @brief Converts the 3D Euler angles to a 3D rotation quaternion.
 	/// @tparam T Value type.
 	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& euler) noexcept;
-	/// @brief Converts a 3D axis-angle rotation to a 3D rotation quaternion.
+	/// @brief Converts the 3D axis-angle rotation to a 3D rotation quaternion.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis. Must be unit.
 	/// @param angle Rotation angle in radians.
@@ -48,19 +48,19 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> RotationQuaternion(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Converts a 3D rotation quaternion to a 3D rotation matrix.
+	/// @brief Converts the 3D rotation quaternion to a 3D rotation matrix.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix3x3<T> RotationMatrix(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D Euler angles to a 3D rotation matrix.
+	/// @brief Converts the 3D Euler angles to a 3D rotation matrix.
 	/// @tparam T Value type.
 	/// @param euler Rotation angles around x, y and z axes in radians.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& euler) noexcept;
-	/// @brief Converts a 3D axis-angle rotation a 3D rotation matrix.
+	/// @brief Converts the 3D axis-angle rotation a 3D rotation matrix.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis. Must be unit.
 	/// @param angle Rotation angle in radians.
@@ -75,19 +75,19 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Converts a 3D rotation quaternion to a 3D Euler angles.
+	/// @brief Converts the 3D rotation quaternion to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D rotation matrix to a 3D Euler angles.
+	/// @brief Converts the 3D rotation matrix to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Converts a 3D axis-angle rotation to a 3D Euler angles.
+	/// @brief Converts the 3D axis-angle rotation to a 3D Euler angles.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis. Must be unit.
 	/// @param angle Rotation angle in radians.
@@ -102,25 +102,25 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Euler(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Converts a 3D rotation quaternion to a 3D axis-angle rotation.
+	/// @brief Converts the 3D rotation quaternion to a 3D axis-angle rotation.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Quaternion<T>& quaternion) noexcept;
-	/// @brief Converts a 3D rotation matrix to a 3D axis-angle rotation.
+	/// @brief Converts the 3D rotation matrix to a 3D axis-angle rotation.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Matrix3x3<T>& rotationMatrix) noexcept;
-	/// @brief Converts a 3D Euler angles to a 3D axis-angle rotation.
+	/// @brief Converts the 3D Euler angles to a 3D axis-angle rotation.
 	/// @tparam T Value type.
 	/// @param euler Euler angles in radians.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& euler) noexcept;
-	/// @brief Creates 3D axis-angle rotation representing a rotation from the @p fromDirection to the @p toDirection.
+	/// @brief Creates a 3D axis-angle rotation representing a rotation from the @p fromDirection to the @p toDirection.
 	/// @tparam T Value type.
 	/// @param fromDirection From direction. Must be unit.
 	/// @param toDirection To direction. Must be unit.
@@ -128,28 +128,28 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> AxisAngle(const Vector3<T>& fromDirection, const Vector3<T>& toDirection) noexcept;
 
-	/// @brief Creates a 3D rotation-scaling matrix from a rotation quaternion and scaling.
+	/// @brief Creates a 3D rotation-scaling matrix from the rotation quaternion and scaling.
 	/// @tparam T Value type.
 	/// @param quaternion Rotation quaternion.
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix3x3<T> RsMatrix(const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D rotation-scaling matrix from a rotation matrix and scaling.
+	/// @brief Creates a 3D rotation-scaling matrix from the rotation matrix and scaling.
 	/// @tparam T Value type.
 	/// @param rotationMatrix Rotation matrix.
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix3x3<T> RsMatrix(const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D rotation-scaling matrix from Euler angles and scaling.
+	/// @brief Creates a 3D rotation-scaling matrix from the Euler angles and scaling.
 	/// @tparam T Value type.
 	/// @param euler Euler angles in radians.
 	/// @param scaling Scaling.
 	/// @return Rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D rotation-scaling matrix from an axis-angle rotation and scaling.
+	/// @brief Creates a 3D rotation-scaling matrix from the axis-angle rotation and scaling.
 	/// @tparam T Value type.
 	/// @param axis Rotation axis.
 	/// @param angle Rotation angle in radians.
@@ -158,7 +158,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RsMatrix(const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
 
-	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, rotation quaternion and scaling.
+	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, rotation quaternion and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
 	/// @param quaternion Rotation quaternion.
@@ -166,7 +166,7 @@ export namespace PonyEngine::Math
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Quaternion<T>& quaternion, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, rotation matrix and scaling.
+	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, rotation matrix and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
 	/// @param rotationMatrix Rotation matrix.
@@ -174,7 +174,7 @@ export namespace PonyEngine::Math
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rotationMatrix, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, Euler angles and scaling.
+	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, Euler angles and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
 	/// @param euler Euler angles in radians.
@@ -182,7 +182,7 @@ export namespace PonyEngine::Math
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& euler, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation, axis-angle rotation and scaling.
+	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation, axis-angle rotation and scaling.
 	/// @tparam T Value type.
 	/// @param translation Translation.
 	/// @param axis Axis. Must be unit.
@@ -191,13 +191,13 @@ export namespace PonyEngine::Math
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Vector3<T>& axis, T angle, const Vector3<T>& scaling) noexcept;
-	/// @brief Creates a 3D translation-rotation-scaling matrix with a zero translation from a rotation-scaling matrix.
+	/// @brief Creates a 3D translation-rotation-scaling matrix with the zero translation from the rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Translation-rotation-scaling matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix4x4<T> TrsMatrix(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Creates a 3D translation-rotation-scaling matrix from a translation and rotation-scaling matrix.
+	/// @brief Creates a 3D translation-rotation-scaling matrix from the translation and rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param translation Translation.
 	/// @param rsMatrix Rotation-scaling matrix.
@@ -205,21 +205,21 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rsMatrix) noexcept;
 
-	/// @brief Extracts a translation from a 3D translation-rotation-scaling matrix.
+	/// @brief Extracts a translation from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Translation.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> ExtractTranslation(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Attempts to extract a rotation quaternion from a 3D rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation quaternion from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation quaternion.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> ExtractRotationQuaternion(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Attempts to extract a rotation quaternion from a 3D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation quaternion from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -227,14 +227,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Quaternion<T> ExtractRotationQuaternion(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Attempts to extract a rotation matrix from a 3D rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation matrix from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrix3D(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Attempts to extract a rotation matrix from a 3D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a rotation matrix from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -242,14 +242,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> ExtractRotationMatrix3D(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Attempts to extract Euler angles from a 3D rotation-scaling matrix.
+	/// @brief Attempts to extract Euler angles from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Euler angles in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractEuler(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Attempts to extract Euler angles from a 3D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract Euler angles from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -257,14 +257,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractEuler(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Attempts to extract an axis-angle rotation from a 3D rotation-scaling matrix.
+	/// @brief Attempts to extract an axis-angle rotation from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Axis-angle rotation. The angle is in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> ExtractAxisAngle(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Attempts to extract an axis-angle rotation from a 3D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract an axis-angle rotation from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is positive.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -272,14 +272,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	std::pair<Vector3<T>, T> ExtractAxisAngle(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Attempts to extract a 3D scaling from a 3D rotation-scaling matrix.
+	/// @brief Attempts to extract a 3D scaling from the 3D rotation-scaling matrix.
 	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
 	/// @param rsMatrix Rotation-scaling matrix.
 	/// @return Scaling.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractScaling3D(const Matrix3x3<T>& rsMatrix) noexcept;
-	/// @brief Attempts to extract a 3D scaling from a 3D translation-rotation-scaling matrix.
+	/// @brief Attempts to extract a 3D scaling from the 3D translation-rotation-scaling matrix.
 	/// @note It works correctly if the scaling is non-negative.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -287,7 +287,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> ExtractScaling3D(const Matrix4x4<T>& trsMatrix) noexcept;
 
-	/// @brief Extracts a 3D rotation-scaling matrix from a 3D translation-rotation-scaling matrix.
+	/// @brief Extracts a 3D rotation-scaling matrix from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
 	/// @return Rotation-scaling matrix.
@@ -310,14 +310,14 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Vector3<T> Rotate(const Vector3<T>& vector, const Vector3<T>& axis, T angle) noexcept;
 
-	/// @brief Applies a 3D transformation matrix to a point vector.
+	/// @brief Applies the 3D transformation matrix to the point vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix.
 	/// @param vector Point.
 	/// @return Transformed point.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
-	/// @brief Applies a 3D transformation matrix to a direction vector.
+	/// @brief Applies the 3D transformation matrix to the direction vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix.
 	/// @param vector Direction.
@@ -328,7 +328,7 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	/// @brief Applies a 3D transformation matrix to a vector.
+	/// @brief Applies the 3D transformation matrix to the vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix.
 	/// @param vector Vector.

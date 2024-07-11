@@ -33,16 +33,16 @@ export namespace PonyEngine::Input
 
 		~KeyboardMessage() noexcept = default;
 
-		/// @brief Gets a key code.
+		/// @brief Gets the key code.
 		/// @return Key code.
 		[[nodiscard("Pure function")]]
 		KeyboardKeyCode GetKeyCode() const noexcept;
-		/// @brief Gets is key down.
-		/// @return Is key down?
+		/// @brief Is the key down?
+		/// @return @a True if the key is down; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool GetIsDown() const noexcept;
 
-		/// @brief Creates a string representing a @p KeyboardMessage.
+		/// @brief Creates a string representing the message.
 		/// @return Representing string.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;

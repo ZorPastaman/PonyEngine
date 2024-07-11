@@ -17,16 +17,25 @@ import PonyEngine.Window;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Windows window interface.
+	/// @brief Windows window.
 	class IWindowsWindow : public IWindow
 	{
 	public:
-		/// @brief Gets a windows window handle.
+		IWindowsWindow(const IWindowsWindow&) = delete;
+		IWindowsWindow(IWindowsWindow&&) = delete;
+
+		/// @brief Gets the windows window handle.
 		/// @return Window handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND GetWindowHandle() const noexcept = 0;
 
+		IWindowsWindow& operator =(const IWindowsWindow&) = delete;
+		IWindowsWindow& operator =(IWindowsWindow&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IWindowsWindow() noexcept = default;
+
 		~IWindowsWindow() noexcept = default;
 	};
 }

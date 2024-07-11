@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Factories;
+export module PonyEngine.Window.Factory;
 
 export import :IWindowFactory;
 export import :WindowParams;

@@ -39,14 +39,14 @@ export namespace PonyEngine::Math
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Cast(U* PONY_RESTRICT destination, const T* PONY_RESTRICT source, std::size_t count) noexcept;
 
-	/// @brief Computes result += right on every element in the sequential order.
+	/// @brief Computes "result += right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result = left + right on every element in the sequential order.
+	/// @brief Computes "result = left + right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param left Left operand array. Its length must be at least @p count.
@@ -55,14 +55,14 @@ export namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Add(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 
-	/// @brief Computes result -= right on every element in the sequential order.
+	/// @brief Computes "result -= right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result = left - right on every element in the sequential order.
+	/// @brief Computes "result = left - right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param left Left operand array. Its length must be at least @p count.
@@ -71,14 +71,14 @@ export namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Subtract(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
 
-	/// @brief Computes result *= right on every element in the sequential order.
+	/// @brief Computes "result *= right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result = left * right on every element in the sequential order.
+	/// @brief Computes "result = left * right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param left Left operand array. Its length must be at least @p count.
@@ -86,7 +86,7 @@ export namespace PonyEngine::Math
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result *= multiplier on every element in the sequential order.
+	/// @brief Computes "result *= multiplier" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Multiplier type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -94,7 +94,7 @@ export namespace PonyEngine::Math
 	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* result, U multiplier, std::size_t count) noexcept;
-	/// @brief Computes result = left * multiplier on every element in the sequential order.
+	/// @brief Computes "result = left * multiplier" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Multiplier type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -104,14 +104,14 @@ export namespace PonyEngine::Math
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Multiply(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, U multiplier, std::size_t count) noexcept;
 
-	/// @brief Computes result /= right on every element in the sequential order.
+	/// @brief Computes "result /= right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param right Right operand array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result = left / right on every element in the sequential order.
+	/// @brief Computes "result = left / right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param left Left operand array. Its length must be at least @p count.
@@ -119,7 +119,7 @@ export namespace PonyEngine::Math
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, const T* PONY_RESTRICT right, std::size_t count) noexcept;
-	/// @brief Computes result /= divisor on every element in the sequential order.
+	/// @brief Computes "result /= divisor" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Divisor type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -127,7 +127,7 @@ export namespace PonyEngine::Math
 	/// @param count Element count.
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* result, U divisor, std::size_t count) noexcept;
-	/// @brief Computes result = left / divisor on every element in the sequential order.
+	/// @brief Computes "result = left / divisor" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @tparam U Divisor type.
 	/// @param result Result array. Its length must be at least @p count.
@@ -137,13 +137,13 @@ export namespace PonyEngine::Math
 	template<Arithmetic T, Arithmetic U>
 	constexpr void Divide(T* PONY_RESTRICT result, const T* PONY_RESTRICT left, U divisor, std::size_t count) noexcept;
 
-	/// @brief Computes result = -result on every element in the sequential order.
+	/// @brief Computes "result = -result" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param count Element count.
 	template<Arithmetic T>
 	constexpr void Negate(T* result, std::size_t count) noexcept;
-	/// @brief Computes result = -right on every element in the sequential order.
+	/// @brief Computes "result = -right" on every element in the sequential order.
 	/// @tparam T Value type.
 	/// @param result Result array. Its length must be at least @p count.
 	/// @param right Right operand array. Its length must be at least @p count.

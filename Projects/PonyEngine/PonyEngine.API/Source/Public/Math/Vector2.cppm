@@ -55,27 +55,27 @@ export namespace PonyEngine::Math
 
 		constexpr ~Vector2() noexcept = default;
 
-		/// @brief Gets an x-component.
+		/// @brief Gets the x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& X() noexcept;
-		/// @brief Gets an x-component.
+		/// @brief Gets the x-component.
 		/// @return X-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& X() const noexcept;
-		/// @brief Gets a y-component.
+		/// @brief Gets the y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Y() noexcept;
-		/// @brief Gets a y-component.
+		/// @brief Gets the y-component.
 		/// @return Y-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Y() const noexcept;
-		/// @brief Gets a data pointer - an array of 2 elements. The order is x, y.
+		/// @brief Gets the data pointer to the array of 2 elements. The order is x, y.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data() noexcept;
-		/// @brief Gets a data pointer - an array of 2 elements. The order is x, y.
+		/// @brief Gets the data pointer to the array of 2 elements. The order is x, y.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
@@ -99,11 +99,11 @@ export namespace PonyEngine::Math
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires(std::is_floating_point_v<T>);
 
-		/// @brief Gets a minimum value among components.
+		/// @brief Gets a minimum value among the components.
 		/// @return Minimum component value.
 		[[nodiscard("Pure function")]]
 		constexpr T Min() const noexcept;
-		/// @brief Gets a maximum value among components.
+		/// @brief Gets a maximum value among the components.
 		/// @return Maximum component value.
 		[[nodiscard("Pure function")]]
 		constexpr T Max() const noexcept;
@@ -112,18 +112,18 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr T Sum() const noexcept;
 
-		/// @brief Swaps components and returns a vector in order y, x.
+		/// @brief Swaps the components and returns a vector in order y, x.
 		/// @return Swapped vector.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2 Swapped() const noexcept;
-		/// @brief Swaps components in @this vector. The order is y, x.
+		/// @brief Swaps the components in the vector. The order is y, x.
 		constexpr void Swap() noexcept;
 
 		/// @brief Checks if all the components are zero.
 		/// @return @a True if this vector components are zero; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsZero() const noexcept;
-		/// @brief Checks if all the components are almost zero with a tolerance value.
+		/// @brief Checks if all the components are almost zero with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return  @a True if this vector components are almost zero; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -132,7 +132,7 @@ export namespace PonyEngine::Math
 		/// @return @a True if this vector is unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUnit() const noexcept;
-		/// @brief Checks if this vector is almost unit with a tolerance value.
+		/// @brief Checks if this vector is almost unit with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -141,7 +141,7 @@ export namespace PonyEngine::Math
 		/// @return @a True if this vector is uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsUniform() const noexcept;
-		/// @brief Checks if this vector is almost uniform with a tolerance value.
+		/// @brief Checks if this vector is almost uniform with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -174,14 +174,14 @@ export namespace PonyEngine::Math
 		template<Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Vector2<U>() const noexcept;
 
-		/// @brief Access to a component operator.
+		/// @brief Gets a component by the @p index.
 		/// @param index Component index. Must be in range [0, 1].
-		/// @return Component dependent on the @p index. 0 -> x, 1 -> y.
+		/// @return Component. 0 -> x, 1 -> y.
 		[[nodiscard("Pure operator")]]
 		constexpr T& operator [](std::size_t index) noexcept;
-		/// @brief Access to a component operator.
+		/// @brief Gets a component by the @p index.
 		/// @param index Component index. Must be in range [0, 1].
-		/// @return Component dependent on the @p index. 0 -> x, 1 -> y.
+		/// @return Component. 0 -> x, 1 -> y.
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
 
@@ -212,8 +212,8 @@ export namespace PonyEngine::Math
 		/// @return @a This.
 		constexpr Vector2& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
 
-		/// @brief Checks if two vectors are equal.
-		/// @param other The other vector.
+		/// @brief Checks if the two vectors are equal.
+		/// @param other Other vector.
 		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Vector2& other) const noexcept;
@@ -222,7 +222,7 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> components; ///< Component array in order x, y.
 	};
 
-	/// @brief Computes a dot product of two vectors.
+	/// @brief Computes a dot product of the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
@@ -230,14 +230,14 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
-	/// @brief Computes an angle between two vectors.
+	/// @brief Computes an angle between the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector. Must be unit.
 	/// @param right Right vector. Must be unit.
 	/// @return Angle in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Angle(const Vector2<T>& left, const Vector2<T>& right) noexcept;
-	/// @brief Computes a signed angle between two vectors.
+	/// @brief Computes a signed angle between the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector. Must be unit.
 	/// @param right Right vector. Must be unit.
@@ -276,8 +276,8 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Scale(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
-	/// @brief Linear interpolation between two vectors if the @p time is in range [0, 1].
-	///        Linear extrapolation between two vectors if the @p time is out of range [0, 1].
+	/// @brief Linear interpolation between the two vectors if the @p time is in range [0, 1].
+	///        Linear extrapolation between the two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
 	/// @param from Interpolation/Extrapolation start point.
 	/// @param to Interpolation/Extrapolation target point.
@@ -286,7 +286,7 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Lerp(const Vector2<T>& from, const Vector2<T>& to, typename Vector2<T>::ComputationalType time) noexcept;
 
-	/// @brief Checks if two vectors are almost equal with a tolerance value.
+	/// @brief Checks if the two vectors are almost equal with the tolerance value.
 	/// @tparam T Component type.
 	/// @param left Left vector.
 	/// @param right Right vector.
@@ -295,7 +295,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, T tolerance = T{0.00001}) noexcept;
 
-	/// @brief Addition operator for two vectors.
+	/// @brief Sums the @p left vector and the @p right vector.
 	/// @tparam T Component type.
 	/// @param left Augend.
 	/// @param right Addend.

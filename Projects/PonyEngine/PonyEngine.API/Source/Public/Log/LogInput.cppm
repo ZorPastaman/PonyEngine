@@ -29,11 +29,11 @@ export namespace PonyEngine::Log
 
 		~LogInput() noexcept = default;
 
-		/// @brief Gets a log message.
+		/// @brief Gets the log message.
 		/// @return Log message.
 		[[nodiscard("Pure function")]]
 		const char* GetMessage() const noexcept;
-		/// @brief Gets an engine frame count.
+		/// @brief Gets the engine frame count.
 		/// @return Engine frame count.
 		[[nodiscard("Pure function")]]
 		std::size_t GetFrameCount() const noexcept;

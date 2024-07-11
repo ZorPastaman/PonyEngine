@@ -29,7 +29,7 @@ export namespace PonyEngine::Input
 
 		~Handle() noexcept = default;
 
-		/// @brief Gets ID.
+		/// @brief Gets the ID.
 		/// @return ID.
 		[[nodiscard("Pure function")]]
 		std::size_t GetId() const noexcept;

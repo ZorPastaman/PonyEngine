@@ -38,8 +38,8 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Destroys a previously created Windows window factory.
-	/// @param factory Previously created Windows window factory.
+	/// @brief Destroys the Windows window factory.
+	/// @param factory Windows window factory to destroy.
 	void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
 
 	WindowsWindowUniquePtr CreateWindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams)

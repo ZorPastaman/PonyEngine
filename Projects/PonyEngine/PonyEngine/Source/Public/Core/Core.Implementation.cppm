@@ -19,13 +19,13 @@ import <functional>;
 import <memory>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 
 import :Engine;
 
 export namespace PonyEngine::Core
 {
-	using EngineUniquePtr = std::unique_ptr<IEngine, std::function<void(IEngine*)>>; ///< Pony Engine unique_ptr typedef.
+	using EngineUniquePtr = std::unique_ptr<IEngine, std::function<void(IEngine*)>>; ///< Engine unique_ptr typedef.
 
 	/// @brief Creates a new @p Engine instance with the @p params.
 	/// @param params Engine parameters.
@@ -36,7 +36,7 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	/// @brief Destroy the @p engine instance.
+	/// @brief Destroy the @p engine.
 	/// @param engine Engine to destroy.
 	void DestroyEngine(IEngine* engine) noexcept;
 

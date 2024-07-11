@@ -48,7 +48,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T RadToDeg = T{180} / std::numbers::pi_v<T>;
 
-	/// @brief Checks if two floating point values are almost equal with a tolerance value.
+	/// @brief Checks if the two floating point values are almost equal with the tolerance value.
 	/// @tparam T Floating point type.
 	/// @param left First value.
 	/// @param right Second value.
@@ -64,7 +64,7 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
 
-	/// @brief Rounds a floating point value to an integral value and returns it as an integral value.
+	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
 	/// @tparam From Input type.
 	/// @tparam To Output type.
 	/// @param from Input value.

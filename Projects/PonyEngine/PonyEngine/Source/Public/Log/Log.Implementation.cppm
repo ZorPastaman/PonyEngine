@@ -50,15 +50,15 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	/// @brief Destroys a previously created logger.
+	/// @brief Destroys the logger.
 	/// @param logger Logger to destroy.
 	void DestroyLogger(ILogger* logger) noexcept;
 
-	/// @brief Destroys a previously created console sub-logger.
+	/// @brief Destroys the console sub-logger.
 	/// @param subLogger Console sub-logger to destroy.
 	void DestroyConsoleSubLogger(ISubLogger* subLogger) noexcept;
 
-	/// @brief Destroys a previously created file sub-logger.
+	/// @brief Destroys the file sub-logger.
 	/// @param subLogger File sub-logger to destroy.
 	void DestroyFileSubLogger(ISubLogger* subLogger) noexcept;
 

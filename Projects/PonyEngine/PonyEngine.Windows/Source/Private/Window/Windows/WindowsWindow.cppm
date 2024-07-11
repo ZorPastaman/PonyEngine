@@ -35,7 +35,7 @@ import :KeyCodeUtility;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Engine window for @p Windows platform.
+	/// @brief Windows window.
 	class WindowsWindow final : public Core::ISystem, public IWindowsWindow, public IWindowProc, public Input::IKeyboardProvider
 	{
 	public:

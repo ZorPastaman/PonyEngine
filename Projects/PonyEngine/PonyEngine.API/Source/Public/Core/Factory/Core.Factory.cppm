@@ -7,20 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Utility:INamed;
+export module PonyEngine.Core.Factory;
 
-export namespace PonyEngine::Utility
-{
-	/// @brief Object that has a name.
-	class INamed
-	{
-	public:
-		/// @brief Gets a name of an object.
-		/// @return Name of an object.
-		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
-
-	protected:
-		~INamed() noexcept = default;
-	};
-}
+export import :EngineParams;
+export import :ISystemFactory;
+export import :ObjectInterfaces;
+export import :SystemInfo;

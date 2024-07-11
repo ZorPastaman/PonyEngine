@@ -21,7 +21,7 @@ import <stdexcept>;
 import <string>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
 import :SystemManager;
@@ -29,7 +29,7 @@ import :TimeManager;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Pony Engine main class.
+	/// @brief Engine.
 	class Engine final : public IEngine
 	{
 	public:
@@ -82,7 +82,7 @@ namespace PonyEngine::Core
 		logger{&params.GetLogger()},
 		isRunning{true}
 	{
-		PONY_LOG_GENERAL_PTR(logger, Log::LogType::Info, "Create time manager");
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create time manager");
 		timeManager.reset(new TimeManager());
 		PONY_LOG(this, Log::LogType::Info, "Time manager created.");
 
@@ -107,7 +107,7 @@ namespace PonyEngine::Core
 
 		PONY_LOG(this, Log::LogType::Info, "Destroy time manager.");
 		timeManager.reset();
-		PONY_LOG_GENERAL_PTR(logger, Log::LogType::Info, "Time manager destroyed.");
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Time manager destroyed.");
 	}
 
 	Log::ILogger& Engine::GetLogger() const noexcept
@@ -132,7 +132,7 @@ namespace PonyEngine::Core
 
 	int Engine::GetExitCode() const noexcept
 	{
-		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get an exit code when the engine is still running.");
+		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get the exit code when the engine is still running.");
 
 		return exitCode;
 	}
@@ -141,13 +141,13 @@ namespace PonyEngine::Core
 	{
 		if (isRunning)
 		{
-			PONY_LOG(this, Log::LogType::Info, std::format("Stop an engine with the exit code '{}'.", exitCode).c_str());
+			PONY_LOG(this, Log::LogType::Info, std::format("Stop the engine with the exit code '{}'.", exitCode).c_str());
 			isRunning = false;
 			this->exitCode = exitCode;
 		}
 		else
 		{
-			PONY_LOG(this, Log::LogType::Info, "Tried to stop an already stopped engine. Ignore it.");
+			PONY_LOG(this, Log::LogType::Info, "Tried to stop the already stopped engine. Ignore it.");
 		}
 	}
 

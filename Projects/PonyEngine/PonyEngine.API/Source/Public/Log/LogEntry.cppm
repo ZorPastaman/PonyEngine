@@ -46,29 +46,29 @@ export namespace PonyEngine::Log
 
 		~LogEntry() noexcept = default;
 
-		/// @brief Gets a log message.
+		/// @brief Gets the log message.
 		/// @return Log message. May be nullptr.
 		[[nodiscard("Pure function")]]
 		const char* GetMessage() const noexcept;
-		/// @brief Gets an exception.
+		/// @brief Gets the exception.
 		/// @return Exception. May be nullptr.
 		[[nodiscard("Pure function")]]
 		const std::exception* GetException() const noexcept;
-		/// @brief Gets a time point.
+		/// @brief Gets the time point.
 		/// @return Time point.
 		[[nodiscard("Pure function")]]
 		std::chrono::time_point<std::chrono::system_clock> GetTimePoint() const noexcept;
-		/// @brief Gets a frame count.
+		/// @brief Gets the frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
 		std::size_t GetFrameCount() const noexcept;
-		/// @brief Gets a log type.
+		/// @brief Gets the log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
 		LogType GetLogType() const noexcept;
 
 		/// @brief Creates a string representing this @p LogEntry.
-		/// @return Created string.
+		/// @return Representing string.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const noexcept;
 
@@ -76,7 +76,7 @@ export namespace PonyEngine::Log
 		LogEntry& operator =(LogEntry&& other) noexcept = default;
 
 	private:
-		/// @brief Makes a string for the function ToString().
+		/// @brief Makes a string for the function @p ToString().
 		[[nodiscard("Pure function")]]
 		std::string MakeString() const noexcept;
 

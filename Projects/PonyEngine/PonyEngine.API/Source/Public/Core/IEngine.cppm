@@ -10,26 +10,28 @@
 export module PonyEngine.Core:IEngine;
 
 import PonyEngine.Log;
-import PonyEngine.Utility;
 
 import :ISystemManager;
 import :ITimeManager;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Main Pony Engine interface.
-	class IEngine : public Utility::INamed
+	/// @brief Engine.
+	class IEngine
 	{
 	public:
-		/// @brief Gets an engine logger.
+		IEngine(const IEngine&) = delete;
+		IEngine(IEngine&&) = delete;
+
+		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& GetLogger() const noexcept = 0;
-		/// @brief Gets an engine time manager.
+		/// @brief Gets the engine time manager.
 		/// @return Engine time manager.
 		[[nodiscard("Pure function")]]
 		virtual ITimeManager& GetTimeManager() const noexcept = 0;
-		/// @brief Gets an engine system manager.
+		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& GetSystemManager() const noexcept = 0;
@@ -39,7 +41,7 @@ export namespace PonyEngine::Core
 		/// @return @a False if the engine received an exit code; @a true otherwise;
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept = 0;
-		/// @brief Gets an exit code of the engine.
+		/// @brief Gets the exit code.
 		/// @note Mustn't be called if @p IsRunning() returns @a true.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
@@ -49,10 +51,21 @@ export namespace PonyEngine::Core
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = 0) noexcept = 0;
 
-		/// @brief Ticks the engine and increments its frame count.
+		/// @brief Gets the engine name.
+		/// @return Engine name.
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept = 0;
+
+		/// @brief Ticks the engine.
 		virtual void Tick() = 0; // TODO: make tick function available only to the owner.
 
+		IEngine& operator =(const IEngine&) = delete;
+		IEngine& operator =(IEngine&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IEngine() noexcept = default;
+
 		~IEngine() noexcept = default;
 	};
 }

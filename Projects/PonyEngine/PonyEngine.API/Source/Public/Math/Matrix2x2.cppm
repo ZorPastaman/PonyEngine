@@ -47,16 +47,16 @@ export namespace PonyEngine::Math
 
 			constexpr ~Row() noexcept = default;
 
-			/// @brief Converts a row to a vector.
+			/// @brief Converts the row to a vector.
 			[[nodiscard("Pure operator")]]
 			constexpr operator Vector2<T>() const noexcept;
 
-			/// @brief Gets a component in a row by a column index.
+			/// @brief Gets a component in the row by the @p columnIndex.
 			/// @param columnIndex Column index. Must be in range [0, 1].
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
 			constexpr T& operator [](std::size_t columnIndex) noexcept requires(!IsConstant);
-			/// @brief Gets a component in a row by a column index.
+			/// @brief Gets a component in the row by the @p columnIndex.
 			/// @param columnIndex Column index. Must be in range [0, 1].
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
@@ -65,7 +65,7 @@ export namespace PonyEngine::Math
 			Row& operator =(const Row&) = delete;
 			Row& operator =(Row&&) = delete;
 
-			/// @brief Assigns a row from the @p row.
+			/// @brief Assigns the row from the @p row.
 			/// @param row Row to assign from.
 			/// @return @a This.
 			constexpr Row& operator =(const Vector2<T>& row) noexcept requires(!IsConstant);
@@ -74,7 +74,7 @@ export namespace PonyEngine::Math
 			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
 
 			/// @brief Creates a row access.
-			/// @param row First element in a row.
+			/// @param row First element in the row.
 			[[nodiscard("Pure constructor")]]
 			explicit constexpr Row(RowValueType* row) noexcept;
 
@@ -109,90 +109,90 @@ export namespace PonyEngine::Math
 
 		constexpr ~Matrix2x2() noexcept = default;
 
-		/// @brief Gets a component 00.
+		/// @brief Gets the component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
 		constexpr T& M00() noexcept;
-		/// @brief Gets a component 00.
+		/// @brief Gets the component 00.
 		/// @return Component 00.
 		[[nodiscard("Pure function")]]
 		constexpr const T& M00() const noexcept;
-		/// @brief Gets a component 10.
+		/// @brief Gets the component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
 		constexpr T& M10() noexcept;
-		/// @brief Gets a component 10.
+		/// @brief Gets the component 10.
 		/// @return Component 10.
 		[[nodiscard("Pure function")]]
 		constexpr const T& M10() const noexcept;
-		/// @brief Gets a component 01.
+		/// @brief Gets the component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
 		constexpr T& M01() noexcept;
-		/// @brief Gets a component 01.
+		/// @brief Gets the component 01.
 		/// @return Component 01.
 		[[nodiscard("Pure function")]]
 		constexpr const T& M01() const noexcept;
-		/// @brief Gets a component 11.
+		/// @brief Gets the component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
 		constexpr T& M11() noexcept;
-		/// @brief Gets a component 11.
+		/// @brief Gets the component 11.
 		/// @return Component 11.
 		[[nodiscard("Pure function")]]
 		constexpr const T& M11() const noexcept;
-		/// @brief Gets a data pointer - an array of 4 elements. The data is column-major.
+		/// @brief Gets the data pointer to the array of 4 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data() noexcept;
-		/// @brief Gets a data pointer - an array of 4 elements. The data is column-major.
+		/// @brief Gets the data pointer to the array of 4 elements. The data is column-major.
 		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
-		/// @brief Gets a column data pointer - an array of 2 elements.
+		/// @brief Gets a column data pointer to an array of 2 elements.
 		/// @param columnIndex Column index.
 		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data(std::size_t columnIndex) noexcept;
-		/// @brief Gets a column data pointer - an array of 2 elements.
+		/// @brief Gets a column data pointer to an array of 2 elements.
 		/// @param columnIndex Column index.
 		/// @return Column data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data(std::size_t columnIndex) const noexcept;
 
-		/// @brief Gets a row.
+		/// @brief Gets a row by the @p rowIndex.
 		/// @param rowIndex Row index.
 		/// @return Row.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2<T> GetRow(std::size_t rowIndex) const noexcept;
-		/// @brief Sets a row.
+		/// @brief Sets a row by the @p rowIndex.
 		/// @param rowIndex Row index.
 		/// @param value Row components.
 		constexpr void SetRow(std::size_t rowIndex, const Vector2<T>& value) noexcept;
 
-		/// @brief Gets a column.
+		/// @brief Gets a column by the @p columnIndex.
 		/// @param columnIndex Column index.
 		/// @return Column.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2<T> GetColumn(std::size_t columnIndex) const noexcept;
-		/// @brief Sets a column.
+		/// @brief Sets a column by the @p columnIndex.
 		/// @param columnIndex Column index.
 		/// @param value Column components.
 		constexpr void SetColumn(std::size_t columnIndex, const Vector2<T>& value) noexcept;
 
-		/// @brief Gets a diagonal.
+		/// @brief Gets the diagonal.
 		/// @return Diagonal.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2<T> GetDiagonal() const noexcept;
-		/// @brief Sets a diagonal.
+		/// @brief Sets the diagonal.
 		/// @param value Diagonal components.
 		constexpr void SetDiagonal(const Vector2<T>& value) noexcept;
 
-		/// @brief Gets a counter-diagonal.
+		/// @brief Gets the counter-diagonal.
 		/// @return Counter-diagonal.
 		[[nodiscard("Pure function")]]
 		constexpr Vector2<T> GetCounterDiagonal() const noexcept;
-		/// @brief Sets a counter-diagonal.
+		/// @brief Sets the counter-diagonal.
 		/// @param value Counter-diagonal components.
 		constexpr void SetCounterDiagonal(const Vector2<T>& value) noexcept;
 
@@ -222,22 +222,22 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr Matrix2x2 Inverse() const noexcept requires(std::is_floating_point_v<T>);
 
-		/// @brief Checks if this matrix is equal to a zero matrix.
-		/// @return @a True if this matrix is equal to a zero matrix; @a false otherwise.
+		/// @brief Checks if this matrix is equal to the zero matrix.
+		/// @return @a True if this matrix is equal to the zero matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsZero() const noexcept;
-		/// @brief Checks if this matrix is almost equal to a zero matrix with a tolerance value.
+		/// @brief Checks if this matrix is almost equal to the zero matrix with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
-		/// @return @a True if this matrix is almost equal to a zero matrix; @a false otherwise.
+		/// @return @a True if this matrix is almost equal to the zero matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
-		/// @brief Checks if this matrix is equal to an identity matrix.
-		/// @return @a True if this matrix is equal to an identity matrix; @a false otherwise.
+		/// @brief Checks if this matrix is equal to the identity matrix.
+		/// @return @a True if this matrix is equal to the identity matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsIdentity() const noexcept;
-		/// @brief Checks if this matrix is almost equal to an identity matrix with a tolerance value.
+		/// @brief Checks if this matrix is almost equal to the identity matrix with the tolerance value.
 		/// @param tolerance Tolerance. Must be positive.
-		/// @return @a True if this matrix is almost equal to an identity matrix; @a false otherwise.
+		/// @return @a True if this matrix is almost equal to the identity matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
 
@@ -319,8 +319,8 @@ export namespace PonyEngine::Math
 		/// @return @a This.
 		constexpr Matrix2x2& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
 
-		/// @brief Checks if two matrices are equal.
-		/// @param other The other matrix.
+		/// @brief Checks if the two matrices are equal.
+		/// @param other Other matrix.
 		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Matrix2x2& other) const noexcept;
@@ -337,7 +337,7 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Matrix2x2<T> Scale(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept;
 
-	/// @brief Checks if two matrices are almost equal with a tolerance value.
+	/// @brief Checks if the two matrices are almost equal with the tolerance value.
 	/// @tparam T Component type.
 	/// @param left Left matrix.
 	/// @param right Right matrix.
@@ -346,7 +346,7 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Matrix2x2<T>& left, const Matrix2x2<T>& right, T tolerance = T{0.00001}) noexcept;
 
-	/// @brief Addition operator for two matrices.
+	/// @brief Sums the @p left and @p right.
 	/// @tparam T Component type.
 	/// @param left Augend.
 	/// @param right Addend.
@@ -396,7 +396,7 @@ export namespace PonyEngine::Math
 	/// @return Product.
 	template<std::integral T> [[nodiscard("Pure operator")]]
 	constexpr Matrix2x2<T> operator *(typename Matrix2x2<T>::ComputationalType multiplier, const Matrix2x2<T>& matrix) noexcept;
-	/// @brief Multiplies two matrices.
+	/// @brief Multiplies the @p left by the @p right.
 	/// @tparam T Component type.
 	/// @param left Multiplicand.
 	/// @param right Multiplier.
@@ -446,7 +446,7 @@ export namespace PonyEngine::Math
 
 namespace PonyEngine::Math
 {
-	/// @brief Flattens matrices and treats them as vectors, and computes a dot product of those vectors.
+	/// @brief Flattens the matrices and treats them as vectors, and computes a dot product of those vectors.
 	/// @tparam T Component type.
 	/// @param left Left matrix.
 	/// @param right Right matrix.

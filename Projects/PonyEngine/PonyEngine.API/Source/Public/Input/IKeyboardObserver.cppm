@@ -9,21 +9,33 @@
 
 export module PonyEngine.Input:IKeyboardObserver;
 
-import PonyEngine.Utility;
-
 import :KeyboardMessage;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Object that accepts an input from a keyboard.
-	class IKeyboardObserver : public Utility::INamed
+	/// @brief Keyboard input observer.
+	class IKeyboardObserver
 	{
 	public:
-		/// @brief Receives a new keyboard input.
+		IKeyboardObserver(const IKeyboardObserver&) = delete;
+		IKeyboardObserver(IKeyboardObserver&&) = delete;
+
+		/// @brief Receives a keyboard input.
 		/// @param keyboardMessage Keyboard message.
 		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
 
+		/// @brief Gets the observer name.
+		/// @return Observer name.
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept = 0;
+
+		IKeyboardObserver& operator =(const IKeyboardObserver&) = delete;
+		IKeyboardObserver& operator =(IKeyboardObserver&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IKeyboardObserver() noexcept = default;
+
 		~IKeyboardObserver() noexcept = default;
 	};
 }

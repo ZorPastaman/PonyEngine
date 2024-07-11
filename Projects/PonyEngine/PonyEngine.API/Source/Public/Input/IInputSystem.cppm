@@ -18,11 +18,14 @@ import :Handle;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input system interface.
+	/// @brief Input system.
 	class IInputSystem
 	{
 	public:
-		/// @brief Registers an action that's raised if the event meets the conditions.
+		IInputSystem(const IInputSystem&) = delete;
+		IInputSystem(IInputSystem&&) = delete;
+
+		/// @brief Registers the action that's raised if the event meets the condition.
 		/// @param event Condition.
 		/// @param action Action.
 		/// @return Registration handle. It's used to unregister.
@@ -32,7 +35,13 @@ export namespace PonyEngine::Input
 		/// @param handle Action handle.
 		virtual void UnregisterAction(Handle handle) = 0;
 
+		IInputSystem& operator =(const IInputSystem&) = delete;
+		IInputSystem& operator =(IInputSystem&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IInputSystem() noexcept = default;
+
 		~IInputSystem() noexcept = default;
 	};
 }

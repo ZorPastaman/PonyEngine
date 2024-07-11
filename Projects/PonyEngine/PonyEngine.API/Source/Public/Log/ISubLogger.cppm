@@ -9,22 +9,33 @@
 
 export module PonyEngine.Log:ISubLogger;
 
-import PonyEngine.Utility;
-
 import :LogEntry;
 
 export namespace PonyEngine::Log
 {
-	/// @brief SubLogger interface.
-	/// @details The sub-logger writes received logs to something.
-	class ISubLogger : public Utility::INamed
+	/// @brief SubLogger.
+	class ISubLogger
 	{
 	public:
-		/// @brief Logs the @p logEntry to something.
+		ISubLogger(const ISubLogger&) = delete;
+		ISubLogger(ISubLogger&&) = delete;
+
+		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 
+		/// @brief Gets the sub-logger name.
+		/// @return Sub-logger name.
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept = 0;
+
+		ISubLogger& operator =(const ISubLogger&) = delete;
+		ISubLogger& operator =(ISubLogger&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		ISubLogger() noexcept = default;
+
 		~ISubLogger() noexcept = default;
 	};
 }
