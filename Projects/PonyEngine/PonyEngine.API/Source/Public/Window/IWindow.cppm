@@ -17,6 +17,9 @@ export namespace PonyEngine::Window
 	class IWindow
 	{
 	public:
+		IWindow(const IWindow&) = delete;
+		IWindow(IWindow&&) = delete;
+
 		/// @brief Checks if the system window is alive.
 		/// @return @a True if it's alive; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -40,7 +43,13 @@ export namespace PonyEngine::Window
 		/// @brief Hides the window.
 		virtual void HideWindow() = 0;
 
+		IWindow& operator =(const IWindow&) = delete;
+		IWindow& operator =(IWindow&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IWindow() noexcept = default;
+
 		~IWindow() noexcept = default;
 	};
 }
