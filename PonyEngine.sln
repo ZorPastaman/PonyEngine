@@ -37,6 +37,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Common", "Projec
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Utility", "Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj", "{B3E69E98-B5F5-443C-A9E1-99E775557C81}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Window.API", "Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj", "{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -95,6 +97,10 @@ Global
 		{B3E69E98-B5F5-443C-A9E1-99E775557C81}.Debug|x64.Build.0 = Debug|x64
 		{B3E69E98-B5F5-443C-A9E1-99E775557C81}.Release|x64.ActiveCfg = Release|x64
 		{B3E69E98-B5F5-443C-A9E1-99E775557C81}.Release|x64.Build.0 = Release|x64
+		{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}.Debug|x64.ActiveCfg = Debug|x64
+		{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}.Debug|x64.Build.0 = Debug|x64
+		{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}.Release|x64.ActiveCfg = Release|x64
+		{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -113,6 +119,7 @@ Global
 		{81AFF359-6732-4EF1-9BE8-6A808B784245} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
 		{DDE9FC95-F61B-4C75-87BB-AA10CD7DC4FA} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
 		{B3E69E98-B5F5-443C-A9E1-99E775557C81} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
+		{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6} = {720E2B60-DD48-4D80-BF09-599A12AD7E65}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}

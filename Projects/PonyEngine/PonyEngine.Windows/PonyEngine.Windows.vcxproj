@@ -23,6 +23,9 @@
     <ProjectReference Include="..\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
+      <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Window\Windows\IWindowProc.cppm" />

@@ -78,6 +78,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
       <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
     </ProjectReference>
+    <ProjectReference Include="..\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
+      <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Window\Windows\Factories\WindowsClassParams.cppm" />
