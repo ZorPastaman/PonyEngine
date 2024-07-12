@@ -21,6 +21,9 @@ export namespace PonyEngine::Window
 	class IWindowFactory : public Core::ISystemFactory
 	{
 	public:
+		IWindowFactory(const IWindowFactory&) = delete;
+		IWindowFactory(IWindowFactory&&) = delete;
+
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
@@ -30,7 +33,13 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual const WindowParams& NextWindowParams() const noexcept = 0;
 
+		IWindowFactory& operator =(const IWindowFactory&) = delete;
+		IWindowFactory& operator =(IWindowFactory&&) = delete;
+
 	protected:
+		[[nodiscard("Pure constructor")]]
+		IWindowFactory() noexcept = default;
+
 		~IWindowFactory() noexcept = default;
 	};
 }
