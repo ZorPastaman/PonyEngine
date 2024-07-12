@@ -11,7 +11,7 @@
 
 import <string>;
 
-import PonyEngine.Window.Windows.Factories;
+import PonyEngine.Window.Windows.Factory;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

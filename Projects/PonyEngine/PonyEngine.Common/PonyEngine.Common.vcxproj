@@ -13,6 +13,7 @@
   <ItemGroup>
     <ClInclude Include="Include\Public\PonyEngine\Compiler\Linking.h" />
     <ClInclude Include="Include\Public\PonyEngine\Compiler\Optimization.h" />
+    <ClInclude Include="Include\Public\PonyEngine\Platform\Windows\Framework.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
