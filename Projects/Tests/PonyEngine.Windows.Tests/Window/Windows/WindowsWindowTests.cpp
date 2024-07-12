@@ -21,7 +21,7 @@ import PonyEngine.Log;
 import PonyEngine.Log.Implementation;
 import PonyEngine.Window;
 import PonyEngine.Window.Windows;
-import PonyEngine.Window.Windows.Factories;
+import PonyEngine.Window.Windows.Factory;
 import PonyEngine.Window.Windows.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

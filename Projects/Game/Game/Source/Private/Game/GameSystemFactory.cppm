@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/LogMacro.h"
+#include "PonyEngine/Log/EngineLog.h"
 
 export module Game.Implementation:GameSystemFactory;
 

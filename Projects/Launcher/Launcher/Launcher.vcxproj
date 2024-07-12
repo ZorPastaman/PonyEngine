@@ -11,18 +11,56 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Launcher\EngineLoop.cppm" />
-    <ClCompile Include="Source\Public\Launcher\ILoopElement.cppm" />
-    <ClCompile Include="Source\Public\Launcher\ISystemFactoriesProvider.cppm" />
-    <ClCompile Include="Source\Public\Launcher\Launcher.cppm" />
-    <ClCompile Include="Source\Public\Launcher\Loop.cppm" />
+    <ClCompile Include="Source\WindowsMain.cpp" />
+    <ClCompile Include="Source\Private\Launcher\EngineLoop.cppm" />
+    <ClCompile Include="Source\Private\Launcher\ILoopElement.cppm" />
+    <ClCompile Include="Source\Private\Launcher\ISystemFactoriesProvider.cppm" />
+    <ClCompile Include="Source\Private\Launcher\Launcher.cppm" />
+    <ClCompile Include="Source\Private\Launcher\Loop.cppm" />
+    <ClCompile Include="Source\Private\Launcher.Windows\Launcher.Windows.cppm" />
+    <ClCompile Include="Source\Private\Launcher.Windows\LoggerProvider.cppm" />
+    <ClCompile Include="Source\Private\Launcher.Windows\SystemFactoriesProvider.cppm" />
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoop.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.API\PonyEngine.API.vcxproj">
-      <Project>{63697fec-e0a2-44f9-abf3-57a83cca3350}</Project>
+    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game.API\Game.API.vcxproj">
+      <Project>{99fdb484-32aa-4b54-8136-4e3ae086a989}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine\PonyEngine.vcxproj">
-      <Project>{d35c7778-7993-437b-b2d1-9e97f128947e}</Project>
+    <ProjectReference Include="$(SolutionDir)\Projects\Game\Game\Game.vcxproj">
+      <Project>{4eefcb24-aa26-40a6-8ab1-ed3682ae0223}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
+      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
+      <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core\PonyEngine.Core.vcxproj">
+      <Project>{0aebf801-c59e-408a-bea2-d3582d7db3f2}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj">
+      <Project>{245050d3-3c78-445c-89b1-9972e3fcc379}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
+      <Project>{7f22adbe-2c5a-44be-b885-c2d041337190}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">
+      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log\PonyEngine.Log.vcxproj">
+      <Project>{260938ca-8a73-40f8-ab77-d1a2295e8fd9}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
+      <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
+      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
+      <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>
+    </ProjectReference>
+    <ProjectReference Include="..\..\PonyEngine\PonyEngine.Window\PonyEngine.Window.vcxproj">
+      <Project>{6f7c3d39-fd6c-447b-9191-a401efdffc08}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -34,13 +72,13 @@
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <ConfigurationType>Application</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>

@@ -15,19 +15,34 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Launcher\Launcher.cppm">
+    <ClCompile Include="Source\Private\Launcher\Launcher.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\ILoopElement.cppm">
+    <ClCompile Include="Source\Private\Launcher\ILoopElement.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\Loop.cppm">
+    <ClCompile Include="Source\Private\Launcher\Loop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\EngineLoop.cppm">
+    <ClCompile Include="Source\Private\Launcher\EngineLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\ISystemFactoriesProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher\ISystemFactoriesProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\Launcher.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\LoggerProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\SystemFactoriesProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoop.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\WindowsMain.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

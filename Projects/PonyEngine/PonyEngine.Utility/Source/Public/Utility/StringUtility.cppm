@@ -10,7 +10,6 @@
 export module PonyEngine.StringUtility;
 
 import <algorithm>;
-import <ranges>;
 import <string>;
 
 export namespace PonyEngine::Utility
