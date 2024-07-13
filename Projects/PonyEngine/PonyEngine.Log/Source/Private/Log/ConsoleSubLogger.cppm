@@ -42,7 +42,7 @@ export namespace PonyEngine::Log
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Log::ConsoleSubLogger"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Log::ConsoleSubLogger"; ///< Class name.
 	};
 }
 
