@@ -10,6 +10,7 @@
 export module PonyEngine.Math:Transformations3D;
 
 import <cmath>;
+import <cstddef>;
 import <type_traits>;
 import <utility>;
 
