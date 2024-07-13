@@ -18,7 +18,6 @@ import <fstream>;
 import <iostream>;
 import <stdexcept>;
 import <string>;
-import <utility>;
 
 import PonyEngine.Log;
 
@@ -45,7 +44,7 @@ export namespace PonyEngine::Log
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Log::FileSubLogger"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Log::FileSubLogger"; ///< Class name.
 
 	private:
 		std::ofstream logFile; ///< log file stream.

@@ -51,7 +51,7 @@ export namespace PonyEngine::Log
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Log::Logger"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Log::Logger"; ///< Class name.
 
 	private:
 		std::vector<ISubLogger*> subLoggers; ///< Sub-loggers container.

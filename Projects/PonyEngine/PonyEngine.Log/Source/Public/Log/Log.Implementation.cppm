@@ -78,19 +78,19 @@ namespace PonyEngine::Log
 
 	void DestroyLogger(ILogger* const logger) noexcept
 	{
-		assert((dynamic_cast<Logger*>(logger) && "A logger of the wrong type is tried to be destroyed."));
+		assert((dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type."));
 		delete static_cast<Logger*>(logger);
 	}
 
 	void DestroyConsoleSubLogger(ISubLogger* const subLogger) noexcept
 	{
-		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) && "A console sub logger of the wrong type is tried to be destroyed."));
+		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
 		delete static_cast<ConsoleSubLogger*>(subLogger);
 	}
 
 	void DestroyFileSubLogger(ISubLogger* const subLogger) noexcept
 	{
-		assert((dynamic_cast<FileSubLogger*>(subLogger) && "A file sub logger of the wrong type is tried to be destroyed."));
+		assert((dynamic_cast<FileSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
 		delete static_cast<FileSubLogger*>(subLogger);
 	}
 }
