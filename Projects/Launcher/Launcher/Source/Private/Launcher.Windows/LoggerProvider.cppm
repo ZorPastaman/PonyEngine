@@ -49,8 +49,8 @@ export namespace Launcher
 
 		// Set all sub-loggers here.
 
-		PonyEngine::Log::SubLoggerUniquePtr consoleSubLogger; ///< Console sub-logger.
-		PonyEngine::Log::SubLoggerUniquePtr fileSubLogger; ///< File sub-logger.
+		PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger; ///< Console sub-logger.
+		PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger; ///< File sub-logger.
 	};
 }
 
