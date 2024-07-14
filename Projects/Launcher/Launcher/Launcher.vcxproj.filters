@@ -42,7 +42,7 @@
     <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\WindowsMain.cpp">
+    <ClCompile Include="Source\Main.Windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

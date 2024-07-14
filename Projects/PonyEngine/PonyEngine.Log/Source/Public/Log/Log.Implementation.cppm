@@ -16,7 +16,6 @@ module;
 export module PonyEngine.Log.Implementation;
 
 import <filesystem>;
-import <functional>;
 import <memory>;
 
 import PonyEngine.Log;
@@ -27,8 +26,33 @@ import :Logger;
 
 export namespace PonyEngine::Log
 {
-	using LoggerUniquePtr = std::unique_ptr<ILogger, std::function<void(ILogger*)>>; ///< Logger unique_ptr typedef.
-	using SubLoggerUniquePtr = std::unique_ptr<ISubLogger, std::function<void(ISubLogger*)>>; ///< Sub-logger unique_ptr typedef.
+	/// @brief Logger deleter.
+	struct PONY_DLL_EXPORT LoggerDeleter final
+	{
+		/// @brief Deletes the @p logger.
+		/// @param logger Logger to delete.
+		void operator ()(ILogger* logger) const noexcept;
+	};
+
+	/// @brief Console sub-logger deleter.
+	struct PONY_DLL_EXPORT ConsoleSubLoggerDeleter final
+	{
+		/// @brief Deletes the @p subLogger.
+		/// @param subLogger Console sub-logger to delete.
+		void operator ()(ISubLogger* subLogger) const noexcept;
+	};
+
+	/// @brief File sub-logger deleter.
+	struct PONY_DLL_EXPORT FileSubLoggerDeleter final
+	{
+		/// @brief Deletes the @p subLogger.
+		/// @param subLogger File sub-logger to delete.
+		void operator ()(ISubLogger* subLogger) const noexcept;
+	};
+
+	using LoggerUniquePtr = std::unique_ptr<ILogger, LoggerDeleter>; ///< Logger unique_ptr typedef.
+	using ConsoleSubLoggerUniquePtr = std::unique_ptr<ISubLogger, ConsoleSubLoggerDeleter>; ///< Console sub-logger unique_ptr typedef.
+	using FileSubLoggerUniquePtr = std::unique_ptr<ISubLogger, FileSubLoggerDeleter>; ///< File sub-logger unique_ptr typedef.
 
 	/// @brief Creates a logger.
 	/// @return Created logger.
@@ -38,13 +62,13 @@ export namespace PonyEngine::Log
 	/// @brief Creates a console sub-logger.
 	/// @return Created console sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT SubLoggerUniquePtr CreateConsoleSubLogger();
+	PONY_DLL_EXPORT ConsoleSubLoggerUniquePtr CreateConsoleSubLogger();
 
 	/// @brief Creates a file sub-logger with the @p path.
 	/// @param path Log file path.
 	/// @return Created file sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT SubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path);
+	PONY_DLL_EXPORT FileSubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path);
 }
 
 namespace PonyEngine::Log
@@ -61,19 +85,34 @@ namespace PonyEngine::Log
 	/// @param subLogger File sub-logger to destroy.
 	void DestroyFileSubLogger(ISubLogger* subLogger) noexcept;
 
+	void LoggerDeleter::operator ()(ILogger* const logger) const noexcept
+	{
+		DestroyLogger(logger);
+	}
+
+	void ConsoleSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
+	{
+		DestroyConsoleSubLogger(subLogger);
+	}
+
+	void FileSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
+	{
+		DestroyFileSubLogger(subLogger);
+	}
+
 	LoggerUniquePtr CreateLogger()
 	{
-		return std::unique_ptr<ILogger, std::function<void(ILogger*)>>(new Logger(), DestroyLogger);
+		return std::unique_ptr<ILogger, LoggerDeleter>(new Logger());
 	}
 
-	SubLoggerUniquePtr CreateConsoleSubLogger()
+	ConsoleSubLoggerUniquePtr CreateConsoleSubLogger()
 	{
-		return std::unique_ptr<ISubLogger, std::function<void(ISubLogger*)>>(new ConsoleSubLogger(), DestroyConsoleSubLogger);
+		return std::unique_ptr<ISubLogger, ConsoleSubLoggerDeleter>(new ConsoleSubLogger());
 	}
 
-	SubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path)
+	FileSubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path)
 	{
-		return std::unique_ptr<ISubLogger, std::function<void(ISubLogger*)>>(new FileSubLogger(path), DestroyFileSubLogger);
+		return std::unique_ptr<ISubLogger, FileSubLoggerDeleter>(new FileSubLogger(path));
 	}
 
 	void DestroyLogger(ILogger* const logger) noexcept
