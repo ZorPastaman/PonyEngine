@@ -24,7 +24,7 @@ import :InputSystem;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system factory.
-	class InputSystemFactory final : public IInputSystemFactory
+	class InputSystemFactory final : public IInputSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		InputSystemFactory() noexcept = default;
@@ -35,6 +35,7 @@ export namespace PonyEngine::Input
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
+		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
@@ -51,15 +52,17 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	/// @brief Destroys the input system factory.
-	/// @param system Input system factory to destroy.
-	void DestroyInputSystem(Core::ISystem* system) noexcept;
-
 	Core::SystemInfo InputSystemFactory::Create(Core::IEngine& engine)
 	{
 		const auto inputSystem = new InputSystem(engine);
 
-		return Core::SystemInfo::Create<InputSystem, IInputSystem>(inputSystem, DestroyInputSystem, true);
+		return Core::SystemInfo::Create<InputSystem, IInputSystem>(*inputSystem, *this, true);
+	}
+
+	void InputSystemFactory::Destroy(Core::ISystem* const system) noexcept
+	{
+		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
+		delete static_cast<InputSystem*>(system);
 	}
 
 	const char* InputSystemFactory::GetSystemName() const noexcept
@@ -70,11 +73,5 @@ namespace PonyEngine::Input
 	const char* InputSystemFactory::GetName() const noexcept
 	{
 		return StaticName;
-	}
-
-	void DestroyInputSystem(Core::ISystem* const system) noexcept
-	{
-		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<InputSystem*>(system);
 	}
 }

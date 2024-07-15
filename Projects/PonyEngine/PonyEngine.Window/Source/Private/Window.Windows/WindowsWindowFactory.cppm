@@ -23,6 +23,7 @@ import <stdexcept>;
 import <string>;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Input;
 import PonyEngine.StringUtility;
@@ -38,7 +39,7 @@ import :WindowsWindow;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window factory.
-	class WindowsWindowFactory final : public IWindowsWindowFactory
+	class WindowsWindowFactory final : public IWindowsWindowFactory, public Core::ISystemDestroyer
 	{
 	public:
 		/// @brief Creates a Windows window factory.
@@ -53,8 +54,7 @@ export namespace PonyEngine::Window
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
-		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept override;
+		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual WindowParams& NextWindowParams() noexcept override;
@@ -67,6 +67,9 @@ export namespace PonyEngine::Window
 		virtual const WindowsWindowParams& NextWindowsWindowParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual const char* GetSystemName() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept override;
 
 		WindowsWindowFactory& operator =(const WindowsWindowFactory&) = delete;
@@ -75,8 +78,6 @@ export namespace PonyEngine::Window
 		static constexpr const char* StaticName = "PonyEngine::Window::WindowsWindowFactory"; ///< Class name.
 
 	private:
-		void Destroy(Core::ISystem* system) const noexcept;		
-
 		WindowParams windowParams;
 		WindowsWindowParams windowsWindowParams;
 
@@ -160,10 +161,10 @@ namespace PonyEngine::Window
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		return Core::SystemInfo::Create<WindowsWindow, IWindow, IWindowsWindow, Input::IKeyboardProvider>(window, std::bind(&WindowsWindowFactory::Destroy, this, std::placeholders::_1), true);
+		return Core::SystemInfo::Create<WindowsWindow, IWindow, IWindowsWindow, Input::IKeyboardProvider>(*window, *this, true);
 	}
 
-	void WindowsWindowFactory::Destroy(Core::ISystem* const system) const noexcept
+	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept
 	{
 		assert((dynamic_cast<WindowsWindow*>(system) && "Tried to destroy a system of the wrong type."));
 		const auto windowsWindow = static_cast<WindowsWindow*>(system);
@@ -192,11 +193,6 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Windows window destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 	}
 
-	const char* WindowsWindowFactory::GetSystemName() const noexcept
-	{
-		return WindowsWindow::StaticName;
-	}
-
 	WindowParams& WindowsWindowFactory::NextWindowParams() noexcept
 	{
 		return windowParams;
@@ -215,6 +211,11 @@ namespace PonyEngine::Window
 	const WindowsWindowParams& WindowsWindowFactory::NextWindowsWindowParams() const noexcept
 	{
 		return windowsWindowParams;
+	}
+
+	const char* WindowsWindowFactory::GetSystemName() const noexcept
+	{
+		return WindowsWindow::StaticName;
 	}
 
 	const char* WindowsWindowFactory::GetName() const noexcept

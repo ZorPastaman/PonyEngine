@@ -88,13 +88,13 @@ export namespace PonyEngine::Core
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename Target, typename Source>
-		void AddObjectInterface(Source* object) requires(std::is_convertible_v<Source*, Target*>);
+		void AddObjectInterface(Source& object) requires(std::is_convertible_v<Source*, Target*>);
 		/// @brief Adds the interfaces.
 		/// @tparam Source Object source type.
 		/// @tparam Targets Interface types.
 		/// @param object Object source.
 		template<typename Source, typename... Targets>
-		void AddObjectInterfaces(Source* object) requires(std::is_convertible_v<Source*, Targets*> && ...);
+		void AddObjectInterfaces(Source& object) requires(std::is_convertible_v<Source*, Targets*> && ...);
 		/// @brief Gets the object interfaces.
 		/// @return Object interfaces iterator.
 		[[nodiscard("Pure function")]]
@@ -151,13 +151,13 @@ namespace PonyEngine::Core
 	}
 
 	template<typename Target, typename Source>
-	void ObjectInterfaces::AddObjectInterface(Source* const object) requires(std::is_convertible_v<Source*, Target*>)
+	void ObjectInterfaces::AddObjectInterface(Source& object) requires(std::is_convertible_v<Source*, Target*>)
 	{
-		AddObjectInterface(typeid(Target), static_cast<Target*>(object));
+		AddObjectInterface(typeid(Target), static_cast<Target*>(&object));
 	}
 
 	template<typename Source, typename... Targets>
-	void ObjectInterfaces::AddObjectInterfaces(Source* const object) requires(std::is_convertible_v<Source*, Targets*> && ...)
+	void ObjectInterfaces::AddObjectInterfaces(Source& object) requires(std::is_convertible_v<Source*, Targets*> && ...)
 	{
 		(AddObjectInterface<Targets, Source>(object),...);
 	}

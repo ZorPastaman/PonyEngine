@@ -10,6 +10,7 @@
 export module PonyEngine.Core.Factory;
 
 export import :EngineParams;
+export import :ISystemDestroyer;
 export import :ISystemFactory;
 export import :ObjectInterfaces;
 export import :SystemInfo;
