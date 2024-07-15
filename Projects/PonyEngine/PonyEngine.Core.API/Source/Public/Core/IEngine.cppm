@@ -56,9 +56,6 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual const char* GetName() const noexcept = 0;
 
-		/// @brief Ticks the engine.
-		virtual void Tick() = 0; // TODO: make tick function available only to the owner.
-
 		IEngine& operator =(const IEngine&) = delete;
 		IEngine& operator =(IEngine&&) = delete;
 
