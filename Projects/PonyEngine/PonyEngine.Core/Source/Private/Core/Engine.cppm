@@ -30,7 +30,7 @@ import :TimeManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class Engine final : public IEngine
+	class Engine final : public IAdvancedEngine
 	{
 	public:
 		/// @brief Creates an @p Engine with the @p params.
@@ -63,7 +63,7 @@ export namespace PonyEngine::Core
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Engine"; ///< Engine static name.
+		static constexpr auto StaticName = "PonyEngine::Engine"; ///< Engine static name.
 
 	private:
 		Log::ILogger* const logger; ///< Logger.
