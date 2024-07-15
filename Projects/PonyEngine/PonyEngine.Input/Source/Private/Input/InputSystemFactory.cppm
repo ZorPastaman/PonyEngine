@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
-import <functional>;
-
 import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Factory;
@@ -46,7 +44,7 @@ export namespace PonyEngine::Input
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
 	};
 }
 
