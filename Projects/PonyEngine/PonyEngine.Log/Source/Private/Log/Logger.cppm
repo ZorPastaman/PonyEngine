@@ -64,7 +64,7 @@ namespace PonyEngine::Log
 	{
 		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
 
-		const LogEntry logEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
+		const auto logEntry = LogEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{
@@ -81,7 +81,7 @@ namespace PonyEngine::Log
 
 	void Logger::LogException(const std::exception& exception, const LogInput& logInput) noexcept
 	{
-		const LogEntry logEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
+		const auto logEntry = LogEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{

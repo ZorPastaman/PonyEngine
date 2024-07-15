@@ -16,6 +16,7 @@ module;
 export module Game.Implementation:GameSystemFactory;
 
 import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
 import Game.Factory;
@@ -25,7 +26,7 @@ import :GameSystem;
 export namespace Game
 {
 	/// @brief Game system factory.
-	class GameSystemFactory final : public IGameSystemFactory
+	class GameSystemFactory final : public IGameSystemFactory, public PonyEngine::Core::ISystemDestroyer
 	{
 	public:
 		/// @brief Creates a game system factory.
@@ -39,6 +40,7 @@ export namespace Game
 
 		[[nodiscard("Pure function")]]
 		virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine& engine) override;
+		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
@@ -58,10 +60,6 @@ export namespace Game
 
 namespace Game
 {
-	/// @brief Destroys the game system.
-	/// @param system Game system to destroy.
-	void DestroyGameSystem(PonyEngine::Core::ISystem* system);
-
 	GameSystemFactory::GameSystemFactory(PonyEngine::Log::ILogger& logger) noexcept :
 		logger{&logger}
 	{
@@ -74,10 +72,16 @@ namespace Game
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
-		auto systemInfo = PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(gameSystem, DestroyGameSystem, true);
+		auto systemInfo = PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(*gameSystem, *this, true);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
 
 		return systemInfo;
+	}
+
+	void GameSystemFactory::Destroy(PonyEngine::Core::ISystem* const system) noexcept
+	{
+		assert((dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type."));
+		delete static_cast<GameSystem*>(system);
 	}
 
 	const char* GameSystemFactory::GetSystemName() const noexcept
@@ -88,11 +92,5 @@ namespace Game
 	const char* GameSystemFactory::GetName() const noexcept
 	{
 		return StaticName;
-	}
-
-	void DestroyGameSystem(PonyEngine::Core::ISystem* const system)
-	{
-		assert((dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<GameSystem*>(system);
 	}
 }
