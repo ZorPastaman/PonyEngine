@@ -94,16 +94,13 @@ namespace PonyEngine::Window
 	[[nodiscard("Pure function")]]
 	HCURSOR GetDefaultCursor();
 
-	/// @brief Empty function.
-	void Dummy();
-
 	WindowsWindowFactory::WindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams) :
 		windowParams(),
 		windowsWindowParams(),
 		logger{&logger},
 		hInstance{NULL}
 	{
-		if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&Dummy), &hInstance) || hInstance == NULL)
+		if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || hInstance == NULL)
 		{
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
@@ -231,9 +228,5 @@ namespace PonyEngine::Window
 		}
 
 		return cursor;
-	}
-
-	void Dummy()
-	{
 	}
 }
