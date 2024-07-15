@@ -18,18 +18,6 @@ export namespace PonyEngine::Window
 	/// @brief Windows window parameters.
 	struct WindowsWindowParams final
 	{
-		[[nodiscard("Pure constructor")]]
-		WindowsWindowParams() noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		WindowsWindowParams(const WindowsWindowParams& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		WindowsWindowParams(WindowsWindowParams&& other) noexcept = default;
-
-		~WindowsWindowParams() noexcept = default;
-
-		WindowsWindowParams& operator =(const WindowsWindowParams& other) noexcept = default;
-		WindowsWindowParams& operator =(WindowsWindowParams&& other) noexcept = default;
-
 		DWORD style; ///< Window style.
 		DWORD extendedStyle; ///< Extended window style.
 		int cmdShow = SW_NORMAL; ///< Window cmdShow.

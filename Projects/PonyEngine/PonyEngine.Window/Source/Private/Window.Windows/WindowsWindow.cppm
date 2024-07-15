@@ -80,7 +80,7 @@ export namespace PonyEngine::Window
 		WindowsWindow& operator =(const WindowsWindow&) = delete;
 		WindowsWindow& operator =(WindowsWindow&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Window::WindowsWindow"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Window::WindowsWindow"; ///< Class name.
 
 	private:
 		/// @brief Responds to a destroy message.
@@ -207,7 +207,7 @@ namespace PonyEngine::Window
 		return hWnd;
 	}
 
-	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver)
+	void WindowsWindow::AddKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
 	{
 		assert((keyboardMessageObserver && "The observer is nullptr."));
 		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer is already added."));
@@ -217,7 +217,7 @@ namespace PonyEngine::Window
 		PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer added.");
 	}
 
-	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver)
+	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
 	{
 		PONY_LOG_IF(keyboardMessageObserver == nullptr, engine, Log::LogType::Warning, "Tried to remove a nullptr keyboard message observer.");
 
@@ -273,7 +273,7 @@ namespace PonyEngine::Window
 	{
 		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
 		{
-			const Input::KeyboardMessage keyboardMessage(keyCode, isDown);
+			const auto keyboardMessage = Input::KeyboardMessage(keyCode, isDown);
 			PONY_LOG(engine, Log::LogType::Verbose, std::format("Push a keyboard message '{}' to the observers.", keyboardMessage.ToString()).c_str());
 
 			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
