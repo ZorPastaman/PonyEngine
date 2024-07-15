@@ -43,6 +43,13 @@ export namespace PonyEngine::Input
 	private:
 		std::size_t id; ///< Unique event ID.
 	};
+
+	/// @brief Handle hash struct.
+	struct HandleHash final
+	{
+		[[nodiscard("Pure operator")]]
+		std::size_t operator ()(const Handle& handle) const noexcept;
+	};
 }
 
 namespace PonyEngine::Input
@@ -56,17 +63,9 @@ namespace PonyEngine::Input
 	{
 		return id;
 	}
-}
 
-/// @brief Handle hash struct.
-export template<>
-struct std::hash<PonyEngine::Input::Handle> final
-{
-	[[nodiscard("Pure operator")]]
-	std::size_t operator ()(const PonyEngine::Input::Handle& handle) const noexcept;
-};
-
-std::size_t std::hash<PonyEngine::Input::Handle>::operator ()(const PonyEngine::Input::Handle& handle) const noexcept
-{
-	return handle.GetId();
+	std::size_t HandleHash::operator ()(const Handle& handle) const noexcept
+	{
+		return handle.GetId();
+	}
 }

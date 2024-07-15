@@ -16,6 +16,7 @@ export module PonyEngine.Input.Implementation:InputSystem;
 import <format>;
 import <functional>;
 import <queue>;
+import <string>;
 import <unordered_map>;
 import <utility>;
 
@@ -55,10 +56,10 @@ export namespace PonyEngine::Input
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Input::InputSystem";
+		static constexpr auto StaticName = "PonyEngine::Input::InputSystem"; ///< Class name.
 
 	private:
-		std::unordered_map<Handle, std::pair<Event, std::function<void()>>> events; ///< Input event action map.
+		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
 		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
 		std::queue<KeyboardMessage> queue; ///< Message queue.
 		std::unordered_map<KeyboardKeyCode, bool> keyStates;

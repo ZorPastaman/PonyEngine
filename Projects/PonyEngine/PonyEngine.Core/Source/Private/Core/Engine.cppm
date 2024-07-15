@@ -63,7 +63,7 @@ export namespace PonyEngine::Core
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Engine"; ///< Engine static name.
+		static constexpr auto StaticName = "PonyEngine::Engine"; ///< Class name.
 
 	private:
 		Log::ILogger* const logger; ///< Logger.
