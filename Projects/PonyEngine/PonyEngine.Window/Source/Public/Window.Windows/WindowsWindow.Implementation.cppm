@@ -15,7 +15,6 @@ module;
 
 export module PonyEngine.Window.Windows.Implementation;
 
-import <functional>;
 import <memory>;
 
 import PonyEngine.Log;
@@ -25,7 +24,15 @@ import :WindowsWindowFactory;
 
 export namespace PonyEngine::Window
 {
-	using WindowsWindowUniquePtr = std::unique_ptr<IWindowsWindowFactory, std::function<void(IWindowsWindowFactory*)>>; ///< Windows window factory unique_ptr typedef.
+	/// @brief Windows window factory deleter.
+	struct PONY_DLL_EXPORT WindowsWindowFactoryDeleter final
+	{
+		/// @brief Deletes the @p factory.
+		/// @param factory Windows window factory to delete.
+		void operator ()(IWindowsWindowFactory* factory) const noexcept;
+	};
+
+	using WindowsWindowUniquePtr = std::unique_ptr<IWindowsWindowFactory, WindowsWindowFactoryDeleter>; ///< Windows window factory unique_ptr typedef.
 
 	/// @brief Creates a Windows window factory.
 	/// @param logger Logger.
@@ -42,9 +49,14 @@ namespace PonyEngine::Window
 	/// @param factory Windows window factory to destroy.
 	void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
 
+	void WindowsWindowFactoryDeleter::operator ()(IWindowsWindowFactory* const factory) const noexcept
+	{
+		DestroyWindowsWindowFactory(factory);
+	}
+
 	WindowsWindowUniquePtr CreateWindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams)
 	{
-		return std::unique_ptr<IWindowsWindowFactory, std::function<void(IWindowsWindowFactory*)>>(new WindowsWindowFactory(logger, classParams), DestroyWindowsWindowFactory);
+		return std::unique_ptr<IWindowsWindowFactory, WindowsWindowFactoryDeleter>(new WindowsWindowFactory(logger, classParams));
 	}
 
 	void DestroyWindowsWindowFactory(IWindowsWindowFactory* const factory) noexcept

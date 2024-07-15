@@ -20,18 +20,6 @@ export namespace PonyEngine::Window
 	/// @brief Window parameters.
 	struct CreateWindowParams final
 	{
-		[[nodiscard("Pure constructor")]]
-		CreateWindowParams() = default;
-		[[nodiscard("Pure constructor")]]
-		CreateWindowParams(const CreateWindowParams& other) = default;
-		[[nodiscard("Pure constructor")]]
-		CreateWindowParams(CreateWindowParams&& other) = default;
-
-		~CreateWindowParams() noexcept = default;
-
-		CreateWindowParams& operator =(const CreateWindowParams& other) = default;
-		CreateWindowParams& operator =(CreateWindowParams&& other) = default;
-
 		std::wstring title; ///< Window title.
 		DWORD style; ///< Window style.
 		DWORD extendedStyle; ///< Extended window style.

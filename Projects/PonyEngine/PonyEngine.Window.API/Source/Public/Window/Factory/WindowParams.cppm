@@ -13,18 +13,9 @@ import <string>;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Window parameters.
+	/// @brief Platform-independent window parameters.
 	struct WindowParams final
 	{
-		WindowParams() noexcept = default;
-		WindowParams(const WindowParams& other) = default;
-		WindowParams(WindowParams&& other) noexcept = default;
-
-		~WindowParams() noexcept = default;
-
-		WindowParams& operator =(const WindowParams& other) = default;
-		WindowParams& operator =(WindowParams&& other) noexcept = default;
-
 		std::wstring title; ///< Window title.
 		int horizontalPosition; ///< Window horizontal position.
 		int verticalPosition; ///< Window vertical position.

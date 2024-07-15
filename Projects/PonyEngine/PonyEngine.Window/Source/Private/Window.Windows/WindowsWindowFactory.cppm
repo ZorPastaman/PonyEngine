@@ -18,7 +18,6 @@ export module PonyEngine.Window.Windows.Implementation:WindowsWindowFactory;
 
 import <exception>;
 import <format>;
-import <functional>;
 import <stdexcept>;
 import <string>;
 
@@ -75,11 +74,11 @@ export namespace PonyEngine::Window
 		WindowsWindowFactory& operator =(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory& operator =(WindowsWindowFactory&&) = delete;
 
-		static constexpr const char* StaticName = "PonyEngine::Window::WindowsWindowFactory"; ///< Class name.
+		static constexpr auto StaticName = "PonyEngine::Window::WindowsWindowFactory"; ///< Class name.
 
 	private:
-		WindowParams windowParams;
-		WindowsWindowParams windowsWindowParams;
+		WindowParams windowParams; ///< Platform-independent window parameters.
+		WindowsWindowParams windowsWindowParams; ///< Windows window parameters.
 
 		Log::ILogger* logger; ///< Logger.
 
