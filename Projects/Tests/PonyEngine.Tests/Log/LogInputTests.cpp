@@ -22,10 +22,10 @@ namespace Log
 	public:
 		TEST_METHOD(ConstructorTest)
 		{
-			const char* const message = "Message.";
-			const std::size_t frame = 106850;
+			const auto message = "Message.";
+			constexpr std::size_t frame = 106850;
 
-			const PonyEngine::Log::LogInput logInput(message, frame);
+			const auto logInput = PonyEngine::Log::LogInput(message, frame);
 			Assert::AreEqual(message, logInput.GetMessage());
 			Assert::AreEqual(frame, logInput.GetFrameCount());
 		}

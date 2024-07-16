@@ -11,7 +11,7 @@
 
 import <string>;
 
-import PonyEngine.Utility;
+import PonyEngine.StringUtility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -22,10 +22,10 @@ namespace Utility
 	public:
 		TEST_METHOD(ConvertWStringToStringTest)
 		{
-			std::string origin("Pony. Engine, Convert- String!");
-			std::wstring wideOrigin(origin.cbegin(), origin.cend());
+			const auto origin = std::string("Pony. Engine, Convert- String!");
+			const auto wideOrigin = std::wstring(origin.cbegin(), origin.cend());
 
-			std::string converted = PonyEngine::Utility::ConvertToString(wideOrigin);
+			const std::string converted = PonyEngine::Utility::ConvertToString(wideOrigin);
 			Assert::AreEqual(0, origin.compare(converted));
 		}
 	};

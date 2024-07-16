@@ -24,33 +24,33 @@ namespace Log
 {
 	TEST_CLASS(FileSubLoggerTests)
 	{
-		const std::filesystem::path testLogPath = "TestLog.log";
+		std::filesystem::path testLogPath = "TestLog.log";
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
-			Assert::IsNotNull(fileSubLogger);
-			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
+			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			Assert::IsNotNull(fileSubLogger.get());
+			fileSubLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
 			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger->GetName());
-			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
+			fileSubLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(LogTest)
 		{
-			PonyEngine::Log::ISubLogger* const fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
-			const char* const message = "Message!";
-			const std::chrono::time_point<std::chrono::system_clock> timePoint(std::chrono::seconds(5691338));
-			const std::size_t frameCount = 84136;
-			const PonyEngine::Log::LogEntry infoLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Info);
+			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			const auto message = "Message!";
+			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(5691338));
+			constexpr std::size_t frameCount = 84136;
+			const auto infoLogEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Info);
 			fileSubLogger->Log(infoLogEntry);
-			PonyEngine::Log::DestroyFileSubLogger(fileSubLogger);
+			fileSubLogger.reset();
 
 			std::ifstream logFile(testLogPath);
 			std::string line;
