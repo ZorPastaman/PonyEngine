@@ -34,22 +34,22 @@ namespace Log
 
 		TEST_METHOD(LogicalOperatorsTest)
 		{
-			const PonyEngine::Log::LogType orLogType = PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning | PonyEngine::Log::LogType::Exception;
+			constexpr auto orLogType = PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning | PonyEngine::Log::LogType::Exception;
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(42), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(orLogType));
 
-			const PonyEngine::Log::LogType andLogType = (PonyEngine::Log::LogType::Verbose | PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning) & orLogType;
+			constexpr auto andLogType = (PonyEngine::Log::LogType::Verbose | PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning) & orLogType;
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(10), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(andLogType));
 
-			const PonyEngine::Log::LogType xorLogType = (PonyEngine::Log::LogType::Verbose | PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning) ^ orLogType;
+			constexpr auto xorLogType = (PonyEngine::Log::LogType::Verbose | PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning) ^ orLogType;
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(33), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(xorLogType));
 
-			const PonyEngine::Log::LogType complementLogType = ~orLogType;
+			constexpr PonyEngine::Log::LogType complementLogType = ~orLogType;
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(21), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(complementLogType));
 		}
 
 		TEST_METHOD(ToStringTest)
 		{
-			const PonyEngine::Log::LogType logType = PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning | PonyEngine::Log::LogType::Exception;
+			constexpr auto logType = PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning | PonyEngine::Log::LogType::Exception;
 			std::string string = PonyEngine::Log::ToString(logType);
 			Assert::AreEqual("Debug | Warning | Exception", string.c_str());
 
