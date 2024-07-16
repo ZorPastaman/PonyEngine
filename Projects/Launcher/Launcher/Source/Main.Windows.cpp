@@ -10,7 +10,6 @@
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-import <array>;
 import <format>;
 import <iostream>;
 
@@ -19,12 +18,12 @@ import PonyEngine.Log;
 import Launcher;
 import Launcher.Windows;
 
-int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const LPWSTR lpCmdLine, const int nCmdShow)
+int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const LPWSTR lpCmdLine, const int nShowCmd)
 {
 	UNREFERENCED_PARAMETER(hInstance);
 	UNREFERENCED_PARAMETER(hPrevInstance);
 	UNREFERENCED_PARAMETER(lpCmdLine);
-	UNREFERENCED_PARAMETER(nCmdShow);
+	UNREFERENCED_PARAMETER(nShowCmd);
 
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a logger provider");
 	const auto loggerProvider = Launcher::LoggerProvider();

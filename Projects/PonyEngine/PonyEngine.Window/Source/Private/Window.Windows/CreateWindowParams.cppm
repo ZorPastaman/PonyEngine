@@ -27,6 +27,6 @@ export namespace PonyEngine::Window
 		int verticalPosition; ///< Vertical window position.
 		int width; ///< Window width.
 		int height; ///< Window height.
-		int cmdShow; ///< Window cmdShow.
+		int cmdShow; ///< Window showCmd.
 	};
 }

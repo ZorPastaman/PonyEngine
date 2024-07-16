@@ -149,7 +149,7 @@ namespace PonyEngine::Window
 		createWindowParams.verticalPosition = windowParams.verticalPosition;
 		createWindowParams.width = windowParams.width;
 		createWindowParams.height = windowParams.height;
-		createWindowParams.cmdShow = windowsWindowParams.cmdShow;
+		createWindowParams.cmdShow = windowsWindowParams.showCmd;
 
 		const auto window = new WindowsWindow(engine, hInstance, classAtom, createWindowParams);
 		const HWND hWnd = window->GetWindowHandle();

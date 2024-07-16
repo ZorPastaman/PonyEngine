@@ -28,7 +28,7 @@ export namespace PonyEngine::Window
 		/// @brief Gets the window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* GetTitle() const = 0;
+		virtual const wchar_t* GetTitle() const noexcept = 0;
 		/// @brief Sets the window title.
 		/// @param title Window title to set.
 		virtual void SetTitle(const wchar_t* title) = 0;

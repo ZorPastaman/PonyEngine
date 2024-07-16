@@ -15,7 +15,6 @@ module;
 
 export module Game.Implementation;
 
-import <functional>;
 import <memory>;
 
 import PonyEngine.Log;
@@ -24,7 +23,15 @@ import :GameSystemFactory;
 
 export namespace Game
 {
-	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>; ///< Game system factory unique_ptr typedef.
+	/// @brief Game system factory deleter.
+	struct PONY_DLL_EXPORT GameSystemFactoryDeleter final
+	{
+		/// @brief Deletes the @p factory.
+		/// @param factory Game system factory to delete.
+		void operator ()(IGameSystemFactory* factory) const noexcept;
+	};
+
+	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, GameSystemFactoryDeleter>; ///< Game system factory unique_ptr typedef.
 
 	/// @brief Creates a game system factory.
 	/// @param logger Logger to use.
@@ -39,14 +46,19 @@ namespace Game
 	/// @param factory Game system factory to destroy.
 	void DestroyGameSystemFactory(IGameSystemFactory* factory) noexcept;
 
+	void GameSystemFactoryDeleter::operator ()(IGameSystemFactory* const factory) const noexcept
+	{
+		DestroyGameSystemFactory(factory);
+	}
+
 	GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger)
 	{
-		return std::unique_ptr<IGameSystemFactory, std::function<void(IGameSystemFactory*)>>(new GameSystemFactory(logger), DestroyGameSystemFactory);
+		return std::unique_ptr<IGameSystemFactory, GameSystemFactoryDeleter>(new GameSystemFactory(logger));
 	}
 
 	void DestroyGameSystemFactory(IGameSystemFactory* const factory) noexcept
 	{
-		assert((dynamic_cast<GameSystemFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
+		assert((dynamic_cast<GameSystemFactory*>(factory) && "Tried to destroy a game system factory of the wrong type."));
 		delete static_cast<GameSystemFactory*>(factory);
 	}
 }
