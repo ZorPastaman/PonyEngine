@@ -66,8 +66,8 @@ export namespace PonyEngine::Window
 		virtual const wchar_t* GetTitle() const noexcept override;
 		virtual void SetTitle(const wchar_t* title) override;
 
-		virtual void ShowWindow() override;
-		virtual void HideWindow() override;
+		virtual void ShowWindow() noexcept override;
+		virtual void HideWindow() noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND GetWindowHandle() const noexcept override;
@@ -192,12 +192,12 @@ namespace PonyEngine::Window
 		this->title = title;
 	}
 
-	void WindowsWindow::ShowWindow()
+	void WindowsWindow::ShowWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_SHOW);
 	}
 
-	void WindowsWindow::HideWindow()
+	void WindowsWindow::HideWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_HIDE);
 	}

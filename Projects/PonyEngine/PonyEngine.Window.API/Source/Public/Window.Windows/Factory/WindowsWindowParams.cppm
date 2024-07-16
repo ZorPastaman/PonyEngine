@@ -20,6 +20,6 @@ export namespace PonyEngine::Window
 	{
 		DWORD style; ///< Window style.
 		DWORD extendedStyle; ///< Extended window style.
-		int cmdShow = SW_NORMAL; ///< Window cmdShow.
+		int showCmd = SW_NORMAL; ///< Window showCmd.
 	};
 }
