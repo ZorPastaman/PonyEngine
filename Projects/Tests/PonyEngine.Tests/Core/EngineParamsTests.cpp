@@ -93,6 +93,7 @@ namespace Core
 			EmptyLogger logger;
 			const auto engineParams = PonyEngine::Core::EngineParams(logger);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
+			Assert::IsTrue(engineParams.GetSystemFactories().IsEnd());
 		}
 
 		TEST_METHOD(GetSystemFactoriesTest)

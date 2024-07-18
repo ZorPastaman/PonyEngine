@@ -10,6 +10,7 @@
 export module Launcher;
 
 export import :EngineLoop;
+export import :EngineSettings;
 export import :ILoopElement;
 export import :ISystemFactoriesProvider;
 export import :Loop;

@@ -256,5 +256,31 @@ namespace Core
 				Assert::AreEqual(i + 1, engine->GetTimeManager().GetFrameCount());
 			}
 		}
+
+		TEST_METHOD(GetSetFrameTimeRate)
+		{
+			EmptyLogger logger;
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameTime(0.16f);
+			Assert::AreEqual(0.16f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(1.f / 0.16f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameTime(0.f);
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameRate(90.f);
+			Assert::AreEqual(1.f / 90.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(90.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameRate(0.f);
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+		}
 	};
 } 

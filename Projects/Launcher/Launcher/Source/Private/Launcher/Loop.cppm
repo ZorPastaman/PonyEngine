@@ -50,6 +50,11 @@ namespace Launcher
 
 	bool IsValid(const std::initializer_list<ILoopElement*> loopElements) noexcept
 	{
+		if (loopElements.size() == 0)
+		{
+			return false;
+		}
+
 		for (const ILoopElement* const loopElement : loopElements)
 		{
 			if (!loopElement)
