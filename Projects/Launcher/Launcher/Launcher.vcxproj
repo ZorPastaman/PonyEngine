@@ -12,7 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.Windows.cpp" />
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsEngineSettings.cppm" />
     <ClCompile Include="Source\Private\Launcher\EngineLoop.cppm" />
+    <ClCompile Include="Source\Private\Launcher\EngineSettings.cppm" />
     <ClCompile Include="Source\Private\Launcher\ILoopElement.cppm" />
     <ClCompile Include="Source\Private\Launcher\ISystemFactoriesProvider.cppm" />
     <ClCompile Include="Source\Private\Launcher\Launcher.cppm" />

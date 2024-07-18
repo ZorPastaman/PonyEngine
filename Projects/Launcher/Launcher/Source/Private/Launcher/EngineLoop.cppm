@@ -20,6 +20,7 @@ import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 
+import :EngineSettings;
 import :ILoopElement;
 import :ISystemFactoriesProvider;
 
@@ -32,8 +33,9 @@ export namespace Launcher
 		/// @brief Creates an engine loop.
 		/// @param logger Logger to use.
 		/// @param systemFactoriesProvider Engine system factories provider.
+		/// @param engineSettings Engine settings.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider);
+		EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -52,7 +54,7 @@ export namespace Launcher
 
 namespace Launcher
 {
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider) :
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings) :
 		logger{&logger}
 	{
 		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine params.");
@@ -65,6 +67,10 @@ namespace Launcher
 		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine.");
 		engine = PonyEngine::Core::CreateEngine(engineParams);
 		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine created.");
+
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
+		engine->GetTimeManager().SetTargetFrameRate(engineSettings.targetFrameRate);
+		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
 	}
 
 	EngineLoop::~EngineLoop() noexcept

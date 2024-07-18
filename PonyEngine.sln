@@ -1,45 +1,44 @@
-﻿
-Microsoft Visual Studio Solution File, Format Version 12.00
+﻿Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.8.34316.72
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Launcher", "Projects\Launcher\Launcher\Launcher.vcxproj", "{7E5B9125-F55A-48D9-8458-B961A4EACE9A}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game.API", "Projects\Game\Game.API\Game.API.vcxproj", "{99FDB484-32AA-4B54-8136-4E3AE086A989}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game", "Projects\Game\Game\Game.vcxproj", "{4EEFCB24-AA26-40A6-8AB1-ED3682AE0223}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Tests", "Projects\Tests\PonyEngine.Tests\PonyEngine.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{B548428F-A26F-4FD5-9587-45D3CB54C39D}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Launcher", "Launcher", "{783A37A8-7A26-4D83-9E23-76352BCFCDAD}"
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43F91669-3F87-4CB1-BA38-E3D973C07263}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj", "{81AFF359-6732-4EF1-9BE8-6A808B784245}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Game.API", "Projects\Game\Game.API\Game.API.vcxproj", "{99FDB484-32AA-4B54-8136-4E3AE086A989}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Common", "Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj", "{DDE9FC95-F61B-4C75-87BB-AA10CD7DC4FA}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Utility", "Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj", "{B3E69E98-B5F5-443C-A9E1-99E775557C81}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Window.API", "Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj", "{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input.API", "Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj", "{245050D3-3C78-445C-89B1-9972E3FCC379}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input", "Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj", "{7F22ADBE-2C5A-44BE-B885-C2D041337190}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Core", "Projects\PonyEngine\PonyEngine.Core\PonyEngine.Core.vcxproj", "{0AEBF801-C59E-408A-BEA2-D3582D7DB3F2}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Core.API", "Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj", "{00A276D2-91E6-4EF6-9380-BE06AD925D61}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Core", "Projects\PonyEngine\PonyEngine.Core\PonyEngine.Core.vcxproj", "{0AEBF801-C59E-408A-BEA2-D3582D7DB3F2}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input", "Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj", "{7F22ADBE-2C5A-44BE-B885-C2D041337190}"
 EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Log.API", "Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj", "{8B6B1B01-CBC6-414D-B455-0BB7ABEDAE4C}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input.API", "Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj", "{245050D3-3C78-445C-89B1-9972E3FCC379}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Log", "Projects\PonyEngine\PonyEngine.Log\PonyEngine.Log.vcxproj", "{260938CA-8A73-40F8-AB77-D1A2295E8FD9}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PonyEngine", "PonyEngine", "{EDA4A489-53F7-482E-A9A8-D078EF8625A6}"
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Log.API", "Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj", "{8B6B1B01-CBC6-414D-B455-0BB7ABEDAE4C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Math", "Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj", "{81AFF359-6732-4EF1-9BE8-6A808B784245}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Utility", "Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj", "{B3E69E98-B5F5-443C-A9E1-99E775557C81}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Window", "Projects\PonyEngine\PonyEngine.Window\PonyEngine.Window.vcxproj", "{6F7C3D39-FD6C-447B-9191-A401EFDFFC08}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Window.API", "Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj", "{0A2CF7D6-506C-405F-AFAA-B045AD0FA2A6}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Tests", "Projects\Tests\PonyEngine.Tests\PonyEngine.Tests.vcxproj", "{4A46DDED-881E-4A6E-9874-2EBFB1A9CE50}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Launcher", "Launcher", "{783A37A8-7A26-4D83-9E23-76352BCFCDAD}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{B548428F-A26F-4FD5-9587-45D3CB54C39D}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "PonyEngine", "PonyEngine", "{EDA4A489-53F7-482E-A9A8-D078EF8625A6}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43F91669-3F87-4CB1-BA38-E3D973C07263}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

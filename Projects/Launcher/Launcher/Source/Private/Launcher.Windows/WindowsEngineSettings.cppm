@@ -7,19 +7,25 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Factory:WindowParams;
+export module Launcher.Windows:WindowsEngineSettings;
 
-import <string>;
+import Launcher;
 
-export namespace PonyEngine::Window
+export namespace Launcher
 {
-	/// @brief Platform-independent window parameters.
-	struct WindowParams final
+	/// @brief Gets the engine settings.
+	/// @return Engine settings.
+	[[nodiscard("Pure function")]]
+	EngineSettings GetEngineSettings() noexcept;
+}
+
+namespace Launcher
+{
+	EngineSettings GetEngineSettings() noexcept
 	{
-		std::wstring title; ///< Window title.
-		int horizontalPosition; ///< Window horizontal position.
-		int verticalPosition; ///< Window vertical position.
-		int width = 800; ///< Window width.
-		int height = 600; ///< Window height.
-	};
+		auto settings = EngineSettings();
+		settings.targetFrameRate = 165.f;
+
+		return settings;
+	}
 }

@@ -23,10 +23,10 @@ export namespace PonyEngine::Window
 		std::wstring title; ///< Window title.
 		DWORD style; ///< Window style.
 		DWORD extendedStyle; ///< Extended window style.
-		int horizontalPosition; ///< Horizontal window position.
-		int verticalPosition; ///< Vertical window position.
-		int width; ///< Window width.
-		int height; ///< Window height.
-		int cmdShow; ///< Window showCmd.
+		int horizontalPosition = CW_USEDEFAULT; ///< Horizontal window position.
+		int verticalPosition = CW_USEDEFAULT; ///< Vertical window position.
+		int width = CW_USEDEFAULT; ///< Window width.
+		int height = CW_USEDEFAULT; ///< Window height.
+		int cmdShow = SW_SHOWDEFAULT; ///< Window showCmd.
 	};
 }
