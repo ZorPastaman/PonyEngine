@@ -91,9 +91,26 @@ namespace Core
 		TEST_METHOD(ContructorTest)
 		{
 			EmptyLogger logger;
-			const auto engineParams = PonyEngine::Core::EngineParams(logger);
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
-			Assert::IsTrue(engineParams.GetSystemFactories().IsEnd());
+
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+			const auto copiedParams = engineParams;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&copiedParams.GetLogger()));
+			auto factories = copiedParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
+			++factories;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
+
+			const auto movedParams = std::move(engineParams);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&movedParams.GetLogger()));
+			factories = movedParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
+			++factories;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
 		}
 
 		TEST_METHOD(GetSystemFactoriesTest)
@@ -119,6 +136,140 @@ namespace Core
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemFactory*>(&factory2)), reinterpret_cast<std::uintptr_t>(&*it));
 			Assert::IsFalse(it.IsEnd());
 			Assert::IsTrue((++it).IsEnd());
+		}
+
+		TEST_METHOD(AssignmentTest)
+		{
+			EmptyLogger logger;
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+
+			EmptyLogger otherLogger;
+			auto otherParams = PonyEngine::Core::EngineParams(otherLogger);
+			EmptySystemFactory factory2;
+			EmptySystemFactory factory3;
+			otherParams.AddSystemFactory(factory2);
+			otherParams.AddSystemFactory(factory3);
+
+			auto anotherParams = otherParams;
+
+			otherParams = engineParams;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&otherParams.GetLogger()));
+			auto factories = otherParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
+			++factories;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
+
+			otherParams = std::move(anotherParams);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&otherLogger)), reinterpret_cast<std::uintptr_t>(&otherParams.GetLogger()));
+			factories = otherParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory2), reinterpret_cast<std::uintptr_t>(&*factories));
+			++factories;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory3), reinterpret_cast<std::uintptr_t>(&*factories));
+		}
+
+		TEST_METHOD(IteratorTest)
+		{
+			EmptyLogger logger;
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
+			Assert::IsTrue(engineParams.GetSystemFactories().IsEnd());
+
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+			auto factories = engineParams.GetSystemFactories();
+			Assert::IsFalse(factories.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
+			++factories;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
+			factories++;
+			Assert::IsTrue(factories.IsEnd());
+		}
+
+		TEST_METHOD(IteratorConstructorTest)
+		{
+			EmptyLogger logger;
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+			auto iterator = engineParams.GetSystemFactories();
+
+			auto copiedIterator = iterator;
+			Assert::IsFalse(copiedIterator.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*copiedIterator));
+			++copiedIterator;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*copiedIterator));
+			++copiedIterator;
+			Assert::IsTrue(copiedIterator.IsEnd());
+
+			auto movedIterator = std::move(iterator);
+			Assert::IsFalse(movedIterator.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*movedIterator));
+			++movedIterator;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*movedIterator));
+			++movedIterator;
+			Assert::IsTrue(movedIterator.IsEnd());
+		}
+
+		TEST_METHOD(IteratorAssignmentTest)
+		{
+			EmptyLogger logger;
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+			auto iterator = engineParams.GetSystemFactories();
+
+			EmptyLogger otherLogger;
+			auto otherParams = PonyEngine::Core::EngineParams(otherLogger);
+			EmptySystemFactory factory2;
+			EmptySystemFactory factory3;
+			otherParams.AddSystemFactory(factory2);
+			otherParams.AddSystemFactory(factory3);
+			auto otherIterator = otherParams.GetSystemFactories();
+
+			otherIterator = iterator;
+			Assert::IsFalse(otherIterator.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*otherIterator));
+			++otherIterator;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*otherIterator));
+			++otherIterator;
+			Assert::IsTrue(otherIterator.IsEnd());
+
+			auto anotherIterator = otherParams.GetSystemFactories();
+			anotherIterator = std::move(iterator);
+			Assert::IsFalse(anotherIterator.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*anotherIterator));
+			++anotherIterator;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*anotherIterator));
+			++anotherIterator;
+			Assert::IsTrue(anotherIterator.IsEnd());
+		}
+
+		TEST_METHOD(IteratorEqualTest)
+		{
+			EmptyLogger logger;
+			auto engineParams = PonyEngine::Core::EngineParams(logger);
+			EmptySystemFactory factory0;
+			EmptySystemFactory factory1;
+			engineParams.AddSystemFactory(factory0);
+			engineParams.AddSystemFactory(factory1);
+
+			auto iterator = engineParams.GetSystemFactories();
+			auto otherIterator = iterator;
+			Assert::IsTrue(iterator == otherIterator);
+			Assert::IsFalse(iterator != otherIterator);
+
+			++iterator;
+			Assert::IsFalse(iterator == otherIterator);
+			Assert::IsTrue(iterator != otherIterator);
 		}
 	};
 }

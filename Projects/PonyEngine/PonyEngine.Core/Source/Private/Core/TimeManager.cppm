@@ -7,12 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Log/EngineLog.h"
+
 export module PonyEngine.Core.Implementation:TimeManager;
 
 import <chrono>;
 import <cstddef>;
 
 import PonyEngine.Core;
+import PonyEngine.Log;
 
 export namespace PonyEngine::Core
 {
@@ -20,7 +25,7 @@ export namespace PonyEngine::Core
 	class TimeManager final : public ITimeManager
 	{
 	public:
-		TimeManager() noexcept = default;
+		explicit TimeManager(const IEngine& engine) noexcept;
 		TimeManager(const TimeManager&) = delete;
 		TimeManager(TimeManager&&) = delete;
 
@@ -47,11 +52,20 @@ export namespace PonyEngine::Core
 		std::chrono::time_point<std::chrono::steady_clock> previousTickTime; ///< Previous tick time.
 
 		std::size_t frameCount; ///< Current frame.
+
+		const IEngine* const engine; ///< Engine that owns the manager.
 	};
 }
 
 namespace PonyEngine::Core
 {
+	TimeManager::TimeManager(const IEngine& engine) noexcept :
+		targetFrameTime(0.f),
+		frameCount{0},
+		engine{&engine}
+	{
+	}
+
 	std::size_t TimeManager::GetFrameCount() const noexcept
 	{
 		return frameCount;
@@ -69,8 +83,10 @@ namespace PonyEngine::Core
 
 	void TimeManager::Tick() noexcept
 	{
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Wait for target frame time.");
 		WaitForTargetTime();
 
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Increase frame count.");
 		++frameCount;
 	}
 

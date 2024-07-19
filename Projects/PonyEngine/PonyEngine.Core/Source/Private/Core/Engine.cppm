@@ -83,7 +83,7 @@ namespace PonyEngine::Core
 		isRunning{true}
 	{
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create time manager");
-		timeManager.reset(new TimeManager());
+		timeManager.reset(new TimeManager(*this));
 		PONY_LOG(this, Log::LogType::Info, "Time manager created.");
 
 		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
