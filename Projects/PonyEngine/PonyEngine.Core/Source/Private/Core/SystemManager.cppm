@@ -91,12 +91,12 @@ namespace PonyEngine::Core
 
 			if (systemInfo.GetIsTickable())
 			{
-				PONY_LOG(this->engine, Log::LogType::Info, "Add to tickable systems.");
+				PONY_LOG(this->engine, Log::LogType::Debug, "Add to tickable systems.");
 				tickableSystems.push_back(systemPointer);
 			}
 			else
 			{
-				PONY_LOG(this->engine, Log::LogType::Info, "The system is not tickable.");
+				PONY_LOG(this->engine, Log::LogType::Debug, "The system is not tickable.");
 			}
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
