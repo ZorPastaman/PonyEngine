@@ -184,10 +184,12 @@ namespace Core
 			auto factories = engineParams.GetSystemFactories();
 			Assert::IsFalse(factories.IsEnd());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
-			++factories;
+			auto anotherFactories = ++factories;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
-			factories++;
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*anotherFactories));
+			anotherFactories = factories++;
 			Assert::IsTrue(factories.IsEnd());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*anotherFactories));
 		}
 
 		TEST_METHOD(IteratorConstructorTest)

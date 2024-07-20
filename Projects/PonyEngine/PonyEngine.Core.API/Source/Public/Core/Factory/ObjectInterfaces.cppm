@@ -95,6 +95,12 @@ export namespace PonyEngine::Core
 		/// @param object Object source.
 		template<typename Source, typename... Targets>
 		void AddObjectInterfaces(Source& object) requires(std::is_convertible_v<Source*, Targets*> && ...);
+		/// @brief Adds the interfaces.
+		/// @tparam Targets Interface types.
+		/// @tparam Source Object source type.
+		/// @param object Object source.
+		template<typename... Targets, typename Source>
+		void AddObjectInterfacesDeduced(Source& object) requires(... && std::is_convertible_v<Source*, Targets*>);
 		/// @brief Gets the object interfaces.
 		/// @return Object interfaces iterator.
 		[[nodiscard("Pure function")]]
@@ -102,9 +108,6 @@ export namespace PonyEngine::Core
 
 		ObjectInterfaces& operator =(const ObjectInterfaces& other) = default;
 		ObjectInterfaces& operator =(ObjectInterfaces&& other) noexcept = default;
-
-		[[nodiscard("Pure operator")]]
-		bool operator ==(const ObjectInterfaces& other) const noexcept = default;
 
 	private:
 		std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>> interfaces; ///< Interfaces.
@@ -160,6 +163,12 @@ namespace PonyEngine::Core
 	void ObjectInterfaces::AddObjectInterfaces(Source& object) requires(std::is_convertible_v<Source*, Targets*> && ...)
 	{
 		(AddObjectInterface<Targets, Source>(object),...);
+	}
+
+	template<typename... Targets, typename Source>
+	void ObjectInterfaces::AddObjectInterfacesDeduced(Source& object) requires(... && std::is_convertible_v<Source*, Targets*>)
+	{
+		AddObjectInterfaces<Source, Targets...>(object);
 	}
 
 	ObjectInterfaces::Iterator ObjectInterfaces::GetObjectInterfaces() const noexcept
