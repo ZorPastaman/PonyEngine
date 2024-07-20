@@ -96,6 +96,7 @@ namespace Core
 		{
 		public:
 			EmptySystem* createdSystem = nullptr;
+			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
 			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
@@ -109,6 +110,7 @@ namespace Core
 			{
 				Assert::IsNotNull(dynamic_cast<EmptySystem*>(system));
 				delete static_cast<EmptySystem*>(system);
+				systemDestroyed = true;
 			}
 
 			[[nodiscard("Pure function")]]
@@ -187,6 +189,7 @@ namespace Core
 			systemFactory.createdSystem->ended = &ended;
 			engine.reset();
 			Assert::IsTrue(ended);
+			Assert::IsTrue(systemFactory.systemDestroyed);
 		}
 
 		TEST_METHOD(GetLoggerTest)
