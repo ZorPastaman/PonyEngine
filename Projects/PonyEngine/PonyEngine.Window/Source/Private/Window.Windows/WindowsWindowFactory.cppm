@@ -157,7 +157,7 @@ namespace PonyEngine::Window
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		return Core::SystemInfo::Create<WindowsWindow, IWindow, IWindowsWindow, Input::IKeyboardProvider>(*window, *this, true);
+		return Core::SystemInfo::CreateDeduced<IWindow, IWindowsWindow, Input::IKeyboardProvider>(*window, *this, true);
 	}
 
 	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept

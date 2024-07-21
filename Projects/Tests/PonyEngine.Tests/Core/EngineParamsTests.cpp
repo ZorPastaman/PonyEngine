@@ -9,7 +9,6 @@
 
 #include "CppUnitTest.h"
 
-import <cstdint>;
 import <exception>;
 
 import PonyEngine.Core;

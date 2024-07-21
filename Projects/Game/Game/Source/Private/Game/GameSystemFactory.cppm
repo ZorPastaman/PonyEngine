@@ -72,7 +72,7 @@ namespace Game
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
-		auto systemInfo = PonyEngine::Core::SystemInfo::Create<GameSystem, IGameSystem>(*gameSystem, *this, true);
+		auto systemInfo = PonyEngine::Core::SystemInfo::CreateDeduced<IGameSystem>(*gameSystem, *this, true);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
 
 		return systemInfo;

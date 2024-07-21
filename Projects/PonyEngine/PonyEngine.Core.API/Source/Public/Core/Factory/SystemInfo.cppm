@@ -16,47 +16,25 @@ import PonyEngine.Core;
 
 import :ISystemDestroyer;
 import :ObjectInterfaces;
+import :SystemDeleter;
 
 export namespace PonyEngine::Core
 {
-	class SystemInfo;
-
-	/// @brief System deleter.
-	class SystemDeleter final
-	{
-	public:
-		[[nodiscard("Pure constructor")]]
-		SystemDeleter(const SystemDeleter& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		SystemDeleter(SystemDeleter&& other) noexcept = default;
-
-		~SystemDeleter() noexcept = default;
-
-		/// @brief Deletes the @p system.
-		/// @param system System to delete.
-		void operator ()(ISystem* system) const noexcept;
-
-		SystemDeleter& operator =(const SystemDeleter& other) noexcept = default;
-		SystemDeleter& operator =(SystemDeleter&& other) noexcept = default;
-
-	private:
-		/// @brief Creates a @p SystemDeleter.
-		/// @param destroyer System destroyer to use.
-		[[nodiscard("Pure constructor")]]
-		explicit SystemDeleter(ISystemDestroyer& destroyer) noexcept;
-
-		ISystemDestroyer* destroyer; ///< System destroyer.
-
-		friend SystemInfo;
-	};
-
 	using SystemUniquePtr = std::unique_ptr<ISystem, SystemDeleter>; ///< Engine system unique_ptr typedef.
 
 	/// @brief System info.
 	class SystemInfo final
 	{
 	public:
-		SystemInfo(const SystemInfo& other) = delete;
+		/// @brief Creates a @p SystemInfo.
+		/// @param system Engine system.
+		/// @param destroyer System destroyer.
+		/// @param interfaces System public interfaces.
+		/// @param isTickable Is the system tickable?
+		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
+		[[nodiscard("Pure constructor")]]
+		SystemInfo(ISystem& system, ISystemDestroyer& destroyer, const ObjectInterfaces& interfaces, bool isTickable) noexcept;
+		SystemInfo(const SystemInfo&) = delete;
 		[[nodiscard("Pure constructor")]]
 		SystemInfo(SystemInfo&& other) noexcept = default;
 
@@ -71,6 +49,15 @@ export namespace PonyEngine::Core
 		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
 		template<typename System, typename... Interfaces> [[nodiscard("Pure function")]]
 		static SystemInfo Create(System& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...));
+		/// @brief Creates a system info.
+		/// @tparam Interfaces System public interface types.
+		/// @tparam System System type.
+		/// @param system Engine system.
+		/// @param destroyer System destroyer.
+		/// @param isTickable Is the system tickable?
+		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
+		template<typename... Interfaces, typename System> [[nodiscard("Pure function")]]
+		static SystemInfo CreateDeduced(System& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (... && std::is_convertible_v<System*, Interfaces*>));
 
 		/// @brief Gets the system.
 		/// @return System.
@@ -85,19 +72,10 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		bool GetIsTickable() const noexcept;
 
-		SystemInfo& operator =(const SystemInfo& other) = delete;
+		SystemInfo& operator =(const SystemInfo&) = delete;
 		SystemInfo& operator =(SystemInfo&& other) noexcept = default;
 
 	private:
-		/// @brief Creates a @p SystemInfo.
-		/// @param system Engine system.
-		/// @param destroyer System destroyer.
-		/// @param interfaces System public interfaces.
-		/// @param isTickable Is the system tickable?
-		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
-		[[nodiscard("Pure constructor")]]
-		SystemInfo(ISystem& system, ISystemDestroyer& destroyer, const ObjectInterfaces& interfaces, bool isTickable) noexcept;
-
 		std::unique_ptr<ISystem, SystemDeleter> system; ///< System.
 		ObjectInterfaces interfaces; ///< System public interfaces.
 		bool isTickable; ///< Is the system tickable?
@@ -106,16 +84,6 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	SystemDeleter::SystemDeleter(ISystemDestroyer& destroyer) noexcept :
-		destroyer{&destroyer}
-	{
-	}
-
-	void SystemDeleter::operator ()(ISystem* const system) const noexcept
-	{
-		destroyer->Destroy(system);
-	}
-
 	SystemInfo::SystemInfo(ISystem& system, ISystemDestroyer& destroyer, const ObjectInterfaces& interfaces, const bool isTickable) noexcept :
 		system(&system, SystemDeleter(destroyer)),
 		interfaces(interfaces),
@@ -130,6 +98,12 @@ namespace PonyEngine::Core
 		interfaces.AddObjectInterfaces<System, Interfaces...>(system);
 
 		return SystemInfo(system, destroyer, interfaces, isTickable);
+	}
+
+	template<typename... Interfaces, typename System>
+	SystemInfo SystemInfo::CreateDeduced(System& system, ISystemDestroyer& destroyer, const bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (... && std::is_convertible_v<System*, Interfaces*>))
+	{
+		return Create<System, Interfaces...>(system, destroyer, isTickable);
 	}
 
 	SystemUniquePtr& SystemInfo::GetSystem() noexcept

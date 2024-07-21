@@ -11,7 +11,6 @@
 
 import <cstddef>;
 import <cstdint>;
-import <functional>;
 import <exception>;
 
 import PonyEngine.Core;

@@ -13,8 +13,6 @@ import <cstdint>;
 
 import PonyEngine.Core;
 import PonyEngine.Core.Factory;
-import PonyEngine.Core.Implementation;
-import PonyEngine.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
