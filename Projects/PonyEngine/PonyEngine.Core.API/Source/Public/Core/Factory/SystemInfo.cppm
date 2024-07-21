@@ -41,28 +41,32 @@ export namespace PonyEngine::Core
 		~SystemInfo() noexcept = default;
 
 		/// @brief Creates a system info.
-		/// @tparam System System type.
+		/// @tparam SystemType System type.
 		/// @tparam Interfaces System public interface types.
 		/// @param system Engine system.
 		/// @param destroyer System destroyer.
 		/// @param isTickable Is the system tickable?
 		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
-		template<typename System, typename... Interfaces> [[nodiscard("Pure function")]]
-		static SystemInfo Create(System& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...));
+		template<typename SystemType, typename... Interfaces> [[nodiscard("Pure function")]]
+		static SystemInfo Create(SystemType& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<SystemType*, ISystem*> && (std::is_convertible_v<SystemType*, Interfaces*> && ...));
 		/// @brief Creates a system info.
 		/// @tparam Interfaces System public interface types.
-		/// @tparam System System type.
+		/// @tparam SystemType System type.
 		/// @param system Engine system.
 		/// @param destroyer System destroyer.
 		/// @param isTickable Is the system tickable?
 		/// @note The @p destroyer must be appropriate to destroy the @p system, and its lifetime must exceed the lifetime of the system.
-		template<typename... Interfaces, typename System> [[nodiscard("Pure function")]]
-		static SystemInfo CreateDeduced(System& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (... && std::is_convertible_v<System*, Interfaces*>));
+		template<typename... Interfaces, typename SystemType> [[nodiscard("Pure function")]]
+		static SystemInfo CreateDeduced(SystemType& system, ISystemDestroyer& destroyer, bool isTickable) requires(std::is_convertible_v<SystemType*, ISystem*> && (... && std::is_convertible_v<SystemType*, Interfaces*>));
 
 		/// @brief Gets the system.
 		/// @return System.
 		[[nodiscard("Pure function")]]
-		SystemUniquePtr& GetSystem() noexcept;
+		SystemUniquePtr& System() noexcept;
+		/// @brief Gets the system.
+		/// @return System.
+		[[nodiscard("Pure function")]]
+		const SystemUniquePtr& System() const noexcept;
 		/// @brief Gets the system public interfaces.
 		/// @return System public interfaces.
 		[[nodiscard("Pure function")]]
@@ -91,22 +95,27 @@ namespace PonyEngine::Core
 	{
 	}
 
-	template<typename System, typename... Interfaces>
-	SystemInfo SystemInfo::Create(System& system, ISystemDestroyer& destroyer, const bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (std::is_convertible_v<System*, Interfaces*> && ...))
+	template<typename SystemType, typename... Interfaces>
+	SystemInfo SystemInfo::Create(SystemType& system, ISystemDestroyer& destroyer, const bool isTickable) requires(std::is_convertible_v<SystemType*, ISystem*> && (std::is_convertible_v<SystemType*, Interfaces*> && ...))
 	{
 		auto interfaces = ObjectInterfaces();
-		interfaces.AddObjectInterfaces<System, Interfaces...>(system);
+		interfaces.AddObjectInterfaces<SystemType, Interfaces...>(system);
 
 		return SystemInfo(system, destroyer, interfaces, isTickable);
 	}
 
-	template<typename... Interfaces, typename System>
-	SystemInfo SystemInfo::CreateDeduced(System& system, ISystemDestroyer& destroyer, const bool isTickable) requires(std::is_convertible_v<System*, ISystem*> && (... && std::is_convertible_v<System*, Interfaces*>))
+	template<typename... Interfaces, typename SystemType>
+	SystemInfo SystemInfo::CreateDeduced(SystemType& system, ISystemDestroyer& destroyer, const bool isTickable) requires(std::is_convertible_v<SystemType*, ISystem*> && (... && std::is_convertible_v<SystemType*, Interfaces*>))
 	{
-		return Create<System, Interfaces...>(system, destroyer, isTickable);
+		return Create<SystemType, Interfaces...>(system, destroyer, isTickable);
 	}
 
-	SystemUniquePtr& SystemInfo::GetSystem() noexcept
+	SystemUniquePtr& SystemInfo::System() noexcept
+	{
+		return system;
+	}
+
+	const SystemUniquePtr& SystemInfo::System() const noexcept
 	{
 		return system;
 	}

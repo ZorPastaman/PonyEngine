@@ -93,15 +93,15 @@ namespace Core
 
 			auto systemInfo = PonyEngine::Core::SystemInfo(*system, factory, interfaces, true);
 			auto systemInterface = *systemInfo.GetInterfaces();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.GetSystem().get_deleter().GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.System().get_deleter().GetSystemDestroyer()));
 			Assert::IsTrue(interface.first.get() == systemInterface.first.get());
 			Assert::IsTrue(systemInfo.GetIsTickable());
 
 			auto movedInfo = std::move(systemInfo);
 			systemInterface = *movedInfo.GetInterfaces();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(movedInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedInfo.GetSystem().get_deleter().GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(movedInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedInfo.System().get_deleter().GetSystemDestroyer()));
 			Assert::IsTrue(interface.first.get() == systemInterface.first.get());
 			Assert::IsTrue(movedInfo.GetIsTickable());
 		}
@@ -110,9 +110,9 @@ namespace Core
 		{
 			auto system = new EmptySystem();
 			auto factory = EmptySystemFactory();
-			auto systemInfo = PonyEngine::Core::SystemInfo::Create<EmptySystem, IInterface, IAnotherInterface>(*system, factory, false);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.GetSystem().get_deleter().GetSystemDestroyer()));
+			const auto systemInfo = PonyEngine::Core::SystemInfo::Create<EmptySystem, IInterface, IAnotherInterface>(*system, factory, false);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.System().get_deleter().GetSystemDestroyer()));
 			auto interfaces = systemInfo.GetInterfaces();
 			auto interface = *interfaces;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
@@ -126,10 +126,10 @@ namespace Core
 			Assert::IsFalse(systemInfo.GetIsTickable());
 
 			system = new EmptySystem();
-			systemInfo = PonyEngine::Core::SystemInfo::CreateDeduced<IInterface, IAnotherInterface>(*system, factory, true);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.GetSystem().get_deleter().GetSystemDestroyer()));
-			interfaces = systemInfo.GetInterfaces();
+			auto otherSystemInfo = PonyEngine::Core::SystemInfo::CreateDeduced<IInterface, IAnotherInterface>(*system, factory, true);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(otherSystemInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherSystemInfo.System().get_deleter().GetSystemDestroyer()));
+			interfaces = otherSystemInfo.GetInterfaces();
 			interface = *interfaces;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -139,7 +139,7 @@ namespace Core
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IAnotherInterface*>(system)), reinterpret_cast<std::uintptr_t>(interface.second));
 			++interfaces;
 			Assert::IsTrue(interfaces.IsEnd());
-			Assert::IsTrue(systemInfo.GetIsTickable());
+			Assert::IsTrue(otherSystemInfo.GetIsTickable());
 		}
 
 		TEST_METHOD(AssignmentTest)
@@ -152,8 +152,8 @@ namespace Core
 
 			auto systemInfo = PonyEngine::Core::SystemInfo(*system, factory, interfaces, true);
 			auto systemInterface = *systemInfo.GetInterfaces();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.GetSystem().get_deleter().GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(systemInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&systemInfo.System().get_deleter().GetSystemDestroyer()));
 			Assert::IsTrue(interface.first.get() == systemInterface.first.get());
 			Assert::IsTrue(systemInfo.GetIsTickable());
 
@@ -163,8 +163,8 @@ namespace Core
 			auto movedInfo = PonyEngine::Core::SystemInfo(*otherSystem, otherFactory, otherInterfaces, false);
 			movedInfo = std::move(systemInfo);
 			systemInterface = *movedInfo.GetInterfaces();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(movedInfo.GetSystem().get()));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedInfo.GetSystem().get_deleter().GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystem*>(system)), reinterpret_cast<std::uintptr_t>(movedInfo.System().get()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedInfo.System().get_deleter().GetSystemDestroyer()));
 			Assert::IsTrue(interface.first.get() == systemInterface.first.get());
 			Assert::IsTrue(movedInfo.GetIsTickable());
 		}
