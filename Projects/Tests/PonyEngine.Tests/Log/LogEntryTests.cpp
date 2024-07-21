@@ -34,7 +34,7 @@ namespace Log
 			constexpr auto logType = PonyEngine::Log::LogType::Warning;
 			constexpr auto exceptionLogType = PonyEngine::Log::LogType::Exception;
 
-			const auto logEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
+			auto logEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
 			Assert::AreEqual(message, logEntry.GetMessage());
 			Assert::IsNull(logEntry.GetException());
 			Assert::IsTrue(timePoint == logEntry.GetTimePoint());
@@ -54,6 +54,20 @@ namespace Log
 			Assert::IsTrue(timePoint == exceptionLogEntry.GetTimePoint());
 			Assert::AreEqual(frameCount, exceptionLogEntry.GetFrameCount());
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogEntry.GetLogType()));
+
+			auto copiedLogEntry = logEntry;
+			Assert::AreEqual(message, copiedLogEntry.GetMessage());
+			Assert::IsNull(copiedLogEntry.GetException());
+			Assert::IsTrue(timePoint == copiedLogEntry.GetTimePoint());
+			Assert::AreEqual(frameCount, copiedLogEntry.GetFrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(copiedLogEntry.GetLogType()));
+
+			auto movedLogEntry = std::move(logEntry);
+			Assert::AreEqual(message, movedLogEntry.GetMessage());
+			Assert::IsNull(movedLogEntry.GetException());
+			Assert::IsTrue(timePoint == movedLogEntry.GetTimePoint());
+			Assert::AreEqual(frameCount, movedLogEntry.GetFrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(movedLogEntry.GetLogType()));
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -85,6 +99,33 @@ namespace Log
 			std::ostringstream exceptionLogEntrySs;
 			exceptionLogEntrySs << exceptionLogEntry;
 			Assert::AreEqual(exceptionLogEntryString.c_str(), exceptionLogEntrySs.str().c_str());
+		}
+
+		TEST_METHOD(AssignmentTest)
+		{
+			const auto message = "Message.";
+			const auto exception = std::exception("Exception text.");
+			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450780));
+			constexpr std::size_t frameCount = 98407;
+			constexpr auto logType = PonyEngine::Log::LogType::Warning;
+			constexpr auto exceptionLogType = PonyEngine::Log::LogType::Exception;
+
+			auto logEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
+			auto copiedLogEntry = PonyEngine::Log::LogEntry("Something", nullptr, std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450)), 123, PonyEngine::Log::LogType::Debug);
+			copiedLogEntry = logEntry;
+			Assert::AreEqual(message, copiedLogEntry.GetMessage());
+			Assert::IsNull(copiedLogEntry.GetException());
+			Assert::IsTrue(timePoint == copiedLogEntry.GetTimePoint());
+			Assert::AreEqual(frameCount, copiedLogEntry.GetFrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(copiedLogEntry.GetLogType()));
+
+			auto movedLogEntry = PonyEngine::Log::LogEntry("Something", nullptr, std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450)), 123, PonyEngine::Log::LogType::Debug);
+			movedLogEntry = std::move(logEntry);
+			Assert::AreEqual(message, movedLogEntry.GetMessage());
+			Assert::IsNull(movedLogEntry.GetException());
+			Assert::IsTrue(timePoint == movedLogEntry.GetTimePoint());
+			Assert::AreEqual(frameCount, movedLogEntry.GetFrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(movedLogEntry.GetLogType()));
 		}
 	};
 }
