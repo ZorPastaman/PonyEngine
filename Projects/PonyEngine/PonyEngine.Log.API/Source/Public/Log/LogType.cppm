@@ -47,15 +47,27 @@ export namespace PonyEngine::Log
 	[[nodiscard("Pure function")]]
 	std::string ToString(LogType logType, bool addNumber = false);
 
+	/// @brief Bitwise complement operator.
+	/// @param logType Log type.
+	/// @return Complement of the @p logType.
 	[[nodiscard("Pure operator")]] 
 	constexpr LogType operator ~(LogType logType) noexcept;
-
+	/// @brief Bitwise and operator.
+	/// @param left Left log type.
+	/// @param right Right log type.
+	/// @return And of the log types.
 	[[nodiscard("Pure operator")]] 
 	constexpr LogType operator &(LogType left, LogType right) noexcept;
-
+	/// @brief Bitwise or operator.
+	/// @param left Left log type.
+	/// @param right Right log type.
+	/// @return Or of the log types.
 	[[nodiscard("Pure operator")]] 
 	constexpr LogType operator |(LogType left, LogType right) noexcept;
-
+	/// @brief Bitwise xor operator.
+	/// @param left Left log type.
+	/// @param right Right log type.
+	/// @return Xor of the log types.
 	[[nodiscard("Pure operator")]] 
 	constexpr LogType operator ^(LogType left, LogType right) noexcept;
 

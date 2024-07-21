@@ -60,5 +60,13 @@ namespace Log
 			ss << logType;
 			Assert::AreEqual(string, ss.str());
 		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			constexpr auto complement = ~PonyEngine::Log::LogType::Debug;
+			constexpr auto andResult = PonyEngine::Log::LogType::Info & PonyEngine::Log::LogType::Warning;
+			constexpr auto orResult = PonyEngine::Log::LogType::Error | PonyEngine::Log::LogType::Exception;
+			constexpr auto xorResult = PonyEngine::Log::LogType::Verbose ^ PonyEngine::Log::LogType::Info;
+		}
 	};
 }
