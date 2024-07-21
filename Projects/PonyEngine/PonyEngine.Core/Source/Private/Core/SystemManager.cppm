@@ -83,7 +83,7 @@ namespace PonyEngine::Core
 			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
 
 			SystemInfo systemInfo = (*factory).Create(engine);
-			auto system = std::move(systemInfo.GetSystem());
+			auto system = std::move(systemInfo.System());
 			ISystem* const systemPointer = system.get();
 			assert((systemPointer && "The system is nullptr."));
 
