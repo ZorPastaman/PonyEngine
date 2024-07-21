@@ -75,6 +75,7 @@
     <ClCompile Include="Core\EngineTests.cpp" />
     <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
+    <ClCompile Include="Core\SystemInfoTests.cpp" />
     <ClCompile Include="Log\ConsoleSubLoggerTests.cpp" />
     <ClCompile Include="Log\FileSubLoggerTests.cpp" />
     <ClCompile Include="Log\LogEntryTests.cpp" />
