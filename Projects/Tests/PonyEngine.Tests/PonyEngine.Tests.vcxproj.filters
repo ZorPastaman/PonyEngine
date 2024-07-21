@@ -81,5 +81,8 @@
     <ClCompile Include="Core\ObjectInterfacesTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\SystemDeleterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

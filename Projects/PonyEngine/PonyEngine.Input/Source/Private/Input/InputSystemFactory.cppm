@@ -54,7 +54,7 @@ namespace PonyEngine::Input
 	{
 		const auto inputSystem = new InputSystem(engine);
 
-		return Core::SystemInfo::Create<InputSystem, IInputSystem>(*inputSystem, *this, true);
+		return Core::SystemInfo::CreateDeduced<IInputSystem>(*inputSystem, *this, true);
 	}
 
 	void InputSystemFactory::Destroy(Core::ISystem* const system) noexcept

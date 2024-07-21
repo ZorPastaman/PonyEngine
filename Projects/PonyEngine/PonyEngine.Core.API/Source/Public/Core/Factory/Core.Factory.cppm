@@ -13,4 +13,5 @@ export import :EngineParams;
 export import :ISystemDestroyer;
 export import :ISystemFactory;
 export import :ObjectInterfaces;
+export import :SystemDeleter;
 export import :SystemInfo;
