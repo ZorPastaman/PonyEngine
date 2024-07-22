@@ -109,7 +109,7 @@ namespace PonyEngine::Input
 			
 			for (const auto& [handle, eventPair] : events)
 			{
-				if (const KeyboardMessage expectedMessage = eventPair.first.GetExpectedMessage(); expectedMessage == message)
+				if (const KeyboardMessage expectedMessage = eventPair.first.ExpectedMessage(); expectedMessage == message)
 				{
 					PONY_LOG(engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
 					eventPair.second();
@@ -121,7 +121,7 @@ namespace PonyEngine::Input
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
 		const Handle handle(currentId++);
-		PONY_LOG(engine, Log::LogType::Info, std::format("Register action. ExpectedMessage: '{}', ID: '{}'.", event.GetExpectedMessage().ToString(), handle.GetId()).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Register action. ExpectedMessage: '{}', ID: '{}'.", event.ExpectedMessage().ToString(), handle.GetId()).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		events.insert(std::pair(handle, eventAction));
 		PONY_LOG(engine, Log::LogType::Info, "Action registered.");

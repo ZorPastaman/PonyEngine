@@ -240,6 +240,7 @@ namespace PonyEngine::Window
 		return StaticName;
 	}
 
+	// TODO: Add tests for these messages
 	LRESULT WindowsWindow::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
 		switch (uMsg)
