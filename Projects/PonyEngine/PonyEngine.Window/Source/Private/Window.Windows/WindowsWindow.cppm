@@ -57,15 +57,14 @@ export namespace PonyEngine::Window
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual bool IsWindowAlive() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const wchar_t* GetTitle() const noexcept override;
 		virtual void SetTitle(const wchar_t* title) override;
 
+		[[nodiscard("Pure function")]]
+		virtual bool IsVisible() const noexcept override;
 		virtual void ShowWindow() noexcept override;
 		virtual void HideWindow() noexcept override;
 
@@ -74,6 +73,9 @@ export namespace PonyEngine::Window
 
 		virtual void AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
 		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
+
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -119,7 +121,7 @@ namespace PonyEngine::Window
 			NULL,
 			NULL,
 			hInstance,
-			this
+			static_cast<IWindowProc*>(this)
 		);
 
 		if (hWnd == NULL)
@@ -172,11 +174,6 @@ namespace PonyEngine::Window
 		return isAlive;
 	}
 
-	const char* WindowsWindow::GetName() const noexcept
-	{
-		return StaticName;
-	}
-
 	const wchar_t* WindowsWindow::GetTitle() const noexcept
 	{
 		return title.c_str();
@@ -190,6 +187,11 @@ namespace PonyEngine::Window
 		}
 
 		this->title = title;
+	}
+
+	bool WindowsWindow::IsVisible() const noexcept
+	{
+		return IsWindowVisible(hWnd);
 	}
 
 	void WindowsWindow::ShowWindow() noexcept
@@ -231,6 +233,11 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG_IF(keyboardMessageObserver != nullptr, engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 		}
+	}
+
+	const char* WindowsWindow::GetName() const noexcept
+	{
+		return StaticName;
 	}
 
 	LRESULT WindowsWindow::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
