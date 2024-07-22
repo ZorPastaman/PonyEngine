@@ -76,7 +76,7 @@ namespace PonyEngine::Window
 				return windowProc->WindowProc(uMsg, wParam, lParam);
 			}
 
-			throw std::logic_error("Wrong Windows window is created.");
+			throw std::logic_error("Wrong Windows window has been created.");
 		}
 
 		SetLastError(DWORD{0});

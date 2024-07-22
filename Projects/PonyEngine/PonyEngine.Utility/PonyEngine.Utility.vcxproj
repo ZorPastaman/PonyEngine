@@ -12,7 +12,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Utility\StringUtility.cppm" />
-    <ClCompile Include="Source\Public\Utility\TypeInfoUtility.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />

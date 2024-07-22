@@ -20,6 +20,7 @@ import <exception>;
 import <format>;
 import <memory>;
 import <string>;
+import <typeindex>;
 import <typeinfo>;
 import <unordered_map>;
 import <utility>;
@@ -28,7 +29,6 @@ import <vector>;
 import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.TypeInfoUtility;
 
 export namespace PonyEngine::Core
 {
@@ -63,7 +63,7 @@ export namespace PonyEngine::Core
 		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
-		std::unordered_map<std::reference_wrapper<const type_info>, void*, Utility::TypeInfoHash, Utility::TypeInfoEqual> systemInterfaces; ///< System interfaces.
+		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 		std::vector<SystemUniquePtr> systems; ///< Systems.
 		std::vector<ISystem*> tickableSystems; ///< Tickable systems.
 
@@ -83,7 +83,7 @@ namespace PonyEngine::Core
 			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
 
 			SystemInfo systemInfo = (*factory).Create(engine);
-			auto system = std::move(systemInfo.System());
+			SystemUniquePtr system = std::move(systemInfo.System());
 			ISystem* const systemPointer = system.get();
 			assert((systemPointer && "The system is nullptr."));
 
@@ -101,7 +101,7 @@ namespace PonyEngine::Core
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
-				systemInterfaces.insert_or_assign((*interfacesIterator).first, (*interfacesIterator).second);
+				systemInterfaces.insert_or_assign(std::type_index((*interfacesIterator).first), (*interfacesIterator).second);
 			}
 
 			PONY_LOG(this->engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());
