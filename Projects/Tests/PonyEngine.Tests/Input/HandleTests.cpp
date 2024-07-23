@@ -7,18 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:Event;
+#include "CppUnitTest.h"
 
-import :KeyboardMessage;
+import <cstddef>;
 
-export namespace PonyEngine::Input
+import PonyEngine.Input;
+
+using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+namespace Input
 {
-	/// @brief Input event.
-	struct Event final
+	TEST_CLASS(HandleTests)
 	{
-		[[nodiscard("Pure operator")]]
-		bool operator ==(const Event& other) const noexcept = default;
-
-		KeyboardMessage expectedMessage; ///< The event is raised if the input system receives such an event.
+		TEST_METHOD(HandleHashTest)
+		{
+			constexpr std::size_t id = 125;
+			const auto handle = PonyEngine::Input::Handle{.id = id};
+			Assert::AreEqual(id, PonyEngine::Input::HandleHash()(handle));
+		}
 	};
 }

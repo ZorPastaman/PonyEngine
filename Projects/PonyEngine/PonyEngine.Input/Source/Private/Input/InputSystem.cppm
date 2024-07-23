@@ -109,9 +109,9 @@ namespace PonyEngine::Input
 			
 			for (const auto& [handle, eventPair] : events)
 			{
-				if (const KeyboardMessage expectedMessage = eventPair.first.ExpectedMessage(); expectedMessage == message)
+				if (eventPair.first.expectedMessage == message)
 				{
-					PONY_LOG(engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.GetId()).c_str());
+					PONY_LOG(engine, Log::LogType::Verbose, std::format("Tick an action. ID: '{}'.", handle.id).c_str());
 					eventPair.second();
 				}
 			}
@@ -121,7 +121,7 @@ namespace PonyEngine::Input
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
 		const Handle handle(currentId++);
-		PONY_LOG(engine, Log::LogType::Info, std::format("Register action. ExpectedMessage: '{}', ID: '{}'.", event.ExpectedMessage().ToString(), handle.GetId()).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Register action. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		events.insert(std::pair(handle, eventAction));
 		PONY_LOG(engine, Log::LogType::Info, "Action registered.");
@@ -131,7 +131,7 @@ namespace PonyEngine::Input
 
 	void InputSystem::UnregisterAction(const Handle handle)
 	{
-		PONY_LOG(engine, Log::LogType::Info, std::format("Unregister action. ID: '{}'.", handle.GetId()).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Unregister action. ID: '{}'.", handle.id).c_str());
 		events.erase(handle);
 		PONY_LOG(engine, Log::LogType::Info, "Action unregistered.");
 	}
@@ -140,15 +140,15 @@ namespace PonyEngine::Input
 	{
 		PONY_LOG(engine, Log::LogType::Verbose, std::format("Received a keyboard message: '{}'.", keyboardMessage.ToString()).c_str());
 
-		if (const auto pair = keyStates.find(keyboardMessage.GetKeyCode()); pair != keyStates.cend() && pair->second == keyboardMessage.GetIsDown())
+		if (const auto pair = keyStates.find(keyboardMessage.keyCode); pair != keyStates.cend() && pair->second == keyboardMessage.isDown)
 		{
 			PONY_LOG(engine, Log::LogType::Verbose, "Ignore the keyboard message 'cause it doesn't change the state.");
 
 			return;
 		}
 
-		keyStates.insert_or_assign(keyboardMessage.GetKeyCode(), keyboardMessage.GetIsDown());
-		queue.push(KeyboardMessage(keyboardMessage.GetKeyCode(), keyboardMessage.GetIsDown()));
+		keyStates.insert_or_assign(keyboardMessage.keyCode, keyboardMessage.isDown);
+		queue.push(KeyboardMessage(keyboardMessage.keyCode, keyboardMessage.isDown));
 	}
 
 	const char* InputSystem::GetName() const noexcept

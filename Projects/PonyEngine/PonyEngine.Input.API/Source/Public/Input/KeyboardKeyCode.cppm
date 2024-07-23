@@ -131,11 +131,11 @@ export namespace PonyEngine::Input
 		NumpadEnter
 	};
 
-	/// @brief Creates a string representing the @p keyCode.
+	/// @brief Gets a string representing the @p keyCode.
 	/// @param keyCode Key code.
-	/// @return Created string.
+	/// @return Key code string.
 	[[nodiscard("Pure function")]]
-	std::string ToString(KeyboardKeyCode keyCode);
+	const char* ToString(KeyboardKeyCode keyCode);
 
 	/// @brief Puts a string representing the @p keyCode into the @p stream.
 	/// @param stream Target.
@@ -262,14 +262,14 @@ namespace PonyEngine::Input
 		{ KeyboardKeyCode::NumpadEnter, "Numpad Enter" }
 	};
 
-	std::string ToString(const KeyboardKeyCode keyCode)
+	const char* ToString(const KeyboardKeyCode keyCode)
 	{
 		if (const auto position = KeyCodeStrings.find(keyCode); position != KeyCodeStrings.end()) [[likely]]
 		{
 			return position->second;
 		}
 
-		return std::to_string(static_cast<std::underlying_type_t<KeyboardKeyCode>>(keyCode));
+		return "Unknown";
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const KeyboardKeyCode keyCode)
