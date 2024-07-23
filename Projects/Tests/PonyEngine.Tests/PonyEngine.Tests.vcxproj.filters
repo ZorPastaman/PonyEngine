@@ -87,7 +87,13 @@
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Input\EventTests.cpp">
+    <ClCompile Include="Input\HandleTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\KeyboardKeyCodeTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\KeyboardMessageTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
