@@ -52,27 +52,25 @@ namespace Log
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			Assert::IsNotNull(logger);
-			PonyEngine::Log::DestroyLogger(logger);
+			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
+			Assert::IsNotNull(logger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
-			Assert::AreEqual("PonyEngine::Logger", logger->GetName());
-			PonyEngine::Log::DestroyLogger(logger);
+			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
+			Assert::AreEqual("PonyEngine::Log::Logger", logger->GetName());
 		}
 
 		TEST_METHOD(LogTest)
 		{
-			const char* const message = "Message!";
-			const std::exception exception("Exception");
-			const std::size_t frameCount = 84136;
-			const PonyEngine::Log::LogInput logInput(message, frameCount);
+			const auto message = "Message!";
+			const auto exception = std::exception("Exception");
+			constexpr std::size_t frameCount = 84136;
+			const auto logInput = PonyEngine::Log::LogInput(message, frameCount);
 
 			TestSubLogger testSubLogger;
-			PonyEngine::Log::ILogger* const logger = PonyEngine::Log::CreateLogger();
+			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
 			logger->AddSubLogger(&testSubLogger);
 			testSubLogger.expectedMessage = message;
 			testSubLogger.expectedException = nullptr;
@@ -91,8 +89,6 @@ namespace Log
 			testSubLogger.expectMessages = false;
 			logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
-
-			PonyEngine::Log::DestroyLogger(logger);
 		}
 	};
 }

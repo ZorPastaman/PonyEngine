@@ -15,25 +15,40 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Launcher\LauncherMain.cppm">
+    <ClCompile Include="Source\Private\Launcher\Launcher.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\IPlatformQuitChecker.cppm">
+    <ClCompile Include="Source\Private\Launcher\ILoopElement.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\Launcher.cppm">
+    <ClCompile Include="Source\Private\Launcher\Loop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\EngineRunner.cppm">
+    <ClCompile Include="Source\Private\Launcher\EngineLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\IPlatformEngineParamsProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher\ISystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\EngineParamsProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher.Windows\Launcher.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Launcher\LoggerProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher.Windows\LoggerProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\SystemFactoriesProvider.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoop.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Main.Windows.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher\EngineSettings.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsEngineSettings.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -25,26 +25,24 @@ namespace Log
 	{
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Log::ISubLogger* const consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
-			Assert::IsNotNull(consoleSubLogger);
-			PonyEngine::Log::DestroyConsoleSubLogger(consoleSubLogger);
+			const PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			Assert::IsNotNull(consoleSubLogger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Log::ISubLogger* const consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			const PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
 			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger->GetName());
-			PonyEngine::Log::DestroyConsoleSubLogger(consoleSubLogger);
 		}
 
 		TEST_METHOD(LogTest)
 		{
-			const char* const message = "Message!";
-			const std::exception exception("Exception");
-			const std::chrono::time_point<std::chrono::system_clock> timePoint(std::chrono::seconds(5691338));
-			const std::size_t frameCount = 84136;
+			auto message = "Message!";
+			const auto exception = std::exception("Exception");
+			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(5691338));
+			constexpr std::size_t frameCount = 84136;
 
-			PonyEngine::Log::ISubLogger* const consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			const PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
 
 			std::ostringstream verboseStream;
 			std::streambuf* const coutBuffer = std::cout.rdbuf(verboseStream.rdbuf());
@@ -85,7 +83,6 @@ namespace Log
 			std::cout.rdbuf(coutBuffer);
 			std::clog.rdbuf(clogBuffer);
 			std::cerr.rdbuf(cerrBuffer);
-;			PonyEngine::Log::DestroyConsoleSubLogger(consoleSubLogger);
 		}
 	};
 }

@@ -11,15 +11,12 @@
 
 import <cstddef>;
 import <cstdint>;
-import <functional>;
 import <exception>;
 
 import PonyEngine.Core;
-import PonyEngine.Core.Factories;
+import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
-import PonyEngine.Window;
-import PonyEngine.Window.Factories;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -40,154 +37,252 @@ namespace Core
 			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override { }
 		};
 
-		class EmptyWindow final : public PonyEngine::Window::IWindow
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override { return ""; }
-
-			[[nodiscard("Pure function")]]
-			virtual const wchar_t* GetTitle() const noexcept override { return L""; }
-			virtual void SetTitle(const wchar_t*) override { }
-
-			virtual void AddKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
-			virtual void RemoveKeyboardMessageObserver(PonyEngine::Window::IKeyboardObserver*) override { }
-
-			virtual void ShowWindow() override { }
-
-			virtual void Tick() override { }
-		};
-
-		class EmptyWindowFactory final : public PonyEngine::Window::IWindowFactory
-		{
-		public:
-			PonyEngine::Window::IWindow* createdWindow = nullptr;
-
-			[[nodiscard("Pure function")]]
-			virtual const char* GetWindowName() const noexcept override { return ""; }
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindow* Create(PonyEngine::Core::IEngine&) override
-			{
-				createdWindow = new EmptyWindow();
-				return createdWindow;
-			}
-			virtual void Destroy(PonyEngine::Window::IWindow* const window) noexcept override
-			{
-				Assert::IsNotNull(dynamic_cast<EmptyWindow*>(window));
-				delete static_cast<EmptyWindow*>(window);
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const wchar_t* GetTitle() const noexcept override { return L""; }
-			virtual void SetTitle(const wchar_t*) noexcept override { }
-		};
-
 		class EmptySystem final : public PonyEngine::Core::ISystem
 		{
 		public:
+			bool begun = false;
+			bool* ended = nullptr;
+			bool ticked = false;
+
 			[[nodiscard("Pure function")]]
 			virtual const char* GetName() const noexcept override { return ""; }
 
-			virtual void Begin() override { }
-			virtual void End() override { }
+			virtual void Begin() override
+			{
+				begun = true;
+			}
 
-			virtual bool IsTickable() const noexcept override { return true; }
-			virtual void Tick() override { }
+			virtual void End() override
+			{
+				if (ended)
+				{
+					*ended = true;
+				}
+			}
+
+			virtual void Tick() override
+			{
+				ticked = true;
+			}
 		};
 
-		class EmptySystemFactory final : public PonyEngine::Core::ISystemFactory
+		class EmptySystem1Base : public PonyEngine::Core::ISystem
 		{
 		public:
-			PonyEngine::Core::ISystem* createdSystem = nullptr;
+			[[nodiscard("Pure function")]]
+			virtual const char* GetName() const noexcept override
+			{
+				return "";
+			}
+
+			virtual void Begin() override
+			{
+			}
+			virtual void End() override
+			{
+			}
+
+			virtual void Tick() override
+			{
+			}
+		};
+
+		class EmptySystem1 final : public EmptySystem1Base
+		{
+		};
+
+		class EmptySystemFactory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
+		{
+		public:
+			EmptySystem* createdSystem = nullptr;
+			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystem* Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
 			{
-				createdSystem = new EmptySystem();
-				return createdSystem;
+				const auto emptySystem = new EmptySystem();
+				createdSystem = emptySystem;
+
+				return PonyEngine::Core::SystemInfo::Create<EmptySystem, EmptySystem>(*emptySystem, *this, true);
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
 				Assert::IsNotNull(dynamic_cast<EmptySystem*>(system));
 				delete static_cast<EmptySystem*>(system);
+				systemDestroyed = true;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetSystemName() const noexcept override { return ""; }
+			virtual const char* GetName() const noexcept override
+			{
+				return "";
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* GetSystemName() const noexcept override
+			{
+				return "";
+			}
+		};
+
+		class EmptySystem1Factory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
+		{
+		public:
+			EmptySystem1* createdSystem = nullptr;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
+			{
+				const auto emptySystem = new EmptySystem1();
+				createdSystem = emptySystem;
+
+				return PonyEngine::Core::SystemInfo::Create<EmptySystem1, EmptySystem1Base>(*emptySystem, *this, true);
+			}
+			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
+			{
+				Assert::IsNotNull(dynamic_cast<EmptySystem1*>(system));
+				delete static_cast<EmptySystem1*>(system);
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* GetName() const noexcept override
+			{
+				return "";
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* GetSystemName() const noexcept override
+			{
+				return "";
+			}
 		};
 
 		TEST_METHOD(CreateTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(&logger);
-			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsNotNull(engine);
-			PonyEngine::Core::DestroyEngine(engine);
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::IsNotNull(engine.get());
 		}
 
-		TEST_METHOD(GetFrameCountTest)
+		TEST_METHOD(SystemTickTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(&logger);
-			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
-			
-			for (std::size_t i = 0; i < 10; ++i)
-			{
-				Assert::AreEqual(i, engine->GetFrameCount());
-				engine->Tick();
-				Assert::AreEqual(i + 1, engine->GetFrameCount());
-			}
+			EmptySystemFactory systemFactory;
+			auto params = PonyEngine::Core::EngineParams(logger);
+			params.AddSystemFactory(systemFactory);
+			auto engine = PonyEngine::Core::CreateEngine(params);
 
-			PonyEngine::Core::DestroyEngine(engine);
+			Assert::IsTrue(systemFactory.createdSystem->begun);
+
+			Assert::IsFalse(systemFactory.createdSystem->ticked);
+
+			engine->Tick();
+			Assert::IsTrue(systemFactory.createdSystem->ticked);
+
+			systemFactory.createdSystem->ticked = false;
+			engine->Tick();
+			Assert::IsTrue(systemFactory.createdSystem->ticked);
+
+			bool ended = false;
+			systemFactory.createdSystem->ended = &ended;
+			engine.reset();
+			Assert::IsTrue(ended);
+			Assert::IsTrue(systemFactory.systemDestroyed);
 		}
 
 		TEST_METHOD(GetLoggerTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(&logger);
-			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->GetLogger())));
-			PonyEngine::Core::DestroyEngine(engine);
 		}
 
-		TEST_METHOD(GetWindowTest)
+		TEST_METHOD(ExitTest)
 		{
 			EmptyLogger logger;
-			EmptyWindowFactory windowFactory;
-			PonyEngine::Core::EngineParams params(&logger);
-			params.SetWindowFactory(&windowFactory);
-			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(windowFactory.createdWindow), reinterpret_cast<std::uintptr_t>(engine->GetWindow()));
-			PonyEngine::Core::DestroyEngine(engine);
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::IsTrue(engine->GetIsRunning());
+			engine->Stop();
+			Assert::IsFalse(engine->GetIsRunning());
+			Assert::AreEqual(0, engine->GetExitCode());
+			engine.reset();
+			engine = PonyEngine::Core::CreateEngine(params);
+			engine->Stop(100);
+			Assert::AreEqual(100, engine->GetExitCode());
+		}
+
+		TEST_METHOD(GetNameTest)
+		{
+			EmptyLogger logger;
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::AreEqual("PonyEngine::Core::Engine", engine->GetName());
 		}
 
 		TEST_METHOD(FindSystemTest)
 		{
 			EmptyLogger logger;
 			EmptySystemFactory systemFactory;
-			PonyEngine::Core::EngineParams params(&logger);
-			params.AddSystemFactory(&systemFactory);
-			PonyEngine::Core::IEngine* const engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->FindSystem([](const PonyEngine::Core::ISystem* const system) { return dynamic_cast<const EmptySystem*>(system) != nullptr; })));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->FindSystem<EmptySystem>()));
-			PonyEngine::Core::DestroyEngine(engine);
+			EmptySystem1Factory system1Factory;
+			auto params = PonyEngine::Core::EngineParams(logger);
+			params.AddSystemFactory(systemFactory);
+			params.AddSystemFactory(system1Factory);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem(typeid(EmptySystem))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem<EmptySystem>()));
+
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem(typeid(EmptySystem1Base))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem<EmptySystem1Base>()));
+
+			Assert::IsNull(engine->GetSystemManager().FindSystem(typeid(EmptySystem1)));
+			Assert::IsNull(engine->GetSystemManager().FindSystem<EmptySystem1>());
+
+			Assert::IsNull(engine->GetSystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
+			Assert::IsNull(engine->GetSystemManager().FindSystem<PonyEngine::Core::ISystem>());
 		}
 
-		TEST_METHOD(ExitTest)
+		TEST_METHOD(GetFrameCountTest)
 		{
 			EmptyLogger logger;
-			PonyEngine::Core::EngineParams params(&logger);
-			PonyEngine::Core::IEngine* engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsTrue(engine->IsRunning());
-			engine->Stop();
-			Assert::IsFalse(engine->IsRunning());
-			Assert::AreEqual(0, engine->GetExitCode());
-			PonyEngine::Core::DestroyEngine(engine);
-			engine = PonyEngine::Core::CreateEngine(params);
-			engine->Stop(100);
-			Assert::AreEqual(100, engine->GetExitCode());
-			PonyEngine::Core::DestroyEngine(engine);
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+
+			for (std::size_t i = 0; i < 10; ++i)
+			{
+				Assert::AreEqual(i, engine->GetTimeManager().GetFrameCount());
+				engine->Tick();
+				Assert::AreEqual(i + 1, engine->GetTimeManager().GetFrameCount());
+			}
+		}
+
+		TEST_METHOD(GetSetFrameTimeRate)
+		{
+			EmptyLogger logger;
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameTime(0.16f);
+			Assert::AreEqual(0.16f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(1.f / 0.16f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameTime(0.f);
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameRate(90.f);
+			Assert::AreEqual(1.f / 90.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(90.f, engine->GetTimeManager().GetTargetFrameRate());
+
+			engine->GetTimeManager().SetTargetFrameRate(0.f);
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
+			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
 		}
 	};
-}
+} 

@@ -36,16 +36,7 @@
     <ClCompile Include="Log\LogEntryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\LogInputTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\LogTypeTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window\KeyboardKeyCodeTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Window\KeyboardMessageTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\EngineParamsTests.cpp">
@@ -79,6 +70,30 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Math\Transformations3DTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\ObjectInterfacesTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SystemDeleterTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SystemInfoTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Window.Windows\WindowsWindowTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\HandleTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\KeyboardKeyCodeTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\KeyboardMessageTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Input\InputSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
