@@ -12,6 +12,7 @@
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 import PonyEngine.Core;
+import PonyEngine.Input;
 import PonyEngine.Log;
 import PonyEngine.Window;
 import PonyEngine.Window.Factory;
@@ -86,6 +87,8 @@ namespace Window
 			mutable EmptySystemManager systemManager;
 
 		public:
+			int stopCode = 123;
+
 			explicit EmptyEngine(EmptyLogger& logger) noexcept :
 				logger{&logger}
 			{
@@ -121,8 +124,9 @@ namespace Window
 				return 0;
 			}
 
-			virtual void Stop(int exitCode) noexcept override
+			virtual void Stop(const int exitCode) noexcept override
 			{
+				stopCode = exitCode;
 			}
 
 			[[nodiscard("Pure function")]]
@@ -133,6 +137,23 @@ namespace Window
 
 			virtual void Tick() override
 			{
+			}
+		};
+
+		class KeyboardObserver final : public PonyEngine::Input::IKeyboardObserver
+		{
+		public:
+			PonyEngine::Input::KeyboardMessage lastMessage;
+
+			virtual void Observe(const PonyEngine::Input::KeyboardMessage& keyboardMessage) override
+			{
+				lastMessage = keyboardMessage;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* GetName() const noexcept override
+			{
+				return "";
 			}
 		};
 
@@ -251,6 +272,48 @@ namespace Window
 			Assert::AreEqual(32L, rect.top);
 			Assert::AreEqual(64L + 320L, rect.right);
 			Assert::AreEqual(32L + 240L, rect.bottom);
+		}
+
+		TEST_METHOD(DestroyMessageTest)
+		{
+			auto logger = EmptyLogger();
+			auto engine = EmptyEngine(logger);
+			auto classParams = PonyEngine::Window::WindowsClassParams();
+			classParams.name = L"Pony Engine Test";
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
+			auto windowInfo = factory->Create(engine);
+			auto window = std::move(windowInfo.System());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			PostMessage(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
+			window->Tick();
+			Assert::AreEqual(0, engine.stopCode);
+		}
+
+		TEST_METHOD(InputMessageTest)
+		{
+			auto logger = EmptyLogger();
+			auto engine = EmptyEngine(logger);
+			auto classParams = PonyEngine::Window::WindowsClassParams();
+			classParams.name = L"Pony Engine Test";
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
+			auto windowInfo = factory->Create(engine);
+			auto window = std::move(windowInfo.System());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			auto keyboardObserver = KeyboardObserver();
+			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.get());
+			keyboardProvider->AddKeyboardObserver(&keyboardObserver);
+			PostMessage(windowsWindow->GetWindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
+			window->Tick();
+			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::T, .isDown = true});
+			PostMessage(windowsWindow->GetWindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
+			window->Tick();
+			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = false});
+			PostMessage(windowsWindow->GetWindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
+			window->Tick();
+			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftAlt, .isDown = true});
+			PostMessage(windowsWindow->GetWindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
+			window->Tick();
+			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
 		}
 	};
 }
