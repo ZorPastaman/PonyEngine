@@ -13,14 +13,15 @@ module;
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
-import PonyEngine.Core;
-import PonyEngine.Input.Factories;
+import PonyEngine.Core.Factory;
+import PonyEngine.Input.Factory;
 
 import :InputSystem;
 
 export namespace PonyEngine::Input
 {
-	class InputSystemFactory final : public IInputSystemFactory
+	/// @brief Input system factory.
+	class InputSystemFactory final : public IInputSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		InputSystemFactory() noexcept = default;
@@ -30,32 +31,44 @@ export namespace PonyEngine::Input
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual IInputSystem* Create(Core::IEngine& engine) override;
+		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* GetSystemName() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual const char* GetName() const noexcept override;
+
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
+
+		static constexpr auto StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	IInputSystem* InputSystemFactory::Create(Core::IEngine& engine)
+	Core::SystemInfo InputSystemFactory::Create(Core::IEngine& engine)
 	{
-		return new InputSystem(engine);
+		const auto inputSystem = new InputSystem(engine);
+
+		return Core::SystemInfo::CreateDeduced<IInputSystem>(*inputSystem, *this, true);
 	}
 
-	void InputSystemFactory::Destroy(Core::ISystem* system) noexcept
+	void InputSystemFactory::Destroy(Core::ISystem* const system) noexcept
 	{
-		assert((dynamic_cast<InputSystem*>(system) != nullptr));
+		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
 		delete static_cast<InputSystem*>(system);
 	}
 
 	const char* InputSystemFactory::GetSystemName() const noexcept
 	{
-		return InputSystem::Name;
+		return InputSystem::StaticName;
+	}
+
+	const char* InputSystemFactory::GetName() const noexcept
+	{
+		return StaticName;
 	}
 }

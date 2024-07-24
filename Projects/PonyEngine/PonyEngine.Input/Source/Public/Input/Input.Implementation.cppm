@@ -11,35 +11,44 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Core/Linking.h"
+#include "PonyEngine/Compiler/Linking.h"
 
 export module PonyEngine.Input.Implementation;
 
-import PonyEngine.Input.Factories;
+import <memory>;
+
+export import PonyEngine.Input.Factory;
 
 import :InputSystemFactory;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Input system factory deleter.
+	struct PONY_DLL_EXPORT InputSystemFactoryDeleter final
+	{
+		/// @brief Deletes the @p factory.
+		/// @param factory Input system factory to delete.
+		void operator ()(IInputSystemFactory* factory) const noexcept;
+	};
+
+	using InputUniquePtr = std::unique_ptr<IInputSystemFactory, InputSystemFactoryDeleter>; ///< Input system factory unique_ptr typedef.
+
 	/// @brief Creates an input system factory.
 	/// @return Input system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT IInputSystemFactory* CreateInputSystemFactory();
-	/// @brief Destroys a previously created input system factory.
-	/// @param factory Input system factory to destroy.
-	PONY_DLL_EXPORT void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept;
+	PONY_DLL_EXPORT InputUniquePtr CreateInputSystemFactory();
 }
 
 namespace PonyEngine::Input
 {
-	IInputSystemFactory* CreateInputSystemFactory()
+	void InputSystemFactoryDeleter::operator ()(IInputSystemFactory* const factory) const noexcept
 	{
-		return new InputSystemFactory();
+		assert((dynamic_cast<InputSystemFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
+		delete static_cast<InputSystemFactory*>(factory);
 	}
 
-	void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept
+	InputUniquePtr CreateInputSystemFactory()
 	{
-		assert((dynamic_cast<InputSystemFactory*>(factory) != nullptr));
-		delete static_cast<InputSystemFactory*>(factory);
+		return std::unique_ptr<IInputSystemFactory, InputSystemFactoryDeleter>(new InputSystemFactory());
 	}
 }

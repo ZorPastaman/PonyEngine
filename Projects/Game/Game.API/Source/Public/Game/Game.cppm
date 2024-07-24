@@ -9,4 +9,4 @@
 
 export module Game;
 
-export import :IGame;
+export import :IGameSystem;

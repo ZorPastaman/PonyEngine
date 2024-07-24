@@ -18,7 +18,10 @@
     <ClCompile Include="Source\Public\Game\Game.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Game\Game.cppm">
+    <ClCompile Include="Source\Private\Game\GameSystem.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Game\GameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
