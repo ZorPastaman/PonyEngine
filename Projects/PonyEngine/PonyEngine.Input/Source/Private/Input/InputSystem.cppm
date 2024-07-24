@@ -120,7 +120,7 @@ namespace PonyEngine::Input
 
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
-		const Handle handle(currentId++);
+		const auto handle = Handle{.id = currentId++};
 		PONY_LOG(engine, Log::LogType::Info, std::format("Register action. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id).c_str());
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		events.insert(std::pair(handle, eventAction));

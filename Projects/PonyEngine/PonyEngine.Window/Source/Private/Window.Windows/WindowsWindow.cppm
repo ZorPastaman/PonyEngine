@@ -279,7 +279,7 @@ namespace PonyEngine::Window
 	{
 		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
 		{
-			const auto keyboardMessage = Input::KeyboardMessage(keyCode, isDown);
+			const auto keyboardMessage = Input::KeyboardMessage{.keyCode = keyCode, .isDown = isDown};
 			PONY_LOG(engine, Log::LogType::Verbose, std::format("Push keyboard message '{}' to observers.", keyboardMessage.ToString()).c_str());
 
 			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
