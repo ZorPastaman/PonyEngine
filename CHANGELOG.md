@@ -9,11 +9,13 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Engine main features.
-- Logger.
-- Window management.
-- Windows platform.
-- Basic math structs: vectors, quaternion.
-- Input system.
+- Common module.
+- Core module.
+- Input module.
+- Log module.
+- Math module.
+- Utility module.
+- Window module.
+- Game & Launcher implementation example.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
