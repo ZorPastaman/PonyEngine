@@ -23,9 +23,6 @@ namespace Launcher
 {
 	EngineSettings GetEngineSettings() noexcept
 	{
-		auto settings = EngineSettings();
-		settings.targetFrameRate = 165.f;
-
-		return settings;
+		return EngineSettings{.targetFrameRate = 165.f};
 	}
 }

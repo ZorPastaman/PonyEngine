@@ -9,6 +9,8 @@
 
 export module Launcher.Windows;
 
+export import Launcher;
+
 export import :LoggerProvider;
 export import :WindowsEngineParamsProvider;
 export import :WindowsEngineSettings;

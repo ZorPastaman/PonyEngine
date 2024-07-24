@@ -15,7 +15,6 @@ import <iostream>;
 
 import PonyEngine.Log;
 
-import Launcher;
 import Launcher.Windows;
 
 int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, const LPWSTR lpCmdLine, const int nShowCmd)

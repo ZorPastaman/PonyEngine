@@ -19,8 +19,6 @@ export module Launcher.Windows:WindowsEngineParamsProvider;
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Log;
-import PonyEngine.Window.Factory;
-import PonyEngine.Window.Windows.Factory;
 import PonyEngine.Window.Windows.Implementation;
 
 import Game.Implementation;
