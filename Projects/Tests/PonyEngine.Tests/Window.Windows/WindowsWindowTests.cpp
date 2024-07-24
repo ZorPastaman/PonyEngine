@@ -113,7 +113,7 @@ namespace Window
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override
+			virtual bool GetIsRunning() const noexcept override
 			{
 				return true;
 			}

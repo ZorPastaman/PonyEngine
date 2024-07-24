@@ -204,9 +204,9 @@ namespace Core
 			EmptyLogger logger;
 			const auto params = PonyEngine::Core::EngineParams(logger);
 			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsTrue(engine->IsRunning());
+			Assert::IsTrue(engine->GetIsRunning());
 			engine->Stop();
-			Assert::IsFalse(engine->IsRunning());
+			Assert::IsFalse(engine->GetIsRunning());
 			Assert::AreEqual(0, engine->GetExitCode());
 			engine.reset();
 			engine = PonyEngine::Core::CreateEngine(params);

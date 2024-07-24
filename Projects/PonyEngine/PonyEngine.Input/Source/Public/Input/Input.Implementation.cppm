@@ -17,6 +17,8 @@ export module PonyEngine.Input.Implementation;
 
 import <memory>;
 
+export import PonyEngine.Input.Factory;
+
 import :InputSystemFactory;
 
 export namespace PonyEngine::Input
@@ -39,23 +41,14 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	/// @brief Destroys the input system factory.
-	/// @param factory Input system factory to destroy.
-	void DestroyInputSystemFactory(IInputSystemFactory* factory) noexcept;
-
 	void InputSystemFactoryDeleter::operator ()(IInputSystemFactory* const factory) const noexcept
 	{
-		DestroyInputSystemFactory(factory);
+		assert((dynamic_cast<InputSystemFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
+		delete static_cast<InputSystemFactory*>(factory);
 	}
 
 	InputUniquePtr CreateInputSystemFactory()
 	{
 		return std::unique_ptr<IInputSystemFactory, InputSystemFactoryDeleter>(new InputSystemFactory());
-	}
-
-	void DestroyInputSystemFactory(IInputSystemFactory* const factory) noexcept
-	{
-		assert((dynamic_cast<InputSystemFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
-		delete static_cast<InputSystemFactory*>(factory);
 	}
 }

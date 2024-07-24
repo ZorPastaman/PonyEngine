@@ -18,7 +18,7 @@ export module PonyEngine.Log.Implementation;
 import <filesystem>;
 import <memory>;
 
-import PonyEngine.Log;
+export import PonyEngine.Log;
 
 import :ConsoleSubLogger;
 import :FileSubLogger;
@@ -73,31 +73,22 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	/// @brief Destroys the logger.
-	/// @param logger Logger to destroy.
-	void DestroyLogger(ILogger* logger) noexcept;
-
-	/// @brief Destroys the console sub-logger.
-	/// @param subLogger Console sub-logger to destroy.
-	void DestroyConsoleSubLogger(ISubLogger* subLogger) noexcept;
-
-	/// @brief Destroys the file sub-logger.
-	/// @param subLogger File sub-logger to destroy.
-	void DestroyFileSubLogger(ISubLogger* subLogger) noexcept;
-
 	void LoggerDeleter::operator ()(ILogger* const logger) const noexcept
 	{
-		DestroyLogger(logger);
+		assert((dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type."));
+		delete static_cast<Logger*>(logger);
 	}
 
 	void ConsoleSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
 	{
-		DestroyConsoleSubLogger(subLogger);
+		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
+		delete static_cast<ConsoleSubLogger*>(subLogger);
 	}
 
 	void FileSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
 	{
-		DestroyFileSubLogger(subLogger);
+		assert((dynamic_cast<FileSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
+		delete static_cast<FileSubLogger*>(subLogger);
 	}
 
 	LoggerUniquePtr CreateLogger()
@@ -113,23 +104,5 @@ namespace PonyEngine::Log
 	FileSubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path)
 	{
 		return std::unique_ptr<ISubLogger, FileSubLoggerDeleter>(new FileSubLogger(path));
-	}
-
-	void DestroyLogger(ILogger* const logger) noexcept
-	{
-		assert((dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type."));
-		delete static_cast<Logger*>(logger);
-	}
-
-	void DestroyConsoleSubLogger(ISubLogger* const subLogger) noexcept
-	{
-		assert((dynamic_cast<ConsoleSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
-		delete static_cast<ConsoleSubLogger*>(subLogger);
-	}
-
-	void DestroyFileSubLogger(ISubLogger* const subLogger) noexcept
-	{
-		assert((dynamic_cast<FileSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
-		delete static_cast<FileSubLogger*>(subLogger);
 	}
 }

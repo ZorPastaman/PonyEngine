@@ -14,54 +14,9 @@ import <cstddef>;
 export namespace PonyEngine::Log
 {
 	/// @brief Log data input.
-	class LogInput final
+	struct LogInput final
 	{
-	public:
-		/// @brief Creates a @p LogInput.
-		/// @param message Log message.
-		/// @param frameCount Engine frame count.
-		[[nodiscard("Pure constructor")]]
-		LogInput(const char* message, std::size_t frameCount) noexcept;
-		[[nodiscard("Pure constructor")]]
-		LogInput(const LogInput& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		LogInput(LogInput&& other) noexcept = default;
-
-		~LogInput() noexcept = default;
-
-		/// @brief Gets the log message.
-		/// @return Log message.
-		[[nodiscard("Pure function")]]
-		const char* GetMessage() const noexcept;
-		/// @brief Gets the engine frame count.
-		/// @return Engine frame count.
-		[[nodiscard("Pure function")]]
-		std::size_t GetFrameCount() const noexcept;
-
-		LogInput& operator =(const LogInput& other) noexcept = default;
-		LogInput& operator =(LogInput&& other) noexcept = default;
-
-	private:
-		const char* message; ///< Log message.
-		std::size_t frameCount; ///< Engine frame count.
+		const char* message = ""; ///< Log message.
+		std::size_t frameCount = 0; ///< Engine frame count.
 	};
-}
-
-namespace PonyEngine::Log
-{
-	LogInput::LogInput(const char* const message, const std::size_t frameCount) noexcept :
-		message{message},
-		frameCount{frameCount}
-	{
-	}
-
-	const char* LogInput::GetMessage() const noexcept
-	{
-		return message;
-	}
-
-	std::size_t LogInput::GetFrameCount() const noexcept
-	{
-		return frameCount;
-	}
 }

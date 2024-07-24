@@ -145,8 +145,8 @@ namespace PonyEngine::Window
 	{
 		const WORD keyFlags = HIWORD(lParam);
 		const WORD scanCode = LOBYTE(keyFlags);
-		const WORD extended = (keyFlags & KF_EXTENDED) == KF_EXTENDED;
-		const WORD extendedPrefix = extended << WORD{15} | extended << WORD{14} | extended << WORD{13}; // 0xE000 if it's extended; 0 otherwise.
+		const WORD extended = keyFlags & KF_EXTENDED;
+		const WORD extendedPrefix = extended << WORD{7} | extended << WORD{6} | extended << WORD{5}; // 0xE000 if it's extended; 0 otherwise.
 		const WORD key = scanCode | extendedPrefix;
 		const auto pair = KeyCodeMap.find(key);
 

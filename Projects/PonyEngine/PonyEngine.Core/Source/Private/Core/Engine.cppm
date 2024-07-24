@@ -20,7 +20,6 @@ import <memory>;
 import <stdexcept>;
 import <string>;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
@@ -50,7 +49,7 @@ export namespace PonyEngine::Core
 		virtual ISystemManager& GetSystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsRunning() const noexcept override;
+		virtual bool GetIsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int GetExitCode() const noexcept override;
 		virtual void Stop(int exitCode = 0) noexcept override;
@@ -125,7 +124,7 @@ namespace PonyEngine::Core
 		return *systemManager;
 	}
 
-	bool Engine::IsRunning() const noexcept
+	bool Engine::GetIsRunning() const noexcept
 	{
 		return isRunning;
 	}
@@ -155,7 +154,7 @@ namespace PonyEngine::Core
 	{
 		if (!isRunning)
 		{
-			throw std::logic_error("The engine is ticked when it's already stopped.");
+			throw std::logic_error("The engine is ticked when it's already been stopped.");
 		}
 
 		PONY_LOG(this, Log::LogType::Verbose, "Tick time manager.");

@@ -36,9 +36,6 @@
     <ClCompile Include="Log\LogEntryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\LogInputTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\LogTypeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

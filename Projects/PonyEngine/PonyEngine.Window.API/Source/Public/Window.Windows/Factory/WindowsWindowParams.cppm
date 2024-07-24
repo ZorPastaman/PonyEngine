@@ -18,8 +18,8 @@ export namespace PonyEngine::Window
 	/// @brief Windows window parameters.
 	struct WindowsWindowParams final
 	{
-		DWORD style; ///< Window style.
-		DWORD extendedStyle; ///< Extended window style.
+		DWORD style = DWORD{0}; ///< Window style.
+		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
 		int showCmd = SW_NORMAL; ///< Window showCmd.
 	};
 }

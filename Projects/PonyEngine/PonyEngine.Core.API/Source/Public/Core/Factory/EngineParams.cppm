@@ -156,7 +156,7 @@ namespace PonyEngine::Core
 
 	void EngineParams::AddSystemFactory(ISystemFactory& systemFactory)
 	{
-		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory is already added."));
+		assert((std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory has already been added."));
 		systemFactories.push_back(&systemFactory);
 	}
 }

@@ -16,9 +16,9 @@ export namespace PonyEngine::Window
 	/// @brief Platform-independent window parameters.
 	struct WindowParams final
 	{
-		std::wstring title; ///< Window title.
-		int horizontalPosition; ///< Window horizontal position.
-		int verticalPosition; ///< Window vertical position.
+		std::wstring title = L"Pony Engine Window"; ///< Window title.
+		int horizontalPosition = 0; ///< Window horizontal position.
+		int verticalPosition = 0; ///< Window vertical position.
 		int width = 800; ///< Window width.
 		int height = 600; ///< Window height.
 	};

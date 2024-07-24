@@ -13,7 +13,6 @@ module;
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Factory;
 
