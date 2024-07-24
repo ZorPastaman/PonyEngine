@@ -100,14 +100,14 @@ export namespace PonyEngine::Log
 namespace PonyEngine::Log
 {
 	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
-		message(message),
-		exception(exception),
-		timePoint(timePoint),
+		message{message},
+		exception{exception},
+		timePoint{timePoint},
 		frameCount{frameCount},
 		logType{logType},
 		isDirty{true}
 	{
-		assert(((logType != LogType::Exception && exception == nullptr) || (logType == LogType::Exception && exception != nullptr)));
+		assert(((logType == LogType::Exception) == (exception != nullptr)) && "Incorrect log type.");
 	}
 
 	const char* LogEntry::GetMessage() const noexcept

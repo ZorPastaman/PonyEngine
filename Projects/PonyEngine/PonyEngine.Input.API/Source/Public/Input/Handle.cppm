@@ -10,7 +10,6 @@
 export module PonyEngine.Input:Handle;
 
 import <cstddef>;
-import <unordered_map>;
 
 export namespace PonyEngine::Input
 {

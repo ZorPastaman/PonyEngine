@@ -36,13 +36,13 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& GetSystemManager() const noexcept = 0;
 
-		/// @brief Checks if the engine received an exit code.
+		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p GetExitCode().
 		/// @return @a False if the engine received an exit code; @a true otherwise;
 		[[nodiscard("Pure function")]]
-		virtual bool IsRunning() const noexcept = 0;
+		virtual bool GetIsRunning() const noexcept = 0;
 		/// @brief Gets the exit code.
-		/// @note Mustn't be called if @p IsRunning() returns @a true.
+		/// @note Mustn't be called if @p GetIsRunning() returns @a true.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		virtual int GetExitCode() const noexcept = 0;

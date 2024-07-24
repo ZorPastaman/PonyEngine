@@ -64,7 +64,7 @@ namespace PonyEngine::Log
 	{
 		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
 
-		const auto logEntry = LogEntry(logInput.GetMessage(), nullptr, std::chrono::system_clock::now(), logInput.GetFrameCount(), logType);
+		const auto logEntry = LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{
@@ -81,7 +81,7 @@ namespace PonyEngine::Log
 
 	void Logger::LogException(const std::exception& exception, const LogInput& logInput) noexcept
 	{
-		const auto logEntry = LogEntry(logInput.GetMessage(), &exception, std::chrono::system_clock::now(), logInput.GetFrameCount(), LogType::Exception);
+		const auto logEntry = LogEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{
@@ -99,7 +99,7 @@ namespace PonyEngine::Log
 	void Logger::AddSubLogger(ISubLogger* const subLogger)
 	{
 		assert((subLogger && "The sub-logger is nullptr."));
-		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger is already added."));
+		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger has already been added."));
 		PONY_CONSOLE(LogType::Info, std::format("Add sub-logger '{}'.", subLogger->GetName()));
 		subLoggers.push_back(subLogger);
 		PONY_CONSOLE(LogType::Info, "Sub-logger added.");

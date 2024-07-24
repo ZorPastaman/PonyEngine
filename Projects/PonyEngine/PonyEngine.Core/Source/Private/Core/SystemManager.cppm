@@ -15,7 +15,6 @@ module;
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
-import <cstddef>;
 import <exception>;
 import <format>;
 import <memory>;
@@ -26,7 +25,6 @@ import <unordered_map>;
 import <utility>;
 import <vector>;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
@@ -80,7 +78,7 @@ namespace PonyEngine::Core
 
 		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactories(); !factory.IsEnd(); ++factory)
 		{
-			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create '{}'.", (*factory).GetSystemName()).c_str());
+			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create system '{}'.", (*factory).GetSystemName()).c_str());
 
 			SystemInfo systemInfo = (*factory).Create(engine);
 			SystemUniquePtr system = std::move(systemInfo.System());
@@ -101,10 +99,11 @@ namespace PonyEngine::Core
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
-				systemInterfaces.insert_or_assign(std::type_index((*interfacesIterator).first), (*interfacesIterator).second);
+				auto [type, objectPointer] = *interfacesIterator;
+				systemInterfaces.insert_or_assign(type.get(), objectPointer);
 			}
 
-			PONY_LOG(this->engine, Log::LogType::Info, std::format("'{}' created.", systemPointer->GetName()).c_str());
+			PONY_LOG(this->engine, Log::LogType::Info, "System created.");
 		}
 
 		PONY_LOG(this->engine, Log::LogType::Info, "Systems created.");
@@ -116,7 +115,7 @@ namespace PonyEngine::Core
 
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy system '{}'.", (*system)->GetName()).c_str());
 			system->reset();
 			PONY_LOG(engine, Log::LogType::Info, "System destroyed.");
 		}
@@ -140,9 +139,9 @@ namespace PonyEngine::Core
 
 		for (const auto& system : systems)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Begin '{}'.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Begin system '{}'.", system->GetName()).c_str());
 			system->Begin();
-			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' begun.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "System begun.");
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, "Systems begun.");
@@ -154,7 +153,7 @@ namespace PonyEngine::Core
 
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("End '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("End system '{}'.", (*system)->GetName()).c_str());
 			try
 			{
 				(*system)->End();
@@ -163,7 +162,7 @@ namespace PonyEngine::Core
 			{
 				PONY_LOG_E(engine, e, "On ending a system.");
 			}
-			PONY_LOG(engine, Log::LogType::Info, std::format("'{}' ended.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "System ended.");
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, "Systems ended.");

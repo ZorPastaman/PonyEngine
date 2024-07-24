@@ -11,8 +11,6 @@ export module PonyEngine.Input:IInputSystem;
 
 import <functional>;
 
-import PonyEngine.Core;
-
 import :Event;
 import :Handle;
 

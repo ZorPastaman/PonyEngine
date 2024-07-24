@@ -18,7 +18,7 @@ export module PonyEngine.Window.Windows.Implementation;
 import <memory>;
 
 import PonyEngine.Log;
-import PonyEngine.Window.Windows.Factory;
+export import PonyEngine.Window.Windows.Factory;
 
 import :WindowsWindowFactory;
 
@@ -45,23 +45,14 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Destroys the Windows window factory.
-	/// @param factory Windows window factory to destroy.
-	void DestroyWindowsWindowFactory(IWindowsWindowFactory* factory) noexcept;
-
 	void WindowsWindowFactoryDeleter::operator ()(IWindowsWindowFactory* const factory) const noexcept
 	{
-		DestroyWindowsWindowFactory(factory);
+		assert((dynamic_cast<WindowsWindowFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
+		delete static_cast<WindowsWindowFactory*>(factory);
 	}
 
 	WindowsWindowUniquePtr CreateWindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams)
 	{
 		return std::unique_ptr<IWindowsWindowFactory, WindowsWindowFactoryDeleter>(new WindowsWindowFactory(logger, classParams));
-	}
-
-	void DestroyWindowsWindowFactory(IWindowsWindowFactory* const factory) noexcept
-	{
-		assert((dynamic_cast<WindowsWindowFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
-		delete static_cast<WindowsWindowFactory*>(factory);
 	}
 }

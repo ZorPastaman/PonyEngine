@@ -9,4 +9,6 @@
 
 export module PonyEngine.Input.Factory;
 
+export import PonyEngine.Input;
+
 export import :IInputSystemFactory;

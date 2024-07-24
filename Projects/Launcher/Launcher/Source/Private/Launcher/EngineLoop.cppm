@@ -85,7 +85,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Tick engine.");
 		engine->Tick();
 
-		if (engine->IsRunning()) [[likely]]
+		if (engine->GetIsRunning()) [[likely]]
 		{
 			return false;
 		}

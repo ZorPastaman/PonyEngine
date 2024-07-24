@@ -46,7 +46,7 @@ export namespace PonyEngine::Core
 
 	private:
 		/// @brief Waits for the target frame time.
-		void WaitForTargetTime() noexcept;
+		void WaitForTargetFrameTime() noexcept;
 
 		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
 		std::chrono::time_point<std::chrono::steady_clock> previousTickTime; ///< Previous tick time.
@@ -84,13 +84,13 @@ namespace PonyEngine::Core
 	void TimeManager::Tick() noexcept
 	{
 		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Wait for target frame time.");
-		WaitForTargetTime();
+		WaitForTargetFrameTime();
 
 		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Increase frame count.");
 		++frameCount;
 	}
 
-	void TimeManager::WaitForTargetTime() noexcept
+	void TimeManager::WaitForTargetFrameTime() noexcept
 	{
 		std::chrono::time_point<std::chrono::steady_clock> now;
 

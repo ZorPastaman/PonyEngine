@@ -51,6 +51,7 @@ export namespace PonyEngine::Log
 		ILogger& operator =(ILogger&& other) noexcept = delete;
 
 	protected:
+		[[nodiscard("Pure constructor")]]
 		ILogger() noexcept = default;
 
 		~ILogger() noexcept = default;

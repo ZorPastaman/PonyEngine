@@ -84,7 +84,6 @@
     <ClCompile Include="Log\FileSubLoggerTests.cpp" />
     <ClCompile Include="Log\LogEntryTests.cpp" />
     <ClCompile Include="Log\LoggerTests.cpp" />
-    <ClCompile Include="Log\LogInputTests.cpp" />
     <ClCompile Include="Log\LogTypeTests.cpp" />
     <ClCompile Include="Math\ArrayArithmeticsTests.cpp" />
     <ClCompile Include="Math\CommonTests.cpp" />

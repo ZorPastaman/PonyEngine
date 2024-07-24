@@ -18,8 +18,7 @@ export module PonyEngine.Core.Implementation;
 import <functional>;
 import <memory>;
 
-import PonyEngine.Core;
-import PonyEngine.Core.Factory;
+export import PonyEngine.Core.Factory;
 
 import :Engine;
 
@@ -44,23 +43,14 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	/// @brief Destroy the @p engine.
-	/// @param engine Engine to destroy.
-	void DestroyEngine(IAdvancedEngine* engine) noexcept;
-
 	void EngineDeleter::operator ()(IAdvancedEngine* const engine) const noexcept
 	{
-		DestroyEngine(engine);
+		assert((dynamic_cast<Engine*>(engine) && "Tried to destroy an engine of the wrong type."));
+		delete static_cast<Engine*>(engine);
 	}
 
 	EngineUniquePtr CreateEngine(const EngineParams& params)
 	{
 		return std::unique_ptr<IAdvancedEngine, EngineDeleter>(new Engine(params));
-	}
-
-	void DestroyEngine(IAdvancedEngine* const engine) noexcept
-	{
-		assert((dynamic_cast<Engine*>(engine) && "Tried to destroy an engine of the wrong type."));
-		delete static_cast<Engine*>(engine);
 	}
 }

@@ -71,7 +71,7 @@ namespace PonyEngine::Window
 	{
 		if (uMsg == WM_CREATE)
 		{
-			if (const auto windowProc = reinterpret_cast<IWindowProc*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams); windowProc != nullptr) [[likely]]
+			if (const auto windowProc = reinterpret_cast<IWindowProc*>(reinterpret_cast<CREATESTRUCT*>(lParam)->lpCreateParams)) [[likely]]
 			{
 				return windowProc->WindowProc(uMsg, wParam, lParam);
 			}
@@ -81,12 +81,12 @@ namespace PonyEngine::Window
 
 		SetLastError(DWORD{0});
 
-		if (const auto windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA)); windowProc != nullptr) [[likely]]
+		if (const auto windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtr(hWnd, GWLP_USERDATA))) [[likely]]
 		{
 			return windowProc->WindowProc(uMsg, wParam, lParam);
 		}
 
-		if (const DWORD errorCode = GetLastError()) [[unlikely]]
+		if (const DWORD errorCode = GetLastError()) [[likely]]
 		{
 			throw std::logic_error(std::format("Error on a window proc. Error code: '{}'.", errorCode));
 		}

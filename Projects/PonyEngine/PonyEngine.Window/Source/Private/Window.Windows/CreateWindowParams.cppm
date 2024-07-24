@@ -20,9 +20,9 @@ export namespace PonyEngine::Window
 	/// @brief Window parameters.
 	struct CreateWindowParams final
 	{
-		std::wstring title; ///< Window title.
-		DWORD style; ///< Window style.
-		DWORD extendedStyle; ///< Extended window style.
+		std::wstring title = L"Pony Engine Window"; ///< Window title.
+		DWORD style = DWORD{0}; ///< Window style.
+		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
 		int horizontalPosition = CW_USEDEFAULT; ///< Horizontal window position.
 		int verticalPosition = CW_USEDEFAULT; ///< Vertical window position.
 		int width = CW_USEDEFAULT; ///< Window width.
