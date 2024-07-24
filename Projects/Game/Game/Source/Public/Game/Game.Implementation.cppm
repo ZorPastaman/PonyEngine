@@ -19,6 +19,8 @@ import <memory>;
 
 import PonyEngine.Log;
 
+export import Game.Factory;
+
 import :GameSystemFactory;
 
 export namespace Game
@@ -42,23 +44,14 @@ export namespace Game
 
 namespace Game
 {
-	/// @brief Destroys the game system factory.
-	/// @param factory Game system factory to destroy.
-	void DestroyGameSystemFactory(IGameSystemFactory* factory) noexcept;
-
 	void GameSystemFactoryDeleter::operator ()(IGameSystemFactory* const factory) const noexcept
 	{
-		DestroyGameSystemFactory(factory);
+		assert((dynamic_cast<GameSystemFactory*>(factory) && "Tried to destroy a game system factory of the wrong type."));
+		delete static_cast<GameSystemFactory*>(factory);
 	}
 
 	GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger)
 	{
 		return std::unique_ptr<IGameSystemFactory, GameSystemFactoryDeleter>(new GameSystemFactory(logger));
-	}
-
-	void DestroyGameSystemFactory(IGameSystemFactory* const factory) noexcept
-	{
-		assert((dynamic_cast<GameSystemFactory*>(factory) && "Tried to destroy a game system factory of the wrong type."));
-		delete static_cast<GameSystemFactory*>(factory);
 	}
 }

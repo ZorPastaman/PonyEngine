@@ -39,6 +39,7 @@ export namespace Game
 
 		virtual void Begin() override;
 		virtual void End() override;
+
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
@@ -77,9 +78,9 @@ namespace Game
 		if (const auto inputSystem = engine->GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register up input.");
-			const auto upMessage = PonyEngine::Input::KeyboardMessage(PonyEngine::Input::KeyboardKeyCode::ArrowUp, true);
-			const auto upEvent = PonyEngine::Input::Event(upMessage);
-			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]()
+			constexpr auto upMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowUp, .isDown = true};
+			constexpr auto upEvent = PonyEngine::Input::Event{.expectedMessage = upMessage};
+			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]
 			{
 				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
@@ -89,9 +90,9 @@ namespace Game
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Up input registered.");
 
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register down input.");
-			const auto downMessage = PonyEngine::Input::KeyboardMessage(PonyEngine::Input::KeyboardKeyCode::ArrowDown, true);
-			const auto downEvent = PonyEngine::Input::Event(downMessage);
-			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]()
+			constexpr auto downMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowDown, .isDown = true};
+			constexpr auto downEvent = PonyEngine::Input::Event{.expectedMessage = downMessage};
+			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]
 			{
 				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
@@ -101,9 +102,9 @@ namespace Game
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Down input registered.");
 
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register right input.");
-			const auto rightMessage = PonyEngine::Input::KeyboardMessage(PonyEngine::Input::KeyboardKeyCode::ArrowRight, true);
-			const auto rightEvent = PonyEngine::Input::Event(rightMessage);
-			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]()
+			constexpr auto rightMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowRight, .isDown = true};
+			constexpr auto rightEvent = PonyEngine::Input::Event{.expectedMessage = rightMessage};
+			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]
 			{
 				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
@@ -113,9 +114,9 @@ namespace Game
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Right input registered.");
 
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Register left input.");
-			const auto leftMessage = PonyEngine::Input::KeyboardMessage(PonyEngine::Input::KeyboardKeyCode::ArrowLeft, true);
-			const auto leftEvent = PonyEngine::Input::Event(leftMessage);
-			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]()
+			constexpr auto leftMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowLeft, .isDown = true};
+			constexpr auto leftEvent = PonyEngine::Input::Event{.expectedMessage = leftMessage};
+			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]
 			{
 				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{

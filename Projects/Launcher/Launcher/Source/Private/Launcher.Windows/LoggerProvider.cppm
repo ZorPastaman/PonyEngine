@@ -19,7 +19,6 @@ import <exception>;
 import <format>;
 import <iostream>;
 
-import PonyEngine.Log;
 import PonyEngine.Log.Implementation;
 
 export namespace Launcher
