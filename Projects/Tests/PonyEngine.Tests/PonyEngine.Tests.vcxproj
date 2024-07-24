@@ -77,6 +77,7 @@
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
     <ClCompile Include="Core\SystemInfoTests.cpp" />
     <ClCompile Include="Input\HandleTests.cpp" />
+    <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input\KeyboardKeyCodeTests.cpp" />
     <ClCompile Include="Input\KeyboardMessageTests.cpp" />
     <ClCompile Include="Log\ConsoleSubLoggerTests.cpp" />
