@@ -111,10 +111,10 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
-			constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
-			constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
-			constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
+			[[maybe_unused]] constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
+			[[maybe_unused]] constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
+			[[maybe_unused]] constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
+			[[maybe_unused]] constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
 		}
 	};
 }

@@ -4157,31 +4157,31 @@ namespace Math
 
 		static constexpr PonyEngine::Math::Matrix4x4<int> MatrixConstexpr()
 		{
-			auto matrix = PonyEngine::Math::Matrix4x4<int>();
+			[[maybe_unused]] auto matrix = PonyEngine::Math::Matrix4x4<int>();
 			PonyEngine::Math::Matrix4x4<int> movedMatrix = std::move(matrix);
 
-			movedMatrix.M00() += 1.f;
-			movedMatrix.M10() -= 2.f;
-			movedMatrix.M20() -= 3.f;
-			movedMatrix.M30() /= 3.f;
-			movedMatrix.M01() *= 2.f;
-			movedMatrix.M11() = 6.f;
-			movedMatrix.M21() = 9.f;
-			movedMatrix.M31() /= 9.f;
-			movedMatrix.M02() *= 6.f;
-			movedMatrix.M12() = 7.f;
-			movedMatrix.M22() = 1.f;
-			movedMatrix.M32() += 1.f;
-			movedMatrix.M03() -= 6.f;
-			movedMatrix.M13() /= 7.f;
-			movedMatrix.M23() *= 1.f;
-			movedMatrix.M33() += 1.f;
-			int* const data = movedMatrix.Data();
-			int* const columnData = movedMatrix.Data(1);
+			movedMatrix.M00() += 1;
+			movedMatrix.M10() -= 2;
+			movedMatrix.M20() -= 3;
+			movedMatrix.M30() /= 3;
+			movedMatrix.M01() *= 2;
+			movedMatrix.M11() = 6;
+			movedMatrix.M21() = 9;
+			movedMatrix.M31() /= 9;
+			movedMatrix.M02() *= 6;
+			movedMatrix.M12() = 7;
+			movedMatrix.M22() = 1;
+			movedMatrix.M32() += 1;
+			movedMatrix.M03() -= 6;
+			movedMatrix.M13() /= 7;
+			movedMatrix.M23() *= 1;
+			movedMatrix.M33() += 1;
+			[[maybe_unused]] int* const data = movedMatrix.Data();
+			[[maybe_unused]] int* const columnData = movedMatrix.Data(1);
 
-			constexpr auto constMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			const int* const dataC = constMatrix.Data();
-			const int* const columnDataC = constMatrix.Data(1);
+			[[maybe_unused]] constexpr auto constMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
+			[[maybe_unused]] const int* const dataC = constMatrix.Data();
+			[[maybe_unused]] const int* const columnDataC = constMatrix.Data(1);
 
 			movedMatrix.SetRow(0, PonyEngine::Math::Vector4<int>(3, 6, 9, 5));
 			movedMatrix.SetColumn(1, PonyEngine::Math::Vector4<int>(3, 6, 9, 3));
@@ -4197,7 +4197,7 @@ namespace Math
 			movedMatrix[1][1] = 5;
 			movedMatrix[1] = PonyEngine::Math::Vector4<int>(9, 4, 8, 5);
 
-			auto copyAssigned = PonyEngine::Math::Matrix4x4<int>();
+			[[maybe_unused]] auto copyAssigned = PonyEngine::Math::Matrix4x4<int>();
 			copyAssigned = movedMatrix;
 			movedMatrix = std::move(copyAssigned);
 
@@ -4206,8 +4206,8 @@ namespace Math
 			movedMatrix *= 3;
 			movedMatrix *= 3.f;
 
-			auto leftMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			constexpr auto rightMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8); // Left and right are MSVC internal compiler error overcome.
+			[[maybe_unused]] auto leftMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
+			[[maybe_unused]] constexpr auto rightMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8); // Left and right are MSVC internal compiler error overcome.
 			leftMatrix *= rightMatrix;
 			leftMatrix /= 4;
 			leftMatrix /= 5.f;
@@ -4217,71 +4217,71 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr PonyEngine::Math::Matrix4x4<int> identity = PonyEngine::Math::Matrix4x4<int>::Predefined::Identity;
-			constexpr PonyEngine::Math::Matrix4x4<int> zero = PonyEngine::Math::Matrix4x4<int>::Predefined::Zero;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> identity = PonyEngine::Math::Matrix4x4<int>::Predefined::Identity;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> zero = PonyEngine::Math::Matrix4x4<int>::Predefined::Zero;
 
-			constexpr auto defaultMatrix = PonyEngine::Math::Matrix4x4<int>();
-			constexpr auto matrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			constexpr auto columnMatrix = PonyEngine::Math::Matrix4x4<int>(PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5));
-			constexpr auto arrayMatrix = PonyEngine::Math::Matrix4x4<int>(std::array<int, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8}.data());
-			constexpr PonyEngine::Math::Matrix4x4<int> copiedMatrix = matrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> movedMatrix = MatrixConstexpr();
+			[[maybe_unused]] constexpr auto defaultMatrix = PonyEngine::Math::Matrix4x4<int>();
+			[[maybe_unused]] constexpr auto matrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
+			[[maybe_unused]] constexpr auto columnMatrix = PonyEngine::Math::Matrix4x4<int>(PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5), PonyEngine::Math::Vector4<int>(3, 6, 9, 5));
+			[[maybe_unused]] constexpr auto arrayMatrix = PonyEngine::Math::Matrix4x4<int>(std::array<int, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8}.data());
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> copiedMatrix = matrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> movedMatrix = MatrixConstexpr();
 
-			constexpr int m00 = matrix.M00();
-			constexpr int m10 = matrix.M10();
-			constexpr int m20 = matrix.M20();
-			constexpr int m30 = matrix.M30();
-			constexpr int m01 = matrix.M01();
-			constexpr int m11 = matrix.M11();
-			constexpr int m21 = matrix.M21();
-			constexpr int m31 = matrix.M31();
-			constexpr int m02 = matrix.M02();
-			constexpr int m12 = matrix.M12();
-			constexpr int m22 = matrix.M22();
-			constexpr int m32 = matrix.M32();
-			constexpr int m03 = matrix.M03();
-			constexpr int m13 = matrix.M13();
-			constexpr int m23 = matrix.M23();
-			constexpr int m33 = matrix.M33();
+			[[maybe_unused]] constexpr int m00 = matrix.M00();
+			[[maybe_unused]] constexpr int m10 = matrix.M10();
+			[[maybe_unused]] constexpr int m20 = matrix.M20();
+			[[maybe_unused]] constexpr int m30 = matrix.M30();
+			[[maybe_unused]] constexpr int m01 = matrix.M01();
+			[[maybe_unused]] constexpr int m11 = matrix.M11();
+			[[maybe_unused]] constexpr int m21 = matrix.M21();
+			[[maybe_unused]] constexpr int m31 = matrix.M31();
+			[[maybe_unused]] constexpr int m02 = matrix.M02();
+			[[maybe_unused]] constexpr int m12 = matrix.M12();
+			[[maybe_unused]] constexpr int m22 = matrix.M22();
+			[[maybe_unused]] constexpr int m32 = matrix.M32();
+			[[maybe_unused]] constexpr int m03 = matrix.M03();
+			[[maybe_unused]] constexpr int m13 = matrix.M13();
+			[[maybe_unused]] constexpr int m23 = matrix.M23();
+			[[maybe_unused]] constexpr int m33 = matrix.M33();
 
-			constexpr PonyEngine::Math::Vector4<int> row = matrix.GetRow(1);
-			constexpr PonyEngine::Math::Vector4<int> column = matrix.GetColumn(0);
-			constexpr PonyEngine::Math::Vector4<int> diagonal = matrix.GetDiagonal();
-			constexpr PonyEngine::Math::Vector4<int> counterDiagonal = matrix.GetCounterDiagonal();
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> row = matrix.GetRow(1);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> column = matrix.GetColumn(0);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> diagonal = matrix.GetDiagonal();
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> counterDiagonal = matrix.GetCounterDiagonal();
 
-			constexpr int trace = matrix.Trace();
-			constexpr int determinant = matrix.Determinant();
-			constexpr PonyEngine::Math::Matrix4x4<int> adjugate = matrix.Adjugate();
-			constexpr PonyEngine::Math::Matrix4x4<int> transpose = matrix.Transpose();
-			constexpr PonyEngine::Math::Matrix4x4<float> inverse = PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8).Inverse();
+			[[maybe_unused]] constexpr int trace = matrix.Trace();
+			[[maybe_unused]] constexpr int determinant = matrix.Determinant();
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> adjugate = matrix.Adjugate();
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> transpose = matrix.Transpose();
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<float> inverse = PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8).Inverse();
 
-			constexpr bool isZero = matrix.IsZero();
-			constexpr bool isAlmostZero = PonyEngine::Math::Matrix4x4<float>::Predefined::Zero.IsAlmostZero();
-			constexpr bool isIdentity = matrix.IsIdentity();
-			constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.IsAlmostIdentity();
+			[[maybe_unused]] constexpr bool isZero = matrix.IsZero();
+			[[maybe_unused]] constexpr bool isAlmostZero = PonyEngine::Math::Matrix4x4<float>::Predefined::Zero.IsAlmostZero();
+			[[maybe_unused]] constexpr bool isIdentity = matrix.IsIdentity();
+			[[maybe_unused]] constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.IsAlmostIdentity();
 
-			constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix4x4<float>>(matrix);
+			[[maybe_unused]] constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix4x4<float>>(matrix);
 
-			constexpr int m10A = matrix[1][0];
-			constexpr PonyEngine::Math::Vector4<int> columnV = matrix[0];
+			[[maybe_unused]] constexpr int m10A = matrix[1][0];
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> columnV = matrix[0];
 
-			constexpr bool equal = matrix == defaultMatrix;
-			constexpr bool notEqual = matrix != defaultMatrix;
+			[[maybe_unused]] constexpr bool equal = matrix == defaultMatrix;
+			[[maybe_unused]] constexpr bool notEqual = matrix != defaultMatrix;
 
-			constexpr PonyEngine::Math::Matrix4x4<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
-			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8), PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8));
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> scaled = PonyEngine::Math::Scale(matrix, columnMatrix);
+			[[maybe_unused]] constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8), PonyEngine::Math::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8));
 
-			constexpr PonyEngine::Math::Matrix4x4<int> sum = matrix + columnMatrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> negated = -matrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> difference = matrix - columnMatrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> productNumR = matrix * 3;
-			constexpr PonyEngine::Math::Matrix4x4<int> productNumL = 3 * matrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> productNumFR = matrix * 3.f;
-			constexpr PonyEngine::Math::Matrix4x4<int> productNumFL = 3.f * matrix;
-			constexpr PonyEngine::Math::Matrix4x4<int> product = matrix * columnMatrix;
-			constexpr PonyEngine::Math::Vector4<int> productV = matrix * PonyEngine::Math::Vector4<int>(4, 6, 1, 5);
-			constexpr PonyEngine::Math::Matrix4x4<int> quotient = matrix / 3;
-			constexpr PonyEngine::Math::Matrix4x4<int> quotientF = matrix / 3.f;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> sum = matrix + columnMatrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> negated = -matrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> difference = matrix - columnMatrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> productNumR = matrix * 3;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> productNumL = 3 * matrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> productNumFR = matrix * 3.f;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> productNumFL = 3.f * matrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> product = matrix * columnMatrix;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> productV = matrix * PonyEngine::Math::Vector4<int>(4, 6, 1, 5);
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> quotient = matrix / 3;
+			[[maybe_unused]] constexpr PonyEngine::Math::Matrix4x4<int> quotientF = matrix / 3.f;
 		}
 	};
 }

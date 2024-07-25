@@ -29,11 +29,11 @@ export namespace Launcher
 	{
 	public:
 		/// @brief Creates an engine loop.
-		/// @param logger Logger to use.
+		/// @param loggerToUse Logger to use.
 		/// @param systemFactoriesProvider Engine system factories provider.
 		/// @param engineSettings Engine settings.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings);
+		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -52,25 +52,25 @@ export namespace Launcher
 
 namespace Launcher
 {
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings) :
-		logger{&logger}
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings) :
+		logger{&loggerToUse}
 	{
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine params.");
-		auto engineParams = PonyEngine::Core::EngineParams(*this->logger);
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create engine params.");
+		auto engineParams = PonyEngine::Core::EngineParams(*logger);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
 		systemFactoriesProvider.AddSystemFactories(engineParams);
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, "System factories added.");
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine params created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "System factories added.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine params created.");
 
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create engine.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create engine.");
 		engine = PonyEngine::Core::CreateEngine(engineParams);
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, std::format("Set target frame rate: '{}'", engineSettings.targetFrameRate).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, std::format("Set target frame rate: '{}'", engineSettings.targetFrameRate).c_str());
 		engine->GetTimeManager().SetTargetFrameRate(engineSettings.targetFrameRate);
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
 	}
 
 	EngineLoop::~EngineLoop() noexcept

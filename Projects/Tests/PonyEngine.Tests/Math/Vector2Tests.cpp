@@ -1305,15 +1305,15 @@ namespace Math
 
 		static constexpr PonyEngine::Math::Vector2<float> VectorConstexpr()
 		{
-			auto vector = PonyEngine::Math::Vector2<float>(4, 5);
+			[[maybe_unused]] auto vector = PonyEngine::Math::Vector2<float>(4, 5);
 			PonyEngine::Math::Vector2<float> movedVector = std::move(vector);
 
 			movedVector.X() += 2;
 			movedVector.Y() *= 3;
 			movedVector.Data()[1] -= 6;
 
-			constexpr auto constVector = PonyEngine::Math::Vector2<float>(4, 5);
-			const float* data = constVector.Data();
+			[[maybe_unused]] constexpr auto constVector = PonyEngine::Math::Vector2<float>(4, 5);
+			[[maybe_unused]] const float* data = constVector.Data();
 
 			movedVector.Swap();
 
@@ -1327,14 +1327,14 @@ namespace Math
 			movedVector *= 4.f;
 			movedVector /= 4.f;
 
-			auto intVector = PonyEngine::Math::Vector2<int>(4, 5);
+			[[maybe_unused]] auto intVector = PonyEngine::Math::Vector2<int>(4, 5);
 			intVector *= 3;
 			intVector *= 4.f;
-			auto intVector1 = PonyEngine::Math::Vector2<int>(4, 5);
+			[[maybe_unused]] auto intVector1 = PonyEngine::Math::Vector2<int>(4, 5);
 			intVector1 /= 5;
 			intVector1 /= 2.f;
 
-			auto movedVector1 = PonyEngine::Math::Vector2<float>();
+			[[maybe_unused]] auto movedVector1 = PonyEngine::Math::Vector2<float>();
 			movedVector1 = constVector;
 			movedVector1 = std::move(movedVector);
 
@@ -1343,61 +1343,61 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr auto up = PonyEngine::Math::Vector2<float>::Predefined::Up;
-			constexpr auto down = PonyEngine::Math::Vector2<float>::Predefined::Down;
-			constexpr auto right = PonyEngine::Math::Vector2<float>::Predefined::Right;
-			constexpr auto left = PonyEngine::Math::Vector2<float>::Predefined::Left;
-			constexpr auto one = PonyEngine::Math::Vector2<float>::Predefined::One;
-			constexpr auto zero = PonyEngine::Math::Vector2<float>::Predefined::Zero;
-			constexpr auto negative = PonyEngine::Math::Vector2<float>::Predefined::Negative;
+			[[maybe_unused]] constexpr auto up = PonyEngine::Math::Vector2<float>::Predefined::Up;
+			[[maybe_unused]] constexpr auto down = PonyEngine::Math::Vector2<float>::Predefined::Down;
+			[[maybe_unused]] constexpr auto right = PonyEngine::Math::Vector2<float>::Predefined::Right;
+			[[maybe_unused]] constexpr auto left = PonyEngine::Math::Vector2<float>::Predefined::Left;
+			[[maybe_unused]] constexpr auto one = PonyEngine::Math::Vector2<float>::Predefined::One;
+			[[maybe_unused]] constexpr auto zero = PonyEngine::Math::Vector2<float>::Predefined::Zero;
+			[[maybe_unused]] constexpr auto negative = PonyEngine::Math::Vector2<float>::Predefined::Negative;
 
-			constexpr auto defaultVector = PonyEngine::Math::Vector2<float>();
-			constexpr auto vector = PonyEngine::Math::Vector2<float>(4, 5);
-			constexpr auto arrayVector = PonyEngine::Math::Vector2<float>(std::array<float, 3>{4, 5, 1}.data());
-			constexpr PonyEngine::Math::Vector2<float> copiedVector = vector;
-			constexpr PonyEngine::Math::Vector2<float> movedVector = VectorConstexpr();
+			[[maybe_unused]] constexpr auto defaultVector = PonyEngine::Math::Vector2<float>();
+			[[maybe_unused]] constexpr auto vector = PonyEngine::Math::Vector2<float>(4, 5);
+			[[maybe_unused]] constexpr auto arrayVector = PonyEngine::Math::Vector2<float>(std::array<float, 3>{4, 5, 1}.data());
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> copiedVector = vector;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> movedVector = VectorConstexpr();
 
-			constexpr float x = vector.X();
-			constexpr float y = vector.Y();
+			[[maybe_unused]] constexpr float x = vector.X();
+			[[maybe_unused]] constexpr float y = vector.Y();
 
-			constexpr float magnitudeSquared = vector.MagnitudeSquared();
-			constexpr float min = vector.Min();
-			constexpr float max = vector.Max();
-			constexpr float thisSum = vector.Sum();
-			constexpr PonyEngine::Math::Vector2<float> swapped = vector.Swapped();
+			[[maybe_unused]] constexpr float magnitudeSquared = vector.MagnitudeSquared();
+			[[maybe_unused]] constexpr float min = vector.Min();
+			[[maybe_unused]] constexpr float max = vector.Max();
+			[[maybe_unused]] constexpr float thisSum = vector.Sum();
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> swapped = vector.Swapped();
 
-			constexpr bool isZero = vector.IsZero();
-			constexpr bool isAlmostZero = vector.IsAlmostZero();
-			constexpr bool isUnit = vector.IsUnit();
-			constexpr bool isUniform = vector.IsUniform();
+			[[maybe_unused]] constexpr bool isZero = vector.IsZero();
+			[[maybe_unused]] constexpr bool isAlmostZero = vector.IsAlmostZero();
+			[[maybe_unused]] constexpr bool isUnit = vector.IsUnit();
+			[[maybe_unused]] constexpr bool isUniform = vector.IsUniform();
 
-			constexpr auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(vector);
+			[[maybe_unused]] constexpr auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(vector);
 
-			constexpr float value = vector[0];
+			[[maybe_unused]] constexpr float value = vector[0];
 
-			constexpr bool equal = arrayVector == vector;
-			constexpr bool notEqual = arrayVector != vector;
+			[[maybe_unused]] constexpr bool equal = arrayVector == vector;
+			[[maybe_unused]] constexpr bool notEqual = arrayVector != vector;
 
-			constexpr float dot = PonyEngine::Math::Dot(vector, arrayVector);
+			[[maybe_unused]] constexpr float dot = PonyEngine::Math::Dot(vector, arrayVector);
 
-			constexpr PonyEngine::Math::Vector2<float> project = PonyEngine::Math::Project(vector, PonyEngine::Math::Vector2<float>::Predefined::Down);
-			constexpr PonyEngine::Math::Vector2<float> projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, PonyEngine::Math::Vector2<float>::Predefined::Left);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> project = PonyEngine::Math::Project(vector, PonyEngine::Math::Vector2<float>::Predefined::Down);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, PonyEngine::Math::Vector2<float>::Predefined::Left);
 
-			constexpr PonyEngine::Math::Vector2<float> reflect = PonyEngine::Math::Reflect(vector, PonyEngine::Math::Vector2<float>::Predefined::Up);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> reflect = PonyEngine::Math::Reflect(vector, PonyEngine::Math::Vector2<float>::Predefined::Up);
 
-			constexpr PonyEngine::Math::Vector2<float> scale = PonyEngine::Math::Scale(vector, arrayVector);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> scale = PonyEngine::Math::Scale(vector, arrayVector);
 
-			constexpr PonyEngine::Math::Vector2<float> lerp = PonyEngine::Math::Lerp(vector, arrayVector, 0.5f);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> lerp = PonyEngine::Math::Lerp(vector, arrayVector, 0.5f);
 
-			constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(vector, arrayVector);
+			[[maybe_unused]] constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(vector, arrayVector);
 
-			constexpr PonyEngine::Math::Vector2<float> sum = vector + arrayVector;
-			constexpr PonyEngine::Math::Vector2<float> difference = vector - arrayVector;
-			constexpr PonyEngine::Math::Vector2<float> product = vector * 3.f;
-			constexpr PonyEngine::Math::Vector2<float> productL = 3.f * vector;
-			constexpr PonyEngine::Math::Vector2<float> quotient = vector / 2.f;
-			constexpr PonyEngine::Math::Vector2<int> productI = PonyEngine::Math::Vector2<int>(4, 5) * 3;
-			constexpr PonyEngine::Math::Vector2<int> productIL = 3 * PonyEngine::Math::Vector2<int>(4, 5);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> sum = vector + arrayVector;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> difference = vector - arrayVector;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> product = vector * 3.f;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> productL = 3.f * vector;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> quotient = vector / 2.f;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<int> productI = PonyEngine::Math::Vector2<int>(4, 5) * 3;
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<int> productIL = 3 * PonyEngine::Math::Vector2<int>(4, 5);
 		}
 	};
 }

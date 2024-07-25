@@ -32,9 +32,9 @@ export namespace Launcher
 	{
 	public:
 		/// @brief Creates a system factories provider.
-		/// @param logger Logger to use.
+		/// @param loggerToUse Logger to use.
 		[[nodiscard("Pure constructor")]]
-		explicit SystemFactoriesProvider(PonyEngine::Log::ILogger& logger);
+		explicit SystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse);
 		SystemFactoriesProvider(const SystemFactoriesProvider&) = delete;
 		SystemFactoriesProvider(SystemFactoriesProvider&&) = delete;
 
@@ -58,15 +58,15 @@ export namespace Launcher
 
 namespace Launcher
 {
-	SystemFactoriesProvider::SystemFactoriesProvider(PonyEngine::Log::ILogger& logger) :
-		logger{&logger}
+	SystemFactoriesProvider::SystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse) :
+		logger{&loggerToUse}
 	{
 		// Create all factories here.
 
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
 		auto windowClassParams = PonyEngine::Window::WindowsClassParams();
 		windowClassParams.name = L"Pony Engine Game";
-		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*this->logger, windowClassParams);
+		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowClassParams);
 		assert((windowsWindowSystemFactory && "The window system factory is nullptr."));
 		PonyEngine::Window::WindowParams& nextWindowParams = windowsWindowSystemFactory->NextWindowParams();
 		nextWindowParams.title = L"Pony Engine Game";
@@ -75,15 +75,15 @@ namespace Launcher
 		nextWindowParams.width = CW_USEDEFAULT;
 		nextWindowParams.height = CW_USEDEFAULT;
 		windowsWindowSystemFactory->NextWindowsWindowParams().style = WS_OVERLAPPEDWINDOW;
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
 
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
 		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
 
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
-		gameSystemFactory = Game::CreateGameSystemFactory(*this->logger);
-		PONY_LOG_GENERAL(this->logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
+		gameSystemFactory = Game::CreateGameSystemFactory(*logger);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
 	}
 
 	SystemFactoriesProvider::~SystemFactoriesProvider() noexcept

@@ -39,10 +39,10 @@ export namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Creates a Windows window factory.
-		/// @param logger Logger.
+		/// @param loggerToUse Logger.
 		/// @param classParams Window class parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams);
+		WindowsWindowFactory(Log::ILogger& loggerToUse, const WindowsClassParams& classParams);
 		WindowsWindowFactory(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory(WindowsWindowFactory&&) = delete;
 
@@ -91,10 +91,8 @@ namespace PonyEngine::Window
 	[[nodiscard("Pure function")]]
 	HCURSOR GetDefaultCursor();
 
-	WindowsWindowFactory::WindowsWindowFactory(Log::ILogger& logger, const WindowsClassParams& classParams) :
-		windowParams(),
-		windowsWindowParams(),
-		logger{&logger},
+	WindowsWindowFactory::WindowsWindowFactory(Log::ILogger& loggerToUse, const WindowsClassParams& classParams) :
+		logger{&loggerToUse},
 		hInstance{NULL}
 	{
 		if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || hInstance == NULL)
@@ -110,13 +108,13 @@ namespace PonyEngine::Window
 		wc.hCursor = classParams.cursor == NULL ? GetDefaultCursor() : classParams.cursor;
 		wc.style = classParams.style;
 
-		PONY_LOG_GENERAL(this->logger, Log::LogType::Info, std::format("Register window class '{}'.", Utility::ConvertToString(classParams.name)).c_str());
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Register window class '{}'.", Utility::ConvertToString(classParams.name)).c_str());
 		classAtom = RegisterClass(&wc);
 		if (!classAtom)
 		{
 			throw std::logic_error(std::format("Couldn't register a class. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG_GENERAL(this->logger, Log::LogType::Info, std::format("Window class '{}' registered.", classAtom).c_str());
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class '{}' registered.", classAtom).c_str());
 	}
 
 	WindowsWindowFactory::~WindowsWindowFactory() noexcept

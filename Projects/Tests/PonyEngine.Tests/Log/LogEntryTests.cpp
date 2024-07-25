@@ -108,7 +108,6 @@ namespace Log
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450780));
 			constexpr std::size_t frameCount = 98407;
 			constexpr auto logType = PonyEngine::Log::LogType::Warning;
-			constexpr auto exceptionLogType = PonyEngine::Log::LogType::Exception;
 
 			auto logEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
 			auto copiedLogEntry = PonyEngine::Log::LogEntry("Something", nullptr, std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450)), 123, PonyEngine::Log::LogType::Debug);

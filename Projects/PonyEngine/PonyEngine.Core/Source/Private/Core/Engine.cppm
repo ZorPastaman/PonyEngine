@@ -70,7 +70,7 @@ export namespace PonyEngine::Core
 		std::unique_ptr<TimeManager> timeManager; ///< Time manager.
 		std::unique_ptr<SystemManager> systemManager; ///< System manager.
 
-		int exitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
+		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 	};
 }
@@ -133,7 +133,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get the exit code when the engine is still running.");
 
-		return exitCode;
+		return engineExitCode;
 	}
 
 	void Engine::Stop(const int exitCode) noexcept
@@ -142,7 +142,7 @@ namespace PonyEngine::Core
 		{
 			PONY_LOG(this, Log::LogType::Info, std::format("Stop the engine with the exit code '{}'.", exitCode).c_str());
 			isRunning = false;
-			this->exitCode = exitCode;
+			engineExitCode = exitCode;
 		}
 		else
 		{

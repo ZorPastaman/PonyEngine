@@ -77,7 +77,7 @@ export namespace PonyEngine::Math
 			[[nodiscard("Pure constructor")]]
 			explicit constexpr Row(RowValueType* row) noexcept;
 
-			RowValueType* const row; ///< Row pointer.
+			RowValueType* const matrixRow; ///< Row pointer.
 
 			friend Matrix4x4;
 		};
@@ -383,8 +383,8 @@ export namespace PonyEngine::Math
 		/// @param column3 Column 3 to assign.
 		constexpr void Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
 		/// @brief Assigns matrix components from the @p components array.
-		/// @param components Component array. Its length must be at least 16.
-		constexpr void Set(const T* components) noexcept;
+		/// @param componentsToSet Component array. Its length must be at least 16.
+		constexpr void Set(const T* componentsToSet) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
@@ -583,7 +583,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix4x4<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
-		row{row}
+		matrixRow{row}
 	{
 	}
 
@@ -605,14 +605,14 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
 	{
-		return row[columnIndex * Dimension];
+		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr const T& Matrix4x4<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return row[columnIndex * Dimension];
+		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
@@ -1028,9 +1028,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::Set(const T* const components) noexcept
+	constexpr void Matrix4x4<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), components, ComponentCount);
+		Copy(Data(), componentsToSet, ComponentCount);
 	}
 
 	template<Arithmetic T>
