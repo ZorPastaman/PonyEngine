@@ -21,13 +21,10 @@ import <format>;
 import <stdexcept>;
 import <string>;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Input;
 import PonyEngine.StringUtility;
-import PonyEngine.Window;
-import PonyEngine.Window.Windows;
 import PonyEngine.Window.Windows.Factory;
 
 import :CreateWindowParams;
