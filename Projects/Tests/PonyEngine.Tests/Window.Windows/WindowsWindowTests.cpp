@@ -65,7 +65,7 @@ namespace Window
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float frameTime) noexcept override
+			virtual void SetTargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -74,7 +74,7 @@ namespace Window
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
+			virtual void* FindSystem(const std::type_info&) const noexcept override
 			{
 				return nullptr;
 			}

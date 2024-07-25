@@ -39,12 +39,12 @@ export namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Creates a @p WindowsWindow.
-		/// @param engine Engine that owns the window.
+		/// @param engineToUse Engine that owns the window.
 		/// @param hInstance Instance that owns the engine.
 		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindow(Core::IEngine& engine, HINSTANCE hInstance, ATOM className, const CreateWindowParams& windowParams);
+		WindowsWindow(Core::IEngine& engineToUse, HINSTANCE hInstance, ATOM className, const CreateWindowParams& windowParams);
 		WindowsWindow(const WindowsWindow&) = delete;
 		WindowsWindow(WindowsWindow&&) = delete;
 
@@ -96,7 +96,7 @@ export namespace PonyEngine::Window
 
 		Core::IEngine* const engine; ///< Engine that owns the window.
 
-		std::wstring title;
+		std::wstring windowTitle; ///< Window title cache.
 		HWND hWnd; ///< Window handler.
 		bool isAlive; ///< Is the system window alive?
 	};
@@ -104,16 +104,16 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	WindowsWindow::WindowsWindow(Core::IEngine& engine, const HINSTANCE hInstance, const ATOM className, const CreateWindowParams& windowParams) :
-		engine{&engine},
-		title(windowParams.title),
+	WindowsWindow::WindowsWindow(Core::IEngine& engineToUse, const HINSTANCE hInstance, const ATOM className, const CreateWindowParams& windowParams) :
+		engine{&engineToUse},
+		windowTitle(windowParams.title),
 		isAlive{false}
 	{
-		PONY_LOG(this->engine, Log::LogType::Info, std::format("Create Windows window of class '{}'.", className).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Create Windows window of class '{}'.", className).c_str());
 		hWnd = CreateWindowEx(
 			windowParams.extendedStyle,
 			reinterpret_cast<LPCTSTR>(className),
-			title.c_str(),
+			windowTitle.c_str(),
 			windowParams.style,
 			windowParams.horizontalPosition, windowParams.verticalPosition,
 			windowParams.width, windowParams.height,
@@ -128,7 +128,7 @@ namespace PonyEngine::Window
 			throw std::logic_error(std::format("Windows hasn't created a window. Error code: '{}'.", GetLastError()));
 		}
 
-		PONY_LOG(this->engine, Log::LogType::Info, std::format("Windows window of class '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Windows window of class '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		isAlive = true;
 		::ShowWindow(hWnd, windowParams.cmdShow);
@@ -175,7 +175,7 @@ namespace PonyEngine::Window
 
 	const wchar_t* WindowsWindow::GetTitle() const noexcept
 	{
-		return title.c_str();
+		return windowTitle.c_str();
 	}
 
 	void WindowsWindow::SetTitle(const wchar_t* const title)
@@ -185,7 +185,7 @@ namespace PonyEngine::Window
 			throw std::logic_error(std::format("Couldn't set a new window title. Error code: '{}'.", GetLastError()));
 		}
 
-		this->title = title;
+		windowTitle = title;
 	}
 
 	bool WindowsWindow::IsVisible() const noexcept

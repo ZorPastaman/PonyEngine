@@ -167,8 +167,8 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		constexpr void Set(T x, T y, T z, T w) noexcept;
 		/// @brief Assigns @p components to the quaternion components.
-		/// @param components Component array. Its length must be at least 4.
-		constexpr void Set(const T* components) noexcept;
+		/// @param componentsToSet Component array. Its length must be at least 4.
+		constexpr void Set(const T* componentsToSet) noexcept;
 
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -483,9 +483,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void Quaternion<T>::Set(const T* const components) noexcept
+	constexpr void Quaternion<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), components, ComponentCount);
+		Copy(Data(), componentsToSet, ComponentCount);
 	}
 
 	template<std::floating_point T>

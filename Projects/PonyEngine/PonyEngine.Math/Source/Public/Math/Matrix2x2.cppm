@@ -78,7 +78,7 @@ export namespace PonyEngine::Math
 			[[nodiscard("Pure constructor")]]
 			explicit constexpr Row(RowValueType* row) noexcept;
 
-			RowValueType* const row; ///< Row pointer.
+			RowValueType* const matrixRow; ///< Row pointer.
 
 			friend Matrix2x2;
 		};
@@ -257,8 +257,8 @@ export namespace PonyEngine::Math
 		/// @param column1 Column 1 to assign.
 		constexpr void Set(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
 		/// @brief Assigns matrix components from the @p components array.
-		/// @param components Component array. Its length must be at least 4.
-		constexpr void Set(const T* components) noexcept;
+		/// @param componentsToSet Component array. Its length must be at least 4.
+		constexpr void Set(const T* componentsToSet) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
@@ -457,7 +457,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr Matrix2x2<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
-		row{row}
+		matrixRow{row}
 	{
 	}
 
@@ -478,14 +478,14 @@ namespace PonyEngine::Math
 	template<bool IsConstant>
 	constexpr T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
 	{
-		return row[columnIndex * Dimension];
+		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
 	constexpr const T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
-		return row[columnIndex * Dimension];
+		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
@@ -716,9 +716,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::Set(const T* const components) noexcept
+	constexpr void Matrix2x2<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), components, ComponentCount);
+		Copy(Data(), componentsToSet, ComponentCount);
 	}
 
 	template<Arithmetic T>

@@ -17,6 +17,7 @@ import <algorithm>;
 import <cstddef>;
 import <cmath>;
 import <type_traits>;
+import <utility>;
 
 import :Common;
 
@@ -182,7 +183,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
-			*result += *right;
+			*result = static_cast<T>(*result + *right);
 		}
 	}
 
@@ -191,7 +192,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
-			*result = *left + *right;
+			*result = static_cast<T>(*left + *right);
 		}
 	}
 
@@ -200,7 +201,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
-			*result -= *right;
+			*result = static_cast<T>(*result - *right);
 		}
 	}
 
@@ -209,7 +210,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
-			*result = *left - *right;
+			*result = static_cast<T>(*left - *right);
 		}
 	}
 
@@ -218,7 +219,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
-			*result *= *right;
+			*result = static_cast<T>(*result * *right);
 		}
 	}
 
@@ -227,7 +228,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
-			*result = *left * *right;
+			*result = static_cast<T>(*left * *right);
 		}
 	}
 
@@ -236,7 +237,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
-			*result *= multiplier;
+			*result = static_cast<T>(*result * multiplier);
 		}
 	}
 
@@ -245,7 +246,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
-			*result = *left * multiplier;
+			*result = static_cast<T>(*left * multiplier);
 		}
 	}
 
@@ -254,7 +255,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
-			*result /= *right;
+			*result = static_cast<T>(*result / *right);
 		}
 	}
 
@@ -263,7 +264,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left, ++right)
 		{
-			*result = *left / *right;
+			*result = static_cast<T>(*left / *right);
 		}
 	}
 
@@ -272,7 +273,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
-			*result /= divisor;
+			*result = static_cast<T>(*result / divisor);
 		}
 	}
 
@@ -281,7 +282,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++left)
 		{
-			*result = *left / divisor;
+			*result = static_cast<T>(*left / divisor);
 		}
 	}
 
@@ -290,7 +291,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result)
 		{
-			*result = -*result;
+			*result = static_cast<T>(-*result);
 		}
 	}
 
@@ -299,7 +300,7 @@ namespace PonyEngine::Math
 	{
 		for (const T* const end = result + count; result != end; ++result, ++right)
 		{
-			*result = -*right;
+			*result = static_cast<T>(-*right);
 		}
 	}
 

@@ -36,9 +36,9 @@ export namespace PonyEngine::Core
 	public:
 		/// @brief Creates a @p SystemManager.
 		/// @param engineParams Engine parameters.
-		/// @param engine Engine that owns the manager.
+		/// @param engineToUse Engine that owns the manager.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const EngineParams& engineParams, IEngine& engine);
+		SystemManager(const EngineParams& engineParams, IEngine& engineToUse);
 		SystemManager(const SystemManager&) = delete;
 		SystemManager(SystemManager&&) = delete;
 
@@ -65,22 +65,22 @@ export namespace PonyEngine::Core
 		std::vector<SystemUniquePtr> systems; ///< Systems.
 		std::vector<ISystem*> tickableSystems; ///< Tickable systems.
 
-		const IEngine* const engine; ///< Engine that owns the manager.
+		IEngine* const engine; ///< Engine that owns the manager.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	SystemManager::SystemManager(const EngineParams& engineParams, IEngine& engine) :
-		engine{&engine}
+	SystemManager::SystemManager(const EngineParams& engineParams, IEngine& engineToUse) :
+		engine{&engineToUse}
 	{
-		PONY_LOG(this->engine, Log::LogType::Info, "Create systems.");
+		PONY_LOG(engine, Log::LogType::Info, "Create systems.");
 
 		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactories(); !factory.IsEnd(); ++factory)
 		{
-			PONY_LOG(this->engine, Log::LogType::Info, std::format("Create system '{}'.", (*factory).GetSystemName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Create system '{}'.", (*factory).GetSystemName()).c_str());
 
-			SystemInfo systemInfo = (*factory).Create(engine);
+			SystemInfo systemInfo = (*factory).Create(*engine);
 			SystemUniquePtr system = std::move(systemInfo.System());
 			ISystem* const systemPointer = system.get();
 			assert((systemPointer && "The system is nullptr."));
@@ -89,12 +89,12 @@ namespace PonyEngine::Core
 
 			if (systemInfo.GetIsTickable())
 			{
-				PONY_LOG(this->engine, Log::LogType::Debug, "Add to tickable systems.");
+				PONY_LOG(engine, Log::LogType::Debug, "Add to tickable systems.");
 				tickableSystems.push_back(systemPointer);
 			}
 			else
 			{
-				PONY_LOG(this->engine, Log::LogType::Debug, "The system is not tickable.");
+				PONY_LOG(engine, Log::LogType::Debug, "The system is not tickable.");
 			}
 
 			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
@@ -103,10 +103,10 @@ namespace PonyEngine::Core
 				systemInterfaces.insert_or_assign(type.get(), objectPointer);
 			}
 
-			PONY_LOG(this->engine, Log::LogType::Info, "System created.");
+			PONY_LOG(engine, Log::LogType::Info, "System created.");
 		}
 
-		PONY_LOG(this->engine, Log::LogType::Info, "Systems created.");
+		PONY_LOG(engine, Log::LogType::Info, "Systems created.");
 	}
 
 	SystemManager::~SystemManager() noexcept

@@ -168,8 +168,8 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		constexpr void Set(T x, T y, T z) noexcept;
 		/// @brief Assigns arguments from the @p components array.
-		/// @param components Component array. Its length must be at least 3.
-		constexpr void Set(const T* components) noexcept;
+		/// @param componentsToSet Component array. Its length must be at least 3.
+		constexpr void Set(const T* componentsToSet) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
@@ -579,9 +579,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Vector3<T>::Set(const T* const components) noexcept
+	constexpr void Vector3<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), components, ComponentCount);
+		Copy(Data(), componentsToSet, ComponentCount);
 	}
 
 	template<Arithmetic T>

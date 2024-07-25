@@ -63,7 +63,7 @@ namespace Input
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float frameTime) noexcept override
+			virtual void SetTargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -72,7 +72,7 @@ namespace Input
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
+			virtual void* FindSystem(const std::type_info&) const noexcept override
 			{
 				return nullptr;
 			}
@@ -120,7 +120,7 @@ namespace Input
 				return 0;
 			}
 
-			virtual void Stop(int exitCode) noexcept override
+			virtual void Stop(int) noexcept override
 			{
 			}
 
