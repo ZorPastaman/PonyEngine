@@ -95,12 +95,12 @@ namespace PonyEngine::Window
 		logger{&loggerToUse},
 		hInstance{NULL}
 	{
-		if (!GetModuleHandleEx(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || hInstance == NULL)
+		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || hInstance == NULL)
 		{
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
 
-		WNDCLASS wc{};
+		WNDCLASSW wc{};
 		wc.lpszClassName = classParams.name.c_str();
 		wc.lpfnWndProc = &WindowProc;
 		wc.hInstance = hInstance;
@@ -109,7 +109,7 @@ namespace PonyEngine::Window
 		wc.style = classParams.style;
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Register window class '{}'.", Utility::ConvertToString(classParams.name)).c_str());
-		classAtom = RegisterClass(&wc);
+		classAtom = RegisterClassW(&wc);
 		if (!classAtom)
 		{
 			throw std::logic_error(std::format("Couldn't register a class. Error code: '{}'.", GetLastError()));
@@ -122,7 +122,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Unregister window class '{}'.", classAtom).c_str());
 		try
 		{
-			if (!UnregisterClass(reinterpret_cast<LPCTSTR>(classAtom), hInstance))
+			if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 			{
 				throw std::logic_error(std::format("Couldn't unregister a class. Error code: '{}'.", GetLastError()));
 			}
@@ -216,7 +216,7 @@ namespace PonyEngine::Window
 
 	HCURSOR GetDefaultCursor()
 	{
-		const auto cursor = static_cast<HCURSOR>(LoadImage(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
+		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (cursor == NULL)
 		{
 			throw std::logic_error(std::format("Couldn't load a class cursor. Error code: '{}'", GetLastError()));
