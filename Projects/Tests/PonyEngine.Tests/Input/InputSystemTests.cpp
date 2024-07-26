@@ -13,8 +13,6 @@ import <cstddef>;
 import <functional>;
 
 import PonyEngine.Core;
-import PonyEngine.Input;
-import PonyEngine.Input.Factory;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Log;
 

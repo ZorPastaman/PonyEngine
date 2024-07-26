@@ -19,7 +19,7 @@ import <exception>;
 import <format>;
 import <iostream>;
 
-import PonyEngine.Log.Implementation;
+import PonyEngine.Log.Windows.Implementation;
 
 export namespace Launcher
 {
@@ -49,6 +49,7 @@ export namespace Launcher
 		// Set all sub-loggers here.
 
 		PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger; ///< Console sub-logger.
+		PonyEngine::Log::OutputDebugStringSubLoggerUniquePtr outputDebugStringSubLogger; ///< Windows output debug string sub-logger.
 		PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger; ///< File sub-logger.
 	};
 }
@@ -69,6 +70,12 @@ namespace Launcher
 		assert((consoleSubLogger && "The console sub-logger is nullptr."));
 		logger->AddSubLogger(consoleSubLogger.get());
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger created.");
+
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create Windows output debug string sub-logger.");
+		outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
+		assert((outputDebugStringSubLogger && "The Windows output debug string sub-logger is nullptr."));
+		logger->AddSubLogger(outputDebugStringSubLogger.get());
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Windows output debug string sub-logger created.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create file sub-logger.");
 		fileSubLogger = PonyEngine::Log::CreateFileSubLogger("Log.log");
@@ -92,6 +99,18 @@ namespace Launcher
 		}
 		fileSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
+
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy Windows output debug string sub-logger.");
+		try
+		{
+			logger->RemoveSubLogger(outputDebugStringSubLogger.get());
+		}
+		catch (std::exception& e)
+		{
+			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, std::format("{} - On removing the Windows output debug string sub-logger.", e.what()).c_str());
+		}
+		outputDebugStringSubLogger.reset();
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Windows output debug string sub-logger destroyed.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy console sub-logger.");
 		try
