@@ -13,8 +13,6 @@ import <cstddef>;
 import <cstdint>;
 import <exception>;
 
-import PonyEngine.Core;
-import PonyEngine.Core.Factory;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 

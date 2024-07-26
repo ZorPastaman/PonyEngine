@@ -96,5 +96,8 @@
     <ClCompile Include="Input\InputSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

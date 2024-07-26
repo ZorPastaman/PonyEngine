@@ -11,7 +11,6 @@
 
 import <cstdint>;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

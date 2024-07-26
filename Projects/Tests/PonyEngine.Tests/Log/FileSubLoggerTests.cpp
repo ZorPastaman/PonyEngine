@@ -15,7 +15,6 @@ import <filesystem>;
 import <fstream>;
 import <string>;
 
-import PonyEngine.Log;
 import PonyEngine.Log.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
