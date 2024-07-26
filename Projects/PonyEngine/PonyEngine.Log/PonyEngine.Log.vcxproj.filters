@@ -27,6 +27,12 @@
     <ClCompile Include="Source\Public\Log\Log.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows.Implementation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLogger.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

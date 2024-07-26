@@ -14,10 +14,6 @@
 import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Log;
-import PonyEngine.Window;
-import PonyEngine.Window.Factory;
-import PonyEngine.Window.Windows;
-import PonyEngine.Window.Windows.Factory;
 import PonyEngine.Window.Windows.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -182,7 +178,7 @@ namespace Window
 			Assert::IsTrue(windowsWindow->IsWindowAlive());
 			window->Tick();
 			Assert::IsTrue(windowsWindow->IsWindowAlive());
-			PostMessage(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
 			window->Tick();
 			Assert::IsFalse(windowsWindow->IsWindowAlive());
 		}
@@ -200,7 +196,7 @@ namespace Window
 			const wchar_t* title = L"Test title";
 			windowsWindow->SetTitle(title);
 			wchar_t gotTitle[64];
-			GetWindowText(windowsWindow->GetWindowHandle(), gotTitle, 64);
+			GetWindowTextW(windowsWindow->GetWindowHandle(), gotTitle, 64);
 			Assert::AreEqual(title, gotTitle);
 			Assert::AreEqual(title, windowsWindow->GetTitle());
 		}
@@ -284,7 +280,7 @@ namespace Window
 			auto windowInfo = factory->Create(engine);
 			auto window = std::move(windowInfo.System());
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			PostMessage(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
 			window->Tick();
 			Assert::AreEqual(0, engine.stopCode);
 		}
@@ -302,16 +298,16 @@ namespace Window
 			auto keyboardObserver = KeyboardObserver();
 			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.get());
 			keyboardProvider->AddKeyboardObserver(&keyboardObserver);
-			PostMessage(windowsWindow->GetWindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::T, .isDown = true});
-			PostMessage(windowsWindow->GetWindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = false});
-			PostMessage(windowsWindow->GetWindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftAlt, .isDown = true});
-			PostMessage(windowsWindow->GetWindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
+			PostMessageW(windowsWindow->GetWindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
 		}

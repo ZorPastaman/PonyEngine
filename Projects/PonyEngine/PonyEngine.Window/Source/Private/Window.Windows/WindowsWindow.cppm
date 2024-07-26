@@ -110,9 +110,9 @@ namespace PonyEngine::Window
 		isAlive{false}
 	{
 		PONY_LOG(engine, Log::LogType::Info, std::format("Create Windows window of class '{}'.", className).c_str());
-		hWnd = CreateWindowEx(
+		hWnd = CreateWindowExW(
 			windowParams.extendedStyle,
-			reinterpret_cast<LPCTSTR>(className),
+			reinterpret_cast<LPCWSTR>(className),
 			windowTitle.c_str(),
 			windowParams.style,
 			windowParams.horizontalPosition, windowParams.verticalPosition,
@@ -161,10 +161,10 @@ namespace PonyEngine::Window
 		PONY_LOG(engine, Log::LogType::Verbose, "Dispatch messages.");
 
 		MSG message;
-		while (PeekMessage(&message, hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
+		while (PeekMessageW(&message, hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
 			TranslateMessage(&message);
-			DispatchMessage(&message);
+			DispatchMessageW(&message);
 		}
 	}
 
@@ -180,7 +180,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::SetTitle(const wchar_t* const title)
 	{
-		if (!SetWindowText(hWnd, title))
+		if (!SetWindowTextW(hWnd, title))
 		{
 			throw std::logic_error(std::format("Couldn't set a new window title. Error code: '{}'.", GetLastError()));
 		}
@@ -266,7 +266,7 @@ namespace PonyEngine::Window
 			break;
 		}
 
-		return DefWindowProc(hWnd, uMsg, wParam, lParam);
+		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 
 	void WindowsWindow::Destroy() noexcept

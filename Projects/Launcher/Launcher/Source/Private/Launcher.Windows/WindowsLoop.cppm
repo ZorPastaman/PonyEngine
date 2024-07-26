@@ -58,10 +58,10 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Peek messages.");
 
 		MSG message;
-		while (PeekMessage(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
+		while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
 			TranslateMessage(&message);
-			DispatchMessage(&message);
+			DispatchMessageW(&message);
 
 			if (message.message == WM_QUIT)
 			{

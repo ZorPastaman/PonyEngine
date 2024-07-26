@@ -14,7 +14,6 @@ import <cstdint>;
 import <exception>;
 import <type_traits>;
 
-import PonyEngine.Log;
 import PonyEngine.Log.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
