@@ -9,6 +9,8 @@
 
 #pragma once
 
+// If you include this file, you have to import PonyEngine.Log as well.
+
 #if PONY_LOG_VERBOSE
 /// @brief Verbose log mask.
 #define PONY_LOG_VERBOSE_MASK PonyEngine::Log::LogType::Verbose

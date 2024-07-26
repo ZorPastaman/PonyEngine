@@ -9,6 +9,8 @@
 
 #pragma once
 
+ // If you include this file, you have to import PonyEngine.Core and PonyEngine.Log as well.
+
 #include "PonyEngine/Log/Log.h"
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
