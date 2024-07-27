@@ -9,7 +9,7 @@
 
 #pragma once
 
- // If you include this file, you have to import PonyEngine.Core and PonyEngine.Log as well.
+ // To use this header, you have to import PonyEngine.Core and PonyEngine.Log as well.
 
 #include "PonyEngine/Log/Log.h"
 

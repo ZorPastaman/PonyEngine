@@ -9,7 +9,7 @@
 
 #pragma once
 
-// If you include this file, you have to import PonyEngine.Log as well.
+// To use this header, you have to import PonyEngine.Log as well.
 
 #if PONY_LOG_VERBOSE
 /// @brief Verbose log mask.
@@ -116,7 +116,7 @@
 #define PONY_LOG_GENERAL(logger, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger)->Log(logType, PonyEngine::Log::LogInput{.message = (logMessage)})); \
+		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogToLogger(*(logger), logType, logMessage)); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -127,7 +127,7 @@
 #define PONY_LOG_IF_GENERAL(condition, logger, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->Log(logType, PonyEngine::Log::LogInput{.message = (logMessage)}))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToLogger(*(logger), logType, logMessage))); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -137,7 +137,7 @@
 #define PONY_LOG_E_GENERAL(logger, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((logger)->LogException(exception, PonyEngine::Log::LogInput{.message = (logMessage)})); \
+		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage)); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -148,7 +148,7 @@
 #define PONY_LOG_E_IF_GENERAL(condition, logger, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (logger)->LogException(exception, PonyEngine::Log::LogInput{.message = (logMessage)}))); \
+		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage))); \
 	}
 
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
