@@ -161,10 +161,8 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On making a log entry string.", e.what()).c_str());
+			return message;
 		}
-
-		return std::string();
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry)
