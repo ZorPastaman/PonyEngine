@@ -54,7 +54,7 @@ export namespace PonyEngine::Log
 		}
 		catch (std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a the Windows console.", e.what()));
+			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a the Windows console.", e.what()).c_str());
 		}
 	}
 

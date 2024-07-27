@@ -7,10 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Log:LogType;
 
 import <algorithm>;
 import <array>;
+import <bit>;
 import <cstdint>;
 import <format>;
 import <string>;
@@ -46,6 +51,12 @@ export namespace PonyEngine::Log
 	/// @return Created string.
 	[[nodiscard("Pure function")]]
 	std::string ToString(LogType logType, bool addNumber = false);
+
+	/// @brief Gets a string representing the @p logType.
+	/// @param logType Log type. It must be one log type value.
+	/// @return Representing string.
+	[[nodiscard("Pure function")]]
+	constexpr const char* ToStringSimple(LogType logType) noexcept;
 
 	/// @brief Bitwise complement operator.
 	/// @param logType Log type.
@@ -109,6 +120,14 @@ namespace PonyEngine::Log
 
 		auto number = static_cast<std::underlying_type_t<LogType>>(logType);
 		return std::format("{} ({})", answer, number);
+	}
+
+	constexpr const char* ToStringSimple(const LogType logType) noexcept
+	{
+		const auto underlyingLogType = static_cast<std::underlying_type_t<LogType>>(logType);
+		assert((std::has_single_bit(underlyingLogType) && underlyingLogType <= static_cast<std::underlying_type_t<LogType>>(LogType::Exception) && "Tried to get a simple ToString() for the wrong LogType."));
+
+		return LogTypeNames[std::countr_zero(underlyingLogType)];
 	}
 
 	std::string ToStringInternal(const LogType logType)

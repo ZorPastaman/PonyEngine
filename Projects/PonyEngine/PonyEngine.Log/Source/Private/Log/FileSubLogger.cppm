@@ -72,7 +72,7 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - On closing the log file.", e.what()));
+				PONY_CONSOLE(LogType::Exception, std::format("{} - On closing the log file.", e.what()).c_str());
 			}
 		}
 	}
@@ -85,7 +85,7 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the log file.", e.what()));
+			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the log file.", e.what()).c_str());
 		}
 	}
 
