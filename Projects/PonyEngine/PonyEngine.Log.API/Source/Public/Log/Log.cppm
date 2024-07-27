@@ -12,5 +12,6 @@ export module PonyEngine.Log;
 export import :ILogger;
 export import :ISubLogger;
 export import :LogEntry;
+export import :LogHelper;
 export import :LogInput;
 export import :LogType;
