@@ -19,8 +19,6 @@ import <algorithm>;
 import <chrono>;
 import <format>;
 import <exception>;
-import <iostream>;
-import <string>;
 import <vector>;
 
 import PonyEngine.Log;
@@ -62,20 +60,11 @@ namespace PonyEngine::Log
 {
 	void Logger::Log(const LogType logType, const LogInput& logInput) noexcept
 	{
-		assert((logType == LogType::Verbose || logType == LogType::Debug || logType == LogType::Info || logType == LogType::Warning || logType == LogType::Error));
-
 		const auto logEntry = LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{
-			try
-			{
-				subLogger->Log(logEntry);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the sublogger '{}'.", e.what(), subLogger->GetName()).c_str());
-			}
+			subLogger->Log(logEntry);
 		}
 	}
 
@@ -85,14 +74,7 @@ namespace PonyEngine::Log
 
 		for (ISubLogger* const subLogger : subLoggers)
 		{
-			try
-			{
-				subLogger->Log(logEntry);
-			}
-			catch (const std::exception& e)
-			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the sublogger '{}'.", e.what(), subLogger->GetName()).c_str());
-			}
+			subLogger->Log(logEntry);
 		}
 	}
 
@@ -107,7 +89,7 @@ namespace PonyEngine::Log
 
 	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
 	{
-		PONY_CONSOLE_IF(subLogger == nullptr, LogType::Warning, "Tried to remove a nullptr sub-logger.");
+		PONY_CONSOLE_IF(!subLogger, LogType::Warning, "Tried to remove a nullptr sub-logger.");
 
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
 		{
@@ -117,7 +99,7 @@ namespace PonyEngine::Log
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE_IF(subLogger != nullptr, LogType::Warning, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()).c_str());
+			PONY_CONSOLE_IF(subLogger, LogType::Warning, std::format("Tried to remove a not added sub-logger '{}'.", subLogger->GetName()).c_str());
 		}
 	}
 

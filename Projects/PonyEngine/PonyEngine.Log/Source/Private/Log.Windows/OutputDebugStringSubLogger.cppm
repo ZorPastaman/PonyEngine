@@ -14,10 +14,7 @@ module;
 
 export module PonyEngine.Log.Windows.Implementation:OutputDebugStringSubLogger;
 
-import <format>;
 import <exception>;
-import <iostream>;
-import <string>;
 
 import PonyEngine.Log;
 
@@ -49,12 +46,11 @@ export namespace PonyEngine::Log
 	{
 		try
 		{
-			OutputDebugStringA(logEntry.ToString().c_str());
-			OutputDebugStringA("\n");
+			OutputDebugStringA(logEntry.ToString());
 		}
 		catch (std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a the Windows console.", e.what()).c_str());
+			PONY_CONSOLE_E(e, "On writing to the Windows console.");
 		}
 	}
 

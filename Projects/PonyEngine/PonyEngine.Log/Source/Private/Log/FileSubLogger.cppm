@@ -15,9 +15,7 @@ export module PonyEngine.Log.Implementation:FileSubLogger;
 
 import <filesystem>;
 import <fstream>;
-import <iostream>;
 import <stdexcept>;
-import <string>;
 
 import PonyEngine.Log;
 
@@ -72,7 +70,7 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE(LogType::Exception, std::format("{} - On closing the log file.", e.what()).c_str());
+				PONY_CONSOLE_E(e, "On closing the log file.");
 			}
 		}
 	}
@@ -81,11 +79,11 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			logFile << logEntry << std::endl;
+			logFile << logEntry;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to the log file.", e.what()).c_str());
+			PONY_CONSOLE_E(e, "On writing to the log file.");
 		}
 	}
 

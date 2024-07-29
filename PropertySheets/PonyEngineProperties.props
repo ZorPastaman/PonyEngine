@@ -40,7 +40,7 @@
       <IntrinsicFunctions>false</IntrinsicFunctions>
       <WholeProgramOptimization>false</WholeProgramOptimization>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>_DEBUG;PONY_LOG_DEBUG;PONY_LOG_INFO;PONY_LOG_WARNING;PONY_LOG_ERROR;PONY_LOG_EXCEPTION;PONY_CONSOLE_LOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;PONY_LOG_DEBUG;PONY_LOG_INFO;PONY_LOG_WARNING;PONY_LOG_ERROR;PONY_LOG_EXCEPTION;PONY_CONSOLE_LOG;PONY_SYSTEM_CONSOLE_LOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <LinkTimeCodeGeneration>Default</LinkTimeCodeGeneration>
@@ -52,7 +52,7 @@
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <WholeProgramOptimization>true</WholeProgramOptimization>
       <Optimization>MaxSpeed</Optimization>
-      <PreprocessorDefinitions>NDEBUG;PONY_LOG_INFO;PONY_LOG_WARNING;PONY_LOG_ERROR;PONY_LOG_EXCEPTION;PONY_CONSOLE_LOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;PONY_LOG_INFO;PONY_LOG_WARNING;PONY_LOG_ERROR;PONY_LOG_EXCEPTION;PONY_CONSOLE_LOG;PONY_SYSTEM_CONSOLE_LOG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>

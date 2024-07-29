@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log:LogEntry;
@@ -18,11 +16,10 @@ export module PonyEngine.Log:LogEntry;
 import <chrono>;
 import <cstddef>;
 import <exception>;
-import <format>;
-import <iostream>;
-import <ostream>;
 import <string>;
 
+import :LogFormat;
+import :LogConsoleHelper;
 import :LogType;
 
 export namespace PonyEngine::Log
@@ -33,25 +30,23 @@ export namespace PonyEngine::Log
 	public:
 		/// @brief Creates a log entry.
 		/// @param message Log message.
-		/// @param exception Exception. Optional - can be nullptr.
-		/// @param timePoint Time when the log entry is created.
-		/// @param frameCount Frame when the log entry is created.
-		/// @param logType Log type. It must be Exception if @p exception isn't nullptr.
+		/// @param exception Exception.
+		/// @param timePoint Time when the log entry has been created.
+		/// @param frameCount Frame when the log entry has been created.
+		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
 		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
-		[[nodiscard("Pure constructor")]]
-		LogEntry(const LogEntry& other) = default;
-		[[nodiscard("Pure constructor")]]
-		LogEntry(LogEntry&& other) noexcept = default;
+		LogEntry(const LogEntry&) = delete;
+		LogEntry(LogEntry&&) = delete;
 
 		~LogEntry() noexcept = default;
 
 		/// @brief Gets the log message.
-		/// @return Log message. May be nullptr.
+		/// @return Log message.
 		[[nodiscard("Pure function")]]
 		const char* GetMessage() const noexcept;
 		/// @brief Gets the exception.
-		/// @return Exception. May be nullptr.
+		/// @return Exception.
 		[[nodiscard("Pure function")]]
 		const std::exception* GetException() const noexcept;
 		/// @brief Gets the time point.
@@ -70,21 +65,21 @@ export namespace PonyEngine::Log
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Representing string.
 		[[nodiscard("Pure function")]]
-		std::string ToString() const noexcept;
+		const char* ToString() const noexcept;
 
-		LogEntry& operator =(const LogEntry& other) = default;
-		LogEntry& operator =(LogEntry&& other) noexcept = default;
+		LogEntry& operator =(const LogEntry&) = delete;
+		LogEntry& operator =(LogEntry&&) = delete;
 
 	private:
 		/// @brief Makes a string for the function @p ToString().
 		[[nodiscard("Pure function")]]
 		std::string MakeString() const noexcept;
 
-		const char* message; ///< Log message.
-		const std::exception* exception; ///< Exception attached to the log entry. This field isn't null only when @p logType is @a LogType::Exception.
-		std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
-		std::size_t frameCount; ///< Frame when the log entry is created.
-		LogType logType; ///< Log type.
+		const char* const message; ///< Log message.
+		const std::exception* const exception; ///< Exception attached to the log entry.
+		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
+		const std::size_t frameCount; ///< Frame when the log entry is created.
+		const LogType logType; ///< Log type.
 
 		mutable std::string stringCache; ///< ToString() cache.
 		mutable bool isDirty; ///< If it's @a true, the cache is invalid.
@@ -107,7 +102,6 @@ namespace PonyEngine::Log
 		logType{logType},
 		isDirty{true}
 	{
-		assert(((logType == LogType::Exception) == (exception != nullptr)) && "Incorrect log type.");
 	}
 
 	const char* LogEntry::GetMessage() const noexcept
@@ -135,7 +129,7 @@ namespace PonyEngine::Log
 		return logType;
 	}
 
-	std::string LogEntry::ToString() const noexcept
+	const char* LogEntry::ToString() const noexcept
 	{
 		if (isDirty)
 		{
@@ -143,25 +137,34 @@ namespace PonyEngine::Log
 			isDirty = false;
 		}
 
-		return stringCache;
+		return stringCache.c_str();
 	}
 
 	std::string LogEntry::MakeString() const noexcept
 	{
 		try
 		{
-			const std::string logTypeString = Log::ToString(logType, false);
-			const std::string messageToFormat = exception == nullptr
-				? message
-				: message == nullptr || *message == '\0'
-				? exception->what()
-				: std::format("{} - {}", exception->what(), message);
+			if (exception)
+			{
+				if (message)
+				{
+					return LogFormat(logType, exception->what(), message, timePoint, frameCount);
+				}
 
-			return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}", logTypeString, timePoint, frameCount, messageToFormat);
+				return LogFormat(logType, exception->what(), timePoint, frameCount);
+			}
+			
+			if (message)
+			{
+				return LogFormat(logType, message, timePoint, frameCount);
+			}
+
+			return LogFormat(logType, "", timePoint, frameCount);
 		}
 		catch (const std::exception& e)
 		{
-			return message;
+			PONY_CONSOLE_E(e, "On making a log string");
+			return std::string();
 		}
 	}
 

@@ -13,11 +13,7 @@ module;
 
 export module PonyEngine.Log.Implementation:ConsoleSubLogger;
 
-import <format>;
 import <exception>;
-import <iostream>;
-import <stdexcept>;
-import <string>;
 
 import PonyEngine.Log;
 
@@ -52,11 +48,11 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			ChooseConsoleStream(logEntry.GetLogType()) << logEntry << std::endl;
+			ChooseConsoleStream(logEntry.GetLogType()) << logEntry;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a console.", e.what()).c_str());
+			PONY_CONSOLE_E(e, "On writing to a console.");
 		}
 	}
 

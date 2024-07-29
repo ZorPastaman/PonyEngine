@@ -59,28 +59,16 @@
 #define PONY_LOG_EXCEPTION_MASK PonyEngine::Log::LogType::None
 #endif
 
-/// @brief Log mask. It contains a mask of all possible log types.
-#define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK)
+/// @brief Log mask. It contains a mask of all possible log types except Exception.
+#define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK | PONY_LOG_EXCEPTION_MASK)
 
-#if PONY_TERMINATE_ON_LOG_EXCEPTION
-/// @brief Log exception action.
-#define PONY_ON_LOG_EXCEPTION_ACTION std::terminate()
+#if PONY_CONSOLE_LOG || PONY_SYSTEM_CONSOLE_LOG
+/// @brief Console log mask.
+#define PONY_CONSOLE_LOG_MASK PONY_LOG_MASK
 #else
-/// @brief Log exception action.
-#define PONY_ON_LOG_EXCEPTION_ACTION
+/// @brief Console log mask.
+#define PONY_CONSOLE_LOG_MASK PonyEngine::Log::LogType::None
 #endif
-
-/// @brief Log try-catch. It calls @p PONY_ON_LOG_EXCEPTION_ACTION on any exception.
-/// @param expression Expression in the try block.
-#define PONY_LOG_TRY_CATCH(expression) \
-	try \
-	{ \
-		expression; \
-	} \
-	catch (...) \
-	{ \
-		PONY_ON_LOG_EXCEPTION_ACTION; \
-	}
 
 /// @brief If wrapper.
 /// @param condition If condition.
@@ -98,7 +86,7 @@
 #define PONY_LOG_GENERAL(logger, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogToLogger(*(logger), logType, logMessage)); \
+		PonyEngine::Log::LogToLogger(*(logger), logType, logMessage); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -109,7 +97,7 @@
 #define PONY_LOG_IF_GENERAL(condition, logger, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToLogger(*(logger), logType, logMessage))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToLogger(*(logger), logType, logMessage)); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -119,7 +107,7 @@
 #define PONY_LOG_E_GENERAL(logger, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage)); \
+		PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -130,7 +118,7 @@
 #define PONY_LOG_E_IF_GENERAL(condition, logger, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToLogger(*(logger), exception, logMessage)); \
 	}
 
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
@@ -138,9 +126,9 @@
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE(logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogToConsole(logType, message)); \
+		PonyEngine::Log::LogToConsole(logType, message); \
 	}
 
 /// @brief Log macro that conditionally puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
@@ -149,18 +137,39 @@
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE_IF(condition, logType, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToConsole(logType, message))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToConsole(logType, message)); \
 	}
+
+/// @brief Log macro that puts an exception into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @param exception std::exception reference.
+#define PONY_CONSOLE_E_S(exception) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	{ \
+		PonyEngine::Log::LogExceptionToConsole(exception); \
+	}
+
+/// @brief Log macro that conditionally puts an exception into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @param condition Log condition.
+/// @param exception std::exception reference.
+#define PONY_CONSOLE_E_S_IF(condition, exception) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	{ \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToConsole(exception)); \
+	}
+
+
 /// @brief Log macro that puts an exception and a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
 /// @param exception std::exception reference.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE_E(exception, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PonyEngine::Log::LogExceptionToConsole(exception, message)); \
+		PonyEngine::Log::LogExceptionToConsole(exception, message); \
 	}
 
 /// @brief Log macro that conditionally puts an exception and a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
@@ -169,7 +178,7 @@
 /// @param exception std::exception reference.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE_E_IF(condition, exception, message) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToConsole(exception, message))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogExceptionToConsole(exception, message)); \
 	}

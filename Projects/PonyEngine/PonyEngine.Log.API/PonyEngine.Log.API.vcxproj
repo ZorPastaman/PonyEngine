@@ -21,7 +21,9 @@
     <ClCompile Include="Source\Public\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Log\Log.cppm" />
+    <ClCompile Include="Source\Public\Log\LogConsoleHelper.cppm" />
     <ClCompile Include="Source\Public\Log\LogEntry.cppm" />
+    <ClCompile Include="Source\Public\Log\LogFormat.cppm" />
     <ClCompile Include="Source\Public\Log\LogHelper.cppm" />
     <ClCompile Include="Source\Public\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Log\LogType.cppm" />
