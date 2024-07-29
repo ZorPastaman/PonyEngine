@@ -59,7 +59,7 @@
 #define PONY_LOG_EXCEPTION_MASK PonyEngine::Log::LogType::None
 #endif
 
-/// @brief Log mask. It contains a mask of all possible log types except Exception.
+/// @brief Log mask. It contains a mask of all possible log types.
 #define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK | PONY_LOG_EXCEPTION_MASK)
 
 #if PONY_CONSOLE_LOG || PONY_SYSTEM_CONSOLE_LOG
@@ -122,7 +122,7 @@
 	}
 
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE(logType, message) \
@@ -132,7 +132,7 @@
 	}
 
 /// @brief Log macro that conditionally puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param condition Log condition.
 /// @param logType Log type.
 /// @param message Message that can be put into a std::cout.
@@ -143,7 +143,7 @@
 	}
 
 /// @brief Log macro that puts an exception into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param exception std::exception reference.
 #define PONY_CONSOLE_E_S(exception) \
 	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyEngine::Log::LogType::None) \
@@ -152,7 +152,7 @@
 	}
 
 /// @brief Log macro that conditionally puts an exception into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param condition Log condition.
 /// @param exception std::exception reference.
 #define PONY_CONSOLE_E_S_IF(condition, exception) \
@@ -163,7 +163,7 @@
 
 
 /// @brief Log macro that puts an exception and a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param exception std::exception reference.
 /// @param message Message that can be put into a std::cout.
 #define PONY_CONSOLE_E(exception, message) \
@@ -173,7 +173,7 @@
 	}
 
 /// @brief Log macro that conditionally puts an exception and a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
-/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error log type.
+/// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param condition Log condition.
 /// @param exception std::exception reference.
 /// @param message Message that can be put into a std::cout.

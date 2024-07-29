@@ -24,7 +24,7 @@
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
+/// @param condition Log condition. Must evaluate to bool.
 /// @param engine PonyEngine::Core::IEngine pointer.
 /// @param logType PonyEngine::Log::LogType value.
 /// @param logMessage const char* as a message.
@@ -44,7 +44,7 @@
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
+/// @param condition Log condition. Must evaluate to bool.
 /// @param engine PonyEngine::Core::IEngine pointer.
 /// @param exception std::exception reference.
 #define PONY_LOG_E_S_IF(condition, engine, exception) \
@@ -64,7 +64,7 @@
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
+/// @param condition Log condition. Must evaluate to bool.
 /// @param engine PonyEngine::Core::IEngine pointer.
 /// @param exception std::exception reference.
 /// @param logMessage const char* as a message.
