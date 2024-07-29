@@ -54,7 +54,7 @@ namespace Log
 			std::ifstream logFile(testLogPath);
 			std::string line;
 			std::getline(logFile, line);
-			Assert::AreEqual(infoLogEntry.ToString(), line);
+			Assert::AreEqual(infoLogEntry.ToString(), (line + '\n').c_str());
 			logFile.close();
 
 			std::filesystem::remove(testLogPath);
