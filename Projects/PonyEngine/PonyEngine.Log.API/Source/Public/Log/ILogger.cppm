@@ -26,8 +26,7 @@ export namespace PonyEngine::Log
 		ILogger(ILogger&& other) noexcept = delete;
 
 		/// @brief Logs via the current sub-loggers.
-		/// @remark Don't log exceptions via this.
-		/// @param logType Log type. Must be a valid one true bit value.
+		/// @param logType Log type.
 		/// @param logInput Log input.
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept = 0;
 		/// @brief Logs the exception via the current sub-loggers.
