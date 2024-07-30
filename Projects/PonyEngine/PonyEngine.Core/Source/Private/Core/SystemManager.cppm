@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/EngineLog.h"
 
 export module PonyEngine.Core.Implementation:SystemManager;
@@ -18,6 +16,7 @@ export module PonyEngine.Core.Implementation:SystemManager;
 import <exception>;
 import <format>;
 import <memory>;
+import <stdexcept>;
 import <string>;
 import <typeindex>;
 import <typeinfo>;
@@ -83,13 +82,16 @@ namespace PonyEngine::Core
 			SystemInfo systemInfo = (*factory).Create(*engine);
 			SystemUniquePtr system = std::move(systemInfo.System());
 			ISystem* const systemPointer = system.get();
-			assert((systemPointer && "The system is nullptr."));
+			if (!systemPointer)
+			{
+				throw std::logic_error("The system is nullptr.");
+			}
 
 			systems.push_back(std::move(system));
 
 			if (systemInfo.GetIsTickable())
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "Add to tickable systems.");
+				PONY_LOG(engine, Log::LogType::Debug, "Add to the tickable systems.");
 				tickableSystems.push_back(systemPointer);
 			}
 			else

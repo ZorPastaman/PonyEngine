@@ -14,6 +14,7 @@ module;
 export module Launcher:EngineLoop;
 
 import <format>;
+import <stdexcept>;
 
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
@@ -64,6 +65,10 @@ namespace Launcher
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create engine.");
 		engine = PonyEngine::Core::CreateEngine(engineParams);
+		if (!engine)
+		{
+			throw std::logic_error("The engine is nullptr.");
+		}
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");

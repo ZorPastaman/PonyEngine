@@ -56,7 +56,7 @@ namespace PonyEngine::Log
 	{
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error("Log file isn't open.");
+			throw std::logic_error("The log file isn't open.");
 		}
 	}
 
