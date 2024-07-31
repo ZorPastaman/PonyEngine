@@ -85,6 +85,13 @@ namespace Log
 			std::ostringstream exceptionLogEntrySs;
 			exceptionLogEntrySs << exceptionLogEntry;
 			Assert::AreEqual(exceptionLogEntryString.c_str(), exceptionLogEntrySs.str().c_str());
+
+			const auto emptyLogEntry = PonyEngine::Log::LogEntry(nullptr, nullptr, timePoint, frameCount, logType);
+			const std::string emptyLogEntryString = emptyLogEntry.ToString();
+			Assert::AreEqual("[Warning] [1970-01-06 05:13:00 UTC (98407)] \n", emptyLogEntryString.c_str());
+			std::ostringstream emptyLogEntrySs;
+			emptyLogEntrySs << emptyLogEntry;
+			Assert::AreEqual(emptyLogEntryString.c_str(), emptyLogEntrySs.str().c_str());
 		}
 	};
 }
