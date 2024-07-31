@@ -47,37 +47,37 @@ namespace Log
 			std::streambuf* const coutBuffer = std::cout.rdbuf(verboseStream.rdbuf());
 			const PonyEngine::Log::LogEntry verboseLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Verbose);
 			consoleSubLogger->Log(verboseLogEntry);
-			Assert::AreEqual(verboseLogEntry.ToString() + '\n', verboseStream.str());
+			Assert::AreEqual(verboseLogEntry.ToString(), verboseStream.str().c_str());
 
 			std::ostringstream debugStream;
 			std::cout.rdbuf(debugStream.rdbuf());
 			const PonyEngine::Log::LogEntry debugLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Debug);
 			consoleSubLogger->Log(debugLogEntry);
-			Assert::AreEqual(debugLogEntry.ToString() + '\n', debugStream.str());
+			Assert::AreEqual(debugLogEntry.ToString(), debugStream.str().c_str());
 
 			std::ostringstream infoStream;
 			std::cout.rdbuf(infoStream.rdbuf());
 			const PonyEngine::Log::LogEntry infoLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Info);
 			consoleSubLogger->Log(infoLogEntry);
-			Assert::AreEqual(infoLogEntry.ToString() + '\n', infoStream.str());
+			Assert::AreEqual(infoLogEntry.ToString(), infoStream.str().c_str());
 
 			std::ostringstream warningStream;
 			std::streambuf* const clogBuffer = std::clog.rdbuf(warningStream.rdbuf());
 			const PonyEngine::Log::LogEntry warningLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Warning);
 			consoleSubLogger->Log(warningLogEntry);
-			Assert::AreEqual(warningLogEntry.ToString() + '\n', warningStream.str());
+			Assert::AreEqual(warningLogEntry.ToString(), warningStream.str().c_str());
 
 			std::ostringstream errorStream;
 			std::streambuf* const cerrBuffer = std::cerr.rdbuf(errorStream.rdbuf());
 			const PonyEngine::Log::LogEntry errorLogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Error);
 			consoleSubLogger->Log(errorLogEntry);
-			Assert::AreEqual(errorLogEntry.ToString() + '\n', errorStream.str());
+			Assert::AreEqual(errorLogEntry.ToString(), errorStream.str().c_str());
 
 			std::ostringstream exceptionStream;
 			std::cerr.rdbuf(exceptionStream.rdbuf());
 			const PonyEngine::Log::LogEntry exceptionLogEntry(message, &exception, timePoint, frameCount, PonyEngine::Log::LogType::Exception);
 			consoleSubLogger->Log(exceptionLogEntry);
-			Assert::AreEqual(exceptionLogEntry.ToString() + '\n', exceptionStream.str());
+			Assert::AreEqual(exceptionLogEntry.ToString(), exceptionStream.str().c_str());
 
 			std::cout.rdbuf(coutBuffer);
 			std::clog.rdbuf(clogBuffer);

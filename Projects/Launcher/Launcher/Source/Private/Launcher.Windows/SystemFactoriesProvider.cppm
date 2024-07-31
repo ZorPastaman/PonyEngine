@@ -9,12 +9,12 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Launcher.Windows:WindowsEngineParamsProvider;
+
+import <stdexcept>;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Implementation;
@@ -67,7 +67,10 @@ namespace Launcher
 		auto windowClassParams = PonyEngine::Window::WindowsClassParams();
 		windowClassParams.name = L"Pony Engine Game";
 		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowClassParams);
-		assert((windowsWindowSystemFactory && "The window system factory is nullptr."));
+		if (!windowsWindowSystemFactory)
+		{
+			throw std::logic_error("The Windows window system factory is nullptr.");
+		}
 		PonyEngine::Window::WindowParams& nextWindowParams = windowsWindowSystemFactory->NextWindowParams();
 		nextWindowParams.title = L"Pony Engine Game";
 		nextWindowParams.horizontalPosition = CW_USEDEFAULT;
@@ -79,10 +82,18 @@ namespace Launcher
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
 		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
+		if (!inputSystemFactory)
+		{
+			throw std::logic_error("The input system factory is nullptr.");
+		}
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
 		gameSystemFactory = Game::CreateGameSystemFactory(*logger);
+		if (!gameSystemFactory)
+		{
+			throw std::logic_error("The game system factory is nullptr.");
+		}
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
 	}
 
