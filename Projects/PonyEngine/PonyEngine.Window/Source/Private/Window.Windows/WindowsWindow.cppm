@@ -219,7 +219,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindow::RemoveKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
 	{
-		PONY_LOG_IF(keyboardMessageObserver == nullptr, engine, Log::LogType::Warning, "Tried to remove a nullptr keyboard message observer.");
+		PONY_LOG_IF(!keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove a nullptr keyboard message observer.");
 
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
@@ -229,7 +229,7 @@ namespace PonyEngine::Window
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageObserver != nullptr, engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, std::format("Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
 		}
 	}
 

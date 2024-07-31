@@ -31,6 +31,7 @@
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\ITimeManager.cppm" />
+    <ClCompile Include="Source\Public\Core\LogHelper.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">

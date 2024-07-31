@@ -13,11 +13,7 @@ module;
 
 export module PonyEngine.Log.Implementation:ConsoleSubLogger;
 
-import <format>;
 import <exception>;
-import <iostream>;
-import <stdexcept>;
-import <string>;
 
 import PonyEngine.Log;
 
@@ -48,45 +44,20 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	/// @brief Chooses a console output stream by the @p logType.
-	/// @param logType Log type.
-	/// @return Chosen stream.
-	[[nodiscard("Pure function")]]
-	std::ostream& ChooseStream(LogType logType);
-
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
 		{
-			std::ostream& stream = ChooseStream(logEntry.GetLogType());
-			stream << logEntry << std::endl;
+			ChooseConsoleStream(logEntry.GetLogType()) << logEntry;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE(LogType::Exception, std::format("{} - On writing to a console.", e.what()));
+			PONY_CONSOLE_E(e, "On writing to a console.");
 		}
 	}
 
 	const char* ConsoleSubLogger::GetName() const noexcept
 	{
 		return StaticName;
-	}
-
-	std::ostream& ChooseStream(const LogType logType)
-	{
-		switch (logType)
-		{
-		case LogType::Verbose:
-		case LogType::Debug:
-		case LogType::Info:
-			return std::cout;
-		case LogType::Warning:
-			return std::clog;
-		case LogType::Error:
-		case LogType::Exception:
-			return std::cerr;
-		default:
-			throw std::invalid_argument("logType has an incorrect value.");
-		}
 	}
 }

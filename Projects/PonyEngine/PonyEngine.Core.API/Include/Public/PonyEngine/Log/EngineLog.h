@@ -9,6 +9,8 @@
 
 #pragma once
 
+ // To use this header, you have to import PonyEngine.Core and PonyEngine.Log as well.
+
 #include "PonyEngine/Log/Log.h"
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
@@ -18,18 +20,37 @@
 #define PONY_LOG(engine, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput{.message = (logMessage), .frameCount = (engine)->GetTimeManager().GetFrameCount()})); \
+		PonyEngine::Core::LogToLogger(*(engine), logType, logMessage); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
+/// @param condition Log condition. Must evaluate to bool.
 /// @param engine PonyEngine::Core::IEngine pointer.
 /// @param logType PonyEngine::Log::LogType value.
 /// @param logMessage const char* as a message.
 #define PONY_LOG_IF(condition, engine, logType, logMessage) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().Log(logType, PonyEngine::Log::LogInput{.message = (logMessage), .frameCount = (engine)->GetTimeManager().GetFrameCount()}))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Core::LogToLogger(*(engine), logType, logMessage)); \
+	}
+
+/// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
+/// @param engine PonyEngine::Core::IEngine pointer.
+/// @param exception std::exception reference.
+#define PONY_LOG_E_S(engine, exception) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
+	{ \
+		PonyEngine::Core::LogExceptionToLogger(*(engine), exception); \
+	}
+
+/// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
+/// @param condition Log condition. Must evaluate to bool.
+/// @param engine PonyEngine::Core::IEngine pointer.
+/// @param exception std::exception reference.
+#define PONY_LOG_E_S_IF(condition, engine, exception) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
+	{ \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Core::LogExceptionToLog(*(engine), exception)); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
@@ -39,16 +60,16 @@
 #define PONY_LOG_E(engine, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH((engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput{.message = (logMessage), .frameCount = (engine)->GetTimeManager().GetFrameCount()})); \
+		PonyEngine::Core::LogExceptionToLogger(*(engine), exception, logMessage); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param condition Log condition.
+/// @param condition Log condition. Must evaluate to bool.
 /// @param engine PonyEngine::Core::IEngine pointer.
 /// @param exception std::exception reference.
 /// @param logMessage const char* as a message.
 #define PONY_LOG_E_IF(condition, engine, exception, logMessage) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_TRY_CATCH(PONY_LOG_CONDITIONAL(condition, (engine)->GetLogger().LogException(exception, PonyEngine::Log::LogInput{.message = (logMessage), .frameCount = (engine)->GetTimeManager().GetFrameCount()}))); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Core::LogExceptionToLogger(*(engine), exception, logMessage)); \
 	}

@@ -24,7 +24,7 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	UNREFERENCED_PARAMETER(lpCmdLine);
 	UNREFERENCED_PARAMETER(nShowCmd);
 
-	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create a logger provider");
+	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger provider");
 	const auto loggerProvider = Launcher::LoggerProvider();
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
 

@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Log/EngineLog.h"
 
 export module PonyEngine.Core.Implementation:Engine;

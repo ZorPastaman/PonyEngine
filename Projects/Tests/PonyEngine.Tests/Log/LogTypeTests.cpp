@@ -20,6 +20,15 @@ namespace Log
 {
 	TEST_CLASS(LogTypeTests)
 	{
+		static void ToStringTestElement(const PonyEngine::Log::LogType logType, const char* expectedString)
+		{
+			Assert::AreEqual(expectedString, PonyEngine::Log::ToString(logType));
+
+			std::ostringstream ss;
+			ss << logType;
+			Assert::AreEqual(expectedString, ss.str().c_str());
+		}
+
 		TEST_METHOD(ValueTest)
 		{
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(0), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::None));
@@ -49,16 +58,16 @@ namespace Log
 
 		TEST_METHOD(ToStringTest)
 		{
-			constexpr auto logType = PonyEngine::Log::LogType::Debug | PonyEngine::Log::LogType::Warning | PonyEngine::Log::LogType::Exception;
-			std::string string = PonyEngine::Log::ToString(logType);
-			Assert::AreEqual("Debug | Warning | Exception", string.c_str());
-
-			string = PonyEngine::Log::ToString(logType, true);
-			Assert::AreEqual("Debug | Warning | Exception (42)", string.c_str());
-
-			std::ostringstream ss;
-			ss << logType;
-			Assert::AreEqual(string, ss.str());
+			ToStringTestElement(PonyEngine::Log::LogType::None, "None");
+			ToStringTestElement(PonyEngine::Log::LogType::Verbose, "Verbose");
+			ToStringTestElement(PonyEngine::Log::LogType::Debug, "Debug");
+			ToStringTestElement(PonyEngine::Log::LogType::Info, "Info");
+			ToStringTestElement(PonyEngine::Log::LogType::Warning, "Warning");
+			ToStringTestElement(PonyEngine::Log::LogType::Error, "Error");
+			ToStringTestElement(PonyEngine::Log::LogType::Exception, "Exception");
+			ToStringTestElement(PonyEngine::Log::LogType::All, "Unknown");
+			ToStringTestElement(PonyEngine::Log::LogType::Info | PonyEngine::Log::LogType::Debug, "Unknown");
+			ToStringTestElement(static_cast<PonyEngine::Log::LogType>(111), "Unknown");
 		}
 
 		TEST_METHOD(ConstexprCompilationTest)
@@ -67,6 +76,7 @@ namespace Log
 			[[maybe_unused]] constexpr auto andResult = PonyEngine::Log::LogType::Info & PonyEngine::Log::LogType::Warning;
 			[[maybe_unused]] constexpr auto orResult = PonyEngine::Log::LogType::Error | PonyEngine::Log::LogType::Exception;
 			[[maybe_unused]] constexpr auto xorResult = PonyEngine::Log::LogType::Verbose ^ PonyEngine::Log::LogType::Info;
+			[[maybe_unused]] constexpr auto string = PonyEngine::Log::ToString(PonyEngine::Log::LogType::Info);
 		}
 	};
 }
