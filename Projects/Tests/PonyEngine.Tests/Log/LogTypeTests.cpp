@@ -76,6 +76,7 @@ namespace Log
 			[[maybe_unused]] constexpr auto andResult = PonyEngine::Log::LogType::Info & PonyEngine::Log::LogType::Warning;
 			[[maybe_unused]] constexpr auto orResult = PonyEngine::Log::LogType::Error | PonyEngine::Log::LogType::Exception;
 			[[maybe_unused]] constexpr auto xorResult = PonyEngine::Log::LogType::Verbose ^ PonyEngine::Log::LogType::Info;
+			[[maybe_unused]] constexpr auto string = PonyEngine::Log::ToString(PonyEngine::Log::LogType::Info);
 		}
 	};
 }
