@@ -18,7 +18,6 @@ import <numbers>;
 import <ostream>;
 import <string>;
 
-import :ArrayArithmetics;
 import :Common;
 import :Vector3;
 import :Vector4;
@@ -421,10 +420,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T> Quaternion<T>::Inverse() const noexcept
 	{
-		Quaternion inverse = Conjugate();
-		Multiply(inverse.Data(), T{1} / MagnitudeSquared(), ComponentCount);
-
-		return inverse;
+		return Conjugate() * (T{1} / MagnitudeSquared());
 	}
 
 	template<std::floating_point T>
@@ -455,10 +451,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	Quaternion<T> Quaternion<T>::Normalized() const noexcept
 	{
-		Quaternion normalized;
-		Multiply(normalized.Data(), Data(), T{1} / Magnitude(), ComponentCount);
-
-		return normalized;
+		return *this * (T{1} / Magnitude());
 	}
 
 	template<std::floating_point T>
@@ -470,7 +463,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	bool Quaternion<T>::IsFinite() const noexcept
 	{
-		return Math::IsFinite(Data(), ComponentCount);
+		return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
 	}
 
 	template<std::floating_point T>
@@ -485,7 +478,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr void Quaternion<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), componentsToSet, ComponentCount);
+		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
 	}
 
 	template<std::floating_point T>
@@ -558,7 +551,10 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T>::operator Quaternion<U>() const noexcept
 	{
 		Quaternion<U> cast;
-		Cast(cast.Data(), Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			cast[i] = static_cast<U>((*this)[i]);
+		}
 
 		return cast;
 	}
@@ -591,7 +587,10 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T> operator +(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		Quaternion<T> sum;
-		Add(sum.Data(), left.Data(), right.Data(), Quaternion<T>::ComponentCount);
+		for (std::size_t i = 0; i < Quaternion<T>::ComponentCount; ++i)
+		{
+			sum[i] = left[i] + right[i];
+		}
 
 		return sum;
 	}
@@ -600,7 +599,10 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T> operator -(const Quaternion<T>& quaternion) noexcept
 	{
 		Quaternion<T> negated;
-		Negate(negated.Data(), quaternion.Data(), Quaternion<T>::ComponentCount);
+		for (std::size_t i = 0; i < Quaternion<T>::ComponentCount; ++i)
+		{
+			negated[i] = -quaternion[i];
+		}
 
 		return negated;
 	}
@@ -609,7 +611,10 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T> operator -(const Quaternion<T>& left, const Quaternion<T>& right) noexcept
 	{
 		Quaternion<T> difference;
-		Subtract(difference.Data(), left.Data(), right.Data(), Quaternion<T>::ComponentCount);
+		for (std::size_t i = 0; i < Quaternion<T>::ComponentCount; ++i)
+		{
+			difference[i] = left[i] - right[i];
+		}
 
 		return difference;
 	}
@@ -618,7 +623,10 @@ namespace PonyEngine::Math
 	constexpr Quaternion<T> operator *(const Quaternion<T>& quaternion, const T multiplier) noexcept
 	{
 		Quaternion<T> product;
-		Multiply(product.Data(), quaternion.Data(), multiplier, Quaternion<T>::ComponentCount);
+		for (std::size_t i = 0; i < Quaternion<T>::ComponentCount; ++i)
+		{
+			product[i] = quaternion[i] * multiplier;
+		}
 
 		return product;
 	}

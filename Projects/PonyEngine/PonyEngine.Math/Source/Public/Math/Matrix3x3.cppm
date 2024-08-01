@@ -16,7 +16,6 @@ import <ostream>;
 import <string>;
 import <type_traits>;
 
-import :ArrayArithmetics;
 import :Common;
 import :Matrix2x2;
 import :Vector3;
@@ -724,7 +723,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::SetColumn(const std::size_t columnIndex, const Vector3<T>& value) noexcept
 	{
-		Copy(Data(columnIndex), value.Data(), Dimension);
+		std::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
 	}
 
 	template<Arithmetic T>
@@ -825,7 +824,15 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Matrix3x3<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		return Math::IsFinite(Data(), ComponentCount);
+		for (const T component : components)
+		{
+			if (!std::isfinite(component))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	template<Arithmetic T>
@@ -851,13 +858,16 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), componentsToSet, ComponentCount);
+		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Scale(const Matrix3x3& scale) noexcept
 	{
-		Multiply(Data(), scale.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] *= scale.Data()[i];
+		}
 	}
 
 	template<Arithmetic T>
@@ -870,7 +880,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> Scale(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
 	{
 		Matrix3x3<T> scaled;
-		Multiply(scaled.Data(), left.Data(), right.Data(), Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			scaled.Data()[i] = left.Data()[i] * right.Data()[i];
+		}
 
 		return scaled;
 	}
@@ -896,7 +909,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T>::operator Matrix3x3<U>() const noexcept
 	{
 		Matrix3x3<U> cast;
-		Cast(cast.Data(), Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			cast.Data()[i] = static_cast<U>(Data()[i]);
+		}
 
 		return cast;
 	}
@@ -916,7 +932,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator +=(const Matrix3x3& other) noexcept
 	{
-		Add(Data(), other.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] += other.Data()[i];
+		}
 
 		return *this;
 	}
@@ -924,7 +943,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator -=(const Matrix3x3& other) noexcept
 	{
-		Subtract(Data(), other.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] -= other.Data()[i];
+		}
 
 		return *this;
 	}
@@ -932,7 +954,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const T multiplier) noexcept
 	{
-		Multiply(Data(), multiplier, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] *= multiplier;
+		}
 
 		return *this;
 	}
@@ -940,7 +965,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		Multiply(Data(), multiplier, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] = static_cast<T>(Data()[i] * multiplier);
+		}
 
 		return *this;
 	}
@@ -954,7 +982,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator /=(const T divisor) noexcept
 	{
-		Divide(Data(), divisor, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] /= divisor;
+		}
 
 		return *this;
 	}
@@ -962,7 +993,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>& Matrix3x3<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
 	{
-		Divide(Data(), divisor, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Data()[i] = static_cast<T>(Data()[i] / divisor);
+		}
 
 		return *this;
 	}
@@ -977,7 +1011,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator +(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
 	{
 		Matrix3x3<T> sum;
-		Add(sum.Data(), left.Data(), right.Data(), Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			sum.Data()[i] = left.Data()[i] + right.Data()[i];
+		}
 
 		return sum;
 	}
@@ -986,7 +1023,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator -(const Matrix3x3<T>& matrix) noexcept
 	{
 		Matrix3x3<T> negated;
-		Negate(negated.Data(), matrix.Data(), Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			negated.Data()[i] = -matrix.Data()[i];
+		}
 
 		return negated;
 	}
@@ -995,7 +1035,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator -(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
 	{
 		Matrix3x3<T> difference;
-		Subtract(difference.Data(), left.Data(), right.Data(), Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			difference.Data()[i] = left.Data()[i] - right.Data()[i];
+		}
 
 		return difference;
 	}
@@ -1004,7 +1047,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const T multiplier) noexcept
 	{
 		Matrix3x3<T> product;
-		Multiply(product.Data(), matrix.Data(), multiplier, Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			product.Data()[i] = matrix.Data()[i] * multiplier;
+		}
 
 		return product;
 	}
@@ -1013,7 +1059,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator *(const Matrix3x3<T>& matrix, const typename Matrix3x3<T>::ComputationalType multiplier) noexcept
 	{
 		Matrix3x3<T> product;
-		Multiply(product.Data(), matrix.Data(), multiplier, Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			product.Data()[i] = static_cast<T>(matrix.Data()[i] * multiplier);
+		}
 
 		return product;
 	}
@@ -1062,7 +1111,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, const T divisor) noexcept
 	{
 		Matrix3x3<T> quotient;
-		Divide(quotient.Data(), matrix.Data(), divisor, Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			quotient.Data()[i] = matrix.Data()[i] / divisor;
+		}
 
 		return quotient;
 	}
@@ -1071,7 +1123,10 @@ namespace PonyEngine::Math
 	constexpr Matrix3x3<T> operator /(const Matrix3x3<T>& matrix, const typename Matrix3x3<T>::ComputationalType divisor) noexcept
 	{
 		Matrix3x3<T> quotient;
-		Divide(quotient.Data(), matrix.Data(), divisor, Matrix3x3<T>::ComponentCount);
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			quotient.Data()[i] = static_cast<T>(matrix.Data()[i] / divisor);
+		}
 
 		return quotient;
 	}

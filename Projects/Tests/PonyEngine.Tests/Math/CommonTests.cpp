@@ -63,11 +63,27 @@ namespace Math
 			Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(1.f, 1.5f));
 		}
 
+		TEST_METHOD(SignShortTest)
+		{
+			Assert::AreEqual(short{1}, PonyEngine::Math::Sign(short{0}));
+			Assert::AreEqual(short{1}, PonyEngine::Math::Sign(short{39}));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::Sign(short{-42}));
+		}
+
+		TEST_METHOD(SignFloatTest)
+		{
+			Assert::AreEqual(1.f, PonyEngine::Math::Sign(0.f));
+			Assert::AreEqual(1.f, PonyEngine::Math::Sign(39.f));
+			Assert::AreEqual(-1.f, PonyEngine::Math::Sign(-42.f));
+			Assert::AreEqual(1.f, PonyEngine::Math::Sign(0.3f));
+			Assert::AreEqual(-1.f, PonyEngine::Math::Sign(-0.3f));
+		}
+
 		TEST_METHOD(SignumShortTest)
 		{
-			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{ 0 }));
-			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{ 39 }));
-			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{ -42 }));
+			Assert::AreEqual(short{0}, PonyEngine::Math::Signum(short{0}));
+			Assert::AreEqual(short{1}, PonyEngine::Math::Signum(short{39}));
+			Assert::AreEqual(short{-1}, PonyEngine::Math::Signum(short{-42}));
 		}
 
 		TEST_METHOD(SignumFloatTest)
@@ -113,6 +129,7 @@ namespace Math
 		{
 			[[maybe_unused]] constexpr float degToRad = PonyEngine::Math::DegToRad<float>;
 			[[maybe_unused]] constexpr float radToDeg = PonyEngine::Math::RadToDeg<float>;
+			[[maybe_unused]] constexpr float sign = PonyEngine::Math::Sign<float>(4.f);
 			[[maybe_unused]] constexpr float signum = PonyEngine::Math::Signum<float>(3.f);
 			[[maybe_unused]] constexpr int round = PonyEngine::Math::RoundToIntegral<float, int>(3.5f);
 		}
