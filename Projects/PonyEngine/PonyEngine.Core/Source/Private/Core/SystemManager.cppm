@@ -79,8 +79,7 @@ namespace PonyEngine::Core
 		{
 			PONY_LOG(engine, Log::LogType::Info, std::format("Create system '{}'.", (*factory).GetSystemName()).c_str());
 
-			SystemInfo systemInfo = (*factory).Create(*engine);
-			SystemUniquePtr system = std::move(systemInfo.System());
+			SystemUniquePtr system = (*factory).Create(*engine);
 			ISystem* const systemPointer = system.get();
 			if (!systemPointer)
 			{
@@ -89,7 +88,7 @@ namespace PonyEngine::Core
 
 			systems.push_back(std::move(system));
 
-			if (systemInfo.GetIsTickable())
+			if (systemPointer->GetIsTickable())
 			{
 				PONY_LOG(engine, Log::LogType::Debug, "Add to the tickable systems.");
 				tickableSystems.push_back(systemPointer);
@@ -99,9 +98,11 @@ namespace PonyEngine::Core
 				PONY_LOG(engine, Log::LogType::Debug, "The system is not tickable.");
 			}
 
-			for (auto interfacesIterator = systemInfo.GetInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
+			const ObjectInterfaces interfaces = systemPointer->GetPublicInterfaces();
+			for (auto interfacesIterator = interfaces.GetObjectInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
 				auto [type, objectPointer] = *interfacesIterator;
+				PONY_LOG(engine, Log::LogType::Debug, std::format("Add '{}' interface.", type.get().name()).c_str());
 				systemInterfaces.insert_or_assign(type.get(), objectPointer);
 			}
 

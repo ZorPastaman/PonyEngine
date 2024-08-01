@@ -50,6 +50,11 @@ export namespace PonyEngine::Window
 
 		~WindowsWindow() noexcept;
 
+		[[nodiscard("Pure function")]]
+		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool GetIsTickable() const noexcept override;
+
 		virtual void Begin() override;
 		virtual void End() override;
 
@@ -146,6 +151,19 @@ namespace PonyEngine::Window
 			PONY_LOG_E(engine, e, "On destroying a window");
 		}
 		PONY_LOG(engine, Log::LogType::Info, "Windows window destroyed.");
+	}
+
+	Core::ObjectInterfaces WindowsWindow::GetPublicInterfaces() noexcept
+	{
+		auto interfaces = Core::ObjectInterfaces();
+		interfaces.AddObjectInterfacesDeduced<IWindow, IWindowsWindow, Input::IKeyboardProvider>(*this);
+
+		return interfaces;
+	}
+
+	bool WindowsWindow::GetIsTickable() const noexcept
+	{
+		return true;
 	}
 
 	void WindowsWindow::Begin()

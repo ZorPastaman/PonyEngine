@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factory:ObjectInterfaces;
+export module PonyEngine.Core:ObjectInterfaces;
 
 import <typeinfo>;
 import <type_traits>;

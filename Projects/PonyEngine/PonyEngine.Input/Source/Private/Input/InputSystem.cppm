@@ -39,6 +39,11 @@ export namespace PonyEngine::Input
 
 		~InputSystem() noexcept = default;
 
+		[[nodiscard("Pure function")]]
+		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool GetIsTickable() const noexcept override;
+
 		virtual void Begin() override;
 		virtual void End() override;
 
@@ -74,6 +79,19 @@ namespace PonyEngine::Input
 		currentId{1},
 		engine{&engine}
 	{
+	}
+
+	Core::ObjectInterfaces InputSystem::GetPublicInterfaces() noexcept
+	{
+		auto interfaces = Core::ObjectInterfaces();
+		interfaces.AddObjectInterfacesDeduced<IInputSystem>(*this);
+
+		return interfaces;
+	}
+
+	bool InputSystem::GetIsTickable() const noexcept
+	{
+		return true;
 	}
 
 	void InputSystem::Begin()

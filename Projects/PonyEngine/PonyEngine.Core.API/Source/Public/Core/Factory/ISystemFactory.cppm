@@ -9,10 +9,16 @@
 
 export module PonyEngine.Core.Factory:ISystemFactory;
 
-import :SystemInfo;
+import <memory>;
+
+import PonyEngine.Core;
+
+import :SystemDeleter;
 
 export namespace PonyEngine::Core
 {
+	using SystemUniquePtr = std::unique_ptr<ISystem, SystemDeleter>;
+
 	/// @brief System factory.
 	class ISystemFactory
 	{
@@ -22,9 +28,9 @@ export namespace PonyEngine::Core
 
 		/// @brief Creates a system.
 		/// @param engine Engine that owns the system.
-		/// @return Created system info.
+		/// @return Created system.
 		[[nodiscard("Pure function")]]
-		virtual SystemInfo Create(IEngine& engine) = 0;
+		virtual SystemUniquePtr Create(IEngine& engine) = 0;
 
 		/// @brief Gets the system factory name.
 		/// @return System factory name.
