@@ -66,6 +66,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
 		auto windowClassParams = PonyEngine::Window::WindowsClassParams();
 		windowClassParams.name = L"Pony Engine Game";
+		windowClassParams.style = CS_OWNDC;
 		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowClassParams);
 		if (!windowsWindowSystemFactory)
 		{
@@ -77,7 +78,9 @@ namespace Launcher
 		nextWindowParams.verticalPosition = CW_USEDEFAULT;
 		nextWindowParams.width = CW_USEDEFAULT;
 		nextWindowParams.height = CW_USEDEFAULT;
-		windowsWindowSystemFactory->NextWindowsWindowParams().style = WS_OVERLAPPEDWINDOW;
+		PonyEngine::Window::WindowsWindowParams& nextWindowsWindowParams =  windowsWindowSystemFactory->NextWindowsWindowParams();
+		nextWindowsWindowParams.style = WS_OVERLAPPEDWINDOW;
+		nextWindowsWindowParams.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
