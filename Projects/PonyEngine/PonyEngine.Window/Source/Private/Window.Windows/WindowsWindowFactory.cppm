@@ -23,7 +23,6 @@ import <string>;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.Input;
 import PonyEngine.StringUtility;
 import PonyEngine.Window.Windows.Factory;
 
@@ -49,7 +48,7 @@ export namespace PonyEngine::Window
 		~WindowsWindowFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
+		virtual Core::SystemUniquePtr Create(Core::IEngine& engine) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -135,7 +134,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class '{}' unregistered.", classAtom).c_str());
 	}
 
-	Core::SystemInfo WindowsWindowFactory::Create(Core::IEngine& engine)
+	Core::SystemUniquePtr WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
 		CreateWindowParams createWindowParams;
 		createWindowParams.title = windowParams.title;
@@ -147,13 +146,15 @@ namespace PonyEngine::Window
 		createWindowParams.height = windowParams.height;
 		createWindowParams.cmdShow = windowsWindowParams.showCmd;
 
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create Windows window.");
 		const auto window = new WindowsWindow(engine, hInstance, classAtom, createWindowParams);
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Windows window created.");
 		const HWND hWnd = window->GetWindowHandle();
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
-		return Core::SystemInfo::CreateDeduced<IWindow, IWindowsWindow, Input::IKeyboardProvider>(*window, *this, true);
+		return Core::SystemUniquePtr(window, Core::SystemDeleter(*this));
 	}
 
 	void WindowsWindowFactory::Destroy(Core::ISystem* const system) noexcept

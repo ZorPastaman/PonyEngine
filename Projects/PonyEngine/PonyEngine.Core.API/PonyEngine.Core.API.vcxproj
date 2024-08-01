@@ -23,9 +23,8 @@
     <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ISystemDestroyer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm" />
+    <ClCompile Include="Source\Public\Core\ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemDeleter.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemInfo.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
     <ClCompile Include="Source\Public\Core\IAdvancedEngine.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />

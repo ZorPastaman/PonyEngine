@@ -39,7 +39,7 @@ export namespace Game
 		~GameSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine& engine) override;
+		virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine& engine) override;
 		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -65,17 +65,9 @@ namespace Game
 	{
 	}
 
-	PonyEngine::Core::SystemInfo GameSystemFactory::Create(PonyEngine::Core::IEngine& engine)
+	PonyEngine::Core::SystemUniquePtr GameSystemFactory::Create(PonyEngine::Core::IEngine& engine)
 	{
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system.");
-		const auto gameSystem = new GameSystem(engine);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Create game system info.");
-		auto systemInfo = PonyEngine::Core::SystemInfo::CreateDeduced<IGameSystem>(*gameSystem, *this, true);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system info created.");
-
-		return systemInfo;
+		return PonyEngine::Core::SystemUniquePtr(new GameSystem(engine), PonyEngine::Core::SystemDeleter(*this));
 	}
 
 	void GameSystemFactory::Destroy(PonyEngine::Core::ISystem* const system) noexcept
