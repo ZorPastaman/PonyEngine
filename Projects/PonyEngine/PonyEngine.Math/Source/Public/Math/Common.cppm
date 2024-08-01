@@ -57,6 +57,12 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreAlmostEqual(T left, T right, T tolerance = T{0.00001}) noexcept;
 
+	/// @brief Sign function.
+	/// @tparam T Value type.
+	/// @param value Input.
+	/// @return @a 1 if the @p value is positive or zero; @a -1 if the @p value is negative.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T Sign(T value) noexcept;
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
@@ -82,9 +88,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr T Sign(T value) noexcept
+	{
+		return value < T{0} ? T{-1} : T{1};
+	}
+
+	template<Arithmetic T>
 	constexpr T Signum(const T value) noexcept
 	{
-		return static_cast<T>(T{} < value) - (value < T{});
+		return static_cast<T>(T{0} < value) - (value < T{0});
 	}
 
 	template<std::floating_point From, std::integral To>

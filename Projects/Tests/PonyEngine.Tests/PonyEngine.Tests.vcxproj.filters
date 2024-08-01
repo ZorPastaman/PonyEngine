@@ -60,9 +60,6 @@
     <ClCompile Include="Math\Matrix2x2Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Math\ArrayArithmeticsTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Math\Matrix4x4Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -108,7 +105,7 @@
     <ClCompile Include="Log\LogHelperTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\LogHelperTests.cpp">
+    <ClCompile Include="Core\CoreLogHelperTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

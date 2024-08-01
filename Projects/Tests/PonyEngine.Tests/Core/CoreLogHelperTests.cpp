@@ -44,11 +44,11 @@ namespace Core
 				lastException = &exception;
 			}
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger* subLogger) override
+			virtual void AddSubLogger(PonyEngine::Log::ISubLogger*) override
 			{
 			}
 
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger* subLogger) override
+			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override
 			{
 			}
 
@@ -76,7 +76,7 @@ namespace Core
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float frameTime) noexcept override
+			virtual void SetTargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -85,7 +85,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
+			virtual void* FindSystem(const std::type_info&) const noexcept override
 			{
 				return nullptr;
 			}
@@ -129,7 +129,7 @@ namespace Core
 				return 0;
 			}
 
-			virtual void Stop(int exitCode) noexcept override
+			virtual void Stop(int) noexcept override
 			{
 			}
 

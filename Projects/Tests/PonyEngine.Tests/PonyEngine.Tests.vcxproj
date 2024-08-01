@@ -73,7 +73,7 @@
   <ItemGroup>
     <ClCompile Include="Core\EngineParamsTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
-    <ClCompile Include="Core\LogHelperTests.cpp" />
+    <ClCompile Include="Core\CoreLogHelperTests.cpp" />
     <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
     <ClCompile Include="Core\SystemInfoTests.cpp" />
@@ -90,7 +90,6 @@
     <ClCompile Include="Log\LogHelperTests.cpp" />
     <ClCompile Include="Log\LogTypeTests.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
-    <ClCompile Include="Math\ArrayArithmeticsTests.cpp" />
     <ClCompile Include="Math\CommonTests.cpp" />
     <ClCompile Include="Math\Matrix2x2Tests.cpp" />
     <ClCompile Include="Math\Matrix3x3Tests.cpp" />

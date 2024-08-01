@@ -9,7 +9,6 @@
 
 export module PonyEngine.Math;
 
-export import :ArrayArithmetics;
 export import :Common;
 export import :Matrix2x2;
 export import :Matrix3x3;
