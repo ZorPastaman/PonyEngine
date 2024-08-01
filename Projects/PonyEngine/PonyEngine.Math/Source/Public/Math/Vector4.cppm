@@ -18,7 +18,6 @@ import <ostream>;
 import <string>;
 import <type_traits>;
 
-import :ArrayArithmetics;
 import :Common;
 
 export namespace PonyEngine::Math
@@ -540,7 +539,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	bool Vector4<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
 	{
-		return Math::IsFinite(Data(), ComponentCount);
+		return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
 	}
 
 	template<Arithmetic T>
@@ -555,13 +554,16 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Vector4<T>::Set(const T* const componentsToSet) noexcept
 	{
-		Copy(Data(), componentsToSet, ComponentCount);
+		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
 	}
 
 	template<Arithmetic T>
 	constexpr void Vector4<T>::Scale(const Vector4& scale) noexcept
 	{
-		Multiply(Data(), scale.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] *= scale[i];
+		}
 	}
 
 	template<Arithmetic T>
@@ -594,7 +596,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
 		Vector4<T> scaled;
-		Multiply(scaled.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			scaled[i] = left[i] * right[i];
+		}
 
 		return scaled;
 	}
@@ -616,7 +621,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T>::operator Vector4<U>() const noexcept
 	{
 		Vector4<U> cast;
-		Cast(cast.Data(), Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			cast[i] = static_cast<U>((*this)[i]);
+		}
 
 		return cast;
 	}
@@ -636,7 +644,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T>& Vector4<T>::operator +=(const Vector4& other) noexcept
 	{
-		Add(Data(), other.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] += other[i];
+		}
 
 		return *this;
 	}
@@ -644,7 +655,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T>& Vector4<T>::operator -=(const Vector4& other) noexcept
 	{
-		Subtract(Data(), other.Data(), ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] -= other[i];
+		}
 
 		return *this;
 	}
@@ -652,7 +666,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T>& Vector4<T>::operator *=(const T multiplier) noexcept requires(std::is_integral_v<T>)
 	{
-		Multiply(Data(), multiplier, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] *= multiplier;
+		}
 
 		return *this;
 	}
@@ -660,7 +677,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T>& Vector4<T>::operator *=(const ComputationalType multiplier) noexcept
 	{
-		Multiply(Data(), multiplier, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] = static_cast<T>((*this)[i] * multiplier);
+		}
 
 		return *this;
 	}
@@ -668,7 +688,10 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector4<T>& Vector4<T>::operator /=(const ComputationalType divisor) noexcept
 	{
-		Divide(Data(), divisor, ComponentCount);
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] = static_cast<T>((*this)[i] / divisor);
+		}
 
 		return *this;
 	}
@@ -683,7 +706,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator +(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
 		Vector4<T> sum;
-		Add(sum.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			sum[i] = left[i] + right[i];
+		}
 
 		return sum;
 	}
@@ -692,7 +718,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator -(const Vector4<T>& vector) noexcept
 	{
 		Vector4<T> negated;
-		Negate(negated.Data(), vector.Data(), Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			negated[i] = -vector[i];
+		}
 
 		return negated;
 	}
@@ -701,7 +730,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator -(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
 		Vector4<T> difference;
-		Subtract(difference.Data(), left.Data(), right.Data(), Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			difference[i] = left[i] - right[i];
+		}
 
 		return difference;
 	}
@@ -710,7 +742,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, const T multiplier) noexcept
 	{
 		Vector4<T> product;
-		Multiply(product.Data(), vector.Data(), multiplier, Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			product[i] = vector[i] * multiplier;
+		}
 
 		return product;
 	}
@@ -719,7 +754,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator *(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType multiplier) noexcept
 	{
 		Vector4<T> product;
-		Multiply(product.Data(), vector.Data(), multiplier, Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			product[i] = static_cast<T>(vector[i] * multiplier);
+		}
 
 		return product;
 	}
@@ -740,7 +778,10 @@ namespace PonyEngine::Math
 	constexpr Vector4<T> operator /(const Vector4<T>& vector, const typename Vector4<T>::ComputationalType divisor) noexcept
 	{
 		Vector4<T> quotient;
-		Divide(quotient.Data(), vector.Data(), divisor, Vector4<T>::ComponentCount);
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			quotient[i] = static_cast<T>(vector[i] / divisor);
+		}
 
 		return quotient;
 	}
