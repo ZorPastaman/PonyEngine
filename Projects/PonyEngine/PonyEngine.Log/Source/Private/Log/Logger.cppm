@@ -82,7 +82,7 @@ namespace PonyEngine::Log
 	{
 		assert((subLogger && "The sub-logger is nullptr."));
 		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger has already been added."));
-		PONY_CONSOLE(LogType::Info, std::format("Add sub-logger '{}'.", subLogger->GetName()).c_str());
+		PONY_CONSOLE(LogType::Info, std::format("Add '{}' sub-logger.", subLogger->GetName()).c_str());
 		subLoggers.push_back(subLogger);
 		PONY_CONSOLE(LogType::Info, "Sub-logger added.");
 	}
@@ -93,7 +93,7 @@ namespace PonyEngine::Log
 
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
 		{
-			PONY_CONSOLE(LogType::Info, std::format("Remove the sub-logger '{}'.", subLogger->GetName()).c_str());
+			PONY_CONSOLE(LogType::Info, std::format("Remove '{}' sub-logger.", subLogger->GetName()).c_str());
 			subLoggers.erase(position);
 			PONY_CONSOLE(LogType::Info, "Sub-logger removed.");
 		}

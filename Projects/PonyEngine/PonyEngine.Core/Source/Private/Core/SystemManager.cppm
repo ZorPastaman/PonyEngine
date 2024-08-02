@@ -77,7 +77,7 @@ namespace PonyEngine::Core
 
 		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactories(); !factory.IsEnd(); ++factory)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Create system '{}'.", (*factory).GetSystemName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}' system.", (*factory).GetSystemName()).c_str());
 
 			SystemUniquePtr system = (*factory).Create(*engine);
 			ISystem* const systemPointer = system.get();
@@ -142,7 +142,7 @@ namespace PonyEngine::Core
 
 		for (const auto& system : systems)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Begin system '{}'.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Begin '{}' system.", system->GetName()).c_str());
 			system->Begin();
 			PONY_LOG(engine, Log::LogType::Info, "System begun.");
 		}
@@ -156,7 +156,7 @@ namespace PonyEngine::Core
 
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("End system '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("End '{}' system.", (*system)->GetName()).c_str());
 			try
 			{
 				(*system)->End();
