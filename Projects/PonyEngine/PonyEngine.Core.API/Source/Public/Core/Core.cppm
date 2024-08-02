@@ -15,3 +15,4 @@ export import :ISystem;
 export import :ISystemManager;
 export import :ITimeManager;
 export import :LogHelper;
+export import :ObjectInterfaces;

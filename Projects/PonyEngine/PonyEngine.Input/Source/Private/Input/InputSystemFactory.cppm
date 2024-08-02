@@ -31,7 +31,7 @@ export namespace PonyEngine::Input
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemInfo Create(Core::IEngine& engine) override;
+		virtual Core::SystemUniquePtr Create(Core::IEngine& engine) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -49,11 +49,9 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	Core::SystemInfo InputSystemFactory::Create(Core::IEngine& engine)
+	Core::SystemUniquePtr InputSystemFactory::Create(Core::IEngine& engine)
 	{
-		const auto inputSystem = new InputSystem(engine);
-
-		return Core::SystemInfo::CreateDeduced<IInputSystem>(*inputSystem, *this, true);
+		return Core::SystemUniquePtr(new InputSystem(engine), Core::SystemDeleter(*this));
 	}
 
 	void InputSystemFactory::Destroy(Core::ISystem* const system) noexcept

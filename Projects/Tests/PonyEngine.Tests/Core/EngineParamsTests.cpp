@@ -42,6 +42,18 @@ namespace Core
 				return "";
 			}
 
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			{
+				return PonyEngine::Core::ObjectInterfaces();
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool GetIsTickable() const noexcept override
+			{
+				return false;
+			}
+
 			virtual void Begin() override
 			{
 			}
@@ -60,12 +72,9 @@ namespace Core
 			PonyEngine::Core::ISystem* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
 			{
-				const auto emptySystem = new EmptySystem();
-				createdSystem = emptySystem;
-
-				return PonyEngine::Core::SystemInfo::Create<EmptySystem>(*emptySystem, *this, true);
+				return PonyEngine::Core::SystemUniquePtr(new EmptySystem(), PonyEngine::Core::SystemDeleter(*this));
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{

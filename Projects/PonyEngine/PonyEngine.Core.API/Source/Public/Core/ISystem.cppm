@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core:ISystem;
 
+import :ObjectInterfaces;
+
 export namespace PonyEngine::Core
 {
 	/// @brief System.
@@ -17,6 +19,15 @@ export namespace PonyEngine::Core
 	public:
 		ISystem(const ISystem&) = delete;
 		ISystem(ISystem&&) = delete;
+
+		/// @brief Gets public system interfaces.
+		/// @return Public system interfaces.
+		[[nodiscard("Pure function")]]
+		virtual ObjectInterfaces GetPublicInterfaces() noexcept = 0;
+		/// @brief Gets if the system is tickable.
+		/// @return @a True if it's tickable; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool GetIsTickable() const noexcept = 0;
 
 		/// @brief Begins the system.
 		/// @details The system takes its dependencies in this function.

@@ -42,6 +42,18 @@ namespace Core
 			virtual void Tick() override
 			{
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			{
+				return PonyEngine::Core::ObjectInterfaces();
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool GetIsTickable() const noexcept override
+			{
+				return false;
+			}
 		};
 
 		class IInterface
