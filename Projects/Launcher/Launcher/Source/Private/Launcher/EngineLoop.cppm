@@ -96,7 +96,7 @@ namespace Launcher
 		}
 
 		exitCode = engine->GetExitCode();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Engine exited with code '{}'.", exitCode).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Engine exited with the code '{}'.", exitCode).c_str());
 
 		return true;
 	}

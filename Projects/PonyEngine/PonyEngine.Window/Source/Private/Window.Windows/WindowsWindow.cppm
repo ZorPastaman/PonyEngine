@@ -50,6 +50,11 @@ export namespace PonyEngine::Window
 
 		~WindowsWindow() noexcept;
 
+		[[nodiscard("Pure function")]]
+		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool GetIsTickable() const noexcept override;
+
 		virtual void Begin() override;
 		virtual void End() override;
 
@@ -148,6 +153,19 @@ namespace PonyEngine::Window
 		PONY_LOG(engine, Log::LogType::Info, "Windows window destroyed.");
 	}
 
+	Core::ObjectInterfaces WindowsWindow::GetPublicInterfaces() noexcept
+	{
+		auto interfaces = Core::ObjectInterfaces();
+		interfaces.AddObjectInterfacesDeduced<IWindow, IWindowsWindow, IKeyboardProvider>(*this);
+
+		return interfaces;
+	}
+
+	bool WindowsWindow::GetIsTickable() const noexcept
+	{
+		return true;
+	}
+
 	void WindowsWindow::Begin()
 	{
 	}
@@ -212,7 +230,7 @@ namespace PonyEngine::Window
 	{
 		assert((keyboardMessageObserver && "The observer is nullptr."));
 		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added."));
-		PONY_LOG(engine, Log::LogType::Info, std::format("Add keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+		PONY_LOG(engine, Log::LogType::Info, std::format("Add '{}' keyboard message observer.", keyboardMessageObserver->GetName()).c_str());
 		keyboardMessageObservers.push_back(keyboardMessageObserver);
 		PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer added.");
 	}
@@ -223,7 +241,7 @@ namespace PonyEngine::Window
 
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Remove a keyboard message observer '{}'.", keyboardMessageObserver->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, std::format("Remove '{}' keyboard message observer.", keyboardMessageObserver->GetName()).c_str());
 			keyboardMessageObservers.erase(position);
 			PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer removed.");
 		}

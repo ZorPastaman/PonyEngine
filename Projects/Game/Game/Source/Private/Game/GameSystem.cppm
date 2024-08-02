@@ -37,6 +37,11 @@ export namespace Game
 
 		~GameSystem() noexcept = default;
 
+		[[nodiscard("Pure function")]]
+		virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool GetIsTickable() const noexcept override;
+
 		virtual void Begin() override;
 		virtual void End() override;
 
@@ -69,6 +74,19 @@ namespace Game
 		rightHandle(0),
 		leftHandle(0)
 	{
+	}
+
+	PonyEngine::Core::ObjectInterfaces GameSystem::GetPublicInterfaces() noexcept
+	{
+		auto interfaces = PonyEngine::Core::ObjectInterfaces();
+		interfaces.AddObjectInterfacesDeduced<IGameSystem>(*this);
+
+		return interfaces;
+	}
+
+	bool GameSystem::GetIsTickable() const noexcept
+	{
+		return true;
 	}
 
 	void GameSystem::Begin()

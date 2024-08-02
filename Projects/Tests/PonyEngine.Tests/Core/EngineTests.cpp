@@ -62,6 +62,21 @@ namespace Core
 			{
 				ticked = true;
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			{
+				auto interfaces = PonyEngine::Core::ObjectInterfaces();
+				interfaces.AddObjectInterfacesDeduced<EmptySystem>(*this);
+
+				return interfaces;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool GetIsTickable() const noexcept override
+			{
+				return true;
+			}
 		};
 
 		class EmptySystem1Base : public PonyEngine::Core::ISystem
@@ -83,6 +98,21 @@ namespace Core
 			virtual void Tick() override
 			{
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			{
+				auto interfaces = PonyEngine::Core::ObjectInterfaces();
+				interfaces.AddObjectInterfacesDeduced<EmptySystem1Base>(*this);
+
+				return interfaces;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool GetIsTickable() const noexcept override
+			{
+				return true;
+			}
 		};
 
 		class EmptySystem1 final : public EmptySystem1Base
@@ -96,12 +126,11 @@ namespace Core
 			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
 			{
-				const auto emptySystem = new EmptySystem();
-				createdSystem = emptySystem;
+				createdSystem = new EmptySystem();
 
-				return PonyEngine::Core::SystemInfo::Create<EmptySystem, EmptySystem>(*emptySystem, *this, true);
+				return PonyEngine::Core::SystemUniquePtr(createdSystem, PonyEngine::Core::SystemDeleter(*this));
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
@@ -129,12 +158,12 @@ namespace Core
 			EmptySystem1* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
 			{
 				const auto emptySystem = new EmptySystem1();
 				createdSystem = emptySystem;
 
-				return PonyEngine::Core::SystemInfo::Create<EmptySystem1, EmptySystem1Base>(*emptySystem, *this, true);
+				return PonyEngine::Core::SystemUniquePtr(emptySystem, PonyEngine::Core::SystemDeleter(*this));
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
@@ -163,6 +192,29 @@ namespace Core
 			Assert::IsNotNull(engine.get());
 		}
 
+		TEST_METHOD(GetLoggerTest)
+		{
+			EmptyLogger logger;
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->GetLogger())));
+		}
+
+		TEST_METHOD(ExitTest)
+		{
+			EmptyLogger logger;
+			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::IsTrue(engine->GetIsRunning());
+			engine->Stop();
+			Assert::IsFalse(engine->GetIsRunning());
+			Assert::AreEqual(0, engine->GetExitCode());
+			engine.reset();
+			engine = PonyEngine::Core::CreateEngine(params);
+			engine->Stop(100);
+			Assert::AreEqual(100, engine->GetExitCode());
+		}
+
 		TEST_METHOD(SystemTickTest)
 		{
 			EmptyLogger logger;
@@ -187,29 +239,6 @@ namespace Core
 			engine.reset();
 			Assert::IsTrue(ended);
 			Assert::IsTrue(systemFactory.systemDestroyed);
-		}
-
-		TEST_METHOD(GetLoggerTest)
-		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
-			const auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->GetLogger())));
-		}
-
-		TEST_METHOD(ExitTest)
-		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
-			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsTrue(engine->GetIsRunning());
-			engine->Stop();
-			Assert::IsFalse(engine->GetIsRunning());
-			Assert::AreEqual(0, engine->GetExitCode());
-			engine.reset();
-			engine = PonyEngine::Core::CreateEngine(params);
-			engine->Stop(100);
-			Assert::AreEqual(100, engine->GetExitCode());
 		}
 
 		TEST_METHOD(GetNameTest)
