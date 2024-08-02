@@ -38,6 +38,18 @@ namespace Core
 			virtual void Tick() override
 			{
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			{
+				return PonyEngine::Core::ObjectInterfaces();
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool GetIsTickable() const noexcept override
+			{
+				return false;
+			}
 		};
 
 		class EmptySystemFactory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
@@ -47,12 +59,9 @@ namespace Core
 			bool deleted = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemInfo Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
 			{
-				const auto emptySystem = new EmptySystem();
-				createdSystem = emptySystem;
-
-				return PonyEngine::Core::SystemInfo::Create<EmptySystem>(*emptySystem, *this, true);
+				return PonyEngine::Core::SystemUniquePtr(new EmptySystem(), PonyEngine::Core::SystemDeleter(*this));
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
