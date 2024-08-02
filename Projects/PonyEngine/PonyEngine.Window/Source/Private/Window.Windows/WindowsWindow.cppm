@@ -156,7 +156,7 @@ namespace PonyEngine::Window
 	Core::ObjectInterfaces WindowsWindow::GetPublicInterfaces() noexcept
 	{
 		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddObjectInterfacesDeduced<IWindow, IWindowsWindow, Input::IKeyboardProvider>(*this);
+		interfaces.AddObjectInterfacesDeduced<IWindow, IWindowsWindow, IKeyboardProvider>(*this);
 
 		return interfaces;
 	}
