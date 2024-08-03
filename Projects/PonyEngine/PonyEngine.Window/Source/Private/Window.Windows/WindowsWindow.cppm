@@ -90,7 +90,7 @@ export namespace PonyEngine::Window
 
 	private:
 		/// @brief Responds to a destroy message.
-		void Destroy() noexcept;
+		void Destroy() const noexcept;
 
 		/// @brief Sends a keyboard message to the @p keyboardMessageObservers.
 		/// @param lParam Windows key info.
@@ -103,7 +103,6 @@ export namespace PonyEngine::Window
 
 		std::wstring windowTitle; ///< Window title cache.
 		HWND hWnd; ///< Window handler.
-		bool isAlive; ///< Is the system window alive?
 	};
 }
 
@@ -111,8 +110,7 @@ namespace PonyEngine::Window
 {
 	WindowsWindow::WindowsWindow(Core::IEngine& engineToUse, const HINSTANCE hInstance, const ATOM className, const CreateWindowParams& windowParams) :
 		engine{&engineToUse},
-		windowTitle(windowParams.title),
-		isAlive{false}
+		windowTitle(windowParams.title)
 	{
 		PONY_LOG(engine, Log::LogType::Info, std::format("Create Windows window of class '{}'.", className).c_str());
 		hWnd = CreateWindowExW(
@@ -134,23 +132,24 @@ namespace PonyEngine::Window
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, std::format("Windows window of class '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
-
-		isAlive = true;
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
 
 	WindowsWindow::~WindowsWindow() noexcept
 	{
-		PONY_LOG(engine, Log::LogType::Info, std::format("Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
-		try
+		if (IsWindow(hWnd))
 		{
-			DestroyWindow(hWnd);
+			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str()); // TODO: Return back try-catch in PONY_LOG
+			if (!DestroyWindow(hWnd))
+			{
+				PONY_LOG(engine, Log::LogType::Error, std::format("Error on destroying the Windows window. Error code: '{}'.", GetLastError()).c_str());
+			}
+			PONY_LOG(engine, Log::LogType::Info, "Windows window destroyed.");
 		}
-		catch (const std::exception& e)
+		else
 		{
-			PONY_LOG_E(engine, e, "On destroying a window");
+			PONY_LOG(engine, Log::LogType::Info, "Skip destroying Windows windows 'cause it's already been destroyed.");
 		}
-		PONY_LOG(engine, Log::LogType::Info, "Windows window destroyed.");
 	}
 
 	Core::ObjectInterfaces WindowsWindow::GetPublicInterfaces() noexcept
@@ -188,7 +187,7 @@ namespace PonyEngine::Window
 
 	bool WindowsWindow::IsWindowAlive() const noexcept
 	{
-		return isAlive;
+		return IsWindow(hWnd);
 	}
 
 	const wchar_t* WindowsWindow::GetTitle() const noexcept
@@ -287,9 +286,8 @@ namespace PonyEngine::Window
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindow::Destroy() noexcept
+	void WindowsWindow::Destroy() const noexcept
 	{
-		isAlive = false;
 		engine->Stop();
 	}
 

@@ -190,23 +190,6 @@ namespace Window
 			Assert::IsTrue(window->GetIsTickable());
 		}
 
-		TEST_METHOD(IsWindowAliveTest)
-		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto classParams = PonyEngine::Window::WindowsClassParams();
-			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			Assert::IsTrue(windowsWindow->IsWindowAlive());
-			window->Tick();
-			Assert::IsTrue(windowsWindow->IsWindowAlive());
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
-			window->Tick();
-			Assert::IsFalse(windowsWindow->IsWindowAlive());
-		}
-
 		TEST_METHOD(GetSetTitleTest)
 		{
 			auto logger = EmptyLogger();

@@ -148,8 +148,12 @@ namespace PonyEngine::Window
 		const WORD extended = keyFlags & KF_EXTENDED;
 		const WORD extendedPrefix = extended << WORD{7} | extended << WORD{6} | extended << WORD{5}; // 0xE000 if it's extended; 0 otherwise.
 		const WORD key = scanCode | extendedPrefix;
-		const auto pair = KeyCodeMap.find(key);
 
-		return pair != KeyCodeMap.cend() ? pair->second : Input::KeyboardKeyCode::None;
+		if (const auto pair = KeyCodeMap.find(key); pair != KeyCodeMap.cend()) [[likely]]
+		{
+			return pair->second;
+		}
+
+		return Input::KeyboardKeyCode::None;
 	}
 }

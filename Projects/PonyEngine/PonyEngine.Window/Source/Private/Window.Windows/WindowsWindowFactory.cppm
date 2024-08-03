@@ -120,16 +120,9 @@ namespace PonyEngine::Window
 	WindowsWindowFactory::~WindowsWindowFactory() noexcept
 	{
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Unregister window class '{}'.", classAtom).c_str());
-		try
+		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
-			{
-				throw std::logic_error(std::format("Couldn't unregister a class. Error code: '{}'.", GetLastError()));
-			}
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E_GENERAL(logger, e, "On unregistering a window class");
+			PONY_LOG_GENERAL(logger, Log::LogType::Error, std::format("Couldn't unregister a class. Error code: '{}'.", GetLastError()).c_str());
 		}
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class '{}' unregistered.", classAtom).c_str());
 	}
@@ -163,23 +156,16 @@ namespace PonyEngine::Window
 		const auto windowsWindow = static_cast<WindowsWindow*>(system);
 		const HWND hWnd = windowsWindow->GetWindowHandle();
 
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Unregister window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		if (windowsWindow->IsWindowAlive())
 		{
-			try
-			{
-				UnregisterWindowProc(windowsWindow->GetWindowHandle());
-			}
-			catch (const std::exception& e)
-			{
-				PONY_LOG_E_GENERAL(logger, e, "On unregistering a window proc");
-			}
+			PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Unregister window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+			UnregisterWindowProc(hWnd);
+			PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc unregistered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		}
 		else
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("The window is already destroyed. No unregistering a window proc required. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
+			PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Skip unregistering window proc 'cause the window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		}
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window proc unregistered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 		delete windowsWindow;
