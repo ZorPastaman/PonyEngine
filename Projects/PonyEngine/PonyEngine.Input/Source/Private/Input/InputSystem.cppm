@@ -98,13 +98,13 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Subscribe to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, std::format("Subscribe to '{}' keyboard provider.", keyboardProvider->GetName()).c_str());
 			keyboardProvider->AddKeyboardObserver(this);
-			PONY_LOG(engine, Log::LogType::Info, "Subscribed to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, "Subscribed to keyboard provider.");
 		}
 		else
 		{
-			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find a window, the input system won't work.");
+			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find a keyboard provider, the keyboard input won't work.");
 		}
 	}
 
@@ -112,9 +112,9 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->GetSystemManager().FindSystem<IKeyboardProvider>())
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, std::format("Unsubscribe to '{}' keyboard provider.", keyboardProvider->GetName()).c_str());
 			keyboardProvider->RemoveKeyboardObserver(this);
-			PONY_LOG(engine, Log::LogType::Info, "Unsubscribed to keyboard messages.");
+			PONY_LOG(engine, Log::LogType::Info, "Unsubscribed to keyboard provider.");
 		}
 	}
 
