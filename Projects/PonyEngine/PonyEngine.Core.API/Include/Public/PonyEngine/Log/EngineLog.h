@@ -50,7 +50,7 @@
 #define PONY_LOG_E_S_IF(condition, engine, exception) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyEngine::Log::LogType::None) \
 	{ \
-		PONY_LOG_CONDITIONAL(condition, PonyEngine::Core::LogExceptionToLog(*(engine), exception)); \
+		PONY_LOG_CONDITIONAL(condition, PonyEngine::Core::LogExceptionToLogger(*(engine), exception)); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.

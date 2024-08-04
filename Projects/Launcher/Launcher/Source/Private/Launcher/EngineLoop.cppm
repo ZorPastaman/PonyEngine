@@ -72,7 +72,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, std::format("Set target frame rate: '{}'", engineSettings.targetFrameRate).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, PonyEngine::Log::SafeFormat("Set target frame rate: '{}'", engineSettings.targetFrameRate).c_str());
 		engine->GetTimeManager().SetTargetFrameRate(engineSettings.targetFrameRate);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine settings set.");

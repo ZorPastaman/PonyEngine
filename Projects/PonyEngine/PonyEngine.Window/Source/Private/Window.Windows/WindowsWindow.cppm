@@ -139,7 +139,7 @@ namespace PonyEngine::Window
 	{
 		if (IsWindow(hWnd))
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str()); // TODO: Return back try-catch in PONY_LOG
+			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd)).c_str());
 			if (!DestroyWindow(hWnd))
 			{
 				PONY_LOG(engine, Log::LogType::Error, std::format("Error on destroying the Windows window. Error code: '{}'.", GetLastError()).c_str());

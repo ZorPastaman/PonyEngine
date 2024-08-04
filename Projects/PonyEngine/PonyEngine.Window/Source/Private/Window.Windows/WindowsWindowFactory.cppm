@@ -114,7 +114,7 @@ namespace PonyEngine::Window
 		{
 			throw std::logic_error(std::format("Couldn't register a class. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class '{}' registered.", classAtom).c_str());
+		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window class '{}' registered.", classAtom);
 	}
 
 	WindowsWindowFactory::~WindowsWindowFactory() noexcept
@@ -122,7 +122,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Unregister window class '{}'.", classAtom).c_str());
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Error, std::format("Couldn't unregister a class. Error code: '{}'.", GetLastError()).c_str());
+			PONY_LOG_GENERAL(logger, Log::LogType::Error, "Couldn't unregister a class. Error code: '{}'.", GetLastError());
 		}
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, std::format("Window class '{}' unregistered.", classAtom).c_str());
 	}

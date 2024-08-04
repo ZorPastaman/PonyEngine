@@ -36,16 +36,19 @@ namespace PonyEngine::Core
 {
 	void LogToLogger(const IEngine& engine, const Log::LogType logType, const char* const message) noexcept
 	{
-		Log::LogToLogger(engine.GetLogger(), logType, message, engine.GetTimeManager().GetFrameCount());
+		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.GetTimeManager().GetFrameCount()};
+		Log::LogToLogger(engine.GetLogger(), logType, additionalInfo, message);
 	}
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception) noexcept
 	{
-		Log::LogExceptionToLogger(engine.GetLogger(), exception, engine.GetTimeManager().GetFrameCount());
+		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.GetTimeManager().GetFrameCount()};
+		Log::LogExceptionToLogger(engine.GetLogger(), additionalInfo, exception);
 	}
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, const char* const message) noexcept
 	{
-		Log::LogExceptionToLogger(engine.GetLogger(), exception, message, engine.GetTimeManager().GetFrameCount());
+		const auto additionalInfo = Log::AdditionalInfo{ .frameCount = engine.GetTimeManager().GetFrameCount() };
+		Log::LogExceptionToLogger(engine.GetLogger(), additionalInfo, exception, message);
 	}
 }

@@ -18,6 +18,7 @@
     <ResourceCompile Include="PonyEngine.Log.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Log\ConsoleExceptionHandler.cppm" />
     <ClCompile Include="Source\Public\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Log\Log.cppm" />
@@ -27,10 +28,14 @@
     <ClCompile Include="Source\Public\Log\LogHelper.cppm" />
     <ClCompile Include="Source\Public\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Log\LogType.cppm" />
+    <ClCompile Include="Source\Public\Log\SafeFormat.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
+      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">

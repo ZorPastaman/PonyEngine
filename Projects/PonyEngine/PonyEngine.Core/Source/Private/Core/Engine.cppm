@@ -138,7 +138,7 @@ namespace PonyEngine::Core
 	{
 		if (isRunning)
 		{
-			PONY_LOG(this, Log::LogType::Info, std::format("Stop the engine with the exit code '{}'.", exitCode).c_str());
+			PONY_LOG(this, Log::LogType::Info, Log::SafeFormat("Stop the engine with the exit code '{}'.", exitCode).c_str());
 			isRunning = false;
 			engineExitCode = exitCode;
 		}
