@@ -42,7 +42,7 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 
 	PONY_LOG_GENERAL(&loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Run main loop.");
 	int exitCode = Launcher::RunLoop({&engineLoop, &windowsLoop});
-	PONY_LOG_GENERAL(&loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, std::format("Main loop ran with the exit code '{}'.", exitCode).c_str());
+	PONY_LOG_GENERAL(&loggerProvider.GetLogger(), PonyEngine::Log::LogType::Info, "Main loop ran with the exit code '{}'.", exitCode);
 
 	return exitCode;
 }

@@ -64,9 +64,7 @@ namespace Launcher
 		// Create all factories here.
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
-		auto windowClassParams = PonyEngine::Window::WindowsClassParams();
-		windowClassParams.name = L"Pony Engine Game";
-		windowClassParams.style = CS_OWNDC;
+		const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = CS_OWNDC};
 		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowClassParams);
 		if (!windowsWindowSystemFactory)
 		{

@@ -72,7 +72,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, std::format("Set target frame rate: '{}'", engineSettings.targetFrameRate).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Set target frame rate: '{}'", engineSettings.targetFrameRate);
 		engine->GetTimeManager().SetTargetFrameRate(engineSettings.targetFrameRate);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
@@ -96,7 +96,7 @@ namespace Launcher
 		}
 
 		exitCode = engine->GetExitCode();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Engine exited with the code '{}'.", exitCode).c_str());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine exited with the code '{}'.", exitCode);
 
 		return true;
 	}
