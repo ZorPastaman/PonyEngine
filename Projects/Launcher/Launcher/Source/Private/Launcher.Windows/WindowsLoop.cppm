@@ -66,7 +66,7 @@ namespace Launcher
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, std::format("Received the exit code '{}' from Windows.", exitCode).c_str());
+				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Received the exit code '{}' from Windows.", exitCode);
 
 				return true;
 			}

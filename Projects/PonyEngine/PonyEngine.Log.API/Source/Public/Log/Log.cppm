@@ -9,7 +9,6 @@
 
 export module PonyEngine.Log;
 
-export import :ConsoleExceptionHandler;
 export import :ILogger;
 export import :ISubLogger;
 export import :LogConsoleHelper;
@@ -18,4 +17,3 @@ export import :LogFormat;
 export import :LogHelper;
 export import :LogInput;
 export import :LogType;
-export import :SafeFormat;

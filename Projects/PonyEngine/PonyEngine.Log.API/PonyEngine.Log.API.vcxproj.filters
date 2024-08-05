@@ -55,11 +55,5 @@
     <ClCompile Include="Source\Public\Log\LogConsoleHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Log\ConsoleExceptionHandler.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Log\SafeFormat.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

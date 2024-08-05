@@ -77,7 +77,7 @@ namespace PonyEngine::Core
 
 		for (EngineParams::SystemFactoriesIterator factory = engineParams.GetSystemFactories(); !factory.IsEnd(); ++factory)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Create '{}' system.", (*factory).GetSystemName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "Create '{}' system.", (*factory).GetSystemName());
 
 			SystemUniquePtr system = (*factory).Create(*engine);
 			ISystem* const systemPointer = system.get();
@@ -102,7 +102,7 @@ namespace PonyEngine::Core
 			for (auto interfacesIterator = interfaces.GetObjectInterfaces(); !interfacesIterator.IsEnd(); ++interfacesIterator)
 			{
 				auto [type, objectPointer] = *interfacesIterator;
-				PONY_LOG(engine, Log::LogType::Debug, std::format("Add '{}' interface.", type.get().name()).c_str());
+				PONY_LOG(engine, Log::LogType::Debug, "Add '{}' interface.", type.get().name());
 				systemInterfaces.insert_or_assign(type.get(), objectPointer);
 			}
 
@@ -118,7 +118,7 @@ namespace PonyEngine::Core
 
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Destroy system '{}'.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "Destroy system '{}'.", (*system)->GetName());
 			system->reset();
 			PONY_LOG(engine, Log::LogType::Info, "System destroyed.");
 		}
@@ -142,7 +142,7 @@ namespace PonyEngine::Core
 
 		for (const auto& system : systems)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("Begin '{}' system.", system->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "Begin '{}' system.", system->GetName());
 			system->Begin();
 			PONY_LOG(engine, Log::LogType::Info, "System begun.");
 		}
@@ -156,7 +156,7 @@ namespace PonyEngine::Core
 
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG(engine, Log::LogType::Info, std::format("End '{}' system.", (*system)->GetName()).c_str());
+			PONY_LOG(engine, Log::LogType::Info, "End '{}' system.", (*system)->GetName());
 			try
 			{
 				(*system)->End();
