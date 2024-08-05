@@ -11,7 +11,7 @@
 
 // To use this header, you have to import PonyEngine.Log as well.
 
-#if PONY_LOG_VERBOSE
+#ifdef PONY_LOG_VERBOSE
 /// @brief Verbose log mask.
 #define PONY_LOG_VERBOSE_MASK PonyEngine::Log::LogType::Verbose
 #else
@@ -19,7 +19,7 @@
 #define PONY_LOG_VERBOSE_MASK PonyEngine::Log::LogType::None
 #endif
 
-#if PONY_LOG_DEBUG
+#ifdef PONY_LOG_DEBUG
 /// @brief Debug log mask.
 #define PONY_LOG_DEBUG_MASK PonyEngine::Log::LogType::Debug
 #else
@@ -27,7 +27,7 @@
 #define PONY_LOG_DEBUG_MASK PonyEngine::Log::LogType::None
 #endif
 
-#if PONY_LOG_INFO
+#ifdef PONY_LOG_INFO
 /// @brief Info log mask.
 #define PONY_LOG_INFO_MASK PonyEngine::Log::LogType::Info
 #else
@@ -35,7 +35,7 @@
 #define PONY_LOG_INFO_MASK PonyEngine::Log::LogType::None
 #endif
 
-#if PONY_LOG_WARNING
+#ifdef PONY_LOG_WARNING
 /// @brief Warning log mask.
 #define PONY_LOG_WARNING_MASK PonyEngine::Log::LogType::Warning
 #else
@@ -43,7 +43,7 @@
 #define PONY_LOG_WARNING_MASK PonyEngine::Log::LogType::None
 #endif
 
-#if PONY_LOG_ERROR
+#ifdef PONY_LOG_ERROR
 /// @brief Error log mask.
 #define PONY_LOG_ERROR_MASK PonyEngine::Log::LogType::Error
 #else
@@ -51,7 +51,7 @@
 #define PONY_LOG_ERROR_MASK PonyEngine::Log::LogType::None
 #endif
 
-#if PONY_LOG_EXCEPTION
+#ifdef PONY_LOG_EXCEPTION
 /// @brief Exception log mask.
 #define PONY_LOG_EXCEPTION_MASK PonyEngine::Log::LogType::Exception
 #else
@@ -62,7 +62,7 @@
 /// @brief Log mask. It contains a mask of all possible log types.
 #define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK | PONY_LOG_EXCEPTION_MASK)
 
-#if PONY_CONSOLE_LOG || PONY_SYSTEM_CONSOLE_LOG
+#ifdef PONY_CONSOLE_LOG || PONY_SYSTEM_CONSOLE_LOG
 /// @brief Console log mask.
 #define PONY_CONSOLE_LOG_MASK PONY_LOG_MASK
 #else
