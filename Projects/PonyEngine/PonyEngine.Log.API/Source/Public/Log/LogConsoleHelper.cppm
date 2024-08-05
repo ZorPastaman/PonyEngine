@@ -9,8 +9,8 @@
 
 module;
 
-#if PONY_SYSTEM_CONSOLE_LOG
-#if _WIN32
+#ifdef PONY_SYSTEM_CONSOLE_LOG
+#ifdef _WIN32
 #include "PonyEngine/Platform/Windows/Framework.h"
 #endif
 #endif
@@ -171,7 +171,7 @@ namespace PonyEngine::Log
 
 	void LogFormattedToConsole(const LogType logType, const char* const log) noexcept
 	{
-#if PONY_CONSOLE_LOG
+#ifdef PONY_CONSOLE_LOG
 		try
 		{
 			ChooseConsoleStream(logType) << log;
@@ -181,8 +181,8 @@ namespace PonyEngine::Log
 			// Something totally wrong happened.
 		}
 #endif
-#if PONY_SYSTEM_CONSOLE_LOG
-#if _WIN32
+#ifdef PONY_SYSTEM_CONSOLE_LOG
+#ifdef _WIN32
 		try
 		{
 			OutputDebugStringA(log);

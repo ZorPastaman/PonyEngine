@@ -126,7 +126,7 @@ namespace PonyEngine::Window
 			static_cast<IWindowProc*>(this)
 		);
 
-		if (hWnd == NULL)
+		if (!hWnd)
 		{
 			throw std::logic_error(std::format("Windows hasn't created a window. Error code: '{}'.", GetLastError()));
 		}

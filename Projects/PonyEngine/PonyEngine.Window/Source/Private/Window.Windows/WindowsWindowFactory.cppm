@@ -94,7 +94,7 @@ namespace PonyEngine::Window
 		logger{&loggerToUse},
 		hInstance{NULL}
 	{
-		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || hInstance == NULL)
+		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || !hInstance)
 		{
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
@@ -105,7 +105,7 @@ namespace PonyEngine::Window
 		wc.lpfnWndProc = &WindowProc;
 		wc.hInstance = hInstance;
 		wc.hIcon = classParams.icon;
-		wc.hCursor = classParams.cursor == NULL ? GetDefaultCursor() : classParams.cursor;
+		wc.hCursor = classParams.cursor ? classParams.cursor : GetDefaultCursor();
 		wc.style = classParams.style;
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Register window class '{}'.", Utility::ConvertToString(classParams.name));
@@ -129,15 +129,17 @@ namespace PonyEngine::Window
 
 	Core::SystemUniquePtr WindowsWindowFactory::Create(Core::IEngine& engine)
 	{
-		CreateWindowParams createWindowParams;
-		createWindowParams.title = windowParams.title;
-		createWindowParams.style = windowsWindowParams.style;
-		createWindowParams.extendedStyle = windowsWindowParams.extendedStyle;
-		createWindowParams.horizontalPosition = windowParams.horizontalPosition;
-		createWindowParams.verticalPosition = windowParams.verticalPosition;
-		createWindowParams.width = windowParams.width;
-		createWindowParams.height = windowParams.height;
-		createWindowParams.cmdShow = windowsWindowParams.showCmd;
+		const auto createWindowParams = CreateWindowParams
+		{
+			.title = windowParams.title,
+			.style = windowsWindowParams.style,
+			.extendedStyle = windowsWindowParams.extendedStyle,
+			.horizontalPosition = windowParams.horizontalPosition,
+			.verticalPosition = windowParams.verticalPosition,
+			.width = windowParams.width,
+			.height = windowParams.height,
+			.cmdShow = windowsWindowParams.showCmd
+		};
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create Windows window.");
 		const auto window = new WindowsWindow(engine, hInstance, classAtom, createWindowParams);
@@ -205,7 +207,7 @@ namespace PonyEngine::Window
 	HCURSOR GetDefaultCursor()
 	{
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
-		if (cursor == NULL)
+		if (!cursor)
 		{
 			throw std::logic_error(std::format("Couldn't load a class cursor. Error code: '{}'", GetLastError()));
 		}
