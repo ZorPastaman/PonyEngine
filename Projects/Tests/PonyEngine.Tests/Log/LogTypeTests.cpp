@@ -58,7 +58,7 @@ namespace Log
 
 		TEST_METHOD(ToStringTest)
 		{
-			ToStringTestElement(PonyEngine::Log::LogType::None, "None");
+			ToStringTestElement(PonyEngine::Log::LogType::None, "Unknown");
 			ToStringTestElement(PonyEngine::Log::LogType::Verbose, "Verbose");
 			ToStringTestElement(PonyEngine::Log::LogType::Debug, "Debug");
 			ToStringTestElement(PonyEngine::Log::LogType::Info, "Info");

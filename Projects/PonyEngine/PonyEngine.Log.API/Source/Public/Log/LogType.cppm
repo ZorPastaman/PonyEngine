@@ -79,9 +79,8 @@ export namespace PonyEngine::Log
 namespace PonyEngine::Log
 {
 	/// @brief Log type names by index.
-	constexpr std::array<const char*, 8> LogTypeNames
+	constexpr std::array<const char*, 7> LogTypeNames
 	{
-		"None",
 		"Verbose",
 		"Debug",
 		"Info",
@@ -96,11 +95,9 @@ namespace PonyEngine::Log
 		constexpr auto exceptionUnderlyingLogType = static_cast<std::underlying_type_t<LogType>>(LogType::Exception);
 
 		const auto underlyingLogType = static_cast<std::underlying_type_t<LogType>>(logType);
-		const std::size_t index = underlyingLogType
-			? std::has_single_bit(underlyingLogType) && underlyingLogType <= exceptionUnderlyingLogType
-				? std::countr_zero(underlyingLogType) + 1
-				: LogTypeNames.size() - 1
-			: 0;
+		const std::size_t index = std::has_single_bit(underlyingLogType) && underlyingLogType <= exceptionUnderlyingLogType
+			? std::countr_zero(underlyingLogType)
+			: LogTypeNames.size() - 1;
 
 		return LogTypeNames[index];
 	}

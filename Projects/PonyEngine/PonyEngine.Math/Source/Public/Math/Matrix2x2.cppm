@@ -54,7 +54,7 @@ export namespace PonyEngine::Math
 			/// @param columnIndex Column index. Must be in range [0, 1].
 			/// @return Component.
 			[[nodiscard("Pure operator")]]
-			constexpr T& operator [](std::size_t columnIndex) noexcept requires(!IsConstant);
+			constexpr T& operator [](std::size_t columnIndex) noexcept requires (!IsConstant);
 			/// @brief Gets a component in the row by the @p columnIndex.
 			/// @param columnIndex Column index. Must be in range [0, 1].
 			/// @return Component.
@@ -67,7 +67,7 @@ export namespace PonyEngine::Math
 			/// @brief Assigns the row from the @p row.
 			/// @param row Row to assign from.
 			/// @return @a This.
-			constexpr Row& operator =(const Vector2<T>& row) noexcept requires(!IsConstant);
+			constexpr Row& operator =(const Vector2<T>& row) noexcept requires (!IsConstant);
 
 		private:
 			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
@@ -219,7 +219,7 @@ export namespace PonyEngine::Math
 		/// @note If the determinant is zero, the result is undefined.
 		/// @return Inverse.
 		[[nodiscard("Pure function")]]
-		constexpr Matrix2x2 Inverse() const noexcept requires(std::is_floating_point_v<T>);
+		constexpr Matrix2x2 Inverse() const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if this matrix is equal to the zero matrix.
 		/// @return @a True if this matrix is equal to the zero matrix; @a false otherwise.
@@ -229,7 +229,7 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this matrix is almost equal to the zero matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this matrix is equal to the identity matrix.
 		/// @return @a True if this matrix is equal to the identity matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -238,12 +238,12 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this matrix is almost equal to the identity matrix; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		constexpr bool IsAlmostIdentity(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept requires(std::is_floating_point_v<T>);
+		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Assigns arguments to the matrix components.
 		/// @param m00 Component 00.
@@ -304,7 +304,7 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Multiplier.
 		/// @return @a This.
-		constexpr Matrix2x2& operator *=(ComputationalType multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Matrix2x2& operator *=(ComputationalType multiplier) noexcept requires (std::is_integral_v<T>);
 		/// @brief Multiplies @a this by the @p other.
 		/// @param other Matrix to multiply by.
 		/// @return @a This.
@@ -316,7 +316,7 @@ export namespace PonyEngine::Math
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Divisor.
 		/// @return @a This.
-		constexpr Matrix2x2& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
+		constexpr Matrix2x2& operator /=(ComputationalType divisor) noexcept requires (std::is_integral_v<T>);
 
 		/// @brief Checks if the two matrices are equal.
 		/// @param other Other matrix.
@@ -475,7 +475,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires(!IsConstant)
+	constexpr T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
 	{
 		return matrixRow[columnIndex * Dimension];
 	}
@@ -489,7 +489,7 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr typename Matrix2x2<T>::template Row<IsConstant>& Matrix2x2<T>::Row<IsConstant>::operator =(const Vector2<T>& row) noexcept requires(!IsConstant)
+	constexpr typename Matrix2x2<T>::template Row<IsConstant>& Matrix2x2<T>::Row<IsConstant>::operator =(const Vector2<T>& row) noexcept requires (!IsConstant)
 	{
 		for (std::size_t i = 0; i < Dimension; ++i)
 		{
@@ -664,7 +664,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T> Matrix2x2<T>::Inverse() const noexcept requires(std::is_floating_point_v<T>)
+	constexpr Matrix2x2<T> Matrix2x2<T>::Inverse() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return Adjugate() * (ComputationalType{1} / Determinant());
 	}
@@ -676,7 +676,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr bool Matrix2x2<T>::IsAlmostZero(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	constexpr bool Matrix2x2<T>::IsAlmostZero(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Predefined::Zero, tolerance);
 	}
@@ -688,13 +688,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr bool Matrix2x2<T>::IsAlmostIdentity(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	constexpr bool Matrix2x2<T>::IsAlmostIdentity(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Predefined::Identity, tolerance);
 	}
 
 	template<Arithmetic T>
-	bool Matrix2x2<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
+	bool Matrix2x2<T>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		for (const T component : components)
 		{
@@ -828,7 +828,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T>& Matrix2x2<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Matrix2x2<T>& Matrix2x2<T>::operator *=(const ComputationalType multiplier) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -856,7 +856,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix2x2<T>& Matrix2x2<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
+	constexpr Matrix2x2<T>& Matrix2x2<T>::operator /=(const ComputationalType divisor) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{

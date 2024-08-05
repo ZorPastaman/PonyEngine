@@ -10,14 +10,23 @@
 export module PonyEngine.Log:LogHelper;
 
 import <cstddef>;
+import <format>;
 import <exception>;
+import <string>;
 
+import :LogConsoleHelper;
 import :ILogger;
 import :LogInput;
 import :LogType;
 
 export namespace PonyEngine::Log
 {
+	/// @brief Additional log information.
+	struct AdditionalInfo final
+	{
+		std::size_t frameCount = 0; ///< Frame count.
+	};
+
 	/// @brief Logs to the @p logger.
 	/// @param logger Logger.
 	/// @param logType Log type.
@@ -26,9 +35,26 @@ export namespace PonyEngine::Log
 	/// @brief Logs to the @p logger.
 	/// @param logger Logger.
 	/// @param logType Log type.
+	/// @param additionalInfo Additional log information.
 	/// @param message Log message.
-	/// @param frameCount Frame count.
-	void LogToLogger(ILogger& logger, LogType logType, const char* message, std::size_t frameCount) noexcept;
+	void LogToLogger(ILogger& logger, LogType logType, const AdditionalInfo& additionalInfo, const char* message) noexcept;
+	/// @brief Logs to the @p logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogToLogger(ILogger& logger, LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to the @p logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param logType Log type.
+	/// @param additionalInfo Additional log information.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogToLogger(ILogger& logger, LogType logType, const AdditionalInfo& additionalInfo, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param logger Logger.
@@ -36,9 +62,9 @@ export namespace PonyEngine::Log
 	void LogExceptionToLogger(ILogger& logger, const std::exception& exception) noexcept;
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param logger Logger.
+	/// @param additionalInfo Additional log information.
 	/// @param exception Exception to log.
-	/// @param frameCount Frame count.
-	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, std::size_t frameCount) noexcept;
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception) noexcept;
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param logger Logger.
 	/// @param exception Exception to log.
@@ -46,10 +72,27 @@ export namespace PonyEngine::Log
 	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, const char* message) noexcept;
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param logger Logger.
+	/// @param additionalInfo Additional log information.
 	/// @param exception Exception to log.
 	/// @param message Log message.
-	/// @param frameCount Frame count.
-	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, const char* message, std::size_t frameCount) noexcept;
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception, const char* message) noexcept;
+	/// @brief Logs the @p exception to the @p logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param exception Exception to log.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs the @p exception to the @p logger.
+	/// @tparam Args Format argument types.
+	/// @param logger Logger.
+	/// @param additionalInfo Additional log information.
+	/// @param exception Exception to log.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
 namespace PonyEngine::Log
@@ -60,10 +103,22 @@ namespace PonyEngine::Log
 		logger.Log(logType, logInput);
 	}
 
-	void LogToLogger(ILogger& logger, const LogType logType, const char* const message, const std::size_t frameCount) noexcept
+	void LogToLogger(ILogger& logger, const LogType logType, const AdditionalInfo& additionalInfo, const char* const message) noexcept
 	{
-		const auto logInput = LogInput{.message = message, .frameCount = frameCount};
+		const auto logInput = LogInput{.message = message, .frameCount = additionalInfo.frameCount};
 		logger.Log(logType, logInput);
+	}
+
+	template<typename... Args>
+	void LogToLogger(ILogger& logger, const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		LogToLogger(logger, logType, SafeFormat(format, std::forward<Args>(args)...).c_str());
+	}
+
+	template<typename... Args>
+	void LogToLogger(ILogger& logger, const LogType logType, const AdditionalInfo& additionalInfo, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		LogToLogger(logger, logType, additionalInfo, SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 
 	void LogExceptionToLogger(ILogger& logger, const std::exception& exception) noexcept
@@ -72,9 +127,9 @@ namespace PonyEngine::Log
 		logger.LogException(exception, logInput);
 	}
 
-	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, const std::size_t frameCount) noexcept
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception) noexcept
 	{
-		const auto logInput = LogInput{.message = nullptr, .frameCount = frameCount};
+		const auto logInput = LogInput{.message = nullptr, .frameCount = additionalInfo.frameCount};
 		logger.LogException(exception, logInput);
 	}
 
@@ -84,9 +139,21 @@ namespace PonyEngine::Log
 		logger.LogException(exception, logInput);
 	}
 
-	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, const char* const message, const std::size_t frameCount) noexcept
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception, const char* const message) noexcept
 	{
-		const auto logInput = LogInput{.message = message, .frameCount = frameCount};
+		const auto logInput = LogInput{.message = message, .frameCount = additionalInfo.frameCount};
 		logger.LogException(exception, logInput);
+	}
+
+	template<typename... Args>
+	void LogExceptionToLogger(ILogger& logger, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		LogExceptionToLogger(logger, exception, SafeFormat(format, std::forward<Args>(args)...).c_str());
+	}
+
+	template<typename... Args>
+	void LogExceptionToLogger(ILogger& logger, const AdditionalInfo& additionalInfo, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		LogExceptionToLogger(logger, additionalInfo, exception, SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 }

@@ -9,9 +9,20 @@
 
 #include "CppUnitTest.h"
 
+#define PONY_LOG_VERBOSE
+#define PONY_LOG_DEBUG
+#define PONY_LOG_INFO
+#define PONY_LOG_WARNING
+#define PONY_LOG_ERROR
+#define PONY_LOG_EXCEPTION
+#define PONY_CONSOLE_LOG
+#include "PonyEngine/Log/EngineLog.h"
+
 import <cstddef>;
 import <cstdint>;
+import <format>;
 import <exception>;
+import <string>;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
@@ -25,21 +36,21 @@ namespace Core
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
-			const char* lastMessage;
+			std::string lastMessage;
 			const std::exception* lastException;
 			std::size_t lastFrameCount;
 			PonyEngine::Log::LogType lastLogType;
 
 			virtual void Log(const PonyEngine::Log::LogType logType, const PonyEngine::Log::LogInput& logInput) noexcept override
 			{
-				lastMessage = logInput.message;
+				lastMessage = logInput.message ? logInput.message : "";
 				lastFrameCount = logInput.frameCount;
 				lastLogType = logType;
 			}
 
 			virtual void LogException(const std::exception& exception, const PonyEngine::Log::LogInput& logInput) noexcept override
 			{
-				lastMessage = logInput.message;
+				lastMessage = logInput.message ? logInput.message : "";
 				lastFrameCount = logInput.frameCount;
 				lastException = &exception;
 			}
@@ -151,9 +162,51 @@ namespace Core
 			const auto message = "Message";
 			timeManager.frameCount = 14;
 			PonyEngine::Core::LogToLogger(engine, PonyEngine::Log::LogType::Debug, message);
-			Assert::AreEqual(message, logger.lastMessage);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+
+			logger.lastMessage = "";
+			logger.lastFrameCount = 22;
+			logger.lastLogType = PonyEngine::Log::LogType::Info;
+			PONY_LOG(&engine, PonyEngine::Log::LogType::Debug, message);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+
+			const auto format = "Format {}.";
+			const auto formatArg = "Format arg";
+			logger.lastMessage = "";
+			logger.lastFrameCount = 22;
+			logger.lastLogType = PonyEngine::Log::LogType::Info;
+			PonyEngine::Core::LogToLogger(engine, PonyEngine::Log::LogType::Debug, format, formatArg);
+			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+
+			logger.lastMessage = "";
+			logger.lastFrameCount = 22;
+			logger.lastLogType = PonyEngine::Log::LogType::Info;
+			PONY_LOG(&engine, PonyEngine::Log::LogType::Debug, format, formatArg);
+			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+
+			logger.lastMessage = "";
+			logger.lastFrameCount = 22;
+			logger.lastLogType = PonyEngine::Log::LogType::Info;
+			PONY_LOG_IF(true, &engine, PonyEngine::Log::LogType::Debug, message);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+
+			logger.lastMessage = "";
+			logger.lastFrameCount = 22;
+			logger.lastLogType = PonyEngine::Log::LogType::Info;
+			PONY_LOG_IF(false, &engine, PonyEngine::Log::LogType::Debug, message);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::AreEqual(std::size_t{22}, logger.lastFrameCount);
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Info), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
 		}
 
 		TEST_METHOD(LogExceptionToLogger)
@@ -168,16 +221,99 @@ namespace Core
 			const auto exception = std::exception("Exception");
 			timeManager.frameCount = 14;
 			PonyEngine::Core::LogExceptionToLogger(engine, exception);
-			Assert::IsNull(logger.lastMessage);
+			Assert::AreEqual("", logger.lastMessage.c_str());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
 
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_S(&engine, exception);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
 			logger.lastException = nullptr;
 			logger.lastFrameCount = 0;
 			PonyEngine::Core::LogExceptionToLogger(engine, exception, message);
-			Assert::AreEqual(message, logger.lastMessage);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E(&engine, exception, message);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			const auto format = "Format {}.";
+			const auto formatArg = "Format arg";
+			PonyEngine::Core::LogExceptionToLogger(engine, exception, format, formatArg);
+			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E(&engine, exception, format, formatArg);
+			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_S_IF(true, &engine, exception);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_S_IF(false, &engine, exception);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::IsNull(logger.lastException);
+			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_IF(true, &engine, exception, message);
+			Assert::AreEqual(message, logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_IF(false, &engine, exception, message);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::IsNull(logger.lastException);
+			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_IF(true, &engine, exception, format, formatArg);
+			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
+			Assert::AreEqual(timeManager.frameCount, logger.lastFrameCount);
+
+			logger.lastMessage = "";
+			logger.lastException = nullptr;
+			logger.lastFrameCount = 0;
+			PONY_LOG_E_IF(false, &engine, exception, format, formatArg);
+			Assert::AreEqual("", logger.lastMessage.c_str());
+			Assert::IsNull(logger.lastException);
+			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
 		}
 	};
 }

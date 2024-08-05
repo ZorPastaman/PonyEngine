@@ -93,10 +93,10 @@ export namespace PonyEngine::Math
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector2 Normalized() const noexcept requires(std::is_floating_point_v<T>);
+		Vector2 Normalized() const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
 		/// @note If the magnitude of the vector is 0, the result is undefined.
-		void Normalize() noexcept requires(std::is_floating_point_v<T>);
+		void Normalize() noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Gets a minimum value among the components.
 		/// @return Minimum component value.
@@ -126,7 +126,7 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return  @a True if this vector components are almost zero; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		constexpr bool IsAlmostZero(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is unit.
 		/// @return @a True if this vector is unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -135,7 +135,7 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is uniform.
 		/// @return @a True if this vector is uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -144,12 +144,12 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires(std::is_floating_point_v<T>);
+		bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsFinite() const noexcept requires(std::is_floating_point_v<T>);
+		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Assigns arguments to the vector components.
 		/// @param x X-component.
@@ -201,7 +201,7 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p multiplier.
 		/// @param multiplier Vector multiplier.
 		/// @return @a This.
-		constexpr Vector2& operator *=(ComputationalType multiplier) noexcept requires(std::is_integral_v<T>);
+		constexpr Vector2& operator *=(ComputationalType multiplier) noexcept requires (std::is_integral_v<T>);
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Vector divisor.
 		/// @return @a This.
@@ -209,7 +209,7 @@ export namespace PonyEngine::Math
 		/// @brief Divides @a this by the @p divisor.
 		/// @param divisor Vector divisor.
 		/// @return @a This.
-		constexpr Vector2& operator /=(ComputationalType divisor) noexcept requires(std::is_integral_v<T>);
+		constexpr Vector2& operator /=(ComputationalType divisor) noexcept requires (std::is_integral_v<T>);
 
 		/// @brief Checks if the two vectors are equal.
 		/// @param other Other vector.
@@ -447,13 +447,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	Vector2<T> Vector2<T>::Normalized() const noexcept requires(std::is_floating_point_v<T>)
+	Vector2<T> Vector2<T>::Normalized() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return *this * (T{1} / Magnitude());
 	}
 
 	template<Arithmetic T>
-	void Vector2<T>::Normalize() noexcept requires(std::is_floating_point_v<T>)
+	void Vector2<T>::Normalize() noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
 	}
@@ -495,7 +495,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr bool Vector2<T>::IsAlmostZero(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	constexpr bool Vector2<T>::IsAlmostZero(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(*this, Predefined::Zero, tolerance);
 	}
@@ -507,7 +507,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	bool Vector2<T>::IsAlmostUnit(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	bool Vector2<T>::IsAlmostUnit(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(MagnitudeSquared(), T{1}, tolerance);
 	}
@@ -519,13 +519,13 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	bool Vector2<T>::IsAlmostUniform(const T tolerance) const noexcept requires(std::is_floating_point_v<T>)
+	bool Vector2<T>::IsAlmostUniform(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return AreAlmostEqual(X(), Y(), tolerance);
 	}
 
 	template<Arithmetic T>
-	bool Vector2<T>::IsFinite() const noexcept requires(std::is_floating_point_v<T>)
+	bool Vector2<T>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return std::isfinite(X()) && std::isfinite(Y());
 	}
@@ -684,7 +684,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept requires(std::is_integral_v<T>)
+	constexpr Vector2<T>& Vector2<T>::operator *=(const ComputationalType multiplier) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -706,7 +706,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept requires(std::is_integral_v<T>)
+	constexpr Vector2<T>& Vector2<T>::operator /=(const ComputationalType divisor) noexcept requires (std::is_integral_v<T>)
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
