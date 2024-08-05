@@ -14,10 +14,10 @@ import <format>;
 import <exception>;
 import <string>;
 
+import :LogConsoleHelper;
 import :ILogger;
 import :LogInput;
 import :LogType;
-import :SafeFormat;
 
 export namespace PonyEngine::Log
 {

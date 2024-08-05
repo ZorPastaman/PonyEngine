@@ -72,7 +72,7 @@ namespace Log
 
 			logger.lastMessage = nullptr;
 			logger.lastLogType = PonyEngine::Log::LogType::None;
-			PonyEngine::Log::LogToLogger(logger, PonyEngine::Log::LogType::Warning, message, frameCount);
+			PonyEngine::Log::LogToLogger(logger, PonyEngine::Log::LogType::Warning, PonyEngine::Log::AdditionalInfo{.frameCount = frameCount}, message);
 			Assert::AreEqual(message, logger.lastMessage);
 			Assert::AreEqual(frameCount, logger.lastFrameCount);
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Warning), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
@@ -93,7 +93,7 @@ namespace Log
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
 
 			logger.lastException = nullptr;
-			PonyEngine::Log::LogExceptionToLogger(logger, exception, frameCount);
+			PonyEngine::Log::LogExceptionToLogger(logger, PonyEngine::Log::AdditionalInfo{.frameCount = frameCount}, exception);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(nullptr, logger.lastMessage);
 			Assert::AreEqual(frameCount, logger.lastFrameCount);
@@ -108,7 +108,7 @@ namespace Log
 			logger.lastException = nullptr;
 			logger.lastFrameCount = 0;
 			logger.lastMessage = nullptr;
-			PonyEngine::Log::LogExceptionToLogger(logger, exception, message, frameCount);
+			PonyEngine::Log::LogExceptionToLogger(logger, PonyEngine::Log::AdditionalInfo{.frameCount = frameCount}, exception, message);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(message, logger.lastMessage);
 			Assert::AreEqual(frameCount, logger.lastFrameCount);

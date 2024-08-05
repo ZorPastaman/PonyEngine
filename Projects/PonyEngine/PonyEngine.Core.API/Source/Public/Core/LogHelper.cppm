@@ -9,6 +9,9 @@
 
 export module PonyEngine.Core:LogHelper;
 
+import <format>;
+import <string>;
+
 import PonyEngine.Log;
 
 import :IEngine;
@@ -20,6 +23,14 @@ export namespace PonyEngine::Core
 	/// @param logType Log type.
 	/// @param message Log message.
 	void LogToLogger(const IEngine& engine, Log::LogType logType, const char* message) noexcept;
+	/// @brief Logs to the @p engine logger.
+	/// @tparam Args Format argument types.
+	/// @param engine Engine to use.
+	/// @param logType Log type.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogToLogger(const IEngine& engine, Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param engine Engine to use.
@@ -30,6 +41,14 @@ export namespace PonyEngine::Core
 	/// @param exception Exception to log.
 	/// @param message Log message.
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, const char* message) noexcept;
+	/// @brief Logs the @p exception to the @p logger.
+	/// @tparam Args Format argument types.
+	/// @param engine Engine to use.
+	/// @param exception Exception to log.
+	/// @param format Format.
+	/// @param args Format arguments.
+	template<typename... Args>
+	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
 namespace PonyEngine::Core
@@ -38,6 +57,12 @@ namespace PonyEngine::Core
 	{
 		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.GetTimeManager().GetFrameCount()};
 		Log::LogToLogger(engine.GetLogger(), logType, additionalInfo, message);
+	}
+
+	template<typename... Args>
+	void LogToLogger(const IEngine& engine, const Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		return LogToLogger(engine, logType, Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception) noexcept
@@ -50,5 +75,11 @@ namespace PonyEngine::Core
 	{
 		const auto additionalInfo = Log::AdditionalInfo{ .frameCount = engine.GetTimeManager().GetFrameCount() };
 		Log::LogExceptionToLogger(engine.GetLogger(), additionalInfo, exception, message);
+	}
+
+	template<typename... Args>
+	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
+	{
+		return LogExceptionToLogger(engine, exception, Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 }
