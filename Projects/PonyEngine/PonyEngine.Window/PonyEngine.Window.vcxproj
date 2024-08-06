@@ -23,7 +23,7 @@
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindow.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowFactory.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindow.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">

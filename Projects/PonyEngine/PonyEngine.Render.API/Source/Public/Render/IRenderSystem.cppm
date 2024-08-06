@@ -7,18 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyEngine/Compiler/Linking.h"
-
-export module PonyEngine.Render.Implementation;
-
-import PonyEngine.Render;
+export module PonyEngine.Render:IRenderSystem;
 
 export namespace PonyEngine::Render
 {
-	PONY_DLL_EXPORT void Render() noexcept
+	/// @brief Render system.
+	class IRenderSystem
 	{
-		
-	}
+	public:
+		IRenderSystem(const IRenderSystem&) = delete;
+		IRenderSystem(IRenderSystem&&) = delete;
+
+		IRenderSystem& operator =(const IRenderSystem&) = delete;
+		IRenderSystem& operator =(IRenderSystem&&) = delete;
+
+	protected:
+		[[nodiscard("Pure constructor")]]
+		IRenderSystem() noexcept = default;
+
+		~IRenderSystem() noexcept = default;
+	};
 }
