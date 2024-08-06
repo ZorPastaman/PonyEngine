@@ -9,6 +9,8 @@
 
 #include "CppUnitTest.h"
 
+import <exception>;
+import <format>;
 import <string>;
 
 import PonyEngine.StringUtility;
@@ -19,7 +21,13 @@ namespace Utility
 {
 	TEST_CLASS(StringUtilityTests)
 	{
-	public:
+		struct ExceptionHandler final
+		{
+			void operator ()(const std::exception& e) const noexcept
+			{
+			}
+		};
+
 		TEST_METHOD(ConvertWStringToStringTest)
 		{
 			const auto origin = std::string("Pony. Engine, Convert- String!");
@@ -27,6 +35,15 @@ namespace Utility
 
 			const std::string converted = PonyEngine::Utility::ConvertToString(wideOrigin);
 			Assert::AreEqual(0, origin.compare(converted));
+		}
+
+		TEST_METHOD(SafeFormatTest)
+		{
+			const auto format = "Format {}.";
+			const auto formatArg = "format arg";
+			Assert::AreEqual(std::format(format, formatArg), PonyEngine::Utility::SafeFormat(format, formatArg));
+			Assert::AreEqual(std::format(format, formatArg), PonyEngine::Utility::SafeFormat<ExceptionHandler>(format, formatArg));
+			Assert::AreEqual(std::format(format, formatArg), PonyEngine::Utility::SafeFormat(ExceptionHandler(), format, formatArg));
 		}
 	};
 }

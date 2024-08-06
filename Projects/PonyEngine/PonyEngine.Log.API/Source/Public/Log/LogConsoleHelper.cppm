@@ -183,14 +183,7 @@ namespace PonyEngine::Log
 #endif
 #ifdef PONY_SYSTEM_CONSOLE_LOG
 #ifdef _WIN32
-		try
-		{
-			OutputDebugStringA(log);
-		}
-		catch (...)
-		{
-			// Something totally wrong happened.
-		}
+		OutputDebugStringA(log);
 #endif
 #endif
 	}

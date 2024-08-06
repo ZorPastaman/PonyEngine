@@ -73,7 +73,7 @@ namespace PonyEngine::Core
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, const char* const message) noexcept
 	{
-		const auto additionalInfo = Log::AdditionalInfo{ .frameCount = engine.GetTimeManager().GetFrameCount() };
+		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.GetTimeManager().GetFrameCount()};
 		Log::LogExceptionToLogger(engine.GetLogger(), additionalInfo, exception, message);
 	}
 

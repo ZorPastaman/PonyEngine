@@ -72,15 +72,22 @@ namespace Launcher
 		{
 			throw std::logic_error("The Windows window system factory is nullptr.");
 		}
-		PonyEngine::Window::WindowParams& nextWindowParams = windowsWindowSystemFactory->NextWindowParams();
-		nextWindowParams.title = L"Pony Engine Game";
-		nextWindowParams.horizontalPosition = CW_USEDEFAULT;
-		nextWindowParams.verticalPosition = CW_USEDEFAULT;
-		nextWindowParams.width = CW_USEDEFAULT;
-		nextWindowParams.height = CW_USEDEFAULT;
-		PonyEngine::Window::WindowsWindowParams& nextWindowsWindowParams =  windowsWindowSystemFactory->NextWindowsWindowParams();
-		nextWindowsWindowParams.style = WS_OVERLAPPEDWINDOW;
-		nextWindowsWindowParams.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
+		constexpr int width = 1280;
+		constexpr int height = 720;
+		windowsWindowSystemFactory->NextWindowParams() = PonyEngine::Window::WindowParams
+		{
+			.title = L"Pony Engine Game",
+			.horizontalPosition = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2,
+			.verticalPosition = GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2,
+			.width = width,
+			.height = height
+		};
+		windowsWindowSystemFactory->NextWindowsWindowParams() = PonyEngine::Window::WindowsWindowParams
+		{
+			.style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
+			.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW,
+			.showCmd = SW_NORMAL
+		};
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");

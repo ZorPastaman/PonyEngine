@@ -166,7 +166,7 @@ namespace PonyEngine::Input
 		}
 
 		keyStates.insert_or_assign(keyboardMessage.keyCode, keyboardMessage.isDown);
-		queue.push(KeyboardMessage(keyboardMessage.keyCode, keyboardMessage.isDown));
+		queue.push(KeyboardMessage{.keyCode = keyboardMessage.keyCode, .isDown = keyboardMessage.isDown});
 	}
 
 	const char* InputSystem::GetName() const noexcept
