@@ -62,7 +62,7 @@
 /// @brief Log mask. It contains a mask of all possible log types.
 #define PONY_LOG_MASK (PONY_LOG_VERBOSE_MASK | PONY_LOG_DEBUG_MASK | PONY_LOG_INFO_MASK | PONY_LOG_WARNING_MASK | PONY_LOG_ERROR_MASK | PONY_LOG_EXCEPTION_MASK)
 
-#ifdef PONY_CONSOLE_LOG || PONY_SYSTEM_CONSOLE_LOG
+#if defined(PONY_CONSOLE_LOG) || defined(PONY_SYSTEM_CONSOLE_LOG)
 /// @brief Console log mask.
 #define PONY_CONSOLE_LOG_MASK PONY_LOG_MASK
 #else

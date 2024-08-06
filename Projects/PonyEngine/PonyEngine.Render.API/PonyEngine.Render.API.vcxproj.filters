@@ -25,7 +25,16 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Render.API.cppm">
+    <ClCompile Include="Source\Public\Render\Render.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\IRenderSystem.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Factory\IRenderSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

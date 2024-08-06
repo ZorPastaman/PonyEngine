@@ -8,3 +8,5 @@
  ***************************************************/
 
 export module PonyEngine.Render;
+
+export import :IRenderSystem;
