@@ -99,14 +99,21 @@ namespace PonyEngine::Window
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
 
-		WNDCLASSEXW wc{};
-		wc.cbSize = sizeof(wc);
-		wc.lpszClassName = classParams.name.c_str();
-		wc.lpfnWndProc = &WindowProc;
-		wc.hInstance = hInstance;
-		wc.hIcon = classParams.icon;
-		wc.hCursor = classParams.cursor ? classParams.cursor : GetDefaultCursor();
-		wc.style = classParams.style;
+		const auto wc = WNDCLASSEXW
+		{
+			.cbSize = sizeof(WNDCLASSEXW),
+			.style = classParams.style,
+			.lpfnWndProc = &WindowProc,
+			.cbClsExtra = 0,
+			.cbWndExtra = 0,
+			.hInstance = hInstance,
+			.hIcon = classParams.icon,
+			.hCursor = classParams.cursor ? classParams.cursor : GetDefaultCursor(),
+			.hbrBackground = NULL,
+			.lpszMenuName = NULL,
+			.lpszClassName = classParams.name.c_str(),
+			.hIconSm = NULL
+		};
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Register window class '{}'.", Utility::ConvertToString(classParams.name));
 		classAtom = RegisterClassExW(&wc);

@@ -44,14 +44,7 @@ export namespace PonyEngine::Log
 
 	void OutputDebugStringSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
-		try
-		{
-			OutputDebugStringA(logEntry.ToString());
-		}
-		catch (std::exception& e)
-		{
-			PONY_CONSOLE_E(e, "On writing to the Windows console.");
-		}
+		OutputDebugStringA(logEntry.ToString());
 	}
 
 	const char* OutputDebugStringSubLogger::GetName() const noexcept
