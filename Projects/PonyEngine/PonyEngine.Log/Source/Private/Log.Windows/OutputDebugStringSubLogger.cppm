@@ -34,7 +34,7 @@ export namespace PonyEngine::Log
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		OutputDebugStringSubLogger& operator =(const OutputDebugStringSubLogger&) = delete;
 		OutputDebugStringSubLogger& operator =(OutputDebugStringSubLogger&&) = delete;
@@ -47,7 +47,7 @@ export namespace PonyEngine::Log
 		OutputDebugStringA(logEntry.ToString());
 	}
 
-	const char* OutputDebugStringSubLogger::GetName() const noexcept
+	const char* OutputDebugStringSubLogger::Name() const noexcept
 	{
 		return StaticName;
 	}

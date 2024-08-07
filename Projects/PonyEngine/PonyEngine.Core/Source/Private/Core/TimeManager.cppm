@@ -32,11 +32,11 @@ export namespace PonyEngine::Core
 		~TimeManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t GetFrameCount() const noexcept override;
+		virtual std::size_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual float GetTargetFrameTime() const noexcept override;
-		virtual void SetTargetFrameTime(float frameTime) noexcept override;
+		virtual float TargetFrameTime() const noexcept override;
+		virtual void TargetFrameTime(float frameTime) noexcept override;
 
 		/// @brief Tick the time manager.
 		void Tick() noexcept;
@@ -66,17 +66,17 @@ namespace PonyEngine::Core
 	{
 	}
 
-	std::size_t TimeManager::GetFrameCount() const noexcept
+	std::size_t TimeManager::FrameCount() const noexcept
 	{
 		return frameCount;
 	}
 
-	float TimeManager::GetTargetFrameTime() const noexcept
+	float TimeManager::TargetFrameTime() const noexcept
 	{
 		return targetFrameTime.count();
 	}
 
-	void TimeManager::SetTargetFrameTime(const float frameTime) noexcept
+	void TimeManager::TargetFrameTime(const float frameTime) noexcept
 	{
 		targetFrameTime = std::chrono::duration<float>(frameTime);
 	}

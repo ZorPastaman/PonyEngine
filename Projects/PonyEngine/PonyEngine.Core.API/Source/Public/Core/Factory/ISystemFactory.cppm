@@ -35,12 +35,12 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system factory name.
 		/// @return System factory name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		/// @brief Gets the system static name.
 		/// @return System static name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept = 0;
+		virtual const char* SystemName() const noexcept = 0;
 
 		ISystemFactory& operator =(const ISystemFactory&) = delete;
 		ISystemFactory& operator =(ISystemFactory&&) = delete;

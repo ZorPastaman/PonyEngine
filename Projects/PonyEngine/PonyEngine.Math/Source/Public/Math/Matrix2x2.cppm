@@ -38,13 +38,13 @@ export namespace PonyEngine::Math
 		/// @brief Row access.
 		/// @tparam IsConstant Is the underlying value const?
 		template<bool IsConstant>
-		class Row final
+		class RowAccess final
 		{
 		public:
-			Row(const Row&) = delete;
-			Row(Row&&) = delete;
+			RowAccess(const RowAccess&) = delete;
+			RowAccess(RowAccess&&) = delete;
 
-			constexpr ~Row() noexcept = default;
+			constexpr ~RowAccess() noexcept = default;
 
 			/// @brief Converts the row to a vector.
 			[[nodiscard("Pure operator")]]
@@ -61,13 +61,13 @@ export namespace PonyEngine::Math
 			[[nodiscard("Pure operator")]]
 			constexpr const T& operator [](std::size_t columnIndex) const noexcept;
 
-			Row& operator =(const Row&) = delete;
-			Row& operator =(Row&&) = delete;
+			RowAccess& operator =(const RowAccess&) = delete;
+			RowAccess& operator =(RowAccess&&) = delete;
 
 			/// @brief Assigns the row from the @p row.
 			/// @param row Row to assign from.
 			/// @return @a This.
-			constexpr Row& operator =(const Vector2<T>& row) noexcept requires (!IsConstant);
+			constexpr RowAccess& operator =(const Vector2<T>& row) noexcept requires (!IsConstant);
 
 		private:
 			using RowValueType = std::conditional_t<IsConstant, const T, T>; ///< @p const @p T or @p T depending on @p IsConstant.
@@ -75,7 +75,7 @@ export namespace PonyEngine::Math
 			/// @brief Creates a row access.
 			/// @param row First element in the row.
 			[[nodiscard("Pure constructor")]]
-			explicit constexpr Row(RowValueType* row) noexcept;
+			explicit constexpr RowAccess(RowValueType* row) noexcept;
 
 			RowValueType* const matrixRow; ///< Row pointer.
 
@@ -163,37 +163,37 @@ export namespace PonyEngine::Math
 		/// @param rowIndex Row index.
 		/// @return Row.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2<T> GetRow(std::size_t rowIndex) const noexcept;
+		constexpr Vector2<T> Row(std::size_t rowIndex) const noexcept;
 		/// @brief Sets a row by the @p rowIndex.
 		/// @param rowIndex Row index.
 		/// @param value Row components.
-		constexpr void SetRow(std::size_t rowIndex, const Vector2<T>& value) noexcept;
+		constexpr void Row(std::size_t rowIndex, const Vector2<T>& value) noexcept;
 
 		/// @brief Gets a column by the @p columnIndex.
 		/// @param columnIndex Column index.
 		/// @return Column.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2<T> GetColumn(std::size_t columnIndex) const noexcept;
+		constexpr Vector2<T> Column(std::size_t columnIndex) const noexcept;
 		/// @brief Sets a column by the @p columnIndex.
 		/// @param columnIndex Column index.
 		/// @param value Column components.
-		constexpr void SetColumn(std::size_t columnIndex, const Vector2<T>& value) noexcept;
+		constexpr void Column(std::size_t columnIndex, const Vector2<T>& value) noexcept;
 
 		/// @brief Gets the diagonal.
 		/// @return Diagonal.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2<T> GetDiagonal() const noexcept;
+		constexpr Vector2<T> Diagonal() const noexcept;
 		/// @brief Sets the diagonal.
 		/// @param value Diagonal components.
-		constexpr void SetDiagonal(const Vector2<T>& value) noexcept;
+		constexpr void Diagonal(const Vector2<T>& value) noexcept;
 
 		/// @brief Gets the counter-diagonal.
 		/// @return Counter-diagonal.
 		[[nodiscard("Pure function")]]
-		constexpr Vector2<T> GetCounterDiagonal() const noexcept;
+		constexpr Vector2<T> CounterDiagonal() const noexcept;
 		/// @brief Sets the counter-diagonal.
 		/// @param value Counter-diagonal components.
-		constexpr void SetCounterDiagonal(const Vector2<T>& value) noexcept;
+		constexpr void CounterDiagonal(const Vector2<T>& value) noexcept;
 
 		/// @brief Computes a trace of the matrix.
 		/// @return Trace of the matrix.
@@ -263,6 +263,14 @@ export namespace PonyEngine::Math
 		/// @param scale Matrix to multiply by.
 		constexpr void Scale(const Matrix2x2& scale) noexcept;
 
+		/// @brief Converts the matrix to an array.
+		/// @return Matrix array.
+		[[nodiscard("Pure function")]]
+		constexpr std::array<T, Matrix2x2<T>::ComponentCount> ToArray() const noexcept;
+		/// @brief Converts the matrix to a c-style array.
+		/// @param array Target array.
+		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+
 		/// @brief Creates a string representing a state of the matrix.
 		/// @remark The format is '(m00, m01)(m10, m11)'.
 		/// @return State string.
@@ -279,13 +287,13 @@ export namespace PonyEngine::Math
 		/// @param rowIndex Row index. Must be in range [0, 1].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		constexpr Row<false> operator [](std::size_t rowIndex) noexcept;
+		constexpr RowAccess<false> operator [](std::size_t rowIndex) noexcept;
 		/// @brief Row access operator.
 		/// @remark Don't store it. Use the access like this: matrix[1][1]; or vector = matrix[1].
 		/// @param rowIndex Row index. Must be in range [0, 1].
 		/// @return Row access.
 		[[nodiscard("Pure operator")]]
-		constexpr Row<true> operator [](std::size_t rowIndex) const noexcept;
+		constexpr RowAccess<true> operator [](std::size_t rowIndex) const noexcept;
 
 		constexpr Matrix2x2& operator =(const Matrix2x2& other) noexcept = default;
 		constexpr Matrix2x2& operator =(Matrix2x2&& other) noexcept = default;
@@ -455,14 +463,14 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr Matrix2x2<T>::Row<IsConstant>::Row(RowValueType* const row) noexcept :
+	constexpr Matrix2x2<T>::RowAccess<IsConstant>::RowAccess(RowValueType* const row) noexcept :
 		matrixRow{row}
 	{
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr Matrix2x2<T>::Row<IsConstant>::operator Vector2<T>() const noexcept
+	constexpr Matrix2x2<T>::RowAccess<IsConstant>::operator Vector2<T>() const noexcept
 	{
 		Vector2<T> row;
 		for (std::size_t i = 0; i < Dimension; ++i)
@@ -475,21 +483,21 @@ namespace PonyEngine::Math
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
+	constexpr T& Matrix2x2<T>::RowAccess<IsConstant>::operator [](const std::size_t columnIndex) noexcept requires (!IsConstant)
 	{
 		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr const T& Matrix2x2<T>::Row<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
+	constexpr const T& Matrix2x2<T>::RowAccess<IsConstant>::operator [](const std::size_t columnIndex) const noexcept
 	{
 		return matrixRow[columnIndex * Dimension];
 	}
 
 	template<Arithmetic T>
 	template<bool IsConstant>
-	constexpr typename Matrix2x2<T>::template Row<IsConstant>& Matrix2x2<T>::Row<IsConstant>::operator =(const Vector2<T>& row) noexcept requires (!IsConstant)
+	constexpr typename Matrix2x2<T>::template RowAccess<IsConstant>& Matrix2x2<T>::RowAccess<IsConstant>::operator =(const Vector2<T>& row) noexcept requires (!IsConstant)
 	{
 		for (std::size_t i = 0; i < Dimension; ++i)
 		{
@@ -590,50 +598,50 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Matrix2x2<T>::GetRow(const std::size_t rowIndex) const noexcept
+	constexpr Vector2<T> Matrix2x2<T>::Row(const std::size_t rowIndex) const noexcept
 	{
 		return (*this)[rowIndex];
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::SetRow(const std::size_t rowIndex, const Vector2<T>& value) noexcept
+	constexpr void Matrix2x2<T>::Row(const std::size_t rowIndex, const Vector2<T>& value) noexcept
 	{
 		(*this)[rowIndex] = value;
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Matrix2x2<T>::GetColumn(const std::size_t columnIndex) const noexcept
+	constexpr Vector2<T> Matrix2x2<T>::Column(const std::size_t columnIndex) const noexcept
 	{
 		return Vector2<T>(Data(columnIndex));
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::SetColumn(const std::size_t columnIndex, const Vector2<T>& value) noexcept
+	constexpr void Matrix2x2<T>::Column(const std::size_t columnIndex, const Vector2<T>& value) noexcept
 	{
 		std::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Matrix2x2<T>::GetDiagonal() const noexcept
+	constexpr Vector2<T> Matrix2x2<T>::Diagonal() const noexcept
 	{
 		return Vector2<T>(M00(), M11());
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::SetDiagonal(const Vector2<T>& value) noexcept
+	constexpr void Matrix2x2<T>::Diagonal(const Vector2<T>& value) noexcept
 	{
 		M00() = value.X();
 		M11() = value.Y();
 	}
 
 	template<Arithmetic T>
-	constexpr Vector2<T> Matrix2x2<T>::GetCounterDiagonal() const noexcept
+	constexpr Vector2<T> Matrix2x2<T>::CounterDiagonal() const noexcept
 	{
 		return Vector2<T>(M01(), M10());
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::SetCounterDiagonal(const Vector2<T>& value) noexcept
+	constexpr void Matrix2x2<T>::CounterDiagonal(const Vector2<T>& value) noexcept
 	{
 		M01() = value.X();
 		M10() = value.Y();
@@ -642,7 +650,7 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr T Matrix2x2<T>::Trace() const noexcept
 	{
-		return GetDiagonal().Sum();
+		return Diagonal().Sum();
 	}
 
 	template<Arithmetic T>
@@ -738,6 +746,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr std::array<T, Matrix2x2<T>::ComponentCount> Matrix2x2<T>::ToArray() const noexcept
+	{
+		return components;
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix2x2<T>::ToArray(T (&array)[ComponentCount]) const noexcept
+	{
+		std::ranges::copy(components, array);
+	}
+
+	template<Arithmetic T>
 	std::string Matrix2x2<T>::ToString() const
 	{
 		return std::format("({}, {})({}, {})", M00(), M01(), M10(), M11());
@@ -783,15 +803,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr typename Matrix2x2<T>::template Row<false> Matrix2x2<T>::operator [](const std::size_t rowIndex) noexcept
+	constexpr typename Matrix2x2<T>::template RowAccess<false> Matrix2x2<T>::operator [](const std::size_t rowIndex) noexcept
 	{
-		return Row<false>(Data() + rowIndex);
+		return RowAccess<false>(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>
-	constexpr typename Matrix2x2<T>::template Row<true> Matrix2x2<T>::operator [](const std::size_t rowIndex) const noexcept
+	constexpr typename Matrix2x2<T>::template RowAccess<true> Matrix2x2<T>::operator [](const std::size_t rowIndex) const noexcept
 	{
-		return Row<true>(Data() + rowIndex);
+		return RowAccess<true>(Data() + rowIndex);
 	}
 
 	template<Arithmetic T>

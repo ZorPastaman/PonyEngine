@@ -44,7 +44,7 @@ export namespace PonyEngine::Log
 		/// @brief Gets the logger name.
 		/// @return Logger name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		ILogger& operator =(const ILogger& other) noexcept = delete;
 		ILogger& operator =(ILogger&& other) noexcept = delete;

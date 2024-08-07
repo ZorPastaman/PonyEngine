@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+import <array>;
 import <cmath>;
 import <format>;
 import <numbers>;
@@ -246,36 +247,48 @@ namespace Math
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<short>(x, y);
+			auto vector = PonyEngine::Math::Vector2<short>(x, y);
 			const short min = vector.Min();
 			Assert::AreEqual(short{-3}, min);
+			constexpr auto cVector = PonyEngine::Math::Vector2<short>(x, y);
+			const short cMin = cVector.Min();
+			Assert::AreEqual(short{-3}, cMin);
 		}
 
 		TEST_METHOD(MinFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			auto vector = PonyEngine::Math::Vector2<float>(x, y);
 			const float min = vector.Min();
-			Assert::AreEqual(-3.f, min);
+			Assert::AreEqual(float{-3}, min);
+			constexpr auto cVector = PonyEngine::Math::Vector2<float>(x, y);
+			const float cMin = cVector.Min();
+			Assert::AreEqual(float{-3}, cMin);
 		}
 
 		TEST_METHOD(MaxShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<short>(x, y);
+			auto vector = PonyEngine::Math::Vector2<short>(x, y);
 			const short max = vector.Max();
 			Assert::AreEqual(short{2}, max);
+			constexpr auto cVector = PonyEngine::Math::Vector2<short>(x, y);
+			const short cMax = cVector.Max();
+			Assert::AreEqual(short{2}, cMax);
 		}
 
 		TEST_METHOD(MaxFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			auto vector = PonyEngine::Math::Vector2<float>(x, y);
 			const float max = vector.Max();
-			Assert::AreEqual(2.f, max);
+			Assert::AreEqual(float{2}, max);
+			constexpr auto cVector = PonyEngine::Math::Vector2<float>(x, y);
+			const float cMax = cVector.Max();
+			Assert::AreEqual(float{2}, cMax);
 		}
 
 		TEST_METHOD(SumThisShortTest)
@@ -511,6 +524,34 @@ namespace Math
 			vector.Scale(scale);
 			Assert::AreEqual(x * xS, vector.X());
 			Assert::AreEqual(y * yS, vector.Y());
+		}
+
+		TEST_METHOD(ToArrayShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr auto vector = PonyEngine::Math::Vector2<short>(x, y);
+			const std::array<short, 2> array = vector.ToArray();
+			Assert::AreEqual(x, array[0]);
+			Assert::AreEqual(y, array[1]);
+			short cArray[2];
+			vector.ToArray(cArray);
+			Assert::AreEqual(x, cArray[0]);
+			Assert::AreEqual(y, cArray[1]);
+		}
+
+		TEST_METHOD(ToArrayFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
+			const std::array<float, 2> array = vector.ToArray();
+			Assert::AreEqual(x, array[0]);
+			Assert::AreEqual(y, array[1]);
+			float cArray[2];
+			vector.ToArray(cArray);
+			Assert::AreEqual(x, cArray[0]);
+			Assert::AreEqual(y, cArray[1]);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -1317,8 +1358,14 @@ namespace Math
 
 			movedVector.Swap();
 
+			[[maybe_unused]] const float min = movedVector.Min();
+			[[maybe_unused]] const float max = movedVector.Max();
+
 			movedVector.Set(5, 2);
 			movedVector.Set(std::array<float, 3>{7, 9, 8}.data());
+
+			float array[2];
+			movedVector.ToArray(array);
 
 			movedVector[1] -= 4;
 
@@ -1370,6 +1417,8 @@ namespace Math
 			[[maybe_unused]] constexpr bool isAlmostZero = vector.IsAlmostZero();
 			[[maybe_unused]] constexpr bool isUnit = vector.IsUnit();
 			[[maybe_unused]] constexpr bool isUniform = vector.IsUniform();
+
+			[[maybe_unused]] constexpr std::array<float, 2> array = vector.ToArray();
 
 			[[maybe_unused]] constexpr auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(vector);
 

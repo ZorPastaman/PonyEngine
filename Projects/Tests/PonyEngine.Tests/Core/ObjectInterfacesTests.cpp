@@ -27,7 +27,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -44,13 +44,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
 			{
 				return PonyEngine::Core::ObjectInterfaces();
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsTickable() const noexcept override
+			virtual bool IsTickable() const noexcept override
 			{
 				return false;
 			}
@@ -68,10 +68,10 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterface<IInterface>(system);
+			interfaces.AddInterface<IInterface>(system);
 
 			auto copiedInterfaces = interfaces;
-			auto copiedIterator = copiedInterfaces.GetObjectInterfaces();
+			auto copiedIterator = copiedInterfaces.Interfaces();
 			auto interface = *copiedIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -79,7 +79,7 @@ namespace Core
 			Assert::IsTrue((++copiedIterator).IsEnd());
 
 			auto movedInterfaces = std::move(interfaces);
-			auto movedIterator = movedInterfaces.GetObjectInterfaces();
+			auto movedIterator = movedInterfaces.Interfaces();
 			interface = *movedIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -91,9 +91,9 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterface(typeid(IInterface), static_cast<IInterface*>(&system));
-			interfaces.AddObjectInterface(typeid(IBaseInterface), static_cast<IBaseInterface*>(&system));
-			auto it = interfaces.GetObjectInterfaces();
+			interfaces.AddInterface(typeid(IInterface), static_cast<IInterface*>(&system));
+			interfaces.AddInterface(typeid(IBaseInterface), static_cast<IBaseInterface*>(&system));
+			auto it = interfaces.Interfaces();
 			Assert::IsFalse(it.IsEnd());
 			Assert::IsTrue(typeid(IInterface) == (*it).first.get());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>((*it).second));
@@ -105,9 +105,9 @@ namespace Core
 			Assert::IsTrue(it.IsEnd());
 
 			interfaces = PonyEngine::Core::ObjectInterfaces();
-			interfaces.AddObjectInterface<IInterface>(system);
-			interfaces.AddObjectInterface<IBaseInterface>(system);
-			it = interfaces.GetObjectInterfaces();
+			interfaces.AddInterface<IInterface>(system);
+			interfaces.AddInterface<IBaseInterface>(system);
+			it = interfaces.Interfaces();
 			Assert::IsFalse(it.IsEnd());
 			Assert::IsTrue(typeid(IInterface) == (*it).first.get());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>((*it).second));
@@ -119,8 +119,8 @@ namespace Core
 			Assert::IsTrue(it.IsEnd());
 
 			interfaces = PonyEngine::Core::ObjectInterfaces();
-			interfaces.AddObjectInterfaces<EmptySystem, IInterface, IBaseInterface>(system);
-			it = interfaces.GetObjectInterfaces();
+			interfaces.AddInterfaces<EmptySystem, IInterface, IBaseInterface>(system);
+			it = interfaces.Interfaces();
 			Assert::IsFalse(it.IsEnd());
 			Assert::IsTrue(typeid(IInterface) == (*it).first.get());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>((*it).second));
@@ -132,8 +132,8 @@ namespace Core
 			Assert::IsTrue(it.IsEnd());
 
 			interfaces = PonyEngine::Core::ObjectInterfaces();
-			interfaces.AddObjectInterfacesDeduced<IInterface, IBaseInterface>(system);
-			it = interfaces.GetObjectInterfaces();
+			interfaces.AddInterfacesDeduced<IInterface, IBaseInterface>(system);
+			it = interfaces.Interfaces();
 			Assert::IsFalse(it.IsEnd());
 			Assert::IsTrue(typeid(IInterface) == (*it).first.get());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>((*it).second));
@@ -149,11 +149,11 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterface<IInterface>(system);
+			interfaces.AddInterface<IInterface>(system);
 
 			auto otherInterfaces = PonyEngine::Core::ObjectInterfaces();
 			otherInterfaces = interfaces;
-			auto otherIterator = otherInterfaces.GetObjectInterfaces();
+			auto otherIterator = otherInterfaces.Interfaces();
 			auto interface = *otherIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -162,7 +162,7 @@ namespace Core
 
 			auto anotherInterfaces = PonyEngine::Core::ObjectInterfaces();
 			anotherInterfaces = std::move(interfaces);
-			auto anotherIterator = anotherInterfaces.GetObjectInterfaces();
+			auto anotherIterator = anotherInterfaces.Interfaces();
 			interface = *anotherIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -174,8 +174,8 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterface<IInterface>(system);
-			auto iterator = interfaces.GetObjectInterfaces();
+			interfaces.AddInterface<IInterface>(system);
+			auto iterator = interfaces.Interfaces();
 
 			auto copiedIterator = iterator;
 			auto interface = *copiedIterator;
@@ -196,9 +196,9 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterfacesDeduced<IInterface, IBaseInterface>(system);
+			interfaces.AddInterfacesDeduced<IInterface, IBaseInterface>(system);
 
-			auto iterator = interfaces.GetObjectInterfaces();
+			auto iterator = interfaces.Interfaces();
 			auto interface = *iterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<IInterface*>(&system)), reinterpret_cast<std::uintptr_t>(interface.second));
@@ -226,11 +226,11 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterfacesDeduced<IInterface, IBaseInterface>(system);
-			auto iterator = interfaces.GetObjectInterfaces();
+			interfaces.AddInterfacesDeduced<IInterface, IBaseInterface>(system);
+			auto iterator = interfaces.Interfaces();
 
 			auto otherInterfaces = PonyEngine::Core::ObjectInterfaces();
-			auto copiedIterator = otherInterfaces.GetObjectInterfaces();
+			auto copiedIterator = otherInterfaces.Interfaces();
 			copiedIterator = iterator;
 			auto interface = *copiedIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
@@ -242,7 +242,7 @@ namespace Core
 			++copiedIterator;
 			Assert::IsTrue(copiedIterator.IsEnd());
 
-			auto movedIterator = otherInterfaces.GetObjectInterfaces();
+			auto movedIterator = otherInterfaces.Interfaces();
 			movedIterator = std::move(iterator);
 			interface = *movedIterator;
 			Assert::IsTrue(typeid(IInterface) == interface.first);
@@ -259,8 +259,8 @@ namespace Core
 		{
 			auto interfaces = PonyEngine::Core::ObjectInterfaces();
 			auto system = EmptySystem();
-			interfaces.AddObjectInterfacesDeduced<IInterface, IBaseInterface>(system);
-			auto iterator = interfaces.GetObjectInterfaces();
+			interfaces.AddInterfacesDeduced<IInterface, IBaseInterface>(system);
+			auto iterator = interfaces.Interfaces();
 
 			auto copiedIterator = iterator;
 			Assert::IsTrue(iterator == copiedIterator);

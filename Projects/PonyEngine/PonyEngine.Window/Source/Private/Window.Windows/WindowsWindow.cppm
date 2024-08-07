@@ -51,9 +51,9 @@ export namespace PonyEngine::Window
 		~WindowsWindow() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsTickable() const noexcept override;
+		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -64,8 +64,8 @@ export namespace PonyEngine::Window
 		virtual bool IsWindowAlive() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* GetTitle() const noexcept override;
-		virtual void SetTitle(const wchar_t* title) override;
+		virtual const wchar_t* Title() const noexcept override;
+		virtual void Title(const wchar_t* title) override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
@@ -73,13 +73,13 @@ export namespace PonyEngine::Window
 		virtual void HideWindow() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual HWND GetWindowHandle() const noexcept override;
+		virtual HWND WindowHandle() const noexcept override;
 
 		virtual void AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
 		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -152,15 +152,15 @@ namespace PonyEngine::Window
 		}
 	}
 
-	Core::ObjectInterfaces WindowsWindow::GetPublicInterfaces() noexcept
+	Core::ObjectInterfaces WindowsWindow::PublicInterfaces() noexcept
 	{
 		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddObjectInterfacesDeduced<IWindow, IWindowsWindow, IKeyboardProvider>(*this);
+		interfaces.AddInterfacesDeduced<IWindow, IWindowsWindow, IKeyboardProvider>(*this);
 
 		return interfaces;
 	}
 
-	bool WindowsWindow::GetIsTickable() const noexcept
+	bool WindowsWindow::IsTickable() const noexcept
 	{
 		return true;
 	}
@@ -190,12 +190,12 @@ namespace PonyEngine::Window
 		return IsWindow(hWnd);
 	}
 
-	const wchar_t* WindowsWindow::GetTitle() const noexcept
+	const wchar_t* WindowsWindow::Title() const noexcept
 	{
 		return windowTitle.c_str();
 	}
 
-	void WindowsWindow::SetTitle(const wchar_t* const title)
+	void WindowsWindow::Title(const wchar_t* const title)
 	{
 		if (!SetWindowTextW(hWnd, title))
 		{
@@ -220,7 +220,7 @@ namespace PonyEngine::Window
 		::ShowWindow(hWnd, SW_HIDE);
 	}
 
-	HWND WindowsWindow::GetWindowHandle() const noexcept
+	HWND WindowsWindow::WindowHandle() const noexcept
 	{
 		return hWnd;
 	}
@@ -229,7 +229,7 @@ namespace PonyEngine::Window
 	{
 		assert((keyboardMessageObserver && "The observer is nullptr."));
 		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added."));
-		PONY_LOG(engine, Log::LogType::Info, "Add '{}' keyboard message observer.", keyboardMessageObserver->GetName());
+		PONY_LOG(engine, Log::LogType::Info, "Add '{}' keyboard message observer.", keyboardMessageObserver->Name());
 		keyboardMessageObservers.push_back(keyboardMessageObserver);
 		PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer added.");
 	}
@@ -240,17 +240,17 @@ namespace PonyEngine::Window
 
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Remove '{}' keyboard message observer.", keyboardMessageObserver->GetName());
+			PONY_LOG(engine, Log::LogType::Info, "Remove '{}' keyboard message observer.", keyboardMessageObserver->Name());
 			keyboardMessageObservers.erase(position);
 			PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer removed.");
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->GetName());
+			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->Name());
 		}
 	}
 
-	const char* WindowsWindow::GetName() const noexcept
+	const char* WindowsWindow::Name() const noexcept
 	{
 		return StaticName;
 	}

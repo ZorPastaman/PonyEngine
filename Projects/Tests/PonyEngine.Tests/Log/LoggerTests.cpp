@@ -33,7 +33,7 @@ namespace Log
 			std::size_t count = 0;
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -41,10 +41,10 @@ namespace Log
 			virtual void Log(const PonyEngine::Log::LogEntry& logEntry) noexcept override
 			{
 				Assert::IsTrue(expectMessages);
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedMessage), reinterpret_cast<std::uintptr_t>(logEntry.GetMessage()));
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedException), reinterpret_cast<std::uintptr_t>(logEntry.GetException()));
-				Assert::AreEqual(expectedFrameCount, logEntry.GetFrameCount());
-				Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logEntry.GetLogType()));
+				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedMessage), reinterpret_cast<std::uintptr_t>(logEntry.Message()));
+				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedException), reinterpret_cast<std::uintptr_t>(logEntry.Exception()));
+				Assert::AreEqual(expectedFrameCount, logEntry.FrameCount());
+				Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logEntry.LogType()));
 				++count;
 			}
 		};
@@ -58,7 +58,7 @@ namespace Log
 		TEST_METHOD(GetNameTest)
 		{
 			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
-			Assert::AreEqual("PonyEngine::Log::Logger", logger->GetName());
+			Assert::AreEqual("PonyEngine::Log::Logger", logger->Name());
 		}
 
 		TEST_METHOD(LogTest)

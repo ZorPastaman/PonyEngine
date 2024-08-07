@@ -28,10 +28,10 @@ export namespace PonyEngine::Window
 		/// @brief Gets the window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* GetTitle() const noexcept = 0;
+		virtual const wchar_t* Title() const noexcept = 0;
 		/// @brief Sets the window title.
 		/// @param title Window title to set.
-		virtual void SetTitle(const wchar_t* title) = 0;
+		virtual void Title(const wchar_t* title) = 0;
 
 		/// @brief Checks if the window is visible.
 		/// @return @a True if it's visible; @a false otherwise.
@@ -45,7 +45,7 @@ export namespace PonyEngine::Window
 		/// @brief Gets the window name.
 		/// @return Window name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		IWindow& operator =(const IWindow&) = delete;
 		IWindow& operator =(IWindow&&) = delete;

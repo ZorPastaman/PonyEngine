@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+import <array>;
 import <format>;
 import <numbers>;
 
@@ -311,6 +312,26 @@ namespace Math
 			Assert::AreEqual(y, quaternion.Y());
 			Assert::AreEqual(z, quaternion.Z());
 			Assert::AreEqual(w, quaternion.W());
+		}
+
+		TEST_METHOD(ToArrayTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
+			const std::array<float, 4> array = quaternion.ToArray();
+			Assert::AreEqual(x, array[0]);
+			Assert::AreEqual(y, array[1]);
+			Assert::AreEqual(z, array[2]);
+			Assert::AreEqual(w, array[3]);
+			float cArray[4];
+			quaternion.ToArray(cArray);
+			Assert::AreEqual(x, cArray[0]);
+			Assert::AreEqual(y, cArray[1]);
+			Assert::AreEqual(z, cArray[2]);
+			Assert::AreEqual(w, cArray[3]);
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -733,6 +754,9 @@ namespace Math
 			quaternion.Set(1.f, 6.f, 7.f, -1.f);
 			quaternion.Set(quaternion.Data());
 
+			float array[4];
+			quaternion.ToArray(array);
+
 			quaternion[0] *= 5.f;
 
 			movedQuaternion = quaternionC;
@@ -765,6 +789,8 @@ namespace Math
 
 			[[maybe_unused]] constexpr bool isIdentity = quaternion.IsIdentity();
 			[[maybe_unused]] constexpr bool isUnit = quaternion.IsUnit();
+
+			[[maybe_unused]] constexpr std::array<float, 4> array = quaternion.ToArray();
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
 			[[maybe_unused]] constexpr auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(quaternion);

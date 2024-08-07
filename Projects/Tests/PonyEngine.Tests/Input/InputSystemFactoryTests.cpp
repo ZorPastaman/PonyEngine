@@ -24,7 +24,7 @@ namespace Input
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -48,18 +48,18 @@ namespace Input
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual std::size_t GetFrameCount() const noexcept override
+			virtual std::size_t FrameCount() const noexcept override
 			{
 				return 0;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual float GetTargetFrameTime() const noexcept override
+			virtual float TargetFrameTime() const noexcept override
 			{
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float) noexcept override
+			virtual void TargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -94,31 +94,31 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& GetLogger() const noexcept override
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ITimeManager& GetTimeManager() const noexcept override
+			virtual PonyEngine::Core::ITimeManager& TimeManager() const noexcept override
 			{
 				return timeManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& GetSystemManager() const noexcept override
+			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
 			{
 				return systemManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsRunning() const noexcept override
+			virtual bool IsRunning() const noexcept override
 			{
 				return true;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual int GetExitCode() const noexcept override
+			virtual int ExitCode() const noexcept override
 			{
 				return 0;
 			}
@@ -128,7 +128,7 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -156,13 +156,13 @@ namespace Input
 		TEST_METHOD(GetSystemNameTest)
 		{
 			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystem", factory->GetSystemName());
+			Assert::AreEqual("PonyEngine::Input::InputSystem", factory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
 			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory->GetName());
+			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory->Name());
 		}
 	};
 }

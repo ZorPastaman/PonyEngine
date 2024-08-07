@@ -38,9 +38,9 @@ export namespace Game
 		~GameSystem() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsTickable() const noexcept override;
+		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -48,7 +48,7 @@ export namespace Game
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		GameSystem& operator =(const GameSystem&) = delete;
 		GameSystem& operator =(GameSystem&&) = delete;
@@ -78,22 +78,22 @@ namespace Game
 	{
 	}
 
-	PonyEngine::Core::ObjectInterfaces GameSystem::GetPublicInterfaces() noexcept
+	PonyEngine::Core::ObjectInterfaces GameSystem::PublicInterfaces() noexcept
 	{
 		auto interfaces = PonyEngine::Core::ObjectInterfaces();
-		interfaces.AddObjectInterfacesDeduced<IGameSystem>(*this);
+		interfaces.AddInterfacesDeduced<IGameSystem>(*this);
 
 		return interfaces;
 	}
 
-	bool GameSystem::GetIsTickable() const noexcept
+	bool GameSystem::IsTickable() const noexcept
 	{
 		return true;
 	}
 
 	void GameSystem::Begin()
 	{
-		if (const auto inputSystem = engine->GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = engine->SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Register inputs.");
 
@@ -102,9 +102,9 @@ namespace Game
 			constexpr auto upEvent = PonyEngine::Input::Event{.expectedMessage = upMessage};
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
-					window->SetTitle(L"Up");
+					window->Title(L"Up");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Up input registered.");
@@ -114,9 +114,9 @@ namespace Game
 			constexpr auto downEvent = PonyEngine::Input::Event{.expectedMessage = downMessage};
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
-					window->SetTitle(L"Down");
+					window->Title(L"Down");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Down input registered.");
@@ -126,9 +126,9 @@ namespace Game
 			constexpr auto rightEvent = PonyEngine::Input::Event{.expectedMessage = rightMessage};
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
-					window->SetTitle(L"Right");
+					window->Title(L"Right");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Right input registered.");
@@ -138,9 +138,9 @@ namespace Game
 			constexpr auto leftEvent = PonyEngine::Input::Event{.expectedMessage = leftMessage};
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->GetSystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
 				{
-					window->SetTitle(L"Left");
+					window->Title(L"Left");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Left input registered.");
@@ -161,7 +161,7 @@ namespace Game
 
 	void GameSystem::End()
 	{
-		if (PonyEngine::Input::IInputSystem* const inputSystem = engine->GetSystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
+		if (PonyEngine::Input::IInputSystem* const inputSystem = engine->SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
 			PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Unregister inputs.");
 
@@ -190,7 +190,7 @@ namespace Game
 		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Game tick.");
 	}
 
-	const char* GameSystem::GetName() const noexcept
+	const char* GameSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

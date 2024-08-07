@@ -87,12 +87,12 @@ export namespace PonyEngine::Core
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		Log::ILogger& GetLogger() const noexcept;
+		Log::ILogger& Logger() const noexcept;
 
 		/// @brief Gets the system factories.
 		/// @return System factories iterator.
 		[[nodiscard("Pure function")]]
-		SystemFactoriesIterator GetSystemFactories() const noexcept;
+		SystemFactoriesIterator SystemFactories() const noexcept;
 		/// @brief Adds the @p systemFactory.
 		/// @param systemFactory System factory to add. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
 		void AddSystemFactory(ISystemFactory& systemFactory);
@@ -144,12 +144,12 @@ namespace PonyEngine::Core
 	{
 	}
 
-	Log::ILogger& EngineParams::GetLogger() const noexcept
+	Log::ILogger& EngineParams::Logger() const noexcept
 	{
 		return *logger;
 	}
 
-	EngineParams::SystemFactoriesIterator EngineParams::GetSystemFactories() const noexcept
+	EngineParams::SystemFactoriesIterator EngineParams::SystemFactories() const noexcept
 	{
 		return SystemFactoriesIterator(systemFactories.cbegin(), systemFactories.cend());
 	}

@@ -36,7 +36,7 @@ namespace Log
 		TEST_METHOD(GetNameTest)
 		{
 			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
-			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger->GetName());
+			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger->Name());
 			fileSubLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}

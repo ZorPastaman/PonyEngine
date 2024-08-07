@@ -33,7 +33,7 @@ export namespace PonyEngine::Log
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
@@ -48,7 +48,7 @@ namespace PonyEngine::Log
 	{
 		try
 		{
-			ChooseConsoleStream(logEntry.GetLogType()) << logEntry;
+			ChooseConsoleStream(logEntry.LogType()) << logEntry;
 		}
 		catch (const std::exception& e)
 		{
@@ -56,7 +56,7 @@ namespace PonyEngine::Log
 		}
 	}
 
-	const char* ConsoleSubLogger::GetName() const noexcept
+	const char* ConsoleSubLogger::Name() const noexcept
 	{
 		return StaticName;
 	}

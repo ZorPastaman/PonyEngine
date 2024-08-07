@@ -169,6 +169,14 @@ export namespace PonyEngine::Math
 		/// @param componentsToSet Component array. Its length must be at least 4.
 		constexpr void Set(const T* componentsToSet) noexcept;
 
+		/// @brief Converts the quaternion to an array.
+		/// @return Quaternion array.
+		[[nodiscard("Pure function")]]
+		constexpr std::array<T, 4> ToArray() const noexcept;
+		/// @brief Converts the quaternion to a c-style array.
+		/// @param array Target array.
+		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
@@ -479,6 +487,18 @@ namespace PonyEngine::Math
 	constexpr void Quaternion<T>::Set(const T* const componentsToSet) noexcept
 	{
 		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
+	}
+
+	template<std::floating_point T>
+	constexpr std::array<T, 4> Quaternion<T>::ToArray() const noexcept
+	{
+		return components;
+	}
+
+	template<std::floating_point T>
+	constexpr void Quaternion<T>::ToArray(T (& array)[ComponentCount]) const noexcept
+	{
+		std::ranges::copy(components, array);
 	}
 
 	template<std::floating_point T>

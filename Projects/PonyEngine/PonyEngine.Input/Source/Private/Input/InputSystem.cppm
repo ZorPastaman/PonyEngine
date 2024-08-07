@@ -40,9 +40,9 @@ export namespace PonyEngine::Input
 		~InputSystem() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsTickable() const noexcept override;
+		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -56,7 +56,7 @@ export namespace PonyEngine::Input
 		virtual void Observe(const KeyboardMessage& keyboardMessage) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
@@ -81,24 +81,24 @@ namespace PonyEngine::Input
 	{
 	}
 
-	Core::ObjectInterfaces InputSystem::GetPublicInterfaces() noexcept
+	Core::ObjectInterfaces InputSystem::PublicInterfaces() noexcept
 	{
 		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddObjectInterfacesDeduced<IInputSystem>(*this);
+		interfaces.AddInterfacesDeduced<IInputSystem>(*this);
 
 		return interfaces;
 	}
 
-	bool InputSystem::GetIsTickable() const noexcept
+	bool InputSystem::IsTickable() const noexcept
 	{
 		return true;
 	}
 
 	void InputSystem::Begin()
 	{
-		if (IKeyboardProvider* const keyboardProvider = engine->GetSystemManager().FindSystem<IKeyboardProvider>())
+		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>())
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->GetName());
+			PONY_LOG(engine, Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->AddKeyboardObserver(this);
 			PONY_LOG(engine, Log::LogType::Info, "Subscribed to keyboard provider.");
 		}
@@ -110,9 +110,9 @@ namespace PonyEngine::Input
 
 	void InputSystem::End()
 	{
-		if (IKeyboardProvider* const keyboardProvider = engine->GetSystemManager().FindSystem<IKeyboardProvider>())
+		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>())
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->GetName());
+			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->RemoveKeyboardObserver(this);
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribed to keyboard provider.");
 		}
@@ -169,7 +169,7 @@ namespace PonyEngine::Input
 		queue.push(KeyboardMessage{.keyCode = keyboardMessage.keyCode, .isDown = keyboardMessage.isDown});
 	}
 
-	const char* InputSystem::GetName() const noexcept
+	const char* InputSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

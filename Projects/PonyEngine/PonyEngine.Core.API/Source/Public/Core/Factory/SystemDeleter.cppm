@@ -33,7 +33,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system destroyer.
 		/// @return System destroyer.
 		[[nodiscard("Pure function")]]
-		ISystemDestroyer& GetSystemDestroyer() const noexcept;
+		ISystemDestroyer& SystemDestroyer() const noexcept;
 
 		/// @brief Deletes the @p system.
 		/// @param system System to delete.
@@ -54,7 +54,7 @@ namespace PonyEngine::Core
 	{
 	}
 
-	ISystemDestroyer& SystemDeleter::GetSystemDestroyer() const noexcept
+	ISystemDestroyer& SystemDeleter::SystemDestroyer() const noexcept
 	{
 		return *destroyer;
 	}

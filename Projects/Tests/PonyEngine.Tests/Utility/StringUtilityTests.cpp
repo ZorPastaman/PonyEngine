@@ -23,7 +23,7 @@ namespace Utility
 	{
 		struct ExceptionHandler final
 		{
-			void operator ()(const std::exception& e) const noexcept
+			void operator ()(const std::exception&) const noexcept
 			{
 			}
 		};

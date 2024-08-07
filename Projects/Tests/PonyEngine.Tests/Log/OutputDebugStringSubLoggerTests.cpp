@@ -26,7 +26,7 @@ namespace Log
 		TEST_METHOD(GetNameTest)
 		{
 			const PonyEngine::Log::OutputDebugStringSubLoggerUniquePtr outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
-			Assert::AreEqual("PonyEngine::Log::OutputDebugStringSubLogger", outputDebugStringSubLogger->GetName());
+			Assert::AreEqual("PonyEngine::Log::OutputDebugStringSubLogger", outputDebugStringSubLogger->Name());
 		}
 
 		// Skip log test 'cause it's too complicated to do it here. And manual tests of it are easy.

@@ -670,7 +670,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> rsMatrix;
 		for (std::size_t i = 0; i < Matrix3x3<T>::Dimension; ++i)
 		{
-			rsMatrix.SetColumn(i, rotationMatrix.GetColumn(i) * scaling[i]);
+			rsMatrix.Column(i, rotationMatrix.Column(i) * scaling[i]);
 		}
 
 		return rsMatrix;
@@ -767,7 +767,7 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0; i < Matrix3x3<T>::Dimension; ++i)
 		{
 			const T inverseScaling = T{1} / scaling[i];
-			rotationMatrix.SetColumn(i, rsMatrix.GetColumn(i) * inverseScaling);
+			rotationMatrix.Column(i, rsMatrix.Column(i) * inverseScaling);
 		}
 
 		return rotationMatrix;
@@ -809,7 +809,7 @@ namespace PonyEngine::Math
 		Vector3<T> scaling;
 		for (std::size_t i = 0; i < Matrix3x3<T>::Dimension; ++i)
 		{
-			scaling[i] = rsMatrix.GetColumn(i).Magnitude();
+			scaling[i] = rsMatrix.Column(i).Magnitude();
 		}
 
 		return scaling;

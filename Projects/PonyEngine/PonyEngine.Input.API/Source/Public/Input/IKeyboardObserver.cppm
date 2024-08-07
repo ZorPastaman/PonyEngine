@@ -27,7 +27,7 @@ export namespace PonyEngine::Input
 		/// @brief Gets the observer name.
 		/// @return Observer name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		IKeyboardObserver& operator =(const IKeyboardObserver&) = delete;
 		IKeyboardObserver& operator =(IKeyboardObserver&&) = delete;
