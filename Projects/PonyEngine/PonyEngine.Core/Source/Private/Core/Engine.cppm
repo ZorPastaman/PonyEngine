@@ -40,22 +40,22 @@ export namespace PonyEngine::Core
 		~Engine() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& GetLogger() const noexcept override;
+		virtual Log::ILogger& Logger() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual ITimeManager& GetTimeManager() const noexcept override;
+		virtual ITimeManager& TimeManager() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& GetSystemManager() const noexcept override;
+		virtual ISystemManager& SystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsRunning() const noexcept override;
+		virtual bool IsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual int GetExitCode() const noexcept override;
+		virtual int ExitCode() const noexcept override;
 		virtual void Stop(int exitCode = 0) noexcept override;
 
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
@@ -65,8 +65,8 @@ export namespace PonyEngine::Core
 	private:
 		Log::ILogger* const logger; ///< Logger.
 
-		std::unique_ptr<TimeManager> timeManager; ///< Time manager.
-		std::unique_ptr<SystemManager> systemManager; ///< System manager.
+		std::unique_ptr<Core::TimeManager> timeManager; ///< Time manager.
+		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
 
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
@@ -76,15 +76,15 @@ export namespace PonyEngine::Core
 namespace PonyEngine::Core
 {
 	Engine::Engine(const EngineParams& params) :
-		logger{&params.GetLogger()},
+		logger{&params.Logger()},
 		isRunning{true}
 	{
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create time manager");
-		timeManager.reset(new TimeManager(*this));
+		timeManager.reset(new Core::TimeManager(*this));
 		PONY_LOG(this, Log::LogType::Info, "Time manager created.");
 
 		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
-		systemManager.reset(new SystemManager(params, *this));
+		systemManager.reset(new Core::SystemManager(params, *this));
 		PONY_LOG(this, Log::LogType::Info, "System manager created.");
 
 		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
@@ -107,27 +107,27 @@ namespace PonyEngine::Core
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Time manager destroyed.");
 	}
 
-	Log::ILogger& Engine::GetLogger() const noexcept
+	Log::ILogger& Engine::Logger() const noexcept
 	{
 		return *logger;
 	}
 
-	ITimeManager& Engine::GetTimeManager() const noexcept
+	ITimeManager& Engine::TimeManager() const noexcept
 	{
 		return *timeManager;
 	}
 
-	ISystemManager& Engine::GetSystemManager() const noexcept
+	ISystemManager& Engine::SystemManager() const noexcept
 	{
 		return *systemManager;
 	}
 
-	bool Engine::GetIsRunning() const noexcept
+	bool Engine::IsRunning() const noexcept
 	{
 		return isRunning;
 	}
 
-	int Engine::GetExitCode() const noexcept
+	int Engine::ExitCode() const noexcept
 	{
 		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get the exit code when the engine is still running.");
 
@@ -161,7 +161,7 @@ namespace PonyEngine::Core
 		systemManager->Tick();
 	}
 
-	const char* Engine::GetName() const noexcept
+	const char* Engine::Name() const noexcept
 	{
 		return StaticName;
 	}

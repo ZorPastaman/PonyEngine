@@ -28,9 +28,9 @@ export namespace PonyEngine::Render
 		~WindowsDirect3D12RenderSystem() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces GetPublicInterfaces() noexcept override;
+		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsTickable() const noexcept override;
+		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -38,7 +38,7 @@ export namespace PonyEngine::Render
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem& operator =(WindowsDirect3D12RenderSystem&&) = delete;
@@ -57,15 +57,15 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Core::ObjectInterfaces WindowsDirect3D12RenderSystem::GetPublicInterfaces() noexcept
+	Core::ObjectInterfaces WindowsDirect3D12RenderSystem::PublicInterfaces() noexcept
 	{
 		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddObjectInterfacesDeduced<IRenderSystem>(*this);
+		interfaces.AddInterfacesDeduced<IRenderSystem>(*this);
 
 		return interfaces;
 	}
 
-	bool WindowsDirect3D12RenderSystem::GetIsTickable() const noexcept
+	bool WindowsDirect3D12RenderSystem::IsTickable() const noexcept
 	{
 		return true;
 	}
@@ -82,7 +82,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	const char* WindowsDirect3D12RenderSystem::GetName() const noexcept
+	const char* WindowsDirect3D12RenderSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

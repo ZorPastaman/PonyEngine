@@ -23,11 +23,11 @@ export namespace PonyEngine::Core
 		/// @brief Gets public system interfaces.
 		/// @return Public system interfaces.
 		[[nodiscard("Pure function")]]
-		virtual ObjectInterfaces GetPublicInterfaces() noexcept = 0;
+		virtual ObjectInterfaces PublicInterfaces() noexcept = 0;
 		/// @brief Gets if the system is tickable.
 		/// @return @a True if it's tickable; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsTickable() const noexcept = 0;
+		virtual bool IsTickable() const noexcept = 0;
 
 		/// @brief Begins the system.
 		/// @details The system takes its dependencies in this function.
@@ -42,7 +42,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system name.
 		/// @return System name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		ISystem& operator =(const ISystem&) = delete;
 		ISystem& operator =(ISystem&&) = delete;

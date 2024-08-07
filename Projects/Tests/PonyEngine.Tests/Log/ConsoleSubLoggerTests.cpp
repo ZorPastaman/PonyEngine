@@ -31,7 +31,7 @@ namespace Log
 		TEST_METHOD(GetNameTest)
 		{
 			const PonyEngine::Log::ConsoleSubLoggerUniquePtr consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
-			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger->GetName());
+			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger->Name());
 		}
 
 		TEST_METHOD(LogTest)

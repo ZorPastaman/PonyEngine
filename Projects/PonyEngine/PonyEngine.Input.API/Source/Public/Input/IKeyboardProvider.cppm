@@ -30,7 +30,7 @@ export namespace PonyEngine::Input
 		/// @brief Gets the provider name.
 		/// @return Provider name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		IKeyboardProvider& operator =(const IKeyboardProvider&) = delete;
 		IKeyboardProvider& operator =(IKeyboardProvider&&) = delete;

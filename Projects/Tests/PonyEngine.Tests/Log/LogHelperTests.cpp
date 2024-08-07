@@ -30,7 +30,7 @@ namespace Log
 		PonyEngine::Log::LogType lastLogType;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override
+		virtual const char* Name() const noexcept override
 		{
 			return "";
 		}

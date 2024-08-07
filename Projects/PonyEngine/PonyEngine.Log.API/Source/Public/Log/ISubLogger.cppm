@@ -27,7 +27,7 @@ export namespace PonyEngine::Log
 		/// @brief Gets the sub-logger name.
 		/// @return Sub-logger name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		ISubLogger& operator =(const ISubLogger&) = delete;
 		ISubLogger& operator =(ISubLogger&&) = delete;

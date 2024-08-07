@@ -23,7 +23,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -40,13 +40,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
 			{
 				return PonyEngine::Core::ObjectInterfaces();
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsTickable() const noexcept override
+			virtual bool IsTickable() const noexcept override
 			{
 				return false;
 			}
@@ -71,13 +71,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetSystemName() const noexcept override
+			virtual const char* SystemName() const noexcept override
 			{
 				return "";
 			}
@@ -87,13 +87,13 @@ namespace Core
 		{
 			auto factory = EmptySystemFactory();
 			auto deleter = PonyEngine::Core::SystemDeleter(factory);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&deleter.GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&deleter.SystemDestroyer()));
 
 			const auto copiedDeleter = deleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&copiedDeleter.GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&copiedDeleter.SystemDestroyer()));
 
 			const auto movedDeleter = std::move(deleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedDeleter.GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedDeleter.SystemDestroyer()));
 		}
 
 		TEST_METHOD(DeleteTest)
@@ -113,10 +113,10 @@ namespace Core
 			auto otherDeleter = PonyEngine::Core::SystemDeleter(otherFactory);
 
 			otherDeleter = deleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.SystemDestroyer()));
 
 			otherDeleter = std::move(deleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.GetSystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.SystemDestroyer()));
 		}
 	};
 }

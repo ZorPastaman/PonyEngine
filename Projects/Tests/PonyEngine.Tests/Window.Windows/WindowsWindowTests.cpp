@@ -26,7 +26,7 @@ namespace Window
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -50,18 +50,18 @@ namespace Window
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual std::size_t GetFrameCount() const noexcept override
+			virtual std::size_t FrameCount() const noexcept override
 			{
 				return 0;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual float GetTargetFrameTime() const noexcept override
+			virtual float TargetFrameTime() const noexcept override
 			{
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float) noexcept override
+			virtual void TargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -91,31 +91,31 @@ namespace Window
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& GetLogger() const noexcept override
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ITimeManager& GetTimeManager() const noexcept override
+			virtual PonyEngine::Core::ITimeManager& TimeManager() const noexcept override
 			{
 				return timeManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& GetSystemManager() const noexcept override
+			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
 			{
 				return systemManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsRunning() const noexcept override
+			virtual bool IsRunning() const noexcept override
 			{
 				return true;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual int GetExitCode() const noexcept override
+			virtual int ExitCode() const noexcept override
 			{
 				return 0;
 			}
@@ -126,7 +126,7 @@ namespace Window
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -147,7 +147,7 @@ namespace Window
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -161,9 +161,9 @@ namespace Window
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			auto window = factory->Create(engine);
-			auto interfaces = window->GetPublicInterfaces();
+			auto interfaces = window->PublicInterfaces();
 
-			auto it = interfaces.GetObjectInterfaces();
+			auto it = interfaces.Interfaces();
 			auto windowInterface = *it;
 			Assert::IsTrue(windowInterface.first.get() == typeid(PonyEngine::Window::IWindow));
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindow*>(window.get())), reinterpret_cast<std::uintptr_t>(windowInterface.second));
@@ -187,7 +187,7 @@ namespace Window
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			auto window = factory->Create(engine);
-			Assert::IsTrue(window->GetIsTickable());
+			Assert::IsTrue(window->IsTickable());
 		}
 
 		TEST_METHOD(GetSetTitleTest)
@@ -200,11 +200,11 @@ namespace Window
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
 			const wchar_t* title = L"Test title";
-			windowsWindow->SetTitle(title);
+			windowsWindow->Title(title);
 			wchar_t gotTitle[64];
-			GetWindowTextW(windowsWindow->GetWindowHandle(), gotTitle, 64);
+			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
 			Assert::AreEqual(title, gotTitle);
-			Assert::AreEqual(title, windowsWindow->GetTitle());
+			Assert::AreEqual(title, windowsWindow->Title());
 		}
 
 		TEST_METHOD(GetNameTest)
@@ -216,7 +216,7 @@ namespace Window
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			Assert::AreEqual("PonyEngine::Window::WindowsWindow", windowsWindow->GetName());
+			Assert::AreEqual("PonyEngine::Window::WindowsWindow", windowsWindow->Name());
 		}
 
 		TEST_METHOD(ShowHideWindowTest)
@@ -229,10 +229,10 @@ namespace Window
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
 			windowsWindow->ShowWindow();
-			Assert::IsTrue(IsWindowVisible(windowsWindow->GetWindowHandle()));
+			Assert::IsTrue(IsWindowVisible(windowsWindow->WindowHandle()));
 			Assert::IsTrue(windowsWindow->IsVisible());
 			windowsWindow->HideWindow();
-			Assert::IsFalse(IsWindowVisible(windowsWindow->GetWindowHandle()));
+			Assert::IsFalse(IsWindowVisible(windowsWindow->WindowHandle()));
 			Assert::IsFalse(windowsWindow->IsVisible());
 		}
 
@@ -247,7 +247,7 @@ namespace Window
 			factory->NextWindowParams().title = title;
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			Assert::AreEqual(title.c_str(), windowsWindow->GetTitle());
+			Assert::AreEqual(title.c_str(), windowsWindow->Title());
 		}
 
 		TEST_METHOD(WindowRectTest)
@@ -265,7 +265,7 @@ namespace Window
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
 			RECT rect;
-			GetWindowRect(windowsWindow->GetWindowHandle(), &rect);
+			GetWindowRect(windowsWindow->WindowHandle(), &rect);
 			Assert::AreEqual(64L, rect.left);
 			Assert::AreEqual(32L, rect.top);
 			Assert::AreEqual(64L + 320L, rect.right);
@@ -281,7 +281,7 @@ namespace Window
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			auto window = factory->Create(engine);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_DESTROY, 0, 0);
+			PostMessageW(windowsWindow->WindowHandle(), WM_DESTROY, 0, 0);
 			window->Tick();
 			Assert::AreEqual(0, engine.stopCode);
 		}
@@ -298,16 +298,16 @@ namespace Window
 			auto keyboardObserver = KeyboardObserver();
 			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.get());
 			keyboardProvider->AddKeyboardObserver(&keyboardObserver);
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
+			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::T, .isDown = true});
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
+			PostMessageW(windowsWindow->WindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = false});
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
+			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftAlt, .isDown = true});
-			PostMessageW(windowsWindow->GetWindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
+			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
 			window->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
 		}

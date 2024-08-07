@@ -26,7 +26,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override { return ""; }
+			virtual const char* Name() const noexcept override { return ""; }
 
 			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override { }
 			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override { }
@@ -43,7 +43,7 @@ namespace Core
 			bool ticked = false;
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override { return ""; }
+			virtual const char* Name() const noexcept override { return ""; }
 
 			virtual void Begin() override
 			{
@@ -64,16 +64,16 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
 			{
 				auto interfaces = PonyEngine::Core::ObjectInterfaces();
-				interfaces.AddObjectInterfacesDeduced<EmptySystem>(*this);
+				interfaces.AddInterfacesDeduced<EmptySystem>(*this);
 
 				return interfaces;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsTickable() const noexcept override
+			virtual bool IsTickable() const noexcept override
 			{
 				return true;
 			}
@@ -83,7 +83,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -100,16 +100,16 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
 			{
 				auto interfaces = PonyEngine::Core::ObjectInterfaces();
-				interfaces.AddObjectInterfacesDeduced<EmptySystem1Base>(*this);
+				interfaces.AddInterfacesDeduced<EmptySystem1Base>(*this);
 
 				return interfaces;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsTickable() const noexcept override
+			virtual bool IsTickable() const noexcept override
 			{
 				return true;
 			}
@@ -140,13 +140,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetSystemName() const noexcept override
+			virtual const char* SystemName() const noexcept override
 			{
 				return "";
 			}
@@ -172,13 +172,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetSystemName() const noexcept override
+			virtual const char* SystemName() const noexcept override
 			{
 				return "";
 			}
@@ -197,7 +197,7 @@ namespace Core
 			EmptyLogger logger;
 			const auto params = PonyEngine::Core::EngineParams(logger);
 			const auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->GetLogger())));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->Logger())));
 		}
 
 		TEST_METHOD(ExitTest)
@@ -205,14 +205,14 @@ namespace Core
 			EmptyLogger logger;
 			const auto params = PonyEngine::Core::EngineParams(logger);
 			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsTrue(engine->GetIsRunning());
+			Assert::IsTrue(engine->IsRunning());
 			engine->Stop();
-			Assert::IsFalse(engine->GetIsRunning());
-			Assert::AreEqual(0, engine->GetExitCode());
+			Assert::IsFalse(engine->IsRunning());
+			Assert::AreEqual(0, engine->ExitCode());
 			engine.reset();
 			engine = PonyEngine::Core::CreateEngine(params);
 			engine->Stop(100);
-			Assert::AreEqual(100, engine->GetExitCode());
+			Assert::AreEqual(100, engine->ExitCode());
 		}
 
 		TEST_METHOD(SystemTickTest)
@@ -246,7 +246,7 @@ namespace Core
 			EmptyLogger logger;
 			const auto params = PonyEngine::Core::EngineParams(logger);
 			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual("PonyEngine::Core::Engine", engine->GetName());
+			Assert::AreEqual("PonyEngine::Core::Engine", engine->Name());
 		}
 
 		TEST_METHOD(FindSystemTest)
@@ -259,17 +259,17 @@ namespace Core
 			params.AddSystemFactory(system1Factory);
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem(typeid(EmptySystem))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem<EmptySystem>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem(typeid(EmptySystem))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem<EmptySystem>()));
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem(typeid(EmptySystem1Base))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->GetSystemManager().FindSystem<EmptySystem1Base>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem(typeid(EmptySystem1Base))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem<EmptySystem1Base>()));
 
-			Assert::IsNull(engine->GetSystemManager().FindSystem(typeid(EmptySystem1)));
-			Assert::IsNull(engine->GetSystemManager().FindSystem<EmptySystem1>());
+			Assert::IsNull(engine->SystemManager().FindSystem(typeid(EmptySystem1)));
+			Assert::IsNull(engine->SystemManager().FindSystem<EmptySystem1>());
 
-			Assert::IsNull(engine->GetSystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
-			Assert::IsNull(engine->GetSystemManager().FindSystem<PonyEngine::Core::ISystem>());
+			Assert::IsNull(engine->SystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
+			Assert::IsNull(engine->SystemManager().FindSystem<PonyEngine::Core::ISystem>());
 		}
 
 		TEST_METHOD(GetFrameCountTest)
@@ -280,9 +280,9 @@ namespace Core
 
 			for (std::size_t i = 0; i < 10; ++i)
 			{
-				Assert::AreEqual(i, engine->GetTimeManager().GetFrameCount());
+				Assert::AreEqual(i, engine->TimeManager().FrameCount());
 				engine->Tick();
-				Assert::AreEqual(i + 1, engine->GetTimeManager().GetFrameCount());
+				Assert::AreEqual(i + 1, engine->TimeManager().FrameCount());
 			}
 		}
 
@@ -292,24 +292,24 @@ namespace Core
 			const auto params = PonyEngine::Core::EngineParams(logger);
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
 
-			engine->GetTimeManager().SetTargetFrameTime(0.16f);
-			Assert::AreEqual(0.16f, engine->GetTimeManager().GetTargetFrameTime());
-			Assert::AreEqual(1.f / 0.16f, engine->GetTimeManager().GetTargetFrameRate());
+			engine->TimeManager().TargetFrameTime(0.16f);
+			Assert::AreEqual(0.16f, engine->TimeManager().TargetFrameTime());
+			Assert::AreEqual(1.f / 0.16f, engine->TimeManager().TargetFrameRate());
 
-			engine->GetTimeManager().SetTargetFrameTime(0.f);
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+			engine->TimeManager().TargetFrameTime(0.f);
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
 
-			engine->GetTimeManager().SetTargetFrameRate(90.f);
-			Assert::AreEqual(1.f / 90.f, engine->GetTimeManager().GetTargetFrameTime());
-			Assert::AreEqual(90.f, engine->GetTimeManager().GetTargetFrameRate());
+			engine->TimeManager().TargetFrameRate(90.f);
+			Assert::AreEqual(1.f / 90.f, engine->TimeManager().TargetFrameTime());
+			Assert::AreEqual(90.f, engine->TimeManager().TargetFrameRate());
 
-			engine->GetTimeManager().SetTargetFrameRate(0.f);
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameTime());
-			Assert::AreEqual(0.f, engine->GetTimeManager().GetTargetFrameRate());
+			engine->TimeManager().TargetFrameRate(0.f);
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
+			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
 		}
 	};
 } 

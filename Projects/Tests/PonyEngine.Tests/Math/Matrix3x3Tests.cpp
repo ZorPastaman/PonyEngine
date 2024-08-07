@@ -790,9 +790,9 @@ namespace Math
 			constexpr short m12 = 7;
 			constexpr short m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto row0 = matrix.GetRow(0);
-			const auto row1 = matrix.GetRow(1);
-			const auto row2 = matrix.GetRow(2);
+			const auto row0 = matrix.Row(0);
+			const auto row1 = matrix.Row(1);
+			const auto row2 = matrix.Row(2);
 			Assert::AreEqual(m00, row0.X());
 			Assert::AreEqual(m01, row0.Y());
 			Assert::AreEqual(m02, row0.Z());
@@ -816,9 +816,9 @@ namespace Math
 			constexpr float m12 = 7;
 			constexpr float m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto row0 = matrix.GetRow(0);
-			const auto row1 = matrix.GetRow(1);
-			const auto row2 = matrix.GetRow(2);
+			const auto row0 = matrix.Row(0);
+			const auto row1 = matrix.Row(1);
+			const auto row2 = matrix.Row(2);
 			Assert::AreEqual(m00, row0.X());
 			Assert::AreEqual(m01, row0.Y());
 			Assert::AreEqual(m02, row0.Z());
@@ -845,9 +845,9 @@ namespace Math
 			constexpr auto row0 = PonyEngine::Math::Vector3<short>(m00, m01, m02);
 			constexpr auto row1 = PonyEngine::Math::Vector3<short>(m10, m11, m12);
 			constexpr auto row2 = PonyEngine::Math::Vector3<short>(m20, m21, m22);
-			matrix.SetRow(0, row0);
-			matrix.SetRow(1, row1);
-			matrix.SetRow(2, row2);
+			matrix.Row(0, row0);
+			matrix.Row(1, row1);
+			matrix.Row(2, row2);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -874,9 +874,9 @@ namespace Math
 			constexpr auto row0 = PonyEngine::Math::Vector3<float>(m00, m01, m02);
 			constexpr auto row1 = PonyEngine::Math::Vector3<float>(m10, m11, m12);
 			constexpr auto row2 = PonyEngine::Math::Vector3<float>(m20, m21, m22);
-			matrix.SetRow(0, row0);
-			matrix.SetRow(1, row1);
-			matrix.SetRow(2, row2);
+			matrix.Row(0, row0);
+			matrix.Row(1, row1);
+			matrix.Row(2, row2);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -900,9 +900,9 @@ namespace Math
 			constexpr short m12 = 7;
 			constexpr short m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto column0 = matrix.GetColumn(0);
-			const auto column1 = matrix.GetColumn(1);
-			const auto column2 = matrix.GetColumn(2);
+			const auto column0 = matrix.Column(0);
+			const auto column1 = matrix.Column(1);
+			const auto column2 = matrix.Column(2);
 			Assert::AreEqual(m00, column0.X());
 			Assert::AreEqual(m10, column0.Y());
 			Assert::AreEqual(m20, column0.Z());
@@ -926,9 +926,9 @@ namespace Math
 			constexpr float m12 = 7;
 			constexpr float m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto column0 = matrix.GetColumn(0);
-			const auto column1 = matrix.GetColumn(1);
-			const auto column2 = matrix.GetColumn(2);
+			const auto column0 = matrix.Column(0);
+			const auto column1 = matrix.Column(1);
+			const auto column2 = matrix.Column(2);
 			Assert::AreEqual(m00, column0.X());
 			Assert::AreEqual(m10, column0.Y());
 			Assert::AreEqual(m20, column0.Z());
@@ -955,9 +955,9 @@ namespace Math
 			constexpr auto column0 = PonyEngine::Math::Vector3<short>(m00, m10, m20);
 			constexpr auto column1 = PonyEngine::Math::Vector3<short>(m01, m11, m21);
 			constexpr auto column2 = PonyEngine::Math::Vector3<short>(m02, m12, m22);
-			matrix.SetColumn(0, column0);
-			matrix.SetColumn(1, column1);
-			matrix.SetColumn(2, column2);
+			matrix.Column(0, column0);
+			matrix.Column(1, column1);
+			matrix.Column(2, column2);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -984,9 +984,9 @@ namespace Math
 			constexpr auto column0 = PonyEngine::Math::Vector3<float>(m00, m10, m20);
 			constexpr auto column1 = PonyEngine::Math::Vector3<float>(m01, m11, m21);
 			constexpr auto column2 = PonyEngine::Math::Vector3<float>(m02, m12, m22);
-			matrix.SetColumn(0, column0);
-			matrix.SetColumn(1, column1);
-			matrix.SetColumn(2, column2);
+			matrix.Column(0, column0);
+			matrix.Column(1, column1);
+			matrix.Column(2, column2);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -1010,7 +1010,7 @@ namespace Math
 			constexpr short m12 = 7;
 			constexpr short m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto diagonal = matrix.GetDiagonal();
+			const auto diagonal = matrix.Diagonal();
 			Assert::AreEqual(m00, diagonal.X());
 			Assert::AreEqual(m11, diagonal.Y());
 			Assert::AreEqual(m22, diagonal.Z());
@@ -1028,7 +1028,7 @@ namespace Math
 			constexpr float m12 = 7;
 			constexpr float m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto diagonal = matrix.GetDiagonal();
+			const auto diagonal = matrix.Diagonal();
 			Assert::AreEqual(m00, diagonal.X());
 			Assert::AreEqual(m11, diagonal.Y());
 			Assert::AreEqual(m22, diagonal.Z());
@@ -1041,7 +1041,7 @@ namespace Math
 			constexpr short m22 = 19;
 			auto matrix = PonyEngine::Math::Matrix3x3<short>();
 			constexpr auto diagonal = PonyEngine::Math::Vector3<short>(m00, m11, m22);
-			matrix.SetDiagonal(diagonal);
+			matrix.Diagonal(diagonal);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(short{}, matrix.M10());
 			Assert::AreEqual(short{}, matrix.M20());
@@ -1060,7 +1060,7 @@ namespace Math
 			constexpr float m22 = 19;
 			auto matrix = PonyEngine::Math::Matrix3x3<float>();
 			constexpr auto diagonal = PonyEngine::Math::Vector3<float>(m00, m11, m22);
-			matrix.SetDiagonal(diagonal);
+			matrix.Diagonal(diagonal);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(float{}, matrix.M10());
 			Assert::AreEqual(float{}, matrix.M20());
@@ -1084,7 +1084,7 @@ namespace Math
 			constexpr short m12 = 7;
 			constexpr short m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto counterDiagonal = matrix.GetCounterDiagonal();
+			const auto counterDiagonal = matrix.CounterDiagonal();
 			Assert::AreEqual(m02, counterDiagonal.X());
 			Assert::AreEqual(m11, counterDiagonal.Y());
 			Assert::AreEqual(m20, counterDiagonal.Z());
@@ -1102,7 +1102,7 @@ namespace Math
 			constexpr float m12 = 7;
 			constexpr float m22 = 19;
 			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const auto counterDiagonal = matrix.GetCounterDiagonal();
+			const auto counterDiagonal = matrix.CounterDiagonal();
 			Assert::AreEqual(m02, counterDiagonal.X());
 			Assert::AreEqual(m11, counterDiagonal.Y());
 			Assert::AreEqual(m20, counterDiagonal.Z());
@@ -1115,7 +1115,7 @@ namespace Math
 			constexpr short m20 = 19;
 			auto matrix = PonyEngine::Math::Matrix3x3<short>();
 			constexpr auto counterDiagonal = PonyEngine::Math::Vector3<short>(m02, m11, m20);
-			matrix.SetCounterDiagonal(counterDiagonal);
+			matrix.CounterDiagonal(counterDiagonal);
 			Assert::AreEqual(short{}, matrix.M00());
 			Assert::AreEqual(short{}, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -1134,7 +1134,7 @@ namespace Math
 			constexpr float m20 = 19;
 			auto matrix = PonyEngine::Math::Matrix3x3<float>();
 			constexpr auto counterDiagonal = PonyEngine::Math::Vector3<float>(m02, m11, m20);
-			matrix.SetCounterDiagonal(counterDiagonal);
+			matrix.CounterDiagonal(counterDiagonal);
 			Assert::AreEqual(float{}, matrix.M00());
 			Assert::AreEqual(float{}, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -1665,6 +1665,76 @@ namespace Math
 			Assert::AreEqual(m02 * m02S, matrix.M02());
 			Assert::AreEqual(m12 * m12S, matrix.M12());
 			Assert::AreEqual(m22 * m22S, matrix.M22());
+		}
+
+		TEST_METHOD(ToArrayShortTest)
+		{
+			constexpr short m00 = 11;
+			constexpr short m10 = 5;
+			constexpr short m20 = 3;
+			constexpr short m01 = 5;
+			constexpr short m11 = 2;
+			constexpr short m21 = 3;
+			constexpr short m02 = 6;
+			constexpr short m12 = 7;
+			constexpr short m22 = 9;
+			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
+			const std::array<short, 9> array = matrix.ToArray();
+			Assert::AreEqual(m00, array[0]);
+			Assert::AreEqual(m10, array[1]);
+			Assert::AreEqual(m20, array[2]);
+			Assert::AreEqual(m01, array[3]);
+			Assert::AreEqual(m11, array[4]);
+			Assert::AreEqual(m21, array[5]);
+			Assert::AreEqual(m02, array[6]);
+			Assert::AreEqual(m12, array[7]);
+			Assert::AreEqual(m22, array[8]);
+			short cArray[9];
+			matrix.ToArray(cArray);
+			Assert::AreEqual(m00, cArray[0]);
+			Assert::AreEqual(m10, cArray[1]);
+			Assert::AreEqual(m20, cArray[2]);
+			Assert::AreEqual(m01, cArray[3]);
+			Assert::AreEqual(m11, cArray[4]);
+			Assert::AreEqual(m21, cArray[5]);
+			Assert::AreEqual(m02, cArray[6]);
+			Assert::AreEqual(m12, cArray[7]);
+			Assert::AreEqual(m22, cArray[8]);
+		}
+
+		TEST_METHOD(ToArrayFloatTest)
+		{
+			constexpr float m00 = 11;
+			constexpr float m10 = 5;
+			constexpr float m20 = 3;
+			constexpr float m01 = 5;
+			constexpr float m11 = 2;
+			constexpr float m21 = 3;
+			constexpr float m02 = 6;
+			constexpr float m12 = 7;
+			constexpr float m22 = 9;
+			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
+			const std::array<float, 9> array = matrix.ToArray();
+			Assert::AreEqual(m00, array[0]);
+			Assert::AreEqual(m10, array[1]);
+			Assert::AreEqual(m20, array[2]);
+			Assert::AreEqual(m01, array[3]);
+			Assert::AreEqual(m11, array[4]);
+			Assert::AreEqual(m21, array[5]);
+			Assert::AreEqual(m02, array[6]);
+			Assert::AreEqual(m12, array[7]);
+			Assert::AreEqual(m22, array[8]);
+			float cArray[9];
+			matrix.ToArray(cArray);
+			Assert::AreEqual(m00, cArray[0]);
+			Assert::AreEqual(m10, cArray[1]);
+			Assert::AreEqual(m20, cArray[2]);
+			Assert::AreEqual(m01, cArray[3]);
+			Assert::AreEqual(m11, cArray[4]);
+			Assert::AreEqual(m21, cArray[5]);
+			Assert::AreEqual(m02, cArray[6]);
+			Assert::AreEqual(m12, cArray[7]);
+			Assert::AreEqual(m22, cArray[8]);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -2752,16 +2822,19 @@ namespace Math
 			[[maybe_unused]] const int* const dataC = constMatrix.Data();
 			[[maybe_unused]] const int* const columnDataC = constMatrix.Data(1);
 
-			movedMatrix.SetRow(0, PonyEngine::Math::Vector3<int>(3, 6, 9));
-			movedMatrix.SetColumn(1, PonyEngine::Math::Vector3<int>(3, 6, 9));
-			movedMatrix.SetDiagonal(PonyEngine::Math::Vector3<int>(3, 6, 9));
-			movedMatrix.SetCounterDiagonal(PonyEngine::Math::Vector3<int>(3, 6, 9));
+			movedMatrix.Row(0, PonyEngine::Math::Vector3<int>(3, 6, 9));
+			movedMatrix.Column(1, PonyEngine::Math::Vector3<int>(3, 6, 9));
+			movedMatrix.Diagonal(PonyEngine::Math::Vector3<int>(3, 6, 9));
+			movedMatrix.CounterDiagonal(PonyEngine::Math::Vector3<int>(3, 6, 9));
 
 			movedMatrix.Set(4, 6, 1, 0, 8, -4, -2, -1, 7);
 			movedMatrix.Set(PonyEngine::Math::Vector3<int>(4, 6, 1), PonyEngine::Math::Vector3<int>(9, 4, 1), PonyEngine::Math::Vector3<int>(9, 4, 1));
 			movedMatrix.Set(std::array<int, 9>{4, 5, 6, 6, 1, 6, -4, -6, -7}.data());
 
 			movedMatrix.Scale(constMatrix);
+
+			int array[9];
+			movedMatrix.ToArray(array);
 
 			movedMatrix[1][1] = 5;
 			movedMatrix[1] = PonyEngine::Math::Vector3<int>(9, 4, 8);
@@ -2806,10 +2879,10 @@ namespace Math
 			[[maybe_unused]] constexpr int m12 = matrix.M12();
 			[[maybe_unused]] constexpr int m22 = matrix.M22();
 
-			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> row = matrix.GetRow(1);
-			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> column = matrix.GetColumn(0);
-			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> diagonal = matrix.GetDiagonal();
-			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> counterDiagonal = matrix.GetCounterDiagonal();
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> row = matrix.Row(1);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> column = matrix.Column(0);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> diagonal = matrix.Diagonal();
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<int> counterDiagonal = matrix.CounterDiagonal();
 
 			[[maybe_unused]] constexpr int trace = matrix.Trace();
 			[[maybe_unused]] constexpr int determinant = matrix.Determinant();
@@ -2821,6 +2894,8 @@ namespace Math
 			[[maybe_unused]] constexpr bool isAlmostZero = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.IsAlmostZero();
 			[[maybe_unused]] constexpr bool isIdentity = matrix.IsIdentity();
 			[[maybe_unused]] constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.IsAlmostIdentity();
+
+			[[maybe_unused]] constexpr std::array<int, 9> array = matrix.ToArray();
 
 			[[maybe_unused]] constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix3x3<float>>(matrix);
 

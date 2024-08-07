@@ -44,7 +44,7 @@ export namespace PonyEngine::Log
 		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
@@ -82,7 +82,7 @@ namespace PonyEngine::Log
 	{
 		assert((subLogger && "The sub-logger is nullptr."));
 		assert((std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger has already been added."));
-		PONY_CONSOLE(LogType::Info, "Add '{}' sub-logger.", subLogger->GetName());
+		PONY_CONSOLE(LogType::Info, "Add '{}' sub-logger.", subLogger->Name());
 		subLoggers.push_back(subLogger);
 		PONY_CONSOLE(LogType::Info, "Sub-logger added.");
 	}
@@ -93,17 +93,17 @@ namespace PonyEngine::Log
 
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
 		{
-			PONY_CONSOLE(LogType::Info, "Remove '{}' sub-logger.", subLogger->GetName());
+			PONY_CONSOLE(LogType::Info, "Remove '{}' sub-logger.", subLogger->Name());
 			subLoggers.erase(position);
 			PONY_CONSOLE(LogType::Info, "Sub-logger removed.");
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE_IF(subLogger, LogType::Warning, "Tried to remove a not added sub-logger '{}'.", subLogger->GetName());
+			PONY_CONSOLE_IF(subLogger, LogType::Warning, "Tried to remove a not added sub-logger '{}'.", subLogger->Name());
 		}
 	}
 
-	const char* Logger::GetName() const noexcept
+	const char* Logger::Name() const noexcept
 	{
 		return StaticName;
 	}

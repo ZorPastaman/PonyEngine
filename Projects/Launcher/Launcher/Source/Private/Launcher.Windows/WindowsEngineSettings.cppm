@@ -13,15 +13,15 @@ import Launcher;
 
 export namespace Launcher
 {
-	/// @brief Gets the engine settings.
+	/// @brief Creates a Windows engine settings.
 	/// @return Engine settings.
 	[[nodiscard("Pure function")]]
-	EngineSettings GetEngineSettings() noexcept;
+	EngineSettings WindowsEngineSettings() noexcept;
 }
 
 namespace Launcher
 {
-	EngineSettings GetEngineSettings() noexcept
+	EngineSettings WindowsEngineSettings() noexcept
 	{
 		return EngineSettings{.targetFrameRate = 165.f};
 	}

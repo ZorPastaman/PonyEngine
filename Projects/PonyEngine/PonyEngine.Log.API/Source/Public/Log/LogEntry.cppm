@@ -44,23 +44,23 @@ export namespace PonyEngine::Log
 		/// @brief Gets the log message.
 		/// @return Log message.
 		[[nodiscard("Pure function")]]
-		const char* GetMessage() const noexcept;
+		const char* Message() const noexcept;
 		/// @brief Gets the exception.
 		/// @return Exception.
 		[[nodiscard("Pure function")]]
-		const std::exception* GetException() const noexcept;
+		const std::exception* Exception() const noexcept;
 		/// @brief Gets the time point.
 		/// @return Time point.
 		[[nodiscard("Pure function")]]
-		std::chrono::time_point<std::chrono::system_clock> GetTimePoint() const noexcept;
+		std::chrono::time_point<std::chrono::system_clock> TimePoint() const noexcept;
 		/// @brief Gets the frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
-		std::size_t GetFrameCount() const noexcept;
+		std::size_t FrameCount() const noexcept;
 		/// @brief Gets the log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
-		LogType GetLogType() const noexcept;
+		LogType LogType() const noexcept;
 
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Representing string.
@@ -79,7 +79,7 @@ export namespace PonyEngine::Log
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
 		const std::size_t frameCount; ///< Frame when the log entry is created.
-		const LogType logType; ///< Log type.
+		const Log::LogType logType; ///< Log type.
 
 		mutable std::string stringCache; ///< ToString() cache.
 		mutable bool isDirty; ///< If it's @a true, the cache is invalid.
@@ -94,7 +94,7 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const LogType logType) noexcept :
+	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		exception{exception},
 		timePoint{timePoint},
@@ -104,27 +104,27 @@ namespace PonyEngine::Log
 	{
 	}
 
-	const char* LogEntry::GetMessage() const noexcept
+	const char* LogEntry::Message() const noexcept
 	{
 		return message;
 	}
 
-	const std::exception* LogEntry::GetException() const noexcept
+	const std::exception* LogEntry::Exception() const noexcept
 	{
 		return exception;
 	}
 
-	std::chrono::time_point<std::chrono::system_clock> LogEntry::GetTimePoint() const noexcept
+	std::chrono::time_point<std::chrono::system_clock> LogEntry::TimePoint() const noexcept
 	{
 		return timePoint;
 	}
 
-	std::size_t LogEntry::GetFrameCount() const noexcept
+	std::size_t LogEntry::FrameCount() const noexcept
 	{
 		return frameCount;
 	}
 
-	LogType LogEntry::GetLogType() const noexcept
+	LogType LogEntry::LogType() const noexcept
 	{
 		return logType;
 	}

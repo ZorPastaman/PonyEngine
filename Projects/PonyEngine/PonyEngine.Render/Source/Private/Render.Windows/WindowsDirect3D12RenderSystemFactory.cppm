@@ -37,9 +37,9 @@ export namespace PonyEngine::Render
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept override;
+		virtual const char* SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		WindowsDirect3D12RenderSystemFactory& operator =(const WindowsDirect3D12RenderSystemFactory&) = delete;
 		WindowsDirect3D12RenderSystemFactory& operator =(WindowsDirect3D12RenderSystemFactory&&) = delete;
@@ -61,12 +61,12 @@ namespace PonyEngine::Render
 		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
 	}
 
-	const char* WindowsDirect3D12RenderSystemFactory::GetSystemName() const noexcept
+	const char* WindowsDirect3D12RenderSystemFactory::SystemName() const noexcept
 	{
 		return WindowsDirect3D12RenderSystem::StaticName;
 	}
 
-	const char* WindowsDirect3D12RenderSystemFactory::GetName() const noexcept
+	const char* WindowsDirect3D12RenderSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}

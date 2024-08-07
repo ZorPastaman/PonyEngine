@@ -26,26 +26,26 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& GetLogger() const noexcept = 0;
+		virtual Log::ILogger& Logger() const noexcept = 0;
 		/// @brief Gets the engine time manager.
 		/// @return Engine time manager.
 		[[nodiscard("Pure function")]]
-		virtual ITimeManager& GetTimeManager() const noexcept = 0;
+		virtual ITimeManager& TimeManager() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& GetSystemManager() const noexcept = 0;
+		virtual ISystemManager& SystemManager() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
-		/// @remark Exit code can be gotten via @p GetExitCode().
+		/// @remark Exit code can be gotten via @p ExitCode().
 		/// @return @a False if the engine received an exit code; @a true otherwise;
 		[[nodiscard("Pure function")]]
-		virtual bool GetIsRunning() const noexcept = 0;
+		virtual bool IsRunning() const noexcept = 0;
 		/// @brief Gets the exit code.
-		/// @note Mustn't be called if @p GetIsRunning() returns @a true.
+		/// @note Mustn't be called if @p IsRunning() returns @a true.
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
-		virtual int GetExitCode() const noexcept = 0;
+		virtual int ExitCode() const noexcept = 0;
 		/// @brief Stops the engine with the @p exitCode.
 		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
@@ -54,7 +54,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine name.
 		/// @return Engine name.
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0;
 
 		IEngine& operator =(const IEngine&) = delete;
 		IEngine& operator =(IEngine&&) = delete;

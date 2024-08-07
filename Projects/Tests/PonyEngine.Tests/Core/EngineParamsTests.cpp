@@ -24,7 +24,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override { return ""; }
+			virtual const char* Name() const noexcept override { return ""; }
 
 			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override { }
 			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override { }
@@ -37,19 +37,19 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces GetPublicInterfaces() noexcept override
+			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
 			{
 				return PonyEngine::Core::ObjectInterfaces();
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsTickable() const noexcept override
+			virtual bool IsTickable() const noexcept override
 			{
 				return false;
 			}
@@ -83,13 +83,13 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetSystemName() const noexcept override
+			virtual const char* SystemName() const noexcept override
 			{
 				return "";
 			}
@@ -99,22 +99,22 @@ namespace Core
 		{
 			EmptyLogger logger;
 			auto engineParams = PonyEngine::Core::EngineParams(logger);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.GetLogger()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&engineParams.Logger()));
 
 			EmptySystemFactory factory0;
 			EmptySystemFactory factory1;
 			engineParams.AddSystemFactory(factory0);
 			engineParams.AddSystemFactory(factory1);
 			const auto copiedParams = engineParams;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&copiedParams.GetLogger()));
-			auto factories = copiedParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&copiedParams.Logger()));
+			auto factories = copiedParams.SystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
 			++factories;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
 
 			const auto movedParams = std::move(engineParams);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&movedParams.GetLogger()));
-			factories = movedParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&movedParams.Logger()));
+			factories = movedParams.SystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
 			++factories;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
@@ -131,7 +131,7 @@ namespace Core
 			engineParams.AddSystemFactory(factory1);
 			engineParams.AddSystemFactory(factory2);
 
-			PonyEngine::Core::EngineParams::SystemFactoriesIterator it = engineParams.GetSystemFactories();
+			PonyEngine::Core::EngineParams::SystemFactoriesIterator it = engineParams.SystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemFactory*>(&factory0)), reinterpret_cast<std::uintptr_t>(&*it));
 			Assert::IsFalse(it.IsEnd());
 			PonyEngine::Core::EngineParams::SystemFactoriesIterator incrementedIt = ++it;
@@ -164,15 +164,15 @@ namespace Core
 			auto anotherParams = otherParams;
 
 			otherParams = engineParams;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&otherParams.GetLogger()));
-			auto factories = otherParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&logger)), reinterpret_cast<std::uintptr_t>(&otherParams.Logger()));
+			auto factories = otherParams.SystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
 			++factories;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory1), reinterpret_cast<std::uintptr_t>(&*factories));
 
 			otherParams = std::move(anotherParams);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&otherLogger)), reinterpret_cast<std::uintptr_t>(&otherParams.GetLogger()));
-			factories = otherParams.GetSystemFactories();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Log::ILogger*>(&otherLogger)), reinterpret_cast<std::uintptr_t>(&otherParams.Logger()));
+			factories = otherParams.SystemFactories();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory2), reinterpret_cast<std::uintptr_t>(&*factories));
 			++factories;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory3), reinterpret_cast<std::uintptr_t>(&*factories));
@@ -182,13 +182,13 @@ namespace Core
 		{
 			EmptyLogger logger;
 			auto engineParams = PonyEngine::Core::EngineParams(logger);
-			Assert::IsTrue(engineParams.GetSystemFactories().IsEnd());
+			Assert::IsTrue(engineParams.SystemFactories().IsEnd());
 
 			EmptySystemFactory factory0;
 			EmptySystemFactory factory1;
 			engineParams.AddSystemFactory(factory0);
 			engineParams.AddSystemFactory(factory1);
-			auto factories = engineParams.GetSystemFactories();
+			auto factories = engineParams.SystemFactories();
 			Assert::IsFalse(factories.IsEnd());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*factories));
 			auto anotherFactories = ++factories;
@@ -207,7 +207,7 @@ namespace Core
 			EmptySystemFactory factory1;
 			engineParams.AddSystemFactory(factory0);
 			engineParams.AddSystemFactory(factory1);
-			auto iterator = engineParams.GetSystemFactories();
+			auto iterator = engineParams.SystemFactories();
 
 			auto copiedIterator = iterator;
 			Assert::IsFalse(copiedIterator.IsEnd());
@@ -234,7 +234,7 @@ namespace Core
 			EmptySystemFactory factory1;
 			engineParams.AddSystemFactory(factory0);
 			engineParams.AddSystemFactory(factory1);
-			auto iterator = engineParams.GetSystemFactories();
+			auto iterator = engineParams.SystemFactories();
 
 			EmptyLogger otherLogger;
 			auto otherParams = PonyEngine::Core::EngineParams(otherLogger);
@@ -242,7 +242,7 @@ namespace Core
 			EmptySystemFactory factory3;
 			otherParams.AddSystemFactory(factory2);
 			otherParams.AddSystemFactory(factory3);
-			auto otherIterator = otherParams.GetSystemFactories();
+			auto otherIterator = otherParams.SystemFactories();
 
 			otherIterator = iterator;
 			Assert::IsFalse(otherIterator.IsEnd());
@@ -252,7 +252,7 @@ namespace Core
 			++otherIterator;
 			Assert::IsTrue(otherIterator.IsEnd());
 
-			auto anotherIterator = otherParams.GetSystemFactories();
+			auto anotherIterator = otherParams.SystemFactories();
 			anotherIterator = std::move(iterator);
 			Assert::IsFalse(anotherIterator.IsEnd());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory0), reinterpret_cast<std::uintptr_t>(&*anotherIterator));
@@ -271,7 +271,7 @@ namespace Core
 			engineParams.AddSystemFactory(factory0);
 			engineParams.AddSystemFactory(factory1);
 
-			auto iterator = engineParams.GetSystemFactories();
+			auto iterator = engineParams.SystemFactories();
 			auto otherIterator = iterator;
 			Assert::IsTrue(iterator == otherIterator);
 			Assert::IsFalse(iterator != otherIterator);

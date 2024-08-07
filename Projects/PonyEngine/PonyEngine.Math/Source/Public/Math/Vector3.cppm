@@ -111,11 +111,19 @@ export namespace PonyEngine::Math
 		/// @brief Gets a minimum value among the components.
 		/// @return Minimum component value.
 		[[nodiscard("Pure function")]]
-		constexpr T Min() const noexcept;
+		constexpr T& Min() noexcept;
+		/// @brief Gets a minimum value among the components.
+		/// @return Minimum component value.
+		[[nodiscard("Pure function")]]
+		constexpr const T& Min() const noexcept;
 		/// @brief Gets a maximum value among the components.
 		/// @return Maximum component value.
 		[[nodiscard("Pure function")]]
-		constexpr T Max() const noexcept;
+		constexpr T& Max() noexcept;
+		/// @brief Gets a maximum value among the components.
+		/// @return Maximum component value.
+		[[nodiscard("Pure function")]]
+		constexpr const T& Max() const noexcept;
 		/// @brief Sums all the components and returns the result.
 		/// @return Sum.
 		[[nodiscard("Pure function")]]
@@ -145,7 +153,7 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost unit; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUnit(T tolerance = T{ 0.00001 }) const noexcept requires (std::is_floating_point_v<T>);
+		bool IsAlmostUnit(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Checks if this vector is uniform.
 		/// @return @a True if this vector is uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -154,7 +162,7 @@ export namespace PonyEngine::Math
 		/// @param tolerance Tolerance. Must be positive.
 		/// @return @a True if this vector is almost uniform; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool IsAlmostUniform(T tolerance = T{ 0.00001 }) const noexcept requires (std::is_floating_point_v<T>);
+		bool IsAlmostUniform(T tolerance = T{0.00001}) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Checks if all the components are finite numbers.
 		/// @return @a True if all the components are finite; @a false otherwise.
@@ -173,6 +181,14 @@ export namespace PonyEngine::Math
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
 		constexpr void Scale(const Vector3& scale) noexcept;
+
+		/// @brief Converts the vector to an array.
+		/// @return Vector array.
+		[[nodiscard("Pure function")]]
+		constexpr std::array<T, 3> ToArray() const noexcept;
+		/// @brief Converts the vector to a c-style array.
+		/// @param array Target array.
+		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z)'.
 		/// @return State string.
@@ -494,13 +510,25 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr T Vector3<T>::Min() const noexcept
+	constexpr T& Vector3<T>::Min() noexcept
 	{
 		return *std::ranges::min_element(components);
 	}
 
 	template<Arithmetic T>
-	constexpr T Vector3<T>::Max() const noexcept
+	constexpr const T& Vector3<T>::Min() const noexcept
+	{
+		return *std::ranges::min_element(components);
+	}
+
+	template<Arithmetic T>
+	constexpr T& Vector3<T>::Max() noexcept
+	{
+		return *std::ranges::max_element(components);
+	}
+
+	template<Arithmetic T>
+	constexpr const T& Vector3<T>::Max() const noexcept
 	{
 		return *std::ranges::max_element(components);
 	}
@@ -590,6 +618,18 @@ namespace PonyEngine::Math
 		{
 			(*this)[i] *= scale[i];
 		}
+	}
+
+	template<Arithmetic T>
+	constexpr std::array<T, 3> Vector3<T>::ToArray() const noexcept
+	{
+		return components;
+	}
+
+	template<Arithmetic T>
+	constexpr void Vector3<T>::ToArray(T (&array)[ComponentCount]) const noexcept
+	{
+		std::ranges::copy(components, array);
 	}
 
 	template<Arithmetic T>

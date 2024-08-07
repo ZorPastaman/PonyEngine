@@ -82,29 +82,29 @@ export namespace PonyEngine::Core
 		/// @brief Gets the object interfaces.
 		/// @return Object interfaces iterator.
 		[[nodiscard("Pure function")]]
-		Iterator GetObjectInterfaces() const noexcept;
+		Iterator Interfaces() const noexcept;
 		/// @brief Adds the interface.
 		/// @param typeInfo Interface type info.
 		/// @param pointer Pointer to the interface object.
-		void AddObjectInterface(const std::type_info& typeInfo, void* pointer);
+		void AddInterface(const std::type_info& typeInfo, void* pointer);
 		/// @brief Adds the interface.
 		/// @tparam Target Interface type.
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename Target, typename Source>
-		void AddObjectInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>);
+		void AddInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>);
 		/// @brief Adds the interfaces.
 		/// @tparam Source Object source type.
 		/// @tparam Targets Interface types.
 		/// @param object Object source.
 		template<typename Source, typename... Targets>
-		void AddObjectInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...);
+		void AddInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...);
 		/// @brief Adds the interfaces.
 		/// @tparam Targets Interface types.
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename... Targets, typename Source>
-		void AddObjectInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>);
+		void AddInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>);
 
 		ObjectInterfaces& operator =(const ObjectInterfaces& other) = default;
 		ObjectInterfaces& operator =(ObjectInterfaces&& other) noexcept = default;
@@ -147,32 +147,32 @@ namespace PonyEngine::Core
 		return temp;
 	}
 
-	ObjectInterfaces::Iterator ObjectInterfaces::GetObjectInterfaces() const noexcept
+	ObjectInterfaces::Iterator ObjectInterfaces::Interfaces() const noexcept
 	{
 		return Iterator(interfaces.cbegin(), interfaces.cend());
 	}
 
-	void ObjectInterfaces::AddObjectInterface(const std::type_info& typeInfo, void* const pointer)
+	void ObjectInterfaces::AddInterface(const std::type_info& typeInfo, void* const pointer)
 	{
 		assert((pointer && "The object pointer is nullptr."));
 		interfaces.emplace_back(typeInfo, pointer);
 	}
 
 	template<typename Target, typename Source>
-	void ObjectInterfaces::AddObjectInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>)
+	void ObjectInterfaces::AddInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>)
 	{
-		AddObjectInterface(typeid(Target), static_cast<Target*>(&object));
+		AddInterface(typeid(Target), static_cast<Target*>(&object));
 	}
 
 	template<typename Source, typename... Targets>
-	void ObjectInterfaces::AddObjectInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...)
+	void ObjectInterfaces::AddInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...)
 	{
-		(AddObjectInterface<Targets, Source>(object),...);
+		(AddInterface<Targets, Source>(object),...);
 	}
 
 	template<typename... Targets, typename Source>
-	void ObjectInterfaces::AddObjectInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>)
+	void ObjectInterfaces::AddInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>)
 	{
-		AddObjectInterfaces<Source, Targets...>(object);
+		AddInterfaces<Source, Targets...>(object);
 	}
 }

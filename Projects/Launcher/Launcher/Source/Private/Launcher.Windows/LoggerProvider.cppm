@@ -36,7 +36,7 @@ export namespace Launcher
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		PonyEngine::Log::ILogger& GetLogger() const noexcept;
+		PonyEngine::Log::ILogger& Logger() const noexcept;
 
 		LoggerProvider& operator =(const LoggerProvider&) = delete;
 		LoggerProvider& operator =(LoggerProvider&&) = delete;
@@ -139,7 +139,7 @@ namespace Launcher
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
 	}
 
-	PonyEngine::Log::ILogger& LoggerProvider::GetLogger() const noexcept
+	PonyEngine::Log::ILogger& LoggerProvider::Logger() const noexcept
 	{
 		return *logger;
 	}

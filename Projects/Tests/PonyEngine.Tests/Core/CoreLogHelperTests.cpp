@@ -9,13 +9,27 @@
 
 #include "CppUnitTest.h"
 
+#ifndef PONY_LOG_VERBOSE
 #define PONY_LOG_VERBOSE
+#endif
+#ifndef PONY_LOG_DEBUG
 #define PONY_LOG_DEBUG
+#endif
+#ifndef PONY_LOG_INFO
 #define PONY_LOG_INFO
+#endif
+#ifndef PONY_LOG_WARNING
 #define PONY_LOG_WARNING
+#endif
+#ifndef PONY_LOG_ERROR
 #define PONY_LOG_ERROR
+#endif
+#ifndef PONY_LOG_EXCEPTION
 #define PONY_LOG_EXCEPTION
+#endif
+#ifndef PONY_CONSOLE_LOG
 #define PONY_CONSOLE_LOG
+#endif
 #include "PonyEngine/Log/EngineLog.h"
 
 import <cstddef>;
@@ -64,7 +78,7 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}
@@ -76,18 +90,18 @@ namespace Core
 			std::size_t frameCount;
 
 			[[nodiscard("Pure function")]]
-			virtual std::size_t GetFrameCount() const noexcept override
+			virtual std::size_t FrameCount() const noexcept override
 			{
 				return frameCount;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual float GetTargetFrameTime() const noexcept override
+			virtual float TargetFrameTime() const noexcept override
 			{
 				return 0.f;
 			}
 
-			virtual void SetTargetFrameTime(float) noexcept override
+			virtual void TargetFrameTime(float) noexcept override
 			{
 			}
 		};
@@ -106,36 +120,36 @@ namespace Core
 		{
 		public:
 			EmptyLogger* logger;
-			TimeManager* timeManager;
+			LogHelperTests::TimeManager* timeManager;
 
-			SystemManager* systemManager;
+			LogHelperTests::SystemManager* systemManager;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& GetLogger() const noexcept override
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ITimeManager& GetTimeManager() const noexcept override
+			virtual PonyEngine::Core::ITimeManager& TimeManager() const noexcept override
 			{
 				return *timeManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& GetSystemManager() const noexcept override
+			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
 			{
 				return *systemManager;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual bool GetIsRunning() const noexcept override
+			virtual bool IsRunning() const noexcept override
 			{
 				return false;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual int GetExitCode() const noexcept override
+			virtual int ExitCode() const noexcept override
 			{
 				return 0;
 			}
@@ -145,7 +159,7 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* GetName() const noexcept override
+			virtual const char* Name() const noexcept override
 			{
 				return "";
 			}

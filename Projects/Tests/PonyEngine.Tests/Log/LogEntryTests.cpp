@@ -35,25 +35,25 @@ namespace Log
 			constexpr auto exceptionLogType = PonyEngine::Log::LogType::Exception;
 
 			auto logEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
-			Assert::AreEqual(message, logEntry.GetMessage());
-			Assert::IsNull(logEntry.GetException());
-			Assert::IsTrue(timePoint == logEntry.GetTimePoint());
-			Assert::AreEqual(frameCount, logEntry.GetFrameCount());
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logEntry.GetLogType()));
+			Assert::AreEqual(message, logEntry.Message());
+			Assert::IsNull(logEntry.Exception());
+			Assert::IsTrue(timePoint == logEntry.TimePoint());
+			Assert::AreEqual(frameCount, logEntry.FrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logEntry.LogType()));
 
 			const auto pureExceptionLogEntry = PonyEngine::Log::LogEntry(nullptr, &exception, timePoint, frameCount, exceptionLogType);
-			Assert::IsNull(pureExceptionLogEntry.GetMessage());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(pureExceptionLogEntry.GetException()));
-			Assert::IsTrue(timePoint == pureExceptionLogEntry.GetTimePoint());
-			Assert::AreEqual(frameCount, pureExceptionLogEntry.GetFrameCount());
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(pureExceptionLogEntry.GetLogType()));
+			Assert::IsNull(pureExceptionLogEntry.Message());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(pureExceptionLogEntry.Exception()));
+			Assert::IsTrue(timePoint == pureExceptionLogEntry.TimePoint());
+			Assert::AreEqual(frameCount, pureExceptionLogEntry.FrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(pureExceptionLogEntry.LogType()));
 
 			const auto exceptionLogEntry = PonyEngine::Log::LogEntry(message, &exception, timePoint, frameCount, exceptionLogType);
-			Assert::AreEqual(message, logEntry.GetMessage());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(exceptionLogEntry.GetException()));
-			Assert::IsTrue(timePoint == exceptionLogEntry.GetTimePoint());
-			Assert::AreEqual(frameCount, exceptionLogEntry.GetFrameCount());
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogEntry.GetLogType()));
+			Assert::AreEqual(message, logEntry.Message());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(exceptionLogEntry.Exception()));
+			Assert::IsTrue(timePoint == exceptionLogEntry.TimePoint());
+			Assert::AreEqual(frameCount, exceptionLogEntry.FrameCount());
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(exceptionLogEntry.LogType()));
 		}
 
 		TEST_METHOD(ToStringTest)

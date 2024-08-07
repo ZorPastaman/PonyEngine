@@ -9,13 +9,27 @@
 
 #include "CppUnitTest.h"
 
+#ifndef PONY_LOG_VERBOSE
 #define PONY_LOG_VERBOSE
+#endif
+#ifndef PONY_LOG_DEBUG
 #define PONY_LOG_DEBUG
+#endif
+#ifndef PONY_LOG_INFO
 #define PONY_LOG_INFO
+#endif
+#ifndef PONY_LOG_WARNING
 #define PONY_LOG_WARNING
+#endif
+#ifndef PONY_LOG_ERROR
 #define PONY_LOG_ERROR
+#endif
+#ifndef PONY_LOG_EXCEPTION
 #define PONY_LOG_EXCEPTION
+#endif
+#ifndef PONY_CONSOLE_LOG
 #define PONY_CONSOLE_LOG
+#endif
 #include "PonyEngine/Log/Log.h"
 
 import <cstdint>;

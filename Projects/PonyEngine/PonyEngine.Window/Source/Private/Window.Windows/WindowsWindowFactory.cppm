@@ -62,10 +62,10 @@ export namespace PonyEngine::Window
 		virtual const WindowsWindowParams& NextWindowsWindowParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept override;
+		virtual const char* SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		WindowsWindowFactory& operator =(const WindowsWindowFactory&) = delete;
 		WindowsWindowFactory& operator =(WindowsWindowFactory&&) = delete;
@@ -88,13 +88,13 @@ namespace PonyEngine::Window
 	/// @brief Gets a default cursor.
 	/// @return Default cursor.
 	[[nodiscard("Pure function")]]
-	HCURSOR GetDefaultCursor();
+	HCURSOR DefaultCursor();
 
 	WindowsWindowFactory::WindowsWindowFactory(Log::ILogger& loggerToUse, const WindowsClassParams& classParams) :
 		logger{&loggerToUse},
 		hInstance{NULL}
 	{
-		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetDefaultCursor), &hInstance) || !hInstance)
+		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
 			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
 		}
@@ -108,7 +108,7 @@ namespace PonyEngine::Window
 			.cbWndExtra = 0,
 			.hInstance = hInstance,
 			.hIcon = classParams.icon,
-			.hCursor = classParams.cursor ? classParams.cursor : GetDefaultCursor(),
+			.hCursor = classParams.cursor ? classParams.cursor : DefaultCursor(),
 			.hbrBackground = NULL,
 			.lpszMenuName = NULL,
 			.lpszClassName = classParams.name.c_str(),
@@ -151,7 +151,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create Windows window.");
 		const auto window = new WindowsWindow(engine, hInstance, classAtom, createWindowParams);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Windows window created.");
-		const HWND hWnd = window->GetWindowHandle();
+		const HWND hWnd = window->WindowHandle();
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		RegisterWindowProc(hWnd, window);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window proc registered. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
@@ -163,7 +163,7 @@ namespace PonyEngine::Window
 	{
 		assert((dynamic_cast<WindowsWindow*>(system) && "Tried to destroy a system of the wrong type."));
 		const auto windowsWindow = static_cast<WindowsWindow*>(system);
-		const HWND hWnd = windowsWindow->GetWindowHandle();
+		const HWND hWnd = windowsWindow->WindowHandle();
 
 		if (windowsWindow->IsWindowAlive())
 		{
@@ -201,17 +201,17 @@ namespace PonyEngine::Window
 		return windowsWindowParams;
 	}
 
-	const char* WindowsWindowFactory::GetSystemName() const noexcept
+	const char* WindowsWindowFactory::SystemName() const noexcept
 	{
 		return WindowsWindow::StaticName;
 	}
 
-	const char* WindowsWindowFactory::GetName() const noexcept
+	const char* WindowsWindowFactory::Name() const noexcept
 	{
 		return StaticName;
 	}
 
-	HCURSOR GetDefaultCursor()
+	HCURSOR DefaultCursor()
 	{
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)

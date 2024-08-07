@@ -43,10 +43,10 @@ export namespace Game
 		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetSystemName() const noexcept override;
+		virtual const char* SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* GetName() const noexcept override;
+		virtual const char* Name() const noexcept override;
 
 		GameSystemFactory& operator =(const GameSystemFactory&) = delete;
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
@@ -76,12 +76,12 @@ namespace Game
 		delete static_cast<GameSystem*>(system);
 	}
 
-	const char* GameSystemFactory::GetSystemName() const noexcept
+	const char* GameSystemFactory::SystemName() const noexcept
 	{
 		return GameSystem::StaticName;
 	}
 
-	const char* GameSystemFactory::GetName() const noexcept
+	const char* GameSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}
