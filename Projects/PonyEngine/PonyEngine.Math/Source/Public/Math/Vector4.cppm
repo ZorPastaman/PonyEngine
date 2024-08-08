@@ -377,6 +377,7 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
+		// TODO: Try auto here
 		static constexpr Vector4 One = Vector4(T{1}, T{1}, T{1}, T{1}); ///< Vector4(1, 1, 1, 1).
 		static constexpr Vector4 Zero = Vector4(T{0}, T{0}, T{0}, T{0}); ///< Vector4(0, 0, 0, 0).
 		static constexpr Vector4 Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1}); ///< Vector4(-1, -1, -1, -1).

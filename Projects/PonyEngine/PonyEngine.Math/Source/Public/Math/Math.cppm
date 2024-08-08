@@ -9,6 +9,10 @@
 
 export module PonyEngine.Math;
 
+export import :Color888;
+export import :Color8888;
+export import :ColorRGB;
+export import :ColorRGBA;
 export import :Common;
 export import :Matrix2x2;
 export import :Matrix3x3;
