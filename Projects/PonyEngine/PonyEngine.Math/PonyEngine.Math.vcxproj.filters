@@ -48,16 +48,16 @@
     <ClCompile Include="Source\Public\Math\Vector4.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Math\ColorRGBA.cppm">
+    <ClCompile Include="Source\Public\Math\RGBA.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Math\ColorRGB.cppm">
+    <ClCompile Include="Source\Public\Math\RGB.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Math\Color8888.cppm">
+    <ClCompile Include="Source\Public\Math\RGBAInt.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Math\Color888.cppm">
+    <ClCompile Include="Source\Public\Math\RGBInt.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

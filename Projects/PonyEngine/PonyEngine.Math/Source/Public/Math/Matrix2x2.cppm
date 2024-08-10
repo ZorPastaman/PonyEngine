@@ -98,7 +98,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix2x2(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4.
+		/// @param components Component array. Its length must be at least 4. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix2x2(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]

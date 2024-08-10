@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Math:ColorRGB;
+export module PonyEngine.Math:RGB;
 
 import <algorithm>;
 import <array>;
@@ -17,37 +17,37 @@ import <format>;
 import <ostream>;
 import <string>;
 
-import :Color888;
+import :RGBInt;
 import :Vector3;
 
 export namespace PonyEngine::Math
 {
 	template<std::floating_point T>
-	class ColorRGB final
+	class RGB final
 	{
 	public:
 		using ValueType = T; ///< Component type.
 
-		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any ColorRGB, it's always 3.
+		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any RGB, it's always 3.
 
 		struct Predefined; ///< Predefined colors.
 
 		[[nodiscard("Pure constructor")]]
-		constexpr ColorRGB() noexcept = default;
+		constexpr RGB() noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		constexpr ColorRGB(T red, T green, T blue) noexcept;
+		constexpr RGB(T red, T green, T blue) noexcept;
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr ColorRGB(const T* components) noexcept;
+		explicit constexpr RGB(const T* components) noexcept;
+		template<std::unsigned_integral U> [[nodiscard("Pure constructor")]]
+		explicit constexpr RGB(const RGBInt<U>& color) noexcept;
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr ColorRGB(const Color888& color) noexcept;
+		explicit constexpr RGB(const Vector3<T>& vector) noexcept;
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr ColorRGB(const Vector3<T>& vector) noexcept;
+		constexpr RGB(const RGB& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		constexpr ColorRGB(const ColorRGB& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		constexpr ColorRGB(ColorRGB&& other) noexcept = default;
+		constexpr RGB(RGB&& other) noexcept = default;
 
-		constexpr ~ColorRGB() noexcept = default;
+		constexpr ~RGB() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		constexpr T& R() noexcept;
@@ -100,10 +100,10 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
-		template<Arithmetic U> [[nodiscard("Pure operator")]]
-		explicit constexpr operator ColorRGB<U>() const noexcept;
-		[[nodiscard("Pure operator")]]
-		explicit constexpr operator Color888() const noexcept;
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator RGB<U>() const noexcept;
+		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator RGBInt<U>() const noexcept;
 
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator Vector3<T>() const noexcept;
@@ -113,209 +113,209 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		constexpr ColorRGB& operator =(const ColorRGB& other) noexcept = default;
-		constexpr ColorRGB& operator =(ColorRGB&& other) noexcept = default;
-		constexpr ColorRGB& operator +=(const ColorRGB& other) noexcept;
-		constexpr ColorRGB& operator -=(const ColorRGB& other) noexcept;
-		constexpr ColorRGB& operator *=(const ColorRGB& other) noexcept;
-		constexpr ColorRGB& operator *=(T multiplier) noexcept;
-		constexpr ColorRGB& operator /=(const ColorRGB& other) noexcept;
-		constexpr ColorRGB& operator /=(T divisor) noexcept;
+		constexpr RGB& operator =(const RGB& other) noexcept = default;
+		constexpr RGB& operator =(RGB&& other) noexcept = default;
+		constexpr RGB& operator +=(const RGB& other) noexcept;
+		constexpr RGB& operator -=(const RGB& other) noexcept;
+		constexpr RGB& operator *=(const RGB& other) noexcept;
+		constexpr RGB& operator *=(T multiplier) noexcept;
+		constexpr RGB& operator /=(const RGB& other) noexcept;
+		constexpr RGB& operator /=(T divisor) noexcept;
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const ColorRGB& other) const noexcept;
+		constexpr bool operator ==(const RGB& other) const noexcept;
 
 	private:
-		static constexpr T InverseColor888Max = T{1} / Color888::MaxValue;
-
 		std::array<T, ComponentCount> components; ///< Component array in order red, green, blue, alpha.
 	};
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T Distance(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
+	constexpr T Distance(const RGB<T>& left, const RGB<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T DistanceSquared(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
-
-	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr ColorRGB<T> Lerp(const ColorRGB<T>& from, const ColorRGB<T>& to, T time) noexcept;
+	constexpr T DistanceSquared(const RGB<T>& left, const RGB<T>& right) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const ColorRGB<T>& left, const ColorRGB<T>& right, T tolerance = T{0.00001}) noexcept;
+	constexpr RGB<T> Lerp(const RGB<T>& from, const RGB<T>& to, T time) noexcept;
+
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreAlmostEqual(const RGB<T>& left, const RGB<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator +(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
+	constexpr RGB<T> operator +(const RGB<T>& left, const RGB<T>& right) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator -(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
+	constexpr RGB<T> operator -(const RGB<T>& left, const RGB<T>& right) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator *(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
+	constexpr RGB<T> operator *(const RGB<T>& left, const RGB<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator *(const ColorRGB<T>& color, T multiplier) noexcept;
+	constexpr RGB<T> operator *(const RGB<T>& color, T multiplier) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator *(T multiplier, const ColorRGB<T>& color) noexcept;
+	constexpr RGB<T> operator *(T multiplier, const RGB<T>& color) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator /(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept;
+	constexpr RGB<T> operator /(const RGB<T>& left, const RGB<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
-	constexpr ColorRGB<T> operator /(const ColorRGB<T>& color, T divisor) noexcept;
+	constexpr RGB<T> operator /(const RGB<T>& color, T divisor) noexcept;
 
 	template<std::floating_point T>
-	std::ostream& operator <<(std::ostream& stream, const ColorRGB<T>& color);
+	std::ostream& operator <<(std::ostream& stream, const RGB<T>& color);
 
 	template<std::floating_point T>
-	struct ColorRGB<T>::Predefined final
+	struct RGB<T>::Predefined final
 	{
 		Predefined() = delete;
 
-		static constexpr ColorRGB Red = ColorRGB(T{1}, T{0}, T{0});
-		static constexpr ColorRGB Green = ColorRGB(T{0}, T{1}, T{0});
-		static constexpr ColorRGB Blue = ColorRGB(T{0}, T{0}, T{1});
-		static constexpr ColorRGB Black = ColorRGB(T{0}, T{0}, T{0});
-		static constexpr ColorRGB White = ColorRGB(T{1}, T{1}, T{1});
-		static constexpr ColorRGB Gray = ColorRGB(T{0.5}, T{0.5}, T{0.5});
-		static constexpr ColorRGB Yellow = ColorRGB(T{1}, T{1}, T{0});
-		static constexpr ColorRGB Magenta = ColorRGB(T{1}, T{0}, T{1});
-		static constexpr ColorRGB Cyan = ColorRGB(T{0}, T{1}, T{1});
+		static constexpr RGB Red = RGB(T{1}, T{0}, T{0});
+		static constexpr RGB Green = RGB(T{0}, T{1}, T{0});
+		static constexpr RGB Blue = RGB(T{0}, T{0}, T{1});
+		static constexpr RGB Black = RGB(T{0}, T{0}, T{0});
+		static constexpr RGB White = RGB(T{1}, T{1}, T{1});
+		static constexpr RGB Gray = RGB(T{0.5}, T{0.5}, T{0.5});
+		static constexpr RGB Yellow = RGB(T{1}, T{1}, T{0});
+		static constexpr RGB Magenta = RGB(T{1}, T{0}, T{1});
+		static constexpr RGB Cyan = RGB(T{0}, T{1}, T{1});
 	};
 }
 
 namespace PonyEngine::Math
 {
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::ColorRGB(const T red, const T green, const T blue) noexcept :
+	constexpr RGB<T>::RGB(const T red, const T green, const T blue) noexcept :
 		components{red, green, blue}
 	{
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::ColorRGB(const T* const components) noexcept
+	constexpr RGB<T>::RGB(const T* const components) noexcept
 	{
 		Set(components);
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::ColorRGB(const Color888& color) noexcept :
-		ColorRGB(color.R() * InverseColor888Max, color.G() * InverseColor888Max, color.B() * InverseColor888Max)
+	template<std::unsigned_integral U>
+	constexpr RGB<T>::RGB(const RGBInt<U>& color) noexcept
+	{
+		constexpr T inverseMaxValue = T{1} / RGBInt<U>::MaxValue;
+		Set(color.R() * inverseMaxValue, color.G() * inverseMaxValue, color.B() * inverseMaxValue);
+	}
+
+	template<std::floating_point T>
+	constexpr RGB<T>::RGB(const Vector3<T>& vector) noexcept :
+		RGB(vector.Data())
 	{
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::ColorRGB(const Vector3<T>& vector) noexcept :
-		ColorRGB(vector.Data())
-	{
-	}
-
-	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::R() noexcept
-	{
-		return components[0];
-	}
-
-	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::R() const noexcept
+	constexpr T& RGB<T>::R() noexcept
 	{
 		return components[0];
 	}
 
 	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::G() noexcept
+	constexpr const T& RGB<T>::R() const noexcept
+	{
+		return components[0];
+	}
+
+	template<std::floating_point T>
+	constexpr T& RGB<T>::G() noexcept
 	{
 		return components[1];
 	}
 
 	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::G() const noexcept
+	constexpr const T& RGB<T>::G() const noexcept
 	{
 		return components[1];
 	}
 
 	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::B() noexcept
+	constexpr T& RGB<T>::B() noexcept
 	{
 		return components[2];
 	}
 
 	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::B() const noexcept
+	constexpr const T& RGB<T>::B() const noexcept
 	{
 		return components[2];
 	}
 
 	template<std::floating_point T>
-	constexpr T* ColorRGB<T>::Data() noexcept
+	constexpr T* RGB<T>::Data() noexcept
 	{
 		return components.data();
 	}
 
 	template<std::floating_point T>
-	constexpr const T* ColorRGB<T>::Data() const noexcept
+	constexpr const T* RGB<T>::Data() const noexcept
 	{
 		return components.data();
 	}
 
 	template<std::floating_point T>
-	constexpr T ColorRGB<T>::Grayscale() const noexcept
+	constexpr T RGB<T>::Grayscale() const noexcept
 	{
 		return R() * T{0.299} + G() * T{0.587} + B() * T{0.114};
 	}
 
 	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::Min() noexcept
+	constexpr T& RGB<T>::Min() noexcept
 	{
 		return *std::ranges::min_element(components);
 	}
 
 	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::Min() const noexcept
+	constexpr const T& RGB<T>::Min() const noexcept
 	{
 		return *std::ranges::min_element(components);
 	}
 
 	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::Max() noexcept
+	constexpr T& RGB<T>::Max() noexcept
 	{
 		return *std::ranges::max_element(components);
 	}
 
 	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::Max() const noexcept
+	constexpr const T& RGB<T>::Max() const noexcept
 	{
 		return *std::ranges::max_element(components);
 	}
 
 	template<std::floating_point T>
-	constexpr bool ColorRGB<T>::IsBlack() const noexcept
+	constexpr bool RGB<T>::IsBlack() const noexcept
 	{
 		return *this == Predefined::Black;
 	}
 
 	template<std::floating_point T>
-	constexpr bool ColorRGB<T>::IsAlmostBlack(const T tolerance) const noexcept
+	constexpr bool RGB<T>::IsAlmostBlack(const T tolerance) const noexcept
 	{
 		return AreAlmostEqual(*this, Predefined::Black, tolerance);
 	}
 
 	template<std::floating_point T>
-	constexpr bool ColorRGB<T>::IsWhite() const noexcept
+	constexpr bool RGB<T>::IsWhite() const noexcept
 	{
 		return *this == Predefined::White;
 	}
 
 	template<std::floating_point T>
-	constexpr bool ColorRGB<T>::IsAlmostWhite(const T tolerance) const noexcept
+	constexpr bool RGB<T>::IsAlmostWhite(const T tolerance) const noexcept
 	{
 		return AreAlmostEqual(*this, Predefined::White, tolerance);
 	}
 
 	template<std::floating_point T>
-	bool ColorRGB<T>::IsFinite() const noexcept
+	bool RGB<T>::IsFinite() const noexcept
 	{
 		return std::isfinite(R()) && std::isfinite(G()) && std::isfinite(B());
 	}
 
 	template<std::floating_point T>
-	constexpr void ColorRGB<T>::Set(const T red, const T green, const T blue) noexcept
+	constexpr void RGB<T>::Set(const T red, const T green, const T blue) noexcept
 	{
 		R() = red;
 		G() = green;
@@ -323,61 +323,61 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void ColorRGB<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void RGB<T>::Set(const T* const componentsToSet) noexcept
 	{
 		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
 	}
 
 	template<std::floating_point T>
-	constexpr std::array<T, 3> ColorRGB<T>::ToArray() const noexcept
+	constexpr std::array<T, 3> RGB<T>::ToArray() const noexcept
 	{
 		return components;
 	}
 
 	template<std::floating_point T>
-	constexpr void ColorRGB<T>::ToArray(T (&array)[ComponentCount]) const noexcept
+	constexpr void RGB<T>::ToArray(T (&array)[ComponentCount]) const noexcept
 	{
 		std::ranges::copy(components, array);
 	}
 
 	template<std::floating_point T>
-	std::string ColorRGB<T>::ToString() const
+	std::string RGB<T>::ToString() const
 	{
 		return std::format("(R: {}, G: {}, B: {})", R(), G(), B());
 	}
 
 	template<std::floating_point T>
-	constexpr T Distance(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr T Distance(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
 		return std::sqrt(DistanceSquared(left, right));
 	}
 
 	template<std::floating_point T>
-	constexpr T DistanceSquared(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr T DistanceSquared(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
-		ColorRGB<T> difference = left - right;
+		RGB<T> difference = left - right;
 		difference *= difference;
 
 		return difference.R() + difference.G() + difference.B();
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> Lerp(const ColorRGB<T>& from, const ColorRGB<T>& to, const T time) noexcept
+	constexpr RGB<T> Lerp(const RGB<T>& from, const RGB<T>& to, const T time) noexcept
 	{
 		return from + (to - from) * time;
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreAlmostEqual(const ColorRGB<T>& left, const ColorRGB<T>& right, const T tolerance) noexcept
+	constexpr bool AreAlmostEqual(const RGB<T>& left, const RGB<T>& right, const T tolerance) noexcept
 	{
 		return DistanceSquared(left, right) < tolerance * tolerance;
 	}
 
 	template<std::floating_point T>
-	template<Arithmetic U>
-	constexpr ColorRGB<T>::operator ColorRGB<U>() const noexcept
+	template<std::floating_point U>
+	constexpr RGB<T>::operator RGB<U>() const noexcept
 	{
-		ColorRGB<U> cast;
+		RGB<U> cast;
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
 			cast[i] = static_cast<U>((*this)[i]);
@@ -387,31 +387,32 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::operator Color888() const noexcept
+	template<std::unsigned_integral U>
+	constexpr RGB<T>::operator RGBInt<U>() const noexcept
 	{
-		return Color888(R() * Color888::MaxValue, G() * Color888::MaxValue, B() * Color888::MaxValue);
+		return RGBInt<U>(R() * RGBInt<U>::MaxValue, G() * RGBInt<U>::MaxValue, B() * RGBInt<U>::MaxValue);
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>::operator Vector3<T>() const noexcept
+	constexpr RGB<T>::operator Vector3<T>() const noexcept
 	{
 		return Vector3<T>(Data());
 	}
 
 	template<std::floating_point T>
-	constexpr T& ColorRGB<T>::operator [](const std::size_t index) noexcept
+	constexpr T& RGB<T>::operator [](const std::size_t index) noexcept
 	{
 		return components[index];
 	}
 
 	template<std::floating_point T>
-	constexpr const T& ColorRGB<T>::operator [](const std::size_t index) const noexcept
+	constexpr const T& RGB<T>::operator [](const std::size_t index) const noexcept
 	{
 		return components[index];
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator +=(const ColorRGB& other) noexcept
+	constexpr RGB<T>& RGB<T>::operator +=(const RGB& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -422,7 +423,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator -=(const ColorRGB& other) noexcept
+	constexpr RGB<T>& RGB<T>::operator -=(const RGB& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -433,7 +434,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator *=(const ColorRGB& other) noexcept
+	constexpr RGB<T>& RGB<T>::operator *=(const RGB& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -444,7 +445,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator *=(const T multiplier) noexcept
+	constexpr RGB<T>& RGB<T>::operator *=(const T multiplier) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -455,7 +456,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator /=(const ColorRGB& other) noexcept
+	constexpr RGB<T>& RGB<T>::operator /=(const RGB& other) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -466,7 +467,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T>& ColorRGB<T>::operator /=(const T divisor) noexcept
+	constexpr RGB<T>& RGB<T>::operator /=(const T divisor) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
@@ -477,16 +478,16 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr bool ColorRGB<T>::operator ==(const ColorRGB& other) const noexcept
+	constexpr bool RGB<T>::operator ==(const RGB& other) const noexcept
 	{
 		return components == other.components;
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator +(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr RGB<T> operator +(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
-		ColorRGB<T> sum;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> sum;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			sum[i] = left[i] + right[i];
 		}
@@ -495,10 +496,10 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator -(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr RGB<T> operator -(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
-		ColorRGB<T> difference;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> difference;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			difference[i] = left[i] - right[i];
 		}
@@ -507,10 +508,10 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator *(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr RGB<T> operator *(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
-		ColorRGB<T> product;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> product;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			product[i] = left[i] * right[i];
 		}
@@ -519,10 +520,10 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator *(const ColorRGB<T>& color, const T multiplier) noexcept
+	constexpr RGB<T> operator *(const RGB<T>& color, const T multiplier) noexcept
 	{
-		ColorRGB<T> product;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> product;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			product[i] = color[i] * multiplier;
 		}
@@ -531,16 +532,16 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator *(const T multiplier, const ColorRGB<T>& color) noexcept
+	constexpr RGB<T> operator *(const T multiplier, const RGB<T>& color) noexcept
 	{
 		return color * multiplier;
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator /(const ColorRGB<T>& left, const ColorRGB<T>& right) noexcept
+	constexpr RGB<T> operator /(const RGB<T>& left, const RGB<T>& right) noexcept
 	{
-		ColorRGB<T> quotient;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> quotient;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			quotient[i] = left[i] / right[i];
 		}
@@ -549,10 +550,10 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr ColorRGB<T> operator /(const ColorRGB<T>& color, const T divisor) noexcept
+	constexpr RGB<T> operator /(const RGB<T>& color, const T divisor) noexcept
 	{
-		ColorRGB<T> quotient;
-		for (std::size_t i = 0; i < ColorRGB<T>::ComponentCount; ++i)
+		RGB<T> quotient;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
 		{
 			quotient[i] = color[i] / divisor;
 		}
@@ -561,7 +562,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	std::ostream& operator <<(std::ostream& stream, const ColorRGB<T>& color)
+	std::ostream& operator <<(std::ostream& stream, const RGB<T>& color)
 	{
 		return stream << color.ToString();
 	}

@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Math\Color888.cppm" />
-    <ClCompile Include="Source\Public\Math\Color8888.cppm" />
-    <ClCompile Include="Source\Public\Math\ColorRGB.cppm" />
-    <ClCompile Include="Source\Public\Math\ColorRGBA.cppm" />
+    <ClCompile Include="Source\Public\Math\RGBInt.cppm" />
+    <ClCompile Include="Source\Public\Math\RGBAInt.cppm" />
+    <ClCompile Include="Source\Public\Math\RGB.cppm" />
+    <ClCompile Include="Source\Public\Math\RGBA.cppm" />
     <ClCompile Include="Source\Public\Math\Common.cppm" />
     <ClCompile Include="Source\Public\Math\Math.cppm" />
     <ClCompile Include="Source\Public\Math\Matrix2x2.cppm" />

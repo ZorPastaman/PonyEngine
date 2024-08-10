@@ -105,7 +105,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 9.
+		/// @param components Component array. Its length must be at least 9. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix3x3(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
