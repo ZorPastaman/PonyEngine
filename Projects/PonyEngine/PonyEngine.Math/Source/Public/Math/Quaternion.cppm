@@ -47,7 +47,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(T x, T y, T z, T w) noexcept;
 		/// @brief Creates a quaternion and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4.
+		/// @param components Component array. Its length must be at least 4. The order is x, y, z, w.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Quaternion(const T* components) noexcept;
 		/// @brief Creates a quaternion and assigns its components from the @p vector components.

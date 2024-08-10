@@ -114,7 +114,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 16.
+		/// @param components Component array. Its length must be at least 16. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Matrix4x4(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]

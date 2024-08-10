@@ -46,7 +46,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(T x, T y, T z, T w) noexcept;
 		/// @brief Creates a vector and assign its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4.
+		/// @param components Component array. Its length must be at least 4. The order is x, y, z, w.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Vector4(const T* components) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -116,20 +116,20 @@ export namespace PonyEngine::Math
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Gets a minimum value among the components.
-		/// @return Minimum component value.
+		/// @brief Gets a minimum among the components.
+		/// @return Minimum component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Min() noexcept;
-		/// @brief Gets a minimum value among the components.
-		/// @return Minimum component value.
+		/// @brief Gets a minimum among the components.
+		/// @return Minimum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Min() const noexcept;
-		/// @brief Gets a maximum value among the components.
-		/// @return Maximum component value.
+		/// @brief Gets a maximum among the components.
+		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Max() noexcept;
-		/// @brief Gets a maximum value among the components.
-		/// @return Maximum component value.
+		/// @brief Gets a maximum among the components.
+		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
 		/// @brief Sums all the components and returns the result.
