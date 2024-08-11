@@ -15,6 +15,7 @@ import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <span>;
 import <string>;
 
 import :RGB;
@@ -48,10 +49,10 @@ export namespace PonyEngine::Math
 		/// @param alpha Alpha component.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBA(T red, T green, T blue, T alpha) noexcept;
-		/// @brief Creates a color and assign its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4. The order is r, g, b, a.
+		/// @brief Creates a color and assigns its components from the @p span. The order is r, g, b, a.
+		/// @param span Components.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr RGBA(const T* components) noexcept;
+		explicit constexpr RGBA(std::span<const T, ComponentCount> span) noexcept;
 		/// @brief Converts the rgb color to an rgba color.
 		/// @param rgb RGB color.
 		/// @param alpha Alpha.
@@ -62,7 +63,7 @@ export namespace PonyEngine::Math
 		/// @param color RGBA int color.
 		template<std::unsigned_integral U> [[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(const RGBAInt<U>& color) noexcept;
-		/// @brief Converts the @p vector to a color component-wise.
+		/// @brief Converts the @p vector to a color component-wise. x -> r, y -> g, z -> b, w -> a.
 		/// @param vector Vector to convert.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(const Vector4<T>& vector) noexcept;
@@ -105,14 +106,14 @@ export namespace PonyEngine::Math
 		/// @return Alpha component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& A() const noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is r, g, b, a.
-		/// @return Data pointer.
+		/// @brief Gets the color span.
+		/// @return Color span. The order is r, g, b, a.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is r, g, b, a.
-		/// @return Data pointer.
+		constexpr std::span<T, 4> Span() noexcept;
+		/// @brief Gets the color span.
+		/// @return Color span. The order is r, g, b, a.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
+		constexpr std::span<const T, 4> Span() const noexcept;
 
 		/// @brief Computes a grayscale.
 		/// @return Grayscale.
@@ -175,13 +176,7 @@ export namespace PonyEngine::Math
 		/// @param blue Blue.
 		/// @param alpha Alpha.
 		constexpr void Set(T red, T green, T blue, T alpha) noexcept;
-		/// @brief Sets components from the array.
-		/// @param componentsToSet Component array. Its length must be at least 4.
-		constexpr void Set(const T* componentsToSet) noexcept;
-
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 4> ToArray() const noexcept;
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
 		/// @brief Creates a string representing a state of the color.
 		/// @return String representing a state of the color.
@@ -286,9 +281,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr RGBA<T>::RGBA(const T* const components) noexcept
+	constexpr RGBA<T>::RGBA(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<std::floating_point T>
@@ -307,7 +302,7 @@ namespace PonyEngine::Math
 
 	template<std::floating_point T>
 	constexpr RGBA<T>::RGBA(const Vector4<T>& vector) noexcept :
-		RGBA(vector.Data())
+		RGBA(vector.X(), vector.Y(), vector.Z(), vector.W()) // TODO: must be vector.Span()
 	{
 	}
 
@@ -360,15 +355,15 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr T* RGBA<T>::Data() noexcept
+	constexpr std::span<T, 4> RGBA<T>::Span() noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
-	constexpr const T* RGBA<T>::Data() const noexcept
+	constexpr std::span<const T, 4> RGBA<T>::Span() const noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
@@ -453,21 +448,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void RGBA<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void RGBA<T>::Set(std::span<const T, ComponentCount> span) noexcept
 	{
-		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
-	}
-
-	template<std::floating_point T>
-	constexpr std::array<T, 4> RGBA<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<std::floating_point T>
-	constexpr void RGBA<T>::ToArray(T (&array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<std::floating_point T>
@@ -485,10 +468,9 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr T DistanceSquared(const RGBA<T>& left, const RGBA<T>& right) noexcept
 	{
-		RGBA<T> difference = left - right;
-		difference *= difference;
+		const RGBA<T> colorVector = left - right;
 
-		return difference.R() + difference.G() + difference.B() + difference.A();
+		return colorVector.R() * colorVector.R() + colorVector.G() * colorVector.G() + colorVector.B() * colorVector.B() + colorVector.A() * colorVector.A();
 	}
 
 	template<std::floating_point T>
@@ -519,7 +501,8 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr RGBA<T>::operator RGB<T>() const noexcept
 	{
-		return RGB<T>(Data());
+		auto sp = std::span<const T, 3>(components.data(), 3);
+		return RGB<T>(Span().template subspan<0, 3>().data()); // TODO: remove .data()
 	}
 
 	template<std::floating_point T>
@@ -532,7 +515,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr RGBA<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T>(Data());
+		return Vector4<T>(Span().data());
 	}
 
 	template<std::floating_point T>
