@@ -51,10 +51,10 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr RGBAInt(const T* components) noexcept;
 		/// @brief Converts the rgb color to an rgba color.
-		/// @param color RGB color.
+		/// @param rgb RGB color.
 		/// @param alpha Alpha.
 		[[nodiscard("Pure constructor")]]
-		constexpr RGBAInt(const RGBInt<T>& color, T alpha) noexcept;
+		constexpr RGBAInt(const RGBInt<T>& rgb, T alpha) noexcept;
 		/// @brief Converts the @p vector to a color component-wise.
 		/// @param vector Vector to convert.
 		[[nodiscard("Pure constructor")]]
@@ -124,15 +124,15 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
 
-		/// @brief Check if the color is black.
+		/// @brief Checks if the color is black.
 		/// @return @a True if it's black; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsBlack() const noexcept;
-		/// @brief Check if the color is white.
+		/// @brief Checks if the color is white.
 		/// @return @a True if it's white; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsWhite() const noexcept;
-		/// @brief Check if the color is fully transparent.
+		/// @brief Checks if the color is fully transparent.
 		/// @return @a True if it's fully transparent; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsTransparent() const noexcept;
@@ -232,8 +232,8 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr RGBAInt<T>::RGBAInt(const RGBInt<T>& color, const T alpha) noexcept :
-		RGBAInt(color.R(), color.G(), color.B(), alpha)
+	constexpr RGBAInt<T>::RGBAInt(const RGBInt<T>& rgb, const T alpha) noexcept :
+		RGBAInt(rgb.R(), rgb.G(), rgb.B(), alpha)
 	{
 	}
 

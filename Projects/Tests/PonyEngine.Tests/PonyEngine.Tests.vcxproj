@@ -91,6 +91,7 @@
     <ClCompile Include="Log\LogTypeTests.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
     <ClCompile Include="Math\RGBAIntTests.cpp" />
+    <ClCompile Include="Math\RGBATests.cpp" />
     <ClCompile Include="Math\RGBIntTests.cpp" />
     <ClCompile Include="Math\CommonTests.cpp" />
     <ClCompile Include="Math\Matrix2x2Tests.cpp" />

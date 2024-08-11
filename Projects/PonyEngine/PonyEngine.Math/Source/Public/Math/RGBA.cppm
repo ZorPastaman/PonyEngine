@@ -24,6 +24,8 @@ import :Vector4;
 
 export namespace PonyEngine::Math
 {
+	/// @brief RGBA color implementation.
+	/// @tparam T Component type.
 	template<std::floating_point T>
 	class RGBA final
 	{
@@ -34,16 +36,34 @@ export namespace PonyEngine::Math
 
 		struct Predefined; ///< Predefined colors.
 
+		// TODO: Add functions to convert to and from RGBInt.
+
+		/// @brief Creates a color and sets its components to zero.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBA() noexcept = default;
+		/// @brief Creates a color and assigns its components from the arguments.
+		/// @param red Red component.
+		/// @param green Green component.
+		/// @param blue Blue component.
+		/// @param alpha Alpha component.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBA(T red, T green, T blue, T alpha) noexcept;
+		/// @brief Creates a color and assign its components from the @p components array.
+		/// @param components Component array. Its length must be at least 4. The order is r, g, b, a.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(const T* components) noexcept;
+		/// @brief Converts the rgb color to an rgba color.
+		/// @param rgb RGB color.
+		/// @param alpha Alpha.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBA(const RGB<T>& rgb, T alpha) noexcept;
+		/// @brief Converts the rgba int color to an rgba float color.
+		/// @tparam U RGBA int color component type.
+		/// @param color RGBA int color.
 		template<std::unsigned_integral U> [[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(const RGBAInt<U>& color) noexcept;
+		/// @brief Converts the @p vector to a color component-wise.
+		/// @param vector Vector to convert.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(const Vector4<T>& vector) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -53,74 +73,138 @@ export namespace PonyEngine::Math
 
 		constexpr ~RGBA() noexcept = default;
 
+		/// @brief Gets the red component.
+		/// @return Red component.
 		[[nodiscard("Pure function")]]
 		constexpr T& R() noexcept;
+		/// @brief Gets the red component.
+		/// @return Red component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& R() const noexcept;
+		/// @brief Gets the green component.
+		/// @return Green component.
 		[[nodiscard("Pure function")]]
 		constexpr T& G() noexcept;
+		/// @brief Gets the green component.
+		/// @return Green component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& G() const noexcept;
+		/// @brief Gets the blue component.
+		/// @return Blue component.
 		[[nodiscard("Pure function")]]
 		constexpr T& B() noexcept;
+		/// @brief Gets the blue component.
+		/// @return Blue component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& B() const noexcept;
+		/// @brief Gets the alpha component.
+		/// @return Alpha component.
 		[[nodiscard("Pure function")]]
 		constexpr T& A() noexcept;
+		/// @brief Gets the alpha component.
+		/// @return Alpha component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& A() const noexcept;
+		/// @brief Gets the data pointer to the array of 4 elements. The order is r, g, b, a.
+		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr T* Data() noexcept;
+		/// @brief Gets the data pointer to the array of 4 elements. The order is r, g, b, a.
+		/// @return Data pointer.
 		[[nodiscard("Pure function")]]
 		constexpr const T* Data() const noexcept;
 
+		/// @brief Computes a grayscale.
+		/// @return Grayscale.
 		[[nodiscard("Pure function")]]
 		constexpr T Grayscale() const noexcept;
 
+		/// @brief Gets a minimum among the components.
+		/// @return Minimum component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Min() noexcept;
+		/// @brief Gets a minimum among the components.
+		/// @return Minimum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Min() const noexcept;
+		/// @brief Gets a maximum among the components.
+		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr T& Max() noexcept;
+		/// @brief Gets a maximum among the components.
+		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
 
+		/// @brief Checks if the color is black.
+		/// @return @a True if it's black; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsBlack() const noexcept;
+		/// @brief Checks if the color is almost black with the @p tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return True if it's almost black; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsAlmostBlack(T tolerance = T{0.00001}) const noexcept;
+		/// @brief Checks if the color is white.
+		/// @return @a True if it's white; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsWhite() const noexcept;
+		/// @brief Checks if the color is almost white with the @p tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return True if it's almost white; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsAlmostWhite(T tolerance = T{0.00001}) const noexcept;
+		/// @brief Checks if the color is fully transparent.
+		/// @return @a True if it's fully transparent; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsTransparent() const noexcept;
+		/// @brief Checks if the color is almost transparent with the @p tolerance value.
+		/// @param tolerance Tolerance. Must be positive.
+		/// @return @a True if it's almost transparent; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsAlmostTransparent(T tolerance = T{0.00001}) const noexcept;
 
+		/// @brief Checks if all the components are finite.
+		/// @return @a True if all the components are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
+		/// @brief Sets arguments to components.
+		/// @param red Red.
+		/// @param green Green.
+		/// @param blue Blue.
+		/// @param alpha Alpha.
 		constexpr void Set(T red, T green, T blue, T alpha) noexcept;
+		/// @brief Sets components from the array.
+		/// @param componentsToSet Component array. Its length must be at least 4.
 		constexpr void Set(const T* componentsToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
 		constexpr std::array<T, 4> ToArray() const noexcept;
 		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
 
+		/// @brief Creates a string representing a state of the color.
+		/// @return String representing a state of the color.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts all the components to @p U and returns it as a new color.
+		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator RGBA<U>() const noexcept;
+		/// @brief Converts the rgba color to an rgb color skipping the alpha.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator RGB<T>() const noexcept;
+		/// @brief Converts to an integral color.
+		/// @tparam U Target type.
 		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator RGBAInt<U>() const noexcept;
 
+		/// @brief Converts the color to a vector.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator Vector4<T>() const noexcept;
+
+		// TODO: Continue tests from here.
 
 		[[nodiscard("Pure operator")]]
 		constexpr T& operator [](std::size_t index) noexcept;
@@ -180,16 +264,16 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr RGBA Red = RGBA(T{1}, T{0}, T{0}, T{1});
-		static constexpr RGBA Green = RGBA(T{0}, T{1}, T{0}, T{1});
-		static constexpr RGBA Blue = RGBA(T{0}, T{0}, T{1}, T{1});
-		static constexpr RGBA Black = RGBA(T{0}, T{0}, T{0}, T{1});
-		static constexpr RGBA White = RGBA(T{1}, T{1}, T{1}, T{1});
-		static constexpr RGBA Clear = RGBA(T{0}, T{0}, T{0}, T{0});
-		static constexpr RGBA Gray = RGBA(T{0.5}, T{0.5}, T{0.5}, T{1});
-		static constexpr RGBA Yellow = RGBA(T{1}, T{1}, T{0}, T{1});
-		static constexpr RGBA Magenta = RGBA(T{1}, T{0}, T{1}, T{1});
-		static constexpr RGBA Cyan = RGBA(T{0}, T{1}, T{1}, T{1});
+		static constexpr auto Red = RGBA(T{1}, T{0}, T{0}, T{1}); ///< RGBA(1, 0, 0, 1).
+		static constexpr auto Green = RGBA(T{0}, T{1}, T{0}, T{1}); ///< RGBA(0, 1, 0, 1).
+		static constexpr auto Blue = RGBA(T{0}, T{0}, T{1}, T{1}); ///< RGBA(0, 0, 1, 1).
+		static constexpr auto Black = RGBA(T{0}, T{0}, T{0}, T{1}); ///< RGBA(0, 0, 0, 1).
+		static constexpr auto White = RGBA(T{1}, T{1}, T{1}, T{1}); ///< RGBA(1, 1, 1, 1).
+		static constexpr auto Clear = RGBA(T{0}, T{0}, T{0}, T{0}); ///< RGBA(0, 0, 0, 0).
+		static constexpr auto Gray = RGBA(T{0.5}, T{0.5}, T{0.5}, T{1}); ///< RGBA(0.5, 0.5, 0.5, 1).
+		static constexpr auto Yellow = RGBA(T{1}, T{1}, T{0}, T{1}); ///< RGBA(1, 1, 0, 1).
+		static constexpr auto Magenta = RGBA(T{1}, T{0}, T{1}, T{1}); ///< RGBA(1, 0, 1, 1).
+		static constexpr auto Cyan = RGBA(T{0}, T{1}, T{1}, T{1}); ///< RGBA(0, 1, 1, 1).
 	};
 }
 

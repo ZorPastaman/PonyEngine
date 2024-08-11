@@ -185,10 +185,10 @@ export namespace PonyEngine::Math
 		/// @brief Converts the vector to an array.
 		/// @return Vector array.
 		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 3> ToArray() const noexcept;
+		constexpr std::array<T, 3> ToArray() const noexcept; // TODO: Add constructors from array. And use them instead of passing Data(). Maybe, it's better to use std::span. Maybe, it's even better to use span instead of pointer everywhere in math.
 		/// @brief Converts the vector to a c-style array.
 		/// @param array Target array.
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept; // TODO: Remove ToArray() functions like this.
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z)'.
 		/// @return State string.

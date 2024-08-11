@@ -109,11 +109,11 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
 
-		/// @brief Check if the color is black.
+		/// @brief Checks if the color is black.
 		/// @return @a True if it's black; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsBlack() const noexcept;
-		/// @brief Check if the color is white.
+		/// @brief Checks if the color is white.
 		/// @return @a True if it's white; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool IsWhite() const noexcept;
