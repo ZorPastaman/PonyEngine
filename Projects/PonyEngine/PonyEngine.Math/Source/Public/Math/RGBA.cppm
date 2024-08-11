@@ -49,8 +49,8 @@ export namespace PonyEngine::Math
 		/// @param alpha Alpha component.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBA(T red, T green, T blue, T alpha) noexcept;
-		/// @brief Creates a color and assigns its components from the @p span. The order is r, g, b, a.
-		/// @param span Components.
+		/// @brief Creates a color and assigns its components from the @p span.
+		/// @param span Components. The order is r, g, b, a.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr RGBA(std::span<const T, ComponentCount> span) noexcept;
 		/// @brief Converts the rgb color to an rgba color.
@@ -501,8 +501,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr RGBA<T>::operator RGB<T>() const noexcept
 	{
-		auto sp = std::span<const T, 3>(components.data(), 3);
-		return RGB<T>(Span().template subspan<0, 3>().data()); // TODO: remove .data()
+		return RGB<T>(std::span<const T, RGB<T>::ComponentCount>(components.data(), RGB<T>::ComponentCount));
 	}
 
 	template<std::floating_point T>

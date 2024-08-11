@@ -13,7 +13,6 @@ import <cstddef>;
 import <cstdint>;
 import <format>;
 import <limits>;
-import <span>;
 import <string>;
 
 import PonyEngine.Math;
@@ -66,15 +65,8 @@ namespace Math
 			Assert::AreEqual(b, color.B());
 			Assert::AreEqual(a, color.A());
 
-			auto array = std::array<float, 4> { r, g, b, a };
-			const auto arrayColor = PonyEngine::Math::RGBA<float>(std::span(array));
-			Assert::AreEqual(r, arrayColor.R());
-			Assert::AreEqual(g, arrayColor.G());
-			Assert::AreEqual(b, arrayColor.B());
-			Assert::AreEqual(a, arrayColor.A());
-
-			constexpr  auto cArray = std::array<float, 4> { r, g, b, a };
-			const auto cArrayColor = PonyEngine::Math::RGBA<float>(std::span(cArray));
+			constexpr auto array = std::array<float, 4> { r, g, b, a };
+			const auto arrayColor = PonyEngine::Math::RGBA<float>(array);
 			Assert::AreEqual(r, arrayColor.R());
 			Assert::AreEqual(g, arrayColor.G());
 			Assert::AreEqual(b, arrayColor.B());
@@ -136,7 +128,7 @@ namespace Math
 			Assert::AreEqual(a, cColor.A());
 		}
 
-		TEST_METHOD(DataTest)
+		TEST_METHOD(SpanTest)
 		{
 			constexpr float r = 0.49f;
 			constexpr float g = 0.69f;

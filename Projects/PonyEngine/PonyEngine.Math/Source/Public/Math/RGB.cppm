@@ -15,6 +15,7 @@ import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <span>;
 import <string>;
 
 import :RGBInt;
@@ -37,7 +38,7 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr RGB(T red, T green, T blue) noexcept;
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr RGB(const T* components) noexcept;
+		explicit constexpr RGB(std::span<const T, ComponentCount> span) noexcept;
 		template<std::unsigned_integral U> [[nodiscard("Pure constructor")]]
 		explicit constexpr RGB(const RGBInt<U>& color) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -62,9 +63,9 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr const T& B() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
+		constexpr std::span<T, 3> Span() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
+		constexpr std::span<const T, 3> Span() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		constexpr T Grayscale() const noexcept;
@@ -91,11 +92,7 @@ export namespace PonyEngine::Math
 		bool IsFinite() const noexcept;
 
 		constexpr void Set(T red, T green, T blue) noexcept;
-		constexpr void Set(const T* componentsToSet) noexcept;
-
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 3> ToArray() const noexcept;
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+		constexpr void Set(std::span<const T, 3> span) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
@@ -187,9 +184,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr RGB<T>::RGB(const T* const components) noexcept
+	constexpr RGB<T>::RGB(std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<std::floating_point T>
@@ -243,15 +240,15 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr T* RGB<T>::Data() noexcept
+	constexpr std::span<T, 3> RGB<T>::Span() noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
-	constexpr const T* RGB<T>::Data() const noexcept
+	constexpr std::span<const T, 3> RGB<T>::Span() const noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
@@ -323,21 +320,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void RGB<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void RGB<T>::Set(std::span<const T, 3> span) noexcept
 	{
-		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
-	}
-
-	template<std::floating_point T>
-	constexpr std::array<T, 3> RGB<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<std::floating_point T>
-	constexpr void RGB<T>::ToArray(T (&array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<std::floating_point T>
@@ -396,7 +381,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr RGB<T>::operator Vector3<T>() const noexcept
 	{
-		return Vector3<T>(Data());
+		return Vector3<T>(Span().data());
 	}
 
 	template<std::floating_point T>
