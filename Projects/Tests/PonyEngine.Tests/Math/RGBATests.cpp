@@ -13,6 +13,7 @@ import <cstddef>;
 import <cstdint>;
 import <format>;
 import <limits>;
+import <span>;
 import <string>;
 
 import PonyEngine.Math;
@@ -65,8 +66,15 @@ namespace Math
 			Assert::AreEqual(b, color.B());
 			Assert::AreEqual(a, color.A());
 
-			constexpr auto array = std::array<float, 4> { r, g, b, a };
-			const auto arrayColor = PonyEngine::Math::RGBA<float>(array.data());
+			auto array = std::array<float, 4> { r, g, b, a };
+			const auto arrayColor = PonyEngine::Math::RGBA<float>(std::span(array));
+			Assert::AreEqual(r, arrayColor.R());
+			Assert::AreEqual(g, arrayColor.G());
+			Assert::AreEqual(b, arrayColor.B());
+			Assert::AreEqual(a, arrayColor.A());
+
+			constexpr  auto cArray = std::array<float, 4> { r, g, b, a };
+			const auto cArrayColor = PonyEngine::Math::RGBA<float>(std::span(cArray));
 			Assert::AreEqual(r, arrayColor.R());
 			Assert::AreEqual(g, arrayColor.G());
 			Assert::AreEqual(b, arrayColor.B());
@@ -135,15 +143,17 @@ namespace Math
 			constexpr float b = 0.211f;
 			constexpr float a = 0.166f;
 			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
-			Assert::AreEqual(r, color.Data()[0]);
-			Assert::AreEqual(g, color.Data()[1]);
-			Assert::AreEqual(b, color.Data()[2]);
-			Assert::AreEqual(a, color.Data()[3]);
+			Assert::AreEqual(r, color.Span()[0]);
+			Assert::AreEqual(g, color.Span()[1]);
+			Assert::AreEqual(b, color.Span()[2]);
+			Assert::AreEqual(a, color.Span()[3]);
+			color.Span()[0] += 1.f;
+			Assert::AreEqual(r + 1, color.Span()[0]);
 			constexpr auto cColor = PonyEngine::Math::RGBA<float>(r, g, b, a);
-			Assert::AreEqual(r, cColor.Data()[0]);
-			Assert::AreEqual(g, cColor.Data()[1]);
-			Assert::AreEqual(b, cColor.Data()[2]);
-			Assert::AreEqual(a, cColor.Data()[3]);
+			Assert::AreEqual(r, cColor.Span()[0]);
+			Assert::AreEqual(g, cColor.Span()[1]);
+			Assert::AreEqual(b, cColor.Span()[2]);
+			Assert::AreEqual(a, cColor.Span()[3]);
 		}
 
 		TEST_METHOD(GrayscaleTest)
@@ -297,6 +307,13 @@ namespace Math
 			constexpr float a = 0.166f;
 			auto color = PonyEngine::Math::RGBA<float>();
 			color.Set(r, g, b, a);
+			Assert::AreEqual(r, color.R());
+			Assert::AreEqual(g, color.G());
+			Assert::AreEqual(b, color.B());
+			Assert::AreEqual(a, color.A());
+			auto array = std::array<float, 4> { r, g, b, a };
+			color = PonyEngine::Math::RGBA<float>();
+			color.Set(array);
 			Assert::AreEqual(r, color.R());
 			Assert::AreEqual(g, color.G());
 			Assert::AreEqual(b, color.B());
