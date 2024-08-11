@@ -16,6 +16,7 @@ import <cstddef>;
 import <format>;
 import <limits>;
 import <ostream>;
+import <span>;
 import <string>;
 
 import :Vector3;
@@ -44,10 +45,10 @@ export namespace PonyEngine::Math
 		/// @param blue Blue component.
 		[[nodiscard("Pure constructor")]]
 		constexpr RGBInt(T red, T green, T blue) noexcept;
-		/// @brief Creates a color and assign its components from the @p components array.
-		/// @param components Component array. Its length must be at least 3. The order is r, g, b.
+		/// @brief Creates a color and assign its components from the @p span.
+		/// @param span Span. The order is r, g, b.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr RGBInt(const T* components) noexcept;
+		explicit constexpr RGBInt(std::span<const T, ComponentCount> span) noexcept;
 		/// @brief Converts the vector to a color component-wise.
 		/// @param vector Vector to convert.
 		[[nodiscard("Pure constructor")]]
@@ -83,14 +84,14 @@ export namespace PonyEngine::Math
 		/// @return Blue component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& B() const noexcept;
-		/// @brief Gets the data pointer to the array of 3 elements. The order is r, g, b.
-		/// @return Data pointer.
+		/// @brief Gets the color span. The order is r, g, b.
+		/// @return Color span.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
-		/// @brief Gets the data pointer to the array of 3 elements. The order is r, g, b.
-		/// @return Data pointer.
+		constexpr std::span<T, 3> Span() noexcept;
+		/// @brief Gets the color span. The order is r, g, b.
+		/// @return Color span.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
+		constexpr std::span<const T, 3> Span() const noexcept;
 
 		/// @brief Gets a minimum among the components.
 		/// @return Minimum component.
@@ -124,16 +125,8 @@ export namespace PonyEngine::Math
 		/// @param blue Blue.
 		constexpr void Set(T red, T green, T blue) noexcept;
 		/// @brief Sets components from the array.
-		/// @param componentsToSet Component array. Its length must be at least 3.
-		constexpr void Set(const T* componentsToSet) noexcept;
-
-		/// @brief Converts the color to an array.
-		/// @return Color array.
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 3> ToArray() const noexcept;
-		/// @brief Converts the color to an array.
-		/// @param array Color array.
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+		/// @param span Span. The order is r, g, b.
+		constexpr void Set(std::span<const T, 3> span) noexcept;
 
 		/// @brief Creates a string representing a state of the color.
 		/// @return String representing a state of the color.
@@ -201,14 +194,14 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr RGBInt<T>::RGBInt(const T* const components) noexcept
+	constexpr RGBInt<T>::RGBInt(std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<std::unsigned_integral T>
 	constexpr RGBInt<T>::RGBInt(const Vector3<T>& vector) noexcept :
-		RGBInt(vector.Data())
+		RGBInt(vector.X(), vector.Y(), vector.Z()) // TODO: Replace with span.
 	{
 	}
 
@@ -249,15 +242,15 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr T* RGBInt<T>::Data() noexcept
+	constexpr std::span<T, 3> RGBInt<T>::Span() noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::unsigned_integral T>
-	constexpr const T* RGBInt<T>::Data() const noexcept
+	constexpr std::span<const T, 3> RGBInt<T>::Span() const noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::unsigned_integral T>
@@ -305,21 +298,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr void RGBInt<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void RGBInt<T>::Set(std::span<const T, 3> span) noexcept
 	{
-		std::copy_n(componentsToSet, ComponentCount, Data()); // TODO: Apply copy_n to other structures
-	}
-
-	template<std::unsigned_integral T>
-	constexpr std::array<T, 3> RGBInt<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<std::unsigned_integral T>
-	constexpr void RGBInt<T>::ToArray(T (&array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<std::unsigned_integral T>
@@ -331,7 +312,7 @@ namespace PonyEngine::Math
 	template<std::unsigned_integral T>
 	constexpr RGBInt<T>::operator Vector3<T>() const noexcept
 	{
-		return Vector3<T>(Data());
+		return Vector3<T>(Span().data());
 	}
 
 	template<std::unsigned_integral T>

@@ -62,7 +62,7 @@ namespace Math
 			Assert::AreEqual(b, color.B());
 
 			auto array = std::array{r, g, b};
-			const auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(array.data());
+			const auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(array);
 			Assert::AreEqual(r, arrayColor.R());
 			Assert::AreEqual(g, arrayColor.G());
 			Assert::AreEqual(b, arrayColor.B());
@@ -99,19 +99,21 @@ namespace Math
 			Assert::AreEqual(b, cColor.B());
 		}
 
-		TEST_METHOD(DataTest)
+		TEST_METHOD(SpanTest)
 		{
 			constexpr std::uint8_t r = 69;
 			constexpr std::uint8_t g = 200;
 			constexpr std::uint8_t b = 228;
 			auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
-			Assert::AreEqual(r, color.Data()[0]);
-			Assert::AreEqual(g, color.Data()[1]);
-			Assert::AreEqual(b, color.Data()[2]);
+			Assert::AreEqual(r, color.Span()[0]);
+			Assert::AreEqual(g, color.Span()[1]);
+			Assert::AreEqual(b, color.Span()[2]);
+			color.Span()[0] += 1;
+			Assert::AreEqual(static_cast<std::uint8_t>(r + 1), color.Span()[0]);
 			constexpr auto cColor = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
-			Assert::AreEqual(r, cColor.Data()[0]);
-			Assert::AreEqual(g, cColor.Data()[1]);
-			Assert::AreEqual(b, cColor.Data()[2]);
+			Assert::AreEqual(r, cColor.Span()[0]);
+			Assert::AreEqual(g, cColor.Span()[1]);
+			Assert::AreEqual(b, cColor.Span()[2]);
 		}
 
 		TEST_METHOD(MinTest)
@@ -168,27 +170,10 @@ namespace Math
 			Assert::AreEqual(b, color.B());
 			color = PonyEngine::Math::RGBInt<std::uint8_t>();
 			constexpr std::array<std::uint8_t, 3> array = {r, g, b};
-			color.Set(array.data());
+			color.Set(array);
 			Assert::AreEqual(r, color.R());
 			Assert::AreEqual(g, color.G());
 			Assert::AreEqual(b, color.B());
-		}
-
-		TEST_METHOD(ToArrayTest)
-		{
-			constexpr std::uint8_t r = 211;
-			constexpr std::uint8_t g = 200;
-			constexpr std::uint8_t b = 1;
-			constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
-			const auto array = color.ToArray();
-			Assert::AreEqual(r, array[0]);
-			Assert::AreEqual(g, array[1]);
-			Assert::AreEqual(b, array[2]);
-			std::uint8_t cArray[3];
-			color.ToArray(cArray);
-			Assert::AreEqual(r, cArray[0]);
-			Assert::AreEqual(g, cArray[1]);
-			Assert::AreEqual(b, cArray[2]);
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -284,17 +269,13 @@ namespace Math
 			[[maybe_unused]] std::uint8_t g = movedColor.G();
 			[[maybe_unused]] std::uint8_t b = movedColor.B();
 
-			[[maybe_unused]] std::uint8_t* data = movedColor.Data();
-			[[maybe_unused]] const std::uint8_t* copiedData = copiedColor.Data();
+			[[maybe_unused]] const auto span = movedColor.Span();
 
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();
 
-			std::uint8_t array[3];
-			movedColor.ToArray(array);
-
 			movedColor.Set(124, 21, 90);
-			movedColor.Set(array);
+			movedColor.Set(span);
 
 			[[maybe_unused]] auto component = movedColor[1];
 
@@ -309,7 +290,7 @@ namespace Math
 			[[maybe_unused]] constexpr auto defaultColor = PonyEngine::Math::RGBInt<std::uint8_t>();
 			[[maybe_unused]] constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(3, 250, 128);
 			constexpr auto array = std::array{color.R(), color.G(), color.B()};
-			[[maybe_unused]] constexpr auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(array.data());
+			[[maybe_unused]] constexpr auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(array);
 			[[maybe_unused]] constexpr auto copiedColor = color;
 			[[maybe_unused]] constexpr auto movedColor = ColorConstexpr();
 
@@ -323,7 +304,7 @@ namespace Math
 			[[maybe_unused]] constexpr bool isBlack = color.IsBlack();
 			[[maybe_unused]] constexpr bool isWhite = color.IsWhite();
 
-			[[maybe_unused]] constexpr auto colorArray = color.ToArray();
+			[[maybe_unused]] constexpr auto colorArray = color.Span();
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyEngine::Math::Vector3<std::uint8_t>>(color);
 
