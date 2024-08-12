@@ -184,7 +184,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr RGB<T>::RGB(std::span<const T, ComponentCount> span) noexcept
+	constexpr RGB<T>::RGB(const std::span<const T, ComponentCount> span) noexcept
 	{
 		Set(span);
 	}
@@ -320,7 +320,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void RGB<T>::Set(std::span<const T, 3> span) noexcept
+	constexpr void RGB<T>::Set(const std::span<const T, 3> span) noexcept
 	{
 		std::ranges::copy(span, components.data());
 	}

@@ -15,6 +15,7 @@ import <cmath>;
 import <cstddef>;
 import <format>;
 import <ostream>;
+import <span>;
 import <string>;
 import <type_traits>;
 
@@ -45,10 +46,10 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(T x, T y, T z, T w) noexcept;
-		/// @brief Creates a vector and assign its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4. The order is x, y, z, w.
+		/// @brief Creates a vector and assign its components from the @p span.
+		/// @param span Span. The order is x, y, z, w.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Vector4(const T* components) noexcept;
+		explicit constexpr Vector4(std::span<const T, ComponentCount> span) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Vector4(const Vector4& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -88,14 +89,14 @@ export namespace PonyEngine::Math
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& W() const noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
-		/// @return Data pointer.
+		/// @brief Gets the vector span. The order is x, y, z, w.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
-		/// @return Data pointer.
+		constexpr std::span<T, 4> Span() noexcept;
+		/// @brief Gets the vector span. The order is x, y, z, w.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
+		constexpr std::span<const T, 4> Span() const noexcept;
 
 		/// @brief Computes a magnitude of the vector.
 		/// @return Computed magnitude.
@@ -184,20 +185,12 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		constexpr void Set(T x, T y, T z, T w) noexcept;
 		/// @brief Assigns arguments from the @p components array.
-		/// @param componentsToSet Component array. Its length must be at least 4.
-		constexpr void Set(const T* componentsToSet) noexcept;
+		/// @param span Span. The order is x, y, z, w.
+		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Vector to multiply by.
 		constexpr void Scale(const Vector4& scale) noexcept;
-
-		/// @brief Converts the vector to an array.
-		/// @return Vector array.
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 4> ToArray() const noexcept;
-		/// @brief Converts the vector to a c-style array.
-		/// @param array Target array.
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -393,9 +386,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T>::Vector4(const T* const components) noexcept
+	constexpr Vector4<T>::Vector4(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<Arithmetic T>
@@ -447,15 +440,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr T* Vector4<T>::Data() noexcept
+	constexpr std::span<T, 4> Vector4<T>::Span() noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<Arithmetic T>
-	constexpr const T* Vector4<T>::Data() const noexcept
+	constexpr std::span<const T, 4> Vector4<T>::Span() const noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<Arithmetic T>
@@ -581,9 +574,9 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr void Vector4<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void Vector4<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
-		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -593,18 +586,6 @@ namespace PonyEngine::Math
 		{
 			(*this)[i] *= scale[i];
 		}
-	}
-
-	template<Arithmetic T>
-	constexpr std::array<T, 4> Vector4<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<Arithmetic T>
-	constexpr void Vector4<T>::ToArray(T (&array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
 	}
 
 	template<Arithmetic T>

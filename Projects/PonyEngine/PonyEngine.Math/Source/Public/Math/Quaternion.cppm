@@ -16,6 +16,7 @@ import <concepts>;
 import <format>;
 import <numbers>;
 import <ostream>;
+import <span>;
 import <string>;
 
 import :Common;
@@ -46,10 +47,10 @@ export namespace PonyEngine::Math
 		/// @param w W-component.
 		[[nodiscard("Pure constructor")]]
 		constexpr Quaternion(T x, T y, T z, T w) noexcept;
-		/// @brief Creates a quaternion and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 4. The order is x, y, z, w.
+		/// @brief Creates a quaternion and assigns its components from the @p span.
+		/// @param span Span. The order is x, y, z, w.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Quaternion(const T* components) noexcept;
+		explicit constexpr Quaternion(std::span<const T, ComponentCount> span) noexcept;
 		/// @brief Creates a quaternion and assigns its components from the @p vector components.
 		/// @param vector Component values source.
 		[[nodiscard("Pure constructor")]]
@@ -93,14 +94,14 @@ export namespace PonyEngine::Math
 		/// @return W-component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& W() const noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
-		/// @return Data pointer.
+		/// @brief Gets the quaternion span. The order is x, y, z, w.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
-		/// @brief Gets the data pointer to the array of 4 elements. The order is x, y, z, w.
-		/// @return Data pointer.
+		constexpr std::span<T, 4> Span() noexcept;
+		/// @brief Gets the quaternion span. The order is x, y, z, w.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
+		constexpr std::span<const T, 4> Span() const noexcept;
 
 		/// @brief Computes a magnitude of the quaternion.
 		/// @remark The rotation quaternion always has a magnitude of 1.
@@ -165,17 +166,9 @@ export namespace PonyEngine::Math
 		/// @param z Z-component.
 		/// @param w W-component.
 		constexpr void Set(T x, T y, T z, T w) noexcept;
-		/// @brief Assigns @p components to the quaternion components.
-		/// @param componentsToSet Component array. Its length must be at least 4.
-		constexpr void Set(const T* componentsToSet) noexcept;
-
-		/// @brief Converts the quaternion to an array.
-		/// @return Quaternion array.
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 4> ToArray() const noexcept;
-		/// @brief Converts the quaternion to a c-style array.
-		/// @param array Target array.
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
+		/// @brief Assigns @p span to the quaternion components.
+		/// @param span Span. The order is x, y, z, w.
+		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -336,14 +329,14 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr Quaternion<T>::Quaternion(const T* const components) noexcept
+	constexpr Quaternion<T>::Quaternion(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const Vector4<T>& vector) noexcept :
-		Quaternion(vector.Data())
+		Quaternion(vector.Span())
 	{
 	}
 
@@ -396,15 +389,15 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr T* Quaternion<T>::Data() noexcept
+	constexpr std::span<T, 4> Quaternion<T>::Span() noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
-	constexpr const T* Quaternion<T>::Data() const noexcept
+	constexpr std::span<const T, 4> Quaternion<T>::Span() const noexcept
 	{
-		return components.data();
+		return components;
 	}
 
 	template<std::floating_point T>
@@ -484,21 +477,9 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void Quaternion<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void Quaternion<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
-		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
-	}
-
-	template<std::floating_point T>
-	constexpr std::array<T, 4> Quaternion<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<std::floating_point T>
-	constexpr void Quaternion<T>::ToArray(T (& array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<std::floating_point T>
@@ -563,7 +544,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr Quaternion<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T>(Data());
+		return Vector4<T>(components);
 	}
 
 	template<std::floating_point T>

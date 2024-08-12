@@ -470,7 +470,7 @@ namespace Math
 			constexpr short m12 = 7;
 			constexpr short m22 = 19;
 			constexpr std::array<short, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
-			const auto matrix = PonyEngine::Math::Matrix3x3<short>(array.data());
+			const auto matrix = PonyEngine::Math::Matrix3x3<short>(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -494,7 +494,7 @@ namespace Math
 			constexpr float m12 = 7;
 			constexpr float m22 = 19;
 			constexpr std::array<float, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
-			const auto matrix = PonyEngine::Math::Matrix3x3<float>(array.data());
+			const auto matrix = PonyEngine::Math::Matrix3x3<float>(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -672,7 +672,7 @@ namespace Math
 			Assert::AreEqual(m22, matrixC.M22());
 		}
 
-		TEST_METHOD(DataShortTest)
+		TEST_METHOD(SpanShortTest)
 		{
 			constexpr short m00 = 10;
 			constexpr short m10 = -15;
@@ -685,47 +685,50 @@ namespace Math
 			constexpr short m22 = 19;
 
 			auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrix.Data()[0]);
-			Assert::AreEqual(m10, matrix.Data()[1]);
-			Assert::AreEqual(m20, matrix.Data()[2]);
-			Assert::AreEqual(m01, matrix.Data()[3]);
-			Assert::AreEqual(m11, matrix.Data()[4]);
-			Assert::AreEqual(m21, matrix.Data()[5]);
-			Assert::AreEqual(m02, matrix.Data()[6]);
-			Assert::AreEqual(m12, matrix.Data()[7]);
-			Assert::AreEqual(m22, matrix.Data()[8]);
-			Assert::AreEqual(m00, matrix.Data(0)[0]);
-			Assert::AreEqual(m10, matrix.Data(0)[1]);
-			Assert::AreEqual(m20, matrix.Data(0)[2]);
-			Assert::AreEqual(m01, matrix.Data(1)[0]);
-			Assert::AreEqual(m11, matrix.Data(1)[1]);
-			Assert::AreEqual(m21, matrix.Data(1)[2]);
-			Assert::AreEqual(m02, matrix.Data(2)[0]);
-			Assert::AreEqual(m12, matrix.Data(2)[1]);
-			Assert::AreEqual(m22, matrix.Data(2)[2]);
+			Assert::AreEqual(m00, matrix.Span()[0]);
+			Assert::AreEqual(m10, matrix.Span()[1]);
+			Assert::AreEqual(m20, matrix.Span()[2]);
+			Assert::AreEqual(m01, matrix.Span()[3]);
+			Assert::AreEqual(m11, matrix.Span()[4]);
+			Assert::AreEqual(m21, matrix.Span()[5]);
+			Assert::AreEqual(m02, matrix.Span()[6]);
+			Assert::AreEqual(m12, matrix.Span()[7]);
+			Assert::AreEqual(m22, matrix.Span()[8]);
+			Assert::AreEqual(m00, matrix.Span(0)[0]);
+			Assert::AreEqual(m10, matrix.Span(0)[1]);
+			Assert::AreEqual(m20, matrix.Span(0)[2]);
+			Assert::AreEqual(m01, matrix.Span(1)[0]);
+			Assert::AreEqual(m11, matrix.Span(1)[1]);
+			Assert::AreEqual(m21, matrix.Span(1)[2]);
+			Assert::AreEqual(m02, matrix.Span(2)[0]);
+			Assert::AreEqual(m12, matrix.Span(2)[1]);
+			Assert::AreEqual(m22, matrix.Span(2)[2]);
+			matrix.Span()[0] += 1;
+			matrix.Span(0)[0] += 1;
+			Assert::AreEqual(static_cast<short>(m00 + 2), matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrixC.Data()[0]);
-			Assert::AreEqual(m10, matrixC.Data()[1]);
-			Assert::AreEqual(m20, matrixC.Data()[2]);
-			Assert::AreEqual(m01, matrixC.Data()[3]);
-			Assert::AreEqual(m11, matrixC.Data()[4]);
-			Assert::AreEqual(m21, matrixC.Data()[5]);
-			Assert::AreEqual(m02, matrixC.Data()[6]);
-			Assert::AreEqual(m12, matrixC.Data()[7]);
-			Assert::AreEqual(m22, matrixC.Data()[8]);
-			Assert::AreEqual(m00, matrixC.Data(0)[0]);
-			Assert::AreEqual(m10, matrixC.Data(0)[1]);
-			Assert::AreEqual(m20, matrixC.Data(0)[2]);
-			Assert::AreEqual(m01, matrixC.Data(1)[0]);
-			Assert::AreEqual(m11, matrixC.Data(1)[1]);
-			Assert::AreEqual(m21, matrixC.Data(1)[2]);
-			Assert::AreEqual(m02, matrixC.Data(2)[0]);
-			Assert::AreEqual(m12, matrixC.Data(2)[1]);
-			Assert::AreEqual(m22, matrixC.Data(2)[2]);
+			Assert::AreEqual(m00, matrixC.Span()[0]);
+			Assert::AreEqual(m10, matrixC.Span()[1]);
+			Assert::AreEqual(m20, matrixC.Span()[2]);
+			Assert::AreEqual(m01, matrixC.Span()[3]);
+			Assert::AreEqual(m11, matrixC.Span()[4]);
+			Assert::AreEqual(m21, matrixC.Span()[5]);
+			Assert::AreEqual(m02, matrixC.Span()[6]);
+			Assert::AreEqual(m12, matrixC.Span()[7]);
+			Assert::AreEqual(m22, matrixC.Span()[8]);
+			Assert::AreEqual(m00, matrixC.Span(0)[0]);
+			Assert::AreEqual(m10, matrixC.Span(0)[1]);
+			Assert::AreEqual(m20, matrixC.Span(0)[2]);
+			Assert::AreEqual(m01, matrixC.Span(1)[0]);
+			Assert::AreEqual(m11, matrixC.Span(1)[1]);
+			Assert::AreEqual(m21, matrixC.Span(1)[2]);
+			Assert::AreEqual(m02, matrixC.Span(2)[0]);
+			Assert::AreEqual(m12, matrixC.Span(2)[1]);
+			Assert::AreEqual(m22, matrixC.Span(2)[2]);
 		}
 
-		TEST_METHOD(DataFloatTest)
+		TEST_METHOD(SpanFloatTest)
 		{
 			constexpr float m00 = 10;
 			constexpr float m10 = -15;
@@ -738,44 +741,47 @@ namespace Math
 			constexpr float m22 = 19;
 
 			auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrix.Data()[0]);
-			Assert::AreEqual(m10, matrix.Data()[1]);
-			Assert::AreEqual(m20, matrix.Data()[2]);
-			Assert::AreEqual(m01, matrix.Data()[3]);
-			Assert::AreEqual(m11, matrix.Data()[4]);
-			Assert::AreEqual(m21, matrix.Data()[5]);
-			Assert::AreEqual(m02, matrix.Data()[6]);
-			Assert::AreEqual(m12, matrix.Data()[7]);
-			Assert::AreEqual(m22, matrix.Data()[8]);
-			Assert::AreEqual(m00, matrix.Data(0)[0]);
-			Assert::AreEqual(m10, matrix.Data(0)[1]);
-			Assert::AreEqual(m20, matrix.Data(0)[2]);
-			Assert::AreEqual(m01, matrix.Data(1)[0]);
-			Assert::AreEqual(m11, matrix.Data(1)[1]);
-			Assert::AreEqual(m21, matrix.Data(1)[2]);
-			Assert::AreEqual(m02, matrix.Data(2)[0]);
-			Assert::AreEqual(m12, matrix.Data(2)[1]);
-			Assert::AreEqual(m22, matrix.Data(2)[2]);
+			Assert::AreEqual(m00, matrix.Span()[0]);
+			Assert::AreEqual(m10, matrix.Span()[1]);
+			Assert::AreEqual(m20, matrix.Span()[2]);
+			Assert::AreEqual(m01, matrix.Span()[3]);
+			Assert::AreEqual(m11, matrix.Span()[4]);
+			Assert::AreEqual(m21, matrix.Span()[5]);
+			Assert::AreEqual(m02, matrix.Span()[6]);
+			Assert::AreEqual(m12, matrix.Span()[7]);
+			Assert::AreEqual(m22, matrix.Span()[8]);
+			Assert::AreEqual(m00, matrix.Span(0)[0]);
+			Assert::AreEqual(m10, matrix.Span(0)[1]);
+			Assert::AreEqual(m20, matrix.Span(0)[2]);
+			Assert::AreEqual(m01, matrix.Span(1)[0]);
+			Assert::AreEqual(m11, matrix.Span(1)[1]);
+			Assert::AreEqual(m21, matrix.Span(1)[2]);
+			Assert::AreEqual(m02, matrix.Span(2)[0]);
+			Assert::AreEqual(m12, matrix.Span(2)[1]);
+			Assert::AreEqual(m22, matrix.Span(2)[2]);
+			matrix.Span()[0] += 1;
+			matrix.Span(0)[0] += 1;
+			Assert::AreEqual(m00 + 2, matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrixC.Data()[0]);
-			Assert::AreEqual(m10, matrixC.Data()[1]);
-			Assert::AreEqual(m20, matrixC.Data()[2]);
-			Assert::AreEqual(m01, matrixC.Data()[3]);
-			Assert::AreEqual(m11, matrixC.Data()[4]);
-			Assert::AreEqual(m21, matrixC.Data()[5]);
-			Assert::AreEqual(m02, matrixC.Data()[6]);
-			Assert::AreEqual(m12, matrixC.Data()[7]);
-			Assert::AreEqual(m22, matrixC.Data()[8]);
-			Assert::AreEqual(m00, matrixC.Data(0)[0]);
-			Assert::AreEqual(m10, matrixC.Data(0)[1]);
-			Assert::AreEqual(m20, matrixC.Data(0)[2]);
-			Assert::AreEqual(m01, matrixC.Data(1)[0]);
-			Assert::AreEqual(m11, matrixC.Data(1)[1]);
-			Assert::AreEqual(m21, matrixC.Data(1)[2]);
-			Assert::AreEqual(m02, matrixC.Data(2)[0]);
-			Assert::AreEqual(m12, matrixC.Data(2)[1]);
-			Assert::AreEqual(m22, matrixC.Data(2)[2]);
+			Assert::AreEqual(m00, matrixC.Span()[0]);
+			Assert::AreEqual(m10, matrixC.Span()[1]);
+			Assert::AreEqual(m20, matrixC.Span()[2]);
+			Assert::AreEqual(m01, matrixC.Span()[3]);
+			Assert::AreEqual(m11, matrixC.Span()[4]);
+			Assert::AreEqual(m21, matrixC.Span()[5]);
+			Assert::AreEqual(m02, matrixC.Span()[6]);
+			Assert::AreEqual(m12, matrixC.Span()[7]);
+			Assert::AreEqual(m22, matrixC.Span()[8]);
+			Assert::AreEqual(m00, matrixC.Span(0)[0]);
+			Assert::AreEqual(m10, matrixC.Span(0)[1]);
+			Assert::AreEqual(m20, matrixC.Span(0)[2]);
+			Assert::AreEqual(m01, matrixC.Span(1)[0]);
+			Assert::AreEqual(m11, matrixC.Span(1)[1]);
+			Assert::AreEqual(m21, matrixC.Span(1)[2]);
+			Assert::AreEqual(m02, matrixC.Span(2)[0]);
+			Assert::AreEqual(m12, matrixC.Span(2)[1]);
+			Assert::AreEqual(m22, matrixC.Span(2)[2]);
 		}
 
 		TEST_METHOD(GetRowShortTest)
@@ -1335,9 +1341,9 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<short>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<short>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -1351,11 +1357,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -1369,12 +1375,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsAlmostZero());
 				Assert::IsTrue(matrix.IsAlmostZero(5.f));
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -1387,9 +1393,9 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<short>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<short>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -1403,11 +1409,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsIdentity());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -1421,12 +1427,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsAlmostIdentity());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsTrue(matrix.IsAlmostIdentity());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsAlmostIdentity());
 				Assert::IsTrue(matrix.IsAlmostIdentity(5.f));
-				matrix.Data()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -1437,13 +1443,13 @@ namespace Math
 
 			const float nan = std::numeric_limits<float>::quiet_NaN();
 			constexpr std::array<float, 9> array{ 3.f, 1.f, -5.f, 7.f, 4.f, -6.f, -7.f, 10.f, 20.f };
-			auto matrix = PonyEngine::Math::Matrix3x3<float>(array.data());
+			auto matrix = PonyEngine::Math::Matrix3x3<float>(array);
 			Assert::IsTrue(matrix.IsFinite());
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] = nan;
+				matrix.Span()[i] = nan;
 				Assert::IsFalse(matrix.IsFinite());
-				matrix.Data()[i] = array[i];
+				matrix.Span()[i] = array[i];
 			}
 		}
 
@@ -1562,7 +1568,7 @@ namespace Math
 			constexpr short m22 = -3;
 			constexpr std::array<short, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
 			auto matrix = PonyEngine::Math::Matrix3x3<short>();
-			matrix.Set(array.data());
+			matrix.Set(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -1587,7 +1593,7 @@ namespace Math
 			constexpr float m22 = -3;
 			constexpr std::array<float, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
 			auto matrix = PonyEngine::Math::Matrix3x3<float>();
-			matrix.Set(array.data());
+			matrix.Set(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -1665,76 +1671,6 @@ namespace Math
 			Assert::AreEqual(m02 * m02S, matrix.M02());
 			Assert::AreEqual(m12 * m12S, matrix.M12());
 			Assert::AreEqual(m22 * m22S, matrix.M22());
-		}
-
-		TEST_METHOD(ToArrayShortTest)
-		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 5;
-			constexpr short m20 = 3;
-			constexpr short m01 = 5;
-			constexpr short m11 = 2;
-			constexpr short m21 = 3;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr auto matrix = PonyEngine::Math::Matrix3x3<short>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const std::array<short, 9> array = matrix.ToArray();
-			Assert::AreEqual(m00, array[0]);
-			Assert::AreEqual(m10, array[1]);
-			Assert::AreEqual(m20, array[2]);
-			Assert::AreEqual(m01, array[3]);
-			Assert::AreEqual(m11, array[4]);
-			Assert::AreEqual(m21, array[5]);
-			Assert::AreEqual(m02, array[6]);
-			Assert::AreEqual(m12, array[7]);
-			Assert::AreEqual(m22, array[8]);
-			short cArray[9];
-			matrix.ToArray(cArray);
-			Assert::AreEqual(m00, cArray[0]);
-			Assert::AreEqual(m10, cArray[1]);
-			Assert::AreEqual(m20, cArray[2]);
-			Assert::AreEqual(m01, cArray[3]);
-			Assert::AreEqual(m11, cArray[4]);
-			Assert::AreEqual(m21, cArray[5]);
-			Assert::AreEqual(m02, cArray[6]);
-			Assert::AreEqual(m12, cArray[7]);
-			Assert::AreEqual(m22, cArray[8]);
-		}
-
-		TEST_METHOD(ToArrayFloatTest)
-		{
-			constexpr float m00 = 11;
-			constexpr float m10 = 5;
-			constexpr float m20 = 3;
-			constexpr float m01 = 5;
-			constexpr float m11 = 2;
-			constexpr float m21 = 3;
-			constexpr float m02 = 6;
-			constexpr float m12 = 7;
-			constexpr float m22 = 9;
-			constexpr auto matrix = PonyEngine::Math::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			const std::array<float, 9> array = matrix.ToArray();
-			Assert::AreEqual(m00, array[0]);
-			Assert::AreEqual(m10, array[1]);
-			Assert::AreEqual(m20, array[2]);
-			Assert::AreEqual(m01, array[3]);
-			Assert::AreEqual(m11, array[4]);
-			Assert::AreEqual(m21, array[5]);
-			Assert::AreEqual(m02, array[6]);
-			Assert::AreEqual(m12, array[7]);
-			Assert::AreEqual(m22, array[8]);
-			float cArray[9];
-			matrix.ToArray(cArray);
-			Assert::AreEqual(m00, cArray[0]);
-			Assert::AreEqual(m10, cArray[1]);
-			Assert::AreEqual(m20, cArray[2]);
-			Assert::AreEqual(m01, cArray[3]);
-			Assert::AreEqual(m11, cArray[4]);
-			Assert::AreEqual(m21, cArray[5]);
-			Assert::AreEqual(m02, cArray[6]);
-			Assert::AreEqual(m12, cArray[7]);
-			Assert::AreEqual(m22, cArray[8]);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -2240,10 +2176,10 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<short>::ComponentCount; ++i)
 			{
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -2266,13 +2202,13 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
-				matrixL.Data()[i] = std::nextafter(matrixL.Data()[i], 0.f);
+				matrixL.Span()[i] = std::nextafter(matrixL.Span()[i], 0.f);
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -2369,12 +2305,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix3x3<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
-				matrixL.Data()[i] = std::nextafter(matrixL.Data()[i], 0.f);
+				matrixL.Span()[i] = std::nextafter(matrixL.Span()[i], 0.f);
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR, 5.f));
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -2815,12 +2751,12 @@ namespace Math
 			movedMatrix.M02() *= 6;
 			movedMatrix.M12() = 7;
 			movedMatrix.M22() = 1;
-			[[maybe_unused]] int* const data = movedMatrix.Data();
-			[[maybe_unused]] int* const columnData = movedMatrix.Data(1);
+			[[maybe_unused]] auto span = movedMatrix.Span();
+			[[maybe_unused]] auto columnSpan = movedMatrix.Span(1);
 
 			[[maybe_unused]] constexpr auto constMatrix = PonyEngine::Math::Matrix3x3<int>(4, 3, 9, 1, -8, -5, -4, 6, 7);
-			[[maybe_unused]] const int* const dataC = constMatrix.Data();
-			[[maybe_unused]] const int* const columnDataC = constMatrix.Data(1);
+			[[maybe_unused]] auto cSpan = constMatrix.Span();
+			[[maybe_unused]] auto cColumnSpan = constMatrix.Span(1);
 
 			movedMatrix.Row(0, PonyEngine::Math::Vector3<int>(3, 6, 9));
 			movedMatrix.Column(1, PonyEngine::Math::Vector3<int>(3, 6, 9));
@@ -2829,12 +2765,9 @@ namespace Math
 
 			movedMatrix.Set(4, 6, 1, 0, 8, -4, -2, -1, 7);
 			movedMatrix.Set(PonyEngine::Math::Vector3<int>(4, 6, 1), PonyEngine::Math::Vector3<int>(9, 4, 1), PonyEngine::Math::Vector3<int>(9, 4, 1));
-			movedMatrix.Set(std::array<int, 9>{4, 5, 6, 6, 1, 6, -4, -6, -7}.data());
+			movedMatrix.Set(std::array<int, 9>{4, 5, 6, 6, 1, 6, -4, -6, -7});
 
 			movedMatrix.Scale(constMatrix);
-
-			int array[9];
-			movedMatrix.ToArray(array);
 
 			movedMatrix[1][1] = 5;
 			movedMatrix[1] = PonyEngine::Math::Vector3<int>(9, 4, 8);
@@ -2865,7 +2798,7 @@ namespace Math
 			[[maybe_unused]] constexpr auto defaultMatrix = PonyEngine::Math::Matrix3x3<int>();
 			[[maybe_unused]] constexpr auto matrix = PonyEngine::Math::Matrix3x3<int>(0, 2, 3, 4, -1, -8, 1, 5, 0);
 			[[maybe_unused]] constexpr auto columnMatrix = PonyEngine::Math::Matrix3x3<int>(PonyEngine::Math::Vector3<int>(4, 6, -1), PonyEngine::Math::Vector3<int>(9, 4, -1), PonyEngine::Math::Vector3<int>(9, 4, -1));
-			[[maybe_unused]] constexpr auto arrayMatrix = PonyEngine::Math::Matrix3x3<int>(std::array<int, 9>{4, 5, 6, 6, 7, 1, -5, -8, -1}.data());
+			[[maybe_unused]] constexpr auto arrayMatrix = PonyEngine::Math::Matrix3x3<int>(std::array<int, 9>{4, 5, 6, 6, 7, 1, -5, -8, -1});
 			[[maybe_unused]] constexpr PonyEngine::Math::Matrix3x3<int> copiedMatrix = matrix;
 			[[maybe_unused]] constexpr PonyEngine::Math::Matrix3x3<int> movedMatrix = MatrixConstexpr();
 
@@ -2894,8 +2827,6 @@ namespace Math
 			[[maybe_unused]] constexpr bool isAlmostZero = PonyEngine::Math::Matrix3x3<float>::Predefined::Zero.IsAlmostZero();
 			[[maybe_unused]] constexpr bool isIdentity = matrix.IsIdentity();
 			[[maybe_unused]] constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix3x3<float>::Predefined::Identity.IsAlmostIdentity();
-
-			[[maybe_unused]] constexpr std::array<int, 9> array = matrix.ToArray();
 
 			[[maybe_unused]] constexpr auto floatMatrix = static_cast<PonyEngine::Math::Matrix3x3<float>>(matrix);
 

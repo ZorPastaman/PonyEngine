@@ -14,6 +14,7 @@ import <cstddef>;
 import <format>;
 import <ostream>;
 import <string>;
+import <span>;
 import <type_traits>;
 
 import :Common;
@@ -105,9 +106,9 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p components array.
-		/// @param components Component array. Its length must be at least 9. The matrix is column-major.
+		/// @param span Span. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Matrix3x3(const T* components) noexcept;
+		explicit constexpr Matrix3x3(std::span<const T, ComponentCount> span) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix3x3(const Matrix3x3& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -187,24 +188,34 @@ export namespace PonyEngine::Math
 		/// @return Component 22.
 		[[nodiscard("Pure function")]]
 		constexpr const T& M22() const noexcept;
-		/// @brief Gets the data pointer to the array of 9 elements. The data is column-major.
-		/// @return Data pointer.
+		/// @brief Gets the component by the @p index.
+		/// @param index Component index.
+		/// @return Component.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data() noexcept;
-		/// @brief Gets the data pointer to the array of 9 elements. The data is column-major.
-		/// @return Data pointer.
+		constexpr T& Component(std::size_t index) noexcept;
+		/// @brief Gets the component by the @p index.
+		/// @param index Component index.
+		/// @return Component.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data() const noexcept;
-		/// @brief Gets a column data pointer to an array of 3 elements.
+		constexpr const T& Component(std::size_t index) const noexcept;
+		/// @brief Gets the span. The data is column-major.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		constexpr std::span<T, 9> Span() noexcept;
+		/// @brief Gets the span. The data is column-major.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		constexpr std::span<const T, 9> Span() const noexcept;
+		/// @brief Gets the column span.
 		/// @param columnIndex Column index.
-		/// @return Column data pointer.
+		/// @return Column span.
 		[[nodiscard("Pure function")]]
-		constexpr T* Data(std::size_t columnIndex) noexcept;
-		/// @brief Gets a column data pointer to an array of 3 elements.
+		constexpr std::span<T, 3> Span(std::size_t columnIndex) noexcept;
+		/// @brief Gets the column span.
 		/// @param columnIndex Column index.
-		/// @return Column data pointer.
+		/// @return Column span.
 		[[nodiscard("Pure function")]]
-		constexpr const T* Data(std::size_t columnIndex) const noexcept;
+		constexpr std::span<const T, 3> Span(std::size_t columnIndex) const noexcept;
 
 		/// @brief Gets a row by the @p rowIndex.
 		/// @param rowIndex Row index.
@@ -308,21 +319,13 @@ export namespace PonyEngine::Math
 		/// @param column1 Column 1 to assign.
 		/// @param column2 Column 2 to assign.
 		constexpr void Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
-		/// @brief Assigns matrix components from the @p components array.
-		/// @param componentsToSet Component array. Its length must be at least 9.
-		constexpr void Set(const T* componentsToSet) noexcept;
+		/// @brief Assigns matrix components from the @p span.
+		/// @param span Span. The matrix is column-major.
+		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
 		/// @brief Multiplies @a this by the @p scale component-wise.
 		/// @param scale Matrix to multiply by.
 		constexpr void Scale(const Matrix3x3& scale) noexcept;
-
-		/// @brief Converts the matrix to an array.
-		/// @return Matrix array.
-		[[nodiscard("Pure function")]]
-		constexpr std::array<T, 9> ToArray() const noexcept;
-		/// @brief Converts the matrix to a c-style array.
-		/// @param array Target array.
-		constexpr void ToArray(T (&array)[ComponentCount]) const noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
 		/// @remark The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
@@ -567,15 +570,15 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>::Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept :
-		Matrix3x3(column0.X(), column0.Y(), column0.Z(), column1.X(), column1.Y(), column1.Z(), column2.X(), column2.Y(), column2.Z())
+	constexpr Matrix3x3<T>::Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept
 	{
+		Set(column0, column1, column2);
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T>::Matrix3x3(const T* const components) noexcept
+	constexpr Matrix3x3<T>::Matrix3x3(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(components);
+		Set(span);
 	}
 
 	template<Arithmetic T>
@@ -687,27 +690,43 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr T* Matrix3x3<T>::Data() noexcept
+	constexpr T& Matrix3x3<T>::Component(const std::size_t index) noexcept
 	{
-		return components.data();
+		return components[index];
 	}
 
 	template<Arithmetic T>
-	constexpr const T* Matrix3x3<T>::Data() const noexcept
+	constexpr const T& Matrix3x3<T>::Component(const std::size_t index) const noexcept
 	{
-		return components.data();
+		return components[index];
 	}
 
 	template<Arithmetic T>
-	constexpr T* Matrix3x3<T>::Data(const std::size_t columnIndex) noexcept
+	constexpr std::span<T, 9> Matrix3x3<T>::Span() noexcept
 	{
-		return Data() + columnIndex * Dimension;
+		return components;
 	}
 
 	template<Arithmetic T>
-	constexpr const T* Matrix3x3<T>::Data(const std::size_t columnIndex) const noexcept
+	constexpr std::span<const T, 9> Matrix3x3<T>::Span() const noexcept
 	{
-		return Data() + columnIndex * Dimension;
+		return components;
+	}
+
+	template<Arithmetic T>
+	constexpr std::span<T, 3> Matrix3x3<T>::Span(const std::size_t columnIndex) noexcept
+	{
+		T* const column = components.data() + columnIndex * Dimension;
+
+		return std::span<T, Dimension>(column, Dimension);
+	}
+
+	template<Arithmetic T>
+	constexpr std::span<const T, 3> Matrix3x3<T>::Span(const std::size_t columnIndex) const noexcept
+	{
+		const T* const column = components.data() + columnIndex * Dimension;
+
+		return std::span<const T, Dimension>(column, Dimension);
 	}
 
 	template<Arithmetic T>
@@ -725,13 +744,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr Vector3<T> Matrix3x3<T>::Column(const std::size_t columnIndex) const noexcept
 	{
-		return Vector3<T>(Data(columnIndex));
+		return Vector3<T>(Span(columnIndex));
 	}
 
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Column(const std::size_t columnIndex, const Vector3<T>& value) noexcept
 	{
-		std::copy(value.Data(), value.Data() + Dimension, Data(columnIndex));
+		std::ranges::copy(value.Span(), Span(columnIndex).data());
 	}
 
 	template<Arithmetic T>
@@ -860,13 +879,15 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr void Matrix3x3<T>::Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept
 	{
-		Set(column0.X(), column0.Y(), column0.Z(), column1.X(), column1.Y(), column1.Z(), column2.X(), column2.Y(), column2.Z());
+		Column(0, column0);
+		Column(1, column1);
+		Column(2, column2);
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::Set(const T* const componentsToSet) noexcept
+	constexpr void Matrix3x3<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
-		std::copy(componentsToSet, componentsToSet + ComponentCount, Data());
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -874,20 +895,8 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] *= scale.Data()[i];
+			Component(i) *= scale.Component(i);
 		}
-	}
-
-	template<Arithmetic T>
-	constexpr std::array<T, 9> Matrix3x3<T>::ToArray() const noexcept
-	{
-		return components;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::ToArray(T (&array)[ComponentCount]) const noexcept
-	{
-		std::ranges::copy(components, array);
 	}
 
 	template<Arithmetic T>
@@ -902,7 +911,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> scaled;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			scaled.Data()[i] = left.Data()[i] * right.Data()[i];
+			scaled.Component(i) = left.Component(i) * right.Component(i);
 		}
 
 		return scaled;
@@ -931,7 +940,7 @@ namespace PonyEngine::Math
 		Matrix3x3<U> cast;
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			cast.Data()[i] = static_cast<U>(Data()[i]);
+			cast.Component(i) = static_cast<U>(Component(i));
 		}
 
 		return cast;
@@ -940,13 +949,13 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr typename Matrix3x3<T>::template RowAccess<false> Matrix3x3<T>::operator [](const std::size_t rowIndex) noexcept
 	{
-		return RowAccess<false>(Data() + rowIndex);
+		return RowAccess<false>(components.data() + rowIndex);
 	}
 
 	template<Arithmetic T>
 	constexpr typename Matrix3x3<T>::template RowAccess<true> Matrix3x3<T>::operator [](const std::size_t rowIndex) const noexcept
 	{
-		return RowAccess<true>(Data() + rowIndex);
+		return RowAccess<true>(components.data() + rowIndex);
 	}
 
 	template<Arithmetic T>
@@ -954,7 +963,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] += other.Data()[i];
+			Component(i) += other.Component(i);
 		}
 
 		return *this;
@@ -965,7 +974,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] -= other.Data()[i];
+			Component(i) -= other.Component(i);
 		}
 
 		return *this;
@@ -976,7 +985,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] *= multiplier;
+			Component(i) *= multiplier;
 		}
 
 		return *this;
@@ -987,7 +996,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] = static_cast<T>(Data()[i] * multiplier);
+			Component(i) = static_cast<T>(Component(i) * multiplier);
 		}
 
 		return *this;
@@ -1004,7 +1013,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] /= divisor;
+			Component(i) /= divisor;
 		}
 
 		return *this;
@@ -1015,7 +1024,7 @@ namespace PonyEngine::Math
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Data()[i] = static_cast<T>(Data()[i] / divisor);
+			Component(i) = static_cast<T>(Component(i) / divisor);
 		}
 
 		return *this;
@@ -1033,7 +1042,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> sum;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			sum.Data()[i] = left.Data()[i] + right.Data()[i];
+			sum.Component(i) = left.Component(i) + right.Component(i);
 		}
 
 		return sum;
@@ -1045,7 +1054,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> negated;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			negated.Data()[i] = -matrix.Data()[i];
+			negated.Component(i) = -matrix.Component(i);
 		}
 
 		return negated;
@@ -1057,7 +1066,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> difference;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			difference.Data()[i] = left.Data()[i] - right.Data()[i];
+			difference.Component(i) = left.Component(i) - right.Component(i);
 		}
 
 		return difference;
@@ -1069,7 +1078,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> product;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			product.Data()[i] = matrix.Data()[i] * multiplier;
+			product.Component(i) = matrix.Component(i) * multiplier;
 		}
 
 		return product;
@@ -1081,7 +1090,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> product;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			product.Data()[i] = static_cast<T>(matrix.Data()[i] * multiplier);
+			product.Component(i) = static_cast<T>(matrix.Component(i) * multiplier);
 		}
 
 		return product;
@@ -1133,7 +1142,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> quotient;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			quotient.Data()[i] = matrix.Data()[i] / divisor;
+			quotient.Component(i) = matrix.Component(i) / divisor;
 		}
 
 		return quotient;
@@ -1145,7 +1154,7 @@ namespace PonyEngine::Math
 		Matrix3x3<T> quotient;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			quotient.Data()[i] = static_cast<T>(matrix.Data()[i] / divisor);
+			quotient.Component(i) = static_cast<T>(matrix.Component(i) / divisor);
 		}
 
 		return quotient;

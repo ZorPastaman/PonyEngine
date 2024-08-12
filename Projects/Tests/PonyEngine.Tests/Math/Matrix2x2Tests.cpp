@@ -293,7 +293,7 @@ namespace Math
 			constexpr short m01 = 6;
 			constexpr short m11 = 5;
 			constexpr std::array<short, 4> array{ m00, m10, m01, m11 };
-			const auto matrix = PonyEngine::Math::Matrix2x2<short>(array.data());
+			const auto matrix = PonyEngine::Math::Matrix2x2<short>(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m01, matrix.M01());
@@ -307,7 +307,7 @@ namespace Math
 			constexpr float m01 = 6;
 			constexpr float m11 = 5;
 			constexpr std::array<float, 4> array{ m00, m10, m01, m11 };
-			const auto matrix = PonyEngine::Math::Matrix2x2<float>(array.data());
+			const auto matrix = PonyEngine::Math::Matrix2x2<float>(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m01, matrix.M01());
@@ -410,58 +410,64 @@ namespace Math
 			Assert::AreEqual(m11, matrixC.M11());
 		}
 
-		TEST_METHOD(DataShortTest)
+		TEST_METHOD(SpanShortTest)
 		{
 			constexpr short m00 = 4;
 			constexpr short m10 = -3;
 			constexpr short m01 = 6;
 			constexpr short m11 = 5;
 			auto matrix = PonyEngine::Math::Matrix2x2<short>(m00, m10, m01, m11);
-			Assert::AreEqual(m00, matrix.Data()[0]);
-			Assert::AreEqual(m10, matrix.Data()[1]);
-			Assert::AreEqual(m01, matrix.Data()[2]);
-			Assert::AreEqual(m11, matrix.Data()[3]);
-			Assert::AreEqual(m00, matrix.Data(0)[0]);
-			Assert::AreEqual(m10, matrix.Data(0)[1]);
-			Assert::AreEqual(m01, matrix.Data(1)[0]);
-			Assert::AreEqual(m11, matrix.Data(1)[1]);
+			Assert::AreEqual(m00, matrix.Span()[0]);
+			Assert::AreEqual(m10, matrix.Span()[1]);
+			Assert::AreEqual(m01, matrix.Span()[2]);
+			Assert::AreEqual(m11, matrix.Span()[3]);
+			Assert::AreEqual(m00, matrix.Span(0)[0]);
+			Assert::AreEqual(m10, matrix.Span(0)[1]);
+			Assert::AreEqual(m01, matrix.Span(1)[0]);
+			Assert::AreEqual(m11, matrix.Span(1)[1]);
+			matrix.Span()[0] += 1;
+			matrix.Span(0)[0] += 1;
+			Assert::AreEqual(static_cast<short>(m00 + 2), matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix2x2<short>(m00, m10, m01, m11);
-			Assert::AreEqual(m00, matrixC.Data()[0]);
-			Assert::AreEqual(m10, matrixC.Data()[1]);
-			Assert::AreEqual(m01, matrixC.Data()[2]);
-			Assert::AreEqual(m11, matrixC.Data()[3]);
-			Assert::AreEqual(m00, matrixC.Data(0)[0]);
-			Assert::AreEqual(m10, matrixC.Data(0)[1]);
-			Assert::AreEqual(m01, matrixC.Data(1)[0]);
-			Assert::AreEqual(m11, matrixC.Data(1)[1]);
+			Assert::AreEqual(m00, matrixC.Span()[0]);
+			Assert::AreEqual(m10, matrixC.Span()[1]);
+			Assert::AreEqual(m01, matrixC.Span()[2]);
+			Assert::AreEqual(m11, matrixC.Span()[3]);
+			Assert::AreEqual(m00, matrixC.Span(0)[0]);
+			Assert::AreEqual(m10, matrixC.Span(0)[1]);
+			Assert::AreEqual(m01, matrixC.Span(1)[0]);
+			Assert::AreEqual(m11, matrixC.Span(1)[1]);
 		}
 
-		TEST_METHOD(DataFloatTest)
+		TEST_METHOD(SpanFloatTest)
 		{
 			constexpr float m00 = 4;
 			constexpr float m10 = -3;
 			constexpr float m01 = 6;
 			constexpr float m11 = 5;
 			auto matrix = PonyEngine::Math::Matrix2x2<float>(m00, m10, m01, m11);
-			Assert::AreEqual(m00, matrix.Data()[0]);
-			Assert::AreEqual(m10, matrix.Data()[1]);
-			Assert::AreEqual(m01, matrix.Data()[2]);
-			Assert::AreEqual(m11, matrix.Data()[3]);
-			Assert::AreEqual(m00, matrix.Data(0)[0]);
-			Assert::AreEqual(m10, matrix.Data(0)[1]);
-			Assert::AreEqual(m01, matrix.Data(1)[0]);
-			Assert::AreEqual(m11, matrix.Data(1)[1]);
+			Assert::AreEqual(m00, matrix.Span()[0]);
+			Assert::AreEqual(m10, matrix.Span()[1]);
+			Assert::AreEqual(m01, matrix.Span()[2]);
+			Assert::AreEqual(m11, matrix.Span()[3]);
+			Assert::AreEqual(m00, matrix.Span(0)[0]);
+			Assert::AreEqual(m10, matrix.Span(0)[1]);
+			Assert::AreEqual(m01, matrix.Span(1)[0]);
+			Assert::AreEqual(m11, matrix.Span(1)[1]);
+			matrix.Span()[0] += 1;
+			matrix.Span(0)[0] += 1;
+			Assert::AreEqual(m00 + 2, matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix2x2<float>(m00, m10, m01, m11);
-			Assert::AreEqual(m00, matrixC.Data()[0]);
-			Assert::AreEqual(m10, matrixC.Data()[1]);
-			Assert::AreEqual(m01, matrixC.Data()[2]);
-			Assert::AreEqual(m11, matrixC.Data()[3]);
-			Assert::AreEqual(m00, matrixC.Data(0)[0]);
-			Assert::AreEqual(m10, matrixC.Data(0)[1]);
-			Assert::AreEqual(m01, matrixC.Data(1)[0]);
-			Assert::AreEqual(m11, matrixC.Data(1)[1]);
+			Assert::AreEqual(m00, matrixC.Span()[0]);
+			Assert::AreEqual(m10, matrixC.Span()[1]);
+			Assert::AreEqual(m01, matrixC.Span()[2]);
+			Assert::AreEqual(m11, matrixC.Span()[3]);
+			Assert::AreEqual(m00, matrixC.Span(0)[0]);
+			Assert::AreEqual(m10, matrixC.Span(0)[1]);
+			Assert::AreEqual(m01, matrixC.Span(1)[0]);
+			Assert::AreEqual(m11, matrixC.Span(1)[1]);
 		}
 
 		TEST_METHOD(GetRowShortTest)
@@ -813,9 +819,9 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -829,11 +835,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -847,12 +853,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsAlmostZero());
 				Assert::IsTrue(matrix.IsAlmostZero(5.f));
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -865,9 +871,9 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<short>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -881,11 +887,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsIdentity());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -899,12 +905,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsAlmostIdentity());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsTrue(matrix.IsAlmostIdentity());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsAlmostIdentity());
 				Assert::IsTrue(matrix.IsAlmostIdentity(5.f));
-				matrix.Data()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -915,13 +921,13 @@ namespace Math
 
 			const float nan = std::numeric_limits<float>::quiet_NaN();
 			constexpr std::array<float, 4> array{ 3.f, 1.f, -5.f, 7.f };
-			auto matrix = PonyEngine::Math::Matrix2x2<float>(array.data());
+			auto matrix = PonyEngine::Math::Matrix2x2<float>(array);
 			Assert::IsTrue(matrix.IsFinite());
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] = nan;
+				matrix.Span()[i] = nan;
 				Assert::IsFalse(matrix.IsFinite());
-				matrix.Data()[i] = array[i];
+				matrix.Span()[i] = array[i];
 			}
 		}
 
@@ -993,7 +999,7 @@ namespace Math
 			constexpr short m11 = 20;
 			constexpr std::array<short, 4> array{ m00, m10, m01, m11 };
 			auto matrix = PonyEngine::Math::Matrix2x2<short>();
-			matrix.Set(array.data());
+			matrix.Set(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m01, matrix.M01());
@@ -1008,7 +1014,7 @@ namespace Math
 			constexpr float m11 = 20;
 			constexpr std::array<float, 4> array{ m00, m10, m01, m11 };
 			auto matrix = PonyEngine::Math::Matrix2x2<float>();
-			matrix.Set(array.data());
+			matrix.Set(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m01, matrix.M01());
@@ -1051,46 +1057,6 @@ namespace Math
 			Assert::AreEqual(m10 * m10S, matrix.M10());
 			Assert::AreEqual(m01 * m01S, matrix.M01());
 			Assert::AreEqual(m11 * m11S, matrix.M11());
-		}
-
-		TEST_METHOD(ToArrayShortTest)
-		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 5;
-			constexpr short m01 = 5;
-			constexpr short m11 = 2;
-			constexpr auto matrix = PonyEngine::Math::Matrix2x2<short>(m00, m10, m01, m11);
-			const std::array<short, 4> array = matrix.ToArray();
-			Assert::AreEqual(m00, array[0]);
-			Assert::AreEqual(m10, array[1]);
-			Assert::AreEqual(m01, array[2]);
-			Assert::AreEqual(m11, array[3]);
-			short cArray[4];
-			matrix.ToArray(cArray);
-			Assert::AreEqual(m00, cArray[0]);
-			Assert::AreEqual(m10, cArray[1]);
-			Assert::AreEqual(m01, cArray[2]);
-			Assert::AreEqual(m11, cArray[3]);
-		}
-
-		TEST_METHOD(ToArrayFloatTest)
-		{
-			constexpr float m00 = 11;
-			constexpr float m10 = 5;
-			constexpr float m01 = 5;
-			constexpr float m11 = 2;
-			constexpr auto matrix = PonyEngine::Math::Matrix2x2<float>(m00, m10, m01, m11);
-			const std::array<float, 4> array = matrix.ToArray();
-			Assert::AreEqual(m00, array[0]);
-			Assert::AreEqual(m10, array[1]);
-			Assert::AreEqual(m01, array[2]);
-			Assert::AreEqual(m11, array[3]);
-			float cArray[4];
-			matrix.ToArray(cArray);
-			Assert::AreEqual(m00, cArray[0]);
-			Assert::AreEqual(m10, cArray[1]);
-			Assert::AreEqual(m01, cArray[2]);
-			Assert::AreEqual(m11, cArray[3]);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -1401,10 +1367,10 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<short>::ComponentCount; ++i)
 			{
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -1422,13 +1388,13 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
-				matrixL.Data()[i] = std::nextafter(matrixL.Data()[i], 0.f);
+				matrixL.Span()[i] = std::nextafter(matrixL.Span()[i], 0.f);
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(matrixL == matrixR);
 				Assert::IsTrue(matrixL != matrixR);
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -1490,12 +1456,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Matrix2x2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
-				matrixL.Data()[i] = std::nextafter(matrixL.Data()[i], 0.f);
+				matrixL.Span()[i] = std::nextafter(matrixL.Span()[i], 0.f);
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
-				matrixL.Data()[i] += 1;
+				matrixL.Span()[i] += 1;
 				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR));
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(matrixL, matrixR, 5.f));
-				matrixL.Data()[i] = matrixR.Data()[i];
+				matrixL.Span()[i] = matrixR.Span()[i];
 			}
 		}
 
@@ -1757,12 +1723,12 @@ namespace Math
 			movedMatrix.M10() -= 2;
 			movedMatrix.M01() *= 2;
 			movedMatrix.M11() = 6;
-			[[maybe_unused]] int* const data = movedMatrix.Data();
-			[[maybe_unused]] int* const columnData = movedMatrix.Data(1);
+			[[maybe_unused]] auto span = movedMatrix.Span();
+			[[maybe_unused]] auto columnSpan = movedMatrix.Span(1);
 
 			[[maybe_unused]] constexpr auto constMatrix = PonyEngine::Math::Matrix2x2<int>(4, 3, 9, 1);
-			[[maybe_unused]] const int* const dataC = constMatrix.Data();
-			[[maybe_unused]] const int* const columnDataC = constMatrix.Data(1);
+			[[maybe_unused]] auto cSpan = constMatrix.Span();
+			[[maybe_unused]] auto cColumnSpan = constMatrix.Span(1);
 
 			movedMatrix.Row(0, PonyEngine::Math::Vector2<int>(3, 6));
 			movedMatrix.Column(1, PonyEngine::Math::Vector2<int>(3, 6));
@@ -1771,12 +1737,9 @@ namespace Math
 
 			movedMatrix.Set(4, 6, 1, 0);
 			movedMatrix.Set(PonyEngine::Math::Vector2<int>(4, 6), PonyEngine::Math::Vector2<int>(9, 4));
-			movedMatrix.Set(std::array<int, 4>{4, 5, 6, 6}.data());
+			movedMatrix.Set(std::array<int, 4>{4, 5, 6, 6});
 
 			movedMatrix.Scale(constMatrix);
-
-			int array[4];
-			movedMatrix.ToArray(array);
 
 			movedMatrix[1][1] = 5;
 			movedMatrix[1] = PonyEngine::Math::Vector2<int>(9, 4);
@@ -1807,7 +1770,7 @@ namespace Math
 			[[maybe_unused]] constexpr auto defaultMatrix = PonyEngine::Math::Matrix2x2<int>();
 			[[maybe_unused]] constexpr auto matrix = PonyEngine::Math::Matrix2x2<int>(0, 2, 3, 4);
 			[[maybe_unused]] constexpr auto columnMatrix = PonyEngine::Math::Matrix2x2<int>(PonyEngine::Math::Vector2<int>(4, 6), PonyEngine::Math::Vector2<int>(9, 4));
-			[[maybe_unused]] constexpr auto arrayMatrix = PonyEngine::Math::Matrix2x2<int>(std::array<int, 4>{4, 5, 6, 6}.data());
+			[[maybe_unused]] constexpr auto arrayMatrix = PonyEngine::Math::Matrix2x2<int>(std::array<int, 4>{4, 5, 6, 6});
 			[[maybe_unused]] constexpr PonyEngine::Math::Matrix2x2<int> copiedMatrix = matrix;
 			[[maybe_unused]] constexpr PonyEngine::Math::Matrix2x2<int> movedMatrix = MatrixConstexpr();
 
@@ -1836,8 +1799,6 @@ namespace Math
 			[[maybe_unused]] constexpr bool isAlmostZero = PonyEngine::Math::Matrix2x2<float>::Predefined::Zero.IsAlmostZero();
 			[[maybe_unused]] constexpr bool isIdentity = matrix.IsIdentity();
 			[[maybe_unused]] constexpr bool isAlmostIdentity = PonyEngine::Math::Matrix2x2<float>::Predefined::Identity.IsAlmostIdentity();
-
-			[[maybe_unused]] constexpr std::array<int, 4> array = matrix.ToArray();
 
 			[[maybe_unused]] constexpr bool equal = matrix == defaultMatrix;
 			[[maybe_unused]] constexpr bool notEqual = matrix != defaultMatrix;
