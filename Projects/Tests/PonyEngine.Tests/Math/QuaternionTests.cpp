@@ -60,7 +60,7 @@ namespace Math
 			constexpr float y = -1;
 			constexpr float z = 1;
 			constexpr float w = 2;
-			auto quaternion = PonyEngine::Math::Quaternion<float>(std::array<float, 4>{x, y, z, w}.data());
+			auto quaternion = PonyEngine::Math::Quaternion<float>(std::array<float, 4>{x, y, z, w});
 			Assert::AreEqual(x, quaternion.X());
 			Assert::AreEqual(y, quaternion.Y());
 			Assert::AreEqual(z, quaternion.Z());
@@ -128,23 +128,25 @@ namespace Math
 			Assert::AreEqual(w, quaternionC.W());
 		}
 
-		TEST_METHOD(DataTest)
+		TEST_METHOD(SpanTest)
 		{
 			constexpr float x = 4;
 			constexpr float y = -1;
 			constexpr float z = 1;
 			constexpr float w = 2;
 			auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			Assert::AreEqual(x, quaternion.Data()[0]);
-			Assert::AreEqual(y, quaternion.Data()[1]);
-			Assert::AreEqual(z, quaternion.Data()[2]);
-			Assert::AreEqual(w, quaternion.Data()[3]);
+			Assert::AreEqual(x, quaternion.Span()[0]);
+			Assert::AreEqual(y, quaternion.Span()[1]);
+			Assert::AreEqual(z, quaternion.Span()[2]);
+			Assert::AreEqual(w, quaternion.Span()[3]);
+			quaternion.Span()[0] += 1;
+			Assert::AreEqual(x + 1, quaternion.Span()[0]);
 
 			constexpr auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			Assert::AreEqual(x, quaternionC.Data()[0]);
-			Assert::AreEqual(y, quaternionC.Data()[1]);
-			Assert::AreEqual(z, quaternionC.Data()[2]);
-			Assert::AreEqual(w, quaternionC.Data()[3]);
+			Assert::AreEqual(x, quaternionC.Span()[0]);
+			Assert::AreEqual(y, quaternionC.Span()[1]);
+			Assert::AreEqual(z, quaternionC.Span()[2]);
+			Assert::AreEqual(w, quaternionC.Span()[3]);
 		}
 
 		TEST_METHOD(MagnitudeTest)
@@ -212,11 +214,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(quaternion.IsIdentity());
-				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				quaternion.Span()[i] = std::nextafter(quaternion.Span()[i], 0.5f);
 				Assert::IsFalse(quaternion.IsIdentity());
-				quaternion.Data()[i] += 1;
+				quaternion.Span()[i] += 1;
 				Assert::IsFalse(quaternion.IsIdentity());
-				quaternion.Data()[i] = PonyEngine::Math::Quaternion<float>::Predefined::Identity.Data()[i];
+				quaternion.Span()[i] = PonyEngine::Math::Quaternion<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -232,12 +234,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(quaternion.IsAlmostIdentity());
-				quaternion.Data()[i] = std::nextafter(quaternion.Data()[i], 0.5f);
+				quaternion.Span()[i] = std::nextafter(quaternion.Span()[i], 0.5f);
 				Assert::IsTrue(quaternion.IsAlmostIdentity());
-				quaternion.Data()[i] += 1;
+				quaternion.Span()[i] += 1;
 				Assert::IsFalse(quaternion.IsAlmostIdentity<false>());
 				Assert::IsTrue(quaternion.IsAlmostIdentity<false>(5.f));
-				quaternion.Data()[i] = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.Data()[i];
+				quaternion.Span()[i] = PonyEngine::Math::Matrix4x4<float>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -307,31 +309,11 @@ namespace Math
 			constexpr float z = 1;
 			constexpr float w = 2;
 			auto quaternion = PonyEngine::Math::Quaternion<float>();
-			quaternion.Set(std::array<float, 4>{x, y, z, w}.data());
+			quaternion.Set(std::array<float, 4>{x, y, z, w});
 			Assert::AreEqual(x, quaternion.X());
 			Assert::AreEqual(y, quaternion.Y());
 			Assert::AreEqual(z, quaternion.Z());
 			Assert::AreEqual(w, quaternion.W());
-		}
-
-		TEST_METHOD(ToArrayTest)
-		{
-			constexpr float x = 2;
-			constexpr float y = -3;
-			constexpr float z = 5;
-			constexpr float w = -2;
-			constexpr auto quaternion = PonyEngine::Math::Quaternion<float>(x, y, z, w);
-			const std::array<float, 4> array = quaternion.ToArray();
-			Assert::AreEqual(x, array[0]);
-			Assert::AreEqual(y, array[1]);
-			Assert::AreEqual(z, array[2]);
-			Assert::AreEqual(w, array[3]);
-			float cArray[4];
-			quaternion.ToArray(cArray);
-			Assert::AreEqual(x, cArray[0]);
-			Assert::AreEqual(y, cArray[1]);
-			Assert::AreEqual(z, cArray[2]);
-			Assert::AreEqual(w, cArray[3]);
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -458,13 +440,13 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
 			{
-				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				otherQuaternion.Span()[i] = std::nextafter(otherQuaternion.Span()[i], 0.f);
 				Assert::IsFalse(quaternion == otherQuaternion);
 				Assert::IsTrue(quaternion != otherQuaternion);
-				otherQuaternion.Data()[i] += 1;
+				otherQuaternion.Span()[i] += 1;
 				Assert::IsFalse(quaternion == otherQuaternion);
 				Assert::IsTrue(quaternion != otherQuaternion);
-				otherQuaternion.Data()[i] = quaternion.Data()[i];
+				otherQuaternion.Span()[i] = quaternion.Span()[i];
 			}
 		}
 
@@ -660,12 +642,12 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
 			{
-				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				otherQuaternion.Span()[i] = std::nextafter(otherQuaternion.Span()[i], 0.f);
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion));
-				otherQuaternion.Data()[i] += 1;
+				otherQuaternion.Span()[i] += 1;
 				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion));
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual<float, false>(quaternion, otherQuaternion, 5.f));
-				otherQuaternion.Data()[i] = quaternion.Data()[i];
+				otherQuaternion.Span()[i] = quaternion.Span()[i];
 			}
 
 			quaternion.Normalize();
@@ -676,14 +658,14 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Quaternion<float>::ComponentCount; ++i)
 			{
 				otherQuaternion = quaternion;
-				otherQuaternion.Data()[i] = std::nextafter(otherQuaternion.Data()[i], 0.f);
+				otherQuaternion.Span()[i] = std::nextafter(otherQuaternion.Span()[i], 0.f);
 				otherQuaternion.Normalize();
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion));
-				otherQuaternion.Data()[i] += 1;
+				otherQuaternion.Span()[i] += 1;
 				otherQuaternion.Normalize();
 				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion));
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(quaternion, otherQuaternion, 1.f));
-				otherQuaternion.Data()[i] = quaternion.Data()[i];
+				otherQuaternion.Span()[i] = quaternion.Span()[i];
 			}
 		}
 
@@ -746,16 +728,13 @@ namespace Math
 			quaternion.Y() /= 4.f;
 			quaternion.Z() += 2.f;
 			quaternion.W() -= 1.f;
-			quaternion.Data()[2] -= 6.f;
+			quaternion.Span()[2] -= 6.f;
 
 			[[maybe_unused]] const auto quaternionC = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
-			[[maybe_unused]] const float y = quaternionC.Data()[1];
+			[[maybe_unused]] const float y = quaternionC.Span()[1];
 
 			quaternion.Set(1.f, 6.f, 7.f, -1.f);
-			quaternion.Set(quaternion.Data());
-
-			float array[4];
-			quaternion.ToArray(array);
+			quaternion.Set(quaternion.Span());
 
 			quaternion[0] *= 5.f;
 
@@ -789,8 +768,6 @@ namespace Math
 
 			[[maybe_unused]] constexpr bool isIdentity = quaternion.IsIdentity();
 			[[maybe_unused]] constexpr bool isUnit = quaternion.IsUnit();
-
-			[[maybe_unused]] constexpr std::array<float, 4> array = quaternion.ToArray();
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyEngine::Math::Vector4<float>>(quaternion);
 			[[maybe_unused]] constexpr auto doubleQuaternion = static_cast<PonyEngine::Math::Quaternion<double>>(quaternion);

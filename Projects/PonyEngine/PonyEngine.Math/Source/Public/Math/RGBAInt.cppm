@@ -219,7 +219,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr RGBAInt<T>::RGBAInt(std::span<const T, ComponentCount> span) noexcept
+	constexpr RGBAInt<T>::RGBAInt(const std::span<const T, ComponentCount> span) noexcept
 	{
 		Set(span);
 	}
@@ -348,7 +348,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
-	constexpr void RGBAInt<T>::Set(std::span<const T, ComponentCount> span) noexcept
+	constexpr void RGBAInt<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
 		std::ranges::copy(span, components.data());
 	}
@@ -368,7 +368,7 @@ namespace PonyEngine::Math
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T>(Span().data());
+		return Vector4<T>(Span());
 	}
 
 	template<std::unsigned_integral T>

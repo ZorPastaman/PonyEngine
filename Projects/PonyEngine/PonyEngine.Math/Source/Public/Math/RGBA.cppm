@@ -448,7 +448,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr void RGBA<T>::Set(std::span<const T, ComponentCount> span) noexcept
+	constexpr void RGBA<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
 		std::ranges::copy(span, components.data());
 	}
@@ -514,7 +514,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr RGBA<T>::operator Vector4<T>() const noexcept
 	{
-		return Vector4<T>(Span().data());
+		return Vector4<T>(Span());
 	}
 
 	template<std::floating_point T>

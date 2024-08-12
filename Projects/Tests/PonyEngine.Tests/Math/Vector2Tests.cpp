@@ -81,20 +81,20 @@ namespace Math
 			Assert::AreEqual(y, vector.Y());
 		}
 
-		TEST_METHOD(ConstructorPointerShortTest)
+		TEST_METHOD(ConstructorSpanShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
-			const auto vector = PonyEngine::Math::Vector2<short>(std::array<short, 2>{x, y}.data());
+			const auto vector = PonyEngine::Math::Vector2<short>(std::array<short, 2>{x, y});
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 		}
 
-		TEST_METHOD(ConstructorPointerFloatTest)
+		TEST_METHOD(ConstructorSpanFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
-			const auto vector = PonyEngine::Math::Vector2<float>(std::array<float, 2>{x, y}.data());
+			const auto vector = PonyEngine::Math::Vector2<float>(std::array<float, 2>{x, y});
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 		}
@@ -165,30 +165,32 @@ namespace Math
 			Assert::AreEqual(y, vectorC.Y());
 		}
 
-		TEST_METHOD(DataShortTest)
+		TEST_METHOD(SpanShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
 			auto vector = PonyEngine::Math::Vector2<short>(x, y);
-			Assert::AreEqual(x, vector.Data()[0]);
-			Assert::AreEqual(y, vector.Data()[1]);
+			Assert::AreEqual(x, vector.Span()[0]);
+			Assert::AreEqual(y, vector.Span()[1]);
+			vector.Span()[0] += 1;
+			Assert::AreEqual(static_cast<short>(x + 1), vector.Span()[0]);
 
 			constexpr auto vectorC = PonyEngine::Math::Vector2<short>(x, y);
-			Assert::AreEqual(x, vectorC.Data()[0]);
-			Assert::AreEqual(y, vectorC.Data()[1]);
+			Assert::AreEqual(x, vectorC.Span()[0]);
+			Assert::AreEqual(y, vectorC.Span()[1]);
 		}
 
-		TEST_METHOD(DataFloatTest)
+		TEST_METHOD(SpanFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
 			auto vector = PonyEngine::Math::Vector2<float>(x, y);
-			Assert::AreEqual(x, vector.Data()[0]);
-			Assert::AreEqual(y, vector.Data()[1]);
+			Assert::AreEqual(x, vector.Span()[0]);
+			Assert::AreEqual(y, vector.Span()[1]);
 
 			constexpr auto vectorC = PonyEngine::Math::Vector2<float>(x, y);
-			Assert::AreEqual(x, vectorC.Data()[0]);
-			Assert::AreEqual(y, vectorC.Data()[1]);
+			Assert::AreEqual(x, vectorC.Span()[0]);
+			Assert::AreEqual(y, vectorC.Span()[1]);
 		}
 
 		TEST_METHOD(MagnitudeShortTest)
@@ -342,9 +344,9 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
 			{
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Vector2<short>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Vector2<short>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -358,11 +360,11 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Data()[i] = PonyEngine::Math::Vector2<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Vector2<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -376,12 +378,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] = std::nextafter(matrix.Data()[i], 0.5f);
+				matrix.Span()[i] = std::nextafter(matrix.Span()[i], 0.5f);
 				Assert::IsTrue(matrix.IsAlmostZero());
-				matrix.Data()[i] += 1;
+				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsAlmostZero());
 				Assert::IsTrue(matrix.IsAlmostZero(5.f));
-				matrix.Data()[i] = PonyEngine::Math::Vector2<float>::Predefined::Zero.Data()[i];
+				matrix.Span()[i] = PonyEngine::Math::Vector2<float>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -476,14 +478,14 @@ namespace Math
 			Assert::AreEqual(yNew, vector.Y());
 		}
 
-		TEST_METHOD(SetArrayShortTest)
+		TEST_METHOD(SetArrayShortTest) // TODO: Check words array, pointer and data in the tests
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
 			auto vector = PonyEngine::Math::Vector2<short>(x, y);
 			constexpr short xNew = 4;
 			constexpr short yNew = 7;
-			vector.Set(std::array<short, 2>{xNew, yNew}.data());
+			vector.Set(std::array<short, 2>{xNew, yNew});
 			Assert::AreEqual(xNew, vector.X());
 			Assert::AreEqual(yNew, vector.Y());
 		}
@@ -495,7 +497,7 @@ namespace Math
 			auto vector = PonyEngine::Math::Vector2<float>(x, y);
 			constexpr float xNew = 4;
 			constexpr float yNew = 7;
-			vector.Set(std::array<float, 2>{xNew, yNew}.data());
+			vector.Set(std::array<float, 2>{xNew, yNew});
 			Assert::AreEqual(xNew, vector.X());
 			Assert::AreEqual(yNew, vector.Y());
 		}
@@ -524,34 +526,6 @@ namespace Math
 			vector.Scale(scale);
 			Assert::AreEqual(x * xS, vector.X());
 			Assert::AreEqual(y * yS, vector.Y());
-		}
-
-		TEST_METHOD(ToArrayShortTest)
-		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<short>(x, y);
-			const std::array<short, 2> array = vector.ToArray();
-			Assert::AreEqual(x, array[0]);
-			Assert::AreEqual(y, array[1]);
-			short cArray[2];
-			vector.ToArray(cArray);
-			Assert::AreEqual(x, cArray[0]);
-			Assert::AreEqual(y, cArray[1]);
-		}
-
-		TEST_METHOD(ToArrayFloatTest)
-		{
-			constexpr float x = 2;
-			constexpr float y = -3;
-			constexpr auto vector = PonyEngine::Math::Vector2<float>(x, y);
-			const std::array<float, 2> array = vector.ToArray();
-			Assert::AreEqual(x, array[0]);
-			Assert::AreEqual(y, array[1]);
-			float cArray[2];
-			vector.ToArray(cArray);
-			Assert::AreEqual(x, cArray[0]);
-			Assert::AreEqual(y, cArray[1]);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -788,10 +762,10 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<short>::ComponentCount; ++i)
 			{
-				otherVector.Data()[i] += 1;
+				otherVector.Span()[i] += 1;
 				Assert::IsFalse(vector == otherVector);
 				Assert::IsTrue(vector != otherVector);
-				otherVector.Data()[i] = vector.Data()[i];
+				otherVector.Span()[i] = vector.Span()[i];
 			}
 		}
 
@@ -807,13 +781,13 @@ namespace Math
 
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
 			{
-				otherVector.Data()[i] = std::nextafter(otherVector.Data()[i], 0.f);
+				otherVector.Span()[i] = std::nextafter(otherVector.Span()[i], 0.f);
 				Assert::IsFalse(vector == otherVector);
 				Assert::IsTrue(vector != otherVector);
-				otherVector.Data()[i] += 1;
+				otherVector.Span()[i] += 1;
 				Assert::IsFalse(vector == otherVector);
 				Assert::IsTrue(vector != otherVector);
-				otherVector.Data()[i] = vector.Data()[i];
+				otherVector.Span()[i] = vector.Span()[i];
 			}
 		}
 
@@ -1196,12 +1170,12 @@ namespace Math
 			for (std::size_t i = 0; i < PonyEngine::Math::Vector2<float>::ComponentCount; ++i)
 			{
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vectorL, vectorR));
-				vectorL.Data()[i] = std::nextafter(vectorL.Data()[i], 0.f);
+				vectorL.Span()[i] = std::nextafter(vectorL.Span()[i], 0.f);
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vectorL, vectorR));
-				vectorL.Data()[i] += 1;
+				vectorL.Span()[i] += 1;
 				Assert::IsFalse(PonyEngine::Math::AreAlmostEqual(vectorL, vectorR));
 				Assert::IsTrue(PonyEngine::Math::AreAlmostEqual(vectorL, vectorR, 5.f));
-				vectorL.Data()[i] = vectorR.Data()[i];
+				vectorL.Span()[i] = vectorR.Span()[i];
 			}
 		}
 
@@ -1351,10 +1325,10 @@ namespace Math
 
 			movedVector.X() += 2;
 			movedVector.Y() *= 3;
-			movedVector.Data()[1] -= 6;
+			movedVector.Span()[1] -= 6;
 
 			[[maybe_unused]] constexpr auto constVector = PonyEngine::Math::Vector2<float>(4, 5);
-			[[maybe_unused]] const float* data = constVector.Data();
+			[[maybe_unused]] auto span = constVector.Span();
 
 			movedVector.Swap();
 
@@ -1362,10 +1336,7 @@ namespace Math
 			[[maybe_unused]] const float max = movedVector.Max();
 
 			movedVector.Set(5, 2);
-			movedVector.Set(std::array<float, 3>{7, 9, 8}.data());
-
-			float array[2];
-			movedVector.ToArray(array);
+			movedVector.Set(std::array<float, 2>{7, 9});
 
 			movedVector[1] -= 4;
 
@@ -1400,7 +1371,7 @@ namespace Math
 
 			[[maybe_unused]] constexpr auto defaultVector = PonyEngine::Math::Vector2<float>();
 			[[maybe_unused]] constexpr auto vector = PonyEngine::Math::Vector2<float>(4, 5);
-			[[maybe_unused]] constexpr auto arrayVector = PonyEngine::Math::Vector2<float>(std::array<float, 3>{4, 5, 1}.data());
+			[[maybe_unused]] constexpr auto arrayVector = PonyEngine::Math::Vector2<float>(std::array<float, 2>{4, 5});
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> copiedVector = vector;
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector2<float> movedVector = VectorConstexpr();
 
@@ -1417,8 +1388,6 @@ namespace Math
 			[[maybe_unused]] constexpr bool isAlmostZero = vector.IsAlmostZero();
 			[[maybe_unused]] constexpr bool isUnit = vector.IsUnit();
 			[[maybe_unused]] constexpr bool isUniform = vector.IsUniform();
-
-			[[maybe_unused]] constexpr std::array<float, 2> array = vector.ToArray();
 
 			[[maybe_unused]] constexpr auto intVector = static_cast<PonyEngine::Math::Vector2<int>>(vector);
 
