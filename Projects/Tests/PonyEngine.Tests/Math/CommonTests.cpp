@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+import <cstdint>;
 import <numbers>;
 import <type_traits>;
 
@@ -21,6 +22,27 @@ namespace Math
 	TEST_CLASS(CommonTests)
 	{
 	public:
+		TEST_METHOD(IsGreaterTest)
+		{
+			Assert::IsTrue(PonyEngine::Math::IsGreaterThan<std::uint32_t, std::uint8_t>);
+			Assert::IsFalse(PonyEngine::Math::IsGreaterThan<std::uint32_t, std::uint32_t>);
+			Assert::IsFalse(PonyEngine::Math::IsGreaterThan<std::uint8_t, std::uint32_t>);
+
+			Assert::IsFalse(PonyEngine::Math::IsGreaterThan<float, float>);
+			Assert::IsTrue(PonyEngine::Math::IsGreaterThan<double, float>);
+			Assert::IsFalse(PonyEngine::Math::IsGreaterThan<float, double>);
+		}
+
+		TEST_METHOD(FloatingBySizeTest)
+		{
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::FloatingBySize<char>>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::FloatingBySize<int>>);
+			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::FloatingBySize<float>>);
+
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::FloatingBySize<long long>>);
+			Assert::IsTrue(std::is_same_v<double, PonyEngine::Math::FloatingBySize<double>>);
+		}
+
 		TEST_METHOD(ComputationalForTest)
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyEngine::Math::ComputationalFor<bool>>);
