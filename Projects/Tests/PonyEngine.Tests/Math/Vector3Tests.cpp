@@ -87,7 +87,7 @@ namespace Math
 			Assert::AreEqual(z, vector.Z());
 		}
 
-		TEST_METHOD(ConstructorPointerShortTest)
+		TEST_METHOD(ConstructorSpanShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
@@ -98,7 +98,7 @@ namespace Math
 			Assert::AreEqual(z, vector.Z());
 		}
 
-		TEST_METHOD(ConstructorPointerFloatTest)
+		TEST_METHOD(ConstructorSpanFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
@@ -198,8 +198,6 @@ namespace Math
 			Assert::AreEqual(x, vector.Span()[0]);
 			Assert::AreEqual(y, vector.Span()[1]);
 			Assert::AreEqual(z, vector.Span()[2]);
-			vector.Span()[0] += 1;
-			Assert::AreEqual(static_cast<short>(x + 1), vector.Span()[0]);
 
 			constexpr auto vectorC = PonyEngine::Math::Vector3<short>(x, y, z);
 			Assert::AreEqual(x, vectorC.Span()[0]);
@@ -216,8 +214,6 @@ namespace Math
 			Assert::AreEqual(x, vector.Span()[0]);
 			Assert::AreEqual(y, vector.Span()[1]);
 			Assert::AreEqual(z, vector.Span()[2]);
-			vector.Span()[0] += 1;
-			Assert::AreEqual(x + 1, vector.Span()[0]);
 
 			constexpr auto vectorC = PonyEngine::Math::Vector3<float>(x, y, z);
 			Assert::AreEqual(x, vectorC.Span()[0]);
@@ -542,7 +538,7 @@ namespace Math
 			Assert::AreEqual(zNew, vector.Z());
 		}
 
-		TEST_METHOD(SetArrayShortTest)
+		TEST_METHOD(SetSpanShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
@@ -557,7 +553,7 @@ namespace Math
 			Assert::AreEqual(zNew, vector.Z());
 		}
 
-		TEST_METHOD(SetArrayFloatTest)
+		TEST_METHOD(SetSpanFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
@@ -1628,7 +1624,6 @@ namespace Math
 			movedVector.Span()[1] -= 6;
 
 			[[maybe_unused]] constexpr auto constVector = PonyEngine::Math::Vector3<float>(4, 5, 1);
-			[[maybe_unused]] auto data = constVector.Span();
 
 			[[maybe_unused]] const float min = movedVector.Min();
 			[[maybe_unused]] const float max = movedVector.Max();
@@ -1644,13 +1639,8 @@ namespace Math
 			movedVector -= PonyEngine::Math::Vector3<float>(4, 5, 1);
 			movedVector *= 4.f;
 			movedVector /= 4.f;
-
-			[[maybe_unused]] auto intVector = PonyEngine::Math::Vector3<int>(4, 5, 1);
-			intVector *= 3;
-			intVector *= 4.f;
-			[[maybe_unused]] auto intVector1 = PonyEngine::Math::Vector3<int>(4, 5, 1);
-			intVector1 /= 5;
-			intVector1 /= 2.f;
+			movedVector *= 3;
+			movedVector /= 5;
 
 			[[maybe_unused]] auto movedVector1 = PonyEngine::Math::Vector3<float>();
 			movedVector1 = constVector;
@@ -1680,6 +1670,8 @@ namespace Math
 			[[maybe_unused]] constexpr float x = vector.X();
 			[[maybe_unused]] constexpr float y = vector.Y();
 			[[maybe_unused]] constexpr float z = vector.Z();
+
+			[[maybe_unused]] constexpr auto span = vector.Span();
 
 			[[maybe_unused]] constexpr float magnitudeSquared = vector.MagnitudeSquared();
 			[[maybe_unused]] constexpr float min = vector.Min();

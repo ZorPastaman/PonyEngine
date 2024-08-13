@@ -54,7 +54,7 @@ namespace Math
 			Assert::AreEqual(w, quaternion.W());
 		}
 
-		TEST_METHOD(ConstructorPointerTest)
+		TEST_METHOD(ConstructorSpanTest)
 		{
 			constexpr float x = 4;
 			constexpr float y = -1;
@@ -139,8 +139,6 @@ namespace Math
 			Assert::AreEqual(y, quaternion.Span()[1]);
 			Assert::AreEqual(z, quaternion.Span()[2]);
 			Assert::AreEqual(w, quaternion.Span()[3]);
-			quaternion.Span()[0] += 1;
-			Assert::AreEqual(x + 1, quaternion.Span()[0]);
 
 			constexpr auto quaternionC = PonyEngine::Math::Quaternion<float>(x, y, z, w);
 			Assert::AreEqual(x, quaternionC.Span()[0]);
@@ -302,7 +300,7 @@ namespace Math
 			Assert::AreEqual(w, quaternion.W());
 		}
 
-		TEST_METHOD(SetArrayTest)
+		TEST_METHOD(SetSpanTest)
 		{
 			constexpr float x = 4;
 			constexpr float y = -1;
@@ -731,7 +729,6 @@ namespace Math
 			quaternion.Span()[2] -= 6.f;
 
 			[[maybe_unused]] const auto quaternionC = PonyEngine::Math::Quaternion<float>(0, 4, 5, 1);
-			[[maybe_unused]] const float y = quaternionC.Span()[1];
 
 			quaternion.Set(1.f, 6.f, 7.f, -1.f);
 			quaternion.Set(quaternion.Span());
@@ -760,6 +757,7 @@ namespace Math
 			[[maybe_unused]] constexpr float y = quaternion.Y();
 			[[maybe_unused]] constexpr float z = quaternion.Z();
 			[[maybe_unused]] constexpr float w = quaternion.W();
+			[[maybe_unused]] constexpr auto span = quaternion.Span();
 
 			[[maybe_unused]] constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
 

@@ -289,8 +289,7 @@ namespace Math
 		{
 			[[maybe_unused]] constexpr auto defaultColor = PonyEngine::Math::RGBInt<std::uint8_t>();
 			[[maybe_unused]] constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(3, 250, 128);
-			constexpr auto array = std::array{color.R(), color.G(), color.B()};
-			[[maybe_unused]] constexpr auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(array);
+			[[maybe_unused]] constexpr auto arrayColor = PonyEngine::Math::RGBInt<std::uint8_t>(std::array{color.R(), color.G(), color.B()});
 			[[maybe_unused]] constexpr auto copiedColor = color;
 			[[maybe_unused]] constexpr auto movedColor = ColorConstexpr();
 

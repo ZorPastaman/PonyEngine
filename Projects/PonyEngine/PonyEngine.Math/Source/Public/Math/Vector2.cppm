@@ -383,13 +383,13 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr Vector2 Up = Vector2(T{0}, T{1}); ///< Vector2(0, 1).
-		static constexpr Vector2 Down = Vector2(T{0}, T{-1}); ///< Vector2(0, -1).
-		static constexpr Vector2 Right = Vector2(T{1}, T{0}); /// Vector2(1, 0).
-		static constexpr Vector2 Left = Vector2(T{-1}, T{0}); ///< Vector2(-1, 0).
-		static constexpr Vector2 One = Vector2(T{1}, T{1}); ///< Vector2(1, 1).
-		static constexpr Vector2 Zero = Vector2(T{0}, T{0}); ///< Vector2(0, 0).
-		static constexpr Vector2 Negative = Vector2(T{-1}, T{-1}); ///< Vector2(-1, -1).
+		static constexpr auto Up = Vector2(T{0}, T{1}); ///< Vector2(0, 1).
+		static constexpr auto Down = Vector2(T{0}, T{-1}); ///< Vector2(0, -1).
+		static constexpr auto Right = Vector2(T{1}, T{0}); /// Vector2(1, 0).
+		static constexpr auto Left = Vector2(T{-1}, T{0}); ///< Vector2(-1, 0).
+		static constexpr auto One = Vector2(T{1}, T{1}); ///< Vector2(1, 1).
+		static constexpr auto Zero = Vector2(T{0}, T{0}); ///< Vector2(0, 0).
+		static constexpr auto Negative = Vector2(T{-1}, T{-1}); ///< Vector2(-1, -1).
 	};
 }
 

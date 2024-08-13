@@ -575,8 +575,8 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr Matrix4x4 Identity = Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix.
-		static constexpr Matrix4x4 Zero = Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+		static constexpr auto Identity = Matrix4x4(T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix.
+		static constexpr auto Zero = Matrix4x4(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
 	};
 }
 

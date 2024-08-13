@@ -962,6 +962,22 @@ namespace Math
 			Assert::AreEqual(m13, matrix.M13());
 			Assert::AreEqual(m23, matrix.M23());
 			Assert::AreEqual(m33, matrix.M33());
+			Assert::AreEqual(m00, matrix.Component(0));
+			Assert::AreEqual(m10, matrix.Component(1));
+			Assert::AreEqual(m20, matrix.Component(2));
+			Assert::AreEqual(m30, matrix.Component(3));
+			Assert::AreEqual(m01, matrix.Component(4));
+			Assert::AreEqual(m11, matrix.Component(5));
+			Assert::AreEqual(m21, matrix.Component(6));
+			Assert::AreEqual(m31, matrix.Component(7));
+			Assert::AreEqual(m02, matrix.Component(8));
+			Assert::AreEqual(m12, matrix.Component(9));
+			Assert::AreEqual(m22, matrix.Component(10));
+			Assert::AreEqual(m32, matrix.Component(11));
+			Assert::AreEqual(m03, matrix.Component(12));
+			Assert::AreEqual(m13, matrix.Component(13));
+			Assert::AreEqual(m23, matrix.Component(14));
+			Assert::AreEqual(m33, matrix.Component(15));
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.M00());
@@ -980,6 +996,22 @@ namespace Math
 			Assert::AreEqual(m13, matrixC.M13());
 			Assert::AreEqual(m23, matrixC.M23());
 			Assert::AreEqual(m33, matrixC.M33());
+			Assert::AreEqual(m00, matrixC.Component(0));
+			Assert::AreEqual(m10, matrixC.Component(1));
+			Assert::AreEqual(m20, matrixC.Component(2));
+			Assert::AreEqual(m30, matrixC.Component(3));
+			Assert::AreEqual(m01, matrixC.Component(4));
+			Assert::AreEqual(m11, matrixC.Component(5));
+			Assert::AreEqual(m21, matrixC.Component(6));
+			Assert::AreEqual(m31, matrixC.Component(7));
+			Assert::AreEqual(m02, matrixC.Component(8));
+			Assert::AreEqual(m12, matrixC.Component(9));
+			Assert::AreEqual(m22, matrixC.Component(10));
+			Assert::AreEqual(m32, matrixC.Component(11));
+			Assert::AreEqual(m03, matrixC.Component(12));
+			Assert::AreEqual(m13, matrixC.Component(13));
+			Assert::AreEqual(m23, matrixC.Component(14));
+			Assert::AreEqual(m33, matrixC.Component(15));
 		}
 
 		TEST_METHOD(ComponentAccessFloatTest)
@@ -1018,6 +1050,22 @@ namespace Math
 			Assert::AreEqual(m13, matrix.M13());
 			Assert::AreEqual(m23, matrix.M23());
 			Assert::AreEqual(m33, matrix.M33());
+			Assert::AreEqual(m00, matrix.Component(0));
+			Assert::AreEqual(m10, matrix.Component(1));
+			Assert::AreEqual(m20, matrix.Component(2));
+			Assert::AreEqual(m30, matrix.Component(3));
+			Assert::AreEqual(m01, matrix.Component(4));
+			Assert::AreEqual(m11, matrix.Component(5));
+			Assert::AreEqual(m21, matrix.Component(6));
+			Assert::AreEqual(m31, matrix.Component(7));
+			Assert::AreEqual(m02, matrix.Component(8));
+			Assert::AreEqual(m12, matrix.Component(9));
+			Assert::AreEqual(m22, matrix.Component(10));
+			Assert::AreEqual(m32, matrix.Component(11));
+			Assert::AreEqual(m03, matrix.Component(12));
+			Assert::AreEqual(m13, matrix.Component(13));
+			Assert::AreEqual(m23, matrix.Component(14));
+			Assert::AreEqual(m33, matrix.Component(15));
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix4x4<float>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.M00());
@@ -1036,6 +1084,22 @@ namespace Math
 			Assert::AreEqual(m13, matrixC.M13());
 			Assert::AreEqual(m23, matrixC.M23());
 			Assert::AreEqual(m33, matrixC.M33());
+			Assert::AreEqual(m00, matrixC.Component(0));
+			Assert::AreEqual(m10, matrixC.Component(1));
+			Assert::AreEqual(m20, matrixC.Component(2));
+			Assert::AreEqual(m30, matrixC.Component(3));
+			Assert::AreEqual(m01, matrixC.Component(4));
+			Assert::AreEqual(m11, matrixC.Component(5));
+			Assert::AreEqual(m21, matrixC.Component(6));
+			Assert::AreEqual(m31, matrixC.Component(7));
+			Assert::AreEqual(m02, matrixC.Component(8));
+			Assert::AreEqual(m12, matrixC.Component(9));
+			Assert::AreEqual(m22, matrixC.Component(10));
+			Assert::AreEqual(m32, matrixC.Component(11));
+			Assert::AreEqual(m03, matrixC.Component(12));
+			Assert::AreEqual(m13, matrixC.Component(13));
+			Assert::AreEqual(m23, matrixC.Component(14));
+			Assert::AreEqual(m33, matrixC.Component(15));
 		}
 
 		TEST_METHOD(SpanShortTest)
@@ -1090,9 +1154,6 @@ namespace Math
 			Assert::AreEqual(m13, matrix.Span(3)[1]);
 			Assert::AreEqual(m23, matrix.Span(3)[2]);
 			Assert::AreEqual(m33, matrix.Span(3)[3]);
-			matrix.Span()[0] += 1;
-			matrix.Span(0)[0] += 1;
-			Assert::AreEqual(static_cast<short>(m00 + 2), matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.Span()[0]);
@@ -1181,9 +1242,6 @@ namespace Math
 			Assert::AreEqual(m13, matrix.Span(3)[1]);
 			Assert::AreEqual(m23, matrix.Span(3)[2]);
 			Assert::AreEqual(m33, matrix.Span(3)[3]);
-			matrix.Span()[0] += 1;
-			matrix.Span(0)[0] += 1;
-			Assert::AreEqual(m00 + 2, matrix.Span()[0]);
 
 			constexpr auto matrixC = PonyEngine::Math::Matrix4x4<float>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.Span()[0]);
@@ -2336,7 +2394,7 @@ namespace Math
 			Assert::AreEqual(m33, matrix.M33());
 		}
 
-		TEST_METHOD(SetArrayShortTest)
+		TEST_METHOD(SetSpanShortTest)
 		{
 			constexpr short m00 = 10;
 			constexpr short m10 = -15;
@@ -2375,7 +2433,7 @@ namespace Math
 			Assert::AreEqual(m33, matrix.M33());
 		}
 
-		TEST_METHOD(SetArrayFloatTest)
+		TEST_METHOD(SetSpanFloatTest)
 		{
 			constexpr float m00 = 10;
 			constexpr float m10 = -15;
@@ -4183,12 +4241,11 @@ namespace Math
 			movedMatrix.M13() /= 7;
 			movedMatrix.M23() *= 1;
 			movedMatrix.M33() += 1;
-			[[maybe_unused]] auto span = movedMatrix.Span();
-			[[maybe_unused]] auto columnSpan = movedMatrix.Span(1);
+			movedMatrix.Component(3) *= 1;
+			movedMatrix.Span()[0] -= 3;
+			movedMatrix.Span(1)[0] /= 2;
 
 			[[maybe_unused]] constexpr auto constMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			[[maybe_unused]] auto cSpan = constMatrix.Span();
-			[[maybe_unused]] auto cColumnSpan = constMatrix.Span(1);
 
 			movedMatrix.Row(0, PonyEngine::Math::Vector4<int>(3, 6, 9, 5));
 			movedMatrix.Column(1, PonyEngine::Math::Vector4<int>(3, 6, 9, 3));
@@ -4212,12 +4269,9 @@ namespace Math
 			movedMatrix -= constMatrix;
 			movedMatrix *= 3;
 			movedMatrix *= 3.f;
-
-			[[maybe_unused]] auto leftMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			[[maybe_unused]] constexpr auto rightMatrix = PonyEngine::Math::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8); // Left and right are MSVC internal compiler error overcome.
-			leftMatrix *= rightMatrix;
-			leftMatrix /= 4;
-			leftMatrix /= 5.f;
+			movedMatrix *= constMatrix;
+			movedMatrix /= 4;
+			movedMatrix /= 5.f;
 
 			return movedMatrix;
 		}
@@ -4250,6 +4304,9 @@ namespace Math
 			[[maybe_unused]] constexpr int m13 = matrix.M13();
 			[[maybe_unused]] constexpr int m23 = matrix.M23();
 			[[maybe_unused]] constexpr int m33 = matrix.M33();
+
+			[[maybe_unused]] constexpr auto span = matrix.Span();
+			[[maybe_unused]] constexpr auto columnSpan = matrix.Span(1);
 
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> row = matrix.Row(1);
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<int> column = matrix.Column(0);

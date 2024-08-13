@@ -502,8 +502,8 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr Matrix3x3 Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix.
-		static constexpr Matrix3x3 Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+		static constexpr auto Identity = Matrix3x3(T{1}, T{0}, T{0}, T{0}, T{1}, T{0}, T{0}, T{0}, T{1}); ///< Identity matrix.
+		static constexpr auto Zero = Matrix3x3(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
 	};
 }
 

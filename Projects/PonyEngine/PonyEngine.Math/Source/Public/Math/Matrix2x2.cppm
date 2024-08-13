@@ -449,8 +449,8 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr Matrix2x2 Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1}); ///< Identity matrix.
-		static constexpr Matrix2x2 Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+		static constexpr auto Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1}); ///< Identity matrix.
+		static constexpr auto Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
 	};
 }
 
@@ -577,7 +577,7 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
-	constexpr T& Matrix2x2<T>::Component(const std::size_t index) noexcept // TODO: Add test
+	constexpr T& Matrix2x2<T>::Component(const std::size_t index) noexcept
 	{
 		return components[index];
 	}
