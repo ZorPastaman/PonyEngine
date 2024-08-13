@@ -163,15 +163,15 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr RGB Red = RGB(T{1}, T{0}, T{0});
-		static constexpr RGB Green = RGB(T{0}, T{1}, T{0});
-		static constexpr RGB Blue = RGB(T{0}, T{0}, T{1});
-		static constexpr RGB Black = RGB(T{0}, T{0}, T{0});
-		static constexpr RGB White = RGB(T{1}, T{1}, T{1});
-		static constexpr RGB Gray = RGB(T{0.5}, T{0.5}, T{0.5});
-		static constexpr RGB Yellow = RGB(T{1}, T{1}, T{0});
-		static constexpr RGB Magenta = RGB(T{1}, T{0}, T{1});
-		static constexpr RGB Cyan = RGB(T{0}, T{1}, T{1});
+		static constexpr auto Red = RGB(T{1}, T{0}, T{0});
+		static constexpr auto Green = RGB(T{0}, T{1}, T{0});
+		static constexpr auto Blue = RGB(T{0}, T{0}, T{1});
+		static constexpr auto Black = RGB(T{0}, T{0}, T{0});
+		static constexpr auto White = RGB(T{1}, T{1}, T{1});
+		static constexpr auto Gray = RGB(T{0.5}, T{0.5}, T{0.5});
+		static constexpr auto Yellow = RGB(T{1}, T{1}, T{0});
+		static constexpr auto Magenta = RGB(T{1}, T{0}, T{1});
+		static constexpr auto Cyan = RGB(T{0}, T{1}, T{1});
 	};
 }
 
@@ -199,7 +199,7 @@ namespace PonyEngine::Math
 
 	template<std::floating_point T>
 	constexpr RGB<T>::RGB(const Vector3<T>& vector) noexcept :
-		RGB(vector.Data())
+		RGB(vector.Span())
 	{
 	}
 

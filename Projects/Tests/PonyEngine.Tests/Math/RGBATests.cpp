@@ -90,6 +90,13 @@ namespace Math
 			Assert::AreEqual(blue / 255., static_cast<double>(convertedRGBA.B()), 0.00001);
 			Assert::AreEqual(alpha / 255., static_cast<double>(convertedRGBA.A()), 0.00001);
 
+			constexpr auto rgbInt = PonyEngine::Math::RGBInt<std::uint8_t>(red, green, blue);
+			auto convertedRGB = PonyEngine::Math::RGBA<float>(rgbInt, a);
+			Assert::AreEqual(red / 255., static_cast<double>(convertedRGB.R()), 0.00001);
+			Assert::AreEqual(green / 255., static_cast<double>(convertedRGB.G()), 0.00001);
+			Assert::AreEqual(blue / 255., static_cast<double>(convertedRGB.B()), 0.00001);
+			Assert::AreEqual(a, convertedRGB.A());
+
 			constexpr auto vector = PonyEngine::Math::Vector4<float>(r, g, b, a);
 			auto vectorColor = PonyEngine::Math::RGBA<float>(vector);
 			Assert::AreEqual(r, vectorColor.R());
@@ -353,6 +360,19 @@ namespace Math
 			Assert::AreEqual(b, rgb.B());
 		}
 
+		TEST_METHOD(ToRGBIntTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			constexpr auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			auto rgb = static_cast<PonyEngine::Math::RGBInt<std::uint8_t>>(color);
+			Assert::AreEqual(static_cast<std::uint8_t>(r * 255), rgb.R());
+			Assert::AreEqual(static_cast<std::uint8_t>(g * 255), rgb.G());
+			Assert::AreEqual(static_cast<std::uint8_t>(b * 255), rgb.B());
+		}
+
 		TEST_METHOD(ToRGBAIntTest)
 		{
 			constexpr float r = 0.49f;
@@ -379,6 +399,190 @@ namespace Math
 			Assert::AreEqual(g, vector.Y());
 			Assert::AreEqual(b, vector.Z());
 			Assert::AreEqual(a, vector.W());
+		}
+
+		TEST_METHOD(ComponentAccessTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			Assert::AreEqual(r, color[0]);
+			Assert::AreEqual(g, color[1]);
+			Assert::AreEqual(b, color[2]);
+			Assert::AreEqual(a, color[3]);
+
+			constexpr auto colorC = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			Assert::AreEqual(r, colorC[0]);
+			Assert::AreEqual(g, colorC[1]);
+			Assert::AreEqual(b, colorC[2]);
+			Assert::AreEqual(a, colorC[3]);
+		}
+
+		TEST_METHOD(CopyAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			constexpr auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			auto copiedColor = PonyEngine::Math::RGBA<float>();
+			PonyEngine::Math::RGBA<float>& colorRef = copiedColor = color;
+			Assert::AreEqual(r, copiedColor.R());
+			Assert::AreEqual(g, copiedColor.G());
+			Assert::AreEqual(b, copiedColor.B());
+			Assert::AreEqual(a, copiedColor.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&copiedColor), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(MoveAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			auto movedColor = PonyEngine::Math::RGBA<float>();
+			PonyEngine::Math::RGBA<float>& colorRef = movedColor = std::move(color);
+			Assert::AreEqual(r, movedColor.R());
+			Assert::AreEqual(g, movedColor.G());
+			Assert::AreEqual(b, movedColor.B());
+			Assert::AreEqual(a, movedColor.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&movedColor), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(SumAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float r1 = 0.19f;
+			constexpr float g1 = 0.09f;
+			constexpr float b1 = 0.219f;
+			constexpr float a1 = 0.366f;
+			constexpr auto color1 = PonyEngine::Math::RGBA<float>(r1, g1, b1, a1);
+			PonyEngine::Math::RGBA<float>& colorRef = color += color1;
+			Assert::AreEqual(r + r1, color.R());
+			Assert::AreEqual(g + g1, color.G());
+			Assert::AreEqual(b + b1, color.B());
+			Assert::AreEqual(a + a1, color.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(SubtractAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float r1 = 0.19f;
+			constexpr float g1 = 0.09f;
+			constexpr float b1 = 0.219f;
+			constexpr float a1 = 0.366f;
+			constexpr auto color1 = PonyEngine::Math::RGBA<float>(r1, g1, b1, a1);
+			PonyEngine::Math::RGBA<float>& colorRef = color -= color1;
+			Assert::AreEqual(r - r1, color.R());
+			Assert::AreEqual(g - g1, color.G());
+			Assert::AreEqual(b - b1, color.B());
+			Assert::AreEqual(a - a1, color.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(ColorProductAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float r1 = 0.19f;
+			constexpr float g1 = 0.09f;
+			constexpr float b1 = 0.219f;
+			constexpr float a1 = 0.366f;
+			constexpr auto color1 = PonyEngine::Math::RGBA<float>(r1, g1, b1, a1);
+			PonyEngine::Math::RGBA<float>& colorRef = color *= color1;
+			Assert::AreEqual(r * r1, color.R());
+			Assert::AreEqual(g * g1, color.G());
+			Assert::AreEqual(b * b1, color.B());
+			Assert::AreEqual(a * a1, color.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(ProductAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float multiplier = 4.f;
+			PonyEngine::Math::RGBA<float>& colorRef = color *= multiplier;
+			Assert::AreEqual(r * multiplier, color.R());
+			Assert::AreEqual(g * multiplier, color.G());
+			Assert::AreEqual(b * multiplier, color.B());
+			Assert::AreEqual(a * multiplier, color.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(ColorDivisionAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float r1 = 0.19f;
+			constexpr float g1 = 0.09f;
+			constexpr float b1 = 0.219f;
+			constexpr float a1 = 0.366f;
+			constexpr auto color1 = PonyEngine::Math::RGBA<float>(r1, g1, b1, a1);
+			PonyEngine::Math::RGBA<float>& colorRef = color /= color1;
+			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(color.R()), 0.00001);
+			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(color.G()), 0.00001);
+			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(color.B()), 0.00001);
+			Assert::AreEqual(static_cast<double>(a / a1), static_cast<double>(color.A()), 0.00001);
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(DivisionAssignmentTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			constexpr float divisor = 4.f;
+			PonyEngine::Math::RGBA<float>& colorRef = color /= divisor;
+			Assert::AreEqual(r / divisor, color.R());
+			Assert::AreEqual(g / divisor, color.G());
+			Assert::AreEqual(b / divisor, color.B());
+			Assert::AreEqual(a / divisor, color.A());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
+		}
+
+		TEST_METHOD(EqualTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyEngine::Math::RGBA<float>(r, g, b, a);
+			const auto otherColor = color;
+			Assert::IsTrue(color == otherColor);
+			Assert::IsFalse(color != otherColor);
+
+			for (std::size_t i = 0; i < PonyEngine::Math::RGBA<float>::ComponentCount; ++i)
+			{
+				const float prevColor = color[i];
+				color[i] += 1.f;
+				Assert::IsFalse(color == otherColor);
+				Assert::IsTrue(color != otherColor);
+				color[i] = prevColor;
+			}
 		}
 	};
 }

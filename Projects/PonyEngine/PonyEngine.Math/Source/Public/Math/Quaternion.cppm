@@ -286,7 +286,7 @@ export namespace PonyEngine::Math
 	{
 		Predefined() = delete;
 
-		static constexpr Quaternion Identity = Quaternion(T{0}, T{0}, T{0}, T{1}); ///< Identity quaternion.
+		static constexpr auto Identity = Quaternion(T{0}, T{0}, T{0}, T{1}); ///< Identity quaternion.
 	};
 }
 

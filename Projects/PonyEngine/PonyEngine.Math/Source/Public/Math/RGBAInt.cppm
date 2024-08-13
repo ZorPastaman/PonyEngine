@@ -232,7 +232,7 @@ namespace PonyEngine::Math
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::RGBAInt(const Vector4<T>& vector) noexcept :
-		RGBAInt(vector.X(), vector.Y(), vector.Z(), vector.W()) // TODO: replace with span.
+		RGBAInt(vector.Span())
 	{
 	}
 

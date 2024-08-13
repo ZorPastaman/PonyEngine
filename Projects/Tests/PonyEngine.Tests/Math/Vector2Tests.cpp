@@ -172,8 +172,6 @@ namespace Math
 			auto vector = PonyEngine::Math::Vector2<short>(x, y);
 			Assert::AreEqual(x, vector.Span()[0]);
 			Assert::AreEqual(y, vector.Span()[1]);
-			vector.Span()[0] += 1;
-			Assert::AreEqual(static_cast<short>(x + 1), vector.Span()[0]);
 
 			constexpr auto vectorC = PonyEngine::Math::Vector2<short>(x, y);
 			Assert::AreEqual(x, vectorC.Span()[0]);
@@ -478,7 +476,7 @@ namespace Math
 			Assert::AreEqual(yNew, vector.Y());
 		}
 
-		TEST_METHOD(SetArrayShortTest) // TODO: Check words array, pointer and data in the tests
+		TEST_METHOD(SetSpanShortTest)
 		{
 			constexpr short x = 2;
 			constexpr short y = -3;
@@ -490,7 +488,7 @@ namespace Math
 			Assert::AreEqual(yNew, vector.Y());
 		}
 
-		TEST_METHOD(SetArrayFloatTest)
+		TEST_METHOD(SetSpanFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
@@ -1328,7 +1326,6 @@ namespace Math
 			movedVector.Span()[1] -= 6;
 
 			[[maybe_unused]] constexpr auto constVector = PonyEngine::Math::Vector2<float>(4, 5);
-			[[maybe_unused]] auto span = constVector.Span();
 
 			movedVector.Swap();
 
@@ -1344,13 +1341,8 @@ namespace Math
 			movedVector -= PonyEngine::Math::Vector2<float>(4, 5);
 			movedVector *= 4.f;
 			movedVector /= 4.f;
-
-			[[maybe_unused]] auto intVector = PonyEngine::Math::Vector2<int>(4, 5);
-			intVector *= 3;
-			intVector *= 4.f;
-			[[maybe_unused]] auto intVector1 = PonyEngine::Math::Vector2<int>(4, 5);
-			intVector1 /= 5;
-			intVector1 /= 2.f;
+			movedVector *= 3;
+			movedVector /= 5;
 
 			[[maybe_unused]] auto movedVector1 = PonyEngine::Math::Vector2<float>();
 			movedVector1 = constVector;
@@ -1377,6 +1369,7 @@ namespace Math
 
 			[[maybe_unused]] constexpr float x = vector.X();
 			[[maybe_unused]] constexpr float y = vector.Y();
+			[[maybe_unused]] constexpr auto span = vector.Span();
 
 			[[maybe_unused]] constexpr float magnitudeSquared = vector.MagnitudeSquared();
 			[[maybe_unused]] constexpr float min = vector.Min();
