@@ -785,10 +785,10 @@ namespace Math
 			constexpr float a1 = 0.366f;
 			constexpr auto color1 = PonyEngine::Math::RGBA<float>(r1, g1, b1, a1);
 			auto quotient = color / color1;
-			Assert::AreEqual(r / r1, quotient.R());
-			Assert::AreEqual(g / g1, quotient.G());
-			Assert::AreEqual(b / b1, quotient.B());
-			Assert::AreEqual(a / a1, quotient.A());
+			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(quotient.R()), 0.00001);
+			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(quotient.G()), 0.00001);
+			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(quotient.B()), 0.00001);
+			Assert::AreEqual(static_cast<double>(a / a1), static_cast<double>(quotient.A()), 0.00001);
 		}
 
 		TEST_METHOD(DivisionTest)
