@@ -108,8 +108,6 @@ namespace Math
 			Assert::AreEqual(r, color.Span()[0]);
 			Assert::AreEqual(g, color.Span()[1]);
 			Assert::AreEqual(b, color.Span()[2]);
-			color.Span()[0] += 1;
-			Assert::AreEqual(static_cast<std::uint8_t>(r + 1), color.Span()[0]);
 			constexpr auto cColor = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
 			Assert::AreEqual(r, cColor.Span()[0]);
 			Assert::AreEqual(g, cColor.Span()[1]);
@@ -270,6 +268,7 @@ namespace Math
 			[[maybe_unused]] std::uint8_t b = movedColor.B();
 
 			[[maybe_unused]] const auto span = movedColor.Span();
+			span[0] += 1;
 
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();

@@ -98,6 +98,7 @@
     <ClCompile Include="Math\Matrix3x3Tests.cpp" />
     <ClCompile Include="Math\Matrix4x4Tests.cpp" />
     <ClCompile Include="Math\QuaternionTests.cpp" />
+    <ClCompile Include="Math\RGBTests.cpp" />
     <ClCompile Include="Math\Transformations2DTests.cpp" />
     <ClCompile Include="Math\Transformations3DTests.cpp" />
     <ClCompile Include="Math\Vector2Tests.cpp" />

@@ -21,7 +21,6 @@ import <string>;
 import :RGB;
 import :RGBAInt;
 import :RGBInt;
-import :Common;
 import :Vector4;
 
 export namespace PonyEngine::Math
@@ -141,6 +140,17 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
 
+		/// @brief Converts the linear color to a gamma-corrected color.
+		///	@note All the color components must be in range [0, 1].
+		/// @return Gamma-corrected color.
+		[[nodiscard("Pure function")]]
+		RGBA Gamma() const noexcept;
+		/// @brief Converts the gamma-corrected color to a linear color.
+		///	@note All the color components must be in range [0, 1].
+		/// @return Linear color.
+		[[nodiscard("Pure function")]]
+		RGBA Linear() const noexcept;
+
 		/// @brief Checks if the color is black.
 		/// @return @a True if it's black; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -174,12 +184,14 @@ export namespace PonyEngine::Math
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
-		/// @brief Sets arguments to components.
+		/// @brief Sets arguments to the components.
 		/// @param red Red.
 		/// @param green Green.
 		/// @param blue Blue.
 		/// @param alpha Alpha.
 		constexpr void Set(T red, T green, T blue, T alpha) noexcept;
+		/// @brief Sets the @p span to the components.
+		/// @param span Span. The order is r, g, b, a.
 		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
 		/// @brief Creates a string representing a state of the color.
@@ -194,14 +206,14 @@ export namespace PonyEngine::Math
 		/// @brief Converts the rgba color to an rgb color skipping the alpha.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator RGB<T>() const noexcept;
-		/// @brief Converts to an integral rgb color.
-		/// @tparam U Target type.
-		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
-		explicit constexpr operator RGBInt<U>() const noexcept;
 		/// @brief Converts to an integral rgba color.
 		/// @tparam U Target type.
 		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator RGBAInt<U>() const noexcept;
+		/// @brief Converts to an integral rgb color.
+		/// @tparam U Target type.
+		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator RGBInt<U>() const noexcept;
 
 		/// @brief Converts the color to a vector.
 		[[nodiscard("Pure operator")]]
@@ -255,35 +267,99 @@ export namespace PonyEngine::Math
 		std::array<T, ComponentCount> components; ///< Component array in order red, green, blue, alpha.
 	};
 
+	/// @brief Computes a distance between two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Distance.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T Distance(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	T Distance(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	/// @brief Computes a squared distance between two colors.
+	/// @remark This function is much faster that @p Distance 'cause it doesn't compute a square root.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Distance
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T DistanceSquared(const RGBA<T>& left, const RGBA<T>& right) noexcept; // TODO: Add Distance functions to Vectors
 
+	/// @brief Linear interpolation between the two colors if the @p time is in range [0, 1].
+	///        Linear extrapolation between the two colors if the @p time is out of range [0, 1].
+	/// @tparam T Component type.
+	/// @param from Interpolation/Extrapolation start point.
+	/// @param to Interpolation/Extrapolation target point.
+	/// @param time Interpolation/Extrapolation time. It can be negative.
+	/// @return Interpolated/Extrapolated color.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr RGBA<T> Lerp(const RGBA<T>& from, const RGBA<T>& to, T time) noexcept;
 
+	/// @brief Checks if the two color are almost equal with the @p tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @param tolerance Tolerance. Must be positive.
+	/// @return @a True if the colors are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const RGBA<T>& left, const RGBA<T>& right, T tolerance = T{0.00001}) noexcept;
 
+	/// @brief Sums the @p left color and the @p right color.
+	/// @tparam T Component type.
+	/// @param left Augend.
+	/// @param right Addend.
+	/// @return Sum.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator +(const RGBA<T>& left, const RGBA<T>& right) noexcept;
 
+	/// @brief Subtracts the @p right color from the @p left color.
+	/// @tparam T Component type.
+	/// @param left Minuend.
+	/// @param right Subtrahend.
+	/// @return Difference.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator -(const RGBA<T>& left, const RGBA<T>& right) noexcept;
 
+	/// @brief Multiplies the @p left color by the @p right color component-wise.
+	/// @tparam T Component type.
+	/// @param left Multiplicand.
+	/// @param right Multiplier.
+	/// @return Product.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator *(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	/// @brief Multiplies the @p color components by the @p multiplier.
+	/// @tparam T Component type.
+	/// @param color Multiplicand.
+	/// @param multiplier Multiplier.
+	/// @return Product.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator *(const RGBA<T>& color, T multiplier) noexcept;
+	/// @brief Multiplies the @p color components by the @p multiplier.
+	/// @tparam T Component type.
+	/// @param multiplier Multiplier.
+	/// @param color Multiplicand.
+	/// @return Product.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator *(T multiplier, const RGBA<T>& color) noexcept;
 
+	/// @brief Divides the @p left color by the @p right color component-wise.
+	/// @tparam T Component type.
+	/// @param left Dividend.
+	/// @param right Divisor.
+	/// @return Quotient.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator /(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	/// @brief Divides the @p color components by the @p divisor.
+	/// @tparam T Component type.
+	/// @param color Dividend.
+	/// @param divisor Divisor.
+	/// @return Quotient.
 	template<std::floating_point T> [[nodiscard("Pure operator")]]
 	constexpr RGBA<T> operator /(const RGBA<T>& color, T divisor) noexcept;
 
+	/// @brief Puts @p color.ToString() into the @p stream.
+	/// @tparam T Component type.
+	/// @param stream Stream.
+	/// @param color Color.
+	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const RGBA<T>& color);
 
@@ -437,6 +513,24 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	RGBA<T> RGBA<T>::Gamma() const noexcept
+	{
+		const RGB<T> rgb = static_cast<RGB<T>>(*this);
+		const RGB<T> gamma = rgb.Gamma();
+
+		return RGBA(gamma, A());
+	}
+
+	template<std::floating_point T>
+	RGBA<T> RGBA<T>::Linear() const noexcept
+	{
+		const RGB<T> rgb = static_cast<RGB<T>>(*this);
+		const RGB<T> linear = rgb.Linear();
+
+		return RGBA(linear, A());
+	}
+
+	template<std::floating_point T>
 	constexpr bool RGBA<T>::IsBlack() const noexcept
 	{
 		return *this == Predefined::Black;
@@ -469,7 +563,7 @@ namespace PonyEngine::Math
 	template<std::floating_point T>
 	constexpr bool RGBA<T>::IsAlmostTransparent(const T tolerance) const noexcept
 	{
-		return AreAlmostEqual(A(), T{0}, tolerance);
+		return A() < tolerance;
 	}
 
 	template<std::floating_point T>
@@ -500,7 +594,7 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
-	constexpr T Distance(const RGBA<T>& left, const RGBA<T>& right) noexcept
+	T Distance(const RGBA<T>& left, const RGBA<T>& right) noexcept
 	{
 		return std::sqrt(DistanceSquared(left, right));
 	}
@@ -546,16 +640,16 @@ namespace PonyEngine::Math
 
 	template<std::floating_point T>
 	template<std::unsigned_integral U>
-	constexpr RGBA<T>::operator RGBInt<U>() const noexcept
+	constexpr RGBA<T>::operator RGBAInt<U>() const noexcept
 	{
-		return RGBInt<U>(R() * RGBInt<U>::MaxValue, G() * RGBInt<U>::MaxValue, B() * RGBInt<U>::MaxValue);
+		return RGBAInt<U>(R() * RGBAInt<U>::MaxValue, G() * RGBAInt<U>::MaxValue, B() * RGBAInt<U>::MaxValue, A() * RGBAInt<U>::MaxValue);
 	}
 
 	template<std::floating_point T>
 	template<std::unsigned_integral U>
-	constexpr RGBA<T>::operator RGBAInt<U>() const noexcept
+	constexpr RGBA<T>::operator RGBInt<U>() const noexcept
 	{
-		return RGBAInt<U>(R() * RGBAInt<U>::MaxValue, G() * RGBAInt<U>::MaxValue, B() * RGBAInt<U>::MaxValue, A() * RGBAInt<U>::MaxValue);
+		return RGBInt<U>(R() * RGBInt<U>::MaxValue, G() * RGBInt<U>::MaxValue, B() * RGBInt<U>::MaxValue);
 	}
 
 	template<std::floating_point T>
