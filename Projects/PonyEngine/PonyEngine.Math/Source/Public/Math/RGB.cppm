@@ -578,7 +578,13 @@ namespace PonyEngine::Math
 	template<std::unsigned_integral U>
 	constexpr RGB<T>::operator RGBInt<U>() const noexcept
 	{
-		return RGBInt<U>(R() * RGBInt<U>::MaxValue, G() * RGBInt<U>::MaxValue, B() * RGBInt<U>::MaxValue);
+		RGBInt<U> color;
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			color[i] = static_cast<U>((*this)[i] * RGBInt<U>::MaxValue);
+		}
+
+		return color;
 	}
 
 	template<std::floating_point T>
