@@ -156,6 +156,21 @@ namespace Math
 			Assert::AreEqual(0.69f, cColor.Max());
 		}
 
+		TEST_METHOD(MinMaxTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			auto color = PonyEngine::Math::RGB<float>(r, g, b);
+			auto pair = color.MinMax();
+			Assert::AreEqual(b, pair.first);
+			Assert::AreEqual(g, pair.second);
+			constexpr auto cColor = PonyEngine::Math::RGB<float>(r, g, b);
+			auto cPair = cColor.MinMax();
+			Assert::AreEqual(b, pair.first);
+			Assert::AreEqual(g, pair.second);
+		}
+
 		TEST_METHOD(GammaTest)
 		{
 			constexpr float r = 0.49f;
@@ -495,6 +510,59 @@ namespace Math
 			Assert::AreEqual(0.671, static_cast<double>(PonyEngine::Math::Distance(color, color1)), 0.001);
 		}
 
+		TEST_METHOD(MinCombinedTest)
+		{
+			constexpr float r = 0.8;
+			constexpr float g = 0.12;
+			constexpr float b = 0.1;
+			constexpr auto color = PonyEngine::Math::RGB<float>(r, g, b);
+			constexpr float r1 = 0.10;
+			constexpr float g1 = 0.6;
+			constexpr float b1 = 0.1;
+			constexpr auto color1 = PonyEngine::Math::RGB<float>(r1, g1, b1);
+			auto min = PonyEngine::Math::Min(color, color1);
+			Assert::AreEqual(r1, min.R());
+			Assert::AreEqual(g, min.G());
+			Assert::AreEqual(b, min.B());
+		}
+
+		TEST_METHOD(MaxCombinedTest)
+		{
+			constexpr float r = 0.8;
+			constexpr float g = 0.12;
+			constexpr float b = 0.1;
+			constexpr auto color = PonyEngine::Math::RGB<float>(r, g, b);
+			constexpr float r1 = 0.10;
+			constexpr float g1 = 0.6;
+			constexpr float b1 = 0.1;
+			constexpr auto color1 = PonyEngine::Math::RGB<float>(r1, g1, b1);
+			auto max = PonyEngine::Math::Max(color, color1);
+			Assert::AreEqual(r, max.R());
+			Assert::AreEqual(g1, max.G());
+			Assert::AreEqual(b, max.B());
+		}
+
+		TEST_METHOD(ClampTest)
+		{
+			constexpr float r = 0.8;
+			constexpr float g = 0.2;
+			constexpr float b = 0.1;
+			constexpr auto color = PonyEngine::Math::RGB<float>(r, g, b);
+			constexpr float r1 = 0.9;
+			constexpr float g1 = 0.6;
+			constexpr float b1 = 0.1;
+			constexpr auto color1 = PonyEngine::Math::RGB<float>(r1, g1, b1);
+			constexpr float r2 = 0.85;
+			constexpr float g2 = 0.8;
+			constexpr float b2 = 0.5;
+			constexpr auto color2 = PonyEngine::Math::RGB<float>(r2, g2, b2);
+
+			auto clamped = PonyEngine::Math::Clamp(color2, color, color1);
+			Assert::AreEqual(r2, clamped.R());
+			Assert::AreEqual(g1, clamped.G());
+			Assert::AreEqual(b, clamped.B());
+		}
+
 		TEST_METHOD(LerpTest)
 		{
 			constexpr float r = 0.49f;
@@ -663,6 +731,7 @@ namespace Math
 
 			copiedColor.Min() /= 3.f;
 			copiedColor.Max() *= 2.f;
+			[[maybe_unused]] const auto minMax = movedColor.MinMax();
 
 			movedColor.Set(0.1f, 0.69f, 0.228f);
 			movedColor.Set(copiedColor.Span());
@@ -701,6 +770,7 @@ namespace Math
 
 			[[maybe_unused]] constexpr auto min = color.Min();
 			[[maybe_unused]] constexpr auto max = color.Max();
+			[[maybe_unused]] constexpr auto minMax = color.MinMax();
 
 			[[maybe_unused]] constexpr bool isBlack = color.IsBlack();
 			[[maybe_unused]] constexpr bool isAlmostBlack = color.IsAlmostBlack();
@@ -719,6 +789,9 @@ namespace Math
 
 			[[maybe_unused]] constexpr float distanceSquared = PonyEngine::Math::DistanceSquared(color, defaultColor);
 
+			[[maybe_unused]] constexpr auto minCombined = PonyEngine::Math::Min(defaultColor, spanColor);
+			[[maybe_unused]] constexpr auto maxCombined = PonyEngine::Math::Max(defaultColor, spanColor);
+			[[maybe_unused]] constexpr auto clamped = PonyEngine::Math::Clamp(color, defaultColor, spanColor);
 			[[maybe_unused]] constexpr auto lerp = PonyEngine::Math::Lerp(color, defaultColor, 0.5f);
 
 			[[maybe_unused]] constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(color, defaultColor);

@@ -124,6 +124,14 @@ export namespace PonyEngine::Math
 		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<T&, T&> MinMax() noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<const T&, const T&> MinMax() const noexcept;
 
 		/// @brief Checks if the color is black.
 		/// @return @a True if it's black; @a false otherwise.
@@ -184,6 +192,29 @@ export namespace PonyEngine::Math
 	private:
 		std::array<T, ComponentCount> components; ///< Component array. The order is r, g, b, a.
 	};
+
+	/// @brief Creates a color consisting of minimal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of minimal elements.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr RGBAInt<T> Min(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept;
+	/// @brief Creates a color consisting of maximal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of maximal elements.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr RGBAInt<T> Max(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept;
+	/// @brief Clamps the @p value between the @p min and @p max component-wise.
+	/// @tparam T Component type.
+	/// @param value Value.
+	/// @param min Minimum.
+	/// @param max Maximum.
+	/// @return Clamped color.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr RGBAInt<T> Clamp(const RGBAInt<T>& value, const RGBAInt<T>& min, const RGBAInt<T>& max) noexcept;
 
 	/// @brief Puts @p RGBAInt.ToString() into the @p stream.
 	///	@tparam T Component type.
@@ -321,6 +352,22 @@ namespace PonyEngine::Math
 	}
 
 	template<std::unsigned_integral T>
+	constexpr std::pair<T&, T&> RGBAInt<T>::MinMax() noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<T&, T&>(*min, *max);
+	}
+
+	template<std::unsigned_integral T>
+	constexpr std::pair<const T&, const T&> RGBAInt<T>::MinMax() const noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<const T&, const T&>(*min, *max);
+	}
+
+	template<std::unsigned_integral T>
 	constexpr bool RGBAInt<T>::IsBlack() const noexcept
 	{
 		return *this == Predefined::Black;
@@ -357,6 +404,42 @@ namespace PonyEngine::Math
 	std::string RGBAInt<T>::ToString() const
 	{
 		return std::format("(R: {}, G: {}, B: {}, A: {})", R(), G(), B(), A());
+	}
+
+	template<std::unsigned_integral T>
+	constexpr RGBAInt<T> Min(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept
+	{
+		RGBAInt<T> min;
+		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
+		{
+			min[i] = std::min(left[i], right[i]);
+		}
+
+		return min;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr RGBAInt<T> Max(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept
+	{
+		RGBAInt<T> max;
+		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
+		{
+			max[i] = std::max(left[i], right[i]);
+		}
+
+		return max;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr RGBAInt<T> Clamp(const RGBAInt<T>& value, const RGBAInt<T>& min, const RGBAInt<T>& max) noexcept
+	{
+		RGBAInt<T> clamped;
+		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
+		{
+			clamped[i] = std::clamp(value[i], min[i], max[i]);
+		}
+
+		return clamped;
 	}
 
 	template<std::unsigned_integral T>

@@ -21,8 +21,6 @@ import <string>;
 import :RGBInt;
 import :Vector3;
 
-// TODO: Add clamp functions
-
 export namespace PonyEngine::Math
 {
 	/// @brief RGB color implementation.
@@ -120,6 +118,14 @@ export namespace PonyEngine::Math
 		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<T&, T&> MinMax() noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<const T&, const T&> MinMax() const noexcept;
 
 		/// @brief Converts the linear color to a gamma-corrected color.
 		///	@note All the color components must be in range [0, 1].
@@ -247,6 +253,28 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T DistanceSquared(const RGB<T>& left, const RGB<T>& right) noexcept;
 
+	/// @brief Creates a color consisting of minimal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of minimal elements.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGB<T> Min(const RGB<T>& left, const RGB<T>& right) noexcept;
+	/// @brief Creates a color consisting of maximal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of maximal elements.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGB<T> Max(const RGB<T>& left, const RGB<T>& right) noexcept;
+	/// @brief Clamps the @p value between the @p min and @p max component-wise.
+	/// @tparam T Component type.
+	/// @param value Value.
+	/// @param min Minimum.
+	/// @param max Maximum.
+	/// @return Clamped color.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGB<T> Clamp(const RGB<T>& value, const RGB<T>& min, const RGB<T>& max) noexcept;
 	/// @brief Linear interpolation between the two colors if the @p time is in range [0, 1].
 	///        Linear extrapolation between the two colors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -451,6 +479,22 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	constexpr std::pair<T&, T&> RGB<T>::MinMax() noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<T&, T&>(*min, *max);
+	}
+
+	template<std::floating_point T>
+	constexpr std::pair<const T&, const T&> RGB<T>::MinMax() const noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<const T&, const T&>(*min, *max);
+	}
+
+	template<std::floating_point T>
 	RGB<T> RGB<T>::Gamma() const noexcept
 	{
 		constexpr T exp = T{1} / GammaValue;
@@ -459,13 +503,12 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
 			const T component = (*this)[i];
-			const T gammaComponent = component > T{0.0031308}
+			gamma[i] = component > T{0.0031308}
 				? std::pow(component, exp) * T{1.055} - T{0.055}
 				: component * T{12.92};
-			gamma[i] = std::clamp(gammaComponent, T{0}, T{1}); // TODO: Use color clamp
 		}
 
-		return gamma;
+		return Clamp(gamma, Predefined::Black, Predefined::White);
 	}
 
 	template<std::floating_point T>
@@ -475,13 +518,12 @@ namespace PonyEngine::Math
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
 			const T component = (*this)[i];
-			const T linearComponent = component > T{0.04045}
+			linear[i] = component > T{0.04045}
 				? std::pow((component + T{0.055}) / T{1.055}, GammaValue)
 				: component / T{12.92};
-			linear[i] = std::clamp(linearComponent, T{0}, T{1});
 		}
 
-		return linear;
+		return Clamp(linear, Predefined::Black, Predefined::White);
 	}
 
 	template<std::floating_point T>
@@ -547,6 +589,42 @@ namespace PonyEngine::Math
 		difference *= difference;
 
 		return difference.R() + difference.G() + difference.B();
+	}
+
+	template<std::floating_point T>
+	constexpr RGB<T> Min(const RGB<T>& left, const RGB<T>& right) noexcept
+	{
+		RGB<T> min;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
+		{
+			min[i] = std::min(left[i], right[i]);
+		}
+
+		return min;
+	}
+
+	template<std::floating_point T>
+	constexpr RGB<T> Max(const RGB<T>& left, const RGB<T>& right) noexcept
+	{
+		RGB<T> max;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
+		{
+			max[i] = std::max(left[i], right[i]);
+		}
+
+		return max;
+	}
+
+	template<std::floating_point T>
+	constexpr RGB<T> Clamp(const RGB<T>& value, const RGB<T>& min, const RGB<T>& max) noexcept
+	{
+		RGB<T> clamped;
+		for (std::size_t i = 0; i < RGB<T>::ComponentCount; ++i)
+		{
+			clamped[i] = std::clamp(value[i], min[i], max[i]);
+		}
+
+		return clamped;
 	}
 
 	template<std::floating_point T>

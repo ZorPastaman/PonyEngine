@@ -125,6 +125,14 @@ export namespace PonyEngine::Math
 		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<T&, T&> MinMax() noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<const T&, const T&> MinMax() const noexcept;
 		/// @brief Sums all the components and returns the result.
 		/// @return Sum.
 		[[nodiscard("Pure function")]]
@@ -305,6 +313,28 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Scale(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
+	/// @brief Creates a vector consisting of minimal elements of the two vectors.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Vector of minimal elements.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Min(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Creates a vector consisting of maximal elements of the two vectors.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Vector of maximal elements.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Max(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Clamps the @p value between the @p min and @p max component-wise.
+	/// @tparam T Component type.
+	/// @param value Value.
+	/// @param min Minimum.
+	/// @param max Maximum.
+	/// @return Clamped vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> Clamp(const Vector3<T>& value, const Vector3<T>& min, const Vector3<T>& max) noexcept;
 	/// @brief Linear interpolation between the two vectors if the @p time is in range [0, 1].
 	///        Linear extrapolation between the two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -527,6 +557,22 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr std::pair<T&, T&> Vector3<T>::MinMax() noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<T&, T&>(*min, *max);
+	}
+
+	template<Arithmetic T>
+	constexpr std::pair<const T&, const T&> Vector3<T>::MinMax() const noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<const T&, const T&>(*min, *max);
+	}
+
+	template<Arithmetic T>
 	constexpr T Vector3<T>::Sum() const noexcept
 	{
 		return X() + Y() + Z();
@@ -571,17 +617,17 @@ namespace PonyEngine::Math
 	template<Arithmetic T>
 	constexpr bool Vector3<T>::IsUniform() const noexcept
 	{
-		const auto [min, max] = std::ranges::minmax_element(components);
+		const auto [min, max] = MinMax();
 
-		return *min == *max;
+		return min == max;
 	}
 
 	template<Arithmetic T>
 	bool Vector3<T>::IsAlmostUniform(const T tolerance) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		const auto [min, max] = std::ranges::minmax_element(components);
+		const auto [min, max] = MinMax();
 
-		return AreAlmostEqual(*min, *max, tolerance);
+		return AreAlmostEqual(min, max, tolerance);
 	}
 
 	template<Arithmetic T>
@@ -684,6 +730,42 @@ namespace PonyEngine::Math
 		}
 
 		return scaled;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Min(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		Vector3<T> min;
+		for (std::size_t i = 0; i < Vector3<T>::ComponentCount; ++i)
+		{
+			min[i] = std::min(left[i], right[i]);
+		}
+
+		return min;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Max(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		Vector3<T> max;
+		for (std::size_t i = 0; i < Vector3<T>::ComponentCount; ++i)
+		{
+			max[i] = std::max(left[i], right[i]);
+		}
+
+		return max;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector3<T> Clamp(const Vector3<T>& value, const Vector3<T>& min, const Vector3<T>& max) noexcept
+	{
+		Vector3<T> clamped;
+		for (std::size_t i = 0; i < Vector3<T>::ComponentCount; ++i)
+		{
+			clamped[i] = std::clamp(value[i], min[i], max[i]);
+		}
+
+		return clamped;
 	}
 
 	template<Arithmetic T>
