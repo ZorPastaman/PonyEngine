@@ -371,6 +371,38 @@ namespace Math
 			Assert::AreEqual(float{5}, cMax);
 		}
 
+		TEST_METHOD(MinMaxShortTest)
+		{
+			constexpr short x = 2;
+			constexpr short y = -3;
+			constexpr short z = 5;
+			constexpr short w = -2;
+			auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			auto pair = vector.MinMax();
+			Assert::AreEqual(y, pair.first);
+			Assert::AreEqual(z, pair.second);
+			constexpr auto cVector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			auto cPair = cVector.MinMax();
+			Assert::AreEqual(y, pair.first);
+			Assert::AreEqual(z, pair.second);
+		}
+
+		TEST_METHOD(MinMaxFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			auto pair = vector.MinMax();
+			Assert::AreEqual(y, pair.first);
+			Assert::AreEqual(z, pair.second);
+			constexpr auto cVector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			auto cPair = cVector.MinMax();
+			Assert::AreEqual(y, pair.first);
+			Assert::AreEqual(z, pair.second);
+		}
+
 		TEST_METHOD(SumThisShortTest)
 		{
 			constexpr short x = 2;
@@ -1257,6 +1289,132 @@ namespace Math
 			Assert::AreEqual(wL * wR, scaled.W());
 		}
 
+		TEST_METHOD(MinCombinedShortTest)
+		{
+			constexpr short x = 8;
+			constexpr short y = 12;
+			constexpr short z = 1;
+			constexpr short w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			constexpr short x1 = 10;
+			constexpr short y1 = 6;
+			constexpr short z1 = 1;
+			constexpr short w1 = 4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<short>(x1, y1, z1, w1);
+			auto min = PonyEngine::Math::Min(vector, vector1);
+			Assert::AreEqual(x, min.X());
+			Assert::AreEqual(y1, min.Y());
+			Assert::AreEqual(z, min.Z());
+			Assert::AreEqual(w, min.W());
+		}
+
+		TEST_METHOD(MinCombinedFloatTest)
+		{
+			constexpr float x = 8;
+			constexpr float y = 12;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			constexpr float x1 = 10;
+			constexpr float y1 = 6;
+			constexpr float z1 = 1;
+			constexpr float w1 = 4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<float>(x1, y1, z1, w1);
+			auto min = PonyEngine::Math::Min(vector, vector1);
+			Assert::AreEqual(x, min.X());
+			Assert::AreEqual(y1, min.Y());
+			Assert::AreEqual(z, min.Z());
+			Assert::AreEqual(w, min.W());
+		}
+
+		TEST_METHOD(MaxCombinedShortTest)
+		{
+			constexpr short x = 8;
+			constexpr short y = 12;
+			constexpr short z = 1;
+			constexpr short w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			constexpr short x1 = 10;
+			constexpr short y1 = 6;
+			constexpr short z1 = 1;
+			constexpr short w1 = 4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<short>(x1, y1, z1, w1);
+			auto min = PonyEngine::Math::Max(vector, vector1);
+			Assert::AreEqual(x1, min.X());
+			Assert::AreEqual(y, min.Y());
+			Assert::AreEqual(z, min.Z());
+			Assert::AreEqual(w1, min.W());
+		}
+
+		TEST_METHOD(MaxCombinedFloatTest)
+		{
+			constexpr float x = 8;
+			constexpr float y = 12;
+			constexpr float z = 1;
+			constexpr float w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			constexpr float x1 = 10;
+			constexpr float y1 = 6;
+			constexpr float z1 = 1;
+			constexpr float w1 = 4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<float>(x1, y1, z1, w1);
+			auto min = PonyEngine::Math::Max(vector, vector1);
+			Assert::AreEqual(x1, min.X());
+			Assert::AreEqual(y, min.Y());
+			Assert::AreEqual(z, min.Z());
+			Assert::AreEqual(w1, min.W());
+		}
+
+		TEST_METHOD(ClampShortTest)
+		{
+			constexpr short x = 8;
+			constexpr short y = 2;
+			constexpr short z = 1;
+			constexpr short w = 2;
+			constexpr auto vector = PonyEngine::Math::Vector4<short>(x, y, z, w);
+			constexpr short x1 = 10;
+			constexpr short y1 = 6;
+			constexpr short z1 = 1;
+			constexpr short w1 = 4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<short>(x1, y1, z1, w1);
+			constexpr short x2 = 9;
+			constexpr short y2 = 8;
+			constexpr short z2 = 5;
+			constexpr short w2 = 1;
+			constexpr auto vector2 = PonyEngine::Math::Vector4<short>(x2, y2, z2, w2);
+
+			auto clamped = PonyEngine::Math::Clamp(vector2, vector, vector1);
+			Assert::AreEqual(x2, clamped.X());
+			Assert::AreEqual(y1, clamped.Y());
+			Assert::AreEqual(z, clamped.Z());
+			Assert::AreEqual(w, clamped.W());
+		}
+
+		TEST_METHOD(ClampFloatTest)
+		{
+			constexpr float x = 0.8;
+			constexpr float y = 0.2;
+			constexpr float z = 0.1;
+			constexpr float w = 0.2;
+			constexpr auto vector = PonyEngine::Math::Vector4<float>(x, y, z, w);
+			constexpr float x1 = 0.9;
+			constexpr float y1 = 0.6;
+			constexpr float z1 = 0.1;
+			constexpr float w1 = 0.4;
+			constexpr auto vector1 = PonyEngine::Math::Vector4<float>(x1, y1, z1, w1);
+			constexpr float x2 = 0.85;
+			constexpr float y2 = 0.8;
+			constexpr float z2 = 0.5;
+			constexpr float w2 = 0.1;
+			constexpr auto vector2 = PonyEngine::Math::Vector4<float>(x2, y2, z2, w2);
+
+			auto clamped = PonyEngine::Math::Clamp(vector2, vector, vector1);
+			Assert::AreEqual(x2, clamped.X());
+			Assert::AreEqual(y1, clamped.Y());
+			Assert::AreEqual(z, clamped.Z());
+			Assert::AreEqual(w, clamped.W());
+		}
+
 		TEST_METHOD(LerpShortTest)
 		{
 			constexpr short xR = 2;
@@ -1570,6 +1728,7 @@ namespace Math
 
 			[[maybe_unused]] const float min = movedVector.Min();
 			[[maybe_unused]] const float max = movedVector.Max();
+			[[maybe_unused]] const auto minMax = movedVector.MinMax();
 
 			movedVector.Swap();
 
@@ -1613,6 +1772,7 @@ namespace Math
 			[[maybe_unused]] constexpr float magnitudeSquared = vector.MagnitudeSquared();
 			[[maybe_unused]] constexpr float min = vector.Min();
 			[[maybe_unused]] constexpr float max = vector.Max();
+			[[maybe_unused]] constexpr auto minMax = vector.MinMax();
 			[[maybe_unused]] constexpr float thisSum = vector.Sum();
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> swapped = vector.Swapped();
 
@@ -1634,6 +1794,9 @@ namespace Math
 
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> scale = PonyEngine::Math::Scale(vector, arrayVector);
 
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> minCombined = PonyEngine::Math::Min(defaultVector, arrayVector);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> maxCombined = PonyEngine::Math::Max(defaultVector, arrayVector);
+			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> clamped = PonyEngine::Math::Clamp(vector, defaultVector, arrayVector);
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector4<float> lerp = PonyEngine::Math::Lerp(vector, arrayVector, 0.5f);
 
 			[[maybe_unused]] constexpr bool areAlmostEqual = PonyEngine::Math::AreAlmostEqual(vector, arrayVector);

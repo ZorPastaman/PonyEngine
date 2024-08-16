@@ -136,6 +136,21 @@ namespace Math
 			Assert::AreEqual(std::uint8_t{211}, cColor.Max());
 		}
 
+		TEST_METHOD(MinMaxTest)
+		{
+			constexpr std::uint8_t r = 211;
+			constexpr std::uint8_t g = 200;
+			constexpr std::uint8_t b = 1;
+			auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
+			auto pair = color.MinMax();
+			Assert::AreEqual(b, pair.first);
+			Assert::AreEqual(r, pair.second);
+			constexpr auto cColor = PonyEngine::Math::RGB<float>(r, g, b);
+			auto cPair = cColor.MinMax();
+			Assert::AreEqual(b, pair.first);
+			Assert::AreEqual(r, pair.second);
+		}
+
 		TEST_METHOD(IsBlackTest)
 		{
 			constexpr std::uint8_t r = 211;
@@ -185,6 +200,59 @@ namespace Math
 			std::ostringstream ss;
 			ss << color;
 			Assert::AreEqual(string, ss.str());
+		}
+
+		TEST_METHOD(MinCombinedTest)
+		{
+			constexpr std::uint8_t r = 211;
+			constexpr std::uint8_t g = 100;
+			constexpr std::uint8_t b = 1;
+			constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
+			constexpr std::uint8_t r1 = 200;
+			constexpr std::uint8_t g1 = 200;
+			constexpr std::uint8_t b1 = 1;
+			constexpr auto color1 = PonyEngine::Math::RGBInt<std::uint8_t>(r1, g1, b1);
+			auto min = PonyEngine::Math::Min(color, color1);
+			Assert::AreEqual(r1, min.R());
+			Assert::AreEqual(g, min.G());
+			Assert::AreEqual(b, min.B());
+		}
+
+		TEST_METHOD(MaxCombinedTest)
+		{
+			constexpr std::uint8_t r = 211;
+			constexpr std::uint8_t g = 100;
+			constexpr std::uint8_t b = 1;
+			constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
+			constexpr std::uint8_t r1 = 200;
+			constexpr std::uint8_t g1 = 200;
+			constexpr std::uint8_t b1 = 1;
+			constexpr auto color1 = PonyEngine::Math::RGBInt<std::uint8_t>(r1, g1, b1);
+			auto max = PonyEngine::Math::Max(color, color1);
+			Assert::AreEqual(r, max.R());
+			Assert::AreEqual(g1, max.G());
+			Assert::AreEqual(b, max.B());
+		}
+
+		TEST_METHOD(ClampTest)
+		{
+			constexpr std::uint8_t r = 211;
+			constexpr std::uint8_t g = 100;
+			constexpr std::uint8_t b = 1;
+			constexpr auto color = PonyEngine::Math::RGBInt<std::uint8_t>(r, g, b);
+			constexpr std::uint8_t r1 = 250;
+			constexpr std::uint8_t g1 = 200;
+			constexpr std::uint8_t b1 = 1;
+			constexpr auto color1 = PonyEngine::Math::RGBInt<std::uint8_t>(r1, g1, b1);
+			constexpr std::uint8_t r2 = 240;
+			constexpr std::uint8_t g2 = 210;
+			constexpr std::uint8_t b2 = 5;
+			constexpr auto color2 = PonyEngine::Math::RGBInt<std::uint8_t>(r2, g2, b2);
+
+			auto clamped = PonyEngine::Math::Clamp(color2, color, color1);
+			Assert::AreEqual(r2, clamped.R());
+			Assert::AreEqual(g1, clamped.G());
+			Assert::AreEqual(b, clamped.B());
 		}
 
 		TEST_METHOD(ToVectorTest)
@@ -272,6 +340,7 @@ namespace Math
 
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();
+			[[maybe_unused]] const auto minMax = movedColor.MinMax();
 
 			movedColor.Set(124, 21, 90);
 			movedColor.Set(span);
@@ -298,6 +367,7 @@ namespace Math
 
 			[[maybe_unused]] constexpr std::uint8_t min = color.Min();
 			[[maybe_unused]] constexpr std::uint8_t max = color.Max();
+			[[maybe_unused]] constexpr auto minMax = color.MinMax();
 
 			[[maybe_unused]] constexpr bool isBlack = color.IsBlack();
 			[[maybe_unused]] constexpr bool isWhite = color.IsWhite();
@@ -308,6 +378,10 @@ namespace Math
 
 			[[maybe_unused]] constexpr bool areEqual = defaultColor == color;
 			[[maybe_unused]] constexpr bool areNorEqual = defaultColor != color;
+
+			[[maybe_unused]] constexpr auto minCombined = PonyEngine::Math::Min(defaultColor, arrayColor);
+			[[maybe_unused]] constexpr auto maxCombined = PonyEngine::Math::Max(defaultColor, arrayColor);
+			[[maybe_unused]] constexpr auto clamped = PonyEngine::Math::Clamp(color, defaultColor, arrayColor);
 		}
 	};
 }

@@ -114,7 +114,15 @@ export namespace PonyEngine::Math
 		/// @brief Gets a maximum among the components.
 		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
-		constexpr const T& Max() const noexcept; // TODO: Add minMax function
+		constexpr const T& Max() const noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<T&, T&> MinMax() noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<const T&, const T&> MinMax() const noexcept;
 		/// @brief Sums all the components and returns the result.
 		/// @return Sum.
 		[[nodiscard("Pure function")]]
@@ -284,6 +292,28 @@ export namespace PonyEngine::Math
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Scale(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
+	/// @brief Creates a vector consisting of minimal elements of the two vectors.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Vector of minimal elements.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Min(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	/// @brief Creates a vector consisting of maximal elements of the two vectors.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Vector of maximal elements.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Max(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	/// @brief Clamps the @p value between the @p min and @p max component-wise.
+	/// @tparam T Component type.
+	/// @param value Value.
+	/// @param min Minimum.
+	/// @param max Maximum.
+	/// @return Clamped vector.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Clamp(const Vector2<T>& value, const Vector2<T>& min, const Vector2<T>& max) noexcept;
 	/// @brief Linear interpolation between the two vectors if the @p time is in range [0, 1].
 	///        Linear extrapolation between the two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -492,6 +522,18 @@ namespace PonyEngine::Math
 	}
 
 	template<Arithmetic T>
+	constexpr std::pair<T&, T&> Vector2<T>::MinMax() noexcept
+	{
+		return X() < Y() ? std::pair<T&, T&>(X(), Y()) : std::pair<T&, T&>(Y(), X());
+	}
+
+	template<Arithmetic T>
+	constexpr std::pair<const T&, const T&> Vector2<T>::MinMax() const noexcept
+	{
+		return X() < Y() ? std::pair<const T&, const T&>(X(), Y()) : std::pair<const T&, const T&>(Y(), X());
+	}
+
+	template<Arithmetic T>
 	constexpr T Vector2<T>::Sum() const noexcept
 	{
 		return X() + Y();
@@ -632,6 +674,42 @@ namespace PonyEngine::Math
 		}
 
 		return scaled;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector2<T> Min(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	{
+		Vector2<T> min;
+		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
+		{
+			min[i] = std::min(left[i], right[i]);
+		}
+
+		return min;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector2<T> Max(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	{
+		Vector2<T> max;
+		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
+		{
+			max[i] = std::max(left[i], right[i]);
+		}
+
+		return max;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector2<T> Clamp(const Vector2<T>& value, const Vector2<T>& min, const Vector2<T>& max) noexcept
+	{
+		Vector2<T> clamped;
+		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
+		{
+			clamped[i] = std::clamp(value[i], min[i], max[i]);
+		}
+
+		return clamped;
 	}
 
 	template<Arithmetic T>

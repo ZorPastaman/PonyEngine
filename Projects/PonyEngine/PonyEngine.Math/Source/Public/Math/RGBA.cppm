@@ -17,6 +17,7 @@ import <format>;
 import <ostream>;
 import <span>;
 import <string>;
+import <utility>;
 
 import :RGB;
 import :RGBAInt;
@@ -139,6 +140,14 @@ export namespace PonyEngine::Math
 		/// @return Maximum component.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Max() const noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<T&, T&> MinMax() noexcept;
+		/// @brief Gets a minimum and maximum among the components.
+		/// @return Minimum and maximum components.
+		[[nodiscard("Pure function")]]
+		constexpr std::pair<const T&, const T&> MinMax() const noexcept;
 
 		/// @brief Converts the linear color to a gamma-corrected color.
 		///	@note All the color components must be in range [0, 1].
@@ -283,6 +292,28 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr T DistanceSquared(const RGBA<T>& left, const RGBA<T>& right) noexcept; // TODO: Add Distance functions to Vectors
 
+	/// @brief Creates a color consisting of minimal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of minimal elements.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGBA<T> Min(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	/// @brief Creates a color consisting of maximal elements of the two colors.
+	/// @tparam T Component type.
+	/// @param left Left color.
+	/// @param right Right color.
+	/// @return Color of maximal elements.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGBA<T> Max(const RGBA<T>& left, const RGBA<T>& right) noexcept;
+	/// @brief Clamps the @p value between the @p min and @p max component-wise.
+	/// @tparam T Component type.
+	/// @param value Value.
+	/// @param min Minimum.
+	/// @param max Maximum.
+	/// @return Clamped color.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr RGBA<T> Clamp(const RGBA<T>& value, const RGBA<T>& min, const RGBA<T>& max) noexcept;
 	/// @brief Linear interpolation between the two colors if the @p time is in range [0, 1].
 	///        Linear extrapolation between the two colors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -513,6 +544,22 @@ namespace PonyEngine::Math
 	}
 
 	template<std::floating_point T>
+	constexpr std::pair<T&, T&> RGBA<T>::MinMax() noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<T&, T&>(*min, *max);
+	}
+
+	template<std::floating_point T>
+	constexpr std::pair<const T&, const T&> RGBA<T>::MinMax() const noexcept
+	{
+		auto [min, max] = std::ranges::minmax_element(components);
+
+		return std::pair<const T&, const T&>(*min, *max);
+	}
+
+	template<std::floating_point T>
 	RGBA<T> RGBA<T>::Gamma() const noexcept
 	{
 		const RGB<T> rgb = static_cast<RGB<T>>(*this);
@@ -605,6 +652,42 @@ namespace PonyEngine::Math
 		const RGBA<T> colorVector = left - right;
 
 		return colorVector.R() * colorVector.R() + colorVector.G() * colorVector.G() + colorVector.B() * colorVector.B() + colorVector.A() * colorVector.A();
+	}
+
+	template<std::floating_point T>
+	constexpr RGBA<T> Min(const RGBA<T>& left, const RGBA<T>& right) noexcept
+	{
+		RGBA<T> min;
+		for (std::size_t i = 0; i < RGBA<T>::ComponentCount; ++i)
+		{
+			min[i] = std::min(left[i], right[i]);
+		}
+
+		return min;
+	}
+
+	template<std::floating_point T>
+	constexpr RGBA<T> Max(const RGBA<T>& left, const RGBA<T>& right) noexcept
+	{
+		RGBA<T> max;
+		for (std::size_t i = 0; i < RGBA<T>::ComponentCount; ++i)
+		{
+			max[i] = std::max(left[i], right[i]);
+		}
+
+		return max;
+	}
+
+	template<std::floating_point T>
+	constexpr RGBA<T> Clamp(const RGBA<T>& value, const RGBA<T>& min, const RGBA<T>& max) noexcept
+	{
+		RGBA<T> clamped;
+		for (std::size_t i = 0; i < RGBA<T>::ComponentCount; ++i)
+		{
+			clamped[i] = std::clamp(value[i], min[i], max[i]);
+		}
+
+		return clamped;
 	}
 
 	template<std::floating_point T>
