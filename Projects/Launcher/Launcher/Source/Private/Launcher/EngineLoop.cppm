@@ -18,8 +18,8 @@ import <stdexcept>;
 
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
+import PonyEngine.Time;
 
-import :EngineSettings;
 import :ILoopElement;
 import :ISystemFactoriesProvider;
 
@@ -32,9 +32,8 @@ export namespace Launcher
 		/// @brief Creates an engine loop.
 		/// @param loggerToUse Logger to use.
 		/// @param systemFactoriesProvider Engine system factories provider.
-		/// @param engineSettings Engine settings.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings);
+		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -53,7 +52,7 @@ export namespace Launcher
 
 namespace Launcher
 {
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const EngineSettings& engineSettings) :
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider) :
 		logger{&loggerToUse}
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create engine params.");
@@ -72,8 +71,11 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Set target frame rate: '{}'", engineSettings.targetFrameRate);
-		engine->TimeManager().TargetFrameRate(engineSettings.targetFrameRate);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Set target frame rate: '{}'", 165);
+		if (const auto frameRateSystem = engine->SystemManager().FindSystem<PonyEngine::Time::IFrameRateSystem>()) // TODO: Do it in post create.
+		{
+			frameRateSystem->TargetFrameRate(165);
+		}
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
 	}

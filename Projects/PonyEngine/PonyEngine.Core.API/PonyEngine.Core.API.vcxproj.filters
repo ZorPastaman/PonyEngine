@@ -39,9 +39,6 @@
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ITimeManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\Factory\ISystemDestroyer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

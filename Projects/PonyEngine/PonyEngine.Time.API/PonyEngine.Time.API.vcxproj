@@ -11,46 +11,38 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Core\Engine.cppm" />
-    <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
-      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
-      <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">
-      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
-      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <ResourceCompile Include="PonyEngine.Core.rc" />
+    <ResourceCompile Include="PonyEngine.Time.API.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
+      <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
+    </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Public\Time\Factory\IFrameRateSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Time\Factory\Time.Factory.cppm" />
+    <ClCompile Include="Source\Public\Time\IFrameRateSystem.cppm" />
+    <ClCompile Include="Source\Public\Time\Time.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{0aebf801-c59e-408a-bea2-d3582d7db3f2}</ProjectGuid>
-    <RootNamespace>PonyEngineCore</RootNamespace>
+    <ProjectGuid>{8b3f2887-0863-444c-884e-dfe775f31ba0}</ProjectGuid>
+    <RootNamespace>PonyEngineTimeAPI</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>true</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
-    <ConfigurationType>DynamicLibrary</ConfigurationType>
+    <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
     <CharacterSet>Unicode</CharacterSet>
@@ -71,15 +63,15 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Time;$(ProjectDir)\Source\Public\Time\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Time;$(ProjectDir)\Source\Public\Time\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
@@ -89,7 +81,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <PreprocessorDefinitions>_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <AdditionalIncludeDirectories>$(ProjectDir)\Include\Public;$(ProjectDir)\Include\Private;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>

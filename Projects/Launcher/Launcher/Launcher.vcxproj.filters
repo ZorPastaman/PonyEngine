@@ -45,11 +45,5 @@
     <ClCompile Include="Source\Main.Windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher\EngineSettings.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Launcher.Windows\WindowsEngineSettings.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>
