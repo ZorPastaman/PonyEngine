@@ -36,7 +36,7 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	void OutputDebugStringSubLoggerDeleter::operator()(ISubLogger* const subLogger) const noexcept
+	void OutputDebugStringSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
 	{
 		assert((dynamic_cast<OutputDebugStringSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
 		delete static_cast<OutputDebugStringSubLogger*>(subLogger);

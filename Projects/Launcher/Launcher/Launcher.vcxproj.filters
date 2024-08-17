@@ -33,13 +33,13 @@
     <ClCompile Include="Source\Private\Launcher.Windows\Launcher.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher.Windows\LoggerProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoggerProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher.Windows\SystemFactoriesProvider.cppm">
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsSystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoop.cppm">
+    <ClCompile Include="Source\Private\Launcher.Windows\WindowsEndLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Main.Windows.cpp">

@@ -11,6 +11,6 @@ export module Launcher.Windows;
 
 export import Launcher;
 
-export import :LoggerProvider;
-export import :WindowsEngineParamsProvider;
-export import :WindowsLoop;
+export import :WindowsEndLoop;
+export import :WindowsLoggerProvider;
+export import :WindowsSystemFactoriesProvider;

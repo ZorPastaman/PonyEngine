@@ -68,7 +68,7 @@ export namespace PonyEngine::Core
 			std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator end; ///< Interfaces iterator end.
 
 			friend ObjectInterfaces;
-		};
+		}; // TODO: use typedef instead. Add begin and end functions
 
 		[[nodiscard("Pure constructor")]]
 		ObjectInterfaces() noexcept = default;
