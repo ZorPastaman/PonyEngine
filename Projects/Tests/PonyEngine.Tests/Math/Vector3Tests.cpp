@@ -1091,6 +1091,34 @@ namespace Math
 			Assert::AreEqual(0.f, cross.Z());
 		}
 
+		TEST_METHOD(DistanceShortTest)
+		{
+			constexpr short xR = 2;
+			constexpr short yR = -3;
+			constexpr short zR = 5;
+			constexpr auto vectorR = PonyEngine::Math::Vector3<short>(xR, yR, zR);
+			constexpr short xL = 6;
+			constexpr short yL = 4;
+			constexpr short zL = -3;
+			constexpr auto vectorL = PonyEngine::Math::Vector3<short>(xL, yL, zL);
+			Assert::AreEqual(11.358, static_cast<double>(PonyEngine::Math::Distance(vectorL, vectorR)), 0.001);
+			Assert::AreEqual(short{129}, PonyEngine::Math::DistanceSquared(vectorR, vectorL));
+		}
+
+		TEST_METHOD(DistanceFloatTest)
+		{
+			constexpr float xR = 2;
+			constexpr float yR = -3;
+			constexpr float zR = 5;
+			constexpr auto vectorR = PonyEngine::Math::Vector3<float>(xR, yR, zR);
+			constexpr float xL = 6;
+			constexpr float yL = 4;
+			constexpr float zL = -3;
+			constexpr auto vectorL = PonyEngine::Math::Vector3<float>(xL, yL, zL);
+			Assert::AreEqual(11.358, static_cast<double>(PonyEngine::Math::Distance(vectorL, vectorR)), 0.001);
+			Assert::AreEqual(129.f, PonyEngine::Math::DistanceSquared(vectorR, vectorL));
+		}
+
 		TEST_METHOD(AngleTest)
 		{
 			float xR = 2;
@@ -1831,6 +1859,7 @@ namespace Math
 
 			[[maybe_unused]] constexpr float dot = PonyEngine::Math::Dot(vector, arrayVector);
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<float> cross = PonyEngine::Math::Cross(vector, arrayVector);
+			[[maybe_unused]] constexpr float distance = PonyEngine::Math::DistanceSquared(vector, arrayVector);
 
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<float> project = PonyEngine::Math::Project(vector, PonyEngine::Math::Vector3<float>::Predefined::Back);
 			[[maybe_unused]] constexpr PonyEngine::Math::Vector3<float> projectOnPlane = PonyEngine::Math::ProjectOnPlane(vector, PonyEngine::Math::Vector3<float>::Predefined::Left);

@@ -256,7 +256,6 @@ export namespace PonyEngine::Math
 	/// @return Dot product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector3<T>& left, const Vector3<T>& right) noexcept;
-
 	/// @brief Computes a cross product of the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
@@ -264,6 +263,21 @@ export namespace PonyEngine::Math
 	/// @return Cross product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Cross(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Computes a distance between two points.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Distance.
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	typename Vector3<T>::ComputationalType Distance(const Vector3<T>& left, const Vector3<T>& right) noexcept;
+	/// @brief Computes a squared distance between two points.
+	/// @remark This function is much faster than @p Distance 'cause it doesn't compute a square root.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Distance
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T DistanceSquared(const Vector3<T>& left, const Vector3<T>& right) noexcept;
 
 	/// @brief Computes an angle between the two vectors.
 	/// @tparam T Component type.
@@ -680,6 +694,18 @@ namespace PonyEngine::Math
 		cross.Z() = left.X() * right.Y() - left.Y() * right.X();
 
 		return cross;
+	}
+
+	template<Arithmetic T>
+	typename Vector3<T>::ComputationalType Distance(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return std::sqrt(static_cast<typename Vector3<T>::ComputationalType>(DistanceSquared(left, right)));
+	}
+
+	template<Arithmetic T>
+	constexpr T DistanceSquared(const Vector3<T>& left, const Vector3<T>& right) noexcept
+	{
+		return (left - right).MagnitudeSquared();
 	}
 
 	template<std::floating_point T>
