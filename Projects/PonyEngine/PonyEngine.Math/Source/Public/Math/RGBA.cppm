@@ -284,13 +284,13 @@ export namespace PonyEngine::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T Distance(const RGBA<T>& left, const RGBA<T>& right) noexcept;
 	/// @brief Computes a squared distance between two colors.
-	/// @remark This function is much faster that @p Distance 'cause it doesn't compute a square root.
+	/// @remark This function is much faster than @p Distance 'cause it doesn't compute a square root.
 	/// @tparam T Component type.
 	/// @param left Left color.
 	/// @param right Right color.
 	/// @return Distance
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T DistanceSquared(const RGBA<T>& left, const RGBA<T>& right) noexcept; // TODO: Add Distance functions to Vectors
+	constexpr T DistanceSquared(const RGBA<T>& left, const RGBA<T>& right) noexcept;
 
 	/// @brief Creates a color consisting of minimal elements of the two colors.
 	/// @tparam T Component type.
