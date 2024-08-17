@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Core.Implementation:Engine;
 
+import <cstddef>;
 import <format>;
 import <memory>;
 import <stdexcept>;
@@ -22,7 +23,6 @@ import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
 import :SystemManager;
-import :TimeManager;
 
 export namespace PonyEngine::Core
 {
@@ -40,9 +40,10 @@ export namespace PonyEngine::Core
 		~Engine() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& Logger() const noexcept override;
+		virtual std::size_t FrameCount() const noexcept override;
+
 		[[nodiscard("Pure function")]]
-		virtual ITimeManager& TimeManager() const noexcept override;
+		virtual Log::ILogger& Logger() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& SystemManager() const noexcept override;
 
@@ -64,9 +65,9 @@ export namespace PonyEngine::Core
 
 	private:
 		Log::ILogger* const logger; ///< Logger.
-
-		std::unique_ptr<Core::TimeManager> timeManager; ///< Time manager.
 		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
+
+		std::size_t frameCount; ///< Frame count.
 
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
@@ -77,12 +78,9 @@ namespace PonyEngine::Core
 {
 	Engine::Engine(const EngineParams& params) :
 		logger{&params.Logger()},
+		frameCount{0},
 		isRunning{true}
 	{
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create time manager");
-		timeManager.reset(new Core::TimeManager(*this));
-		PONY_LOG(this, Log::LogType::Info, "Time manager created.");
-
 		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
 		systemManager.reset(new Core::SystemManager(params, *this));
 		PONY_LOG(this, Log::LogType::Info, "System manager created.");
@@ -101,20 +99,16 @@ namespace PonyEngine::Core
 		PONY_LOG(this, Log::LogType::Info, "Destroy system manager.");
 		systemManager.reset();
 		PONY_LOG(this, Log::LogType::Info, "System manager destroyed.");
+	}
 
-		PONY_LOG(this, Log::LogType::Info, "Destroy time manager.");
-		timeManager.reset();
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Time manager destroyed.");
+	std::size_t Engine::FrameCount() const noexcept
+	{
+		return frameCount;
 	}
 
 	Log::ILogger& Engine::Logger() const noexcept
 	{
 		return *logger;
-	}
-
-	ITimeManager& Engine::TimeManager() const noexcept
-	{
-		return *timeManager;
 	}
 
 	ISystemManager& Engine::SystemManager() const noexcept
@@ -155,10 +149,10 @@ namespace PonyEngine::Core
 			throw std::logic_error("The engine is ticked when it's already been stopped.");
 		}
 
-		PONY_LOG(this, Log::LogType::Verbose, "Tick time manager.");
-		timeManager->Tick();
 		PONY_LOG(this, Log::LogType::Verbose, "Tick system manager.");
 		systemManager->Tick();
+
+		++frameCount;
 	}
 
 	const char* Engine::Name() const noexcept

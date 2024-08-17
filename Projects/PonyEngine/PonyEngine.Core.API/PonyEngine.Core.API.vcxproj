@@ -29,7 +29,6 @@
     <ClCompile Include="Source\Public\Core\IAdvancedEngine.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\ITimeManager.cppm" />
     <ClCompile Include="Source\Public\Core\LogHelper.cppm" />
   </ItemGroup>
   <ItemGroup>

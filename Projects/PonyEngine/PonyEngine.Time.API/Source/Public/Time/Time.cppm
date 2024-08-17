@@ -7,13 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Launcher:EngineSettings;
+export module PonyEngine.Time;
 
-export namespace Launcher
-{
-	/// @brief Engine settings.
-	struct EngineSettings final
-	{
-		float targetFrameRate; ///< Target frame rate in fps.
-	};
-}
+export import :IFrameRateSystem;

@@ -12,7 +12,6 @@ export module PonyEngine.Core:IEngine;
 import PonyEngine.Log;
 
 import :ISystemManager;
-import :ITimeManager;
 
 export namespace PonyEngine::Core
 {
@@ -23,14 +22,15 @@ export namespace PonyEngine::Core
 		IEngine(const IEngine&) = delete;
 		IEngine(IEngine&&) = delete;
 
+		/// @brief Gets the current frame count.
+		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
+		virtual std::size_t FrameCount() const noexcept = 0;
+
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual Log::ILogger& Logger() const noexcept = 0;
-		/// @brief Gets the engine time manager.
-		/// @return Engine time manager.
-		[[nodiscard("Pure function")]]
-		virtual ITimeManager& TimeManager() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]

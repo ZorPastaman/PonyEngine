@@ -7,22 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Launcher.Windows:WindowsEngineSettings;
+export module PonyEngine.Time.Factory;
 
-import Launcher;
+export import PonyEngine.Time;
 
-export namespace Launcher
-{
-	/// @brief Creates a Windows engine settings.
-	/// @return Engine settings.
-	[[nodiscard("Pure function")]]
-	EngineSettings WindowsEngineSettings() noexcept;
-}
-
-namespace Launcher
-{
-	EngineSettings WindowsEngineSettings() noexcept
-	{
-		return EngineSettings{.targetFrameRate = 165.f};
-	}
-}
+export import :IFrameRateSystemFactory;

@@ -33,7 +33,7 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
-	auto engineLoop = Launcher::EngineLoop(loggerProvider.Logger(), windowsSystemFactoriesProvider, Launcher::WindowsEngineSettings());
+	auto engineLoop = Launcher::EngineLoop(loggerProvider.Logger(), windowsSystemFactoriesProvider);
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Engine loop created.");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows loop.");
