@@ -104,6 +104,8 @@
     <ClCompile Include="Math\Vector2Tests.cpp" />
     <ClCompile Include="Math\Vector3Tests.cpp" />
     <ClCompile Include="Math\Vector4Tests.cpp" />
+    <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
+    <ClCompile Include="Time\FrameRateSystemTests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowFactoryTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp" />
@@ -132,6 +134,12 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
       <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time.API\PonyEngine.Time.API.vcxproj">
+      <Project>{8b3f2887-0863-444c-884e-dfe775f31ba0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time\PonyEngine.Time.vcxproj">
+      <Project>{d58a635f-ec7c-4b7b-8301-7c51118d9d6f}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>

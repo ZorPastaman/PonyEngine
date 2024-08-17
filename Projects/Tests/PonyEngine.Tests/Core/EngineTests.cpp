@@ -280,36 +280,10 @@ namespace Core
 
 			for (std::size_t i = 0; i < 10; ++i)
 			{
-				Assert::AreEqual(i, engine->TimeManager().FrameCount());
+				Assert::AreEqual(i, engine->FrameCount());
 				engine->Tick();
-				Assert::AreEqual(i + 1, engine->TimeManager().FrameCount());
+				Assert::AreEqual(i + 1, engine->FrameCount());
 			}
-		}
-
-		TEST_METHOD(GetSetFrameTimeRate)
-		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
-			const auto engine = PonyEngine::Core::CreateEngine(params);
-
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
-
-			engine->TimeManager().TargetFrameTime(0.16f);
-			Assert::AreEqual(0.16f, engine->TimeManager().TargetFrameTime());
-			Assert::AreEqual(1.f / 0.16f, engine->TimeManager().TargetFrameRate());
-
-			engine->TimeManager().TargetFrameTime(0.f);
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
-
-			engine->TimeManager().TargetFrameRate(90.f);
-			Assert::AreEqual(1.f / 90.f, engine->TimeManager().TargetFrameTime());
-			Assert::AreEqual(90.f, engine->TimeManager().TargetFrameRate());
-
-			engine->TimeManager().TargetFrameRate(0.f);
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameTime());
-			Assert::AreEqual(0.f, engine->TimeManager().TargetFrameRate());
 		}
 	};
 } 

@@ -43,26 +43,6 @@ namespace Window
 			}
 		};
 
-		class EmptyTimeManager : public PonyEngine::Core::ITimeManager
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual std::size_t FrameCount() const noexcept override
-			{
-				return 0;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual float TargetFrameTime() const noexcept override
-			{
-				return 0.f;
-			}
-
-			virtual void TargetFrameTime(float) noexcept override
-			{
-			}
-		};
-
 		class EmptySystemManager : public PonyEngine::Core::ISystemManager
 		{
 		public:
@@ -76,7 +56,6 @@ namespace Window
 		class EmptyEngine : public PonyEngine::Core::IAdvancedEngine
 		{
 			EmptyLogger* logger;
-			mutable EmptyTimeManager timeManager;
 			mutable EmptySystemManager systemManager;
 
 		public:
@@ -88,15 +67,15 @@ namespace Window
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			virtual std::size_t FrameCount() const noexcept override
 			{
-				return *logger;
+				return 0;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ITimeManager& TimeManager() const noexcept override
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
 			{
-				return timeManager;
+				return *logger;
 			}
 
 			[[nodiscard("Pure function")]]
