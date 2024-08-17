@@ -25,11 +25,11 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	UNREFERENCED_PARAMETER(nShowCmd);
 
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger provider");
-	const auto loggerProvider = Launcher::LoggerProvider();
+	const auto loggerProvider = Launcher::WindowsLoggerProvider();
 	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows system factories provider.");
-	const auto windowsSystemFactoriesProvider = Launcher::SystemFactoriesProvider(loggerProvider.Logger());
+	const auto windowsSystemFactoriesProvider = Launcher::WindowsSystemFactoriesProvider(loggerProvider.Logger());
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
@@ -37,11 +37,11 @@ int APIENTRY wWinMain(const HINSTANCE hInstance, const HINSTANCE hPrevInstance, 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Engine loop created.");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows loop.");
-	auto windowsLoop = Launcher::WindowsLoop(loggerProvider.Logger());
+	auto windowsLoop = Launcher::WindowsEndLoop(loggerProvider.Logger());
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows loop created.");
 
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Run main loop.");
-	int exitCode = Launcher::RunLoop({&engineLoop, &windowsLoop});
+	const int exitCode = Launcher::RunLoop({&engineLoop, &windowsLoop});
 	PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Main loop ran with the exit code '{}'.", exitCode);
 
 	return exitCode;

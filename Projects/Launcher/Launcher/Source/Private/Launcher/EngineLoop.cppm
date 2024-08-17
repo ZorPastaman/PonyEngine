@@ -69,15 +69,6 @@ namespace Launcher
 			throw std::logic_error("The engine is nullptr.");
 		}
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set engine settings.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Set target frame rate: '{}'", 165);
-		if (const auto frameRateSystem = engine->SystemManager().FindSystem<PonyEngine::Time::IFrameRateSystem>()) // TODO: Do it in post create.
-		{
-			frameRateSystem->TargetFrameRate(165);
-		}
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Target frame rate set.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine settings set.");
 	}
 
 	EngineLoop::~EngineLoop() noexcept

@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Log/Log.h"
 
-export module Launcher.Windows:LoggerProvider;
+export module Launcher.Windows:WindowsLoggerProvider;
 
 import <exception>;
 import <iostream>;
@@ -21,27 +21,45 @@ import PonyEngine.Log.Windows.Implementation;
 
 export namespace Launcher
 {
-	/// @brief Logger provider.
-	class LoggerProvider final
+	/// @brief Logger provider for Windows.
+	class WindowsLoggerProvider final
 	{
 	public:
 		/// @brief Creates a logger provider.
 		[[nodiscard("Pure constructor")]]
-		LoggerProvider();
-		LoggerProvider(const LoggerProvider&) = delete;
-		LoggerProvider(LoggerProvider&&) = delete;
+		WindowsLoggerProvider();
+		WindowsLoggerProvider(const WindowsLoggerProvider&) = delete;
+		WindowsLoggerProvider(WindowsLoggerProvider&&) = delete;
 
-		~LoggerProvider() noexcept;
+		~WindowsLoggerProvider() noexcept;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Log::ILogger& Logger() const noexcept;
 
-		LoggerProvider& operator =(const LoggerProvider&) = delete;
-		LoggerProvider& operator =(LoggerProvider&&) = delete;
+		WindowsLoggerProvider& operator =(const WindowsLoggerProvider&) = delete;
+		WindowsLoggerProvider& operator =(WindowsLoggerProvider&&) = delete;
 
 	private:
+		/// @brief Creates a logger.
+		void CreateLogger();
+		/// @brief Creates a console sub-logger.
+		void CreateConsoleSubLogger();
+		/// @brief Creates a Windows output debug string sub-logger.
+		void CreateOutputDebugStringSubLogger();
+		/// @brief Creates a file sub-logger.
+		void CreateFileSubLogger();
+
+		/// @brief Destroys the logger.
+		void DestroyLogger() noexcept;
+		/// @brief Destroys the console sub-logger.
+		void DestroyConsoleSubLogger() noexcept;
+		/// @brief Destroys a Windows output debug string sub-logger.
+		void DestroyOutputDebugStringSubLogger() noexcept;
+		/// @brief Destroys a file sub-logger.
+		void DestroyFileSubLogger() noexcept;
+
 		PonyEngine::Log::LoggerUniquePtr logger; ///< Logger.
 
 		// Set all sub-loggers here.
@@ -54,7 +72,32 @@ export namespace Launcher
 
 namespace Launcher
 {
-	LoggerProvider::LoggerProvider()
+	WindowsLoggerProvider::WindowsLoggerProvider()
+	{
+		CreateLogger();
+
+		// Create and add all sub-loggers here.
+		CreateConsoleSubLogger();
+		CreateOutputDebugStringSubLogger();
+		CreateFileSubLogger();
+	}
+
+	WindowsLoggerProvider::~WindowsLoggerProvider() noexcept
+	{
+		// Remove and destroy all sub-loggers here.
+		DestroyFileSubLogger();
+		DestroyOutputDebugStringSubLogger();
+		DestroyConsoleSubLogger();
+
+		DestroyLogger();
+	}
+
+	PonyEngine::Log::ILogger& WindowsLoggerProvider::Logger() const noexcept
+	{
+		return *logger;
+	}
+
+	void WindowsLoggerProvider::CreateLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
 		logger = PonyEngine::Log::CreateLogger();
@@ -63,9 +106,10 @@ namespace Launcher
 			throw std::logic_error("The logger is nullptr.");
 		}
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger created.");
+	}
 
-		// Create and add all sub-loggers here.
-
+	void WindowsLoggerProvider::CreateConsoleSubLogger()
+	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create console sub-logger.");
 		consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
 		if (!consoleSubLogger)
@@ -74,7 +118,10 @@ namespace Launcher
 		}
 		logger->AddSubLogger(consoleSubLogger.get());
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger created.");
+	}
 
+	void WindowsLoggerProvider::CreateOutputDebugStringSubLogger()
+	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create Windows output debug string sub-logger.");
 		outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
 		if (!outputDebugStringSubLogger)
@@ -83,7 +130,10 @@ namespace Launcher
 		}
 		logger->AddSubLogger(outputDebugStringSubLogger.get());
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Windows output debug string sub-logger created.");
+	}
 
+	void WindowsLoggerProvider::CreateFileSubLogger()
+	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create file sub-logger.");
 		fileSubLogger = PonyEngine::Log::CreateFileSubLogger("Log.log");
 		if (!fileSubLogger)
@@ -94,34 +144,15 @@ namespace Launcher
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger created.");
 	}
 
-	LoggerProvider::~LoggerProvider() noexcept
+	void WindowsLoggerProvider::DestroyLogger() noexcept
 	{
-		// Remove and destroy all sub-loggers here.
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy logger.");
+		logger.reset();
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
+	}
 
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy file sub-logger.");
-		try
-		{
-			logger->RemoveSubLogger(fileSubLogger.get());
-		}
-		catch (std::exception& e)
-		{
-			PONY_CONSOLE_E(e, "On removing the file sub-logger.");
-		}
-		fileSubLogger.reset();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
-
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy Windows output debug string sub-logger.");
-		try
-		{
-			logger->RemoveSubLogger(outputDebugStringSubLogger.get());
-		}
-		catch (std::exception& e)
-		{
-			PONY_CONSOLE_E(e, "On removing the Windows output debug string sub-logger.");
-		}
-		outputDebugStringSubLogger.reset();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Windows output debug string sub-logger destroyed.");
-
+	void WindowsLoggerProvider::DestroyConsoleSubLogger() noexcept
+	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy console sub-logger.");
 		try
 		{
@@ -133,14 +164,35 @@ namespace Launcher
 		}
 		consoleSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Console sub-logger destroyed.");
-
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy logger.");
-		logger.reset();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
 	}
 
-	PonyEngine::Log::ILogger& LoggerProvider::Logger() const noexcept
+	void WindowsLoggerProvider::DestroyOutputDebugStringSubLogger() noexcept
 	{
-		return *logger;
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy Windows output debug string sub-logger.");
+		try
+		{
+			logger->RemoveSubLogger(outputDebugStringSubLogger.get());
+		}
+		catch (std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On removing the Windows output debug string sub-logger.");
+		}
+		outputDebugStringSubLogger.reset();
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Windows output debug string sub-logger destroyed.");
+	}
+
+	void WindowsLoggerProvider::DestroyFileSubLogger() noexcept
+	{
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy file sub-logger.");
+		try
+		{
+			logger->RemoveSubLogger(fileSubLogger.get());
+		}
+		catch (std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On removing the file sub-logger.");
+		}
+		fileSubLogger.reset();
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
 	}
 }

@@ -12,7 +12,7 @@ module;
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module Launcher.Windows:WindowsEngineParamsProvider;
+export module Launcher.Windows:WindowsSystemFactoriesProvider;
 
 import <stdexcept>;
 
@@ -30,22 +30,22 @@ import Launcher;
 export namespace Launcher
 {
 	/// @brief Windows engine system factories provider.
-	class SystemFactoriesProvider final : public ISystemFactoriesProvider // TODO: Rename everything in this folder to Windows
+	class WindowsSystemFactoriesProvider final : public ISystemFactoriesProvider
 	{
 	public:
 		/// @brief Creates a system factories provider.
 		/// @param loggerToUse Logger to use.
 		[[nodiscard("Pure constructor")]]
-		explicit SystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse);
-		SystemFactoriesProvider(const SystemFactoriesProvider&) = delete;
-		SystemFactoriesProvider(SystemFactoriesProvider&&) = delete;
+		explicit WindowsSystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse);
+		WindowsSystemFactoriesProvider(const WindowsSystemFactoriesProvider&) = delete;
+		WindowsSystemFactoriesProvider(WindowsSystemFactoriesProvider&&) = delete;
 
-		~SystemFactoriesProvider() noexcept;
+		~WindowsSystemFactoriesProvider() noexcept;
 
 		virtual void AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const override;
 
-		SystemFactoriesProvider& operator =(const SystemFactoriesProvider&) = delete;
-		SystemFactoriesProvider& operator =(SystemFactoriesProvider&&) = delete;
+		WindowsSystemFactoriesProvider& operator =(const WindowsSystemFactoriesProvider&) = delete;
+		WindowsSystemFactoriesProvider& operator =(WindowsSystemFactoriesProvider&&) = delete;
 
 	private:
 		PonyEngine::Log::ILogger* const logger; ///< Logger.
@@ -57,13 +57,12 @@ export namespace Launcher
 		PonyEngine::Input::InputUniquePtr inputSystemFactory; ///< Input system factory.
 		Game::GameUniquePtr gameSystemFactory; ///< Game system factory.
 		PonyEngine::Render::WindowsDirect3D12RenderUniquePtr windowsDirect3D12RenderFactory; ///< Direct3D 12 render system for Windows factory.
-		// TODO: Make work with factories like work with systems
 	};
 }
 
 namespace Launcher
 {
-	SystemFactoriesProvider::SystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse) :
+	WindowsSystemFactoriesProvider::WindowsSystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse) :
 		logger{&loggerToUse}
 	{
 		// Create all factories here.
@@ -74,6 +73,7 @@ namespace Launcher
 		{
 			throw std::logic_error("The frame rate system factory is nullptr.");
 		}
+		frameRateSystemFactory->TargetFrameRate(165);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Frame rate system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
@@ -126,7 +126,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Direct3D 12 render system for Windows factory created.");
 	}
 
-	SystemFactoriesProvider::~SystemFactoriesProvider() noexcept
+	WindowsSystemFactoriesProvider::~WindowsSystemFactoriesProvider() noexcept
 	{
 		// Destroy all factories here.
 
@@ -147,7 +147,7 @@ namespace Launcher
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Direct3D 12 render system for Windows factory destroyed.");
 	}
 
-	void SystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const
+	void WindowsSystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add frame rate system factory.");
 		engineParams.AddSystemFactory(*frameRateSystemFactory);
