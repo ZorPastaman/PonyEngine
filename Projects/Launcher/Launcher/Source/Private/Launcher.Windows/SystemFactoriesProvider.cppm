@@ -30,7 +30,7 @@ import Launcher;
 export namespace Launcher
 {
 	/// @brief Windows engine system factories provider.
-	class SystemFactoriesProvider final : public ISystemFactoriesProvider
+	class SystemFactoriesProvider final : public ISystemFactoriesProvider // TODO: Rename everything in this folder to Windows
 	{
 	public:
 		/// @brief Creates a system factories provider.
@@ -85,7 +85,7 @@ namespace Launcher
 		}
 		constexpr int width = 1280;
 		constexpr int height = 720;
-		windowsWindowSystemFactory->NextWindowParams() = PonyEngine::Window::WindowParams
+		windowsWindowSystemFactory->NextWindowParams() = PonyEngine::Window::WindowParams // TODO: Add logs for different settings
 		{
 			.title = L"Pony Engine Game",
 			.horizontalPosition = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2,

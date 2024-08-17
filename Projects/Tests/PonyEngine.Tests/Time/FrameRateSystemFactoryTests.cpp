@@ -10,14 +10,14 @@
 #include "CppUnitTest.h"
 
 import PonyEngine.Core;
-import PonyEngine.Input.Implementation;
 import PonyEngine.Log;
+import PonyEngine.Time.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Input
+namespace Time
 {
-	TEST_CLASS(InputSystemFactoryTests)
+	TEST_CLASS(FrameRateSystemFactoryTests)
 	{
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
@@ -46,16 +46,9 @@ namespace Input
 		class EmptySystemManager : public PonyEngine::Core::ISystemManager
 		{
 		public:
-			PonyEngine::Input::IKeyboardProvider* keyboardProvider = nullptr;
-
 			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
+			virtual void* FindSystem(const std::type_info&) const noexcept override
 			{
-				if (typeInfo == typeid(PonyEngine::Input::IKeyboardProvider))
-				{
-					return keyboardProvider;
-				}
-
 				return nullptr;
 			}
 		};
@@ -67,7 +60,7 @@ namespace Input
 			mutable EmptySystemManager systemManager;
 
 			explicit EmptyEngine(EmptyLogger& logger) noexcept :
-				logger{ &logger }
+				logger{&logger}
 			{
 			}
 
@@ -118,7 +111,7 @@ namespace Input
 
 		TEST_METHOD(CreateTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
 			Assert::IsNotNull(factory.get());
 		}
 
@@ -126,21 +119,21 @@ namespace Input
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
 			auto inputSystem = factory->Create(engine);
 			Assert::IsNotNull(inputSystem.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystem", factory->SystemName());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
+			Assert::AreEqual("PonyEngine::Time::FrameRateSystem", factory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory->Name());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
+			Assert::AreEqual("PonyEngine::Time::FrameRateSystemFactory", factory->Name());
 		}
 	};
 }
