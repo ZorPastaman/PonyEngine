@@ -17,7 +17,7 @@ import :SystemDeleter;
 
 export namespace PonyEngine::Core
 {
-	using SystemUniquePtr = std::unique_ptr<ISystem, SystemDeleter>;
+	using SystemUniquePtr = std::unique_ptr<ISystem, SystemDeleter>; ///< System unique_ptr typedef.
 
 	/// @brief System factory.
 	class ISystemFactory

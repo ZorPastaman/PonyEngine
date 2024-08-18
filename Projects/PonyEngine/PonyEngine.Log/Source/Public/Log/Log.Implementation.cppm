@@ -18,7 +18,7 @@ export module PonyEngine.Log.Implementation;
 import <filesystem>;
 import <memory>;
 
-export import PonyEngine.Log;
+export import PonyEngine.Log.Factory;
 
 import :ConsoleSubLogger;
 import :FileSubLogger;
@@ -26,14 +26,6 @@ import :Logger;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Logger deleter.
-	struct PONY_DLL_EXPORT LoggerDeleter final
-	{
-		/// @brief Deletes the @p logger.
-		/// @param logger Logger to delete.
-		void operator ()(ILogger* logger) const noexcept;
-	};
-
 	/// @brief Console sub-logger deleter.
 	struct PONY_DLL_EXPORT ConsoleSubLoggerDeleter final
 	{
@@ -50,14 +42,13 @@ export namespace PonyEngine::Log
 		void operator ()(ISubLogger* subLogger) const noexcept;
 	};
 
-	using LoggerUniquePtr = std::unique_ptr<ILogger, LoggerDeleter>; ///< Logger unique_ptr typedef.
 	using ConsoleSubLoggerUniquePtr = std::unique_ptr<ISubLogger, ConsoleSubLoggerDeleter>; ///< Console sub-logger unique_ptr typedef.
 	using FileSubLoggerUniquePtr = std::unique_ptr<ISubLogger, FileSubLoggerDeleter>; ///< File sub-logger unique_ptr typedef.
 
 	/// @brief Creates a logger.
 	/// @return Created logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT LoggerUniquePtr CreateLogger();
+	PONY_DLL_EXPORT LoggerUniquePtr CreateLogger(); // TODO: Return struct with unique_ptr and interfaces.
 
 	/// @brief Creates a console sub-logger.
 	/// @return Created console sub-logger.
@@ -73,11 +64,14 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	void LoggerDeleter::operator ()(ILogger* const logger) const noexcept
+	/// @brief Logger destroyer.
+	struct LoggerDestroyer final : ILoggerDestroyer
 	{
-		assert((dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type."));
-		delete static_cast<Logger*>(logger);
+		/// @brief Destroys the @p logger.
+		/// @param logger Logger to destroy.
+		virtual void Destroy(ILogger* logger) noexcept override;
 	}
+	LoggerDestroyer;
 
 	void ConsoleSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
 	{
@@ -93,7 +87,7 @@ namespace PonyEngine::Log
 
 	LoggerUniquePtr CreateLogger()
 	{
-		return std::unique_ptr<ILogger, LoggerDeleter>(new Logger());
+		return LoggerUniquePtr(new Logger(), LoggerDeleter(LoggerDestroyer));
 	}
 
 	ConsoleSubLoggerUniquePtr CreateConsoleSubLogger()
@@ -104,5 +98,11 @@ namespace PonyEngine::Log
 	FileSubLoggerUniquePtr CreateFileSubLogger(const std::filesystem::path& path)
 	{
 		return std::unique_ptr<ISubLogger, FileSubLoggerDeleter>(new FileSubLogger(path));
+	}
+
+	void LoggerDestroyer::Destroy(ILogger* const logger) noexcept
+	{
+		assert((dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type."));
+		delete static_cast<Logger*>(logger);
 	}
 }
