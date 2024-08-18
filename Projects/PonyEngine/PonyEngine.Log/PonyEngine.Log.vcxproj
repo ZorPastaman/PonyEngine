@@ -17,6 +17,7 @@
     <ClCompile Include="Source\Private\Log\Logger.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Log.Windows.Implementation.cppm" />
     <ClCompile Include="Source\Public\Log\Log.Implementation.cppm" />
+    <ClCompile Include="Source\Private\Log\LoggerDestroyer.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
