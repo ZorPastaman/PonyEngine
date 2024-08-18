@@ -42,8 +42,6 @@ export namespace Launcher
 		WindowsLoggerProvider& operator =(WindowsLoggerProvider&&) = delete;
 
 	private:
-		/// @brief Creates a logger.
-		void CreateLogger();
 		/// @brief Creates a console sub-logger.
 		void CreateConsoleSubLogger();
 		/// @brief Creates a Windows output debug string sub-logger.
@@ -72,11 +70,14 @@ export namespace Launcher
 
 namespace Launcher
 {
-	WindowsLoggerProvider::WindowsLoggerProvider()
-	{
-		CreateLogger();
+	/// @brief Creates a logger.
+	/// @return Created logger.
+	[[nodiscard("Pure function")]]
+	PonyEngine::Log::LoggerUniquePtr CreateLogger();
 
-		// Create and add all sub-loggers here.
+	WindowsLoggerProvider::WindowsLoggerProvider() :
+		logger{CreateLogger()}
+	{
 		CreateConsoleSubLogger();
 		CreateOutputDebugStringSubLogger();
 		CreateFileSubLogger();
@@ -84,7 +85,6 @@ namespace Launcher
 
 	WindowsLoggerProvider::~WindowsLoggerProvider() noexcept
 	{
-		// Remove and destroy all sub-loggers here.
 		DestroyFileSubLogger();
 		DestroyOutputDebugStringSubLogger();
 		DestroyConsoleSubLogger();
@@ -95,17 +95,6 @@ namespace Launcher
 	PonyEngine::Log::ILogger& WindowsLoggerProvider::Logger() const noexcept
 	{
 		return *logger;
-	}
-
-	void WindowsLoggerProvider::CreateLogger()
-	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
-		logger = PonyEngine::Log::CreateLogger();
-		if (!logger)
-		{
-			throw std::logic_error("The logger is nullptr.");
-		}
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger created.");
 	}
 
 	void WindowsLoggerProvider::CreateConsoleSubLogger()
@@ -194,5 +183,18 @@ namespace Launcher
 		}
 		fileSubLogger.reset();
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "File sub-logger destroyed.");
+	}
+
+	PonyEngine::Log::LoggerUniquePtr CreateLogger()
+	{
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
+		auto logger = PonyEngine::Log::CreateLogger();
+		if (!logger)
+		{
+			throw std::logic_error("The logger is nullptr.");
+		}
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger created.");
+
+		return logger;
 	}
 }
