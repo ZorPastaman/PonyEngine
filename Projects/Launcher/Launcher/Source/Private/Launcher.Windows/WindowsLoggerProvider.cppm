@@ -16,6 +16,7 @@ export module Launcher.Windows:WindowsLoggerProvider;
 import <exception>;
 import <iostream>;
 import <stdexcept>;
+import <utility>;
 
 import PonyEngine.Log.Windows.Implementation;
 
@@ -188,13 +189,13 @@ namespace Launcher
 	PonyEngine::Log::LoggerUniquePtr CreateLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
-		auto logger = PonyEngine::Log::CreateLogger();
-		if (!logger)
+		auto loggerData = PonyEngine::Log::CreateLogger();
+		if (!loggerData.logger)
 		{
 			throw std::logic_error("The logger is nullptr.");
 		}
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger created.");
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' logger created.", loggerData.logger->Name());
 
-		return logger;
+		return std::move(loggerData.logger);
 	}
 }

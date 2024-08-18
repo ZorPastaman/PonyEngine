@@ -7,12 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Factory;
+export module PonyEngine.Log.Factory:LoggerData;
 
 import <memory>;
 
-export import PonyEngine.Log;
+import PonyEngine.Log;
 
-export import :ILoggerDestroyer;
-export import :LoggerData;
-export import :LoggerDeleter;
+import :LoggerDeleter;
+
+export namespace PonyEngine::Log
+{
+	using LoggerUniquePtr = std::unique_ptr<ILogger, LoggerDeleter>; ///< Logger unique_ptr typedef.
+
+	/// @brief Logger data.
+	struct LoggerData final
+	{
+		LoggerUniquePtr logger; ///< Logger unique_ptr.
+	};
+}

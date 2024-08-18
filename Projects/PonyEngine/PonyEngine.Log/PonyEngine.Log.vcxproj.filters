@@ -33,6 +33,9 @@
     <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Log\LoggerDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

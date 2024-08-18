@@ -20,6 +20,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Log\Factory\ILoggerDestroyer.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\Log.Factory.cppm" />
+    <ClCompile Include="Source\Public\Log\Factory\LoggerData.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\LoggerDeleter.cppm" />
     <ClCompile Include="Source\Public\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Log\ISubLogger.cppm" />
