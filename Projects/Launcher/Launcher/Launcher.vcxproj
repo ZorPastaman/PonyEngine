@@ -21,6 +21,12 @@
     <ClCompile Include="Source\Private\Launcher.Windows\WindowsLoggerProvider.cppm" />
     <ClCompile Include="Source\Private\Launcher.Windows\WindowsSystemFactoriesProvider.cppm" />
     <ClCompile Include="Source\Private\Launcher.Windows\WindowsEndLoop.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelper.Windows.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers.Windows\OutputDebugStringSubLoggerHelper.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers\ConsoleSubLoggerHelper.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers\FileSubLoggerHelper.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers\LoggerHelper.cppm" />
+    <ClCompile Include="Source\Private\LogHelpers\LogHelper.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">

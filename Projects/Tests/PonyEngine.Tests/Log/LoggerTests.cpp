@@ -51,14 +51,14 @@ namespace Log
 
 		TEST_METHOD(CreateTest)
 		{
-			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
-			Assert::IsNotNull(logger.get());
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			Assert::IsNotNull(logger.logger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
-			Assert::AreEqual("PonyEngine::Log::Logger", logger->Name());
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			Assert::AreEqual("PonyEngine::Log::Logger", logger.logger->Name());
 		}
 
 		TEST_METHOD(LogTest)
@@ -69,24 +69,24 @@ namespace Log
 			const auto logInput = PonyEngine::Log::LogInput(message, frameCount);
 
 			TestSubLogger testSubLogger;
-			const PonyEngine::Log::LoggerUniquePtr logger = PonyEngine::Log::CreateLogger();
-			logger->AddSubLogger(&testSubLogger);
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			logger.logger->AddSubLogger(&testSubLogger);
 			testSubLogger.expectedMessage = message;
 			testSubLogger.expectedException = nullptr;
 			testSubLogger.expectedFrameCount = frameCount;
 			testSubLogger.expectMessages = true;
 			testSubLogger.expectedLogType = PonyEngine::Log::LogType::Info;
-			logger->Log(PonyEngine::Log::LogType::Info, logInput);
+			logger.logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{1}, testSubLogger.count);
 
 			testSubLogger.expectedException = &exception;
 			testSubLogger.expectedLogType = PonyEngine::Log::LogType::Exception;
-			logger->LogException(exception, logInput);
+			logger.logger->LogException(exception, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
-			logger->RemoveSubLogger(&testSubLogger);
+			logger.logger->RemoveSubLogger(&testSubLogger);
 			testSubLogger.expectMessages = false;
-			logger->Log(PonyEngine::Log::LogType::Info, logInput);
+			logger.logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 		}
 	};

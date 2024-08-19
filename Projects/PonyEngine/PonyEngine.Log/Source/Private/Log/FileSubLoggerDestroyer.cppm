@@ -11,26 +11,26 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Log.Implementation:LoggerDestroyer;
+export module PonyEngine.Log.Implementation:FileSubLoggerDestroyer;
 
 import PonyEngine.Log.Factory;
 
-import :Logger;
+import :FileSubLogger;
 
 export namespace PonyEngine::Log
 {
-	/// @brief Logger destroyer.
-	struct LoggerDestroyer final : ILoggerDestroyer
+	/// @brief File sub-logger destroyer.
+	struct FileSubLoggerDestroyer final : ISubLoggerDestroyer
 	{
-		virtual void Destroy(ILogger* logger) noexcept override;
+		virtual void Destroy(ISubLogger* subLogger) noexcept override;
 	};
 }
 
 namespace PonyEngine::Log
 {
-	void LoggerDestroyer::Destroy(ILogger* const logger) noexcept
+	void FileSubLoggerDestroyer::Destroy(ISubLogger* const subLogger) noexcept
 	{
-		assert(dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type.");
-		delete static_cast<Logger*>(logger);
+		assert(dynamic_cast<FileSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type.");
+		delete static_cast<FileSubLogger*>(subLogger);
 	}
 }

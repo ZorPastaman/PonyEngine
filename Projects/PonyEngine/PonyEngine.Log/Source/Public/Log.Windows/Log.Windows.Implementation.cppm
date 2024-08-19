@@ -9,41 +9,33 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Compiler/Linking.h"
 
 export module PonyEngine.Log.Windows.Implementation;
 
-import <memory>;
-
 export import PonyEngine.Log.Implementation;
+export import PonyEngine.Log.Windows.Factory;
 
 import :OutputDebugStringSubLogger;
+import :OutputDebugStringSubLoggerDestroyer;
 
 export namespace PonyEngine::Log
 {
-	struct PONY_DLL_EXPORT OutputDebugStringSubLoggerDeleter final
-	{
-		void operator ()(ISubLogger* subLogger) const noexcept;
-	};
-
-	using OutputDebugStringSubLoggerUniquePtr = std::unique_ptr<ISubLogger, OutputDebugStringSubLoggerDeleter>;
-
+	/// @brief Creates an output debug string sub-logger.
+	/// @return Created output debug string sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT OutputDebugStringSubLoggerUniquePtr CreateOutputDebugStringSubLogger();
+	PONY_DLL_EXPORT OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
 }
 
 namespace PonyEngine::Log
 {
-	void OutputDebugStringSubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
-	{
-		assert((dynamic_cast<OutputDebugStringSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type."));
-		delete static_cast<OutputDebugStringSubLogger*>(subLogger);
-	}
+	auto DefaultOutputDebugStringSubLoggerDestroyer = OutputDebugStringSubLoggerDestroyer(); ///< Default output debug string sub-logger destroyer.
 
-	OutputDebugStringSubLoggerUniquePtr CreateOutputDebugStringSubLogger()
+	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger()
 	{
-		return std::unique_ptr<ISubLogger, OutputDebugStringSubLoggerDeleter>(new OutputDebugStringSubLogger());
+		const auto outputDebugStringSubLogger = new OutputDebugStringSubLogger();
+		const auto outputDebugStringSubLoggerDeleter = SubLoggerDeleter(DefaultOutputDebugStringSubLoggerDestroyer);
+
+		return OutputDebugStringSubLoggerData{.subLogger = SubLoggerUniquePtr(outputDebugStringSubLogger, outputDebugStringSubLoggerDeleter)};
 	}
 }

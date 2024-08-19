@@ -27,29 +27,29 @@ namespace Log
 
 		TEST_METHOD(CreateTest)
 		{
-			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
-			Assert::IsNotNull(fileSubLogger.get());
-			fileSubLogger.reset();
+			PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			Assert::IsNotNull(fileSubLogger.subLogger.get());
+			fileSubLogger.subLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
-			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger->Name());
-			fileSubLogger.reset();
+			PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger.subLogger->Name());
+			fileSubLogger.subLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}
 
 		TEST_METHOD(LogTest)
 		{
-			PonyEngine::Log::FileSubLoggerUniquePtr fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
+			PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(testLogPath);
 			const auto message = "Message!";
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(5691338));
 			constexpr std::size_t frameCount = 84136;
 			const auto infoLogEntry = PonyEngine::Log::LogEntry(message, nullptr, timePoint, frameCount, PonyEngine::Log::LogType::Info);
-			fileSubLogger->Log(infoLogEntry);
-			fileSubLogger.reset();
+			fileSubLogger.subLogger->Log(infoLogEntry);
+			fileSubLogger.subLogger.reset();
 
 			std::ifstream logFile(testLogPath);
 			std::string line;

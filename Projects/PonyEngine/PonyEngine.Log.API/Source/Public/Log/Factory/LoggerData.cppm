@@ -9,16 +9,10 @@
 
 export module PonyEngine.Log.Factory:LoggerData;
 
-import <memory>;
-
-import PonyEngine.Log;
-
-import :LoggerDeleter;
+import :LoggerUniquePtr;
 
 export namespace PonyEngine::Log
 {
-	using LoggerUniquePtr = std::unique_ptr<ILogger, LoggerDeleter>; ///< Logger unique_ptr typedef.
-
 	/// @brief Logger data.
 	struct LoggerData final
 	{

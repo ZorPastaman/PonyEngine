@@ -36,6 +36,15 @@
     <ClCompile Include="Source\Private\Log\LoggerDestroyer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Log\ConsoleSubLoggerDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Log\FileSubLoggerDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLoggerDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

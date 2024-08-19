@@ -19,14 +19,14 @@ namespace Log
 	{
 		TEST_METHOD(CreateTest)
 		{
-			const PonyEngine::Log::OutputDebugStringSubLoggerUniquePtr outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
-			Assert::IsNotNull(outputDebugStringSubLogger.get());
+			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
+			Assert::IsNotNull(outputDebugStringSubLogger.subLogger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			const PonyEngine::Log::OutputDebugStringSubLoggerUniquePtr outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
-			Assert::AreEqual("PonyEngine::Log::OutputDebugStringSubLogger", outputDebugStringSubLogger->Name());
+			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
+			Assert::AreEqual("PonyEngine::Log::OutputDebugStringSubLogger", outputDebugStringSubLogger.subLogger->Name());
 		}
 
 		// Skip log test 'cause it's too complicated to do it here. And manual tests of it are easy.

@@ -12,8 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLoggerDestroyer.cppm" />
     <ClCompile Include="Source\Private\Log\ConsoleSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\ConsoleSubLoggerDestroyer.cppm" />
     <ClCompile Include="Source\Private\Log\FileSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\FileSubLoggerDestroyer.cppm" />
     <ClCompile Include="Source\Private\Log\Logger.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Log.Windows.Implementation.cppm" />
     <ClCompile Include="Source\Public\Log\Log.Implementation.cppm" />
