@@ -37,7 +37,7 @@ export namespace PonyEngine::Time
 
 		[[nodiscard("Pure function")]]
 		virtual float TargetFrameTime() const noexcept override;
-		virtual void TargetFrameTime(float frameTime) noexcept override;
+		virtual void TargetFrameTime(float frameTimeToSet) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -77,9 +77,9 @@ namespace PonyEngine::Time
 		return frameTime;
 	}
 
-	void FrameRateSystemFactory::TargetFrameTime(const float frameTime) noexcept
+	void FrameRateSystemFactory::TargetFrameTime(const float frameTimeToSet) noexcept
 	{
-		this->frameTime = frameTime;
+		frameTime = frameTimeToSet;
 	}
 
 	const char* FrameRateSystemFactory::SystemName() const noexcept

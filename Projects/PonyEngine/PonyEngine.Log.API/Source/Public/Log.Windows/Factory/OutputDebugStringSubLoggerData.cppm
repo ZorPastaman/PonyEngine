@@ -7,30 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
-export module PonyEngine.Log.Implementation:LoggerDestroyer;
+export module PonyEngine.Log.Windows.Factory:OutputDebugStringSubLoggerData;
 
 import PonyEngine.Log.Factory;
 
-import :Logger;
-
 export namespace PonyEngine::Log
 {
-	/// @brief Logger destroyer.
-	struct LoggerDestroyer final : ILoggerDestroyer
+	/// @brief Output debug string sub-logger data.
+	struct OutputDebugStringSubLoggerData final
 	{
-		virtual void Destroy(ILogger* logger) noexcept override;
+		SubLoggerUniquePtr subLogger; ///< Sub-logger.
 	};
-}
-
-namespace PonyEngine::Log
-{
-	void LoggerDestroyer::Destroy(ILogger* const logger) noexcept
-	{
-		assert(dynamic_cast<Logger*>(logger) && "Tried to destroy a logger of the wrong type.");
-		delete static_cast<Logger*>(logger);
-	}
 }

@@ -7,7 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Factory:LoggerDeleter;
+export module PonyEngine.Log.Factory:LoggerUniquePtr;
+
+import <memory>;
 
 import :ILoggerDestroyer;
 
@@ -17,6 +19,10 @@ export namespace PonyEngine::Log
 	class LoggerDeleter final
 	{
 	public:
+		/// @brief Creates an empty @p LoggerDeleter.
+		/// @details It's used only to create a field.
+		[[nodiscard("Pure constructor")]]
+		LoggerDeleter() noexcept = default;
 		/// @brief Creates a @p LoggerDeleter.
 		/// @param loggerDestroyer Logger destroyer to use.
 		[[nodiscard("Pure constructor")]]
@@ -41,8 +47,10 @@ export namespace PonyEngine::Log
 		LoggerDeleter& operator =(LoggerDeleter&& other) noexcept = default;
 
 	private:
-		ILoggerDestroyer* loggerDestroyer;
+		ILoggerDestroyer* loggerDestroyer; ///< Logger destroyer.
 	};
+
+	using LoggerUniquePtr = std::unique_ptr<ILogger, LoggerDeleter>; ///< Logger unique_ptr typedef.
 }
 
 namespace PonyEngine::Log

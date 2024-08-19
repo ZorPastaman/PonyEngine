@@ -7,14 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Factory;
+export module LogHelper;
 
-export import PonyEngine.Log;
-
-export import :ConsoleSubLoggerData;
-export import :FileSubLoggerData;
-export import :ILoggerDestroyer;
-export import :ISubLoggerDestroyer;
-export import :LoggerData;
-export import :LoggerUniquePtr;
-export import :SubLoggerUniquePtr;
+export import :ConsoleSubLoggerHelper;
+export import :FileSubLoggerHelper;
+export import :LoggerHelper;
