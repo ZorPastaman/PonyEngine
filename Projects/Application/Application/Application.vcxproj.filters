@@ -15,63 +15,59 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Core\Core.cppm">
+    <ClCompile Include="Source\Private\Application\Application.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm">
+    <ClCompile Include="Source\Private\Application\ILoopElement.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm">
+    <ClCompile Include="Source\Private\Application\Loop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm">
+    <ClCompile Include="Source\Private\Application\EngineLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ObjectInterfaces.cppm">
+    <ClCompile Include="Source\Private\Application\ISystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\IEngine.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\Application.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ISystem.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\WindowsLoggerProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ISystemManager.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\WindowsSystemFactoriesProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\ISystemDestroyer.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\WindowsEndLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ITickableEngine.cppm">
+    <ClCompile Include="Source\Main.Windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\SystemDeleter.cppm">
+    <ClCompile Include="Source\Private\LogHelpers\LogHelpers.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\LogHelper.cppm">
+    <ClCompile Include="Source\Private\LogHelpers\LoggerHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineUniquePtr.cppm">
+    <ClCompile Include="Source\Private\LogHelpers\ConsoleSubLoggerHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\IEngineDestroyer.cppm">
+    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelper.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm">
+    <ClCompile Include="Source\Private\LogHelpers.Windows\OutputDebugStringSubLoggerHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Log\EngineLog.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PonyEngine.Core.API.rc">
-      <Filter>Resource Files</Filter>
-    </ResourceCompile>
+    <ClCompile Include="Source\Private\LogHelpers\FileSubLoggerHelper.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\CoreHelpers\CoreHelpers.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\CoreHelpers\EngineHelper.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

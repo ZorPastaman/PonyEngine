@@ -18,6 +18,7 @@ import <fstream>;
 import <stdexcept>;
 
 import PonyEngine.Log;
+import PonyEngine.StringUtility;
 
 export namespace PonyEngine::Log
 {
@@ -45,14 +46,20 @@ export namespace PonyEngine::Log
 		static constexpr auto StaticName = "PonyEngine::Log::FileSubLogger"; ///< Class name.
 
 	private:
-		std::ofstream logFile; ///< log file stream.
+		std::ofstream logFile; ///< Log file stream.
 	};
 }
 
 namespace PonyEngine::Log
 {
+	/// @brief Creates a log file stream.
+	/// @param logPath Log file path.
+	/// @return Created log file stream.
+	[[nodiscard("Pure function")]]
+	std::ofstream CreateLogFileStream(const std::filesystem::path& logPath);
+
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
-		logFile(logPath)
+		logFile{CreateLogFileStream(logPath)}
 	{
 		if (!logFile.is_open()) [[unlikely]]
 		{
@@ -90,5 +97,14 @@ namespace PonyEngine::Log
 	const char* FileSubLogger::Name() const noexcept
 	{
 		return StaticName;
+	}
+
+	std::ofstream CreateLogFileStream(const std::filesystem::path& logPath)
+	{
+		PONY_CONSOLE(LogType::Debug, "Create log file stream at the path '{}'.", Utility::ConvertToString(logPath.c_str()));
+		auto logFile = std::ofstream(logPath);
+		PONY_CONSOLE(LogType::Debug, "Log file stream created.");
+
+		return logFile;
 	}
 }

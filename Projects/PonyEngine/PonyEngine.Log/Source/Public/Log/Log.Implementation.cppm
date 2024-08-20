@@ -27,19 +27,21 @@ import :LoggerDestroyer;
 export namespace PonyEngine::Log
 {
 	/// @brief Creates a logger.
+	/// @param params Logger parameters.
 	/// @return Created logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT LoggerData CreateLogger();
+	PONY_DLL_EXPORT LoggerData CreateLogger(const LoggerParams& params);
 
 	/// @brief Creates a console sub-logger.
+	/// @param params Console sub-logger parameters.
 	/// @return Created console sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT ConsoleSubLoggerData CreateConsoleSubLogger();
+	PONY_DLL_EXPORT ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams& params);
 	/// @brief Creates a file sub-logger with the @p path.
-	/// @param path Log file path.
+	/// @param params File sub-logger parameters.
 	/// @return Created file sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT FileSubLoggerData CreateFileSubLogger(const std::filesystem::path& path);
+	PONY_DLL_EXPORT FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params);
 }
 
 namespace PonyEngine::Log
@@ -49,7 +51,7 @@ namespace PonyEngine::Log
 	auto DefaultConsoleSubLoggerDestroyer = ConsoleSubLoggerDestroyer(); ///< Default console sub-logger destroyer.
 	auto DefaultFileSubLoggerDestroyer = FileSubLoggerDestroyer(); ///< Default file sub-logger destroyer.
 
-	LoggerData CreateLogger()
+	LoggerData CreateLogger(const LoggerParams&)
 	{
 		const auto logger = new Logger();
 		const auto loggerDeleter = LoggerDeleter(DefaultLoggerDestroyer);
@@ -57,7 +59,7 @@ namespace PonyEngine::Log
 		return LoggerData{.logger = LoggerUniquePtr(logger, loggerDeleter)};
 	}
 
-	ConsoleSubLoggerData CreateConsoleSubLogger()
+	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams&)
 	{
 		const auto consoleSubLogger = new ConsoleSubLogger();
 		const auto consoleSubLoggerDeleter = SubLoggerDeleter(DefaultConsoleSubLoggerDestroyer);
@@ -65,9 +67,9 @@ namespace PonyEngine::Log
 		return ConsoleSubLoggerData{.subLogger = SubLoggerUniquePtr(consoleSubLogger, consoleSubLoggerDeleter)};
 	}
 
-	FileSubLoggerData CreateFileSubLogger(const std::filesystem::path& path)
+	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		const auto fileSubLogger = new FileSubLogger(path);
+		const auto fileSubLogger = new FileSubLogger(params.logPath);
 		const auto fileSubLoggerDeleter = SubLoggerDeleter(DefaultFileSubLoggerDestroyer);
 
 		return FileSubLoggerData{.subLogger = SubLoggerUniquePtr(fileSubLogger, fileSubLoggerDeleter)};

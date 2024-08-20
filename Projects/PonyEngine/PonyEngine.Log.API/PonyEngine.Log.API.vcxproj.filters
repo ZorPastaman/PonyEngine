@@ -85,5 +85,17 @@
     <ClCompile Include="Source\Public\Log.Windows\Factory\Log.Windows.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log\Factory\LoggerParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

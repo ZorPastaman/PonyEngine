@@ -7,17 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Factory;
+export module PonyEngine.Core.Factory:EngineData;
 
-export import PonyEngine.Log;
+import :EngineUniquePtr;
 
-export import :ConsoleSubLoggerData;
-export import :ConsoleSubLoggerParams;
-export import :FileSubLoggerData;
-export import :FileSubLoggerParams;
-export import :ILoggerDestroyer;
-export import :ISubLoggerDestroyer;
-export import :LoggerData;
-export import :LoggerParams;
-export import :LoggerUniquePtr;
-export import :SubLoggerUniquePtr;
+export namespace PonyEngine::Core
+{
+	/// @brief Engine data.
+	struct EngineData final
+	{
+		EngineUniquePtr engine; ///< Engine.
+
+		ITickableEngine* tickableEngine; ///< Engine tickable interface.
+	};
+}

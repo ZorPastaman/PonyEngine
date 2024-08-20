@@ -19,10 +19,6 @@ export namespace PonyEngine::Log
 	class LoggerDeleter final
 	{
 	public:
-		/// @brief Creates an empty @p LoggerDeleter.
-		/// @details It's used only to create a field.
-		[[nodiscard("Pure constructor")]]
-		LoggerDeleter() noexcept = default;
 		/// @brief Creates a @p LoggerDeleter.
 		/// @param loggerDestroyer Logger destroyer to use.
 		[[nodiscard("Pure constructor")]]

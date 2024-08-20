@@ -18,7 +18,7 @@ export namespace PonyEngine::Core
 	/// @brief System deleter.
 	class SystemDeleter final
 	{
-	public: // TODO: Add default constructor to create fields. The same to other deleters.
+	public:
 		/// @brief Creates a @p SystemDeleter.
 		/// @param destroyer System destroyer to use.
 		[[nodiscard("Pure constructor")]]

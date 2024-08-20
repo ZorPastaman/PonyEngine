@@ -7,17 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Factory;
+export module PonyEngine.Log.Factory:FileSubLoggerParams;
 
-export import PonyEngine.Log;
+import <filesystem>;
 
-export import :ConsoleSubLoggerData;
-export import :ConsoleSubLoggerParams;
-export import :FileSubLoggerData;
-export import :FileSubLoggerParams;
-export import :ILoggerDestroyer;
-export import :ISubLoggerDestroyer;
-export import :LoggerData;
-export import :LoggerParams;
-export import :LoggerUniquePtr;
-export import :SubLoggerUniquePtr;
+export namespace PonyEngine::Log
+{
+	/// @brief File sub-logger parameters.
+	struct FileSubLoggerParams final
+	{
+		std::filesystem::path logPath = "Log.log"; ///< Log file path.
+	};
+}

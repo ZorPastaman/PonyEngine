@@ -20,13 +20,16 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\EngineUniquePtr.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\IEngineDestroyer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ISystemDestroyer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm" />
     <ClCompile Include="Source\Public\Core\ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemDeleter.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
-    <ClCompile Include="Source\Public\Core\IAdvancedEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\ITickableEngine.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\LogHelper.cppm" />
