@@ -56,7 +56,7 @@ namespace Time
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::IAdvancedEngine
+		class EmptyEngine : public PonyEngine::Core::ITickableEngine
 		{
 		public:
 			EmptyLogger* logger;

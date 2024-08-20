@@ -20,12 +20,16 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Log.Windows\Factory\Log.Windows.Factory.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\ILoggerDestroyer.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\ISubLoggerDestroyer.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\Log.Factory.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\LoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Factory\LoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\LoggerUniquePtr.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\SubLoggerUniquePtr.cppm" />
     <ClCompile Include="Source\Public\Log\ILogger.cppm" />

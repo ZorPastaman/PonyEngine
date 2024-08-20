@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Core\Engine.cppm" />
+    <ClCompile Include="Source\Private\Core\EngineDestroyer.cppm" />
     <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
   </ItemGroup>

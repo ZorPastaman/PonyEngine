@@ -11,7 +11,10 @@ export module PonyEngine.Core.Factory;
 
 export import PonyEngine.Core;
 
+export import :EngineData;
 export import :EngineParams;
+export import :EngineUniquePtr;
+export import :IEngineDestroyer;
 export import :ISystemDestroyer;
 export import :ISystemFactory;
 export import :SystemDeleter;

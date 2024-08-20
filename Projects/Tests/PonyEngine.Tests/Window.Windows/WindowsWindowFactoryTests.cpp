@@ -53,7 +53,7 @@ namespace Window
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::IAdvancedEngine
+		class EmptyEngine : public PonyEngine::Core::ITickableEngine
 		{
 			EmptyLogger* logger;
 			mutable EmptySystemManager systemManager;

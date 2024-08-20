@@ -22,16 +22,17 @@ import :OutputDebugStringSubLoggerDestroyer;
 export namespace PonyEngine::Log
 {
 	/// @brief Creates an output debug string sub-logger.
+	/// @param params Output debug string sub-logger parameters.
 	/// @return Created output debug string sub-logger.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
+	PONY_DLL_EXPORT OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params);
 }
 
 namespace PonyEngine::Log
 {
 	auto DefaultOutputDebugStringSubLoggerDestroyer = OutputDebugStringSubLoggerDestroyer(); ///< Default output debug string sub-logger destroyer.
 
-	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger()
+	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams&)
 	{
 		const auto outputDebugStringSubLogger = new OutputDebugStringSubLogger();
 		const auto outputDebugStringSubLoggerDeleter = SubLoggerDeleter(DefaultOutputDebugStringSubLoggerDestroyer);

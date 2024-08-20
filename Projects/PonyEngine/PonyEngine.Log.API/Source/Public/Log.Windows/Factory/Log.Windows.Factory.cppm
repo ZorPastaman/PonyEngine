@@ -12,3 +12,4 @@ export module PonyEngine.Log.Windows.Factory;
 export import PonyEngine.Log.Factory;
 
 export import :OutputDebugStringSubLoggerData;
+export import :OutputDebugStringSubLoggerParams;

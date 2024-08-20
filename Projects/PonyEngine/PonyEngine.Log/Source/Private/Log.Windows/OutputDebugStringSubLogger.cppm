@@ -9,7 +9,6 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Log.Windows.Implementation:OutputDebugStringSubLogger;

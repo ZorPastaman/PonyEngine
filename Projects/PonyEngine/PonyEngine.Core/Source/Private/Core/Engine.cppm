@@ -27,7 +27,7 @@ import :SystemManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class Engine final : public IAdvancedEngine
+	class Engine final : public IEngine, public ITickableEngine
 	{
 	public:
 		/// @brief Creates an @p Engine with the @p params.
@@ -64,27 +64,31 @@ export namespace PonyEngine::Core
 		static constexpr auto StaticName = "PonyEngine::Core::Engine"; ///< Class name.
 
 	private:
-		Log::ILogger* const logger; ///< Logger.
-		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
-
 		std::size_t frameCount; ///< Frame count.
 
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
+
+		Log::ILogger* const logger; ///< Logger.
+		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	Engine::Engine(const EngineParams& params) :
-		logger{&params.Logger()},
-		frameCount{0},
-		isRunning{true}
-	{
-		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
-		systemManager.reset(new Core::SystemManager(params, *this));
-		PONY_LOG(this, Log::LogType::Info, "System manager created.");
+	/// @brief Creates a system manager.
+	/// @param params Engine parameters.
+	/// @param engine Engine that owns the manager.
+	/// @return Created system manager.
+	[[nodiscard("Pure function")]]
+	std::unique_ptr<SystemManager> CreateSystemManager(const EngineParams& params, IEngine& engine);
 
+	Engine::Engine(const EngineParams& params) :
+		frameCount{0},
+		isRunning{true},
+		logger{&params.Logger()},
+		systemManager{CreateSystemManager(params, *this)}
+	{
 		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
 		systemManager->Begin();
 		PONY_LOG(this, Log::LogType::Info, "System manager begun.");
@@ -158,5 +162,14 @@ namespace PonyEngine::Core
 	const char* Engine::Name() const noexcept
 	{
 		return StaticName;
+	}
+
+	std::unique_ptr<SystemManager> CreateSystemManager(const EngineParams& params, IEngine& engine)
+	{
+		PONY_LOG(&engine, Log::LogType::Info, "Create system manager.");
+		const auto systemManager = new SystemManager(params, engine);
+		PONY_LOG(&engine, Log::LogType::Info, "System manager created.");
+
+		return std::unique_ptr<SystemManager>(systemManager);
 	}
 }

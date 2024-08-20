@@ -19,10 +19,6 @@ export namespace PonyEngine::Log
 	class SubLoggerDeleter final
 	{
 	public:
-		/// @brief Creates an empty @p SubLoggerDeleter.
-		///	@details It's used only to create a field.
-		[[nodiscard("Pure constructor")]]
-		SubLoggerDeleter() noexcept = default;
 		/// @brief Creates a @p SubLoggerDeleter.
 		/// @param subLoggerDestroyer Logger destroyer to use.
 		[[nodiscard("Pure constructor")]]
