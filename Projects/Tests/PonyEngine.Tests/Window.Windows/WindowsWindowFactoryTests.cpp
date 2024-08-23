@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Window.Windows.Implementation;
 
@@ -53,7 +53,7 @@ namespace Window
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::ITickableEngine
+		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 			EmptyLogger* logger;
 			mutable EmptySystemManager systemManager;
@@ -119,8 +119,9 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			Assert::IsNotNull(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			Assert::IsNotNull(window.system.get());
 		}
 
 		TEST_METHOD(GetNameTest)
@@ -140,7 +141,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			Assert::AreEqual("PonyEngine::Window::WindowsWindow", factory->SystemName());
+			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", factory->SystemName());
 		}
 	};
 }

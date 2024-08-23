@@ -32,7 +32,7 @@ export namespace PonyEngine::Time
 		~FrameRateSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemUniquePtr Create(Core::IEngine& engine) override;
+		virtual Core::SystemData Create(const Core::SystemParams& params) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -61,9 +61,18 @@ namespace PonyEngine::Time
 	{
 	}
 
-	Core::SystemUniquePtr FrameRateSystemFactory::Create(Core::IEngine& engine)
+	Core::SystemData FrameRateSystemFactory::Create(const Core::SystemParams& params)
 	{
-		return Core::SystemUniquePtr(new FrameRateSystem(engine, frameTime), Core::SystemDeleter(*this));
+		const auto system = new FrameRateSystem(*params.engine, frameTime);
+		auto interfaces = Core::ObjectInterfaces();
+		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
+
+		return Core::SystemData
+		{
+			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
+			.tickableSystem = system,
+			.publicInterfaces = interfaces
+		};
 	}
 
 	void FrameRateSystemFactory::Destroy(Core::ISystem* const system) noexcept

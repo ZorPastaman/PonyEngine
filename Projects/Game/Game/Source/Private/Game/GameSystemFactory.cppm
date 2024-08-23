@@ -39,7 +39,7 @@ export namespace Game
 		~GameSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine& engine) override;
+		virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override;
 		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -65,9 +65,19 @@ namespace Game
 	{
 	}
 
-	PonyEngine::Core::SystemUniquePtr GameSystemFactory::Create(PonyEngine::Core::IEngine& engine)
+	PonyEngine::Core::SystemData GameSystemFactory::Create(const PonyEngine::Core::SystemParams& params)
 	{
-		return PonyEngine::Core::SystemUniquePtr(new GameSystem(engine), PonyEngine::Core::SystemDeleter(*this));
+		const auto system = new GameSystem(*params.engine);
+		const auto deleter = PonyEngine::Core::SystemDeleter(*this);
+		auto interfaces = PonyEngine::Core::ObjectInterfaces();
+		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
+
+		return PonyEngine::Core::SystemData
+		{
+			.system = PonyEngine::Core::SystemUniquePtr(system, deleter),
+			.tickableSystem = system,
+			.publicInterfaces = interfaces
+		};
 	}
 
 	void GameSystemFactory::Destroy(PonyEngine::Core::ISystem* const system) noexcept

@@ -51,9 +51,9 @@ namespace CoreHelpers
 
 	PonyEngine::Core::EngineData CreateAndSetupEngine(const PonyEngine::Core::EngineParams& engineParams)
 	{
-		PONY_LOG_GENERAL(&engineParams.Logger(), PonyEngine::Log::LogType::Info, "Create engine.");
+		PONY_LOG_GENERAL(engineParams.logger, PonyEngine::Log::LogType::Info, "Create engine.");
 		auto engine = CoreHelpers::CreateEngine(engineParams);
-		PONY_LOG_GENERAL(&engineParams.Logger(), PonyEngine::Log::LogType::Info, "'{}' engine created.", engine.engine->Name());
+		PONY_LOG_GENERAL(engineParams.logger, PonyEngine::Log::LogType::Info, "'{}' engine created.", engine.engine->Name());
 
 		return engine;
 	}

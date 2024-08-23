@@ -18,6 +18,6 @@ export namespace PonyEngine::Core
 	{
 		EngineUniquePtr engine; ///< Engine.
 
-		ITickableEngine* tickableEngine; ///< Engine tickable interface.
+		ITickableEngine* tickableEngine = nullptr; ///< Engine tickable interface.
 	};
 }

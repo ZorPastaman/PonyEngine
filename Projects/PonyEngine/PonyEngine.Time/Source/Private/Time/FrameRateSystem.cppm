@@ -17,7 +17,7 @@ import PonyEngine.Time;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system.
-	class FrameRateSystem final : public Core::ISystem, public IFrameRateSystem
+	class FrameRateSystem final : public Core::ISystem, public Core::ITickableSystem, public IFrameRateSystem
 	{
 	public:
 		/// @brief Creates a @p FrameRateSystem.
@@ -29,11 +29,6 @@ export namespace PonyEngine::Time
 		FrameRateSystem(FrameRateSystem&&) = delete;
 
 		~FrameRateSystem() noexcept = default;
-
-		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -69,19 +64,6 @@ namespace PonyEngine::Time
 		frameCount{0},
 		engine{&engine}
 	{
-	}
-
-	Core::ObjectInterfaces FrameRateSystem::PublicInterfaces() noexcept
-	{
-		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*this);
-
-		return interfaces;
-	}
-
-	bool FrameRateSystem::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	void FrameRateSystem::Begin()

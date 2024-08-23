@@ -7,7 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Factory:SystemDeleter;
+export module PonyEngine.Core.Factory:SystemUniquePtr;
+
+import <memory>;
 
 import PonyEngine.Core;
 
@@ -45,6 +47,8 @@ export namespace PonyEngine::Core
 	private:
 		ISystemDestroyer* destroyer; ///< System destroyer.
 	};
+
+	using SystemUniquePtr = std::unique_ptr<ISystem, SystemDeleter>; ///< System unique_ptr typedef.
 }
 
 namespace PonyEngine::Core

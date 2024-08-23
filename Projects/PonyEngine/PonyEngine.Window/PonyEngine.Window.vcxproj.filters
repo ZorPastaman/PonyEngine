@@ -37,7 +37,7 @@
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindow.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowFactory.cppm">

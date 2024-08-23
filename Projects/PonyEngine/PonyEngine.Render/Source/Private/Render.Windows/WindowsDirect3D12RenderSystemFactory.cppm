@@ -33,7 +33,7 @@ export namespace PonyEngine::Render
 		~WindowsDirect3D12RenderSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemUniquePtr Create(Core::IEngine& engine) override;
+		virtual Core::SystemData Create(const Core::SystemParams& params) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -50,9 +50,18 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Core::SystemUniquePtr WindowsDirect3D12RenderSystemFactory::Create(Core::IEngine& engine)
+	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(const Core::SystemParams& params)
 	{
-		return Core::SystemUniquePtr(new WindowsDirect3D12RenderSystem(engine), Core::SystemDeleter(*this));
+		const auto system = new WindowsDirect3D12RenderSystem(*params.engine);
+		auto interfaces = Core::ObjectInterfaces();
+		interfaces.AddInterfacesDeduced<IRenderSystem>(*system);
+
+		return Core::SystemData
+		{
+			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
+			.tickableSystem = system,
+			.publicInterfaces = interfaces
+		};
 	}
 
 	void WindowsDirect3D12RenderSystemFactory::Destroy(Core::ISystem* const system) noexcept

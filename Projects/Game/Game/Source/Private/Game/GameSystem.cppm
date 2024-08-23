@@ -25,7 +25,7 @@ import Game;
 export namespace Game
 {
 	/// @brief Game system.
-	class GameSystem final : public PonyEngine::Core::ISystem, public IGameSystem
+	class GameSystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem, public IGameSystem
 	{
 	public:
 		/// @brief Creates a game system.
@@ -36,11 +36,6 @@ export namespace Game
 		GameSystem(GameSystem&&) = delete;
 
 		~GameSystem() noexcept = default;
-
-		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -76,19 +71,6 @@ namespace Game
 		leftHandle(0),
 		closeHandle(0)
 	{
-	}
-
-	PonyEngine::Core::ObjectInterfaces GameSystem::PublicInterfaces() noexcept
-	{
-		auto interfaces = PonyEngine::Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IGameSystem>(*this);
-
-		return interfaces;
-	}
-
-	bool GameSystem::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	void GameSystem::Begin()

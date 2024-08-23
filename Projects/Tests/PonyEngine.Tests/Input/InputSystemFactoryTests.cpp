@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Log;
 
@@ -60,7 +60,7 @@ namespace Input
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::ITickableEngine
+		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 		public:
 			EmptyLogger* logger;
@@ -126,9 +126,10 @@ namespace Input
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			auto inputSystem = factory->Create(engine);
-			Assert::IsNotNull(inputSystem.get());
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			const auto factoryParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto inputSystem = factory->Create(factoryParams);
+			Assert::IsNotNull(inputSystem.system.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)

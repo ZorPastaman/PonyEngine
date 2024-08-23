@@ -21,6 +21,11 @@ export namespace PonyEngine::Core
 		/// @brief Ticks the engine.
 		virtual void Tick() = 0;
 
+		/// @brief Gets the system name.
+		/// @return System name.
+		[[nodiscard("Pure function")]]
+		virtual const char* Name() const noexcept = 0;
+
 		ITickableEngine& operator =(const ITickableEngine&) = delete;
 		ITickableEngine& operator =(ITickableEngine&&) = delete;
 

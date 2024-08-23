@@ -19,13 +19,13 @@ namespace Log
 	{
 		TEST_METHOD(CreateTest)
 		{
-			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
+			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(PonyEngine::Log::OutputDebugStringSubLoggerParams());
 			Assert::IsNotNull(outputDebugStringSubLogger.subLogger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger();
+			const PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(PonyEngine::Log::OutputDebugStringSubLoggerParams());
 			Assert::AreEqual("PonyEngine::Log::OutputDebugStringSubLogger", outputDebugStringSubLogger.subLogger->Name());
 		}
 

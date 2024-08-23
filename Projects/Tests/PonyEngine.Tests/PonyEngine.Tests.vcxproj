@@ -71,10 +71,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\EngineParamsTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
     <ClCompile Include="Core\CoreLogHelperTests.cpp" />
-    <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
     <ClCompile Include="Input\HandleTests.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />

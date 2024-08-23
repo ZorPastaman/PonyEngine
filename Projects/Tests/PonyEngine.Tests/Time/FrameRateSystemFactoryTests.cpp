@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Time.Implementation;
 
@@ -53,7 +53,7 @@ namespace Time
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::ITickableEngine
+		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 		public:
 			EmptyLogger* logger;
@@ -120,8 +120,9 @@ namespace Time
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			auto inputSystem = factory->Create(engine);
-			Assert::IsNotNull(inputSystem.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto inputSystem = factory->Create(systemParams);
+			Assert::IsNotNull(inputSystem.system.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)

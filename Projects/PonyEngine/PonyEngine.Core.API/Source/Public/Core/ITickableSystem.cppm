@@ -7,36 +7,32 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:ISystem;
+export module PonyEngine.Core:ITickableSystem;
 
 export namespace PonyEngine::Core
 {
-	/// @brief System.
-	class ISystem
+	/// @brief Tickable system.
+	class ITickableSystem
 	{
 	public:
-		ISystem(const ISystem&) = delete;
-		ISystem(ISystem&&) = delete;
+		ITickableSystem(const ITickableSystem&) = delete;
+		ITickableSystem(ITickableSystem&&) = delete;
 
-		/// @brief Begins the system.
-		/// @details The system takes its dependencies in this function.
-		virtual void Begin() = 0;
-		/// @brief Ends the system.
-		/// @details The function is called before a destruction.
-		virtual void End() = 0;
+		/// @brief Ticks the system.
+		virtual void Tick() = 0;
 
 		/// @brief Gets the system name.
 		/// @return System name.
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept = 0;
 
-		ISystem& operator =(const ISystem&) = delete;
-		ISystem& operator =(ISystem&&) = delete;
+		ITickableSystem& operator =(const ITickableSystem&) = delete;
+		ITickableSystem& operator =(ITickableSystem&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		ISystem() noexcept = default;
+		ITickableSystem() noexcept = default;
 
-		~ISystem() noexcept = default;
+		~ITickableSystem() noexcept = default;
 	};
 }
