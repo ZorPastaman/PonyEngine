@@ -36,7 +36,7 @@ export namespace PonyEngine::Log
 
 		/// @brief Adds the @p subLogger to the list of sub-loggers.
 		/// @param subLogger Sub-logger to add. It mustn't be nullptr. It mustn't be already added.
-		virtual void AddSubLogger(ISubLogger* subLogger) = 0;
+		virtual void AddSubLogger(ISubLogger* subLogger) = 0; // TODO: Use reference
 		/// @brief Removes the @p subLogger from the list of sub-loggers.
 		/// @param subLogger Sub-logger to remove.
 		virtual void RemoveSubLogger(ISubLogger* subLogger) = 0;

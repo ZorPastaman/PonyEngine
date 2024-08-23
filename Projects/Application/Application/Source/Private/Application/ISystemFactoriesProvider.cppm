@@ -20,9 +20,9 @@ export namespace Application
 		ISystemFactoriesProvider(const ISystemFactoriesProvider&) = delete;
 		ISystemFactoriesProvider(ISystemFactoriesProvider&&) = delete;
 
-		/// @brief Adds system factories to the @p engineParams.
-		/// @param engineParams Engine params.
-		virtual void AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const = 0;
+		/// @brief Adds system factories to the @p systemFactoriesParams.
+		/// @param systemFactories System factories.
+		virtual void AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const = 0;
 
 		ISystemFactoriesProvider& operator =(const ISystemFactoriesProvider&) = delete;
 		ISystemFactoriesProvider& operator =(ISystemFactoriesProvider&&) = delete;

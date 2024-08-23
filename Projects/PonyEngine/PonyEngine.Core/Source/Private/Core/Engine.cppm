@@ -31,9 +31,10 @@ export namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates an @p Engine with the @p params.
-		/// @param params Engine parameters.
+		/// @param logger Logger.
+		/// @param systemFactories System factories.
 		[[nodiscard("Pure constructor")]]
-		explicit Engine(const EngineParams& params);
+		Engine(Log::ILogger& logger, const SystemFactoriesContainer& systemFactories);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
@@ -77,17 +78,17 @@ export namespace PonyEngine::Core
 namespace PonyEngine::Core
 {
 	/// @brief Creates a system manager.
-	/// @param params Engine parameters.
+	/// @param systemFactories Engine parameters.
 	/// @param engine Engine that owns the manager.
 	/// @return Created system manager.
 	[[nodiscard("Pure function")]]
-	std::unique_ptr<SystemManager> CreateSystemManager(const EngineParams& params, IEngine& engine);
+	std::unique_ptr<SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine);
 
-	Engine::Engine(const EngineParams& params) :
+	Engine::Engine(Log::ILogger& logger, const SystemFactoriesContainer& systemFactories) :
 		frameCount{0},
 		isRunning{true},
-		logger{&params.Logger()},
-		systemManager{CreateSystemManager(params, *this)}
+		logger{&logger},
+		systemManager{CreateSystemManager(systemFactories, *this)}
 	{
 		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
 		systemManager->Begin();
@@ -164,10 +165,10 @@ namespace PonyEngine::Core
 		return StaticName;
 	}
 
-	std::unique_ptr<SystemManager> CreateSystemManager(const EngineParams& params, IEngine& engine)
+	std::unique_ptr<SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine)
 	{
 		PONY_LOG(&engine, Log::LogType::Info, "Create system manager.");
-		const auto systemManager = new SystemManager(params, engine);
+		const auto systemManager = new SystemManager(systemFactories, engine);
 		PONY_LOG(&engine, Log::LogType::Info, "System manager created.");
 
 		return std::unique_ptr<SystemManager>(systemManager);

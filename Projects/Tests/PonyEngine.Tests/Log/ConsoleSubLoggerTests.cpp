@@ -24,13 +24,13 @@ namespace Log
 	{
 		TEST_METHOD(CreateTest)
 		{
-			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
 			Assert::IsNotNull(consoleSubLogger.subLogger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
 			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger.subLogger->Name());
 		}
 
@@ -41,7 +41,7 @@ namespace Log
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(5691338));
 			constexpr std::size_t frameCount = 84136;
 
-			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger();
+			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
 
 			std::ostringstream verboseStream;
 			std::streambuf* const coutBuffer = std::cout.rdbuf(verboseStream.rdbuf());

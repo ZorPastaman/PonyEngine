@@ -39,9 +39,6 @@
     <ClCompile Include="Log\LogTypeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\EngineParamsTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\ConsoleSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -67,9 +64,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Math\Transformations3DTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Core\ObjectInterfacesTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\SystemDeleterTests.cpp">

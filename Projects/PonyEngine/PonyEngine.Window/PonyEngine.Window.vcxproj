@@ -21,7 +21,7 @@
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindow.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowFactory.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm" />
   </ItemGroup>

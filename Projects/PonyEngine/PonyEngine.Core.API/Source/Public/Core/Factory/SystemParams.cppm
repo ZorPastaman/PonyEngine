@@ -7,11 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Core.Factory:SystemParams;
 
-export import :IEngine;
-export import :ISystem;
-export import :ISystemManager;
-export import :ITickableEngine;
-export import :ITickableSystem;
-export import :LogHelper;
+import PonyEngine.Core;
+
+export namespace PonyEngine::Core
+{
+	/// @brief System parameters.
+	struct SystemParams final
+	{
+		IEngine* engine = nullptr; ///< Engine that owns the system.
+	};
+}

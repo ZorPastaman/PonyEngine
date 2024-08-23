@@ -27,7 +27,7 @@ import PonyEngine.Log;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class InputSystem final : public Core::ISystem, public IInputSystem, public IKeyboardObserver
+	class InputSystem final : public Core::ISystem, public Core::ITickableSystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an @p Input system
@@ -38,11 +38,6 @@ export namespace PonyEngine::Input
 		InputSystem(InputSystem&&) = delete;
 
 		~InputSystem() noexcept = default;
-
-		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -79,19 +74,6 @@ namespace PonyEngine::Input
 		currentId{1},
 		engine{&engine}
 	{
-	}
-
-	Core::ObjectInterfaces InputSystem::PublicInterfaces() noexcept
-	{
-		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IInputSystem>(*this);
-
-		return interfaces;
-	}
-
-	bool InputSystem::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	void InputSystem::Begin()

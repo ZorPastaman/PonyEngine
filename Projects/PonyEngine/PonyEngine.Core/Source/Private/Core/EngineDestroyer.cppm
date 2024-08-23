@@ -32,7 +32,7 @@ namespace PonyEngine::Core
 {
 	void EngineDestroyer::Destroy(IEngine* const engine) noexcept
 	{
-		assert((dynamic_cast<Engine*>(engine) && "Tried to destroy an engine of the wrong type."));
+		assert(dynamic_cast<Engine*>(engine) && "Tried to destroy an engine of the wrong type.");
 		delete static_cast<Engine*>(engine);
 	}
 }

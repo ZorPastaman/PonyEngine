@@ -27,7 +27,7 @@
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ObjectInterfaces.cppm">
+    <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\IEngine.cppm">
@@ -45,7 +45,7 @@
     <ClCompile Include="Source\Public\Core\ITickableEngine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\SystemDeleter.cppm">
+    <ClCompile Include="Source\Public\Core\Factory\SystemUniquePtr.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\LogHelper.cppm">
@@ -58,6 +58,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Core\ITickableSystem.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

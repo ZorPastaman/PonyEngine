@@ -51,13 +51,13 @@ namespace Log
 
 		TEST_METHOD(CreateTest)
 		{
-			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
 			Assert::IsNotNull(logger.logger.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
 			Assert::AreEqual("PonyEngine::Log::Logger", logger.logger->Name());
 		}
 
@@ -69,7 +69,7 @@ namespace Log
 			const auto logInput = PonyEngine::Log::LogInput(message, frameCount);
 
 			TestSubLogger testSubLogger;
-			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger();
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
 			logger.logger->AddSubLogger(&testSubLogger);
 			testSubLogger.expectedMessage = message;
 			testSubLogger.expectedException = nullptr;

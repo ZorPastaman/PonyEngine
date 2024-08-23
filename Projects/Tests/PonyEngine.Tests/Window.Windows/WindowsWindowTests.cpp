@@ -11,7 +11,7 @@
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Input;
 import PonyEngine.Log;
 import PonyEngine.Window.Windows.Implementation;
@@ -56,7 +56,7 @@ namespace Window
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::ITickableEngine
+		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 			EmptyLogger* logger;
 			mutable EmptySystemManager systemManager;
@@ -132,43 +132,6 @@ namespace Window
 			}
 		};
 
-		TEST_METHOD(GetInterfacesTest)
-		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto classParams = PonyEngine::Window::WindowsClassParams();
-			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto interfaces = window->PublicInterfaces();
-
-			auto it = interfaces.Interfaces();
-			auto windowInterface = *it;
-			Assert::IsTrue(windowInterface.first.get() == typeid(PonyEngine::Window::IWindow));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindow*>(window.get())), reinterpret_cast<std::uintptr_t>(windowInterface.second));
-
-			++it;
-			windowInterface = *it;
-			Assert::IsTrue(windowInterface.first.get() == typeid(PonyEngine::Window::IWindowsWindow));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get())), reinterpret_cast<std::uintptr_t>(windowInterface.second));
-
-			++it;
-			windowInterface = *it;
-			Assert::IsTrue(windowInterface.first.get() == typeid(PonyEngine::Input::IKeyboardProvider));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.get())), reinterpret_cast<std::uintptr_t>(windowInterface.second));
-		}
-
-		TEST_METHOD(GetIsTickableTest)
-		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto classParams = PonyEngine::Window::WindowsClassParams();
-			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			Assert::IsTrue(window->IsTickable());
-		}
-
 		TEST_METHOD(GetSetTitleTest)
 		{
 			auto logger = EmptyLogger();
@@ -176,8 +139,9 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			const wchar_t* title = L"Test title";
 			windowsWindow->Title(title);
 			wchar_t gotTitle[64];
@@ -193,9 +157,10 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
-			Assert::AreEqual("PonyEngine::Window::WindowsWindow", windowsWindow->Name());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
+			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", windowsWindow->Name());
 		}
 
 		TEST_METHOD(ShowHideWindowTest)
@@ -205,8 +170,9 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			windowsWindow->ShowWindow();
 			Assert::IsTrue(IsWindowVisible(windowsWindow->WindowHandle()));
 			Assert::IsTrue(windowsWindow->IsVisible());
@@ -224,8 +190,9 @@ namespace Window
 			std::wstring title = L"Test title";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			factory->NextWindowParams().title = title;
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			Assert::AreEqual(title.c_str(), windowsWindow->Title());
 		}
 
@@ -241,8 +208,9 @@ namespace Window
 			params.verticalPosition = 32;
 			params.width = 320;
 			params.height = 240;
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			RECT rect;
 			GetWindowRect(windowsWindow->WindowHandle(), &rect);
 			Assert::AreEqual(64L, rect.left);
@@ -258,10 +226,11 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			PostMessageW(windowsWindow->WindowHandle(), WM_DESTROY, 0, 0);
-			window->Tick();
+			window.tickableSystem->Tick();
 			Assert::AreEqual(0, engine.stopCode);
 		}
 
@@ -272,22 +241,23 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			auto window = factory->Create(engine);
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto window = factory->Create(systemParams);
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			auto keyboardObserver = KeyboardObserver();
-			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.get());
+			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.system.get());
 			keyboardProvider->AddKeyboardObserver(&keyboardObserver);
 			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
-			window->Tick();
+			window.tickableSystem->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::T, .isDown = true});
 			PostMessageW(windowsWindow->WindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
-			window->Tick();
+			window.tickableSystem->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = false});
 			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
-			window->Tick();
+			window.tickableSystem->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftAlt, .isDown = true});
 			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
-			window->Tick();
+			window.tickableSystem->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
 		}
 	};

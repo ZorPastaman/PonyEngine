@@ -7,11 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Core.Factory:SystemData;
 
-export import :IEngine;
-export import :ISystem;
-export import :ISystemManager;
-export import :ITickableEngine;
-export import :ITickableSystem;
-export import :LogHelper;
+import :SystemUniquePtr;
+import :ObjectInterfaces;
+
+export namespace PonyEngine::Core
+{
+	/// @brief System data.
+	struct SystemData final
+	{
+		SystemUniquePtr system; ///< System.
+
+		ITickableSystem* tickableSystem = nullptr; ///< Tickable system. Optional.
+		ObjectInterfaces publicInterfaces; ///< System public interfaces.
+	};
+}

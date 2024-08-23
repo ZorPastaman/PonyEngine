@@ -15,7 +15,7 @@ import PonyEngine.Render;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows.
-	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public IRenderSystem
+	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public Core::ITickableSystem, public IRenderSystem // TODO: Add IDirect3D12RenderSystem
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.
@@ -26,11 +26,6 @@ export namespace PonyEngine::Render
 		WindowsDirect3D12RenderSystem(WindowsDirect3D12RenderSystem&&) = delete;
 
 		~WindowsDirect3D12RenderSystem() noexcept = default;
-
-		[[nodiscard("Pure function")]]
-		virtual Core::ObjectInterfaces PublicInterfaces() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsTickable() const noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -55,19 +50,6 @@ namespace PonyEngine::Render
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine) noexcept :
 		engine{&engine}
 	{
-	}
-
-	Core::ObjectInterfaces WindowsDirect3D12RenderSystem::PublicInterfaces() noexcept
-	{
-		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IRenderSystem>(*this);
-
-		return interfaces;
-	}
-
-	bool WindowsDirect3D12RenderSystem::IsTickable() const noexcept
-	{
-		return true;
 	}
 
 	void WindowsDirect3D12RenderSystem::Begin()

@@ -12,7 +12,7 @@
 import <chrono>;
 import <cstddef>;
 
-import PonyEngine.Core;
+import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 import PonyEngine.Time.Implementation;
 
@@ -56,7 +56,7 @@ namespace Time
 			}
 		};
 
-		class EmptyEngine : public PonyEngine::Core::ITickableEngine
+		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 		public:
 			EmptyLogger* logger;
@@ -112,46 +112,25 @@ namespace Time
 			}
 		};
 
-		TEST_METHOD(GetPublicInterfaceTest)
-		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			auto frameRateSystem = factory->Create(engine);
-			auto interfaces = frameRateSystem->PublicInterfaces();
-			auto it = interfaces.Interfaces();
-			auto interface = *it;
-			Assert::IsTrue(interface.first.get() == typeid(PonyEngine::Time::IFrameRateSystem));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystem.get())), reinterpret_cast<std::uintptr_t>(interface.second));
-			++it;
-			Assert::IsTrue(it.IsEnd());
-		}
-
-		TEST_METHOD(GetIsTickableTest)
-		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			auto frameRateSystem = factory->Create(engine);
-			Assert::IsTrue(frameRateSystem->IsTickable());
-		}
-
 		TEST_METHOD(TickTest)
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			auto frameRateSystemBase = factory->Create(engine);
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto frameRateSystemBase = factory->Create(systemParams);
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
+			frameRateSystemBase.system->Begin();
 			float frameTime = 5.f;
 			frameRateSystem->TargetFrameTime(frameTime);
 			auto now = std::chrono::steady_clock::now();
-			frameRateSystemBase->Tick();
+			frameRateSystemBase.tickableSystem->Tick();
 			auto timeDiff = std::chrono::steady_clock::now() - now;
 			Assert::IsFalse(timeDiff >= std::chrono::duration<float>(frameTime));
-			frameRateSystemBase->Tick();
+			frameRateSystemBase.tickableSystem->Tick();
 			timeDiff = std::chrono::steady_clock::now() - now;
 			Assert::IsTrue(timeDiff >= std::chrono::duration<float>(frameTime));
+			frameRateSystemBase.system->End();
 		}
 
 		TEST_METHOD(GetSetFrameTimeRate)
@@ -159,8 +138,9 @@ namespace Time
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			auto frameRateSystemBase = factory->Create(engine);
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.get());
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			auto frameRateSystemBase = factory->Create(systemParams);
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameRate());

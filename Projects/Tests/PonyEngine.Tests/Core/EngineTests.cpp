@@ -35,7 +35,7 @@ namespace Core
 			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override { }
 		};
 
-		class EmptySystem final : public PonyEngine::Core::ISystem
+		class EmptySystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem
 		{
 		public:
 			bool begun = false;
@@ -62,21 +62,6 @@ namespace Core
 			{
 				ticked = true;
 			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
-			{
-				auto interfaces = PonyEngine::Core::ObjectInterfaces();
-				interfaces.AddInterfacesDeduced<EmptySystem>(*this);
-
-				return interfaces;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsTickable() const noexcept override
-			{
-				return true;
-			}
 		};
 
 		class EmptySystem1Base : public PonyEngine::Core::ISystem
@@ -94,25 +79,6 @@ namespace Core
 			virtual void End() override
 			{
 			}
-
-			virtual void Tick() override
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ObjectInterfaces PublicInterfaces() noexcept override
-			{
-				auto interfaces = PonyEngine::Core::ObjectInterfaces();
-				interfaces.AddInterfacesDeduced<EmptySystem1Base>(*this);
-
-				return interfaces;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsTickable() const noexcept override
-			{
-				return true;
-			}
 		};
 
 		class EmptySystem1 final : public EmptySystem1Base
@@ -126,11 +92,19 @@ namespace Core
 			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override
 			{
 				createdSystem = new EmptySystem();
+				const auto deleter = PonyEngine::Core::SystemDeleter(*this);
+				auto interfaces = PonyEngine::Core::ObjectInterfaces();
+				interfaces.AddInterfacesDeduced<EmptySystem>(*createdSystem);
 
-				return PonyEngine::Core::SystemUniquePtr(createdSystem, PonyEngine::Core::SystemDeleter(*this));
+				return PonyEngine::Core::SystemData
+				{
+					.system = PonyEngine::Core::SystemUniquePtr(createdSystem, deleter),
+					.tickableSystem = createdSystem,
+					.publicInterfaces = interfaces
+				};
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
@@ -158,12 +132,18 @@ namespace Core
 			EmptySystem1* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemUniquePtr Create(PonyEngine::Core::IEngine&) override
+			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override
 			{
-				const auto emptySystem = new EmptySystem1();
-				createdSystem = emptySystem;
+				createdSystem = new EmptySystem1();
+				const auto deleter = PonyEngine::Core::SystemDeleter(*this);
+				auto interfaces = PonyEngine::Core::ObjectInterfaces();
+				interfaces.AddInterfacesDeduced<EmptySystem1Base>(*createdSystem);
 
-				return PonyEngine::Core::SystemUniquePtr(emptySystem, PonyEngine::Core::SystemDeleter(*this));
+				return PonyEngine::Core::SystemData
+				{
+					.system = PonyEngine::Core::SystemUniquePtr(createdSystem, deleter),
+					.publicInterfaces = interfaces
+				};
 			}
 			virtual void Destroy(PonyEngine::Core::ISystem* const system) noexcept override
 			{
@@ -186,103 +166,104 @@ namespace Core
 
 		TEST_METHOD(CreateTest)
 		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto logger = EmptyLogger();
+			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
 			const auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsNotNull(engine.get());
+			Assert::IsNotNull(engine.engine.get());
+			Assert::IsNotNull(engine.tickableEngine);
 		}
 
 		TEST_METHOD(GetLoggerTest)
 		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto logger = EmptyLogger();
+			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
 			const auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&(engine->Logger())));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&engine.engine->Logger()));
 		}
 
 		TEST_METHOD(ExitTest)
 		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto logger = EmptyLogger();
+			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
 			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::IsTrue(engine->IsRunning());
-			engine->Stop();
-			Assert::IsFalse(engine->IsRunning());
-			Assert::AreEqual(0, engine->ExitCode());
-			engine.reset();
+			Assert::IsTrue(engine.engine->IsRunning());
+			engine.engine->Stop();
+			Assert::IsFalse(engine.engine->IsRunning());
+			Assert::AreEqual(0, engine.engine->ExitCode());
+			engine.engine.reset();
 			engine = PonyEngine::Core::CreateEngine(params);
-			engine->Stop(100);
-			Assert::AreEqual(100, engine->ExitCode());
+			engine.engine->Stop(100);
+			Assert::AreEqual(100, engine.engine->ExitCode());
 		}
 
 		TEST_METHOD(SystemTickTest)
 		{
-			EmptyLogger logger;
+			auto logger = EmptyLogger();
 			EmptySystemFactory systemFactory;
-			auto params = PonyEngine::Core::EngineParams(logger);
-			params.AddSystemFactory(systemFactory);
+			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			params.systemFactories.AddSystemFactory(systemFactory);
 			auto engine = PonyEngine::Core::CreateEngine(params);
 
 			Assert::IsTrue(systemFactory.createdSystem->begun);
 
 			Assert::IsFalse(systemFactory.createdSystem->ticked);
 
-			engine->Tick();
+			engine.tickableEngine->Tick();
 			Assert::IsTrue(systemFactory.createdSystem->ticked);
 
 			systemFactory.createdSystem->ticked = false;
-			engine->Tick();
+			engine.tickableEngine->Tick();
 			Assert::IsTrue(systemFactory.createdSystem->ticked);
 
 			bool ended = false;
 			systemFactory.createdSystem->ended = &ended;
-			engine.reset();
+			engine.engine.reset();
 			Assert::IsTrue(ended);
 			Assert::IsTrue(systemFactory.systemDestroyed);
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto logger = EmptyLogger();
+			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
 			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual("PonyEngine::Core::Engine", engine->Name());
+			Assert::AreEqual("PonyEngine::Core::Engine", engine.engine->Name());
 		}
 
 		TEST_METHOD(FindSystemTest)
 		{
-			EmptyLogger logger;
-			EmptySystemFactory systemFactory;
-			EmptySystem1Factory system1Factory;
-			auto params = PonyEngine::Core::EngineParams(logger);
-			params.AddSystemFactory(systemFactory);
-			params.AddSystemFactory(system1Factory);
+			auto logger = EmptyLogger();
+			auto systemFactory = EmptySystemFactory();
+			auto system1Factory = EmptySystem1Factory();
+			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			params.systemFactories.AddSystemFactory(systemFactory);
+			params.systemFactories.AddSystemFactory(system1Factory);
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem(typeid(EmptySystem))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem<EmptySystem>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(EmptySystem))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<EmptySystem>()));
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem(typeid(EmptySystem1Base))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine->SystemManager().FindSystem<EmptySystem1Base>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(EmptySystem1Base))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<EmptySystem1Base*>(system1Factory.createdSystem)), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<EmptySystem1Base>()));
 
-			Assert::IsNull(engine->SystemManager().FindSystem(typeid(EmptySystem1)));
-			Assert::IsNull(engine->SystemManager().FindSystem<EmptySystem1>());
+			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(EmptySystem1)));
+			Assert::IsNull(engine.engine->SystemManager().FindSystem<EmptySystem1>());
 
-			Assert::IsNull(engine->SystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
-			Assert::IsNull(engine->SystemManager().FindSystem<PonyEngine::Core::ISystem>());
+			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
+			Assert::IsNull(engine.engine->SystemManager().FindSystem<PonyEngine::Core::ISystem>());
 		}
 
 		TEST_METHOD(GetFrameCountTest)
 		{
-			EmptyLogger logger;
-			const auto params = PonyEngine::Core::EngineParams(logger);
+			auto logger = EmptyLogger();
+			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 
 			for (std::size_t i = 0; i < 10; ++i)
 			{
-				Assert::AreEqual(i, engine->FrameCount());
-				engine->Tick();
-				Assert::AreEqual(i + 1, engine->FrameCount());
+				Assert::AreEqual(i, engine.engine->FrameCount());
+				engine.tickableEngine->Tick();
+				Assert::AreEqual(i + 1, engine.engine->FrameCount());
 			}
 		}
 	};

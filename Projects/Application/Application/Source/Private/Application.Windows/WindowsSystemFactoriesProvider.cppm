@@ -42,7 +42,7 @@ export namespace Application
 
 		~WindowsSystemFactoriesProvider() noexcept;
 
-		virtual void AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const override;
+		virtual void AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const override;
 
 		WindowsSystemFactoriesProvider& operator =(const WindowsSystemFactoriesProvider&) = delete;
 		WindowsSystemFactoriesProvider& operator =(WindowsSystemFactoriesProvider&&) = delete;
@@ -147,22 +147,22 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window factory destroyed.");
 	}
 
-	void WindowsSystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::EngineParams& engineParams) const
+	void WindowsSystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add frame rate system factory.");
-		engineParams.AddSystemFactory(*frameRateSystemFactory);
+		systemFactories.AddSystemFactory(*frameRateSystemFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Frame rate system factory added.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add Windows window system factory.");
-		engineParams.AddSystemFactory(*windowsWindowSystemFactory);
+		systemFactories.AddSystemFactory(*windowsWindowSystemFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Windows window system factory added.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add input system factory.");
-		engineParams.AddSystemFactory(*inputSystemFactory);
+		systemFactories.AddSystemFactory(*inputSystemFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Input system factory added.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add game system factory.");
-		engineParams.AddSystemFactory(*gameSystemFactory);
+		systemFactories.AddSystemFactory(*gameSystemFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system factory added.");
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add Direct3D 12 render system for Windows factory.");
-		engineParams.AddSystemFactory(*windowsDirect3D12RenderFactory);
+		systemFactories.AddSystemFactory(*windowsDirect3D12RenderFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Direct3D 12 render system for Windows factory added.");
 	}
 }
