@@ -43,7 +43,7 @@ namespace Core
 			bool deleted = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override
+			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
 			{
 				const auto system = new EmptySystem();
 				const auto deleter = PonyEngine::Core::SystemDeleter(*this);

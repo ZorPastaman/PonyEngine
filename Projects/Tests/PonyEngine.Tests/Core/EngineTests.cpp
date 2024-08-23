@@ -92,7 +92,7 @@ namespace Core
 			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override
+			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
 			{
 				createdSystem = new EmptySystem();
 				const auto deleter = PonyEngine::Core::SystemDeleter(*this);
@@ -132,7 +132,7 @@ namespace Core
 			EmptySystem1* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override
+			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
 			{
 				createdSystem = new EmptySystem1();
 				const auto deleter = PonyEngine::Core::SystemDeleter(*this);

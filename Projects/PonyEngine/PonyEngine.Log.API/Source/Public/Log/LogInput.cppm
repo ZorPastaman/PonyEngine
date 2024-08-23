@@ -16,7 +16,7 @@ export namespace PonyEngine::Log
 	/// @brief Log data input.
 	struct LogInput final
 	{
-		const char* message = ""; ///< Log message.
+		const char* message = nullptr; ///< Log message.
 		std::size_t frameCount = 0; ///< Engine frame count.
 	};
 }

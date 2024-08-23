@@ -22,7 +22,6 @@ export module PonyEngine.Log:LogConsoleHelper;
 import <exception>;
 import <format>;
 import <iostream>;
-import <ostream>;
 import <string>;
 
 import PonyEngine.StringUtility;
@@ -110,7 +109,7 @@ namespace PonyEngine::Log
 	template<typename ... Args>
 	void LogToConsole(const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...).c_str());
+		LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 
 	void LogExceptionToConsole(const std::exception& exception) noexcept
@@ -142,7 +141,7 @@ namespace PonyEngine::Log
 	template<typename ... Args>
 	void LogExceptionToConsole(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...).c_str());
+		LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 
 	std::ostream& ChooseConsoleStream(const LogType logType) noexcept
