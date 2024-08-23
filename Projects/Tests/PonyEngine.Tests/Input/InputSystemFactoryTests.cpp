@@ -35,10 +35,10 @@ namespace Input
 			{
 			}
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger*) override
+			virtual void AddSubLogger(PonyEngine::Log::ISubLogger&) override
 			{
 			}
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override
+			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger&) override
 			{
 			}
 		};

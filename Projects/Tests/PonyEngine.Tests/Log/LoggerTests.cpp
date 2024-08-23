@@ -70,7 +70,7 @@ namespace Log
 
 			TestSubLogger testSubLogger;
 			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
-			logger.logger->AddSubLogger(&testSubLogger);
+			logger.logger->AddSubLogger(testSubLogger);
 			testSubLogger.expectedMessage = message;
 			testSubLogger.expectedException = nullptr;
 			testSubLogger.expectedFrameCount = frameCount;
@@ -84,7 +84,7 @@ namespace Log
 			logger.logger->LogException(exception, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
 
-			logger.logger->RemoveSubLogger(&testSubLogger);
+			logger.logger->RemoveSubLogger(testSubLogger);
 			testSubLogger.expectMessages = false;
 			logger.logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);

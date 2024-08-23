@@ -77,7 +77,7 @@ namespace Application
 		for (PonyEngine::Log::SubLoggerUniquePtr& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
-			logger->AddSubLogger(subLogger.get());
+			logger->AddSubLogger(*subLogger.get());
 			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Sub-logger added.");
 		}
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers added.");
@@ -93,7 +93,7 @@ namespace Application
 			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Remove '{}' sub-logger.", subLogger->Name());
 			try
 			{
-				logger->RemoveSubLogger(subLogger.get());
+				logger->RemoveSubLogger(*subLogger.get());
 			}
 			catch (const std::exception& e)
 			{
