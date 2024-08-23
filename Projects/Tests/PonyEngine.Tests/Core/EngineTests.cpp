@@ -31,8 +31,8 @@ namespace Core
 			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override { }
 			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override { }
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger*) override { }
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger*) override { }
+			virtual void AddSubLogger(PonyEngine::Log::ISubLogger&) override { }
+			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger&) override { }
 		};
 
 		class EmptySystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem

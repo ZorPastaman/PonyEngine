@@ -40,8 +40,8 @@ export namespace PonyEngine::Log
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
 
-		virtual void AddSubLogger(ISubLogger* subLogger) override;
-		virtual void RemoveSubLogger(ISubLogger* subLogger) override;
+		virtual void AddSubLogger(ISubLogger& subLogger) override;
+		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -78,28 +78,25 @@ namespace PonyEngine::Log
 		}
 	}
 
-	void Logger::AddSubLogger(ISubLogger* const subLogger)
+	void Logger::AddSubLogger(ISubLogger& subLogger)
 	{
-		assert(subLogger && "The sub-logger is nullptr.");
-		assert(std::ranges::find(std::as_const(subLoggers), subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
-		PONY_CONSOLE(LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
-		subLoggers.push_back(subLogger);
+		assert(std::ranges::find(std::as_const(subLoggers), &subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
+		PONY_CONSOLE(LogType::Debug, "Add '{}' sub-logger.", subLogger.Name());
+		subLoggers.push_back(&subLogger);
 		PONY_CONSOLE(LogType::Debug, "Sub-logger added.");
 	}
 
-	void Logger::RemoveSubLogger(ISubLogger* const subLogger)
+	void Logger::RemoveSubLogger(ISubLogger& subLogger)
 	{
-		PONY_CONSOLE_IF(!subLogger, LogType::Warning, "Tried to remove a nullptr sub-logger.");
-
-		if (const auto position = std::ranges::find(std::as_const(subLoggers), subLogger); position != subLoggers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(subLoggers), &subLogger); position != subLoggers.cend()) [[likely]]
 		{
-			PONY_CONSOLE(LogType::Debug, "Remove '{}' sub-logger.", subLogger->Name());
+			PONY_CONSOLE(LogType::Debug, "Remove '{}' sub-logger.", subLogger.Name());
 			subLoggers.erase(position);
 			PONY_CONSOLE(LogType::Debug, "Sub-logger removed.");
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE_IF(subLogger, LogType::Warning, "Tried to remove a not added sub-logger '{}'.", subLogger->Name());
+			PONY_CONSOLE(LogType::Warning, "Tried to remove a not added sub-logger '{}'.", subLogger.Name());
 		}
 	}
 
