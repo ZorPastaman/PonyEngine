@@ -28,12 +28,6 @@ namespace Log
 			Assert::IsNotNull(consoleSubLogger.subLogger.get());
 		}
 
-		TEST_METHOD(GetNameTest)
-		{
-			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
-			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger.subLogger->Name());
-		}
-
 		TEST_METHOD(LogTest)
 		{
 			auto message = "Message!";
@@ -82,6 +76,12 @@ namespace Log
 			std::cout.rdbuf(coutBuffer);
 			std::clog.rdbuf(clogBuffer);
 			std::cerr.rdbuf(cerrBuffer);
+		}
+
+		TEST_METHOD(GetNameTest)
+		{
+			const PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
+			Assert::AreEqual("PonyEngine::Log::ConsoleSubLogger", consoleSubLogger.subLogger->Name());
 		}
 	};
 }

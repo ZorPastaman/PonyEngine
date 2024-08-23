@@ -55,12 +55,6 @@ namespace Log
 			Assert::IsNotNull(logger.logger.get());
 		}
 
-		TEST_METHOD(GetNameTest)
-		{
-			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
-			Assert::AreEqual("PonyEngine::Log::Logger", logger.logger->Name());
-		}
-
 		TEST_METHOD(LogTest)
 		{
 			const auto message = "Message!";
@@ -88,6 +82,12 @@ namespace Log
 			testSubLogger.expectMessages = false;
 			logger.logger->Log(PonyEngine::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.count);
+		}
+
+		TEST_METHOD(GetNameTest)
+		{
+			const PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
+			Assert::AreEqual("PonyEngine::Log::Logger", logger.logger->Name());
 		}
 	};
 }

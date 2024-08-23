@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Log.Implementation:ConsoleSubLogger;
 
 import <exception>;
+import <ostream>;
 
 import PonyEngine.Log;
 

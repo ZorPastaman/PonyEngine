@@ -34,15 +34,6 @@ namespace Log
 			std::filesystem::remove(testLogPath);
 		}
 
-		TEST_METHOD(GetNameTest)
-		{
-			const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = testLogPath};
-			PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(params);
-			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger.subLogger->Name());
-			fileSubLogger.subLogger.reset();
-			std::filesystem::remove(testLogPath);
-		}
-
 		TEST_METHOD(LogTest)
 		{
 			const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = testLogPath};
@@ -60,6 +51,15 @@ namespace Log
 			Assert::AreEqual(infoLogEntry.ToString(), (line + '\n').c_str());
 			logFile.close();
 
+			std::filesystem::remove(testLogPath);
+		}
+
+		TEST_METHOD(GetNameTest)
+		{
+			const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = testLogPath};
+			PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(params);
+			Assert::AreEqual("PonyEngine::Log::FileSubLogger", fileSubLogger.subLogger->Name());
+			fileSubLogger.subLogger.reset();
 			std::filesystem::remove(testLogPath);
 		}
 	};
