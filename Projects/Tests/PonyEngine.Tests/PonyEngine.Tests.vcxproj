@@ -79,6 +79,7 @@
     <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input\KeyboardKeyCodeTests.cpp" />
     <ClCompile Include="Input\KeyboardMessageTests.cpp" />
+    <ClCompile Include="Log\ConsoleExceptionHandlerTests.cpp" />
     <ClCompile Include="Log\ConsoleSubLoggerTests.cpp" />
     <ClCompile Include="Log\FileSubLoggerTests.cpp" />
     <ClCompile Include="Log\LogConsoleHelperTests.cpp" />
