@@ -71,9 +71,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Core\EngineDeleterTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
     <ClCompile Include="Core\CoreLogHelperTests.cpp" />
+    <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
+    <ClCompile Include="Core\SystemFactoriesContainerTests.cpp" />
     <ClCompile Include="Input\HandleTests.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
     <ClCompile Include="Input\InputSystemTests.cpp" />

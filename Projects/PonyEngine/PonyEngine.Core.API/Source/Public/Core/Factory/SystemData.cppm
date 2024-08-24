@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core.Factory:SystemData;
 
+import PonyEngine.Core;
+
 import :SystemUniquePtr;
 import :ObjectInterfaces;
 

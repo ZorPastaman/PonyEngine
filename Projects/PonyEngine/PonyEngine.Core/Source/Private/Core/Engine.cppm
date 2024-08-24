@@ -30,7 +30,7 @@ export namespace PonyEngine::Core
 	class Engine final : public IEngine, public ITickableEngine
 	{
 	public:
-		/// @brief Creates an @p Engine with the @p params.
+		/// @brief Creates an @p Engine.
 		/// @param logger Logger.
 		/// @param systemFactories System factories.
 		[[nodiscard("Pure constructor")]]
@@ -149,7 +149,7 @@ namespace PonyEngine::Core
 
 	void Engine::Tick()
 	{
-		if (!isRunning)
+		if (!isRunning) // TODO: Throw if the engine is ticked when it's in tick. Need to think about exceptions from SystemManager::Tick().
 		{
 			throw std::logic_error("The engine is ticked when it's already been stopped.");
 		}

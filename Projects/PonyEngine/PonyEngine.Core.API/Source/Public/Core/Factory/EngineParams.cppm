@@ -9,11 +9,9 @@
 
 export module PonyEngine.Core.Factory:EngineParams;
 
-import <functional>;
-
 import PonyEngine.Log;
 
-import :SystemFactoriesParams;
+import :SystemFactoriesContainer;
 
 export namespace PonyEngine::Core
 {

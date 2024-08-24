@@ -19,6 +19,6 @@ export import :ISystemDestroyer;
 export import :ISystemFactory;
 export import :ObjectInterfaces;
 export import :SystemData;
-export import :SystemFactoriesParams;
+export import :SystemFactoriesContainer;
 export import :SystemParams;
 export import :SystemUniquePtr;
