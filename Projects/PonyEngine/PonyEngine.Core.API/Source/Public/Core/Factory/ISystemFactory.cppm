@@ -9,8 +9,6 @@
 
 export module PonyEngine.Core.Factory:ISystemFactory;
 
-import PonyEngine.Core;
-
 import :SystemData;
 import :SystemParams;
 

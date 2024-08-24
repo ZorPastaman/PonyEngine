@@ -10,8 +10,6 @@
 #include "CppUnitTest.h"
 
 import <cstddef>;
-import <cstdint>;
-import <exception>;
 
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
@@ -173,6 +171,20 @@ namespace Core
 			Assert::IsNotNull(engine.tickableEngine);
 		}
 
+		TEST_METHOD(GetFrameCountTest)
+		{
+			auto logger = EmptyLogger();
+			const auto params = PonyEngine::Core::EngineParams{ .logger = &logger };
+			const auto engine = PonyEngine::Core::CreateEngine(params);
+
+			for (std::size_t i = 0; i < 10; ++i)
+			{
+				Assert::AreEqual(i, engine.engine->FrameCount());
+				engine.tickableEngine->Tick();
+				Assert::AreEqual(i + 1, engine.engine->FrameCount());
+			}
+		}
+
 		TEST_METHOD(GetLoggerTest)
 		{
 			auto logger = EmptyLogger();
@@ -194,6 +206,14 @@ namespace Core
 			engine = PonyEngine::Core::CreateEngine(params);
 			engine.engine->Stop(100);
 			Assert::AreEqual(100, engine.engine->ExitCode());
+		}
+
+		TEST_METHOD(GetNameTest)
+		{
+			auto logger = EmptyLogger();
+			auto params = PonyEngine::Core::EngineParams{ .logger = &logger };
+			auto engine = PonyEngine::Core::CreateEngine(params);
+			Assert::AreEqual("PonyEngine::Core::Engine", engine.engine->Name());
 		}
 
 		TEST_METHOD(SystemTickTest)
@@ -222,14 +242,6 @@ namespace Core
 			Assert::IsTrue(systemFactory.systemDestroyed);
 		}
 
-		TEST_METHOD(GetNameTest)
-		{
-			auto logger = EmptyLogger();
-			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
-			auto engine = PonyEngine::Core::CreateEngine(params);
-			Assert::AreEqual("PonyEngine::Core::Engine", engine.engine->Name());
-		}
-
 		TEST_METHOD(FindSystemTest)
 		{
 			auto logger = EmptyLogger();
@@ -251,20 +263,6 @@ namespace Core
 
 			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
 			Assert::IsNull(engine.engine->SystemManager().FindSystem<PonyEngine::Core::ISystem>());
-		}
-
-		TEST_METHOD(GetFrameCountTest)
-		{
-			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
-			const auto engine = PonyEngine::Core::CreateEngine(params);
-
-			for (std::size_t i = 0; i < 10; ++i)
-			{
-				Assert::AreEqual(i, engine.engine->FrameCount());
-				engine.tickableEngine->Tick();
-				Assert::AreEqual(i + 1, engine.engine->FrameCount());
-			}
 		}
 	};
 } 

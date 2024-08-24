@@ -60,11 +60,11 @@ export namespace PonyEngine::Core
 		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
-		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 		std::vector<SystemUniquePtr> systems; ///< Systems.
 		std::vector<ITickableSystem*> tickableSystems; ///< Tickable systems.
+		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 
-		IEngine* const engine; ///< Engine that owns the manager.
+		const IEngine* const engine; ///< Engine that owns the manager.
 	};
 }
 

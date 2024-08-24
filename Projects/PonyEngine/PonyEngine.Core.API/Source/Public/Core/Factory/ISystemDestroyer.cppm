@@ -22,7 +22,6 @@ export namespace PonyEngine::Core
 
 		/// @brief Destroys the @p system.
 		/// @param system System to destroy.
-		/// @note Don't call it directly. It's used only via a system unique_ptr.
 		virtual void Destroy(ISystem* system) noexcept = 0;
 
 		ISystemDestroyer& operator =(const ISystemDestroyer&) = delete;

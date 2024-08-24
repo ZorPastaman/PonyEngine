@@ -36,6 +36,7 @@ namespace PonyEngine::Core
 	EngineData CreateEngine(const EngineParams& params)
 	{
 		assert(params.logger && "The logger is nullptr.");
+
 		const auto engine = new Engine(*params.logger, params.systemFactories);
 		const auto engineDeleter = EngineDeleter(DefaultEngineDestroyer);
 

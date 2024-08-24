@@ -15,7 +15,6 @@ export module PonyEngine.Core.Factory:ObjectInterfaces;
 
 import <typeinfo>;
 import <type_traits>;
-import <utility>;
 import <vector>;
 
 export namespace PonyEngine::Core

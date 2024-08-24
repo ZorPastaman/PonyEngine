@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factory:SystemFactoriesParams;
+export module PonyEngine.Core.Factory:SystemFactoriesContainer;
 
 import <algorithm>;
 import <vector>;
