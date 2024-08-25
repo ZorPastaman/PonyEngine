@@ -63,7 +63,7 @@ namespace PonyEngine::Log
 	{
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error("The log file isn't open.");
+			throw std::logic_error(SafeFormat("The log file at path '{}' isn't open.", Utility::ConvertToString(logPath.c_str())));
 		}
 	}
 

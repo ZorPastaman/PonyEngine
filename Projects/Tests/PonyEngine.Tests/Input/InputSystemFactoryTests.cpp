@@ -127,7 +127,7 @@ namespace Input
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			const auto factoryParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto factoryParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto inputSystem = factory->Create(factoryParams);
 			Assert::IsNotNull(inputSystem.system.get());
 		}

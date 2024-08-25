@@ -26,6 +26,7 @@ import <vector>;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
+import PonyEngine.StringUtility;
 
 export namespace PonyEngine::Core
 {
@@ -70,20 +71,28 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
+	/// @brief Creates a system.
+	/// @param factory Factory to use.
+	/// @param params System params to use.
+	/// @return Created system.
+	[[nodiscard("Pure function")]]
+	SystemData CreateSystem(ISystemFactory* factory, const SystemParams& params);
+
 	SystemManager::SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engineToUse) :
 		engine{&engineToUse}
 	{
 		PONY_LOG(engine, Log::LogType::Info, "Create systems.");
 
-		const auto systemParams = SystemParams{.engine = &engineToUse};
+		const auto systemParams = SystemParams{.engine = engineToUse};
 		for (ISystemFactory* const factory : systemFactories)
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Create '{}' system.", factory->SystemName());
+			PONY_LOG(engine, Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
-			SystemData system = factory->Create(systemParams);
+			SystemData system = CreateSystem(factory, systemParams);
+
 			if (!system.system)
 			{
-				throw std::logic_error("The system is nullptr.");
+				throw std::logic_error(Log::SafeFormat("The '{}' system from the '{}' factory is nullptr.", factory->SystemName(), factory->Name()));
 			}
 
 			systems.push_back(std::move(system.system));
@@ -141,7 +150,16 @@ namespace PonyEngine::Core
 		for (const SystemUniquePtr& system : systems)
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Begin '{}' system.", system->Name());
-			system->Begin();
+			try
+			{
+				system->Begin();
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(engine, e, "On beginning the '{}' system.", system->Name());
+
+				throw;
+			}
 			PONY_LOG(engine, Log::LogType::Info, "System begun.");
 		}
 
@@ -161,7 +179,7 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On ending a system.");
+				PONY_LOG_E(engine, e, "On ending the '{}' system.", (*system)->Name());
 			}
 			PONY_LOG(engine, Log::LogType::Info, "System ended.");
 		}
@@ -176,7 +194,30 @@ namespace PonyEngine::Core
 		for (ITickableSystem* const system : tickableSystems)
 		{
 			PONY_LOG(engine, Log::LogType::Verbose, system->Name());
-			system->Tick();
+			try
+			{
+				system->Tick();
+			}
+			catch (const std::exception& e)
+			{
+				PONY_LOG_E(engine, e, "On ticking the '{}' system.", system->Name());
+
+				throw;
+			}
+		}
+	}
+
+	SystemData CreateSystem(ISystemFactory* factory, const SystemParams& params)
+	{
+		try
+		{
+			return factory->Create(params);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(&params.engine, e, "On creating a '{}' system with the '{}' factory.", factory->SystemName(), factory->Name());
+
+			throw;
 		}
 	}
 }

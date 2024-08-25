@@ -18,6 +18,9 @@
     <ClCompile Include="Source\Public\Common\Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Common\ExitCodes.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Public\PonyEngine\Compiler\Linking.h">

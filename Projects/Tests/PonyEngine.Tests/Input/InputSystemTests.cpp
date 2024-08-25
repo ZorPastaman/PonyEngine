@@ -148,7 +148,7 @@ namespace Input
 			auto keyboardProvider = KeyboardProvider();
 			engine.systemManager.keyboardProvider = &keyboardProvider;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto inputSystemBase = factory->Create(systemParams);
 			keyboardProvider.expectedObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystemBase.system.get());
 			inputSystemBase.system->Begin();
@@ -165,7 +165,7 @@ namespace Input
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto inputSystemBase = factory->Create(systemParams);
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
@@ -197,7 +197,7 @@ namespace Input
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto inputSystemBase = factory->Create(systemParams);
 			Assert::AreEqual("PonyEngine::Input::InputSystem", inputSystemBase.system->Name());
 		}

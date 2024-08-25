@@ -67,7 +67,7 @@ namespace Game
 
 	PonyEngine::Core::SystemData GameSystemFactory::Create(const PonyEngine::Core::SystemParams& params)
 	{
-		const auto system = new GameSystem(*params.engine);
+		const auto system = new GameSystem(params.engine);
 		const auto deleter = PonyEngine::Core::SystemDeleter(*this);
 		auto interfaces = PonyEngine::Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IGameSystem>(*system);

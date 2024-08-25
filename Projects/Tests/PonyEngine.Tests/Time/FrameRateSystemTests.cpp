@@ -117,7 +117,7 @@ namespace Time
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto frameRateSystemBase = factory->Create(systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 			frameRateSystemBase.system->Begin();
@@ -138,7 +138,7 @@ namespace Time
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto frameRateSystemBase = factory->Create(systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 

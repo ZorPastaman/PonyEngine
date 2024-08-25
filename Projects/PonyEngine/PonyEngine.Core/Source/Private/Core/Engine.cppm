@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Core.Implementation:Engine;
 
 import <cstddef>;
+import <exception>;
 import <format>;
 import <memory>;
 import <stdexcept>;
@@ -21,6 +22,7 @@ import <string>;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
+import PonyEngine.Common;
 
 import :SystemManager;
 
@@ -52,7 +54,7 @@ export namespace PonyEngine::Core
 		virtual bool IsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int ExitCode() const noexcept override;
-		virtual void Stop(int exitCode = 0) noexcept override;
+		virtual void Stop(int exitCode = static_cast<int>(Common::ExitCodes::Success)) noexcept override;
 
 		virtual void Tick() override;
 
@@ -69,6 +71,7 @@ export namespace PonyEngine::Core
 
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
+		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
 
 		Log::ILogger* const logger; ///< Logger.
 		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
@@ -77,6 +80,11 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
+	/// @brief Prepares the @p logger for work.
+	/// @param logger Logger.
+	/// @return Prepared logger.
+	[[nodiscard("Pure function")]]
+	Log::ILogger* PrepareLogger(Log::ILogger& logger) noexcept;
 	/// @brief Creates a system manager.
 	/// @param systemFactories Engine parameters.
 	/// @param engine Engine that owns the manager.
@@ -87,7 +95,8 @@ namespace PonyEngine::Core
 	Engine::Engine(Log::ILogger& logger, const SystemFactoriesContainer& systemFactories) :
 		frameCount{0},
 		isRunning{true},
-		logger{&logger},
+		isTicking{false},
+		logger{PrepareLogger(logger)},
 		systemManager{CreateSystemManager(systemFactories, *this)}
 	{
 		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
@@ -149,20 +158,46 @@ namespace PonyEngine::Core
 
 	void Engine::Tick()
 	{
-		if (!isRunning) // TODO: Throw if the engine is ticked when it's in tick. Need to think about exceptions from SystemManager::Tick().
+		if (!isRunning)
 		{
 			throw std::logic_error("The engine is ticked when it's already been stopped.");
 		}
 
+		if (isTicking)
+		{
+			throw std::logic_error("The engine is ticked inside another tick.");
+		}
+		isTicking = true;
+
 		PONY_LOG(this, Log::LogType::Verbose, "Tick system manager.");
-		systemManager->Tick();
+
+		try
+		{
+			systemManager->Tick();
+		}
+		catch (...)
+		{
+			// Logging is done in the system manager.
+			Stop(static_cast<int>(Common::ExitCodes::SystemTickException));
+			isTicking = false;
+
+			throw;
+		}
 
 		++frameCount;
+		isTicking = false;
 	}
 
 	const char* Engine::Name() const noexcept
 	{
 		return StaticName;
+	}
+
+	Log::ILogger* PrepareLogger(Log::ILogger& logger) noexcept
+	{
+		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "'{}' logger is used by the engine.", logger.Name());
+
+		return &logger;
 	}
 
 	std::unique_ptr<SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine)

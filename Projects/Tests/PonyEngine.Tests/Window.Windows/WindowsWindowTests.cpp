@@ -139,7 +139,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			const wchar_t* title = L"Test title";
@@ -157,7 +157,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", windowsWindow->Name());
@@ -170,7 +170,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			windowsWindow->ShowWindow();
@@ -190,7 +190,7 @@ namespace Window
 			std::wstring title = L"Test title";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
 			factory->NextWindowParams().title = title;
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			Assert::AreEqual(title.c_str(), windowsWindow->Title());
@@ -208,7 +208,7 @@ namespace Window
 			params.verticalPosition = 32;
 			params.width = 320;
 			params.height = 240;
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			RECT rect;
@@ -226,7 +226,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			PostMessageW(windowsWindow->WindowHandle(), WM_DESTROY, 0, 0);
@@ -241,7 +241,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindow*>(window.system.get());
 			auto keyboardObserver = KeyboardObserver();

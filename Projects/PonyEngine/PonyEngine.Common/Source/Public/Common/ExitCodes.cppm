@@ -7,6 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Common;
+export module PonyEngine.Common:ExitCodes;
 
-export import :ExitCodes;
+export namespace PonyEngine::Common
+{
+	/// @brief Exit codes that are returned from main().
+	///	@remark The enum is always int based.
+	enum class ExitCodes : int
+	{
+		Success = 0,
+		SystemTickException = 1
+	};
+}

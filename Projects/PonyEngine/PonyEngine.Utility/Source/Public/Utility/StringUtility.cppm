@@ -72,7 +72,7 @@ namespace PonyEngine::Utility
 	{
 		try
 		{
-			return std::format(format, std::forward<Args>(args)...);
+			return std::format(format, std::forward<Args>(args)...); // TODO: If a formatter throws an exception, add its what() as a format argument instead of returning empty string.
 		}
 		catch (...)
 		{

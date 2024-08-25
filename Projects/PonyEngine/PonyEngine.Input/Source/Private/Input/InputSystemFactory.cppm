@@ -51,7 +51,7 @@ namespace PonyEngine::Input
 {
 	Core::SystemData InputSystemFactory::Create(const Core::SystemParams& params)
 	{
-		const auto system = new InputSystem(*params.engine);
+		const auto system = new InputSystem(params.engine);
 		const auto deleter = Core::SystemDeleter(*this);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IInputSystem>(*system);

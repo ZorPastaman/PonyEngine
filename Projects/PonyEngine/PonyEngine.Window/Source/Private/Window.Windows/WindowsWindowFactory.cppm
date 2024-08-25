@@ -149,7 +149,7 @@ namespace PonyEngine::Window
 		};
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create Windows window.");
-		const auto system = new WindowsWindowSystem(*params.engine, hInstance, classAtom, createWindowParams);
+		const auto system = new WindowsWindowSystem(params.engine, hInstance, classAtom, createWindowParams);
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Windows window created.");
 		const HWND hWnd = system->WindowHandle();
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
