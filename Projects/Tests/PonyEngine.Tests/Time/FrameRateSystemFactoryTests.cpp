@@ -120,7 +120,7 @@ namespace Time
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto inputSystem = factory->Create(systemParams);
 			Assert::IsNotNull(inputSystem.system.get());
 		}

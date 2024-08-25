@@ -63,7 +63,7 @@ namespace PonyEngine::Time
 
 	Core::SystemData FrameRateSystemFactory::Create(const Core::SystemParams& params)
 	{
-		const auto system = new FrameRateSystem(*params.engine, frameTime);
+		const auto system = new FrameRateSystem(params.engine, frameTime);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 

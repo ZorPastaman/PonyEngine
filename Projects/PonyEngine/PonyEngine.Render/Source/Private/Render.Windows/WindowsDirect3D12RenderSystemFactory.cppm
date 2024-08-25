@@ -52,7 +52,7 @@ namespace PonyEngine::Render
 {
 	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(const Core::SystemParams& params)
 	{
-		const auto system = new WindowsDirect3D12RenderSystem(*params.engine);
+		const auto system = new WindowsDirect3D12RenderSystem(params.engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IRenderSystem>(*system);
 

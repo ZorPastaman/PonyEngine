@@ -165,7 +165,7 @@ namespace Core
 		TEST_METHOD(CreateTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 			Assert::IsNotNull(engine.engine.get());
 			Assert::IsNotNull(engine.tickableEngine);
@@ -174,7 +174,7 @@ namespace Core
 		TEST_METHOD(GetFrameCountTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{ .logger = &logger };
+			const auto params = PonyEngine::Core::EngineParams{ .logger = logger };
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 
 			for (std::size_t i = 0; i < 10; ++i)
@@ -188,7 +188,7 @@ namespace Core
 		TEST_METHOD(GetLoggerTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			const auto engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&engine.engine->Logger()));
 		}
@@ -196,7 +196,7 @@ namespace Core
 		TEST_METHOD(ExitTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			auto engine = PonyEngine::Core::CreateEngine(params);
 			Assert::IsTrue(engine.engine->IsRunning());
 			engine.engine->Stop();
@@ -211,7 +211,7 @@ namespace Core
 		TEST_METHOD(GetNameTest)
 		{
 			auto logger = EmptyLogger();
-			auto params = PonyEngine::Core::EngineParams{ .logger = &logger };
+			auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			auto engine = PonyEngine::Core::CreateEngine(params);
 			Assert::AreEqual("PonyEngine::Core::Engine", engine.engine->Name());
 		}
@@ -220,7 +220,7 @@ namespace Core
 		{
 			auto logger = EmptyLogger();
 			EmptySystemFactory systemFactory;
-			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			params.systemFactories.AddSystemFactory(systemFactory);
 			auto engine = PonyEngine::Core::CreateEngine(params);
 
@@ -247,7 +247,7 @@ namespace Core
 			auto logger = EmptyLogger();
 			auto systemFactory = EmptySystemFactory();
 			auto system1Factory = EmptySystem1Factory();
-			auto params = PonyEngine::Core::EngineParams{.logger = &logger};
+			auto params = PonyEngine::Core::EngineParams{.logger = logger};
 			params.systemFactories.AddSystemFactory(systemFactory);
 			params.systemFactories.AddSystemFactory(system1Factory);
 			const auto engine = PonyEngine::Core::CreateEngine(params);

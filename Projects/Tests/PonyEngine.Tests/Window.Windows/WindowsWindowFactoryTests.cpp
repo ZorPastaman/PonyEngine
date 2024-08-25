@@ -119,7 +119,7 @@ namespace Window
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = &engine};
+			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
 			auto window = factory->Create(systemParams);
 			Assert::IsNotNull(window.system.get());
 		}

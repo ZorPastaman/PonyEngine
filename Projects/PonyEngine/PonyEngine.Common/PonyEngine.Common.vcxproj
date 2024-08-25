@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Common\Common.cppm" />
+    <ClCompile Include="Source\Public\Common\ExitCodes.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyEngine.Common.rc" />

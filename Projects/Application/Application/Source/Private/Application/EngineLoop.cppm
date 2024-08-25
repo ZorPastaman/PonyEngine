@@ -93,7 +93,7 @@ namespace Application
 	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider)
 	{
 		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create engine params.");
-		auto engineParams = PonyEngine::Core::EngineParams{.logger = &logger};
+		auto engineParams = PonyEngine::Core::EngineParams{.logger = logger};
 		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
 		systemFactoriesProvider.AddSystemFactories(engineParams.systemFactories);
 		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "System factories added.");
