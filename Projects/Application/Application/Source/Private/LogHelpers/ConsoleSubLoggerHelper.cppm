@@ -9,11 +9,11 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module LogHelpers:ConsoleSubLoggerHelper;
-
-import <stdexcept>;
 
 import PonyEngine.Log.Implementation;
 
@@ -40,10 +40,7 @@ namespace LogHelpers
 	PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger(const PonyEngine::Log::ConsoleSubLoggerParams& params)
 	{
 		PonyEngine::Log::ConsoleSubLoggerData consoleSubLoggerData = PonyEngine::Log::CreateConsoleSubLogger(params);
-		if (!consoleSubLoggerData.subLogger)
-		{
-			throw std::logic_error("The console sub-logger is nullptr.");
-		}
+		assert(consoleSubLoggerData.subLogger && "The console sub-logger is nullptr.");
 
 		return consoleSubLoggerData;
 	}

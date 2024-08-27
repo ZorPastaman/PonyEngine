@@ -77,13 +77,13 @@ namespace Core
 		{
 			auto factory = EmptySystemFactory();
 			auto deleter = PonyEngine::Core::SystemDeleter(factory);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&deleter.SystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(deleter.SystemDestroyer()));
 
 			const auto copiedDeleter = deleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&copiedDeleter.SystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(copiedDeleter.SystemDestroyer()));
 
 			const auto movedDeleter = std::move(deleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&movedDeleter.SystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(movedDeleter.SystemDestroyer()));
 		}
 
 		TEST_METHOD(DeleteTest)
@@ -103,10 +103,10 @@ namespace Core
 			auto otherDeleter = PonyEngine::Core::SystemDeleter(otherFactory);
 
 			otherDeleter = deleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.SystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(otherDeleter.SystemDestroyer()));
 
 			otherDeleter = std::move(deleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(&otherDeleter.SystemDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(static_cast<PonyEngine::Core::ISystemDestroyer*>(&factory)), reinterpret_cast<std::uintptr_t>(otherDeleter.SystemDestroyer()));
 		}
 	};
 }

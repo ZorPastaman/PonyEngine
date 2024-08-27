@@ -59,6 +59,11 @@ export namespace PonyEngine::Utility
 
 namespace PonyEngine::Utility
 {
+	struct EmptyExceptionHandler final
+	{
+		void operator ()(const std::exception&) const noexcept {}
+	};
+
 	std::string ConvertToString(const std::wstring& source)
 	{
 		std::string answer(source.length(), 0);
@@ -70,29 +75,13 @@ namespace PonyEngine::Utility
 	template<typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		try
-		{
-			return std::format(format, std::forward<Args>(args)...); // TODO: If a formatter throws an exception, add its what() as a format argument instead of returning empty string.
-		}
-		catch (...)
-		{
-			return std::string();
-		}
+		return SafeFormat<EmptyExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
 	{
-		try
-		{
-			return std::format(format, std::forward<Args>(args)...);
-		}
-		catch (const std::exception& e)
-		{
-			ExceptionHandler()(e);
-
-			return std::string();
-		}
+		return SafeFormat(ExceptionHandler(), format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>

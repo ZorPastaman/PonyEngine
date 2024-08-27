@@ -13,8 +13,11 @@ export namespace PonyEngine::Common
 {
 	/// @brief Exit codes that are returned from main().
 	///	@remark The enum is always int based.
+	///	@remark Negative exit codes are returned by an application, positive are returned by an engine.
 	enum class ExitCodes : int
 	{
+		EngineTickException = -2,
+		ApplicationException = -1,
 		Success = 0,
 		SystemTickException = 1
 	};

@@ -19,6 +19,8 @@ export namespace PonyEngine::Log
 	class SubLoggerDeleter final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		SubLoggerDeleter() noexcept = default;
 		/// @brief Creates a @p SubLoggerDeleter.
 		/// @param subLoggerDestroyer Logger destroyer to use.
 		[[nodiscard("Pure constructor")]]
@@ -33,7 +35,7 @@ export namespace PonyEngine::Log
 		/// @brief Gets the sub-logger destroyer.
 		/// @return Sub-logger destroyer.
 		[[nodiscard("Pure function")]]
-		ISubLoggerDestroyer& SubLoggerDestroyer() const noexcept;
+		ISubLoggerDestroyer* SubLoggerDestroyer() const noexcept;
 
 		/// @brief Destroys the @p subLogger.
 		/// @param subLogger Sub-logger to destroy.
@@ -56,14 +58,17 @@ namespace PonyEngine::Log
 	{
 	}
 
-	ISubLoggerDestroyer& SubLoggerDeleter::SubLoggerDestroyer() const noexcept
+	ISubLoggerDestroyer* SubLoggerDeleter::SubLoggerDestroyer() const noexcept
 	{
-		return *subLoggerDestroyer;
+		return subLoggerDestroyer;
 	}
 
 	void SubLoggerDeleter::operator ()(ISubLogger* const subLogger) const noexcept
 	{
-		subLoggerDestroyer->Destroy(subLogger);
+		if (subLoggerDestroyer)
+		{
+			subLoggerDestroyer->Destroy(subLogger);
+		}
 	}
 
 }

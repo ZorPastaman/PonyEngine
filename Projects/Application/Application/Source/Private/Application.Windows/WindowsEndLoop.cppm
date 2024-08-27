@@ -14,9 +14,6 @@ module;
 
 export module Application.Windows:WindowsEndLoop;
 
-import <format>;
-import <iostream>;
-
 import PonyEngine.Log;
 
 import Application;

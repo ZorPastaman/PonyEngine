@@ -9,11 +9,11 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module LogHelpers:LoggerHelper;
-
-import <stdexcept>;
 
 import PonyEngine.Log.Implementation;
 
@@ -40,10 +40,7 @@ namespace LogHelpers
 	PonyEngine::Log::LoggerData CreateLogger(const PonyEngine::Log::LoggerParams& params)
 	{
 		PonyEngine::Log::LoggerData loggerData = PonyEngine::Log::CreateLogger(params);
-		if (!loggerData.logger)
-		{
-			throw std::logic_error("The logger is nullptr.");
-		}
+		assert(loggerData.logger && "The logger is nullptr.");
 
 		return loggerData;
 	}

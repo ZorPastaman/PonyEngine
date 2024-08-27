@@ -13,9 +13,11 @@ module;
 
 export module Application:EngineLoop;
 
+import <exception>;
 import <format>;
 import <stdexcept>;
 
+import PonyEngine.Common;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 import PonyEngine.Time;
@@ -77,7 +79,27 @@ namespace Application
 	bool EngineLoop::Tick(int& exitCode)
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Verbose, "Tick engine.");
-		engine.tickableEngine->Tick();
+
+		try
+		{
+			engine.tickableEngine->Tick();
+		}
+		catch (const std::exception& e)
+		{
+			if (!engine.engine->IsRunning())
+			{
+				// Logging is done in the engine.
+				exitCode = engine.engine->ExitCode();
+
+				return true;
+			}
+
+			PONY_LOG_E_GENERAL(logger, e, "On ticking the engine.")
+
+			exitCode = static_cast<int>(PonyEngine::Common::ExitCodes::EngineTickException);
+
+			return true;
+		}
 
 		if (engine.engine->IsRunning()) [[likely]]
 		{
@@ -92,15 +114,13 @@ namespace Application
 
 	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider)
 	{
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create engine params.");
-		auto engineParams = PonyEngine::Core::EngineParams{.logger = logger};
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "Add system factories.");
-		systemFactoriesProvider.AddSystemFactories(engineParams.systemFactories);
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "System factories added.");
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Engine params created.");
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Gather engine system factories.");
+		auto factories = PonyEngine::Core::SystemFactoriesContainer();
+		systemFactoriesProvider.AddSystemFactories(factories);
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Engine system factories gathered.");
 
 		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create and set up engine.");
-		auto engine = CoreHelpers::CreateAndSetupEngine(engineParams);
+		auto engine = CoreHelpers::CreateAndSetupEngine(logger, factories);
 		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' engine created and set up.", engine.engine->Name());
 
 		return engine;
