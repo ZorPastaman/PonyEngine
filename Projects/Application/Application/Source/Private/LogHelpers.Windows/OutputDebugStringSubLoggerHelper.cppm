@@ -9,11 +9,11 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module LogHelpers.Windows:OutputDebugStringSubLoggerHelper;
-
-import <stdexcept>;
 
 import PonyEngine.Log.Windows.Implementation;
 
@@ -40,10 +40,7 @@ namespace LogHelpers
 	PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const PonyEngine::Log::OutputDebugStringSubLoggerParams& params)
 	{
 		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLoggerData = PonyEngine::Log::CreateOutputDebugStringSubLogger(params);
-		if (!outputDebugStringSubLoggerData.subLogger)
-		{
-			throw std::logic_error("The output debug string sub-logger is nullptr.");
-		}
+		assert(outputDebugStringSubLoggerData.subLogger && "The output debug string sub-logger is nullptr.");
 
 		return outputDebugStringSubLoggerData;
 	}

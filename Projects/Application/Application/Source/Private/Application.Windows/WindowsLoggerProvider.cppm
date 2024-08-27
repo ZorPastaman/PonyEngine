@@ -15,7 +15,6 @@ export module Application.Windows:WindowsLoggerProvider;
 
 import <array>;
 import <exception>;
-import <iostream>;
 
 import PonyEngine.Log.Windows.Factory;
 

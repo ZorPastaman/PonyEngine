@@ -19,6 +19,8 @@ export namespace PonyEngine::Log
 	class LoggerDeleter final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		LoggerDeleter() noexcept = default;
 		/// @brief Creates a @p LoggerDeleter.
 		/// @param loggerDestroyer Logger destroyer to use.
 		[[nodiscard("Pure constructor")]]
@@ -33,7 +35,7 @@ export namespace PonyEngine::Log
 		/// @brief Gets the logger destroyer.
 		/// @return Logger destroyer.
 		[[nodiscard("Pure function")]]
-		ILoggerDestroyer& LoggerDestroyer() const noexcept;
+		ILoggerDestroyer* LoggerDestroyer() const noexcept;
 
 		/// @brief Destroys the @p logger.
 		/// @param logger Logger to destroy.
@@ -56,14 +58,17 @@ namespace PonyEngine::Log
 	{
 	}
 
-	ILoggerDestroyer& LoggerDeleter::LoggerDestroyer() const noexcept
+	ILoggerDestroyer* LoggerDeleter::LoggerDestroyer() const noexcept
 	{
-		return *loggerDestroyer;
+		return loggerDestroyer;
 	}
 
 	void LoggerDeleter::operator ()(ILogger* const logger) const noexcept
 	{
-		loggerDestroyer->Destroy(logger);
+		if (loggerDestroyer)
+		{
+			loggerDestroyer->Destroy(logger);
+		}
 	}
 
 }

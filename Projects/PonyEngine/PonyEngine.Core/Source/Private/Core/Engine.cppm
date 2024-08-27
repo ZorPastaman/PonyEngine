@@ -147,8 +147,8 @@ namespace PonyEngine::Core
 		if (isRunning)
 		{
 			PONY_LOG(this, Log::LogType::Info, "Stop the engine with the exit code '{}'.", exitCode);
-			isRunning = false;
 			engineExitCode = exitCode;
+			isRunning = false;
 		}
 		else
 		{

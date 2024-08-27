@@ -116,13 +116,13 @@ namespace Core
 		{
 			auto engineDestroyer = EngineDestroyer();
 			const auto engineDeleter = PonyEngine::Core::EngineDeleter(engineDestroyer);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(&engineDeleter.EngineDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(engineDeleter.EngineDestroyer()));
 
 			PonyEngine::Core::EngineDeleter copiedEngineDeleter = engineDeleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(&copiedEngineDeleter.EngineDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(copiedEngineDeleter.EngineDestroyer()));
 
 			const PonyEngine::Core::EngineDeleter movedEngineDeleter = std::move(copiedEngineDeleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(&movedEngineDeleter.EngineDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(movedEngineDeleter.EngineDestroyer()));
 		}
 
 		TEST_METHOD(DeleteTest)
@@ -144,11 +144,11 @@ namespace Core
 
 			auto copiedEngineDeleter = PonyEngine::Core::EngineDeleter(anotherEngineDestroyer);
 			copiedEngineDeleter = engineDeleter;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(&copiedEngineDeleter.EngineDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(copiedEngineDeleter.EngineDestroyer()));
 
 			auto movedEngineDeleter = PonyEngine::Core::EngineDeleter(anotherEngineDestroyer);
 			movedEngineDeleter = std::move(engineDeleter);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(&movedEngineDeleter.EngineDestroyer()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&engineDestroyer), reinterpret_cast<std::uintptr_t>(movedEngineDeleter.EngineDestroyer()));
 		}
 	};
 }

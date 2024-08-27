@@ -11,14 +11,11 @@
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 import <exception>;
-import <format>;
-import <iostream>;
 
+import PonyEngine.Common;
 import PonyEngine.Log;
 
 import Application.Windows;
-
-constexpr int ExceptionCode = -1; // TODO: make a good exception handling system.
 
 int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
@@ -49,6 +46,6 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 	catch (const std::exception& e)
 	{
 		PONY_CONSOLE_E(e, "On main().");
-		return ExceptionCode;
+		return static_cast<int>(PonyEngine::Common::ExitCodes::ApplicationException);
 	}
 }

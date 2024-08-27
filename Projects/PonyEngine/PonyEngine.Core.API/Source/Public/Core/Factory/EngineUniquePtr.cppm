@@ -19,6 +19,8 @@ export namespace PonyEngine::Core
 	class EngineDeleter final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		EngineDeleter() noexcept = default;
 		/// @brief Creates an @p EngineDeleter.
 		/// @param engineDestroyer Engine destroyer to use.
 		[[nodiscard("Pure constructor")]]
@@ -33,7 +35,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine destroyer.
 		/// @return Engine destroyer.
 		[[nodiscard("Pure function")]]
-		IEngineDestroyer& EngineDestroyer() const noexcept;
+		IEngineDestroyer* EngineDestroyer() const noexcept;
 
 		/// @brief Deletes the @p engine.
 		/// @param engine Engine to delete.
@@ -56,13 +58,16 @@ namespace PonyEngine::Core
 	{
 	}
 
-	IEngineDestroyer& EngineDeleter::EngineDestroyer() const noexcept
+	IEngineDestroyer* EngineDeleter::EngineDestroyer() const noexcept
 	{
-		return *engineDestroyer;
+		return engineDestroyer;
 	}
 
 	void EngineDeleter::operator ()(IEngine* const engine) const noexcept
 	{
-		engineDestroyer->Destroy(engine);
+		if (engineDestroyer)
+		{
+			engineDestroyer->Destroy(engine);
+		}
 	}
 }

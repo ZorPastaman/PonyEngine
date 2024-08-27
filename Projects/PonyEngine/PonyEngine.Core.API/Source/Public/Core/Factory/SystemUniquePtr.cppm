@@ -21,6 +21,8 @@ export namespace PonyEngine::Core
 	class SystemDeleter final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		SystemDeleter() noexcept = default;
 		/// @brief Creates a @p SystemDeleter.
 		/// @param destroyer System destroyer to use.
 		[[nodiscard("Pure constructor")]]
@@ -35,7 +37,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system destroyer.
 		/// @return System destroyer.
 		[[nodiscard("Pure function")]]
-		ISystemDestroyer& SystemDestroyer() const noexcept;
+		ISystemDestroyer* SystemDestroyer() const noexcept;
 
 		/// @brief Deletes the @p system.
 		/// @param system System to delete.
@@ -58,13 +60,16 @@ namespace PonyEngine::Core
 	{
 	}
 
-	ISystemDestroyer& SystemDeleter::SystemDestroyer() const noexcept
+	ISystemDestroyer* SystemDeleter::SystemDestroyer() const noexcept
 	{
-		return *destroyer;
+		return destroyer;
 	}
 
 	void SystemDeleter::operator ()(ISystem* const system) const noexcept
 	{
-		destroyer->Destroy(system);
+		if (destroyer)
+		{
+			destroyer->Destroy(system);
+		}
 	}
 }

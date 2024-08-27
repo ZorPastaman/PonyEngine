@@ -9,12 +9,13 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module LogHelpers:FileSubLoggerHelper;
 
 import <filesystem>;
-import <stdexcept>;
 
 import PonyEngine.Log.Implementation;
 import PonyEngine.StringUtility;
@@ -42,17 +43,16 @@ namespace LogHelpers
 	PonyEngine::Log::FileSubLoggerData CreateFileSubLogger(const PonyEngine::Log::FileSubLoggerParams& params)
 	{
 		PonyEngine::Log::FileSubLoggerData fileSubLoggerData = PonyEngine::Log::CreateFileSubLogger(params);
-		if (!fileSubLoggerData.subLogger)
-		{
-			throw std::logic_error("The file sub-logger is nullptr.");
-		}
+		assert(fileSubLoggerData.subLogger && "The file sub-logger is nullptr.");
 
 		return fileSubLoggerData;
 	}
 
 	PonyEngine::Log::FileSubLoggerData CreateAndSetupFileSubLogger()
 	{
+		PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Create file sub-logger params.");
 		const PonyEngine::Log::FileSubLoggerParams params = CreateFileSubLoggerParams();
+		PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "File sub-logger params created.");
 
 		PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Create file sub-logger. Log file path: '{}'.", PonyEngine::Utility::ConvertToString(params.logPath.c_str()));
 		PonyEngine::Log::FileSubLoggerData fileSubLoggerData = LogHelpers::CreateFileSubLogger(params);
@@ -63,6 +63,6 @@ namespace LogHelpers
 
 	PonyEngine::Log::FileSubLoggerParams CreateFileSubLoggerParams()
 	{
-		return PonyEngine::Log::FileSubLoggerParams{.logPath = "Log.log"};
+		return PonyEngine::Log::FileSubLoggerParams();
 	}
 }
