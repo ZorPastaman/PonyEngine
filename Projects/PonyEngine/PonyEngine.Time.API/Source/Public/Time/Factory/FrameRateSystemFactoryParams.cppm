@@ -7,11 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Application.Windows;
+export module PonyEngine.Time.Factory:FrameRateSystemFactoryParams;
 
-export import Application;
-
-export import :WindowsEndLoop;
-export import :WindowsEngineSetupAgent;
-export import :WindowsLoggerProvider;
-export import :WindowsSystemFactoriesProvider;
+export namespace PonyEngine::Time
+{
+	/// @brief Frame rate system factory parameters.
+	struct FrameRateSystemFactoryParams final
+	{
+	};
+}

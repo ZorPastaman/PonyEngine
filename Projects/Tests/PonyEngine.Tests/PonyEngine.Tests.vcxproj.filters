@@ -141,5 +141,8 @@
     <ClCompile Include="Core\SystemFactoriesContainerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

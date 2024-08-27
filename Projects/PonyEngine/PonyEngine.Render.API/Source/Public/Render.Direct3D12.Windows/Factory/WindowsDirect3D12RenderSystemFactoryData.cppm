@@ -7,11 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Application.Windows;
+export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderSystemFactoryData;
 
-export import Application;
+import PonyEngine.Core.Factory;
 
-export import :WindowsEndLoop;
-export import :WindowsEngineSetupAgent;
-export import :WindowsLoggerProvider;
-export import :WindowsSystemFactoriesProvider;
+export namespace PonyEngine::Render
+{
+	/// @brief Direct3D 12 render system for Windows factory data.
+	struct WindowsDirect3D12RenderSystemFactoryData final
+	{
+		Core::SystemFactoryUniquePtr systemFactory; ///< Render system factory.
+	};
+}

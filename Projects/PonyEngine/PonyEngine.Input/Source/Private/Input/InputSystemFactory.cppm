@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
+import <utility>;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Factory;
 
@@ -21,7 +23,7 @@ import :InputSystem;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system factory.
-	class InputSystemFactory final : public IInputSystemFactory, public Core::ISystemDestroyer
+	class InputSystemFactory final : public Core::ISystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		InputSystemFactory() noexcept = default;
@@ -60,7 +62,7 @@ namespace PonyEngine::Input
 		{
 			.system = Core::SystemUniquePtr(system, deleter),
 			.tickableSystem = system,
-			.publicInterfaces = interfaces
+			.publicInterfaces = std::move(interfaces)
 		};
 	}
 

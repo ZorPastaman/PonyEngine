@@ -116,9 +116,9 @@ namespace Time
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto frameRateSystemBase = factory->Create(systemParams);
+			auto frameRateSystemBase = factory.systemFactory->Create(systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 			frameRateSystemBase.system->Begin();
 			float frameTime = 5.f;
@@ -137,29 +137,18 @@ namespace Time
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto frameRateSystemBase = factory->Create(systemParams);
+			auto frameRateSystemBase = factory.systemFactory->Create(systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
-			Assert::AreEqual(0.f, frameRateSystem->TargetFrameRate());
 
 			frameRateSystem->TargetFrameTime(0.16f);
 			Assert::AreEqual(0.16f, frameRateSystem->TargetFrameTime());
-			Assert::AreEqual(1.f / 0.16f, frameRateSystem->TargetFrameRate());
 
 			frameRateSystem->TargetFrameTime(0.f);
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
-			Assert::AreEqual(0.f, frameRateSystem->TargetFrameRate());
-
-			frameRateSystem->TargetFrameRate(90.f);
-			Assert::AreEqual(1.f / 90.f, frameRateSystem->TargetFrameTime());
-			Assert::AreEqual(90.f, frameRateSystem->TargetFrameRate());
-
-			frameRateSystem->TargetFrameRate(0.f);
-			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
-			Assert::AreEqual(0.f, frameRateSystem->TargetFrameRate());
 		}
 	};
 }

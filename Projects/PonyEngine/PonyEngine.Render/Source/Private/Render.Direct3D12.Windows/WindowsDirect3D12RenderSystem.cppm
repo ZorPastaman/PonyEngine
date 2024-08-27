@@ -15,7 +15,7 @@ import PonyEngine.Render;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows.
-	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public Core::ITickableSystem, public IRenderSystem // TODO: Add IDirect3D12RenderSystem
+	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public Core::ITickableSystem, public IRenderSystem
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.

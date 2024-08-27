@@ -118,30 +118,30 @@ namespace Input
 
 		TEST_METHOD(CreateTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::IsNotNull(factory.get());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			const auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
 			const auto factoryParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystem = factory->Create(factoryParams);
+			auto inputSystem = factory.systemFactory->Create(factoryParams);
 			Assert::IsNotNull(inputSystem.system.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystem", factory->SystemName());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			Assert::AreEqual("PonyEngine::Input::InputSystem", factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
-			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory->Name());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory.systemFactory->Name());
 		}
 	};
 }

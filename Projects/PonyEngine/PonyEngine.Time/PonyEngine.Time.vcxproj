@@ -30,6 +30,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Time\FrameRateSystem.cppm" />
     <ClCompile Include="Source\Private\Time\FrameRateSystemFactory.cppm" />
+    <ClCompile Include="Source\Private\Time\FrameRateSystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Time\Time.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
