@@ -31,10 +31,13 @@
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Factory\IRenderSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\Render.Direct3D12.Windows.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

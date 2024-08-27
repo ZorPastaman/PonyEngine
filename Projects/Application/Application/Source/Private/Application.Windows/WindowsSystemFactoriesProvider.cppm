@@ -52,11 +52,11 @@ export namespace Application
 
 		// Set all factories here.
 
-		PonyEngine::Time::FrameRateUniquePtr frameRateSystemFactory; ///< Frame rate system factory.
+		PonyEngine::Core::SystemFactoryUniquePtr frameRateSystemFactory; ///< Frame rate system factory.
 		PonyEngine::Window::WindowsWindowUniquePtr windowsWindowSystemFactory; ///< Window system factory.
-		PonyEngine::Input::InputUniquePtr inputSystemFactory; ///< Input system factory.
+		PonyEngine::Core::SystemFactoryUniquePtr inputSystemFactory; ///< Input system factory.
 		Game::GameUniquePtr gameSystemFactory; ///< Game system factory.
-		PonyEngine::Render::WindowsDirect3D12RenderUniquePtr windowsDirect3D12RenderFactory; ///< Direct3D 12 render system for Windows factory.
+		PonyEngine::Core::SystemFactoryUniquePtr windowsDirect3D12RenderFactory; ///< Direct3D 12 render system for Windows factory.
 	};
 }
 
@@ -68,12 +68,11 @@ namespace Application
 		// Create all factories here.
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create frame rate system factory.");
-		frameRateSystemFactory = PonyEngine::Time::CreateFrameRateSystemFactory();
+		frameRateSystemFactory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams()).systemFactory;
 		if (!frameRateSystemFactory)
 		{
 			throw std::logic_error("The frame rate system factory is nullptr.");
 		}
-		frameRateSystemFactory->TargetFrameRate(165);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Frame rate system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
@@ -102,7 +101,7 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
-		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory();
+		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams()).systemFactory;
 		if (!inputSystemFactory)
 		{
 			throw std::logic_error("The input system factory is nullptr.");
@@ -118,7 +117,7 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
 
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
-		windowsDirect3D12RenderFactory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory();
+		windowsDirect3D12RenderFactory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams()).systemFactory;
 		if (!windowsDirect3D12RenderFactory)
 		{
 			throw std::logic_error("The Direct3D 12 render system for Windows factory is nullptr");

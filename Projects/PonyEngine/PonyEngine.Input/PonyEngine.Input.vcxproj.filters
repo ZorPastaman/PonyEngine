@@ -24,6 +24,9 @@
     <ClCompile Include="Source\Public\Input\Input.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Input\InputSystemFactoryDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

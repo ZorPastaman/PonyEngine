@@ -147,15 +147,15 @@ namespace Input
 			auto engine = EmptyEngine(logger);
 			auto keyboardProvider = KeyboardProvider();
 			engine.systemManager.keyboardProvider = &keyboardProvider;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory->Create(systemParams);
+			auto inputSystemBase = factory.systemFactory->Create(systemParams);
 			keyboardProvider.expectedObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystemBase.system.get());
 			inputSystemBase.system->Begin();
 			inputSystemBase.system->End();
 
 			engine.systemManager.keyboardProvider = nullptr;
-			inputSystemBase = factory->Create(systemParams);
+			inputSystemBase = factory.systemFactory->Create(systemParams);
 			inputSystemBase.system->Begin();
 			inputSystemBase.system->End();
 		}
@@ -164,9 +164,9 @@ namespace Input
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory->Create(systemParams);
+			auto inputSystemBase = factory.systemFactory->Create(systemParams);
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
 			inputSystemBase.system->Begin();
@@ -196,9 +196,9 @@ namespace Input
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory->Create(systemParams);
+			auto inputSystemBase = factory.systemFactory->Create(systemParams);
 			Assert::AreEqual("PonyEngine::Input::InputSystem", inputSystemBase.system->Name());
 		}
 	};

@@ -11,4 +11,5 @@ export module PonyEngine.Time.Factory;
 
 export import PonyEngine.Time;
 
-export import :IFrameRateSystemFactory;
+export import :FrameRateSystemFactoryData;
+export import :FrameRateSystemFactoryParams;

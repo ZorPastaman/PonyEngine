@@ -7,11 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Application.Windows;
+export module PonyEngine.Input.Factory:InputSystemFactoryData;
 
-export import Application;
+import PonyEngine.Core.Factory;
 
-export import :WindowsEndLoop;
-export import :WindowsEngineSetupAgent;
-export import :WindowsLoggerProvider;
-export import :WindowsSystemFactoriesProvider;
+export namespace PonyEngine::Input
+{
+	/// @brief Input system factory data.
+	struct InputSystemFactoryData final
+	{
+		Core::SystemFactoryUniquePtr systemFactory; ///< Input system factory.
+	};
+}

@@ -13,16 +13,18 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystemFactory;
 
+import <utility>;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.Render.Factory;
+import PonyEngine.Render.Direct3D12.Windows.Factory;
 
 import :WindowsDirect3D12RenderSystem;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows factory.
-	class WindowsDirect3D12RenderSystemFactory final : public IRenderSystemFactory, public Core::ISystemDestroyer
+	class WindowsDirect3D12RenderSystemFactory final : public Core::ISystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -60,7 +62,7 @@ namespace PonyEngine::Render
 		{
 			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
 			.tickableSystem = system,
-			.publicInterfaces = interfaces
+			.publicInterfaces = std::move(interfaces)
 		};
 	}
 

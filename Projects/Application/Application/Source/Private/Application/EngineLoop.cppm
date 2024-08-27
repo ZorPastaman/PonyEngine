@@ -24,6 +24,7 @@ import PonyEngine.Time;
 
 import CoreHelpers;
 
+import :IEngineSetupAgent;
 import :ILoopElement;
 import :ISystemFactoriesProvider;
 
@@ -36,8 +37,9 @@ export namespace Application
 		/// @brief Creates an engine loop.
 		/// @param loggerToUse Logger to use.
 		/// @param systemFactoriesProvider Engine system factories provider.
+		/// @param engineSetupAgent Engine set-up agent.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider);
+		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const IEngineSetupAgent& engineSetupAgent);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -63,10 +65,11 @@ namespace Application
 	[[nodiscard("Pure function")]]
 	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider);
 
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider) :
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const IEngineSetupAgent& engineSetupAgent) :
 		logger{&loggerToUse},
 		engine{CreateEngine(*logger, systemFactoriesProvider)}
 	{
+		engineSetupAgent.Setup(*engine.engine);
 	}
 
 	EngineLoop::~EngineLoop() noexcept

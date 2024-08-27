@@ -72,6 +72,12 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factory\ISystemFactoryDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Core\Factory\SystemFactoryUniquePtr.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Time.Implementation:FrameRateSystemFactory;
 
+import <utility>;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Time.Factory;
 
@@ -21,11 +23,11 @@ import :FrameRateSystem;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system factory.
-	class FrameRateSystemFactory final : public IFrameRateSystemFactory, public Core::ISystemDestroyer
+	class FrameRateSystemFactory final : public Core::ISystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		FrameRateSystemFactory() noexcept;
+		FrameRateSystemFactory() noexcept = default;
 		FrameRateSystemFactory(const FrameRateSystemFactory&) = delete;
 		FrameRateSystemFactory(FrameRateSystemFactory&&) = delete;
 
@@ -36,10 +38,6 @@ export namespace PonyEngine::Time
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual float TargetFrameTime() const noexcept override;
-		virtual void TargetFrameTime(float frameTimeToSet) noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -48,22 +46,14 @@ export namespace PonyEngine::Time
 		FrameRateSystemFactory& operator =(FrameRateSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "PonyEngine::Time::FrameRateSystemFactory"; ///< Class name.
-
-	private:
-		float frameTime;
 	};
 }
 
 namespace PonyEngine::Time
 {
-	FrameRateSystemFactory::FrameRateSystemFactory() noexcept :
-		frameTime{0.f}
-	{
-	}
-
 	Core::SystemData FrameRateSystemFactory::Create(const Core::SystemParams& params)
 	{
-		const auto system = new FrameRateSystem(params.engine, frameTime);
+		const auto system = new FrameRateSystem(params.engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 
@@ -71,7 +61,7 @@ namespace PonyEngine::Time
 		{
 			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
 			.tickableSystem = system,
-			.publicInterfaces = interfaces
+			.publicInterfaces = std::move(interfaces)
 		};
 	}
 
@@ -79,16 +69,6 @@ namespace PonyEngine::Time
 	{
 		assert((dynamic_cast<FrameRateSystem*>(system) && "Tried to destroy a system of the wrong type."));
 		delete static_cast<FrameRateSystem*>(system);
-	}
-
-	float FrameRateSystemFactory::TargetFrameTime() const noexcept
-	{
-		return frameTime;
-	}
-
-	void FrameRateSystemFactory::TargetFrameTime(const float frameTimeToSet) noexcept
-	{
-		frameTime = frameTimeToSet;
 	}
 
 	const char* FrameRateSystemFactory::SystemName() const noexcept

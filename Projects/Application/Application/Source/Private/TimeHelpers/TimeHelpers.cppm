@@ -7,8 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Factory;
+export module TimeHelpers;
 
-export import PonyEngine.Render;
-
-export import :IRenderSystemFactory;
+export import :FrameRateSystemHelper;

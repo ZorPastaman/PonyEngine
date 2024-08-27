@@ -9,46 +9,36 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Compiler/Linking.h"
 
 export module PonyEngine.Time.Implementation;
 
-import <memory>;
-
 export import PonyEngine.Time.Factory;
 
 import :FrameRateSystemFactory;
+import :FrameRateSystemFactoryDestroyer;
 
 export namespace PonyEngine::Time
 {
-	/// @brief Frame rate system factory deleter.
-	struct PONY_DLL_EXPORT FrameRateSystemFactoryDeleter final
-	{
-		/// @brief Deletes the @p factory.
-		/// @param factory Frame rate system factory to delete.
-		void operator ()(IFrameRateSystemFactory* factory) const noexcept;
-	};
-
-	using FrameRateUniquePtr = std::unique_ptr<IFrameRateSystemFactory, FrameRateSystemFactoryDeleter>; ///< Frame rate system factory unique_ptr typedef.
-
 	/// @brief Creates a frame rate system factory.
+	/// @param params Frame rate system factory parameters.
 	/// @return Frame rate system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT FrameRateUniquePtr CreateFrameRateSystemFactory();
+	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(const FrameRateSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Time
 {
-	void FrameRateSystemFactoryDeleter::operator ()(IFrameRateSystemFactory* const factory) const noexcept
-	{
-		assert((dynamic_cast<FrameRateSystemFactory*>(factory) && "Tried to destroy a factory of the wrong type."));
-		delete static_cast<FrameRateSystemFactory*>(factory);
-	}
+	auto DefaultFrameRateSystemFactoryDestroyer = FrameRateSystemFactoryDestroyer();
 
-	FrameRateUniquePtr CreateFrameRateSystemFactory()
+	FrameRateSystemFactoryData CreateFrameRateSystemFactory(const FrameRateSystemFactoryParams&)
 	{
-		return std::unique_ptr<IFrameRateSystemFactory, FrameRateSystemFactoryDeleter>(new FrameRateSystemFactory());
+		const auto factory = new FrameRateSystemFactory();
+		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultFrameRateSystemFactoryDestroyer);
+
+		return FrameRateSystemFactoryData
+		{
+			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter)
+		};
 	}
 }

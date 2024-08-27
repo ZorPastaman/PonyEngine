@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.Windows.cpp" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsEngineSetupAgent.cppm" />
+    <ClCompile Include="Source\Private\Application\IEngineSetupAgent.cppm" />
     <ClCompile Include="Source\Private\CoreHelpers\CoreHelpers.cppm" />
     <ClCompile Include="Source\Private\CoreHelpers\EngineHelper.cppm" />
     <ClCompile Include="Source\Private\Application\EngineLoop.cppm" />
@@ -29,6 +31,8 @@
     <ClCompile Include="Source\Private\LogHelpers\FileSubLoggerHelper.cppm" />
     <ClCompile Include="Source\Private\LogHelpers\LoggerHelper.cppm" />
     <ClCompile Include="Source\Private\LogHelpers\LogHelpers.cppm" />
+    <ClCompile Include="Source\Private\TimeHelpers\FrameRateSystemHelper.cppm" />
+    <ClCompile Include="Source\Private\TimeHelpers\TimeHelpers.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
