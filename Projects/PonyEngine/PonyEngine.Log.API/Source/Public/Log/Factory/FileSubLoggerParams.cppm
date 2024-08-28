@@ -16,6 +16,6 @@ export namespace PonyEngine::Log
 	/// @brief File sub-logger parameters.
 	struct FileSubLoggerParams final
 	{
-		std::filesystem::path logPath = "Log.log"; ///< Log file path.
+		std::filesystem::path logPath; ///< Log file path.
 	};
 }

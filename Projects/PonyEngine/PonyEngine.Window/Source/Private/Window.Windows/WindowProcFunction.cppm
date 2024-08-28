@@ -49,7 +49,7 @@ namespace PonyEngine::Window
 		{
 			if (const DWORD errorCode = GetLastError()) [[unlikely]]
 			{
-				throw std::logic_error(std::format("Error on registering a window proc. Error code: '{}'.", errorCode));
+				throw std::logic_error(std::format("Error on registering window proc. Error code: '{}'.", errorCode));
 			}
 		}
 	}
@@ -62,7 +62,7 @@ namespace PonyEngine::Window
 		{
 			if (const DWORD errorCode = GetLastError()) [[likely]]
 			{
-				throw std::logic_error(std::format("Error on unregistering a window proc. Error code: '{}'.", errorCode));
+				throw std::logic_error(std::format("Error on unregistering window proc. Error code: '{}'.", errorCode));
 			}
 		}
 	}
@@ -88,7 +88,7 @@ namespace PonyEngine::Window
 
 		if (const DWORD errorCode = GetLastError()) [[likely]]
 		{
-			throw std::logic_error(std::format("Error on a window proc. Error code: '{}'.", errorCode));
+			throw std::logic_error(std::format("Error on window proc. Error code: '{}'.", errorCode));
 		}
 
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);

@@ -53,7 +53,7 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE_E(e, "On writing to a console.");
+			PONY_CONSOLE_E(e, "On writing to console.");
 		}
 	}
 

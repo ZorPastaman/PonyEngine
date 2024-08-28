@@ -137,7 +137,7 @@ namespace PonyEngine::Core
 
 	int Engine::ExitCode() const noexcept
 	{
-		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get the exit code when the engine is still running.");
+		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get exit code when engine is still running.");
 
 		return engineExitCode;
 	}
@@ -146,13 +146,13 @@ namespace PonyEngine::Core
 	{
 		if (isRunning)
 		{
-			PONY_LOG(this, Log::LogType::Info, "Stop the engine with the exit code '{}'.", exitCode);
+			PONY_LOG(this, Log::LogType::Info, "Stop engine with exit code '{}'.", exitCode);
 			engineExitCode = exitCode;
 			isRunning = false;
 		}
 		else
 		{
-			PONY_LOG(this, Log::LogType::Info, "Tried to stop the already stopped engine. Ignore it.");
+			PONY_LOG(this, Log::LogType::Info, "Tried to stop already stopped engine. Ignore it.");
 		}
 	}
 
@@ -160,12 +160,12 @@ namespace PonyEngine::Core
 	{
 		if (!isRunning)
 		{
-			throw std::logic_error("The engine is ticked when it's already been stopped.");
+			throw std::logic_error("Engine is ticked when it's already been stopped.");
 		}
 
 		if (isTicking)
 		{
-			throw std::logic_error("The engine is ticked inside another tick.");
+			throw std::logic_error("Engine is ticked inside another tick.");
 		}
 		isTicking = true;
 
@@ -195,7 +195,7 @@ namespace PonyEngine::Core
 
 	Log::ILogger* PrepareLogger(Log::ILogger& logger) noexcept
 	{
-		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "'{}' logger is used by the engine.", logger.Name());
+		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "Engine uses '{}' logger.", logger.Name());
 
 		return &logger;
 	}

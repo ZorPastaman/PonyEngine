@@ -63,7 +63,7 @@ namespace PonyEngine::Log
 	{
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error(SafeFormat("The log file at path '{}' isn't open.", Utility::ConvertToString(logPath.c_str())));
+			throw std::logic_error(SafeFormat("Log file at path '{}' isn't open.", Utility::ConvertToString(logPath.c_str())));
 		}
 	}
 
@@ -77,7 +77,7 @@ namespace PonyEngine::Log
 			}
 			catch (const std::exception& e)
 			{
-				PONY_CONSOLE_E(e, "On closing the log file.");
+				PONY_CONSOLE_E(e, "On closing log file.");
 			}
 		}
 	}
@@ -90,7 +90,7 @@ namespace PonyEngine::Log
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE_E(e, "On writing to the log file.");
+			PONY_CONSOLE_E(e, "On writing to log file.");
 		}
 	}
 
@@ -101,7 +101,7 @@ namespace PonyEngine::Log
 
 	std::ofstream CreateLogFileStream(const std::filesystem::path& logPath)
 	{
-		PONY_CONSOLE(LogType::Debug, "Create log file stream at the path '{}'.", Utility::ConvertToString(logPath.c_str()));
+		PONY_CONSOLE(LogType::Debug, "Create log file stream at path '{}'.", Utility::ConvertToString(logPath.c_str()));
 		auto logFile = std::ofstream(logPath);
 		PONY_CONSOLE(LogType::Debug, "Log file stream created.");
 

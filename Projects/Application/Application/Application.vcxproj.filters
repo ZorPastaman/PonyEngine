@@ -54,7 +54,7 @@
     <ClCompile Include="Source\Private\LogHelpers\ConsoleSubLoggerHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelper.Windows.cppm">
+    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelpers.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\LogHelpers.Windows\OutputDebugStringSubLoggerHelper.cppm">
@@ -67,12 +67,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\CoreHelpers\EngineHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Application\IEngineSetupAgent.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsEngineSetupAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\TimeHelpers\TimeHelpers.cppm">

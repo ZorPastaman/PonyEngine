@@ -63,7 +63,7 @@ namespace Application
 			if (message.message == WM_QUIT)
 			{
 				exitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Received the exit code '{}' from Windows.", exitCode);
+				PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Received exit code '{}' from Windows.", exitCode);
 
 				return true;
 			}

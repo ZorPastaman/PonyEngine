@@ -7,11 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Log/EngineLog.h"
+
 export module PonyEngine.Time.Implementation:FrameRateSystem;
 
 import <chrono>;
 
 import PonyEngine.Core;
+import PonyEngine.Log;
 import PonyEngine.Time;
 
 export namespace PonyEngine::Time
@@ -76,6 +81,7 @@ namespace PonyEngine::Time
 	void FrameRateSystem::Tick()
 	{
 		std::chrono::time_point<std::chrono::steady_clock> now;
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Expected wait for target frame time: '{}'", previousTickTime + targetFrameTime - now);
 
 		do
 		{
@@ -93,6 +99,7 @@ namespace PonyEngine::Time
 	void FrameRateSystem::TargetFrameTime(const float frameTime) noexcept
 	{
 		targetFrameTime = std::chrono::duration<float>(frameTime);
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Target frame time set to '{}'.", frameTime);
 	}
 
 	const char* FrameRateSystem::Name() const noexcept
