@@ -96,7 +96,7 @@ namespace PonyEngine::Window
 	{
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
-			throw std::logic_error(std::format("Couldn't find a dll module to create a window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(std::format("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
 		}
 
 		const auto wc = WNDCLASSEXW
@@ -119,7 +119,7 @@ namespace PonyEngine::Window
 		classAtom = RegisterClassExW(&wc);
 		if (!classAtom)
 		{
-			throw std::logic_error(std::format("Couldn't register a class. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(std::format("Couldn't register class. Error code: '{}'.", GetLastError()));
 		}
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window class '{}' registered.", classAtom);
 	}
@@ -129,7 +129,7 @@ namespace PonyEngine::Window
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Unregister window class '{}'.", classAtom);
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Error, "Couldn't unregister a class. Error code: '{}'.", GetLastError());
+			PONY_LOG_GENERAL(logger, Log::LogType::Error, "Couldn't unregister class. Error code: '{}'.", GetLastError());
 		}
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window class '{}' unregistered.", classAtom);
 	}
@@ -181,7 +181,7 @@ namespace PonyEngine::Window
 		}
 		else
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Info, "Skip unregistering window proc 'cause the window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG_GENERAL(logger, Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		}
 
 		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
@@ -224,7 +224,7 @@ namespace PonyEngine::Window
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::logic_error(std::format("Couldn't load a class cursor. Error code: '{}'", GetLastError()));
+			throw std::logic_error(std::format("Couldn't load default cursor. Error code: '{}'", GetLastError()));
 		}
 
 		return cursor;

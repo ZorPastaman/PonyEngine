@@ -24,7 +24,6 @@ import PonyEngine.Time;
 
 import CoreHelpers;
 
-import :IEngineSetupAgent;
 import :ILoopElement;
 import :ISystemFactoriesProvider;
 
@@ -39,7 +38,7 @@ export namespace Application
 		/// @param systemFactoriesProvider Engine system factories provider.
 		/// @param engineSetupAgent Engine set-up agent.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const IEngineSetupAgent& engineSetupAgent);
+		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -65,11 +64,10 @@ namespace Application
 	[[nodiscard("Pure function")]]
 	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider);
 
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider, const IEngineSetupAgent& engineSetupAgent) :
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider) :
 		logger{&loggerToUse},
 		engine{CreateEngine(*logger, systemFactoriesProvider)}
 	{
-		engineSetupAgent.Setup(*engine.engine);
 	}
 
 	EngineLoop::~EngineLoop() noexcept
@@ -97,7 +95,7 @@ namespace Application
 				return true;
 			}
 
-			PONY_LOG_E_GENERAL(logger, e, "On ticking the engine.")
+			PONY_LOG_E_GENERAL(logger, e, "On ticking engine.")
 
 			exitCode = static_cast<int>(PonyEngine::Common::ExitCodes::EngineTickException);
 
@@ -110,7 +108,7 @@ namespace Application
 		}
 
 		exitCode = engine.engine->ExitCode();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine exited with the code '{}'.", exitCode);
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine exited with code '{}'.", exitCode);
 
 		return true;
 	}

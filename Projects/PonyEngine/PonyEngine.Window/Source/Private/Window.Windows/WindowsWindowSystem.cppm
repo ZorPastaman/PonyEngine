@@ -123,7 +123,7 @@ namespace PonyEngine::Window
 
 		if (!hWnd)
 		{
-			throw std::logic_error(std::format("Windows hasn't created a window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(std::format("Windows hasn't created window. Error code: '{}'.", GetLastError()));
 		}
 
 		PONY_LOG(engine, Log::LogType::Info, "Windows window of class '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd));
@@ -137,7 +137,7 @@ namespace PonyEngine::Window
 			PONY_LOG(engine, Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			if (!DestroyWindow(hWnd))
 			{
-				PONY_LOG(engine, Log::LogType::Error, "Error on destroying the Windows window. Error code: '{}'.", GetLastError());
+				PONY_LOG(engine, Log::LogType::Error, "Error on destroying Windows window. Error code: '{}'.", GetLastError());
 			}
 			PONY_LOG(engine, Log::LogType::Info, "Windows window destroyed.");
 		}
@@ -181,7 +181,7 @@ namespace PonyEngine::Window
 	{
 		if (!SetWindowTextW(hWnd, title))
 		{
-			throw std::logic_error(std::format("Couldn't set a new window title. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(std::format("Couldn't set new window title. Error code: '{}'.", GetLastError()));
 		}
 
 		windowTitle = title;
@@ -218,7 +218,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
 	{
-		PONY_LOG_IF(!keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove a nullptr keyboard message observer.");
+		PONY_LOG_IF(!keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove nullptr keyboard message observer.");
 
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
@@ -228,7 +228,7 @@ namespace PonyEngine::Window
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove a not added keyboard message observer '{}'.", keyboardMessageObserver->Name());
+			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver->Name());
 		}
 	}
 
@@ -252,16 +252,16 @@ namespace PonyEngine::Window
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(engine, Log::LogType::Verbose, "Received key down command with the code '{}'.", lParam);
+			PONY_LOG(engine, Log::LogType::Verbose, "Received key down command with code '{}'.", lParam);
 			PushKeyboardKeyMessage(lParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(engine, Log::LogType::Verbose, "Received key up command with the code '{}'.", lParam);
+			PONY_LOG(engine, Log::LogType::Verbose, "Received key up command with code '{}'.", lParam);
 			PushKeyboardKeyMessage(lParam, false);
 			break;
 		default:
-			PONY_LOG(engine, Log::LogType::Verbose, "Received an unhandled message. Type: '{}'", uMsg);
+			PONY_LOG(engine, Log::LogType::Verbose, "Received unhandled message. Type: '{}'", uMsg);
 			break;
 		}
 
@@ -288,7 +288,7 @@ namespace PonyEngine::Window
 				}
 				catch (const std::exception& e)
 				{
-					PONY_LOG_E(engine, e, "On observing a keyboard key message");
+					PONY_LOG_E(engine, e, "On observing keyboard key message");
 				}
 			}
 		}

@@ -86,7 +86,7 @@ namespace PonyEngine::Input
 		}
 		else
 		{
-			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find a keyboard provider, the keyboard input won't work.");
+			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find keyboard provider, keyboard input won't work.");
 		}
 	}
 
@@ -138,11 +138,11 @@ namespace PonyEngine::Input
 
 	void InputSystem::Observe(const KeyboardMessage& keyboardMessage) noexcept
 	{
-		PONY_LOG(engine, Log::LogType::Verbose, "Received a keyboard message: '{}'.", keyboardMessage.ToString());
+		PONY_LOG(engine, Log::LogType::Verbose, "Received keyboard message: '{}'.", keyboardMessage.ToString());
 
 		if (const auto pair = keyStates.find(keyboardMessage.keyCode); pair != keyStates.cend() && pair->second == keyboardMessage.isDown)
 		{
-			PONY_LOG(engine, Log::LogType::Verbose, "Ignore the keyboard message 'cause it doesn't change the state.");
+			PONY_LOG(engine, Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change the state.");
 
 			return;
 		}

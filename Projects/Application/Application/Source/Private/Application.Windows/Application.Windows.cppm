@@ -12,6 +12,5 @@ export module Application.Windows;
 export import Application;
 
 export import :WindowsEndLoop;
-export import :WindowsEngineSetupAgent;
 export import :WindowsLoggerProvider;
 export import :WindowsSystemFactoriesProvider;

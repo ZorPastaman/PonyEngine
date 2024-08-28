@@ -34,7 +34,7 @@ namespace Application
 
 	int RunLoop(const std::initializer_list<ILoopElement*> loopElements)
 	{
-		assert((IsValid(loopElements) && "The loop elements aren't valid."));
+		assert(IsValid(loopElements) && "The loop elements aren't valid.");
 
 		while (true)
 		{

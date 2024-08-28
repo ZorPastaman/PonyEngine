@@ -97,7 +97,7 @@ namespace PonyEngine::Log
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE(LogType::Warning, "Tried to remove a not added sub-logger '{}'.", subLogger.Name());
+			PONY_CONSOLE(LogType::Warning, "Tried to remove not added sub-logger '{}'.", subLogger.Name());
 		}
 	}
 

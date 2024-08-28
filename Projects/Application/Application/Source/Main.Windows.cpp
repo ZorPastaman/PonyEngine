@@ -30,7 +30,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
 
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
-		auto engineLoop = Application::EngineLoop(loggerProvider.Logger(), windowsSystemFactoriesProvider, Application::WindowsEngineSetupAgent());
+		auto engineLoop = Application::EngineLoop(loggerProvider.Logger(), windowsSystemFactoriesProvider);
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Engine loop created.");
 
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows loop.");
@@ -39,7 +39,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Run main loop.");
 		const int exitCode = Application::RunLoop({&engineLoop, &windowsLoop});
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Main loop ran with the exit code '{}'.", exitCode);
+		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Main loop finished with exit code '{}'.", exitCode);
 
 		return exitCode;
 	}

@@ -63,6 +63,6 @@ namespace LogHelpers
 
 	PonyEngine::Log::FileSubLoggerParams CreateFileSubLoggerParams()
 	{
-		return PonyEngine::Log::FileSubLoggerParams();
+		return PonyEngine::Log::FileSubLoggerParams{.logPath = "Log.log"};
 	}
 }

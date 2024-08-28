@@ -99,12 +99,12 @@ namespace PonyEngine::Core
 
 			if (system.tickableSystem)
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "Add to the tickable systems.");
+				PONY_LOG(engine, Log::LogType::Debug, "Add to tickable systems.");
 				tickableSystems.push_back(system.tickableSystem);
 			}
 			else
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "The system is not tickable.");
+				PONY_LOG(engine, Log::LogType::Debug, "System is not tickable.");
 			}
 
 			for (auto [interface, objectPointer] : system.publicInterfaces)
@@ -156,7 +156,7 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On beginning the '{}' system.", system->Name());
+				PONY_LOG_E(engine, e, "On beginning '{}' system.", system->Name());
 
 				throw;
 			}
@@ -179,7 +179,7 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On ending the '{}' system.", (*system)->Name());
+				PONY_LOG_E(engine, e, "On ending '{}' system.", (*system)->Name());
 			}
 			PONY_LOG(engine, Log::LogType::Info, "System ended.");
 		}
@@ -200,7 +200,7 @@ namespace PonyEngine::Core
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On ticking the '{}' system.", system->Name());
+				PONY_LOG_E(engine, e, "On ticking '{}' system.", system->Name());
 
 				throw;
 			}
@@ -215,7 +215,7 @@ namespace PonyEngine::Core
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(&params.engine, e, "On creating a '{}' system with the '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG_E(&params.engine, e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
 			throw;
 		}
