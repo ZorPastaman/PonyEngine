@@ -55,8 +55,6 @@ export namespace PonyEngine::Time
 		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
 		std::chrono::time_point<std::chrono::steady_clock> previousTickTime; ///< Previous tick time.
 
-		std::size_t frameCount; ///< Current frame.
-
 		const Core::IEngine* const engine; ///< Engine that owns the system.
 	};
 }
@@ -65,7 +63,6 @@ namespace PonyEngine::Time
 {
 	FrameRateSystem::FrameRateSystem(const Core::IEngine& engine) noexcept :
 		targetFrameTime(0.f),
-		frameCount{0},
 		engine{&engine}
 	{
 	}
@@ -81,7 +78,7 @@ namespace PonyEngine::Time
 	void FrameRateSystem::Tick()
 	{
 		std::chrono::time_point<std::chrono::steady_clock> now;
-		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Expected wait for target frame time: '{}'", previousTickTime + targetFrameTime - now);
+		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Expected wait for target frame time: '{}'", std::chrono::duration<float>(previousTickTime + targetFrameTime - std::chrono::steady_clock::now()));
 
 		do
 		{
@@ -99,7 +96,7 @@ namespace PonyEngine::Time
 	void FrameRateSystem::TargetFrameTime(const float frameTime) noexcept
 	{
 		targetFrameTime = std::chrono::duration<float>(frameTime);
-		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Target frame time set to '{}'.", frameTime);
+		PONY_LOG(engine, PonyEngine::Log::LogType::Info, "Target frame time set to '{}'.", targetFrameTime);
 	}
 
 	const char* FrameRateSystem::Name() const noexcept

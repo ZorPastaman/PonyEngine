@@ -22,10 +22,8 @@ import PonyEngine.Core.Implementation;
 import PonyEngine.Log;
 import PonyEngine.Time;
 
-import CoreHelpers;
-
 import :ILoopElement;
-import :ISystemFactoriesProvider;
+import :IEngineConfigProvider;
 
 export namespace Application
 {
@@ -38,7 +36,7 @@ export namespace Application
 		/// @param systemFactoriesProvider Engine system factories provider.
 		/// @param engineSetupAgent Engine set-up agent.
 		[[nodiscard("Pure constructor")]]
-		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider);
+		EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const IEngineConfigProvider& systemFactoriesProvider);
 		EngineLoop(const EngineLoop&) = delete;
 		EngineLoop(EngineLoop&&) = delete;
 
@@ -62,12 +60,15 @@ namespace Application
 	/// @param systemFactoriesProvider System factories provider.
 	/// @return Created engine.
 	[[nodiscard("Pure function")]]
-	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider);
+	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const IEngineConfigProvider& systemFactoriesProvider);
 
-	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const ISystemFactoriesProvider& systemFactoriesProvider) :
+	EngineLoop::EngineLoop(PonyEngine::Log::ILogger& loggerToUse, const IEngineConfigProvider& systemFactoriesProvider) :
 		logger{&loggerToUse},
 		engine{CreateEngine(*logger, systemFactoriesProvider)}
 	{
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Set up engine systems.");
+		systemFactoriesProvider.SetupSystems(engine.engine->SystemManager());
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Engine systems set up.");
 	}
 
 	EngineLoop::~EngineLoop() noexcept
@@ -113,16 +114,15 @@ namespace Application
 		return true;
 	}
 
-	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const ISystemFactoriesProvider& systemFactoriesProvider)
+	PonyEngine::Core::EngineData CreateEngine(PonyEngine::Log::ILogger& logger, const IEngineConfigProvider& systemFactoriesProvider)
 	{
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Gather engine system factories.");
-		auto factories = PonyEngine::Core::SystemFactoriesContainer();
-		systemFactoriesProvider.AddSystemFactories(factories);
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Engine system factories gathered.");
-
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create and set up engine.");
-		auto engine = CoreHelpers::CreateAndSetupEngine(logger, factories);
-		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' engine created and set up.", engine.engine->Name());
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create engine.");
+		auto params = PonyEngine::Core::EngineParams{.logger = logger};
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "Add system factories to params.");
+		systemFactoriesProvider.AddSystemFactories(params.systemFactories);
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Debug, "System factories added to params.");
+		PonyEngine::Core::EngineData engine = PonyEngine::Core::CreateEngine(params);
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Engine created.");
 
 		return engine;
 	}

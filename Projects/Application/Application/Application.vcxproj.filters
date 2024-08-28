@@ -27,7 +27,7 @@
     <ClCompile Include="Source\Private\Application\EngineLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application\ISystemFactoriesProvider.cppm">
+    <ClCompile Include="Source\Private\Application\IEngineConfigProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows.cppm">
@@ -36,43 +36,13 @@
     <ClCompile Include="Source\Private\Application.Windows\WindowsLoggerProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsSystemFactoriesProvider.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\WindowsEngineConfigProvider.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Application.Windows\WindowsEndLoop.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Main.Windows.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers\LogHelpers.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers\LoggerHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers\ConsoleSubLoggerHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelpers.Windows.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers.Windows\OutputDebugStringSubLoggerHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\LogHelpers\FileSubLoggerHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\CoreHelpers\CoreHelpers.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\CoreHelpers\EngineHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\TimeHelpers\TimeHelpers.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\TimeHelpers\FrameRateSystemHelper.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

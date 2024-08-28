@@ -16,9 +16,7 @@ export module Application.Windows:WindowsLoggerProvider;
 import <array>;
 import <exception>;
 
-import PonyEngine.Log.Windows.Factory;
-
-import LogHelpers.Windows;
+import PonyEngine.Log.Windows.Implementation;
 
 export namespace Application
 {
@@ -77,7 +75,6 @@ namespace Application
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
 			logger->AddSubLogger(*subLogger.get());
-			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Sub-logger added.");
 		}
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers added.");
 	}
@@ -98,7 +95,6 @@ namespace Application
 			{
 				PONY_CONSOLE_E(e, "On removing sub-logger.");
 			}
-			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Sub-logger removed.");
 		}
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers removed.");
 
@@ -125,36 +121,40 @@ namespace Application
 
 	PonyEngine::Log::LoggerData CreateLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create and set up logger.");
-		PonyEngine::Log::LoggerData logger = LogHelpers::CreateAndSetupLogger();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' logger created and set up.", logger.logger->Name());
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
+		const auto params = PonyEngine::Log::LoggerParams();
+		PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(params);
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
 
 		return logger;
 	}
 
 	PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create and set up console sub-logger.");
-		PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = LogHelpers::CreateAndSetupConsoleSubLogger();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' console sub-logger created and set up.", consoleSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create console sub-logger.");
+		const auto params = PonyEngine::Log::ConsoleSubLoggerParams();
+		PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(params);
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
 
 		return consoleSubLogger;
 	}
 
 	PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create and set up output debug string sub-logger.");
-		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = LogHelpers::CreateAndSetupOutputDebugStringSubLogger();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' output debug string sub-logger created and set up.", outputDebugStringSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create output debug string sub-logger.");
+		const auto params = PonyEngine::Log::OutputDebugStringSubLoggerParams();
+		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(params);
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
 
 		return outputDebugStringSubLogger;
 	}
 
 	PonyEngine::Log::FileSubLoggerData CreateFileSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create and set up file sub-logger.");
-		PonyEngine::Log::FileSubLoggerData fileSubLogger = LogHelpers::CreateAndSetupFileSubLogger();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' file sub-logger created and set up.", fileSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create file sub-logger.");
+		const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = "Log.log"};
+		PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(params);
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
 
 		return fileSubLogger;
 	}

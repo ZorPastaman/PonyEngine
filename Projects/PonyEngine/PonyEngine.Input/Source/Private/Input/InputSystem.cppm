@@ -82,7 +82,6 @@ namespace PonyEngine::Input
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->AddKeyboardObserver(this);
-			PONY_LOG(engine, Log::LogType::Info, "Subscribed to keyboard provider.");
 		}
 		else
 		{
@@ -96,7 +95,6 @@ namespace PonyEngine::Input
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->RemoveKeyboardObserver(this);
-			PONY_LOG(engine, Log::LogType::Info, "Unsubscribed to keyboard provider.");
 		}
 	}
 
@@ -121,19 +119,17 @@ namespace PonyEngine::Input
 	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
 	{
 		const auto handle = Handle{.id = currentId++};
-		PONY_LOG(engine, Log::LogType::Info, "Register action. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id);
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		events.insert(std::pair(handle, eventAction));
-		PONY_LOG(engine, Log::LogType::Info, "Action registered.");
+		PONY_LOG(engine, Log::LogType::Info, "Action registered. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id);
 
 		return handle;
 	}
 
 	void InputSystem::UnregisterAction(const Handle handle)
 	{
-		PONY_LOG(engine, Log::LogType::Info, "Unregister action. ID: '{}'.", handle.id);
 		events.erase(handle);
-		PONY_LOG(engine, Log::LogType::Info, "Action unregistered.");
+		PONY_LOG(engine, Log::LogType::Info, "Action unregistered. ID: '{}'.", handle.id);
 	}
 
 	void InputSystem::Observe(const KeyboardMessage& keyboardMessage) noexcept
@@ -142,7 +138,7 @@ namespace PonyEngine::Input
 
 		if (const auto pair = keyStates.find(keyboardMessage.keyCode); pair != keyStates.cend() && pair->second == keyboardMessage.isDown)
 		{
-			PONY_LOG(engine, Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change the state.");
+			PONY_LOG(engine, Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change state.");
 
 			return;
 		}

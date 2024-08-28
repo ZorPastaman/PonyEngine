@@ -11,5 +11,5 @@ export module Application;
 
 export import :EngineLoop;
 export import :ILoopElement;
-export import :ISystemFactoriesProvider;
+export import :IEngineConfigProvider;
 export import :Loop;

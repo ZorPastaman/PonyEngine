@@ -12,7 +12,7 @@ module;
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module Application.Windows:WindowsSystemFactoriesProvider;
+export module Application.Windows:WindowsEngineConfigProvider;
 
 import <stdexcept>;
 
@@ -29,23 +29,25 @@ import Application;
 
 export namespace Application
 {
-	/// @brief Windows engine system factories provider.
-	class WindowsSystemFactoriesProvider final : public ISystemFactoriesProvider
+	/// @brief Windows engine config provider.
+	class WindowsEngineConfigProvider final : public IEngineConfigProvider
 	{
 	public:
 		/// @brief Creates a system factories provider.
 		/// @param loggerToUse Logger to use.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsSystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse);
-		WindowsSystemFactoriesProvider(const WindowsSystemFactoriesProvider&) = delete;
-		WindowsSystemFactoriesProvider(WindowsSystemFactoriesProvider&&) = delete;
+		explicit WindowsEngineConfigProvider(PonyEngine::Log::ILogger& loggerToUse);
+		WindowsEngineConfigProvider(const WindowsEngineConfigProvider&) = delete;
+		WindowsEngineConfigProvider(WindowsEngineConfigProvider&&) = delete;
 
-		~WindowsSystemFactoriesProvider() noexcept;
+		~WindowsEngineConfigProvider() noexcept;
 
 		virtual void AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const override;
 
-		WindowsSystemFactoriesProvider& operator =(const WindowsSystemFactoriesProvider&) = delete;
-		WindowsSystemFactoriesProvider& operator =(WindowsSystemFactoriesProvider&&) = delete;
+		virtual void SetupSystems(PonyEngine::Core::ISystemManager& systemManager) const override;
+
+		WindowsEngineConfigProvider& operator =(const WindowsEngineConfigProvider&) = delete;
+		WindowsEngineConfigProvider& operator =(WindowsEngineConfigProvider&&) = delete;
 
 	private:
 		PonyEngine::Log::ILogger* const logger; ///< Logger.
@@ -62,7 +64,7 @@ export namespace Application
 
 namespace Application
 {
-	WindowsSystemFactoriesProvider::WindowsSystemFactoriesProvider(PonyEngine::Log::ILogger& loggerToUse) :
+	WindowsEngineConfigProvider::WindowsEngineConfigProvider(PonyEngine::Log::ILogger& loggerToUse) :
 		logger{&loggerToUse}
 	{
 		// Create all factories here.
@@ -125,7 +127,7 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Direct3D 12 render system for Windows factory created.");
 	}
 
-	WindowsSystemFactoriesProvider::~WindowsSystemFactoriesProvider() noexcept
+	WindowsEngineConfigProvider::~WindowsEngineConfigProvider() noexcept
 	{
 		// Destroy all factories here.
 
@@ -146,7 +148,7 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window factory destroyed.");
 	}
 
-	void WindowsSystemFactoriesProvider::AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const
+	void WindowsEngineConfigProvider::AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const
 	{
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add frame rate system factory.");
 		systemFactories.AddSystemFactory(*frameRateSystemFactory);
@@ -163,5 +165,13 @@ namespace Application
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add Direct3D 12 render system for Windows factory.");
 		systemFactories.AddSystemFactory(*windowsDirect3D12RenderFactory);
 		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Direct3D 12 render system for Windows factory added.");
+	}
+
+	void WindowsEngineConfigProvider::SetupSystems(PonyEngine::Core::ISystemManager& systemManager) const
+	{
+		if (const auto frameRateSystem = systemManager.FindSystem<PonyEngine::Time::IFrameRateSystem>())
+		{
+			frameRateSystem->TargetFrameTime(PonyEngine::Time::ConvertFrameRateFrameTime(60.f));
+		}
 	}
 }

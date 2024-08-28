@@ -12,25 +12,15 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.Windows.cpp" />
-    <ClCompile Include="Source\Private\CoreHelpers\CoreHelpers.cppm" />
-    <ClCompile Include="Source\Private\CoreHelpers\EngineHelper.cppm" />
     <ClCompile Include="Source\Private\Application\EngineLoop.cppm" />
     <ClCompile Include="Source\Private\Application\ILoopElement.cppm" />
-    <ClCompile Include="Source\Private\Application\ISystemFactoriesProvider.cppm" />
+    <ClCompile Include="Source\Private\Application\IEngineConfigProvider.cppm" />
     <ClCompile Include="Source\Private\Application\Application.cppm" />
     <ClCompile Include="Source\Private\Application\Loop.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\WindowsLoggerProvider.cppm" />
-    <ClCompile Include="Source\Private\Application.Windows\WindowsSystemFactoriesProvider.cppm" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsEngineConfigProvider.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\WindowsEndLoop.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers.Windows\LogHelpers.Windows.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers.Windows\OutputDebugStringSubLoggerHelper.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers\ConsoleSubLoggerHelper.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers\FileSubLoggerHelper.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers\LoggerHelper.cppm" />
-    <ClCompile Include="Source\Private\LogHelpers\LogHelpers.cppm" />
-    <ClCompile Include="Source\Private\TimeHelpers\FrameRateSystemHelper.cppm" />
-    <ClCompile Include="Source\Private\TimeHelpers\TimeHelpers.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
