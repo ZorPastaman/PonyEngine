@@ -26,7 +26,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
 
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows system factories provider.");
-		const auto windowsSystemFactoriesProvider = Application::WindowsSystemFactoriesProvider(loggerProvider.Logger());
+		const auto windowsSystemFactoriesProvider = Application::WindowsEngineConfigProvider(loggerProvider.Logger());
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
 
 		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
