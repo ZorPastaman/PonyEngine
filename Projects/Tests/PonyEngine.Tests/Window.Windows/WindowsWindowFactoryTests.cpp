@@ -118,9 +118,11 @@ namespace Window
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{.logger = logger, .windowsClassParams = classParams});
+			Assert::IsNotNull(factory.systemFactory.get());
+			Assert::IsNotNull(factory.windowsWindowSystemFactory);
 			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto window = factory->Create(systemParams);
+			auto window = factory.systemFactory->Create(systemParams);
 			Assert::IsNotNull(window.system.get());
 		}
 
@@ -130,8 +132,8 @@ namespace Window
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			Assert::AreEqual("PonyEngine::Window::WindowsWindowFactory", factory->Name());
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{ .logger = logger, .windowsClassParams = classParams });
+			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystemFactory", factory.systemFactory->Name());
 		}
 
 		TEST_METHOD(GetSystemName)
@@ -140,8 +142,8 @@ namespace Window
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(logger, classParams);
-			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", factory->SystemName());
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{ .logger = logger, .windowsClassParams = classParams });
+			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", factory.systemFactory->SystemName());
 		}
 	};
 }

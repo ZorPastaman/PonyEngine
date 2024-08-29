@@ -9,49 +9,36 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Compiler/Linking.h"
 
 export module Game.Implementation;
 
-import <memory>;
-
-import PonyEngine.Log;
-
 export import Game.Factory;
 
 import :GameSystemFactory;
+import :GameSystemFactoryDestroyer;
 
 export namespace Game
 {
-	/// @brief Game system factory deleter.
-	struct PONY_DLL_EXPORT GameSystemFactoryDeleter final
-	{
-		/// @brief Deletes the @p factory.
-		/// @param factory Game system factory to delete.
-		void operator ()(IGameSystemFactory* factory) const noexcept;
-	};
-
-	using GameUniquePtr = std::unique_ptr<IGameSystemFactory, GameSystemFactoryDeleter>; ///< Game system factory unique_ptr typedef.
-
 	/// @brief Creates a game system factory.
-	/// @param logger Logger to use.
+	/// @param params Game system factory parameters.
 	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger);
+	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(const GameSystemFactoryParams& params);
 }
 
 namespace Game
 {
-	void GameSystemFactoryDeleter::operator ()(IGameSystemFactory* const factory) const noexcept
-	{
-		assert((dynamic_cast<GameSystemFactory*>(factory) && "Tried to destroy a game system factory of the wrong type."));
-		delete static_cast<GameSystemFactory*>(factory);
-	}
+	auto DefaultGameSystemFactoryDestroyer = GameSystemFactoryDestroyer(); ///< Default game system factory destroyer.
 
-	GameUniquePtr CreateGameSystemFactory(PonyEngine::Log::ILogger& logger)
+	GameSystemFactoryData CreateGameSystemFactory(const GameSystemFactoryParams&)
 	{
-		return std::unique_ptr<IGameSystemFactory, GameSystemFactoryDeleter>(new GameSystemFactory(logger));
+		const auto factory = new GameSystemFactory();
+		const auto factoryDeleter = PonyEngine::Core::SystemFactoryDeleter(DefaultGameSystemFactoryDestroyer);
+
+		return GameSystemFactoryData
+		{
+			.systemFactory = PonyEngine::Core::SystemFactoryUniquePtr(factory, factoryDeleter)
+		};
 	}
 }

@@ -35,7 +35,7 @@ export namespace PonyEngine::Utility
 	/// @tparam Args Format argument types.
 	/// @param format Format.
 	/// @param args Format arguments.
-	/// @return Format result or empty string if std::format() threw.
+	/// @return Format result or exception string.
 	template<typename... Args> [[nodiscard("Pure function")]]
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept;
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p ExceptionHandler.
@@ -43,7 +43,7 @@ export namespace PonyEngine::Utility
 	/// @tparam Args Format argument types.
 	/// @param format Format.
 	/// @param args Format arguments.
-	/// @return Format result or empty string if std::format() threw.
+	/// @return Format result or exception string.
 	template<ExceptionHandler ExceptionHandler, typename... Args> [[nodiscard("Pure function")]]
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>);
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p exceptionHandler.
@@ -52,7 +52,7 @@ export namespace PonyEngine::Utility
 	/// @param exceptionHandler Exception handler.
 	/// @param format Format.
 	/// @param args Format arguments.
-	/// @return Format result or empty string if std::format() threw.
+	/// @return Format result or exception string.
 	template<ExceptionHandler ExceptionHandler, typename... Args> [[nodiscard("Pure function")]]
 	std::string SafeFormat(const ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
 }
@@ -95,7 +95,7 @@ namespace PonyEngine::Utility
 		{
 			exceptionHandler(e);
 
-			return std::string();
+			return std::string(e.what());
 		}
 	}
 }

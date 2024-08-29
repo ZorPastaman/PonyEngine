@@ -9,4 +9,4 @@
 
 export module PonyEngine.Window;
 
-export import :IWindow;
+export import :IWindowSystem;

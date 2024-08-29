@@ -24,5 +24,8 @@
     <ClCompile Include="Source\Private\Game\GameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Game\GameSystemFactoryDestroyer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

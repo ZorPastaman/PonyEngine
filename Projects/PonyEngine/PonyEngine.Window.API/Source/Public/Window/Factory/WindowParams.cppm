@@ -11,15 +11,15 @@ export module PonyEngine.Window.Factory:WindowParams;
 
 import <string>;
 
+import PonyEngine.Math;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Platform-independent window parameters.
-	struct WindowParams final
+	struct WindowParams
 	{
 		std::wstring title = L"Pony Engine Window"; ///< Window title.
-		int horizontalPosition = 0; ///< Window horizontal position.
-		int verticalPosition = 0; ///< Window vertical position.
-		int width = 800; ///< Window width.
-		int height = 600; ///< Window height.
+		Math::Vector2<int> position = Math::Vector2<int>(10, 10); ///< Window position (horizontal, vertical).
+		Math::Vector2<int> size = Math::Vector2<int>(800, 600); ///< Window size (width, height).
 	};
 }

@@ -12,6 +12,8 @@ export module PonyEngine.Window.Windows.Factory;
 export import PonyEngine.Window.Factory;
 export import PonyEngine.Window.Windows;
 
-export import :IWindowsWindowFactory;
+export import :IWindowsWindowSystemFactory;
 export import :WindowsClassParams;
+export import :WindowsWindowSystemFactoryData;
+export import :WindowsWindowSystemFactoryParams;
 export import :WindowsWindowParams;

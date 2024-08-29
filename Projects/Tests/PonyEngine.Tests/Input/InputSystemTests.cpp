@@ -124,14 +124,14 @@ namespace Input
 		public:
 			PonyEngine::Input::IKeyboardObserver* expectedObserver;
 
-			virtual void AddKeyboardObserver(PonyEngine::Input::IKeyboardObserver* keyboardObserver) override
+			virtual void AddKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
 			{
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(keyboardObserver));
+				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(&keyboardObserver));
 			}
 
-			virtual void RemoveKeyboardObserver(PonyEngine::Input::IKeyboardObserver* keyboardObserver) override
+			virtual void RemoveKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
 			{
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(keyboardObserver));
+				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(&keyboardObserver));
 			}
 
 			[[nodiscard("Pure function")]]

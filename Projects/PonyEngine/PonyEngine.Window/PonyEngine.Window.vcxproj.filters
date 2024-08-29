@@ -25,9 +25,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\CreateWindowParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -40,10 +37,13 @@
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowFactory.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactoryDestroyer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Window\Factory\IWindowFactory.cppm">
+    <ClCompile Include="Source\Public\Window\Factory\IWindowSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Factory\Window.Factory.cppm">
@@ -24,13 +24,13 @@
     <ClCompile Include="Source\Public\Window\Factory\WindowParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window\IWindow.cppm">
+    <ClCompile Include="Source\Public\Window\IWindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Window.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsWindowFactory.cppm">
+    <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsWindowSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsClassParams.cppm">
@@ -42,10 +42,16 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindow.cppm">
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

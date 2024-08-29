@@ -17,12 +17,12 @@
     <ResourceCompile Include="PonyEngine.Window.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\CreateWindowParams.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowFactory.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactory.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -37,6 +37,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
+      <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>

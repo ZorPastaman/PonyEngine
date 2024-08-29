@@ -7,18 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window:IWindow;
-
-import <string>;
+export module PonyEngine.Window:IWindowSystem;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Engine window.
-	class IWindow
+	/// @brief Window system.
+	class IWindowSystem
 	{
 	public:
-		IWindow(const IWindow&) = delete;
-		IWindow(IWindow&&) = delete;
+		IWindowSystem(const IWindowSystem&) = delete;
+		IWindowSystem(IWindowSystem&&) = delete;
 
 		/// @brief Checks if the system window is alive.
 		/// @return @a True if it's alive; @a false otherwise.
@@ -28,10 +26,17 @@ export namespace PonyEngine::Window
 		/// @brief Gets the window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* Title() const noexcept = 0;
+		virtual const wchar_t* MainTitle() const noexcept = 0;
 		/// @brief Sets the window title.
 		/// @param title Window title to set.
-		virtual void Title(const wchar_t* title) = 0;
+		virtual void MainTitle(const wchar_t* title) = 0;
+		/// @brief Gets the window title text.
+		/// @return Window title text.
+		[[nodiscard("Pure function")]]
+		virtual const wchar_t* SecondaryTitle() const noexcept = 0;
+		/// @brief Sets the window title text.
+		/// @param title Window title text to set.
+		virtual void SecondaryTitle(const wchar_t* title) = 0;
 
 		/// @brief Checks if the window is visible.
 		/// @return @a True if it's visible; @a false otherwise.
@@ -47,13 +52,13 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept = 0;
 
-		IWindow& operator =(const IWindow&) = delete;
-		IWindow& operator =(IWindow&&) = delete;
+		IWindowSystem& operator =(const IWindowSystem&) = delete;
+		IWindowSystem& operator =(IWindowSystem&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		IWindow() noexcept = default;
+		IWindowSystem() noexcept = default;
 
-		~IWindow() noexcept = default;
+		~IWindowSystem() noexcept = default;
 	};
 }

@@ -7,39 +7,34 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Factory:IWindowFactory;
-
-import <string>;
-
-import PonyEngine.Core.Factory;
+export module PonyEngine.Window.Factory:IWindowSystemFactory;
 
 import :WindowParams;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window factory.
-	class IWindowFactory : public Core::ISystemFactory
+	class IWindowSystemFactory
 	{
 	public:
-		IWindowFactory(const IWindowFactory&) = delete;
-		IWindowFactory(IWindowFactory&&) = delete;
+		IWindowSystemFactory(const IWindowSystemFactory&) = delete;
+		IWindowSystemFactory(IWindowSystemFactory&&) = delete;
 
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual WindowParams& NextWindowParams() noexcept = 0;
-		/// @brief Gets the next window params.
-		/// @return Next window params.
-		[[nodiscard("Pure function")]]
-		virtual const WindowParams& NextWindowParams() const noexcept = 0;
+		virtual WindowParams NextWindowParams() const noexcept = 0;
+		/// @brief Sets the next window params.
+		/// @param params Next window params to set.
+		virtual void NextWindowParams(const WindowParams& params) noexcept = 0;
 
-		IWindowFactory& operator =(const IWindowFactory&) = delete;
-		IWindowFactory& operator =(IWindowFactory&&) = delete;
+		IWindowSystemFactory& operator =(const IWindowSystemFactory&) = delete;
+		IWindowSystemFactory& operator =(IWindowSystemFactory&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		IWindowFactory() noexcept = default;
+		IWindowSystemFactory() noexcept = default;
 
-		~IWindowFactory() noexcept = default;
+		~IWindowSystemFactory() noexcept = default;
 	};
 }

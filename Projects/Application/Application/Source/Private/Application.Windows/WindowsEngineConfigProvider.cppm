@@ -9,12 +9,14 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Application.Windows:WindowsEngineConfigProvider;
 
-import <stdexcept>;
+import <array>;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Implementation;
@@ -52,119 +54,64 @@ export namespace Application
 	private:
 		PonyEngine::Log::ILogger* const logger; ///< Logger.
 
-		// Set all factories here.
-
-		PonyEngine::Core::SystemFactoryUniquePtr frameRateSystemFactory; ///< Frame rate system factory.
-		PonyEngine::Window::WindowsWindowUniquePtr windowsWindowSystemFactory; ///< Window system factory.
-		PonyEngine::Core::SystemFactoryUniquePtr inputSystemFactory; ///< Input system factory.
-		Game::GameUniquePtr gameSystemFactory; ///< Game system factory.
-		PonyEngine::Core::SystemFactoryUniquePtr windowsDirect3D12RenderFactory; ///< Direct3D 12 render system for Windows factory.
+		std::array<PonyEngine::Core::SystemFactoryUniquePtr, 5> factories; ///< System factories;
 	};
 }
 
 namespace Application
 {
+	/// @brief Creates a frame rate system factory.
+	/// @param logger Logger to use.
+	/// @return Frame rate system factory.
+	[[nodiscard("Pure function")]]
+	PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory(PonyEngine::Log::ILogger& logger);
+	/// @brief Creates a window system factory.
+	/// @param logger Logger to use.
+	/// @return Window system factory.
+	[[nodiscard("Pure function")]]
+	PonyEngine::Window::WindowsWindowSystemFactoryData CreateWindowSystemFactory(PonyEngine::Log::ILogger& logger);
+	/// @brief Creates an input system factory.
+	/// @param logger Logger to use.
+	/// @return Input system factory.
+	[[nodiscard("Pure function")]]
+	PonyEngine::Input::InputSystemFactoryData CreateInputSystemFactory(PonyEngine::Log::ILogger& logger);
+	/// @brief Creates a game system factory.
+	/// @param logger Logger to use.
+	/// @return Game system factory.
+	[[nodiscard("Pure function")]]
+	Game::GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Log::ILogger& logger);
+	/// @brief Creates a render system factory.
+	/// @param logger Logger to use.
+	/// @return Render system factory.
+	[[nodiscard("Pure function")]]
+	PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData CreateRenderSystemFactory(PonyEngine::Log::ILogger& logger);
+
 	WindowsEngineConfigProvider::WindowsEngineConfigProvider(PonyEngine::Log::ILogger& loggerToUse) :
-		logger{&loggerToUse}
+		logger{&loggerToUse},
+		factories{CreateFrameRateSystemFactory(*logger).systemFactory, CreateWindowSystemFactory(*logger).systemFactory,
+			CreateInputSystemFactory(*logger).systemFactory, CreateGameSystemFactory(*logger).systemFactory, CreateRenderSystemFactory(*logger).systemFactory}
 	{
-		// Create all factories here.
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create frame rate system factory.");
-		frameRateSystemFactory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams()).systemFactory;
-		if (!frameRateSystemFactory)
-		{
-			throw std::logic_error("The frame rate system factory is nullptr.");
-		}
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Frame rate system factory created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
-		const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = CS_OWNDC};
-		windowsWindowSystemFactory = PonyEngine::Window::CreateWindowsWindowFactory(*logger, windowClassParams);
-		if (!windowsWindowSystemFactory)
-		{
-			throw std::logic_error("The Windows window system factory is nullptr.");
-		}
-		constexpr int width = 1280;
-		constexpr int height = 720;
-		windowsWindowSystemFactory->NextWindowParams() = PonyEngine::Window::WindowParams // TODO: Add logs for different settings
-		{
-			.title = L"Pony Engine Game",
-			.horizontalPosition = GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2,
-			.verticalPosition = GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2,
-			.width = width,
-			.height = height
-		};
-		windowsWindowSystemFactory->NextWindowsWindowParams() = PonyEngine::Window::WindowsWindowParams
-		{
-			.style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX,
-			.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW,
-			.showCmd = SW_NORMAL
-		};
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window system factory created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
-		inputSystemFactory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams()).systemFactory;
-		if (!inputSystemFactory)
-		{
-			throw std::logic_error("The input system factory is nullptr.");
-		}
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
-		gameSystemFactory = Game::CreateGameSystemFactory(*logger);
-		if (!gameSystemFactory)
-		{
-			throw std::logic_error("The game system factory is nullptr.");
-		}
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Game system factory created.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
-		windowsDirect3D12RenderFactory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams()).systemFactory;
-		if (!windowsDirect3D12RenderFactory)
-		{
-			throw std::logic_error("The Direct3D 12 render system for Windows factory is nullptr");
-		}
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Direct3D 12 render system for Windows factory created.");
 	}
 
 	WindowsEngineConfigProvider::~WindowsEngineConfigProvider() noexcept
 	{
-		// Destroy all factories here.
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy Direct3D 12 render system for Windows factory.");
-		windowsDirect3D12RenderFactory.reset();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Direct3D 12 render system for Windows factory destroyed.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy game system factory.");
-		gameSystemFactory.reset();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Game system factory destroyed.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy input system factory.");
-		inputSystemFactory.reset();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Input system factory destroyed.");
-
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy Windows window factory.");
-		windowsWindowSystemFactory.reset();
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Windows window factory destroyed.");
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "Destroy system factories");
+		for (auto it = factories.rbegin(); it != factories.rend(); ++it)
+		{
+			PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Destroy '{}' system factory.", (*it)->Name());
+			it->reset();
+			PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "System factory destroyed.");
+		}
+		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Info, "System factories destroyed.");
 	}
 
 	void WindowsEngineConfigProvider::AddSystemFactories(PonyEngine::Core::SystemFactoriesContainer& systemFactories) const
 	{
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add frame rate system factory.");
-		systemFactories.AddSystemFactory(*frameRateSystemFactory);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Frame rate system factory added.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add Windows window system factory.");
-		systemFactories.AddSystemFactory(*windowsWindowSystemFactory);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Windows window system factory added.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add input system factory.");
-		systemFactories.AddSystemFactory(*inputSystemFactory);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Input system factory added.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add game system factory.");
-		systemFactories.AddSystemFactory(*gameSystemFactory);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Game system factory added.");
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add Direct3D 12 render system for Windows factory.");
-		systemFactories.AddSystemFactory(*windowsDirect3D12RenderFactory);
-		PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Direct3D 12 render system for Windows factory added.");
+		for (const PonyEngine::Core::SystemFactoryUniquePtr& factory : factories)
+		{
+			PONY_LOG_GENERAL(logger, PonyEngine::Log::LogType::Debug, "Add '{}' system factory.", factory->Name());
+			systemFactories.AddSystemFactory(*factory);
+		}
 	}
 
 	void WindowsEngineConfigProvider::SetupSystems(PonyEngine::Core::ISystemManager& systemManager) const
@@ -173,5 +120,71 @@ namespace Application
 		{
 			frameRateSystem->TargetFrameTime(PonyEngine::Time::ConvertFrameRateFrameTime(60.f));
 		}
+	}
+
+	PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory(PonyEngine::Log::ILogger& logger)
+	{
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create frame rate system factory.");
+		PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
+		assert(factory.systemFactory && "The frame rate system factory is nullptr.");
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' frame rate system factory created.", factory.systemFactory->Name());
+
+		return factory;
+	}
+
+	PonyEngine::Window::WindowsWindowSystemFactoryData CreateWindowSystemFactory(PonyEngine::Log::ILogger& logger)
+	{
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create Windows window system factory.");
+		const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = CS_OWNDC};
+		const auto windowSystemFactoryParams = PonyEngine::Window::WindowsWindowSystemFactoryParams{.logger = logger, .windowsClassParams = windowClassParams};
+		PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(windowSystemFactoryParams);
+		assert(factory.systemFactory && "The Windows window system factory is nullptr.");
+		assert(factory.windowsWindowSystemFactory && "The pointer to a Windows window system factory is nullptr.");
+
+		constexpr int width = 1280;
+		constexpr int height = 720;
+
+		auto windowParams = PonyEngine::Window::WindowsWindowParams();
+		windowParams.title = L"Pony Engine Game";
+		windowParams.position = PonyEngine::Math::Vector2<int>(GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2, GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2);
+		windowParams.size = PonyEngine::Math::Vector2<int>(width, height);
+		windowParams.style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
+		windowParams.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
+		windowParams.cmdShow = SW_NORMAL;
+		factory.windowsWindowSystemFactory->NextWindowsWindowParams(windowParams);
+
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
+
+		return factory;
+	}
+
+	PonyEngine::Input::InputSystemFactoryData CreateInputSystemFactory(PonyEngine::Log::ILogger& logger)
+	{
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create input system factory.");
+		PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+		assert(factory.systemFactory && "The input system factory is nullptr");
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' input system factory created.", factory.systemFactory->Name());
+
+		return factory;
+	}
+
+	Game::GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Log::ILogger& logger)
+	{
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create game system factory.");
+		Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(Game::GameSystemFactoryParams());
+		assert(factory.systemFactory && "The game system factory is nullptr");
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' game system factory created.");
+
+		return factory;
+	}
+
+	PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData CreateRenderSystemFactory(PonyEngine::Log::ILogger& logger)
+	{
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
+		PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams());
+		assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
+		PONY_LOG_GENERAL(&logger, PonyEngine::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
+
+		return factory;
 	}
 }
