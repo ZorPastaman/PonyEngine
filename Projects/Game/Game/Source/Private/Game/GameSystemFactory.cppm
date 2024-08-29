@@ -11,8 +11,6 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/EngineLog.h"
-
 export module Game.Implementation:GameSystemFactory;
 
 import PonyEngine.Core;
@@ -26,13 +24,12 @@ import :GameSystem;
 export namespace Game
 {
 	/// @brief Game system factory.
-	class GameSystemFactory final : public IGameSystemFactory, public PonyEngine::Core::ISystemDestroyer
+	class GameSystemFactory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
 	{
 	public:
 		/// @brief Creates a game system factory.
-		/// @param logger Logger to use.
 		[[nodiscard("Pure constructor")]]
-		explicit GameSystemFactory(PonyEngine::Log::ILogger& logger) noexcept;
+		explicit GameSystemFactory() noexcept = default;
 		GameSystemFactory(const GameSystemFactory&) = delete;
 		GameSystemFactory(GameSystemFactory&&) = delete;
 
@@ -52,37 +49,26 @@ export namespace Game
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "Game::GameSystemFactory"; ///< Class name.
-
-	private:
-		PonyEngine::Log::ILogger* const logger;
 	};
 }
 
 namespace Game
 {
-	GameSystemFactory::GameSystemFactory(PonyEngine::Log::ILogger& logger) noexcept :
-		logger{&logger}
-	{
-	}
-
 	PonyEngine::Core::SystemData GameSystemFactory::Create(const PonyEngine::Core::SystemParams& params)
 	{
 		const auto system = new GameSystem(params.engine);
 		const auto deleter = PonyEngine::Core::SystemDeleter(*this);
-		auto interfaces = PonyEngine::Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
 
 		return PonyEngine::Core::SystemData
 		{
 			.system = PonyEngine::Core::SystemUniquePtr(system, deleter),
-			.tickableSystem = system,
-			.publicInterfaces = interfaces
+			.tickableSystem = system
 		};
 	}
 
 	void GameSystemFactory::Destroy(PonyEngine::Core::ISystem* const system) noexcept
 	{
-		assert((dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type."));
+		assert(dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type.");
 		delete static_cast<GameSystem*>(system);
 	}
 

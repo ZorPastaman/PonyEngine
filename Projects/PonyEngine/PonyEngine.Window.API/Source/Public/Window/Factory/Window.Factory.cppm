@@ -11,5 +11,5 @@ export module PonyEngine.Window.Factory;
 
 export import PonyEngine.Window;
 
-export import :IWindowFactory;
+export import :IWindowSystemFactory;
 export import :WindowParams;

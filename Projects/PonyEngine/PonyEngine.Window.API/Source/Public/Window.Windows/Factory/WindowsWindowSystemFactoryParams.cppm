@@ -7,21 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemFactoryParams;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+import <functional>;
 
-export module PonyEngine.Window.Windows.Factory:WindowsWindowParams;
+import PonyEngine.Log;
 
-import PonyEngine.Window.Factory;
+import :WindowsClassParams;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Windows window parameters.
-	struct WindowsWindowParams final : WindowParams
+	/// @brief Window system for Windows factory parameters.
+	struct WindowsWindowSystemFactoryParams final
 	{
-		DWORD style = DWORD{0}; ///< Window style.
-		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
-		int cmdShow = SW_NORMAL; ///< Window cmdShow.
+		std::reference_wrapper<Log::ILogger> logger; ///< Logger.
+		WindowsClassParams windowsClassParams; ///< Windows class parameters.
 	};
 }

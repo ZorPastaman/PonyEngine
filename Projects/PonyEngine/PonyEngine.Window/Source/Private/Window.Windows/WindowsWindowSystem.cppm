@@ -14,10 +14,9 @@ module;
 #include "PonyEngine/Log/EngineLog.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowsWindow;
+export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
 
 import <algorithm>;
-import <format>;
 import <exception>;
 import <stdexcept>;
 import <string>;
@@ -26,16 +25,17 @@ import <vector>;
 import PonyEngine.Core;
 import PonyEngine.Log;
 import PonyEngine.Input;
-import PonyEngine.Window.Windows;
+import PonyEngine.Math;
+import PonyEngine.StringUtility;
+import PonyEngine.Window.Windows.Factory;
 
-import :CreateWindowParams;
 import :IWindowProc;
 import :KeyCodeUtility;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system.
-	class WindowsWindowSystem final : public Core::ISystem, public Core::ITickableSystem, public IWindowsWindow, public IWindowProc, public Input::IKeyboardProvider
+	class WindowsWindowSystem final : public Core::ISystem, public Core::ITickableSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
@@ -44,7 +44,7 @@ export namespace PonyEngine::Window
 		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystem(Core::IEngine& engineToUse, HINSTANCE hInstance, ATOM className, const CreateWindowParams& windowParams);
+		WindowsWindowSystem(Core::IEngine& engineToUse, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
 		WindowsWindowSystem(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem(WindowsWindowSystem&&) = delete;
 
@@ -59,8 +59,11 @@ export namespace PonyEngine::Window
 		virtual bool IsWindowAlive() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* Title() const noexcept override;
-		virtual void Title(const wchar_t* title) override;
+		virtual const wchar_t* MainTitle() const noexcept override;
+		virtual void MainTitle(const wchar_t* title) override;
+
+		[[nodiscard("Pure function")]] virtual const wchar_t* SecondaryTitle() const noexcept override;
+		virtual void SecondaryTitle(const wchar_t* title) override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
@@ -70,8 +73,8 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
 
-		virtual void AddKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
-		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver* keyboardMessageObserver) override;
+		virtual void AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
+		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -84,6 +87,9 @@ export namespace PonyEngine::Window
 		static constexpr auto StaticName = "PonyEngine::Window::WindowsWindowSystem"; ///< Class name.
 
 	private:
+		/// @brief Update the window title.
+		void UpdateWindowTitle() const;
+
 		/// @brief Responds to a destroy message.
 		void Destroy() const noexcept;
 
@@ -92,41 +98,34 @@ export namespace PonyEngine::Window
 		/// @param isDown @a True if the button is pressed, @a false if it's up.
 		void PushKeyboardKeyMessage(LPARAM lParam, bool isDown) const;
 
-		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
-
 		Core::IEngine* const engine; ///< Engine that owns the window.
+		const HWND hWnd; ///< Window handler.
 
-		std::wstring windowTitle; ///< Window title cache.
-		HWND hWnd; ///< Window handler.
+		std::wstring mainTitle; ///< Window main title cache.
+		std::wstring secondaryTitle; ///< Window title text cache.
+
+		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
 	};
 }
 
 namespace PonyEngine::Window
 {
-	WindowsWindowSystem::WindowsWindowSystem(Core::IEngine& engineToUse, const HINSTANCE hInstance, const ATOM className, const CreateWindowParams& windowParams) :
+	/// @brief Creates a Windows window.
+	/// @param engine Engine.
+	/// @param windowProc Window proc.
+	/// @param hInstance Instance.
+	/// @param className Window class name.
+	/// @param windowParams Window parameters.
+	/// @return Created Windows window.
+	[[nodiscard("Pure function")]]
+	HWND CreateWindowsWindow(const Core::IEngine& engine, IWindowProc& windowProc, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
+
+	WindowsWindowSystem::WindowsWindowSystem(Core::IEngine& engineToUse, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams) :
 		engine{&engineToUse},
-		windowTitle(windowParams.title)
+		mainTitle(windowParams.title),
+		hWnd{CreateWindowsWindow(*engine, *this, hInstance, className, windowParams)}
 	{
-		PONY_LOG(engine, Log::LogType::Info, "Create Windows window of class '{}'.", className);
-		hWnd = CreateWindowExW(
-			windowParams.extendedStyle,
-			reinterpret_cast<LPCWSTR>(className),
-			windowTitle.c_str(),
-			windowParams.style,
-			windowParams.horizontalPosition, windowParams.verticalPosition,
-			windowParams.width, windowParams.height,
-			NULL,
-			NULL,
-			hInstance,
-			static_cast<IWindowProc*>(this)
-		);
-
-		if (!hWnd)
-		{
-			throw std::logic_error(std::format("Windows hasn't created window. Error code: '{}'.", GetLastError()));
-		}
-
-		PONY_LOG(engine, Log::LogType::Info, "Windows window of class '{}' created. Window handle: '{}'.", className, reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(engine, Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
 
@@ -143,7 +142,7 @@ namespace PonyEngine::Window
 		}
 		else
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Skip destroying Windows windows 'cause it's already been destroyed.");
+			PONY_LOG(engine, Log::LogType::Info, "Skip destroying Windows window 'cause it's already been destroyed.");
 		}
 	}
 
@@ -172,19 +171,26 @@ namespace PonyEngine::Window
 		return IsWindow(hWnd);
 	}
 
-	const wchar_t* WindowsWindowSystem::Title() const noexcept
+	const wchar_t* WindowsWindowSystem::MainTitle() const noexcept
 	{
-		return windowTitle.c_str();
+		return mainTitle.c_str();
 	}
 
-	void WindowsWindowSystem::Title(const wchar_t* const title)
+	void WindowsWindowSystem::MainTitle(const wchar_t* const title)
 	{
-		if (!SetWindowTextW(hWnd, title))
-		{
-			throw std::logic_error(std::format("Couldn't set new window title. Error code: '{}'.", GetLastError()));
-		}
+		mainTitle = title;
+		UpdateWindowTitle();
+	}
 
-		windowTitle = title;
+	const wchar_t* WindowsWindowSystem::SecondaryTitle() const noexcept
+	{
+		return secondaryTitle.c_str();
+	}
+
+	void WindowsWindowSystem::SecondaryTitle(const wchar_t* title)
+	{
+		secondaryTitle = title;
+		UpdateWindowTitle();
 	}
 
 	bool WindowsWindowSystem::IsVisible() const noexcept
@@ -195,11 +201,13 @@ namespace PonyEngine::Window
 	void WindowsWindowSystem::ShowWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_SHOW);
+		PONY_LOG(engine, Log::LogType::Debug, "Show window.");
 	}
 
 	void WindowsWindowSystem::HideWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_HIDE);
+		PONY_LOG(engine, Log::LogType::Debug, "Hide window.");
 	}
 
 	HWND WindowsWindowSystem::WindowHandle() const noexcept
@@ -207,28 +215,23 @@ namespace PonyEngine::Window
 		return hWnd;
 	}
 
-	void WindowsWindowSystem::AddKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
+	void WindowsWindowSystem::AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
 	{
-		assert((keyboardMessageObserver && "The observer is nullptr."));
-		assert((std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added."));
-		PONY_LOG(engine, Log::LogType::Info, "Add '{}' keyboard message observer.", keyboardMessageObserver->Name());
-		keyboardMessageObservers.push_back(keyboardMessageObserver);
-		PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer added.");
+		assert(std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added.");
+		keyboardMessageObservers.push_back(&keyboardMessageObserver);
+		PONY_LOG(engine, Log::LogType::Debug, "'{}' keyboard message observer added.", keyboardMessageObserver.Name());
 	}
 
-	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver* const keyboardMessageObserver)
+	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
 	{
-		PONY_LOG_IF(!keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove nullptr keyboard message observer.");
-
-		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Remove '{}' keyboard message observer.", keyboardMessageObserver->Name());
 			keyboardMessageObservers.erase(position);
-			PONY_LOG(engine, Log::LogType::Info, "Keyboard message observer removed.");
+			PONY_LOG(engine, Log::LogType::Debug, "{} keyboard message observer removed.", keyboardMessageObserver.Name());
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG_IF(keyboardMessageObserver, engine, Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver->Name());
+			PONY_LOG(engine, Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver.Name());
 		}
 	}
 
@@ -268,6 +271,18 @@ namespace PonyEngine::Window
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 
+	void WindowsWindowSystem::UpdateWindowTitle() const
+	{
+		const std::wstring titleToSet = secondaryTitle.length() > 0 ? mainTitle + L" - " + secondaryTitle : mainTitle;
+
+		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
+		{
+			throw std::logic_error(Utility::SafeFormat("Couldn't set new window title. Error code: '{}'.", GetLastError()));
+		}
+
+		PONY_LOG(engine, Log::LogType::Verbose, "Window title set to {}.", Utility::ConvertToString(titleToSet));
+	}
+
 	void WindowsWindowSystem::Destroy() const noexcept
 	{
 		engine->Stop();
@@ -292,5 +307,30 @@ namespace PonyEngine::Window
 				}
 			}
 		}
+	}
+
+	HWND CreateWindowsWindow(const Core::IEngine& engine, IWindowProc& windowProc, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
+	{
+		PONY_LOG(&engine, Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
+			className, windowParams.style, windowParams.extendedStyle, Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
+		const HWND hWnd = CreateWindowExW(
+			windowParams.extendedStyle,
+			reinterpret_cast<LPCWSTR>(className),
+			windowParams.title.c_str(),
+			windowParams.style,
+			windowParams.position.X(), windowParams.position.Y(),
+			windowParams.size.X(), windowParams.size.Y(),
+			NULL,
+			NULL,
+			hInstance,
+			&windowProc
+		);
+		if (!hWnd)
+		{
+			throw std::logic_error(Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
+		}
+		PONY_LOG(&engine, Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+
+		return hWnd;
 	}
 }

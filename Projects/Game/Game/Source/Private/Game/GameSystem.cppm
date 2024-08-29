@@ -20,12 +20,10 @@ import PonyEngine.Input;
 import PonyEngine.Log;
 import PonyEngine.Window;
 
-import Game;
-
 export namespace Game
 {
 	/// @brief Game system.
-	class GameSystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem, public IGameSystem
+	class GameSystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem
 	{
 	public:
 		/// @brief Creates a game system.
@@ -84,9 +82,9 @@ namespace Game
 			constexpr auto upEvent = PonyEngine::Input::Event{.expectedMessage = upMessage};
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
-					window->Title(L"Up");
+					window->SecondaryTitle(L"Up");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Up input registered.");
@@ -96,9 +94,9 @@ namespace Game
 			constexpr auto downEvent = PonyEngine::Input::Event{.expectedMessage = downMessage};
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
-					window->Title(L"Down");
+					window->SecondaryTitle(L"Down");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Down input registered.");
@@ -108,9 +106,9 @@ namespace Game
 			constexpr auto rightEvent = PonyEngine::Input::Event{.expectedMessage = rightMessage};
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
-					window->Title(L"Right");
+					window->SecondaryTitle(L"Right");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Right input registered.");
@@ -120,9 +118,9 @@ namespace Game
 			constexpr auto leftEvent = PonyEngine::Input::Event{.expectedMessage = leftMessage};
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindow* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindow>())
+				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
-					window->Title(L"Left");
+					window->SecondaryTitle(L"Left");
 				}
 			}));
 			PONY_LOG(engine, PonyEngine::Log::LogType::Debug, "Left input registered.");

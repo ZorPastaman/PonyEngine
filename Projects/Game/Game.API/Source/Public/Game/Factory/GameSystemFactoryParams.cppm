@@ -7,24 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Game:IGameSystem;
+export module Game.Factory:GameSystemFactoryParams;
+
+import PonyEngine.Core.Factory;
 
 export namespace Game
 {
-	/// @brief Game system.
-	class IGameSystem
+	/// @brief Game system factory parameters.
+	struct GameSystemFactoryParams final
 	{
-	public:
-		IGameSystem(const IGameSystem&) = delete;
-		IGameSystem(IGameSystem&&) = delete;
-
-		IGameSystem& operator =(const IGameSystem&) = delete;
-		IGameSystem& operator =(IGameSystem&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IGameSystem() noexcept = default;
-
-		~IGameSystem() noexcept = default;
 	};
 }

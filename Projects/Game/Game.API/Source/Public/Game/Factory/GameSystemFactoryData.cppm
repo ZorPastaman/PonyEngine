@@ -7,6 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Game;
+export module Game.Factory:GameSystemFactoryData;
 
-export import :IGameSystem;
+import PonyEngine.Core.Factory;
+
+export namespace Game
+{
+	/// @brief Game system factory data.
+	struct GameSystemFactoryData final
+	{
+		PonyEngine::Core::SystemFactoryUniquePtr systemFactory; ///< Game system factory.
+	};
+}

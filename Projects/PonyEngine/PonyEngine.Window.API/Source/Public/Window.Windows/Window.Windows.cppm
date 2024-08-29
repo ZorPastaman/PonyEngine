@@ -11,4 +11,4 @@ export module PonyEngine.Window.Windows;
 
 export import PonyEngine.Window;
 
-export import :IWindowsWindow;
+export import :IWindowsWindowSystem;
