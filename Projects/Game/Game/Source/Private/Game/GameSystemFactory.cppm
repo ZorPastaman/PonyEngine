@@ -36,7 +36,7 @@ export namespace Game
 		~GameSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams& params) override;
+		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams& params) override;
 		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -54,9 +54,9 @@ export namespace Game
 
 namespace Game
 {
-	PonyEngine::Core::SystemData GameSystemFactory::Create(const PonyEngine::Core::SystemParams& params)
+	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams&)
 	{
-		const auto system = new GameSystem(params.engine);
+		const auto system = new GameSystem(engine);
 		const auto deleter = PonyEngine::Core::SystemDeleter(*this);
 
 		return PonyEngine::Core::SystemData

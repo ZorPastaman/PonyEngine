@@ -26,9 +26,9 @@ export namespace PonyEngine::Time
 	{
 	public:
 		/// @brief Creates a @p FrameRateSystem.
-		/// @param engine Engine that owns the system.
+		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
-		explicit FrameRateSystem(const Core::IEngine& engine) noexcept;
+		explicit FrameRateSystem(Core::IEngine& engine) noexcept;
 		FrameRateSystem(const FrameRateSystem&) = delete;
 		FrameRateSystem(FrameRateSystem&&) = delete;
 
@@ -55,13 +55,13 @@ export namespace PonyEngine::Time
 		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
 		std::chrono::time_point<std::chrono::steady_clock> previousTickTime; ///< Previous tick time.
 
-		const Core::IEngine* const engine; ///< Engine that owns the system.
+		Core::IEngine* engine; ///< Engine.
 	};
 }
 
 namespace PonyEngine::Time
 {
-	FrameRateSystem::FrameRateSystem(const Core::IEngine& engine) noexcept :
+	FrameRateSystem::FrameRateSystem(Core::IEngine& engine) noexcept :
 		targetFrameTime(0.f),
 		engine{&engine}
 	{
@@ -77,8 +77,8 @@ namespace PonyEngine::Time
 
 	void FrameRateSystem::Tick()
 	{
-		std::chrono::time_point<std::chrono::steady_clock> now;
 		PONY_LOG(engine, PonyEngine::Log::LogType::Verbose, "Expected wait for target frame time: '{}'", std::chrono::duration<float>(previousTickTime + targetFrameTime - std::chrono::steady_clock::now()));
+		std::chrono::time_point<std::chrono::steady_clock> now;
 
 		do
 		{

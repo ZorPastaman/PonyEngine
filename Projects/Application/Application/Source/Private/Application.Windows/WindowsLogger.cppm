@@ -9,9 +9,11 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
-export module Application.Windows:WindowsLoggerProvider;
+export module Application.Windows:WindowsLogger;
 
 import <array>;
 import <exception>;
@@ -20,27 +22,45 @@ import PonyEngine.Log.Windows.Implementation;
 
 export namespace Application
 {
-	/// @brief Logger provider for Windows.
-	class WindowsLoggerProvider final
+	/// @brief Pony Engine logger for Windows wrapper.
+	class WindowsLogger final
 	{
 	public:
-		/// @brief Creates a logger provider.
+		/// @brief Creates a @p WindowsLogger.
 		[[nodiscard("Pure constructor")]]
-		WindowsLoggerProvider();
-		WindowsLoggerProvider(const WindowsLoggerProvider&) = delete;
-		WindowsLoggerProvider(WindowsLoggerProvider&&) = delete;
+		WindowsLogger();
+		WindowsLogger(const WindowsLogger&) = delete;
+		WindowsLogger(WindowsLogger&&) = delete;
 
-		~WindowsLoggerProvider() noexcept;
+		~WindowsLogger() noexcept;
 
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Log::ILogger& Logger() const noexcept;
 
-		WindowsLoggerProvider& operator =(const WindowsLoggerProvider&) = delete;
-		WindowsLoggerProvider& operator =(WindowsLoggerProvider&&) = delete;
+		WindowsLogger& operator =(const WindowsLogger&) = delete;
+		WindowsLogger& operator =(WindowsLogger&&) = delete;
 
 	private:
+		/// @brief Creates a logger.
+		/// @return Created logger.
+		[[nodiscard("Pure function")]]
+		static PonyEngine::Log::LoggerData CreateLogger();
+
+		/// @brief Creates a console sub-logger.
+		/// @return Created console sub-logger.
+		[[nodiscard("Pure function")]]
+		static PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger();
+		/// @brief Creates an output debug string sub-logger.
+		/// @return Created output debug string sub-logger.
+		[[nodiscard("Pure function")]]
+		static PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
+		/// @brief Creates a file sub-logger.
+		/// @return Created file sub-logger.
+		[[nodiscard("Pure function")]]
+		static PonyEngine::Log::FileSubLoggerData CreateFileSubLogger();
+
 		PonyEngine::Log::LoggerUniquePtr logger; ///< Logger.
 		std::array<PonyEngine::Log::SubLoggerUniquePtr, 3> subLoggers; ///< Sub-loggers.
 	};
@@ -48,25 +68,7 @@ export namespace Application
 
 namespace Application
 {
-	/// @brief Creates a logger.
-	/// @return Created logger.
-	[[nodiscard("Pure function")]]
-	PonyEngine::Log::LoggerData CreateLogger();
-
-	/// @brief Creates a console sub-logger.
-	/// @return Created console sub-logger.
-	[[nodiscard("Pure function")]]
-	PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger();
-	/// @brief Creates an output debug string sub-logger.
-	/// @return Created output debug string sub-logger.
-	[[nodiscard("Pure function")]]
-	PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
-	/// @brief Creates a file sub-logger.
-	/// @return Created file sub-logger.
-	[[nodiscard("Pure function")]]
-	PonyEngine::Log::FileSubLoggerData CreateFileSubLogger();
-
-	WindowsLoggerProvider::WindowsLoggerProvider() :
+	WindowsLogger::WindowsLogger() :
 		logger{CreateLogger().logger},
 		subLoggers{CreateConsoleSubLogger().subLogger, CreateOutputDebugStringSubLogger().subLogger, CreateFileSubLogger().subLogger}
 	{
@@ -74,22 +76,20 @@ namespace Application
 		for (PonyEngine::Log::SubLoggerUniquePtr& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
-			logger->AddSubLogger(*subLogger.get());
+			logger->AddSubLogger(*subLogger);
 		}
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers added.");
 	}
 
-	WindowsLoggerProvider::~WindowsLoggerProvider() noexcept
+	WindowsLogger::~WindowsLogger() noexcept
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Remove sub-loggers.");
 		for (auto it = subLoggers.crbegin(); it != subLoggers.crend(); ++it)
 		{
-			const PonyEngine::Log::SubLoggerUniquePtr& subLogger = *it;
-
-			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Remove '{}' sub-logger.", subLogger->Name());
+			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Remove '{}' sub-logger.", (*it)->Name());
 			try
 			{
-				logger->RemoveSubLogger(*subLogger.get());
+				logger->RemoveSubLogger(**it);
 			}
 			catch (const std::exception& e)
 			{
@@ -114,46 +114,47 @@ namespace Application
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
 	}
 
-	PonyEngine::Log::ILogger& WindowsLoggerProvider::Logger() const noexcept
+	PonyEngine::Log::ILogger& WindowsLogger::Logger() const noexcept
 	{
 		return *logger;
 	}
 
-	PonyEngine::Log::LoggerData CreateLogger()
+	PonyEngine::Log::LoggerData WindowsLogger::CreateLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
-		const auto params = PonyEngine::Log::LoggerParams();
-		PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(params);
+		PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
+		assert(logger.logger && "The logger is nullptr.");
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
 
 		return logger;
 	}
 
-	PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger()
+	PonyEngine::Log::ConsoleSubLoggerData WindowsLogger::CreateConsoleSubLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create console sub-logger.");
-		const auto params = PonyEngine::Log::ConsoleSubLoggerParams();
-		PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(params);
+		PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
+		assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
 
 		return consoleSubLogger;
 	}
 
-	PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger()
+	PonyEngine::Log::OutputDebugStringSubLoggerData WindowsLogger::CreateOutputDebugStringSubLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create output debug string sub-logger.");
-		const auto params = PonyEngine::Log::OutputDebugStringSubLoggerParams();
-		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(params);
+		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(PonyEngine::Log::OutputDebugStringSubLoggerParams());
+		assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
 
 		return outputDebugStringSubLogger;
 	}
 
-	PonyEngine::Log::FileSubLoggerData CreateFileSubLogger()
+	PonyEngine::Log::FileSubLoggerData WindowsLogger::CreateFileSubLogger()
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create file sub-logger.");
 		const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = "Log.log"};
 		PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(params);
+		assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
 		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
 
 		return fileSubLogger;

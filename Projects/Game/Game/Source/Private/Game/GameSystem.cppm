@@ -27,7 +27,7 @@ export namespace Game
 	{
 	public:
 		/// @brief Creates a game system.
-		/// @param engine Engine that owns the game system.
+		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
 		explicit GameSystem(PonyEngine::Core::IEngine& engine);
 		GameSystem(const GameSystem&) = delete;
@@ -49,25 +49,25 @@ export namespace Game
 		static constexpr auto StaticName = "Game::GameSystem"; ///< Class name.
 
 	private:
-		PonyEngine::Core::IEngine* const engine; ///< Engine.
-
 		PonyEngine::Input::Handle upHandle; ///< Up arrow input handle.
 		PonyEngine::Input::Handle downHandle; ///< Down arrow input handle.
 		PonyEngine::Input::Handle rightHandle; ///< Right arrow input handle.
 		PonyEngine::Input::Handle leftHandle; ///< Left arrow input handle.
 		PonyEngine::Input::Handle closeHandle; ///< Escape input handle.
+
+		PonyEngine::Core::IEngine* const engine; ///< Engine.
 	};
 }
 
 namespace Game
 {
 	GameSystem::GameSystem(PonyEngine::Core::IEngine& engine) :
-		engine{&engine},
-		upHandle(0),
-		downHandle(0),
-		rightHandle(0),
-		leftHandle(0),
-		closeHandle(0)
+		upHandle(),
+		downHandle(),
+		rightHandle(),
+		leftHandle(),
+		closeHandle(),
+		engine{&engine}
 	{
 	}
 

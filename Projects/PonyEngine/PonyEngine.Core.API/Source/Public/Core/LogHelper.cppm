@@ -10,7 +10,6 @@
 export module PonyEngine.Core:LogHelper;
 
 import <format>;
-import <string>;
 
 import PonyEngine.Log;
 

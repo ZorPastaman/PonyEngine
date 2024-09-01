@@ -20,6 +20,24 @@ namespace Core
 {
 	TEST_CLASS(EngineTests)
 	{
+		class Application : public PonyEngine::Core::IApplication // TODO: Move classes like this to a shared file.
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -90,7 +108,7 @@ namespace Core
 			bool systemDestroyed = false;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
+			virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine&, const PonyEngine::Core::SystemParams&) override
 			{
 				createdSystem = new EmptySystem();
 				const auto deleter = PonyEngine::Core::SystemDeleter(*this);
@@ -130,7 +148,7 @@ namespace Core
 			EmptySystem1* createdSystem = nullptr;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
+			virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine&, const PonyEngine::Core::SystemParams&) override
 			{
 				createdSystem = new EmptySystem1();
 				const auto deleter = PonyEngine::Core::SystemDeleter(*this);
@@ -165,8 +183,9 @@ namespace Core
 		TEST_METHOD(CreateTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
-			const auto engine = PonyEngine::Core::CreateEngine(params);
+			auto application = Application();
+			application.logger = &logger;
+			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::IsNotNull(engine.engine.get());
 			Assert::IsNotNull(engine.tickableEngine);
 		}
@@ -174,8 +193,9 @@ namespace Core
 		TEST_METHOD(GetFrameCountTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{ .logger = logger };
-			const auto engine = PonyEngine::Core::CreateEngine(params);
+			auto application = Application();
+			application.logger = &logger;
+			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 
 			for (std::size_t i = 0; i < 10; ++i)
 			{
@@ -188,22 +208,24 @@ namespace Core
 		TEST_METHOD(GetLoggerTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
-			const auto engine = PonyEngine::Core::CreateEngine(params);
+			auto application = Application();
+			application.logger = &logger;
+			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&engine.engine->Logger()));
 		}
 
 		TEST_METHOD(ExitTest)
 		{
 			auto logger = EmptyLogger();
-			const auto params = PonyEngine::Core::EngineParams{.logger = logger};
-			auto engine = PonyEngine::Core::CreateEngine(params);
+			auto application = Application();
+			application.logger = &logger;
+			auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::IsTrue(engine.engine->IsRunning());
 			engine.engine->Stop();
 			Assert::IsFalse(engine.engine->IsRunning());
 			Assert::AreEqual(0, engine.engine->ExitCode());
 			engine.engine.reset();
-			engine = PonyEngine::Core::CreateEngine(params);
+			engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			engine.engine->Stop(100);
 			Assert::AreEqual(100, engine.engine->ExitCode());
 		}
@@ -211,18 +233,21 @@ namespace Core
 		TEST_METHOD(GetNameTest)
 		{
 			auto logger = EmptyLogger();
-			auto params = PonyEngine::Core::EngineParams{.logger = logger};
-			auto engine = PonyEngine::Core::CreateEngine(params);
+			auto application = Application();
+			application.logger = &logger;
+			auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::AreEqual("PonyEngine::Core::Engine", engine.engine->Name());
 		}
 
 		TEST_METHOD(SystemTickTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			EmptySystemFactory systemFactory;
-			auto params = PonyEngine::Core::EngineParams{.logger = logger};
+			auto params = PonyEngine::Core::EngineParams();
 			params.systemFactories.AddSystemFactory(systemFactory);
-			auto engine = PonyEngine::Core::CreateEngine(params);
+			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
 			Assert::IsTrue(systemFactory.createdSystem->begun);
 
@@ -245,12 +270,14 @@ namespace Core
 		TEST_METHOD(FindSystemTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto systemFactory = EmptySystemFactory();
 			auto system1Factory = EmptySystem1Factory();
-			auto params = PonyEngine::Core::EngineParams{.logger = logger};
+			auto params = PonyEngine::Core::EngineParams();
 			params.systemFactories.AddSystemFactory(systemFactory);
 			params.systemFactories.AddSystemFactory(system1Factory);
-			const auto engine = PonyEngine::Core::CreateEngine(params);
+			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(EmptySystem))));
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(systemFactory.createdSystem), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<EmptySystem>()));

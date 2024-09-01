@@ -19,6 +19,24 @@ namespace Time
 {
 	TEST_CLASS(FrameRateSystemFactoryTests)
 	{
+		class Application : public PonyEngine::Core::IApplication
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -111,29 +129,34 @@ namespace Time
 
 		TEST_METHOD(CreateTest)
 		{
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
 			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystem = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
 			Assert::IsNotNull(inputSystem.system.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
 			Assert::AreEqual("PonyEngine::Time::FrameRateSystem", factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
 			Assert::AreEqual("PonyEngine::Time::FrameRateSystemFactory", factory.systemFactory->Name());
 		}
 	};

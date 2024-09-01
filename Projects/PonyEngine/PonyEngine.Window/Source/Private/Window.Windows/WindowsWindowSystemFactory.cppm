@@ -39,26 +39,23 @@ export namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Creates a Windows window factory.
-		/// @param loggerToUse Logger.
+		/// @param application Application.
 		/// @param classParams Window class parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystemFactory(Log::ILogger& loggerToUse, const WindowsClassParams& classParams);
+		WindowsWindowSystemFactory(Core::IApplication& application, const WindowsClassParams& classParams);
 		WindowsWindowSystemFactory(const WindowsWindowSystemFactory&) = delete;
 		WindowsWindowSystemFactory(WindowsWindowSystemFactory&&) = delete;
 
 		~WindowsWindowSystemFactory() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowParams NextWindowParams() const noexcept override;
-		virtual void NextWindowParams(const WindowParams& params) noexcept override;
-
+		virtual WindowsWindowParams& WindowParams() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual WindowsWindowParams NextWindowsWindowParams() const noexcept override;
-		virtual void NextWindowsWindowParams(const WindowsWindowParams& params) noexcept override;
+		virtual const WindowsWindowParams& WindowParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -72,56 +69,58 @@ export namespace PonyEngine::Window
 		static constexpr auto StaticName = "PonyEngine::Window::WindowsWindowSystemFactory"; ///< Class name.
 
 	private:
-		Log::ILogger* const logger; ///< Logger.
-
-		const HINSTANCE hInstance; ///< This dll instance.
-		const ATOM classAtom; ///< Window class atom.
+		/// @brief Gets this dll instance.
+		/// @return Instance.
+		[[nodiscard("Pure function")]]
+		static HINSTANCE GetInstance();
+		/// @brief Creates Windows class.
+		/// @param classParams Class parameters.
+		/// @return Created class.
+		[[nodiscard("Pure function")]]
+		ATOM CreateClass(const WindowsClassParams& classParams) const;
 
 		WindowsWindowParams windowParams; ///< Next window parameters.
+
+		Core::IApplication* application; ///< Application.
+
+		HINSTANCE hInstance; ///< This dll instance.
+		ATOM classAtom; ///< Window class atom.
 	};
 }
 
 namespace PonyEngine::Window
 {
-	/// @brief Gets HInstance.
-	/// @return HInstance.
-	[[nodiscard("Pure function")]]
-	HINSTANCE GetHInstance();
-
-	[[nodiscard("Pure function")]]
-	ATOM RegisterWindowClass(Log::ILogger& logger, HINSTANCE hInstance, const WindowsClassParams& classParams);
-
 	/// @brief Gets a default cursor.
 	/// @return Default cursor.
 	[[nodiscard("Pure function")]]
 	HCURSOR DefaultCursor();
 
-	WindowsWindowSystemFactory::WindowsWindowSystemFactory(Log::ILogger& loggerToUse, const WindowsClassParams& classParams) :
-		logger{&loggerToUse},
-		hInstance{GetHInstance()},
-		classAtom{RegisterWindowClass(loggerToUse, hInstance, classParams)}
+	WindowsWindowSystemFactory::WindowsWindowSystemFactory(Core::IApplication& application, const WindowsClassParams& classParams) :
+		application{&application},
+		hInstance{GetInstance()},
+		classAtom{CreateClass(classParams)}
 	{
 	}
 
 	WindowsWindowSystemFactory::~WindowsWindowSystemFactory() noexcept
 	{
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Unregister window class '{}'.", classAtom);
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Unregister window class '{}'.", classAtom);
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Error, "Couldn't unregister class. Error code: '{}'.", GetLastError());
+			PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Error, "Couldn't unregister class. Error code: '{}'.", GetLastError());
 		}
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window class unregistered.");
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Window class unregistered.");
 	}
 
-	Core::SystemData WindowsWindowSystemFactory::Create(const Core::SystemParams& params)
+	Core::SystemData WindowsWindowSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
 	{
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Create Windows window.");
-		const auto system = new WindowsWindowSystem(params.engine, hInstance, classAtom, windowParams);
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Windows window created.");
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Create Windows window.");
+		const auto system = new WindowsWindowSystem(engine, hInstance, classAtom, windowParams);
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Windows window created.");
 		const HWND hWnd = system->WindowHandle();
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		RegisterWindowProc(hWnd, system);
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window proc registered.");
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Window proc registered.");
 		const auto deleter = Core::SystemDeleter(*this);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
@@ -142,40 +141,28 @@ namespace PonyEngine::Window
 
 		if (windowsWindow->IsWindowAlive())
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Info, "Unregister window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Unregister window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			UnregisterWindowProc(hWnd);
-			PONY_LOG_GENERAL(logger, Log::LogType::Info, "Window proc unregistered.");
+			PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Window proc unregistered.");
 		}
 		else
 		{
-			PONY_LOG_GENERAL(logger, Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		}
 
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		delete windowsWindow;
-		PONY_LOG_GENERAL(logger, Log::LogType::Info, "Windows window destroyed.");
+		PONY_LOG_GENERAL(&application->Logger(), Log::LogType::Info, "Windows window destroyed.");
 	}
 
-	WindowParams WindowsWindowSystemFactory::NextWindowParams() const noexcept
-	{
-		return static_cast<WindowParams>(windowParams);
-	}
-
-	void WindowsWindowSystemFactory::NextWindowParams(const WindowParams& params) noexcept
-	{
-		windowParams.title = params.title;
-		windowParams.position = params.position;
-		windowParams.size = params.size;
-	}
-
-	WindowsWindowParams WindowsWindowSystemFactory::NextWindowsWindowParams() const noexcept
+	WindowsWindowParams& WindowsWindowSystemFactory::WindowParams() noexcept
 	{
 		return windowParams;
 	}
 
-	void WindowsWindowSystemFactory::NextWindowsWindowParams(const WindowsWindowParams& params) noexcept
+	const WindowsWindowParams& WindowsWindowSystemFactory::WindowParams() const noexcept
 	{
-		windowParams = params;
+		return windowParams;
 	}
 
 	const char* WindowsWindowSystemFactory::SystemName() const noexcept
@@ -188,18 +175,18 @@ namespace PonyEngine::Window
 		return StaticName;
 	}
 
-	HINSTANCE GetHInstance()
+	HINSTANCE WindowsWindowSystemFactory::GetInstance()
 	{
-		HINSTANCE hInstance;
+		HINSTANCE hInstance = NULL;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
-			throw std::logic_error(std::format("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(Utility::SafeFormat("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
 		}
 
 		return hInstance;
 	}
 
-	ATOM RegisterWindowClass(Log::ILogger& logger, const HINSTANCE hInstance, const WindowsClassParams& classParams)
+	ATOM WindowsWindowSystemFactory::CreateClass(const WindowsClassParams& classParams) const
 	{
 		const auto wc = WNDCLASSEXW
 		{
@@ -217,15 +204,16 @@ namespace PonyEngine::Window
 			.hIconSm = NULL
 		};
 
-		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "Register window class '{}'. HInstance: '{}'; Style: '{}'; Icon: '{}'; Cursor: '{}'.", Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
-		const ATOM classAtom = RegisterClassExW(&wc);
-		if (!classAtom)
+		PONY_LOG_GENERAL(&this->application->Logger(), Log::LogType::Info, "Register window class '{}'. HInstance: '{}'; Style: '{}'; Icon: '{}'; Cursor: '{}'.",
+			Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
+		const ATOM atom = RegisterClassExW(&wc);
+		if (!atom)
 		{
 			throw std::logic_error(Utility::SafeFormat("Couldn't register class. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "Window class '{}' registered.", classAtom);
+		PONY_LOG_GENERAL(&this->application->Logger(), Log::LogType::Info, "Window class '{}' registered.", atom);
 
-		return classAtom;
+		return atom;
 	}
 
 	HCURSOR DefaultCursor()

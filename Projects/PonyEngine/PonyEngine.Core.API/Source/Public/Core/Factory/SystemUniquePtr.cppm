@@ -67,7 +67,7 @@ namespace PonyEngine::Core
 
 	void SystemDeleter::operator ()(ISystem* const system) const noexcept
 	{
-		if (destroyer)
+		if (destroyer) [[likely]]
 		{
 			destroyer->Destroy(system);
 		}

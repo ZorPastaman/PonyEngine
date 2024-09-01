@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Compiler/Linking.h"
 
-export module PonyEngine.Log.Implementation;
+export module PonyEngine.Log.Implementation; // TODO: Move to PonyDebug
 
 import <filesystem>;
 

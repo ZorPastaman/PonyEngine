@@ -9,14 +9,13 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/EngineLog.h"
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
 import <exception>;
-import <format>;
-import <memory>;
-import <stdexcept>;
 import <string>;
 import <typeindex>;
 import <typeinfo>;
@@ -36,9 +35,9 @@ export namespace PonyEngine::Core
 	public:
 		/// @brief Creates a @p SystemManager.
 		/// @param systemFactories System factories.
-		/// @param engineToUse Engine that owns the manager.
+		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engineToUse);
+		SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine);
 		SystemManager(const SystemManager&) = delete;
 		SystemManager(SystemManager&&) = delete;
 
@@ -61,62 +60,56 @@ export namespace PonyEngine::Core
 		SystemManager& operator =(SystemManager&& other) = delete;
 
 	private:
+		/// @brief Creates a system.
+		/// @param factory Factory to use.
+		/// @return Created system.
+		[[nodiscard("Pure function")]]
+		SystemData CreateSystem(ISystemFactory* factory) const;
+
+		IEngine* engine; ///< Engine.
+
 		std::vector<SystemUniquePtr> systems; ///< Systems.
 		std::vector<ITickableSystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
-
-		const IEngine* const engine; ///< Engine that owns the manager.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	/// @brief Creates a system.
-	/// @param factory Factory to use.
-	/// @param params System params to use.
-	/// @return Created system.
-	[[nodiscard("Pure function")]]
-	SystemData CreateSystem(ISystemFactory* factory, const SystemParams& params);
-
-	SystemManager::SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engineToUse) :
-		engine{&engineToUse}
+	SystemManager::SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine) :
+		engine{&engine}
 	{
-		PONY_LOG(engine, Log::LogType::Info, "Create systems.");
+		PONY_LOG(this->engine, Log::LogType::Info, "Create systems.");
 
-		const auto systemParams = SystemParams{.engine = engineToUse};
 		for (ISystemFactory* const factory : systemFactories)
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG(this->engine, Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
-			SystemData system = CreateSystem(factory, systemParams);
-
-			if (!system.system)
-			{
-				throw std::logic_error(Log::SafeFormat("The '{}' system from the '{}' factory is nullptr.", factory->SystemName(), factory->Name()));
-			}
+			SystemData system = CreateSystem(factory);
+			assert(system.system && "The system is nullptr.");
 
 			systems.push_back(std::move(system.system));
 
 			if (system.tickableSystem)
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "Add to tickable systems.");
+				PONY_LOG(this->engine, Log::LogType::Debug, "Add to tickable systems.");
 				tickableSystems.push_back(system.tickableSystem);
 			}
 			else
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "System is not tickable.");
+				PONY_LOG(this->engine, Log::LogType::Debug, "System is not tickable.");
 			}
 
 			for (auto [interface, objectPointer] : system.publicInterfaces)
 			{
-				PONY_LOG(engine, Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
+				PONY_LOG(this->engine, Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
 				systemInterfaces.insert_or_assign(interface.get(), objectPointer);
 			}
 
-			PONY_LOG(engine, Log::LogType::Info, "System created.");
+			PONY_LOG(this->engine, Log::LogType::Info, "System created.");
 		}
 
-		PONY_LOG(engine, Log::LogType::Info, "Systems created.");
+		PONY_LOG(this->engine, Log::LogType::Info, "Systems created.");
 	}
 
 	SystemManager::~SystemManager() noexcept
@@ -207,15 +200,15 @@ namespace PonyEngine::Core
 		}
 	}
 
-	SystemData CreateSystem(ISystemFactory* factory, const SystemParams& params)
+	SystemData SystemManager::CreateSystem(ISystemFactory* const factory) const
 	{
 		try
 		{
-			return factory->Create(params);
+			return factory->Create(*engine, SystemParams{});
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(&params.engine, e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG_E(engine, e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
 			throw;
 		}

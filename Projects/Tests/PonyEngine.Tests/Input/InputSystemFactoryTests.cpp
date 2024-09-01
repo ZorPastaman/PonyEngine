@@ -19,6 +19,24 @@ namespace Input
 {
 	TEST_CLASS(InputSystemFactoryTests)
 	{
+		class Application : public PonyEngine::Core::IApplication
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -118,7 +136,8 @@ namespace Input
 
 		TEST_METHOD(CreateTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
 			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
@@ -126,21 +145,25 @@ namespace Input
 		{
 			auto logger = EmptyLogger();
 			auto engine = EmptyEngine(logger);
-			const auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
-			const auto factoryParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystem = factory.systemFactory->Create(factoryParams);
+			auto application = Application();
+			application.logger = &logger;
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto factoryParams = PonyEngine::Core::SystemParams();
+			auto inputSystem = factory.systemFactory->Create(engine, factoryParams);
 			Assert::IsNotNull(inputSystem.system.get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
 			Assert::AreEqual("PonyEngine::Input::InputSystem", factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
+			auto application = Application();
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
 			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory.systemFactory->Name());
 		}
 	};

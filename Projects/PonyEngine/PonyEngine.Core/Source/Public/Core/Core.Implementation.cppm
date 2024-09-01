@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyEngine/Compiler/Linking.h"
 
 export module PonyEngine.Core.Implementation;
@@ -22,20 +20,21 @@ import :EngineDestroyer;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Creates a new @p Engine instance with the @p params.
+	/// @brief Creates an engine.
+	/// @param application Application.
 	/// @param params Engine parameters.
-	/// @return Created @p Engine.
+	/// @return Created engine.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT EngineData CreateEngine(const EngineParams& params);
+	PONY_DLL_EXPORT EngineData CreateEngine(IApplication& application, const EngineParams& params);
 }
 
 namespace PonyEngine::Core
 {
 	auto DefaultEngineDestroyer = EngineDestroyer(); ///< Default engine destroyer.
 
-	EngineData CreateEngine(const EngineParams& params)
+	EngineData CreateEngine(IApplication& application, const EngineParams& params)
 	{
-		const auto engine = new Engine(params.logger, params.systemFactories);
+		const auto engine = new Engine(application, params.systemFactories);
 		const auto engineDeleter = EngineDeleter(DefaultEngineDestroyer);
 
 		return EngineData{.engine = EngineUniquePtr(engine, engineDeleter), .tickableEngine = engine};

@@ -15,23 +15,26 @@ export module PonyEngine.Input.Implementation;
 
 export import PonyEngine.Input.Factory;
 
+import PonyEngine.Core;
+
 import :InputSystemFactory;
 import :InputSystemFactoryDestroyer;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Creates an input system factory.
+	/// @param application Application.
 	/// @param params Input system factory parameters.
 	/// @return Input system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(const InputSystemFactoryParams& params);
+	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplication& application, const InputSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Input
 {
 	auto DefaultInputSystemFactoryDestroyer = InputSystemFactoryDestroyer(); ///< Default input system factory destroyer.
 
-	InputSystemFactoryData CreateInputSystemFactory(const InputSystemFactoryParams&)
+	InputSystemFactoryData CreateInputSystemFactory(Core::IApplication&, const InputSystemFactoryParams&)
 	{
 		const auto factory = new InputSystemFactory();
 		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultInputSystemFactoryDestroyer);

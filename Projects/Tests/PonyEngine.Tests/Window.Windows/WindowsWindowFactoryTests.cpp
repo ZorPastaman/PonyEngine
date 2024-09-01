@@ -19,6 +19,24 @@ namespace Window
 {
 	TEST_CLASS(WindowsWindowFactoryTests)
 	{
+		class Application : public PonyEngine::Core::IApplication
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -115,34 +133,40 @@ namespace Window
 		TEST_METHOD(CreateTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{.logger = logger, .windowsClassParams = classParams});
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			Assert::IsNotNull(factory.systemFactory.get());
-			Assert::IsNotNull(factory.windowsWindowSystemFactory);
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto window = factory.systemFactory->Create(systemParams);
+			Assert::IsNotNull(factory.windowSystemFactory);
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto window = factory.systemFactory->Create(engine, systemParams);
 			Assert::IsNotNull(window.system.get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{ .logger = logger, .windowsClassParams = classParams });
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams });
 			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystemFactory", factory.systemFactory->Name());
 		}
 
 		TEST_METHOD(GetSystemName)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(PonyEngine::Window::WindowsWindowSystemFactoryParams{ .logger = logger, .windowsClassParams = classParams });
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams });
 			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", factory.systemFactory->SystemName());
 		}
 	};

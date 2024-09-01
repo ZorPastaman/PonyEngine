@@ -21,27 +21,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
 	try
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger provider");
-		const auto loggerProvider = Application::WindowsLoggerProvider();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger provider created");
-
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows system factories provider.");
-		const auto windowsSystemFactoriesProvider = Application::WindowsEngineConfigProvider(loggerProvider.Logger());
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows system factories provider created.");
-
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create engine loop.");
-		auto engineLoop = Application::EngineLoop(loggerProvider.Logger(), windowsSystemFactoriesProvider);
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Engine loop created.");
-
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Create Windows loop.");
-		auto windowsLoop = Application::WindowsEndLoop(loggerProvider.Logger());
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Windows loop created.");
-
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Run main loop.");
-		const int exitCode = Application::RunLoop({&engineLoop, &windowsLoop});
-		PONY_LOG_GENERAL(&loggerProvider.Logger(), PonyEngine::Log::LogType::Info, "Main loop finished with exit code '{}'.", exitCode);
-
-		return exitCode;
+		return Application::WindowsApplication().Run();
 	}
 	catch (const std::exception& e)
 	{

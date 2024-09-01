@@ -34,7 +34,7 @@ export namespace PonyEngine::Time
 		~FrameRateSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -51,9 +51,9 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
-	Core::SystemData FrameRateSystemFactory::Create(const Core::SystemParams& params)
+	Core::SystemData FrameRateSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
 	{
-		const auto system = new FrameRateSystem(params.engine);
+		const auto system = new FrameRateSystem(engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 

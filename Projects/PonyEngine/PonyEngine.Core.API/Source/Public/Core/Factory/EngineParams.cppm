@@ -9,10 +9,6 @@
 
 export module PonyEngine.Core.Factory:EngineParams;
 
-import <functional>;
-
-import PonyEngine.Log;
-
 import :SystemFactoriesContainer;
 
 export namespace PonyEngine::Core
@@ -20,7 +16,6 @@ export namespace PonyEngine::Core
 	/// @brief Engine parameters.
 	struct EngineParams final
 	{
-		std::reference_wrapper<Log::ILogger> logger; ///< Logger.
 		SystemFactoriesContainer systemFactories; ///< System factories.
 	};
 }

@@ -22,6 +22,24 @@ namespace Input
 {
 	TEST_CLASS(InputSystemTests)
 	{
+		class Application : public PonyEngine::Core::IApplication
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -144,18 +162,20 @@ namespace Input
 		TEST_METHOD(BeginEndTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
 			auto keyboardProvider = KeyboardProvider();
 			engine.systemManager.keyboardProvider = &keyboardProvider;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
 			keyboardProvider.expectedObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystemBase.system.get());
 			inputSystemBase.system->Begin();
 			inputSystemBase.system->End();
 
 			engine.systemManager.keyboardProvider = nullptr;
-			inputSystemBase = factory.systemFactory->Create(systemParams);
+			inputSystemBase = factory.systemFactory->Create(engine, systemParams);
 			inputSystemBase.system->Begin();
 			inputSystemBase.system->End();
 		}
@@ -163,10 +183,12 @@ namespace Input
 		TEST_METHOD(TickTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
 			inputSystemBase.system->Begin();
@@ -195,10 +217,12 @@ namespace Input
 		TEST_METHOD(GetNameTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto inputSystemBase = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
 			Assert::AreEqual("PonyEngine::Input::InputSystem", inputSystemBase.system->Name());
 		}
 	};

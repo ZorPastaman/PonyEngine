@@ -20,6 +20,6 @@ export namespace PonyEngine::Window
 	{
 		Core::SystemFactoryUniquePtr systemFactory; ///< System factory.
 
-		IWindowsWindowSystemFactory* windowsWindowSystemFactory; ///< Window for Windows system factory.
+		IWindowsWindowSystemFactory* windowSystemFactory; ///< Window system factory.
 	};
 }

@@ -9,26 +9,25 @@
 
 export module PonyEngine.Window.Windows.Factory:IWindowsWindowSystemFactory;
 
-import PonyEngine.Window.Factory;
-
 import :WindowsWindowParams;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window system for Windows factory.
-	class IWindowsWindowSystemFactory : public IWindowSystemFactory
+	class IWindowsWindowSystemFactory
 	{
 	public:
 		IWindowsWindowSystemFactory(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory(IWindowsWindowSystemFactory&&) = delete;
 
-		/// @brief Gets the next Windows window params.
-		/// @return Next Windows window params.
+		/// @brief Gets the next window params.
+		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual WindowsWindowParams NextWindowsWindowParams() const noexcept = 0;
-		/// @brief Sets the next Windows window params.
-		/// @param params Next Windows window params to set.
-		virtual void NextWindowsWindowParams(const WindowsWindowParams& params) noexcept = 0;
+		virtual WindowsWindowParams& WindowParams() noexcept = 0;
+		/// @brief Gets the next window params.
+		/// @return Next window params.
+		[[nodiscard("Pure function")]]
+		virtual const WindowsWindowParams& WindowParams() const noexcept = 0;
 
 		IWindowsWindowSystemFactory& operator =(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory& operator =(IWindowsWindowSystemFactory&&) = delete;

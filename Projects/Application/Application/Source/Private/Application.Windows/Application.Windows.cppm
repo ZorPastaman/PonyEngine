@@ -9,8 +9,4 @@
 
 export module Application.Windows;
 
-export import Application;
-
-export import :WindowsEndLoop;
-export import :WindowsEngineConfigProvider;
-export import :WindowsLoggerProvider;
+export import :WindowsApplication;

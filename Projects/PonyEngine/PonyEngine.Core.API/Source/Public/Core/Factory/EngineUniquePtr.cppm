@@ -65,7 +65,7 @@ namespace PonyEngine::Core
 
 	void EngineDeleter::operator ()(IEngine* const engine) const noexcept
 	{
-		if (engineDestroyer)
+		if (engineDestroyer) [[likely]]
 		{
 			engineDestroyer->Destroy(engine);
 		}

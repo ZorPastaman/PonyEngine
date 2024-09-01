@@ -15,23 +15,26 @@ export module Game.Implementation;
 
 export import Game.Factory;
 
+import PonyEngine.Core;
+
 import :GameSystemFactory;
 import :GameSystemFactoryDestroyer;
 
 export namespace Game
 {
 	/// @brief Creates a game system factory.
+	/// @param application Application
 	/// @param params Game system factory parameters.
 	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(const GameSystemFactoryParams& params);
+	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplication& application, const GameSystemFactoryParams& params);
 }
 
 namespace Game
 {
 	auto DefaultGameSystemFactoryDestroyer = GameSystemFactoryDestroyer(); ///< Default game system factory destroyer.
 
-	GameSystemFactoryData CreateGameSystemFactory(const GameSystemFactoryParams&)
+	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplication&, const GameSystemFactoryParams&)
 	{
 		const auto factory = new GameSystemFactory();
 		const auto factoryDeleter = PonyEngine::Core::SystemFactoryDeleter(DefaultGameSystemFactoryDestroyer);

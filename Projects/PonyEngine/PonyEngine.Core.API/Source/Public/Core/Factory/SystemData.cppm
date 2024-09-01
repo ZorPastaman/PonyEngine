@@ -22,6 +22,7 @@ export namespace PonyEngine::Core
 		SystemUniquePtr system; ///< System.
 
 		ITickableSystem* tickableSystem = nullptr; ///< Tickable system. Optional.
+
 		ObjectInterfaces publicInterfaces; ///< System public interfaces.
 	};
 }
