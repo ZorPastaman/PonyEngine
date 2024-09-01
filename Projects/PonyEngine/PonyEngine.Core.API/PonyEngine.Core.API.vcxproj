@@ -31,6 +31,7 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoryUniquePtr.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm" />
+    <ClCompile Include="Source\Public\Core\IApplication.cppm" />
     <ClCompile Include="Source\Public\Core\ITickableSystem.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemUniquePtr.cppm" />

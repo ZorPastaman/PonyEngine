@@ -39,12 +39,12 @@ export namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
-		/// @param engineToUse Engine that owns the window.
-		/// @param hInstance Instance that owns the engine.
+		/// @param engine Engine.
+		/// @param hInstance Instance.
 		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystem(Core::IEngine& engineToUse, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
+		WindowsWindowSystem(Core::IEngine& engine, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
 		WindowsWindowSystem(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem(WindowsWindowSystem&&) = delete;
 
@@ -98,11 +98,20 @@ export namespace PonyEngine::Window
 		/// @param isDown @a True if the button is pressed, @a false if it's up.
 		void PushKeyboardKeyMessage(LPARAM lParam, bool isDown) const;
 
-		Core::IEngine* const engine; ///< Engine that owns the window.
-		const HWND hWnd; ///< Window handler.
+		/// @brief Creates a window.
+		/// @param hInstance Instance.
+		/// @param className Class name.
+		/// @param windowParams Window parameters.
+		/// @return Created window.
+		[[nodiscard("Pure function")]]
+		HWND CreateControlledWindow(HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
 
 		std::wstring mainTitle; ///< Window main title cache.
 		std::wstring secondaryTitle; ///< Window title text cache.
+
+		Core::IEngine* engine; ///< Engine.
+
+		HWND hWnd; ///< Window handler.
 
 		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
 	};
@@ -110,22 +119,12 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Creates a Windows window.
-	/// @param engine Engine.
-	/// @param windowProc Window proc.
-	/// @param hInstance Instance.
-	/// @param className Window class name.
-	/// @param windowParams Window parameters.
-	/// @return Created Windows window.
-	[[nodiscard("Pure function")]]
-	HWND CreateWindowsWindow(const Core::IEngine& engine, IWindowProc& windowProc, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
-
-	WindowsWindowSystem::WindowsWindowSystem(Core::IEngine& engineToUse, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams) :
-		engine{&engineToUse},
+	WindowsWindowSystem::WindowsWindowSystem(Core::IEngine& engine, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams) :
 		mainTitle(windowParams.title),
-		hWnd{CreateWindowsWindow(*engine, *this, hInstance, className, windowParams)}
+		engine{&engine},
+		hWnd{CreateControlledWindow(hInstance, className, windowParams)}
 	{
-		PONY_LOG(engine, Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
+		PONY_LOG(this->engine, Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
 
@@ -309,28 +308,28 @@ namespace PonyEngine::Window
 		}
 	}
 
-	HWND CreateWindowsWindow(const Core::IEngine& engine, IWindowProc& windowProc, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
+	HWND WindowsWindowSystem::CreateControlledWindow(const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
 	{
-		PONY_LOG(&engine, Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
+		PONY_LOG(this->engine, Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
 			className, windowParams.style, windowParams.extendedStyle, Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
-		const HWND hWnd = CreateWindowExW(
+		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
 			reinterpret_cast<LPCWSTR>(className),
-			windowParams.title.c_str(),
+			mainTitle.c_str(),
 			windowParams.style,
 			windowParams.position.X(), windowParams.position.Y(),
 			windowParams.size.X(), windowParams.size.Y(),
 			NULL,
 			NULL,
 			hInstance,
-			&windowProc
+			static_cast<IWindowProc*>(this)
 		);
-		if (!hWnd)
+		if (!windowHandle)
 		{
 			throw std::logic_error(Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG(&engine, Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(this->engine, Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
-		return hWnd;
+		return windowHandle;
 	}
 }

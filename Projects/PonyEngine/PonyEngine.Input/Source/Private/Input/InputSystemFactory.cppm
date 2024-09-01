@@ -16,7 +16,6 @@ export module PonyEngine.Input.Implementation:InputSystemFactory;
 import <utility>;
 
 import PonyEngine.Core.Factory;
-import PonyEngine.Input.Factory;
 
 import :InputSystem;
 
@@ -33,7 +32,7 @@ export namespace PonyEngine::Input
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -51,16 +50,15 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	Core::SystemData InputSystemFactory::Create(const Core::SystemParams& params)
+	Core::SystemData InputSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
 	{
-		const auto system = new InputSystem(params.engine);
-		const auto deleter = Core::SystemDeleter(*this);
+		const auto system = new InputSystem(engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IInputSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, deleter),
+			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
 			.tickableSystem = system,
 			.publicInterfaces = std::move(interfaces)
 		};

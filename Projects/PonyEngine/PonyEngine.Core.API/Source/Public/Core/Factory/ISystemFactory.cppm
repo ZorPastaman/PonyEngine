@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core.Factory:ISystemFactory;
 
+import PonyEngine.Core;
+
 import :SystemData;
 import :SystemParams;
 
@@ -22,20 +24,21 @@ export namespace PonyEngine::Core
 		ISystemFactory(ISystemFactory&&) = delete;
 
 		/// @brief Creates a system.
+		///	@param engine Engine.
 		/// @param params System parameters.
 		/// @return Created system.
 		[[nodiscard("Pure function")]]
-		virtual SystemData Create(const SystemParams& params) = 0;
-
-		/// @brief Gets the system factory name.
-		/// @return System factory name.
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
+		virtual SystemData Create(IEngine& engine, const SystemParams& params) = 0;
 
 		/// @brief Gets the system static name.
 		/// @return System static name.
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept = 0;
+
+		/// @brief Gets the system factory name.
+		/// @return System factory name.
+		[[nodiscard("Pure function")]]
+		virtual const char* Name() const noexcept = 0;
 
 		ISystemFactory& operator =(const ISystemFactory&) = delete;
 		ISystemFactory& operator =(ISystemFactory&&) = delete;

@@ -12,15 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Main.Windows.cpp" />
-    <ClCompile Include="Source\Private\Application\EngineLoop.cppm" />
-    <ClCompile Include="Source\Private\Application\ILoopElement.cppm" />
-    <ClCompile Include="Source\Private\Application\IEngineConfigProvider.cppm" />
-    <ClCompile Include="Source\Private\Application\Application.cppm" />
-    <ClCompile Include="Source\Private\Application\Loop.cppm" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsApplication.cppm" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsEngine.cppm" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsLogger.cppm" />
+    <ClCompile Include="Source\Private\Application.Windows\WindowsQuitChecker.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows.cppm" />
-    <ClCompile Include="Source\Private\Application.Windows\WindowsLoggerProvider.cppm" />
-    <ClCompile Include="Source\Private\Application.Windows\WindowsEngineConfigProvider.cppm" />
-    <ClCompile Include="Source\Private\Application.Windows\WindowsEndLoop.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">

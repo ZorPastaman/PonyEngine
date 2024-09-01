@@ -24,7 +24,7 @@ export namespace PonyEngine::Window
 		IWindowsWindowSystem(const IWindowsWindowSystem&) = delete;
 		IWindowsWindowSystem(IWindowsWindowSystem&&) = delete;
 
-		/// @brief Gets the windows window handle.
+		/// @brief Gets the window handle.
 		/// @return Window handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept = 0;

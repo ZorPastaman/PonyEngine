@@ -19,7 +19,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.
-		/// @param engine Engine that owns the render system.
+		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
 		explicit WindowsDirect3D12RenderSystem(Core::IEngine& engine) noexcept;
 		WindowsDirect3D12RenderSystem(const WindowsDirect3D12RenderSystem&) = delete;
@@ -41,7 +41,7 @@ export namespace PonyEngine::Render
 		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystem"; ///< Class name.
 
 	private:
-		Core::IEngine* const engine;
+		Core::IEngine* engine; ///< Engine.
 	};
 }
 

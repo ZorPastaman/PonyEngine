@@ -30,10 +30,10 @@ export namespace PonyEngine::Input
 	class InputSystem final : public Core::ISystem, public Core::ITickableSystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:
-		/// @brief Creates an @p Input system
-		/// @param engine Engine that owns the input system.
+		/// @brief Creates an input system
+		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
-		explicit InputSystem(const Core::IEngine& engine) noexcept;
+		explicit InputSystem(Core::IEngine& engine) noexcept;
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
@@ -59,18 +59,20 @@ export namespace PonyEngine::Input
 		static constexpr auto StaticName = "PonyEngine::Input::InputSystem"; ///< Class name.
 
 	private:
-		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
 		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
-		std::queue<KeyboardMessage> queue; ///< Message queue.
-		std::unordered_map<KeyboardKeyCode, bool> keyStates;
 
-		const Core::IEngine* const engine; ///< Engine that owns the input system.
+		std::unordered_map<KeyboardKeyCode, bool> keyStates; ///< Current key states.
+		std::queue<KeyboardMessage> queue; ///< Message queue.
+
+		Core::IEngine* engine; ///< Engine.
+
+		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	InputSystem::InputSystem(const Core::IEngine& engine) noexcept :
+	InputSystem::InputSystem(Core::IEngine& engine) noexcept :
 		currentId{1},
 		engine{&engine}
 	{
@@ -78,12 +80,12 @@ namespace PonyEngine::Input
 
 	void InputSystem::Begin()
 	{
-		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>())
+		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->AddKeyboardObserver(*this);
 		}
-		else
+		else [[unlikely]]
 		{
 			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find keyboard provider, keyboard input won't work.");
 		}
@@ -91,7 +93,7 @@ namespace PonyEngine::Input
 
 	void InputSystem::End()
 	{
-		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>())
+		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
 			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->RemoveKeyboardObserver(*this);

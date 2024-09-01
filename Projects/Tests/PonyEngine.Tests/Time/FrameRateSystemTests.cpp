@@ -22,6 +22,24 @@ namespace Time
 {
 	TEST_CLASS(FrameRateSystemTests)
 	{
+		class Application : public PonyEngine::Core::IApplication
+		{
+		public:
+			PonyEngine::Log::ILogger* logger;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			{
+				return *logger;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const char* Name() const noexcept override
+			{
+				return "";
+			}
+		};
+
 		class EmptyLogger final : public PonyEngine::Log::ILogger
 		{
 		public:
@@ -115,10 +133,12 @@ namespace Time
 		TEST_METHOD(TickTest)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto frameRateSystemBase = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 			frameRateSystemBase.system->Begin();
 			float frameTime = 5.f;
@@ -136,10 +156,12 @@ namespace Time
 		TEST_METHOD(GetSetFrameTimeRate)
 		{
 			auto logger = EmptyLogger();
+			auto application = Application();
+			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams{.engine = engine};
-			auto frameRateSystemBase = factory.systemFactory->Create(systemParams);
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			const auto systemParams = PonyEngine::Core::SystemParams();
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, systemParams);
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
 
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());

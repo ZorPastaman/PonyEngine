@@ -9,15 +9,10 @@
 
 export module PonyEngine.Core.Factory:SystemParams;
 
-import <functional>;
-
-import PonyEngine.Core;
-
 export namespace PonyEngine::Core
 {
 	/// @brief System parameters.
 	struct SystemParams final
 	{
-		std::reference_wrapper<IEngine> engine; ///< Engine that owns the system.
 	};
 }

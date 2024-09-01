@@ -11,8 +11,6 @@ export module PonyEngine.Core.Factory:SystemFactoryUniquePtr;
 
 import <memory>;
 
-import PonyEngine.Core;
-
 import :ISystemFactoryDestroyer;
 
 export namespace PonyEngine::Core
@@ -67,7 +65,7 @@ namespace PonyEngine::Core
 
 	void SystemFactoryDeleter::operator ()(ISystemFactory* const factory) const noexcept
 	{
-		if (destroyer)
+		if (destroyer) [[likely]]
 		{
 			destroyer->Destroy(factory);
 		}

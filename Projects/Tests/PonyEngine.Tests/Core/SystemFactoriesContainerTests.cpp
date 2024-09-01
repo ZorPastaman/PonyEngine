@@ -21,7 +21,7 @@ namespace Core
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(const PonyEngine::Core::SystemParams&) override
+			virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine&, const PonyEngine::Core::SystemParams&) override
 			{
 				return PonyEngine::Core::SystemData{.system = PonyEngine::Core::SystemUniquePtr(nullptr, PonyEngine::Core::SystemDeleter(*this))};
 			}

@@ -14,15 +14,12 @@ module;
 export module PonyEngine.Core.Implementation:Engine;
 
 import <cstddef>;
-import <exception>;
-import <format>;
 import <memory>;
 import <stdexcept>;
-import <string>;
 
+import PonyEngine.Common;
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.Common;
 
 import :SystemManager;
 
@@ -33,10 +30,10 @@ export namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates an @p Engine.
-		/// @param logger Logger.
+		/// @param application Application.
 		/// @param systemFactories System factories.
 		[[nodiscard("Pure constructor")]]
-		Engine(Log::ILogger& logger, const SystemFactoriesContainer& systemFactories);
+		Engine(IApplication& application, const SystemFactoriesContainer& systemFactories);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
@@ -67,41 +64,37 @@ export namespace PonyEngine::Core
 		static constexpr auto StaticName = "PonyEngine::Core::Engine"; ///< Class name.
 
 	private:
-		std::size_t frameCount; ///< Frame count.
+		/// @brief Creates a system manager.
+		/// @param systemFactories Engine parameters.
+		/// @return Created system manager.
+		[[nodiscard("Pure function")]]
+		std::unique_ptr<Core::SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories);
 
+		std::size_t frameCount; ///< Frame count.
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
 
-		Log::ILogger* const logger; ///< Logger.
+		IApplication* application; ///< Application
+
 		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	/// @brief Prepares the @p logger for work.
-	/// @param logger Logger.
-	/// @return Prepared logger.
-	[[nodiscard("Pure function")]]
-	Log::ILogger* PrepareLogger(Log::ILogger& logger) noexcept;
-	/// @brief Creates a system manager.
-	/// @param systemFactories Engine parameters.
-	/// @param engine Engine that owns the manager.
-	/// @return Created system manager.
-	[[nodiscard("Pure function")]]
-	std::unique_ptr<SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine);
-
-	Engine::Engine(Log::ILogger& logger, const SystemFactoriesContainer& systemFactories) :
+	Engine::Engine(IApplication& application, const SystemFactoriesContainer& systemFactories) :
 		frameCount{0},
 		isRunning{true},
 		isTicking{false},
-		logger{PrepareLogger(logger)},
-		systemManager{CreateSystemManager(systemFactories, *this)}
+		application{&application},
+		systemManager{CreateSystemManager(systemFactories)}
 	{
 		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
 		systemManager->Begin();
 		PONY_LOG(this, Log::LogType::Info, "System manager begun.");
+
+		PONY_LOG(this, Log::LogType::Debug, "Engine created in '{}' application.", application.Name());
 	}
 
 	Engine::~Engine() noexcept
@@ -122,7 +115,7 @@ namespace PonyEngine::Core
 
 	Log::ILogger& Engine::Logger() const noexcept
 	{
-		return *logger;
+		return application->Logger();
 	}
 
 	ISystemManager& Engine::SystemManager() const noexcept
@@ -158,12 +151,12 @@ namespace PonyEngine::Core
 
 	void Engine::Tick()
 	{
-		if (!isRunning)
+		if (!isRunning) [[unlikely]]
 		{
 			throw std::logic_error("Engine is ticked when it's already been stopped.");
 		}
 
-		if (isTicking)
+		if (isTicking) [[unlikely]]
 		{
 			throw std::logic_error("Engine is ticked inside another tick.");
 		}
@@ -193,19 +186,12 @@ namespace PonyEngine::Core
 		return StaticName;
 	}
 
-	Log::ILogger* PrepareLogger(Log::ILogger& logger) noexcept
+	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager(const SystemFactoriesContainer& systemFactories)
 	{
-		PONY_LOG_GENERAL(&logger, Log::LogType::Info, "Engine uses '{}' logger.", logger.Name());
+		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
+		const auto manager = new Core::SystemManager(systemFactories, *this);
+		PONY_LOG(this, Log::LogType::Info, "System manager created.");
 
-		return &logger;
-	}
-
-	std::unique_ptr<SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine)
-	{
-		PONY_LOG(&engine, Log::LogType::Info, "Create system manager.");
-		const auto systemManager = new SystemManager(systemFactories, engine);
-		PONY_LOG(&engine, Log::LogType::Info, "System manager created.");
-
-		return std::unique_ptr<SystemManager>(systemManager);
+		return std::unique_ptr<Core::SystemManager>(manager);
 	}
 }

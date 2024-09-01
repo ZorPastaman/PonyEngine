@@ -78,6 +78,9 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoryUniquePtr.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Core\IApplication.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
