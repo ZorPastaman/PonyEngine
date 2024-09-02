@@ -9,4 +9,6 @@
 
 export module Application.Windows;
 
+export import Application;
+
 export import :WindowsApplication;

@@ -11,8 +11,9 @@ module;
 
 #include <cassert>
 
+#include "PonyBase/Core/Windows/Framework.h"
+
 #include "PonyEngine/Log/EngineLog.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystemFactory;
 
@@ -23,9 +24,10 @@ import <stdexcept>;
 import <string>;
 import <utility>;
 
+import PonyBase.StringUtility;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.StringUtility;
 import PonyEngine.Window.Windows.Factory;
 
 import :IWindowProc;
@@ -180,7 +182,7 @@ namespace PonyEngine::Window
 		HINSTANCE hInstance = NULL;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
-			throw std::logic_error(Utility::SafeFormat("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
 		}
 
 		return hInstance;
@@ -205,11 +207,11 @@ namespace PonyEngine::Window
 		};
 
 		PONY_LOG_GENERAL(&this->application->Logger(), Log::LogType::Info, "Register window class '{}'. HInstance: '{}'; Style: '{}'; Icon: '{}'; Cursor: '{}'.",
-			Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
+			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
 		const ATOM atom = RegisterClassExW(&wc);
 		if (!atom)
 		{
-			throw std::logic_error(Utility::SafeFormat("Couldn't register class. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't register class. Error code: '{}'.", GetLastError()));
 		}
 		PONY_LOG_GENERAL(&this->application->Logger(), Log::LogType::Info, "Window class '{}' registered.", atom);
 
@@ -221,7 +223,7 @@ namespace PonyEngine::Window
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::logic_error(Utility::SafeFormat("Couldn't load default cursor. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '{}'.", GetLastError()));
 		}
 
 		return cursor;

@@ -9,8 +9,8 @@
 
 #include "CppUnitTest.h"
 
-import <string>;
-import <type_traits>;
+#include <string>
+#include <type_traits>
 
 import PonyEngine.Log;
 

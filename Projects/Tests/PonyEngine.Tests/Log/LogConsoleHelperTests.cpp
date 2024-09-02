@@ -32,10 +32,10 @@
 #endif
 #include "PonyEngine/Log/Log.h"
 
-import <cstdint>;
-import <format>;
-import <iostream>;
-import <string>;
+#include <cstdint>
+#include <format>
+#include <iostream>
+#include <string>
 
 import PonyEngine.Log;
 

@@ -9,11 +9,11 @@
 
 #include "CppUnitTest.h"
 
-import <cstddef>;
-import <cstdint>;
-import <exception>;
-import <format>;
-import <string>;
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <format>
+#include <string>
 
 import PonyEngine.Log;
 

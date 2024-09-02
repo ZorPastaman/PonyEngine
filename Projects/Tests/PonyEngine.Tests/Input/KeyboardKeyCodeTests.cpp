@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import <cstdint>;
+#include <cstdint>
 
 import PonyEngine.Input;
 

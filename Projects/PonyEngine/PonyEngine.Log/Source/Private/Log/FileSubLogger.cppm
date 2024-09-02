@@ -17,8 +17,9 @@ import <filesystem>;
 import <fstream>;
 import <stdexcept>;
 
+import PonyBase.StringUtility;
+
 import PonyEngine.Log;
-import PonyEngine.StringUtility;
 
 export namespace PonyEngine::Log
 {
@@ -55,11 +56,11 @@ namespace PonyEngine::Log
 	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
 		logFile(logPath)
 	{
-		PONY_CONSOLE(LogType::Debug, "Log file stream created at path '{}'.", Utility::ConvertToString(logPath.c_str()));
+		PONY_CONSOLE(LogType::Debug, "Log file stream created at path '{}'.", PonyBase::Utility::ConvertToString(logPath.c_str()));
 
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error(SafeFormat("Log file at path '{}' isn't open.", Utility::ConvertToString(logPath.c_str())));
+			throw std::logic_error(SafeFormat("Log file at path '{}' isn't open.", PonyBase::Utility::ConvertToString(logPath.c_str())));
 		}
 	}
 

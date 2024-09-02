@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyBase/Core/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows:IWindowsWindowSystem;
 

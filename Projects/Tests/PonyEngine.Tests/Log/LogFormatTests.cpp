@@ -9,10 +9,9 @@
 
 #include "CppUnitTest.h"
 
-import <chrono>;
-import <cstddef>;
-import <format>;
-import <string>;
+#include <chrono>
+#include <cstddef>
+#include <format>
 
 import PonyEngine.Log;
 

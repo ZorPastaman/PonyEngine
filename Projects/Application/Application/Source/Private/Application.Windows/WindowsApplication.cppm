@@ -9,8 +9,9 @@
 
 export module Application.Windows:WindowsApplication;
 
-import PonyEngine.Core;
 import PonyEngine.Log;
+
+import Application;
 
 import :WindowsLogger;
 import :WindowsEngine;
@@ -19,7 +20,7 @@ import :WindowsQuitChecker;
 export namespace Application
 {
 	/// @brief Application for Windows.
-	class WindowsApplication final : PonyEngine::Core::IApplication
+	class WindowsApplication final : IApplication
 	{
 	public:
 		/// @brief Creates a @p WindowsApplication.
@@ -30,8 +31,6 @@ export namespace Application
 
 		~WindowsApplication() noexcept = default;
 
-		/// @brief Gets the logger.
-		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual PonyEngine::Log::ILogger& Logger() const noexcept override;
 
@@ -70,12 +69,12 @@ namespace Application
 	int WindowsApplication::Run() const
 	{
 		int exitCode = 0;
-		bool running;
+		bool isRunning;
 
 		do
 		{
-			running = engine.Tick(exitCode) && quitChecker.Check(exitCode);
-		} while (running);
+			isRunning = engine.Tick(exitCode) && quitChecker.Check(exitCode);
+		} while (isRunning);
 
 		return exitCode;
 	}

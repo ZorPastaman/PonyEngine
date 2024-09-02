@@ -9,11 +9,11 @@
 
 #include "CppUnitTest.h"
 
-import <chrono>;
-import <cstddef>;
-import <filesystem>;
-import <fstream>;
-import <string>;
+#include <chrono>
+#include <cstddef>
+#include <filesystem>
+#include <fstream>
+#include <string>
 
 import PonyEngine.Log.Implementation;
 

@@ -94,32 +94,14 @@
     <ClCompile Include="Log\LogTypeTests.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
     <ClCompile Include="Log\SubLoggerDeleterTests.cpp" />
-    <ClCompile Include="Math\RGBAIntTests.cpp" />
-    <ClCompile Include="Math\RGBATests.cpp" />
-    <ClCompile Include="Math\RGBIntTests.cpp" />
-    <ClCompile Include="Math\CommonTests.cpp" />
-    <ClCompile Include="Math\Matrix2x2Tests.cpp" />
-    <ClCompile Include="Math\Matrix3x3Tests.cpp" />
-    <ClCompile Include="Math\Matrix4x4Tests.cpp" />
-    <ClCompile Include="Math\QuaternionTests.cpp" />
-    <ClCompile Include="Math\RGBTests.cpp" />
-    <ClCompile Include="Math\Transformations2DTests.cpp" />
-    <ClCompile Include="Math\Transformations3DTests.cpp" />
-    <ClCompile Include="Math\Vector2Tests.cpp" />
-    <ClCompile Include="Math\Vector3Tests.cpp" />
-    <ClCompile Include="Math\Vector4Tests.cpp" />
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemTests.cpp" />
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp" />
-    <ClCompile Include="Utility\StringUtilityTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowFactoryTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
-      <Project>{d637b8c4-8abf-421e-9b7e-0b842096fb62}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
@@ -131,23 +113,20 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj">
       <Project>{245050d3-3c78-445c-89b1-9972e3fcc379}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
+      <Project>{7f22adbe-2c5a-44be-b885-c2d041337190}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log\PonyEngine.Log.vcxproj">
       <Project>{260938ca-8a73-40f8-ab77-d1a2295e8fd9}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Math\PonyEngine.Math.vcxproj">
-      <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time.API\PonyEngine.Time.API.vcxproj">
       <Project>{8b3f2887-0863-444c-884e-dfe775f31ba0}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time\PonyEngine.Time.vcxproj">
       <Project>{d58a635f-ec7c-4b7b-8301-7c51118d9d6f}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Utility\PonyEngine.Utility.vcxproj">
-      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
       <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>

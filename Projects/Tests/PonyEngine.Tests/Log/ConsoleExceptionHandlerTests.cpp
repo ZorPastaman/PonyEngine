@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import <iostream>;
+#include <iostream>
 
 import PonyEngine.Log;
 

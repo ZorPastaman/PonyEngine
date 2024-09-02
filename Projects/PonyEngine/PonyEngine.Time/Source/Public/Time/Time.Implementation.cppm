@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Compiler/Linking.h"
+#include "PonyBase/Core/Linking.h"
 
 export module PonyEngine.Time.Implementation;
 

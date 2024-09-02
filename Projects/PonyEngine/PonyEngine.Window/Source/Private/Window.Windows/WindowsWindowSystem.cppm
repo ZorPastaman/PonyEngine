@@ -11,8 +11,9 @@ module;
 
 #include <cassert>
 
+#include "PonyBase/Core/Windows/Framework.h"
+
 #include "PonyEngine/Log/EngineLog.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
 
@@ -22,11 +23,12 @@ import <stdexcept>;
 import <string>;
 import <vector>;
 
+import PonyBase.Math;
+import PonyBase.StringUtility;
+
 import PonyEngine.Core;
 import PonyEngine.Log;
 import PonyEngine.Input;
-import PonyEngine.Math;
-import PonyEngine.StringUtility;
 import PonyEngine.Window.Windows.Factory;
 
 import :IWindowProc;
@@ -276,10 +278,10 @@ namespace PonyEngine::Window
 
 		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
 		{
-			throw std::logic_error(Utility::SafeFormat("Couldn't set new window title. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '{}'.", GetLastError()));
 		}
 
-		PONY_LOG(engine, Log::LogType::Verbose, "Window title set to {}.", Utility::ConvertToString(titleToSet));
+		PONY_LOG(engine, Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
 	}
 
 	void WindowsWindowSystem::Destroy() const noexcept
@@ -311,7 +313,7 @@ namespace PonyEngine::Window
 	HWND WindowsWindowSystem::CreateControlledWindow(const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
 	{
 		PONY_LOG(this->engine, Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
-			className, windowParams.style, windowParams.extendedStyle, Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
+			className, windowParams.style, windowParams.extendedStyle, PonyBase::Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
 		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
 			reinterpret_cast<LPCWSTR>(className),
@@ -326,7 +328,7 @@ namespace PonyEngine::Window
 		);
 		if (!windowHandle)
 		{
-			throw std::logic_error(Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
 		}
 		PONY_LOG(this->engine, Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 

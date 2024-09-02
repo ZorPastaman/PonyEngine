@@ -9,10 +9,10 @@
 
 #include "CppUnitTest.h"
 
-import <cstddef>;
-import <cstdint>;
-import <exception>;
-import <type_traits>;
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <type_traits>
 
 import PonyEngine.Log.Implementation;
 
