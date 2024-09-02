@@ -9,8 +9,8 @@
 
 #include "CppUnitTest.h"
 
-import <cstddef>;
-import <functional>;
+#include <cstddef>
+#include <functional>
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Implementation;

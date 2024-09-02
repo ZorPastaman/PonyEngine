@@ -9,12 +9,12 @@
 
 #include "CppUnitTest.h"
 
-import <chrono>;
-import <cstddef>;
-import <cstdint>;
-import <exception>;
-import <string>;
-import <type_traits>;
+#include <chrono>
+#include <cstddef>
+#include <cstdint>
+#include <exception>
+#include <string>
+#include <type_traits>
 
 import PonyEngine.Log;
 

@@ -17,7 +17,8 @@ import <cstddef>;
 import <memory>;
 import <stdexcept>;
 
-import PonyEngine.Common;
+import PonyBase.Core;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
 
@@ -51,7 +52,7 @@ export namespace PonyEngine::Core
 		virtual bool IsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int ExitCode() const noexcept override;
-		virtual void Stop(int exitCode = static_cast<int>(Common::ExitCodes::Success)) noexcept override;
+		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept override;
 
 		virtual void Tick() override;
 
@@ -171,7 +172,7 @@ namespace PonyEngine::Core
 		catch (...)
 		{
 			// Logging is done in the system manager.
-			Stop(static_cast<int>(Common::ExitCodes::SystemTickException));
+			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
 			isTicking = false;
 
 			throw;

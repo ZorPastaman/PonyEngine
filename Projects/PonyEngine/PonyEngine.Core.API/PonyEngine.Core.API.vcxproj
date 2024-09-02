@@ -31,7 +31,7 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoryUniquePtr.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm" />
-    <ClCompile Include="Source\Public\Core\IApplication.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\IApplication.cppm" />
     <ClCompile Include="Source\Public\Core\ITickableSystem.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemUniquePtr.cppm" />
@@ -42,7 +42,7 @@
     <ClCompile Include="Source\Public\Core\LogHelper.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Common\PonyEngine.Common.vcxproj">
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Log.API\PonyEngine.Log.API.vcxproj">

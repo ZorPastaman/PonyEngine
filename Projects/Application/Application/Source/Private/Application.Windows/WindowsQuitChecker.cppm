@@ -9,13 +9,15 @@
 
 module;
 
+#include "PonyBase/Core/Windows/Framework.h"
+
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Application.Windows:WindowsQuitChecker;
 
-import PonyEngine.Core;
 import PonyEngine.Log;
+
+import Application;
 
 export namespace Application
 {
@@ -26,7 +28,7 @@ export namespace Application
 		/// @brief Creates a @p WindowsQuitChecker.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsQuitChecker(PonyEngine::Core::IApplication& application);
+		explicit WindowsQuitChecker(IApplication& application);
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
@@ -41,20 +43,20 @@ export namespace Application
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Core::IApplication* application; ///< Application
+		IApplication* application; ///< Application
 	};
 }
 
 namespace Application
 {
-	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Core::IApplication& application) :
+	WindowsQuitChecker::WindowsQuitChecker(IApplication& application) :
 		application{&application}
 	{
 	}
 
 	bool WindowsQuitChecker::Check(int& quitCode) const noexcept
 	{
-		PONY_LOG_GENERAL(&application->Logger(), PonyEngine::Log::LogType::Verbose, "Peek messages.");
+		PONY_LOG_GENERAL(&application->Logger(), PonyEngine::Log::LogType::Verbose, "Peek application messages.");
 
 		MSG message;
 		while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))

@@ -7,12 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <exception>
+
+#include "PonyBase/Core/Windows/Framework.h"
+
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Platform/Windows/Framework.h"
 
-import <exception>;
+import PonyBase.Core;
 
-import PonyEngine.Common;
 import PonyEngine.Log;
 
 import Application.Windows;
@@ -26,6 +28,6 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 	catch (const std::exception& e)
 	{
 		PONY_CONSOLE_E(e, "On main().");
-		return static_cast<int>(PonyEngine::Common::ExitCodes::ApplicationException);
+		return static_cast<int>(PonyBase::Core::ExitCodes::MainException);
 	}
 }

@@ -9,7 +9,8 @@
 
 export module PonyEngine.Core:IEngine;
 
-import PonyEngine.Common;
+import PonyBase.Core;
+
 import PonyEngine.Log;
 
 import :ISystemManager;
@@ -50,7 +51,7 @@ export namespace PonyEngine::Core
 		/// @brief Stops the engine with the @p exitCode.
 		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
-		virtual void Stop(int exitCode = static_cast<int>(Common::ExitCodes::Success)) noexcept = 0;
+		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept = 0;
 
 		/// @brief Gets the engine name.
 		/// @return Engine name.

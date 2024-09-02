@@ -23,9 +23,10 @@ import <unordered_map>;
 import <utility>;
 import <vector>;
 
+import PonyBase.StringUtility;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Log;
-import PonyEngine.StringUtility;
 
 export namespace PonyEngine::Core
 {

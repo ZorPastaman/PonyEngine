@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import <cstddef>;
+#include <cstddef>
 
 import PonyEngine.Core.Implementation;
 import PonyEngine.Log;

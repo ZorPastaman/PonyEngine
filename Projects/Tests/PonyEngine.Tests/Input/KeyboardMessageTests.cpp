@@ -9,9 +9,9 @@
 
 #include "CppUnitTest.h"
 
-import <format>;
-import <ostream>;
-import <string>;
+#include <format>
+#include <ostream>
+#include <string>
 
 import PonyEngine.Input;
 

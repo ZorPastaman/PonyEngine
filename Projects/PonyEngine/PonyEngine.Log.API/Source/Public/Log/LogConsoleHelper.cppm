@@ -11,7 +11,7 @@ module;
 
 #ifdef PONY_SYSTEM_CONSOLE_LOG
 #ifdef _WIN32
-#include "PonyEngine/Platform/Windows/Framework.h"
+#include "PonyBase/Core/Windows/Framework.h"
 #endif
 #endif
 
@@ -24,7 +24,7 @@ import <format>;
 import <iostream>;
 import <string>;
 
-import PonyEngine.StringUtility;
+import PonyBase.StringUtility;
 
 import :LogFormat;
 import :LogType;
@@ -165,7 +165,7 @@ namespace PonyEngine::Log
 	template<typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
+		return PonyBase::Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
 	void LogFormattedToConsole(const LogType logType, const char* const log) noexcept

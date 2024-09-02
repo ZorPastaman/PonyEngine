@@ -14,6 +14,7 @@ export import PonyEngine.Core;
 export import :EngineData;
 export import :EngineParams;
 export import :EngineUniquePtr;
+export import :IApplication;
 export import :IEngineDestroyer;
 export import :ISystemDestroyer;
 export import :ISystemFactory;
