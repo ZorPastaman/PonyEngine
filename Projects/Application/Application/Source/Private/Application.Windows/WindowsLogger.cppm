@@ -11,14 +11,14 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 export module Application.Windows:WindowsLogger;
 
 import <array>;
 import <exception>;
 
-import PonyEngine.Log.Windows.Implementation;
+import PonyDebug.Log.Windows.Implementation;
 
 export namespace Application
 {
@@ -37,7 +37,7 @@ export namespace Application
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		PonyEngine::Log::ILogger& Logger() const noexcept;
+		PonyDebug::Log::ILogger& Logger() const noexcept;
 
 		WindowsLogger& operator =(const WindowsLogger&) = delete;
 		WindowsLogger& operator =(WindowsLogger&&) = delete;
@@ -46,23 +46,23 @@ export namespace Application
 		/// @brief Creates a logger.
 		/// @return Created logger.
 		[[nodiscard("Pure function")]]
-		static PonyEngine::Log::LoggerData CreateLogger();
+		static PonyDebug::Log::LoggerData CreateLogger();
 
 		/// @brief Creates a console sub-logger.
 		/// @return Created console sub-logger.
 		[[nodiscard("Pure function")]]
-		static PonyEngine::Log::ConsoleSubLoggerData CreateConsoleSubLogger();
+		static PonyDebug::Log::ConsoleSubLoggerData CreateConsoleSubLogger();
 		/// @brief Creates an output debug string sub-logger.
 		/// @return Created output debug string sub-logger.
 		[[nodiscard("Pure function")]]
-		static PonyEngine::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
+		static PonyDebug::Log::OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger();
 		/// @brief Creates a file sub-logger.
 		/// @return Created file sub-logger.
 		[[nodiscard("Pure function")]]
-		static PonyEngine::Log::FileSubLoggerData CreateFileSubLogger();
+		static PonyDebug::Log::FileSubLoggerData CreateFileSubLogger();
 
-		PonyEngine::Log::LoggerUniquePtr logger; ///< Logger.
-		std::array<PonyEngine::Log::SubLoggerUniquePtr, 3> subLoggers; ///< Sub-loggers.
+		PonyDebug::Log::LoggerUniquePtr logger; ///< Logger.
+		std::array<PonyDebug::Log::SubLoggerUniquePtr, 3> subLoggers; ///< Sub-loggers.
 	};
 }
 
@@ -72,21 +72,21 @@ namespace Application
 		logger{CreateLogger().logger},
 		subLoggers{CreateConsoleSubLogger().subLogger, CreateOutputDebugStringSubLogger().subLogger, CreateFileSubLogger().subLogger}
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Add sub-loggers.");
-		for (PonyEngine::Log::SubLoggerUniquePtr& subLogger : subLoggers)
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
+		for (PonyDebug::Log::SubLoggerUniquePtr& subLogger : subLoggers)
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
 			logger->AddSubLogger(*subLogger);
 		}
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers added.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers added.");
 	}
 
 	WindowsLogger::~WindowsLogger() noexcept
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Remove sub-loggers.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Remove sub-loggers.");
 		for (auto it = subLoggers.crbegin(); it != subLoggers.crend(); ++it)
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Debug, "Remove '{}' sub-logger.", (*it)->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Remove '{}' sub-logger.", (*it)->Name());
 			try
 			{
 				logger->RemoveSubLogger(**it);
@@ -96,66 +96,66 @@ namespace Application
 				PONY_CONSOLE_E(e, "On removing sub-logger.");
 			}
 		}
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers removed.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers removed.");
 
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy sub-loggers.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy sub-loggers.");
 		for (auto it = subLoggers.rbegin(); it != subLoggers.rend(); ++it)
 		{
-			PonyEngine::Log::SubLoggerUniquePtr& subLogger = *it;
+			PonyDebug::Log::SubLoggerUniquePtr& subLogger = *it;
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy '{}' sub-logger.", subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", subLogger->Name());
 			subLogger.reset();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-logger destroyed.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-logger destroyed.");
 		}
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Sub-loggers destroyed.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers destroyed.");
 
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroy '{}' logger.", logger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' logger.", logger->Name());
 		logger.reset();
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Logger destroyed.");
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Logger destroyed.");
 	}
 
-	PonyEngine::Log::ILogger& WindowsLogger::Logger() const noexcept
+	PonyDebug::Log::ILogger& WindowsLogger::Logger() const noexcept
 	{
 		return *logger;
 	}
 
-	PonyEngine::Log::LoggerData WindowsLogger::CreateLogger()
+	PonyDebug::Log::LoggerData WindowsLogger::CreateLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create logger.");
-		PonyEngine::Log::LoggerData logger = PonyEngine::Log::CreateLogger(PonyEngine::Log::LoggerParams());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
+		PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
 		assert(logger.logger && "The logger is nullptr.");
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
 
 		return logger;
 	}
 
-	PonyEngine::Log::ConsoleSubLoggerData WindowsLogger::CreateConsoleSubLogger()
+	PonyDebug::Log::ConsoleSubLoggerData WindowsLogger::CreateConsoleSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create console sub-logger.");
-		PonyEngine::Log::ConsoleSubLoggerData consoleSubLogger = PonyEngine::Log::CreateConsoleSubLogger(PonyEngine::Log::ConsoleSubLoggerParams());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create console sub-logger.");
+		PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
 		assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
 
 		return consoleSubLogger;
 	}
 
-	PonyEngine::Log::OutputDebugStringSubLoggerData WindowsLogger::CreateOutputDebugStringSubLogger()
+	PonyDebug::Log::OutputDebugStringSubLoggerData WindowsLogger::CreateOutputDebugStringSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create output debug string sub-logger.");
-		PonyEngine::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyEngine::Log::CreateOutputDebugStringSubLogger(PonyEngine::Log::OutputDebugStringSubLoggerParams());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create output debug string sub-logger.");
+		PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams());
 		assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
 
 		return outputDebugStringSubLogger;
 	}
 
-	PonyEngine::Log::FileSubLoggerData WindowsLogger::CreateFileSubLogger()
+	PonyDebug::Log::FileSubLoggerData WindowsLogger::CreateFileSubLogger()
 	{
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Create file sub-logger.");
-		const auto params = PonyEngine::Log::FileSubLoggerParams{.logPath = "Log.log"};
-		PonyEngine::Log::FileSubLoggerData fileSubLogger = PonyEngine::Log::CreateFileSubLogger(params);
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create file sub-logger.");
+		const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Log.log"};
+		PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
 		assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
 
 		return fileSubLogger;
 	}

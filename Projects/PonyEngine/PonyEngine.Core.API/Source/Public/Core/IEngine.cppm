@@ -11,7 +11,7 @@ export module PonyEngine.Core:IEngine;
 
 import PonyBase.Core;
 
-import PonyEngine.Log;
+import PonyDebug.Log;
 
 import :ISystemManager;
 
@@ -32,7 +32,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& Logger() const noexcept = 0;
+		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]

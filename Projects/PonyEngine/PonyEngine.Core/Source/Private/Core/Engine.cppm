@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Log/EngineLog.h"
+#include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Core.Implementation:Engine;
 
@@ -19,8 +19,9 @@ import <stdexcept>;
 
 import PonyBase.Core;
 
+import PonyDebug.Log;
+
 import PonyEngine.Core.Factory;
-import PonyEngine.Log;
 
 import :SystemManager;
 
@@ -44,7 +45,7 @@ export namespace PonyEngine::Core
 		virtual std::size_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& SystemManager() const noexcept override;
 
@@ -91,22 +92,22 @@ namespace PonyEngine::Core
 		application{&application},
 		systemManager{CreateSystemManager(systemFactories)}
 	{
-		PONY_LOG(this, Log::LogType::Info, "Begin system manager.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "Begin system manager.");
 		systemManager->Begin();
-		PONY_LOG(this, Log::LogType::Info, "System manager begun.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager begun.");
 
-		PONY_LOG(this, Log::LogType::Debug, "Engine created in '{}' application.", application.Name());
+		PONY_LOG(this, PonyDebug::Log::LogType::Debug, "Engine created in '{}' application.", application.Name());
 	}
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG(this, Log::LogType::Info, "End system manager.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "End system manager.");
 		systemManager->End();
-		PONY_LOG(this, Log::LogType::Info, "System manager ended.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager ended.");
 
-		PONY_LOG(this, Log::LogType::Info, "Destroy system manager.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "Destroy system manager.");
 		systemManager.reset();
-		PONY_LOG(this, Log::LogType::Info, "System manager destroyed.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager destroyed.");
 	}
 
 	std::size_t Engine::FrameCount() const noexcept
@@ -114,7 +115,7 @@ namespace PonyEngine::Core
 		return frameCount;
 	}
 
-	Log::ILogger& Engine::Logger() const noexcept
+	PonyDebug::Log::ILogger& Engine::Logger() const noexcept
 	{
 		return application->Logger();
 	}
@@ -131,7 +132,7 @@ namespace PonyEngine::Core
 
 	int Engine::ExitCode() const noexcept
 	{
-		PONY_LOG_IF(isRunning, this, Log::LogType::Warning, "Tried to get exit code when engine is still running.");
+		PONY_LOG_IF(isRunning, this, PonyDebug::Log::LogType::Warning, "Tried to get exit code when engine is still running.");
 
 		return engineExitCode;
 	}
@@ -142,11 +143,11 @@ namespace PonyEngine::Core
 		{
 			engineExitCode = exitCode;
 			isRunning = false;
-			PONY_LOG(this, Log::LogType::Info, "Engine stopped with exit code '{}'.", exitCode);
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "Engine stopped with exit code '{}'.", exitCode);
 		}
 		else
 		{
-			PONY_LOG(this, Log::LogType::Info, "Tried to stop already stopped engine. Ignore it.");
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "Tried to stop already stopped engine. Ignore it.");
 		}
 	}
 
@@ -163,7 +164,7 @@ namespace PonyEngine::Core
 		}
 		isTicking = true;
 
-		PONY_LOG(this, Log::LogType::Verbose, "Tick system manager.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Verbose, "Tick system manager.");
 
 		try
 		{
@@ -189,9 +190,9 @@ namespace PonyEngine::Core
 
 	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager(const SystemFactoriesContainer& systemFactories)
 	{
-		PONY_LOG(this, Log::LogType::Info, "Create system manager.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "Create system manager.");
 		const auto manager = new Core::SystemManager(systemFactories, *this);
-		PONY_LOG(this, Log::LogType::Info, "System manager created.");
+		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager created.");
 
 		return std::unique_ptr<Core::SystemManager>(manager);
 	}

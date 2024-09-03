@@ -9,7 +9,7 @@
 
 export module PonyEngine.Core.Factory:IApplication;
 
-import PonyEngine.Log;
+import PonyDebug.Log;
 
 export namespace PonyEngine::Core
 {
@@ -23,7 +23,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the application logger.
 		/// @return Application logger.
 		[[nodiscard("Pure function")]]
-		virtual Log::ILogger& Logger() const noexcept = 0;
+		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Gets the application name.
 		/// @return Application name.

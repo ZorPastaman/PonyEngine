@@ -13,9 +13,10 @@ module;
 
 export module Game.Implementation:GameSystemFactory;
 
+import PonyDebug.Log;
+
 import PonyEngine.Core;
 import PonyEngine.Core.Factory;
-import PonyEngine.Log;
 
 import Game.Factory;
 

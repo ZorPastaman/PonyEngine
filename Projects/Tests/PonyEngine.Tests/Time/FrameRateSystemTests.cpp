@@ -12,8 +12,9 @@
 #include <chrono>
 #include <cstddef>
 
+import PonyDebug.Log;
+
 import PonyEngine.Core.Factory;
-import PonyEngine.Log;
 import PonyEngine.Time.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -25,10 +26,10 @@ namespace Time
 		class Application : public PonyEngine::Core::IApplication
 		{
 		public:
-			PonyEngine::Log::ILogger* logger;
+			PonyDebug::Log::ILogger* logger;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}
@@ -40,7 +41,7 @@ namespace Time
 			}
 		};
 
-		class EmptyLogger final : public PonyEngine::Log::ILogger
+		class EmptyLogger final : public PonyDebug::Log::ILogger
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -49,17 +50,17 @@ namespace Time
 				return "";
 			}
 
-			virtual void Log(PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override
+			virtual void Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
 			{
 			}
-			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override
+			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
 			{
 			}
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
 		};
@@ -92,7 +93,7 @@ namespace Time
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}

@@ -11,13 +11,13 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 export module Application.Windows:WindowsQuitChecker;
 
-import PonyEngine.Log;
+import PonyDebug.Log;
 
-import Application;
+import PonyEngine.Core.Factory;
 
 export namespace Application
 {
@@ -28,7 +28,7 @@ export namespace Application
 		/// @brief Creates a @p WindowsQuitChecker.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsQuitChecker(IApplication& application);
+		explicit WindowsQuitChecker(PonyEngine::Core::IApplication& application);
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
@@ -43,20 +43,20 @@ export namespace Application
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		IApplication* application; ///< Application
+		PonyEngine::Core::IApplication* application; ///< Application
 	};
 }
 
 namespace Application
 {
-	WindowsQuitChecker::WindowsQuitChecker(IApplication& application) :
+	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Core::IApplication& application) :
 		application{&application}
 	{
 	}
 
 	bool WindowsQuitChecker::Check(int& quitCode) const noexcept
 	{
-		PONY_LOG_GENERAL(&application->Logger(), PonyEngine::Log::LogType::Verbose, "Peek application messages.");
+		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Verbose, "Peek application messages.");
 
 		MSG message;
 		while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -67,7 +67,7 @@ namespace Application
 			if (message.message == WM_QUIT)
 			{
 				quitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(&application->Logger(), PonyEngine::Log::LogType::Info, "Received exit code '{}' from Windows.", quitCode);
+				PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Received exit code '{}' from Windows.", quitCode);
 
 				return false;
 			}

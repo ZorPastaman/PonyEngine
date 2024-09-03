@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Log/EngineLog.h"
+#include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Input.Implementation:InputSystem;
 
@@ -20,9 +20,10 @@ import <string>;
 import <unordered_map>;
 import <utility>;
 
+import PonyDebug.Log;
+
 import PonyEngine.Core;
 import PonyEngine.Input;
-import PonyEngine.Log;
 
 export namespace PonyEngine::Input
 {
@@ -82,12 +83,12 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
+			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->AddKeyboardObserver(*this);
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(engine, Log::LogType::Warning, "Couldn't find keyboard provider, keyboard input won't work.");
+			PONY_LOG(engine, PonyDebug::Log::LogType::Warning, "Couldn't find keyboard provider, keyboard input won't work.");
 		}
 	}
 
@@ -95,7 +96,7 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
-			PONY_LOG(engine, Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
+			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
 			keyboardProvider->RemoveKeyboardObserver(*this);
 		}
 	}
@@ -111,7 +112,7 @@ namespace PonyEngine::Input
 			{
 				if (eventPair.first.expectedMessage == message)
 				{
-					PONY_LOG(engine, Log::LogType::Verbose, "Tick an action. ID: '{}'.", handle.id);
+					PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Tick an action. ID: '{}'.", handle.id);
 					eventPair.second();
 				}
 			}
@@ -123,7 +124,7 @@ namespace PonyEngine::Input
 		const auto handle = Handle{.id = currentId++};
 		const std::pair<Event, std::function<void()>> eventAction(event, action);
 		events.insert(std::pair(handle, eventAction));
-		PONY_LOG(engine, Log::LogType::Info, "Action registered. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id);
+		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Action registered. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id);
 
 		return handle;
 	}
@@ -131,16 +132,16 @@ namespace PonyEngine::Input
 	void InputSystem::UnregisterAction(const Handle handle)
 	{
 		events.erase(handle);
-		PONY_LOG(engine, Log::LogType::Info, "Action unregistered. ID: '{}'.", handle.id);
+		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Action unregistered. ID: '{}'.", handle.id);
 	}
 
 	void InputSystem::Observe(const KeyboardMessage& keyboardMessage) noexcept
 	{
-		PONY_LOG(engine, Log::LogType::Verbose, "Received keyboard message: '{}'.", keyboardMessage.ToString());
+		PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Received keyboard message: '{}'.", keyboardMessage.ToString());
 
 		if (const auto pair = keyStates.find(keyboardMessage.keyCode); pair != keyStates.cend() && pair->second == keyboardMessage.isDown)
 		{
-			PONY_LOG(engine, Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change state.");
+			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change state.");
 
 			return;
 		}

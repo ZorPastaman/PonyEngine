@@ -11,7 +11,7 @@ export module PonyEngine.Core:LogHelper;
 
 import <format>;
 
-import PonyEngine.Log;
+import PonyDebug.Log;
 
 import :IEngine;
 
@@ -21,7 +21,7 @@ export namespace PonyEngine::Core
 	/// @param engine Engine to use.
 	/// @param logType Log type.
 	/// @param message Log message.
-	void LogToLogger(const IEngine& engine, Log::LogType logType, const char* message) noexcept;
+	void LogToLogger(const IEngine& engine, PonyDebug::Log::LogType logType, const char* message) noexcept;
 	/// @brief Logs to the @p engine logger.
 	/// @tparam Args Format argument types.
 	/// @param engine Engine to use.
@@ -29,7 +29,7 @@ export namespace PonyEngine::Core
 	/// @param format Format.
 	/// @param args Format arguments.
 	template<typename... Args>
-	void LogToLogger(const IEngine& engine, Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
+	void LogToLogger(const IEngine& engine, PonyDebug::Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs the @p exception to the @p logger.
 	/// @param engine Engine to use.
@@ -52,33 +52,33 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	void LogToLogger(const IEngine& engine, const Log::LogType logType, const char* const message) noexcept
+	void LogToLogger(const IEngine& engine, const PonyDebug::Log::LogType logType, const char* const message) noexcept
 	{
-		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.FrameCount()};
-		Log::LogToLogger(engine.Logger(), logType, additionalInfo, message);
+		const auto additionalInfo = PonyDebug::Log::AdditionalInfo{.frameCount = engine.FrameCount()};
+		PonyDebug::Log::LogToLogger(engine.Logger(), logType, additionalInfo, message);
 	}
 
 	template<typename... Args>
-	void LogToLogger(const IEngine& engine, const Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToLogger(const IEngine& engine, const PonyDebug::Log::LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return LogToLogger(engine, logType, Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
+		return LogToLogger(engine, logType, PonyDebug::Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception) noexcept
 	{
-		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.FrameCount()};
-		Log::LogExceptionToLogger(engine.Logger(), additionalInfo, exception);
+		const auto additionalInfo = PonyDebug::Log::AdditionalInfo{.frameCount = engine.FrameCount()};
+		PonyDebug::Log::LogExceptionToLogger(engine.Logger(), additionalInfo, exception);
 	}
 
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, const char* const message) noexcept
 	{
-		const auto additionalInfo = Log::AdditionalInfo{.frameCount = engine.FrameCount()};
-		Log::LogExceptionToLogger(engine.Logger(), additionalInfo, exception, message);
+		const auto additionalInfo = PonyDebug::Log::AdditionalInfo{.frameCount = engine.FrameCount()};
+		PonyDebug::Log::LogExceptionToLogger(engine.Logger(), additionalInfo, exception, message);
 	}
 
 	template<typename... Args>
 	void LogExceptionToLogger(const IEngine& engine, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return LogExceptionToLogger(engine, exception, Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
+		return LogExceptionToLogger(engine, exception, PonyDebug::Log::SafeFormat(format, std::forward<Args>(args)...).c_str());
 	}
 }

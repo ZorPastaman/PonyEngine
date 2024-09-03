@@ -11,11 +11,11 @@
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 import PonyBase.Core;
 
-import PonyEngine.Log;
+import PonyDebug.Log;
 
 import Application.Windows;
 
