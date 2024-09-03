@@ -9,8 +9,9 @@
 
 #include "CppUnitTest.h"
 
+import PonyDebug.Log;
+
 import PonyEngine.Core.Factory;
-import PonyEngine.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -18,22 +19,22 @@ namespace Core
 {
 	TEST_CLASS(EngineDeleterTests)
 	{
-		class EmptyLogger final : public PonyEngine::Log::ILogger
+		class EmptyLogger final : public PonyDebug::Log::ILogger
 		{
 		public:
-			virtual void Log(const PonyEngine::Log::LogType, const PonyEngine::Log::LogInput&) noexcept override
+			virtual void Log(const PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
 			{
 			}
 
-			virtual void LogException(const std::exception&, const PonyEngine::Log::LogInput&) noexcept override
+			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
 			{
 			}
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
 
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
 
@@ -67,7 +68,7 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
 			{
 				return logger;
 			}

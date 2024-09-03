@@ -30,7 +30,7 @@
 #ifndef PONY_CONSOLE_LOG
 #define PONY_CONSOLE_LOG
 #endif
-#include "PonyEngine/Log/EngineLog.h"
+#include "PonyEngine/Log/Log.h"
 
 #include <cstddef>
 #include <cstdint>
@@ -38,8 +38,9 @@
 #include <exception>
 #include <string>
 
+import PonyDebug.Log;
+
 import PonyEngine.Core;
-import PonyEngine.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -47,33 +48,33 @@ namespace Core
 {
 	TEST_CLASS(LogHelperTests)
 	{
-		class EmptyLogger final : public PonyEngine::Log::ILogger
+		class EmptyLogger final : public PonyDebug::Log::ILogger
 		{
 		public:
 			std::string lastMessage;
 			const std::exception* lastException;
 			std::size_t lastFrameCount;
-			PonyEngine::Log::LogType lastLogType;
+			PonyDebug::Log::LogType lastLogType;
 
-			virtual void Log(const PonyEngine::Log::LogType logType, const PonyEngine::Log::LogInput& logInput) noexcept override
+			virtual void Log(const PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override
 			{
 				lastMessage = logInput.message ? logInput.message : "";
 				lastFrameCount = logInput.frameCount;
 				lastLogType = logType;
 			}
 
-			virtual void LogException(const std::exception& exception, const PonyEngine::Log::LogInput& logInput) noexcept override
+			virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override
 			{
 				lastMessage = logInput.message ? logInput.message : "";
 				lastFrameCount = logInput.frameCount;
 				lastException = &exception;
 			}
 
-			virtual void AddSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
 
-			virtual void RemoveSubLogger(PonyEngine::Log::ISubLogger&) override
+			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
 			{
 			}
 
@@ -108,7 +109,7 @@ namespace Core
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Log::ILogger& Logger() const noexcept override
+			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
 			{
 				return *logger;
 			}
@@ -150,52 +151,52 @@ namespace Core
 
 			const auto message = "Message";
 			engine.frameCount = 14;
-			PonyEngine::Core::LogToLogger(engine, PonyEngine::Log::LogType::Debug, message);
+			PonyEngine::Core::LogToLogger(engine, PonyDebug::Log::LogType::Debug, message);
 			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(engine.frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
 			logger.lastMessage = "";
 			logger.lastFrameCount = 22;
-			logger.lastLogType = PonyEngine::Log::LogType::Info;
-			PONY_LOG(&engine, PonyEngine::Log::LogType::Debug, message);
+			logger.lastLogType = PonyDebug::Log::LogType::Info;
+			PONY_LOG(&engine, PonyDebug::Log::LogType::Debug, message);
 			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(engine.frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
 			const auto format = "Format {}.";
 			const auto formatArg = "Format arg";
 			logger.lastMessage = "";
 			logger.lastFrameCount = 22;
-			logger.lastLogType = PonyEngine::Log::LogType::Info;
-			PonyEngine::Core::LogToLogger(engine, PonyEngine::Log::LogType::Debug, format, formatArg);
+			logger.lastLogType = PonyDebug::Log::LogType::Info;
+			PonyEngine::Core::LogToLogger(engine, PonyDebug::Log::LogType::Debug, format, formatArg);
 			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
 			Assert::AreEqual(engine.frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
 			logger.lastMessage = "";
 			logger.lastFrameCount = 22;
-			logger.lastLogType = PonyEngine::Log::LogType::Info;
-			PONY_LOG(&engine, PonyEngine::Log::LogType::Debug, format, formatArg);
+			logger.lastLogType = PonyDebug::Log::LogType::Info;
+			PONY_LOG(&engine, PonyDebug::Log::LogType::Debug, format, formatArg);
 			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
 			Assert::AreEqual(engine.frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
 			logger.lastMessage = "";
 			logger.lastFrameCount = 22;
-			logger.lastLogType = PonyEngine::Log::LogType::Info;
-			PONY_LOG_IF(true, &engine, PonyEngine::Log::LogType::Debug, message);
+			logger.lastLogType = PonyDebug::Log::LogType::Info;
+			PONY_LOG_IF(true, &engine, PonyDebug::Log::LogType::Debug, message);
 			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(engine.frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Debug), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
 			logger.lastMessage = "";
 			logger.lastFrameCount = 22;
-			logger.lastLogType = PonyEngine::Log::LogType::Info;
-			PONY_LOG_IF(false, &engine, PonyEngine::Log::LogType::Debug, message);
+			logger.lastLogType = PonyDebug::Log::LogType::Info;
+			PONY_LOG_IF(false, &engine, PonyDebug::Log::LogType::Debug, message);
 			Assert::AreEqual("", logger.lastMessage.c_str());
 			Assert::AreEqual(std::size_t{22}, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(PonyEngine::Log::LogType::Info), static_cast<std::underlying_type_t<PonyEngine::Log::LogType>>(logger.lastLogType));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Info), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 		}
 
 		TEST_METHOD(LogExceptionToLogger)

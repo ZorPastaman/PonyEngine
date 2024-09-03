@@ -15,8 +15,9 @@ export module PonyEngine.Window.Windows.Implementation;
 
 export import PonyEngine.Window.Windows.Factory;
 
+import PonyDebug.Log;
+
 import PonyEngine.Core;
-import PonyEngine.Log;
 
 import :WindowsWindowSystemFactory;
 import :WindowsWindowSystemFactoryDestroyer;
