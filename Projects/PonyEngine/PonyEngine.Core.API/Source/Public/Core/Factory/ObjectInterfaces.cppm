@@ -13,8 +13,8 @@ module;
 
 export module PonyEngine.Core.Factory:ObjectInterfaces;
 
+import <concepts>;
 import <typeinfo>;
-import <type_traits>;
 import <vector>;
 
 export namespace PonyEngine::Core
@@ -44,19 +44,19 @@ export namespace PonyEngine::Core
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename Target, typename Source>
-		void AddInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>);
+		void AddInterface(Source& object) requires (std::derived_from<Source, Target>);
 		/// @brief Adds the interfaces.
 		/// @tparam Source Object source type.
 		/// @tparam Targets Interface types.
 		/// @param object Object source.
 		template<typename Source, typename... Targets>
-		void AddInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...);
+		void AddInterfaces(Source& object) requires (std::derived_from<Source, Targets> && ...);
 		/// @brief Adds the interfaces.
 		/// @tparam Targets Interface types.
 		/// @tparam Source Object source type.
 		/// @param object Object source.
 		template<typename... Targets, typename Source>
-		void AddInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>);
+		void AddInterfacesDeduced(Source& object) requires (... && std::derived_from<Source, Targets>);
 
 		/// @brief Gets a begin iterator.
 		/// @return Begin iterator.
@@ -109,19 +109,19 @@ namespace PonyEngine::Core
 	}
 
 	template<typename Target, typename Source>
-	void ObjectInterfaces::AddInterface(Source& object) requires (std::is_convertible_v<Source*, Target*>)
+	void ObjectInterfaces::AddInterface(Source& object) requires (std::derived_from<Source, Target>)
 	{
 		AddInterface(typeid(Target), static_cast<Target*>(&object));
 	}
 
 	template<typename Source, typename... Targets>
-	void ObjectInterfaces::AddInterfaces(Source& object) requires (std::is_convertible_v<Source*, Targets*> && ...)
+	void ObjectInterfaces::AddInterfaces(Source& object) requires (std::derived_from<Source, Targets> && ...)
 	{
 		(AddInterface<Targets, Source>(object),...);
 	}
 
 	template<typename... Targets, typename Source>
-	void ObjectInterfaces::AddInterfacesDeduced(Source& object) requires (... && std::is_convertible_v<Source*, Targets*>)
+	void ObjectInterfaces::AddInterfacesDeduced(Source& object) requires (... && std::derived_from<Source, Targets>)
 	{
 		AddInterfaces<Source, Targets...>(object);
 	}

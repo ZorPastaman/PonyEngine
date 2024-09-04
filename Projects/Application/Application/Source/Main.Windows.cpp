@@ -23,11 +23,23 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
 	try
 	{
-		return Application::WindowsApplication().Run();
+		const auto application = Application::WindowsApplication();
+
+		try
+		{
+			return application.Run();
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On ticking application.");
+
+			return static_cast<int>(PonyBase::Core::ExitCodes::ApplicationTickException);
+		}
 	}
 	catch (const std::exception& e)
 	{
 		PONY_CONSOLE_E(e, "On main().");
+
 		return static_cast<int>(PonyBase::Core::ExitCodes::MainException);
 	}
 }

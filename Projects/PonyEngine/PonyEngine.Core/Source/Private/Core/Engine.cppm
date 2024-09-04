@@ -66,6 +66,11 @@ export namespace PonyEngine::Core
 		static constexpr auto StaticName = "PonyEngine::Core::Engine"; ///< Class name.
 
 	private:
+		void BeginTick();
+		void EndTick();
+
+		void TickSystemManager();
+
 		/// @brief Creates a system manager.
 		/// @param systemFactories Engine parameters.
 		/// @return Created system manager.
@@ -153,6 +158,21 @@ namespace PonyEngine::Core
 
 	void Engine::Tick()
 	{
+		BeginTick();
+
+		PONY_LOG(this, PonyDebug::Log::LogType::Verbose, "Tick system manager.");
+		TickSystemManager();
+
+		EndTick();
+	}
+
+	const char* Engine::Name() const noexcept
+	{
+		return StaticName;
+	}
+
+	void Engine::BeginTick()
+	{
 		if (!isRunning) [[unlikely]]
 		{
 			throw std::logic_error("Engine is ticked when it's already been stopped.");
@@ -162,15 +182,23 @@ namespace PonyEngine::Core
 		{
 			throw std::logic_error("Engine is ticked inside another tick.");
 		}
+
 		isTicking = true;
+	}
 
-		PONY_LOG(this, PonyDebug::Log::LogType::Verbose, "Tick system manager.");
+	void Engine::EndTick()
+	{
+		++frameCount;
+		isTicking = false;
+	}
 
+	void Engine::TickSystemManager()
+	{
 		try
 		{
 			systemManager->Tick();
 		}
-		catch (...)
+		catch (const HandledException&)
 		{
 			// Logging is done in the system manager.
 			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
@@ -178,14 +206,14 @@ namespace PonyEngine::Core
 
 			throw;
 		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(this, e, "On ticking system manager.");
+			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemManagerTickException));
+			isTicking = false;
 
-		++frameCount;
-		isTicking = false;
-	}
-
-	const char* Engine::Name() const noexcept
-	{
-		return StaticName;
+			throw;
+		}
 	}
 
 	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager(const SystemFactoriesContainer& systemFactories)

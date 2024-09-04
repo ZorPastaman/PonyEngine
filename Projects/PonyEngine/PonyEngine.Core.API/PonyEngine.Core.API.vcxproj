@@ -19,6 +19,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Core\Core.cppm" />
+    <ClCompile Include="Source\Public\Core\HandledException.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm" />

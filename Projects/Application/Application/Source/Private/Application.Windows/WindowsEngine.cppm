@@ -126,16 +126,14 @@ namespace Application
 		{
 			engine.tickableEngine->Tick();
 		}
+		catch (const PonyEngine::Core::HandledException&)
+		{
+			exitCode = engine.engine->ExitCode();
+
+			return false;
+		}
 		catch (const std::exception& e)
 		{
-			if (!engine.engine->IsRunning())
-			{
-				// Logging is done in the engine.
-				exitCode = engine.engine->ExitCode(); // TODO: No guessing. Add exception wrapper for handled by engine exceptions.
-
-				return false;
-			}
-
 			PONY_LOG_E_GENERAL(&application->Logger(), e, "On ticking engine.")
 			exitCode = static_cast<int>(PonyBase::Core::ExitCodes::EngineTickException);
 

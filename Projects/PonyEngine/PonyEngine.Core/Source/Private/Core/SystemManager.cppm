@@ -197,7 +197,7 @@ namespace PonyEngine::Core
 			{
 				PONY_LOG_E(engine, e, "On ticking '{}' system.", system->Name());
 
-				throw;
+				throw HandledException(e);
 			}
 		}
 	}

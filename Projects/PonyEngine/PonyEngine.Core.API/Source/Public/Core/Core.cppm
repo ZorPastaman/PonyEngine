@@ -9,6 +9,7 @@
 
 export module PonyEngine.Core;
 
+export import :HandledException;
 export import :IEngine;
 export import :ISystem;
 export import :ISystemManager;
