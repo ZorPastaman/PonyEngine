@@ -16,9 +16,11 @@ export namespace PonyBase::Core
 	///	@remark Negative exit codes are returned by an application, positive ones are returned by an engine.
 	enum class ExitCodes : int
 	{
-		EngineTickException = -2,
+		EngineTickException = -3,
+		ApplicationTickException = -2,
 		MainException = -1,
 		Success = 0,
-		SystemTickException = 1
+		SystemTickException = 1,
+		SystemManagerTickException = 2
 	};
 }
