@@ -7,11 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+export module PonyEngine.Render.Core;
 
-export import :IEngine;
-export import :ISystem;
-export import :ISystemManager;
-export import :ITickableEngine;
-export import :ITickableSystem;
-export import :LogHelper;
+export import :IRenderer;

@@ -11,6 +11,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Include\Public\PonyBase\Core\COM\Framework.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Linking.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Optimization.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Windows\Framework.h" />

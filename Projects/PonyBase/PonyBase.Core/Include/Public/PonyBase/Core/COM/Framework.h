@@ -7,11 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+#pragma once
 
-export import :IEngine;
-export import :ISystem;
-export import :ISystemManager;
-export import :ITickableEngine;
-export import :ITickableSystem;
-export import :LogHelper;
+#include <wrl/client.h>

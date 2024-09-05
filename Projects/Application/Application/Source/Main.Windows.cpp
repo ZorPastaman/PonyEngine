@@ -31,7 +31,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 		}
 		catch (const std::exception& e)
 		{
-			PONY_CONSOLE_E(e, "On ticking application.");
+			PONY_CONSOLE_E(e, "On running application.");
 
 			return static_cast<int>(PonyBase::Core::ExitCodes::ApplicationTickException);
 		}

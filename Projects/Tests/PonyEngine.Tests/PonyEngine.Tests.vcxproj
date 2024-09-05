@@ -74,7 +74,6 @@
     <ClCompile Include="Core\EngineDeleterTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
     <ClCompile Include="Core\CoreLogHelperTests.cpp" />
-    <ClCompile Include="Core\HandledExceptionTests.cpp" />
     <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Core\SystemDeleterTests.cpp" />
     <ClCompile Include="Core\SystemFactoriesContainerTests.cpp" />
