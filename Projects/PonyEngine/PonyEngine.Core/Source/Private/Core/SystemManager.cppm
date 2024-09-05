@@ -23,6 +23,7 @@ import <unordered_map>;
 import <utility>;
 import <vector>;
 
+import PonyBase.Core;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -105,7 +106,8 @@ namespace PonyEngine::Core
 			for (auto [interface, objectPointer] : system.publicInterfaces)
 			{
 				PONY_LOG(this->engine, PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
-				systemInterfaces.insert_or_assign(interface.get(), objectPointer);
+				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
+				systemInterfaces.emplace(interface.get(), objectPointer);
 			}
 
 			PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "System created.");
@@ -196,8 +198,9 @@ namespace PonyEngine::Core
 			catch (const std::exception& e)
 			{
 				PONY_LOG_E(engine, e, "On ticking '{}' system.", system->Name());
+				engine->Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
 
-				throw HandledException(e);
+				throw;
 			}
 		}
 	}

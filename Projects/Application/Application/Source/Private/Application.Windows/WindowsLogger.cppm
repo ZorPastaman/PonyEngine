@@ -121,42 +121,78 @@ namespace Application
 
 	PonyDebug::Log::LoggerData WindowsLogger::CreateLogger()
 	{
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
-		PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
-		assert(logger.logger && "The logger is nullptr.");
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
+		try
+		{
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
+			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
+			assert(logger.logger && "The logger is nullptr.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
 
-		return logger;
+			return logger;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On creating logger.");
+
+			throw;
+		}
 	}
 
 	PonyDebug::Log::ConsoleSubLoggerData WindowsLogger::CreateConsoleSubLogger()
 	{
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create console sub-logger.");
-		PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
-		assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
+		try
+		{
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create console sub-logger.");
+			PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
+			assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
 
-		return consoleSubLogger;
+			return consoleSubLogger;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On creating console sub-logger.");
+
+			throw;
+		}
 	}
 
 	PonyDebug::Log::OutputDebugStringSubLoggerData WindowsLogger::CreateOutputDebugStringSubLogger()
 	{
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create output debug string sub-logger.");
-		PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams());
-		assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
+		try
+		{
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create output debug string sub-logger.");
+			PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams());
+			assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
 
-		return outputDebugStringSubLogger;
+			return outputDebugStringSubLogger;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On creating output debug string sub-logger.");
+
+			throw;
+		}
 	}
 
 	PonyDebug::Log::FileSubLoggerData WindowsLogger::CreateFileSubLogger()
 	{
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create file sub-logger.");
-		const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Log.log"};
-		PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
-		assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
+		try
+		{
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create file sub-logger.");
+			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Log.log"};
+			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
+			assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
 
-		return fileSubLogger;
+			return fileSubLogger;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_CONSOLE_E(e, "On creating file sub-logger.");
+
+			throw;
+		}
 	}
 }

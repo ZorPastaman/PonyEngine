@@ -17,23 +17,32 @@
     <ResourceCompile Include="PonyEngine.Render.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj">
+      <Project>{9a54f3c1-1617-4da7-a874-8c16b37e018a}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Math\PonyBase.Math.vcxproj">
       <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj">
-      <Project>{9a54f3c1-1617-4da7-a874-8c16b37e018a}</Project>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
+      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Render.Core\IRenderer.cppm" />
+    <ClCompile Include="Source\Private\Render.Core\Render.Core.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryDestroyer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISubSystem.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -86,6 +95,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -96,6 +106,7 @@
     <Link>
       <SubSystem>Windows</SubSystem>
       <Version>0.1</Version>
+      <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

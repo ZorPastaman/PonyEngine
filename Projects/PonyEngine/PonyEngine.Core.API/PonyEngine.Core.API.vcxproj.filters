@@ -81,9 +81,6 @@
     <ClCompile Include="Source\Public\Core\Factory\IApplication.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\HandledException.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

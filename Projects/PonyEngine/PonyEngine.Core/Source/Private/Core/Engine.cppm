@@ -67,7 +67,7 @@ export namespace PonyEngine::Core
 
 	private:
 		void BeginTick();
-		void EndTick();
+		void EndTick() noexcept;
 
 		void TickSystemManager();
 
@@ -97,9 +97,18 @@ namespace PonyEngine::Core
 		application{&application},
 		systemManager{CreateSystemManager(systemFactories)}
 	{
-		PONY_LOG(this, PonyDebug::Log::LogType::Info, "Begin system manager.");
-		systemManager->Begin();
-		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager begun.");
+		try
+		{
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "Begin system manager.");
+			systemManager->Begin();
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager begun.");
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(this, e, "On beginning system manager.");
+
+			throw;
+		}
 
 		PONY_LOG(this, PonyDebug::Log::LogType::Debug, "Engine created in '{}' application.", application.Name());
 	}
@@ -186,7 +195,7 @@ namespace PonyEngine::Core
 		isTicking = true;
 	}
 
-	void Engine::EndTick()
+	void Engine::EndTick() noexcept
 	{
 		++frameCount;
 		isTicking = false;
@@ -198,19 +207,13 @@ namespace PonyEngine::Core
 		{
 			systemManager->Tick();
 		}
-		catch (const HandledException&)
-		{
-			// Logging is done in the system manager.
-			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
-			isTicking = false;
-
-			throw;
-		}
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(this, e, "On ticking system manager.");
-			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemManagerTickException));
-			isTicking = false;
+			if (IsRunning())
+			{
+				Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemManagerTickException));
+			}
 
 			throw;
 		}
@@ -218,10 +221,19 @@ namespace PonyEngine::Core
 
 	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager(const SystemFactoriesContainer& systemFactories)
 	{
-		PONY_LOG(this, PonyDebug::Log::LogType::Info, "Create system manager.");
-		const auto manager = new Core::SystemManager(systemFactories, *this);
-		PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager created.");
+		try
+		{
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "Create system manager.");
+			const auto manager = new Core::SystemManager(systemFactories, *this);
+			PONY_LOG(this, PonyDebug::Log::LogType::Info, "System manager created.");
 
-		return std::unique_ptr<Core::SystemManager>(manager);
+			return std::unique_ptr<Core::SystemManager>(manager);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(this, e, "On creating system manager.");
+
+			throw;
+		}
 	}
 }
