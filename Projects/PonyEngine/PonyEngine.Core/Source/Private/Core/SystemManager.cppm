@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Core.Implementation:SystemManager;
 
@@ -82,11 +82,11 @@ namespace PonyEngine::Core
 	SystemManager::SystemManager(const SystemFactoriesContainer& systemFactories, IEngine& engine) :
 		engine{&engine}
 	{
-		PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "Create systems.");
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create systems.");
 
 		for (ISystemFactory* const factory : systemFactories)
 		{
-			PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
 			SystemData system = CreateSystem(factory);
 			assert(system.system && "The system is nullptr.");
@@ -95,39 +95,39 @@ namespace PonyEngine::Core
 
 			if (system.tickableSystem)
 			{
-				PONY_LOG(this->engine, PonyDebug::Log::LogType::Debug, "Add to tickable systems.");
+				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add to tickable systems.");
 				tickableSystems.push_back(system.tickableSystem);
 			}
 			else
 			{
-				PONY_LOG(this->engine, PonyDebug::Log::LogType::Debug, "System is not tickable.");
+				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "System is not tickable.");
 			}
 
 			for (auto [interface, objectPointer] : system.publicInterfaces)
 			{
-				PONY_LOG(this->engine, PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
+				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
 				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
 				systemInterfaces.emplace(interface.get(), objectPointer);
 			}
 
-			PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "System created.");
+			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "System created.");
 		}
 
-		PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "Systems created.");
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Systems created.");
 	}
 
 	SystemManager::~SystemManager() noexcept
 	{
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Destroy systems.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy systems.");
 
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Destroy system '{}'.", (*system)->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy system '{}'.", (*system)->Name());
 			system->reset();
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "System destroyed.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System destroyed.");
 		}
 
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Systems destroyed.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems destroyed.");
 	}
 
 	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
@@ -142,62 +142,62 @@ namespace PonyEngine::Core
 
 	void SystemManager::Begin() const
 	{
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Begin systems.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin systems.");
 
 		for (const SystemUniquePtr& system : systems)
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
 			try
 			{
 				system->Begin();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On beginning '{}' system.", system->Name());
+				PONY_LOG_E(engine->Logger(), e, "On beginning '{}' system.", system->Name());
 
 				throw;
 			}
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "System begun.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System begun.");
 		}
 
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Systems begun.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems begun.");
 	}
 
 	void SystemManager::End() const noexcept
 	{
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "End systems.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End systems.");
 
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "End '{}' system.", (*system)->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End '{}' system.", (*system)->Name());
 			try
 			{
 				(*system)->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On ending '{}' system.", (*system)->Name());
+				PONY_LOG_E(engine->Logger(), e, "On ending '{}' system.", (*system)->Name());
 			}
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "System ended.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System ended.");
 		}
 
-		PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Systems ended.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems ended.");
 	}
 
 	void SystemManager::Tick() const
 	{
-		PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Tick systems.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
 
 		for (ITickableSystem* const system : tickableSystems)
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, system->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, system->Name());
 			try
 			{
 				system->Tick();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine, e, "On ticking '{}' system.", system->Name());
+				PONY_LOG_E(engine->Logger(), e, "On ticking '{}' system.", system->Name());
 				engine->Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
 
 				throw;
@@ -213,7 +213,7 @@ namespace PonyEngine::Core
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(engine, e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG_E(engine->Logger(), e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
 			throw;
 		}

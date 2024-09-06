@@ -80,49 +80,70 @@
 	}
 
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyDebug::Log::ILogger pointer.
+/// @param logger PonyDebug::Log::ILogger reference.
 /// @param logType PonyDebug::Log::LogType value.
 /// @param logMessage const char* as a message or format string.
 /// @param ... Format arguments.
-#define PONY_LOG_GENERAL(logger, logType, logMessage, ...) \
+#define PONY_LOG(logger, logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
 	{ \
-		PonyDebug::Log::LogToLogger(*(logger), logType, logMessage __VA_OPT__(,) __VA_ARGS__); \
+		PonyDebug::Log::LogToLogger(logger, logType, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
 
 /// @brief Log macro that conditionally calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyDebug::Log::ILogger pointer.
+/// @param logger PonyDebug::Log::ILogger reference.
 /// @param logType PonyDebug::Log::LogType value.
 /// @param logMessage const char* as a message or format string.
 /// @param ... Format arguments.
-#define PONY_LOG_IF_GENERAL(condition, logger, logType, logMessage, ...) \
+#define PONY_LOG_IF(condition, logger, logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
 	{ \
-		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogToLogger(*(logger), logType, logMessage __VA_OPT__(,) __VA_ARGS__)); \
+		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogToLogger(logger, logType, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
 
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
-/// @param logger PonyDebug::Log::ILogger pointer.
+/// @param logger PonyDebug::Log::ILogger reference.
 /// @param exception std::exception reference.
-/// @param logMessage const char* as a message or format string.
 /// @param ... Format arguments.
-#define PONY_LOG_E_GENERAL(logger, exception, logMessage, ...) \
+#define PONY_LOG_E_S(logger, exception) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
 	{ \
-		PonyDebug::Log::LogExceptionToLogger(*(logger), exception, logMessage __VA_OPT__(,) __VA_ARGS__); \
+		PonyDebug::Log::LogExceptionToLogger(logger, exception); \
 	}
 
 /// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param condition Log condition.
-/// @param logger PonyDebug::Log::ILogger pointer.
+/// @param logger PonyDebug::Log::ILogger reference.
+/// @param exception std::exception reference.
+/// @param ... Format arguments.
+#define PONY_LOG_E_S_IF(condition, logger, exception, logMessage, ...) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	{ \
+		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToLogger(logger, exception)); \
+	}
+
+/// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
+/// @param logger PonyDebug::Log::ILogger reference.
 /// @param exception std::exception reference.
 /// @param logMessage const char* as a message or format string.
 /// @param ... Format arguments.
-#define PONY_LOG_E_IF_GENERAL(condition, logger, exception, logMessage, ...) \
+#define PONY_LOG_E(logger, exception, logMessage, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
 	{ \
-		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToLogger(*(logger), exception, logMessage __VA_OPT__(,) __VA_ARGS__)); \
+		PonyDebug::Log::LogExceptionToLogger(logger, exception, logMessage __VA_OPT__(,) __VA_ARGS__); \
+	}
+
+/// @brief Log exception macro that conditionally calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
+/// @param condition Log condition.
+/// @param logger PonyDebug::Log::ILogger reference.
+/// @param exception std::exception reference.
+/// @param logMessage const char* as a message or format string.
+/// @param ... Format arguments.
+#define PONY_LOG_E_IF(condition, logger, exception, logMessage, ...) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	{ \
+		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToLogger(logger, exception, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
 
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.

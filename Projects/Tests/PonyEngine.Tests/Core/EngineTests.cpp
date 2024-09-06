@@ -206,15 +206,6 @@ namespace Core
 			}
 		}
 
-		TEST_METHOD(GetLoggerTest)
-		{
-			auto logger = EmptyLogger();
-			auto application = Application();
-			application.logger = &logger;
-			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&logger), reinterpret_cast<std::uintptr_t>(&engine.engine->Logger()));
-		}
-
 		TEST_METHOD(ExitTest)
 		{
 			auto logger = EmptyLogger();

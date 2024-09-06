@@ -104,23 +104,23 @@ namespace Application
 
 	WindowsEngine::~WindowsEngine() noexcept
 	{
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine.engine->Name());
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine.engine->Name());
 		engine.engine.reset();
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
 
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
 		for (auto it = systemFactories.rbegin(); it != systemFactories.rend(); ++it)
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Debug, "Destroy '{}' system factory.", (*it)->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Destroy '{}' system factory.", (*it)->Name());
 			it->reset();
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Debug, "System factory destroyed.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "System factory destroyed.");
 		}
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
 	}
 
 	bool WindowsEngine::Tick(int& exitCode) const
 	{
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine.");
 
 		try
 		{
@@ -128,7 +128,7 @@ namespace Application
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On ticking engine.")
+			PONY_LOG_E(application->Logger(), e, "On ticking engine.");
 			exitCode = engine.engine->IsRunning() ? static_cast<int>(PonyBase::Core::ExitCodes::EngineTickException) : engine.engine->ExitCode();
 
 			return false;
@@ -140,7 +140,7 @@ namespace Application
 		}
 
 		exitCode = engine.engine->ExitCode();
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Engine exited with code '{}'.", exitCode);
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine exited with code '{}'.", exitCode);
 
 		return false;
 	}
@@ -149,16 +149,16 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create frame rate system factory.");
-			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create frame rate system factory.");
+			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams{});
 			assert(factory.systemFactory && "The frame rate system factory is nullptr.");
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", factory.systemFactory->Name());
 
 			return factory;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating frame rate system factory.");
+			PONY_LOG_E(application->Logger(), e, "On creating frame rate system factory.");
 
 			throw;
 		}
@@ -168,7 +168,7 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
 			const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = CS_OWNDC};
 			const auto windowSystemFactoryParams = PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = windowClassParams };
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, windowSystemFactoryParams);
@@ -186,13 +186,13 @@ namespace Application
 			windowParams.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
 			windowParams.cmdShow = SW_NORMAL;
 
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
 
 			return factory;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating Windows window system factory.");
+			PONY_LOG_E(application->Logger(), e, "On creating Windows window system factory.");
 
 			throw;
 		}
@@ -202,16 +202,16 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
-			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
+			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{});
 			assert(factory.systemFactory && "The input system factory is nullptr");
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", factory.systemFactory->Name());
 
 			return factory;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating input system factory.");
+			PONY_LOG_E(application->Logger(), e, "On creating input system factory.");
 
 			throw;
 		}
@@ -221,16 +221,16 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
-			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
+			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams{});
 			assert(factory.systemFactory && "The game system factory is nullptr");
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.");
 
 			return factory;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating game system factory.");
+			PONY_LOG_E(application->Logger(), e, "On creating game system factory.");
 
 			throw;
 		}
@@ -240,16 +240,16 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
-			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
+			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{});
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
 
 			return factory;
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating Direct3D 12 render system for Windows factory.");
+			PONY_LOG_E(application->Logger(), e, "On creating Direct3D 12 render system for Windows factory.");
 
 			throw;
 		}
@@ -259,16 +259,16 @@ namespace Application
 	{
 		try
 		{
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
 
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
-			auto params = PonyEngine::Core::EngineParams();
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
+			auto params = PonyEngine::Core::EngineParams{};
 			for (PonyEngine::Core::SystemFactoryUniquePtr& factory : systemFactories)
 			{
-				PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());
+				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());
 				params.systemFactories.AddSystemFactory(*factory);
 			}
-			PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Debug, "Engine params created.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Engine params created.");
 			
 			PonyEngine::Core::EngineData engineData = PonyEngine::Core::CreateEngine(*application, params);
 			assert(engineData.engine && "The engine is nullptr.");
@@ -278,7 +278,7 @@ namespace Application
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E_GENERAL(&application->Logger(), e, "On creating engine.");
+			PONY_LOG_E(application->Logger(), e, "On creating engine.");
 
 			throw;
 		}

@@ -20,7 +20,7 @@ export namespace PonyEngine::Render
 		IRenderer(IRenderer&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::IEngine& Engine() const noexcept = 0; // TODO: Don't return a parent context. The main reason to use it here is access to a logger. I should add a better logging system with wrappers in each context and with single Macro system.
+		virtual Core::IEngine& Engine() const noexcept = 0;
 
 		IRenderer& operator =(const IRenderer&) = delete;
 		IRenderer& operator =(IRenderer&&) = delete;

@@ -38,21 +38,21 @@ namespace Log
 			Assert::AreEqual(message, logEntry.Message());
 			Assert::IsNull(logEntry.Exception());
 			Assert::IsTrue(timePoint == logEntry.TimePoint());
-			Assert::AreEqual(frameCount, logEntry.FrameCount());
+			Assert::AreEqual(frameCount, logEntry.FrameCount().value());
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logEntry.LogType()));
 
 			const auto pureExceptionLogEntry = PonyDebug::Log::LogEntry(nullptr, &exception, timePoint, frameCount, exceptionLogType);
 			Assert::IsNull(pureExceptionLogEntry.Message());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(pureExceptionLogEntry.Exception()));
 			Assert::IsTrue(timePoint == pureExceptionLogEntry.TimePoint());
-			Assert::AreEqual(frameCount, pureExceptionLogEntry.FrameCount());
+			Assert::AreEqual(frameCount, pureExceptionLogEntry.FrameCount().value());
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(pureExceptionLogEntry.LogType()));
 
 			const auto exceptionLogEntry = PonyDebug::Log::LogEntry(message, &exception, timePoint, frameCount, exceptionLogType);
 			Assert::AreEqual(message, logEntry.Message());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(exceptionLogEntry.Exception()));
 			Assert::IsTrue(timePoint == exceptionLogEntry.TimePoint());
-			Assert::AreEqual(frameCount, exceptionLogEntry.FrameCount());
+			Assert::AreEqual(frameCount, exceptionLogEntry.FrameCount().value());
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(exceptionLogType), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(exceptionLogEntry.LogType()));
 		}
 

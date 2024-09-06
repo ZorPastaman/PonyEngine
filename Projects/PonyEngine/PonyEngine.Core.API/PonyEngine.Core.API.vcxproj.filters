@@ -48,9 +48,6 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemUniquePtr.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\LogHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\Factory\EngineUniquePtr.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -84,9 +81,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Log\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -16,6 +16,7 @@ export module PonyDebug.Log:LogEntry;
 import <chrono>;
 import <cstddef>;
 import <exception>;
+import <optional>;
 import <string>;
 
 import :LogFormat;
@@ -35,7 +36,7 @@ export namespace PonyDebug::Log
 		/// @param frameCount Frame when the log entry has been created.
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
-		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount, LogType logType) noexcept;
+		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::size_t> frameCount, LogType logType) noexcept;
 		LogEntry(const LogEntry&) = delete;
 		LogEntry(LogEntry&&) = delete;
 
@@ -56,7 +57,7 @@ export namespace PonyDebug::Log
 		/// @brief Gets the frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
-		std::size_t FrameCount() const noexcept;
+		std::optional<std::size_t> FrameCount() const noexcept;
 		/// @brief Gets the log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
@@ -78,7 +79,7 @@ export namespace PonyDebug::Log
 		const char* const message; ///< Log message.
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
-		const std::size_t frameCount; ///< Frame when the log entry is created.
+		const std::optional<std::size_t> frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
 		mutable std::string stringCache; ///< ToString() cache.
@@ -94,7 +95,7 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount, const Log::LogType logType) noexcept :
+	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::size_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		exception{exception},
 		timePoint{timePoint},
@@ -119,7 +120,7 @@ namespace PonyDebug::Log
 		return timePoint;
 	}
 
-	std::size_t LogEntry::FrameCount() const noexcept
+	std::optional<std::size_t> LogEntry::FrameCount() const noexcept
 	{
 		return frameCount;
 	}
@@ -144,22 +145,27 @@ namespace PonyDebug::Log
 	{
 		try
 		{
-			if (exception)
+			switch ((message != nullptr) << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
 			{
-				if (message)
-				{
-					return LogFormat(logType, exception->what(), message, timePoint, frameCount);
-				}
-
-				return LogFormat(logType, exception->what(), timePoint, frameCount);
+			case 0:
+				return LogFormat(logType, "", timePoint);
+			case 1:
+				return LogFormat(logType, "", timePoint, frameCount.value());
+			case 2:
+				return LogFormat(logType, exception->what(), timePoint);
+			case 3:
+				return LogFormat(logType, exception->what(), timePoint, frameCount.value());
+			case 4:
+				return LogFormat(logType, message, timePoint);
+			case 5:
+				return LogFormat(logType, message, timePoint, frameCount.value());
+			case 6:
+				return LogFormat(logType, exception->what(), message, timePoint);
+			case 7:
+				return LogFormat(logType, exception->what(), message, timePoint, frameCount.value());
+			default:
+				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message ? message : "Unknown message", timePoint, frameCount.value_or(0));
 			}
-			
-			if (message)
-			{
-				return LogFormat(logType, message, timePoint, frameCount);
-			}
-
-			return LogFormat(logType, "", timePoint, frameCount);
 		}
 		catch (const std::exception& e)
 		{
