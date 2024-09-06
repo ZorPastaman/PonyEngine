@@ -43,7 +43,7 @@ namespace Log
 				Assert::IsTrue(expectMessages);
 				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedMessage), reinterpret_cast<std::uintptr_t>(logEntry.Message()));
 				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedException), reinterpret_cast<std::uintptr_t>(logEntry.Exception()));
-				Assert::AreEqual(expectedFrameCount, logEntry.FrameCount());
+				Assert::AreEqual(expectedFrameCount, logEntry.FrameCount().value());
 				Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(expectedLogType), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logEntry.LogType()));
 				++count;
 			}

@@ -124,7 +124,7 @@ namespace Application
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
-			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
+			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{});
 			assert(logger.logger && "The logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
 
@@ -143,7 +143,7 @@ namespace Application
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create console sub-logger.");
-			PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
+			PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams{});
 			assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
 
@@ -162,7 +162,7 @@ namespace Application
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create output debug string sub-logger.");
-			PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams());
+			PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams{});
 			assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
 

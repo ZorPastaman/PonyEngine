@@ -56,7 +56,7 @@ namespace Application
 
 	bool WindowsQuitChecker::Check(int& quitCode) const noexcept
 	{
-		PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Verbose, "Peek application messages.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Peek application messages.");
 
 		MSG message;
 		while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -67,7 +67,7 @@ namespace Application
 			if (message.message == WM_QUIT)
 			{
 				quitCode = static_cast<int>(message.wParam);
-				PONY_LOG_GENERAL(&application->Logger(), PonyDebug::Log::LogType::Info, "Received exit code '{}' from Windows.", quitCode);
+				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Received exit code '{}' from Windows.", quitCode);
 
 				return false;
 			}

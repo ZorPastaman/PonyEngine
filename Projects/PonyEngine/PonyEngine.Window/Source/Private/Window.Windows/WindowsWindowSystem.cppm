@@ -13,7 +13,7 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
 
@@ -127,7 +127,7 @@ namespace PonyEngine::Window
 		engine{&engine},
 		hWnd{CreateControlledWindow(hInstance, className, windowParams)}
 	{
-		PONY_LOG(this->engine, PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
 
@@ -135,16 +135,16 @@ namespace PonyEngine::Window
 	{
 		if (IsWindow(hWnd))
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			if (!DestroyWindow(hWnd))
 			{
-				PONY_LOG(engine, PonyDebug::Log::LogType::Error, "Error on destroying Windows window. Error code: '{}'.", GetLastError());
+				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Error, "Error on destroying Windows window. Error code: '{}'.", GetLastError());
 			}
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Windows window destroyed.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 		}
 		else
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Skip destroying Windows window 'cause it's already been destroyed.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Skip destroying Windows window 'cause it's already been destroyed.");
 		}
 	}
 
@@ -158,7 +158,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::Tick()
 	{
-		PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Dispatch messages.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Dispatch messages.");
 
 		MSG message;
 		while (PeekMessageW(&message, hWnd, 0, 0, PM_REMOVE | PM_NOYIELD))
@@ -203,13 +203,13 @@ namespace PonyEngine::Window
 	void WindowsWindowSystem::ShowWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_SHOW);
-		PONY_LOG(engine, PonyDebug::Log::LogType::Debug, "Show window.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Show window.");
 	}
 
 	void WindowsWindowSystem::HideWindow() noexcept
 	{
 		::ShowWindow(hWnd, SW_HIDE);
-		PONY_LOG(engine, PonyDebug::Log::LogType::Debug, "Hide window.");
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Hide window.");
 	}
 
 	HWND WindowsWindowSystem::WindowHandle() const noexcept
@@ -221,7 +221,7 @@ namespace PonyEngine::Window
 	{
 		assert(std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added.");
 		keyboardMessageObservers.push_back(&keyboardMessageObserver);
-		PONY_LOG(engine, PonyDebug::Log::LogType::Debug, "'{}' keyboard message observer added.", keyboardMessageObserver.Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "'{}' keyboard message observer added.", keyboardMessageObserver.Name());
 	}
 
 	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
@@ -229,11 +229,11 @@ namespace PonyEngine::Window
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
 			keyboardMessageObservers.erase(position);
-			PONY_LOG(engine, PonyDebug::Log::LogType::Debug, "{} keyboard message observer removed.", keyboardMessageObserver.Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "{} keyboard message observer removed.", keyboardMessageObserver.Name());
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(engine, PonyDebug::Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver.Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver.Name());
 		}
 	}
 
@@ -248,25 +248,25 @@ namespace PonyEngine::Window
 		{
 		// Main
 		case WM_CREATE:
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Received create command.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Received create command.");
 			break;
 		case WM_DESTROY:
-			PONY_LOG(engine, PonyDebug::Log::LogType::Info, "Received destroy command.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Received destroy command.");
 			Destroy();
 			break;
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Received key down command with code '{}'.", lParam);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key down command with code '{}'.", lParam);
 			PushKeyboardKeyMessage(lParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Received key up command with code '{}'.", lParam);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key up command with code '{}'.", lParam);
 			PushKeyboardKeyMessage(lParam, false);
 			break;
 		default:
-			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Received unhandled message. Type: '{}'", uMsg);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received unhandled message. Type: '{}'", uMsg);
 			break;
 		}
 
@@ -282,7 +282,7 @@ namespace PonyEngine::Window
 			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '{}'.", GetLastError()));
 		}
 
-		PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
 	}
 
 	void WindowsWindowSystem::Destroy() const noexcept
@@ -295,7 +295,7 @@ namespace PonyEngine::Window
 		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
 		{
 			const auto keyboardMessage = Input::KeyboardMessage{.keyCode = keyCode, .isDown = isDown};
-			PONY_LOG(engine, PonyDebug::Log::LogType::Verbose, "Push keyboard message '{}' to observers.", keyboardMessage.ToString());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Push keyboard message '{}' to observers.", keyboardMessage.ToString());
 
 			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
 			{
@@ -305,7 +305,7 @@ namespace PonyEngine::Window
 				}
 				catch (const std::exception& e)
 				{
-					PONY_LOG_E(engine, e, "On observing keyboard key message");
+					PONY_LOG_E(engine->Logger(), e, "On observing keyboard key message");
 				}
 			}
 		}
@@ -313,7 +313,7 @@ namespace PonyEngine::Window
 
 	HWND WindowsWindowSystem::CreateControlledWindow(const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
 	{
-		PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
 			className, windowParams.style, windowParams.extendedStyle, PonyBase::Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
 		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
@@ -331,7 +331,7 @@ namespace PonyEngine::Window
 		{
 			throw std::logic_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
 		}
-		PONY_LOG(this->engine, PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
 		return windowHandle;
 	}

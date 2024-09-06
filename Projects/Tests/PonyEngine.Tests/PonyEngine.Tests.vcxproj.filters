@@ -36,9 +36,6 @@
     <ClCompile Include="Input\InputSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\CoreLogHelperTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Input\InputSystemFactoryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

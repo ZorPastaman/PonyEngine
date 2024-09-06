@@ -19,6 +19,7 @@ module;
 
 export module PonyDebug.Log:LogConsoleHelper;
 
+import <chrono>;
 import <exception>;
 import <format>;
 import <iostream>;
@@ -97,7 +98,7 @@ namespace PonyDebug::Log
 	{
 		try
 		{
-			const std::string log = LogFormat(logType, message ? message : "");
+			const std::string log = LogFormat(logType, message ? message : "", std::chrono::system_clock::now());
 			LogFormattedToConsole(logType, log.c_str());
 		}
 		catch (...)
@@ -116,7 +117,7 @@ namespace PonyDebug::Log
 	{
 		try
 		{
-			const std::string log = LogFormat(LogType::Exception, exception.what());
+			const std::string log = LogFormat(LogType::Exception, exception.what(), std::chrono::system_clock::now());
 			LogFormattedToConsole(LogType::Exception, log.c_str());
 		}
 		catch (...)
@@ -129,7 +130,7 @@ namespace PonyDebug::Log
 	{
 		try
 		{
-			const std::string log = LogFormat(LogType::Exception, exception.what(), message ? message : "");
+			const std::string log = LogFormat(LogType::Exception, exception.what(), message ? message : "", std::chrono::system_clock::now());
 			LogFormattedToConsole(LogType::Exception, log.c_str());
 		}
 		catch (...)

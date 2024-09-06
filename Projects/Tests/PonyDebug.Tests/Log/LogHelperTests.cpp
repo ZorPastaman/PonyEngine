@@ -38,7 +38,7 @@ namespace Log
 		virtual void Log(const PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override
 		{
 			lastMessage = logInput.message ? logInput.message : "";
-			lastFrameCount = logInput.frameCount;
+			lastFrameCount = logInput.frameCount.value_or(0);
 			lastLogType = logType;
 		}
 
@@ -46,7 +46,7 @@ namespace Log
 		{
 			lastException = &exception;
 			lastMessage = logInput.message ? logInput.message : "";
-			lastFrameCount = logInput.frameCount;
+			lastFrameCount = logInput.frameCount.value_or(0);
 		}
 
 		virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
@@ -72,23 +72,11 @@ namespace Log
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Info), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 
-			logger.lastMessage = "";
-			logger.lastLogType = PonyDebug::Log::LogType::None;
-			PonyDebug::Log::LogToLogger(logger, PonyDebug::Log::LogType::Warning, PonyDebug::Log::AdditionalInfo{.frameCount = frameCount}, message);
-			Assert::AreEqual(message, logger.lastMessage.c_str());
-			Assert::AreEqual(frameCount, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Warning), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
-
 			const auto format = "Format {}.";
 			const auto formatArg = "Format arg";
 			PonyDebug::Log::LogToLogger(logger, PonyDebug::Log::LogType::Info, format, formatArg);
 			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Info), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
-
-			PonyDebug::Log::LogToLogger(logger, PonyDebug::Log::LogType::Info, PonyDebug::Log::AdditionalInfo{.frameCount = frameCount}, format, formatArg);
-			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
-			Assert::AreEqual(frameCount, logger.lastFrameCount);
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(PonyDebug::Log::LogType::Info), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logger.lastLogType));
 		}
 
@@ -107,25 +95,11 @@ namespace Log
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
 
 			logger.lastException = nullptr;
-			PonyDebug::Log::LogExceptionToLogger(logger, PonyDebug::Log::AdditionalInfo{.frameCount = frameCount}, exception);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
-			Assert::AreEqual("", logger.lastMessage.c_str());
-			Assert::AreEqual(frameCount, logger.lastFrameCount);
-
-			logger.lastException = nullptr;
 			logger.lastFrameCount = 1000;
 			PonyDebug::Log::LogExceptionToLogger(logger, exception, message);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(message, logger.lastMessage.c_str());
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
-
-			logger.lastException = nullptr;
-			logger.lastFrameCount = 0;
-			logger.lastMessage = "";
-			PonyDebug::Log::LogExceptionToLogger(logger, PonyDebug::Log::AdditionalInfo{.frameCount = frameCount}, exception, message);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
-			Assert::AreEqual(message, logger.lastMessage.c_str());
-			Assert::AreEqual(frameCount, logger.lastFrameCount);
 
 			const auto format = "Format {}.";
 			const auto formatArg = "Format arg";
@@ -133,11 +107,6 @@ namespace Log
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
 			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
 			Assert::AreEqual(std::size_t{0}, logger.lastFrameCount);
-
-			PonyDebug::Log::LogExceptionToLogger(logger, PonyDebug::Log::AdditionalInfo{.frameCount = frameCount}, exception, format, formatArg);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(logger.lastException));
-			Assert::AreEqual(std::format(format, formatArg).c_str(), logger.lastMessage.c_str());
-			Assert::AreEqual(frameCount, logger.lastFrameCount);
 		}
 	};
 }

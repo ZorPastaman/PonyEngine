@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Log/Log.h"
+#include "PonyDebug/Log/Log.h"
 
 #include "PonyEngine/Render/DXGI/Framework.h"
 
@@ -68,12 +68,12 @@ namespace PonyEngine::Render
 	DXGISubSystem::~DXGISubSystem() noexcept
 	{
 #ifdef _DEBUG
-		PONY_LOG(&renderer->Engine(), PonyDebug::Log::LogType::Info, "Report DXGI live objects.");
+		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Report DXGI live objects.");
 		if (const HRESULT result = dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, static_cast<DXGI_DEBUG_RLO_FLAGS>(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL)); FAILED(result))
 		{
-			PONY_LOG(&renderer->Engine(), PonyDebug::Log::LogType::Error, "Failed to report live objects with '{}' result.", result);
+			PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to report live objects with '{}' result.", result);
 		}
-		PONY_LOG(&renderer->Engine(), PonyDebug::Log::LogType::Info, "DXGI live objects reported.");
+		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI live objects reported.");
 
 		dxgiDebug.Reset();
 #endif

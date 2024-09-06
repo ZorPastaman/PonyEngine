@@ -14,4 +14,3 @@ export import :ISystem;
 export import :ISystemManager;
 export import :ITickableEngine;
 export import :ITickableSystem;
-export import :LogHelper;

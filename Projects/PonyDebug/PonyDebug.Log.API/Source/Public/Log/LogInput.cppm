@@ -10,6 +10,7 @@
 export module PonyDebug.Log:LogInput;
 
 import <cstddef>;
+import <optional>;
 
 export namespace PonyDebug::Log
 {
@@ -17,6 +18,6 @@ export namespace PonyDebug::Log
 	struct LogInput final
 	{
 		const char* message = nullptr; ///< Log message.
-		std::size_t frameCount = 0; ///< Engine frame count.
+		std::optional<std::size_t> frameCount = {}; ///< Engine frame count.
 	};
 }
