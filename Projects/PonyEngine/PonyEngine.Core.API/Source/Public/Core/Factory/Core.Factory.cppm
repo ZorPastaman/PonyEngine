@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Factory; // TODO: Divide into SystemFactory and EngineFactory.
+export module PonyEngine.Core.Factory;
 
 export import PonyEngine.Core;
 
