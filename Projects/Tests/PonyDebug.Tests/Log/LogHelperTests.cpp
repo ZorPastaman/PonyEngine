@@ -65,7 +65,6 @@ namespace Log
 			logger.lastFrameCount = 100;
 
 			const auto message = "Message";
-			constexpr std::size_t frameCount = 1023;
 
 			PonyDebug::Log::LogToLogger(logger, PonyDebug::Log::LogType::Info, message);
 			Assert::AreEqual(message, logger.lastMessage.c_str());
@@ -86,7 +85,6 @@ namespace Log
 			logger.lastFrameCount = 100;
 
 			const auto message = "Message";
-			constexpr std::size_t frameCount = 1023;
 			const auto exception = std::exception("Exception");
 
 			PonyDebug::Log::LogExceptionToLogger(logger, exception);
