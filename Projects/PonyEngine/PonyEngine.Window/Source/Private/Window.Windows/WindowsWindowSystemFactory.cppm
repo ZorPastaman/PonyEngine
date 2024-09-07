@@ -107,10 +107,10 @@ namespace PonyEngine::Window
 
 	WindowsWindowSystemFactory::~WindowsWindowSystemFactory() noexcept
 	{
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window class '{}'.", classAtom);
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window class '0x{:X}'.", classAtom);
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Error, "Couldn't unregister class. Error code: '{}'.", GetLastError());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Error, "Couldn't unregister class. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window class unregistered.");
 	}
@@ -121,7 +121,7 @@ namespace PonyEngine::Window
 		const auto system = new WindowsWindowSystem(engine, hInstance, classAtom, windowParams);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window created.");
 		const HWND hWnd = system->WindowHandle();
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Register window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Register window proc. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		RegisterWindowProc(hWnd, system);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window proc registered.");
 		const auto deleter = Core::SystemDeleter(*this);
@@ -144,16 +144,16 @@ namespace PonyEngine::Window
 
 		if (windowsWindow->IsWindowAlive())
 		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window proc. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window proc. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			UnregisterWindowProc(hWnd);
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window proc unregistered.");
 		}
 		else
 		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		}
 
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 		delete windowsWindow;
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 	}
@@ -183,7 +183,7 @@ namespace PonyEngine::Window
 		HINSTANCE hInstance = NULL;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return hInstance;
@@ -207,14 +207,14 @@ namespace PonyEngine::Window
 			.hIconSm = NULL
 		};
 
-		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '{}'; Style: '{}'; Icon: '{}'; Cursor: '{}'.",
+		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '0x{:X}'; Style: '0x{:X}'; Icon: '0x{:X}'; Cursor: '0x{:X}'.",
 			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
 		const ATOM atom = RegisterClassExW(&wc);
 		if (!atom)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't register class. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't register class. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Window class '{}' registered.", atom);
+		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Window class '0x{:X}' registered.", atom);
 
 		return atom;
 	}
@@ -224,7 +224,7 @@ namespace PonyEngine::Window
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return cursor;

@@ -135,10 +135,10 @@ namespace PonyEngine::Window
 	{
 		if (IsWindow(hWnd))
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			if (!DestroyWindow(hWnd))
 			{
-				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Error, "Error on destroying Windows window. Error code: '{}'.", GetLastError());
+				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Error, "Error on destroying Windows window. Error code: '0x{:X}'.", GetLastError());
 			}
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 		}
@@ -257,16 +257,16 @@ namespace PonyEngine::Window
 		// Input
 		case WM_SYSKEYDOWN:
 		case WM_KEYDOWN:
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key down command with code '{}'.", lParam);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key down command with code '0x{:X}'.", lParam);
 			PushKeyboardKeyMessage(lParam, true);
 			break;
 		case WM_SYSKEYUP:
 		case WM_KEYUP:
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key up command with code '{}'.", lParam);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received key up command with code '0x{:X}'.", lParam);
 			PushKeyboardKeyMessage(lParam, false);
 			break;
 		default:
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received unhandled message. Type: '{}'", uMsg);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Received unhandled message. Type: '0x{:X}'", uMsg);
 			break;
 		}
 
@@ -279,7 +279,7 @@ namespace PonyEngine::Window
 
 		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
@@ -313,7 +313,7 @@ namespace PonyEngine::Window
 
 	HWND WindowsWindowSystem::CreateControlledWindow(const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams)
 	{
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '{}'. Style: '{}'; Extended style: '{}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '{}'.",
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '0x{:X}'.",
 			className, windowParams.style, windowParams.extendedStyle, PonyBase::Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
 		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
@@ -329,9 +329,9 @@ namespace PonyEngine::Window
 		);
 		if (!windowHandle)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '{}'.", GetLastError()));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '{}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
 		return windowHandle;
 	}
