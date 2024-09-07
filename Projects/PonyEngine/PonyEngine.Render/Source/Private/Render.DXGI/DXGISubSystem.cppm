@@ -58,7 +58,7 @@ namespace PonyEngine::Render
 #ifdef _DEBUG
 		if (const HRESULT result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiDebug.GetAddressOf())); FAILED(result))
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Failed to get DXGI debug interface with '{}' result.", result));
+			throw std::logic_error(PonyBase::Utility::SafeFormat("Failed to get DXGI debug interface with '0x{:X}' result.", result));
 		}
 
 		dxgiDebug->EnableLeakTrackingForThread();
@@ -71,7 +71,7 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Report DXGI live objects.");
 		if (const HRESULT result = dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, static_cast<DXGI_DEBUG_RLO_FLAGS>(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL)); FAILED(result))
 		{
-			PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to report live objects with '{}' result.", result);
+			PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to report live objects with '0x{:X}' result.", result);
 		}
 		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI live objects reported.");
 

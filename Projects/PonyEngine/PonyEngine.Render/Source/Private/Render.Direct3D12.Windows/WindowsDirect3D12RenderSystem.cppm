@@ -54,8 +54,8 @@ export namespace PonyEngine::Render
 	private:
 		Core::IEngine* engine; ///< Engine.
 
-		DXGISubSystem dxgiSubSystem; ///< DXGI sub-system.
 		Direct3D12SubSystem direct3D12SubSystem; ///< Direct3D 12 sub-system.
+		DXGISubSystem dxgiSubSystem; ///< DXGI sub-system.
 	};
 }
 
