@@ -130,6 +130,10 @@ namespace PonyEngine::Core
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy system manager.");
 		systemManager.reset();
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager destroyed.");
+
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy engine logger.");
+		engineLogger.reset();
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine logger destroyed.");
 	}
 
 	std::size_t Engine::FrameCount() const noexcept
