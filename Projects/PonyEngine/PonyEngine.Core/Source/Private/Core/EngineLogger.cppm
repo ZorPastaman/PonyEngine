@@ -74,12 +74,12 @@ namespace PonyEngine::Core
 	void EngineLogger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept
 	{
 		const PonyDebug::Log::LogInput engineLogInput = ConvertToEngineLogInput(logInput);
-		externalLogger->LogException(exception, logInput);
+		externalLogger->LogException(exception, engineLogInput);
 	}
 
 	void EngineLogger::AddSubLogger(PonyDebug::Log::ISubLogger& subLogger)
 	{
-		externalLogger->AddSubLogger(subLogger); // TODO: Make internal sub-loggers.
+		externalLogger->AddSubLogger(subLogger);
 	}
 
 	void EngineLogger::RemoveSubLogger(PonyDebug::Log::ISubLogger& subLogger)

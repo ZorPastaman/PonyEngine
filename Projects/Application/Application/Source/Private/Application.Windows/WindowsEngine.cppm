@@ -224,7 +224,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
 			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams{});
 			assert(factory.systemFactory && "The game system factory is nullptr");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.", factory.systemFactory->Name());
 
 			return factory;
 		}
