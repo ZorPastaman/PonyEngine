@@ -60,7 +60,7 @@ namespace PonyDebug::Log
 
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::logic_error(SafeFormat("Log file at path '{}' isn't open.", PonyBase::Utility::ConvertToString(logPath.c_str())));
+			throw std::runtime_error(SafeFormat("Log file at path '{}' isn't open.", PonyBase::Utility::ConvertToString(logPath.c_str())));
 		}
 	}
 

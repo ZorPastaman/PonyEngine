@@ -279,7 +279,7 @@ namespace PonyEngine::Window
 
 		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
@@ -329,7 +329,7 @@ namespace PonyEngine::Window
 		);
 		if (!windowHandle)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
