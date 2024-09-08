@@ -7,6 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Core/Windows/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
+
 export module Application.Windows:WindowsApplication;
 
 import PonyDebug.Log;
@@ -47,6 +53,10 @@ export namespace Application
 		static constexpr auto StaticName = "Application::WindowsApplication"; ///< Class name.
 
 	private:
+		/// @brief Sets the process priority.
+		/// @param priority Priority to set.
+		void SetProcessPriority(DWORD priority) const noexcept;
+
 		WindowsLogger logger; ///< Logger for Windows.
 		WindowsEngine engine; ///< Engine for Windows.
 		WindowsQuitChecker quitChecker; /// Quit checker for Windows.
@@ -59,6 +69,7 @@ namespace Application
 		engine(*this),
 		quitChecker(*this)
 	{
+		SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 	}
 
 	PonyDebug::Log::ILogger& WindowsApplication::Logger() const noexcept
@@ -82,5 +93,15 @@ namespace Application
 	const char* WindowsApplication::Name() const noexcept
 	{
 		return StaticName;
+	}
+
+	void WindowsApplication::SetProcessPriority(const DWORD priority) const noexcept
+	{
+		if (!SetPriorityClass(GetCurrentProcess(), priority))
+		{
+			PONY_LOG(logger.Logger(), PonyDebug::Log::LogType::Error, "Couldn't set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError());
+		}
+
+		PONY_LOG(logger.Logger(), PonyDebug::Log::LogType::Info, "Current process priority set to '0x{:X}'.", priority);
 	}
 }

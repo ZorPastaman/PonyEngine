@@ -183,7 +183,7 @@ namespace PonyEngine::Window
 		HINSTANCE hInstance = NULL;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return hInstance;
@@ -212,7 +212,7 @@ namespace PonyEngine::Window
 		const ATOM atom = RegisterClassExW(&wc);
 		if (!atom)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't register class. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't register class. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Window class '0x{:X}' registered.", atom);
 
@@ -224,7 +224,7 @@ namespace PonyEngine::Window
 		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return cursor;

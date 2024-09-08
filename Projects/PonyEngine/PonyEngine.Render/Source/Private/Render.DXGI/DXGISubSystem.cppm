@@ -15,6 +15,7 @@ module;
 
 export module PonyEngine.Render.DXGI:DXGISubSystem;
 
+import <cstdint>;
 import <stdexcept>;
 
 import PonyBase.StringUtility;
@@ -45,7 +46,7 @@ export namespace PonyEngine::Render
 		IRenderer* renderer;
 
 #ifdef _DEBUG
-		Microsoft::WRL::ComPtr<IDXGIDebug1> dxgiDebug;
+		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
 #endif
 	};
 }
@@ -56,12 +57,15 @@ namespace PonyEngine::Render
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
-		if (const HRESULT result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(dxgiDebug.GetAddressOf())); FAILED(result))
+		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Create DXGI debug interface.");
+		if (const HRESULT result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result))
 		{
-			throw std::logic_error(PonyBase::Utility::SafeFormat("Failed to get DXGI debug interface with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get DXGI debug interface with '0x{:X}' result.", result));
 		}
+		PONY_LOG(renderer.Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
 
-		dxgiDebug->EnableLeakTrackingForThread();
+		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Debug, "Enable DXGI leak tracking.");
+		debug->EnableLeakTrackingForThread();
 #endif
 	}
 
@@ -69,13 +73,15 @@ namespace PonyEngine::Render
 	{
 #ifdef _DEBUG
 		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Report DXGI live objects.");
-		if (const HRESULT result = dxgiDebug->ReportLiveObjects(DXGI_DEBUG_ALL, static_cast<DXGI_DEBUG_RLO_FLAGS>(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL)); FAILED(result))
+		if (const HRESULT result = debug->ReportLiveObjects(DXGI_DEBUG_ALL, static_cast<DXGI_DEBUG_RLO_FLAGS>(DXGI_DEBUG_RLO_DETAIL | DXGI_DEBUG_RLO_IGNORE_INTERNAL)); FAILED(result))
 		{
 			PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to report live objects with '0x{:X}' result.", result);
 		}
 		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI live objects reported.");
 
-		dxgiDebug.Reset();
+		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy DXGI debug interface.");
+		debug.Reset();
+		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface destroyed.");
 #endif
 	}
 }
