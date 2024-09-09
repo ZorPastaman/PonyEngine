@@ -180,7 +180,7 @@ namespace PonyEngine::Window
 
 	HINSTANCE WindowsWindowSystemFactory::GetInstance()
 	{
-		HINSTANCE hInstance = NULL;
+		HINSTANCE hInstance = nullptr;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
@@ -201,14 +201,15 @@ namespace PonyEngine::Window
 			.hInstance = hInstance,
 			.hIcon = classParams.icon,
 			.hCursor = classParams.cursor ? classParams.cursor : DefaultCursor(),
-			.hbrBackground = NULL,
-			.lpszMenuName = NULL,
+			.hbrBackground = nullptr,
+			.lpszMenuName = nullptr,
 			.lpszClassName = classParams.name.c_str(),
-			.hIconSm = NULL
+			.hIconSm = classParams.smallIcon
 		};
 
-		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '0x{:X}'; Style: '0x{:X}'; Icon: '0x{:X}'; Cursor: '0x{:X}'.",
-			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), reinterpret_cast<std::uintptr_t>(wc.hCursor));
+		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '0x{:X}'; Style: '0x{:X}'; Icon: '0x{:X}'; Cursor: '0x{:X}'; Small icon: '0x{:X}'.",
+			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon), 
+			reinterpret_cast<std::uintptr_t>(wc.hCursor), reinterpret_cast<std::uintptr_t>(wc.hIconSm));
 		const ATOM atom = RegisterClassExW(&wc);
 		if (!atom)
 		{
@@ -221,7 +222,7 @@ namespace PonyEngine::Window
 
 	HCURSOR DefaultCursor()
 	{
-		const auto cursor = static_cast<HCURSOR>(LoadImageW(NULL, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
+		const auto cursor = static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't load default cursor. Error code: '0x{:X}'.", GetLastError()));

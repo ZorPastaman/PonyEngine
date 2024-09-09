@@ -9,7 +9,7 @@
 
 export module PonyEngine.Render.Core:IRenderer;
 
-import PonyEngine.Core;
+import PonyDebug.Log;
 
 export namespace PonyEngine::Render
 {
@@ -20,7 +20,7 @@ export namespace PonyEngine::Render
 		IRenderer(IRenderer&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::IEngine& Engine() const noexcept = 0;
+		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 
 		IRenderer& operator =(const IRenderer&) = delete;
 		IRenderer& operator =(IRenderer&&) = delete;

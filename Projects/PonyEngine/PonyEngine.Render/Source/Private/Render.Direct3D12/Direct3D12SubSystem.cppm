@@ -39,6 +39,8 @@ export namespace PonyEngine::Render
 
 		~Direct3D12SubSystem() noexcept;
 
+		void Tick();
+
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
 
@@ -46,17 +48,21 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		static GUID GetGuid();
 
+		GUID guid;
 		UINT64 fenceValue;
 
 		IRenderer* renderer;
 
-		GUID guid;
+		HANDLE fenceEvent;
 
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug;
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
+		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
+		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
+
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
 	};
 }
@@ -64,78 +70,156 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer) :
+		guid{GetGuid()},
 		fenceValue{0},
-		renderer{&renderer},
-		guid{GetGuid()}
+		renderer{&renderer}
 	{
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "'{:X}-{:X}-{:X}-{:X}' guid gotten for Direct3D 12 render system.", guid.Data1, guid.Data2, guid.Data3, *reinterpret_cast<std::uint64_t*>(guid.Data4));
+		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "'{:X}-{:X}-{:X}-{:X}' guid gotten for Direct3D 12 render system.", guid.Data1, guid.Data2, guid.Data3, *reinterpret_cast<std::uint64_t*>(guid.Data4)); // TODO: Make a function for GUID ToString().
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create fence event.");
+		if ((fenceEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create fence event. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event created.");
 
 #ifdef _DEBUG
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 debug interface.");
-		if (const HRESULT result = D3D12GetDebugInterface(IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result))
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 debug interface.");
+		if (const HRESULT result = D3D12GetDebugInterface(IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get Direct3D 12 debug interface with '0x{:X}' result.", result));
 		}
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
 
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Debug, "Enable Direct3D 12 debug layer.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Debug, "Enable Direct3D 12 debug layer.");
 		debug->EnableDebugLayer();
 #endif
 
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 device.");
-		if (const HRESULT result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result))
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 device.");
+		if (const HRESULT result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]] // TODO: Feature level to params
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 device with '0x{:X}' result.", result));
 		}
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command queue.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command queue.");
 		constexpr auto commandQueueDescription = D3D12_COMMAND_QUEUE_DESC
 		{
-			.Type = D3D12_COMMAND_LIST_TYPE_DIRECT,
-			.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH,
+			.Type = commandListType,
+			.Priority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH, // TODO: Priority to params
 			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
 			.NodeMask = 0
 		};
-		if (const HRESULT result = device->CreateCommandQueue1(&commandQueueDescription, guid, IID_PPV_ARGS(commandQueue.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = device->CreateCommandQueue1(&commandQueueDescription, guid, IID_PPV_ARGS(commandQueue.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 command queue with '0x{:X}' result.", result));
 		}
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandQueue.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandQueue.Get()));
 
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence.");
-		if (const HRESULT result = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result))
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command allocator.");
+		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(commandAllocator.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command allocator with '0x{:X}' result.", result));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command allocator created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandAllocator.Get()));
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command list.");
+		if (const HRESULT result = device->CreateCommandList1(0, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command list with '0x{:X}' result.", result));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence.");
+		if (const HRESULT result = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 fence with '0x{:X}' result.", result));
 		}
-		PONY_LOG(this->renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
 	{
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
 		fence.Reset();
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
 
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 command queue.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 command list.");
+		commandList.Reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list destroyed.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 command allocator.");
+		commandAllocator.Reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command allocator destroyed.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 command queue.");
 		commandQueue.Reset();
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue destroyed.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue destroyed.");
 
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 device.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 device.");
 		device.Reset();
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device destroyed.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device destroyed.");
 
 #ifdef _DEBUG
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 debug interface.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 debug interface.");
 		debug.Reset();
-		PONY_LOG(renderer->Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface destroyed.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface destroyed.");
 #endif
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy fence event.");
+		if (!CloseHandle(fenceEvent)) [[unlikely]]
+		{
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Error, "Failed to close fence event. Error code: '0x{:X}'", GetLastError());
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event destroyed.");
+	}
+
+	void Direct3D12SubSystem::Tick()
+	{
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command allocator.");
+		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command allocator with '0x{:X}' result.", result));
+		}
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command list.");
+		if (const HRESULT result = commandList->Reset(commandAllocator.Get(), nullptr); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", result));
+		}
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Close command list.");
+		if (const HRESULT result = commandList->Close(); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", result));
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command list.");
+		ID3D12CommandList* const commandLists[] = { commandList.Get() };
+		commandQueue->ExecuteCommandLists(1, commandLists);
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Current fence value is '{}'.", fenceValue);
+		if (const HRESULT result = commandQueue->Signal(fence.Get(), ++fenceValue); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Current fence value is '{}'.", result, fenceValue));
+		}
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Current fence value: '{}'.", fenceValue);
+		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, fenceEvent); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", result));
+		}
+		if (const DWORD result = WaitForSingleObjectEx(fenceEvent, 20000, false); result != WAIT_OBJECT_0) [[unlikely]] // TODO: Timeout to params
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", result));
+		}
 	}
 
 	GUID Direct3D12SubSystem::GetGuid()
 	{
 		GUID guid;
-		if (const HRESULT result = CoCreateGuid(&guid); FAILED(result))
+		if (const HRESULT result = CoCreateGuid(&guid); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get guid for Direct3D 12 render system with '0x{:X}' result.", result));
 		}

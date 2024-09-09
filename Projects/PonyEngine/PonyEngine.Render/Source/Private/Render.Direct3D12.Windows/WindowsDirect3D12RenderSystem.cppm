@@ -11,7 +11,11 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
+
+import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Render;
@@ -41,7 +45,7 @@ export namespace PonyEngine::Render
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::IEngine& Engine() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -78,11 +82,13 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Tick()
 	{
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick Direct3D 12 sub-system.");
+		direct3D12SubSystem.Tick();
 	}
 
-	Core::IEngine& WindowsDirect3D12RenderSystem::Engine() const noexcept
+	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept
 	{
-		return *engine;
+		return engine->Logger();
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept
