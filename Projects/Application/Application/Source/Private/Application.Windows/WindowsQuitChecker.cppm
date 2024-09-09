@@ -59,7 +59,7 @@ namespace Application
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Peek application messages.");
 
 		MSG message;
-		while (PeekMessageW(&message, NULL, 0, 0, PM_REMOVE | PM_NOYIELD))
+		while (PeekMessageW(&message, nullptr, 0, 0, PM_REMOVE | PM_NOYIELD))
 		{
 			TranslateMessage(&message);
 			DispatchMessageW(&message);

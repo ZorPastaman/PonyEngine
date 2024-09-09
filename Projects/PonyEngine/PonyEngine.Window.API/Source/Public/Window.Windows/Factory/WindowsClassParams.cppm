@@ -21,8 +21,9 @@ export namespace PonyEngine::Window
 	struct WindowsClassParams final
 	{
 		std::wstring name = L"Pony Engine Class"; ///< Class name. Must be unique.
-		HICON icon = NULL; ///< Class icon. The default icon is used if it's NULL.
-		HCURSOR cursor = NULL; ///< Class cursor. The default cursor is used if it's NULL.
+		HICON icon = nullptr; ///< Class icon. The default icon is used if it's nullptr.
+		HICON smallIcon = nullptr; ///< Class small icon. The default icon is used if it's nullptr.
+		HCURSOR cursor = nullptr; ///< Class cursor. The default cursor is used if it's nullptr.
 		UINT style = UINT{0}; ///< Class style;
 	};
 }

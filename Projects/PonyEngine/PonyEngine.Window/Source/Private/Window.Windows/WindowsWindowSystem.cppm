@@ -322,8 +322,8 @@ namespace PonyEngine::Window
 			windowParams.style,
 			windowParams.position.X(), windowParams.position.Y(),
 			windowParams.size.X(), windowParams.size.Y(),
-			NULL,
-			NULL,
+			nullptr,
+			nullptr,
 			hInstance,
 			static_cast<IWindowProc*>(this)
 		);
