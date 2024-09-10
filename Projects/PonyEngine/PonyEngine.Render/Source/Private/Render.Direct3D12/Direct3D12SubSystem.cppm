@@ -17,6 +17,7 @@ export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
 
 import <cstdint>;
 import <stdexcept>;
+import <type_traits>;
 
 import PonyBase.StringUtility;
 
@@ -40,6 +41,11 @@ export namespace PonyEngine::Render
 		~Direct3D12SubSystem() noexcept;
 
 		void Tick();
+
+		[[nodiscard("Pure function")]]
+		ID3D12Device10* GetDevice() const;
+		[[nodiscard("Pure function")]]
+		ID3D12CommandQueue* GetCommandQueue() const;
 
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
@@ -89,7 +95,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 debug interface.");
 		if (const HRESULT result = D3D12GetDebugInterface(IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get Direct3D 12 debug interface with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get Direct3D 12 debug interface with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
 
@@ -100,7 +106,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 device.");
 		if (const HRESULT result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]] // TODO: Feature level to params
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 device with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
@@ -114,28 +120,28 @@ namespace PonyEngine::Render
 		};
 		if (const HRESULT result = device->CreateCommandQueue1(&commandQueueDescription, guid, IID_PPV_ARGS(commandQueue.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 command queue with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 command queue with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandQueue.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command allocator.");
 		if (const HRESULT result = device->CreateCommandAllocator(commandListType, IID_PPV_ARGS(commandAllocator.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command allocator with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command allocator created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandAllocator.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 command list.");
 		if (const HRESULT result = device->CreateCommandList1(0, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command list with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence.");
 		if (const HRESULT result = device->CreateFence(fenceValue, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 fence with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 fence with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
 	}
@@ -181,19 +187,19 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command allocator.");
 		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command allocator with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command list.");
 		if (const HRESULT result = commandList->Reset(commandAllocator.Get(), nullptr); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Close command list.");
 		if (const HRESULT result = commandList->Close(); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command list.");
 		ID3D12CommandList* const commandLists[] = { commandList.Get() };
@@ -202,18 +208,28 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Current fence value is '{}'.", fenceValue);
 		if (const HRESULT result = commandQueue->Signal(fence.Get(), ++fenceValue); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Current fence value is '{}'.", result, fenceValue));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Current fence value is '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), fenceValue));
 		}
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Current fence value: '{}'.", fenceValue);
 		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, fenceEvent); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		if (const DWORD result = WaitForSingleObjectEx(fenceEvent, 20000, false); result != WAIT_OBJECT_0) [[unlikely]] // TODO: Timeout to params
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+	}
+
+	ID3D12Device10* Direct3D12SubSystem::GetDevice() const
+	{
+		return device.Get();
+	}
+
+	ID3D12CommandQueue* Direct3D12SubSystem::GetCommandQueue() const
+	{
+		return commandQueue.Get();
 	}
 
 	GUID Direct3D12SubSystem::GetGuid()
@@ -221,7 +237,7 @@ namespace PonyEngine::Render
 		GUID guid;
 		if (const HRESULT result = CoCreateGuid(&guid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get guid for Direct3D 12 render system with '0x{:X}' result.", result));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get guid for Direct3D 12 render system with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return guid;

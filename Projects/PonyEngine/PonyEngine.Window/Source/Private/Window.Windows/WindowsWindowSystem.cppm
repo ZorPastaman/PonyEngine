@@ -315,13 +315,23 @@ namespace PonyEngine::Window
 	{
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Size: '{}'; HInstance: '0x{:X}'.",
 			className, windowParams.style, windowParams.extendedStyle, PonyBase::Utility::ConvertToString(windowParams.title), windowParams.position.ToString(), windowParams.size.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
+
+		auto rect = RECT{.left = windowParams.position.X(), .top = windowParams.position.Y(), .right = windowParams.position.X() + windowParams.size.X(), .bottom = windowParams.position.Y() + windowParams.size.Y()};
+		if (!AdjustWindowRectEx(&rect, windowParams.style, false, windowParams.extendedStyle))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
+		}
+		const auto position = PonyBase::Math::Vector2<int>(rect.left, rect.top);
+		const auto size = PonyBase::Math::Vector2<int>(rect.right - rect.left, rect.bottom - rect.top);
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'", position.ToString(), size.ToString());
+
 		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
 			reinterpret_cast<LPCWSTR>(className),
 			mainTitle.c_str(),
 			windowParams.style,
-			windowParams.position.X(), windowParams.position.Y(),
-			windowParams.size.X(), windowParams.size.Y(),
+			position.X(), position.Y(),
+			size.X(), size.Y(),
 			nullptr,
 			nullptr,
 			hInstance,
