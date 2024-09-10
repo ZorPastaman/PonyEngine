@@ -15,10 +15,13 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
 
+import <stdexcept>;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Render;
+import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Core;
 import PonyEngine.Render.Direct3D12;
@@ -74,6 +77,16 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Begin()
 	{
+		dxgiSubSystem.CreateFence(direct3D12SubSystem.GetDevice(), direct3D12SubSystem.GetCommandQueue());
+
+		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		{
+			dxgiSubSystem.CreateSwapChain(direct3D12SubSystem.GetCommandQueue(), windowSystem->WindowHandle());
+		}
+		else
+		{
+			throw std::runtime_error("Failed to find Windows window system.");
+		}
 	}
 
 	void WindowsDirect3D12RenderSystem::End()
@@ -84,6 +97,7 @@ namespace PonyEngine::Render
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick Direct3D 12 sub-system.");
 		direct3D12SubSystem.Tick();
+		dxgiSubSystem.Tick();
 	}
 
 	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept

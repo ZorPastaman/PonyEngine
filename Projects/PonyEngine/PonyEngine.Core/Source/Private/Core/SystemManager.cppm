@@ -84,6 +84,8 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create systems.");
 
+		auto systemInterfacesBuffer = std::unordered_map<std::type_index, void*>();
+
 		for (ISystemFactory* const factory : systemFactories)
 		{
 			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
@@ -106,12 +108,14 @@ namespace PonyEngine::Core
 			for (auto [interface, objectPointer] : system.publicInterfaces)
 			{
 				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
-				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
-				systemInterfaces.emplace(interface.get(), objectPointer);
+				assert(!systemInterfacesBuffer.contains(interface.get()) && "The interface has already been added.");
+				systemInterfacesBuffer.emplace(interface.get(), objectPointer);
 			}
 
 			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "System created.");
 		}
+
+		systemInterfaces = std::move(systemInterfacesBuffer); // It prevents trying to find systems before Begin().
 
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Systems created.");
 	}
