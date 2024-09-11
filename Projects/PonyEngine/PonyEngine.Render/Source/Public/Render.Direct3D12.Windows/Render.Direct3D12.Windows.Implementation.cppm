@@ -41,7 +41,8 @@ namespace PonyEngine::Render
 
 		return WindowsDirect3D12RenderSystemFactoryData
 		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter)
+			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
+			.renderSystemFactory = factory
 		};
 	}
 }

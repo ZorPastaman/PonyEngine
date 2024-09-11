@@ -18,6 +18,9 @@
     <ClCompile Include="Source\Public\Utility\StringUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

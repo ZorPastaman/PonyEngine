@@ -25,7 +25,7 @@ import :WindowsDirect3D12RenderSystem;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows factory.
-	class WindowsDirect3D12RenderSystemFactory final : public Core::ISystemFactory, public Core::ISystemDestroyer
+	class WindowsDirect3D12RenderSystemFactory final : public Core::ISystemFactory, public IWindowsDirect3D12RenderSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -40,6 +40,11 @@ export namespace PonyEngine::Render
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual WindowsDirect3D12RenderSystemParams& RenderSystemParams() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const WindowsDirect3D12RenderSystemParams& RenderSystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -48,6 +53,9 @@ export namespace PonyEngine::Render
 		WindowsDirect3D12RenderSystemFactory& operator =(WindowsDirect3D12RenderSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystemFactory"; ///< Class name.
+
+	private:
+		WindowsDirect3D12RenderSystemParams renderSystemParams;
 	};
 }
 
@@ -55,7 +63,7 @@ namespace PonyEngine::Render
 {
 	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
 	{
-		const auto system = new WindowsDirect3D12RenderSystem(engine);
+		const auto system = new WindowsDirect3D12RenderSystem(engine, renderSystemParams);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IRenderSystem>(*system);
 
@@ -71,6 +79,16 @@ namespace PonyEngine::Render
 	{
 		assert((dynamic_cast<WindowsDirect3D12RenderSystem*>(system) && "Tried to destroy a system of the wrong type."));
 		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
+	}
+
+	WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::RenderSystemParams() noexcept
+	{
+		return renderSystemParams;
+	}
+
+	const WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::RenderSystemParams() const noexcept
+	{
+		return renderSystemParams;
 	}
 
 	const char* WindowsDirect3D12RenderSystemFactory::SystemName() const noexcept

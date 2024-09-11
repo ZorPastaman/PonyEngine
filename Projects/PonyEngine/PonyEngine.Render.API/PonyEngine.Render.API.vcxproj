@@ -19,6 +19,9 @@
     <ResourceCompile Include="PonyEngine.Render.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
+      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Math\PonyBase.Math.vcxproj">
       <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
     </ProjectReference>
@@ -27,9 +30,11 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\IWindowsDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\Render.Direct3D12.Windows.Factory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
   </ItemGroup>

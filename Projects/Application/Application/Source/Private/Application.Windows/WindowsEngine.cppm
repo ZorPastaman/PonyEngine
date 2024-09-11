@@ -21,6 +21,7 @@ import <array>;
 import <exception>;
 
 import PonyBase.Core;
+import PonyBase.Math;
 
 import PonyDebug.Log;
 
@@ -84,6 +85,8 @@ export namespace Application
 
 		/// @brief Sets up the frame rate system.
 		void SetupFrameRateSystem() const noexcept;
+
+		static constexpr auto DefaultResolution = PonyBase::Math::Vector2<unsigned int>(1280u, 720u);
 
 		PonyEngine::Core::IApplication* application; ///< Application.
 
@@ -175,8 +178,8 @@ namespace Application
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
-			constexpr int width = 1280;
-			constexpr int height = 720;
+			constexpr int width = DefaultResolution.X();
+			constexpr int height = DefaultResolution.Y();
 
 			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->WindowParams();
 			windowParams.title = L"Pony Engine Game";
@@ -243,6 +246,11 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
 			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{});
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
+			assert(factory.renderSystemFactory && "The Direct3D render system for Windows factory interface is nullptr.");
+
+			PonyEngine::Render::WindowsDirect3D12RenderSystemParams& renderSystemParams = factory.renderSystemFactory->RenderSystemParams();
+			renderSystemParams.resolution = static_cast<PonyBase::Math::Vector2<UINT>>(DefaultResolution);
+
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
 
 			return factory;
