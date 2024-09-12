@@ -42,7 +42,7 @@ export namespace PonyEngine::Render
 		WindowsDirect3D12RenderSystem(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem(WindowsDirect3D12RenderSystem&&) = delete;
 
-		~WindowsDirect3D12RenderSystem() noexcept;
+		~WindowsDirect3D12RenderSystem() noexcept = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -73,22 +73,8 @@ namespace PonyEngine::Render
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderSystemParams& params) :
 		engine{&engine},
 		dxgiSubSystem(*this, params.resolution),
-		direct3D12SubSystem(*this, params.commandQueuePriority, params.fenceTimeout)
+		direct3D12SubSystem(*this, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
 	{
-	}
-
-	WindowsDirect3D12RenderSystem::~WindowsDirect3D12RenderSystem() noexcept
-	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Wait for end of frame of Direct3D 12 sub-system.");
-		try
-		{
-			direct3D12SubSystem.WaitForEndOfFrame();
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E(engine->Logger(), e, "On waiting for end of frame of Direct3D 12 sub-system.");
-		}
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End of frame of Direct3D 12 sub-system waited for.");
 	}
 
 	void WindowsDirect3D12RenderSystem::Begin()
@@ -105,6 +91,9 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::End()
 	{
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Wait for end of frame of Direct3D 12 sub-system.");
+		direct3D12SubSystem.WaitForEndOfFrame();
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End of frame of Direct3D 12 sub-system waited for.");
 	}
 
 	void WindowsDirect3D12RenderSystem::Tick()

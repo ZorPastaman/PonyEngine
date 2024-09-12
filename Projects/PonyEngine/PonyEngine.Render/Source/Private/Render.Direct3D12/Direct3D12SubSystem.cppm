@@ -35,7 +35,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		Direct3D12SubSystem(IRenderer& renderer, INT commandQueuePriority, DWORD fenceTimeout);
+		Direct3D12SubSystem(IRenderer& renderer, D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
 		Direct3D12SubSystem(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem(Direct3D12SubSystem&&) = delete;
 
@@ -77,7 +77,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const INT commandQueuePriority, const DWORD fenceTimeout) :
+	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
 		guid{GetGuid()},
 		fenceValue{0},
 		fenceTimeout{fenceTimeout},
@@ -106,8 +106,8 @@ namespace PonyEngine::Render
 		debug->EnableDebugLayer();
 #endif
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 device.");
-		if (const HRESULT result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 device. Feature level: '0x{:X}.'", static_cast<unsigned int>(featureLevel));
+		if (const HRESULT result = D3D12CreateDevice(nullptr, featureLevel, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create Direct3D 12 device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -220,13 +220,13 @@ namespace PonyEngine::Render
 
 	void Direct3D12SubSystem::WaitForEndOfFrame()
 	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Current fence value is '{}'.", fenceValue);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Current fence value: '{}'.", fenceValue);
 		if (const HRESULT result = commandQueue->Signal(fence.Get(), ++fenceValue); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Current fence value is '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), fenceValue));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Current fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), fenceValue));
 		}
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Current fence value: '{}'. Timeout: '{}' ms.", fenceValue, fenceTimeout);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Current fence value: '{}'. Timeout: '{} ms'.", fenceValue, fenceTimeout);
 		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, fenceEvent); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
