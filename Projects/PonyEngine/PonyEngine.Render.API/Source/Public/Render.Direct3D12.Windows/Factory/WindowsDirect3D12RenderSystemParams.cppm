@@ -20,6 +20,7 @@ export namespace PonyEngine::Render
 	/// @brief Direct3D 12 render system for Windows parameters.
 	struct WindowsDirect3D12RenderSystemParams final
 	{
+		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
 		PonyBase::Math::Vector2<UINT> resolution = PonyBase::Math::Vector2<UINT>(800, 600);
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
 		DWORD fenceTimeout = 20000;

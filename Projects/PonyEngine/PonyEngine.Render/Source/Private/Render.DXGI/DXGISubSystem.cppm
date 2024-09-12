@@ -79,8 +79,13 @@ namespace PonyEngine::Render
 		debug->EnableLeakTrackingForThread();
 #endif
 
+		UINT factoryFlags = 0;
+#ifdef _DEBUG
+		factoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
+#endif
+
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create DXGI factory.");
-		if (const HRESULT result = CreateDXGIFactory2(0, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
