@@ -87,6 +87,7 @@ export namespace Application
 		void SetupFrameRateSystem() const noexcept;
 
 		static constexpr auto DefaultResolution = PonyBase::Math::Vector2<unsigned int>(1280u, 720u);
+		static constexpr bool DefaultWindowed = false;
 
 		PonyEngine::Core::IApplication* application; ///< Application.
 
@@ -172,21 +173,21 @@ namespace Application
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
-			const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = CS_OWNDC};
+			const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = PonyEngine::Window::DefaultClassStyle};
 			const auto windowSystemFactoryParams = PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = windowClassParams };
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, windowSystemFactoryParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
-			constexpr int width = DefaultResolution.X();
-			constexpr int height = DefaultResolution.Y();
+			const bool windowed = DefaultWindowed;
+			const auto size = windowed ? static_cast<PonyBase::Math::Vector2<int>>(DefaultResolution) : PonyEngine::Window::GetDisplaySize();
 
 			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->WindowParams();
 			windowParams.title = L"Pony Engine Game";
-			windowParams.position = PonyBase::Math::Vector2<int>(GetSystemMetrics(SM_CXSCREEN) / 2 - width / 2, GetSystemMetrics(SM_CYSCREEN) / 2 - height / 2);
-			windowParams.size = PonyBase::Math::Vector2<int>(width, height);
-			windowParams.style = WS_OVERLAPPED | WS_CAPTION | WS_SYSMENU | WS_MINIMIZEBOX;
-			windowParams.extendedStyle = WS_EX_OVERLAPPEDWINDOW | WS_EX_APPWINDOW;
+			windowParams.position = PonyEngine::Window::CalculateCenteredWindowPosition(size);
+			windowParams.size = size;
+			windowParams.style = windowed ? PonyEngine::Window::DefaultWindowedStyle : PonyEngine::Window::DefaultBorderlessWindowedStyle;
+			windowParams.extendedStyle = (windowed ? PonyEngine::Window::DefaultWindowedExtendedStyle : PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle) | WS_EX_APPWINDOW;
 			windowParams.cmdShow = SW_NORMAL;
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
@@ -247,9 +248,6 @@ namespace Application
 			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{});
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
 			assert(factory.renderSystemFactory && "The Direct3D render system for Windows factory interface is nullptr.");
-
-			PonyEngine::Render::WindowsDirect3D12RenderSystemParams& renderSystemParams = factory.renderSystemFactory->RenderSystemParams();
-			renderSystemParams.resolution = static_cast<PonyBase::Math::Vector2<UINT>>(DefaultResolution);
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
 
