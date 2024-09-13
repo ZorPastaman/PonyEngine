@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderSystemParams;
 
+import <optional>;
+
 import PonyBase.Math;
 
 export namespace PonyEngine::Render
@@ -21,8 +23,9 @@ export namespace PonyEngine::Render
 	struct WindowsDirect3D12RenderSystemParams final
 	{
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
-		PonyBase::Math::Vector2<UINT> resolution = PonyBase::Math::Vector2<UINT>(800, 600);
+		std::optional<PonyBase::Math::Vector2<UINT>> resolution = {};
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
+
 		DWORD fenceTimeout = 20000;
 	};
 }

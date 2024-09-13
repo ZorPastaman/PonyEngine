@@ -16,6 +16,7 @@ module;
 export module PonyEngine.Render.DXGI:DXGISubSystem;
 
 import <cstdint>;
+import <optional>;
 import <stdexcept>;
 import <type_traits>;
 
@@ -25,6 +26,7 @@ import PonyBase.StringUtility;
 import PonyDebug.Log;
 
 import PonyEngine.Core;
+import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Core;
 
@@ -35,7 +37,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISubSystem(IRenderer& renderer, const PonyBase::Math::Vector2<UINT>& resolution);
+		DXGISubSystem(IRenderer& renderer, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
 		DXGISubSystem(const DXGISubSystem&) = delete;
 		DXGISubSystem(DXGISubSystem&&) = delete;
 
@@ -49,7 +51,7 @@ export namespace PonyEngine::Render
 		DXGISubSystem& operator =(DXGISubSystem&&) = delete;
 
 	private:
-		PonyBase::Math::Vector2<UINT> resolution;
+		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
 
 		IRenderer* renderer;
 
@@ -63,7 +65,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const PonyBase::Math::Vector2<UINT>& resolution) :
+	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
 		resolution{resolution},
 		renderer{&renderer}
 	{
@@ -118,10 +120,12 @@ namespace PonyEngine::Render
 
 	void DXGISubSystem::CreateSwapChain(IUnknown* const device, const HWND hWnd)
 	{
+		const PonyBase::Math::Vector2<UINT> renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(hWnd));
+
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
-			.Width = resolution.X(),
-			.Height = resolution.Y(),
+			.Width = renderResolution.X(),
+			.Height = renderResolution.Y(),
 			.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0},
@@ -132,13 +136,11 @@ namespace PonyEngine::Render
 			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
 			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 		};
-		const auto swapChainFullScreenDescription = DXGI_SWAP_CHAIN_FULLSCREEN_DESC{.Windowed = true};
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
-			resolution.ToString());
-
+			renderResolution.ToString());
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> createdSwapChain;
-		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, &swapChainFullScreenDescription, nullptr, createdSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, createdSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
