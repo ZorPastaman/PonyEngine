@@ -323,7 +323,7 @@ namespace PonyEngine::Window
 		}
 		const auto position = PonyBase::Math::Vector2<int>(rect.left, rect.top);
 		const auto size = PonyBase::Math::Vector2<int>(rect.right - rect.left, rect.bottom - rect.top);
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'", position.ToString(), size.ToString());
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'.", position.ToString(), size.ToString());
 
 		const HWND windowHandle = CreateWindowExW(
 			windowParams.extendedStyle,
