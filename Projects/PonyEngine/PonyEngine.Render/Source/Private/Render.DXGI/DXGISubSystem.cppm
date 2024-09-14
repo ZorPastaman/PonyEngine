@@ -53,6 +53,8 @@ export namespace PonyEngine::Render
 	private:
 		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
 
+		static constexpr UINT BufferCount = 2u;
+
 		IRenderer* renderer;
 
 #ifdef _DEBUG
@@ -128,9 +130,9 @@ namespace PonyEngine::Render
 			.Height = renderResolution.Y(),
 			.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
 			.Stereo = false,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0},
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
-			.BufferCount = 2,
+			.BufferCount = BufferCount,
 			.Scaling = DXGI_SCALING_STRETCH,
 			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
