@@ -11,7 +11,7 @@ module;
 
 #include "PonyEngine/Render/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderSystemParams;
+export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderParams;
 
 import <optional>;
 
@@ -19,8 +19,8 @@ import PonyBase.Math;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D 12 render system for Windows parameters.
-	struct WindowsDirect3D12RenderSystemParams final
+	/// @brief Windows Direct3D 12 render parameters.
+	struct WindowsDirect3D12RenderParams final
 	{
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
 		std::optional<PonyBase::Math::Vector2<UINT>> resolution = {};

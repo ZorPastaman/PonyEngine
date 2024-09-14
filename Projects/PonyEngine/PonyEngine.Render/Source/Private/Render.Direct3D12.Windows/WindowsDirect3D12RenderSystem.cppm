@@ -38,7 +38,7 @@ export namespace PonyEngine::Render
 		/// @param engine Engine.
 		/// @param params Render system parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderSystemParams& params);
+		WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params);
 		WindowsDirect3D12RenderSystem(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem(WindowsDirect3D12RenderSystem&&) = delete;
 
@@ -70,7 +70,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderSystemParams& params) :
+	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
 		engine{&engine},
 		dxgiSubSystem(*this, params.resolution),
 		direct3D12SubSystem(*this, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)

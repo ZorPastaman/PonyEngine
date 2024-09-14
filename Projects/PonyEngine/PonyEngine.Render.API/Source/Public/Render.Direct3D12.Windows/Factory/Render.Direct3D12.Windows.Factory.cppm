@@ -12,6 +12,6 @@ export module PonyEngine.Render.Direct3D12.Windows.Factory;
 export import PonyEngine.Render;
 
 export import :IWindowsDirect3D12RenderSystemFactory;
+export import :WindowsDirect3D12RenderParams;
 export import :WindowsDirect3D12RenderSystemFactoryData;
 export import :WindowsDirect3D12RenderSystemFactoryParams;
-export import :WindowsDirect3D12RenderSystemParams;
