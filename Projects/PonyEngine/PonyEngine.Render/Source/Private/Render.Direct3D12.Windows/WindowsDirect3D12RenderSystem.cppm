@@ -13,11 +13,17 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
+#include "PonyEngine/Render/Direct3D12/Framework.h"
+#include "PonyEngine/Render/DXGI/Framework.h"
+
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
 
 import <stdexcept>;
+import <type_traits>;
 
 import PonyEngine.Render.Direct3D12.Windows.Factory;
+
+import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
@@ -61,6 +67,8 @@ export namespace PonyEngine::Render
 		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystem"; ///< Class name.
 
 	private:
+		static constexpr UINT BufferCount = 2u; ///< Buffer count.
+
 		Core::IEngine* engine; ///< Engine.
 
 		DXGISubSystem dxgiSubSystem; ///< DXGI sub-system.
@@ -72,8 +80,8 @@ namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
 		engine{&engine},
-		dxgiSubSystem(*this, params.resolution),
-		direct3D12SubSystem(*this, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
+		dxgiSubSystem(*this, BufferCount, params.resolution),
+		direct3D12SubSystem(*this, BufferCount, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
 	{
 	}
 
@@ -81,12 +89,23 @@ namespace PonyEngine::Render
 	{
 		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			dxgiSubSystem.CreateSwapChain(direct3D12SubSystem.GetCommandQueue(), windowSystem->WindowHandle());
+			dxgiSubSystem.AcquireSwapChain(direct3D12SubSystem.GetCommandQueue(), windowSystem->WindowHandle());
 		}
 		else
 		{
 			throw std::runtime_error("Failed to find Windows window system.");
 		}
+
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
+		IDXGISwapChain4* const swapChain = dxgiSubSystem.GetSwapChain();
+		for (UINT i = 0u; i < BufferCount; ++i)
+		{
+			if (const HRESULT result = swapChain->GetBuffer(i, IID_PPV_ARGS(direct3D12SubSystem.GetBufferPointer(i))); FAILED(result))
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get swap chain buffer at index '{}' with '0x{:X}' result.", i, static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+		}
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 	}
 
 	void WindowsDirect3D12RenderSystem::End()

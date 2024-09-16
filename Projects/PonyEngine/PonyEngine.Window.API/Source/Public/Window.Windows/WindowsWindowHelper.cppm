@@ -15,7 +15,7 @@ export module PonyEngine.Window.Windows:WindowsWindowHelper;
 
 import PonyBase.Math;
 
-export namespace PonyEngine::Window
+export namespace PonyEngine::Window // TODO: Add tests and docs.
 {
 	constexpr UINT DefaultClassStyle = CS_OWNDC;
 
@@ -43,7 +43,7 @@ namespace PonyEngine::Window
 
 	PonyBase::Math::Vector2<int> CalculateCenteredWindowPosition(const PonyBase::Math::Vector2<int>& windowSize) noexcept
 	{
-		PonyBase::Math::Vector2<int> displaySize = GetDisplaySize();
+		const PonyBase::Math::Vector2<int> displaySize = GetDisplaySize();
 
 		PonyBase::Math::Vector2<int> position;
 		position.X() = displaySize.X() / 2 - windowSize.X() / 2;

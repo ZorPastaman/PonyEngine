@@ -37,13 +37,15 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISubSystem(IRenderer& renderer, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
+		DXGISubSystem(IRenderer& renderer, UINT bufferCount, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
 		DXGISubSystem(const DXGISubSystem&) = delete;
 		DXGISubSystem(DXGISubSystem&&) = delete;
 
 		~DXGISubSystem() noexcept;
 
-		void CreateSwapChain(IUnknown* device, HWND hWnd);
+		void AcquireSwapChain(IUnknown* device, HWND hWnd);
+		[[nodiscard("Pure function")]]
+		IDXGISwapChain4* GetSwapChain() const noexcept;
 
 		void Present() const;
 
@@ -52,8 +54,7 @@ export namespace PonyEngine::Render
 
 	private:
 		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
-
-		static constexpr UINT BufferCount = 2u;
+		UINT bufferCount;
 
 		IRenderer* renderer;
 
@@ -67,17 +68,20 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
+	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
 		resolution{resolution},
+		bufferCount{bufferCount},
 		renderer{&renderer}
 	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI parameters. Buffer count: '{}'; Resolution: '{}'.", this->bufferCount, this->resolution.has_value() ? this->resolution->ToString() : "empty");
+
 #ifdef _DEBUG
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create DXGI debug interface.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI debug interface.");
 		if (const HRESULT result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get DXGI debug interface with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI debug interface with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Debug, "Enable DXGI leak tracking.");
 		debug->EnableLeakTrackingForThread();
@@ -88,23 +92,23 @@ namespace PonyEngine::Render
 		factoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create DXGI factory.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI factory.");
 		if (const HRESULT result = CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result))
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(factory.Get()));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(factory.Get()));
 	}
 
 	DXGISubSystem::~DXGISubSystem() noexcept
 	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy swap chain.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release swap chain.");
 		swapChain.Reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain destroyed.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain released.");
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy DXGI factory.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release DXGI factory.");
 		factory.Reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory destroyed.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory released.");
 
 #ifdef _DEBUG
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Report DXGI live objects.");
@@ -114,15 +118,18 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI live objects reported.");
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy DXGI debug interface.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release DXGI debug interface.");
 		debug.Reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface destroyed.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface released.");
 #endif
 	}
 
-	void DXGISubSystem::CreateSwapChain(IUnknown* const device, const HWND hWnd)
+	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd)
 	{
 		const PonyBase::Math::Vector2<UINT> renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(hWnd));
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
+			renderResolution.ToString());
 
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
@@ -132,25 +139,29 @@ namespace PonyEngine::Render
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
-			.BufferCount = BufferCount,
+			.BufferCount = bufferCount,
 			.Scaling = DXGI_SCALING_STRETCH,
 			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
 			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 		};
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
-			renderResolution.ToString());
-		Microsoft::WRL::ComPtr<IDXGISwapChain1> createdSwapChain;
-		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, createdSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+		Microsoft::WRL::ComPtr<IDXGISwapChain1> acquiredSwapChain;
+		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		if (const HRESULT result = createdSwapChain->QueryInterface(swapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+
+		if (const HRESULT result = acquiredSwapChain->QueryInterface(swapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
+	}
+
+	IDXGISwapChain4* DXGISubSystem::GetSwapChain() const noexcept
+	{
+		return swapChain.Get();
 	}
 
 	void DXGISubSystem::Present() const
