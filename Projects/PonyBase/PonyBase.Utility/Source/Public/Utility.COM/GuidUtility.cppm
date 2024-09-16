@@ -25,7 +25,7 @@ export namespace PonyBase::Utility
 	/// @param guid GUID.
 	/// @return String representing the @p guid.
 	[[nodiscard("Pure function")]]
-	std::string ToString(const GUID& guid) noexcept;
+	std::string ToString(const GUID& guid) noexcept; // TODO: Add test
 }
 
 namespace PonyBase::Utility
