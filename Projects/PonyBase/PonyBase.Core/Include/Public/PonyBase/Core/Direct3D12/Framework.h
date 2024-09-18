@@ -9,10 +9,10 @@
 
 #pragma once
 
+#include "PonyBase/Core/COM/Framework.h"
+
 #include <d3d12.h>
 
 #ifdef _DEBUG
 #include "d3d12sdklayers.h"
 #endif
-
-#include "PonyBase/Core/COM/Framework.h"

@@ -11,8 +11,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Include\Public\PonyEngine\Render\Direct3D12\Framework.h" />
-    <ClInclude Include="Include\Public\PonyEngine\Render\DXGI\Framework.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

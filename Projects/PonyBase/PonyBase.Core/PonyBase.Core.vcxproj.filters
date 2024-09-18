@@ -38,6 +38,12 @@
     <ClInclude Include="Include\Public\PonyBase\Core\COM\Framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Public\PonyBase\Core\Direct3D12\Framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Include\Public\PonyBase\Core\DXGI\Framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyBase.Core.rc">

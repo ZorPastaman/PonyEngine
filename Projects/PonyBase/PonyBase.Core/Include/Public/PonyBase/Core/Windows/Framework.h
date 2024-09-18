@@ -11,4 +11,4 @@
 
 #define WIN32_LEAN_AND_MEAN
 #define NOMINMAX
-#include <windows.h> // TODO: Think about better place for this framework. Other frameworks must be relocated as well, it seems.
+#include <windows.h>
