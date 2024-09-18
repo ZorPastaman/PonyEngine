@@ -12,6 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Include\Public\PonyBase\Core\COM\Framework.h" />
+    <ClInclude Include="Include\Public\PonyBase\Core\Direct3D12\Framework.h" />
+    <ClInclude Include="Include\Public\PonyBase\Core\DXGI\Framework.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Linking.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Optimization.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Windows\Framework.h" />

@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyEngine/Render/Direct3D12/Framework.h"
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
 export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderParams;
 

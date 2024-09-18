@@ -11,7 +11,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-#include "PonyEngine/Render/DXGI/Framework.h"
+#include "PonyBase/Core/DXGI/Framework.h"
 
 export module PonyEngine.Render.DXGI:DXGISubSystem;
 
@@ -43,9 +43,10 @@ export namespace PonyEngine::Render
 
 		~DXGISubSystem() noexcept;
 
-		void AcquireSwapChain(IUnknown* device, HWND hWnd);
 		[[nodiscard("Pure function")]]
 		IDXGISwapChain4* GetSwapChain() const noexcept;
+
+		void AcquireSwapChain(IUnknown* device, HWND hWnd);
 
 		void Present() const;
 
@@ -124,6 +125,11 @@ namespace PonyEngine::Render
 #endif
 	}
 
+	IDXGISwapChain4* DXGISubSystem::GetSwapChain() const noexcept
+	{
+		return swapChain.Get();
+	}
+
 	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd)
 	{
 		const PonyBase::Math::Vector2<UINT> renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(hWnd));
@@ -157,11 +163,6 @@ namespace PonyEngine::Render
 		}
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
-	}
-
-	IDXGISwapChain4* DXGISubSystem::GetSwapChain() const noexcept
-	{
-		return swapChain.Get();
 	}
 
 	void DXGISubSystem::Present() const

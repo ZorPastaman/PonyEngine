@@ -9,10 +9,10 @@
 
 #pragma once
 
+#include "PonyBase/Core/COM/Framework.h"
+
 #include <dxgi1_6.h>
 
 #ifdef _DEBUG
 #include <dxgidebug.h>
 #endif
-
-#include "PonyBase/Core/COM/Framework.h"
