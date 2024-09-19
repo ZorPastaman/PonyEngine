@@ -15,10 +15,13 @@ export module Game.Implementation:GameSystem;
 
 import <functional>;
 
+import PonyBase.Math;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
+import PonyEngine.Render;
 import PonyEngine.Window;
 
 export namespace Game
@@ -87,6 +90,10 @@ namespace Game
 				{
 					window->SecondaryTitle(L"Up");
 				}
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Yellow);
+				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Up input registered.");
 
@@ -98,6 +105,10 @@ namespace Game
 				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
 					window->SecondaryTitle(L"Down");
+				}
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Magenta);
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Down input registered.");
@@ -111,6 +122,10 @@ namespace Game
 				{
 					window->SecondaryTitle(L"Right");
 				}
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Cyan);
+				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Right input registered.");
 
@@ -122,6 +137,10 @@ namespace Game
 				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
 				{
 					window->SecondaryTitle(L"Left");
+				}
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Gray);
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");

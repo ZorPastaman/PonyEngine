@@ -59,6 +59,10 @@ export namespace PonyEngine::Render
 		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept override;
+		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
 
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
@@ -140,6 +144,16 @@ namespace PonyEngine::Render
 	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept
 	{
 		return engine->Logger();
+	}
+
+	PonyBase::Math::RGBA<float> WindowsDirect3D12RenderSystem::ClearColor() const noexcept
+	{
+		return static_cast<PonyBase::Math::RGBA<float>>(direct3D12SubSystem.ClearColor());
+	}
+
+	void WindowsDirect3D12RenderSystem::ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept
+	{
+		direct3D12SubSystem.ClearColor() = static_cast<PonyBase::Math::RGBA<FLOAT>>(color);
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept

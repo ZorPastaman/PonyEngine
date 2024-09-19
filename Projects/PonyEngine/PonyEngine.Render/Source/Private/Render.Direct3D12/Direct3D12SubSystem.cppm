@@ -49,6 +49,11 @@ export namespace PonyEngine::Render
 		const UINT& BufferIndex() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
+		[[nodiscard("Pure function")]]
+		const PonyBase::Math::RGBA<FLOAT>& ClearColor() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
 		[[nodiscard("Pure function")]]
@@ -77,12 +82,11 @@ export namespace PonyEngine::Render
 
 		void ReleaseBuffers() const noexcept;
 
-		static constexpr auto ClearColor = PonyBase::Math::RGBA<FLOAT>::Predefined::Magenta;
-
 		UINT bufferCount;
 		UINT bufferIndex;
 
 		DXGI_FORMAT rtvFormat;
+		PonyBase::Math::RGBA<FLOAT> clearColor;
 
 		UINT64 fenceValue;
 		DWORD fenceTimeout;
@@ -116,6 +120,7 @@ namespace PonyEngine::Render
 		bufferCount{bufferCount},
 		bufferIndex{0u},
 		rtvFormat{rtvFormat},
+		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
 		fenceValue{0LL},
 		fenceTimeout{fenceTimeout},
 		renderer{&renderer},
@@ -263,6 +268,16 @@ namespace PonyEngine::Render
 		return bufferIndex;
 	}
 
+	PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() noexcept
+	{
+		return clearColor;
+	}
+
+	const PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() const noexcept
+	{
+		return clearColor;
+	}
+
 	ID3D12CommandQueue* Direct3D12SubSystem::GetCommandQueue() const
 	{
 		return commandQueue.Get();
@@ -325,7 +340,7 @@ namespace PonyEngine::Render
 		commandList->ResourceBarrier(1, &renderTargetBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render targets.");
-		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], ClearColor.Span().data(), 0, nullptr);
+		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
 		commandList->OMSetRenderTargets(1, &rtvHandles[bufferIndex], false, nullptr);
 
 		const auto presentBarrier = D3D12_RESOURCE_BARRIER
