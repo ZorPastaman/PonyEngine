@@ -37,7 +37,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISubSystem(IRenderer& renderer, UINT bufferCount, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
+		DXGISubSystem(IRenderer& renderer, UINT bufferCount, DXGI_FORMAT rtvFormat, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
 		DXGISubSystem(const DXGISubSystem&) = delete;
 		DXGISubSystem(DXGISubSystem&&) = delete;
 
@@ -56,6 +56,7 @@ export namespace PonyEngine::Render
 	private:
 		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
 		UINT bufferCount;
+		DXGI_FORMAT rtvFormat;
 
 		IRenderer* renderer;
 
@@ -69,9 +70,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
+	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
 		resolution{resolution},
 		bufferCount{bufferCount},
+		rtvFormat{rtvFormat},
 		renderer{&renderer}
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI parameters. Buffer count: '{}'; Resolution: '{}'.", this->bufferCount, this->resolution.has_value() ? this->resolution->ToString() : "empty");
@@ -141,7 +143,7 @@ namespace PonyEngine::Render
 		{
 			.Width = renderResolution.X(),
 			.Height = renderResolution.Y(),
-			.Format = DXGI_FORMAT_R8G8B8A8_UNORM,
+			.Format = rtvFormat,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
@@ -167,7 +169,6 @@ namespace PonyEngine::Render
 
 	void DXGISubSystem::Present() const
 	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Present swap chain.");
 		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to present swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
