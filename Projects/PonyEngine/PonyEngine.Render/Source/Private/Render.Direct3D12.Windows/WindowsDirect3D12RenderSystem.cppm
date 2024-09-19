@@ -68,6 +68,7 @@ export namespace PonyEngine::Render
 
 	private:
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
+		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		Core::IEngine* engine; ///< Engine.
 
@@ -80,8 +81,8 @@ namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
 		engine{&engine},
-		dxgiSubSystem(*this, BufferCount, params.resolution),
-		direct3D12SubSystem(*this, BufferCount, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
+		dxgiSubSystem(*this, BufferCount, RtvFormat, params.resolution),
+		direct3D12SubSystem(*this, BufferCount, RtvFormat, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
 	{
 	}
 
@@ -107,6 +108,10 @@ namespace PonyEngine::Render
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(direct3D12SubSystem.GetBuffer(i)));
 		}
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
+
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Initialize Direct3D 12 sub-system.");
+		direct3D12SubSystem.Initialize();
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
 	void WindowsDirect3D12RenderSystem::End()
@@ -118,24 +123,18 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Tick()
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Clear.");
-		direct3D12SubSystem.Clear();
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of previous frame.");
+		direct3D12SubSystem.WaitForEndOfFrame();
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Update back buffer index.");
 		direct3D12SubSystem.BufferIndex() = dxgiSubSystem.GetSwapChain()->GetCurrentBackBufferIndex();
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
-		direct3D12SubSystem.BeginFrame();
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");
-		direct3D12SubSystem.EndFrame();
-
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Populate commands.");
+		direct3D12SubSystem.PopulateCommands();
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Execute.");
 		direct3D12SubSystem.Execute();
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
 		dxgiSubSystem.Present();
-
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of frame.");
-		direct3D12SubSystem.WaitForEndOfFrame();
 	}
 
 	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept
