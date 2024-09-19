@@ -9,6 +9,8 @@
 
 export module PonyEngine.Render:IRenderSystem;
 
+import PonyBase.Math;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Render system.
@@ -17,6 +19,10 @@ export namespace PonyEngine::Render
 	public:
 		IRenderSystem(const IRenderSystem&) = delete;
 		IRenderSystem(IRenderSystem&&) = delete;
+
+		[[nodiscard("Pure function")]]
+		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept = 0;
+		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept = 0;
 
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;
