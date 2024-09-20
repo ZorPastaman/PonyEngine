@@ -17,8 +17,6 @@ import <cstdint>;
 import <format>;
 import <string>;
 
-import PonyBase.StringUtility;
-
 export namespace PonyBase::Utility
 {
 	/// @brief Creates a string representing the @p guid.
@@ -32,6 +30,6 @@ namespace PonyBase::Utility
 {
 	std::string ToString(const GUID& guid) noexcept
 	{
-		return SafeFormat("{:X}-{:X}-{:X}-{:X}", guid.Data1, guid.Data2, guid.Data3, *reinterpret_cast<const std::uint64_t*>(guid.Data4));
+		return std::format("{:X}-{:X}-{:X}-{:X}", guid.Data1, guid.Data2, guid.Data3, *reinterpret_cast<const std::uint64_t*>(guid.Data4));
 	}
 }

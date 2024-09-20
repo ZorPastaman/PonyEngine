@@ -9,19 +9,16 @@
 
 module;
 
+#include "PonyBase/Core/Direct3D12/Framework.h"
+#include "PonyBase/Core/DXGI/Framework.h"
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
-
-#include "PonyBase/Core/Direct3D12/Framework.h"
-#include "PonyBase/Core/DXGI/Framework.h"
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
 
 import <stdexcept>;
 import <type_traits>;
-
-import PonyEngine.Render.Direct3D12.Windows.Factory;
 
 import PonyBase.StringUtility;
 
@@ -29,6 +26,8 @@ import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Window.Windows;
+
+import PonyEngine.Render.Direct3D12.Windows.Factory;
 
 import PonyEngine.Render.Core;
 import PonyEngine.Render.Direct3D12;
@@ -154,6 +153,7 @@ namespace PonyEngine::Render
 	void WindowsDirect3D12RenderSystem::ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept
 	{
 		direct3D12SubSystem.ClearColor() = static_cast<PonyBase::Math::RGBA<FLOAT>>(color);
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem.ClearColor().ToString());
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept

@@ -140,7 +140,7 @@ namespace Game
 				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Gray);
+					render->ClearColor(PonyBase::Math::RGBA<float>::Predefined::Blue);
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");

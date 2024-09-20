@@ -13,9 +13,9 @@ module;
 
 export module PonyDebug.Log.Implementation;
 
-import <filesystem>;
-
 export import PonyDebug.Log.Factory;
+
+import <filesystem>;
 
 import :ConsoleSubLogger;
 import :ConsoleSubLoggerDestroyer;
