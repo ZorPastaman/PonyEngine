@@ -16,6 +16,7 @@ export module PonyEngine.Time.Implementation:FrameRateSystemFactory;
 import <utility>;
 
 import PonyEngine.Core.Factory;
+
 import PonyEngine.Time.Factory;
 
 import :FrameRateSystem;

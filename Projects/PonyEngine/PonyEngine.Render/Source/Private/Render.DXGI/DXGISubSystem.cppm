@@ -9,9 +9,9 @@
 
 module;
 
-#include "PonyDebug/Log/Log.h"
-
 #include "PonyBase/Core/DXGI/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.DXGI:DXGISubSystem;
 

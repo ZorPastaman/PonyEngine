@@ -30,6 +30,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
+
 import PonyEngine.Window.Windows.Factory;
 
 import :IWindowProc;
@@ -181,6 +182,7 @@ namespace PonyEngine::Window
 	void WindowsWindowSystem::MainTitle(const wchar_t* const title)
 	{
 		mainTitle = title;
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", PonyBase::Utility::ConvertToString(mainTitle));
 		UpdateWindowTitle();
 	}
 
@@ -192,6 +194,7 @@ namespace PonyEngine::Window
 	void WindowsWindowSystem::SecondaryTitle(const wchar_t* title)
 	{
 		secondaryTitle = title;
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", PonyBase::Utility::ConvertToString(secondaryTitle));
 		UpdateWindowTitle();
 	}
 
@@ -279,10 +282,10 @@ namespace PonyEngine::Window
 
 		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Couldn't set new window title. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to {}.", PonyBase::Utility::ConvertToString(titleToSet));
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", PonyBase::Utility::ConvertToString(titleToSet));
 	}
 
 	void WindowsWindowSystem::Destroy() const noexcept
@@ -339,7 +342,7 @@ namespace PonyEngine::Window
 		);
 		if (!windowHandle)
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Windows hasn't created window. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 

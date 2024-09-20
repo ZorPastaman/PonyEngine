@@ -23,6 +23,7 @@ import <utility>;
 import PonyDebug.Log;
 
 import PonyEngine.Core;
+
 import PonyEngine.Input;
 
 export namespace PonyEngine::Input

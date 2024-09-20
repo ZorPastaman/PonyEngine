@@ -9,9 +9,9 @@
 
 module;
 
-#include "PonyDebug/Log/Log.h"
-
 #include "PonyBase/Core/Direct3D12/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
 
@@ -340,8 +340,10 @@ namespace PonyEngine::Render
 		commandList->ResourceBarrier(1, &renderTargetBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render targets.");
-		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
 		commandList->OMSetRenderTargets(1, &rtvHandles[bufferIndex], false, nullptr);
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
+		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
 
 		const auto presentBarrier = D3D12_RESOURCE_BARRIER
 		{
@@ -428,14 +430,14 @@ namespace PonyEngine::Render
 	std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> Direct3D12SubSystem::CreateRtvHandles() const
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create RTV handle array. Buffer count: '{}'.", bufferCount);
-		auto rtvHandles = std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]>(new D3D12_CPU_DESCRIPTOR_HANDLE[bufferCount]);
+		auto createdRtvHandles = std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]>(new D3D12_CPU_DESCRIPTOR_HANDLE[bufferCount]);
 		for (UINT i = 0u; i < bufferCount; ++i)
 		{
-			rtvHandles[i] = D3D12_CPU_DESCRIPTOR_HANDLE();
+			createdRtvHandles[i] = D3D12_CPU_DESCRIPTOR_HANDLE();
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "RTV handle array created.");
 
-		return rtvHandles;
+		return createdRtvHandles;
 	}
 
 	void Direct3D12SubSystem::ReleaseBuffers() const noexcept
