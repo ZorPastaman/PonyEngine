@@ -55,5 +55,8 @@
     <ClCompile Include="Source\Private\Render.Core\IRenderer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

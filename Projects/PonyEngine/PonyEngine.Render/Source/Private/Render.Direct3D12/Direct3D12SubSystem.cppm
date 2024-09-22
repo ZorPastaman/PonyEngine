@@ -19,6 +19,8 @@ import <cstdint>;
 import <memory>;
 import <stdexcept>;
 import <type_traits>;
+import <utility>;
+import <vector>;
 
 import PonyBase.Math;
 import PonyBase.GuidUtility;
@@ -29,6 +31,8 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 
 import PonyEngine.Render.Core;
+
+import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
 {
@@ -67,6 +71,10 @@ export namespace PonyEngine::Render
 		void Execute() const;
 		void WaitForEndOfFrame();
 
+		[[nodiscard("Won't be able to destroy")]]
+		IRenderObject& CreateRenderObject(const Mesh& mesh);
+		void DestroyRenderObject(IRenderObject& renderObject) noexcept;
+
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
 
@@ -100,7 +108,7 @@ export namespace PonyEngine::Render
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug;
 #endif
-		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+		Microsoft::WRL::ComPtr<ID3D12Device10> device; // TODO: Split the subsystem to pipeline and data
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
@@ -111,6 +119,9 @@ export namespace PonyEngine::Render
 		std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> rtvHandles;
 
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
+
+		std::vector<Direct3D12RenderObject> renderObjects;
+		std::size_t nextId;
 	};
 }
 
@@ -126,7 +137,8 @@ namespace PonyEngine::Render
 		renderer{&renderer},
 		guid{AcquireGuid()},
 		buffers{CreateBuffers()},
-		rtvHandles{CreateRtvHandles()}
+		rtvHandles{CreateRtvHandles()},
+		nextId{0}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
@@ -398,6 +410,23 @@ namespace PonyEngine::Render
 		else
 		{
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
+		}
+	}
+
+	IRenderObject& Direct3D12SubSystem::CreateRenderObject(const Mesh& mesh)
+	{
+		return renderObjects.emplace_back(mesh, nextId++);
+	}
+
+	void Direct3D12SubSystem::DestroyRenderObject(IRenderObject& renderObject) noexcept // TODO: Change to unique_ptr
+	{
+		for (std::size_t i = 0; i < renderObjects.size(); ++i)
+		{
+			if (renderObjects[i].Id() == renderObject.Id())
+			{
+				renderObjects.erase(renderObjects.begin() + i);
+				break;
+			}
 		}
 	}
 

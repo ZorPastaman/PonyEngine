@@ -9,4 +9,6 @@
 
 export module PonyEngine.Render;
 
+export import :IRenderObject;
 export import :IRenderSystem;
+export import :Mesh;
