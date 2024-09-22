@@ -23,7 +23,7 @@ export namespace PonyEngine::Render
 	struct WindowsDirect3D12RenderParams final
 	{
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
-		std::optional<PonyBase::Math::Vector2<UINT>> resolution = {};
+		std::optional<PonyBase::Math::Vector2<UINT>> resolution = {}; // TODO: Make a universal resolution class
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
 
 		DWORD fenceTimeout = 20000;
