@@ -61,9 +61,8 @@ export namespace PonyEngine::Render
 		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept override;
 		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual IRenderObject& CreateRenderObject(const Mesh& mesh) override;
-		virtual void DestroyRenderObject(IRenderObject& renderObject) noexcept override;
+		virtual RenderObjectHandle CreateRenderObject(const Mesh& mesh) override;
+		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -160,14 +159,14 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem.ClearColor().ToString());
 	}
 
-	IRenderObject& WindowsDirect3D12RenderSystem::CreateRenderObject(const Mesh& mesh)
+	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const Mesh& mesh)
 	{
 		return direct3D12SubSystem.CreateRenderObject(mesh);
 	}
 
-	void WindowsDirect3D12RenderSystem::DestroyRenderObject(IRenderObject& renderObject) noexcept
+	void WindowsDirect3D12RenderSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
 	{
-		direct3D12SubSystem.DestroyRenderObject(renderObject);
+		direct3D12SubSystem.DestroyRenderObject(renderObjectHandle);
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept

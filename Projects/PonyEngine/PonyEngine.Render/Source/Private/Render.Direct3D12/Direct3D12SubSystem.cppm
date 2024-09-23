@@ -9,6 +9,8 @@
 
 module;
 
+#include <ranges>
+
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -17,8 +19,10 @@ export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
 
 import <cstdint>;
 import <memory>;
+import <ranges>;
 import <stdexcept>;
 import <type_traits>;
+import <unordered_map>;
 import <utility>;
 import <vector>;
 
@@ -71,9 +75,8 @@ export namespace PonyEngine::Render
 		void Execute() const;
 		void WaitForEndOfFrame();
 
-		[[nodiscard("Won't be able to destroy")]]
-		IRenderObject& CreateRenderObject(const Mesh& mesh);
-		void DestroyRenderObject(IRenderObject& renderObject) noexcept;
+		RenderObjectHandle CreateRenderObject(const Mesh& mesh);
+		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
 
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
@@ -121,7 +124,8 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
 
 		std::vector<Direct3D12RenderObject> renderObjects;
-		std::size_t nextId;
+		std::unordered_map<std::size_t, std::size_t> idRenderObjectMap;
+		std::size_t nextRenderObjectId;
 	};
 }
 
@@ -138,7 +142,7 @@ namespace PonyEngine::Render
 		guid{AcquireGuid()},
 		buffers{CreateBuffers()},
 		rtvHandles{CreateRtvHandles()},
-		nextId{0}
+		nextRenderObjectId{1}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
@@ -413,20 +417,34 @@ namespace PonyEngine::Render
 		}
 	}
 
-	IRenderObject& Direct3D12SubSystem::CreateRenderObject(const Mesh& mesh)
+	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const Mesh& mesh)
 	{
-		return renderObjects.emplace_back(mesh, nextId++);
+		const size_t index = renderObjects.size();
+		renderObjects.emplace_back(mesh);
+		const size_t id = nextRenderObjectId++;
+		idRenderObjectMap.emplace(id, index);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object created. ID: '{}'; Mesh: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(&mesh));
+
+		return RenderObjectHandle{.id = id};
 	}
 
-	void Direct3D12SubSystem::DestroyRenderObject(IRenderObject& renderObject) noexcept // TODO: Change to unique_ptr
+	void Direct3D12SubSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
 	{
-		for (std::size_t i = 0; i < renderObjects.size(); ++i)
+		if (const auto position = idRenderObjectMap.find(renderObjectHandle.id); position != idRenderObjectMap.cend())
 		{
-			if (renderObjects[i].Id() == renderObject.Id())
+			const std::size_t index = position->second;
+			renderObjects.erase(renderObjects.cbegin() + index);
+			idRenderObjectMap.erase(position);
+			for (auto& renderObjectIndex : std::views::values(idRenderObjectMap))
 			{
-				renderObjects.erase(renderObjects.begin() + i);
-				break;
+				renderObjectIndex -= renderObjectIndex > index;
 			}
+
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object destroyed. ID: '{}'", renderObjectHandle.id);
+		}
+		else
+		{
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Warning, "Tried to destroy a not registered render object. ID: '{}'.", renderObjectHandle.id);
 		}
 	}
 

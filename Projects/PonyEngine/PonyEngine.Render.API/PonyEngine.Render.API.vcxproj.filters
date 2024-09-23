@@ -49,7 +49,7 @@
     <ClCompile Include="Source\Public\Render\Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderObject.cppm">
+    <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
