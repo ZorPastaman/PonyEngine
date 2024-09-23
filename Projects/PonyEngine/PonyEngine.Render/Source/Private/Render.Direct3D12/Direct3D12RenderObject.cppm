@@ -15,11 +15,11 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderObject final : public IRenderObject
+	class Direct3D12RenderObject final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObject(const Render::Mesh& mesh, std::size_t id) noexcept;
+		explicit Direct3D12RenderObject(const Mesh& mesh) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderObject(const Direct3D12RenderObject& other) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -28,43 +28,31 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObject() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t Id() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual const Render::Mesh& Mesh() const noexcept override;
+		const Mesh& Mesh() const noexcept;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept;
 
 	private:
 		const Render::Mesh* mesh;
-		std::size_t id; // TODO: remove id. It isn't needed with unique_ptr
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObject::Direct3D12RenderObject(const Render::Mesh& mesh, const std::size_t id) noexcept :
-		mesh{&mesh},
-		id{id}
+	Direct3D12RenderObject::Direct3D12RenderObject(const Render::Mesh& mesh) noexcept :
+		mesh{&mesh}
 	{
 	}
 
 	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12RenderObject& other) noexcept :
-		mesh{other.mesh},
-		id{other.id}
+		mesh{other.mesh}
 	{
 	}
 
 	Direct3D12RenderObject::Direct3D12RenderObject(Direct3D12RenderObject&& other) noexcept :
-		mesh{other.mesh},
-		id{other.id}
+		mesh{other.mesh}
 	{
-	}
-
-	std::size_t Direct3D12RenderObject::Id() const noexcept
-	{
-		return id;
 	}
 
 	const Mesh& Direct3D12RenderObject::Mesh() const noexcept
@@ -75,7 +63,6 @@ namespace PonyEngine::Render
 	Direct3D12RenderObject& Direct3D12RenderObject::operator =(const Direct3D12RenderObject& other) noexcept
 	{
 		mesh = other.mesh;
-		id = other.id;
 
 		return *this;
 	}
@@ -83,7 +70,6 @@ namespace PonyEngine::Render
 	Direct3D12RenderObject& Direct3D12RenderObject::operator =(Direct3D12RenderObject&& other) noexcept
 	{
 		mesh = other.mesh;
-		id = other.id;
 
 		return *this;
 	}

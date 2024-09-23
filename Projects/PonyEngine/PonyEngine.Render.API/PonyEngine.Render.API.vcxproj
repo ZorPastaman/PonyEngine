@@ -33,10 +33,10 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderParams.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderObject.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render\Mesh.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
+    <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

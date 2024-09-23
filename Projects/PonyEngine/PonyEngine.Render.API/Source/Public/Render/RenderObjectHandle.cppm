@@ -7,8 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render;
+export module PonyEngine.Render:RenderObjectHandle;
 
-export import :IRenderSystem;
-export import :Mesh;
-export import :RenderObjectHandle;
+import <cstddef>;
+
+export namespace PonyEngine::Render
+{
+	struct RenderObjectHandle final // TODO: Think about unique_handle that automatically closes handle. And make handle struct universal.
+	{
+		std::size_t id;
+	};
+}
