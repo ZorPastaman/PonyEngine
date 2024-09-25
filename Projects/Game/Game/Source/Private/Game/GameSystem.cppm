@@ -13,6 +13,7 @@ module;
 
 export module Game.Implementation:GameSystem;
 
+import <cstdint>;
 import <functional>;
 
 import PonyBase.Math;
@@ -59,6 +60,9 @@ export namespace Game
 		PonyEngine::Input::Handle leftHandle; ///< Left arrow input handle.
 		PonyEngine::Input::Handle closeHandle; ///< Escape input handle.
 
+		PonyEngine::Render::Mesh triangle;
+		PonyEngine::Render::RenderObjectHandle triangleHandle; ///< Triangle handle.
+
 		PonyEngine::Core::IEngine* const engine; ///< Engine.
 	};
 }
@@ -71,6 +75,7 @@ namespace Game
 		rightHandle(),
 		leftHandle(),
 		closeHandle(),
+		triangleHandle(),
 		engine{&engine}
 	{
 	}
@@ -157,6 +162,17 @@ namespace Game
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Warning, "No input system found.");
 		}
+
+		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+		{
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
+			constexpr PonyBase::Math::Vector3<float> vertexPositions[] = {PonyBase::Math::Vector3<float>(0.5f, 0.5f, 0.f), PonyBase::Math::Vector3<float>(0.25f, 0.25f, 0.f), PonyBase::Math::Vector3<float>(0.1f, 0.1f, 0.f)};
+			constexpr PonyBase::Math::RGBA<float> vertexColors[] = {PonyBase::Math::RGBA<float>::Predefined::Red, PonyBase::Math::RGBA<float>::Predefined::Green, PonyBase::Math::RGBA<float>::Predefined::Blue};
+			constexpr PonyBase::Math::Vector3<std::uint32_t> vertexIndices[] = {PonyBase::Math::Vector3<std::uint32_t>(0, 1, 2)};
+			triangle = PonyEngine::Render::Mesh(vertexPositions, vertexColors, vertexIndices);
+			triangleHandle = renderSystem->CreateRenderObject(triangle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
+		}
 	}
 
 	void GameSystem::End()
@@ -182,6 +198,13 @@ namespace Game
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Close input unregistered.");
 
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Inputs unregistered.");
+		}
+
+		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+		{
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Destroy triangle.");
+			renderSystem->DestroyRenderObject(triangleHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle destroyed.");
 		}
 	}
 
