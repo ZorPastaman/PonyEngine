@@ -17,6 +17,8 @@ export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
 
 import <cstddef>;
 import <cstdint>;
+import <filesystem>;
+import <fstream>;
 import <memory>;
 import <ranges>;
 import <stdexcept>;
@@ -69,7 +71,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2** GetBufferPointer(UINT targetBufferIndex) const noexcept;
 
-		void Initialize() const;
+		void Initialize(const PonyBase::Math::Vector2<UINT>& resolutionToSet);
 
 		void PopulateCommands();
 		void Execute() const;
@@ -92,6 +94,8 @@ export namespace PonyEngine::Render
 		std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> CreateRtvHandles() const;
 
 		void ReleaseBuffers() const noexcept;
+
+		PonyBase::Math::Vector2<UINT> resolution;
 
 		UINT bufferCount;
 		UINT bufferIndex;
@@ -124,6 +128,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 
 		std::vector<Direct3D12RenderObject> renderObjects;
 		std::size_t nextRenderObjectId;
@@ -133,6 +138,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
+		resolution(),
 		bufferCount{bufferCount},
 		bufferIndex{0u},
 		rtvFormat{rtvFormat},
@@ -228,8 +234,62 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
 
+		D3D12_INPUT_ELEMENT_DESC vertexLayout[] =
+		{
+			D3D12_INPUT_ELEMENT_DESC
+			{
+				.SemanticName = "POSITION",
+				.SemanticIndex = 0u,
+				.Format = DXGI_FORMAT_R32G32B32_FLOAT,
+				.InputSlot = 0u,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0u
+			},
+			D3D12_INPUT_ELEMENT_DESC
+			{
+				.SemanticName = "COLOR",
+				.SemanticIndex = 0u,
+				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
+				.InputSlot = 1u,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0u
+			}
+		};
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		auto vertexShader = std::ifstream("VertexShader.cso", std::ios::binary | std::ios::ate);
+		if (!vertexShader.is_open())
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 vertex shader file."));
+		}
+		std::size_t vertexShaderSize = vertexShader.tellg();
+		auto vertexShaderData = std::vector<char>(vertexShaderSize);
+		vertexShader.seekg(std::ios::beg);
+		if (!vertexShader.read(vertexShaderData.data(), vertexShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 vertex shader file."));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		auto pixelShader = std::ifstream("PixelShader.cso", std::ios::binary | std::ios::ate);
+		if (!pixelShader.is_open())
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 pixel shader file."));
+		}
+		std::size_t pixelShaderSize = pixelShader.tellg();
+		auto pixelShaderData = std::vector<char>(pixelShaderSize);
+		pixelShader.seekg(std::ios::beg);
+		if (!pixelShader.read(pixelShaderData.data(), pixelShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 pixel shader file."));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
+
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 root signature.");
-		constexpr auto rootSignatureDescription = D3D12_ROOT_SIGNATURE_DESC{.NumParameters = 0u, .pParameters = nullptr, .NumStaticSamplers = 0u, .pStaticSamplers = nullptr, .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT};
+		constexpr auto rootSignatureDescription = D3D12_ROOT_SIGNATURE_DESC{ .NumParameters = 0u, .pParameters = nullptr, .NumStaticSamplers = 0u, .pStaticSamplers = nullptr, .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT };
 		Microsoft::WRL::ComPtr<ID3DBlob> signature;
 		Microsoft::WRL::ComPtr<ID3DBlob> error;
 		if (const HRESULT result = D3D12SerializeRootSignature(&rootSignatureDescription, D3D_ROOT_SIGNATURE_VERSION_1, signature.GetAddressOf(), error.GetAddressOf()); FAILED(result))
@@ -241,10 +301,47 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.Get()));
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 graphics pipeline state.");
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC gfxPsd{};
+		gfxPsd.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = vertexLayout, .NumElements = _countof(vertexLayout)};
+		gfxPsd.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+		gfxPsd.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShaderData.data(), .BytecodeLength = vertexShaderData.size()};
+		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShaderData.data(), .BytecodeLength = pixelShaderData.size()};
+		gfxPsd.pRootSignature = rootSignature.Get();
+		gfxPsd.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		gfxPsd.NumRenderTargets = 2;
+		gfxPsd.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		gfxPsd.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;
+		gfxPsd.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0};
+		gfxPsd.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		gfxPsd.DepthStencilState.DepthEnable = false;
+		gfxPsd.DepthStencilState.StencilEnable = false;
+		gfxPsd.SampleMask = UINT_MAX;
+		constexpr D3D12_RENDER_TARGET_BLEND_DESC renderTargetBlendDesc =
+		{
+			false, false,
+			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
+			D3D12_LOGIC_OP_NOOP,
+			D3D12_COLOR_WRITE_ENABLE_ALL,
+		};
+		gfxPsd.BlendState.RenderTarget[0] = renderTargetBlendDesc;
+		gfxPsd.BlendState.RenderTarget[1] = renderTargetBlendDesc;
+		if (const HRESULT result = device->CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline state acquired.");
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
 	{
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 pipeline state.");
+		pipelineState.Reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pipeline state released.");
+
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 root signature.");
 		rootSignature.Reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature released.");
@@ -328,7 +425,7 @@ namespace PonyEngine::Render
 		return buffers[targetBufferIndex].GetAddressOf();
 	}
 
-	void Direct3D12SubSystem::Initialize() const
+	void Direct3D12SubSystem::Initialize(const PonyBase::Math::Vector2<UINT>& resolutionToSet)
 	{
 		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
 		{
@@ -343,6 +440,9 @@ namespace PonyEngine::Render
 			device->CreateRenderTargetView(buffers[i].Get(), &rtvDescription, rtvHandles[i]);
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render target views created.");
+
+		resolution = resolutionToSet;
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Resolution set to '{}'.", resolution.ToString());
 	}
 
 	void Direct3D12SubSystem::PopulateCommands()
@@ -358,6 +458,17 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
+		commandList->SetPipelineState(pipelineState.Get());
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature.");
+		commandList->SetGraphicsRootSignature(rootSignature.Get());
+
+		const auto viewPort = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.X()), .Height = static_cast<FLOAT>(resolution.Y()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
+		commandList->RSSetViewports(1, &viewPort);
+		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.X()), .bottom = static_cast<LONG>(resolution.Y())};
+		commandList->RSSetScissorRects(1, &rect);
 
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
@@ -385,10 +496,10 @@ namespace PonyEngine::Render
 		{
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject.Id());
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			commandList->IASetVertexBuffers(0, 1, &renderObject.MeshResource().VertexPositionView());
-			commandList->IASetVertexBuffers(1, 1, &renderObject.MeshResource().VertexColorView());
+			const D3D12_VERTEX_BUFFER_VIEW bufferViews[] = {renderObject.MeshResource().VertexPositionView(), renderObject.MeshResource().VertexColorView()};
+			commandList->IASetVertexBuffers(0, 2, bufferViews);
 			commandList->IASetIndexBuffer(&renderObject.MeshResource().VertexIndexView());
-			commandList->DrawIndexedInstanced(static_cast<UINT>(renderObject.Mesh().TriangleCount() * 3), 1, 0, 0, 0);
+			commandList->DrawIndexedInstanced(static_cast<UINT>(renderObject.Mesh().VertexCount()), 1, 0, 0, 0);
 		}
 
 		const auto presentBarrier = D3D12_RESOURCE_BARRIER
