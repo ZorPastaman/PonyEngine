@@ -46,6 +46,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		IDXGISwapChain4* GetSwapChain() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		PonyBase::Math::Vector2<UINT> GetResolution() const noexcept;
+
 		void AcquireSwapChain(IUnknown* device, HWND hWnd);
 
 		void Present() const;
@@ -132,9 +135,15 @@ namespace PonyEngine::Render
 		return swapChain.Get();
 	}
 
+	PonyBase::Math::Vector2<UINT> DXGISubSystem::GetResolution() const noexcept
+	{
+		return resolution.value();
+	}
+
 	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd)
 	{
 		const PonyBase::Math::Vector2<UINT> renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(hWnd));
+		resolution = renderResolution;
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
 			renderResolution.ToString());

@@ -166,7 +166,7 @@ namespace Game
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
-			constexpr PonyBase::Math::Vector3<float> vertexPositions[] = {PonyBase::Math::Vector3<float>(0.5f, 0.5f, 0.f), PonyBase::Math::Vector3<float>(0.25f, 0.25f, 0.f), PonyBase::Math::Vector3<float>(0.1f, 0.1f, 0.f)};
+			constexpr PonyBase::Math::Vector3<float> vertexPositions[] = {PonyBase::Math::Vector3<float>(-1.f, -1.f, 0.f), PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f), PonyBase::Math::Vector3<float>(1.f, -1.f, 0.f)};
 			constexpr PonyBase::Math::RGBA<float> vertexColors[] = {PonyBase::Math::RGBA<float>::Predefined::Red, PonyBase::Math::RGBA<float>::Predefined::Green, PonyBase::Math::RGBA<float>::Predefined::Blue};
 			constexpr PonyBase::Math::Vector3<std::uint32_t> vertexIndices[] = {PonyBase::Math::Vector3<std::uint32_t>(0, 1, 2)};
 			triangle = PonyEngine::Render::Mesh(vertexPositions, vertexColors, vertexIndices);
