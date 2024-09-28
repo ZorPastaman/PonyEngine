@@ -459,9 +459,6 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
-		commandList->SetPipelineState(pipelineState.Get());
-
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature.");
 		commandList->SetGraphicsRootSignature(rootSignature.Get());
 
@@ -490,6 +487,9 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
 		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
+		commandList->SetPipelineState(pipelineState.Get());
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (const auto& renderObject : renderObjects)
