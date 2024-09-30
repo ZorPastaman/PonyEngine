@@ -44,7 +44,7 @@ export namespace PonyEngine::Render
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept;
 
 	private:
-		const Render::Mesh* mesh;
+		Render::Mesh mesh;
 		Direct3D12Mesh meshResource;
 
 		std::size_t id;
@@ -54,7 +54,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12RenderObject::Direct3D12RenderObject(const std::size_t id, const Render::Mesh& mesh, const Direct3D12Mesh& meshResource) noexcept :
-		mesh{&mesh},
+		mesh(mesh),
 		meshResource(meshResource),
 		id{id}
 	{
@@ -81,7 +81,7 @@ namespace PonyEngine::Render
 
 	const Mesh& Direct3D12RenderObject::Mesh() const noexcept
 	{
-		return *mesh;
+		return mesh;
 	}
 
 	const Direct3D12Mesh& Direct3D12RenderObject::MeshResource() const noexcept
@@ -99,7 +99,7 @@ namespace PonyEngine::Render
 
 	Direct3D12RenderObject& Direct3D12RenderObject::operator =(Direct3D12RenderObject&& other) noexcept
 	{
-		mesh = other.mesh;
+		mesh = std::move(other.mesh);
 		meshResource = std::move(other.meshResource);
 
 		return *this;
