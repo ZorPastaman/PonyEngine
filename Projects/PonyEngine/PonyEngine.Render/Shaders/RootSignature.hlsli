@@ -7,26 +7,5 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "RootSignature.hlsli"
-
-struct VertexInput
-{
-	float3 position : POSITION;
-	float4 color : COLOR;
-};
-
-struct VertexOutput
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
-
-[RootSignature(ROOT_SIGNATURE)]
-VertexOutput main(VertexInput input)
-{
-	VertexOutput output;
-	output.position = float4(input.position, 1.f);
-	output.color = input.color;
-
-	return output;
-}
+#define ROOT_SIGNATURE \
+	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT)"

@@ -289,14 +289,19 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 root signature.");
-		constexpr auto rootSignatureDescription = D3D12_ROOT_SIGNATURE_DESC{ .NumParameters = 0u, .pParameters = nullptr, .NumStaticSamplers = 0u, .pStaticSamplers = nullptr, .Flags = D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT };
-		Microsoft::WRL::ComPtr<ID3DBlob> signature;
-		Microsoft::WRL::ComPtr<ID3DBlob> error;
-		if (const HRESULT result = D3D12SerializeRootSignature(&rootSignatureDescription, D3D_ROOT_SIGNATURE_VERSION_1, signature.GetAddressOf(), error.GetAddressOf()); FAILED(result))
+		auto rootSignatureShader = std::ifstream("RootSignature.cso", std::ios::binary | std::ios::ate);
+		if (!rootSignatureShader.is_open())
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to serialize Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 root signature shader file."));
 		}
-		if (const HRESULT result = device->CreateRootSignature(0, signature->GetBufferPointer(), signature->GetBufferSize(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
+		std::size_t rootSignatureShaderSize = rootSignatureShader.tellg();
+		auto rootSignatureShaderData = std::vector<char>(rootSignatureShaderSize);
+		rootSignatureShader.seekg(std::ios::beg);
+		if (!rootSignatureShader.read(rootSignatureShaderData.data(), rootSignatureShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 root signature shader file."));
+		}
+		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShaderData.data(), rootSignatureShaderData.size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -310,25 +315,26 @@ namespace PonyEngine::Render
 		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShaderData.data(), .BytecodeLength = pixelShaderData.size()};
 		gfxPsd.pRootSignature = rootSignature.Get();
 		gfxPsd.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		gfxPsd.NumRenderTargets = 2;
+		gfxPsd.NumRenderTargets = 1;
 		gfxPsd.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		gfxPsd.RTVFormats[1] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		gfxPsd.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0};
 		gfxPsd.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
 		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
-		gfxPsd.DepthStencilState.DepthEnable = false;
-		gfxPsd.DepthStencilState.StencilEnable = false;
+		gfxPsd.RasterizerState.FrontCounterClockwise = true;
 		gfxPsd.SampleMask = UINT_MAX;
-		constexpr D3D12_RENDER_TARGET_BLEND_DESC renderTargetBlendDesc =
+		gfxPsd.BlendState.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
 		{
-			false, false,
-			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-			D3D12_BLEND_ONE, D3D12_BLEND_ZERO, D3D12_BLEND_OP_ADD,
-			D3D12_LOGIC_OP_NOOP,
-			D3D12_COLOR_WRITE_ENABLE_ALL,
+			.BlendEnable = false,
+			.LogicOpEnable = false,
+			.SrcBlend = D3D12_BLEND_ZERO,
+			.DestBlend = D3D12_BLEND_ZERO,
+			.BlendOp = D3D12_BLEND_OP_ADD,
+			.SrcBlendAlpha = D3D12_BLEND_ZERO,
+			.DestBlendAlpha = D3D12_BLEND_ZERO,
+			.BlendOpAlpha = D3D12_BLEND_OP_ADD,
+			.LogicOp = D3D12_LOGIC_OP_NOOP,
+			.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
 		};
-		gfxPsd.BlendState.RenderTarget[0] = renderTargetBlendDesc;
-		gfxPsd.BlendState.RenderTarget[1] = renderTargetBlendDesc;
 		if (const HRESULT result = device->CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -496,8 +502,8 @@ namespace PonyEngine::Render
 		{
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject.Id());
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			const D3D12_VERTEX_BUFFER_VIEW bufferViews[] = {renderObject.MeshResource().VertexPositionView(), renderObject.MeshResource().VertexColorView()};
-			commandList->IASetVertexBuffers(0, 2, bufferViews);
+			commandList->IASetVertexBuffers(0, 1, &renderObject.MeshResource().VertexPositionView());
+			commandList->IASetVertexBuffers(1, 1, &renderObject.MeshResource().VertexColorView());
 			commandList->IASetIndexBuffer(&renderObject.MeshResource().VertexIndexView());
 			commandList->DrawIndexedInstanced(static_cast<UINT>(renderObject.Mesh().VertexCount()), 1, 0, 0, 0);
 		}
