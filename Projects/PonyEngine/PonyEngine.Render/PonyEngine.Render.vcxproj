@@ -45,7 +45,11 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryDestroyer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexBuffer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Mesh.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHelper.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm" />

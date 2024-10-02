@@ -9,4 +9,6 @@
 
 export module PonyEngine.Render.Core;
 
+export import PonyEngine.Render;
+
 export import :IRenderer;

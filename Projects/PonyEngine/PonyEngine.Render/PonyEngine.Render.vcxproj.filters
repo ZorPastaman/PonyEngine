@@ -61,6 +61,18 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexBuffer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHelper.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\VertexShader.hlsl" />

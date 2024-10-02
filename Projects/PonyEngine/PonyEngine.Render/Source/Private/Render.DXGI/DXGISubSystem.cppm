@@ -16,7 +16,6 @@ module;
 export module PonyEngine.Render.DXGI:DXGISubSystem;
 
 import <cstdint>;
-import <optional>;
 import <stdexcept>;
 import <type_traits>;
 
@@ -25,7 +24,6 @@ import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Core;
@@ -37,7 +35,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISubSystem(IRenderer& renderer, UINT bufferCount, DXGI_FORMAT rtvFormat, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution);
+		DXGISubSystem(IRenderer& renderer, UINT bufferCount, DXGI_FORMAT rtvFormat);
 		DXGISubSystem(const DXGISubSystem&) = delete;
 		DXGISubSystem(DXGISubSystem&&) = delete;
 
@@ -46,10 +44,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		IDXGISwapChain4* GetSwapChain() const noexcept;
 
-		[[nodiscard("Pure function")]]
-		PonyBase::Math::Vector2<UINT> GetResolution() const noexcept;
-
-		void AcquireSwapChain(IUnknown* device, HWND hWnd);
+		void AcquireSwapChain(IUnknown* device, HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution);
 
 		void Present() const;
 
@@ -57,7 +52,6 @@ export namespace PonyEngine::Render
 		DXGISubSystem& operator =(DXGISubSystem&&) = delete;
 
 	private:
-		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
 		UINT bufferCount;
 		DXGI_FORMAT rtvFormat;
 
@@ -73,14 +67,11 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat, const std::optional<PonyBase::Math::Vector2<UINT>>& resolution) :
-		resolution{resolution},
+	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat) :
 		bufferCount{bufferCount},
 		rtvFormat{rtvFormat},
 		renderer{&renderer}
 	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI parameters. Buffer count: '{}'; Resolution: '{}'.", this->bufferCount, this->resolution.has_value() ? this->resolution->ToString() : "empty");
-
 #ifdef _DEBUG
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI debug interface.");
 		if (const HRESULT result = DXGIGetDebugInterface1(0, IID_PPV_ARGS(debug.GetAddressOf())); FAILED(result)) [[unlikely]]
@@ -98,8 +89,8 @@ namespace PonyEngine::Render
 		factoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI factory.");
-		if (const HRESULT result = CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result))
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI factory. FactoryFlags: '0x{:X}'.", factoryFlags);
+		if (const HRESULT result = CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -135,23 +126,15 @@ namespace PonyEngine::Render
 		return swapChain.Get();
 	}
 
-	PonyBase::Math::Vector2<UINT> DXGISubSystem::GetResolution() const noexcept
+	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution)
 	{
-		return resolution.value();
-	}
-
-	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd)
-	{
-		const PonyBase::Math::Vector2<UINT> renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(hWnd));
-		resolution = renderResolution;
-
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
-			renderResolution.ToString());
+			resolution.ToString());
 
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
-			.Width = renderResolution.X(),
-			.Height = renderResolution.Y(),
+			.Width = resolution.X(),
+			.Height = resolution.Y(),
 			.Format = rtvFormat,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
@@ -167,7 +150,6 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
 		if (const HRESULT result = acquiredSwapChain->QueryInterface(swapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));

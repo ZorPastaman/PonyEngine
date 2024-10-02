@@ -25,8 +25,8 @@ import <stdexcept>;
 import <type_traits>;
 import <unordered_map>;
 import <utility>;
-import <vector>;
 
+import PonyBase.Geometry;
 import PonyBase.Math;
 import PonyBase.GuidUtility;
 import PonyBase.StringUtility;
@@ -38,6 +38,7 @@ import PonyEngine.Core;
 import PonyEngine.Render.Core;
 
 import :Direct3D12Mesh;
+import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
@@ -77,7 +78,7 @@ export namespace PonyEngine::Render
 		void Execute() const;
 		void WaitForEndOfFrame();
 
-		RenderObjectHandle CreateRenderObject(const Mesh& mesh);
+		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh);
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
 
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
@@ -130,7 +131,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 
-		std::vector<Direct3D12RenderObject> renderObjects;
+		std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects;
 		std::size_t nextRenderObjectId;
 	};
 }
@@ -319,7 +320,7 @@ namespace PonyEngine::Render
 		gfxPsd.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 		gfxPsd.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0};
 		gfxPsd.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_NONE;
+		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
 		gfxPsd.RasterizerState.FrontCounterClockwise = true;
 		gfxPsd.SampleMask = UINT_MAX;
 		gfxPsd.BlendState.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
@@ -500,12 +501,13 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (const auto& renderObject : renderObjects)
 		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject.Id());
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject.first.id);
+			const Direct3D12Mesh& renderMesh = renderObject.second.MeshResource(); // TODO: rename meshResource to renderMesh.
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-			commandList->IASetVertexBuffers(0, 1, &renderObject.MeshResource().VertexPositionView());
-			commandList->IASetVertexBuffers(1, 1, &renderObject.MeshResource().VertexColorView());
-			commandList->IASetIndexBuffer(&renderObject.MeshResource().VertexIndexView());
-			commandList->DrawIndexedInstanced(static_cast<UINT>(renderObject.Mesh().VertexCount()), 1, 0, 0, 0);
+			commandList->IASetVertexBuffers(0, 1, &renderMesh.VerticesView());
+			commandList->IASetVertexBuffers(1, 1, &renderMesh.VertexColorsView());
+			commandList->IASetIndexBuffer(&renderMesh.VertexIndicesView());
+			commandList->DrawIndexedInstanced(renderMesh.IndexCount(), 1, 0, 0, 0);
 		}
 
 		const auto presentBarrier = D3D12_RESOURCE_BARRIER
@@ -564,128 +566,25 @@ namespace PonyEngine::Render
 		}
 	}
 
-	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const Mesh& mesh)
+	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)
 	{
 		const size_t id = nextRenderObjectId++;
 
-		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = D3D12_HEAP_TYPE_UPLOAD,
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
-		const auto vertexPositionDescription = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = mesh.VertexCount() * sizeof(PonyBase::Math::Vector3<float>),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-		const auto vertexColorDescription = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = mesh.VertexCount() * sizeof(PonyBase::Math::RGBA<float>),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-		const auto vertexIndexDescription = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = mesh.TriangleCount() * sizeof(PonyBase::Math::Vector3<std::uint32_t>),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
+		const auto renderMesh = CreateDirect3D12Mesh(device.Get(), mesh);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created.");
 
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexPositionResource, vertexColorResource, vertexIndexResource;
-		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &vertexPositionDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr,
-			0, nullptr, IID_PPV_ARGS(vertexPositionResource.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex position resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &vertexColorDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr,
-			0, nullptr, IID_PPV_ARGS(vertexColorResource.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex color resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = device->CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &vertexIndexDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr,
-			0, nullptr, IID_PPV_ARGS(vertexIndexResource.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex index resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		const auto vertexPositionRange = D3D12_RANGE{.Begin = 0, .End = mesh.VertexCount() * sizeof(PonyBase::Math::Vector3<float>)};
-		const auto vertexColorRange = D3D12_RANGE{.Begin = 0, .End = mesh.VertexCount() * sizeof(PonyBase::Math::RGBA<float>)};
-		const auto vertexIndexRange = D3D12_RANGE{.Begin = 0, .End = mesh.TriangleCount() * sizeof(PonyBase::Math::Vector3<std::uint32_t>)};
-		void* vertexPositionData;
-		void* vertexColorData;
-		void* vertexIndexData;
-		if (const HRESULT result = vertexPositionResource->Map(0, &vertexPositionRange, &vertexPositionData); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map vertex position resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = vertexColorResource->Map(0, &vertexColorRange, &vertexColorData); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map vertex color resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = vertexIndexResource->Map(0, &vertexIndexRange, &vertexIndexData); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map vertex index resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		std::memcpy(vertexPositionData, mesh.Vertices().data(), mesh.VertexCount() * sizeof(PonyBase::Math::Vector3<float>));
-		std::memcpy(vertexColorData, mesh.Colors().data(), mesh.VertexCount() * sizeof(PonyBase::Math::RGBA<float>));
-		std::memcpy(vertexIndexData, mesh.Triangles().data(), mesh.TriangleCount() * sizeof(PonyBase::Math::Vector3<std::uint32_t>));
-		vertexPositionResource->Unmap(0, &vertexPositionRange);
-		vertexColorResource->Unmap(0, &vertexColorRange);
-		vertexIndexResource->Unmap(0, &vertexIndexRange);
-
-		const auto vertexPositionView = D3D12_VERTEX_BUFFER_VIEW{.BufferLocation = vertexPositionResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<UINT>(mesh.VertexCount() * sizeof(PonyBase::Math::Vector3<float>)),
-			.StrideInBytes = sizeof(PonyBase::Math::Vector3<float>)};
-		const auto vertexColorView = D3D12_VERTEX_BUFFER_VIEW{.BufferLocation = vertexColorResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<UINT>(mesh.VertexCount() * sizeof(PonyBase::Math::RGBA<float>)),
-			.StrideInBytes = sizeof(PonyBase::Math::RGBA<float>)};
-		const auto vertexIndexView = D3D12_INDEX_BUFFER_VIEW{.BufferLocation = vertexIndexResource->GetGPUVirtualAddress(), .SizeInBytes = static_cast<UINT>(mesh.TriangleCount() * sizeof(PonyBase::Math::Vector3<std::uint32_t>)),
-			.Format = DXGI_FORMAT_R32_UINT};
-
-		const auto meshResource = Direct3D12Mesh(vertexPositionResource, vertexColorResource, vertexIndexResource, vertexPositionView, vertexColorView, vertexIndexView);
-
-		renderObjects.emplace_back(id, mesh, meshResource);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object created. ID: '{}'; Mesh: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(&mesh));
+		renderObjects.emplace(id, renderMesh);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object created. ID: '{}'.", id);
 
 		return RenderObjectHandle{.id = id};
 	}
 
 	void Direct3D12SubSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
 	{
-		for (std::size_t i = 0; i < renderObjects.size(); ++i)
+		if (const auto position = renderObjects.find(renderObjectHandle); position != renderObjects.cend()) [[likely]]
 		{
-			if (renderObjects[i].Id() == renderObjectHandle.id)
-			{
-				renderObjects.erase(renderObjects.cbegin() + i);
-				PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy render object of id '{}' at index '{}'.", renderObjectHandle.id, i);
-				break;
-			}
+			renderObjects.erase(position);
 		}
 	}
 

@@ -17,9 +17,11 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
 
+import <optional>;
 import <stdexcept>;
 import <type_traits>;
 
+import PonyBase.Math;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -61,7 +63,7 @@ export namespace PonyEngine::Render
 		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept override;
 		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept override;
 
-		virtual RenderObjectHandle CreateRenderObject(const Mesh& mesh) override;
+		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) override;
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -76,6 +78,8 @@ export namespace PonyEngine::Render
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
+		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
+
 		Core::IEngine* engine; ///< Engine.
 
 		DXGISubSystem dxgiSubSystem; ///< DXGI sub-system.
@@ -86,17 +90,23 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
+		resolution(params.resolution),
 		engine{&engine},
-		dxgiSubSystem(*this, BufferCount, RtvFormat, params.resolution),
+		dxgiSubSystem(*this, BufferCount, RtvFormat),
 		direct3D12SubSystem(*this, BufferCount, RtvFormat, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
 	{
 	}
 
 	void WindowsDirect3D12RenderSystem::Begin()
 	{
+		PonyBase::Math::Vector2<UINT> renderResolution;
+
 		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			dxgiSubSystem.AcquireSwapChain(direct3D12SubSystem.GetCommandQueue(), windowSystem->WindowHandle());
+			const HWND windowHandle = windowSystem->WindowHandle();
+			renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(windowHandle));
+
+			dxgiSubSystem.AcquireSwapChain(direct3D12SubSystem.GetCommandQueue(), windowHandle, renderResolution);
 		}
 		else
 		{
@@ -116,7 +126,7 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Initialize Direct3D 12 sub-system.");
-		direct3D12SubSystem.Initialize(dxgiSubSystem.GetResolution());
+		direct3D12SubSystem.Initialize(renderResolution);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -159,7 +169,7 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem.ClearColor().ToString());
 	}
 
-	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const Mesh& mesh)
+	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)
 	{
 		return direct3D12SubSystem.CreateRenderObject(mesh);
 	}
