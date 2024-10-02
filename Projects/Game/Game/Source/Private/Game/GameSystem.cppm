@@ -16,6 +16,7 @@ export module Game.Implementation:GameSystem;
 import <cstdint>;
 import <functional>;
 
+import PonyBase.Geometry;
 import PonyBase.Math;
 
 import PonyDebug.Log;
@@ -60,7 +61,6 @@ export namespace Game
 		PonyEngine::Input::Handle leftHandle; ///< Left arrow input handle.
 		PonyEngine::Input::Handle closeHandle; ///< Escape input handle.
 
-		PonyEngine::Render::Mesh triangle;
 		PonyEngine::Render::RenderObjectHandle triangleHandle; ///< Triangle handle.
 
 		PonyEngine::Core::IEngine* const engine; ///< Engine.
@@ -166,11 +166,18 @@ namespace Game
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
-			constexpr PonyBase::Math::Vector3<float> vertexPositions[] = {PonyBase::Math::Vector3<float>(1.f, -1.f, 0.f), PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f), PonyBase::Math::Vector3<float>(-1.f, -1.f, 0.f)};
-			constexpr PonyBase::Math::RGBA<float> vertexColors[] = {PonyBase::Math::RGBA<float>::Predefined::Red, PonyBase::Math::RGBA<float>::Predefined::Green, PonyBase::Math::RGBA<float>::Predefined::Blue};
-			constexpr PonyBase::Math::Vector3<std::uint32_t> vertexIndices[] = {PonyBase::Math::Vector3<std::uint32_t>(0, 1, 2)};
-			triangle = PonyEngine::Render::Mesh(vertexPositions, vertexColors, vertexIndices);
-			triangleHandle = renderSystem->CreateRenderObject(triangle);
+			constexpr PonyBase::Math::Vector3<float> vertices[] = { PonyBase::Math::Vector3<float>(0.f, 0.4f, 0.f), PonyBase::Math::Vector3<float>(0.4f, 0.6f, 0.4f), PonyBase::Math::Vector3<float>(0.f, 0.8f, 0.8f), PonyBase::Math::Vector3<float>(-0.4f, 0.6f, 0.4f),
+				PonyBase::Math::Vector3<float>(0.f, -0.8f, 0.f), PonyBase::Math::Vector3<float>(0.4f, -0.6f, 0.4f), PonyBase::Math::Vector3<float>(0.f, -0.4f, 0.8f), PonyBase::Math::Vector3<float>(-0.4f, -0.6f, 0.4f) };
+			constexpr PonyBase::Math::Vector3<std::uint32_t> vertexTriangles[] = { PonyBase::Math::Vector3<std::uint32_t>(0, 1, 2), PonyBase::Math::Vector3<std::uint32_t>(0, 2, 3), PonyBase::Math::Vector3<std::uint32_t>(4, 6, 5), PonyBase::Math::Vector3<std::uint32_t>(4, 7, 6),
+				PonyBase::Math::Vector3<std::uint32_t>(0, 4, 1), PonyBase::Math::Vector3<std::uint32_t>(1, 4, 5), PonyBase::Math::Vector3<std::uint32_t>(1, 5, 2), PonyBase::Math::Vector3<std::uint32_t>(2, 5, 6),
+				PonyBase::Math::Vector3<std::uint32_t>(2, 6, 3), PonyBase::Math::Vector3<std::uint32_t>(3, 6, 7), PonyBase::Math::Vector3<std::uint32_t>(3, 7, 0), PonyBase::Math::Vector3<std::uint32_t>(0, 7, 4) };
+			constexpr PonyBase::Math::RGBA<float> vertexColors[] = { PonyBase::Math::RGBA<float>::Predefined::Red, PonyBase::Math::RGBA<float>::Predefined::Green, PonyBase::Math::RGBA<float>::Predefined::Blue, PonyBase::Math::RGBA<float>::Predefined::Yellow,
+				PonyBase::Math::RGBA<float>::Predefined::Magenta, PonyBase::Math::RGBA<float>::Predefined::Cyan, PonyBase::Math::RGBA<float>::Predefined::Gray, PonyBase::Math::RGBA<float>::Predefined::White };
+			auto box = PonyBase::Geometry::Mesh();
+			box.Vertices(vertices);
+			box.Triangles(vertexTriangles);
+			box.Colors(vertexColors);
+			triangleHandle = renderSystem->CreateRenderObject(box);
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}
 	}

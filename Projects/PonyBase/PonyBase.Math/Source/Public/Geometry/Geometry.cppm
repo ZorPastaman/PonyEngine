@@ -7,7 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render;
+export module PonyBase.Geometry;
 
-export import :IRenderSystem;
-export import :RenderObjectHandle;
+export import :Mesh;

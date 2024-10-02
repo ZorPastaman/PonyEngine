@@ -9,9 +9,9 @@
 
 export module PonyEngine.Render:IRenderSystem;
 
+import PonyBase.Geometry;
 import PonyBase.Math;
 
-import :Mesh;
 import :RenderObjectHandle;
 
 export namespace PonyEngine::Render
@@ -27,8 +27,8 @@ export namespace PonyEngine::Render
 		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept = 0;
 		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept = 0;
 
-		virtual RenderObjectHandle CreateRenderObject(const Mesh& mesh) = 0;
-		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept = 0;
+		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) = 0;
+		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) = 0;
 
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;
