@@ -19,7 +19,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexResource, UINT vertexSize, UINT vertexCount) noexcept;
+		Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& verticesResource, UINT vertexSize, UINT vertexCount) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12VertexBuffer(const Direct3D12VertexBuffer& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -28,7 +28,9 @@ export namespace PonyEngine::Render
 		~Direct3D12VertexBuffer() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetVertexResource() const noexcept;
+		Microsoft::WRL::ComPtr<ID3D12Resource2>& VerticesResource() noexcept;
+		[[nodiscard("Pure function")]]
+		const Microsoft::WRL::ComPtr<ID3D12Resource2>& VerticesResource() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		UINT VertexSize() const noexcept;
@@ -39,7 +41,7 @@ export namespace PonyEngine::Render
 		Direct3D12VertexBuffer& operator =(Direct3D12VertexBuffer&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> verticesResource;
 		UINT vertexSize;
 		UINT vertexCount;
 	};
@@ -47,16 +49,21 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12VertexBuffer::Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexResource, const UINT vertexSize, const UINT vertexCount) noexcept :
-		vertexResource(vertexResource),
+	Direct3D12VertexBuffer::Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& verticesResource, const UINT vertexSize, const UINT vertexCount) noexcept :
+		verticesResource(verticesResource),
 		vertexSize{vertexSize},
 		vertexCount{vertexCount}
 	{
 	}
 
-	ID3D12Resource2* Direct3D12VertexBuffer::GetVertexResource() const noexcept
+	Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12VertexBuffer::VerticesResource() noexcept
 	{
-		return vertexResource.Get();
+		return verticesResource;
+	}
+
+	const Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12VertexBuffer::VerticesResource() const noexcept
+	{
+		return verticesResource;
 	}
 
 	UINT Direct3D12VertexBuffer::VertexSize() const noexcept

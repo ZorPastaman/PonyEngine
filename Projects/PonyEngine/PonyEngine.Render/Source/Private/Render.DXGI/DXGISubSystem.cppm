@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/DXGI/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -35,16 +37,18 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		DXGISubSystem(IRenderer& renderer, UINT bufferCount, DXGI_FORMAT rtvFormat);
+		explicit DXGISubSystem(IRenderer& renderer);
 		DXGISubSystem(const DXGISubSystem&) = delete;
 		DXGISubSystem(DXGISubSystem&&) = delete;
 
 		~DXGISubSystem() noexcept;
 
 		[[nodiscard("Pure function")]]
-		IDXGISwapChain4* GetSwapChain() const noexcept;
+		UINT GetCurrentBackBufferIndex() const noexcept;
+		template<typename T> [[nodiscard("Pure function")]]
+		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
 
-		void AcquireSwapChain(IUnknown* device, HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution);
+		void Initialize(IUnknown* device, HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 
 		void Present() const;
 
@@ -52,9 +56,6 @@ export namespace PonyEngine::Render
 		DXGISubSystem& operator =(DXGISubSystem&&) = delete;
 
 	private:
-		UINT bufferCount;
-		DXGI_FORMAT rtvFormat;
-
 		IRenderer* renderer;
 
 #ifdef _DEBUG
@@ -67,9 +68,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat) :
-		bufferCount{bufferCount},
-		rtvFormat{rtvFormat},
+	DXGISubSystem::DXGISubSystem(IRenderer& renderer) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -121,16 +120,25 @@ namespace PonyEngine::Render
 #endif
 	}
 
-	IDXGISwapChain4* DXGISubSystem::GetSwapChain() const noexcept
+	UINT DXGISubSystem::GetCurrentBackBufferIndex() const noexcept
 	{
-		return swapChain.Get();
+		assert(swapChain && "The swap chain is nullptr.");
+
+		return swapChain->GetCurrentBackBufferIndex();
 	}
 
-	void DXGISubSystem::AcquireSwapChain(IUnknown* const device, const HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution)
+	template<typename T>
+	HRESULT DXGISubSystem::GetBuffer(const UINT bufferIndex, T** const buffer) const noexcept
+	{
+		assert(swapChain && "The swap chain is nullptr.");
+
+		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
+	}
+
+	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
 			resolution.ToString());
-
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
 			.Width = resolution.X(),
@@ -154,12 +162,13 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
 	}
 
 	void DXGISubSystem::Present() const
 	{
+		assert(swapChain && "The swap chain is nullptr.");
+
 		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to present swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));

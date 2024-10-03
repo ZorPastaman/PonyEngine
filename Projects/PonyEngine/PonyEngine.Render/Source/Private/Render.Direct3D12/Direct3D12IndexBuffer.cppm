@@ -21,7 +21,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& indexResource, const Direct3D12IndexFormat& indexFormat, UINT indexCount) noexcept;
+		Direct3D12IndexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& indicesResource, const Direct3D12IndexFormat& indexFormat, UINT indexCount) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12IndexBuffer(const Direct3D12IndexBuffer& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -30,7 +30,9 @@ export namespace PonyEngine::Render
 		~Direct3D12IndexBuffer() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetIndexResource() const noexcept;
+		Microsoft::WRL::ComPtr<ID3D12Resource2>& IndicesResource() noexcept;
+		[[nodiscard("Pure function")]]
+		const Microsoft::WRL::ComPtr<ID3D12Resource2>& IndicesResource() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT IndexFormat() const noexcept;
@@ -43,7 +45,7 @@ export namespace PonyEngine::Render
 		Direct3D12IndexBuffer& operator =(Direct3D12IndexBuffer&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> indexResource;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> indicesResource;
 		Direct3D12IndexFormat indexFormat;
 		UINT indexCount;
 	};
@@ -51,16 +53,21 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12IndexBuffer::Direct3D12IndexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& indexResource, const Direct3D12IndexFormat& indexFormat, const UINT indexCount) noexcept :
-		indexResource(indexResource),
+	Direct3D12IndexBuffer::Direct3D12IndexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& indicesResource, const Direct3D12IndexFormat& indexFormat, const UINT indexCount) noexcept :
+		indicesResource(indicesResource),
 		indexFormat{indexFormat},
 		indexCount{indexCount}
 	{
 	}
 
-	ID3D12Resource2* Direct3D12IndexBuffer::GetIndexResource() const noexcept
+	Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12IndexBuffer::IndicesResource() noexcept
 	{
-		return indexResource.Get();
+		return indicesResource;
+	}
+
+	const Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12IndexBuffer::IndicesResource() const noexcept
+	{
+		return indicesResource;
 	}
 
 	DXGI_FORMAT Direct3D12IndexBuffer::IndexFormat() const noexcept

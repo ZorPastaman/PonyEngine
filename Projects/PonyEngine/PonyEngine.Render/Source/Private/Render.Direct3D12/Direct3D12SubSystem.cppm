@@ -21,10 +21,12 @@ import <filesystem>;
 import <fstream>;
 import <memory>;
 import <ranges>;
+import <span>;
 import <stdexcept>;
 import <type_traits>;
 import <unordered_map>;
 import <utility>;
+import <vector>;
 
 import PonyBase.Geometry;
 import PonyBase.Math;
@@ -48,16 +50,11 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		Direct3D12SubSystem(IRenderer& renderer, UINT bufferCount, DXGI_FORMAT rtvFormat, D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
+		Direct3D12SubSystem(IRenderer& renderer, D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
 		Direct3D12SubSystem(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem(Direct3D12SubSystem&&) = delete;
 
 		~Direct3D12SubSystem() noexcept;
-
-		[[nodiscard("Pure function")]]
-		UINT& BufferIndex() noexcept;
-		[[nodiscard("Pure function")]]
-		const UINT& BufferIndex() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
@@ -67,14 +64,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetBuffer(UINT targetBufferIndex) const noexcept;
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2** GetBufferPointer(UINT targetBufferIndex) const noexcept;
+		void Initialize(const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers);
 
-		void Initialize(const PonyBase::Math::Vector2<UINT>& resolutionToSet);
-
-		void PopulateCommands();
+		void PopulateCommands(UINT bufferIndex);
 		void Execute() const;
 		void WaitForEndOfFrame();
 
@@ -88,20 +80,6 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		GUID AcquireGuid() const;
 
-		[[nodiscard("Pure function")]]
-		std::unique_ptr<Microsoft::WRL::ComPtr<ID3D12Resource2>[]> CreateBuffers() const;
-
-		[[nodiscard("Pure function")]]
-		std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> CreateRtvHandles() const;
-
-		void ReleaseBuffers() const noexcept;
-
-		PonyBase::Math::Vector2<UINT> resolution;
-
-		UINT bufferCount;
-		UINT bufferIndex;
-
-		DXGI_FORMAT rtvFormat;
 		PonyBase::Math::RGBA<FLOAT> clearColor;
 
 		UINT64 fenceValue;
@@ -121,15 +99,18 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
 
-		std::unique_ptr<Microsoft::WRL::ComPtr<ID3D12Resource2>[]> buffers;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-		std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> rtvHandles;
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+
+		D3D12_VIEWPORT viewPort;
+		D3D12_RECT viewRect;
 
 		std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects;
 		std::size_t nextRenderObjectId;
@@ -138,18 +119,14 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const UINT bufferCount, const DXGI_FORMAT rtvFormat, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
-		resolution(),
-		bufferCount{bufferCount},
-		bufferIndex{0u},
-		rtvFormat{rtvFormat},
+	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
 		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
 		fenceValue{0LL},
 		fenceTimeout{fenceTimeout},
 		renderer{&renderer},
 		guid{AcquireGuid()},
-		buffers{CreateBuffers()},
-		rtvHandles{CreateRtvHandles()},
+		viewPort{},
+		viewRect{},
 		nextRenderObjectId{1}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -208,139 +185,12 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 rtv descriptors.");
-		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			.NumDescriptors = bufferCount,
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		if (const HRESULT result = device->CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
-		const UINT rtvDescriptorHandleIncrement = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		for (UINT i = 1u; i < bufferCount; ++i)
-		{
-			rtvHandles[i].ptr = rtvHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv descriptors acquired.");
-
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 fence.");
 		if (const HRESULT result = device->CreateFence(fenceValue++, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 fence with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
-
-		D3D12_INPUT_ELEMENT_DESC vertexLayout[] =
-		{
-			D3D12_INPUT_ELEMENT_DESC
-			{
-				.SemanticName = "POSITION",
-				.SemanticIndex = 0u,
-				.Format = DXGI_FORMAT_R32G32B32_FLOAT,
-				.InputSlot = 0u,
-				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-				.InstanceDataStepRate = 0u
-			},
-			D3D12_INPUT_ELEMENT_DESC
-			{
-				.SemanticName = "COLOR",
-				.SemanticIndex = 0u,
-				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
-				.InputSlot = 1u,
-				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-				.InstanceDataStepRate = 0u
-			}
-		};
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
-		auto vertexShader = std::ifstream("VertexShader.cso", std::ios::binary | std::ios::ate);
-		if (!vertexShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 vertex shader file."));
-		}
-		std::size_t vertexShaderSize = vertexShader.tellg();
-		auto vertexShaderData = std::vector<char>(vertexShaderSize);
-		vertexShader.seekg(std::ios::beg);
-		if (!vertexShader.read(vertexShaderData.data(), vertexShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 vertex shader file."));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
-		auto pixelShader = std::ifstream("PixelShader.cso", std::ios::binary | std::ios::ate);
-		if (!pixelShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 pixel shader file."));
-		}
-		std::size_t pixelShaderSize = pixelShader.tellg();
-		auto pixelShaderData = std::vector<char>(pixelShaderSize);
-		pixelShader.seekg(std::ios::beg);
-		if (!pixelShader.read(pixelShaderData.data(), pixelShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 pixel shader file."));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 root signature.");
-		auto rootSignatureShader = std::ifstream("RootSignature.cso", std::ios::binary | std::ios::ate);
-		if (!rootSignatureShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 root signature shader file."));
-		}
-		std::size_t rootSignatureShaderSize = rootSignatureShader.tellg();
-		auto rootSignatureShaderData = std::vector<char>(rootSignatureShaderSize);
-		rootSignatureShader.seekg(std::ios::beg);
-		if (!rootSignatureShader.read(rootSignatureShaderData.data(), rootSignatureShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 root signature shader file."));
-		}
-		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShaderData.data(), rootSignatureShaderData.size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.Get()));
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 graphics pipeline state.");
-		D3D12_GRAPHICS_PIPELINE_STATE_DESC gfxPsd{};
-		gfxPsd.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = vertexLayout, .NumElements = _countof(vertexLayout)};
-		gfxPsd.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-		gfxPsd.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShaderData.data(), .BytecodeLength = vertexShaderData.size()};
-		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShaderData.data(), .BytecodeLength = pixelShaderData.size()};
-		gfxPsd.pRootSignature = rootSignature.Get();
-		gfxPsd.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
-		gfxPsd.NumRenderTargets = 1;
-		gfxPsd.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
-		gfxPsd.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0};
-		gfxPsd.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
-		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
-		gfxPsd.RasterizerState.FrontCounterClockwise = true;
-		gfxPsd.SampleMask = UINT_MAX;
-		gfxPsd.BlendState.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
-		{
-			.BlendEnable = false,
-			.LogicOpEnable = false,
-			.SrcBlend = D3D12_BLEND_ZERO,
-			.DestBlend = D3D12_BLEND_ZERO,
-			.BlendOp = D3D12_BLEND_OP_ADD,
-			.SrcBlendAlpha = D3D12_BLEND_ZERO,
-			.DestBlendAlpha = D3D12_BLEND_ZERO,
-			.BlendOpAlpha = D3D12_BLEND_OP_ADD,
-			.LogicOp = D3D12_LOGIC_OP_NOOP,
-			.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
-		};
-		if (const HRESULT result = device->CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline state acquired.");
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
@@ -357,15 +207,13 @@ namespace PonyEngine::Render
 		fence.Reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence released.");
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 rtv descriptors.");
-		rtvHandles.reset();
-		rtvDescriptorHeap.Reset();
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv descriptors released.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 rtv handles.");
+		rtvHandles.clear();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv handles released.");
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 buffers.");
-		ReleaseBuffers();
-		buffers.reset();
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 buffers released.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 back buffers.");
+		backBuffers.clear();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 back buffers released.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command list.");
 		commandList.Reset();
@@ -397,16 +245,6 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event closed.");
 	}
 
-	UINT& Direct3D12SubSystem::BufferIndex() noexcept
-	{
-		return bufferIndex;
-	}
-
-	const UINT& Direct3D12SubSystem::BufferIndex() const noexcept
-	{
-		return bufferIndex;
-	}
-
 	PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() noexcept
 	{
 		return clearColor;
@@ -422,37 +260,162 @@ namespace PonyEngine::Render
 		return commandQueue.Get();
 	}
 
-	ID3D12Resource2* Direct3D12SubSystem::GetBuffer(const UINT targetBufferIndex) const noexcept
+	void Direct3D12SubSystem::Initialize(const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers)
 	{
-		return buffers[targetBufferIndex].Get();
-	}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set Direct3D 12 view port and view rect to resolution of '{}'.", resolution.ToString());
+		viewPort = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.X()), .Height = static_cast<FLOAT>(resolution.Y()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
+		viewRect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.X()), .bottom = static_cast<LONG>(resolution.Y())};
 
-	ID3D12Resource2** Direct3D12SubSystem::GetBufferPointer(const UINT targetBufferIndex) const noexcept
-	{
-		return buffers[targetBufferIndex].GetAddressOf();
-	}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
+		backBuffers.resize(buffers.size());
+		for (std::size_t i = 0; i < backBuffers.size(); ++i)
+		{
+			backBuffers[i] = buffers[i];
+		}
 
-	void Direct3D12SubSystem::Initialize(const PonyBase::Math::Vector2<UINT>& resolutionToSet)
-	{
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 rtv handles.");
+		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
+		{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+			.NumDescriptors = static_cast<UINT>(buffers.size()),
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+			.NodeMask = 0u
+		};
+		if (const HRESULT result = device->CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		rtvHandles.resize(buffers.size());
+		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+		const UINT rtvDescriptorHandleIncrement = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		for (std::size_t i = 1; i < rtvHandles.size(); ++i)
+		{
+			rtvHandles[i].ptr = rtvHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv descriptors acquired.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create render target views.");
 		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
 		{
 			.Format = rtvFormat,
 			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
-			.Texture2D = D3D12_TEX2D_RTV{.MipSlice = 0u, .PlaneSlice = 0u}
+			.Texture2D = D3D12_TEX2D_RTV{}
 		};
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create render target views.");
-		for (UINT i = 0u; i < bufferCount; ++i)
+		for (std::size_t i = 0; i < buffers.size(); ++i)
 		{
 			device->CreateRenderTargetView(buffers[i].Get(), &rtvDescription, rtvHandles[i]);
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render target views created.");
 
-		resolution = resolutionToSet;
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Resolution set to '{}'.", resolution.ToString());
+		constexpr D3D12_INPUT_ELEMENT_DESC vertexLayout[] =
+		{
+			D3D12_INPUT_ELEMENT_DESC
+			{
+				.SemanticName = "POSITION",
+				.SemanticIndex = 0u,
+				.Format = DXGI_FORMAT_R32G32B32_FLOAT,
+				.InputSlot = 0u,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0u
+			},
+			D3D12_INPUT_ELEMENT_DESC
+			{
+				.SemanticName = "COLOR",
+				.SemanticIndex = 0u,
+				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
+				.InputSlot = 1u,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0u
+			}
+		};
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		auto vertexShader = std::ifstream("VertexShader.cso", std::ios::binary | std::ios::ate);
+		if (!vertexShader.is_open())
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 vertex shader file."));
+		}
+		std::size_t vertexShaderSize = vertexShader.tellg();
+		auto vertexShaderData = std::vector<char>(vertexShaderSize);
+		vertexShader.seekg(std::ios::beg);
+		if (!vertexShader.read(vertexShaderData.data(), vertexShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 vertex shader file."));
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		auto pixelShader = std::ifstream("PixelShader.cso", std::ios::binary | std::ios::ate);
+		if (!pixelShader.is_open())
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 pixel shader file."));
+		}
+		std::size_t pixelShaderSize = pixelShader.tellg();
+		auto pixelShaderData = std::vector<char>(pixelShaderSize);
+		pixelShader.seekg(std::ios::beg);
+		if (!pixelShader.read(pixelShaderData.data(), pixelShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 pixel shader file."));
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 root signature.");
+		auto rootSignatureShader = std::ifstream("RootSignature.cso", std::ios::binary | std::ios::ate);
+		if (!rootSignatureShader.is_open())
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 root signature shader file."));
+		}
+		std::size_t rootSignatureShaderSize = rootSignatureShader.tellg();
+		auto rootSignatureShaderData = std::vector<char>(rootSignatureShaderSize);
+		rootSignatureShader.seekg(std::ios::beg);
+		if (!rootSignatureShader.read(rootSignatureShaderData.data(), rootSignatureShaderSize))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 root signature shader file."));
+		}
+		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShaderData.data(), rootSignatureShaderData.size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.Get()));
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 graphics pipeline state.");
+		D3D12_GRAPHICS_PIPELINE_STATE_DESC gfxPsd{};
+		gfxPsd.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = vertexLayout, .NumElements = _countof(vertexLayout)};
+		gfxPsd.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
+		gfxPsd.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShaderData.data(), .BytecodeLength = vertexShaderData.size()};
+		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShaderData.data(), .BytecodeLength = pixelShaderData.size()};
+		gfxPsd.pRootSignature = rootSignature.Get();
+		gfxPsd.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
+		gfxPsd.NumRenderTargets = 1;
+		gfxPsd.RTVFormats[0] = rtvFormat;
+		gfxPsd.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0};
+		gfxPsd.RasterizerState.FillMode = D3D12_FILL_MODE_SOLID;
+		gfxPsd.RasterizerState.CullMode = D3D12_CULL_MODE_BACK;
+		gfxPsd.RasterizerState.FrontCounterClockwise = true;
+		gfxPsd.SampleMask = UINT_MAX;
+		gfxPsd.BlendState.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
+		{
+			.BlendEnable = false,
+			.LogicOpEnable = false,
+			.SrcBlend = D3D12_BLEND_ZERO,
+			.DestBlend = D3D12_BLEND_ZERO,
+			.BlendOp = D3D12_BLEND_OP_ADD,
+			.SrcBlendAlpha = D3D12_BLEND_ZERO,
+			.DestBlendAlpha = D3D12_BLEND_ZERO,
+			.BlendOpAlpha = D3D12_BLEND_OP_ADD,
+			.LogicOp = D3D12_LOGIC_OP_NOOP,
+			.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
+		};
+		if (const HRESULT result = device->CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline state acquired.");
 	}
 
-	void Direct3D12SubSystem::PopulateCommands()
+	void Direct3D12SubSystem::PopulateCommands(const UINT bufferIndex)
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command allocator.");
 		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
@@ -466,13 +429,8 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature.");
-		commandList->SetGraphicsRootSignature(rootSignature.Get());
-
-		const auto viewPort = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.X()), .Height = static_cast<FLOAT>(resolution.Y()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
 		commandList->RSSetViewports(1, &viewPort);
-		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.X()), .bottom = static_cast<LONG>(resolution.Y())};
-		commandList->RSSetScissorRects(1, &rect);
+		commandList->RSSetScissorRects(1, &viewRect);
 
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
@@ -480,13 +438,13 @@ namespace PonyEngine::Render
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = buffers[bufferIndex].Get(),
+				.pResource = backBuffers[bufferIndex].Get(),
 				.Subresource = 0,
 				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
 				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 			}
 		};
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as render target.", reinterpret_cast<std::uintptr_t>(buffers[bufferIndex].Get()), bufferIndex);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as render target.", reinterpret_cast<std::uintptr_t>(backBuffers[bufferIndex].Get()), bufferIndex);
 		commandList->ResourceBarrier(1, &renderTargetBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render targets.");
@@ -494,6 +452,9 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
 		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature.");
+		commandList->SetGraphicsRootSignature(rootSignature.Get());
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
 		commandList->SetPipelineState(pipelineState.Get());
@@ -516,13 +477,13 @@ namespace PonyEngine::Render
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = buffers[bufferIndex].Get(),
+				.pResource = backBuffers[bufferIndex].Get(),
 				.Subresource = 0,
 				.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
 				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
 			}
 		};
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as present.", reinterpret_cast<std::uintptr_t>(buffers[bufferIndex].Get()), bufferIndex);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as present.", reinterpret_cast<std::uintptr_t>(backBuffers[bufferIndex].Get()), bufferIndex);
 		commandList->ResourceBarrier(1, &presentBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Close command list.");
@@ -599,39 +560,5 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "'{}' guid acquired.", PonyBase::Utility::ToString(acquiredGuid));
 
 		return acquiredGuid;
-	}
-
-	std::unique_ptr<Microsoft::WRL::ComPtr<ID3D12Resource2>[]> Direct3D12SubSystem::CreateBuffers() const
-	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create buffer array. Buffer count: '{}'.", bufferCount);
-		auto resourceBuffers = std::unique_ptr<Microsoft::WRL::ComPtr<ID3D12Resource2>[]>(new Microsoft::WRL::ComPtr<ID3D12Resource2>[bufferCount]);
-		for (UINT i = 0u; i < bufferCount; ++i)
-		{
-			resourceBuffers[i] = Microsoft::WRL::ComPtr<ID3D12Resource2>();
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Buffer array created.");
-
-		return resourceBuffers;
-	}
-
-	std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]> Direct3D12SubSystem::CreateRtvHandles() const
-	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create RTV handle array. Buffer count: '{}'.", bufferCount);
-		auto createdRtvHandles = std::unique_ptr<D3D12_CPU_DESCRIPTOR_HANDLE[]>(new D3D12_CPU_DESCRIPTOR_HANDLE[bufferCount]);
-		for (UINT i = 0u; i < bufferCount; ++i)
-		{
-			createdRtvHandles[i] = D3D12_CPU_DESCRIPTOR_HANDLE();
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "RTV handle array created.");
-
-		return createdRtvHandles;
-	}
-
-	void Direct3D12SubSystem::ReleaseBuffers() const noexcept
-	{
-		for (UINT i = 0u; i < bufferCount; ++i)
-		{
-			buffers[i].Reset();
-		}
 	}
 }
