@@ -38,20 +38,20 @@ export namespace PonyEngine::Render
 		Direct3D12IndexFormat& operator =(Direct3D12IndexFormat&&) noexcept = default;
 
 	private:
-		[[nodiscard("Pure constructor")]]
-		static DXGI_FORMAT GetFormat(UINT indexSize);
-
 		UINT indexSize;
-		DXGI_FORMAT indexFormat;
 	};
 }
 
 namespace PonyEngine::Render
 {
+	[[nodiscard("Pure constructor")]]
+	DXGI_FORMAT GetFormat(UINT indexSize);
+
 	Direct3D12IndexFormat::Direct3D12IndexFormat(const UINT indexSize) :
-		indexSize{indexSize},
-		indexFormat{GetFormat(this->indexSize)}
+		indexSize{indexSize}
 	{
+		[[maybe_unused]]
+		DXGI_FORMAT format = GetFormat(indexSize); // Throws an exception if the indexSize is incorrect to invalidate the instance.
 	}
 
 	UINT Direct3D12IndexFormat::IndexSize() const noexcept
@@ -61,10 +61,10 @@ namespace PonyEngine::Render
 
 	DXGI_FORMAT Direct3D12IndexFormat::IndexFormat() const noexcept
 	{
-		return indexFormat;
+		return GetFormat(indexSize);
 	}
 
-	DXGI_FORMAT Direct3D12IndexFormat::GetFormat(const UINT indexSize)
+	DXGI_FORMAT GetFormat(const UINT indexSize)
 	{
 		switch (indexSize)
 		{

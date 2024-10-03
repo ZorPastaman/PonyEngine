@@ -92,8 +92,8 @@ namespace PonyEngine::Render
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
 		resolution(params.resolution),
 		engine{&engine},
-		dxgiSubSystem(*this, BufferCount, RtvFormat),
-		direct3D12SubSystem(*this, BufferCount, RtvFormat, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
+		dxgiSubSystem(*this),
+		direct3D12SubSystem(*this, params.featureLevel, params.commandQueuePriority, params.fenceTimeout)
 	{
 	}
 
@@ -106,7 +106,7 @@ namespace PonyEngine::Render
 			const HWND windowHandle = windowSystem->WindowHandle();
 			renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(windowHandle));
 
-			dxgiSubSystem.AcquireSwapChain(direct3D12SubSystem.GetCommandQueue(), windowHandle, renderResolution);
+			dxgiSubSystem.Initialize(direct3D12SubSystem.GetCommandQueue(), windowHandle, renderResolution, RtvFormat, BufferCount);
 		}
 		else
 		{
@@ -114,19 +114,19 @@ namespace PonyEngine::Render
 		}
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
-		IDXGISwapChain4* const swapChain = dxgiSubSystem.GetSwapChain();
+		Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffers[BufferCount];
 		for (UINT i = 0u; i < BufferCount; ++i)
 		{
-			if (const HRESULT result = swapChain->GetBuffer(i, IID_PPV_ARGS(direct3D12SubSystem.GetBufferPointer(i))); FAILED(result))
+			if (const HRESULT result = dxgiSubSystem.GetBuffer(i, backBuffers[i].GetAddressOf()); FAILED(result))
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get swap chain buffer at index '{}' with '0x{:X}' result.", i, static_cast<std::make_unsigned_t<HRESULT>>(result)));
 			}
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(direct3D12SubSystem.GetBuffer(i)));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(backBuffers[i].Get()));
 		}
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Initialize Direct3D 12 sub-system.");
-		direct3D12SubSystem.Initialize(renderResolution);
+		direct3D12SubSystem.Initialize(renderResolution, RtvFormat, backBuffers);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -142,10 +142,8 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of previous frame.");
 		direct3D12SubSystem.WaitForEndOfFrame();
 
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Update back buffer index.");
-		direct3D12SubSystem.BufferIndex() = dxgiSubSystem.GetSwapChain()->GetCurrentBackBufferIndex();
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Populate commands.");
-		direct3D12SubSystem.PopulateCommands();
+		direct3D12SubSystem.PopulateCommands(dxgiSubSystem.GetCurrentBackBufferIndex());
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Execute.");
 		direct3D12SubSystem.Execute();
 
