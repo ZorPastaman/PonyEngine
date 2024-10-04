@@ -43,6 +43,7 @@ import :Direct3D12Fence;
 import :Direct3D12Mesh;
 import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
+import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
 {
@@ -303,61 +304,28 @@ namespace PonyEngine::Render
 			}
 		};
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
-		auto vertexShader = std::ifstream("VertexShader.cso", std::ios::binary | std::ios::ate);
-		if (!vertexShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 vertex shader file."));
-		}
-		std::size_t vertexShaderSize = vertexShader.tellg();
-		auto vertexShaderData = std::vector<char>(vertexShaderSize);
-		vertexShader.seekg(std::ios::beg);
-		if (!vertexShader.read(vertexShaderData.data(), vertexShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 vertex shader file."));
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
-		auto pixelShader = std::ifstream("PixelShader.cso", std::ios::binary | std::ios::ate);
-		if (!pixelShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 pixel shader file."));
-		}
-		std::size_t pixelShaderSize = pixelShader.tellg();
-		auto pixelShaderData = std::vector<char>(pixelShaderSize);
-		pixelShader.seekg(std::ios::beg);
-		if (!pixelShader.read(pixelShaderData.data(), pixelShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 pixel shader file."));
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
-
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 root signature.");
-		auto rootSignatureShader = std::ifstream("RootSignature.cso", std::ios::binary | std::ios::ate);
-		if (!rootSignatureShader.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 root signature shader file."));
-		}
-		std::size_t rootSignatureShaderSize = rootSignatureShader.tellg();
-		auto rootSignatureShaderData = std::vector<char>(rootSignatureShaderSize);
-		rootSignatureShader.seekg(std::ios::beg);
-		if (!rootSignatureShader.read(rootSignatureShaderData.data(), rootSignatureShaderSize))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 root signature shader file."));
-		}
-		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShaderData.data(), rootSignatureShaderData.size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
+		auto rootSignatureShader = Direct3D12Shader("RootSignature");
+		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShader.Data(), rootSignatureShader.Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.Get()));
 
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		auto vertexShader = Direct3D12Shader("VertexShader");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		auto pixelShader = Direct3D12Shader("PixelShader");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
+
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 graphics pipeline state.");
 		D3D12_GRAPHICS_PIPELINE_STATE_DESC gfxPsd{};
 		gfxPsd.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = vertexLayout, .NumElements = _countof(vertexLayout)};
 		gfxPsd.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED;
-		gfxPsd.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShaderData.data(), .BytecodeLength = vertexShaderData.size()};
-		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShaderData.data(), .BytecodeLength = pixelShaderData.size()};
+		gfxPsd.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size()};
+		gfxPsd.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShader.Data(), .BytecodeLength = pixelShader.Size()};
 		gfxPsd.pRootSignature = rootSignature.Get();
 		gfxPsd.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 		gfxPsd.NumRenderTargets = 1;
@@ -424,9 +392,6 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
 		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature.");
-		commandList->SetGraphicsRootSignature(rootSignature.Get());
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
 		commandList->SetPipelineState(pipelineState.Get());
