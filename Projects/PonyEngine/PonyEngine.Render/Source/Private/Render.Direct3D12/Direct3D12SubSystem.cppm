@@ -39,6 +39,7 @@ import PonyEngine.Core;
 
 import PonyEngine.Render.Core;
 
+import :Direct3D12Fence;
 import :Direct3D12Mesh;
 import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
@@ -68,7 +69,7 @@ export namespace PonyEngine::Render
 
 		void PopulateCommands(UINT bufferIndex);
 		void Execute() const;
-		void WaitForEndOfFrame();
+		void WaitForEndOfFrame() const;
 
 		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh);
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
@@ -82,14 +83,9 @@ export namespace PonyEngine::Render
 
 		PonyBase::Math::RGBA<FLOAT> clearColor;
 
-		UINT64 fenceValue;
-		DWORD fenceTimeout;
-
 		IRenderer* renderer;
 
 		GUID guid;
-
-		HANDLE fenceEvent;
 
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug;
@@ -98,13 +94,12 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
+		std::unique_ptr<Direct3DFence> fence;
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
 
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
-
-		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
 
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
@@ -121,8 +116,6 @@ namespace PonyEngine::Render
 {
 	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
 		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
-		fenceValue{0LL},
-		fenceTimeout{fenceTimeout},
 		renderer{&renderer},
 		guid{AcquireGuid()},
 		viewPort{},
@@ -130,13 +123,6 @@ namespace PonyEngine::Render
 		nextRenderObjectId{1}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create fence event.");
-		if ((fenceEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create fence event. Error code: '0x{:X}'.", GetLastError()));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fenceEvent));
 
 #ifdef _DEBUG
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 debug interface.");
@@ -185,12 +171,7 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 fence.");
-		if (const HRESULT result = device->CreateFence(fenceValue++, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 fence with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
+		fence.reset(new Direct3DFence(*this->renderer, device.Get(), fenceTimeout));
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
@@ -203,10 +184,6 @@ namespace PonyEngine::Render
 		rootSignature.Reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature released.");
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 fence.");
-		fence.Reset();
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence released.");
-
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 rtv handles.");
 		rtvHandles.clear();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv handles released.");
@@ -214,6 +191,8 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 back buffers.");
 		backBuffers.clear();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 back buffers released.");
+
+		fence.reset();
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command list.");
 		commandList.Reset();
@@ -236,13 +215,6 @@ namespace PonyEngine::Render
 		debug.Reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 debug interface released.");
 #endif
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Close fence event.");
-		if (!CloseHandle(fenceEvent)) [[unlikely]]
-		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Error, "Failed to close fence event. Error code: '0x{:X}'", GetLastError());
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event closed.");
 	}
 
 	PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() noexcept
@@ -500,31 +472,9 @@ namespace PonyEngine::Render
 		commandQueue->ExecuteCommandLists(1, commandLists);
 	}
 
-	void Direct3D12SubSystem::WaitForEndOfFrame()
+	void Direct3D12SubSystem::WaitForEndOfFrame() const
 	{
-		const UINT64 currentFenceValue = fenceValue++;
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Fence value: '{}'.", currentFenceValue);
-		if (const HRESULT result = commandQueue->Signal(fence.Get(), currentFenceValue); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentFenceValue));
-		}
-
-		if (fence->GetCompletedValue() < currentFenceValue)
-		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, fenceTimeout);
-			if (const HRESULT result = fence->SetEventOnCompletion(currentFenceValue, fenceEvent); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			if (const DWORD result = WaitForSingleObjectEx(fenceEvent, fenceTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-		}
-		else
-		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
-		}
+		fence->Wait(commandQueue.Get());
 	}
 
 	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)

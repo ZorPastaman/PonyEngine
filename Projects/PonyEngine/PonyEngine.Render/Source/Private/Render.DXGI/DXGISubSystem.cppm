@@ -122,16 +122,12 @@ namespace PonyEngine::Render
 
 	UINT DXGISubSystem::GetCurrentBackBufferIndex() const noexcept
 	{
-		assert(swapChain && "The swap chain is nullptr.");
-
 		return swapChain->GetCurrentBackBufferIndex();
 	}
 
 	template<typename T>
 	HRESULT DXGISubSystem::GetBuffer(const UINT bufferIndex, T** const buffer) const noexcept
 	{
-		assert(swapChain && "The swap chain is nullptr.");
-
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
@@ -167,9 +163,7 @@ namespace PonyEngine::Render
 
 	void DXGISubSystem::Present() const
 	{
-		assert(swapChain && "The swap chain is nullptr.");
-
-		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]] // TODO: Add SyncInterval as V-Sync setting to params
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to present swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
