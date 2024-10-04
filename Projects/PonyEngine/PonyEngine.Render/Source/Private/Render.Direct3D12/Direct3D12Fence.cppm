@@ -31,22 +31,25 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3DFence(IRenderer& renderer, ID3D12Device10* device, DWORD fenceTimeout);
+		Direct3DFence(IRenderer& renderer, ID3D12CommandQueue* commandQueue, DWORD fenceTimeout);
 		Direct3DFence(const Direct3DFence&) = delete;
-		Direct3DFence(Direct3DFence&&) = delete;
+		[[nodiscard("Pure constructor")]]
+		Direct3DFence(Direct3DFence&& other) noexcept = default;
 
 		~Direct3DFence() noexcept;
 
-		void Wait(ID3D12CommandQueue* commandQueue);
+		void Wait();
 
 		Direct3DFence& operator =(const Direct3DFence&) = delete;
-		Direct3DFence& operator =(Direct3DFence&&) = delete;
+		Direct3DFence& operator =(Direct3DFence&&) noexcept = default;
 
 	private:
 		UINT64 fenceValue;
 		DWORD fenceTimeout;
 
 		IRenderer* renderer;
+
+		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 
 		HANDLE fenceEvent;
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
@@ -55,11 +58,18 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3DFence::Direct3DFence(IRenderer& renderer, ID3D12Device10* const device, const DWORD fenceTimeout) :
+	Direct3DFence::Direct3DFence(IRenderer& renderer, ID3D12CommandQueue* const commandQueue, const DWORD fenceTimeout) :
 		fenceValue{0LL},
 		fenceTimeout{fenceTimeout},
-		renderer{&renderer}
+		renderer{&renderer},
+		commandQueue(commandQueue)
 	{
+		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+		if (const HRESULT result = commandQueue->GetDevice(IID_PPV_ARGS(device.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get Direct3D 12 device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create fence event.");
 		if ((fenceEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
 		{
@@ -89,7 +99,7 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event closed.");
 	}
 
-	void Direct3DFence::Wait(ID3D12CommandQueue* const commandQueue)
+	void Direct3DFence::Wait()
 	{
 		const UINT64 currentFenceValue = fenceValue++;
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Fence value: '{}'.", currentFenceValue);
