@@ -26,7 +26,7 @@ import PonyBase.StringUtility;
 import :Direct3D12Mesh;
 import :Direct3D12VertexBuffer;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render // TODO: Transform this helper to a manager class. Btw, it will make it easier to support IRenderer context
 {
 	[[nodiscard("Pure constructor")]]
 	Direct3D12Mesh CreateDirect3D12Mesh(ID3D12Device10* device, const PonyBase::Geometry::Mesh& mesh);
