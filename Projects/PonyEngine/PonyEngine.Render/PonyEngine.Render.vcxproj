@@ -45,6 +45,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryDestroyer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Camera.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexBuffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Material.cppm" />
