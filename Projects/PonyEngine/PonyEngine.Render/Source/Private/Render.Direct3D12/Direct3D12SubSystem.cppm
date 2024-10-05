@@ -39,6 +39,7 @@ import PonyEngine.Core;
 
 import PonyEngine.Render.Core;
 
+import :Direct3D12Camera;
 import :Direct3D12Fence;
 import :Direct3D12Material;
 import :Direct3D12Mesh;
@@ -103,8 +104,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
 
-		D3D12_VIEWPORT viewPort;
-		D3D12_RECT viewRect;
+		std::unique_ptr<Direct3D12Camera> camera;
 
 		std::unique_ptr<Direct3D12Material> material;
 
@@ -119,8 +119,6 @@ namespace PonyEngine::Render
 		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
 		renderer{&renderer},
 		guid{AcquireGuid()},
-		viewPort{},
-		viewRect{},
 		nextRenderObjectId{1}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -181,6 +179,10 @@ namespace PonyEngine::Render
 		material.reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material released.");
 
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 camera.");
+		camera.reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 camera released.");
+
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 rtv handles.");
 		rtvHandles.clear();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv handles released.");
@@ -231,9 +233,8 @@ namespace PonyEngine::Render
 
 	void Direct3D12SubSystem::Initialize(const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers)
 	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set Direct3D 12 view port and view rect to resolution of '{}'.", resolution.ToString());
-		viewPort = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.X()), .Height = static_cast<FLOAT>(resolution.Y()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
-		viewRect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.X()), .bottom = static_cast<LONG>(resolution.Y())};
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set Direct3D 12 camera with resolution of '{}'.", resolution.ToString());
+		camera.reset(new Direct3D12Camera(resolution));
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
 		backBuffers.resize(buffers.size());
@@ -304,8 +305,8 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		commandList->RSSetViewports(1, &viewPort);
-		commandList->RSSetScissorRects(1, &viewRect);
+		commandList->RSSetViewports(1, &camera->ViewPort());
+		commandList->RSSetScissorRects(1, &camera->ViewRect());
 
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
