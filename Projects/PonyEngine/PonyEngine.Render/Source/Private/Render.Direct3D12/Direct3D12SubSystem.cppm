@@ -45,6 +45,7 @@ import :Direct3D12Material;
 import :Direct3D12Mesh;
 import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
+import :Direct3D12RenderTarget;
 import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
@@ -99,10 +100,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
 		std::unique_ptr<Direct3DFence> fence;
 
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
-
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+		std::unique_ptr<Direct3D12RenderTarget> renderTarget;
 
 		std::unique_ptr<Direct3D12Camera> camera;
 
@@ -183,13 +181,9 @@ namespace PonyEngine::Render
 		camera.reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 camera released.");
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 rtv handles.");
-		rtvHandles.clear();
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv handles released.");
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 back buffers.");
-		backBuffers.clear();
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 back buffers released.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 render target manager.");
+		renderTarget.reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target manager released.");
 
 		fence.reset();
 
@@ -236,46 +230,9 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set Direct3D 12 camera with resolution of '{}'.", resolution.ToString());
 		camera.reset(new Direct3D12Camera(resolution));
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
-		backBuffers.resize(buffers.size());
-		for (std::size_t i = 0; i < backBuffers.size(); ++i)
-		{
-			backBuffers[i] = buffers[i];
-		}
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 rtv handles.");
-		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			.NumDescriptors = static_cast<UINT>(buffers.size()),
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		if (const HRESULT result = device->CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		rtvHandles.resize(buffers.size());
-		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
-		const UINT rtvDescriptorHandleIncrement = device->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		for (std::size_t i = 1; i < rtvHandles.size(); ++i)
-		{
-			rtvHandles[i].ptr = rtvHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 rtv descriptors acquired.");
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create render target views.");
-		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
-		{
-			.Format = rtvFormat,
-			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
-			.Texture2D = D3D12_TEX2D_RTV{}
-		};
-		for (std::size_t i = 0; i < buffers.size(); ++i)
-		{
-			device->CreateRenderTargetView(buffers[i].Get(), &rtvDescription, rtvHandles[i]);
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render target views created.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target manager.");
+		renderTarget.reset(new Direct3D12RenderTarget(device.Get(), buffers, rtvFormat));
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target manager created.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
 		const auto rootSignatureShader = Direct3D12Shader("RootSignature");
@@ -308,28 +265,32 @@ namespace PonyEngine::Render
 		commandList->RSSetViewports(1, &camera->ViewPort());
 		commandList->RSSetScissorRects(1, &camera->ViewRect());
 
+		ID3D12Resource2* const backBuffer = renderTarget->GetBackBuffer(bufferIndex);
+
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
 			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = backBuffers[bufferIndex].Get(),
+				.pResource = backBuffer,
 				.Subresource = 0,
 				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
 				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 			}
 		};
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as render target.", reinterpret_cast<std::uintptr_t>(backBuffers[bufferIndex].Get()), bufferIndex);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as render target.", reinterpret_cast<std::uintptr_t>(backBuffer), bufferIndex);
 		commandList->ResourceBarrier(1, &renderTargetBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render targets.");
-		commandList->OMSetRenderTargets(1, &rtvHandles[bufferIndex], false, nullptr);
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRtvHandle(bufferIndex);
+		commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
-		commandList->ClearRenderTargetView(rtvHandles[bufferIndex], clearColor.Span().data(), 0, nullptr);
+		commandList->ClearRenderTargetView(rtvHandle, clearColor.Span().data(), 0, nullptr);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
+		commandList->SetGraphicsRootSignature(material->GetRootSignature());
 		commandList->SetPipelineState(material->GetPipelineState());
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
@@ -350,13 +311,13 @@ namespace PonyEngine::Render
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = backBuffers[bufferIndex].Get(),
+				.pResource = backBuffer,
 				.Subresource = 0,
 				.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
 				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
 			}
 		};
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as present.", reinterpret_cast<std::uintptr_t>(backBuffers[bufferIndex].Get()), bufferIndex);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as present.", reinterpret_cast<std::uintptr_t>(backBuffer), bufferIndex);
 		commandList->ResourceBarrier(1, &presentBarrier);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Close command list.");

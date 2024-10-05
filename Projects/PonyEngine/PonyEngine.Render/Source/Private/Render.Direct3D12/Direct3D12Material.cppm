@@ -33,6 +33,8 @@ export namespace PonyEngine::Render
 		~Direct3D12Material() noexcept = default;
 
 		[[nodiscard("Pure function")]]
+		ID3D12RootSignature* GetRootSignature() const noexcept;
+		[[nodiscard("Pure function")]]
 		ID3D12PipelineState* GetPipelineState() const noexcept;
 
 		Direct3D12Material& operator =(const Direct3D12Material& other) noexcept = default;
@@ -121,6 +123,11 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+	}
+
+	ID3D12RootSignature* Direct3D12Material::GetRootSignature() const noexcept
+	{
+		return rootSignature.Get();
 	}
 
 	ID3D12PipelineState* Direct3D12Material::GetPipelineState() const noexcept
