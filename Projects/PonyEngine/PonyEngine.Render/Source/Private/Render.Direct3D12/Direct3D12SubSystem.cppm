@@ -45,6 +45,7 @@ import :Direct3D12Material;
 import :Direct3D12Mesh;
 import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
+import :Direct3D12RenderObjectManager;
 import :Direct3D12RenderTarget;
 import :Direct3D12Shader;
 
@@ -75,8 +76,8 @@ export namespace PonyEngine::Render
 		void Execute() const;
 		void WaitForEndOfFrame() const;
 
-		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh);
-		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
+		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) const;
+		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) const noexcept;
 
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
@@ -106,8 +107,7 @@ export namespace PonyEngine::Render
 
 		std::unique_ptr<Direct3D12Material> material;
 
-		std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects;
-		std::size_t nextRenderObjectId;
+		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager;
 	};
 }
 
@@ -116,8 +116,7 @@ namespace PonyEngine::Render
 	Direct3D12SubSystem::Direct3D12SubSystem(IRenderer& renderer, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
 		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
 		renderer{&renderer},
-		guid{AcquireGuid()},
-		nextRenderObjectId{1}
+		guid{AcquireGuid()}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
 
@@ -169,10 +168,14 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
 		fence.reset(new Direct3DFence(*this->renderer, commandQueue.Get(), fenceTimeout));
+
+		renderObjectManager.reset(new Direct3D12RenderObjectManager(device.Get()));
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
 	{
+		renderObjectManager.reset();
+
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 material.");
 		material.reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material released.");
@@ -294,10 +297,10 @@ namespace PonyEngine::Render
 		commandList->SetPipelineState(material->GetPipelineState());
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
-		for (const auto& renderObject : renderObjects)
+		for (auto renderObject = renderObjectManager->RenderObjectBegin(); renderObject != renderObjectManager->RenderObjectEnd(); ++renderObject)
 		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject.first.id);
-			const Direct3D12Mesh& renderMesh = renderObject.second.MeshResource(); // TODO: rename meshResource to renderMesh.
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject->first.id);
+			const Direct3D12Mesh& renderMesh = renderObject->second.RenderMesh();
 			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			commandList->IASetVertexBuffers(0, 1, &renderMesh.VerticesView());
 			commandList->IASetVertexBuffers(1, 1, &renderMesh.VertexColorsView());
@@ -339,26 +342,14 @@ namespace PonyEngine::Render
 		fence->Wait();
 	}
 
-	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)
+	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) const
 	{
-		const size_t id = nextRenderObjectId++;
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
-		const auto renderMesh = CreateDirect3D12Mesh(device.Get(), mesh);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created.");
-
-		renderObjects.emplace(id, renderMesh);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object created. ID: '{}'.", id);
-
-		return RenderObjectHandle{.id = id};
+		return renderObjectManager->CreateRenderObject(mesh);
 	}
 
-	void Direct3D12SubSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
+	void Direct3D12SubSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) const noexcept
 	{
-		if (const auto position = renderObjects.find(renderObjectHandle); position != renderObjects.cend()) [[likely]]
-		{
-			renderObjects.erase(position);
-		}
+		renderObjectManager->DestroyRenderObject(renderObjectHandle);
 	}
 
 	GUID Direct3D12SubSystem::AcquireGuid() const

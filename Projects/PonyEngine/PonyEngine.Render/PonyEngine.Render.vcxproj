@@ -51,6 +51,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Material.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Mesh.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHelper.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObjectManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTarget.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Shader.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm" />
