@@ -28,7 +28,7 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObject() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		const Direct3D12Mesh& MeshResource() const noexcept;
+		const Direct3D12Mesh& RenderMesh() const noexcept;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept = default;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept = default;
@@ -45,7 +45,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	const Direct3D12Mesh& Direct3D12RenderObject::MeshResource() const noexcept
+	const Direct3D12Mesh& Direct3D12RenderObject::RenderMesh() const noexcept
 	{
 		return meshResource;
 	}
