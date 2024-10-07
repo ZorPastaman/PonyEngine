@@ -19,7 +19,6 @@ import <unordered_map>;
 import PonyEngine.Render;
 
 import :Direct3D12Mesh;
-import :Direct3D12MeshHelper;
 import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
@@ -37,7 +36,7 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh);
+		RenderObjectHandle CreateRenderObject(const Direct3D12Mesh& mesh);
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -64,11 +63,10 @@ namespace PonyEngine::Render
 	{
 	}
 
-	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)
+	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const Direct3D12Mesh& mesh)
 	{
 		const size_t id = nextRenderObjectId++;
-		const auto renderMesh = CreateDirect3D12Mesh(device.Get(), mesh);
-		renderObjects.emplace(id, renderMesh);
+		renderObjects.emplace(id, mesh);
 
 		return RenderObjectHandle{.id = id};
 	}

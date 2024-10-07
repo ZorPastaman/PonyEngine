@@ -45,7 +45,7 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBackBufferIndex() const noexcept;
-		template<typename T> [[nodiscard("Pure function")]]
+		template<typename T>
 		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
 
 		void Initialize(IUnknown* device, HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
@@ -88,7 +88,7 @@ namespace PonyEngine::Render
 		factoryFlags |= DXGI_CREATE_FACTORY_DEBUG;
 #endif
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI factory. FactoryFlags: '0x{:X}'.", factoryFlags);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire DXGI factory. Factory flags: '0x{:X}'.", factoryFlags);
 		if (const HRESULT result = CreateDXGIFactory2(factoryFlags, IID_PPV_ARGS(factory.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
@@ -122,19 +122,26 @@ namespace PonyEngine::Render
 
 	UINT DXGISubSystem::GetCurrentBackBufferIndex() const noexcept
 	{
+		assert(swapChain && "The swap chain is nullptr.");
+
 		return swapChain->GetCurrentBackBufferIndex();
 	}
 
 	template<typename T>
 	HRESULT DXGISubSystem::GetBuffer(const UINT bufferIndex, T** const buffer) const noexcept
 	{
+		assert(swapChain && "The swap chain is nullptr.");
+
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
 	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'.", reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd),
-			resolution.ToString());
+		assert(device && "The device is nullptr.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.", 
+			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd), resolution.ToString(), static_cast<int>(rtvFormat), bufferCount);
+
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
 			.Width = resolution.X(),
@@ -147,7 +154,7 @@ namespace PonyEngine::Render
 			.Scaling = DXGI_SCALING_STRETCH,
 			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
 			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
-			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_MODE_SWITCH | DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
+			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 		};
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> acquiredSwapChain;
 		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
@@ -158,12 +165,22 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
+		if (const HRESULT result = factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to make window association with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (const HRESULT result = swapChain->SetFullscreenState(false, nullptr); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to disable fullscreen with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
 	}
 
 	void DXGISubSystem::Present() const
 	{
-		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]] // TODO: Add SyncInterval as V-Sync setting to params
+		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to present swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
