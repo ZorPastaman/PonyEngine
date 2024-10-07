@@ -70,9 +70,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Fence.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -89,6 +86,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObjectManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GraphicsPipeline.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
