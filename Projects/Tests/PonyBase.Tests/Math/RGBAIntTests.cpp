@@ -443,13 +443,13 @@ namespace Math
 
 			[[maybe_unused]] constexpr std::uint8_t min = color.Min();
 			[[maybe_unused]] constexpr std::uint8_t max = color.Max();
-			[[maybe_unused]] constexpr auto minMax = color.MinMax();
+			[[maybe_unused]] constexpr std::pair<std::uint8_t, std::uint8_t> minMax = color.MinMax();
 
 			[[maybe_unused]] constexpr bool isBlack = color.IsBlack();
 			[[maybe_unused]] constexpr bool isWhite = color.IsWhite();
 			[[maybe_unused]] constexpr bool isTransparent = color.IsTransparent();
 
-			[[maybe_unused]] constexpr auto span = color.Span();
+			[[maybe_unused]] constexpr auto spanElement = color.Span()[0];
 
 			[[maybe_unused]] constexpr auto gotRgb = static_cast<PonyBase::Math::RGBInt<std::uint8_t>>(color);
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyBase::Math::Vector4<std::uint8_t>>(color);

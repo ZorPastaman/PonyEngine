@@ -1799,12 +1799,12 @@ namespace Math
 			[[maybe_unused]] constexpr float y = vector.Y();
 			[[maybe_unused]] constexpr float z = vector.Z();
 
-			[[maybe_unused]] constexpr auto span = vector.Span();
+			[[maybe_unused]] constexpr auto spanElement = vector.Span()[0];
 
 			[[maybe_unused]] constexpr float magnitudeSquared = vector.MagnitudeSquared();
 			[[maybe_unused]] constexpr float min = vector.Min();
 			[[maybe_unused]] constexpr float max = vector.Max();
-			[[maybe_unused]] constexpr auto minMax = vector.MinMax();
+			[[maybe_unused]] constexpr std::pair<float, float> minMax = vector.MinMax();
 			[[maybe_unused]] constexpr float thisSum = vector.Sum();
 			[[maybe_unused]] constexpr PonyBase::Math::Vector4<float> swapped = vector.Swapped();
 

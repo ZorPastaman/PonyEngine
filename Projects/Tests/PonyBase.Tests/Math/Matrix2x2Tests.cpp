@@ -1786,8 +1786,8 @@ namespace Math
 			[[maybe_unused]] constexpr int m11 = matrix.M11();
 			[[maybe_unused]] constexpr auto component = matrix.Component(1);
 
-			[[maybe_unused]] constexpr auto span = matrix.Span();
-			[[maybe_unused]] constexpr auto columnSpan = matrix.Span(1);
+			[[maybe_unused]] constexpr auto spanElement = matrix.Span()[0];
+			[[maybe_unused]] constexpr auto columnSpanElement = matrix.Span(1)[0];
 
 			[[maybe_unused]] constexpr PonyBase::Math::Vector2<int> row = matrix.Row(1);
 			[[maybe_unused]] constexpr PonyBase::Math::Vector2<int> column = matrix.Column(0);
