@@ -757,7 +757,7 @@ namespace Math
 			[[maybe_unused]] constexpr float y = quaternion.Y();
 			[[maybe_unused]] constexpr float z = quaternion.Z();
 			[[maybe_unused]] constexpr float w = quaternion.W();
-			[[maybe_unused]] constexpr auto span = quaternion.Span();
+			[[maybe_unused]] constexpr auto spanElement = quaternion.Span()[0];
 
 			[[maybe_unused]] constexpr float magnitudeSquared = quaternion.MagnitudeSquared();
 

@@ -936,13 +936,13 @@ namespace Math
 			[[maybe_unused]] constexpr float b = color.B();
 			[[maybe_unused]] constexpr float a = color.A();
 
-			[[maybe_unused]] constexpr auto span = color.Span();
+			[[maybe_unused]] constexpr auto spanElement = color.Span()[0];
 
 			[[maybe_unused]] constexpr auto grayscale = color.Grayscale();
 
 			[[maybe_unused]] constexpr auto min = color.Min();
 			[[maybe_unused]] constexpr auto max = color.Max();
-			[[maybe_unused]] constexpr auto minMax = color.MinMax();
+			[[maybe_unused]] constexpr std::pair<float, float> minMax = color.MinMax();
 
 			[[maybe_unused]] constexpr bool isBlack = color.IsBlack();
 			[[maybe_unused]] constexpr bool isAlmostBlack = color.IsAlmostBlack();
