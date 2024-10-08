@@ -21,7 +21,7 @@ import <cstdint>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.Math;
+import PonyBase.Screen;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -48,7 +48,7 @@ export namespace PonyEngine::Render
 		template<typename T>
 		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
 
-		void Initialize(IUnknown* device, HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
+		void Initialize(IUnknown* device, HWND hWnd, const PonyBase::Screen::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 
 		void Present() const;
 
@@ -135,7 +135,7 @@ namespace PonyEngine::Render
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
-	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
+	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyBase::Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		assert(device && "The device is nullptr.");
 
@@ -144,8 +144,8 @@ namespace PonyEngine::Render
 
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
-			.Width = resolution.X(),
-			.Height = resolution.Y(),
+			.Width = resolution.Width(),
+			.Height = resolution.Height(),
 			.Format = rtvFormat,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},

@@ -22,6 +22,7 @@ import <exception>;
 
 import PonyBase.Core;
 import PonyBase.Math;
+import PonyBase.Screen;
 
 import PonyDebug.Log;
 
@@ -86,7 +87,7 @@ export namespace Application
 		/// @brief Sets up the frame rate system.
 		void SetupFrameRateSystem() const noexcept;
 
-		static constexpr auto DefaultResolution = PonyBase::Math::Vector2<unsigned int>(1280u, 720u);
+		static constexpr auto DefaultResolution = PonyBase::Screen::Resolution<unsigned int>(1280u, 720u);
 		static constexpr bool DefaultWindowed = false;
 
 		PonyEngine::Core::IApplication* application; ///< Application.
@@ -180,7 +181,7 @@ namespace Application
 			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
 			const bool windowed = DefaultWindowed;
-			const auto size = windowed ? static_cast<PonyBase::Math::Vector2<int>>(DefaultResolution) : PonyEngine::Window::GetDisplaySize();
+			const auto size = windowed ? DefaultResolution : PonyEngine::Window::GetDisplaySize();
 
 			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->WindowParams();
 			windowParams.title = L"Pony Engine Game";

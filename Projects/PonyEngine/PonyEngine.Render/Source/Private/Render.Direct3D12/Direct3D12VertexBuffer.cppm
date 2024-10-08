@@ -19,7 +19,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& verticesResource, UINT vertexSize, UINT vertexCount) noexcept;
+		Direct3D12VertexBuffer(ID3D12Resource2* verticesResource, UINT vertexSize, UINT vertexCount) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12VertexBuffer(const Direct3D12VertexBuffer& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -28,9 +28,7 @@ export namespace PonyEngine::Render
 		~Direct3D12VertexBuffer() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		Microsoft::WRL::ComPtr<ID3D12Resource2>& VerticesResource() noexcept;
-		[[nodiscard("Pure function")]]
-		const Microsoft::WRL::ComPtr<ID3D12Resource2>& VerticesResource() const noexcept;
+		ID3D12Resource2* GetVerticesResource() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		UINT VertexSize() const noexcept;
@@ -49,21 +47,16 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12VertexBuffer::Direct3D12VertexBuffer(const Microsoft::WRL::ComPtr<ID3D12Resource2>& verticesResource, const UINT vertexSize, const UINT vertexCount) noexcept :
+	Direct3D12VertexBuffer::Direct3D12VertexBuffer(ID3D12Resource2* const verticesResource, const UINT vertexSize, const UINT vertexCount) noexcept :
 		verticesResource(verticesResource),
 		vertexSize{vertexSize},
 		vertexCount{vertexCount}
 	{
 	}
 
-	Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12VertexBuffer::VerticesResource() noexcept
+	ID3D12Resource2* Direct3D12VertexBuffer::GetVerticesResource() const noexcept
 	{
-		return verticesResource;
-	}
-
-	const Microsoft::WRL::ComPtr<ID3D12Resource2>& Direct3D12VertexBuffer::VerticesResource() const noexcept
-	{
-		return verticesResource;
+		return verticesResource.Get();
 	}
 
 	UINT Direct3D12VertexBuffer::VertexSize() const noexcept

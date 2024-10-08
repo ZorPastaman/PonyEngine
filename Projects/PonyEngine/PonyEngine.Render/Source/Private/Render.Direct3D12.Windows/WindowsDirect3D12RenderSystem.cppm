@@ -17,13 +17,16 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
 
+import <array>;
 import <cstdint>;
 import <memory>;
 import <optional>;
+import <span>;
 import <stdexcept>;
 import <type_traits>;
 
 import PonyBase.Math;
+import PonyBase.Screen;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -85,7 +88,7 @@ export namespace PonyEngine::Render
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		std::optional<PonyBase::Math::Vector2<UINT>> resolution;
+		std::optional<PonyBase::Screen::Resolution<UINT>> resolution;
 
 		Core::IEngine* engine; ///< Engine.
 
@@ -97,7 +100,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
-		resolution(params.resolution),
+		resolution(params.resolution.has_value() ? std::optional<PonyBase::Screen::Resolution<UINT>>(static_cast<PonyBase::Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
 		engine{&engine},
 		dxgiSubSystem(CreateDXGISubSystem()),
 		direct3D12SubSystem(CreateDirect3D12SubSystem(params.featureLevel, params.commandQueuePriority, params.fenceTimeout))
@@ -117,12 +120,11 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Begin()
 	{
-		PonyBase::Math::Vector2<UINT> renderResolution;
+		PonyBase::Screen::Resolution<UINT> renderResolution;
 
 		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
 			const HWND windowHandle = windowSystem->WindowHandle();
-			renderResolution = resolution.has_value() ? resolution.value() : static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(windowHandle));
 
 			if (resolution.has_value())
 			{
@@ -131,7 +133,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderResolution = static_cast<PonyBase::Math::Vector2<UINT>>(Window::GetWindowClientSize(windowHandle));
+				renderResolution = static_cast<PonyBase::Screen::Resolution<UINT>>(Window::GetWindowClientSize(windowHandle));
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
 
@@ -145,7 +147,7 @@ namespace PonyEngine::Render
 		}
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffers[BufferCount];
+		std::array<Microsoft::WRL::ComPtr<ID3D12Resource2>, BufferCount> backBuffers;
 		for (UINT i = 0u; i < BufferCount; ++i)
 		{
 			if (const HRESULT result = dxgiSubSystem->GetBuffer(i, backBuffers[i].GetAddressOf()); FAILED(result)) [[unlikely]]
@@ -157,7 +159,12 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Initialize Direct3D 12 sub-system.");
-		direct3D12SubSystem->Initialize(renderResolution, RtvFormat, backBuffers);
+		std::array<ID3D12Resource2*, BufferCount> rawBackBuffers;
+		for (std::size_t i = 0; i < BufferCount; ++i)
+		{
+			rawBackBuffers[i] = backBuffers[i].Get();
+		}
+		direct3D12SubSystem->Initialize(renderResolution, rawBackBuffers, RtvFormat);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 

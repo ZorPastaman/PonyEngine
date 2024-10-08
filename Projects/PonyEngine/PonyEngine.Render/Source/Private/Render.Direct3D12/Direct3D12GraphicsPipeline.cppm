@@ -15,21 +15,26 @@ module;
 
 export module PonyEngine.Render.Direct3D12:Direct3D12GraphicsPipeline;
 
+import <cstdint>;
 import <memory>;
+import <span>;
+import <stdexcept>;
+import <type_traits>;
 
 import PonyBase.Geometry;
 import PonyBase.Math;
 import PonyBase.GuidUtility;
+import PonyBase.Screen;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
 import :Direct3D12Camera;
 import :Direct3D12Fence;
-import :Direct3D12RenderTarget;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
 import :Direct3D12Material;
+import :Direct3D12RenderTarget;
 import :Direct3D12RenderObjectManager;
 
 export namespace PonyEngine::Render
@@ -42,7 +47,7 @@ export namespace PonyEngine::Render
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline(Direct3D12GraphicsPipeline&&) = delete;
 
-		~Direct3D12GraphicsPipeline() noexcept = default;
+		~Direct3D12GraphicsPipeline() noexcept;
 
 		[[nodiscard("Pure function")]]
 		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
@@ -52,9 +57,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers);
+		void Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
-		void PopulateCommands(UINT bufferIndex);
+		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
 		void WaitForEndOfFrame() const;
 
@@ -66,8 +71,6 @@ export namespace PonyEngine::Render
 
 	private:
 		GUID guid;
-		PonyBase::Math::RGBA<FLOAT> clearColor;
-
 		IRenderer* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
@@ -87,10 +90,11 @@ namespace PonyEngine::Render
 {
 	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderer& renderer, ID3D12Device10* const device, const INT commandQueuePriority, const DWORD fenceTimeout) :
 		guid{PonyBase::Utility::AcquireGuid()},
-		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black),
 		renderer{&renderer}
 	{
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_DIRECT;
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline guid: '{}'.", PonyBase::Utility::ToString(guid));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 command queue. Priority: '{}'.", commandQueuePriority);
 		const auto commandQueueDescription = D3D12_COMMAND_QUEUE_DESC
@@ -120,20 +124,66 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence. Fence timeout: {}.", fenceTimeout);
 		fence.reset(new Direct3DFence(*this->renderer, commandQueue.Get(), fenceTimeout));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created.");
 
-		meshManager.reset(new Direct3D12MeshManager(device));
-		renderObjectManager.reset(new Direct3D12RenderObjectManager(device));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
+		meshManager.reset(new Direct3D12MeshManager(*this->renderer, device));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager created.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render object manager.");
+		renderObjectManager.reset(new Direct3D12RenderObjectManager(*this->renderer, device));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager created.");
+	}
+
+	Direct3D12GraphicsPipeline::~Direct3D12GraphicsPipeline() noexcept
+	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 render object manager.");
+		renderObjectManager.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 mesh manager.");
+		meshManager.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 material.");
+		material.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 camera.");
+		camera.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 camera destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 render target.");
+		renderTarget.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
+		fence.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command list.");
+		commandList.Reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list released.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command allocator.");
+		commandAllocator.Reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command allocator released.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command queue.");
+		commandQueue.Reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
 	}
 
 	PonyBase::Math::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() noexcept
 	{
-		return clearColor;
+		return renderTarget->ClearColor();
 	}
 
 	const PonyBase::Math::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() const noexcept
 	{
-		return clearColor;
+		return renderTarget->ClearColor();
 	}
 
 	ID3D12CommandQueue* Direct3D12GraphicsPipeline::GetCommandQueue() const
@@ -141,16 +191,19 @@ namespace PonyEngine::Render
 		return commandQueue.Get();
 	}
 
-	void Direct3D12GraphicsPipeline::Initialize(const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers)
+	void Direct3D12GraphicsPipeline::Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
 	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Set Direct3D 12 camera with resolution of '{}'.", resolution.ToString());
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 camera. Resolution: '{}'.", resolution.ToString());
 		camera.reset(new Direct3D12Camera(resolution));
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 camera created.");
 
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Get command queue device.");
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 		if (const HRESULT result = commandQueue->GetDevice(IID_PPV_ARGS(device.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Command queue device gotten.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target manager.");
 		renderTarget.reset(new Direct3D12RenderTarget(device.Get(), buffers, rtvFormat));
@@ -170,7 +223,7 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateCommands(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateCommands(const UINT bufferIndex) const
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command allocator.");
 		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
@@ -184,6 +237,7 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set camera view.");
 		commandList->RSSetViewports(1, &camera->ViewPort());
 		commandList->RSSetScissorRects(1, &camera->ViewRect());
 
@@ -207,20 +261,19 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render targets.");
 		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRtvHandle(bufferIndex);
 		commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color.");
-		commandList->ClearRenderTargetView(rtvHandle, clearColor.Span().data(), 0, nullptr);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color to {}.", renderTarget->ClearColor().ToString());
+		commandList->ClearRenderTargetView(rtvHandle, renderTarget->ClearColor().Span().data(), 0, nullptr);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
 		commandList->SetGraphicsRootSignature(material->GetRootSignature());
 		commandList->SetPipelineState(material->GetPipelineState());
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (auto renderObject = renderObjectManager->RenderObjectBegin(); renderObject != renderObjectManager->RenderObjectEnd(); ++renderObject)
 		{
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject->first.id);
 			const Direct3D12Mesh& renderMesh = renderObject->second.RenderMesh();
-			commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 			commandList->IASetVertexBuffers(0, 1, &renderMesh.VerticesView());
 			commandList->IASetVertexBuffers(1, 1, &renderMesh.VertexColorsView());
 			commandList->IASetIndexBuffer(&renderMesh.VertexIndicesView());

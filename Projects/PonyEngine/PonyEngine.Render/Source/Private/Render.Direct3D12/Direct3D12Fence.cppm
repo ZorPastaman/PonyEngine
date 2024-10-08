@@ -15,13 +15,13 @@ module;
 
 export module PonyEngine.Render.Direct3D12:Direct3D12Fence;
 
+import <cstdint>;
 import <stdexcept>;
+import <type_traits>;
 
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
-
-import PonyEngine.Render;
 
 import PonyEngine.Render.Core;
 
@@ -64,11 +64,13 @@ namespace PonyEngine::Render
 		renderer{&renderer},
 		commandQueue(commandQueue)
 	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Get command queue device.");
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
-		if (const HRESULT result = commandQueue->GetDevice(IID_PPV_ARGS(device.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = commandQueue->GetDevice(IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get Direct3D 12 device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Command queue device gotten.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create fence event.");
 		if ((fenceEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
@@ -97,6 +99,10 @@ namespace PonyEngine::Render
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Error, "Failed to close fence event. Error code: '0x{:X}'", GetLastError());
 		}
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Fence event closed.");
+
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command queue.");
+		commandQueue.Reset();
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
 	}
 
 	void Direct3DFence::Wait()

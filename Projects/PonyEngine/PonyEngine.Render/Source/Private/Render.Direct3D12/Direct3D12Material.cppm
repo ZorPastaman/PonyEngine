@@ -15,6 +15,7 @@ export module PonyEngine.Render.Direct3D12:Direct3D12Material;
 
 import <cstddef>;
 import <stdexcept>;
+import <type_traits>;
 
 import :Direct3D12Shader;
 

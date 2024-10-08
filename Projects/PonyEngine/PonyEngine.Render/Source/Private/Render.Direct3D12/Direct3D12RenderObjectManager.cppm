@@ -11,12 +11,18 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12:Direct3D12RenderObjectManager;
 
 import <cstddef>;
 import <unordered_map>;
 
+import PonyDebug.Log;
+
 import PonyEngine.Render;
+
+import PonyEngine.Render.Core;
 
 import :Direct3D12Mesh;
 import :Direct3D12RenderObject;
@@ -29,7 +35,7 @@ export namespace PonyEngine::Render
 		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
 
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderObjectManager(ID3D12Device10* device) noexcept;
+		Direct3D12RenderObjectManager(IRenderer& renderer, ID3D12Device10* device) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
@@ -48,6 +54,8 @@ export namespace PonyEngine::Render
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
 
 	private:
+		IRenderer* renderer;
+
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 
 		std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects;
@@ -57,7 +65,8 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(ID3D12Device10* const device) noexcept :
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderer& renderer, ID3D12Device10* const device) noexcept :
+		renderer{&renderer},
 		device(device),
 		nextRenderObjectId{1}
 	{
@@ -67,6 +76,7 @@ namespace PonyEngine::Render
 	{
 		const size_t id = nextRenderObjectId++;
 		renderObjects.emplace(id, mesh);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Render object created with '{}' id.", id);
 
 		return RenderObjectHandle{.id = id};
 	}
@@ -76,6 +86,7 @@ namespace PonyEngine::Render
 		if (const auto position = renderObjects.find(renderObjectHandle); position != renderObjects.cend()) [[likely]]
 		{
 			renderObjects.erase(position);
+			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Render object with '{}' id destroyed.", renderObjectHandle.id);
 		}
 	}
 

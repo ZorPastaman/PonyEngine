@@ -11,6 +11,8 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12:Direct3D12MeshManager;
 
 import <algorithm>;
@@ -18,12 +20,19 @@ import <cstddef>;
 import <cstdint>;
 import <cstring>;
 import <span>;
+import <stdexcept>;
+import <type_traits>;
 
 import PonyBase.Geometry;
 import PonyBase.Math;
 import PonyBase.StringUtility;
 
+import PonyDebug.Log;
+
+import PonyEngine.Render.Core;
+
 import :Direct3D12Mesh;
+import :Direct3D12IndexBuffer;
 import :Direct3D12VertexBuffer;
 
 export namespace PonyEngine::Render
@@ -32,7 +41,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12MeshManager(ID3D12Device10* device);
+		Direct3D12MeshManager(IRenderer& renderer, ID3D12Device10* device);
 
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh CreateDirect3D12Mesh(const PonyBase::Geometry::Mesh& mesh) const;
@@ -43,7 +52,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyBase::Math::RGBA<float>> colors, std::size_t vertexCount) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexBuffer CreateVertexIndices( std::span<const PonyBase::Math::Vector3<std::uint32_t>> triangles) const;
+		Direct3D12IndexBuffer CreateVertexIndices(std::span<const PonyBase::Math::Vector3<std::uint32_t>> triangles) const;
 
 		static constexpr auto HeapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -54,13 +63,16 @@ export namespace PonyEngine::Render
 			.VisibleNodeMask = 0u
 		};
 
+		IRenderer* renderer;
+
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MeshManager::Direct3D12MeshManager(ID3D12Device10* const device) :
+	Direct3D12MeshManager::Direct3D12MeshManager(IRenderer& renderer, ID3D12Device10* const device) :
+		renderer{&renderer},
 		device(device)
 	{
 	}
@@ -76,11 +88,21 @@ namespace PonyEngine::Render
 			.VisibleNodeMask = 0u
 		};
 
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertices.");
 		const Direct3D12VertexBuffer vertices = CreateVertices(mesh.Vertices());
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertices created.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertex colors.");
 		const Direct3D12VertexBuffer colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
 		const Direct3D12IndexBuffer indices = CreateVertexIndices(mesh.Triangles());
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
-		return Direct3D12Mesh(vertices, colors, indices);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh.");
+		const auto renderMesh = Direct3D12Mesh(vertices, colors, indices);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh created.");
+
+		return renderMesh;
 	}
 
 	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertices(const std::span<const PonyBase::Math::Vector3<float>> vertices) const
@@ -97,7 +119,7 @@ namespace PonyEngine::Render
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
 			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
@@ -117,7 +139,7 @@ namespace PonyEngine::Render
 		std::memcpy(verticesData, vertices.data(), vertexBufferSize);
 		verticesResource->Unmap(0, nullptr);
 
-		return Direct3D12VertexBuffer(verticesResource, vertexSize, vertexCount);
+		return Direct3D12VertexBuffer(verticesResource.Get(), vertexSize, vertexCount);
 	}
 
 	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyBase::Math::RGBA<float>> colors, const std::size_t vertexCount) const
@@ -134,7 +156,7 @@ namespace PonyEngine::Render
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
 			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
@@ -161,7 +183,7 @@ namespace PonyEngine::Render
 		}
 		colorsResource->Unmap(0, nullptr);
 
-		return Direct3D12VertexBuffer(colorsResource, colorSize, colorCount);
+		return Direct3D12VertexBuffer(colorsResource.Get(), colorSize, colorCount);
 	}
 
 	Direct3D12IndexBuffer Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyBase::Math::Vector3<std::uint32_t>> triangles) const
@@ -178,7 +200,7 @@ namespace PonyEngine::Render
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
 			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
@@ -198,6 +220,6 @@ namespace PonyEngine::Render
 		std::memcpy(indicesData, triangles.data(), indexBufferSize);
 		indicesResource->Unmap(0, nullptr);
 
-		return Direct3D12IndexBuffer(indicesResource, Direct3D12IndexFormat(indexSize), indexCount);
+		return Direct3D12IndexBuffer(indicesResource.Get(), Direct3D12IndexFormat(indexSize), indexCount);
 	}
 }

@@ -15,22 +15,15 @@ module;
 
 export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
 
-import <cstddef>;
 import <cstdint>;
-import <filesystem>;
-import <fstream>;
 import <memory>;
-import <ranges>;
 import <span>;
 import <stdexcept>;
 import <type_traits>;
-import <unordered_map>;
-import <utility>;
-import <vector>;
 
 import PonyBase.Geometry;
 import PonyBase.Math;
-import PonyBase.GuidUtility;
+import PonyBase.Screen;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -39,16 +32,7 @@ import PonyEngine.Core;
 
 import PonyEngine.Render.Core;
 
-import :Direct3D12Camera;
-import :Direct3D12Fence;
 import :Direct3D12GraphicsPipeline;
-import :Direct3D12Material;
-import :Direct3D12Mesh;
-import :Direct3D12MeshManager;
-import :Direct3D12RenderObject;
-import :Direct3D12RenderObjectManager;
-import :Direct3D12RenderTarget;
-import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
 {
@@ -71,7 +55,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const PonyBase::Math::Vector2<UINT>& resolution, DXGI_FORMAT rtvFormat, std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers) const;
+		void Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
@@ -118,11 +102,17 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 graphics pipeline.'");
 		graphicsPipeline.reset(new Direct3D12GraphicsPipeline(*this->renderer, device.Get(), commandQueuePriority, fenceTimeout));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline created.'");
 	}
 
 	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
 	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 graphics pipeline.'");
+		graphicsPipeline.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline destroyed.'");
+
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 device.");
 		device.Reset();
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device released.");
@@ -149,9 +139,9 @@ namespace PonyEngine::Render
 		return graphicsPipeline->GetCommandQueue();
 	}
 
-	void Direct3D12SubSystem::Initialize(const PonyBase::Math::Vector2<UINT>& resolution, const DXGI_FORMAT rtvFormat, const std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers) const
+	void Direct3D12SubSystem::Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
 	{
-		graphicsPipeline->Initialize(resolution, rtvFormat, buffers);
+		graphicsPipeline->Initialize(resolution, buffers, rtvFormat);
 	}
 
 	void Direct3D12SubSystem::PopulateCommands(const UINT bufferIndex) const

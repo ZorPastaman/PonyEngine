@@ -17,6 +17,7 @@ import <span>;
 import <stdexcept>;
 import <vector>;
 
+import PonyBase.Math;
 import PonyBase.StringUtility;
 
 export namespace PonyEngine::Render
@@ -25,11 +26,16 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderTarget(ID3D12Device10* device, std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers, DXGI_FORMAT rtvFormat);
+		Direct3D12RenderTarget(ID3D12Device10* device, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 		Direct3D12RenderTarget(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget(Direct3D12RenderTarget&&) = delete;
 
 		~Direct3D12RenderTarget() noexcept = default;
+
+		[[nodiscard("Pure function")]]
+		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
+		[[nodiscard("Pure function")]]
+		const PonyBase::Math::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2* GetBackBuffer(UINT index) const noexcept;
@@ -40,6 +46,8 @@ export namespace PonyEngine::Render
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
 
 	private:
+		PonyBase::Math::RGBA<FLOAT> clearColor;
+
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
 		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
@@ -48,7 +56,8 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderTarget::Direct3D12RenderTarget(ID3D12Device10* const device, const std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers, const DXGI_FORMAT rtvFormat)
+	Direct3D12RenderTarget::Direct3D12RenderTarget(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) :
+		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black)
 	{
 		backBuffers.resize(buffers.size());
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
@@ -83,8 +92,18 @@ namespace PonyEngine::Render
 		};
 		for (std::size_t i = 0; i < buffers.size(); ++i)
 		{
-			device->CreateRenderTargetView(buffers[i].Get(), &rtvDescription, rtvHandles[i]);
+			device->CreateRenderTargetView(buffers[i], &rtvDescription, rtvHandles[i]);
 		}
+	}
+
+	PonyBase::Math::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() noexcept
+	{
+		return clearColor;
+	}
+
+	const PonyBase::Math::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() const noexcept
+	{
+		return clearColor;
 	}
 
 	ID3D12Resource2* Direct3D12RenderTarget::GetBackBuffer(const UINT index) const noexcept

@@ -59,9 +59,9 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12Mesh::Direct3D12Mesh(const Direct3D12VertexBuffer& verticesBuffer, const Direct3D12VertexBuffer& vertexColorsBuffer, const Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept :
-		vertices(verticesBuffer.VerticesResource()),
-		vertexColors(vertexColorsBuffer.VerticesResource()),
-		vertexIndices(vertexIndicesBuffer.IndicesResource()),
+		vertices(verticesBuffer.GetVerticesResource()),
+		vertexColors(vertexColorsBuffer.GetVerticesResource()),
+		vertexIndices(vertexIndicesBuffer.GetIndicesResource()),
 		verticesView{.BufferLocation = vertices->GetGPUVirtualAddress(), .SizeInBytes = verticesBuffer.VertexSize() * verticesBuffer.VertexCount(), .StrideInBytes = verticesBuffer.VertexSize()},
 		vertexColorsView{.BufferLocation = vertexColors->GetGPUVirtualAddress(), .SizeInBytes = vertexColorsBuffer.VertexSize() * vertexColorsBuffer.VertexCount(), .StrideInBytes = vertexColorsBuffer.VertexSize()},
 		vertexIndicesView{.BufferLocation = vertexIndices->GetGPUVirtualAddress(), .SizeInBytes = vertexIndicesBuffer.IndexSize() * vertexIndicesBuffer.IndexCount(), .Format = vertexIndicesBuffer.IndexFormat()},
