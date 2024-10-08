@@ -9,8 +9,6 @@
 
 export module PonyEngine.Render.Direct3D12:Direct3D12RenderObject;
 
-import <utility>;
-
 import :Direct3D12Mesh;
 
 export namespace PonyEngine::Render

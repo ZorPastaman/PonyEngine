@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12:Direct3D12Camera;
 
-import PonyBase.Math;
+import PonyBase.Screen;
 
 export namespace PonyEngine::Render
 {
@@ -21,7 +21,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12Camera(const PonyBase::Math::Vector2<UINT>& resolution) noexcept;
+		explicit Direct3D12Camera(const PonyBase::Screen::Resolution<UINT>& resolution) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Camera(const Direct3D12Camera& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -45,9 +45,9 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Camera::Direct3D12Camera(const PonyBase::Math::Vector2<UINT>& resolution) noexcept :
-		viewPort{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.X()), .Height = static_cast<FLOAT>(resolution.Y()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH},
-		viewRect{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.X()), .bottom = static_cast<LONG>(resolution.Y())}
+	Direct3D12Camera::Direct3D12Camera(const PonyBase::Screen::Resolution<UINT>& resolution) noexcept :
+		viewPort{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.Width()), .Height = static_cast<FLOAT>(resolution.Height()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH},
+		viewRect{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height())}
 	{
 	}
 

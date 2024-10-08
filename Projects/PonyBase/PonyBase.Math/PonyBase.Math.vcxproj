@@ -28,6 +28,8 @@
     <ClCompile Include="Source\Public\Math\Vector2.cppm" />
     <ClCompile Include="Source\Public\Math\Vector3.cppm" />
     <ClCompile Include="Source\Public\Math\Vector4.cppm" />
+    <ClCompile Include="Source\Public\Screen\Resolution.cppm" />
+    <ClCompile Include="Source\Public\Screen\Screen.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h" />
@@ -71,11 +73,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Math;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Math;$(ProjectDir)\Source\Public\Screen;$(PublicModuleDirectories)</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Math;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Math;$(ProjectDir)\Source\Public\Screen;$(PublicModuleDirectories)</PublicModuleDirectories>
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

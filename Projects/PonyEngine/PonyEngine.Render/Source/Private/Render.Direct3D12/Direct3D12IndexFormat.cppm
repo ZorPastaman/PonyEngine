@@ -37,6 +37,9 @@ export namespace PonyEngine::Render
 		Direct3D12IndexFormat& operator =(const Direct3D12IndexFormat& other) noexcept = default;
 		Direct3D12IndexFormat& operator =(Direct3D12IndexFormat&&) noexcept = default;
 
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Direct3D12IndexFormat&) const noexcept = default;
+
 	private:
 		UINT indexSize;
 	};

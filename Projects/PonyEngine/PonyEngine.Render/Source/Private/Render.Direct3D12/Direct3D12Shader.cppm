@@ -32,7 +32,7 @@ export namespace PonyEngine::Render
 		~Direct3D12Shader() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		const void* Data() const noexcept;
+		const char* Data() const noexcept;
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
@@ -64,7 +64,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	const void* Direct3D12Shader::Data() const noexcept
+	const char* Direct3D12Shader::Data() const noexcept
 	{
 		return data.data();
 	}
