@@ -12,6 +12,7 @@ export module PonyBase.Geometry:Mesh;
 import <algorithm>;
 import <cstddef>;
 import <cstdint>;
+import <limits>;
 import <stdexcept>;
 import <span>;
 import <utility>;
@@ -38,16 +39,16 @@ export namespace PonyBase::Geometry
 		~Mesh() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::size_t VertexCount() const noexcept;
-		void VertexCount(std::size_t vertexCount);
+		std::uint32_t VertexCount() const noexcept;
+		void VertexCount(std::uint32_t vertexCount);
 
 		[[nodiscard("Pure function")]]
 		std::size_t TriangleCount() const noexcept;
 		void TriangleCount(std::size_t triangleCount);
 
 		[[nodiscard("Pure function")]]
-		const Math::Vector3<float>& Vertex(std::size_t vertexIndex) const noexcept;
-		void Vertex(std::size_t vertexIndex, const Math::Vector3<float>& vertex) noexcept;
+		const Math::Vector3<float>& Vertex(std::uint32_t vertexIndex) const noexcept;
+		void Vertex(std::uint32_t vertexIndex, const Math::Vector3<float>& vertex) noexcept;
 		[[nodiscard("Pure function")]]
 		std::span<const Math::Vector3<float>> Vertices() const noexcept;
 		void Vertices(std::span<const Math::Vector3<float>> verticesToSet);
@@ -60,8 +61,8 @@ export namespace PonyBase::Geometry
 		void Triangles(std::span<const Math::Vector3<std::uint32_t>> trianglesToSet);
 
 		[[nodiscard("Pure function")]]
-		const Math::RGBA<float>& Color(std::size_t vertexIndex) const noexcept;
-		void Color(std::size_t vertexIndex, const Math::RGBA<float>& color) noexcept;
+		const Math::RGBA<float>& Color(std::uint32_t vertexIndex) const noexcept;
+		void Color(std::uint32_t vertexIndex, const Math::RGBA<float>& color) noexcept;
 		[[nodiscard("Pure function")]]
 		std::span<const Math::RGBA<float>> Colors() const noexcept;
 		void Colors(std::span<const Math::RGBA<float>> colorsToSet);
@@ -79,12 +80,12 @@ export namespace PonyBase::Geometry
 
 namespace PonyBase::Geometry
 {
-	std::size_t Mesh::VertexCount() const noexcept
+	std::uint32_t Mesh::VertexCount() const noexcept
 	{
-		return vertices.size();
+		return static_cast<std::uint32_t>(vertices.size());
 	}
 
-	void Mesh::VertexCount(const std::size_t vertexCount)
+	void Mesh::VertexCount(const std::uint32_t vertexCount)
 	{
 		if (vertexCount == vertices.size())
 		{
@@ -129,12 +130,12 @@ namespace PonyBase::Geometry
 		triangles.resize(triangleCount);
 	}
 
-	const Math::Vector3<float>& Mesh::Vertex(const std::size_t vertexIndex) const noexcept
+	const Math::Vector3<float>& Mesh::Vertex(const std::uint32_t vertexIndex) const noexcept
 	{
 		return vertices[vertexIndex];
 	}
 
-	void Mesh::Vertex(const std::size_t vertexIndex, const Math::Vector3<float>& vertex) noexcept
+	void Mesh::Vertex(const std::uint32_t vertexIndex, const Math::Vector3<float>& vertex) noexcept
 	{
 		vertices[vertexIndex] = vertex;
 	}
@@ -146,7 +147,12 @@ namespace PonyBase::Geometry
 
 	void Mesh::Vertices(const std::span<const Math::Vector3<float>> verticesToSet)
 	{
-		VertexCount(verticesToSet.size());
+		if (verticesToSet.size() > std::numeric_limits<std::uint32_t>::max())
+		{
+			throw std::invalid_argument("Vertex count mayn't exceed std::uint32_t max value.");
+		}
+
+		VertexCount(static_cast<std::uint32_t>(verticesToSet.size()));
 		std::ranges::copy(verticesToSet, vertices.begin());
 	}
 
@@ -157,7 +163,7 @@ namespace PonyBase::Geometry
 
 	void Mesh::Triangle(const std::size_t triangleIndex, const Math::Vector3<std::uint32_t>& triangle)
 	{
-		const std::size_t vertexCount = vertices.size();
+		const std::uint32_t vertexCount = static_cast<std::uint32_t>(vertices.size());
 		for (std::size_t i = 0; i < Math::Vector3<std::uint32_t>::ComponentCount; ++i)
 		{
 			if (triangle[i] >= vertexCount) [[unlikely]]
@@ -176,7 +182,7 @@ namespace PonyBase::Geometry
 
 	void Mesh::Triangles(const std::span<const Math::Vector3<std::uint32_t>> trianglesToSet)
 	{
-		const std::size_t vertexCount = vertices.size();
+		const std::uint32_t vertexCount = static_cast<std::uint32_t>(vertices.size());
 		const std::uint32_t* current = trianglesToSet.data()->Span().data();
 		const std::uint32_t* const end = current + trianglesToSet.size() * Math::Vector3<std::uint32_t>::ComponentCount;
 		for (; current != end; ++current)
@@ -191,12 +197,12 @@ namespace PonyBase::Geometry
 		std::ranges::copy(trianglesToSet, triangles.begin());
 	}
 
-	const Math::RGBA<float>& Mesh::Color(const std::size_t vertexIndex) const noexcept
+	const Math::RGBA<float>& Mesh::Color(const std::uint32_t vertexIndex) const noexcept
 	{
 		return colors[vertexIndex];
 	}
 
-	void Mesh::Color(const std::size_t vertexIndex, const Math::RGBA<float>& color) noexcept
+	void Mesh::Color(const std::uint32_t vertexIndex, const Math::RGBA<float>& color) noexcept
 	{
 		colors[vertexIndex] = color;
 	}
