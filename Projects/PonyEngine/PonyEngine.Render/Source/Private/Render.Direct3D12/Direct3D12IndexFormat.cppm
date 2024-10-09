@@ -53,8 +53,7 @@ namespace PonyEngine::Render
 	Direct3D12IndexFormat::Direct3D12IndexFormat(const UINT indexSize) :
 		indexSize{indexSize}
 	{
-		[[maybe_unused]]
-		DXGI_FORMAT format = GetFormat(indexSize); // Throws an exception if the indexSize is incorrect to invalidate the instance.
+		[[maybe_unused]] const DXGI_FORMAT format = GetFormat(indexSize); // Throws an exception if the indexSize is incorrect to invalidate the instance.
 	}
 
 	UINT Direct3D12IndexFormat::IndexSize() const noexcept
@@ -71,8 +70,6 @@ namespace PonyEngine::Render
 	{
 		switch (indexSize)
 		{
-		case 1:
-			return DXGI_FORMAT_R8_UINT;
 		case 2:
 			return DXGI_FORMAT_R16_UINT;
 		case 4:

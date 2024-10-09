@@ -11,6 +11,7 @@ export module PonyBase.Screen:Resolution;
 
 import <concepts>;
 import <format>;
+import <ostream>;
 import <string>;
 
 import PonyBase.Math;
@@ -64,6 +65,10 @@ export namespace PonyBase::Screen
 	private:
 		Math::Vector2<T> resolution;
 	};
+
+	template<std::unsigned_integral T>
+	std::ostream& operator <<(std::ostream& stream, const Resolution<T>& resolution);
+
 }
 
 namespace PonyBase::Screen
@@ -128,5 +133,11 @@ namespace PonyBase::Screen
 	constexpr Resolution<T>::operator Math::Vector2<T>() const noexcept
 	{
 		return resolution;
+	}
+
+	template<std::unsigned_integral T>
+	std::ostream& operator <<(std::ostream& stream, const Resolution<T>& resolution)
+	{
+		return stream << resolution.ToString();
 	}
 }
