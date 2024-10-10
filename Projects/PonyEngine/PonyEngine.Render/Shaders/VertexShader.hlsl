@@ -9,6 +9,8 @@
 
 #include "RootSignature.hlsli"
 
+float4x4 ModelViewProjection : register(b0);
+
 struct VertexInput
 {
 	float3 position : POSITION;
@@ -25,7 +27,7 @@ struct VertexOutput
 VertexOutput main(VertexInput input)
 {
 	VertexOutput output;
-	output.position = float4(input.position, 1.f);
+	output.position = mul(ModelViewProjection, float4(input.position, 1.f));
 	output.color = input.color;
 
 	return output;

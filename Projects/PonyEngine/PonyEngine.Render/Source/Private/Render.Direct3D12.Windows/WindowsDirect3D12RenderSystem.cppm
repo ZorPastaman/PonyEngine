@@ -68,8 +68,14 @@ export namespace PonyEngine::Render
 		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept override;
 		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept override;
 
-		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) override;
+		[[nodiscard("Pure function")]]
+		virtual PonyBase::Math::Matrix4x4<float> CameraTrsMatrix() const noexcept override;
+		virtual void CameraTrsMatrix(const PonyBase::Math::Matrix4x4<float>& trs) noexcept override;
+
+		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<float>& trs) override;
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept override;
+
+		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<float>& trs) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -85,10 +91,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		std::unique_ptr<Direct3D12SubSystem> CreateDirect3D12SubSystem(D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
 
+	private:
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		std::optional<PonyBase::Screen::Resolution<UINT>> resolution;
+		FLOAT fov;
+		FLOAT nearPlane;
+		FLOAT farPlane;
 
 		Core::IEngine* engine; ///< Engine.
 
@@ -101,6 +111,9 @@ namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
 		resolution(params.resolution.has_value() ? std::optional<PonyBase::Screen::Resolution<UINT>>(static_cast<PonyBase::Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
+		fov{static_cast<FLOAT>(params.fov)},
+		nearPlane{static_cast<FLOAT>(params.nearPlane)},
+		farPlane{static_cast<FLOAT>(params.farPlane)},
 		engine{&engine},
 		dxgiSubSystem(CreateDXGISubSystem()),
 		direct3D12SubSystem(CreateDirect3D12SubSystem(params.featureLevel, params.commandQueuePriority, params.fenceTimeout))
@@ -164,7 +177,7 @@ namespace PonyEngine::Render
 		{
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
-		direct3D12SubSystem->Initialize(renderResolution, rawBackBuffers, RtvFormat);
+		direct3D12SubSystem->Initialize(renderResolution, fov, nearPlane, farPlane, rawBackBuffers, RtvFormat);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -205,14 +218,29 @@ namespace PonyEngine::Render
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem->ClearColor().ToString());
 	}
 
-	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh)
+	PonyBase::Math::Matrix4x4<float> WindowsDirect3D12RenderSystem::CameraTrsMatrix() const noexcept
 	{
-		return direct3D12SubSystem->CreateRenderObject(mesh);
+		return static_cast<PonyBase::Math::Matrix4x4<float>>(direct3D12SubSystem->CameraTrsMatrix());
+	}
+
+	void WindowsDirect3D12RenderSystem::CameraTrsMatrix(const PonyBase::Math::Matrix4x4<float>& trs) noexcept
+	{
+		direct3D12SubSystem->CameraTrsMatrix() = trs;
+	}
+
+	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<float>& trs)
+	{
+		return direct3D12SubSystem->CreateRenderObject(mesh, static_cast<PonyBase::Math::Matrix4x4<FLOAT>>(trs));
 	}
 
 	void WindowsDirect3D12RenderSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
 	{
 		direct3D12SubSystem->DestroyRenderObject(renderObjectHandle);
+	}
+
+	void WindowsDirect3D12RenderSystem::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<float>& trs) const noexcept
+	{
+		direct3D12SubSystem->UpdateRenderObjectTrs(handle, static_cast<PonyBase::Math::Matrix4x4<FLOAT>>(trs));
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept

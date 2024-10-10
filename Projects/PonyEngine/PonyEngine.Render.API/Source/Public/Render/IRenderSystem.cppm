@@ -27,8 +27,14 @@ export namespace PonyEngine::Render
 		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept = 0;
 		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept = 0;
 
-		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh) = 0;
+		[[nodiscard("Pure function")]]
+		virtual PonyBase::Math::Matrix4x4<float> CameraTrsMatrix() const noexcept = 0;
+		virtual void CameraTrsMatrix(const PonyBase::Math::Matrix4x4<float>& trs) noexcept = 0;
+
+		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<float>& trs) = 0;
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) = 0;
+
+		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<float>& trs) const noexcept = 0;
 
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;
