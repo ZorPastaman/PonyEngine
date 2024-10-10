@@ -18,6 +18,8 @@ export module PonyEngine.Render.Direct3D12:Direct3D12RenderObjectManager;
 import <cstddef>;
 import <unordered_map>;
 
+import PonyBase.Math;
+
 import PonyDebug.Log;
 
 import PonyEngine.Render;
@@ -42,8 +44,10 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		RenderObjectHandle CreateRenderObject(const Direct3D12Mesh& mesh);
+		RenderObjectHandle CreateRenderObject(const Direct3D12Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs);
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
+
+		void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept;
 
 		[[nodiscard("Pure function")]]
 		RenderObjectIterator RenderObjectBegin() const noexcept;
@@ -72,13 +76,13 @@ namespace PonyEngine::Render
 	{
 	}
 
-	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const Direct3D12Mesh& mesh)
+	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const Direct3D12Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs)
 	{
-		const size_t id = nextRenderObjectId++;
-		renderObjects.emplace(id, mesh);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Render object created with '{}' id.", id);
+		const auto handle = RenderObjectHandle{.id = nextRenderObjectId++};
+		renderObjects.try_emplace(handle, mesh, trs);
+		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Render object created with '{}' id.", handle.id);
 
-		return RenderObjectHandle{.id = id};
+		return handle;
 	}
 
 	void Direct3D12RenderObjectManager::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
@@ -87,6 +91,14 @@ namespace PonyEngine::Render
 		{
 			renderObjects.erase(position);
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Render object with '{}' id destroyed.", renderObjectHandle.id);
+		}
+	}
+
+	void Direct3D12RenderObjectManager::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept
+	{
+		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
+		{
+			position->second.TrsMatrix() = trs;
 		}
 	}
 

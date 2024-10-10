@@ -206,6 +206,9 @@ export namespace PonyBase::Math
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix4x4<T> TrsMatrix(const Vector3<T>& translation, const Matrix3x3<T>& rsMatrix) noexcept;
 
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Matrix4x4<T> PerspectiveMatrix(T fov, T aspect, T nearPlane, T farPlane) noexcept; // TODO: Add docs and tests
+
 	/// @brief Extracts a translation from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
 	/// @param trsMatrix Translation-rotation-scaling matrix.
@@ -738,6 +741,22 @@ namespace PonyBase::Math
 		trsMatrix.M23() = translation.Z();
 
 		return trsMatrix;
+	}
+
+	template<std::floating_point T>
+	constexpr Matrix4x4<T> PerspectiveMatrix(const T fov, const T aspect, const T nearPlane, const T farPlane) noexcept
+	{
+		const T fovScale = T{1} / std::tan(fov * T{0.5});
+		const T planeScale = farPlane / (farPlane - nearPlane);;
+
+		auto perspective = Matrix4x4<T>::Predefined::Zero;
+		perspective.M00() = fovScale / aspect;
+		perspective.M11() = fovScale;
+		perspective.M22() = planeScale;
+		perspective.M32() = T{1};
+		perspective.M23() = -nearPlane * planeScale;
+
+		return perspective;
 	}
 
 	template<std::floating_point T>

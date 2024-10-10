@@ -15,6 +15,7 @@ export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12Rend
 
 import <optional>;
 
+import PonyBase.Math;
 import PonyBase.Screen;
 
 export namespace PonyEngine::Render
@@ -23,6 +24,9 @@ export namespace PonyEngine::Render
 	struct WindowsDirect3D12RenderParams final
 	{
 		std::optional<PonyBase::Screen::Resolution<unsigned int>> resolution = {};
+		float fov = 80.f * PonyBase::Math::DegToRad<float>;
+		float nearPlane = 0.2f;
+		float farPlane = 1000.f;
 
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
