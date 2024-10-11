@@ -1768,21 +1768,21 @@ namespace Math
 			Assert::AreEqual(0.921, static_cast<double>(quaternion.W()), 0.001);
 		}
 
-		TEST_METHOD(QuaternionFromDirectionsTest)
+		TEST_METHOD(FromToQuaternionTest)
 		{
 			auto from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			auto to = from;
-			auto quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			auto quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::IsTrue(quaternion.IsIdentity());
 
 			from = PonyBase::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
 			to = from;
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::IsTrue(quaternion.IsIdentity());
 
 			from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			to = -from;
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(-1., static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
@@ -1790,7 +1790,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
 			to = -from;
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(-0.707, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0.707, static_cast<double>(quaternion.Z()), 0.001);
@@ -1798,7 +1798,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
 			to = -from;
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(1., static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
@@ -1806,7 +1806,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = -from;
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(0.981, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(-0.196, static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(quaternion.Z()), 0.001);
@@ -1814,7 +1814,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(0.122, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(0.037, static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(-0.305, static_cast<double>(quaternion.Z()), 0.001);
@@ -1822,11 +1822,26 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
-			quaternion = PonyBase::Math::RotationQuaternion(from, to);
+			quaternion = PonyBase::Math::FromToRotationQuaternion(from, to);
 			Assert::AreEqual(0.545, static_cast<double>(quaternion.X()), 0.001);
 			Assert::AreEqual(-0.245, static_cast<double>(quaternion.Y()), 0.001);
 			Assert::AreEqual(0.682, static_cast<double>(quaternion.Z()), 0.001);
 			Assert::AreEqual(0.422, static_cast<double>(quaternion.W()), 0.001);
+		}
+
+		TEST_METHOD(LookInRotationQuaternionTest)
+		{
+			const auto forward = PonyBase::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+			const auto up = PonyBase::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+			auto quaternion = PonyBase::Math::LookInRotationQuaternion(forward, up);
+			Assert::AreEqual(-0.076, static_cast<double>(quaternion.X()), 0.001);
+			Assert::AreEqual(-0.54, static_cast<double>(quaternion.Y()), 0.001);
+			Assert::AreEqual(-0.427, static_cast<double>(quaternion.Z()), 0.001);
+			Assert::AreEqual(0.721, static_cast<double>(quaternion.W()), 0.001);
+
+			quaternion = PonyBase::Math::LookInRotationQuaternion(forward, forward);
+			const auto expectedQuaternion = PonyBase::Math::FromToRotationQuaternion(PonyBase::Math::Vector3<float>::Predefined::Forward, forward);
+			Assert::IsTrue(PonyBase::Math::AreAlmostEqual(expectedQuaternion, quaternion));
 		}
 
 		TEST_METHOD(RotationMatrixFromQuaternionTest)
@@ -4715,21 +4730,21 @@ namespace Math
 			Assert::AreEqual(0.763, static_cast<double>(matrix.M22()), 0.001);
 		}
 
-		TEST_METHOD(RotationMatrixFromDirectionsTest)
+		TEST_METHOD(FromToRotationMatrixTest)
 		{
 			auto from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			auto to = from;
-			auto matrix = PonyBase::Math::RotationMatrix(from, to);
+			auto matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::IsTrue(matrix.IsIdentity());
 
 			from = PonyBase::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
 			to = from;
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::IsTrue(matrix.IsIdentity());
 			
 			from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			to = -from;
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
@@ -4742,7 +4757,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
 			to = -from;
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(0., static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(-1., static_cast<double>(matrix.M20()), 0.001);
@@ -4755,7 +4770,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
 			to = -from;
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(1., static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
@@ -4768,7 +4783,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = -from;
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(0.923, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(-0.384, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(matrix.M20()), 0.001);
@@ -4781,7 +4796,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(0.811, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(-0.567, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(-0.144, static_cast<double>(matrix.M20()), 0.001);
@@ -4794,7 +4809,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
-			matrix = PonyBase::Math::RotationMatrix(from, to);
+			matrix = PonyBase::Math::FromToRotationMatrix(from, to);
 			Assert::AreEqual(-0.05, static_cast<double>(matrix.M00()), 0.001);
 			Assert::AreEqual(0.308, static_cast<double>(matrix.M10()), 0.001);
 			Assert::AreEqual(0.95, static_cast<double>(matrix.M20()), 0.001);
@@ -4804,6 +4819,26 @@ namespace Math
 			Assert::AreEqual(0.536, static_cast<double>(matrix.M02()), 0.001);
 			Assert::AreEqual(-0.794, static_cast<double>(matrix.M12()), 0.001);
 			Assert::AreEqual(0.285, static_cast<double>(matrix.M22()), 0.001);
+		}
+
+		TEST_METHOD(LookInRotationMatrixTest)
+		{
+			const auto forward = PonyBase::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+			const auto up = PonyBase::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+			auto matrix = PonyBase::Math::LookInRotationMatrix(forward, up);
+			Assert::AreEqual(0.051, static_cast<double>(matrix.M00()), 0.001);
+			Assert::AreEqual(-0.534, static_cast<double>(matrix.M10()), 0.001);
+			Assert::AreEqual(0.844, static_cast<double>(matrix.M20()), 0.001);
+			Assert::AreEqual(0.698, static_cast<double>(matrix.M01()), 0.001);
+			Assert::AreEqual(0.623, static_cast<double>(matrix.M11()), 0.001);
+			Assert::AreEqual(0.353, static_cast<double>(matrix.M21()), 0.001);
+			Assert::AreEqual(-0.714, static_cast<double>(matrix.M02()), 0.001);
+			Assert::AreEqual(0.571, static_cast<double>(matrix.M12()), 0.001);
+			Assert::AreEqual(0.405, static_cast<double>(matrix.M22()), 0.001);
+
+			matrix = PonyBase::Math::LookInRotationMatrix(forward, forward);
+			const auto expectedMatrix = PonyBase::Math::FromToRotationMatrix(PonyBase::Math::Vector3<float>::Predefined::Forward, forward);
+			Assert::IsTrue(PonyBase::Math::AreAlmostEqual(expectedMatrix, matrix));
 		}
 
 		TEST_METHOD(EulerFromQuaternionTest)
@@ -6539,59 +6574,73 @@ namespace Math
 			Assert::AreEqual(0.261, static_cast<double>(euler.Z()), 0.001);
 		}
 
-		TEST_METHOD(EulerFromDirectionsTest)
+		TEST_METHOD(FromToEulerTest)
 		{
 			auto from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			auto to = from;
-			auto euler = PonyBase::Math::Euler(from, to);
+			auto euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::IsTrue(euler.IsAlmostZero());
 			
 			from = PonyBase::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
 			to = from;
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::IsTrue(euler.IsAlmostZero());
 			
 			from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			to = -from;
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
 			to = -from;
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(-std::numbers::pi_v<double> / 2., static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
 			
 			from = PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
 			to = -from;
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Z())), 0.001);
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = -from;
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0., static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(std::abs(euler.Y())), 0.001);
 			Assert::AreEqual(-2.747, static_cast<double>(euler.Z()), 0.001);
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0.255, static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(-0.005, static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(-0.625, static_cast<double>(euler.Z()), 0.001);
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
-			euler = PonyBase::Math::Euler(from, to);
+			euler = PonyBase::Math::FromToEuler(from, to);
 			Assert::AreEqual(0.918, static_cast<double>(euler.X()), 0.001);
 			Assert::AreEqual(1.082, static_cast<double>(euler.Y()), 0.001);
 			Assert::AreEqual(2.611, static_cast<double>(euler.Z()), 0.001);
+		}
+
+		TEST_METHOD(LookInEulerTest)
+		{
+			const auto forward = PonyBase::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+			const auto up = PonyBase::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+			auto euler = PonyBase::Math::LookInEuler(forward, up);
+			Assert::AreEqual(-0.608, static_cast<double>(euler.X()), 0.001);
+			Assert::AreEqual(-1.055, static_cast<double>(euler.Y()), 0.001);
+			Assert::AreEqual(-0.708, static_cast<double>(euler.Z()), 0.001);
+
+			euler = PonyBase::Math::LookInEuler(forward, forward);
+			const auto expectedEuler = PonyBase::Math::FromToEuler(PonyBase::Math::Vector3<float>::Predefined::Forward, forward);
+			Assert::IsTrue(PonyBase::Math::AreAlmostEqual(expectedEuler, euler));
 		}
 
 		TEST_METHOD(AxisAngleFromQuaternionTest)
@@ -7877,11 +7926,11 @@ namespace Math
 			Assert::AreEqual(2.7, static_cast<double>(axisAngle.second), 0.001);
 		}
 
-		TEST_METHOD(AxisAngleFromDirectionsTest)
+		TEST_METHOD(FromToAxisAngleTest)
 		{
 			auto from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f);
 			auto to = from;
-			auto axisAngle = PonyBase::Math::AxisAngle(from, to);
+			auto axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7889,7 +7938,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(-3.f, 4.f, 2.3f).Normalized();
 			to = from;
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(1., static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7897,7 +7946,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(0.f, 0.f, 1.f).Normalized();
 			to = -from;
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(-1., static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7905,7 +7954,7 @@ namespace Math
 
 			from = PonyBase::Math::Vector3<float>(1.f, 0.f, 1.f).Normalized();
 			to = -from;
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(-0.707, static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(0.707, static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7913,7 +7962,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(0.f, 1.f, 0.f).Normalized();
 			to = -from;
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(1., static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7921,7 +7970,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = -from;
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(0.98, static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(-0.196, static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7929,7 +7978,7 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(6.f, 5.f, 3.f).Normalized();
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(0.369, static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(0.111, static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(-0.922, static_cast<double>(axisAngle.first.Z()), 0.001);
@@ -7937,11 +7986,26 @@ namespace Math
 			
 			from = PonyBase::Math::Vector3<float>(1.f, 5.f, 1.f).Normalized();
 			to = PonyBase::Math::Vector3<float>(-6.f, -5.f, 3.f).Normalized();
-			axisAngle = PonyBase::Math::AxisAngle(from, to);
+			axisAngle = PonyBase::Math::FromToAxisAngle(from, to);
 			Assert::AreEqual(0.601, static_cast<double>(axisAngle.first.X()), 0.001);
 			Assert::AreEqual(-0.271, static_cast<double>(axisAngle.first.Y()), 0.001);
 			Assert::AreEqual(0.752, static_cast<double>(axisAngle.first.Z()), 0.001);
 			Assert::AreEqual(2.271, static_cast<double>(axisAngle.second), 0.001);
+		}
+
+		TEST_METHOD(LookInAxisAngleTest)
+		{
+			const auto forward = PonyBase::Math::Vector3<float>(-3.f, 2.4f, 1.7f).Normalized();
+			const auto up = PonyBase::Math::Vector3<float>(1.f, 1.2f, 0.7f).Normalized();
+			auto axisAngle = PonyBase::Math::LookInAxisAngle(forward, up);
+			Assert::AreEqual(-0.11, static_cast<double>(axisAngle.first.X()), 0.001);
+			Assert::AreEqual(-0.78, static_cast<double>(axisAngle.first.Y()), 0.001);
+			Assert::AreEqual(-0.617, static_cast<double>(axisAngle.first.Z()), 0.001);
+			Assert::AreEqual(1.531, static_cast<double>(axisAngle.second), 0.001);
+
+			axisAngle = PonyBase::Math::LookInAxisAngle(forward, forward);
+			const auto expectedAxisAngle = PonyBase::Math::FromToAxisAngle(PonyBase::Math::Vector3<float>::Predefined::Forward, forward);
+			Assert::IsTrue(PonyBase::Math::AreAlmostEqual(expectedAxisAngle.first, axisAngle.first) && PonyBase::Math::AreAlmostEqual(expectedAxisAngle.second, axisAngle.second));
 		}
 
 		TEST_METHOD(RsMatrixFromQuaternionScalingTest)
@@ -8202,6 +8266,27 @@ namespace Math
 			Assert::AreEqual(4.6, static_cast<double>(trsMatrix.M13()), 0.001);
 			Assert::AreEqual(9.5, static_cast<double>(trsMatrix.M23()), 0.001);
 			Assert::AreEqual(1., static_cast<double>(trsMatrix.M33()), 0.001);
+		}
+
+		TEST_METHOD(PerspectiveMatrixTest)
+		{
+			const auto perspectiveMatrix = PonyBase::Math::PerspectiveMatrix(80.f * PonyBase::Math::DegToRad<float>, 1.7f, 0.2f, 1000.f);
+			Assert::AreEqual(0.701, static_cast<double>(perspectiveMatrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M30()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M01()), 0.001);
+			Assert::AreEqual(1.192, static_cast<double>(perspectiveMatrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M31()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M12()), 0.001);
+			Assert::AreEqual(1, static_cast<double>(perspectiveMatrix.M22()), 0.001);
+			Assert::AreEqual(1., static_cast<double>(perspectiveMatrix.M32()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M03()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M13()), 0.001);
+			Assert::AreEqual(-0.2, static_cast<double>(perspectiveMatrix.M23()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M33()), 0.001);
 		}
 
 		TEST_METHOD(TranslationFromTrsMatrixTest)
