@@ -85,6 +85,7 @@
     <ClCompile Include="Math\Vector2Tests.cpp" />
     <ClCompile Include="Math\Vector3Tests.cpp" />
     <ClCompile Include="Math\Vector4Tests.cpp" />
+    <ClCompile Include="Utility\GuidUtilityTests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
   </ItemGroup>
   <ItemGroup>
