@@ -16,11 +16,14 @@ export module PonyBase.GuidUtility;
 import <cstdint>;
 import <format>;
 import <string>;
+import <type_traits>;
 
 import PonyBase.StringUtility;
 
 export namespace PonyBase::Utility
 {
+	/// @brief Acquires GUID.
+	/// @return GUID.
 	[[nodiscard("Pure function")]]
 	GUID AcquireGuid();
 
@@ -28,7 +31,7 @@ export namespace PonyBase::Utility
 	/// @param guid GUID.
 	/// @return String representing the @p guid.
 	[[nodiscard("Pure function")]]
-	std::string ToString(const GUID& guid) noexcept; // TODO: Add test
+	std::string ToString(const GUID& guid) noexcept;
 }
 
 namespace PonyBase::Utility
@@ -38,7 +41,7 @@ namespace PonyBase::Utility
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(SafeFormat("Failed to get guid for Direct3D 12 render system with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(SafeFormat("Failed to get guid with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return acquiredGuid;
