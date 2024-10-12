@@ -21,14 +21,14 @@ import <span>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.Geometry;
-import PonyBase.Math;
-import PonyBase.Screen;
+import PonyMath.Geometry;
+import PonyMath.Core;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core;
+import PonyEngine.Screen;
 
 import PonyEngine.Render.Core;
 
@@ -48,28 +48,28 @@ export namespace PonyEngine::Render
 		~Direct3D12SubSystem() noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
+		PonyMath::Core::RGBA<FLOAT>& ClearColor() noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Math::RGBA<FLOAT>& ClearColor() const noexcept;
+		const PonyMath::Core::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyBase::Math::Matrix4x4<FLOAT>& CameraTrsMatrix() noexcept;
+		PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Math::Matrix4x4<FLOAT>& CameraTrsMatrix() const noexcept;
+		const PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, FLOAT fov, FLOAT nearPlane, FLOAT farPlane, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
+		void Initialize(const Screen::Resolution<UINT>& resolution, FLOAT fov, FLOAT nearPlane, FLOAT farPlane, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
 		void WaitForEndOfFrame() const;
 
-		RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs) const;
+		RenderObjectHandle CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& trs) const;
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) const noexcept;
 
-		void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) const noexcept;
+		void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<FLOAT>& trs) const noexcept;
 
 		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
@@ -131,22 +131,22 @@ namespace PonyEngine::Render
 #endif
 	}
 
-	PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() noexcept
+	PonyMath::Core::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() noexcept
 	{
 		return graphicsPipeline->ClearColor();
 	}
 
-	const PonyBase::Math::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() const noexcept
+	const PonyMath::Core::RGBA<FLOAT>& Direct3D12SubSystem::ClearColor() const noexcept
 	{
 		return graphicsPipeline->ClearColor();
 	}
 
-	PonyBase::Math::Matrix4x4<FLOAT>& Direct3D12SubSystem::CameraTrsMatrix() noexcept
+	PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12SubSystem::CameraTrsMatrix() noexcept
 	{
 		return graphicsPipeline->CameraTrsMatrix();
 	}
 
-	const PonyBase::Math::Matrix4x4<FLOAT>& Direct3D12SubSystem::CameraTrsMatrix() const noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12SubSystem::CameraTrsMatrix() const noexcept
 	{
 		return graphicsPipeline->CameraTrsMatrix();
 	}
@@ -156,7 +156,7 @@ namespace PonyEngine::Render
 		return graphicsPipeline->GetCommandQueue();
 	}
 
-	void Direct3D12SubSystem::Initialize(const PonyBase::Screen::Resolution<UINT>& resolution, const FLOAT fov, const FLOAT nearPlane, const FLOAT farPlane, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
+	void Direct3D12SubSystem::Initialize(const Screen::Resolution<UINT>& resolution, const FLOAT fov, const FLOAT nearPlane, const FLOAT farPlane, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
 	{
 		graphicsPipeline->Initialize(resolution, fov, nearPlane, farPlane, buffers, rtvFormat);
 	}
@@ -176,7 +176,7 @@ namespace PonyEngine::Render
 		graphicsPipeline->WaitForEndOfFrame();
 	}
 
-	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs) const
+	RenderObjectHandle Direct3D12SubSystem::CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& trs) const
 	{
 		return graphicsPipeline->CreateRenderObject(mesh, trs);
 	}
@@ -186,7 +186,7 @@ namespace PonyEngine::Render
 		graphicsPipeline->DestroyRenderObject(renderObjectHandle);
 	}
 
-	void Direct3D12SubSystem::UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) const noexcept
+	void Direct3D12SubSystem::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<FLOAT>& trs) const noexcept
 	{
 		graphicsPipeline->UpdateRenderObjectTrs(handle, trs);
 	}

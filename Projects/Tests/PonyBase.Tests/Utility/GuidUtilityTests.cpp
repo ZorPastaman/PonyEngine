@@ -9,6 +9,8 @@
 
 #include "CppUnitTest.h"
 
+#include <string>
+
 #include "PonyBase/Core/COM/Framework.h"
 
 import PonyBase.GuidUtility;

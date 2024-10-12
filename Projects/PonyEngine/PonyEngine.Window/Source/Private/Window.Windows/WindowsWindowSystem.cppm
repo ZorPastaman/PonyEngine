@@ -23,13 +23,15 @@ import <stdexcept>;
 import <string>;
 import <vector>;
 
-import PonyBase.Math;
 import PonyBase.StringUtility;
+
+import PonyMath.Core;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
+import PonyEngine.Screen;
 
 import PonyEngine.Window.Windows.Factory;
 
@@ -330,8 +332,8 @@ namespace PonyEngine::Window
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
-		const auto position = PonyBase::Math::Vector2<int>(rect.left, rect.top);
-		const auto size = PonyBase::Math::Vector2<int>(rect.right - rect.left, rect.bottom - rect.top);
+		const auto position = PonyMath::Core::Vector2<int>(rect.left, rect.top);
+		const auto size = PonyEngine::Screen::Resolution<unsigned int>(rect.right - rect.left, rect.bottom - rect.top);
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'.", position.ToString(), size.ToString());
 
 		const HWND windowHandle = CreateWindowExW(
@@ -340,7 +342,7 @@ namespace PonyEngine::Window
 			mainTitle.c_str(),
 			windowParams.style,
 			position.X(), position.Y(),
-			size.X(), size.Y(),
+			size.Width(), size.Height(),
 			nullptr,
 			nullptr,
 			hInstance,

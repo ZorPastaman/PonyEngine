@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12:Direct3D12RenderObject;
 
-import PonyBase.Math;
+import PonyMath.Core;
 
 import :Direct3D12Mesh;
 
@@ -23,7 +23,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept;
+		explicit Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderObject(const Direct3D12RenderObject& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -35,22 +35,22 @@ export namespace PonyEngine::Render
 		const Direct3D12Mesh& RenderMesh() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyBase::Math::Matrix4x4<FLOAT>& TrsMatrix() noexcept;
+		PonyMath::Core::Matrix4x4<FLOAT>& TrsMatrix() noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Math::Matrix4x4<FLOAT>& TrsMatrix() const noexcept;
+		const PonyMath::Core::Matrix4x4<FLOAT>& TrsMatrix() const noexcept;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept = default;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept = default;
 
 	private:
 		Direct3D12Mesh meshResource;
-		PonyBase::Math::Matrix4x4<FLOAT> trsMatrix;
+		PonyMath::Core::Matrix4x4<FLOAT> trsMatrix;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept :
+	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept :
 		meshResource(meshResource),
 		trsMatrix(trs)
 	{
@@ -61,12 +61,12 @@ namespace PonyEngine::Render
 		return meshResource;
 	}
 
-	PonyBase::Math::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() noexcept
+	PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() noexcept
 	{
 		return trsMatrix;
 	}
 
-	const PonyBase::Math::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() const noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() const noexcept
 	{
 		return trsMatrix;
 	}

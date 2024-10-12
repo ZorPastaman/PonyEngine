@@ -16,8 +16,8 @@ export module Game.Implementation:GameSystem;
 import <cstdint>;
 import <functional>;
 
-import PonyBase.Geometry;
-import PonyBase.Math;
+import PonyMath.Core;
+import PonyMath.Geometry;
 
 import PonyDebug.Log;
 
@@ -61,10 +61,10 @@ export namespace Game
 		PonyEngine::Input::Handle leftHandle; ///< Left arrow input handle.
 		PonyEngine::Input::Handle closeHandle; ///< Escape input handle.
 
-		PonyEngine::Render::RenderObjectHandle boxHandle; ///< Triangle handle.
-		PonyBase::Math::Vector3<float> boxPosition = PonyBase::Math::Vector3<float>(0.f, 0.f, 20.f);
-		PonyBase::Math::Vector3<float> boxRotation = PonyBase::Math::Vector3<float>::Predefined::Zero;
-		PonyBase::Math::Vector3<float> boxScale = PonyBase::Math::Vector3<float>::Predefined::One * 5.f;
+		PonyEngine::Render::RenderObjectHandle boxHandle; ///< Box handle.
+		PonyMath::Core::Vector3<float> boxPosition; ///< Box position.
+		PonyMath::Core::Vector3<float> boxRotation; ///< Box rotation.
+		PonyMath::Core::Vector3<float> boxScale; ///< Box scale.
 
 		PonyEngine::Core::IEngine* const engine; ///< Engine.
 	};
@@ -79,6 +79,9 @@ namespace Game
 		leftHandle(),
 		closeHandle(),
 		boxHandle(),
+		boxPosition(0.f, 0.f, 20.f),
+		boxRotation(PonyMath::Core::Vector3<float>::Predefined::Zero),
+		boxScale(PonyMath::Core::Vector3<float>::Predefined::One * 5.f),
 		engine{&engine}
 	{
 	}
@@ -100,8 +103,8 @@ namespace Game
 				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.X() += 10.f * PonyBase::Math::DegToRad<float>;
-					const PonyBase::Math::Matrix4x4<float> trs = PonyBase::Math::TrsMatrix(boxPosition, boxRotation, boxScale);
+					boxRotation.X() += 10.f * PonyMath::Core::DegToRad<float>;
+					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
 					render->UpdateRenderObjectTrs(boxHandle, trs);
 				}
 			}));
@@ -118,8 +121,8 @@ namespace Game
 				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.X() -= 10.f * PonyBase::Math::DegToRad<float>;
-					const PonyBase::Math::Matrix4x4<float> trs = PonyBase::Math::TrsMatrix(boxPosition, boxRotation, boxScale);
+					boxRotation.X() -= 10.f * PonyMath::Core::DegToRad<float>;
+					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
 					render->UpdateRenderObjectTrs(boxHandle, trs);
 				}
 			}));
@@ -136,8 +139,8 @@ namespace Game
 				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.Y() -= 10.f * PonyBase::Math::DegToRad<float>;
-					const PonyBase::Math::Matrix4x4<float> trs = PonyBase::Math::TrsMatrix(boxPosition, boxRotation, boxScale);
+					boxRotation.Y() -= 10.f * PonyMath::Core::DegToRad<float>;
+					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
 					render->UpdateRenderObjectTrs(boxHandle, trs);
 				}
 			}));
@@ -154,8 +157,8 @@ namespace Game
 				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.Y() += 10.f * PonyBase::Math::DegToRad<float>;
-					const PonyBase::Math::Matrix4x4<float> trs = PonyBase::Math::TrsMatrix(boxPosition, boxRotation, boxScale);
+					boxRotation.Y() += 10.f * PonyMath::Core::DegToRad<float>;
+					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
 					render->UpdateRenderObjectTrs(boxHandle, trs);
 				}
 			}));
@@ -177,18 +180,18 @@ namespace Game
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
-			constexpr PonyBase::Math::Vector3<float> vertices[] = { PonyBase::Math::Vector3<float>(-1.f, 1.f, -1.f), PonyBase::Math::Vector3<float>(1.f, 1.f, -1.f), PonyBase::Math::Vector3<float>(1.f, 1.f, 1.f), PonyBase::Math::Vector3<float>(-1.f, 1.f, 1.f),
-				PonyBase::Math::Vector3<float>(-1.f, -1.f, -1.f), PonyBase::Math::Vector3<float>(1.f, -1.f, -1.f), PonyBase::Math::Vector3<float>(1.f, -1.f, 1.f), PonyBase::Math::Vector3<float>(-1.f, -1.f, 1.f) };
-			constexpr PonyBase::Math::Vector3<std::uint32_t> vertexTriangles[] = { PonyBase::Math::Vector3<std::uint32_t>(0, 1, 2), PonyBase::Math::Vector3<std::uint32_t>(0, 2, 3), PonyBase::Math::Vector3<std::uint32_t>(4, 6, 5), PonyBase::Math::Vector3<std::uint32_t>(4, 7, 6),
-				PonyBase::Math::Vector3<std::uint32_t>(0, 4, 1), PonyBase::Math::Vector3<std::uint32_t>(1, 4, 5), PonyBase::Math::Vector3<std::uint32_t>(1, 5, 2), PonyBase::Math::Vector3<std::uint32_t>(2, 5, 6),
-				PonyBase::Math::Vector3<std::uint32_t>(2, 6, 3), PonyBase::Math::Vector3<std::uint32_t>(3, 6, 7), PonyBase::Math::Vector3<std::uint32_t>(3, 7, 0), PonyBase::Math::Vector3<std::uint32_t>(0, 7, 4) };
-			constexpr PonyBase::Math::RGBA<float> vertexColors[] = { PonyBase::Math::RGBA<float>::Predefined::Red, PonyBase::Math::RGBA<float>::Predefined::Green, PonyBase::Math::RGBA<float>::Predefined::Blue, PonyBase::Math::RGBA<float>::Predefined::Yellow,
-				PonyBase::Math::RGBA<float>::Predefined::Magenta, PonyBase::Math::RGBA<float>::Predefined::Cyan, PonyBase::Math::RGBA<float>::Predefined::Gray, PonyBase::Math::RGBA<float>::Predefined::White };
-			auto box = PonyBase::Geometry::Mesh();
+			constexpr PonyMath::Core::Vector3<float> vertices[] = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
+				PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f) };
+			constexpr PonyMath::Core::Vector3<std::uint32_t> vertexTriangles[] = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
+				PonyMath::Core::Vector3<std::uint32_t>(0, 4, 1), PonyMath::Core::Vector3<std::uint32_t>(1, 4, 5), PonyMath::Core::Vector3<std::uint32_t>(1, 5, 2), PonyMath::Core::Vector3<std::uint32_t>(2, 5, 6),
+				PonyMath::Core::Vector3<std::uint32_t>(2, 6, 3), PonyMath::Core::Vector3<std::uint32_t>(3, 6, 7), PonyMath::Core::Vector3<std::uint32_t>(3, 7, 0), PonyMath::Core::Vector3<std::uint32_t>(0, 7, 4) };
+			constexpr PonyMath::Core::RGBA<float> vertexColors[] = { PonyMath::Core::RGBA<float>::Predefined::Red, PonyMath::Core::RGBA<float>::Predefined::Green, PonyMath::Core::RGBA<float>::Predefined::Blue, PonyMath::Core::RGBA<float>::Predefined::Yellow,
+				PonyMath::Core::RGBA<float>::Predefined::Magenta, PonyMath::Core::RGBA<float>::Predefined::Cyan, PonyMath::Core::RGBA<float>::Predefined::Gray, PonyMath::Core::RGBA<float>::Predefined::White };
+			auto box = PonyMath::Geometry::Mesh();
 			box.Vertices(vertices);
 			box.Triangles(vertexTriangles);
 			box.Colors(vertexColors);
-			const PonyBase::Math::Matrix4x4<float> trs = PonyBase::Math::TrsMatrix(boxPosition, boxRotation, boxScale);
+			const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
 			boxHandle = renderSystem->CreateRenderObject(box, trs);
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}

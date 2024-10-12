@@ -25,13 +25,15 @@ import <span>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.Math;
-import PonyBase.Screen;
 import PonyBase.StringUtility;
+
+import PonyMath.Core;
+import PonyMath.Geometry;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core;
+import PonyEngine.Screen;
 import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Direct3D12.Windows.Factory;
@@ -65,17 +67,17 @@ export namespace PonyEngine::Render
 		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyBase::Math::RGBA<float> ClearColor() const noexcept override;
-		virtual void ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept override;
+		virtual PonyMath::Core::RGBA<float> ClearColor() const noexcept override;
+		virtual void ClearColor(const PonyMath::Core::RGBA<float>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyBase::Math::Matrix4x4<float> CameraTrsMatrix() const noexcept override;
-		virtual void CameraTrsMatrix(const PonyBase::Math::Matrix4x4<float>& trs) noexcept override;
+		virtual PonyMath::Core::Matrix4x4<float> CameraTrsMatrix() const noexcept override;
+		virtual void CameraTrsMatrix(const PonyMath::Core::Matrix4x4<float>& trs) noexcept override;
 
-		virtual RenderObjectHandle CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<float>& trs) override;
+		virtual RenderObjectHandle CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& trs) override;
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept override;
 
-		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<float>& trs) const noexcept override;
+		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -95,7 +97,7 @@ export namespace PonyEngine::Render
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		std::optional<PonyBase::Screen::Resolution<UINT>> resolution;
+		std::optional<Screen::Resolution<UINT>> resolution;
 		FLOAT fov;
 		FLOAT nearPlane;
 		FLOAT farPlane;
@@ -110,7 +112,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderParams& params) :
-		resolution(params.resolution.has_value() ? std::optional<PonyBase::Screen::Resolution<UINT>>(static_cast<PonyBase::Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
+		resolution(params.resolution.has_value() ? std::optional<Screen::Resolution<UINT>>(static_cast<Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
 		fov{static_cast<FLOAT>(params.fov)},
 		nearPlane{static_cast<FLOAT>(params.nearPlane)},
 		farPlane{static_cast<FLOAT>(params.farPlane)},
@@ -133,7 +135,7 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Begin()
 	{
-		PonyBase::Screen::Resolution<UINT> renderResolution;
+		Screen::Resolution<UINT> renderResolution;
 
 		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
@@ -146,7 +148,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderResolution = static_cast<PonyBase::Screen::Resolution<UINT>>(Window::GetWindowClientSize(windowHandle));
+				renderResolution = static_cast<Screen::Resolution<UINT>>(Window::GetWindowClientSize(windowHandle));
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
 
@@ -207,30 +209,30 @@ namespace PonyEngine::Render
 		return engine->Logger();
 	}
 
-	PonyBase::Math::RGBA<float> WindowsDirect3D12RenderSystem::ClearColor() const noexcept
+	PonyMath::Core::RGBA<float> WindowsDirect3D12RenderSystem::ClearColor() const noexcept
 	{
-		return static_cast<PonyBase::Math::RGBA<float>>(direct3D12SubSystem->ClearColor());
+		return static_cast<PonyMath::Core::RGBA<float>>(direct3D12SubSystem->ClearColor());
 	}
 
-	void WindowsDirect3D12RenderSystem::ClearColor(const PonyBase::Math::RGBA<float>& color) noexcept
+	void WindowsDirect3D12RenderSystem::ClearColor(const PonyMath::Core::RGBA<float>& color) noexcept
 	{
-		direct3D12SubSystem->ClearColor() = static_cast<PonyBase::Math::RGBA<FLOAT>>(color);
+		direct3D12SubSystem->ClearColor() = static_cast<PonyMath::Core::RGBA<FLOAT>>(color);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem->ClearColor().ToString());
 	}
 
-	PonyBase::Math::Matrix4x4<float> WindowsDirect3D12RenderSystem::CameraTrsMatrix() const noexcept
+	PonyMath::Core::Matrix4x4<float> WindowsDirect3D12RenderSystem::CameraTrsMatrix() const noexcept
 	{
-		return static_cast<PonyBase::Math::Matrix4x4<float>>(direct3D12SubSystem->CameraTrsMatrix());
+		return static_cast<PonyMath::Core::Matrix4x4<float>>(direct3D12SubSystem->CameraTrsMatrix());
 	}
 
-	void WindowsDirect3D12RenderSystem::CameraTrsMatrix(const PonyBase::Math::Matrix4x4<float>& trs) noexcept
+	void WindowsDirect3D12RenderSystem::CameraTrsMatrix(const PonyMath::Core::Matrix4x4<float>& trs) noexcept
 	{
 		direct3D12SubSystem->CameraTrsMatrix() = trs;
 	}
 
-	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const PonyBase::Geometry::Mesh& mesh, const PonyBase::Math::Matrix4x4<float>& trs)
+	RenderObjectHandle WindowsDirect3D12RenderSystem::CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& trs)
 	{
-		return direct3D12SubSystem->CreateRenderObject(mesh, static_cast<PonyBase::Math::Matrix4x4<FLOAT>>(trs));
+		return direct3D12SubSystem->CreateRenderObject(mesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(trs));
 	}
 
 	void WindowsDirect3D12RenderSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
@@ -238,9 +240,9 @@ namespace PonyEngine::Render
 		direct3D12SubSystem->DestroyRenderObject(renderObjectHandle);
 	}
 
-	void WindowsDirect3D12RenderSystem::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<float>& trs) const noexcept
+	void WindowsDirect3D12RenderSystem::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept
 	{
-		direct3D12SubSystem->UpdateRenderObjectTrs(handle, static_cast<PonyBase::Math::Matrix4x4<FLOAT>>(trs));
+		direct3D12SubSystem->UpdateRenderObjectTrs(handle, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(trs));
 	}
 
 	const char* WindowsDirect3D12RenderSystem::Name() const noexcept

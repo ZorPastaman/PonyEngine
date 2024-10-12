@@ -15,16 +15,17 @@ export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12Rend
 
 import <optional>;
 
-import PonyBase.Math;
-import PonyBase.Screen;
+import PonyMath.Core;
+
+import PonyEngine.Screen;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Windows Direct3D 12 render parameters.
 	struct WindowsDirect3D12RenderParams final
 	{
-		std::optional<PonyBase::Screen::Resolution<unsigned int>> resolution = {};
-		float fov = 80.f * PonyBase::Math::DegToRad<float>;
+		std::optional<Screen::Resolution<unsigned int>> resolution = {};
+		float fov = 80.f * PonyMath::Core::DegToRad<float>;
 		float nearPlane = 0.2f;
 		float farPlane = 1000.f;
 

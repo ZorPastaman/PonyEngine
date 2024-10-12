@@ -17,8 +17,9 @@ import <span>;
 import <stdexcept>;
 import <vector>;
 
-import PonyBase.Math;
 import PonyBase.StringUtility;
+
+import PonyMath.Core;
 
 export namespace PonyEngine::Render
 {
@@ -33,9 +34,9 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderTarget() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		PonyBase::Math::RGBA<FLOAT>& ClearColor() noexcept;
+		PonyMath::Core::RGBA<FLOAT>& ClearColor() noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Math::RGBA<FLOAT>& ClearColor() const noexcept;
+		const PonyMath::Core::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2* GetBackBuffer(UINT index) const noexcept;
@@ -46,7 +47,7 @@ export namespace PonyEngine::Render
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
 
 	private:
-		PonyBase::Math::RGBA<FLOAT> clearColor;
+		PonyMath::Core::RGBA<FLOAT> clearColor;
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
@@ -57,7 +58,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12RenderTarget::Direct3D12RenderTarget(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) :
-		clearColor(PonyBase::Math::RGBA<FLOAT>::Predefined::Black)
+		clearColor(PonyMath::Core::RGBA<FLOAT>::Predefined::Black)
 	{
 		backBuffers.resize(buffers.size());
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
@@ -96,12 +97,12 @@ namespace PonyEngine::Render
 		}
 	}
 
-	PonyBase::Math::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() noexcept
+	PonyMath::Core::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() noexcept
 	{
 		return clearColor;
 	}
 
-	const PonyBase::Math::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() const noexcept
+	const PonyMath::Core::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() const noexcept
 	{
 		return clearColor;
 	}
