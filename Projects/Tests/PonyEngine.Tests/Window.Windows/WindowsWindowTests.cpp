@@ -11,10 +11,13 @@
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+import PonyMath.Core;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Input;
+import PonyEngine.Screen;
 import PonyEngine.Window.Windows.Implementation;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -235,8 +238,8 @@ namespace Window
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			PonyEngine::Window::WindowsWindowParams& params = factory.windowSystemFactory->WindowParams();
-			params.position = PonyBase::Math::Vector2<int>(64, 32);
-			params.size = PonyBase::Screen::Resolution<unsigned int>(320, 240);
+			params.position = PonyMath::Core::Vector2<int>(64, 32);
+			params.size = PonyEngine::Screen::Resolution<unsigned int>(320, 240);
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());

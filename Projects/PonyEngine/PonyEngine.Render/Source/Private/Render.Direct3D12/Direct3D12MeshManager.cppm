@@ -23,9 +23,10 @@ import <span>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.Geometry;
-import PonyBase.Math;
 import PonyBase.StringUtility;
+
+import PonyMath.Core;
+import PonyMath.Geometry;
 
 import PonyDebug.Log;
 
@@ -41,18 +42,18 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MeshManager(IRenderer& renderer, ID3D12Device10* device);
+		Direct3D12MeshManager(IRenderer& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh CreateDirect3D12Mesh(const PonyBase::Geometry::Mesh& mesh) const;
+		Direct3D12Mesh CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) const;
 
 	private:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer CreateVertices(std::span<const PonyBase::Math::Vector3<float>> vertices) const;
+		Direct3D12VertexBuffer CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyBase::Math::RGBA<float>> colors, std::size_t vertexCount) const;
+		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyMath::Core::RGBA<float>> colors, std::size_t vertexCount) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexBuffer CreateVertexIndices(std::span<const PonyBase::Math::Vector3<std::uint32_t>> triangles) const;
+		Direct3D12IndexBuffer CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
 		static constexpr auto HeapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -77,7 +78,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Direct3D12Mesh Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyBase::Geometry::Mesh& mesh) const
+	Direct3D12Mesh Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) const
 	{
 		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -105,9 +106,9 @@ namespace PonyEngine::Render
 		return renderMesh;
 	}
 
-	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertices(const std::span<const PonyBase::Math::Vector3<float>> vertices) const
+	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const
 	{
-		constexpr UINT vertexSize = sizeof(PonyBase::Math::Vector3<float>);
+		constexpr UINT vertexSize = sizeof(PonyMath::Core::Vector3<float>);
 		const UINT vertexCount = static_cast<UINT>(vertices.size());
 		const std::size_t vertexBufferSize = vertexSize * vertexCount;
 		const auto verticesDescription = D3D12_RESOURCE_DESC1
@@ -142,9 +143,9 @@ namespace PonyEngine::Render
 		return Direct3D12VertexBuffer(verticesResource.Get(), vertexSize, vertexCount);
 	}
 
-	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyBase::Math::RGBA<float>> colors, const std::size_t vertexCount) const
+	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Core::RGBA<float>> colors, const std::size_t vertexCount) const
 	{
-		constexpr UINT colorSize = sizeof(PonyBase::Math::RGBA<float>);
+		constexpr UINT colorSize = sizeof(PonyMath::Core::RGBA<float>);
 		const UINT colorCount = static_cast<UINT>(colors.size() > 0 ? colors.size() : vertexCount);
 		const std::size_t colorBufferSize = colorSize * colorCount;
 		const auto colorsDescription = D3D12_RESOURCE_DESC1
@@ -179,17 +180,17 @@ namespace PonyEngine::Render
 		}
 		else
 		{
-			std::fill_n(static_cast<PonyBase::Math::RGBA<float>*>(colorsData), colorCount, PonyBase::Math::RGBA<float>::Predefined::White);
+			std::fill_n(static_cast<PonyMath::Core::RGBA<float>*>(colorsData), colorCount, PonyMath::Core::RGBA<float>::Predefined::White);
 		}
 		colorsResource->Unmap(0, nullptr);
 
 		return Direct3D12VertexBuffer(colorsResource.Get(), colorSize, colorCount);
 	}
 
-	Direct3D12IndexBuffer Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyBase::Math::Vector3<std::uint32_t>> triangles) const
+	Direct3D12IndexBuffer Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const
 	{
 		constexpr std::size_t indexSize = sizeof(std::uint32_t);
-		const UINT indexCount = static_cast<UINT>(triangles.size() * PonyBase::Math::Vector3<std::uint32_t>::ComponentCount);
+		const UINT indexCount = static_cast<UINT>(triangles.size() * PonyMath::Core::Vector3<std::uint32_t>::ComponentCount);
 		const std::size_t indexBufferSize = indexSize * indexCount;
 		const auto indicesDescription = D3D12_RESOURCE_DESC1
 		{

@@ -18,7 +18,7 @@ export module PonyEngine.Render.Direct3D12:Direct3D12RenderObjectManager;
 import <cstddef>;
 import <unordered_map>;
 
-import PonyBase.Math;
+import PonyMath.Core;
 
 import PonyDebug.Log;
 
@@ -44,10 +44,10 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		RenderObjectHandle CreateRenderObject(const Direct3D12Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs);
+		RenderObjectHandle CreateRenderObject(const Direct3D12Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& trs);
 		void DestroyRenderObject(RenderObjectHandle renderObjectHandle) noexcept;
 
-		void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept;
+		void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept;
 
 		[[nodiscard("Pure function")]]
 		RenderObjectIterator RenderObjectBegin() const noexcept;
@@ -76,7 +76,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const Direct3D12Mesh& mesh, const PonyBase::Math::Matrix4x4<FLOAT>& trs)
+	RenderObjectHandle Direct3D12RenderObjectManager::CreateRenderObject(const Direct3D12Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& trs)
 	{
 		const auto handle = RenderObjectHandle{.id = nextRenderObjectId++};
 		renderObjects.try_emplace(handle, mesh, trs);
@@ -94,7 +94,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12RenderObjectManager::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyBase::Math::Matrix4x4<FLOAT>& trs) noexcept
+	void Direct3D12RenderObjectManager::UpdateRenderObjectTrs(const RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept
 	{
 		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
 		{

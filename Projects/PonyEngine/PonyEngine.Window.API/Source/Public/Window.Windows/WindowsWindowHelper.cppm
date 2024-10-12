@@ -13,10 +13,11 @@ module;
 
 export module PonyEngine.Window.Windows:WindowsWindowHelper;
 
-import PonyBase.Math;
-import PonyBase.Screen;
+import PonyMath.Core;
 
-export namespace PonyEngine::Window // TODO: Add tests and docs.
+import PonyEngine.Screen;
+
+export namespace PonyEngine::Window // TODO: Add tests and docs. And move to PonyEngine.Screen
 {
 	constexpr UINT DefaultClassStyle = CS_OWNDC;
 
@@ -26,39 +27,39 @@ export namespace PonyEngine::Window // TODO: Add tests and docs.
 	constexpr DWORD DefaultBorderlessWindowedExtendedStyle = 0;
 
 	[[nodiscard("Pure function")]]
-	PonyBase::Screen::Resolution<unsigned int> GetDisplaySize() noexcept;
+	Screen::Resolution<unsigned int> GetDisplaySize() noexcept;
 
 	[[nodiscard("Pure function")]]
-	PonyBase::Math::Vector2<int> CalculateCenteredWindowPosition(const PonyBase::Screen::Resolution<unsigned int>& windowSize) noexcept;
+	PonyMath::Core::Vector2<int> CalculateCenteredWindowPosition(const Screen::Resolution<unsigned int>& windowSize) noexcept;
 
 	[[nodiscard("Pure function")]]
-	PonyBase::Screen::Resolution<unsigned int> GetWindowClientSize(HWND hWnd) noexcept;
+	Screen::Resolution<unsigned int> GetWindowClientSize(HWND hWnd) noexcept;
 }
 
 namespace PonyEngine::Window
 {
-	PonyBase::Screen::Resolution<unsigned int> GetDisplaySize() noexcept
+	Screen::Resolution<unsigned int> GetDisplaySize() noexcept
 	{
-		return PonyBase::Screen::Resolution<unsigned int>(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
+		return PonyEngine::Screen::Resolution<unsigned int>(GetSystemMetrics(SM_CXSCREEN), GetSystemMetrics(SM_CYSCREEN));
 	}
 
-	PonyBase::Math::Vector2<int> CalculateCenteredWindowPosition(const PonyBase::Screen::Resolution<unsigned int>& windowSize) noexcept
+	PonyMath::Core::Vector2<int> CalculateCenteredWindowPosition(const Screen::Resolution<unsigned int>& windowSize) noexcept
 	{
-		const PonyBase::Screen::Resolution<unsigned int> displaySize = GetDisplaySize();
+		const Screen::Resolution<unsigned int> displaySize = GetDisplaySize();
 
-		PonyBase::Math::Vector2<int> position;
+		PonyMath::Core::Vector2<int> position;
 		position.X() = displaySize.Width() / 2 - windowSize.Width() / 2;
 		position.Y() = displaySize.Height() / 2 - windowSize.Height() / 2;
 
 		return position;
 	}
 
-	PonyBase::Screen::Resolution<unsigned int> GetWindowClientSize(const HWND hWnd) noexcept
+	Screen::Resolution<unsigned int> GetWindowClientSize(const HWND hWnd) noexcept
 	{
 		RECT rect;
 		GetClientRect(hWnd, &rect);
 
-		PonyBase::Screen::Resolution<unsigned int> size;
+		Screen::Resolution<unsigned int> size;
 		size.Width() = rect.right - rect.left;
 		size.Height() = rect.bottom - rect.top;
 

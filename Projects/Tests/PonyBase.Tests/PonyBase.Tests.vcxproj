@@ -71,29 +71,12 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Math\CommonTests.cpp" />
-    <ClCompile Include="Math\Matrix2x2Tests.cpp" />
-    <ClCompile Include="Math\Matrix3x3Tests.cpp" />
-    <ClCompile Include="Math\Matrix4x4Tests.cpp" />
-    <ClCompile Include="Math\QuaternionTests.cpp" />
-    <ClCompile Include="Math\RGBAIntTests.cpp" />
-    <ClCompile Include="Math\RGBATests.cpp" />
-    <ClCompile Include="Math\RGBIntTests.cpp" />
-    <ClCompile Include="Math\RGBTests.cpp" />
-    <ClCompile Include="Math\Transformations2DTests.cpp" />
-    <ClCompile Include="Math\Transformations3DTests.cpp" />
-    <ClCompile Include="Math\Vector2Tests.cpp" />
-    <ClCompile Include="Math\Vector3Tests.cpp" />
-    <ClCompile Include="Math\Vector4Tests.cpp" />
     <ClCompile Include="Utility\GuidUtilityTests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Math\PonyBase.Math.vcxproj">
-      <Project>{81aff359-6732-4ef1-9be8-6a808b784245}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Utility\PonyBase.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>

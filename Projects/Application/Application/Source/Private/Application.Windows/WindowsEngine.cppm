@@ -21,14 +21,14 @@ import <array>;
 import <exception>;
 
 import PonyBase.Core;
-import PonyBase.Math;
-import PonyBase.Screen;
+import PonyMath.Core;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core.Implementation;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Render.Direct3D12.Windows.Implementation;
+import PonyEngine.Screen;
 import PonyEngine.Time.Implementation;
 import PonyEngine.Window.Windows.Implementation;
 
@@ -87,7 +87,7 @@ export namespace Application
 		/// @brief Sets up the frame rate system.
 		void SetupFrameRateSystem() const noexcept;
 
-		static constexpr auto DefaultResolution = PonyBase::Screen::Resolution<unsigned int>(1280u, 720u);
+		static constexpr auto DefaultResolution = PonyEngine::Screen::Resolution<unsigned int>(1280u, 720u);
 		static constexpr bool DefaultWindowed = false;
 
 		PonyEngine::Core::IApplication* application; ///< Application.

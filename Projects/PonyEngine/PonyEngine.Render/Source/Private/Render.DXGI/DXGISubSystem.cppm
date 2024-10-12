@@ -21,11 +21,11 @@ import <cstdint>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.Screen;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
+import PonyEngine.Screen;
 import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Core;
@@ -48,7 +48,7 @@ export namespace PonyEngine::Render
 		template<typename T>
 		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
 
-		void Initialize(IUnknown* device, HWND hWnd, const PonyBase::Screen::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
+		void Initialize(IUnknown* device, HWND hWnd, const Screen::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 
 		void Present() const;
 
@@ -135,7 +135,7 @@ namespace PonyEngine::Render
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
-	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyBase::Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
+	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		assert(device && "The device is nullptr.");
 
