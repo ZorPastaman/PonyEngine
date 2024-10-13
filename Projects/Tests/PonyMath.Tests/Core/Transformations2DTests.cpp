@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+#include <cmath>
 #include <numbers>
 
 import PonyMath.Core;
@@ -415,14 +416,14 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr auto rsMatrix = PonyMath::Core::Matrix2x2<float>(-0.97f, -1.75f, -2.625f, 1.455f);
-			constexpr PonyMath::Core::Matrix3x3<float> trsMatrix = PonyMath::Core::TrsMatrix(rsMatrix);
-			constexpr auto translation = PonyMath::Core::Vector2<float>(-3, 7);
-			constexpr PonyMath::Core::Matrix3x3<float> trsMatrixT = PonyMath::Core::TrsMatrix(translation, rsMatrix);
-			constexpr PonyMath::Core::Vector2<float> translationE = PonyMath::Core::ExtractTranslation(trsMatrixT);
-			constexpr PonyMath::Core::Matrix2x2<float> rsMatrixE = PonyMath::Core::ExtractRsMatrix(trsMatrixT);
-			constexpr PonyMath::Core::Vector2<float> point = PonyMath::Core::TransformPoint(trsMatrixT, translation);
-			constexpr PonyMath::Core::Vector2<float> direction = PonyMath::Core::TransformDirection(trsMatrixT, translation);
+			[[maybe_unused]] constexpr auto rsMatrix = PonyMath::Core::Matrix2x2<float>(-0.97f, -1.75f, -2.625f, 1.455f);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<float> trsMatrix = PonyMath::Core::TrsMatrix(rsMatrix);
+			[[maybe_unused]] constexpr auto translation = PonyMath::Core::Vector2<float>(-3, 7);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<float> trsMatrixT = PonyMath::Core::TrsMatrix(translation, rsMatrix);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> translationE = PonyMath::Core::ExtractTranslation(trsMatrixT);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix2x2<float> rsMatrixE = PonyMath::Core::ExtractRsMatrix(trsMatrixT);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> point = PonyMath::Core::TransformPoint(trsMatrixT, translation);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> direction = PonyMath::Core::TransformDirection(trsMatrixT, translation);
 		}
 	};
 }

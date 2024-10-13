@@ -11,8 +11,15 @@
 
 #include <array>
 #include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <format>
 #include <numbers>
+#include <ostream>
+#include <span>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 import PonyMath.Core;
 

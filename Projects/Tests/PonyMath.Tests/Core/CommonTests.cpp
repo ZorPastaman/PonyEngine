@@ -9,8 +9,10 @@
 
 #include "CppUnitTest.h"
 
+#include <cmath>
 #include <cstdint>
 #include <numbers>
+#include <type_traits>
 
 import PonyMath.Core;
 
