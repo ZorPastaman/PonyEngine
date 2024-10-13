@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+#include <cmath>
 #include <numbers>
 
 import PonyMath.Core;
@@ -8435,6 +8436,38 @@ namespace Math
 			Assert::AreEqual(1.813, static_cast<double>(rsMatrix.M22()), 0.001);
 		}
 
+		TEST_METHOD(FovFromPerspectiveMatrixTest)
+		{
+			constexpr auto perspectiveMatrix = PonyMath::Core::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+			const float fov = PonyMath::Core::ExtractFov(perspectiveMatrix);
+
+			Assert::AreEqual(80. * PonyMath::Core::DegToRad<double>, static_cast<double>(fov), 0.001);
+		}
+
+		TEST_METHOD(AspectFromPerspectiveMatrixTest)
+		{
+			constexpr auto perspectiveMatrix = PonyMath::Core::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+			const float aspect = PonyMath::Core::ExtractAspect(perspectiveMatrix);
+
+			Assert::AreEqual(1.7, static_cast<double>(aspect), 0.001);
+		}
+
+		TEST_METHOD(NearPlaneFromPerspectiveMatrixTest)
+		{
+			constexpr auto perspectiveMatrix = PonyMath::Core::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
+			const float nearPlane = PonyMath::Core::ExtractNearPlane(perspectiveMatrix);
+
+			Assert::AreEqual(0.2, static_cast<double>(nearPlane), 0.001);
+		}
+
+		TEST_METHOD(FarPlaneFromPerspectiveMatrixTest)
+		{
+			const auto perspectiveMatrix = PonyMath::Core::PerspectiveMatrix(80.f * PonyMath::Core::DegToRad<float>, 1.7f, 0.2f, 1000.f);
+			const float farPlane = PonyMath::Core::ExtractFarPlane(perspectiveMatrix);
+
+			Assert::AreEqual(1000., static_cast<double>(farPlane), 0.1);
+		}
+
 		TEST_METHOD(RotateWithEulerTest)
 		{
 			constexpr auto vector = PonyMath::Core::Vector3<float>(4.6f, 8.1f, -3.9f);
@@ -8478,19 +8511,22 @@ namespace Math
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			constexpr auto quaternion = PonyMath::Core::Quaternion<float>(0.541f, 0.021f, 0.291f, 0.789f);
-			constexpr auto matrix = PonyMath::Core::RotationMatrix(quaternion);
-			constexpr auto scaling = PonyMath::Core::Vector3<float>(2.f, -3.f, 5.f);
-			constexpr auto rsMatrix = PonyMath::Core::RsMatrix(quaternion, scaling);
-			constexpr auto rsMatrix1 = PonyMath::Core::RsMatrix(matrix, scaling);
-			constexpr auto translation = PonyMath::Core::Vector3<float>(-3.f, 5.f, -6.f);
-			constexpr auto trsMatrix = PonyMath::Core::TrsMatrix(translation, quaternion, scaling);
-			constexpr auto trsMatrix1 = PonyMath::Core::TrsMatrix(rsMatrix);
-			constexpr auto trsMatrix2 = PonyMath::Core::TrsMatrix(translation, rsMatrix);
-			constexpr auto translation1 = PonyMath::Core::ExtractTranslation(trsMatrix);
-			constexpr auto rsMatrix2 = PonyMath::Core::ExtractRsMatrix(trsMatrix);
-			constexpr auto point = PonyMath::Core::TransformPoint(trsMatrix, scaling);
-			constexpr auto direction = PonyMath::Core::TransformDirection(trsMatrix, scaling);
+			[[maybe_unused]] constexpr auto quaternion = PonyMath::Core::Quaternion<float>(0.541f, 0.021f, 0.291f, 0.789f);
+			[[maybe_unused]] constexpr auto matrix = PonyMath::Core::RotationMatrix(quaternion);
+			[[maybe_unused]] constexpr auto scaling = PonyMath::Core::Vector3<float>(2.f, -3.f, 5.f);
+			[[maybe_unused]] constexpr auto rsMatrix = PonyMath::Core::RsMatrix(quaternion, scaling);
+			[[maybe_unused]] constexpr auto rsMatrix1 = PonyMath::Core::RsMatrix(matrix, scaling);
+			[[maybe_unused]] constexpr auto translation = PonyMath::Core::Vector3<float>(-3.f, 5.f, -6.f);
+			[[maybe_unused]] constexpr auto trsMatrix = PonyMath::Core::TrsMatrix(translation, quaternion, scaling);
+			[[maybe_unused]] constexpr auto trsMatrix1 = PonyMath::Core::TrsMatrix(rsMatrix);
+			[[maybe_unused]] constexpr auto trsMatrix2 = PonyMath::Core::TrsMatrix(translation, rsMatrix);
+			[[maybe_unused]] constexpr auto translation1 = PonyMath::Core::ExtractTranslation(trsMatrix);
+			[[maybe_unused]] constexpr auto rsMatrix2 = PonyMath::Core::ExtractRsMatrix(trsMatrix);
+			[[maybe_unused]] constexpr auto aspect = PonyMath::Core::ExtractAspect(trsMatrix);
+			[[maybe_unused]] constexpr auto nearPlane = PonyMath::Core::ExtractNearPlane(trsMatrix);
+			[[maybe_unused]] constexpr auto farPlane = PonyMath::Core::ExtractFarPlane(trsMatrix);
+			[[maybe_unused]] constexpr auto point = PonyMath::Core::TransformPoint(trsMatrix, scaling);
+			[[maybe_unused]] constexpr auto direction = PonyMath::Core::TransformDirection(trsMatrix, scaling);
 		}
 	};
 }

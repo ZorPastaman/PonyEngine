@@ -9,11 +9,16 @@
 
 #include "CppUnitTest.h"
 
+#include <array>
 #include <cstddef>
 #include <cstdint>
 #include <format>
 #include <limits>
+#include <ostream>
+#include <span>
 #include <string>
+#include <type_traits>
+#include <utility>
 
 import PonyMath.Core;
 

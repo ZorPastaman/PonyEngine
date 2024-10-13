@@ -341,6 +341,31 @@ export namespace PonyMath::Core
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Matrix3x3<T> ExtractRsMatrix(const Matrix4x4<T>& trsMatrix) noexcept;
 
+	/// @brief Extracts a field of view from the perspective projection matrix.
+	/// @tparam T Value type.
+	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @return Field of view in radians.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	T ExtractFov(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+	/// @brief Extracts an aspect ratio from the perspective projection matrix.
+	/// @tparam T Value type.
+	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @return Aspect ratio (width / height).
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T ExtractAspect(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+	/// @brief Extracts a near clipping plane distance from the perspective projection matrix.
+	/// @tparam T Value type.
+	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @return Near clipping plane distance.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T ExtractNearPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+	/// @brief Extracts a far clipping plane distance from the perspective projection matrix.
+	/// @tparam T Value type.
+	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @return Far clipping plane distance.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T ExtractFarPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+
 	/// @brief Rotates the @p vector with the @p euler.
 	/// @tparam T Value type.
 	/// @param vector Vector to rotate.
@@ -940,6 +965,32 @@ namespace PonyMath::Core
 	constexpr Matrix3x3<T> ExtractRsMatrix(const Matrix4x4<T>& trsMatrix) noexcept
 	{
 		return Matrix3x3<T>(trsMatrix.M00(), trsMatrix.M10(), trsMatrix.M20(), trsMatrix.M01(), trsMatrix.M11(), trsMatrix.M21(), trsMatrix.M02(), trsMatrix.M12(), trsMatrix.M22());
+	}
+
+	template<std::floating_point T>
+	T ExtractFov(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	{
+		const T fovTan = T{1} / perspectiveMatrix.M11();
+
+		return std::atan(fovTan) * T{2};
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractAspect(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	{
+		return perspectiveMatrix.M11() / perspectiveMatrix.M00();
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractNearPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	{
+		return -perspectiveMatrix.M23() / perspectiveMatrix.M22();
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractFarPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	{
+		return -perspectiveMatrix.M23() / (perspectiveMatrix.M22() - T{1});
 	}
 
 	template<std::floating_point T>

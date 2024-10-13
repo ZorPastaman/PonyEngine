@@ -10,8 +10,17 @@
 #include "CppUnitTest.h"
 
 #include <array>
+#include <cmath>
+#include <cstddef>
+#include <cstdint>
 #include <format>
+#include <limits>
 #include <numbers>
+#include <ostream>
+#include <span>
+#include <string>
+#include <type_traits>
+#include <utility>
 
 import PonyMath.Core;
 
