@@ -205,14 +205,14 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto Red = RGBInt(MaxValue, T{0}, T{0}); ///< RGBInt(MaxValue, 0, 0).
-		static constexpr auto Green = RGBInt(T{0}, MaxValue, T{0}); ///< RGBInt(0, MaxValue, 0).
-		static constexpr auto Blue = RGBInt(T{0}, T{0}, MaxValue); ///< RGBInt(0, 0, MaxValue).
-		static constexpr auto Black = RGBInt(T{0}, T{0}, T{0}); ///< RGBInt(0, 0, 0).
+		static constexpr auto Red = RGBInt(MaxValue, T(0), T(0)); ///< RGBInt(MaxValue, 0, 0).
+		static constexpr auto Green = RGBInt(T(0), MaxValue, T(0)); ///< RGBInt(0, MaxValue, 0).
+		static constexpr auto Blue = RGBInt(T(0), T(0), MaxValue); ///< RGBInt(0, 0, MaxValue).
+		static constexpr auto Black = RGBInt(T(0), T(0), T(0)); ///< RGBInt(0, 0, 0).
 		static constexpr auto White = RGBInt(MaxValue, MaxValue, MaxValue); ///< RGBInt(MaxValue, MaxValue, MaxValue).
-		static constexpr auto Yellow = RGBInt(MaxValue, MaxValue, T{0}); ///< RGBInt(MaxValue, MaxValue, 0).
-		static constexpr auto Magenta = RGBInt(MaxValue, T{0}, MaxValue); ///< RGBInt(MaxValue, 0, MaxValue).
-		static constexpr auto Cyan = RGBInt(T{0}, MaxValue, MaxValue); ///< RGBInt(0, MaxValue, MaxValue).
+		static constexpr auto Yellow = RGBInt(MaxValue, MaxValue, T(0)); ///< RGBInt(MaxValue, MaxValue, 0).
+		static constexpr auto Magenta = RGBInt(MaxValue, T(0), MaxValue); ///< RGBInt(MaxValue, 0, MaxValue).
+		static constexpr auto Cyan = RGBInt(T(0), MaxValue, MaxValue); ///< RGBInt(0, MaxValue, MaxValue).
 	};
 }
 

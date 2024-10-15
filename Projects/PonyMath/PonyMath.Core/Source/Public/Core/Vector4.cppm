@@ -415,9 +415,9 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto One = Vector4(T{1}, T{1}, T{1}, T{1}); ///< Vector4(1, 1, 1, 1).
-		static constexpr auto Zero = Vector4(T{0}, T{0}, T{0}, T{0}); ///< Vector4(0, 0, 0, 0).
-		static constexpr auto Negative = Vector4(T{-1}, T{-1}, T{-1}, T{-1}); ///< Vector4(-1, -1, -1, -1).
+		static constexpr auto One = Vector4(T(1), T(1), T(1), T(1)); ///< Vector4(1, 1, 1, 1).
+		static constexpr auto Zero = Vector4(T(0), T(0), T(0), T(0)); ///< Vector4(0, 0, 0, 0).
+		static constexpr auto Negative = Vector4(T(-1), T(-1), T(-1), T(-1)); ///< Vector4(-1, -1, -1, -1).
 	};
 }
 

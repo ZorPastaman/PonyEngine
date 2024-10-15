@@ -18,7 +18,7 @@ import PonyMath.Core;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Math
+namespace Core
 {
 	TEST_CLASS(CommonTests)
 	{

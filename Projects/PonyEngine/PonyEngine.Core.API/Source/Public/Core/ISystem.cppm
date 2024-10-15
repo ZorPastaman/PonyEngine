@@ -28,7 +28,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system name.
 		/// @return System name.
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
+		virtual const char* Name() const noexcept = 0; // TODO: try string_view instead of char*
 
 		ISystem& operator =(const ISystem&) = delete;
 		ISystem& operator =(ISystem&&) = delete;

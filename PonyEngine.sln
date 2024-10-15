@@ -65,6 +65,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Screen.API", "Pr
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyMath.Tests", "Projects\Tests\PonyMath.Tests\PonyMath.Tests.vcxproj", "{2965A8A8-6E6B-430A-84C5-9792AE8620B4}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyMath.Space", "Projects\PonyMath\PonyMath.Space\PonyMath.Space.vcxproj", "{21CDE60F-881E-445F-8507-703C23AF5897}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -167,6 +169,10 @@ Global
 		{2965A8A8-6E6B-430A-84C5-9792AE8620B4}.Debug|x64.Build.0 = Debug|x64
 		{2965A8A8-6E6B-430A-84C5-9792AE8620B4}.Release|x64.ActiveCfg = Release|x64
 		{2965A8A8-6E6B-430A-84C5-9792AE8620B4}.Release|x64.Build.0 = Release|x64
+		{21CDE60F-881E-445F-8507-703C23AF5897}.Debug|x64.ActiveCfg = Debug|x64
+		{21CDE60F-881E-445F-8507-703C23AF5897}.Debug|x64.Build.0 = Debug|x64
+		{21CDE60F-881E-445F-8507-703C23AF5897}.Release|x64.ActiveCfg = Release|x64
+		{21CDE60F-881E-445F-8507-703C23AF5897}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -196,6 +202,7 @@ Global
 		{2AB77CC5-4A2F-40A2-AF75-2B448BBABB89} = {373D347D-5FA2-4A67-8FCB-FDEA7B8D6BFD}
 		{AF990672-C1E8-41C8-9E42-A4DC871AE69B} = {EDA4A489-53F7-482E-A9A8-D078EF8625A6}
 		{2965A8A8-6E6B-430A-84C5-9792AE8620B4} = {43F91669-3F87-4CB1-BA38-E3D973C07263}
+		{21CDE60F-881E-445F-8507-703C23AF5897} = {373D347D-5FA2-4A67-8FCB-FDEA7B8D6BFD}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}

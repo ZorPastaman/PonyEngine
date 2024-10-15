@@ -449,8 +449,8 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto Identity = Matrix2x2(T{1}, T{0}, T{0}, T{1}); ///< Identity matrix.
-		static constexpr auto Zero = Matrix2x2(T{0}, T{0}, T{0}, T{0}); ///< Zero matrix.
+		static constexpr auto Identity = Matrix2x2(T(1), T(0), T(0), T(1)); ///< Identity matrix.
+		static constexpr auto Zero = Matrix2x2(T(0), T(0), T(0), T(0)); ///< Zero matrix.
 	};
 }
 

@@ -32,6 +32,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj">
       <Project>{2ab77cc5-4a2f-40a2-af75-2b448bbabb89}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Space\PonyMath.Space.vcxproj">
+      <Project>{21cde60f-881e-445f-8507-703c23af5897}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
@@ -40,6 +43,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj">
       <Project>{245050d3-3c78-445c-89b1-9972e3fcc379}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
+      <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj">
       <Project>{9a54f3c1-1617-4da7-a874-8c16b37e018a}</Project>

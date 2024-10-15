@@ -13,18 +13,20 @@ module;
 
 export module Game.Implementation:GameSystem;
 
+import <algorithm>;
+import <array>;
 import <cstdint>;
 import <functional>;
 
 import PonyMath.Core;
 import PonyMath.Geometry;
+import PonyMath.Space;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Render;
-import PonyEngine.Window;
 
 export namespace Game
 {
@@ -59,12 +61,17 @@ export namespace Game
 		PonyEngine::Input::Handle downHandle; ///< Down arrow input handle.
 		PonyEngine::Input::Handle rightHandle; ///< Right arrow input handle.
 		PonyEngine::Input::Handle leftHandle; ///< Left arrow input handle.
+		PonyEngine::Input::Handle wHandle; ///< W input handle.
+		PonyEngine::Input::Handle sHandle; ///< S input handle.
+		PonyEngine::Input::Handle aHandle; ///< A input handle.
+		PonyEngine::Input::Handle dHandle; ///< D input handle.
+		PonyEngine::Input::Handle spaceHandle; ///< Space input handle.
+		PonyEngine::Input::Handle controlHandle; ///< Control input handle.
+		PonyEngine::Input::Handle enterHandle; ///< Enter input handle.
 		PonyEngine::Input::Handle closeHandle; ///< Escape input handle.
 
 		PonyEngine::Render::RenderObjectHandle boxHandle; ///< Box handle.
-		PonyMath::Core::Vector3<float> boxPosition; ///< Box position.
-		PonyMath::Core::Vector3<float> boxRotation; ///< Box rotation.
-		PonyMath::Core::Vector3<float> boxScale; ///< Box scale.
+		PonyMath::Space::Transform3D boxTransform; ///< Box transform.
 
 		PonyEngine::Core::IEngine* const engine; ///< Engine.
 	};
@@ -79,9 +86,7 @@ namespace Game
 		leftHandle(),
 		closeHandle(),
 		boxHandle(),
-		boxPosition(0.f, 0.f, 20.f),
-		boxRotation(PonyMath::Core::Vector3<float>::Predefined::Zero),
-		boxScale(PonyMath::Core::Vector3<float>::Predefined::One * 5.f),
+		boxTransform(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, 5.f),
 		engine{&engine}
 	{
 	}
@@ -97,15 +102,10 @@ namespace Game
 			constexpr auto upEvent = PonyEngine::Input::Event{.expectedMessage = upMessage};
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
-				{
-					window->SecondaryTitle(L"Up");
-				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.X() += 10.f * PonyMath::Core::DegToRad<float>;
-					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
-					render->UpdateRenderObjectTrs(boxHandle, trs);
+					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Up input registered.");
@@ -115,15 +115,10 @@ namespace Game
 			constexpr auto downEvent = PonyEngine::Input::Event{.expectedMessage = downMessage};
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
-				{
-					window->SecondaryTitle(L"Down");
-				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.X() -= 10.f * PonyMath::Core::DegToRad<float>;
-					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
-					render->UpdateRenderObjectTrs(boxHandle, trs);
+					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(-10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Down input registered.");
@@ -133,15 +128,10 @@ namespace Game
 			constexpr auto rightEvent = PonyEngine::Input::Event{.expectedMessage = rightMessage};
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
-				{
-					window->SecondaryTitle(L"Right");
-				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.Y() -= 10.f * PonyMath::Core::DegToRad<float>;
-					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
-					render->UpdateRenderObjectTrs(boxHandle, trs);
+					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, -10.f * PonyMath::Core::DegToRad<float>, 0.f)));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Right input registered.");
@@ -151,23 +141,113 @@ namespace Game
 			constexpr auto leftEvent = PonyEngine::Input::Event{.expectedMessage = leftMessage};
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]
 			{
-				if (PonyEngine::Window::IWindowSystem* const window = engine->SystemManager().FindSystem<PonyEngine::Window::IWindowSystem>())
-				{
-					window->SecondaryTitle(L"Left");
-				}
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
-					boxRotation.Y() += 10.f * PonyMath::Core::DegToRad<float>;
-					const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
-					render->UpdateRenderObjectTrs(boxHandle, trs);
+					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, 10.f * PonyMath::Core::DegToRad<float>, 0.f)));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");
 
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register w input.");
+			constexpr auto wMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::W, .isDown = true};
+			constexpr auto wEvent = PonyEngine::Input::Event{.expectedMessage = wMessage};
+			wHandle = inputSystem->RegisterAction(wEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, 5.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "W input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register s input.");
+			constexpr auto sMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::S, .isDown = true};
+			constexpr auto sEvent = PonyEngine::Input::Event{.expectedMessage = sMessage};
+			sHandle = inputSystem->RegisterAction(sEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, -5.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "S input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register a input.");
+			constexpr auto aMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::A, .isDown = true};
+			constexpr auto aEvent = PonyEngine::Input::Event{.expectedMessage = aMessage};
+			aHandle = inputSystem->RegisterAction(aEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(-5.f, 0.f, 0.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register d input.");
+			constexpr auto dMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::D, .isDown = true};
+			constexpr auto dEvent = PonyEngine::Input::Event{.expectedMessage = dMessage};
+			dHandle = inputSystem->RegisterAction(dEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(5.f, 0.f, 0.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register space input.");
+			constexpr auto spaceMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Space, .isDown = true};
+			constexpr auto spaceEvent = PonyEngine::Input::Event{.expectedMessage = spaceMessage};
+			spaceHandle = inputSystem->RegisterAction(spaceEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 5.f, 0.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Space input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register control input.");
+			constexpr auto controlMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftCtrl, .isDown = true};
+			constexpr auto controlEvent = PonyEngine::Input::Event{.expectedMessage = controlMessage};
+			controlHandle = inputSystem->RegisterAction(controlEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, -5.f, 0.f));
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
+
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register enter input.");
+			constexpr auto enterMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Enter, .isDown = true};
+			constexpr auto enterEvent = PonyEngine::Input::Event{.expectedMessage = enterMessage};
+			enterHandle = inputSystem->RegisterAction(enterEvent, std::bind([&]
+			{
+				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				{
+					boxTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f));
+					boxTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity);
+					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+				}
+			}));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
+
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register close input.");
 			constexpr auto escapeMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Escape, .isDown = false};
 			constexpr auto escapeEvent = PonyEngine::Input::Event{.expectedMessage = escapeMessage};
-			closeHandle = inputSystem->RegisterAction(escapeEvent, std::bind([&]{engine->Stop();}));
+			closeHandle = inputSystem->RegisterAction(escapeEvent, std::bind([&]
+			{
+				engine->Stop();
+			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Close input registered.");
 
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
@@ -180,19 +260,18 @@ namespace Game
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
-			constexpr PonyMath::Core::Vector3<float> vertices[] = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
+			constexpr std::array<PonyMath::Core::Vector3<float>, 8> vertices = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
 				PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f) };
-			constexpr PonyMath::Core::Vector3<std::uint32_t> vertexTriangles[] = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
+			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 12> triangles = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
 				PonyMath::Core::Vector3<std::uint32_t>(0, 4, 1), PonyMath::Core::Vector3<std::uint32_t>(1, 4, 5), PonyMath::Core::Vector3<std::uint32_t>(1, 5, 2), PonyMath::Core::Vector3<std::uint32_t>(2, 5, 6),
 				PonyMath::Core::Vector3<std::uint32_t>(2, 6, 3), PonyMath::Core::Vector3<std::uint32_t>(3, 6, 7), PonyMath::Core::Vector3<std::uint32_t>(3, 7, 0), PonyMath::Core::Vector3<std::uint32_t>(0, 7, 4) };
-			constexpr PonyMath::Core::RGBA<float> vertexColors[] = { PonyMath::Core::RGBA<float>::Predefined::Red, PonyMath::Core::RGBA<float>::Predefined::Green, PonyMath::Core::RGBA<float>::Predefined::Blue, PonyMath::Core::RGBA<float>::Predefined::Yellow,
+			constexpr std::array<PonyMath::Core::RGBA<float>, 8> vertexColors = { PonyMath::Core::RGBA<float>::Predefined::Red, PonyMath::Core::RGBA<float>::Predefined::Green, PonyMath::Core::RGBA<float>::Predefined::Blue, PonyMath::Core::RGBA<float>::Predefined::Yellow,
 				PonyMath::Core::RGBA<float>::Predefined::Magenta, PonyMath::Core::RGBA<float>::Predefined::Cyan, PonyMath::Core::RGBA<float>::Predefined::Gray, PonyMath::Core::RGBA<float>::Predefined::White };
 			auto box = PonyMath::Geometry::Mesh();
 			box.Vertices(vertices);
-			box.Triangles(vertexTriangles);
+			box.Triangles(triangles);
 			box.Colors(vertexColors);
-			const PonyMath::Core::Matrix4x4<float> trs = PonyMath::Core::TrsMatrix(boxPosition, boxRotation, boxScale);
-			boxHandle = renderSystem->CreateRenderObject(box, trs);
+			boxHandle = renderSystem->CreateRenderObject(box, boxTransform.TrsMatrix());
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}
 	}
@@ -215,6 +294,24 @@ namespace Game
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister left input.");
 			inputSystem->UnregisterAction(leftHandle);
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister w input.");
+			inputSystem->UnregisterAction(wHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "W input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister s input.");
+			inputSystem->UnregisterAction(sHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "S input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister a input.");
+			inputSystem->UnregisterAction(aHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister d input.");
+			inputSystem->UnregisterAction(dHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "D input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister space input.");
+			inputSystem->UnregisterAction(spaceHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Space input unregistered.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister control input.");
+			inputSystem->UnregisterAction(controlHandle);
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input unregistered.");
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister close input.");
 			inputSystem->UnregisterAction(closeHandle);
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Close input unregistered.");
