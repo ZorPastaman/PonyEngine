@@ -28,7 +28,7 @@
     <ClCompile Include="Source\Public\Core\Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Math.cppm">
+    <ClCompile Include="Source\Public\Core\Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Matrix2x2.cppm">

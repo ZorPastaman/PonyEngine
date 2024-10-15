@@ -360,15 +360,15 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto Red = RGB(T{1}, T{0}, T{0}); ///< RGB(1, 0, 0).
-		static constexpr auto Green = RGB(T{0}, T{1}, T{0}); ///< RGB(0, 1, 0).
-		static constexpr auto Blue = RGB(T{0}, T{0}, T{1}); ///< RGB(0, 0, 1).
-		static constexpr auto Black = RGB(T{0}, T{0}, T{0}); ///< RGB(0, 0, 0).
-		static constexpr auto White = RGB(T{1}, T{1}, T{1}); ///< RGB(1, 1, 1).
-		static constexpr auto Gray = RGB(T{0.5}, T{0.5}, T{0.5}); ///< RGB(0.5, 0.5, 0.5).
-		static constexpr auto Yellow = RGB(T{1}, T{1}, T{0}); ///< RGB(1, 1, 0).
-		static constexpr auto Magenta = RGB(T{1}, T{0}, T{1}); ///< RGB(1, 0, 1).
-		static constexpr auto Cyan = RGB(T{0}, T{1}, T{1}); ///< RGB(0, 1, 1).
+		static constexpr auto Red = RGB(T(1), T(0), T(0)); ///< RGB(1, 0, 0).
+		static constexpr auto Green = RGB(T(0), T(1), T(0)); ///< RGB(0, 1, 0).
+		static constexpr auto Blue = RGB(T(0), T(0), T(1)); ///< RGB(0, 0, 1).
+		static constexpr auto Black = RGB(T(0), T(0), T(0)); ///< RGB(0, 0, 0).
+		static constexpr auto White = RGB(T(1), T(1), T(1)); ///< RGB(1, 1, 1).
+		static constexpr auto Gray = RGB(T(0.5), T(0.5), T(0.5)); ///< RGB(0.5, 0.5, 0.5).
+		static constexpr auto Yellow = RGB(T(1), T(1), T(0)); ///< RGB(1, 1, 0).
+		static constexpr auto Magenta = RGB(T(1), T(0), T(1)); ///< RGB(1, 0, 1).
+		static constexpr auto Cyan = RGB(T(0), T(1), T(1)); ///< RGB(0, 1, 1).
 	};
 }
 

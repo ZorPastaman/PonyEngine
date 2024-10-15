@@ -399,16 +399,16 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto Red = RGBA(T{1}, T{0}, T{0}, T{1}); ///< RGBA(1, 0, 0, 1).
-		static constexpr auto Green = RGBA(T{0}, T{1}, T{0}, T{1}); ///< RGBA(0, 1, 0, 1).
-		static constexpr auto Blue = RGBA(T{0}, T{0}, T{1}, T{1}); ///< RGBA(0, 0, 1, 1).
-		static constexpr auto Black = RGBA(T{0}, T{0}, T{0}, T{1}); ///< RGBA(0, 0, 0, 1).
-		static constexpr auto White = RGBA(T{1}, T{1}, T{1}, T{1}); ///< RGBA(1, 1, 1, 1).
-		static constexpr auto Clear = RGBA(T{0}, T{0}, T{0}, T{0}); ///< RGBA(0, 0, 0, 0).
-		static constexpr auto Gray = RGBA(T{0.5}, T{0.5}, T{0.5}, T{1}); ///< RGBA(0.5, 0.5, 0.5, 1).
-		static constexpr auto Yellow = RGBA(T{1}, T{1}, T{0}, T{1}); ///< RGBA(1, 1, 0, 1).
-		static constexpr auto Magenta = RGBA(T{1}, T{0}, T{1}, T{1}); ///< RGBA(1, 0, 1, 1).
-		static constexpr auto Cyan = RGBA(T{0}, T{1}, T{1}, T{1}); ///< RGBA(0, 1, 1, 1).
+		static constexpr auto Red = RGBA(T(1), T(0), T(0), T(1)); ///< RGBA(1, 0, 0, 1).
+		static constexpr auto Green = RGBA(T(0), T(1), T(0), T(1)); ///< RGBA(0, 1, 0, 1).
+		static constexpr auto Blue = RGBA(T(0), T(0), T(1), T(1)); ///< RGBA(0, 0, 1, 1).
+		static constexpr auto Black = RGBA(T(0), T(0), T(0), T(1)); ///< RGBA(0, 0, 0, 1).
+		static constexpr auto White = RGBA(T(1), T(1), T(1), T(1)); ///< RGBA(1, 1, 1, 1).
+		static constexpr auto Clear = RGBA(T(0), T(0), T(0), T(0)); ///< RGBA(0, 0, 0, 0).
+		static constexpr auto Gray = RGBA(T(0.5), T(0.5), T(0.5), T(1)); ///< RGBA(0.5, 0.5, 0.5, 1).
+		static constexpr auto Yellow = RGBA(T(1), T(1), T(0), T(1)); ///< RGBA(1, 1, 0, 1).
+		static constexpr auto Magenta = RGBA(T(1), T(0), T(1), T(1)); ///< RGBA(1, 0, 1, 1).
+		static constexpr auto Cyan = RGBA(T(0), T(1), T(1), T(1)); ///< RGBA(0, 1, 1, 1).
 	};
 }
 

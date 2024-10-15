@@ -448,15 +448,15 @@ export namespace PonyMath::Core
 	{
 		Predefined() = delete;
 
-		static constexpr auto Forward = Vector3(T{0}, T{0}, T{1}); ///< Vector3(0, 0, 1).
-		static constexpr auto Back = Vector3(T{0}, T{0}, T{-1}); ///< Vector3(0, 0, -1).
-		static constexpr auto Up = Vector3(T{0}, T{1}, T{0}); ///< Vector3(0, 1, 0).
-		static constexpr auto Down = Vector3(T{0}, T{-1}, T{0}); ///< Vector3(0, -1, 0).
-		static constexpr auto Right = Vector3(T{1}, T{0}, T{0}); /// Vector3(1, 0, 0).
-		static constexpr auto Left = Vector3(T{-1}, T{0}, T{0}); ///< Vector3(-1, 0, 0).
-		static constexpr auto One = Vector3(T{1}, T{1}, T{1}); ///< Vector3(1, 1, 1).
-		static constexpr auto Zero = Vector3(T{0}, T{0}, T{0}); ///< Vector3(0, 0, 0).
-		static constexpr auto Negative = Vector3(T{-1}, T{-1}, T{-1}); ///< Vector3(-1, -1, -1).
+		static constexpr auto Forward = Vector3(T(0), T(0), T(1)); ///< Vector3(0, 0, 1).
+		static constexpr auto Back = Vector3(T(0), T(0), T(-1)); ///< Vector3(0, 0, -1).
+		static constexpr auto Up = Vector3(T(0), T(1), T(0)); ///< Vector3(0, 1, 0).
+		static constexpr auto Down = Vector3(T(0), T(-1), T(0)); ///< Vector3(0, -1, 0).
+		static constexpr auto Right = Vector3(T(1), T(0), T(0)); /// Vector3(1, 0, 0).
+		static constexpr auto Left = Vector3(T(-1), T(0), T(0)); ///< Vector3(-1, 0, 0).
+		static constexpr auto One = Vector3(T(1), T(1), T(1)); ///< Vector3(1, 1, 1).
+		static constexpr auto Zero = Vector3(T(0), T(0), T(0)); ///< Vector3(0, 0, 0).
+		static constexpr auto Negative = Vector3(T(-1), T(-1), T(-1)); ///< Vector3(-1, -1, -1).
 	};
 }
 
