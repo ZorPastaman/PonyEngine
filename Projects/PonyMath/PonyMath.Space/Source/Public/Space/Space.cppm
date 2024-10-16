@@ -9,4 +9,5 @@
 
 export module PonyMath.Space;
 
+export import :Transform2D;
 export import :Transform3D;

@@ -46,7 +46,7 @@ export namespace PonyMath::Geometry
 		[[nodiscard("Pure function")]]
 		std::uint32_t VertexCount() const noexcept;
 		/// @brief Sets the vertex count.
-		/// @param vertexCount New vertex count.
+		/// @param vertexCount Vertex count to set.
 		/// @remark If the new vertex count is less than the current vertex count, the triangles will be cleared;
 		/// @remark If the new vertex count is greater than the current vertex count, the triangles will remain;
 		/// @remark If the mesh has vertex colors, their array will be resized appropriately.
@@ -59,7 +59,7 @@ export namespace PonyMath::Geometry
 		/// @brief Sets triangle count.
 		/// @note Vertex count must be set first.
 		/// @note It throws if the vertex array is empty and you try to set the triangle count more than zero.
-		/// @param triangleCount New triangle count.
+		/// @param triangleCount Triangle count to set.
 		void TriangleCount(std::size_t triangleCount);
 
 		/// @brief Checks if the vertex color array isn't empty.

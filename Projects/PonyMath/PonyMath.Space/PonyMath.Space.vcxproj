@@ -23,6 +23,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Space\Space.cppm" />
+    <ClCompile Include="Source\Public\Space\Transform2D.cppm" />
     <ClCompile Include="Source\Public\Space\Transform3D.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

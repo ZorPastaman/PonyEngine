@@ -436,5 +436,51 @@ namespace Geometry
 				Assert::IsTrue(colors[i] == mesh.Colors()[i]);
 			}
 		}
+
+		TEST_METHOD(AssignmentTest)
+		{
+			auto mesh = PonyMath::Geometry::Mesh();
+			constexpr std::array<PonyMath::Core::Vector3<float>, 3> vertices = { PonyMath::Core::Vector3<float>(1.f, 2.f, 3.f), PonyMath::Core::Vector3<float>(-1.f, -2.f, -3.f), PonyMath::Core::Vector3<float>(-2.f, 4.f, -7.f) };
+			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 1> triangles = { PonyMath::Core::Vector3<std::uint32_t>{0, 2, 1} };
+			constexpr std::array<PonyMath::Core::RGBA<float>, 3> colors = { PonyMath::Core::RGBA<float>(0.2f, 0.5f, 0.8f, 1.f), PonyMath::Core::RGBA<float>(0.f, 1.f, 0.4f, 0.9f), PonyMath::Core::RGBA<float>(1.f, 0.f, 0.f, 0.7f) };
+			mesh.Vertices(vertices);
+			mesh.Triangles(triangles);
+			mesh.Colors(colors);
+			auto copiedMesh = PonyMath::Geometry::Mesh();;
+			copiedMesh = mesh;
+			Assert::AreEqual(vertices.size(), static_cast<std::size_t>(copiedMesh.VertexCount()));
+			for (std::uint32_t i = 0u; i < vertices.size(); ++i)
+			{
+				Assert::IsTrue(vertices[i] == copiedMesh.Vertex(i));
+			}
+			Assert::AreEqual(triangles.size(), copiedMesh.TriangleCount());
+			for (std::size_t i = 0; i < triangles.size(); ++i)
+			{
+				Assert::IsTrue(triangles[i] == copiedMesh.Triangle(i));
+			}
+			Assert::IsTrue(copiedMesh.HasColors());
+			for (std::uint32_t i = 0u; i < colors.size(); ++i)
+			{
+				Assert::IsTrue(colors[i] == copiedMesh.Color(i));
+			}
+
+			auto movedMesh = PonyMath::Geometry::Mesh();
+			movedMesh = std::move(mesh);
+			Assert::AreEqual(vertices.size(), static_cast<std::size_t>(movedMesh.VertexCount()));
+			for (std::uint32_t i = 0u; i < vertices.size(); ++i)
+			{
+				Assert::IsTrue(vertices[i] == movedMesh.Vertex(i));
+			}
+			Assert::AreEqual(triangles.size(), movedMesh.TriangleCount());
+			for (std::size_t i = 0; i < triangles.size(); ++i)
+			{
+				Assert::IsTrue(triangles[i] == movedMesh.Triangle(i));
+			}
+			Assert::IsTrue(movedMesh.HasColors());
+			for (std::uint32_t i = 0u; i < colors.size(); ++i)
+			{
+				Assert::IsTrue(colors[i] == movedMesh.Color(i));
+			}
+		}
 	};
 }
