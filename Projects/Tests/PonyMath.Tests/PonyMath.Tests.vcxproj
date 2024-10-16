@@ -26,6 +26,7 @@
     <ClCompile Include="Core\Vector3Tests.cpp" />
     <ClCompile Include="Core\Vector4Tests.cpp" />
     <ClCompile Include="Geometry\MeshTests.cpp" />
+    <ClCompile Include="Space\Transform2DTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Core\PonyMath.Core.vcxproj">
@@ -33,6 +34,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj">
       <Project>{2ab77cc5-4a2f-40a2-af75-2b448bbabb89}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Space\PonyMath.Space.vcxproj">
+      <Project>{21cde60f-881e-445f-8507-703c23af5897}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">
