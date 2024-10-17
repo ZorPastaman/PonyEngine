@@ -19,7 +19,7 @@ import PonyMath.Core;
 export namespace PonyMath::Space
 {
 	/// @brief 3D transform implementation.
-	class Transform3D final // TODO: Add docs and tests
+	class Transform3D final
 	{
 	public:
 		using PositionType = Core::Vector3<float>; ///< Position type.
@@ -117,6 +117,7 @@ export namespace PonyMath::Space
 		/// @param up Up vector. Must be unit.
 		void LookIn(const Core::Vector3<float>& direction, const Core::Vector3<float>& up) noexcept;
 		/// @brief Rotates the transform so that it looks at the specific point.
+		/// @note The function does nothing if the @p point is too close to the current position.
 		/// @param point Look target.
 		/// @param up Up vector. Must be unit.
 		void LookAt(const Core::Vector3<float>& point, const Core::Vector3<float>& up) noexcept;
@@ -148,9 +149,10 @@ export namespace PonyMath::Space
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.
 	/// @param left Left transform.
 	/// @param right Right transform.
+	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if they're almost equal; @a false otherwise.
 	[[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right) noexcept;
+	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right, float tolerance = 0.00001f) noexcept;
 
 	/// @brief Puts the transform ToString() to the stream.
 	/// @param stream Target.
@@ -292,9 +294,9 @@ namespace PonyMath::Space
 		return position == other.position && rotation == other.rotation && scale == other.scale;
 	}
 
-	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right) noexcept
+	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right, const float tolerance) noexcept
 	{
-		return Core::AreAlmostEqual(left.Position(), right.Position()) && Core::AreAlmostEqual(left.Rotation(), right.Rotation()) && Core::AreAlmostEqual(left.Scale(), right.Scale());
+		return Core::AreAlmostEqual(left.Position(), right.Position(), tolerance) && Core::AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && Core::AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const Transform3D& transform)

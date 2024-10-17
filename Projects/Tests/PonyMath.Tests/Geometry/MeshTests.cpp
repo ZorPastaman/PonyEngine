@@ -138,7 +138,7 @@ namespace Geometry
 			{
 				Assert::IsTrue(vertices[i] == mesh.Vertex(i));
 			}
-			for (std::uint32_t i = vertices.size(); i < 10u; ++i)
+			for (std::uint32_t i = static_cast<std::uint32_t>(vertices.size()); i < 10u; ++i)
 			{
 				Assert::IsTrue(PonyMath::Core::Vector3<float>::Predefined::Zero == mesh.Vertex(i));
 			}
