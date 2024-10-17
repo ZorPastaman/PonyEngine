@@ -27,6 +27,7 @@
     <ClCompile Include="Core\Vector4Tests.cpp" />
     <ClCompile Include="Geometry\MeshTests.cpp" />
     <ClCompile Include="Space\Transform2DTests.cpp" />
+    <ClCompile Include="Space\Transform3DTests.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Core\PonyMath.Core.vcxproj">
