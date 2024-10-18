@@ -121,6 +121,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window\PonyEngine.Window.vcxproj">
       <Project>{6f7c3d39-fd6c-447b-9191-a401efdffc08}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
+      <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

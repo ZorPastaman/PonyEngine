@@ -7,6 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.DXGI;
+export module PonyEngine.Screen.Factory;
 
-export import :DXGISubSystem;
+export import :ScreenSystemFactoryData;
+export import :ScreenSystemFactoryParams;

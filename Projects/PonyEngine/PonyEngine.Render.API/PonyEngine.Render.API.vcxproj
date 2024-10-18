@@ -39,6 +39,10 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Render.Direct3D12.Factory.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />
@@ -79,11 +83,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Render;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Render;$(ProjectDir)\Source\Public\Render\Factory;$(ProjectDir)\Source\Public\Render.Direct3D12;$(ProjectDir)\Source\Public\Render.Direct3D12\Factory;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Render;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Render;$(ProjectDir)\Source\Public\Render\Factory;$(ProjectDir)\Source\Public\Render.Direct3D12;$(ProjectDir)\Source\Public\Render.Direct3D12\Factory;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows;$(ProjectDir)\Source\Public\Render.Direct3D12.Windows\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

@@ -24,7 +24,6 @@ import <utility>;
 import <vector>;
 
 import PonyBase.Core;
-import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 

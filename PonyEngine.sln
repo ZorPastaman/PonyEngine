@@ -27,6 +27,10 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input", "Project
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Input.API", "Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj", "{245050D3-3C78-445C-89B1-9972E3FCC379}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Screen", "Projects\PonyEngine\PonyEngine.Screen\PonyEngine.Screen.vcxproj", "{D0FC9462-753D-47EC-8897-74D7F15F7A2C}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Screen.API", "Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj", "{AF990672-C1E8-41C8-9E42-A4DC871AE69B}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Render", "Projects\PonyEngine\PonyEngine.Render\PonyEngine.Render.vcxproj", "{ABD4E8F3-04FB-41F8-A7B0-B628FE63A030}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Render.API", "Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj", "{9A54F3C1-1617-4DA7-A874-8C16B37E018A}"
@@ -60,8 +64,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43F91669-3F87-4CB1-BA38-E3D973C07263}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyMath.Geometry", "Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj", "{2AB77CC5-4A2F-40A2-AF75-2B448BBABB89}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyEngine.Screen.API", "Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj", "{AF990672-C1E8-41C8-9E42-A4DC871AE69B}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyMath.Tests", "Projects\Tests\PonyMath.Tests\PonyMath.Tests.vcxproj", "{2965A8A8-6E6B-430A-84C5-9792AE8620B4}"
 EndProject
@@ -173,6 +175,10 @@ Global
 		{21CDE60F-881E-445F-8507-703C23AF5897}.Debug|x64.Build.0 = Debug|x64
 		{21CDE60F-881E-445F-8507-703C23AF5897}.Release|x64.ActiveCfg = Release|x64
 		{21CDE60F-881E-445F-8507-703C23AF5897}.Release|x64.Build.0 = Release|x64
+		{D0FC9462-753D-47EC-8897-74D7F15F7A2C}.Debug|x64.ActiveCfg = Debug|x64
+		{D0FC9462-753D-47EC-8897-74D7F15F7A2C}.Debug|x64.Build.0 = Debug|x64
+		{D0FC9462-753D-47EC-8897-74D7F15F7A2C}.Release|x64.ActiveCfg = Release|x64
+		{D0FC9462-753D-47EC-8897-74D7F15F7A2C}.Release|x64.Build.0 = Release|x64
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -203,6 +209,7 @@ Global
 		{AF990672-C1E8-41C8-9E42-A4DC871AE69B} = {EDA4A489-53F7-482E-A9A8-D078EF8625A6}
 		{2965A8A8-6E6B-430A-84C5-9792AE8620B4} = {43F91669-3F87-4CB1-BA38-E3D973C07263}
 		{21CDE60F-881E-445F-8507-703C23AF5897} = {373D347D-5FA2-4A67-8FCB-FDEA7B8D6BFD}
+		{D0FC9462-753D-47EC-8897-74D7F15F7A2C} = {EDA4A489-53F7-482E-A9A8-D078EF8625A6}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {DAEFC5E5-61AC-4005-98D4-E683FC101E3D}

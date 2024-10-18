@@ -9,6 +9,10 @@
 
 export module PonyEngine.Window:IWindowSystem;
 
+import PonyMath.Core;
+
+import PonyEngine.Screen;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Window system.
@@ -46,6 +50,15 @@ export namespace PonyEngine::Window
 		virtual void ShowWindow() = 0;
 		/// @brief Hides the window.
 		virtual void HideWindow() = 0;
+
+		/// @brief Gets the window position.
+		/// @return Window position.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<int> Position() const noexcept = 0;
+		/// @brief Gets the window resolution.
+		/// @return Window resolution.
+		[[nodiscard("Pure function")]]
+		virtual Screen::Resolution<unsigned int> Resolution() const noexcept = 0;
 
 		/// @brief Gets the window name.
 		/// @return Window name.
