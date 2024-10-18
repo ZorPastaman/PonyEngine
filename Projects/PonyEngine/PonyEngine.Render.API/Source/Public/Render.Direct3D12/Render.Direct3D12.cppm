@@ -9,4 +9,4 @@
 
 export module PonyEngine.Render.Direct3D12;
 
-export import :Direct3D12SubSystem;
+export import PonyEngine.Render;

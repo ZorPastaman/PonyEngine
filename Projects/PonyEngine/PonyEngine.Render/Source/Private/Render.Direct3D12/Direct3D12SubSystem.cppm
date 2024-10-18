@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12:Direct3D12SubSystem;
+export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12SubSystem;
 
 import <cstdint>;
 import <memory>;

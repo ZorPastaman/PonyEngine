@@ -9,8 +9,7 @@
 
 module;
 
-#include "PonyBase/Core/Direct3D12/Framework.h"
-#include "PonyBase/Core/DXGI/Framework.h"
+#include "PonyBase/Core/Direct3D12/Windows/Framework.h"
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -39,8 +38,9 @@ import PonyEngine.Window.Windows;
 import PonyEngine.Render.Direct3D12.Windows.Factory;
 
 import PonyEngine.Render.Core;
-import PonyEngine.Render.Direct3D12;
-import PonyEngine.Render.DXGI;
+import PonyEngine.Render.Direct3D12.Implementation;
+
+import :WindowsDirect3D12DXGISubSystem;
 
 export namespace PonyEngine::Render
 {
@@ -89,7 +89,7 @@ export namespace PonyEngine::Render
 
 	private:
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<DXGISubSystem> CreateDXGISubSystem();
+		std::unique_ptr<WindowsDirect3D12DXGISubSystem> CreateDXGISubSystem();
 		[[nodiscard("Pure function")]]
 		std::unique_ptr<Direct3D12SubSystem> CreateDirect3D12SubSystem(D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
 
@@ -104,7 +104,7 @@ export namespace PonyEngine::Render
 
 		Core::IEngine* engine; ///< Engine.
 
-		std::unique_ptr<DXGISubSystem> dxgiSubSystem; ///< DXGI sub-system.
+		std::unique_ptr<WindowsDirect3D12DXGISubSystem> dxgiSubSystem; ///< DXGI sub-system.
 		std::unique_ptr<Direct3D12SubSystem> direct3D12SubSystem; ///< Direct3D 12 sub-system.
 	};
 }
@@ -148,7 +148,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderResolution = static_cast<Screen::Resolution<UINT>>(Window::GetWindowClientSize(windowHandle));
+				renderResolution = static_cast<Screen::Resolution<UINT>>(windowSystem->Resolution());
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
 
@@ -250,13 +250,13 @@ namespace PonyEngine::Render
 		return StaticName;
 	}
 
-	std::unique_ptr<DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()
+	std::unique_ptr<WindowsDirect3D12DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
-		const auto createdDxgiSubSystem = new DXGISubSystem(*this);
+		const auto createdDxgiSubSystem = new WindowsDirect3D12DXGISubSystem(*this);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
-		return std::unique_ptr<DXGISubSystem>(createdDxgiSubSystem);
+		return std::unique_ptr<WindowsDirect3D12DXGISubSystem>(createdDxgiSubSystem);
 	}
 
 	std::unique_ptr<Direct3D12SubSystem> WindowsDirect3D12RenderSystem::CreateDirect3D12SubSystem(const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout)

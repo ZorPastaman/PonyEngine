@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12:Direct3D12RenderTarget;
+export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12RenderTarget;
 
 import <span>;
 import <stdexcept>;

@@ -13,7 +13,7 @@ import PonyDebug.Log;
 
 export namespace PonyEngine::Render
 {
-	class IRenderer
+	class IRenderer // TODO: Make a context. The same may be applied to the IEngine. IEngine must be for external use, and IEngineContext for internal.
 	{
 	public:
 		IRenderer(const IRenderer&) = delete;

@@ -55,17 +55,20 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
       <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen\PonyEngine.Screen.vcxproj">
+      <Project>{d0fc9462-753d-47ec-8897-74d7f15f7a2c}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj">
       <Project>{9a54f3c1-1617-4da7-a874-8c16b37e018a}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render\PonyEngine.Render.vcxproj">
       <Project>{abd4e8f3-04fb-41f8-a7b0-b628fe63a030}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time\PonyEngine.Time.vcxproj">
-      <Project>{d58a635f-ec7c-4b7b-8301-7c51118d9d6f}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time.API\PonyEngine.Time.API.vcxproj">
       <Project>{8b3f2887-0863-444c-884e-dfe775f31ba0}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time\PonyEngine.Time.vcxproj">
+      <Project>{d58a635f-ec7c-4b7b-8301-7c51118d9d6f}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
       <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>

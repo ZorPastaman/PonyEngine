@@ -11,6 +11,11 @@
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+#include <cstddef>
+#include <exception>
+#include <string>
+#include <typeinfo>
+
 import PonyMath.Core;
 
 import PonyDebug.Log;
@@ -71,19 +76,22 @@ namespace Window
 		class EmptySystemManager : public PonyEngine::Core::ISystemManager
 		{
 		public:
+			PonyEngine::Screen::IScreenSystem* screenSystem = nullptr;
+
 			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info&) const noexcept override
+			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
 			{
-				return nullptr;
+				return typeInfo == typeid(PonyEngine::Screen::IScreenSystem) ? screenSystem : nullptr;
 			}
 		};
 
 		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
 		{
 			EmptyLogger* logger;
-			mutable EmptySystemManager systemManager;
 
 		public:
+			mutable EmptySystemManager systemManager;
+
 			int stopCode = 123;
 
 			explicit EmptyEngine(EmptyLogger& logger) noexcept :
@@ -154,17 +162,30 @@ namespace Window
 			}
 		};
 
+		class ScreenSystem final : public PonyEngine::Screen::IScreenSystem
+		{
+		public:
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Screen::Resolution<unsigned int> DisplayResolution() const noexcept override
+			{
+				return PonyEngine::Screen::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
+			}
+		};
+
 		TEST_METHOD(GetSetTitleTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
+			window.system->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());
 			const wchar_t* title = L"Test title";
 			windowsWindow->MainTitle(title);
@@ -172,14 +193,17 @@ namespace Window
 			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
 			Assert::AreEqual(title, gotTitle);
 			Assert::AreEqual(title, windowsWindow->MainTitle());
+			window.system->End();
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
@@ -192,14 +216,17 @@ namespace Window
 		TEST_METHOD(ShowHideWindowTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
+			window.system->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());
 			windowsWindow->ShowWindow();
 			Assert::IsTrue(IsWindowVisible(windowsWindow->WindowHandle()));
@@ -207,14 +234,17 @@ namespace Window
 			windowsWindow->HideWindow();
 			Assert::IsFalse(IsWindowVisible(windowsWindow->WindowHandle()));
 			Assert::IsFalse(windowsWindow->IsVisible());
+			window.system->End();
 		}
 
 		TEST_METHOD(CreateTitleTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			std::wstring title = L"Test title";
@@ -231,54 +261,62 @@ namespace Window
 		TEST_METHOD(WindowRectTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
-			PonyEngine::Window::WindowsWindowParams& params = factory.windowSystemFactory->WindowParams();
-			params.position = PonyMath::Core::Vector2<int>(64, 32);
-			params.size = PonyEngine::Screen::Resolution<unsigned int>(320, 240);
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
+			window.system->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());
 			RECT rect;
 			GetWindowRect(windowsWindow->WindowHandle(), &rect);
-			Assert::AreEqual(64L, rect.left);
-			Assert::AreEqual(32L, rect.top);
-			Assert::AreEqual(64L + 320L, rect.right);
-			Assert::AreEqual(32L + 240L, rect.bottom);
+			Assert::AreEqual(0L, rect.left);
+			Assert::AreEqual(0L, rect.top);
+			Assert::AreEqual(static_cast<LONG>(GetSystemMetrics(SM_CXSCREEN)), rect.right);
+			Assert::AreEqual(static_cast<LONG>(GetSystemMetrics(SM_CYSCREEN)), rect.bottom);
+			window.system->End();
 		}
 
 		TEST_METHOD(DestroyMessageTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
+			window.system->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());
 			PostMessageW(windowsWindow->WindowHandle(), WM_DESTROY, 0, 0);
 			window.tickableSystem->Tick();
 			Assert::AreEqual(0, engine.stopCode);
+			window.system->End();
 		}
 
 		TEST_METHOD(InputMessageTest)
 		{
 			auto logger = EmptyLogger();
+			auto screenSystem = ScreenSystem();
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = EmptyEngine(logger);
+			engine.systemManager.screenSystem = &screenSystem;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
+			window.system->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());
 			auto keyboardObserver = KeyboardObserver();
 			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(window.system.get());
@@ -295,6 +333,7 @@ namespace Window
 			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
 			window.tickableSystem->Tick();
 			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
+			window.system->End();
 		}
 	};
 }

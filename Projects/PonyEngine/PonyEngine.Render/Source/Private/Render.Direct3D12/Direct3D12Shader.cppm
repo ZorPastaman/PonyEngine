@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12:Direct3D12Shader;
+export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12Shader;
 
 import <cstddef>;
 import <format>;

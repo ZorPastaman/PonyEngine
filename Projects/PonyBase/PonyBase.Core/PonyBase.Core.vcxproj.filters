@@ -41,7 +41,7 @@
     <ClInclude Include="Include\Public\PonyBase\Core\Direct3D12\Framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Public\PonyBase\Core\DXGI\Framework.h">
+    <ClInclude Include="Include\Public\PonyBase\Core\Direct3D12\Windows\Framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

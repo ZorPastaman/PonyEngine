@@ -28,7 +28,7 @@ import PonyDebug.Log;
 import PonyEngine.Core.Implementation;
 import PonyEngine.Input.Implementation;
 import PonyEngine.Render.Direct3D12.Windows.Implementation;
-import PonyEngine.Screen;
+import PonyEngine.Screen.Windows.Implementation;
 import PonyEngine.Time.Implementation;
 import PonyEngine.Window.Windows.Implementation;
 
@@ -58,6 +58,10 @@ export namespace Application
 		WindowsEngine& operator =(WindowsEngine&&) = delete;
 
 	private:
+		/// @brief Creates a screen system factory.
+		/// @return Screen system factory.
+		[[nodiscard("Pure function")]]
+		PonyEngine::Screen::ScreenSystemFactoryData CreateScreenSystemFactory() const;
 		/// @brief Creates a frame rate system factory.
 		/// @return Frame rate system factory.
 		[[nodiscard("Pure function")]]
@@ -87,12 +91,9 @@ export namespace Application
 		/// @brief Sets up the frame rate system.
 		void SetupFrameRateSystem() const noexcept;
 
-		static constexpr auto DefaultResolution = PonyEngine::Screen::Resolution<unsigned int>(1280u, 720u);
-		static constexpr bool DefaultWindowed = false;
-
 		PonyEngine::Core::IApplication* application; ///< Application.
 
-		std::array<PonyEngine::Core::SystemFactoryUniquePtr, 5> systemFactories; ///< System factories.
+		std::array<PonyEngine::Core::SystemFactoryUniquePtr, 6> systemFactories; ///< System factories.
 		PonyEngine::Core::EngineData engine; ///< Engine.
 	};
 }
@@ -101,7 +102,7 @@ namespace Application
 {
 	WindowsEngine::WindowsEngine(PonyEngine::Core::IApplication& application) :
 		application{&application},
-		systemFactories{CreateFrameRateSystemFactory().systemFactory, CreateWindowSystemFactory().systemFactory, CreateInputSystemFactory().systemFactory, CreateGameSystemFactory().systemFactory, CreateRenderSystemFactory().systemFactory},
+		systemFactories{CreateScreenSystemFactory().systemFactory, CreateFrameRateSystemFactory().systemFactory, CreateWindowSystemFactory().systemFactory, CreateInputSystemFactory().systemFactory, CreateGameSystemFactory().systemFactory, CreateRenderSystemFactory().systemFactory},
 		engine{CreateEngine()}
 	{
 		SetupFrameRateSystem();
@@ -150,6 +151,25 @@ namespace Application
 		return false;
 	}
 
+	PonyEngine::Screen::ScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
+	{
+		try
+		{
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
+			PonyEngine::Screen::ScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::ScreenSystemFactoryParams{});
+			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
+
+			return factory;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On creating Windows screen system factory.");
+
+			throw;
+		}
+	}
+
 	PonyEngine::Time::FrameRateSystemFactoryData WindowsEngine::CreateFrameRateSystemFactory() const
 	{
 		try
@@ -180,15 +200,10 @@ namespace Application
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
-			const bool windowed = DefaultWindowed;
-			const auto size = windowed ? DefaultResolution : PonyEngine::Window::GetDisplaySize();
-
 			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->WindowParams();
 			windowParams.title = L"Pony Engine Game";
-			windowParams.position = PonyEngine::Window::CalculateCenteredWindowPosition(size);
-			windowParams.size = size;
-			windowParams.style = windowed ? PonyEngine::Window::DefaultWindowedStyle : PonyEngine::Window::DefaultBorderlessWindowedStyle;
-			windowParams.extendedStyle = (windowed ? PonyEngine::Window::DefaultWindowedExtendedStyle : PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle) | WS_EX_APPWINDOW;
+			windowParams.style = PonyEngine::Window::DefaultBorderlessWindowedStyle;
+			windowParams.extendedStyle = PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle | WS_EX_APPWINDOW;
 			windowParams.cmdShow = SW_NORMAL;
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());

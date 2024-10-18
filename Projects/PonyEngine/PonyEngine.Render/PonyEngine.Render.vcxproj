@@ -29,6 +29,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Core\PonyMath.Core.vcxproj">
       <Project>{6f808c7f-60c8-4894-91ed-cfb0906af8f0}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj">
+      <Project>{2ab77cc5-4a2f-40a2-af75-2b448bbabb89}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
@@ -58,10 +61,9 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Fence.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Implementation.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\DXGISubSystem.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>

@@ -11,11 +11,11 @@ module;
 
 #include <cassert>
 
-#include "PonyBase/Core/DXGI/Framework.h"
+#include "PonyBase/Core/Direct3D12/Windows/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.DXGI:DXGISubSystem;
+export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12DXGISubSystem;
 
 import <cstdint>;
 import <stdexcept>;
@@ -33,15 +33,15 @@ import PonyEngine.Render.Core;
 export namespace PonyEngine::Render
 {
 	/// @brief DXGI sub-system.
-	class DXGISubSystem final
+	class WindowsDirect3D12DXGISubSystem final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit DXGISubSystem(IRenderer& renderer);
-		DXGISubSystem(const DXGISubSystem&) = delete;
-		DXGISubSystem(DXGISubSystem&&) = delete;
+		explicit WindowsDirect3D12DXGISubSystem(IRenderer& renderer);
+		WindowsDirect3D12DXGISubSystem(const WindowsDirect3D12DXGISubSystem&) = delete;
+		WindowsDirect3D12DXGISubSystem(WindowsDirect3D12DXGISubSystem&&) = delete;
 
-		~DXGISubSystem() noexcept;
+		~WindowsDirect3D12DXGISubSystem() noexcept;
 
 		[[nodiscard("Pure function")]]
 		UINT GetCurrentBackBufferIndex() const noexcept;
@@ -52,8 +52,8 @@ export namespace PonyEngine::Render
 
 		void Present() const;
 
-		DXGISubSystem& operator =(const DXGISubSystem&) = delete;
-		DXGISubSystem& operator =(DXGISubSystem&&) = delete;
+		WindowsDirect3D12DXGISubSystem& operator =(const WindowsDirect3D12DXGISubSystem&) = delete;
+		WindowsDirect3D12DXGISubSystem& operator =(WindowsDirect3D12DXGISubSystem&&) = delete;
 
 	private:
 		IRenderer* renderer;
@@ -68,7 +68,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	DXGISubSystem::DXGISubSystem(IRenderer& renderer) :
+	WindowsDirect3D12DXGISubSystem::WindowsDirect3D12DXGISubSystem(IRenderer& renderer) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -96,7 +96,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(factory.Get()));
 	}
 
-	DXGISubSystem::~DXGISubSystem() noexcept
+	WindowsDirect3D12DXGISubSystem::~WindowsDirect3D12DXGISubSystem() noexcept
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release swap chain.");
 		swapChain.Reset();
@@ -120,7 +120,7 @@ namespace PonyEngine::Render
 #endif
 	}
 
-	UINT DXGISubSystem::GetCurrentBackBufferIndex() const noexcept
+	UINT WindowsDirect3D12DXGISubSystem::GetCurrentBackBufferIndex() const noexcept
 	{
 		assert(swapChain && "The swap chain is nullptr.");
 
@@ -128,14 +128,14 @@ namespace PonyEngine::Render
 	}
 
 	template<typename T>
-	HRESULT DXGISubSystem::GetBuffer(const UINT bufferIndex, T** const buffer) const noexcept
+	HRESULT WindowsDirect3D12DXGISubSystem::GetBuffer(const UINT bufferIndex, T** const buffer) const noexcept
 	{
 		assert(swapChain && "The swap chain is nullptr.");
 
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
-	void DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
+	void WindowsDirect3D12DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		assert(device && "The device is nullptr.");
 
@@ -178,7 +178,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
 	}
 
-	void DXGISubSystem::Present() const
+	void WindowsDirect3D12DXGISubSystem::Present() const
 	{
 		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
 		{

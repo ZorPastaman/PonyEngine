@@ -7,12 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Render.Factory;
 
-#include "PonyBase/Core/COM/Framework.h"
-
-#include <dxgi1_6.h>
-
-#ifdef _DEBUG
-#include <dxgidebug.h>
-#endif
+export import PonyEngine.Render;

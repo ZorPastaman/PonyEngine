@@ -33,7 +33,6 @@ import PonyEngine.Core.Factory;
 import PonyEngine.Window.Windows.Factory;
 
 import :IWindowProc;
-import :WindowProcFunction;
 import :WindowsWindowSystem;
 
 export namespace PonyEngine::Window
@@ -121,10 +120,6 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window.");
 		const auto system = new WindowsWindowSystem(engine, hInstance, classAtom, windowParams);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window created.");
-		const HWND hWnd = system->WindowHandle();
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Register window proc. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
-		RegisterWindowProc(hWnd, system);
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window proc registered.");
 		const auto deleter = Core::SystemDeleter(*this);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
@@ -140,22 +135,9 @@ namespace PonyEngine::Window
 	void WindowsWindowSystemFactory::Destroy(Core::ISystem* const system) noexcept
 	{
 		assert((dynamic_cast<WindowsWindowSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		const auto windowsWindow = static_cast<WindowsWindowSystem*>(system);
-		const HWND hWnd = windowsWindow->WindowHandle();
 
-		if (windowsWindow->IsWindowAlive())
-		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window proc. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
-			UnregisterWindowProc(hWnd);
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window proc unregistered.");
-		}
-		else
-		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Skip unregistering window proc 'cause window has already been destroyed. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
-		}
-
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
-		delete windowsWindow;
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window.");
+		delete static_cast<WindowsWindowSystem*>(system);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 	}
 

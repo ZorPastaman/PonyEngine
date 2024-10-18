@@ -49,5 +49,17 @@
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Render.Direct3D12.Factory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
