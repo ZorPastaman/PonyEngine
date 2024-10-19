@@ -32,6 +32,7 @@ import PonyEngine.Screen;
 
 import PonyEngine.Render.Core;
 
+import :Direct3D12CameraParams;
 import :Direct3D12GraphicsPipeline;
 
 export namespace PonyEngine::Render
@@ -53,6 +54,9 @@ export namespace PonyEngine::Render
 		const PonyMath::Core::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		const Direct3D12CameraParams& CameraParams() const noexcept;
+		void CameraParams(const Direct3D12CameraParams& cameraParams) const noexcept;
+		[[nodiscard("Pure function")]]
 		PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() noexcept;
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() const noexcept;
@@ -60,7 +64,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const Screen::Resolution<UINT>& resolution, FLOAT fov, FLOAT nearPlane, FLOAT farPlane, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
+		void Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
@@ -141,6 +145,16 @@ namespace PonyEngine::Render
 		return graphicsPipeline->ClearColor();
 	}
 
+	const Direct3D12CameraParams& Direct3D12SubSystem::CameraParams() const noexcept
+	{
+		return graphicsPipeline->CameraParams();
+	}
+
+	void Direct3D12SubSystem::CameraParams(const Direct3D12CameraParams& cameraParams) const noexcept
+	{
+		graphicsPipeline->CameraParams(cameraParams);
+	}
+
 	PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12SubSystem::CameraTrsMatrix() noexcept
 	{
 		return graphicsPipeline->CameraTrsMatrix();
@@ -156,9 +170,9 @@ namespace PonyEngine::Render
 		return graphicsPipeline->GetCommandQueue();
 	}
 
-	void Direct3D12SubSystem::Initialize(const Screen::Resolution<UINT>& resolution, const FLOAT fov, const FLOAT nearPlane, const FLOAT farPlane, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
+	void Direct3D12SubSystem::Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
 	{
-		graphicsPipeline->Initialize(resolution, fov, nearPlane, farPlane, buffers, rtvFormat);
+		graphicsPipeline->Initialize(cameraParams, resolution, buffers, rtvFormat);
 	}
 
 	void Direct3D12SubSystem::PopulateCommands(const UINT bufferIndex) const

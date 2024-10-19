@@ -32,6 +32,7 @@ import PonyDebug.Log;
 import PonyEngine.Screen;
 
 import :Direct3D12Camera;
+import :Direct3D12CameraParams;
 import :Direct3D12Fence;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
@@ -57,6 +58,9 @@ export namespace PonyEngine::Render
 		const PonyMath::Core::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		const Direct3D12CameraParams& CameraParams() const noexcept;
+		void CameraParams(const Direct3D12CameraParams& cameraParams) const noexcept;
+		[[nodiscard("Pure function")]]
 		PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() noexcept;
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<FLOAT>& CameraTrsMatrix() const noexcept;
@@ -64,7 +68,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const Screen::Resolution<UINT>& resolution, FLOAT fov, FLOAT nearPlane, FLOAT farPlane, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
+		void Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
@@ -195,6 +199,16 @@ namespace PonyEngine::Render
 		return renderTarget->ClearColor();
 	}
 
+	const Direct3D12CameraParams& Direct3D12GraphicsPipeline::CameraParams() const noexcept
+	{
+		return camera->CameraParams();
+	}
+
+	void Direct3D12GraphicsPipeline::CameraParams(const Direct3D12CameraParams& cameraParams) const noexcept
+	{
+		camera->CameraParams(cameraParams);
+	}
+
 	PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12GraphicsPipeline::CameraTrsMatrix() noexcept
 	{
 		return camera->TrsMatrix();
@@ -210,10 +224,10 @@ namespace PonyEngine::Render
 		return commandQueue.Get();
 	}
 
-	void Direct3D12GraphicsPipeline::Initialize(const Screen::Resolution<UINT>& resolution, const FLOAT fov, const FLOAT nearPlane, const FLOAT farPlane, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
+	void Direct3D12GraphicsPipeline::Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 camera. Resolution: '{}'.", resolution.ToString());
-		camera.reset(new Direct3D12Camera(resolution, fov, nearPlane, farPlane));
+		camera.reset(new Direct3D12Camera(cameraParams, resolution));
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 camera created.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Get command queue device.");

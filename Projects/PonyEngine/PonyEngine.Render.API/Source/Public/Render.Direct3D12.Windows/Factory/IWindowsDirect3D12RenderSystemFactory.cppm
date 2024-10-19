@@ -9,20 +9,22 @@
 
 export module PonyEngine.Render.Direct3D12.Windows.Factory:IWindowsDirect3D12RenderSystemFactory;
 
+import PonyEngine.Render.Direct3D12.Factory;
+
 import :WindowsDirect3D12RenderParams;
 
 export namespace PonyEngine::Render
 {
-	class IWindowsDirect3D12RenderSystemFactory
+	class IWindowsDirect3D12RenderSystemFactory : public IDirect3D12RenderSystemFactory
 	{
 	public:
 		IWindowsDirect3D12RenderSystemFactory(const IWindowsDirect3D12RenderSystemFactory&) = delete;
 		IWindowsDirect3D12RenderSystemFactory(IWindowsDirect3D12RenderSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowsDirect3D12RenderParams& RenderSystemParams() noexcept = 0;
+		virtual WindowsDirect3D12RenderParams& RenderSystemParams() noexcept override = 0;
 		[[nodiscard("Pure function")]]
-		virtual const WindowsDirect3D12RenderParams& RenderSystemParams() const noexcept = 0;
+		virtual const WindowsDirect3D12RenderParams& RenderSystemParams() const noexcept override = 0;
 
 		IWindowsDirect3D12RenderSystemFactory& operator =(const IWindowsDirect3D12RenderSystemFactory&) = delete;
 		IWindowsDirect3D12RenderSystemFactory& operator =(IWindowsDirect3D12RenderSystemFactory&&) = delete;
