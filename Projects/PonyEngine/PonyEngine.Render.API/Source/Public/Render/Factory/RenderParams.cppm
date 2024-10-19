@@ -7,8 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12;
+export module PonyEngine.Render.Factory:RenderParams;
 
-export import PonyEngine.Render;
+import <optional>;
 
-export import :IDirect3D12RenderSystem;
+import PonyEngine.Render;
+import PonyEngine.Screen;
+
+export namespace PonyEngine::Render
+{
+	struct RenderParams
+	{
+		CameraParams cameraParams = CameraParams{.fov = 60.f * PonyMath::Core::DegToRad<float>, .nearPlane = 0.2f, .farPlane = 1000.f};
+		std::optional<Screen::Resolution<unsigned int>> resolution = {};
+	};
+}

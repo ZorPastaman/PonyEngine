@@ -9,5 +9,6 @@
 
 export module PonyEngine.Render;
 
+export import :CameraParams;
 export import :IRenderSystem;
 export import :RenderObjectHandle;

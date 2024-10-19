@@ -7,8 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12;
+module;
 
-export import PonyEngine.Render;
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-export import :IDirect3D12RenderSystem;
+export module PonyEngine.Render.Direct3D12.Factory:Direct3D12RenderParams;
+
+import PonyEngine.Render.Factory;
+
+export namespace PonyEngine::Render
+{
+	struct Direct3D12RenderParams : RenderParams
+	{
+		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
+		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
+
+		DWORD fenceTimeout = 20000;
+	};
+}

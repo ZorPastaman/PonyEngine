@@ -7,8 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12;
+module;
 
-export import PonyEngine.Render;
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-export import :IDirect3D12RenderSystem;
+export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12CameraParams;
+
+export namespace PonyEngine::Render
+{
+	struct Direct3D12CameraParams final
+	{
+		FLOAT fov;
+		FLOAT nearPlane;
+		FLOAT farPlane;
+	};
+}
