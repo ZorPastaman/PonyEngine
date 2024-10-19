@@ -18,7 +18,7 @@
     <ClInclude Include="resource.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="Include\Public\PonyEngine\Log\Log.h">
+    <ClInclude Include="Include\Public\PonyDebug\Log\Log.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -95,6 +95,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log.Windows\IWindowsSubLogger.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

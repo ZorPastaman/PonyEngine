@@ -15,12 +15,12 @@ export module PonyDebug.Log.Windows.Implementation:OutputDebugStringSubLogger;
 
 import <exception>;
 
-import PonyDebug.Log;
+import PonyDebug.Log.Windows;
 
 export namespace PonyDebug::Log
 {
 	/// @brief Sub-logger that puts logs into the @p OutputDebugString.
-	class OutputDebugStringSubLogger final : public ISubLogger
+	class OutputDebugStringSubLogger final : public IWindowsSubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

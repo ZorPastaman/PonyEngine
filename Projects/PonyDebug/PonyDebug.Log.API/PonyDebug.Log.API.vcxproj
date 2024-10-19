@@ -21,6 +21,8 @@
     <ClCompile Include="Source\Public\Log.Windows\Factory\Log.Windows.Factory.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerData.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Factory\OutputDebugStringSubLoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Log.Windows\IWindowsSubLogger.cppm" />
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerData.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerData.cppm" />

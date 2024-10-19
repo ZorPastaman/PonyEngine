@@ -10,6 +10,7 @@
 export module PonyDebug.Log.Windows.Factory:OutputDebugStringSubLoggerData;
 
 import PonyDebug.Log.Factory;
+import PonyDebug.Log.Windows;
 
 export namespace PonyDebug::Log
 {
@@ -17,5 +18,7 @@ export namespace PonyDebug::Log
 	struct OutputDebugStringSubLoggerData final
 	{
 		SubLoggerUniquePtr subLogger; ///< Sub-logger.
+
+		IWindowsSubLogger* windowsSubLogger = nullptr; ///< Windows sub-logger.
 	};
 }
