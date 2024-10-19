@@ -13,7 +13,7 @@ import :LogEntry;
 
 export namespace PonyDebug::Log
 {
-	/// @brief SubLogger.
+	/// @brief Sub-logger.
 	class ISubLogger
 	{
 	public:

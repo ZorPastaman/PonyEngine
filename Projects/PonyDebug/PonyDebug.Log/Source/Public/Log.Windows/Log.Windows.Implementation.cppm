@@ -37,6 +37,10 @@ namespace PonyDebug::Log
 		const auto outputDebugStringSubLogger = new OutputDebugStringSubLogger();
 		const auto outputDebugStringSubLoggerDeleter = SubLoggerDeleter(DefaultOutputDebugStringSubLoggerDestroyer);
 
-		return OutputDebugStringSubLoggerData{.subLogger = SubLoggerUniquePtr(outputDebugStringSubLogger, outputDebugStringSubLoggerDeleter)};
+		return OutputDebugStringSubLoggerData
+		{
+			.subLogger = SubLoggerUniquePtr(outputDebugStringSubLogger, outputDebugStringSubLoggerDeleter),
+			.windowsSubLogger = outputDebugStringSubLogger
+		};
 	}
 }
