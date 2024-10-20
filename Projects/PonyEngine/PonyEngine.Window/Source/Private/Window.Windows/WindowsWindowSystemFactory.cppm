@@ -56,9 +56,9 @@ export namespace PonyEngine::Window
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowsWindowParams& WindowParams() noexcept override;
+		virtual WindowsWindowParams& WindowSystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const WindowsWindowParams& WindowParams() const noexcept override;
+		virtual const WindowsWindowParams& WindowSystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -141,12 +141,12 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 	}
 
-	WindowsWindowParams& WindowsWindowSystemFactory::WindowParams() noexcept
+	WindowsWindowParams& WindowsWindowSystemFactory::WindowSystemParams() noexcept
 	{
 		return windowParams;
 	}
 
-	const WindowsWindowParams& WindowsWindowSystemFactory::WindowParams() const noexcept
+	const WindowsWindowParams& WindowsWindowSystemFactory::WindowSystemParams() const noexcept
 	{
 		return windowParams;
 	}

@@ -9,12 +9,14 @@
 
 export module PonyEngine.Window.Windows.Factory:IWindowsWindowSystemFactory;
 
+import PonyEngine.Window.Factory;
+
 import :WindowsWindowParams;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window system for Windows factory.
-	class IWindowsWindowSystemFactory
+	class IWindowsWindowSystemFactory : public IWindowSystemFactory
 	{
 	public:
 		IWindowsWindowSystemFactory(const IWindowsWindowSystemFactory&) = delete;
@@ -23,11 +25,11 @@ export namespace PonyEngine::Window
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual WindowsWindowParams& WindowParams() noexcept = 0;
+		virtual WindowsWindowParams& WindowSystemParams() noexcept override = 0;
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual const WindowsWindowParams& WindowParams() const noexcept = 0;
+		virtual const WindowsWindowParams& WindowSystemParams() const noexcept override = 0;
 
 		IWindowsWindowSystemFactory& operator =(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory& operator =(IWindowsWindowSystemFactory&&) = delete;

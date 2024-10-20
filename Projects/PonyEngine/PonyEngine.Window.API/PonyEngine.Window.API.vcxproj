@@ -26,6 +26,9 @@
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowHelper.cppm" />
+    <ClCompile Include="Source\Public\Window\Factory\IWindowSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Window\Factory\Window.Factory.cppm" />
+    <ClCompile Include="Source\Public\Window\Factory\WindowParams.cppm" />
     <ClCompile Include="Source\Public\Window\IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>

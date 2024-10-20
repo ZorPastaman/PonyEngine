@@ -7,25 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyBase/Core/Windows/Framework.h"
-
-export module PonyEngine.Window.Windows.Factory:WindowsWindowParams;
+export module PonyEngine.Window.Factory:WindowParams;
 
 import <string>;
 
-import PonyMath.Core;
-
-import PonyEngine.Window.Factory;
-
 export namespace PonyEngine::Window
 {
-	/// @brief Windows window parameters.
-	struct WindowsWindowParams final : WindowParams
+	struct WindowParams
 	{
-		DWORD style = DWORD{0}; ///< Window style.
-		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
-		int cmdShow = SW_NORMAL; ///< Window cmdShow.
+		std::wstring title = L"Pony Engine Window"; ///< Window title.
 	};
 }
