@@ -11,7 +11,7 @@ export module PonyEngine.Render.Direct3D12.Factory:IDirect3D12RenderSystemFactor
 
 import PonyEngine.Render.Factory;
 
-import :Direct3D12RenderParams;
+import :Direct3D12RenderSystemParams;
 
 export namespace PonyEngine::Render
 {
@@ -22,9 +22,9 @@ export namespace PonyEngine::Render
 		IDirect3D12RenderSystemFactory(IDirect3D12RenderSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual Direct3D12RenderParams& RenderSystemParams() noexcept override = 0;
+		virtual Direct3D12RenderSystemParams& SystemParams() noexcept override = 0;
 		[[nodiscard("Pure function")]]
-		virtual const Direct3D12RenderParams& RenderSystemParams() const noexcept override = 0;
+		virtual const Direct3D12RenderSystemParams& SystemParams() const noexcept override = 0;
 
 		IDirect3D12RenderSystemFactory& operator =(const IDirect3D12RenderSystemFactory&) = delete;
 		IDirect3D12RenderSystemFactory& operator =(IDirect3D12RenderSystemFactory&&) = delete;

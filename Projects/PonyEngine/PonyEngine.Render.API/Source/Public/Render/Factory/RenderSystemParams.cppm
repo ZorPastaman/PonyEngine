@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Factory:RenderParams;
+export module PonyEngine.Render.Factory:RenderSystemParams;
 
 import <optional>;
 
@@ -16,9 +16,9 @@ import PonyEngine.Screen;
 
 export namespace PonyEngine::Render
 {
-	struct RenderParams
+	struct RenderSystemParams
 	{
-		CameraParams cameraParams = CameraParams{.fov = 60.f * PonyMath::Core::DegToRad<float>, .nearPlane = 0.2f, .farPlane = 1000.f};
+		CameraParams cameraParams = CameraParams{.fov = 60.f * PonyMath::Core::DegToRad<float>, .nearPlane = 0.2f, .farPlane = 1000.f}; // TODO: Use projection matrix
 		std::optional<Screen::Resolution<unsigned int>> resolution = {};
 	};
 }

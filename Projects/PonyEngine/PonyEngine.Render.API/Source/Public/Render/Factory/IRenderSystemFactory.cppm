@@ -9,20 +9,22 @@
 
 export module PonyEngine.Render.Factory:IRenderSystemFactory;
 
-import :RenderParams;
+import PonyEngine.Core.Factory;
+
+import :RenderSystemParams;
 
 export namespace PonyEngine::Render
 {
-	class IRenderSystemFactory
+	class IRenderSystemFactory : public Core::ISystemFactory
 	{
 	public:
 		IRenderSystemFactory(const IRenderSystemFactory&) = delete;
 		IRenderSystemFactory(IRenderSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual RenderParams& RenderSystemParams() noexcept = 0;
+		virtual RenderSystemParams& SystemParams() noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const RenderParams& RenderSystemParams() const noexcept = 0;
+		virtual const RenderSystemParams& SystemParams() const noexcept = 0;
 
 		IRenderSystemFactory& operator =(const IRenderSystemFactory&) = delete;
 		IRenderSystemFactory& operator =(IRenderSystemFactory&&) = delete;

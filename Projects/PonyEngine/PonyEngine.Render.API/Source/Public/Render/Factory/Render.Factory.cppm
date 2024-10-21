@@ -12,4 +12,4 @@ export module PonyEngine.Render.Factory;
 export import PonyEngine.Render;
 
 export import :IRenderSystemFactory;
-export import :RenderParams;
+export import :RenderSystemParams;

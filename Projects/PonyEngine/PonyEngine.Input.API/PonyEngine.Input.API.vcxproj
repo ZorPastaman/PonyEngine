@@ -18,9 +18,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Input\Event.cppm" />
+    <ClCompile Include="Source\Public\Input\Factory\IInputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\Factory\Input.Factory.cppm" />
     <ClCompile Include="Source\Public\Input\Factory\InputSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Input\Factory\InputSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Input\Factory\InputSystemParams.cppm" />
     <ClCompile Include="Source\Public\Input\Handle.cppm" />
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
     <ClCompile Include="Source\Public\Input\IKeyboardObserver.cppm" />

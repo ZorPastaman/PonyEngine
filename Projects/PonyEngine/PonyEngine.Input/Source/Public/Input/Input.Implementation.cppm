@@ -41,7 +41,8 @@ namespace PonyEngine::Input
 
 		return InputSystemFactoryData
 		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter)
+			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
+			.inputSystemFactory = factory
 		};
 	}
 }
