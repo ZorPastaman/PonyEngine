@@ -38,10 +38,10 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\Render.Direct3D12.Windows.Factory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Factory\WindowsDirect3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Direct3D12RenderParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Direct3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Factory\IDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Render.Direct3D12.Factory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm" />
@@ -49,7 +49,7 @@
     <ClCompile Include="Source\Public\Render\CameraParams.cppm" />
     <ClCompile Include="Source\Public\Render\Factory\IRenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm" />
-    <ClCompile Include="Source\Public\Render\Factory\RenderParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Factory\RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />

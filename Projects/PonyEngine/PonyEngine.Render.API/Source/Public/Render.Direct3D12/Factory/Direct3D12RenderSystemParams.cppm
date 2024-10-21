@@ -7,19 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Factory:InputSystemFactoryData;
+module;
 
-import PonyEngine.Core.Factory;
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-import :IInputSystemFactory;
+export module PonyEngine.Render.Direct3D12.Factory:Direct3D12RenderSystemParams;
 
-export namespace PonyEngine::Input
+import PonyEngine.Render.Factory;
+
+export namespace PonyEngine::Render
 {
-	/// @brief Input system factory data.
-	struct InputSystemFactoryData final
+	struct Direct3D12RenderSystemParams : RenderSystemParams
 	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< Input system factory.
+		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
+		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
 
-		IInputSystemFactory* inputSystemFactory = nullptr; ///< Input system factory.
+		DWORD fenceTimeout = 20000;
 	};
 }

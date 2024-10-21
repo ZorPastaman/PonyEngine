@@ -26,7 +26,7 @@ import :WindowsDirect3D12RenderSystem;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows factory.
-	class WindowsDirect3D12RenderSystemFactory final : public Core::ISystemFactory, public IWindowsDirect3D12RenderSystemFactory, public Core::ISystemDestroyer
+	class WindowsDirect3D12RenderSystemFactory final : public IWindowsDirect3D12RenderSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -41,9 +41,9 @@ export namespace PonyEngine::Render
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowsDirect3D12RenderParams& RenderSystemParams() noexcept override;
+		virtual WindowsDirect3D12RenderSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const WindowsDirect3D12RenderParams& RenderSystemParams() const noexcept override;
+		virtual const WindowsDirect3D12RenderSystemParams& SystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -56,7 +56,7 @@ export namespace PonyEngine::Render
 		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystemFactory"; ///< Class name.
 
 	private:
-		WindowsDirect3D12RenderParams renderSystemParams;
+		WindowsDirect3D12RenderSystemParams renderSystemParams;
 	};
 }
 
@@ -82,12 +82,12 @@ namespace PonyEngine::Render
 		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
 	}
 
-	WindowsDirect3D12RenderParams& WindowsDirect3D12RenderSystemFactory::RenderSystemParams() noexcept
+	WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::SystemParams() noexcept
 	{
 		return renderSystemParams;
 	}
 
-	const WindowsDirect3D12RenderParams& WindowsDirect3D12RenderSystemFactory::RenderSystemParams() const noexcept
+	const WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::SystemParams() const noexcept
 	{
 		return renderSystemParams;
 	}

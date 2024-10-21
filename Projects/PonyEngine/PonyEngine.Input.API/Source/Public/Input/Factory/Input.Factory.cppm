@@ -11,5 +11,7 @@ export module PonyEngine.Input.Factory;
 
 export import PonyEngine.Input;
 
+export import :IInputSystemFactory;
 export import :InputSystemFactoryData;
 export import :InputSystemFactoryParams;
+export import :InputSystemParams;
