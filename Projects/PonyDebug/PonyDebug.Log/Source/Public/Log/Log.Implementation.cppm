@@ -53,25 +53,22 @@ namespace PonyDebug::Log
 
 	LoggerData CreateLogger(const LoggerParams&)
 	{
-		const auto logger = new Logger();
-		const auto loggerDeleter = LoggerDeleter(DefaultLoggerDestroyer);
+		ILogger* const logger = new Logger();
 
-		return LoggerData{.logger = LoggerUniquePtr(logger, loggerDeleter)};
+		return LoggerData{.logger = LoggerUniquePtr(*logger, DefaultLoggerDestroyer)};
 	}
 
 	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams&)
 	{
-		const auto consoleSubLogger = new ConsoleSubLogger();
-		const auto consoleSubLoggerDeleter = SubLoggerDeleter(DefaultConsoleSubLoggerDestroyer);
+		ISubLogger* const consoleSubLogger = new ConsoleSubLogger();
 
-		return ConsoleSubLoggerData{.subLogger = SubLoggerUniquePtr(consoleSubLogger, consoleSubLoggerDeleter)};
+		return ConsoleSubLoggerData{.subLogger = SubLoggerUniquePtr(*consoleSubLogger, DefaultConsoleSubLoggerDestroyer)};
 	}
 
 	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		const auto fileSubLogger = new FileSubLogger(params.logPath);
-		const auto fileSubLoggerDeleter = SubLoggerDeleter(DefaultFileSubLoggerDestroyer);
+		ISubLogger* const fileSubLogger = new FileSubLogger(params.logPath);
 
-		return FileSubLoggerData{.subLogger = SubLoggerUniquePtr(fileSubLogger, fileSubLoggerDeleter)};
+		return FileSubLoggerData{.subLogger = SubLoggerUniquePtr(*fileSubLogger, DefaultFileSubLoggerDestroyer)};
 	}
 }

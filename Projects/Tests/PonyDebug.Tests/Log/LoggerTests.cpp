@@ -52,7 +52,7 @@ namespace Log
 		TEST_METHOD(CreateTest)
 		{
 			const PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
-			Assert::IsNotNull(logger.logger.get());
+			Assert::IsNotNull(logger.logger.Get());
 		}
 
 		TEST_METHOD(LogTest)

@@ -20,6 +20,12 @@ export namespace PonyDebug::Log
 		ILoggerDestroyer(const ILoggerDestroyer&) = delete;
 		ILoggerDestroyer(ILoggerDestroyer&&) = delete;
 
+		/// @brief Checks the logger compatibility.
+		/// @param logger Logger.
+		/// @return @a True if it's compatible; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(ILogger* logger) const noexcept = 0;
+
 		/// @brief Destroys the @p logger.
 		/// @param logger Logger to destroy.
 		virtual void Destroy(ILogger* logger) noexcept = 0;

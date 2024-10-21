@@ -17,8 +17,6 @@ export namespace PonyDebug::Log
 	/// @brief Output debug string sub-logger data.
 	struct OutputDebugStringSubLoggerData final
 	{
-		SubLoggerUniquePtr subLogger; ///< Sub-logger.
-
-		IWindowsSubLogger* windowsSubLogger = nullptr; ///< Windows sub-logger.
+		SubLoggerUniquePtr<IWindowsSubLogger> subLogger; ///< Sub-logger.
 	};
 }

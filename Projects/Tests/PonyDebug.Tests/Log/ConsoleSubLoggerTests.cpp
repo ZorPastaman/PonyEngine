@@ -25,7 +25,7 @@ namespace Log
 		TEST_METHOD(CreateTest)
 		{
 			const PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
-			Assert::IsNotNull(consoleSubLogger.subLogger.get());
+			Assert::IsNotNull(consoleSubLogger.subLogger.Get());
 		}
 
 		TEST_METHOD(LogTest)

@@ -22,12 +22,20 @@ export namespace PonyDebug::Log
 	/// @brief Output debug string sub-logger destroyer.
 	struct OutputDebugStringSubLoggerDestroyer final : ISubLoggerDestroyer
 	{
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(ISubLogger* subLogger) const noexcept override;
+
 		virtual void Destroy(ISubLogger* subLogger) noexcept override;
 	};
 }
 
 namespace PonyDebug::Log
 {
+	bool OutputDebugStringSubLoggerDestroyer::IsCompatible(ISubLogger* const subLogger) const noexcept
+	{
+		return dynamic_cast<OutputDebugStringSubLogger*>(subLogger);
+	}
+
 	void OutputDebugStringSubLoggerDestroyer::Destroy(ISubLogger* const subLogger) noexcept
 	{
 		assert(dynamic_cast<OutputDebugStringSubLogger*>(subLogger) && "Tried to destroy a sub-logger of the wrong type.");

@@ -29,8 +29,8 @@ namespace Log
 		{
 			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = testLogPath};
 			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
-			Assert::IsNotNull(fileSubLogger.subLogger.get());
-			fileSubLogger.subLogger.reset();
+			Assert::IsNotNull(fileSubLogger.subLogger.Get());
+			fileSubLogger.subLogger.Reset();
 			std::filesystem::remove(testLogPath);
 		}
 
@@ -43,7 +43,7 @@ namespace Log
 			constexpr std::size_t frameCount = 84136;
 			const auto infoLogEntry = PonyDebug::Log::LogEntry(message, nullptr, timePoint, frameCount, PonyDebug::Log::LogType::Info);
 			fileSubLogger.subLogger->Log(infoLogEntry);
-			fileSubLogger.subLogger.reset();
+			fileSubLogger.subLogger.Reset();
 
 			std::ifstream logFile(testLogPath);
 			std::string line;
@@ -59,7 +59,7 @@ namespace Log
 			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = testLogPath};
 			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
 			Assert::AreEqual("PonyDebug::Log::FileSubLogger", fileSubLogger.subLogger->Name());
-			fileSubLogger.subLogger.reset();
+			fileSubLogger.subLogger.Reset();
 			std::filesystem::remove(testLogPath);
 		}
 	};
