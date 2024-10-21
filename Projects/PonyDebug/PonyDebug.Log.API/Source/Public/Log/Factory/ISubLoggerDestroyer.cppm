@@ -20,6 +20,12 @@ export namespace PonyDebug::Log
 		ISubLoggerDestroyer(const ISubLoggerDestroyer&) = delete;
 		ISubLoggerDestroyer(ISubLoggerDestroyer&&) = delete;
 
+		/// @brief Checks the sub-logger compatibility.
+		/// @param subLogger Sub-logger.
+		/// @return @a True if it's compatible; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(ISubLogger* subLogger) const noexcept = 0;
+
 		/// @brief Destroys the @p subLogger.
 		/// @param subLogger Sub-logger to destroy.
 		virtual void Destroy(ISubLogger* subLogger) noexcept = 0;

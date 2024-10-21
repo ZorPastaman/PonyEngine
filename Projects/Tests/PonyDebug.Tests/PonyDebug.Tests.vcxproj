@@ -86,12 +86,10 @@
     <ClCompile Include="Log\LogConsoleHelperTests.cpp" />
     <ClCompile Include="Log\LogEntryTests.cpp" />
     <ClCompile Include="Log\LogFormatTests.cpp" />
-    <ClCompile Include="Log\LoggerDeleterTests.cpp" />
     <ClCompile Include="Log\LoggerTests.cpp" />
     <ClCompile Include="Log\LogHelperTests.cpp" />
     <ClCompile Include="Log\LogTypeTests.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
-    <ClCompile Include="Log\SubLoggerDeleterTests.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

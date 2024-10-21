@@ -251,7 +251,7 @@ namespace Window
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
 			auto windowParams = PonyEngine::Window::WindowsWindowParams();
 			windowParams.title = title;
-			factory.windowSystemFactory->WindowParams().title = title;
+			factory.windowSystemFactory->WindowSystemParams().title = title;
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto window = factory.systemFactory->Create(engine, systemParams);
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(window.system.get());

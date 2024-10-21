@@ -33,9 +33,6 @@
     <ClCompile Include="Log\LogFormatTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\LoggerDeleterTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\LoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -46,9 +43,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Log\SubLoggerDeleterTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

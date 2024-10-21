@@ -9,6 +9,8 @@
 
 export module PonyDebug.Log.Factory:ConsoleSubLoggerData;
 
+import PonyDebug.Log;
+
 import :SubLoggerUniquePtr;
 
 export namespace PonyDebug::Log
@@ -16,6 +18,6 @@ export namespace PonyDebug::Log
 	/// @brief Console sub-logger data.
 	struct ConsoleSubLoggerData final
 	{
-		SubLoggerUniquePtr subLogger; ///< Sub-logger.
+		SubLoggerUniquePtr<ISubLogger> subLogger; ///< Sub-logger.
 	};
 }

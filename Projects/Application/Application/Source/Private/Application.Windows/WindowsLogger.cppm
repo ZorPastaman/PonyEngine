@@ -61,8 +61,8 @@ export namespace Application
 		[[nodiscard("Pure function")]]
 		static PonyDebug::Log::FileSubLoggerData CreateFileSubLogger();
 
-		PonyDebug::Log::LoggerUniquePtr logger; ///< Logger.
-		std::array<PonyDebug::Log::SubLoggerUniquePtr, 3> subLoggers; ///< Sub-loggers.
+		PonyDebug::Log::LoggerUniquePtr<PonyDebug::Log::ILogger> logger; ///< Logger.
+		std::array<PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>, 3> subLoggers; ///< Sub-loggers.
 	};
 }
 
@@ -70,10 +70,15 @@ namespace Application
 {
 	WindowsLogger::WindowsLogger() :
 		logger{CreateLogger().logger},
-		subLoggers{CreateConsoleSubLogger().subLogger, CreateOutputDebugStringSubLogger().subLogger, CreateFileSubLogger().subLogger}
+		subLoggers
+		{
+			CreateConsoleSubLogger().subLogger,
+			static_cast<PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>>(CreateOutputDebugStringSubLogger().subLogger),
+			CreateFileSubLogger().subLogger
+		}
 	{
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
-		for (PonyDebug::Log::SubLoggerUniquePtr& subLogger : subLoggers)
+		for (PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
 			logger->AddSubLogger(*subLogger);
@@ -101,16 +106,16 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy sub-loggers.");
 		for (auto it = subLoggers.rbegin(); it != subLoggers.rend(); ++it)
 		{
-			PonyDebug::Log::SubLoggerUniquePtr& subLogger = *it;
+			PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>& subLogger = *it;
 
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", subLogger->Name());
-			subLogger.reset();
+			subLogger.Reset();
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-logger destroyed.");
 		}
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers destroyed.");
 
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' logger.", logger->Name());
-		logger.reset();
+		logger.Reset();
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Logger destroyed.");
 	}
 
