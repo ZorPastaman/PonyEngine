@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time.Factory;
+export module PonyEngine.Time.Factory:FrameRateSystemParams;
 
-export import PonyEngine.Time;
-
-export import :FrameRateSystemFactoryData;
-export import :FrameRateSystemFactoryParams;
-export import :FrameRateSystemParams;
-export import :IFrameRateSystemFactory;
+export namespace PonyEngine::Time
+{
+	struct FrameRateSystemParams final
+	{
+	};
+}

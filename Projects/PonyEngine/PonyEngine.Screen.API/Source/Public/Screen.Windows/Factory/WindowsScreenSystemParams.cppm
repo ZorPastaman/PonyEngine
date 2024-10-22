@@ -13,7 +13,7 @@ import PonyEngine.Screen.Factory;
 
 export namespace PonyEngine::Screen
 {
-	struct WindowsScreenSystemParams : ScreenSystemParams
+	struct WindowsScreenSystemParams final : ScreenSystemParams
 	{
 	};
 }

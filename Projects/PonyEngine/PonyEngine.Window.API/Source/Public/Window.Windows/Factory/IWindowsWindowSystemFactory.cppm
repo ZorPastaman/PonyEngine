@@ -25,11 +25,11 @@ export namespace PonyEngine::Window
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual WindowsWindowParams& WindowSystemParams() noexcept override = 0;
+		virtual WindowsWindowParams& SystemParams() noexcept override = 0;
 		/// @brief Gets the next window params.
 		/// @return Next window params.
 		[[nodiscard("Pure function")]]
-		virtual const WindowsWindowParams& WindowSystemParams() const noexcept override = 0;
+		virtual const WindowsWindowParams& SystemParams() const noexcept override = 0;
 
 		IWindowsWindowSystemFactory& operator =(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory& operator =(IWindowsWindowSystemFactory&&) = delete;

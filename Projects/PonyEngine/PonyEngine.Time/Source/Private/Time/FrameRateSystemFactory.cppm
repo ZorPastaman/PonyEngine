@@ -24,7 +24,7 @@ import :FrameRateSystem;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system factory.
-	class FrameRateSystemFactory final : public Core::ISystemFactory, public Core::ISystemDestroyer
+	class FrameRateSystemFactory final : public IFrameRateSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -39,6 +39,11 @@ export namespace PonyEngine::Time
 		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual FrameRateSystemParams& SystemParams() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const FrameRateSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const char* Name() const noexcept override;
@@ -47,6 +52,9 @@ export namespace PonyEngine::Time
 		FrameRateSystemFactory& operator =(FrameRateSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "PonyEngine::Time::FrameRateSystemFactory"; ///< Class name.
+
+	private:
+		FrameRateSystemParams frameRateSystemParams;
 	};
 }
 
@@ -70,6 +78,16 @@ namespace PonyEngine::Time
 	{
 		assert((dynamic_cast<FrameRateSystem*>(system) && "Tried to destroy a system of the wrong type."));
 		delete static_cast<FrameRateSystem*>(system);
+	}
+
+	FrameRateSystemParams& FrameRateSystemFactory::SystemParams() noexcept
+	{
+		return frameRateSystemParams;
+	}
+
+	const FrameRateSystemParams& FrameRateSystemFactory::SystemParams() const noexcept
+	{
+		return frameRateSystemParams;
 	}
 
 	const char* FrameRateSystemFactory::SystemName() const noexcept
