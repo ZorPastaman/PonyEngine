@@ -19,7 +19,7 @@ import PonyMath.Core;
 export namespace PonyEngine::Screen
 {
 	template<std::unsigned_integral T>
-	class Resolution final
+	class Resolution final // TODO: Add tests and docs to the Screen projects
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

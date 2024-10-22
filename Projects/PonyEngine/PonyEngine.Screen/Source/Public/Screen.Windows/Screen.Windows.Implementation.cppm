@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Screen.Windows.Implementation;
 
-export import PonyEngine.Screen.Factory;
+export import PonyEngine.Screen.Windows.Factory;
 
 import PonyEngine.Core.Factory;
 
@@ -27,19 +27,19 @@ export namespace PonyEngine::Screen
 	/// @param params Screen system for Windows factory parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT ScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplication& application, const ScreenSystemFactoryParams& params);
+	PONY_DLL_EXPORT WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplication& application, const WindowsScreenSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Screen
 {
 	auto DefaultWindowsScreenSystemFactoryDestroyer = WindowsScreenSystemFactoryDestroyer(); ///< Default window system for Windows factory destroyer.
 
-	ScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplication& application, const ScreenSystemFactoryParams&)
+	WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplication& application, const WindowsScreenSystemFactoryParams&)
 	{
 		const auto factory = new WindowsScreenSystemFactory(application);
 		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultWindowsScreenSystemFactoryDestroyer);
 
-		return ScreenSystemFactoryData
+		return WindowsScreenSystemFactoryData
 		{
 			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
 		};
