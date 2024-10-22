@@ -43,5 +43,11 @@
     <ClCompile Include="Source\Public\Time\Factory\FrameRateSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Time\Factory\IFrameRateSystemFactory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Time\Factory\FrameRateSystemParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

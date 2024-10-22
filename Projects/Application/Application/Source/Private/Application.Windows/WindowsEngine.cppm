@@ -200,7 +200,7 @@ namespace Application
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
-			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->WindowSystemParams();
+			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->SystemParams();
 			windowParams.title = L"Pony Engine Game";
 			windowParams.style = PonyEngine::Window::DefaultBorderlessWindowedStyle;
 			windowParams.extendedStyle = PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle | WS_EX_APPWINDOW;

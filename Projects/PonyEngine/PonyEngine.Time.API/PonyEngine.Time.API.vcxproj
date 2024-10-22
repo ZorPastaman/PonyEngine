@@ -24,6 +24,8 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Time\Factory\FrameRateSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Time\Factory\FrameRateSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Time\Factory\FrameRateSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Time\Factory\IFrameRateSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Time\Factory\Time.Factory.cppm" />
     <ClCompile Include="Source\Public\Time\FrameTimeFrameRateConversion.cppm" />
     <ClCompile Include="Source\Public\Time\IFrameRateSystem.cppm" />
