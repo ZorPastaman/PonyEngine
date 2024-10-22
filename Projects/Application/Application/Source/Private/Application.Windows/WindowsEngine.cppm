@@ -61,7 +61,7 @@ export namespace Application
 		/// @brief Creates a screen system factory.
 		/// @return Screen system factory.
 		[[nodiscard("Pure function")]]
-		PonyEngine::Screen::ScreenSystemFactoryData CreateScreenSystemFactory() const;
+		PonyEngine::Screen::WindowsScreenSystemFactoryData CreateScreenSystemFactory() const;
 		/// @brief Creates a frame rate system factory.
 		/// @return Frame rate system factory.
 		[[nodiscard("Pure function")]]
@@ -151,12 +151,12 @@ namespace Application
 		return false;
 	}
 
-	PonyEngine::Screen::ScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
+	PonyEngine::Screen::WindowsScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
 	{
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
-			PonyEngine::Screen::ScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::ScreenSystemFactoryParams{});
+			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
 			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
 

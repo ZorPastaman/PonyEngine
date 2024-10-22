@@ -7,14 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Factory:ScreenSystemFactoryData;
+export module PonyEngine.Screen.Windows.Factory;
 
-import PonyEngine.Core.Factory;
+export import PonyEngine.Screen.Factory;
+export import PonyEngine.Screen.Windows;
 
-export namespace PonyEngine::Screen
-{
-	struct ScreenSystemFactoryData final
-	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< System factory.
-	};
-}
+export import :IWindowsScreenSystemFactory;
+export import :WindowsScreenSystemFactoryData;
+export import :WindowsScreenSystemFactoryParams;
+export import :WindowsScreenSystemParams;

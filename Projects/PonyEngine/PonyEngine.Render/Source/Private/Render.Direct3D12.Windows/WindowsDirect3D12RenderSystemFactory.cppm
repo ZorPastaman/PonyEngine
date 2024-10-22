@@ -18,7 +18,6 @@ import <utility>;
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
-
 import PonyEngine.Render.Direct3D12.Windows.Factory;
 
 import :WindowsDirect3D12RenderSystem;
