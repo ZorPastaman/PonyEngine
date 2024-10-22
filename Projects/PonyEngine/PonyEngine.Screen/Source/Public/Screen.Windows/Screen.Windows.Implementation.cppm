@@ -42,6 +42,7 @@ namespace PonyEngine::Screen
 		return WindowsScreenSystemFactoryData
 		{
 			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
+			.windowsSystemFactory = factory
 		};
 	}
 }

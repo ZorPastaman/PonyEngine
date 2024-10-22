@@ -45,7 +45,7 @@ import :WindowsDirect3D12DXGISubSystem;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows.
-	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public Core::ITickableSystem, public IRenderSystem, public IRenderer
+	class WindowsDirect3D12RenderSystem final : public Core::ISystem, public Core::ITickableSystem, public IWindowsDirect3D12RenderSystem, public IRenderer
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.
