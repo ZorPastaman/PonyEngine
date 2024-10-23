@@ -36,13 +36,8 @@ namespace PonyEngine::Render
 
 	WindowsDirect3D12RenderSystemFactoryData CreateWindowsDirect3D12RenderSystemFactory(Core::IApplication&, const WindowsDirect3D12RenderSystemFactoryParams&)
 	{
-		const auto factory = new WindowsDirect3D12RenderSystemFactory();
-		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultWindowsDirect3D12RenderSystemFactoryDestroyer);
+		IWindowsDirect3D12RenderSystemFactory* const factory = new WindowsDirect3D12RenderSystemFactory();
 
-		return WindowsDirect3D12RenderSystemFactoryData
-		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
-			.renderSystemFactory = factory
-		};
+		return WindowsDirect3D12RenderSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultWindowsDirect3D12RenderSystemFactoryDestroyer)};
 	}
 }

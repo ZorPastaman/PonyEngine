@@ -7,16 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemFactoryData;
+export module Game:IGameSystem;
 
-import PonyEngine.Core.Factory;
-
-import :IWindowsScreenSystemFactory;
-
-export namespace PonyEngine::Screen
+export namespace Game
 {
-	struct WindowsScreenSystemFactoryData final
+	/// @brief Game system.
+	class IGameSystem
 	{
-		Core::SystemFactoryUniquePtr<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
+	public:
+		IGameSystem(const IGameSystem&) = delete;
+		IGameSystem(IGameSystem&&) = delete;
+
+		IGameSystem& operator =(const IGameSystem&) = delete;
+		IGameSystem& operator =(IGameSystem&&) = delete;
+
+	protected:
+		[[nodiscard("Pure constructor")]]
+		IGameSystem() noexcept = default;
+
+		~IGameSystem() noexcept = default;
 	};
 }

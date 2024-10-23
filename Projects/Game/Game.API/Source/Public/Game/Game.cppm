@@ -7,16 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemFactoryData;
+export module Game;
 
-import PonyEngine.Core.Factory;
-
-import :IWindowsScreenSystemFactory;
-
-export namespace PonyEngine::Screen
-{
-	struct WindowsScreenSystemFactoryData final
-	{
-		Core::SystemFactoryUniquePtr<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
-	};
-}
+export import :IGameSystem;

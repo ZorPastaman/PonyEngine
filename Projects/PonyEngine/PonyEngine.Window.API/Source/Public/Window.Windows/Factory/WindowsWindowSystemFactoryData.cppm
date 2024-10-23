@@ -18,8 +18,6 @@ export namespace PonyEngine::Window
 	/// @brief Window system for Windows factory data.
 	struct WindowsWindowSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< System factory.
-
-		IWindowsWindowSystemFactory* windowSystemFactory; ///< Window system factory.
+		Core::SystemFactoryUniquePtr<IWindowsWindowSystemFactory> systemFactory; ///< System factory.
 	};
 }

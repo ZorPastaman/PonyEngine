@@ -25,7 +25,7 @@ import :GameSystem;
 export namespace Game
 {
 	/// @brief Game system factory.
-	class GameSystemFactory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
+	class GameSystemFactory final : public IGameSystemFactory, public PonyEngine::Core::ISystemDestroyer
 	{
 	public:
 		/// @brief Creates a game system factory.
@@ -41,6 +41,11 @@ export namespace Game
 		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual GameSystemParams& SystemParams() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const GameSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -50,6 +55,9 @@ export namespace Game
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "Game::GameSystemFactory"; ///< Class name.
+
+	private:
+		GameSystemParams systemParams; ///< Game system parameters.
 	};
 }
 
@@ -71,6 +79,16 @@ namespace Game
 	{
 		assert(dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type.");
 		delete static_cast<GameSystem*>(system);
+	}
+
+	GameSystemParams& GameSystemFactory::SystemParams() noexcept
+	{
+		return systemParams;
+	}
+
+	const GameSystemParams& GameSystemFactory::SystemParams() const noexcept
+	{
+		return systemParams;
 	}
 
 	const char* GameSystemFactory::SystemName() const noexcept

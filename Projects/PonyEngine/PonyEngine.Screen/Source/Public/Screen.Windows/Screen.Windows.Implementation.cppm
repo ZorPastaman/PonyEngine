@@ -36,13 +36,8 @@ namespace PonyEngine::Screen
 
 	WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplication& application, const WindowsScreenSystemFactoryParams&)
 	{
-		const auto factory = new WindowsScreenSystemFactory(application);
-		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultWindowsScreenSystemFactoryDestroyer);
+		IWindowsScreenSystemFactory* const factory = new WindowsScreenSystemFactory(application);
 
-		return WindowsScreenSystemFactoryData
-		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
-			.windowsSystemFactory = factory
-		};
+		return WindowsScreenSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultWindowsScreenSystemFactoryDestroyer)};
 	}
 }
