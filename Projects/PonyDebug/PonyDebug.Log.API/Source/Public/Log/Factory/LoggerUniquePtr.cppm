@@ -58,13 +58,9 @@ namespace PonyDebug::Log
 
 export namespace PonyDebug::Log
 {
-	/// @brief Logger concept.
-	template<typename T>
-	concept LoggerType = std::convertible_to<T*, ILogger*>;
-
 	/// @brief Logger unique pointer.
 	/// @tparam T Logger type.
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	class LoggerUniquePtr final // TODO: Add tests
 	{
 	public:
@@ -82,8 +78,8 @@ export namespace PonyDebug::Log
 		/// @brief Move constructor with a conversion of the logger type.
 		/// @tparam U Source type.
 		/// @param other Source.
-		template<LoggerType U> [[nodiscard("Pure constructor")]]
-		explicit LoggerUniquePtr(LoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>);
+		template<std::derived_from<T> U> [[nodiscard("Pure constructor")]]
+		explicit LoggerUniquePtr(LoggerUniquePtr<U>&& other) noexcept;
 
 		~LoggerUniquePtr() noexcept = default;
 
@@ -113,13 +109,13 @@ export namespace PonyDebug::Log
 		/// @tparam U Source type.
 		/// @param other Source.
 		/// @return This.
-		template<LoggerType U>
-		LoggerUniquePtr& operator =(LoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>);
+		template<std::derived_from<T> U>
+		LoggerUniquePtr& operator =(LoggerUniquePtr<U>&& other) noexcept;
 
 	private:
 		std::unique_ptr<T, LoggerDeleter> pointer; ///< Unique_ptr.
 
-		template<LoggerType U>
+		template<std::derived_from<ILogger> U>
 		friend class LoggerUniquePtr;
 	};
 }
@@ -144,53 +140,53 @@ namespace PonyDebug::Log
 		}
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	LoggerUniquePtr<T>::LoggerUniquePtr(T& logger, ILoggerDestroyer& loggerDestroyer) noexcept :
 		pointer(&logger, LoggerDeleter(loggerDestroyer))
 	{
-		assert(!pointer || pointer.get_deleter().IsCompatible(pointer.get()) && "The logger isn't compatible with the destroyer.");
+		assert(pointer.get_deleter().IsCompatible(pointer.get()) && "The logger isn't compatible with the destroyer.");
 	}
 
-	template<LoggerType T>
-	template<LoggerType U>
-	LoggerUniquePtr<T>::LoggerUniquePtr(LoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>) :
+	template<std::derived_from<ILogger> T>
+	template<std::derived_from<T> U>
+	LoggerUniquePtr<T>::LoggerUniquePtr(LoggerUniquePtr<U>&& other) noexcept :
 		pointer(std::move(other.pointer))
 	{
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	T* LoggerUniquePtr<T>::Get() const noexcept
 	{
 		return pointer.get();
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	void LoggerUniquePtr<T>::Reset() noexcept
 	{
 		pointer.reset();
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	LoggerUniquePtr<T>::operator bool() const noexcept
 	{
 		return static_cast<bool>(pointer);
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	T& LoggerUniquePtr<T>::operator *() const noexcept
 	{
 		return *pointer;
 	}
 
-	template<LoggerType T>
+	template<std::derived_from<ILogger> T>
 	T* LoggerUniquePtr<T>::operator ->() const noexcept
 	{
 		return pointer.get();
 	}
 
-	template<LoggerType T>
-	template<LoggerType U>
-	LoggerUniquePtr<T>& LoggerUniquePtr<T>::operator =(LoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>)
+	template<std::derived_from<ILogger> T>
+	template<std::derived_from<T> U>
+	LoggerUniquePtr<T>& LoggerUniquePtr<T>::operator =(LoggerUniquePtr<U>&& other) noexcept
 	{
 		pointer = std::move(other.pointer);
 

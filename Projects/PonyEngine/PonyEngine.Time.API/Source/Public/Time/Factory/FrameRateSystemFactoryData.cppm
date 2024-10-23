@@ -18,8 +18,6 @@ export namespace PonyEngine::Time
 	/// @brief Frame rate system factory data.
 	struct FrameRateSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< Frame rate system factory.
-
-		IFrameRateSystemFactory* frameRateSystemFactory = nullptr; ///< Frame rate system factory.
+		Core::SystemFactoryUniquePtr<IFrameRateSystemFactory> systemFactory; ///< Frame rate system factory.
 	};
 }

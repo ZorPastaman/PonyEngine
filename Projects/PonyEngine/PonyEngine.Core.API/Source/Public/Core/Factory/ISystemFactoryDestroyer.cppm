@@ -20,6 +20,12 @@ export namespace PonyEngine::Core
 		ISystemFactoryDestroyer(const ISystemFactoryDestroyer&) = delete;
 		ISystemFactoryDestroyer(ISystemFactoryDestroyer&&) = delete;
 
+		/// @brief Checks the system factory compatibility.
+		/// @param factory System factory.
+		/// @return @a True if it's compatible; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(ISystemFactory* factory) const noexcept = 0;
+
 		/// @brief Destroys the @p factory.
 		/// @param factory System factory to destroy.
 		virtual void Destroy(ISystemFactory* factory) noexcept = 0;

@@ -36,13 +36,8 @@ namespace PonyEngine::Input
 
 	InputSystemFactoryData CreateInputSystemFactory(Core::IApplication&, const InputSystemFactoryParams&)
 	{
-		const auto factory = new InputSystemFactory();
-		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultInputSystemFactoryDestroyer);
+		IInputSystemFactory* const factory = new InputSystemFactory();
 
-		return InputSystemFactoryData
-		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
-			.inputSystemFactory = factory
-		};
+		return InputSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultInputSystemFactoryDestroyer)};
 	}
 }

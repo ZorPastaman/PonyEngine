@@ -38,13 +38,8 @@ namespace PonyEngine::Window
 
 	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplication& application, const WindowsWindowSystemFactoryParams& params)
 	{
-		const auto factory = new WindowsWindowSystemFactory(application, params.windowsClassParams);
-		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultWindowsWindowSystemFactoryDestroyer);
+		IWindowsWindowSystemFactory* const factory = new WindowsWindowSystemFactory(application, params.windowsClassParams);
 
-		return WindowsWindowSystemFactoryData
-		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter),
-			.windowSystemFactory = factory
-		};
+		return WindowsWindowSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultWindowsWindowSystemFactoryDestroyer)};
 	}
 }

@@ -36,12 +36,8 @@ namespace Game
 
 	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplication&, const GameSystemFactoryParams&)
 	{
-		const auto factory = new GameSystemFactory();
-		const auto factoryDeleter = PonyEngine::Core::SystemFactoryDeleter(DefaultGameSystemFactoryDestroyer);
+		IGameSystemFactory* const factory = new GameSystemFactory();
 
-		return GameSystemFactoryData
-		{
-			.systemFactory = PonyEngine::Core::SystemFactoryUniquePtr(factory, factoryDeleter)
-		};
+		return GameSystemFactoryData{.systemFactory = PonyEngine::Core::SystemFactoryUniquePtr(*factory, DefaultGameSystemFactoryDestroyer)};
 	}
 }

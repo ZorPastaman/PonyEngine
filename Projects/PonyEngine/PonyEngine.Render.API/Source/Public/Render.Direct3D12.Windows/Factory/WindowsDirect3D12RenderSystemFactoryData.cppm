@@ -18,8 +18,6 @@ export namespace PonyEngine::Render
 	/// @brief Direct3D 12 render system for Windows factory data.
 	struct WindowsDirect3D12RenderSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< Render system factory.
-
-		IWindowsDirect3D12RenderSystemFactory* renderSystemFactory = nullptr; ///< Render system factory interface.
+		Core::SystemFactoryUniquePtr<IWindowsDirect3D12RenderSystemFactory> systemFactory; ///< Render system factory.
 	};
 }

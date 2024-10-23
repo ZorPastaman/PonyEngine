@@ -19,6 +19,7 @@ export module Application.Windows:WindowsEngine;
 
 import <array>;
 import <exception>;
+import <format>; // It's necessary to import because of a bug in MSVC.
 
 import PonyBase.Core;
 import PonyMath.Core;
@@ -93,7 +94,7 @@ export namespace Application
 
 		PonyEngine::Core::IApplication* application; ///< Application.
 
-		std::array<PonyEngine::Core::SystemFactoryUniquePtr, 6> systemFactories; ///< System factories.
+		std::array<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>, 6> systemFactories; ///< System factories.
 		PonyEngine::Core::EngineData engine; ///< Engine.
 	};
 }
@@ -102,7 +103,15 @@ namespace Application
 {
 	WindowsEngine::WindowsEngine(PonyEngine::Core::IApplication& application) :
 		application{&application},
-		systemFactories{CreateScreenSystemFactory().systemFactory, CreateFrameRateSystemFactory().systemFactory, CreateWindowSystemFactory().systemFactory, CreateInputSystemFactory().systemFactory, CreateGameSystemFactory().systemFactory, CreateRenderSystemFactory().systemFactory},
+		systemFactories
+		{
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateScreenSystemFactory().systemFactory),
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateFrameRateSystemFactory().systemFactory),
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateWindowSystemFactory().systemFactory),
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateInputSystemFactory().systemFactory),
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateGameSystemFactory().systemFactory),
+			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateRenderSystemFactory().systemFactory)
+		},
 		engine{CreateEngine()}
 	{
 		SetupFrameRateSystem();
@@ -118,7 +127,7 @@ namespace Application
 		for (auto it = systemFactories.rbegin(); it != systemFactories.rend(); ++it)
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Destroy '{}' system factory.", (*it)->Name());
-			it->reset();
+			it->Reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "System factory destroyed.");
 		}
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
@@ -198,9 +207,8 @@ namespace Application
 			const auto windowSystemFactoryParams = PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = windowClassParams };
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, windowSystemFactoryParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
-			assert(factory.windowSystemFactory && "Windows window system factory extended interface is nullptr.");
 
-			PonyEngine::Window::WindowsWindowParams& windowParams = factory.windowSystemFactory->SystemParams();
+			PonyEngine::Window::WindowsWindowParams& windowParams = factory.systemFactory->SystemParams();
 			windowParams.title = L"Pony Engine Game";
 			windowParams.style = PonyEngine::Window::DefaultBorderlessWindowedStyle;
 			windowParams.extendedStyle = PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle | WS_EX_APPWINDOW;
@@ -263,7 +271,6 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
 			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{});
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
-			assert(factory.renderSystemFactory && "The Direct3D render system for Windows factory interface is nullptr.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
 
@@ -285,7 +292,7 @@ namespace Application
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
 			auto params = PonyEngine::Core::EngineParams{};
-			for (PonyEngine::Core::SystemFactoryUniquePtr& factory : systemFactories)
+			for (PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>& factory : systemFactories)
 			{
 				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());
 				params.systemFactories.AddSystemFactory(*factory);

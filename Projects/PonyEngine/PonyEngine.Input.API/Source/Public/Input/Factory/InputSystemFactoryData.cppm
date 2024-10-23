@@ -18,8 +18,6 @@ export namespace PonyEngine::Input
 	/// @brief Input system factory data.
 	struct InputSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr systemFactory; ///< Input system factory.
-
-		IInputSystemFactory* inputSystemFactory = nullptr; ///< Input system factory.
+		Core::SystemFactoryUniquePtr<IInputSystemFactory> systemFactory; ///< Input system factory.
 	};
 }

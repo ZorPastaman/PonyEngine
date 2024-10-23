@@ -36,12 +36,8 @@ namespace PonyEngine::Time
 
 	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplication&, const FrameRateSystemFactoryParams&)
 	{
-		const auto factory = new FrameRateSystemFactory();
-		const auto factoryDeleter = Core::SystemFactoryDeleter(DefaultFrameRateSystemFactoryDestroyer);
+		IFrameRateSystemFactory* const factory = new FrameRateSystemFactory();
 
-		return FrameRateSystemFactoryData
-		{
-			.systemFactory = Core::SystemFactoryUniquePtr(factory, factoryDeleter)
-		};
+		return FrameRateSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultFrameRateSystemFactoryDestroyer)};
 	}
 }

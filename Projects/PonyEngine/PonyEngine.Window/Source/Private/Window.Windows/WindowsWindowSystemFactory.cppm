@@ -38,7 +38,7 @@ import :WindowsWindowSystem;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window factory.
-	class WindowsWindowSystemFactory final : public Core::ISystemFactory, public IWindowsWindowSystemFactory, public Core::ISystemDestroyer
+	class WindowsWindowSystemFactory final : public IWindowsWindowSystemFactory, public Core::ISystemDestroyer
 	{
 	public:
 		/// @brief Creates a Windows window factory.

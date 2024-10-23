@@ -60,14 +60,9 @@ namespace PonyDebug::Log
 
 export namespace PonyDebug::Log
 {
-	/// @brief Sub-logger concept.
-	/// @tparam T Sub-logger type.
-	template<typename T>
-	concept SubLoggerType = std::convertible_to<T*, ISubLogger*>;
-
 	/// @brief Sub-logger unique pointer.
 	/// @tparam T Sub-logger type.
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	class SubLoggerUniquePtr final // TODO: Add tests
 	{
 	public:
@@ -85,8 +80,8 @@ export namespace PonyDebug::Log
 		/// @brief Move constructor with a conversion of the sub-logger type.
 		/// @tparam U Source type.
 		/// @param other Source.
-		template<SubLoggerType U> [[nodiscard("Pure constructor")]]
-		explicit SubLoggerUniquePtr(SubLoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>);
+		template<std::derived_from<T> U> [[nodiscard("Pure constructor")]]
+		explicit SubLoggerUniquePtr(SubLoggerUniquePtr<U>&& other) noexcept;
 
 		/// @brief Destroys the pointed sub-logger if it's not nullptr.
 		~SubLoggerUniquePtr() noexcept = default;
@@ -117,13 +112,13 @@ export namespace PonyDebug::Log
 		/// @tparam U Source type.
 		/// @param other Source.
 		/// @return This.
-		template<SubLoggerType U>
-		SubLoggerUniquePtr& operator =(SubLoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>);
+		template<std::derived_from<T> U>
+		SubLoggerUniquePtr& operator =(SubLoggerUniquePtr<U>&& other) noexcept;
 
 	private:
 		std::unique_ptr<T, SubLoggerDeleter> pointer; ///< Unique_ptr.
 
-		template<SubLoggerType U>
+		template<std::derived_from<ISubLogger> U>
 		friend class SubLoggerUniquePtr;
 	};
 }
@@ -148,53 +143,53 @@ namespace PonyDebug::Log
 		}
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	SubLoggerUniquePtr<T>::SubLoggerUniquePtr(T& subLogger, ISubLoggerDestroyer& subLoggerDestroyer) noexcept :
 		pointer(&subLogger, SubLoggerDeleter(subLoggerDestroyer))
 	{
-		assert(!pointer || pointer.get_deleter().IsCompatible(pointer.get()) && "The sub-logger isn't compatible with the destroyer.");
+		assert(pointer.get_deleter().IsCompatible(pointer.get()) && "The sub-logger isn't compatible with the destroyer.");
 	}
 
-	template<SubLoggerType T>
-	template<SubLoggerType U>
-	SubLoggerUniquePtr<T>::SubLoggerUniquePtr(SubLoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>) :
+	template<std::derived_from<ISubLogger> T>
+	template<std::derived_from<T> U>
+	SubLoggerUniquePtr<T>::SubLoggerUniquePtr(SubLoggerUniquePtr<U>&& other) noexcept :
 		pointer(std::move(other.pointer))
 	{
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	T* SubLoggerUniquePtr<T>::Get() const noexcept
 	{
 		return pointer.get();
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	void SubLoggerUniquePtr<T>::Reset() noexcept
 	{
 		pointer.reset();
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	SubLoggerUniquePtr<T>::operator bool() const noexcept
 	{
 		return static_cast<bool>(pointer);
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	T& SubLoggerUniquePtr<T>::operator *() const noexcept
 	{
 		return *pointer;
 	}
 
-	template<SubLoggerType T>
+	template<std::derived_from<ISubLogger> T>
 	T* SubLoggerUniquePtr<T>::operator ->() const noexcept
 	{
 		return pointer.get();
 	}
 
-	template<SubLoggerType T>
-	template<SubLoggerType U>
-	SubLoggerUniquePtr<T>& SubLoggerUniquePtr<T>::operator =(SubLoggerUniquePtr<U>&& other) noexcept requires (std::convertible_to<U*, T*>)
+	template<std::derived_from<ISubLogger> T>
+	template<std::derived_from<T> U>
+	SubLoggerUniquePtr<T>& SubLoggerUniquePtr<T>::operator =(SubLoggerUniquePtr<U>&& other) noexcept
 	{
 		pointer = std::move(other.pointer);
 
