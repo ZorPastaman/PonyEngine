@@ -11,13 +11,15 @@ export module PonyEngine.Input:IInputSystem;
 
 import <functional>;
 
+import PonyEngine.Core;
+
 import :Event;
 import :Handle;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class IInputSystem
+	class IInputSystem : public Core::ISystem
 	{
 	public:
 		IInputSystem(const IInputSystem&) = delete;

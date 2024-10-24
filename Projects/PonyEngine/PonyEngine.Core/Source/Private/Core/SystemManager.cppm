@@ -70,8 +70,8 @@ export namespace PonyEngine::Core
 
 		IEngine* engine; ///< Engine.
 
-		std::vector<SystemUniquePtr> systems; ///< Systems.
-		std::vector<ITickableSystem*> tickableSystems; ///< Tickable systems.
+		std::vector<SystemUniquePtr<IEngineSystem>> systems; ///< Systems.
+		std::vector<ITickableEngineSystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 	};
 }
@@ -89,22 +89,23 @@ namespace PonyEngine::Core
 		{
 			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 
-			SystemData system = CreateSystem(factory);
-			assert(system.system && "The system is nullptr.");
+			SystemData systemData = CreateSystem(factory);
+			IEngineSystem* const system = systemData.system.Get();
+			assert(system && "The system is nullptr.");
 
-			systems.push_back(std::move(system.system));
+			systems.push_back(std::move(systemData.system));
 
-			if (system.tickableSystem)
+			if (const auto tickableSystem = dynamic_cast<ITickableEngineSystem*>(system); tickableSystem)
 			{
 				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add to tickable systems.");
-				tickableSystems.push_back(system.tickableSystem);
+				tickableSystems.push_back(tickableSystem);
 			}
 			else
 			{
 				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "System is not tickable.");
 			}
 
-			for (auto [interface, objectPointer] : system.publicInterfaces)
+			for (auto [interface, objectPointer] : systemData.publicInterfaces)
 			{
 				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
 				assert(!systemInterfacesBuffer.contains(interface.get()) && "The interface has already been added.");
@@ -126,7 +127,7 @@ namespace PonyEngine::Core
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy system '{}'.", (*system)->Name());
-			system->reset();
+			system->Reset();
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System destroyed.");
 		}
 
@@ -147,7 +148,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin systems.");
 
-		for (const SystemUniquePtr& system : systems)
+		for (const SystemUniquePtr<IEngineSystem>& system : systems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
 			try
@@ -191,7 +192,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
 
-		for (ITickableSystem* const system : tickableSystems)
+		for (ITickableEngineSystem* const system : tickableSystems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, system->Name());
 			try

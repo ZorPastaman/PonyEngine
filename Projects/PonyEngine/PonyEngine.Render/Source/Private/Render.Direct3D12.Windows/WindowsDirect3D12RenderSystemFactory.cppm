@@ -37,12 +37,15 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual WindowsDirect3D12RenderSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const WindowsDirect3D12RenderSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -69,16 +72,9 @@ namespace PonyEngine::Render
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
-			.tickableSystem = system,
+			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void WindowsDirect3D12RenderSystemFactory::Destroy(Core::ISystem* const system) noexcept
-	{
-		assert((dynamic_cast<WindowsDirect3D12RenderSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
 	}
 
 	WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::SystemParams() noexcept
@@ -89,6 +85,17 @@ namespace PonyEngine::Render
 	const WindowsDirect3D12RenderSystemParams& WindowsDirect3D12RenderSystemFactory::SystemParams() const noexcept
 	{
 		return renderSystemParams;
+	}
+
+	bool WindowsDirect3D12RenderSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<WindowsDirect3D12RenderSystem*>(system);
+	}
+
+	void WindowsDirect3D12RenderSystemFactory::Destroy(Core::IEngineSystem* system) noexcept
+	{
+		assert(dynamic_cast<WindowsDirect3D12RenderSystem*>(system) && "Tried to destroy a system of the wrong type.");
+		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
 	}
 
 	const char* WindowsDirect3D12RenderSystemFactory::SystemName() const noexcept

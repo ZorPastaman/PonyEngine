@@ -9,10 +9,12 @@
 
 export module Game:IGameSystem;
 
+import PonyEngine.Core;
+
 export namespace Game
 {
 	/// @brief Game system.
-	class IGameSystem
+	class IGameSystem : public PonyEngine::Core::ISystem
 	{
 	public:
 		IGameSystem(const IGameSystem&) = delete;

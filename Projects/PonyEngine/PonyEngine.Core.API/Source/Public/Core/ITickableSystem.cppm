@@ -7,32 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:ITickableSystem;
+export module PonyEngine.Core:ITickableEngineSystem;
+
+import :IEngineSystem;
 
 export namespace PonyEngine::Core
 {
 	/// @brief Tickable system.
-	class ITickableSystem
+	class ITickableEngineSystem : public IEngineSystem
 	{
 	public:
-		ITickableSystem(const ITickableSystem&) = delete;
-		ITickableSystem(ITickableSystem&&) = delete;
+		ITickableEngineSystem(const ITickableEngineSystem&) = delete;
+		ITickableEngineSystem(ITickableEngineSystem&&) = delete;
 
 		/// @brief Ticks the system.
 		virtual void Tick() = 0;
 
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
-
-		ITickableSystem& operator =(const ITickableSystem&) = delete;
-		ITickableSystem& operator =(ITickableSystem&&) = delete;
+		ITickableEngineSystem& operator =(const ITickableEngineSystem&) = delete;
+		ITickableEngineSystem& operator =(ITickableEngineSystem&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		ITickableSystem() noexcept = default;
+		ITickableEngineSystem() noexcept = default;
 
-		~ITickableSystem() noexcept = default;
+		~ITickableEngineSystem() noexcept = default;
 	};
 }

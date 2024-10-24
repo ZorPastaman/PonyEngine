@@ -86,7 +86,7 @@ export namespace PonyDebug::Log
 		/// @brief Destroys the pointed sub-logger if it's not nullptr.
 		~SubLoggerUniquePtr() noexcept = default;
 
-		/// @brief Gets a sub-logger.
+		/// @brief Gets the sub-logger.
 		/// @return Sub-logger.
 		[[nodiscard("Pure function")]]
 		T* Get() const noexcept;
@@ -97,11 +97,11 @@ export namespace PonyDebug::Log
 		[[nodiscard("Pure operator")]]
 		explicit operator bool() const noexcept;
 
-		/// @brief Gets a sub-logger reference.
+		/// @brief Gets the sub-logger reference.
 		/// @return Sub-logger reference.
 		[[nodiscard("Pure operator")]]
 		T& operator *() const noexcept;
-		/// @brief Gets a sub-logger pointer.
+		/// @brief Gets the sub-logger pointer.
 		/// @return Sub-logger pointer.
 		[[nodiscard("Pure operator")]]
 		T* operator ->() const noexcept;

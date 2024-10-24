@@ -28,10 +28,12 @@ import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Render;
 
+import Game;
+
 export namespace Game
 {
 	/// @brief Game system.
-	class GameSystem final : public PonyEngine::Core::ISystem, public PonyEngine::Core::ITickableSystem
+	class GameSystem final : public PonyEngine::Core::ITickableEngineSystem, public IGameSystem
 	{
 	public:
 		/// @brief Creates a game system.

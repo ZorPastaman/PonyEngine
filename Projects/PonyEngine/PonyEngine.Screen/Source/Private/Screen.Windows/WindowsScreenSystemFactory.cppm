@@ -34,12 +34,15 @@ export namespace PonyEngine::Screen
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual WindowsScreenSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const WindowsScreenSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -66,23 +69,14 @@ namespace PonyEngine::Screen
 	Core::SystemData WindowsScreenSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
 	{
 		const auto system = new WindowsScreenSystem(engine);
-		const auto deleter = Core::SystemDeleter(*this);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IScreenSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, deleter),
-			.tickableSystem = nullptr,
+			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void WindowsScreenSystemFactory::Destroy(Core::ISystem* system) noexcept
-	{
-		assert((dynamic_cast<WindowsScreenSystem*>(system) && "Tried to destroy a system of the wrong type."));
-
-		delete static_cast<WindowsScreenSystem*>(system);
 	}
 
 	WindowsScreenSystemParams& WindowsScreenSystemFactory::SystemParams() noexcept
@@ -93,6 +87,17 @@ namespace PonyEngine::Screen
 	const WindowsScreenSystemParams& WindowsScreenSystemFactory::SystemParams() const noexcept
 	{
 		return systemParams;
+	}
+
+	bool WindowsScreenSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<WindowsScreenSystem*>(system);
+	}
+
+	void WindowsScreenSystemFactory::Destroy(Core::IEngineSystem* system) noexcept
+	{
+		assert(dynamic_cast<WindowsScreenSystem*>(system) && "Tried to destroy a system of the wrong type.");
+		delete static_cast<WindowsScreenSystem*>(system);
 	}
 
 	const char* WindowsScreenSystemFactory::SystemName() const noexcept
