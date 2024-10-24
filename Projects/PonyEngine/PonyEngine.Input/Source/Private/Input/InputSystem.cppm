@@ -29,7 +29,7 @@ import PonyEngine.Input;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class InputSystem final : public Core::ISystem, public Core::ITickableSystem, public IInputSystem, public IKeyboardObserver
+	class InputSystem final : public Core::ITickableEngineSystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an input system

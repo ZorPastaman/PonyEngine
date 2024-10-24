@@ -36,12 +36,15 @@ export namespace PonyEngine::Time
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual FrameRateSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const FrameRateSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -68,16 +71,9 @@ namespace PonyEngine::Time
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
-			.tickableSystem = system,
+			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void FrameRateSystemFactory::Destroy(Core::ISystem* const system) noexcept
-	{
-		assert((dynamic_cast<FrameRateSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<FrameRateSystem*>(system);
 	}
 
 	FrameRateSystemParams& FrameRateSystemFactory::SystemParams() noexcept
@@ -88,6 +84,17 @@ namespace PonyEngine::Time
 	const FrameRateSystemParams& FrameRateSystemFactory::SystemParams() const noexcept
 	{
 		return frameRateSystemParams;
+	}
+
+	bool FrameRateSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<FrameRateSystem*>(system);
+	}
+
+	void FrameRateSystemFactory::Destroy(Core::IEngineSystem* const system) noexcept
+	{
+		assert(dynamic_cast<FrameRateSystem*>(system) && "Tried to destroy a system of the wrong type.");
+		delete static_cast<FrameRateSystem*>(system);
 	}
 
 	const char* FrameRateSystemFactory::SystemName() const noexcept

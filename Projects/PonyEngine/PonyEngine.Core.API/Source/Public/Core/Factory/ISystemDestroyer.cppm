@@ -20,9 +20,15 @@ export namespace PonyEngine::Core
 		ISystemDestroyer(const ISystemDestroyer&) = delete;
 		ISystemDestroyer(ISystemDestroyer&&) = delete;
 
+		/// @brief Checks if the destroyer is compatible with the @p system.
+		/// @param system Target system.
+		/// @return @a True if it's compatible; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(IEngineSystem* system) const noexcept = 0;
+
 		/// @brief Destroys the @p system.
 		/// @param system System to destroy.
-		virtual void Destroy(ISystem* system) noexcept = 0;
+		virtual void Destroy(IEngineSystem* system) noexcept = 0;
 
 		ISystemDestroyer& operator =(const ISystemDestroyer&) = delete;
 		ISystemDestroyer& operator =(ISystemDestroyer&&) = delete;

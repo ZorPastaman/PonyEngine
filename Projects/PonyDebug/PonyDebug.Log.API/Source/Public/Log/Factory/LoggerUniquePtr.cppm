@@ -83,7 +83,7 @@ export namespace PonyDebug::Log
 
 		~LoggerUniquePtr() noexcept = default;
 
-		/// @brief Gets a logger.
+		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		T* Get() const noexcept;
@@ -94,11 +94,11 @@ export namespace PonyDebug::Log
 		[[nodiscard("Pure operator")]]
 		explicit operator bool() const noexcept;
 
-		/// @brief Gets a logger reference.
+		/// @brief Gets the logger reference.
 		/// @return Logger reference.
 		[[nodiscard("Pure operator")]]
 		T& operator *() const noexcept;
-		/// @brief Gets a logger pointer.
+		/// @brief Gets the logger pointer.
 		/// @return Logger pointer.
 		[[nodiscard("Pure operator")]]
 		T* operator ->() const noexcept;

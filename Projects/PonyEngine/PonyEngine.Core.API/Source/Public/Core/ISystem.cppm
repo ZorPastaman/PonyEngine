@@ -18,13 +18,6 @@ export namespace PonyEngine::Core
 		ISystem(const ISystem&) = delete;
 		ISystem(ISystem&&) = delete;
 
-		/// @brief Begins the system.
-		/// @details The system takes its dependencies in this function.
-		virtual void Begin() = 0;
-		/// @brief Ends the system.
-		/// @details The function is called before a destruction.
-		virtual void End() = 0;
-
 		/// @brief Gets the system name.
 		/// @return System name.
 		[[nodiscard("Pure function")]]

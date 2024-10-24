@@ -13,6 +13,8 @@ module;
 
 export module Game.Implementation:GameSystemFactory;
 
+import <utility>;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
@@ -38,12 +40,15 @@ export namespace Game
 
 		[[nodiscard("Pure function")]]
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams& params) override;
-		virtual void Destroy(PonyEngine::Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual GameSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const GameSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(PonyEngine::Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(PonyEngine::Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -66,19 +71,14 @@ namespace Game
 	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams&)
 	{
 		const auto system = new GameSystem(engine);
-		const auto deleter = PonyEngine::Core::SystemDeleter(*this);
+		auto interfaces = PonyEngine::Core::ObjectInterfaces();
+		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = PonyEngine::Core::SystemUniquePtr(system, deleter),
-			.tickableSystem = system
+			.system = PonyEngine::Core::SystemUniquePtr<PonyEngine::Core::IEngineSystem>(*system, *this),
+			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void GameSystemFactory::Destroy(PonyEngine::Core::ISystem* const system) noexcept
-	{
-		assert(dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type.");
-		delete static_cast<GameSystem*>(system);
 	}
 
 	GameSystemParams& GameSystemFactory::SystemParams() noexcept
@@ -89,6 +89,17 @@ namespace Game
 	const GameSystemParams& GameSystemFactory::SystemParams() const noexcept
 	{
 		return systemParams;
+	}
+
+	bool GameSystemFactory::IsCompatible(PonyEngine::Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<GameSystem*>(system);
+	}
+
+	void GameSystemFactory::Destroy(PonyEngine::Core::IEngineSystem* const system) noexcept
+	{
+		assert(dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type.");
+		delete static_cast<GameSystem*>(system);
 	}
 
 	const char* GameSystemFactory::SystemName() const noexcept

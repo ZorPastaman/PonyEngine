@@ -9,10 +9,12 @@
 
 export module PonyEngine.Time:IFrameRateSystem;
 
+import PonyEngine.Core;
+
 export namespace PonyEngine::Time
 {
 	/// @brief System that controls a frame rate of an engine.
-	class IFrameRateSystem
+	class IFrameRateSystem : public Core::ISystem
 	{
 	public:
 		IFrameRateSystem(const IFrameRateSystem&) = delete;

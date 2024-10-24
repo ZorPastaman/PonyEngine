@@ -9,11 +9,13 @@
 
 export module PonyEngine.Screen:IScreenSystem;
 
+import PonyEngine.Core;
+
 import :Resolution;
 
 export namespace PonyEngine::Screen
 {
-	class IScreenSystem
+	class IScreenSystem : public Core::ISystem
 	{
 	public:
 		IScreenSystem(const IScreenSystem&) = delete;

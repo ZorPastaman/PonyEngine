@@ -11,12 +11,13 @@ export module PonyEngine.Window:IWindowSystem;
 
 import PonyMath.Core;
 
+import PonyEngine.Core;
 import PonyEngine.Screen;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window system.
-	class IWindowSystem
+	class IWindowSystem : public Core::ISystem
 	{
 	public:
 		IWindowSystem(const IWindowSystem&) = delete;

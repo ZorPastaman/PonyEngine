@@ -34,12 +34,15 @@ export namespace PonyEngine::Input
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual InputSystemParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const InputSystemParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -67,16 +70,9 @@ namespace PonyEngine::Input
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, Core::SystemDeleter(*this)),
-			.tickableSystem = system,
+			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void InputSystemFactory::Destroy(Core::ISystem* const system) noexcept
-	{
-		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<InputSystem*>(system);
 	}
 
 	InputSystemParams& InputSystemFactory::SystemParams() noexcept
@@ -87,6 +83,17 @@ namespace PonyEngine::Input
 	const InputSystemParams& InputSystemFactory::SystemParams() const noexcept
 	{
 		return inputSystemParams;
+	}
+
+	bool InputSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<InputSystem*>(system);
+	}
+
+	void InputSystemFactory::Destroy(Core::IEngineSystem* const system) noexcept
+	{
+		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
+		delete static_cast<InputSystem*>(system);
 	}
 
 	const char* InputSystemFactory::SystemName() const noexcept

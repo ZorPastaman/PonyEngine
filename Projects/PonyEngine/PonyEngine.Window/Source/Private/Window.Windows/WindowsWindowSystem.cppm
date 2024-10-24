@@ -42,7 +42,7 @@ import :WindowProcFunction;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system.
-	class WindowsWindowSystem final : public Core::ISystem, public Core::ITickableSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
+	class WindowsWindowSystem final : public Core::ITickableEngineSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.

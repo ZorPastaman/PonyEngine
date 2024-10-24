@@ -12,13 +12,15 @@ export module PonyEngine.Render:IRenderSystem;
 import PonyMath.Core;
 import PonyMath.Geometry;
 
+import PonyEngine.Core;
+
 import :CameraParams;
 import :RenderObjectHandle;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Render system.
-	class IRenderSystem
+	class IRenderSystem : public Core::ISystem
 	{
 	public:
 		IRenderSystem(const IRenderSystem&) = delete;

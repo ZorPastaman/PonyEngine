@@ -18,7 +18,7 @@ import PonyEngine.Screen;
 
 export namespace PonyEngine::Screen
 {
-	class WindowsScreenSystem final : public Core::ISystem, public IScreenSystem
+	class WindowsScreenSystem final : public Core::IEngineSystem, public IScreenSystem
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

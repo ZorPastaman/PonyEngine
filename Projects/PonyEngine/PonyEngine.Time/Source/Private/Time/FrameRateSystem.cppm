@@ -23,7 +23,7 @@ import PonyEngine.Time;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system.
-	class FrameRateSystem final : public Core::ISystem, public Core::ITickableSystem, public IFrameRateSystem
+	class FrameRateSystem final : public Core::ITickableEngineSystem, public IFrameRateSystem
 	{
 	public:
 		/// @brief Creates a @p FrameRateSystem.

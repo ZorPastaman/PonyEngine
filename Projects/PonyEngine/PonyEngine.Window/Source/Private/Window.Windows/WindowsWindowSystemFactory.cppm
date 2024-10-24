@@ -53,12 +53,15 @@ export namespace PonyEngine::Window
 
 		[[nodiscard("Pure function")]]
 		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
-		virtual void Destroy(Core::ISystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual WindowsWindowParams& SystemParams() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const WindowsWindowParams& SystemParams() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
+		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const char* SystemName() const noexcept override;
@@ -120,25 +123,14 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window.");
 		const auto system = new WindowsWindowSystem(engine, hInstance, classAtom, windowParams);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window created.");
-		const auto deleter = Core::SystemDeleter(*this);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr(system, deleter),
-			.tickableSystem = system,
+			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	void WindowsWindowSystemFactory::Destroy(Core::ISystem* const system) noexcept
-	{
-		assert((dynamic_cast<WindowsWindowSystem*>(system) && "Tried to destroy a system of the wrong type."));
-
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window.");
-		delete static_cast<WindowsWindowSystem*>(system);
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 	}
 
 	WindowsWindowParams& WindowsWindowSystemFactory::SystemParams() noexcept
@@ -149,6 +141,20 @@ namespace PonyEngine::Window
 	const WindowsWindowParams& WindowsWindowSystemFactory::SystemParams() const noexcept
 	{
 		return windowParams;
+	}
+
+	bool WindowsWindowSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
+	{
+		return dynamic_cast<WindowsWindowSystem*>(system);
+	}
+
+	void WindowsWindowSystemFactory::Destroy(Core::IEngineSystem* const system) noexcept
+	{
+		assert(dynamic_cast<WindowsWindowSystem*>(system) && "Tried to destroy a system of the wrong type.");
+
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window.");
+		delete static_cast<WindowsWindowSystem*>(system);
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
 	}
 
 	const char* WindowsWindowSystemFactory::SystemName() const noexcept
