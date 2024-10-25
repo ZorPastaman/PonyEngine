@@ -18,6 +18,7 @@ import <cstddef>;
 import <exception>;
 import <optional>;
 import <string>;
+import <string_view>;
 
 import :LogFormat;
 import :LogConsoleHelper;
@@ -36,7 +37,7 @@ export namespace PonyDebug::Log
 		/// @param frameCount Frame when the log entry has been created.
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
-		LogEntry(const char* message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::size_t> frameCount, LogType logType) noexcept;
+		LogEntry(std::string_view message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::size_t> frameCount, LogType logType) noexcept;
 		LogEntry(const LogEntry&) = delete;
 		LogEntry(LogEntry&&) = delete;
 
@@ -45,7 +46,7 @@ export namespace PonyDebug::Log
 		/// @brief Gets the log message.
 		/// @return Log message.
 		[[nodiscard("Pure function")]]
-		const char* Message() const noexcept;
+		std::string_view Message() const noexcept;
 		/// @brief Gets the exception.
 		/// @return Exception.
 		[[nodiscard("Pure function")]]
@@ -66,7 +67,7 @@ export namespace PonyDebug::Log
 		/// @brief Creates a string representing this @p LogEntry.
 		/// @return Representing string.
 		[[nodiscard("Pure function")]]
-		const char* ToString() const noexcept;
+		std::string_view ToString() const noexcept;
 
 		LogEntry& operator =(const LogEntry&) = delete;
 		LogEntry& operator =(LogEntry&&) = delete;
@@ -76,7 +77,7 @@ export namespace PonyDebug::Log
 		[[nodiscard("Pure function")]]
 		std::string MakeString() const noexcept;
 
-		const char* const message; ///< Log message.
+		const std::string_view message; ///< Log message.
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
 		const std::optional<std::size_t> frameCount; ///< Frame when the log entry is created.
@@ -94,7 +95,7 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	LogEntry::LogEntry(const char* const message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::size_t> frameCount, const Log::LogType logType) noexcept :
+	LogEntry::LogEntry(const std::string_view message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::size_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		exception{exception},
 		timePoint{timePoint},
@@ -103,7 +104,7 @@ namespace PonyDebug::Log
 	{
 	}
 
-	const char* LogEntry::Message() const noexcept
+	std::string_view LogEntry::Message() const noexcept
 	{
 		return message;
 	}
@@ -128,26 +129,26 @@ namespace PonyDebug::Log
 		return logType;
 	}
 
-	const char* LogEntry::ToString() const noexcept
+	std::string_view LogEntry::ToString() const noexcept
 	{
 		if (!stringCache.has_value())
 		{
 			stringCache = MakeString();
 		}
 
-		return stringCache.value().c_str();
+		return stringCache.value();
 	}
 
 	std::string LogEntry::MakeString() const noexcept
 	{
 		try
 		{
-			switch ((message != nullptr) << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
+			switch (!message.empty() << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
 			{
 			case 0:
-				return LogFormat(logType, "", timePoint);
+				return LogFormat(logType, timePoint);
 			case 1:
-				return LogFormat(logType, "", timePoint, frameCount.value());
+				return LogFormat(logType, timePoint, frameCount.value());
 			case 2:
 				return LogFormat(logType, exception->what(), timePoint);
 			case 3:
@@ -161,7 +162,7 @@ namespace PonyDebug::Log
 			case 7:
 				return LogFormat(logType, exception->what(), message, timePoint, frameCount.value());
 			default:
-				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message ? message : "Unknown message", timePoint, frameCount.value_or(0));
+				return LogFormat(logType, exception ? exception->what() : "Unknown exception", message.empty() ? "Unknown message" : message, timePoint, frameCount.value_or(0));
 			}
 		}
 		catch (const std::exception& e)

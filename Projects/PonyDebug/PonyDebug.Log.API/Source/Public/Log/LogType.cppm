@@ -14,6 +14,7 @@ import <bit>;
 import <cstddef>;
 import <cstdint>;
 import <ostream>;
+import <string_view>;
 import <type_traits>;
 
 export namespace PonyDebug::Log
@@ -43,7 +44,7 @@ export namespace PonyDebug::Log
 	/// @param logType Log type.
 	/// @return Representing string.
 	[[nodiscard("Pure function")]]
-	constexpr const char* ToString(LogType logType) noexcept;
+	constexpr std::string_view ToString(LogType logType) noexcept;
 
 	/// @brief Bitwise complement operator.
 	/// @param logType Log type.
@@ -79,7 +80,7 @@ export namespace PonyDebug::Log
 namespace PonyDebug::Log
 {
 	/// @brief Log type names by index.
-	constexpr std::array<const char*, 7> LogTypeNames
+	constexpr std::array<std::string_view, 7> LogTypeNames
 	{
 		"Verbose",
 		"Debug",
@@ -90,7 +91,7 @@ namespace PonyDebug::Log
 		"Unknown"
 	};
 
-	constexpr const char* ToString(const LogType logType) noexcept
+	constexpr std::string_view ToString(const LogType logType) noexcept
 	{
 		constexpr auto exceptionUnderlyingLogType = static_cast<std::underlying_type_t<LogType>>(LogType::Exception);
 
