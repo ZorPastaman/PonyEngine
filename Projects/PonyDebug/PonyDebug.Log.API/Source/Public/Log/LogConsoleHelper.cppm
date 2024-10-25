@@ -24,6 +24,7 @@ import <exception>;
 import <format>;
 import <iostream>;
 import <string>;
+import <string_view>;
 
 import PonyBase.StringUtility;
 
@@ -43,7 +44,7 @@ export namespace PonyDebug::Log
 	/// @brief Logs to a standard console and a system console.
 	/// @param logType Log type.
 	/// @param message Log message.
-	void LogToConsole(LogType logType, const char* message) noexcept;
+	void LogToConsole(LogType logType, std::string_view message) noexcept;
 	/// @brief Logs to a standard console and a system console.
 	/// @tparam Args Format argument types.
 	/// @param logType Log type.
@@ -58,7 +59,7 @@ export namespace PonyDebug::Log
 	/// @brief Logs the @p exception to a standard console and a system console.
 	/// @param exception Exception to log.
 	/// @param message Log message.
-	void LogExceptionToConsole(const std::exception& exception, const char* message) noexcept;
+	void LogExceptionToConsole(const std::exception& exception, std::string_view message) noexcept;
 	/// @brief Logs the @p exception to a standard console and a system console.
 	/// @tparam Args Format argument types.
 	/// @param exception Exception to log.
@@ -87,19 +88,19 @@ namespace PonyDebug::Log
 	/// @brief Logs to a standard console and a system console.
 	/// @param logType Log type.
 	/// @param log Formatted log message.
-	void LogFormattedToConsole(LogType logType, const char* log) noexcept;
+	void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
 
 	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
 	{
 		PONY_CONSOLE_E_S(e);
 	}
 
-	void LogToConsole(const LogType logType, const char* const message) noexcept
+	void LogToConsole(const LogType logType, const std::string_view message) noexcept
 	{
 		try
 		{
-			const std::string log = LogFormat(logType, message ? message : "", std::chrono::system_clock::now());
-			LogFormattedToConsole(logType, log.c_str());
+			const std::string log = message.empty() ? LogFormat(logType, std::chrono::system_clock::now()) : LogFormat(logType, message, std::chrono::system_clock::now());
+			LogFormattedToConsole(logType, log);
 		}
 		catch (...)
 		{
@@ -110,7 +111,7 @@ namespace PonyDebug::Log
 	template<typename ... Args>
 	void LogToConsole(const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...).c_str());
+		LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
 	void LogExceptionToConsole(const std::exception& exception) noexcept
@@ -118,7 +119,7 @@ namespace PonyDebug::Log
 		try
 		{
 			const std::string log = LogFormat(LogType::Exception, exception.what(), std::chrono::system_clock::now());
-			LogFormattedToConsole(LogType::Exception, log.c_str());
+			LogFormattedToConsole(LogType::Exception, log);
 		}
 		catch (...)
 		{
@@ -126,12 +127,12 @@ namespace PonyDebug::Log
 		}
 	}
 
-	void LogExceptionToConsole(const std::exception& exception, const char* const message) noexcept
+	void LogExceptionToConsole(const std::exception& exception, const std::string_view message) noexcept
 	{
 		try
 		{
-			const std::string log = LogFormat(LogType::Exception, exception.what(), message ? message : "", std::chrono::system_clock::now());
-			LogFormattedToConsole(LogType::Exception, log.c_str());
+			const std::string log = message.empty() ? LogFormat(LogType::Exception, exception.what(), std::chrono::system_clock::now()) : LogFormat(LogType::Exception, exception.what(), message, std::chrono::system_clock::now());
+			LogFormattedToConsole(LogType::Exception, log);
 		}
 		catch (...)
 		{
@@ -142,7 +143,7 @@ namespace PonyDebug::Log
 	template<typename ... Args>
 	void LogExceptionToConsole(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...).c_str());
+		LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
 	std::ostream& ChooseConsoleStream(const LogType logType) noexcept
@@ -169,7 +170,7 @@ namespace PonyDebug::Log
 		return PonyBase::Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
-	void LogFormattedToConsole(const LogType logType, const char* const log) noexcept
+	void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
 	{
 #ifdef PONY_CONSOLE_LOG
 		try
@@ -183,7 +184,7 @@ namespace PonyDebug::Log
 #endif
 #ifdef PONY_SYSTEM_CONSOLE_LOG
 #ifdef _WIN32
-		OutputDebugStringA(log);
+		OutputDebugStringA(log.data());
 #endif
 #endif
 	}

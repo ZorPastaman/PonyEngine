@@ -82,7 +82,7 @@
 /// @brief Log macro that calls the log function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param logger PonyDebug::Log::ILogger reference.
 /// @param logType PonyDebug::Log::LogType value.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG(logger, logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
@@ -94,7 +94,7 @@
 /// @param condition Log condition.
 /// @param logger PonyDebug::Log::ILogger reference.
 /// @param logType PonyDebug::Log::LogType value.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_IF(condition, logger, logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
@@ -126,7 +126,7 @@
 /// @brief Log exception macro that calls the log exception function if it's enabled with the preprocessors; otherwise it's empty.
 /// @param logger PonyDebug::Log::ILogger reference.
 /// @param exception std::exception reference.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_E(logger, exception, logMessage, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
@@ -138,7 +138,7 @@
 /// @param condition Log condition.
 /// @param logger PonyDebug::Log::ILogger reference.
 /// @param exception std::exception reference.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_E_IF(condition, logger, exception, logMessage, ...) \
 	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
@@ -149,7 +149,7 @@
 /// @brief Log macro that puts a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param logType Log type.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE(logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
@@ -161,7 +161,7 @@
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param condition Log condition.
 /// @param logType Log type.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_IF(condition, logType, logMessage, ...) \
 	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
@@ -192,7 +192,7 @@
 /// @brief Log macro that puts an exception and a message into a corresponding console output if it's enabled with the preprocessors; otherwise it's empty.
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param exception std::exception reference.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_E(exception, logMessage, ...) \
 	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
@@ -204,7 +204,7 @@
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param condition Log condition.
 /// @param exception std::exception reference.
-/// @param logMessage const char* as a message or format string.
+/// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_E_IF(condition, exception, logMessage, ...) \
 	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \

@@ -19,6 +19,7 @@ import <algorithm>;
 import <chrono>;
 import <format>;
 import <exception>;
+import <string_view>;
 import <utility>;
 import <vector>;
 
@@ -45,12 +46,12 @@ export namespace PonyDebug::Log
 		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
 
-		static constexpr auto StaticName = "PonyDebug::Log::Logger"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyDebug::Log::Logger"; ///< Class name.
 
 	private:
 		std::vector<ISubLogger*> subLoggers; ///< Sub-loggers container.
@@ -95,11 +96,11 @@ namespace PonyDebug::Log
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE(LogType::Warning, "Tried to remove not added sub-logger '{}'.", subLogger.Name());
+			PONY_CONSOLE(LogType::Warning, "Tried to remove not added '{}' sub-logger.", subLogger.Name());
 		}
 	}
 
-	const char* Logger::Name() const noexcept
+	std::string_view Logger::Name() const noexcept
 	{
 		return StaticName;
 	}

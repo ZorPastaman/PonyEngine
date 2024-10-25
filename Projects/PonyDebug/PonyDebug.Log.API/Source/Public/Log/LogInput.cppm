@@ -11,13 +11,14 @@ export module PonyDebug.Log:LogInput;
 
 import <cstddef>;
 import <optional>;
+import <string_view>;
 
 export namespace PonyDebug::Log
 {
 	/// @brief Log data input.
 	struct LogInput final
 	{
-		const char* message = nullptr; ///< Log message.
+		std::string_view message; ///< Log message.
 		std::optional<std::size_t> frameCount = {}; ///< Engine frame count.
 	};
 }
