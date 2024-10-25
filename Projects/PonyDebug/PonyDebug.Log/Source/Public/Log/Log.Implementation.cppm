@@ -16,13 +16,13 @@ export module PonyDebug.Log.Implementation;
 export import PonyDebug.Log.Factory;
 
 import <filesystem>;
+import <utility>;
+
+import PonyBase.Memory;
 
 import :ConsoleSubLogger;
-import :ConsoleSubLoggerDestroyer;
 import :FileSubLogger;
-import :FileSubLoggerDestroyer;
 import :Logger;
-import :LoggerDestroyer;
 
 export namespace PonyDebug::Log
 {
@@ -46,29 +46,24 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	auto DefaultLoggerDestroyer = LoggerDestroyer(); ///< Default logger destroyer.
-
-	auto DefaultConsoleSubLoggerDestroyer = ConsoleSubLoggerDestroyer(); ///< Default console sub-logger destroyer.
-	auto DefaultFileSubLoggerDestroyer = FileSubLoggerDestroyer(); ///< Default file sub-logger destroyer.
-
 	LoggerData CreateLogger(const LoggerParams&)
 	{
-		ILogger* const logger = new Logger();
+		auto logger = PonyBase::Memory::UniquePointer<Logger>();
 
-		return LoggerData{.logger = LoggerUniquePtr(*logger, DefaultLoggerDestroyer)};
+		return LoggerData{.logger = PonyBase::Memory::UniquePointer<ILogger>(std::move(logger))};
 	}
 
 	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams&)
 	{
-		ISubLogger* const consoleSubLogger = new ConsoleSubLogger();
+		auto consoleSubLogger = PonyBase::Memory::UniquePointer<ConsoleSubLogger>();
 
-		return ConsoleSubLoggerData{.subLogger = SubLoggerUniquePtr(*consoleSubLogger, DefaultConsoleSubLoggerDestroyer)};
+		return ConsoleSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(consoleSubLogger))};
 	}
 
 	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		ISubLogger* const fileSubLogger = new FileSubLogger(params.logPath);
+		auto fileSubLogger = PonyBase::Memory::UniquePointer<FileSubLogger>(params.logPath);
 
-		return FileSubLoggerData{.subLogger = SubLoggerUniquePtr(*fileSubLogger, DefaultFileSubLoggerDestroyer)};
+		return FileSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(fileSubLogger))};
 	}
 }

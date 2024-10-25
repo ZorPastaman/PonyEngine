@@ -18,6 +18,8 @@ export module Application.Windows:WindowsLogger;
 import <array>;
 import <exception>;
 
+import PonyBase.Memory;
+
 import PonyDebug.Log.Windows.Implementation;
 
 export namespace Application
@@ -61,8 +63,8 @@ export namespace Application
 		[[nodiscard("Pure function")]]
 		static PonyDebug::Log::FileSubLoggerData CreateFileSubLogger();
 
-		PonyDebug::Log::LoggerUniquePtr<PonyDebug::Log::ILogger> logger; ///< Logger.
-		std::array<PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>, 3> subLoggers; ///< Sub-loggers.
+		PonyBase::Memory::UniquePointer<PonyDebug::Log::ILogger> logger; ///< Logger.
+		std::array<PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>, 3> subLoggers; ///< Sub-loggers.
 	};
 }
 
@@ -73,12 +75,12 @@ namespace Application
 		subLoggers
 		{
 			CreateConsoleSubLogger().subLogger,
-			static_cast<PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>>(CreateOutputDebugStringSubLogger().subLogger),
+			static_cast<PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>>(CreateOutputDebugStringSubLogger().subLogger),
 			CreateFileSubLogger().subLogger
 		}
 	{
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
-		for (PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>& subLogger : subLoggers)
+		for (PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
 			logger->AddSubLogger(*subLogger);
@@ -106,7 +108,7 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy sub-loggers.");
 		for (auto it = subLoggers.rbegin(); it != subLoggers.rend(); ++it)
 		{
-			PonyDebug::Log::SubLoggerUniquePtr<PonyDebug::Log::ISubLogger>& subLogger = *it;
+			PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>& subLogger = *it;
 
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", subLogger->Name());
 			subLogger.Reset();

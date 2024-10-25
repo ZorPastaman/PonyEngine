@@ -82,8 +82,7 @@ export namespace PonyDebug::Log
 		const std::optional<std::size_t> frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
-		mutable std::string stringCache; ///< ToString() cache.
-		mutable bool isDirty; ///< If it's @a true, the cache is invalid.
+		mutable std::optional<std::string> stringCache; ///< ToString() cache.
 	};
 
 	/// @brief Puts logEntry.ToString() into the @p stream.
@@ -100,8 +99,7 @@ namespace PonyDebug::Log
 		exception{exception},
 		timePoint{timePoint},
 		frameCount{frameCount},
-		logType{logType},
-		isDirty{true}
+		logType{logType}
 	{
 	}
 
@@ -132,13 +130,12 @@ namespace PonyDebug::Log
 
 	const char* LogEntry::ToString() const noexcept
 	{
-		if (isDirty)
+		if (!stringCache.has_value())
 		{
 			stringCache = MakeString();
-			isDirty = false;
 		}
 
-		return stringCache.c_str();
+		return stringCache.value().c_str();
 	}
 
 	std::string LogEntry::MakeString() const noexcept

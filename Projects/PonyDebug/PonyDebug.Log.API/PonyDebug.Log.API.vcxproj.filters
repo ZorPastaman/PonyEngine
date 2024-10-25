@@ -58,19 +58,7 @@
     <ClCompile Include="Source\Public\Log\Factory\Log.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Log\Factory\ILoggerDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Log\Factory\LoggerUniquePtr.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Log\Factory\LoggerData.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Log\Factory\ISubLoggerDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Log\Factory\SubLoggerUniquePtr.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerData.cppm">
