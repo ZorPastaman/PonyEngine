@@ -16,8 +16,11 @@ export module PonyDebug.Log.Windows.Implementation;
 export import PonyDebug.Log.Implementation;
 export import PonyDebug.Log.Windows.Factory;
 
+import <utility>;
+
+import PonyBase.Memory;
+
 import :OutputDebugStringSubLogger;
-import :OutputDebugStringSubLoggerDestroyer;
 
 export namespace PonyDebug::Log
 {
@@ -30,12 +33,10 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	auto DefaultOutputDebugStringSubLoggerDestroyer = OutputDebugStringSubLoggerDestroyer(); ///< Default output debug string sub-logger destroyer.
-
 	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams&)
 	{
-		IWindowsSubLogger* const outputDebugStringSubLogger = new OutputDebugStringSubLogger();
+		auto outputDebugStringSubLogger = PonyBase::Memory::UniquePointer<OutputDebugStringSubLogger>();
 
-		return OutputDebugStringSubLoggerData{.subLogger = SubLoggerUniquePtr(*outputDebugStringSubLogger, DefaultOutputDebugStringSubLoggerDestroyer)};
+		return OutputDebugStringSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<IWindowsSubLogger>(std::move(outputDebugStringSubLogger))};
 	}
 }

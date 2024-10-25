@@ -7,17 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log.Factory:ConsoleSubLoggerData;
+export module PonyBase.Memory;
 
-import PonyBase.Memory;
-
-import PonyDebug.Log;
-
-export namespace PonyDebug::Log
-{
-	/// @brief Console sub-logger data.
-	struct ConsoleSubLoggerData final
-	{
-		PonyBase::Memory::UniquePointer<ISubLogger> subLogger; ///< Sub-logger.
-	};
-}
+export import :UniquePointer;

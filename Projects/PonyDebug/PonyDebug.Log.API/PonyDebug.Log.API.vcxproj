@@ -27,13 +27,9 @@
     <ClCompile Include="Source\Public\Log\Factory\ConsoleSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerData.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\FileSubLoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Log\Factory\ILoggerDestroyer.cppm" />
-    <ClCompile Include="Source\Public\Log\Factory\ISubLoggerDestroyer.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\Log.Factory.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\LoggerData.cppm" />
     <ClCompile Include="Source\Public\Log\Factory\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Log\Factory\LoggerUniquePtr.cppm" />
-    <ClCompile Include="Source\Public\Log\Factory\SubLoggerUniquePtr.cppm" />
     <ClCompile Include="Source\Public\Log\ILogger.cppm" />
     <ClCompile Include="Source\Public\Log\ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Log\Log.cppm" />
@@ -47,6 +43,9 @@
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Utility\PonyBase.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
