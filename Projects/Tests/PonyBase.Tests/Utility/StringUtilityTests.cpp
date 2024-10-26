@@ -44,6 +44,7 @@ namespace Utility
 			Assert::AreEqual(std::format(format, formatArg), PonyBase::Utility::SafeFormat(format, formatArg));
 			Assert::AreEqual(std::format(format, formatArg), PonyBase::Utility::SafeFormat<ExceptionHandler>(format, formatArg));
 			Assert::AreEqual(std::format(format, formatArg), PonyBase::Utility::SafeFormat(ExceptionHandler(), format, formatArg));
+			// TODO: Check exception throw
 		}
 	};
 }

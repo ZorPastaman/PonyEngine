@@ -35,7 +35,7 @@ namespace PonyDebug::Log
 {
 	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams&)
 	{
-		auto outputDebugStringSubLogger = PonyBase::Memory::UniquePointer<OutputDebugStringSubLogger>();
+		auto outputDebugStringSubLogger = PonyBase::Memory::UniquePointer<OutputDebugStringSubLogger>::Create();
 
 		return OutputDebugStringSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<IWindowsSubLogger>(std::move(outputDebugStringSubLogger))};
 	}

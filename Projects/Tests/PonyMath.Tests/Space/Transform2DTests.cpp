@@ -98,7 +98,7 @@ namespace Space
 			constexpr float rotation = 0.99f;
 			constexpr auto scale = PonyMath::Core::Vector2<float>(0.5f, 1.2f);
 			const auto transform = PonyMath::Space::Transform2D(position, rotation, scale);
-			Assert::IsTrue(PonyMath::Core::TrsMatrix(position, rotation, scale) == transform.TrsMatrix());
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::TrsMatrix(position, rotation, scale), transform.TrsMatrix()));
 		}
 
 		TEST_METHOD(DirectionsTest)

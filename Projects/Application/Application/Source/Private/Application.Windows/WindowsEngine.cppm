@@ -19,7 +19,7 @@ export module Application.Windows:WindowsEngine;
 
 import <array>;
 import <exception>;
-import <format>; // It's necessary to import because of a bug in MSVC.
+import <format>;
 
 import PonyBase.Core;
 import PonyMath.Core;
