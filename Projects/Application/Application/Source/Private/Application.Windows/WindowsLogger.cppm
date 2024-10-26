@@ -17,6 +17,7 @@ export module Application.Windows:WindowsLogger;
 
 import <array>;
 import <exception>;
+import <format>;
 
 import PonyBase.Memory;
 

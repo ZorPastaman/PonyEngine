@@ -15,6 +15,7 @@ export module PonyBase.GuidUtility;
 
 import <cstdint>;
 import <format>;
+import <stdexcept>;
 import <string>;
 import <type_traits>;
 

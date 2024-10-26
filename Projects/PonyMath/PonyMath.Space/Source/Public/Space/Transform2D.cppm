@@ -19,7 +19,7 @@ import PonyMath.Core;
 export namespace PonyMath::Space
 {
 	/// @brief 3D transform implementation.
-	class Transform2D final // TODO: Add docs and tests
+	class Transform2D final
 	{
 	public:
 		using PositionType = Core::Vector2<float>; ///< Position type.

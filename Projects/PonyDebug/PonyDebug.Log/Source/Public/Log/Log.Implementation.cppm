@@ -48,21 +48,21 @@ namespace PonyDebug::Log
 {
 	LoggerData CreateLogger(const LoggerParams&)
 	{
-		auto logger = PonyBase::Memory::UniquePointer<Logger>();
+		auto logger = PonyBase::Memory::UniquePointer<Logger>::Create();
 
 		return LoggerData{.logger = PonyBase::Memory::UniquePointer<ILogger>(std::move(logger))};
 	}
 
 	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams&)
 	{
-		auto consoleSubLogger = PonyBase::Memory::UniquePointer<ConsoleSubLogger>();
+		auto consoleSubLogger = PonyBase::Memory::UniquePointer<ConsoleSubLogger>::Create();
 
 		return ConsoleSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(consoleSubLogger))};
 	}
 
 	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		auto fileSubLogger = PonyBase::Memory::UniquePointer<FileSubLogger>(params.logPath);
+		auto fileSubLogger = PonyBase::Memory::UniquePointer<FileSubLogger>::Create(params.logPath);
 
 		return FileSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(fileSubLogger))};
 	}
