@@ -108,7 +108,7 @@ namespace PonyDebug::Log
 		}
 	}
 
-	template<typename ... Args>
+	template<typename... Args>
 	void LogToConsole(const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...));
@@ -140,7 +140,7 @@ namespace PonyDebug::Log
 		}
 	}
 
-	template<typename ... Args>
+	template<typename... Args>
 	void LogExceptionToConsole(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...));
