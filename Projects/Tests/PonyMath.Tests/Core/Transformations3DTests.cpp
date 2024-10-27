@@ -8306,6 +8306,27 @@ namespace Core
 			Assert::AreEqual(0., static_cast<double>(perspectiveMatrix.M33()), 0.001);
 		}
 
+		TEST_METHOD(OrthographicMatrixTest)
+		{
+			const auto orthographicMatrix = PonyMath::Core::OrthographicMatrix(20.f, 1.7f, 0.2f, 1000.f);
+			Assert::AreEqual(0.058, static_cast<double>(orthographicMatrix.M00()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M10()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M20()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M30()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M01()), 0.001);
+			Assert::AreEqual(0.1, static_cast<double>(orthographicMatrix.M11()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M21()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M31()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M02()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M12()), 0.001);
+			Assert::AreEqual(0.001, static_cast<double>(orthographicMatrix.M22()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M32()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M03()), 0.001);
+			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M13()), 0.001);
+			Assert::AreEqual(-0.0002, static_cast<double>(orthographicMatrix.M23()), 0.0001);
+			Assert::AreEqual(1., static_cast<double>(orthographicMatrix.M33()), 0.001);
+		}
+
 		TEST_METHOD(TranslationFromTrsMatrixTest)
 		{
 			constexpr auto trsMatrix = PonyMath::Core::Matrix4x4<float>(1.20195207f, 2.83368228f, -1.18977177f, 0.f, -2.78489148f, 2.1459669f, 2.297652f, 0.f, 1.56952848f, 0.0955356f, 1.81313376f, 0.f, -4.2f, -6.4f, 3.1f, 1.f);
@@ -8444,7 +8465,15 @@ namespace Core
 			Assert::AreEqual(80. * PonyMath::Core::DegToRad<double>, static_cast<double>(fov), 0.001);
 		}
 
-		TEST_METHOD(AspectFromPerspectiveMatrixTest)
+		TEST_METHOD(HeightFromOrthographicMatrixTest)
+		{
+			constexpr auto orthographicMatrix = PonyMath::Core::Matrix4x4<float>(0.058f, 0.f, 0.f, 0.f, 0.f, 0.1f, 0.f, 0.f, 0.f, 0.f, 0.001f, 0.f, 0.f, 0.f, -0.0002f, 1.f);
+			const float height = PonyMath::Core::ExtractHeight(orthographicMatrix);
+
+			Assert::AreEqual(20., static_cast<double>(height), 0.001);
+		}
+
+		TEST_METHOD(AspectFromMatrixTest)
 		{
 			constexpr auto perspectiveMatrix = PonyMath::Core::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
 			const float aspect = PonyMath::Core::ExtractAspect(perspectiveMatrix);
@@ -8452,7 +8481,7 @@ namespace Core
 			Assert::AreEqual(1.7, static_cast<double>(aspect), 0.001);
 		}
 
-		TEST_METHOD(NearPlaneFromPerspectiveMatrixTest)
+		TEST_METHOD(NearPlaneFromMatrixTest)
 		{
 			constexpr auto perspectiveMatrix = PonyMath::Core::Matrix4x4<float>(0.701f, 0.f, 0.f, 0.f, 0.f, 1.192f, 0.f, 0.f, 0.f, 0.f, 1.f, 1.f, 0.f, 0.f, -0.2f, 0.f);
 			const float nearPlane = PonyMath::Core::ExtractNearPlane(perspectiveMatrix);
@@ -8463,7 +8492,15 @@ namespace Core
 		TEST_METHOD(FarPlaneFromPerspectiveMatrixTest)
 		{
 			const auto perspectiveMatrix = PonyMath::Core::PerspectiveMatrix(80.f * PonyMath::Core::DegToRad<float>, 1.7f, 0.2f, 1000.f);
-			const float farPlane = PonyMath::Core::ExtractFarPlane(perspectiveMatrix);
+			const float farPlane = PonyMath::Core::ExtractFarPlanePerspective(perspectiveMatrix);
+
+			Assert::AreEqual(1000., static_cast<double>(farPlane), 0.1);
+		}
+
+		TEST_METHOD(FarPlaneFromOrthographicMatrixTest)
+		{
+			constexpr auto orthographicMatrix = PonyMath::Core::OrthographicMatrix(20.f, 1.7f, 0.2f, 1000.f);
+			const float farPlane = PonyMath::Core::ExtractFarPlaneOrthographic(orthographicMatrix);
 
 			Assert::AreEqual(1000., static_cast<double>(farPlane), 0.1);
 		}
@@ -8520,11 +8557,14 @@ namespace Core
 			[[maybe_unused]] constexpr auto trsMatrix = PonyMath::Core::TrsMatrix(translation, quaternion, scaling);
 			[[maybe_unused]] constexpr auto trsMatrix1 = PonyMath::Core::TrsMatrix(rsMatrix);
 			[[maybe_unused]] constexpr auto trsMatrix2 = PonyMath::Core::TrsMatrix(translation, rsMatrix);
+			[[maybe_unused]] constexpr auto orthographic = PonyMath::Core::OrthographicMatrix(20.f, 1.2f, 5.f, 1000.f);
 			[[maybe_unused]] constexpr auto translation1 = PonyMath::Core::ExtractTranslation(trsMatrix);
 			[[maybe_unused]] constexpr auto rsMatrix2 = PonyMath::Core::ExtractRsMatrix(trsMatrix);
+			[[maybe_unused]] constexpr auto height = PonyMath::Core::ExtractHeight(orthographic);
 			[[maybe_unused]] constexpr auto aspect = PonyMath::Core::ExtractAspect(trsMatrix);
 			[[maybe_unused]] constexpr auto nearPlane = PonyMath::Core::ExtractNearPlane(trsMatrix);
-			[[maybe_unused]] constexpr auto farPlane = PonyMath::Core::ExtractFarPlane(trsMatrix);
+			[[maybe_unused]] constexpr auto farPlane = PonyMath::Core::ExtractFarPlanePerspective(trsMatrix);
+			[[maybe_unused]] constexpr auto farPlaneOrth = PonyMath::Core::ExtractFarPlaneOrthographic(orthographic);
 			[[maybe_unused]] constexpr auto point = PonyMath::Core::TransformPoint(trsMatrix, scaling);
 			[[maybe_unused]] constexpr auto direction = PonyMath::Core::TransformDirection(trsMatrix, scaling);
 		}
