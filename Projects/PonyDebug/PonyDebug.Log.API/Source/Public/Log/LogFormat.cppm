@@ -69,12 +69,12 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	std::string LogFormat(const LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint)
+	std::string LogFormat(const LogType logType, const std::chrono::time_point<std::chrono::system_clock> timePoint)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC}]\n", ToString(logType), timePoint);
 	}
 
-	std::string LogFormat(const LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::size_t frameCount)
+	std::string LogFormat(const LogType logType, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::size_t frameCount)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})]\n", ToString(logType), timePoint, frameCount);
 	}
