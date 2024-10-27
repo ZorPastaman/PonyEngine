@@ -244,13 +244,22 @@ export namespace PonyMath::Core
 
 	/// @brief Creates a 3D perspective projection matrix.
 	/// @tparam T Value type.
-	/// @param fov Vertical field of view in radians.
-	/// @param aspect Aspect ratio (width / height).
-	/// @param nearPlane Distance between a camera and a near clipping plane.
-	/// @param farPlane Distance between a camera and a far clipping plane.
+	/// @param fov Vertical field of view in radians. Must be positive.
+	/// @param aspect Aspect ratio (width / height). Must be positive.
+	/// @param nearPlane Distance between a camera and a near clipping plane. Must be positive.
+	/// @param farPlane Distance between a camera and a far clipping plane. Must be positive and greater than the @p nearPlane.
 	/// @return Perspective projection matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix4x4<T> PerspectiveMatrix(T fov, T aspect, T nearPlane, T farPlane) noexcept;
+	/// @brief Creates a 3D orthographic projection matrix.
+	/// @tparam T Value type.
+	/// @param height Height. Must be positive.
+	/// @param aspect Aspect ratio (width / height). Must be positive.
+	/// @param nearPlane Distance between a camera and a near clipping plane. Must be positive.
+	/// @param farPlane Distance between a camera and a far clipping plane. Must be positive and greater than the @p nearPlane.
+	/// @return Orthographic projection matrix.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Matrix4x4<T> OrthographicMatrix(T height, T aspect, T nearPlane, T farPlane) noexcept;
 
 	/// @brief Extracts a translation from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
@@ -347,24 +356,36 @@ export namespace PonyMath::Core
 	/// @return Field of view in radians.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	T ExtractFov(const Matrix4x4<T>& perspectiveMatrix) noexcept;
-	/// @brief Extracts an aspect ratio from the perspective projection matrix.
+	/// @brief Extracts a height from the orthographic projection matrix.
 	/// @tparam T Value type.
-	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @param orthographicMatrix Orthographic projection matrix.
+	/// @return Height.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T ExtractHeight(const Matrix4x4<T>& orthographicMatrix) noexcept;
+	/// @brief Extracts an aspect ratio from the perspective or orthographic projection matrix.
+	/// @tparam T Value type.
+	/// @param projectionMatrix Projection matrix.
 	/// @return Aspect ratio (width / height).
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T ExtractAspect(const Matrix4x4<T>& perspectiveMatrix) noexcept;
-	/// @brief Extracts a near clipping plane distance from the perspective projection matrix.
+	constexpr T ExtractAspect(const Matrix4x4<T>& projectionMatrix) noexcept;
+	/// @brief Extracts a near clipping plane distance from the perspective or orthographic projection matrix.
 	/// @tparam T Value type.
-	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @param projectionMatrix Projection matrix.
 	/// @return Near clipping plane distance.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T ExtractNearPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+	constexpr T ExtractNearPlane(const Matrix4x4<T>& projectionMatrix) noexcept;
 	/// @brief Extracts a far clipping plane distance from the perspective projection matrix.
 	/// @tparam T Value type.
-	/// @param perspectiveMatrix Perspective projection matrix.
+	/// @param orthographicMatrix Perspective projection matrix.
 	/// @return Far clipping plane distance.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr T ExtractFarPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept;
+	constexpr T ExtractFarPlanePerspective(const Matrix4x4<T>& orthographicMatrix) noexcept;
+	/// @brief Extracts a far clipping plane distance from the orthographic projection matrix.
+	/// @tparam T Value type.
+	/// @param orthographicMatrix Orthographic projection matrix.
+	/// @return Far clipping plane distance.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr T ExtractFarPlaneOrthographic(const Matrix4x4<T>& orthographicMatrix) noexcept;
 
 	/// @brief Rotates the @p vector with the @p euler.
 	/// @tparam T Value type.
@@ -865,7 +886,7 @@ namespace PonyMath::Core
 	}
 
 	template<std::floating_point T>
-	Matrix4x4<T> PerspectiveMatrix(const T fov, const T aspect, const T nearPlane, const T farPlane) noexcept // TODO: Add extract functions
+	Matrix4x4<T> PerspectiveMatrix(const T fov, const T aspect, const T nearPlane, const T farPlane) noexcept
 	{
 		const T fovScale = T{1} / std::tan(fov * T{0.5});
 		const T planeScale = farPlane / (farPlane - nearPlane);
@@ -878,6 +899,21 @@ namespace PonyMath::Core
 		perspective.M23() = -nearPlane * planeScale;
 
 		return perspective;
+	}
+
+	template<std::floating_point T>
+	constexpr Matrix4x4<T> OrthographicMatrix(const T height, const T aspect, const T nearPlane, const T farPlane) noexcept
+	{
+		const T width = height * aspect;
+		const T inverseDepth = T{1} / (farPlane - nearPlane);
+
+		Matrix4x4<T> orthographic = Matrix4x4<T>::Predefined::Identity;
+		orthographic.M00() = T{2} / width;
+		orthographic.M11() = T{2} / height;
+		orthographic.M22() = inverseDepth;
+		orthographic.M23() = -nearPlane * inverseDepth;
+
+		return orthographic;
 	}
 
 	template<std::floating_point T>
@@ -976,21 +1012,33 @@ namespace PonyMath::Core
 	}
 
 	template<std::floating_point T>
-	constexpr T ExtractAspect(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	constexpr T ExtractHeight(const Matrix4x4<T>& orthographicMatrix) noexcept
 	{
-		return perspectiveMatrix.M11() / perspectiveMatrix.M00();
+		return T{2} / orthographicMatrix.M11();
 	}
 
 	template<std::floating_point T>
-	constexpr T ExtractNearPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	constexpr T ExtractAspect(const Matrix4x4<T>& projectionMatrix) noexcept
 	{
-		return -perspectiveMatrix.M23() / perspectiveMatrix.M22();
+		return projectionMatrix.M11() / projectionMatrix.M00();
 	}
 
 	template<std::floating_point T>
-	constexpr T ExtractFarPlane(const Matrix4x4<T>& perspectiveMatrix) noexcept
+	constexpr T ExtractNearPlane(const Matrix4x4<T>& projectionMatrix) noexcept
 	{
-		return -perspectiveMatrix.M23() / (perspectiveMatrix.M22() - T{1});
+		return -projectionMatrix.M23() / projectionMatrix.M22();
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractFarPlanePerspective(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return -orthographicMatrix.M23() / (orthographicMatrix.M22() - T{1});
+	}
+
+	template<std::floating_point T>
+	constexpr T ExtractFarPlaneOrthographic(const Matrix4x4<T>& orthographicMatrix) noexcept
+	{
+		return (T{1} - orthographicMatrix.M23()) / orthographicMatrix.M22();
 	}
 
 	template<std::floating_point T>
