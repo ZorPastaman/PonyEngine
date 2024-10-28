@@ -210,7 +210,7 @@ namespace PonyMath::Space
 
 	const Core::Matrix3x3<float>& Transform2D::TrsMatrix() const noexcept
 	{
-		if (!trs.has_value())
+		if (!trs)
 		{
 			trs = Core::TrsMatrix(position, rotation, scale);
 		}

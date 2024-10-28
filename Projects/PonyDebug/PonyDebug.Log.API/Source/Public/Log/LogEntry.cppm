@@ -131,7 +131,7 @@ namespace PonyDebug::Log
 
 	std::string_view LogEntry::ToString() const noexcept
 	{
-		if (!stringCache.has_value())
+		if (!stringCache)
 		{
 			stringCache = MakeString();
 		}

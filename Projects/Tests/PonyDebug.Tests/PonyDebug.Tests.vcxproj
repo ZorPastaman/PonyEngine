@@ -89,7 +89,13 @@
     <ClCompile Include="Log\LoggerTests.cpp" />
     <ClCompile Include="Log\LogHelperTests.cpp" />
     <ClCompile Include="Log\LogTypeTests.cpp" />
+    <ClCompile Include="Log\Mocks\Logger.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
+    <ClCompile Include="Log\Mocks\SubLogger.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Log\Mocks\Logger.h" />
+    <ClInclude Include="Log\Mocks\SubLogger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

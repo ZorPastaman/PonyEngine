@@ -14,6 +14,7 @@
 #include <filesystem>
 #include <fstream>
 #include <string>
+#include <string_view>
 
 import PonyDebug.Log.Implementation;
 
@@ -48,7 +49,7 @@ namespace Log
 			std::ifstream logFile(testLogPath);
 			std::string line;
 			std::getline(logFile, line);
-			Assert::AreEqual(infoLogEntry.ToString(), (line + '\n').c_str());
+			Assert::AreEqual(infoLogEntry.ToString(), std::string_view(line + '\n'));
 			logFile.close();
 
 			std::filesystem::remove(testLogPath);
@@ -58,7 +59,7 @@ namespace Log
 		{
 			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = testLogPath};
 			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
-			Assert::AreEqual("PonyDebug::Log::FileSubLogger", fileSubLogger.subLogger->Name());
+			Assert::AreEqual(std::string_view("PonyDebug::Log::FileSubLogger"), fileSubLogger.subLogger->Name());
 			fileSubLogger.subLogger.Reset();
 			std::filesystem::remove(testLogPath);
 		}

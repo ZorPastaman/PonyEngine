@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 import PonyDebug.Log;
@@ -20,13 +21,13 @@ namespace Log
 {
 	TEST_CLASS(LogTypeTests)
 	{
-		static void ToStringTestElement(const PonyDebug::Log::LogType logType, const char* expectedString)
+		static void ToStringTestElement(const PonyDebug::Log::LogType logType, const std::string_view expectedString)
 		{
 			Assert::AreEqual(expectedString, PonyDebug::Log::ToString(logType));
 
 			std::ostringstream ss;
 			ss << logType;
-			Assert::AreEqual(expectedString, ss.str().c_str());
+			Assert::AreEqual(expectedString, std::string_view(ss.str()));
 		}
 
 		TEST_METHOD(ValueTest)
