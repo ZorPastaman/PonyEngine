@@ -14,6 +14,7 @@
 #include <cstdint>
 #include <exception>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 import PonyDebug.Log;
@@ -27,7 +28,7 @@ namespace Log
 	public:
 		TEST_METHOD(ConstructorTest)
 		{
-			const auto message = "Message.";
+			constexpr std::string_view message = "Message.";
 			const auto exception = std::exception("Exception text.");
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450780));
 			constexpr std::size_t frameCount = 98407;
@@ -41,8 +42,8 @@ namespace Log
 			Assert::AreEqual(frameCount, logEntry.FrameCount().value());
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logType), static_cast<std::underlying_type_t<PonyDebug::Log::LogType>>(logEntry.LogType()));
 
-			const auto pureExceptionLogEntry = PonyDebug::Log::LogEntry(nullptr, &exception, timePoint, frameCount, exceptionLogType);
-			Assert::IsNull(pureExceptionLogEntry.Message());
+			const auto pureExceptionLogEntry = PonyDebug::Log::LogEntry(std::string_view(), &exception, timePoint, frameCount, exceptionLogType);
+			Assert::IsTrue(pureExceptionLogEntry.Message().empty());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&exception), reinterpret_cast<std::uintptr_t>(pureExceptionLogEntry.Exception()));
 			Assert::IsTrue(timePoint == pureExceptionLogEntry.TimePoint());
 			Assert::AreEqual(frameCount, pureExceptionLogEntry.FrameCount().value());
@@ -58,7 +59,7 @@ namespace Log
 
 		TEST_METHOD(ToStringTest)
 		{
-			const auto message = "Message.";
+			constexpr std::string_view message = "Message.";
 			const auto exception = std::exception("Exception text.");
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450780));
 			constexpr std::size_t frameCount = 98407;
@@ -66,32 +67,32 @@ namespace Log
 			constexpr auto exceptionLogType = PonyDebug::Log::LogType::Exception;
 
 			const auto logEntry = PonyDebug::Log::LogEntry(message, nullptr, timePoint, frameCount, logType);
-			const std::string logEntryString = logEntry.ToString();
-			Assert::AreEqual("[Warning] [1970-01-06 05:13:00 UTC (98407)] Message.\n", logEntryString.c_str());
+			const std::string_view logEntryString = logEntry.ToString();
+			Assert::AreEqual(std::string_view("[Warning] [1970-01-06 05:13:00 UTC (98407)] Message.\n"), logEntryString);
 			std::ostringstream logEntrySs;
 			logEntrySs << logEntry;
-			Assert::AreEqual(logEntryString.c_str(), logEntrySs.str().c_str());
+			Assert::AreEqual(logEntryString, std::string_view(logEntrySs.str()));
 
-			const auto pureExceptionLogEntry = PonyDebug::Log::LogEntry(nullptr, &exception, timePoint, frameCount, exceptionLogType);
-			const std::string pureExceptionLogEntryString = pureExceptionLogEntry.ToString();
-			Assert::AreEqual("[Exception] [1970-01-06 05:13:00 UTC (98407)] Exception text.\n", pureExceptionLogEntryString.c_str());
+			const auto pureExceptionLogEntry = PonyDebug::Log::LogEntry(std::string_view(), &exception, timePoint, frameCount, exceptionLogType);
+			const std::string_view pureExceptionLogEntryString = pureExceptionLogEntry.ToString();
+			Assert::AreEqual(std::string_view("[Exception] [1970-01-06 05:13:00 UTC (98407)] Exception text.\n"), pureExceptionLogEntryString);
 			std::ostringstream pureExceptionLogEntrySs;
 			pureExceptionLogEntrySs << pureExceptionLogEntry;
-			Assert::AreEqual(pureExceptionLogEntryString.c_str(), pureExceptionLogEntrySs.str().c_str());
+			Assert::AreEqual(pureExceptionLogEntryString, std::string_view(pureExceptionLogEntrySs.str()));
 
 			const auto exceptionLogEntry = PonyDebug::Log::LogEntry(message, &exception, timePoint, frameCount, exceptionLogType);
-			const std::string exceptionLogEntryString = exceptionLogEntry.ToString();
-			Assert::AreEqual("[Exception] [1970-01-06 05:13:00 UTC (98407)] Exception text. - Message.\n", exceptionLogEntryString.c_str());
+			const std::string_view exceptionLogEntryString = exceptionLogEntry.ToString();
+			Assert::AreEqual(std::string_view("[Exception] [1970-01-06 05:13:00 UTC (98407)] Exception text. - Message.\n"), exceptionLogEntryString);
 			std::ostringstream exceptionLogEntrySs;
 			exceptionLogEntrySs << exceptionLogEntry;
-			Assert::AreEqual(exceptionLogEntryString.c_str(), exceptionLogEntrySs.str().c_str());
+			Assert::AreEqual(exceptionLogEntryString, std::string_view(exceptionLogEntrySs.str()));
 
-			const auto emptyLogEntry = PonyDebug::Log::LogEntry(nullptr, nullptr, timePoint, frameCount, logType);
-			const std::string emptyLogEntryString = emptyLogEntry.ToString();
-			Assert::AreEqual("[Warning] [1970-01-06 05:13:00 UTC (98407)] \n", emptyLogEntryString.c_str());
+			const auto emptyLogEntry = PonyDebug::Log::LogEntry(std::string_view(), nullptr, timePoint, frameCount, logType);
+			const std::string_view emptyLogEntryString = emptyLogEntry.ToString();
+			Assert::AreEqual(std::string_view("[Warning] [1970-01-06 05:13:00 UTC (98407)]\n"), emptyLogEntryString);
 			std::ostringstream emptyLogEntrySs;
 			emptyLogEntrySs << emptyLogEntry;
-			Assert::AreEqual(emptyLogEntryString.c_str(), emptyLogEntrySs.str().c_str());
+			Assert::AreEqual(emptyLogEntryString, std::string_view(emptyLogEntrySs.str()));
 		}
 	};
 }

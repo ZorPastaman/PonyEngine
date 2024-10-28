@@ -29,6 +29,8 @@ namespace Log
 			const auto message = "Message!";
 			const auto secondMessage = "Second message.";
 
+			Assert::AreEqual(std::format("[{}] [{:%F %R:%OS UTC}]\n", ToString(logType), timePoint), PonyDebug::Log::LogFormat(logType, timePoint));
+			Assert::AreEqual(std::format("[{}] [{:%F %R:%OS UTC} ({})]\n", ToString(logType), timePoint, frameCount), PonyDebug::Log::LogFormat(logType, timePoint, frameCount));
 			Assert::AreEqual(std::format("[{}] [{:%F %R:%OS UTC}] {}\n", ToString(logType), timePoint, message), PonyDebug::Log::LogFormat(logType, message, timePoint));
 			Assert::AreEqual(std::format("[{}] [{:%F %R:%OS UTC} ({})] {}\n", ToString(logType), timePoint, frameCount, message), PonyDebug::Log::LogFormat(logType, message, timePoint, frameCount));
 			Assert::AreEqual(std::format("[{}] [{:%F %R:%OS UTC}] {} - {}\n", ToString(logType), timePoint, message, secondMessage), PonyDebug::Log::LogFormat(logType, message, secondMessage, timePoint));
