@@ -13,8 +13,8 @@ import <string_view>;
 
 import PonyEngine.Core;
 
-import :SystemData;
 import :EngineSystemParams;
+import :SystemData;
 import :SystemParams;
 
 export namespace PonyEngine::Core
@@ -29,7 +29,7 @@ export namespace PonyEngine::Core
 		/// @brief Creates a system.
 		///	@param engine Engine context.
 		/// @param params Engine system parameters.
-		/// @return Created system.
+		/// @return Created system data.
 		[[nodiscard("Pure function")]]
 		virtual SystemData Create(IEngineContext& engine, const EngineSystemParams& params) = 0;
 

@@ -26,6 +26,7 @@ import <string_view>;
 import <utility>;
 
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
@@ -121,7 +122,7 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window.");
 		auto system = PonyBase::Memory::UniquePointer<WindowsWindowSystem>::Create(engine, hInstance, classAtom, windowParams);
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Windows window created.");
-		auto interfaces = Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
 
 		return Core::SystemData

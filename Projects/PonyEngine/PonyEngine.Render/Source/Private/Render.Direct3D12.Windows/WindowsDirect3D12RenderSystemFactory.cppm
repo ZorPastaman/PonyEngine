@@ -17,6 +17,7 @@ import <string_view>;
 import <utility>;
 
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 
 import PonyDebug.Log;
 
@@ -66,7 +67,7 @@ namespace PonyEngine::Render
 	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
 		auto system = PonyBase::Memory::UniquePointer<WindowsDirect3D12RenderSystem>::Create(engine, renderSystemParams);
-		auto interfaces = Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IRenderSystem, IDirect3D12RenderSystem, IWindowsDirect3D12RenderSystem>(*system);
 
 		return Core::SystemData

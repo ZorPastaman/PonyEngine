@@ -12,6 +12,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm" />
+    <ClCompile Include="Source\Public\Utility\ObjectUtility.cppm" />
     <ClCompile Include="Source\Public\Utility\StringUtility.cppm" />
   </ItemGroup>
   <ItemGroup>

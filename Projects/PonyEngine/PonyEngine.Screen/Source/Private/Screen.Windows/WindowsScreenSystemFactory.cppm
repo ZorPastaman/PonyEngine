@@ -17,6 +17,7 @@ import <string_view>;
 import <utility>;
 
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Screen.Windows.Factory;
@@ -64,7 +65,7 @@ namespace PonyEngine::Screen
 	Core::SystemData WindowsScreenSystemFactory::Create(Core::IEngineContext&, const Core::EngineSystemParams&)
 	{
 		auto system = PonyBase::Memory::UniquePointer<WindowsScreenSystem>::Create();
-		auto interfaces = Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IScreenSystem, IWindowsScreenSystem>(*system);
 
 		return Core::SystemData

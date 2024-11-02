@@ -14,6 +14,7 @@
 #include <utility>
 
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -25,7 +26,7 @@ namespace Core
 
 		auto createdSystem = PonyBase::Memory::UniquePointer<System>::Create();
 		system = createdSystem.Get();
-		auto interfaces = PonyEngine::Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<ISystemInterface>(*system);
 
 		return PonyEngine::Core::SystemData

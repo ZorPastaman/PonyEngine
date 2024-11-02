@@ -17,6 +17,7 @@ import <string_view>;
 import <utility>;
 
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 
 import PonyDebug.Log;
 
@@ -70,7 +71,7 @@ namespace Game
 	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams&)
 	{
 		auto system = PonyBase::Memory::UniquePointer<GameSystem>::Create(engine);
-		auto interfaces = PonyEngine::Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
 
 		return PonyEngine::Core::SystemData

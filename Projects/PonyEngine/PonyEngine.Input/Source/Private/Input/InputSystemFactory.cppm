@@ -16,6 +16,8 @@ export module PonyEngine.Input.Implementation:InputSystemFactory;
 import <string_view>;
 import <utility>;
 
+import PonyBase.ObjectUtility;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Factory;
 
@@ -62,7 +64,7 @@ namespace PonyEngine::Input
 	Core::SystemData InputSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
 		auto system = PonyBase::Memory::UniquePointer<InputSystem>::Create(engine);
-		auto interfaces = Core::ObjectInterfaces();
+		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IInputSystem>(*system);
 
 		return Core::SystemData

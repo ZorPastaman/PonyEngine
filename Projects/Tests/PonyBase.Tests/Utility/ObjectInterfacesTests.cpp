@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-import PonyEngine.Core.Factory;
+import PonyBase.ObjectUtility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -36,7 +36,7 @@ namespace Core
 		TEST_METHOD(ConstructorsTest)
 		{
 			auto classObject = Class();
-			auto defaultInterfaces = PonyEngine::Core::ObjectInterfaces();
+			auto defaultInterfaces = PonyBase::Utility::ObjectInterfaces();
 			defaultInterfaces.AddInterfacesDeduced<IInterface>(classObject);
 			Assert::IsTrue(typeid(IInterface) == defaultInterfaces.Begin()->first.get());
 
@@ -51,7 +51,7 @@ namespace Core
 		{
 			auto classObject = Class();
 			auto class1Object = Class1();
-			auto interfaces = PonyEngine::Core::ObjectInterfaces();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
 			interfaces.AddInterface(typeid(IInterface), static_cast<IInterface*>(&classObject));
 			interfaces.AddInterface(typeid(IInterface1), static_cast<IInterface1*>(&class1Object));
 			interfaces.AddInterface(typeid(Class1), &class1Object);
@@ -76,7 +76,7 @@ namespace Core
 		{
 			auto classObject = Class();
 			auto class1Object = Class1();
-			auto interfaces = PonyEngine::Core::ObjectInterfaces();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
 			interfaces.AddInterface<IInterface, Class>(classObject);
 			interfaces.AddInterface<IInterface1, Class1>(class1Object);
 			interfaces.AddInterface<Class1, Class1>(class1Object);
@@ -101,7 +101,7 @@ namespace Core
 		{
 			auto classObject = Class();
 			auto class1Object = Class1();
-			auto interfaces = PonyEngine::Core::ObjectInterfaces();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
 			interfaces.AddInterfaces<Class, IInterface>(classObject);
 			interfaces.AddInterfaces<Class1, IInterface1, Class1>(class1Object);
 
@@ -125,7 +125,7 @@ namespace Core
 		{
 			auto classObject = Class();
 			auto class1Object = Class1();
-			auto interfaces = PonyEngine::Core::ObjectInterfaces();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
 			interfaces.AddInterfacesDeduced<IInterface>(classObject);
 			interfaces.AddInterfacesDeduced<IInterface1, Class1>(class1Object);
 
@@ -148,15 +148,15 @@ namespace Core
 		TEST_METHOD(AssignmentTest)
 		{
 			auto classObject = Class();
-			auto defaultInterfaces = PonyEngine::Core::ObjectInterfaces();
+			auto defaultInterfaces = PonyBase::Utility::ObjectInterfaces();
 			defaultInterfaces.AddInterfacesDeduced<IInterface>(classObject);
 			Assert::IsTrue(typeid(IInterface) == defaultInterfaces.Begin()->first.get());
 
-			auto copiedInterfaces = PonyEngine::Core::ObjectInterfaces();
+			auto copiedInterfaces = PonyBase::Utility::ObjectInterfaces();
 			copiedInterfaces = defaultInterfaces;
 			Assert::IsTrue(typeid(IInterface) == copiedInterfaces.Begin()->first.get());
 
-			auto movedInterfaces = PonyEngine::Core::ObjectInterfaces();
+			auto movedInterfaces = PonyBase::Utility::ObjectInterfaces();
 			movedInterfaces = std::move(defaultInterfaces);
 			Assert::IsTrue(typeid(IInterface) == movedInterfaces.Begin()->first.get());
 		}
