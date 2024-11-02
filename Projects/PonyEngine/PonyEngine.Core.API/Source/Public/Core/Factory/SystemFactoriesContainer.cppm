@@ -23,7 +23,7 @@ export namespace PonyEngine::Core
 {
 	/// @brief System factories container.
 	///	@details System factories in it can't be nullptr and they are always unique.
-	class SystemFactoriesContainer final // TODO: Add test for tick order.
+	class SystemFactoriesContainer final
 	{
 	public:
 		using Iterator = std::vector<std::pair<ISystemFactory*, int>>::iterator; ///< System factories iterator.
