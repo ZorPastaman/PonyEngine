@@ -17,13 +17,13 @@ import <format>;
 import <functional>;
 import <queue>;
 import <string>;
+import <string_view>;
 import <unordered_map>;
 import <utility>;
 
 import PonyDebug.Log;
 
 import PonyEngine.Core;
-
 import PonyEngine.Input;
 
 export namespace PonyEngine::Input
@@ -33,9 +33,9 @@ export namespace PonyEngine::Input
 	{
 	public:
 		/// @brief Creates an input system
-		/// @param engine Engine.
+		/// @param engine Engine context.
 		[[nodiscard("Pure constructor")]]
-		explicit InputSystem(Core::IEngine& engine) noexcept;
+		explicit InputSystem(Core::IEngineContext& engine) noexcept;
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
@@ -53,12 +53,12 @@ export namespace PonyEngine::Input
 		virtual void Observe(const KeyboardMessage& keyboardMessage) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Input::InputSystem"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Input::InputSystem"; ///< Class name.
 
 	private:
 		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
@@ -66,7 +66,7 @@ export namespace PonyEngine::Input
 		std::unordered_map<KeyboardKeyCode, bool> keyStates; ///< Current key states.
 		std::queue<KeyboardMessage> queue; ///< Message queue.
 
-		Core::IEngine* engine; ///< Engine.
+		Core::IEngineContext* engine; ///< Engine.
 
 		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
 	};
@@ -74,7 +74,7 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	InputSystem::InputSystem(Core::IEngine& engine) noexcept :
+	InputSystem::InputSystem(Core::IEngineContext& engine) noexcept :
 		currentId{1},
 		engine{&engine}
 	{
@@ -151,7 +151,7 @@ namespace PonyEngine::Input
 		queue.push(KeyboardMessage{.keyCode = keyboardMessage.keyCode, .isDown = keyboardMessage.isDown});
 	}
 
-	const char* InputSystem::Name() const noexcept
+	std::string_view InputSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

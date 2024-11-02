@@ -9,10 +9,12 @@
 
 export module PonyEngine.Input.Factory:InputSystemParams;
 
+import PonyEngine.Core.Factory;
+
 export namespace PonyEngine::Input
 {
 	/// @brief Input system parameters.
-	struct InputSystemParams final
+	struct InputSystemParams final : Core::SystemParams
 	{
 	};
 }

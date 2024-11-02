@@ -15,28 +15,28 @@ export module PonyEngine.Core.Implementation;
 
 export import PonyEngine.Core.Factory;
 
+import <utility>;
+
+import PonyBase.Memory;
+
 import :Engine;
-import :EngineDestroyer;
 
 export namespace PonyEngine::Core
 {
 	/// @brief Creates an engine.
-	/// @param application Application.
+	/// @param application Application context.
 	/// @param params Engine parameters.
 	/// @return Created engine.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT EngineData CreateEngine(IApplication& application, const EngineParams& params);
+	PONY_DLL_EXPORT EngineData CreateEngine(IApplicationContext& application, const EngineParams& params);
 }
 
 namespace PonyEngine::Core
 {
-	auto DefaultEngineDestroyer = EngineDestroyer(); ///< Default engine destroyer.
-
-	EngineData CreateEngine(IApplication& application, const EngineParams& params)
+	EngineData CreateEngine(IApplicationContext& application, const EngineParams& params)
 	{
-		const auto engine = new Engine(application, params.systemFactories);
-		const auto engineDeleter = EngineDeleter(DefaultEngineDestroyer);
+		auto engine = PonyBase::Memory::UniquePointer<Engine>::Create(application, params.systemFactories);
 
-		return EngineData{.engine = EngineUniquePtr(engine, engineDeleter), .tickableEngine = engine};
+		return EngineData{.engine = PonyBase::Memory::UniquePointer<IEngine>(std::move(engine))};
 	}
 }

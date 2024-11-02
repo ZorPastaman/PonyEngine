@@ -11,6 +11,7 @@ export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemFactoryParams
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Windows screen system factory parameters.
 	struct WindowsScreenSystemFactoryParams final
 	{
 	};

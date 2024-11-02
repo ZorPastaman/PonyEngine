@@ -22,6 +22,7 @@ import <memory>;
 import <optional>;
 import <span>;
 import <stdexcept>;
+import <string_view>;
 import <type_traits>;
 
 import PonyBase.StringUtility;
@@ -52,7 +53,7 @@ export namespace PonyEngine::Render
 		/// @param engine Engine.
 		/// @param params Render system parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderSystemParams& params);
+		WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const WindowsDirect3D12RenderSystemParams& params);
 		WindowsDirect3D12RenderSystem(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem(WindowsDirect3D12RenderSystem&&) = delete;
 
@@ -82,12 +83,12 @@ export namespace PonyEngine::Render
 		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem& operator =(WindowsDirect3D12RenderSystem&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystem"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystem"; ///< Class name.
 
 	private:
 		[[nodiscard("Pure function")]]
@@ -101,7 +102,7 @@ export namespace PonyEngine::Render
 		Direct3D12CameraParams cameraParams;
 		std::optional<Screen::Resolution<UINT>> resolution;
 
-		Core::IEngine* engine; ///< Engine.
+		Core::IEngineContext* engine; ///< Engine.
 
 		std::unique_ptr<WindowsDirect3D12DXGISubSystem> dxgiSubSystem; ///< DXGI sub-system.
 		std::unique_ptr<Direct3D12SubSystem> direct3D12SubSystem; ///< Direct3D 12 sub-system.
@@ -110,7 +111,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngine& engine, const WindowsDirect3D12RenderSystemParams& params) :
+	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const WindowsDirect3D12RenderSystemParams& params) :
 		cameraParams{.fov = static_cast<FLOAT>(params.cameraParams.fov), .nearPlane = static_cast<FLOAT>(params.cameraParams.nearPlane), .farPlane = static_cast<FLOAT>(params.cameraParams.farPlane)},
 		resolution(params.resolution.has_value() ? std::optional<Screen::Resolution<UINT>>(static_cast<Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
 		engine{&engine},
@@ -255,7 +256,7 @@ namespace PonyEngine::Render
 		direct3D12SubSystem->UpdateRenderObjectTrs(handle, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(trs));
 	}
 
-	const char* WindowsDirect3D12RenderSystem::Name() const noexcept
+	std::string_view WindowsDirect3D12RenderSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

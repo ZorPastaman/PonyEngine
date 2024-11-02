@@ -20,7 +20,7 @@ import <vector>;
 export namespace PonyEngine::Core
 {
 	/// @brief Object interfaces.
-	class ObjectInterfaces final
+	class ObjectInterfaces final // TODO: Seems it must be in PonyBase
 	{
 	public:
 		using Iterator = std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::iterator; ///< Interfaces iterator.

@@ -9,9 +9,12 @@
 
 export module PonyEngine.Time.Factory:FrameRateSystemParams;
 
+import PonyEngine.Core.Factory;
+
 export namespace PonyEngine::Time
 {
-	struct FrameRateSystemParams final
+	/// @brief Frame rate system parameters.
+	struct FrameRateSystemParams final : Core::SystemParams
 	{
 	};
 }

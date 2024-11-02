@@ -13,7 +13,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Game\GameSystem.cppm" />
     <ClCompile Include="Source\Private\Game\GameSystemFactory.cppm" />
-    <ClCompile Include="Source\Private\Game\GameSystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Game\Game.Implementation.cppm" />
   </ItemGroup>
   <ItemGroup>

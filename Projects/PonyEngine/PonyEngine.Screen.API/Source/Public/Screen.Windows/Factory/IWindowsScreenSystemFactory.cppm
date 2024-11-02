@@ -15,6 +15,7 @@ import :WindowsScreenSystemParams;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Windows screen system factory.
 	class IWindowsScreenSystemFactory : public IScreenSystemFactory
 	{
 	public:

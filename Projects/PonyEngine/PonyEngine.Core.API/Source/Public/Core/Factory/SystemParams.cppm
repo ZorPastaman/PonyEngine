@@ -12,7 +12,7 @@ export module PonyEngine.Core.Factory:SystemParams;
 export namespace PonyEngine::Core
 {
 	/// @brief System parameters.
-	struct SystemParams final
+	struct SystemParams
 	{
 	};
 }

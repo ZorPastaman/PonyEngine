@@ -15,12 +15,15 @@ import :Resolution;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Screen system.
 	class IScreenSystem : public Core::ISystem
 	{
 	public:
 		IScreenSystem(const IScreenSystem&) = delete;
 		IScreenSystem(IScreenSystem&&) = delete;
 
+		/// @brief Gets a display resolution.
+		/// @return Display resolution.
 		[[nodiscard("Pure function")]]
 		virtual Resolution<unsigned int> DisplayResolution() const noexcept = 0;
 

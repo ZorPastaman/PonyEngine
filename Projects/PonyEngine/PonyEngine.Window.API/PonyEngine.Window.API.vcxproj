@@ -22,19 +22,22 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\Window.Windows.Factory.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowParams.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowHelper.cppm" />
     <ClCompile Include="Source\Public\Window\Factory\IWindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\Factory\Window.Factory.cppm" />
-    <ClCompile Include="Source\Public\Window\Factory\WindowParams.cppm" />
+    <ClCompile Include="Source\Public\Window\Factory\WindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window\IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Core\PonyMath.Core.vcxproj">
       <Project>{6f808c7f-60c8-4894-91ed-cfb0906af8f0}</Project>

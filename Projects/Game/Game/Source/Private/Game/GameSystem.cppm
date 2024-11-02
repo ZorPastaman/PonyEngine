@@ -17,6 +17,7 @@ import <algorithm>;
 import <array>;
 import <cstdint>;
 import <functional>;
+import <string_view>;
 
 import PonyMath.Core;
 import PonyMath.Geometry;
@@ -39,7 +40,7 @@ export namespace Game
 		/// @brief Creates a game system.
 		/// @param engine Engine.
 		[[nodiscard("Pure constructor")]]
-		explicit GameSystem(PonyEngine::Core::IEngine& engine);
+		explicit GameSystem(PonyEngine::Core::IEngineContext& engine);
 		GameSystem(const GameSystem&) = delete;
 		GameSystem(GameSystem&&) = delete;
 
@@ -51,12 +52,12 @@ export namespace Game
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		GameSystem& operator =(const GameSystem&) = delete;
 		GameSystem& operator =(GameSystem&&) = delete;
 
-		static constexpr auto StaticName = "Game::GameSystem"; ///< Class name.
+		static constexpr std::string_view StaticName = "Game::GameSystem"; ///< Class name.
 
 	private:
 		PonyEngine::Input::Handle upHandle; ///< Up arrow input handle.
@@ -81,13 +82,13 @@ export namespace Game
 		PonyEngine::Render::RenderObjectHandle boxHandle; ///< Box handle.
 		PonyMath::Space::Transform3D boxTransform; ///< Box transform.
 
-		PonyEngine::Core::IEngine* const engine; ///< Engine.
+		PonyEngine::Core::IEngineContext* const engine; ///< Engine.
 	};
 }
 
 namespace Game
 {
-	GameSystem::GameSystem(PonyEngine::Core::IEngine& engine) :
+	GameSystem::GameSystem(PonyEngine::Core::IEngineContext& engine) :
 		upHandle(),
 		downHandle(),
 		rightHandle(),
@@ -461,7 +462,7 @@ namespace Game
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
 	}
 
-	const char* GameSystem::Name() const noexcept
+	std::string_view GameSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

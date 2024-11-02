@@ -9,6 +9,13 @@
 
 #include "CppUnitTest.h"
 
+#include <string_view>
+#include <variant>
+
+#include "Mocks/Application.h"
+#include "Mocks/Logger.h"
+#include "Mocks/Engine.h"
+
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
@@ -20,152 +27,37 @@ namespace Input
 {
 	TEST_CLASS(InputSystemFactoryTests)
 	{
-		class Application : public PonyEngine::Core::IApplication
-		{
-		public:
-			PonyDebug::Log::ILogger* logger;
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-		};
-
-		class EmptyLogger final : public PonyDebug::Log::ILogger
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-
-			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-		};
-
-		class EmptySystemManager : public PonyEngine::Core::ISystemManager
-		{
-		public:
-			PonyEngine::Input::IKeyboardProvider* keyboardProvider = nullptr;
-
-			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
-			{
-				if (typeInfo == typeid(PonyEngine::Input::IKeyboardProvider))
-				{
-					return keyboardProvider;
-				}
-
-				return nullptr;
-			}
-		};
-
-		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
-		{
-		public:
-			EmptyLogger* logger;
-			mutable EmptySystemManager systemManager;
-
-			explicit EmptyEngine(EmptyLogger& logger) noexcept :
-				logger{ &logger }
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::size_t FrameCount() const noexcept override
-			{
-				return 0;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
-			{
-				return systemManager;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override
-			{
-				return true;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual int ExitCode() const noexcept override
-			{
-				return 0;
-			}
-
-			virtual void Stop(int) noexcept override
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Tick() override
-			{
-			}
-		};
-
 		TEST_METHOD(CreateTest)
 		{
-			auto application = Application();
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			Assert::IsNotNull(factory.systemFactory.get());
+			auto application = Core::Application();
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			Assert::IsNotNull(factory.systemFactory.Get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
 		{
-			auto logger = EmptyLogger();
-			auto engine = EmptyEngine(logger);
-			auto application = Application();
+			auto application = Core::Application();
+			auto logger = Core::Logger();
+			auto engine = Core::Engine();
 			application.logger = &logger;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			const auto factoryParams = PonyEngine::Core::SystemParams();
-			auto inputSystem = factory.systemFactory->Create(engine, factoryParams);
-			Assert::IsNotNull(inputSystem.system.get());
+			engine.application = &application;
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			Assert::IsNotNull(std::get<1>(inputSystem.system).Get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
-			auto application = Application();
+			auto application = Core::Application();
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			Assert::AreEqual("PonyEngine::Input::InputSystem", factory.systemFactory->SystemName());
+			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto application = Application();
+			auto application = Core::Application();
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			Assert::AreEqual("PonyEngine::Input::InputSystemFactory", factory.systemFactory->Name());
+			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystemFactory"), factory.systemFactory->Name());
 		}
 	};
 }

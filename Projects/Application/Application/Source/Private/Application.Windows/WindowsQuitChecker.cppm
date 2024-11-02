@@ -28,7 +28,7 @@ export namespace Application
 		/// @brief Creates a @p WindowsQuitChecker.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsQuitChecker(PonyEngine::Core::IApplication& application) noexcept;
+		explicit WindowsQuitChecker(PonyEngine::Core::IApplicationContext& application) noexcept;
 		WindowsQuitChecker(const WindowsQuitChecker&) = delete;
 		WindowsQuitChecker(WindowsQuitChecker&&) = delete;
 
@@ -43,13 +43,13 @@ export namespace Application
 		WindowsQuitChecker& operator =(WindowsQuitChecker&&) = delete;
 
 	private:
-		PonyEngine::Core::IApplication* application; ///< Application
+		PonyEngine::Core::IApplicationContext* application; ///< Application
 	};
 }
 
 namespace Application
 {
-	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Core::IApplication& application) noexcept :
+	WindowsQuitChecker::WindowsQuitChecker(PonyEngine::Core::IApplicationContext& application) noexcept :
 		application{&application}
 	{
 	}

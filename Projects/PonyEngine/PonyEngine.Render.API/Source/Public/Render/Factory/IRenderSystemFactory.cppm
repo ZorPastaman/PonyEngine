@@ -22,9 +22,9 @@ export namespace PonyEngine::Render
 		IRenderSystemFactory(IRenderSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual RenderSystemParams& SystemParams() noexcept = 0;
+		virtual RenderSystemParams& SystemParams() noexcept override = 0;
 		[[nodiscard("Pure function")]]
-		virtual const RenderSystemParams& SystemParams() const noexcept = 0;
+		virtual const RenderSystemParams& SystemParams() const noexcept override = 0;
 
 		IRenderSystemFactory& operator =(const IRenderSystemFactory&) = delete;
 		IRenderSystemFactory& operator =(IRenderSystemFactory&&) = delete;

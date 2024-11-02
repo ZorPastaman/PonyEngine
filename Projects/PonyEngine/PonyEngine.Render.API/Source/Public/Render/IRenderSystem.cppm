@@ -41,9 +41,6 @@ export namespace PonyEngine::Render
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) = 0;
 		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept = 0;
 
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
-
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;
 

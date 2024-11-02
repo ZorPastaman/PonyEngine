@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
+import <string_view>;
 import <utility>;
 
 import PonyEngine.Core.Factory;
@@ -23,7 +24,7 @@ import :InputSystem;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system factory.
-	class InputSystemFactory final : public IInputSystemFactory, public Core::ISystemDestroyer
+	class InputSystemFactory final : public IInputSystemFactory
 	{
 	public:
 		InputSystemFactory() noexcept = default;
@@ -33,7 +34,7 @@ export namespace PonyEngine::Input
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual InputSystemParams& SystemParams() noexcept override;
@@ -41,14 +42,10 @@ export namespace PonyEngine::Input
 		virtual const InputSystemParams& SystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
-		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
+		virtual std::string_view SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
@@ -62,15 +59,15 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
-	Core::SystemData InputSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
+	Core::SystemData InputSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
-		const auto system = new InputSystem(engine);
+		auto system = PonyBase::Memory::UniquePointer<InputSystem>::Create(engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IInputSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
+			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
@@ -85,23 +82,12 @@ namespace PonyEngine::Input
 		return inputSystemParams;
 	}
 
-	bool InputSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
-	{
-		return dynamic_cast<InputSystem*>(system);
-	}
-
-	void InputSystemFactory::Destroy(Core::IEngineSystem* const system) noexcept
-	{
-		assert((dynamic_cast<InputSystem*>(system) && "Tried to destroy a system of the wrong type."));
-		delete static_cast<InputSystem*>(system);
-	}
-
-	const char* InputSystemFactory::SystemName() const noexcept
+	std::string_view InputSystemFactory::SystemName() const noexcept
 	{
 		return InputSystem::StaticName;
 	}
 
-	const char* InputSystemFactory::Name() const noexcept
+	std::string_view InputSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}

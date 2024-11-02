@@ -9,6 +9,13 @@
 
 #include "CppUnitTest.h"
 
+#include <string_view>
+#include <variant>
+
+#include "Mocks/Application.h"
+#include "Mocks/Engine.h"
+#include "Mocks/Logger.h"
+
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
@@ -20,155 +27,57 @@ namespace Window
 {
 	TEST_CLASS(WindowsWindowFactoryTests)
 	{
-		class Application : public PonyEngine::Core::IApplication
-		{
-		public:
-			PonyDebug::Log::ILogger* logger;
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-		};
-
-		class EmptyLogger final : public PonyDebug::Log::ILogger
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-
-			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-		};
-
-		class EmptySystemManager : public PonyEngine::Core::ISystemManager
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info&) const noexcept override
-			{
-				return nullptr;
-			}
-		};
-
-		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
-		{
-			EmptyLogger* logger;
-			mutable EmptySystemManager systemManager;
-
-		public:
-			int stopCode = 123;
-
-			explicit EmptyEngine(EmptyLogger& logger) noexcept :
-				logger{ &logger }
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::size_t FrameCount() const noexcept override
-			{
-				return 0;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
-			{
-				return systemManager;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override
-			{
-				return true;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual int ExitCode() const noexcept override
-			{
-				return 0;
-			}
-
-			virtual void Stop(const int exitCode) noexcept override
-			{
-				stopCode = exitCode;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Tick() override
-			{
-			}
-		};
-
 		TEST_METHOD(CreateTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
-			Assert::IsNotNull(factory.systemFactory.get());
-			Assert::IsNotNull(factory.windowSystemFactory);
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto window = factory.systemFactory->Create(engine, systemParams);
-			Assert::IsNotNull(window.system.get());
+			Assert::IsNotNull(factory.systemFactory.Get());
+		}
+
+		TEST_METHOD(CreateSystemTest)
+		{
+			auto logger = Core::Logger();
+			auto application = Core::Application();
+			application.logger = &logger;
+			auto engine = Core::Engine();
+			engine.application = &application;
+			auto classParams = PonyEngine::Window::WindowsClassParams();
+			classParams.name = L"Pony Engine Test";
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{ .windowsClassParams = classParams });
+			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			Assert::IsNotNull(std::get<1>(window.system).Get());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams });
-			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystemFactory", factory.systemFactory->Name());
+			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystemFactory"), factory.systemFactory->Name());
 		}
 
 		TEST_METHOD(GetSystemName)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams });
-			Assert::AreEqual("PonyEngine::Window::WindowsWindowSystem", factory.systemFactory->SystemName());
+			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystem"), factory.systemFactory->SystemName());
 		}
 	};
 }

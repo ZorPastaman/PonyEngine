@@ -9,8 +9,16 @@
 
 #include "CppUnitTest.h"
 
+#include <algorithm>
 #include <cstddef>
+#include <cstdint>
 #include <functional>
+#include <string_view>
+#include <variant>
+#include <vector>
+
+#include "Mocks/Engine.h"
+#include "Mocks/Logger.h"
 
 import PonyDebug.Log;
 
@@ -23,138 +31,29 @@ namespace Input
 {
 	TEST_CLASS(InputSystemTests)
 	{
-		class Application : public PonyEngine::Core::IApplication
-		{
-		public:
-			PonyDebug::Log::ILogger* logger;
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-		};
-
-		class EmptyLogger final : public PonyDebug::Log::ILogger
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-
-			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-		};
-
-		class EmptySystemManager : public PonyEngine::Core::ISystemManager
-		{
-		public:
-			PonyEngine::Input::IKeyboardProvider* keyboardProvider = nullptr;
-
-			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override
-			{
-				if (typeInfo == typeid(PonyEngine::Input::IKeyboardProvider))
-				{
-					return keyboardProvider;
-				}
-
-				return nullptr;
-			}
-		};
-
-		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
-		{
-		public:
-			EmptyLogger* logger;
-			mutable EmptySystemManager systemManager;
-
-			explicit EmptyEngine(EmptyLogger& logger) noexcept :
-				logger{&logger}
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::size_t FrameCount() const noexcept override
-			{
-				return 0;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
-			{
-				return systemManager;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override
-			{
-				return true;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual int ExitCode() const noexcept override
-			{
-				return 0;
-			}
-
-			virtual void Stop(int) noexcept override
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Tick() override
-			{
-			}
-		};
-
 		class KeyboardProvider final : public PonyEngine::Input::IKeyboardProvider
 		{
 		public:
-			PonyEngine::Input::IKeyboardObserver* expectedObserver;
+			std::vector<PonyEngine::Input::IKeyboardObserver*> observers;
+			std::size_t version;
 
 			virtual void AddKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
 			{
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(&keyboardObserver));
+				observers.push_back(&keyboardObserver);
+				++version;
 			}
 
 			virtual void RemoveKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
 			{
-				Assert::AreEqual(reinterpret_cast<std::uintptr_t>(expectedObserver), reinterpret_cast<std::uintptr_t>(&keyboardObserver));
+				if (const auto position = std::ranges::find(observers, &keyboardObserver); position != observers.cend())
+				{
+					observers.erase(position);
+					++version;
+				}
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
+			virtual std::string_view Name() const noexcept override
 			{
 				return "";
 			}
@@ -162,69 +61,71 @@ namespace Input
 
 		TEST_METHOD(BeginEndTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto keyboardProvider = KeyboardProvider();
-			engine.systemManager.keyboardProvider = &keyboardProvider;
+			
+			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
-			keyboardProvider.expectedObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystemBase.system.get());
-			inputSystemBase.system->Begin();
-			inputSystemBase.system->End();
-
-			engine.systemManager.keyboardProvider = nullptr;
-			inputSystemBase = factory.systemFactory->Create(engine, systemParams);
-			inputSystemBase.system->Begin();
-			inputSystemBase.system->End();
+			constexpr auto systemParams = PonyEngine::Core::EngineSystemParams();
+			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
+			Assert::AreEqual(std::size_t{0}, keyboardProvider.version);
+			std::get<1>(inputSystem.system)->Begin();
+			Assert::AreEqual(std::size_t{1}, keyboardProvider.version);
+			Assert::AreEqual(std::size_t{1}, keyboardProvider.observers.size());
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(std::get<1>(inputSystem.system).Get())), reinterpret_cast<std::uintptr_t>(keyboardProvider.observers[0]));
+			std::get<1>(inputSystem.system)->End();
+			Assert::AreEqual(std::size_t{2}, keyboardProvider.version);
+			Assert::AreEqual(std::size_t{0}, keyboardProvider.observers.size());
 		}
 
 		TEST_METHOD(TickTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
+			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
-			inputSystemBase.system->Begin();
-			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(inputSystemBase.system.get());
+			std::get<1>(inputSystemBase.system)->Begin();
+			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(inputSystemBase.system).Get());
 			auto message = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true};
 			auto event = PonyEngine::Input::Event{.expectedMessage = message};
 			auto handle = inputSystem->RegisterAction(event, func);
 			auto inputObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystem);
 			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true});
-			inputSystemBase.tickableSystem->Tick();
+			std::get<1>(inputSystemBase.system)->Tick();
 			Assert::IsTrue(gotInput);
 			gotInput = false;
 			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = false});
-			inputSystemBase.tickableSystem->Tick();
+			std::get<1>(inputSystemBase.system)->Tick();
 			Assert::IsFalse(gotInput);
 			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::W, .isDown = true});
-			inputSystemBase.tickableSystem->Tick();
+			std::get<1>(inputSystemBase.system)->Tick();
 			Assert::IsFalse(gotInput);
 			inputSystem->UnregisterAction(handle);
 			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true});
-			inputSystemBase.tickableSystem->Tick();
+			std::get<1>(inputSystemBase.system)->Tick();
 			Assert::IsFalse(gotInput);
-			inputSystemBase.system->End();
+			std::get<1>(inputSystemBase.system)->End();
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto inputSystemBase = factory.systemFactory->Create(engine, systemParams);
-			Assert::AreEqual("PonyEngine::Input::InputSystem", inputSystemBase.system->Name());
+			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), std::get<1>(inputSystemBase.system)->Name());
 		}
 	};
 }

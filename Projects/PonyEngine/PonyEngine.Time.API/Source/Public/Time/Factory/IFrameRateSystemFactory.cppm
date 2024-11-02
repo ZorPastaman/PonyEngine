@@ -15,6 +15,7 @@ import :FrameRateSystemParams;
 
 export namespace PonyEngine::Time
 {
+	/// @brief Frame rate system factory.
 	class IFrameRateSystemFactory : public Core::ISystemFactory
 	{
 	public:
@@ -22,9 +23,9 @@ export namespace PonyEngine::Time
 		IFrameRateSystemFactory(IFrameRateSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual FrameRateSystemParams& SystemParams() noexcept = 0;
+		virtual FrameRateSystemParams& SystemParams() noexcept override = 0;
 		[[nodiscard("Pure function")]]
-		virtual const FrameRateSystemParams& SystemParams() const noexcept = 0;
+		virtual const FrameRateSystemParams& SystemParams() const noexcept override = 0;
 
 		IFrameRateSystemFactory& operator =(const IFrameRateSystemFactory&) = delete;
 		IFrameRateSystemFactory& operator =(IFrameRateSystemFactory&&) = delete;

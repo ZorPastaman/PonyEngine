@@ -43,8 +43,5 @@
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactoryDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

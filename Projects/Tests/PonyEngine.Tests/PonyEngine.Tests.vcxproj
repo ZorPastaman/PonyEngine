@@ -52,7 +52,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -62,7 +62,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -71,10 +71,15 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Core\EngineDeleterTests.cpp" />
     <ClCompile Include="Core\EngineTests.cpp" />
+    <ClCompile Include="Mocks\Application.cpp" />
+    <ClCompile Include="Mocks\Engine.cpp" />
+    <ClCompile Include="Mocks\Logger.cpp" />
+    <ClCompile Include="Mocks\System.cpp" />
+    <ClCompile Include="Mocks\SystemFactory.cpp" />
+    <ClCompile Include="Mocks\TickableSystem.cpp" />
+    <ClCompile Include="Mocks\TickableSystemFactory.cpp" />
     <ClCompile Include="Core\ObjectInterfacesTests.cpp" />
-    <ClCompile Include="Core\SystemDeleterTests.cpp" />
     <ClCompile Include="Core\SystemFactoriesContainerTests.cpp" />
     <ClCompile Include="Input\HandleTests.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
@@ -90,6 +95,9 @@
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
@@ -124,6 +132,15 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
       <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Mocks\Application.h" />
+    <ClInclude Include="Mocks\Engine.h" />
+    <ClInclude Include="Mocks\Logger.h" />
+    <ClInclude Include="Mocks\System.h" />
+    <ClInclude Include="Mocks\SystemFactory.h" />
+    <ClInclude Include="Mocks\TickableSystem.h" />
+    <ClInclude Include="Mocks\TickableSystemFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

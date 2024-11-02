@@ -26,7 +26,7 @@ import :WindowsQuitChecker;
 export namespace Application
 {
 	/// @brief Application for Windows.
-	class WindowsApplication final : PonyEngine::Core::IApplication
+	class WindowsApplication final : PonyEngine::Core::IApplicationContext
 	{
 	public:
 		/// @brief Creates a @p WindowsApplication.
@@ -45,7 +45,7 @@ export namespace Application
 		int Run() const;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		WindowsApplication& operator =(const WindowsApplication&) = delete;
 		WindowsApplication& operator =(WindowsApplication&&) = delete;
@@ -90,7 +90,7 @@ namespace Application
 		return exitCode;
 	}
 
-	const char* WindowsApplication::Name() const noexcept
+	std::string_view WindowsApplication::Name() const noexcept
 	{
 		return StaticName;
 	}
