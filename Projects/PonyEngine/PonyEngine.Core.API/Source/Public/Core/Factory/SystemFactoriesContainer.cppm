@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Core.Factory:SystemFactoriesContainer;
 
 import <algorithm>;
+import <utility>;
 import <vector>;
 
 import :ISystemFactory;
@@ -22,11 +23,11 @@ export namespace PonyEngine::Core
 {
 	/// @brief System factories container.
 	///	@details System factories in it can't be nullptr and they are always unique.
-	class SystemFactoriesContainer final
+	class SystemFactoriesContainer final // TODO: Add test for tick order.
 	{
 	public:
-		using Iterator = std::vector<ISystemFactory*>::iterator; ///< System factories iterator.
-		using ConstIterator = std::vector<ISystemFactory*>::const_iterator; ///< System factories const iterator.
+		using Iterator = std::vector<std::pair<ISystemFactory*, int>>::iterator; ///< System factories iterator.
+		using ConstIterator = std::vector<std::pair<ISystemFactory*, int>>::const_iterator; ///< System factories const iterator.
 
 		[[nodiscard("Pure constructor")]]
 		SystemFactoriesContainer() noexcept = default;
@@ -39,7 +40,8 @@ export namespace PonyEngine::Core
 
 		/// @brief Adds the @p systemFactory.
 		/// @param systemFactory System factory to add. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
-		void AddSystemFactory(ISystemFactory& systemFactory);
+		/// @param tickOrder Tick order. Affects tickable systems only.
+		void AddSystemFactory(ISystemFactory& systemFactory, int tickOrder = 0);
 
 		/// @brief Gets a begin iterator.
 		/// @return Begin iterator.
@@ -79,16 +81,16 @@ export namespace PonyEngine::Core
 		SystemFactoriesContainer& operator =(SystemFactoriesContainer&& other) noexcept = default;
 
 	private:
-		std::vector<ISystemFactory*> systemFactories; ///< System factories.
+		std::vector<std::pair<ISystemFactory*, int>> systemFactories; ///< System factories.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	void SystemFactoriesContainer::AddSystemFactory(ISystemFactory& systemFactory)
+	void SystemFactoriesContainer::AddSystemFactory(ISystemFactory& systemFactory, const int tickOrder)
 	{
-		assert(std::ranges::find(std::as_const(systemFactories), &systemFactory) == systemFactories.cend() && "The system factory has already been added.");
-		systemFactories.push_back(&systemFactory);
+		assert(std::ranges::find_if(std::as_const(systemFactories), [&](const std::pair<ISystemFactory*, int>& element) { return element.first == &systemFactory; }) == systemFactories.cend() && "The system factory has already been added.");
+		systemFactories.emplace_back(&systemFactory, tickOrder);
 	}
 
 	SystemFactoriesContainer::Iterator SystemFactoriesContainer::Begin() noexcept

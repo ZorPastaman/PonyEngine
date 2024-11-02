@@ -248,6 +248,10 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::DestroyRenderObject(const RenderObjectHandle renderObjectHandle) noexcept
 	{
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Wait for end of frame.");
+		direct3D12SubSystem->WaitForEndOfFrame();
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End of frame waited for.");
+
 		direct3D12SubSystem->DestroyRenderObject(renderObjectHandle);
 	}
 

@@ -24,13 +24,13 @@ namespace Core
 			auto factory = SystemFactory();
 			auto defaultContainer = PonyEngine::Core::SystemFactoriesContainer();
 			defaultContainer.AddSystemFactory(factory);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*defaultContainer.Begin()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(defaultContainer.Begin()->first));
 
 			const auto copiedContainer = defaultContainer;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*copiedContainer.Begin()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(copiedContainer.Begin()->first));
 
 			const auto movedContainer = std::move(defaultContainer);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*movedContainer.Begin()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(movedContainer.Begin()->first));
 		}
 
 		TEST_METHOD(AddFactoryTest)
@@ -42,10 +42,10 @@ namespace Core
 			container.AddSystemFactory(anotherFactory);
 
 			auto it = container.begin();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*it));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(it->first));
 
 			++it;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&anotherFactory), reinterpret_cast<std::uintptr_t>(*it));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&anotherFactory), reinterpret_cast<std::uintptr_t>(it->first));
 
 			++it;
 			Assert::IsTrue(it == container.end());
@@ -59,11 +59,11 @@ namespace Core
 
 			auto copiedContainer = PonyEngine::Core::SystemFactoriesContainer();
 			copiedContainer = defaultContainer;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*copiedContainer.begin()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(copiedContainer.begin()->first));
 
 			auto movedContainer = PonyEngine::Core::SystemFactoriesContainer();
 			movedContainer = std::move(defaultContainer);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*movedContainer.begin()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(movedContainer.begin()->first));
 		}
 	};
 }

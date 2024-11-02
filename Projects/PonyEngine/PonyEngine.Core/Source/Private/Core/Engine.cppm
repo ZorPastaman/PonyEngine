@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Core.Implementation:Engine;
 
 import <cstddef>;
+import <exception>;
 import <memory>;
 import <stdexcept>;
 import <string_view>;
@@ -121,8 +122,6 @@ namespace PonyEngine::Core
 
 			throw;
 		}
-
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Engine created in '{}' application.", application.Name());
 	}
 
 	Engine::~Engine() noexcept
@@ -177,7 +176,7 @@ namespace PonyEngine::Core
 		}
 		else
 		{
-			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Tried to stop already stopped engine. Ignore it.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Tried to stop already stopped engine. Ignore it.");
 		}
 	}
 
@@ -213,8 +212,8 @@ namespace PonyEngine::Core
 
 	void Engine::EndTick() noexcept
 	{
-		++frameCount;
 		isTicking = false;
+		++frameCount;
 	}
 
 	void Engine::TickSystemManager()
