@@ -29,7 +29,6 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineSystem.cppm" />
     <ClCompile Include="Source\Public\Core\ITickableEngineSystem.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
@@ -38,6 +37,9 @@
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\\PonyBase\PonyBase.Utility\PonyBase.Utility.vcxproj">
+      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
       <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>

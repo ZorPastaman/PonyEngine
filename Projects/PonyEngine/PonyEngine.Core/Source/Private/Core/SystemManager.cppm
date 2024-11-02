@@ -26,6 +26,7 @@ import <vector>;
 
 import PonyBase.Core;
 import PonyBase.Memory;
+import PonyBase.ObjectUtility;
 
 import PonyDebug.Log;
 

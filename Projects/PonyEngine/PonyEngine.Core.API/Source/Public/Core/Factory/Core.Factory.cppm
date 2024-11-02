@@ -16,7 +16,6 @@ export import :EngineSystemParams;
 export import :EngineParams;
 export import :IApplication;
 export import :ISystemFactory;
-export import :ObjectInterfaces;
 export import :SystemData;
 export import :SystemFactoriesContainer;
 export import :SystemParams;

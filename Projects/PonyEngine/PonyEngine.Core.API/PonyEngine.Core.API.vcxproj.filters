@@ -27,9 +27,6 @@
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

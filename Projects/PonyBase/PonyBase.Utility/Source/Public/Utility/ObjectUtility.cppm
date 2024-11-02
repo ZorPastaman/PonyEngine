@@ -11,16 +11,16 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Core.Factory:ObjectInterfaces;
+export module PonyBase.ObjectUtility;
 
 import <concepts>;
 import <typeinfo>;
 import <vector>;
 
-export namespace PonyEngine::Core
+export namespace PonyBase::Utility
 {
 	/// @brief Object interfaces.
-	class ObjectInterfaces final // TODO: Seems it must be in PonyBase
+	class ObjectInterfaces final
 	{
 	public:
 		using Iterator = std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::iterator; ///< Interfaces iterator.
@@ -100,7 +100,7 @@ export namespace PonyEngine::Core
 	};
 }
 
-namespace PonyEngine::Core
+namespace PonyBase::Utility
 {
 	void ObjectInterfaces::AddInterface(const std::type_info& typeInfo, void* const pointer)
 	{
@@ -117,7 +117,7 @@ namespace PonyEngine::Core
 	template<typename Source, typename... Targets>
 	void ObjectInterfaces::AddInterfaces(Source& object) requires (std::derived_from<Source, Targets> && ...)
 	{
-		(AddInterface<Targets, Source>(object),...);
+		(AddInterface<Targets, Source>(object), ...);
 	}
 
 	template<typename... Targets, typename Source>

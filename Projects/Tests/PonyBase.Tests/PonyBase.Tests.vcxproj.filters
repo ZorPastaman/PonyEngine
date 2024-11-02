@@ -33,6 +33,9 @@
     <ClCompile Include="Memory\Mocks\DerivedWithParams.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Utility\ObjectInterfacesTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Memory\Mocks\Base.h">

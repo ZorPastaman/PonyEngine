@@ -76,6 +76,7 @@
     <ClCompile Include="Memory\Mocks\Base.cpp" />
     <ClCompile Include="Memory\UniquePointerTests.cpp" />
     <ClCompile Include="Utility\GuidUtilityTests.cpp" />
+    <ClCompile Include="Utility\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
   </ItemGroup>
   <ItemGroup>
