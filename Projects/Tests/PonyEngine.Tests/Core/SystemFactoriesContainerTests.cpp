@@ -38,14 +38,16 @@ namespace Core
 			auto factory = SystemFactory();
 			auto anotherFactory = SystemFactory();
 			auto container = PonyEngine::Core::SystemFactoriesContainer();
-			container.AddSystemFactory(factory);
-			container.AddSystemFactory(anotherFactory);
+			container.AddSystemFactory(factory, 2);
+			container.AddSystemFactory(anotherFactory, 1);
 
 			auto it = container.begin();
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(it->first));
+			Assert::AreEqual(2, it->second);
 
 			++it;
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&anotherFactory), reinterpret_cast<std::uintptr_t>(it->first));
+			Assert::AreEqual(1, it->second);
 
 			++it;
 			Assert::IsTrue(it == container.end());
