@@ -21,28 +21,26 @@
     <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\EngineUniquePtr.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\IEngineDestroyer.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\ISystemDestroyer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\ISystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemFactoryUniquePtr.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\EngineSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\IApplication.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineSystem.cppm" />
-    <ClCompile Include="Source\Public\Core\ITickableSystem.cppm" />
+    <ClCompile Include="Source\Public\Core\ITickableEngineSystem.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\ObjectInterfaces.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemUniquePtr.cppm" />
-    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
-    <ClCompile Include="Source\Public\Core\ITickableEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />
     <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
+    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
@@ -84,11 +82,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factory;$(ProjectDir)\Source\Public\Main;$(ProjectDir)\Source\Public\Main\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Core\Factory;$(ProjectDir)\Source\Public\Main;$(ProjectDir)\Source\Public\Main\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

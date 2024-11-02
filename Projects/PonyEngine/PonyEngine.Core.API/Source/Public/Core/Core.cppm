@@ -10,8 +10,8 @@
 export module PonyEngine.Core;
 
 export import :IEngine;
+export import :IEngineContext;
 export import :IEngineSystem;
 export import :ISystem;
 export import :ISystemManager;
-export import :ITickableEngine;
 export import :ITickableEngineSystem;

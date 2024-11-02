@@ -53,7 +53,7 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -63,7 +63,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(VCInstallDir)UnitTest\include;$(ProjectDir);%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -72,6 +72,9 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
@@ -89,13 +92,13 @@
     <ClCompile Include="Log\LoggerTests.cpp" />
     <ClCompile Include="Log\LogHelperTests.cpp" />
     <ClCompile Include="Log\LogTypeTests.cpp" />
-    <ClCompile Include="Log\Mocks\Logger.cpp" />
+    <ClCompile Include="Mocks\Logger.cpp" />
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp" />
-    <ClCompile Include="Log\Mocks\SubLogger.cpp" />
+    <ClCompile Include="Mocks\SubLogger.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Log\Mocks\Logger.h" />
-    <ClInclude Include="Log\Mocks\SubLogger.h" />
+    <ClInclude Include="Mocks\Logger.h" />
+    <ClInclude Include="Mocks\SubLogger.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

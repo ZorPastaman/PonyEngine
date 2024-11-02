@@ -22,6 +22,8 @@ import <exception>;
 import <format>;
 
 import PonyBase.Core;
+import PonyBase.Memory;
+
 import PonyMath.Core;
 
 import PonyDebug.Log;
@@ -44,7 +46,7 @@ export namespace Application
 		/// @brief Creates a @p WindowsEngine.
 		/// @param application Application.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsEngine(PonyEngine::Core::IApplication& application);
+		explicit WindowsEngine(PonyEngine::Core::IApplicationContext& application);
 		WindowsEngine(const WindowsEngine&) = delete;
 		WindowsEngine(WindowsEngine&&) = delete;
 
@@ -92,35 +94,35 @@ export namespace Application
 		/// @brief Sets up the frame rate system.
 		void SetupFrameRateSystem() const noexcept;
 
-		PonyEngine::Core::IApplication* application; ///< Application.
+		PonyEngine::Core::IApplicationContext* application; ///< Application.
 
-		std::array<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>, 6> systemFactories; ///< System factories.
-		PonyEngine::Core::EngineData engine; ///< Engine.
+		std::array<PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>, 6> systemFactories; ///< System factories.
+		PonyBase::Memory::UniquePointer<PonyEngine::Core::IEngine> engine; ///< Engine.
 	};
 }
 
 namespace Application
 {
-	WindowsEngine::WindowsEngine(PonyEngine::Core::IApplication& application) :
+	WindowsEngine::WindowsEngine(PonyEngine::Core::IApplicationContext& application) :
 		application{&application},
 		systemFactories
 		{
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateScreenSystemFactory().systemFactory),
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateFrameRateSystemFactory().systemFactory),
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateWindowSystemFactory().systemFactory),
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateInputSystemFactory().systemFactory),
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateGameSystemFactory().systemFactory),
-			static_cast<PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>>(CreateRenderSystemFactory().systemFactory)
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateScreenSystemFactory().systemFactory),
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateFrameRateSystemFactory().systemFactory),
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateWindowSystemFactory().systemFactory),
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateInputSystemFactory().systemFactory),
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateGameSystemFactory().systemFactory),
+			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateRenderSystemFactory().systemFactory)
 		},
-		engine{CreateEngine()}
+		engine{CreateEngine().engine}
 	{
 		SetupFrameRateSystem();
 	}
 
 	WindowsEngine::~WindowsEngine() noexcept
 	{
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine.engine->Name());
-		engine.engine.reset();
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine->Name());
+		engine.Reset();
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
 
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
@@ -139,22 +141,22 @@ namespace Application
 
 		try
 		{
-			engine.tickableEngine->Tick();
+			engine->Tick();
 		}
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On ticking engine.");
-			exitCode = engine.engine->IsRunning() ? static_cast<int>(PonyBase::Core::ExitCodes::EngineTickException) : engine.engine->ExitCode();
+			exitCode = engine->IsRunning() ? static_cast<int>(PonyBase::Core::ExitCodes::EngineTickException) : engine->ExitCode();
 
 			return false;
 		}
 
-		if (engine.engine->IsRunning()) [[likely]]
+		if (engine->IsRunning()) [[likely]]
 		{
 			return true;
 		}
 
-		exitCode = engine.engine->ExitCode();
+		exitCode = engine->ExitCode();
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine exited with code '{}'.", exitCode);
 
 		return false;
@@ -208,7 +210,7 @@ namespace Application
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, windowSystemFactoryParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 
-			PonyEngine::Window::WindowsWindowParams& windowParams = factory.systemFactory->SystemParams();
+			PonyEngine::Window::WindowsWindowSystemParams& windowParams = factory.systemFactory->SystemParams();
 			windowParams.title = L"Pony Engine Game";
 			windowParams.style = PonyEngine::Window::DefaultBorderlessWindowedStyle;
 			windowParams.extendedStyle = PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle | WS_EX_APPWINDOW;
@@ -292,7 +294,7 @@ namespace Application
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
 			auto params = PonyEngine::Core::EngineParams{};
-			for (PonyEngine::Core::SystemFactoryUniquePtr<PonyEngine::Core::ISystemFactory>& factory : systemFactories)
+			for (PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>& factory : systemFactories)
 			{
 				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());
 				params.systemFactories.AddSystemFactory(*factory);
@@ -301,7 +303,6 @@ namespace Application
 			
 			PonyEngine::Core::EngineData engineData = PonyEngine::Core::CreateEngine(*application, params);
 			assert(engineData.engine && "The engine is nullptr.");
-			assert(engineData.tickableEngine && "The tickable engine is nullptr.");
 
 			return engineData;
 		}
@@ -315,7 +316,7 @@ namespace Application
 
 	void WindowsEngine::SetupFrameRateSystem() const noexcept
 	{
-		const auto frameRateSystem = engine.engine->SystemManager().FindSystem<PonyEngine::Time::IFrameRateSystem>();
+		const auto frameRateSystem = engine->SystemManager().FindSystem<PonyEngine::Time::IFrameRateSystem>();
 		assert(frameRateSystem && "The frame rate system is nullptr.");
 
 		frameRateSystem->TargetFrameTime(PonyEngine::Time::ConvertFrameRateFrameTime(60.f));

@@ -13,6 +13,7 @@ import PonyEngine.Screen;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Windows screen system.
 	class IWindowsScreenSystem : public IScreenSystem
 	{
 	public:

@@ -25,11 +25,11 @@ export namespace Game
 		/// @brief Gets a game system parameters.
 		/// @return Game system parameters.
 		[[nodiscard("Pure function")]]
-		virtual GameSystemParams& SystemParams() noexcept = 0;
+		virtual GameSystemParams& SystemParams() noexcept override = 0;
 		/// @brief Gets a game system parameters.
 		/// @return Game system parameters.
 		[[nodiscard("Pure function")]]
-		virtual const GameSystemParams& SystemParams() const noexcept = 0;
+		virtual const GameSystemParams& SystemParams() const noexcept override = 0;
 
 		IGameSystemFactory& operator =(const IGameSystemFactory&) = delete;
 		IGameSystemFactory& operator =(IGameSystemFactory&&) = delete;

@@ -7,14 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Factory:WindowParams;
+export module PonyEngine.Core.Factory:EngineSystemParams;
 
-import <string>;
-
-export namespace PonyEngine::Window
+export namespace PonyEngine::Core
 {
-	struct WindowParams
+	/// @brief Engine system parameters.
+	struct EngineSystemParams final
 	{
-		std::wstring title = L"Pony Engine Window"; ///< Window title.
 	};
 }

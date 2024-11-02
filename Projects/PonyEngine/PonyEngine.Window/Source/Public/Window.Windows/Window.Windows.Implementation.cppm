@@ -15,12 +15,15 @@ export module PonyEngine.Window.Windows.Implementation;
 
 export import PonyEngine.Window.Windows.Factory;
 
+import <utility>;
+
+import PonyBase.Memory;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
 
 import :WindowsWindowSystemFactory;
-import :WindowsWindowSystemFactoryDestroyer;
 
 export namespace PonyEngine::Window
 {
@@ -29,17 +32,15 @@ export namespace PonyEngine::Window
 	/// @param params Window system for Windows factory parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplication& application, const WindowsWindowSystemFactoryParams& params);
+	PONY_DLL_EXPORT WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Window
 {
-	auto DefaultWindowsWindowSystemFactoryDestroyer = WindowsWindowSystemFactoryDestroyer(); ///< Default window system for Windows factory destroyer.
-
-	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplication& application, const WindowsWindowSystemFactoryParams& params)
+	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& params)
 	{
-		IWindowsWindowSystemFactory* const factory = new WindowsWindowSystemFactory(application, params.windowsClassParams);
+		auto factory = PonyBase::Memory::UniquePointer<WindowsWindowSystemFactory>::Create(application, params.windowsClassParams);
 
-		return WindowsWindowSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultWindowsWindowSystemFactoryDestroyer)};
+		return WindowsWindowSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IWindowsWindowSystemFactory>(std::move(factory))};
 	}
 }

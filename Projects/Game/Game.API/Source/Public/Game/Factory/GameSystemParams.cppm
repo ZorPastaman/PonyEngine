@@ -9,10 +9,12 @@
 
 export module Game.Factory:GameSystemParams;
 
+import PonyEngine.Core.Factory;
+
 export namespace Game
 {
 	/// @brief Game system parameters.
-	struct GameSystemParams final
+	struct GameSystemParams final : PonyEngine::Core::SystemParams
 	{
 	};
 }

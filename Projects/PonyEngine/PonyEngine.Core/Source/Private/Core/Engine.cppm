@@ -16,6 +16,7 @@ export module PonyEngine.Core.Implementation:Engine;
 import <cstddef>;
 import <memory>;
 import <stdexcept>;
+import <string_view>;
 
 import PonyBase.Core;
 
@@ -29,14 +30,14 @@ import :SystemManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class Engine final : public IEngine, public ITickableEngine
+	class Engine final : public IEngine, public IEngineContext
 	{
 	public:
 		/// @brief Creates an @p Engine.
-		/// @param application Application.
+		/// @param application Application context.
 		/// @param systemFactories System factories.
 		[[nodiscard("Pure constructor")]]
-		Engine(IApplication& application, const SystemFactoriesContainer& systemFactories);
+		Engine(IApplicationContext& application, const SystemFactoriesContainer& systemFactories);
 		Engine(const Engine&) = delete;
 		Engine(Engine&&) = delete;
 
@@ -59,17 +60,20 @@ export namespace PonyEngine::Core
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Core::Engine"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Core::Engine"; ///< Class name.
 
 	private:
+		/// @brief Before tick procedure.
 		void BeginTick();
+		/// @brief After tick procedure.
 		void EndTick() noexcept;
 
+		/// @brief Ticks the system manager.
 		void TickSystemManager();
 
 		/// @brief Creates an engine logger.
@@ -88,7 +92,7 @@ export namespace PonyEngine::Core
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
 
-		IApplication* application; ///< Application
+		IApplicationContext* application; ///< Application
 
 		std::unique_ptr<EngineLogger> engineLogger; ///< Engine logger.
 		std::unique_ptr<Core::SystemManager> systemManager; ///< System manager.
@@ -97,7 +101,7 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	Engine::Engine(IApplication& application, const SystemFactoriesContainer& systemFactories) :
+	Engine::Engine(IApplicationContext& application, const SystemFactoriesContainer& systemFactories) :
 		frameCount{0},
 		isRunning{true},
 		isTicking{false},
@@ -187,7 +191,7 @@ namespace PonyEngine::Core
 		EndTick();
 	}
 
-	const char* Engine::Name() const noexcept
+	std::string_view Engine::Name() const noexcept
 	{
 		return StaticName;
 	}
@@ -222,10 +226,7 @@ namespace PonyEngine::Core
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(Logger(), e, "On ticking system manager.");
-			if (IsRunning())
-			{
-				Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemManagerTickException));
-			}
+			Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemManagerTickException));
 
 			throw;
 		}

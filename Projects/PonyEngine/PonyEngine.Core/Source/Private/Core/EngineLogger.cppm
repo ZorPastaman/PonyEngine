@@ -23,10 +23,10 @@ export namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates an @p EngineLogger.
-		/// @param engine Engine.
+		/// @param engine Engine context.
 		/// @param externalLogger External logger.
 		[[nodiscard("Pure constructor")]]
-		EngineLogger(IEngine& engine, PonyDebug::Log::ILogger& externalLogger) noexcept;
+		EngineLogger(IEngineContext& engine, PonyDebug::Log::ILogger& externalLogger) noexcept;
 		EngineLogger(const EngineLogger&) = delete;
 		EngineLogger(EngineLogger&&) = delete;
 
@@ -53,14 +53,14 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		PonyDebug::Log::LogInput ConvertToEngineLogInput(const PonyDebug::Log::LogInput& logInput) const noexcept;
 
-		IEngine* engine; ///< Engine.
+		IEngineContext* engine; ///< Engine.
 		PonyDebug::Log::ILogger* externalLogger; ///< External logger.
 	};
 }
 
 namespace PonyEngine::Core
 {
-	EngineLogger::EngineLogger(IEngine& engine, PonyDebug::Log::ILogger& externalLogger) noexcept :
+	EngineLogger::EngineLogger(IEngineContext& engine, PonyDebug::Log::ILogger& externalLogger) noexcept :
 		engine{&engine},
 		externalLogger{&externalLogger}
 	{

@@ -9,14 +9,17 @@
 
 export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemFactoryData;
 
+import PonyBase.Memory;
+
 import PonyEngine.Core.Factory;
 
 import :IWindowsScreenSystemFactory;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Windows screen system factory data.
 	struct WindowsScreenSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
+		PonyBase::Memory::UniquePointer<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
 	};
 }

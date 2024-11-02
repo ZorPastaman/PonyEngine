@@ -13,7 +13,10 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystemFactory;
 
+import <string_view>;
 import <utility>;
+
+import PonyBase.Memory;
 
 import PonyDebug.Log;
 
@@ -25,7 +28,7 @@ import :WindowsDirect3D12RenderSystem;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows factory.
-	class WindowsDirect3D12RenderSystemFactory final : public IWindowsDirect3D12RenderSystemFactory, public Core::ISystemDestroyer
+	class WindowsDirect3D12RenderSystemFactory final : public IWindowsDirect3D12RenderSystemFactory
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -36,7 +39,7 @@ export namespace PonyEngine::Render
 		~WindowsDirect3D12RenderSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual WindowsDirect3D12RenderSystemParams& SystemParams() noexcept override;
@@ -44,18 +47,14 @@ export namespace PonyEngine::Render
 		virtual const WindowsDirect3D12RenderSystemParams& SystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
-		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
-
+		virtual std::string_view SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const char* SystemName() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		WindowsDirect3D12RenderSystemFactory& operator =(const WindowsDirect3D12RenderSystemFactory&) = delete;
 		WindowsDirect3D12RenderSystemFactory& operator =(WindowsDirect3D12RenderSystemFactory&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystemFactory"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystemFactory"; ///< Class name.
 
 	private:
 		WindowsDirect3D12RenderSystemParams renderSystemParams;
@@ -64,15 +63,15 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
+	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
-		const auto system = new WindowsDirect3D12RenderSystem(engine, renderSystemParams);
+		auto system = PonyBase::Memory::UniquePointer<WindowsDirect3D12RenderSystem>::Create(engine, renderSystemParams);
 		auto interfaces = Core::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IRenderSystem>(*system);
+		interfaces.AddInterfacesDeduced<IRenderSystem, IDirect3D12RenderSystem, IWindowsDirect3D12RenderSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
+			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
@@ -87,23 +86,12 @@ namespace PonyEngine::Render
 		return renderSystemParams;
 	}
 
-	bool WindowsDirect3D12RenderSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
-	{
-		return dynamic_cast<WindowsDirect3D12RenderSystem*>(system);
-	}
-
-	void WindowsDirect3D12RenderSystemFactory::Destroy(Core::IEngineSystem* system) noexcept
-	{
-		assert(dynamic_cast<WindowsDirect3D12RenderSystem*>(system) && "Tried to destroy a system of the wrong type.");
-		delete static_cast<WindowsDirect3D12RenderSystem*>(system);
-	}
-
-	const char* WindowsDirect3D12RenderSystemFactory::SystemName() const noexcept
+	std::string_view WindowsDirect3D12RenderSystemFactory::SystemName() const noexcept
 	{
 		return WindowsDirect3D12RenderSystem::StaticName;
 	}
 
-	const char* WindowsDirect3D12RenderSystemFactory::Name() const noexcept
+	std::string_view WindowsDirect3D12RenderSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}

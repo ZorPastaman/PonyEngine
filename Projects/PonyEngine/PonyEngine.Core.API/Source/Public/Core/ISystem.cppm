@@ -9,6 +9,8 @@
 
 export module PonyEngine.Core:ISystem;
 
+import <string_view>;
+
 export namespace PonyEngine::Core
 {
 	/// @brief System.
@@ -21,7 +23,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the system name.
 		/// @return System name.
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0; // TODO: try string_view instead of char*
+		virtual std::string_view Name() const noexcept = 0;
 
 		ISystem& operator =(const ISystem&) = delete;
 		ISystem& operator =(ISystem&&) = delete;

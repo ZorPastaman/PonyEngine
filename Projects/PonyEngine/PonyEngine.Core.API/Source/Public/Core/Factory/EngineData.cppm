@@ -9,15 +9,15 @@
 
 export module PonyEngine.Core.Factory:EngineData;
 
-import :EngineUniquePtr;
+import PonyBase.Memory;
+
+import PonyEngine.Core;
 
 export namespace PonyEngine::Core
 {
 	/// @brief Engine data.
 	struct EngineData final
 	{
-		EngineUniquePtr engine; ///< Engine.
-
-		ITickableEngine* tickableEngine = nullptr; ///< Engine tickable interface.
+		PonyBase::Memory::UniquePointer<IEngine> engine; ///< Engine.
 	};
 }

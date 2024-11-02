@@ -13,16 +13,18 @@ module;
 
 export module PonyEngine.Screen.Windows.Implementation:WindowsScreenSystem;
 
+import <string_view>;
+
 import PonyEngine.Core;
-import PonyEngine.Screen;
+import PonyEngine.Screen.Windows;
 
 export namespace PonyEngine::Screen
 {
-	class WindowsScreenSystem final : public Core::IEngineSystem, public IScreenSystem
+	class WindowsScreenSystem final : public Core::IEngineSystem, public IWindowsScreenSystem
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsScreenSystem(Core::IEngine& engine) noexcept;
+		WindowsScreenSystem() noexcept;
 		WindowsScreenSystem(const WindowsScreenSystem&) = delete;
 		WindowsScreenSystem(WindowsScreenSystem&&) = delete;
 
@@ -35,12 +37,12 @@ export namespace PonyEngine::Screen
 		virtual Resolution<unsigned int> DisplayResolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		WindowsScreenSystem& operator =(const WindowsScreenSystem&) = delete;
 		WindowsScreenSystem& operator =(WindowsScreenSystem&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Screen::WindowsScreenSystem"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Screen::WindowsScreenSystem"; ///< Class name.
 
 	private:
 		Resolution<unsigned int> displayResolution;
@@ -49,7 +51,7 @@ export namespace PonyEngine::Screen
 
 namespace PonyEngine::Screen
 {
-	WindowsScreenSystem::WindowsScreenSystem(Core::IEngine&) noexcept :
+	WindowsScreenSystem::WindowsScreenSystem() noexcept :
 		displayResolution(PonyEngine::Screen::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN))))
 	{
 	}
@@ -67,7 +69,7 @@ namespace PonyEngine::Screen
 		return displayResolution;
 	}
 
-	const char* WindowsScreenSystem::Name() const noexcept
+	std::string_view WindowsScreenSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

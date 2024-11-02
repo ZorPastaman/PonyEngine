@@ -20,11 +20,14 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time.API\PonyEngine.Time.API.vcxproj">
       <Project>{8b3f2887-0863-444c-884e-dfe775f31ba0}</Project>
     </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
-      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
-    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
+      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
@@ -33,7 +36,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Time\FrameRateSystem.cppm" />
     <ClCompile Include="Source\Private\Time\FrameRateSystemFactory.cppm" />
-    <ClCompile Include="Source\Private\Time\FrameRateSystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Time\Time.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

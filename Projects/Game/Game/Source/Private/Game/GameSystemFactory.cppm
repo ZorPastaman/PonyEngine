@@ -13,7 +13,10 @@ module;
 
 export module Game.Implementation:GameSystemFactory;
 
+import <string_view>;
 import <utility>;
+
+import PonyBase.Memory;
 
 import PonyDebug.Log;
 
@@ -27,7 +30,7 @@ import :GameSystem;
 export namespace Game
 {
 	/// @brief Game system factory.
-	class GameSystemFactory final : public IGameSystemFactory, public PonyEngine::Core::ISystemDestroyer
+	class GameSystemFactory final : public IGameSystemFactory
 	{
 	public:
 		/// @brief Creates a game system factory.
@@ -39,7 +42,7 @@ export namespace Game
 		~GameSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams& params) override;
+		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual GameSystemParams& SystemParams() noexcept override;
@@ -47,19 +50,15 @@ export namespace Game
 		virtual const GameSystemParams& SystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsCompatible(PonyEngine::Core::IEngineSystem* system) const noexcept override;
-		virtual void Destroy(PonyEngine::Core::IEngineSystem* system) noexcept override;
+		virtual std::string_view SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		GameSystemFactory& operator =(const GameSystemFactory&) = delete;
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
-		static constexpr auto StaticName = "Game::GameSystemFactory"; ///< Class name.
+		static constexpr std::string_view StaticName = "Game::GameSystemFactory"; ///< Class name.
 
 	private:
 		GameSystemParams systemParams; ///< Game system parameters.
@@ -68,15 +67,15 @@ export namespace Game
 
 namespace Game
 {
-	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngine& engine, const PonyEngine::Core::SystemParams&)
+	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams&)
 	{
-		const auto system = new GameSystem(engine);
+		auto system = PonyBase::Memory::UniquePointer<GameSystem>::Create(engine);
 		auto interfaces = PonyEngine::Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = PonyEngine::Core::SystemUniquePtr<PonyEngine::Core::IEngineSystem>(*system, *this),
+			.system = PonyBase::Memory::UniquePointer<PonyEngine::Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
@@ -91,23 +90,12 @@ namespace Game
 		return systemParams;
 	}
 
-	bool GameSystemFactory::IsCompatible(PonyEngine::Core::IEngineSystem* const system) const noexcept
-	{
-		return dynamic_cast<GameSystem*>(system);
-	}
-
-	void GameSystemFactory::Destroy(PonyEngine::Core::IEngineSystem* const system) noexcept
-	{
-		assert(dynamic_cast<GameSystem*>(system) && "Tried to destroy a system of the wrong type.");
-		delete static_cast<GameSystem*>(system);
-	}
-
-	const char* GameSystemFactory::SystemName() const noexcept
+	std::string_view GameSystemFactory::SystemName() const noexcept
 	{
 		return GameSystem::StaticName;
 	}
 
-	const char* GameSystemFactory::Name() const noexcept
+	std::string_view GameSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}

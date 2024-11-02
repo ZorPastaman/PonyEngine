@@ -21,6 +21,7 @@ import <algorithm>;
 import <exception>;
 import <stdexcept>;
 import <string>;
+import <string_view>;
 import <vector>;
 
 import PonyBase.StringUtility;
@@ -51,7 +52,7 @@ export namespace PonyEngine::Window
 		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystem(Core::IEngine& engine, HINSTANCE hInstance, ATOM className, const WindowsWindowParams& windowParams);
+		WindowsWindowSystem(Core::IEngineContext& engine, HINSTANCE hInstance, ATOM className, const WindowsWindowSystemParams& windowParams);
 		WindowsWindowSystem(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem(WindowsWindowSystem&&) = delete;
 
@@ -66,11 +67,12 @@ export namespace PonyEngine::Window
 		virtual bool IsWindowAlive() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const wchar_t* MainTitle() const noexcept override;
-		virtual void MainTitle(const wchar_t* title) override;
+		virtual std::wstring_view MainTitle() const noexcept override;
+		virtual void MainTitle(std::wstring_view title) override;
 
-		[[nodiscard("Pure function")]] virtual const wchar_t* SecondaryTitle() const noexcept override;
-		virtual void SecondaryTitle(const wchar_t* title) override;
+		[[nodiscard("Pure function")]]
+		virtual std::wstring_view SecondaryTitle() const noexcept override;
+		virtual void SecondaryTitle(std::wstring_view title) override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
@@ -89,14 +91,14 @@ export namespace PonyEngine::Window
 		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		WindowsWindowSystem& operator =(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem& operator =(WindowsWindowSystem&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Window::WindowsWindowSystem"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Window::WindowsWindowSystem"; ///< Class name.
 
 	private:
 		/// @brief Update the window title.
@@ -124,7 +126,7 @@ export namespace PonyEngine::Window
 		std::wstring mainTitle; ///< Window main title cache.
 		std::wstring secondaryTitle; ///< Window title text cache.
 
-		Core::IEngine* engine; ///< Engine.
+		Core::IEngineContext* engine; ///< Engine.
 
 		HWND hWnd; ///< Window handler.
 
@@ -134,7 +136,7 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	WindowsWindowSystem::WindowsWindowSystem(Core::IEngine& engine, const HINSTANCE hInstance, const ATOM className, const WindowsWindowParams& windowParams) :
+	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const HINSTANCE hInstance, const ATOM className, const WindowsWindowSystemParams& windowParams) :
 		hInstance{hInstance},
 		className{className},
 		style{windowParams.style},
@@ -192,24 +194,24 @@ namespace PonyEngine::Window
 		return IsWindow(hWnd);
 	}
 
-	const wchar_t* WindowsWindowSystem::MainTitle() const noexcept
+	std::wstring_view WindowsWindowSystem::MainTitle() const noexcept
 	{
-		return mainTitle.c_str();
+		return mainTitle;
 	}
 
-	void WindowsWindowSystem::MainTitle(const wchar_t* const title)
+	void WindowsWindowSystem::MainTitle(const std::wstring_view title)
 	{
 		mainTitle = title;
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", PonyBase::Utility::ConvertToString(mainTitle));
 		UpdateWindowTitle();
 	}
 
-	const wchar_t* WindowsWindowSystem::SecondaryTitle() const noexcept
+	std::wstring_view WindowsWindowSystem::SecondaryTitle() const noexcept
 	{
-		return secondaryTitle.c_str();
+		return secondaryTitle;
 	}
 
-	void WindowsWindowSystem::SecondaryTitle(const wchar_t* title)
+	void WindowsWindowSystem::SecondaryTitle(const std::wstring_view title)
 	{
 		secondaryTitle = title;
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", PonyBase::Utility::ConvertToString(secondaryTitle));
@@ -274,7 +276,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	const char* WindowsWindowSystem::Name() const noexcept
+	std::string_view WindowsWindowSystem::Name() const noexcept
 	{
 		return StaticName;
 	}

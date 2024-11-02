@@ -37,9 +37,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

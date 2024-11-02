@@ -23,6 +23,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
       <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
+      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
     </ProjectReference>
@@ -33,7 +36,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm" />
-    <ClCompile Include="Source\Private\Input\InputSystemFactoryDestroyer.cppm" />
     <ClCompile Include="Source\Public\Input\Input.Implementation.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

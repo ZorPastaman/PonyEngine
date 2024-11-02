@@ -11,6 +11,11 @@
 
 #include <chrono>
 #include <cstddef>
+#include <variant>
+
+#include "Mocks/Application.h"
+#include "Mocks/Engine.h"
+#include "Mocks/Logger.h"
 
 import PonyDebug.Log;
 
@@ -23,147 +28,39 @@ namespace Time
 {
 	TEST_CLASS(FrameRateSystemTests)
 	{
-		class Application : public PonyEngine::Core::IApplication
-		{
-		public:
-			PonyDebug::Log::ILogger* logger;
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-		};
-
-		class EmptyLogger final : public PonyDebug::Log::ILogger
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-			virtual void LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept override
-			{
-			}
-
-			virtual void AddSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-			virtual void RemoveSubLogger(PonyDebug::Log::ISubLogger&) override
-			{
-			}
-		};
-
-		class EmptySystemManager : public PonyEngine::Core::ISystemManager
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual void* FindSystem(const std::type_info&) const noexcept override
-			{
-				return nullptr;
-			}
-		};
-
-		class EmptyEngine : public PonyEngine::Core::IEngine, public PonyEngine::Core::ITickableEngine
-		{
-		public:
-			EmptyLogger* logger;
-			mutable EmptySystemManager systemManager;
-
-			explicit EmptyEngine(EmptyLogger& logger) noexcept :
-				logger{ &logger }
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::size_t FrameCount() const noexcept override
-			{
-				return 0;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyDebug::Log::ILogger& Logger() const noexcept override
-			{
-				return *logger;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override
-			{
-				return systemManager;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual bool IsRunning() const noexcept override
-			{
-				return true;
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual int ExitCode() const noexcept override
-			{
-				return 0;
-			}
-
-			virtual void Stop(int) noexcept override
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			virtual void Tick() override
-			{
-			}
-		};
-
 		TEST_METHOD(TickTest)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto frameRateSystemBase = factory.systemFactory->Create(engine, systemParams);
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
-			frameRateSystemBase.system->Begin();
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
+			std::get<1>(frameRateSystemBase.system)->Begin();
 			float frameTime = 5.f;
 			frameRateSystem->TargetFrameTime(frameTime);
 			auto now = std::chrono::steady_clock::now();
-			frameRateSystemBase.tickableSystem->Tick();
+			std::get<1>(frameRateSystemBase.system)->Tick();
 			auto timeDiff = std::chrono::steady_clock::now() - now;
 			Assert::IsFalse(timeDiff >= std::chrono::duration<float>(frameTime));
-			frameRateSystemBase.tickableSystem->Tick();
+			std::get<1>(frameRateSystemBase.system)->Tick();
 			timeDiff = std::chrono::steady_clock::now() - now;
 			Assert::IsTrue(timeDiff >= std::chrono::duration<float>(frameTime));
-			frameRateSystemBase.system->End();
+			std::get<1>(frameRateSystemBase.system)->End();
 		}
 
 		TEST_METHOD(GetSetFrameTimeRate)
 		{
-			auto logger = EmptyLogger();
-			auto application = Application();
+			auto logger = Core::Logger();
+			auto application = Core::Application();
 			application.logger = &logger;
-			auto engine = EmptyEngine(logger);
+			auto engine = Core::Engine();
+			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto frameRateSystemBase = factory.systemFactory->Create(engine, systemParams);
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(frameRateSystemBase.system.get());
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
 
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
 

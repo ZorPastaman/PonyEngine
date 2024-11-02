@@ -9,7 +9,7 @@
 
 export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemFactoryData;
 
-import PonyEngine.Core.Factory;
+import PonyBase.Memory;
 
 import :IWindowsWindowSystemFactory;
 
@@ -18,6 +18,6 @@ export namespace PonyEngine::Window
 	/// @brief Window system for Windows factory data.
 	struct WindowsWindowSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr<IWindowsWindowSystemFactory> systemFactory; ///< System factory.
+		PonyBase::Memory::UniquePointer<IWindowsWindowSystemFactory> systemFactory; ///< System factory.
 	};
 }

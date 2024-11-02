@@ -9,6 +9,8 @@
 
 export module Game.Factory:GameSystemFactoryData;
 
+import PonyBase.Memory;
+
 import PonyEngine.Core.Factory;
 
 import :IGameSystemFactory;
@@ -18,6 +20,6 @@ export namespace Game
 	/// @brief Game system factory data.
 	struct GameSystemFactoryData final
 	{
-		PonyEngine::Core::SystemFactoryUniquePtr<IGameSystemFactory> systemFactory; ///< Game system factory.
+		PonyBase::Memory::UniquePointer<IGameSystemFactory> systemFactory; ///< Game system factory.
 	};
 }

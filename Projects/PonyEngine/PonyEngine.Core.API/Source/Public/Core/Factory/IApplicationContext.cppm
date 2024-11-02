@@ -9,16 +9,18 @@
 
 export module PonyEngine.Core.Factory:IApplication;
 
+import <string_view>;
+
 import PonyDebug.Log;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Main application.
-	class IApplication
+	/// @brief Application context.
+	class IApplicationContext
 	{
 	public:
-		IApplication(const IApplication&) = delete;
-		IApplication(IApplication&&) = delete;
+		IApplicationContext(const IApplicationContext&) = delete;
+		IApplicationContext(IApplicationContext&&) = delete;
 
 		/// @brief Gets the application logger.
 		/// @return Application logger.
@@ -28,15 +30,15 @@ export namespace PonyEngine::Core
 		/// @brief Gets the application name.
 		/// @return Application name.
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
+		virtual std::string_view Name() const noexcept = 0;
 
-		IApplication& operator =(const IApplication&) = delete;
-		IApplication& operator =(IApplication&&) = delete;
+		IApplicationContext& operator =(const IApplicationContext&) = delete;
+		IApplicationContext& operator =(IApplicationContext&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		IApplication() noexcept = default;
+		IApplicationContext() noexcept = default;
 
-		~IApplication() noexcept = default;
+		~IApplicationContext() noexcept = default;
 	};
 }

@@ -34,8 +34,5 @@
     <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactoryDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

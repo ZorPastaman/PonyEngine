@@ -259,7 +259,7 @@ export namespace PonyMath::Core
 	/// @param farPlane Distance between a camera and a far clipping plane. Must be positive and greater than the @p nearPlane.
 	/// @return Orthographic projection matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Matrix4x4<T> OrthographicMatrix(T height, T aspect, T nearPlane, T farPlane) noexcept;
+	constexpr Matrix4x4<T> OrthographicMatrix(T height, T aspect, T nearPlane, T farPlane) noexcept; // TODO: Try width and height instead of aspect
 
 	/// @brief Extracts a translation from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.

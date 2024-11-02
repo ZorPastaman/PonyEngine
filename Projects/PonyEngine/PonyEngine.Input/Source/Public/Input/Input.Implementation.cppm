@@ -15,29 +15,30 @@ export module PonyEngine.Input.Implementation;
 
 export import PonyEngine.Input.Factory;
 
+import <utility>;
+
+import PonyBase.Memory;
+
 import PonyEngine.Core;
 
 import :InputSystemFactory;
-import :InputSystemFactoryDestroyer;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Creates an input system factory.
-	/// @param application Application.
+	/// @param application Application context.
 	/// @param params Input system factory parameters.
 	/// @return Input system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplication& application, const InputSystemFactoryParams& params);
+	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Input
 {
-	auto DefaultInputSystemFactoryDestroyer = InputSystemFactoryDestroyer(); ///< Default input system factory destroyer.
-
-	InputSystemFactoryData CreateInputSystemFactory(Core::IApplication&, const InputSystemFactoryParams&)
+	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext&, const InputSystemFactoryParams&)
 	{
-		IInputSystemFactory* const factory = new InputSystemFactory();
+		auto factory = PonyBase::Memory::UniquePointer<InputSystemFactory>::Create();
 
-		return InputSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultInputSystemFactoryDestroyer)};
+		return InputSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IInputSystemFactory>(std::move(factory))};
 	}
 }

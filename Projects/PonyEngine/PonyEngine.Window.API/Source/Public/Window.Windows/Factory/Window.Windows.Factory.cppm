@@ -16,4 +16,4 @@ export import :IWindowsWindowSystemFactory;
 export import :WindowsClassParams;
 export import :WindowsWindowSystemFactoryData;
 export import :WindowsWindowSystemFactoryParams;
-export import :WindowsWindowParams;
+export import :WindowsWindowSystemParams;

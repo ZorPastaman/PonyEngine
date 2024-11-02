@@ -13,10 +13,12 @@ module;
 
 export module PonyEngine.Time.Implementation:FrameRateSystemFactory;
 
+import <string_view>;
 import <utility>;
 
-import PonyEngine.Core.Factory;
+import PonyBase.Memory;
 
+import PonyEngine.Core.Factory;
 import PonyEngine.Time.Factory;
 
 import :FrameRateSystem;
@@ -24,7 +26,7 @@ import :FrameRateSystem;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system factory.
-	class FrameRateSystemFactory final : public IFrameRateSystemFactory, public Core::ISystemDestroyer
+	class FrameRateSystemFactory final : public IFrameRateSystemFactory
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -35,7 +37,7 @@ export namespace PonyEngine::Time
 		~FrameRateSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngine& engine, const Core::SystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual FrameRateSystemParams& SystemParams() noexcept override;
@@ -43,18 +45,14 @@ export namespace PonyEngine::Time
 		virtual const FrameRateSystemParams& SystemParams() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual bool IsCompatible(Core::IEngineSystem* system) const noexcept override;
-		virtual void Destroy(Core::IEngineSystem* system) noexcept override;
-
+		virtual std::string_view SystemName() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const char* SystemName() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept override;
+		virtual std::string_view Name() const noexcept override;
 
 		FrameRateSystemFactory& operator =(const FrameRateSystemFactory&) = delete;
 		FrameRateSystemFactory& operator =(FrameRateSystemFactory&&) = delete;
 
-		static constexpr auto StaticName = "PonyEngine::Time::FrameRateSystemFactory"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Time::FrameRateSystemFactory"; ///< Class name.
 
 	private:
 		FrameRateSystemParams frameRateSystemParams;
@@ -63,15 +61,15 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
-	Core::SystemData FrameRateSystemFactory::Create(Core::IEngine& engine, const Core::SystemParams&)
+	Core::SystemData FrameRateSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
-		const auto system = new FrameRateSystem(engine);
+		auto system = PonyBase::Memory::UniquePointer<FrameRateSystem>::Create(engine);
 		auto interfaces = Core::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = Core::SystemUniquePtr<Core::IEngineSystem>(*system, *this),
+			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
@@ -86,23 +84,12 @@ namespace PonyEngine::Time
 		return frameRateSystemParams;
 	}
 
-	bool FrameRateSystemFactory::IsCompatible(Core::IEngineSystem* const system) const noexcept
-	{
-		return dynamic_cast<FrameRateSystem*>(system);
-	}
-
-	void FrameRateSystemFactory::Destroy(Core::IEngineSystem* const system) noexcept
-	{
-		assert(dynamic_cast<FrameRateSystem*>(system) && "Tried to destroy a system of the wrong type.");
-		delete static_cast<FrameRateSystem*>(system);
-	}
-
-	const char* FrameRateSystemFactory::SystemName() const noexcept
+	std::string_view FrameRateSystemFactory::SystemName() const noexcept
 	{
 		return FrameRateSystem::StaticName;
 	}
 
-	const char* FrameRateSystemFactory::Name() const noexcept
+	std::string_view FrameRateSystemFactory::Name() const noexcept
 	{
 		return StaticName;
 	}

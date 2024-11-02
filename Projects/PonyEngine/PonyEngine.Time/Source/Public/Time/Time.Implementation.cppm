@@ -15,29 +15,28 @@ export module PonyEngine.Time.Implementation;
 
 export import PonyEngine.Time.Factory;
 
+import <utility>;
+
 import PonyEngine.Core;
 
 import :FrameRateSystemFactory;
-import :FrameRateSystemFactoryDestroyer;
 
 export namespace PonyEngine::Time
 {
 	/// @brief Creates a frame rate system factory.
-	/// @param application Application
+	/// @param application Application context.
 	/// @param params Frame rate system factory parameters.
 	/// @return Frame rate system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplication& application, const FrameRateSystemFactoryParams& params);
+	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& params);
 }
 
 namespace PonyEngine::Time
 {
-	auto DefaultFrameRateSystemFactoryDestroyer = FrameRateSystemFactoryDestroyer();
-
-	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplication&, const FrameRateSystemFactoryParams&)
+	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext&, const FrameRateSystemFactoryParams&)
 	{
-		IFrameRateSystemFactory* const factory = new FrameRateSystemFactory();
+		auto factory = PonyBase::Memory::UniquePointer<FrameRateSystemFactory>::Create();
 
-		return FrameRateSystemFactoryData{.systemFactory = Core::SystemFactoryUniquePtr(*factory, DefaultFrameRateSystemFactoryDestroyer)};
+		return FrameRateSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IFrameRateSystemFactory>(std::move(factory))};
 	}
 }

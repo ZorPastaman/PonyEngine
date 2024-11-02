@@ -30,7 +30,7 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\Window.Windows.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowParams.cppm">
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm">
@@ -54,7 +54,7 @@
     <ClCompile Include="Source\Public\Window\Factory\IWindowSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window\Factory\WindowParams.cppm">
+    <ClCompile Include="Source\Public\Window\Factory\WindowSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

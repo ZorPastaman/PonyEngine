@@ -24,9 +24,6 @@
     <ClCompile Include="Source\Public\Core\Core.Implementation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Core\EngineDestroyer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Core\EngineLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -15,6 +15,7 @@ import :ScreenSystemParams;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Screen system factory.
 	class IScreenSystemFactory : public Core::ISystemFactory
 	{
 	public:
@@ -22,9 +23,9 @@ export namespace PonyEngine::Screen
 		IScreenSystemFactory(IScreenSystemFactory&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual ScreenSystemParams& SystemParams() noexcept = 0;
+		virtual ScreenSystemParams& SystemParams() noexcept override = 0;
 		[[nodiscard("Pure function")]]
-		virtual const ScreenSystemParams& SystemParams() const noexcept = 0;
+		virtual const ScreenSystemParams& SystemParams() const noexcept override = 0;
 
 		IScreenSystemFactory& operator =(const IScreenSystemFactory&) = delete;
 		IScreenSystemFactory& operator =(IScreenSystemFactory&&) = delete;

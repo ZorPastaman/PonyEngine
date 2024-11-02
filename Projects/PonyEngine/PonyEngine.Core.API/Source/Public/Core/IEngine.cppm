@@ -9,9 +9,10 @@
 
 export module PonyEngine.Core:IEngine;
 
-import PonyBase.Core;
+import <cstddef>;
+import <string_view>;
 
-import PonyDebug.Log;
+import PonyBase.Core;
 
 import :ISystemManager;
 
@@ -29,10 +30,6 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::size_t FrameCount() const noexcept = 0;
 
-		/// @brief Gets the engine logger.
-		/// @return Engine logger.
-		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
@@ -53,10 +50,13 @@ export namespace PonyEngine::Core
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept = 0;
 
+		/// @brief Ticks the engine.
+		virtual void Tick() = 0;
+
 		/// @brief Gets the engine name.
 		/// @return Engine name.
 		[[nodiscard("Pure function")]]
-		virtual const char* Name() const noexcept = 0;
+		virtual std::string_view Name() const noexcept = 0;
 
 		IEngine& operator =(const IEngine&) = delete;
 		IEngine& operator =(IEngine&&) = delete;

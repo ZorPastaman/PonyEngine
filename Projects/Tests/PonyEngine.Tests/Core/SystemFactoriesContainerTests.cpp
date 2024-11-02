@@ -9,6 +9,8 @@
 
 #include "CppUnitTest.h"
 
+#include "Mocks/SystemFactory.h"
+
 import PonyEngine.Core.Factory;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -17,35 +19,9 @@ namespace Core
 {
 	TEST_CLASS(SystemFactoriesContainerTests)
 	{
-		class EmptyFactory final : public PonyEngine::Core::ISystemFactory, public PonyEngine::Core::ISystemDestroyer
-		{
-		public:
-			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngine&, const PonyEngine::Core::SystemParams&) override
-			{
-				return PonyEngine::Core::SystemData{.system = PonyEngine::Core::SystemUniquePtr(nullptr, PonyEngine::Core::SystemDeleter(*this))};
-			}
-
-			virtual void Destroy(PonyEngine::Core::ISystem*) noexcept override
-			{
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* Name() const noexcept override
-			{
-				return "";
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual const char* SystemName() const noexcept override
-			{
-				return "";
-			}
-		};
-
 		TEST_METHOD(ConstructorTest)
 		{
-			auto factory = EmptyFactory();
+			auto factory = SystemFactory();
 			auto defaultContainer = PonyEngine::Core::SystemFactoriesContainer();
 			defaultContainer.AddSystemFactory(factory);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&factory), reinterpret_cast<std::uintptr_t>(*defaultContainer.Begin()));
@@ -59,8 +35,8 @@ namespace Core
 
 		TEST_METHOD(AddFactoryTest)
 		{
-			auto factory = EmptyFactory();
-			auto anotherFactory = EmptyFactory();
+			auto factory = SystemFactory();
+			auto anotherFactory = SystemFactory();
 			auto container = PonyEngine::Core::SystemFactoriesContainer();
 			container.AddSystemFactory(factory);
 			container.AddSystemFactory(anotherFactory);
@@ -77,7 +53,7 @@ namespace Core
 
 		TEST_METHOD(AssignmentTest)
 		{
-			auto factory = EmptyFactory();
+			auto factory = SystemFactory();
 			auto defaultContainer = PonyEngine::Core::SystemFactoriesContainer();
 			defaultContainer.AddSystemFactory(factory);
 

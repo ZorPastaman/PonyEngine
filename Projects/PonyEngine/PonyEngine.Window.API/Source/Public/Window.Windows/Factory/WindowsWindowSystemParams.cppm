@@ -11,18 +11,14 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Factory:WindowsWindowParams;
-
-import <string>;
-
-import PonyMath.Core;
+export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemParams;
 
 import PonyEngine.Window.Factory;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window parameters.
-	struct WindowsWindowParams final : WindowParams
+	struct WindowsWindowSystemParams final : WindowSystemParams
 	{
 		DWORD style = DWORD{0}; ///< Window style.
 		DWORD extendedStyle = DWORD{0}; ///< Extended window style.

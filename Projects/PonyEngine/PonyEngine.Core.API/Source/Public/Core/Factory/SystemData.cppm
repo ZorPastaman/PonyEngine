@@ -9,9 +9,12 @@
 
 export module PonyEngine.Core.Factory:SystemData;
 
+import <variant>;
+
+import PonyBase.Memory;
+
 import PonyEngine.Core;
 
-import :SystemUniquePtr;
 import :ObjectInterfaces;
 
 export namespace PonyEngine::Core
@@ -19,9 +22,7 @@ export namespace PonyEngine::Core
 	/// @brief System data.
 	struct SystemData final
 	{
-		SystemUniquePtr<IEngineSystem> system; ///< System.
-		// TODO: Use variant for IEngineSystem and ITickableEngineSystem.
+		std::variant<PonyBase::Memory::UniquePointer<IEngineSystem>, PonyBase::Memory::UniquePointer<ITickableEngineSystem>> system; ///< System.
 		ObjectInterfaces publicInterfaces; ///< System public interfaces.
-		// TODO: Think about something that guarantees that the system actually inherits these interfaces. Maybe, it's enough to have an assert with dynamic_cast in the SystemManager
 	};
 }

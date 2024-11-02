@@ -9,6 +9,8 @@
 
 export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderSystemFactoryData;
 
+import PonyBase.Memory;
+
 import PonyEngine.Core.Factory;
 
 import :IWindowsDirect3D12RenderSystemFactory;
@@ -18,6 +20,6 @@ export namespace PonyEngine::Render
 	/// @brief Direct3D 12 render system for Windows factory data.
 	struct WindowsDirect3D12RenderSystemFactoryData final
 	{
-		Core::SystemFactoryUniquePtr<IWindowsDirect3D12RenderSystemFactory> systemFactory; ///< Render system factory.
+		PonyBase::Memory::UniquePointer<IWindowsDirect3D12RenderSystemFactory> systemFactory; ///< Render system factory.
 	};
 }

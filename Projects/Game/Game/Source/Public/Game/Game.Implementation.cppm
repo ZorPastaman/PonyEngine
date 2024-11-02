@@ -15,29 +15,30 @@ export module Game.Implementation;
 
 export import Game.Factory;
 
+import <utility>;
+
+import PonyBase.Memory;
+
 import PonyEngine.Core;
 
 import :GameSystemFactory;
-import :GameSystemFactoryDestroyer;
 
 export namespace Game
 {
 	/// @brief Creates a game system factory.
-	/// @param application Application
+	/// @param application Application context.
 	/// @param params Game system factory parameters.
 	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplication& application, const GameSystemFactoryParams& params);
+	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& params);
 }
 
 namespace Game
 {
-	auto DefaultGameSystemFactoryDestroyer = GameSystemFactoryDestroyer(); ///< Default game system factory destroyer.
-
-	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplication&, const GameSystemFactoryParams&)
+	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext&, const GameSystemFactoryParams&)
 	{
-		IGameSystemFactory* const factory = new GameSystemFactory();
+		auto factory = PonyBase::Memory::UniquePointer<GameSystemFactory>::Create();
 
-		return GameSystemFactoryData{.systemFactory = PonyEngine::Core::SystemFactoryUniquePtr(*factory, DefaultGameSystemFactoryDestroyer)};
+		return GameSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IGameSystemFactory>(std::move(factory))};
 	}
 }
