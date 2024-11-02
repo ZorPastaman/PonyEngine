@@ -20,6 +20,7 @@ export module Application.Windows:WindowsEngine;
 import <array>;
 import <exception>;
 import <format>;
+import <utility>;
 
 import PonyBase.Core;
 import PonyBase.Memory;
@@ -61,14 +62,14 @@ export namespace Application
 		WindowsEngine& operator =(WindowsEngine&&) = delete;
 
 	private:
-		/// @brief Creates a screen system factory.
-		/// @return Screen system factory.
-		[[nodiscard("Pure function")]]
-		PonyEngine::Screen::WindowsScreenSystemFactoryData CreateScreenSystemFactory() const;
 		/// @brief Creates a frame rate system factory.
 		/// @return Frame rate system factory.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory() const;
+		/// @brief Creates a screen system factory.
+		/// @return Screen system factory.
+		[[nodiscard("Pure function")]]
+		PonyEngine::Screen::WindowsScreenSystemFactoryData CreateScreenSystemFactory() const;
 		/// @brief Creates a window system factory.
 		/// @return Window system factory.
 		[[nodiscard("Pure function")]]
@@ -77,14 +78,14 @@ export namespace Application
 		/// @return Input system factory.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Input::InputSystemFactoryData CreateInputSystemFactory() const;
-		/// @brief Creates a game system factory.
-		/// @return Game system factory.
-		[[nodiscard("Pure function")]]
-		Game::GameSystemFactoryData CreateGameSystemFactory() const;
 		/// @brief Creates a render system factory.
 		/// @return Render system factory.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData CreateRenderSystemFactory() const;
+		/// @brief Creates a game system factory.
+		/// @return Game system factory.
+		[[nodiscard("Pure function")]]
+		Game::GameSystemFactoryData CreateGameSystemFactory() const;
 
 		/// @brief Creates an engine.
 		/// @return Created engine.
@@ -96,7 +97,7 @@ export namespace Application
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
 
-		std::array<PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>, 6> systemFactories; ///< System factories.
+		std::array<std::pair<PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>, int>, 6> systemFactories; ///< System factories.
 		PonyBase::Memory::UniquePointer<PonyEngine::Core::IEngine> engine; ///< Engine.
 	};
 }
@@ -107,12 +108,12 @@ namespace Application
 		application{&application},
 		systemFactories
 		{
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateScreenSystemFactory().systemFactory),
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateFrameRateSystemFactory().systemFactory),
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateWindowSystemFactory().systemFactory),
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateInputSystemFactory().systemFactory),
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateGameSystemFactory().systemFactory),
-			PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateRenderSystemFactory().systemFactory)
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateFrameRateSystemFactory().systemFactory), 1),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateScreenSystemFactory().systemFactory), 0),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateWindowSystemFactory().systemFactory), 2),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateInputSystemFactory().systemFactory), 3),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateRenderSystemFactory().systemFactory), 5),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateGameSystemFactory().systemFactory), 4)
 		},
 		engine{CreateEngine().engine}
 	{
@@ -128,8 +129,8 @@ namespace Application
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
 		for (auto it = systemFactories.rbegin(); it != systemFactories.rend(); ++it)
 		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Destroy '{}' system factory.", (*it)->Name());
-			it->Reset();
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Destroy '{}' system factory.", it->first->Name());
+			it->first.Reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "System factory destroyed.");
 		}
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
@@ -162,25 +163,6 @@ namespace Application
 		return false;
 	}
 
-	PonyEngine::Screen::WindowsScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
-	{
-		try
-		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
-			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
-			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
-
-			return factory;
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E(application->Logger(), e, "On creating Windows screen system factory.");
-
-			throw;
-		}
-	}
-
 	PonyEngine::Time::FrameRateSystemFactoryData WindowsEngine::CreateFrameRateSystemFactory() const
 	{
 		try
@@ -195,6 +177,25 @@ namespace Application
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On creating frame rate system factory.");
+
+			throw;
+		}
+	}
+
+	PonyEngine::Screen::WindowsScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
+	{
+		try
+		{
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
+			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
+
+			return factory;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On creating Windows screen system factory.");
 
 			throw;
 		}
@@ -247,25 +248,6 @@ namespace Application
 		}
 	}
 
-	Game::GameSystemFactoryData WindowsEngine::CreateGameSystemFactory() const
-	{
-		try
-		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
-			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams{});
-			assert(factory.systemFactory && "The game system factory is nullptr");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.", factory.systemFactory->Name());
-
-			return factory;
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E(application->Logger(), e, "On creating game system factory.");
-
-			throw;
-		}
-	}
-
 	PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData WindowsEngine::CreateRenderSystemFactory() const
 	{
 		try
@@ -286,6 +268,25 @@ namespace Application
 		}
 	}
 
+	Game::GameSystemFactoryData WindowsEngine::CreateGameSystemFactory() const
+	{
+		try
+		{
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
+			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams{});
+			assert(factory.systemFactory && "The game system factory is nullptr");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.", factory.systemFactory->Name());
+
+			return factory;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On creating game system factory.");
+
+			throw;
+		}
+	}
+
 	PonyEngine::Core::EngineData WindowsEngine::CreateEngine()
 	{
 		try
@@ -294,10 +295,10 @@ namespace Application
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
 			auto params = PonyEngine::Core::EngineParams{};
-			for (PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>& factory : systemFactories)
+			for (const auto& [factory, tickOrder] : systemFactories)
 			{
 				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());
-				params.systemFactories.AddSystemFactory(*factory);
+				params.systemFactories.AddSystemFactory(*factory, tickOrder);
 			}
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Engine params created.");
 			
