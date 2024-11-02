@@ -79,7 +79,7 @@ namespace PonyEngine::Time
 
 	void FrameRateSystem::Tick()
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Expected wait for target frame time: '{}'", std::chrono::duration<float>(previousTickTime + targetFrameTime - std::chrono::steady_clock::now()));
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for target frame time: '{}'.", targetFrameTime);
 		std::chrono::time_point<std::chrono::steady_clock> now;
 
 		do

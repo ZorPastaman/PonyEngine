@@ -56,7 +56,7 @@ export namespace PonyEngine::Time
 		static constexpr std::string_view StaticName = "PonyEngine::Time::FrameRateSystemFactory"; ///< Class name.
 
 	private:
-		FrameRateSystemParams frameRateSystemParams;
+		FrameRateSystemParams frameRateSystemParams; //< Frame rate system parameters.
 	};
 }
 
