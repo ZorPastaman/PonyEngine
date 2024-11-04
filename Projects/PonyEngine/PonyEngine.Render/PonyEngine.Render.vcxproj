@@ -35,6 +35,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj">
       <Project>{2ab77cc5-4a2f-40a2-af75-2b448bbabb89}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Utility\PonyMath.Utility.vcxproj">
+      <Project>{6d31a869-1cfe-41e8-bd5c-0384d12d04bb}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>

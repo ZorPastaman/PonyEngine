@@ -9,9 +9,9 @@
 
 export module PonyEngine.Screen:IScreenSystem;
 
-import PonyEngine.Core;
+import PonyMath.Utility;
 
-import :Resolution;
+import PonyEngine.Core;
 
 export namespace PonyEngine::Screen
 {
@@ -25,7 +25,7 @@ export namespace PonyEngine::Screen
 		/// @brief Gets a display resolution.
 		/// @return Display resolution.
 		[[nodiscard("Pure function")]]
-		virtual Resolution<unsigned int> DisplayResolution() const noexcept = 0;
+		virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept = 0;
 
 		IScreenSystem& operator =(const IScreenSystem&) = delete;
 		IScreenSystem& operator =(IScreenSystem&&) = delete;

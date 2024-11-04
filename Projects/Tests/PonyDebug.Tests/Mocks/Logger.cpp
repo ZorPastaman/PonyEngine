@@ -69,11 +69,11 @@ namespace Log
 		++version;
 	}
 
-	void Logger::AddSubLogger(PonyDebug::Log::ISubLogger& subLogger)
+	void Logger::AddSubLogger(PonyDebug::Log::ISubLogger&)
 	{
 	}
 
-	void Logger::RemoveSubLogger(PonyDebug::Log::ISubLogger& subLogger)
+	void Logger::RemoveSubLogger(PonyDebug::Log::ISubLogger&)
 	{
 	}
 

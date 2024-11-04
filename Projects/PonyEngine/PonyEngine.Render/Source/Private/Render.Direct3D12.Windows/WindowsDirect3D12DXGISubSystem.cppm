@@ -23,6 +23,8 @@ import <type_traits>;
 
 import PonyBase.StringUtility;
 
+import PonyMath.Utility;
+
 import PonyDebug.Log;
 
 import PonyEngine.Screen;
@@ -48,7 +50,7 @@ export namespace PonyEngine::Render
 		template<typename T>
 		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
 
-		void Initialize(IUnknown* device, HWND hWnd, const Screen::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
+		void Initialize(IUnknown* device, HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 
 		void Present() const;
 
@@ -135,7 +137,7 @@ namespace PonyEngine::Render
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
 	}
 
-	void WindowsDirect3D12DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const Screen::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
+	void WindowsDirect3D12DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		assert(device && "The device is nullptr.");
 

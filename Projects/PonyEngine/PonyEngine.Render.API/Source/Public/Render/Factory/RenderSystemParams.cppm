@@ -11,6 +11,9 @@ export module PonyEngine.Render.Factory:RenderSystemParams;
 
 import <optional>;
 
+import PonyMath.Core;
+import PonyMath.Utility;
+
 import PonyEngine.Core.Factory;
 import PonyEngine.Render;
 import PonyEngine.Screen;
@@ -20,6 +23,6 @@ export namespace PonyEngine::Render
 	struct RenderSystemParams : Core::SystemParams
 	{
 		CameraParams cameraParams = CameraParams{.fov = 60.f * PonyMath::Core::DegToRad<float>, .nearPlane = 0.2f, .farPlane = 1000.f}; // TODO: Use projection matrix
-		std::optional<Screen::Resolution<unsigned int>> resolution = {};
+		std::optional<PonyMath::Utility::Resolution<unsigned int>> resolution = {};
 	};
 }

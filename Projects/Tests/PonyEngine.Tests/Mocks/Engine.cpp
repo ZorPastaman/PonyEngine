@@ -46,9 +46,9 @@ namespace Core
 		return exitCode.value();
 	}
 
-	void Engine::Stop(const int exitCode) noexcept
+	void Engine::Stop(const int exitCodeToSet) noexcept
 	{
-		this->exitCode = exitCode;
+		exitCode = exitCodeToSet;
 	}
 
 	void Engine::Tick()

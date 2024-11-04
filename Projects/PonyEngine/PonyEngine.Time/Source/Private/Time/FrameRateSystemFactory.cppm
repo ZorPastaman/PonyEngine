@@ -64,7 +64,7 @@ namespace PonyEngine::Time
 {
 	Core::SystemData FrameRateSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
-		auto system = PonyBase::Memory::UniquePointer<FrameRateSystem>::Create(engine);
+		auto system = PonyBase::Memory::UniquePointer<FrameRateSystem>::Create(engine, frameRateSystemParams.targetFrameTime);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 

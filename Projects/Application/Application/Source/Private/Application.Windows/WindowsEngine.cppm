@@ -170,6 +170,9 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create frame rate system factory.");
 			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams{});
 			assert(factory.systemFactory && "The frame rate system factory is nullptr.");
+
+			factory.systemFactory->SystemParams().targetFrameTime = PonyEngine::Time::ConvertFrameRateFrameTime(60.f);
+
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", factory.systemFactory->Name());
 
 			return factory;
@@ -317,9 +320,5 @@ namespace Application
 
 	void WindowsEngine::SetupFrameRateSystem() const noexcept
 	{
-		const auto frameRateSystem = engine->SystemManager().FindSystem<PonyEngine::Time::IFrameRateSystem>();
-		assert(frameRateSystem && "The frame rate system is nullptr.");
-
-		frameRateSystem->TargetFrameTime(PonyEngine::Time::ConvertFrameRateFrameTime(60.f));
 	}
 }

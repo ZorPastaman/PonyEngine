@@ -85,6 +85,8 @@
     <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input\KeyboardKeyCodeTests.cpp" />
     <ClCompile Include="Input\KeyboardMessageTests.cpp" />
+    <ClCompile Include="Screen.Windows\WindowsScreenSystemFactoryTests.cpp" />
+    <ClCompile Include="Screen.Windows\WindowsScreenSystemTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemTests.cpp" />
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp" />
@@ -100,6 +102,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Utility\PonyBase.Utility.vcxproj">
       <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Utility\PonyMath.Utility.vcxproj">
+      <Project>{6d31a869-1cfe-41e8-bd5c-0384d12d04bb}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
@@ -119,6 +124,12 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
       <Project>{7f22adbe-2c5a-44be-b885-c2d041337190}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
+      <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen\PonyEngine.Screen.vcxproj">
+      <Project>{d0fc9462-753d-47ec-8897-74d7f15f7a2c}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Time.API\PonyEngine.Time.API.vcxproj">
       <Project>{8b3f2887-0863-444c-884e-dfe775f31ba0}</Project>
     </ProjectReference>
@@ -130,9 +141,6 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window\PonyEngine.Window.vcxproj">
       <Project>{6f7c3d39-fd6c-447b-9191-a401efdffc08}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
-      <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

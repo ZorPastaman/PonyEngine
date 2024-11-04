@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen:Resolution;
+export module PonyMath.Utility:Resolution;
 
 import <concepts>;
 import <format>;
@@ -16,18 +16,28 @@ import <string>;
 
 import PonyMath.Core;
 
-export namespace PonyEngine::Screen
+export namespace PonyMath::Utility
 {
+	/// @brief Resolution.
+	/// @tparam T Value type.
 	template<std::unsigned_integral T>
-	class Resolution final // TODO: Add tests and docs to the Screen projects
+	class Resolution final
 	{
 	public:
+		using ValueType = T; ///< Value type.
+
+		/// @brief Creates a resolution 0x0.
 		[[nodiscard("Pure constructor")]]
 		constexpr Resolution() noexcept = default;
+		/// @brief Creates a resolution @p width x @p height.
+		/// @param width Width.
+		/// @param height Height.
 		[[nodiscard("Pure constructor")]]
 		constexpr Resolution(T width, T height) noexcept;
+		/// @brief Creates a resolution vector.X() x vector.Y().
+		/// @param vector Vector.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Resolution(const PonyMath::Core::Vector2<T>& vector) noexcept;
+		explicit constexpr Resolution(const Core::Vector2<T>& vector) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Resolution(const Resolution& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -35,24 +45,40 @@ export namespace PonyEngine::Screen
 
 		constexpr ~Resolution() noexcept = default;
 
+		/// @brief Gets the width.
+		/// @return Width.
 		[[nodiscard("Pure function")]]
 		constexpr T& Width() noexcept;
+		/// @brief Gets the width.
+		/// @return Width.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Width() const noexcept;
+		/// @brief Gets the height.
+		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr T& Height() noexcept;
+		/// @brief Gets the height.
+		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Height() const noexcept;
 
+		/// @brief Computes an aspect ratio (width / height).
+		/// @tparam U Aspect ratio type.
+		/// @return Aspect ratio.
 		template<std::floating_point U> [[nodiscard("Pure function")]]
 		constexpr U Aspect() const noexcept;
 
+		/// @brief Creates a string representing a state of the resolution.
+		/// @return String representing a state of the resolution.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts to the other resolution type.
+		/// @tparam U Target type.
 		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Resolution<U>() const noexcept;
 
+		/// @brief Converts to a vector. Width -> X, height -> Y.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator PonyMath::Core::Vector2<T>() const noexcept;
 
@@ -60,18 +86,23 @@ export namespace PonyEngine::Screen
 		constexpr Resolution& operator =(Resolution&& other) noexcept = default;
 
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const Resolution&) const noexcept = default;
+		constexpr bool operator ==(const Resolution& other) const noexcept = default;
 
 	private:
-		PonyMath::Core::Vector2<T> resolution;
+		Core::Vector2<T> resolution; ///< Resolution. X - width, Y - height.
 	};
 
+	/// @brief Puts @p resolution.ToString() into the @p stream.
+	/// @tparam T Value type.
+	/// @param stream Stream.
+	/// @param resolution Resolution.
+	/// @return @p stream.
 	template<std::unsigned_integral T>
 	std::ostream& operator <<(std::ostream& stream, const Resolution<T>& resolution);
 
 }
 
-namespace PonyEngine::Screen
+namespace PonyMath::Utility
 {
 	template<std::unsigned_integral T>
 	constexpr Resolution<T>::Resolution(const T width, const T height) noexcept :
@@ -80,7 +111,7 @@ namespace PonyEngine::Screen
 	}
 
 	template<std::unsigned_integral T>
-	constexpr Resolution<T>::Resolution(const PonyMath::Core::Vector2<T>& vector) noexcept :
+	constexpr Resolution<T>::Resolution(const Core::Vector2<T>& vector) noexcept :
 		Resolution(vector.X(), vector.Y())
 	{
 	}

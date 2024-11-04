@@ -21,9 +21,11 @@ import <span>;
 import <stdexcept>;
 import <type_traits>;
 
+import PonyBase.StringUtility;
+
 import PonyMath.Geometry;
 import PonyMath.Core;
-import PonyBase.StringUtility;
+import PonyMath.Utility;
 
 import PonyDebug.Log;
 
@@ -64,7 +66,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
+		void Initialize(const Direct3D12CameraParams& cameraParams, const PonyMath::Utility::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
@@ -170,7 +172,7 @@ namespace PonyEngine::Render
 		return graphicsPipeline->GetCommandQueue();
 	}
 
-	void Direct3D12SubSystem::Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
+	void Direct3D12SubSystem::Initialize(const Direct3D12CameraParams& cameraParams, const PonyMath::Utility::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) const
 	{
 		graphicsPipeline->Initialize(cameraParams, resolution, buffers, rtvFormat);
 	}

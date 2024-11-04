@@ -7,17 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemFactoryData;
+export module PonyMath.Utility;
 
-import PonyBase.Memory;
-
-import :IWindowsScreenSystemFactory;
-
-export namespace PonyEngine::Screen
-{
-	/// @brief Windows screen system factory data.
-	struct WindowsScreenSystemFactoryData final
-	{
-		PonyBase::Memory::UniquePointer<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
-	};
-}
+export import :Resolution;

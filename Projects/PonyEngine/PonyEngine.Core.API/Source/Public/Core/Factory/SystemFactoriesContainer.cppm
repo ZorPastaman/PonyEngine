@@ -39,7 +39,7 @@ export namespace PonyEngine::Core
 		~SystemFactoriesContainer() noexcept = default;
 
 		/// @brief Adds the @p systemFactory.
-		/// @param systemFactory System factory to add. It must be unique in one @p EngineParams. Its lifetime must exceed the engine lifetime.
+		/// @param systemFactory System factory to add. It must be unique in one @p EngineParams.
 		/// @param tickOrder Tick order. Affects tickable systems only.
 		void AddSystemFactory(ISystemFactory& systemFactory, int tickOrder = 0);
 

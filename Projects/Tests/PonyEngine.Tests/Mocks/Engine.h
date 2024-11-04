@@ -45,7 +45,7 @@ namespace Core
 		virtual bool IsRunning() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual int ExitCode() const noexcept override;
-		virtual void Stop(int exitCode) noexcept override;
+		virtual void Stop(int exitCodeToSet) noexcept override;
 
 		virtual void Tick() override;
 
