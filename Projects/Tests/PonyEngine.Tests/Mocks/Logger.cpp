@@ -11,19 +11,19 @@
 
 namespace Core
 {
-	void Logger::Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept
+	void Logger::Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept
 	{
 	}
 
-	void Logger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept
+	void Logger::LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept
 	{
 	}
 
-	void Logger::AddSubLogger(PonyDebug::Log::ISubLogger& subLogger)
+	void Logger::AddSubLogger(PonyDebug::Log::ISubLogger&)
 	{
 	}
 
-	void Logger::RemoveSubLogger(PonyDebug::Log::ISubLogger& subLogger)
+	void Logger::RemoveSubLogger(PonyDebug::Log::ISubLogger&)
 	{
 	}
 

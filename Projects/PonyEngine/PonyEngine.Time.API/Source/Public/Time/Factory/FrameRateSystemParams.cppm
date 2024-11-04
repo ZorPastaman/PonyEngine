@@ -16,5 +16,6 @@ export namespace PonyEngine::Time
 	/// @brief Frame rate system parameters.
 	struct FrameRateSystemParams final : Core::SystemParams
 	{
+		float targetFrameTime; ///< Target frame time.
 	};
 }

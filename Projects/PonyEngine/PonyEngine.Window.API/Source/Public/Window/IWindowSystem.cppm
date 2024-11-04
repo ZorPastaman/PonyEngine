@@ -12,9 +12,9 @@ export module PonyEngine.Window:IWindowSystem;
 import <string_view>;
 
 import PonyMath.Core;
+import PonyMath.Utility;
 
 import PonyEngine.Core;
-import PonyEngine.Screen;
 
 export namespace PonyEngine::Window
 {
@@ -61,7 +61,7 @@ export namespace PonyEngine::Window
 		/// @brief Gets the window resolution.
 		/// @return Window resolution.
 		[[nodiscard("Pure function")]]
-		virtual Screen::Resolution<unsigned int> Resolution() const noexcept = 0;
+		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
 
 		IWindowSystem& operator =(const IWindowSystem&) = delete;
 		IWindowSystem& operator =(IWindowSystem&&) = delete;

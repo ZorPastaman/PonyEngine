@@ -26,6 +26,7 @@ import :WindowsScreenSystem;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Windows screen system factory.
 	class WindowsScreenSystemFactory final : public IWindowsScreenSystemFactory
 	{
 	public:
@@ -56,15 +57,15 @@ export namespace PonyEngine::Screen
 		static constexpr std::string_view StaticName = "PonyEngine::Screen::WindowsScreenSystemFactory"; ///< Class name.
 
 	private:
-		WindowsScreenSystemParams systemParams;
+		WindowsScreenSystemParams systemParams; ///< Screen system parameters.
 	};
 }
 
 namespace PonyEngine::Screen
 {
-	Core::SystemData WindowsScreenSystemFactory::Create(Core::IEngineContext&, const Core::EngineSystemParams&)
+	Core::SystemData WindowsScreenSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
-		auto system = PonyBase::Memory::UniquePointer<WindowsScreenSystem>::Create();
+		auto system = PonyBase::Memory::UniquePointer<WindowsScreenSystem>::Create(engine);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IScreenSystem, IWindowsScreenSystem>(*system);
 

@@ -27,6 +27,7 @@ import <vector>;
 import PonyBase.StringUtility;
 
 import PonyMath.Core;
+import PonyMath.Utility;
 
 import PonyDebug.Log;
 
@@ -82,7 +83,7 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Core::Vector2<int> Position() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual Screen::Resolution<unsigned int> Resolution() const noexcept override;
+		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
@@ -243,12 +244,12 @@ namespace PonyEngine::Window
 		return PonyMath::Core::Vector2<int>(static_cast<int>(rect.left), static_cast<int>(rect.right));
 	}
 
-	Screen::Resolution<unsigned int> WindowsWindowSystem::Resolution() const noexcept
+	PonyMath::Utility::Resolution<unsigned int> WindowsWindowSystem::Resolution() const noexcept
 	{
 		RECT rect;
 		GetClientRect(hWnd, &rect);
 
-		return Screen::Resolution<unsigned int>(static_cast<unsigned int>(rect.right - rect.left), static_cast<unsigned int>(rect.bottom - rect.top));
+		return PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(rect.right - rect.left), static_cast<unsigned int>(rect.bottom - rect.top));
 	}
 
 	HWND WindowsWindowSystem::WindowHandle() const noexcept
@@ -358,7 +359,7 @@ namespace PonyEngine::Window
 			throw std::logic_error("Failed to find Screen system.");
 		}
 
-		const Screen::Resolution<unsigned int> resolution = screenSystem->DisplayResolution();
+		const PonyMath::Utility::Resolution<unsigned int> resolution = screenSystem->DisplayResolution();
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
 			className, style, extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), resolution.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
 
@@ -374,7 +375,7 @@ namespace PonyEngine::Window
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
 		const auto position = PonyMath::Core::Vector2<int>(rect.left, rect.top);
-		const auto size = PonyEngine::Screen::Resolution<unsigned int>(rect.right - rect.left, rect.bottom - rect.top);
+		const auto size = PonyMath::Utility::Resolution<unsigned int>(rect.right - rect.left, rect.bottom - rect.top);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'.", position.ToString(), size.ToString());
 
 		const HWND windowHandle = CreateWindowExW(

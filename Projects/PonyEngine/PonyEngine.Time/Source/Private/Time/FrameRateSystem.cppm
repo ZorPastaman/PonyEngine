@@ -29,8 +29,9 @@ export namespace PonyEngine::Time
 	public:
 		/// @brief Creates a @p FrameRateSystem.
 		/// @param engine Engine context.
+		/// @param targetFrameTime Target frame time.
 		[[nodiscard("Pure constructor")]]
-		explicit FrameRateSystem(Core::IEngineContext& engine) noexcept;
+		FrameRateSystem(Core::IEngineContext& engine, float targetFrameTime) noexcept;
 		FrameRateSystem(const FrameRateSystem&) = delete;
 		FrameRateSystem(FrameRateSystem&&) = delete;
 
@@ -63,8 +64,8 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
-	FrameRateSystem::FrameRateSystem(Core::IEngineContext& engine) noexcept :
-		targetFrameTime(0.f),
+	FrameRateSystem::FrameRateSystem(Core::IEngineContext& engine, const float targetFrameTime) noexcept :
+		targetFrameTime(targetFrameTime),
 		engine{&engine}
 	{
 	}

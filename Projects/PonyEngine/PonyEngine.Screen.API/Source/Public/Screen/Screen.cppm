@@ -10,4 +10,3 @@
 export module PonyEngine.Screen;
 
 export import :IScreenSystem;
-export import :Resolution;

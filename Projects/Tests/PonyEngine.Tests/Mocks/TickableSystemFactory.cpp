@@ -20,7 +20,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Core
 {
-	PonyEngine::Core::SystemData TickableSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params)
+	PonyEngine::Core::SystemData TickableSystemFactory::Create(PonyEngine::Core::IEngineContext&, const PonyEngine::Core::EngineSystemParams&)
 	{
 		Assert::IsNull(system);
 

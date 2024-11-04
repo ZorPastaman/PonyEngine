@@ -13,6 +13,7 @@ import PonyEngine.Core.Factory;
 
 export namespace PonyEngine::Screen
 {
+	/// @brief Screen system parameters.
 	struct ScreenSystemParams : Core::SystemParams
 	{
 	};

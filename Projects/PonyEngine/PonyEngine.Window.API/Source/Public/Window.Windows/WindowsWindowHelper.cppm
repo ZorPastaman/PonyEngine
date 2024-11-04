@@ -15,8 +15,6 @@ export module PonyEngine.Window.Windows:WindowsWindowHelper;
 
 import PonyMath.Core;
 
-import PonyEngine.Screen;
-
 export namespace PonyEngine::Window // TODO: Add tests and docs. And move to PonyEngine.Screen
 {
 	constexpr UINT DefaultClassStyle = CS_OWNDC;

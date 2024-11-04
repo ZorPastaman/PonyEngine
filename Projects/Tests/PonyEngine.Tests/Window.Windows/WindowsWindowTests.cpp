@@ -23,6 +23,7 @@
 #include "Mocks/Logger.h"
 
 import PonyMath.Core;
+import PonyMath.Utility;
 
 import PonyDebug.Log;
 
@@ -60,9 +61,9 @@ namespace Window
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Screen::Resolution<unsigned int> DisplayResolution() const noexcept override
+			virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept override
 			{
-				return PonyEngine::Screen::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
+				return PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
 			}
 
 			[[nodiscard("Pure function")]]

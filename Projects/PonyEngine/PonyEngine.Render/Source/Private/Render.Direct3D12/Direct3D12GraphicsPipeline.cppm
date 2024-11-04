@@ -26,6 +26,7 @@ import PonyBase.StringUtility;
 
 import PonyMath.Core;
 import PonyMath.Geometry;
+import PonyMath.Utility;
 
 import PonyDebug.Log;
 
@@ -68,7 +69,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		void Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
+		void Initialize(const Direct3D12CameraParams& cameraParams, const PonyMath::Utility::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
@@ -224,7 +225,7 @@ namespace PonyEngine::Render
 		return commandQueue.Get();
 	}
 
-	void Direct3D12GraphicsPipeline::Initialize(const Direct3D12CameraParams& cameraParams, const Screen::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
+	void Direct3D12GraphicsPipeline::Initialize(const Direct3D12CameraParams& cameraParams, const PonyMath::Utility::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 camera. Resolution: '{}'.", resolution.ToString());
 		camera.reset(new Direct3D12Camera(cameraParams, resolution));

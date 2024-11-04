@@ -29,6 +29,7 @@ import PonyBase.StringUtility;
 
 import PonyMath.Core;
 import PonyMath.Geometry;
+import PonyMath.Utility;
 
 import PonyDebug.Log;
 
@@ -100,7 +101,7 @@ export namespace PonyEngine::Render
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		Direct3D12CameraParams cameraParams;
-		std::optional<Screen::Resolution<UINT>> resolution;
+		std::optional<PonyMath::Utility::Resolution<UINT>> resolution;
 
 		Core::IEngineContext* engine; ///< Engine.
 
@@ -113,7 +114,7 @@ namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const WindowsDirect3D12RenderSystemParams& params) :
 		cameraParams{.fov = static_cast<FLOAT>(params.cameraParams.fov), .nearPlane = static_cast<FLOAT>(params.cameraParams.nearPlane), .farPlane = static_cast<FLOAT>(params.cameraParams.farPlane)},
-		resolution(params.resolution.has_value() ? std::optional<Screen::Resolution<UINT>>(static_cast<Screen::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
+		resolution(params.resolution.has_value() ? std::optional<PonyMath::Utility::Resolution<UINT>>(static_cast<PonyMath::Utility::Resolution<UINT>>(params.resolution.value())) : std::nullopt),
 		engine{&engine},
 		dxgiSubSystem(CreateDXGISubSystem()),
 		direct3D12SubSystem(CreateDirect3D12SubSystem(params.featureLevel, params.commandQueuePriority, params.fenceTimeout))
@@ -133,7 +134,7 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Begin()
 	{
-		Screen::Resolution<UINT> renderResolution;
+		PonyMath::Utility::Resolution<UINT> renderResolution;
 
 		if (const auto windowSystem = engine->SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
@@ -146,7 +147,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderResolution = static_cast<Screen::Resolution<UINT>>(windowSystem->Resolution());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(windowSystem->Resolution());
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
 
