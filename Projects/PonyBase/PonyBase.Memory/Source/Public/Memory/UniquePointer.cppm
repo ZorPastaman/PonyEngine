@@ -77,7 +77,7 @@ export namespace PonyBase::Memory
 	/// @brief Unique pointer.
 	/// @tparam T Object type.
 	template<typename T>
-	class UniquePointer final // TODO: Try to add constexpr. Maybe other classes need it too.
+	class UniquePointer final
 	{
 	public:
 		/// @brief Creates an empty @p UniquePointer.

@@ -9,7 +9,9 @@
 
 #include "CppUnitTest.h"
 
+#include <cstdint>
 #include <string_view>
+#include <utility>
 #include <variant>
 
 #include "Mocks/Application.h"
@@ -44,6 +46,12 @@ namespace Time
 			const auto systemParams = PonyEngine::Core::SystemParams();
 			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::IsNotNull(std::get<1>(inputSystem.system).Get());
+
+			auto it = inputSystem.publicInterfaces.Begin();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(inputSystem.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
+
+			++it;
+			Assert::IsTrue(it == inputSystem.publicInterfaces.End());
 		}
 
 		TEST_METHOD(GetSystemNameTest)

@@ -160,5 +160,42 @@ namespace Utility
 			Assert::IsFalse(resolution == otherResolution);
 			Assert::IsTrue(resolution != otherResolution);
 		}
+
+		static constexpr PonyMath::Utility::Resolution<unsigned int> GetConstexpr()
+		{
+			auto resolution = PonyMath::Utility::Resolution<unsigned int>(1024u, 768u);
+			auto movedResolution = std::move(resolution);
+
+			[[maybe_unused]] auto width = movedResolution.Width();
+			[[maybe_unused]] auto height = movedResolution.Height();
+
+			auto copiedResolution = PonyMath::Utility::Resolution<unsigned int>();
+			copiedResolution = movedResolution;
+			auto movedCopy = PonyMath::Utility::Resolution<unsigned int>();
+			movedCopy = std::move(copiedResolution);
+
+			return movedResolution;
+		}
+
+		TEST_METHOD(ConstexprTest)
+		{
+			[[maybe_unused]] constexpr auto defaultResolution = PonyMath::Utility::Resolution<unsigned int>();
+			[[maybe_unused]] constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(1024u, 768u);
+			[[maybe_unused]] constexpr auto vectorResolution = PonyMath::Utility::Resolution<unsigned int>(PonyMath::Core::Vector2<unsigned int>(800u, 600u));
+			[[maybe_unused]] constexpr auto copiedResolution = resolution;
+			[[maybe_unused]] constexpr auto movedResolution = GetConstexpr();
+
+			[[maybe_unused]] constexpr auto width = resolution.Width();
+			[[maybe_unused]] constexpr auto height = resolution.Height();
+
+			[[maybe_unused]] constexpr auto aspect = resolution.Aspect<float>();
+
+			[[maybe_unused]] constexpr auto castResolution = static_cast<PonyMath::Utility::Resolution<unsigned long long>>(resolution);
+
+			[[maybe_unused]] constexpr auto resolutionVector = static_cast<PonyMath::Core::Vector2<unsigned int>>(resolution);
+
+			[[maybe_unused]] constexpr bool equal = resolution == copiedResolution;
+			[[maybe_unused]] constexpr bool notEqual = resolution != copiedResolution;
+		}
 	};
 }
