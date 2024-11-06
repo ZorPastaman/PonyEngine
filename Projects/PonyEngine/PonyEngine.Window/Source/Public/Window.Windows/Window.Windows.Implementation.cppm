@@ -19,8 +19,6 @@ import <utility>;
 
 import PonyBase.Memory;
 
-import PonyDebug.Log;
-
 import PonyEngine.Core;
 
 import :WindowsWindowSystemFactory;

@@ -13,11 +13,14 @@ import <string>;
 
 import PonyEngine.Core.Factory;
 
+import :WindowRect;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Window system parameters.
 	struct WindowSystemParams : Core::SystemParams
 	{
+		WindowRect rect; ///< Window rect.
 		std::wstring title = L"Pony Engine Window"; ///< Window title.
 	};
 }

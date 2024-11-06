@@ -24,7 +24,7 @@ export namespace PonyEngine::Window
 		HICON icon = nullptr; ///< Class icon. The default icon is used if it's nullptr.
 		HICON smallIcon = nullptr; ///< Class small icon. The default icon is used if it's nullptr.
 		HCURSOR cursor = nullptr; ///< Class cursor. The default cursor is used if it's nullptr.
-		UINT style = UINT{0}; ///< Class style;
+		UINT style = CS_OWNDC; ///< Class style;
 	};
 }
 

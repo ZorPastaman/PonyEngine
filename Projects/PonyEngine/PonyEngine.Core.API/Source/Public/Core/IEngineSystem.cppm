@@ -22,7 +22,7 @@ export namespace PonyEngine::Core
 
 		/// @brief Begins the system.
 		/// @details The system takes its dependencies in this function.
-		virtual void Begin() = 0;
+		virtual void Begin() = 0; // TODO: Try to remove begin and end
 		/// @brief Ends the system.
 		/// @details The function is called before a destruction.
 		virtual void End() = 0;
