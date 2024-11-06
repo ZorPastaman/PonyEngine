@@ -18,10 +18,12 @@ module;
 export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
 
 import <algorithm>;
+import <cstdint>;
 import <exception>;
 import <stdexcept>;
 import <string>;
 import <string_view>;
+import <utility>;
 import <vector>;
 
 import PonyBase.StringUtility;
@@ -63,9 +65,6 @@ export namespace PonyEngine::Window
 		virtual void End() override;
 
 		virtual void Tick() override;
-
-		[[nodiscard("Pure function")]]
-		virtual bool IsWindowAlive() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::wstring_view MainTitle() const noexcept override;
@@ -117,12 +116,21 @@ export namespace PonyEngine::Window
 		/// @return Created window.
 		[[nodiscard("Pure function")]]
 		HWND CreateControlledWindow();
+		/// @brief Gets a target window position.
+		/// @return Target window position.
+		[[nodiscard("Pure function")]]
+		PonyMath::Core::Vector2<int> GetTargetPosition() const noexcept;
+		/// @brief Gets a target window resolution.
+		/// @return Target window resolution.
+		[[nodiscard("Pure function")]]
+		PonyMath::Utility::Resolution<unsigned int> GetTargetResolution() const noexcept;
 
 		HINSTANCE hInstance; ///< Instance.
 		ATOM className; ///< Class name.
-		DWORD style; ///< Window style.
-		DWORD extendedStyle; ///< Extended window style.
+
+		WindowsWindowStyle style; ///< Window style.
 		int cmdShow; ///< Window cmdShow.
+		WindowRect windowRect; ///< WindowRect.
 
 		std::wstring mainTitle; ///< Window main title cache.
 		std::wstring secondaryTitle; ///< Window title text cache.
@@ -140,12 +148,12 @@ namespace PonyEngine::Window
 	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const HINSTANCE hInstance, const ATOM className, const WindowsWindowSystemParams& windowParams) :
 		hInstance{hInstance},
 		className{className},
-		style{windowParams.style},
-		extendedStyle{windowParams.extendedStyle},
+		style{windowParams.windowsWindowStyle},
 		cmdShow{windowParams.cmdShow},
+		windowRect(windowParams.rect),
 		mainTitle(windowParams.title),
 		engine{&engine},
-		hWnd{}
+		hWnd{nullptr}
 	{
 	}
 
@@ -190,11 +198,6 @@ namespace PonyEngine::Window
 		}
 	}
 
-	bool WindowsWindowSystem::IsWindowAlive() const noexcept
-	{
-		return IsWindow(hWnd);
-	}
-
 	std::wstring_view WindowsWindowSystem::MainTitle() const noexcept
 	{
 		return mainTitle;
@@ -226,13 +229,15 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::ShowWindow() noexcept
 	{
-		::ShowWindow(hWnd, SW_SHOW);
+		cmdShow = SW_SHOW;
+		::ShowWindow(hWnd, cmdShow);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Show window.");
 	}
 
 	void WindowsWindowSystem::HideWindow() noexcept
 	{
-		::ShowWindow(hWnd, SW_HIDE);
+		cmdShow = SW_HIDE;
+		::ShowWindow(hWnd, cmdShow);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Hide window.");
 	}
 
@@ -353,38 +358,32 @@ namespace PonyEngine::Window
 
 	HWND WindowsWindowSystem::CreateControlledWindow()
 	{
-		const auto screenSystem = engine->SystemManager().FindSystem<Screen::IScreenSystem>();
-		if (!screenSystem)
-		{
-			throw std::logic_error("Failed to find Screen system.");
-		}
-
-		const PonyMath::Utility::Resolution<unsigned int> resolution = screenSystem->DisplayResolution();
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
-			className, style, extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), resolution.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
-
+		PonyMath::Core::Vector2<int> position = GetTargetPosition();
+		PonyMath::Utility::Resolution<unsigned int> resolution = GetTargetResolution();
 		auto rect = RECT
 		{
-			.left = 0L,
-			.top = 0L,
-			.right = static_cast<LONG>(resolution.Width()),
-			.bottom = static_cast<LONG>(resolution.Height())
+			.left = static_cast<LONG>(position.X()),
+			.top = static_cast<LONG>(position.Y()),
+			.right = static_cast<LONG>(position.X()) + static_cast<LONG>(resolution.Width()),
+			.bottom = static_cast<LONG>(position.Y()) + static_cast<LONG>(resolution.Height())
 		};
-		if (!AdjustWindowRectEx(&rect, style, false, extendedStyle))
+		if (!AdjustWindowRectEx(&rect, style.style, false, style.extendedStyle))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));
 		}
-		const auto position = PonyMath::Core::Vector2<int>(rect.left, rect.top);
-		const auto size = PonyMath::Utility::Resolution<unsigned int>(rect.right - rect.left, rect.bottom - rect.top);
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Actual window position: '{}'. Actual window size: '{}'.", position.ToString(), size.ToString());
+		position = PonyMath::Core::Vector2<int>(rect.left, rect.top);
+		resolution = PonyMath::Utility::Resolution<unsigned int>(rect.right - rect.left, rect.bottom - rect.top);
+
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
+			className, style.style, style.extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
 
 		const HWND windowHandle = CreateWindowExW(
-			extendedStyle,
+			style.extendedStyle,
 			reinterpret_cast<LPCWSTR>(className),
 			mainTitle.c_str(),
-			style,
+			style.style,
 			position.X(), position.Y(),
-			size.Width(), size.Height(),
+			resolution.Width(), resolution.Height(),
 			nullptr,
 			nullptr,
 			hInstance,
@@ -397,9 +396,42 @@ namespace PonyEngine::Window
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Register window proc. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
-		RegisterWindowProc(windowHandle, this);
+		try
+		{
+			RegisterWindowProc(windowHandle, this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(engine->Logger(), e, "On registering window proc.");
+			DestroyWindow(windowHandle);
+
+			throw;
+		}
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Window proc registered.");
 
 		return windowHandle;
+	}
+
+	PonyMath::Core::Vector2<int> WindowsWindowSystem::GetTargetPosition() const noexcept
+	{
+		return windowRect.fullscreen
+			? PonyMath::Core::Vector2<int>(0, 0)
+			: windowRect.position;
+	}
+
+	PonyMath::Utility::Resolution<unsigned int> WindowsWindowSystem::GetTargetResolution() const noexcept
+	{
+		if (!windowRect.fullscreen)
+		{
+			return windowRect.resolution;
+		}
+
+		const auto screenSystem = engine->SystemManager().FindSystem<Screen::IScreenSystem>();
+		if (!screenSystem)
+		{
+			throw std::runtime_error("Failed to find screen system.");
+		}
+
+		return screenSystem->DisplayResolution();
 	}
 }

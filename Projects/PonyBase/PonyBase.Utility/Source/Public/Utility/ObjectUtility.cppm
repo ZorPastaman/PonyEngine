@@ -126,7 +126,7 @@ namespace PonyBase::Utility
 		AddInterfaces<Source, Targets...>(object);
 	}
 
-	ObjectInterfaces::Iterator ObjectInterfaces::Begin() noexcept
+	ObjectInterfaces::Iterator ObjectInterfaces::Begin() noexcept // TODO: Try to use span
 	{
 		return interfaces.begin();
 	}

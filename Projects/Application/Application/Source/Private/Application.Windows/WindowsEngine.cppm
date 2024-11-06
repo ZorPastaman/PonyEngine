@@ -92,9 +92,6 @@ export namespace Application
 		[[nodiscard("Pure function")]]
 		PonyEngine::Core::EngineData CreateEngine();
 
-		/// @brief Sets up the frame rate system.
-		void SetupFrameRateSystem() const noexcept;
-
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
 
 		std::array<std::pair<PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>, int>, 6> systemFactories; ///< System factories.
@@ -117,7 +114,6 @@ namespace Application
 		},
 		engine{CreateEngine().engine}
 	{
-		SetupFrameRateSystem();
 	}
 
 	WindowsEngine::~WindowsEngine() noexcept
@@ -209,16 +205,13 @@ namespace Application
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
-			const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game", .style = PonyEngine::Window::DefaultClassStyle};
+			const auto windowClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
 			const auto windowSystemFactoryParams = PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = windowClassParams };
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, windowSystemFactoryParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 
 			PonyEngine::Window::WindowsWindowSystemParams& windowParams = factory.systemFactory->SystemParams();
-			windowParams.title = L"Pony Engine Game";
-			windowParams.style = PonyEngine::Window::DefaultBorderlessWindowedStyle;
-			windowParams.extendedStyle = PonyEngine::Window::DefaultBorderlessWindowedExtendedStyle | WS_EX_APPWINDOW;
-			windowParams.cmdShow = SW_NORMAL;
+			windowParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
 
@@ -316,9 +309,5 @@ namespace Application
 
 			throw;
 		}
-	}
-
-	void WindowsEngine::SetupFrameRateSystem() const noexcept
-	{
 	}
 }

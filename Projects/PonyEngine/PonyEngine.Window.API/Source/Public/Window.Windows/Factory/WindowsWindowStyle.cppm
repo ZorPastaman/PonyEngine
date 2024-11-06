@@ -11,18 +11,13 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemParams;
-
-import PonyEngine.Window.Factory;
-
-import :WindowsWindowStyle;
+export module PonyEngine.Window.Windows.Factory:WindowsWindowStyle;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Windows window parameters.
-	struct WindowsWindowSystemParams final : WindowSystemParams
+	struct WindowsWindowStyle final
 	{
-		WindowsWindowStyle windowsWindowStyle; ///< Windows window style.
-		int cmdShow = SW_NORMAL; ///< Window cmdShow.
+		DWORD style = WS_POPUP; ///< Window style.
+		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
 	};
 }

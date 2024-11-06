@@ -25,11 +25,6 @@ export namespace PonyEngine::Window
 		IWindowSystem(const IWindowSystem&) = delete;
 		IWindowSystem(IWindowSystem&&) = delete;
 
-		/// @brief Checks if the system window is alive.
-		/// @return @a True if it's alive; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsWindowAlive() const noexcept = 0;
-
 		/// @brief Gets the window title.
 		/// @return Window title.
 		[[nodiscard("Pure function")]]

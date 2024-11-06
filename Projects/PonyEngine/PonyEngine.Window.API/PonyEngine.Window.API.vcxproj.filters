@@ -45,9 +45,6 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowHelper.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Window\Factory\Window.Factory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -55,6 +52,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Factory\WindowSystemParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window\Factory\WindowRect.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowStyle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

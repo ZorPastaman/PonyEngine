@@ -20,14 +20,15 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsWindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsClassParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\Window.Windows.Factory.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowStyle.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowHelper.cppm" />
     <ClCompile Include="Source\Public\Window\Factory\IWindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\Factory\Window.Factory.cppm" />
+    <ClCompile Include="Source\Public\Window\Factory\WindowRect.cppm" />
     <ClCompile Include="Source\Public\Window\Factory\WindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window\IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
