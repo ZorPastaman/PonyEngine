@@ -74,8 +74,8 @@ export namespace PonyEngine::Core
 		/// @brief After tick procedure.
 		void EndTick() noexcept;
 
-		/// @brief Ticks the system manager.
-		void TickSystemManager();
+		/// @brief Ticks systems.
+		void TickSystems();
 
 		/// @brief Creates an engine logger.
 		/// @return Created engine logger.
@@ -83,10 +83,9 @@ export namespace PonyEngine::Core
 		std::unique_ptr<EngineLogger> CreateEngineLogger();
 
 		/// @brief Creates a system manager.
-		/// @param systemFactories Engine parameters.
 		/// @return Created system manager.
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<Core::SystemManager> CreateSystemManager(const SystemFactoriesContainer& systemFactories);
+		std::unique_ptr<Core::SystemManager> CreateSystemManager();
 
 		std::size_t frameCount; ///< Frame count.
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
@@ -108,17 +107,30 @@ namespace PonyEngine::Core
 		isTicking{false},
 		application{&application},
 		engineLogger{CreateEngineLogger()},
-		systemManager{CreateSystemManager(systemFactories)}
+		systemManager{CreateSystemManager()}
 	{
 		try
 		{
-			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Begin system manager.");
-			systemManager->Begin();
-			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager begun.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create systems.");
+			systemManager->CreateSystems(systemFactories);
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Systems created.");
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(Logger(), e, "On beginning system manager.");
+			PONY_LOG_E(Logger(), e, "On creating systems.");
+
+			throw;
+		}
+
+		try
+		{
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Begin systems.");
+			systemManager->BeginSystems();
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Systems begun.");
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(Logger(), e, "On beginning systems.");
 
 			throw;
 		}
@@ -126,9 +138,13 @@ namespace PonyEngine::Core
 
 	Engine::~Engine() noexcept
 	{
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "End system manager.");
-		systemManager->End();
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager ended.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "End systems.");
+		systemManager->EndSystems();
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Systems ended.");
+
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy systems.");
+		systemManager->DestroySystems();
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Systems destroyed.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy system manager.");
 		systemManager.reset();
@@ -185,7 +201,7 @@ namespace PonyEngine::Core
 		BeginTick();
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Tick system manager.");
-		TickSystemManager();
+		TickSystems();
 
 		EndTick();
 	}
@@ -216,11 +232,11 @@ namespace PonyEngine::Core
 		++frameCount;
 	}
 
-	void Engine::TickSystemManager()
+	void Engine::TickSystems()
 	{
 		try
 		{
-			systemManager->Tick();
+			systemManager->TickSystems();
 		}
 		catch (const std::exception& e)
 		{
@@ -249,12 +265,12 @@ namespace PonyEngine::Core
 		}
 	}
 
-	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager(const SystemFactoriesContainer& systemFactories)
+	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager()
 	{
 		try
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create system manager.");
-			const auto manager = new Core::SystemManager(systemFactories, *this);
+			const auto manager = new Core::SystemManager(*this);
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager created.");
 
 			return std::unique_ptr<Core::SystemManager>(manager);

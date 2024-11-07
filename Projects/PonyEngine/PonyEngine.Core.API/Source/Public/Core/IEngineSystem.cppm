@@ -21,10 +21,10 @@ export namespace PonyEngine::Core
 		IEngineSystem(IEngineSystem&&) = delete;
 
 		/// @brief Begins the system.
-		/// @details The system takes its dependencies in this function.
-		virtual void Begin() = 0; // TODO: Try to remove begin and end
+		/// @details It's called once before a first engine tick.
+		virtual void Begin() = 0;
 		/// @brief Ends the system.
-		/// @details The function is called before a destruction.
+		/// @details It's called once after a last engine tick.
 		virtual void End() = 0;
 
 		IEngineSystem& operator =(const IEngineSystem&) = delete;

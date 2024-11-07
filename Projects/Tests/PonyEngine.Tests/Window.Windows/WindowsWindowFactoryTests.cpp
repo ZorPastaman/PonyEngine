@@ -51,7 +51,8 @@ namespace Window
 			engine.application = &application;
 			auto classParams = PonyEngine::Window::WindowsClassParams();
 			classParams.name = L"Pony Engine Test";
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{ .windowsClassParams = classParams });
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{.windowsClassParams = classParams});
+			factory.systemFactory->SystemParams().rect.fullscreen = false;
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::IsNotNull(std::get<1>(window.system).Get());
 

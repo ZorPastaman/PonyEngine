@@ -60,17 +60,20 @@ export namespace PonyEngine::Screen
 
 namespace PonyEngine::Screen
 {
+	/// @brief Gets a current display resolution.
+	/// @return Display resolution.
+	[[nodiscard("Pure function")]]
+	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept;
+
 	WindowsScreenSystem::WindowsScreenSystem(Core::IEngineContext& engine) noexcept :
-		displayResolution(),
+		displayResolution(GetDisplayResolution()),
 		engine{&engine}
 	{
+		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
 	}
 
 	void WindowsScreenSystem::Begin()
 	{
-		displayResolution.Width() = static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN));
-		displayResolution.Height() = static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN));
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
 	}
 
 	void WindowsScreenSystem::End()
@@ -85,5 +88,14 @@ namespace PonyEngine::Screen
 	std::string_view WindowsScreenSystem::Name() const noexcept
 	{
 		return StaticName;
+	}
+
+	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept
+	{
+		PonyMath::Utility::Resolution<unsigned int> resolution;
+		resolution.Width() = static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN));
+		resolution.Height() = static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN));
+
+		return resolution;
 	}
 }
