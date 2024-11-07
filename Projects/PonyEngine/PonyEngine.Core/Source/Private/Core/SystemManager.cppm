@@ -10,7 +10,6 @@
 module;
 
 #include <cassert>
-#include <ranges>
 
 #include "PonyDebug/Log/Log.h"
 
@@ -18,6 +17,7 @@ export module PonyEngine.Core.Implementation:SystemManager;
 
 import <algorithm>;
 import <exception>;
+import <ranges>;
 import <string>;
 import <typeindex>;
 import <typeinfo>;
@@ -41,27 +41,32 @@ export namespace PonyEngine::Core
 	{
 	public:
 		/// @brief Creates a @p SystemManager.
-		/// @param systemFactories System factories.
 		/// @param engine Engine context.
 		[[nodiscard("Pure constructor")]]
-		SystemManager(const SystemFactoriesContainer& systemFactories, IEngineContext& engine);
+		explicit SystemManager(IEngineContext& engine);
 		SystemManager(const SystemManager&) = delete;
 		SystemManager(SystemManager&&) = delete;
 
-		~SystemManager() noexcept;
+		~SystemManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
 		virtual void* FindSystem(const std::type_info& typeInfo) const noexcept override;
 
+		/// @brief Creates systems.
+		/// @param systemFactories System factories.
+		void CreateSystems(const SystemFactoriesContainer& systemFactories);
+		/// @brief Destroys systems.
+		void DestroySystems() noexcept;
+
 		/// @brief Begins the systems.
 		/// @details Call this before a first tick.
-		void Begin() const;
+		void BeginSystems() const;
 		/// @brief Ends the systems.
 		/// @details Call this before a destruction of the @p SystemManager.
-		void End() const noexcept;
+		void EndSystems() const noexcept;
 
 		/// @brief Ticks the systems.
-		void Tick() const;
+		void TickSystems() const;
 
 		SystemManager& operator =(const SystemManager&) = delete;
 		SystemManager& operator =(SystemManager&& other) = delete;
@@ -91,17 +96,28 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	SystemManager::SystemManager(const SystemFactoriesContainer& systemFactories, IEngineContext& engine) :
+	SystemManager::SystemManager(IEngineContext& engine) :
 		engine{&engine}
 	{
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create systems.");
+	}
 
-		auto tickableSystemsBuffer = std::vector<std::pair<ITickableEngineSystem*, int>>();
-		auto systemInterfacesBuffer = std::unordered_map<std::type_index, void*>();
-
-		for (auto [factory, tickOrder] : systemFactories)
+	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
+	{
+		if (const auto pair = systemInterfaces.find(typeInfo); pair != systemInterfaces.cend()) [[likely]]
 		{
-			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			return pair->second;
+		}
+
+		return nullptr;
+	}
+
+	void SystemManager::CreateSystems(const SystemFactoriesContainer& systemFactories)
+	{
+		auto tickableSystemsBuffer = std::vector<std::pair<ITickableEngineSystem*, int>>();
+
+		for (const auto [factory, tickOrder] : systemFactories)
+		{
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
 			SystemData systemData = CreateSystem(factory);
 
 			switch (systemData.system.index())
@@ -117,31 +133,25 @@ namespace PonyEngine::Core
 				break;
 			}
 
-			for (auto [interface, objectPointer] : systemData.publicInterfaces)
+			for (const auto [interface, objectPointer] : systemData.publicInterfaces)
 			{
-				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
-				assert(!systemInterfacesBuffer.contains(interface.get()) && "The interface has already been added.");
-				systemInterfacesBuffer.emplace(interface.get(), objectPointer);
+				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
+				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
+				systemInterfaces.emplace(interface.get(), objectPointer);
 			}
 
-			PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "System created.");
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System created.");
 		}
 
-		std::ranges::sort(tickableSystemsBuffer, [](const std::pair<ITickableEngineSystem*, int>& left, const std::pair<ITickableEngineSystem*, int>& right) { return left.second < right.second; });
+		std::ranges::sort(tickableSystemsBuffer, [](const std::pair<ITickableEngineSystem*, int>& left, const std::pair<ITickableEngineSystem*, int>& right){ return left.second < right.second; });
 		for (auto tickableSystem : std::views::keys(tickableSystemsBuffer))
 		{
 			tickableSystems.push_back(tickableSystem);
 		}
-
-		systemInterfaces = std::move(systemInterfacesBuffer); // It prevents trying to find systems before Begin().
-
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Systems created.");
 	}
 
-	SystemManager::~SystemManager() noexcept
+	void SystemManager::DestroySystems() noexcept
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy systems.");
-
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system.", (*system)->Name());
@@ -149,23 +159,13 @@ namespace PonyEngine::Core
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System destroyed.");
 		}
 
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems destroyed.");
+		systems.clear();
+		tickableSystems.clear();
+		systemInterfaces.clear();
 	}
 
-	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
+	void SystemManager::BeginSystems() const
 	{
-		if (const auto pair = systemInterfaces.find(typeInfo); pair != systemInterfaces.cend()) [[likely]]
-		{
-			return pair->second;
-		}
-
-		return nullptr;
-	}
-
-	void SystemManager::Begin() const
-	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin systems.");
-
 		for (const PonyBase::Memory::UniquePointer<IEngineSystem>& system : systems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
@@ -181,14 +181,10 @@ namespace PonyEngine::Core
 			}
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System begun.");
 		}
-
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems begun.");
 	}
 
-	void SystemManager::End() const noexcept
+	void SystemManager::EndSystems() const noexcept
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End systems.");
-
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End '{}' system.", (*system)->Name());
@@ -202,11 +198,9 @@ namespace PonyEngine::Core
 			}
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System ended.");
 		}
-
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Systems ended.");
 	}
 
-	void SystemManager::Tick() const
+	void SystemManager::TickSystems() const
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
 
@@ -244,14 +238,14 @@ namespace PonyEngine::Core
 	void SystemManager::AddNonTickable(PonyBase::Memory::UniquePointer<IEngineSystem> system)
 	{
 		assert(system && "The system is nullptr.");
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", system->Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", system->Name());
 		systems.push_back(std::move(system));
 	}
 
 	void SystemManager::AddTickable(PonyBase::Memory::UniquePointer<ITickableEngineSystem> system, const int tickOrder, std::vector<std::pair<ITickableEngineSystem*, int>>& tickableSystemsBuffer)
 	{
 		assert(system && "The system is nullptr.");
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", system->Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", system->Name());
 		tickableSystemsBuffer.emplace_back(system.Get(), tickOrder);
 		auto baseSystem = PonyBase::Memory::UniquePointer<IEngineSystem>(std::move(system));
 		systems.push_back(std::move(baseSystem));

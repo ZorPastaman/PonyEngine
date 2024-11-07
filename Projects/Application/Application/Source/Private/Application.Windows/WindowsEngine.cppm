@@ -62,14 +62,14 @@ export namespace Application
 		WindowsEngine& operator =(WindowsEngine&&) = delete;
 
 	private:
-		/// @brief Creates a frame rate system factory.
-		/// @return Frame rate system factory.
-		[[nodiscard("Pure function")]]
-		PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory() const;
 		/// @brief Creates a screen system factory.
 		/// @return Screen system factory.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Screen::WindowsScreenSystemFactoryData CreateScreenSystemFactory() const;
+		/// @brief Creates a frame rate system factory.
+		/// @return Frame rate system factory.
+		[[nodiscard("Pure function")]]
+		PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory() const;
 		/// @brief Creates a window system factory.
 		/// @return Window system factory.
 		[[nodiscard("Pure function")]]
@@ -105,8 +105,8 @@ namespace Application
 		application{&application},
 		systemFactories
 		{
-			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateFrameRateSystemFactory().systemFactory), 1),
 			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateScreenSystemFactory().systemFactory), 0),
+			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateFrameRateSystemFactory().systemFactory), 1),
 			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateWindowSystemFactory().systemFactory), 2),
 			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateInputSystemFactory().systemFactory), 3),
 			std::pair(PonyBase::Memory::UniquePointer<PonyEngine::Core::ISystemFactory>(CreateRenderSystemFactory().systemFactory), 5),
@@ -159,6 +159,25 @@ namespace Application
 		return false;
 	}
 
+	PonyEngine::Screen::WindowsScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
+	{
+		try
+		{
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
+			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
+
+			return factory;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On creating Windows screen system factory.");
+
+			throw;
+		}
+	}
+
 	PonyEngine::Time::FrameRateSystemFactoryData WindowsEngine::CreateFrameRateSystemFactory() const
 	{
 		try
@@ -176,25 +195,6 @@ namespace Application
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On creating frame rate system factory.");
-
-			throw;
-		}
-	}
-
-	PonyEngine::Screen::WindowsScreenSystemFactoryData WindowsEngine::CreateScreenSystemFactory() const
-	{
-		try
-		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
-			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
-			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
-
-			return factory;
-		}
-		catch (const std::exception& e)
-		{
-			PONY_LOG_E(application->Logger(), e, "On creating Windows screen system factory.");
 
 			throw;
 		}
