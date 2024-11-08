@@ -32,7 +32,7 @@ namespace Time
 		TEST_METHOD(CreateTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.Get());
 		}
 
@@ -42,29 +42,28 @@ namespace Time
 			auto application = Core::Application();
 			application.logger = &logger;
 			auto engine = Core::Engine();
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
-			const auto systemParams = PonyEngine::Core::SystemParams();
-			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
-			Assert::IsNotNull(std::get<1>(inputSystem.system).Get());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
+			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			Assert::IsNotNull(std::get<1>(frameRateSystem.system).Get());
 
-			auto it = inputSystem.publicInterfaces.Begin();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(inputSystem.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
+			auto it = frameRateSystem.publicInterfaces.Begin();
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
 
 			++it;
-			Assert::IsTrue(it == inputSystem.publicInterfaces.End());
+			Assert::IsTrue(it == frameRateSystem.publicInterfaces.End());
 		}
 
 		TEST_METHOD(GetSystemNameTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Time::FrameRateSystem"), factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Time::FrameRateSystemFactory"), factory.systemFactory->Name());
 		}
 	};

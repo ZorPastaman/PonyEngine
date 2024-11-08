@@ -31,7 +31,7 @@ namespace Screen
 			auto logger = Core::Logger();
 			auto application = Core::Application();
 			application.logger = &logger;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.Get());
 		}
 
@@ -42,7 +42,7 @@ namespace Screen
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams{});
 			auto screenSystem = std::get<0>(system.system).Get();
 			Assert::IsNotNull(screenSystem);
@@ -60,7 +60,7 @@ namespace Screen
 			auto logger = Core::Logger();
 			auto application = Core::Application();
 			application.logger = &logger;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Screen::WindowsScreenSystem"), factory.systemFactory->SystemName());
 		}
 
@@ -69,7 +69,7 @@ namespace Screen
 			auto logger = Core::Logger();
 			auto application = Core::Application();
 			application.logger = &logger;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Screen::WindowsScreenSystemFactory"), factory.systemFactory->Name());
 		}
 	};

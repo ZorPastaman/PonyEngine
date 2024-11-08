@@ -18,7 +18,7 @@ import :WindowRect;
 export namespace PonyEngine::Window
 {
 	/// @brief Window system parameters.
-	struct WindowSystemParams : Core::SystemParams
+	struct WindowSystemParams
 	{
 		WindowRect rect; ///< Window rect.
 		std::wstring title = L"Pony Engine Window"; ///< Window title.

@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/COM/Framework.h"
 
-export module PonyBase.GuidUtility;
+export module PonyBase.COMUtility:GuidUtility;
 
 import <cstdint>;
 import <format>;
@@ -50,6 +50,9 @@ namespace PonyBase::Utility
 
 	std::string ToString(const GUID& guid) noexcept
 	{
-		return std::format("{:X}-{:X}-{:X}-{:X}", guid.Data1, guid.Data2, guid.Data3, *reinterpret_cast<const std::uint64_t*>(guid.Data4));
+		auto buffer = std::wstring(39, '\0');
+		StringFromGUID2(guid, buffer.data(), buffer.size());
+
+		return ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
 	}
 }

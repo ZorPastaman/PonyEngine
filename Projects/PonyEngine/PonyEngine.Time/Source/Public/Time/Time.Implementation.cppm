@@ -26,16 +26,17 @@ export namespace PonyEngine::Time
 	/// @brief Creates a frame rate system factory.
 	/// @param application Application context.
 	/// @param params Frame rate system factory parameters.
+	/// @param systemParams Frame rate system parameters.
 	/// @return Frame rate system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& params);
+	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& params, const FrameRateSystemParams& systemParams);
 }
 
 namespace PonyEngine::Time
 {
-	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext&, const FrameRateSystemFactoryParams&)
+	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext&, const FrameRateSystemFactoryParams&, const FrameRateSystemParams& systemParams)
 	{
-		auto factory = PonyBase::Memory::UniquePointer<FrameRateSystemFactory>::Create();
+		auto factory = PonyBase::Memory::UniquePointer<FrameRateSystemFactory>::Create(systemParams);
 
 		return FrameRateSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IFrameRateSystemFactory>(std::move(factory))};
 	}

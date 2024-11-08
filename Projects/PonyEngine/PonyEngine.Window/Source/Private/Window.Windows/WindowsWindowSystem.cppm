@@ -20,6 +20,7 @@ export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
 import <algorithm>;
 import <cstdint>;
 import <exception>;
+import <memory>;
 import <stdexcept>;
 import <string>;
 import <string_view>;
@@ -42,6 +43,7 @@ import PonyEngine.Window.Windows.Factory;
 import :IWindowProc;
 import :KeyCodeUtility;
 import :WindowProcFunction;
+import :WindowsClass;
 
 export namespace PonyEngine::Window
 {
@@ -51,11 +53,9 @@ export namespace PonyEngine::Window
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
 		/// @param engine Engine.
-		/// @param hInstance Instance.
-		/// @param className Class name of a registered class.
 		/// @param windowParams Window parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystem(Core::IEngineContext& engine, HINSTANCE hInstance, ATOM className, const WindowsWindowSystemParams& windowParams);
+		WindowsWindowSystem(Core::IEngineContext& engine, const WindowsWindowSystemParams& windowParams);
 		WindowsWindowSystem(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem(WindowsWindowSystem&&) = delete;
 
@@ -135,14 +135,12 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		HWND CreateControlledWindow(const WindowsWindowStyle& style, const WindowRect& rect);
 
-		HINSTANCE hInstance; ///< Instance.
-		ATOM className; ///< Class name.
-
 		std::wstring mainTitle; ///< Window main title cache.
 		std::wstring secondaryTitle; ///< Window title text cache.
 
 		Core::IEngineContext* engine; ///< Engine.
 
+		std::shared_ptr<IWindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
 
 		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
@@ -157,11 +155,10 @@ namespace PonyEngine::Window
 	[[nodiscard("Pure function")]]
 	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Utility::Resolution<unsigned int>> PositionResolution(const RECT& windowRect) noexcept;
 
-	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const HINSTANCE hInstance, const ATOM className, const WindowsWindowSystemParams& windowParams) :
-		hInstance{hInstance},
-		className{className},
+	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const WindowsWindowSystemParams& windowParams) :
 		mainTitle(windowParams.title),
 		engine{&engine},
+		windowsClass(windowParams.windowsClass),
 		hWnd{CreateControlledWindow(windowParams.windowsWindowStyle, windowParams.rect)}
 	{
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
@@ -183,6 +180,10 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Skip destroying Windows window 'cause it's already been destroyed.");
 		}
+
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Release Windows class.");
+		windowsClass.reset();
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Windows class released.");
 	}
 
 	void WindowsWindowSystem::Begin()
@@ -417,18 +418,18 @@ namespace PonyEngine::Window
 		const auto [position, resolution] = PositionResolution(GetWindowRect(style, rect));
 
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
-			className, style.style, style.extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(hInstance));
+			windowsClass->Class(), style.style, style.extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
 
 		const HWND windowHandle = CreateWindowExW(
 			style.extendedStyle,
-			reinterpret_cast<LPCWSTR>(className),
+			reinterpret_cast<LPCWSTR>(windowsClass->Class()),
 			mainTitle.c_str(),
 			style.style,
 			position.X(), position.Y(),
 			resolution.Width(), resolution.Height(),
 			nullptr,
 			nullptr,
-			hInstance,
+			windowsClass->Instance(),
 			static_cast<IWindowProc*>(this)
 		);
 		if (!windowHandle)

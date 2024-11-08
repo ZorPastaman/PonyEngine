@@ -36,16 +36,6 @@ namespace Core
 		};
 	}
 
-	PonyEngine::Core::SystemParams& SystemFactory::SystemParams() noexcept
-	{
-		return systemParams;
-	}
-
-	const PonyEngine::Core::SystemParams& SystemFactory::SystemParams() const noexcept
-	{
-		return systemParams;
-	}
-
 	System* SystemFactory::GetSystem() const noexcept
 	{
 		return system;

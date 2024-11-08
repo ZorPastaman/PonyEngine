@@ -7,12 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Factory:SystemParams;
+export module PonyBase.ObjectUtility;
 
-export namespace PonyEngine::Core
-{
-	/// @brief System parameters.
-	struct SystemParams
-	{
-	};
-}
+export import :ObjectInterfaces;

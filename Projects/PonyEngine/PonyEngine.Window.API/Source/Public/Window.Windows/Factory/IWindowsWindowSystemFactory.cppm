@@ -22,11 +22,6 @@ export namespace PonyEngine::Window
 		IWindowsWindowSystemFactory(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory(IWindowsWindowSystemFactory&&) = delete;
 
-		[[nodiscard("Pure function")]]
-		virtual WindowsWindowSystemParams& SystemParams() noexcept override = 0;
-		[[nodiscard("Pure function")]]
-		virtual const WindowsWindowSystemParams& SystemParams() const noexcept override = 0;
-
 		IWindowsWindowSystemFactory& operator =(const IWindowsWindowSystemFactory&) = delete;
 		IWindowsWindowSystemFactory& operator =(IWindowsWindowSystemFactory&&) = delete;
 

@@ -16,7 +16,7 @@ import PonyEngine.Core;
 
 namespace Core
 {
-	class ISystemInterface : PonyEngine::Core::ISystem
+	class ISystemInterface
 	{
 	public:
 		ISystemInterface(const ISystemInterface&) = delete;

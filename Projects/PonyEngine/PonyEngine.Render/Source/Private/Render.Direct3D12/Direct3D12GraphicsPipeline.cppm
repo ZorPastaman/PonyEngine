@@ -21,7 +21,7 @@ import <span>;
 import <stdexcept>;
 import <type_traits>;
 
-import PonyBase.GuidUtility;
+import PonyBase.COMUtility;
 import PonyBase.StringUtility;
 
 import PonyMath.Core;

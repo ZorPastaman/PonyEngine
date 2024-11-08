@@ -30,8 +30,10 @@ export namespace PonyEngine::Time
 	class FrameRateSystemFactory final : public IFrameRateSystemFactory
 	{
 	public:
+		/// @brief Creates a @p FrameRateSystemFactory.
+		/// @param frameRateSystemParams Frame rate system parameters.
 		[[nodiscard("Pure constructor")]]
-		FrameRateSystemFactory() noexcept = default;
+		explicit FrameRateSystemFactory(const FrameRateSystemParams& frameRateSystemParams) noexcept;
 		FrameRateSystemFactory(const FrameRateSystemFactory&) = delete;
 		FrameRateSystemFactory(FrameRateSystemFactory&&) = delete;
 
@@ -41,12 +43,8 @@ export namespace PonyEngine::Time
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual FrameRateSystemParams& SystemParams() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const FrameRateSystemParams& SystemParams() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 
@@ -62,6 +60,11 @@ export namespace PonyEngine::Time
 
 namespace PonyEngine::Time
 {
+	FrameRateSystemFactory::FrameRateSystemFactory(const FrameRateSystemParams& frameRateSystemParams) noexcept :
+		frameRateSystemParams(frameRateSystemParams)
+	{
+	}
+
 	Core::SystemData FrameRateSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
 	{
 		auto system = PonyBase::Memory::UniquePointer<FrameRateSystem>::Create(engine, frameRateSystemParams.targetFrameTime);
@@ -73,16 +76,6 @@ namespace PonyEngine::Time
 			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	FrameRateSystemParams& FrameRateSystemFactory::SystemParams() noexcept
-	{
-		return frameRateSystemParams;
-	}
-
-	const FrameRateSystemParams& FrameRateSystemFactory::SystemParams() const noexcept
-	{
-		return frameRateSystemParams;
 	}
 
 	std::string_view FrameRateSystemFactory::SystemName() const noexcept

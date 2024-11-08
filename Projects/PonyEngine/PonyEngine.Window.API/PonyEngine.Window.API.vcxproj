@@ -17,6 +17,7 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsClass.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsWindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsClassParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Factory\Window.Windows.Factory.cppm" />

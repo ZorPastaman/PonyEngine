@@ -46,11 +46,6 @@ export namespace Game
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual GameSystemParams& SystemParams() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const GameSystemParams& SystemParams() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -60,9 +55,6 @@ export namespace Game
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
 		static constexpr std::string_view StaticName = "Game::GameSystemFactory"; ///< Class name.
-
-	private:
-		GameSystemParams systemParams; ///< Game system parameters.
 	};
 }
 
@@ -79,16 +71,6 @@ namespace Game
 			.system = PonyBase::Memory::UniquePointer<PonyEngine::Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	GameSystemParams& GameSystemFactory::SystemParams() noexcept
-	{
-		return systemParams;
-	}
-
-	const GameSystemParams& GameSystemFactory::SystemParams() const noexcept
-	{
-		return systemParams;
 	}
 
 	std::string_view GameSystemFactory::SystemName() const noexcept

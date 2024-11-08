@@ -39,11 +39,6 @@ export namespace PonyEngine::Input
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual InputSystemParams& SystemParams() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const InputSystemParams& SystemParams() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -53,9 +48,6 @@ export namespace PonyEngine::Input
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
-
-	private:
-		InputSystemParams inputSystemParams; ///< Input system parameters.
 	};
 }
 
@@ -72,16 +64,6 @@ namespace PonyEngine::Input
 			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	InputSystemParams& InputSystemFactory::SystemParams() noexcept
-	{
-		return inputSystemParams;
-	}
-
-	const InputSystemParams& InputSystemFactory::SystemParams() const noexcept
-	{
-		return inputSystemParams;
 	}
 
 	std::string_view InputSystemFactory::SystemName() const noexcept

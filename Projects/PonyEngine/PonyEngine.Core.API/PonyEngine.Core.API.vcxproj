@@ -26,11 +26,9 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\EngineSystemParams.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemParams.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineSystem.cppm" />
     <ClCompile Include="Source\Public\Core\ITickableEngineSystem.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />
-    <ClCompile Include="Source\Public\Core\ISystem.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\IEngine.cppm" />
   </ItemGroup>

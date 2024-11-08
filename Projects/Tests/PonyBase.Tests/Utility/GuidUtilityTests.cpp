@@ -13,7 +13,7 @@
 
 #include "PonyBase/Core/COM/Framework.h"
 
-import PonyBase.GuidUtility;
+import PonyBase.COMUtility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -26,7 +26,7 @@ namespace Utility
 			auto guid = GUID{.Data1 = 0xD2DF2879, .Data2 = 0xB16A, .Data3 = 0xBABA};
 			*reinterpret_cast<std::uint64_t*>(guid.Data4) = 0x6517BB1B6D4D;
 
-			Assert::AreEqual("D2DF2879-B16A-BABA-6517BB1B6D4D", PonyBase::Utility::ToString(guid).c_str());
+			Assert::AreEqual("D2DF2879-B16A-BABA-4D6D-1BBB17650000", PonyBase::Utility::ToString(guid).c_str());
 		}
 	};
 }

@@ -9,12 +9,10 @@
 
 export module PonyEngine.Screen.Factory:ScreenSystemParams;
 
-import PonyEngine.Core.Factory;
-
 export namespace PonyEngine::Screen
 {
 	/// @brief Screen system parameters.
-	struct ScreenSystemParams : Core::SystemParams
+	struct ScreenSystemParams
 	{
 	};
 }

@@ -28,14 +28,15 @@ export namespace PonyEngine::Input
 	/// @brief Creates an input system factory.
 	/// @param application Application context.
 	/// @param params Input system factory parameters.
+	/// @param systemParams Input system parameters.
 	/// @return Input system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& params);
+	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& params, const InputSystemParams& systemParams);
 }
 
 namespace PonyEngine::Input
 {
-	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext&, const InputSystemFactoryParams&)
+	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext&, const InputSystemFactoryParams&, const InputSystemParams&)
 	{
 		auto factory = PonyBase::Memory::UniquePointer<InputSystemFactory>::Create();
 

@@ -34,7 +34,7 @@ namespace Screen
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{});
+			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams{});
 			std::get<0>(system.system)->Begin();
 			auto screenSystem = dynamic_cast<PonyEngine::Screen::IScreenSystem*>(std::get<0>(system.system).Get());

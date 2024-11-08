@@ -22,11 +22,6 @@ namespace Core
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemParams& SystemParams() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const PonyEngine::Core::SystemParams& SystemParams() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		System* GetSystem() const noexcept;
 		void Reset() noexcept;
 
@@ -37,8 +32,6 @@ namespace Core
 		virtual std::string_view Name() const noexcept override;
 
 	private:
-		PonyEngine::Core::SystemParams systemParams;
-
 		System* system = nullptr;
 	};
 }

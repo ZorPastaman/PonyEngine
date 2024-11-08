@@ -7,9 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyBase.StringUtility;
+export module PonyBase.StringUtility:SafeFormat;
 
-import <algorithm>;
 import <exception>;
 import <format>;
 import <string>;
@@ -19,16 +18,12 @@ export namespace PonyBase::Utility
 {
 	/// @brief The concept is satisfied if @p T has a function that accepts @p const @p std::exception& like this: @p exceptionHandler(e).
 	template<typename T>
-	concept ExceptionHandler = requires (const T& exceptionHandler, const std::exception& e)
+	concept ExceptionHandler = requires (const T & exceptionHandler, const std::exception & e)
 	{
-		{ exceptionHandler(e) } noexcept;
+		{
+			exceptionHandler(e)
+		} noexcept;
 	};
-
-	/// @brief Converts std::wstring to std::string. It just casts every wchar to char.
-	/// @param source Source.
-	/// @return Converted string.
-	[[nodiscard("Pure function")]]
-	std::string ConvertToString(const std::wstring& source);
 
 	/// @brief @p std::format() wrapper that doesn't throw.
 	/// @tparam Args Format argument types.
@@ -62,16 +57,10 @@ namespace PonyBase::Utility
 	struct EmptyExceptionHandler final
 	{
 		/// @brief Does nothing.
-		void operator ()(const std::exception&) const noexcept {}
+		void operator ()(const std::exception&) const noexcept
+		{
+		}
 	};
-
-	std::string ConvertToString(const std::wstring& source)
-	{
-		std::string answer(source.length(), 0);
-		std::ranges::transform(source, answer.begin(), [](const wchar_t c) { return static_cast<std::string::value_type>(c); });
-
-		return answer;
-	}
 
 	template<typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
