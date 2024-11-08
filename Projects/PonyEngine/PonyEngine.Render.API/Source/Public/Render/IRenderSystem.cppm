@@ -11,6 +11,7 @@ export module PonyEngine.Render:IRenderSystem;
 
 import <string_view>;
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 
@@ -27,8 +28,8 @@ export namespace PonyEngine::Render
 		IRenderSystem(IRenderSystem&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::RGBA<float> ClearColor() const noexcept = 0;
-		virtual void ClearColor(const PonyMath::Core::RGBA<float>& color) noexcept = 0;
+		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept = 0;
+		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual CameraParams CameraParameters() const noexcept = 0; // TODO: Here and in other api interfaces, don't return values, return references.

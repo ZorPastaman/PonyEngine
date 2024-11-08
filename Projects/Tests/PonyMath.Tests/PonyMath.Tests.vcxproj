@@ -16,10 +16,10 @@
     <ClCompile Include="Core\Matrix3x3Tests.cpp" />
     <ClCompile Include="Core\Matrix4x4Tests.cpp" />
     <ClCompile Include="Core\QuaternionTests.cpp" />
-    <ClCompile Include="Core\RGBAIntTests.cpp" />
-    <ClCompile Include="Core\RGBATests.cpp" />
-    <ClCompile Include="Core\RGBIntTests.cpp" />
-    <ClCompile Include="Core\RGBTests.cpp" />
+    <ClCompile Include="Color\RGBAIntTests.cpp" />
+    <ClCompile Include="Color\RGBATests.cpp" />
+    <ClCompile Include="Color\RGBIntTests.cpp" />
+    <ClCompile Include="Color\RGBTests.cpp" />
     <ClCompile Include="Core\Transformations2DTests.cpp" />
     <ClCompile Include="Core\Transformations3DTests.cpp" />
     <ClCompile Include="Core\Vector2Tests.cpp" />
@@ -31,17 +31,8 @@
     <ClCompile Include="Utility\ResolutionTests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Core\PonyMath.Core.vcxproj">
-      <Project>{6f808c7f-60c8-4894-91ed-cfb0906af8f0}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Geometry\PonyMath.Geometry.vcxproj">
-      <Project>{2ab77cc5-4a2f-40a2-af75-2b448bbabb89}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Space\PonyMath.Space.vcxproj">
-      <Project>{21cde60f-881e-445f-8507-703c23af5897}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyMath\PonyMath.Utility\PonyMath.Utility.vcxproj">
-      <Project>{6d31a869-1cfe-41e8-bd5c-0384d12d04bb}</Project>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
+      <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
     </ProjectReference>
   </ItemGroup>
   <PropertyGroup Label="Globals">

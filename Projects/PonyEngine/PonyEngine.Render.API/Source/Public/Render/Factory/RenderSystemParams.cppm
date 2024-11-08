@@ -15,7 +15,6 @@ import PonyMath.Core;
 import PonyMath.Utility;
 
 import PonyEngine.Render;
-import PonyEngine.Screen;
 
 export namespace PonyEngine::Render
 {
