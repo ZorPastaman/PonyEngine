@@ -30,16 +30,16 @@
     <ClCompile Include="Core\QuaternionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RGBAIntTests.cpp">
+    <ClCompile Include="Color\RGBAIntTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RGBATests.cpp">
+    <ClCompile Include="Color\RGBATests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RGBIntTests.cpp">
+    <ClCompile Include="Color\RGBIntTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\RGBTests.cpp">
+    <ClCompile Include="Color\RGBTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Core\Transformations2DTests.cpp">

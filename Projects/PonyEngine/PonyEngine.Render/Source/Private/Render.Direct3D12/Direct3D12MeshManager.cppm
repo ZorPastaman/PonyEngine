@@ -25,6 +25,7 @@ import <type_traits>;
 
 import PonyBase.StringUtility;
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 
@@ -51,7 +52,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		Direct3D12VertexBuffer CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyMath::Core::RGBA<float>> colors, std::size_t vertexCount) const;
+		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors, std::size_t vertexCount) const;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12IndexBuffer CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
@@ -143,9 +144,9 @@ namespace PonyEngine::Render
 		return Direct3D12VertexBuffer(verticesResource.Get(), vertexSize, vertexCount);
 	}
 
-	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Core::RGBA<float>> colors, const std::size_t vertexCount) const
+	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Color::RGBA<float>> colors, const std::size_t vertexCount) const
 	{
-		constexpr UINT colorSize = sizeof(PonyMath::Core::RGBA<float>);
+		constexpr UINT colorSize = sizeof(PonyMath::Color::RGBA<float>);
 		const UINT colorCount = static_cast<UINT>(colors.size() > 0 ? colors.size() : vertexCount);
 		const std::size_t colorBufferSize = colorSize * colorCount;
 		const auto colorsDescription = D3D12_RESOURCE_DESC1
@@ -180,7 +181,7 @@ namespace PonyEngine::Render
 		}
 		else
 		{
-			std::fill_n(static_cast<PonyMath::Core::RGBA<float>*>(colorsData), colorCount, PonyMath::Core::RGBA<float>::Predefined::White);
+			std::fill_n(static_cast<PonyMath::Color::RGBA<float>*>(colorsData), colorCount, PonyMath::Color::RGBA<float>::Predefined::White);
 		}
 		colorsResource->Unmap(0, nullptr);
 

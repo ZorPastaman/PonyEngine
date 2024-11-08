@@ -24,13 +24,12 @@ import <type_traits>;
 import PonyBase.COMUtility;
 import PonyBase.StringUtility;
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 import PonyMath.Utility;
 
 import PonyDebug.Log;
-
-import PonyEngine.Screen;
 
 import :Direct3D12Camera;
 import :Direct3D12CameraParams;
@@ -54,9 +53,9 @@ export namespace PonyEngine::Render
 		~Direct3D12GraphicsPipeline() noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyMath::Core::RGBA<FLOAT>& ClearColor() noexcept;
+		PonyMath::Color::RGBA<FLOAT>& ClearColor() noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyMath::Core::RGBA<FLOAT>& ClearColor() const noexcept;
+		const PonyMath::Color::RGBA<FLOAT>& ClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		const Direct3D12CameraParams& CameraParams() const noexcept;
@@ -190,12 +189,12 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
 	}
 
-	PonyMath::Core::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() noexcept
+	PonyMath::Color::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() noexcept
 	{
 		return renderTarget->ClearColor();
 	}
 
-	const PonyMath::Core::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() const noexcept
+	const PonyMath::Color::RGBA<FLOAT>& Direct3D12GraphicsPipeline::ClearColor() const noexcept
 	{
 		return renderTarget->ClearColor();
 	}

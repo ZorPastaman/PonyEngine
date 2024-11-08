@@ -17,6 +17,7 @@
 #include <type_traits>
 #include <utility>
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 
@@ -30,7 +31,7 @@ namespace Geometry
 		{
 			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<float>, PonyMath::Geometry::Mesh::VertexType>);
 			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<std::uint32_t>, PonyMath::Geometry::Mesh::TriangleType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::RGBA<float>, PonyMath::Geometry::Mesh::VertexColorType>);
+			Assert::IsTrue(std::is_same_v<PonyMath::Color::RGBA<float>, PonyMath::Geometry::Mesh::VertexColorType>);
 		}
 
 		TEST_METHOD(ConstructorTest)
@@ -42,7 +43,7 @@ namespace Geometry
 
 			constexpr std::array<PonyMath::Core::Vector3<float>, 3> vertices = { PonyMath::Core::Vector3<float>(1.f, 2.f, 3.f), PonyMath::Core::Vector3<float>(-1.f, -2.f, -3.f), PonyMath::Core::Vector3<float>(-2.f, 4.f, -7.f) };
 			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 1> triangles = { PonyMath::Core::Vector3<std::uint32_t>{0, 2, 1} };
-			constexpr std::array<PonyMath::Core::RGBA<float>, 3> colors = { PonyMath::Core::RGBA<float>(0.2f, 0.5f, 0.8f, 1.f), PonyMath::Core::RGBA<float>(0.f, 1.f, 0.4f, 0.9f), PonyMath::Core::RGBA<float>(1.f, 0.f, 0.f, 0.7f) };
+			constexpr std::array<PonyMath::Color::RGBA<float>, 3> colors = { PonyMath::Color::RGBA<float>(0.2f, 0.5f, 0.8f, 1.f), PonyMath::Color::RGBA<float>(0.f, 1.f, 0.4f, 0.9f), PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.7f) };
 			mesh.Vertices(vertices);
 			mesh.Triangles(triangles);
 			mesh.Colors(colors);
@@ -163,12 +164,12 @@ namespace Geometry
 			Assert::IsFalse(mesh.HasColors());
 			Assert::AreEqual(std::size_t{0}, mesh.Colors().size());
 
-			constexpr std::array<PonyMath::Core::RGBA<float>, 4> colors =
+			constexpr std::array<PonyMath::Color::RGBA<float>, 4> colors =
 			{
-				PonyMath::Core::RGBA<float>(0.1f, 0.2f, 0.3f, 0.9f),
-				PonyMath::Core::RGBA<float>(0.12f, 0.22f, 0.83f, 0.9f),
-				PonyMath::Core::RGBA<float>(0.13f, 0.42f, 0.93f, 0.8f),
-				PonyMath::Core::RGBA<float>(0.16f, 0.62f, 0.73f, 0.95f),
+				PonyMath::Color::RGBA<float>(0.1f, 0.2f, 0.3f, 0.9f),
+				PonyMath::Color::RGBA<float>(0.12f, 0.22f, 0.83f, 0.9f),
+				PonyMath::Color::RGBA<float>(0.13f, 0.42f, 0.93f, 0.8f),
+				PonyMath::Color::RGBA<float>(0.16f, 0.62f, 0.73f, 0.95f),
 			};
 			mesh.Colors(std::span(colors).subspan(0, 4));
 			mesh.Triangles(std::span(triangles).subspan(0, 2));
@@ -217,7 +218,7 @@ namespace Geometry
 			}
 			for (std::uint32_t i = 4u; i < 6u; ++i)
 			{
-				Assert::IsTrue(PonyMath::Core::RGBA<float>::Predefined::Clear == mesh.Color(i));
+				Assert::IsTrue(PonyMath::Color::RGBA<float>::Predefined::Clear == mesh.Color(i));
 			}
 
 			mesh.VertexCount(3u);
@@ -286,7 +287,7 @@ namespace Geometry
 			Assert::AreEqual(std::size_t{4}, mesh.Colors().size());
 			for (std::uint32_t i = 0u; i < mesh.VertexCount(); ++i)
 			{
-				Assert::IsTrue(PonyMath::Core::RGBA<float>::Predefined::Clear == mesh.Color(i));
+				Assert::IsTrue(PonyMath::Color::RGBA<float>::Predefined::Clear == mesh.Color(i));
 			}
 
 			mesh.HasColors(false);
@@ -404,11 +405,11 @@ namespace Geometry
 			auto mesh = PonyMath::Geometry::Mesh();
 			mesh.VertexCount(3u);
 			mesh.HasColors(true);
-			constexpr std::array<PonyMath::Core::RGBA<float>, 3> colors =
+			constexpr std::array<PonyMath::Color::RGBA<float>, 3> colors =
 			{
-				PonyMath::Core::RGBA<float>(0.1f, 0.3f, 0.4f, 0.9f),
-				PonyMath::Core::RGBA<float>(0.f, 0.7f, 0.45f, 0.95f),
-				PonyMath::Core::RGBA<float>(0.7f, 0.3f, 0.7f, 1.f)
+				PonyMath::Color::RGBA<float>(0.1f, 0.3f, 0.4f, 0.9f),
+				PonyMath::Color::RGBA<float>(0.f, 0.7f, 0.45f, 0.95f),
+				PonyMath::Color::RGBA<float>(0.7f, 0.3f, 0.7f, 1.f)
 			};
 
 			for (std::uint32_t i = 0; i < colors.size(); ++i)
@@ -423,11 +424,11 @@ namespace Geometry
 			auto mesh = PonyMath::Geometry::Mesh();
 			mesh.VertexCount(3u);
 			mesh.HasColors(true);
-			constexpr std::array<PonyMath::Core::RGBA<float>, 3> colors =
+			constexpr std::array<PonyMath::Color::RGBA<float>, 3> colors =
 			{
-				PonyMath::Core::RGBA<float>(0.1f, 0.3f, 0.4f, 0.9f),
-				PonyMath::Core::RGBA<float>(0.f, 0.7f, 0.45f, 0.95f),
-				PonyMath::Core::RGBA<float>(0.7f, 0.3f, 0.7f, 1.f)
+				PonyMath::Color::RGBA<float>(0.1f, 0.3f, 0.4f, 0.9f),
+				PonyMath::Color::RGBA<float>(0.f, 0.7f, 0.45f, 0.95f),
+				PonyMath::Color::RGBA<float>(0.7f, 0.3f, 0.7f, 1.f)
 			};
 			mesh.Colors(colors);
 			Assert::AreEqual(std::size_t{3}, mesh.Colors().size());
@@ -442,7 +443,7 @@ namespace Geometry
 			auto mesh = PonyMath::Geometry::Mesh();
 			constexpr std::array<PonyMath::Core::Vector3<float>, 3> vertices = { PonyMath::Core::Vector3<float>(1.f, 2.f, 3.f), PonyMath::Core::Vector3<float>(-1.f, -2.f, -3.f), PonyMath::Core::Vector3<float>(-2.f, 4.f, -7.f) };
 			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 1> triangles = { PonyMath::Core::Vector3<std::uint32_t>{0, 2, 1} };
-			constexpr std::array<PonyMath::Core::RGBA<float>, 3> colors = { PonyMath::Core::RGBA<float>(0.2f, 0.5f, 0.8f, 1.f), PonyMath::Core::RGBA<float>(0.f, 1.f, 0.4f, 0.9f), PonyMath::Core::RGBA<float>(1.f, 0.f, 0.f, 0.7f) };
+			constexpr std::array<PonyMath::Color::RGBA<float>, 3> colors = { PonyMath::Color::RGBA<float>(0.2f, 0.5f, 0.8f, 1.f), PonyMath::Color::RGBA<float>(0.f, 1.f, 0.4f, 0.9f), PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.7f) };
 			mesh.Vertices(vertices);
 			mesh.Triangles(triangles);
 			mesh.Colors(colors);

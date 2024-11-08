@@ -16,8 +16,6 @@ export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12Camera;
 import PonyMath.Core;
 import PonyMath.Utility;
 
-import PonyEngine.Screen;
-
 import :Direct3D12CameraParams;
 
 export namespace PonyEngine::Render

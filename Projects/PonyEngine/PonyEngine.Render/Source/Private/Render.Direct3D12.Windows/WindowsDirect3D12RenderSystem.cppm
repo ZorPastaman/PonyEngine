@@ -27,6 +27,7 @@ import <type_traits>;
 
 import PonyBase.StringUtility;
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 import PonyMath.Utility;
@@ -68,8 +69,8 @@ export namespace PonyEngine::Render
 		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::RGBA<float> ClearColor() const noexcept override;
-		virtual void ClearColor(const PonyMath::Core::RGBA<float>& color) noexcept override;
+		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept override;
+		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual CameraParams CameraParameters() const noexcept override;
@@ -199,14 +200,14 @@ namespace PonyEngine::Render
 		return engine->Logger();
 	}
 
-	PonyMath::Core::RGBA<float> WindowsDirect3D12RenderSystem::ClearColor() const noexcept
+	PonyMath::Color::RGBA<float> WindowsDirect3D12RenderSystem::ClearColor() const noexcept
 	{
-		return static_cast<PonyMath::Core::RGBA<float>>(direct3D12SubSystem->ClearColor());
+		return static_cast<PonyMath::Color::RGBA<float>>(direct3D12SubSystem->ClearColor());
 	}
 
-	void WindowsDirect3D12RenderSystem::ClearColor(const PonyMath::Core::RGBA<float>& color) noexcept
+	void WindowsDirect3D12RenderSystem::ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept
 	{
-		direct3D12SubSystem->ClearColor() = static_cast<PonyMath::Core::RGBA<FLOAT>>(color);
+		direct3D12SubSystem->ClearColor() = static_cast<PonyMath::Color::RGBA<FLOAT>>(color);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Clear color set to '{}'.", direct3D12SubSystem->ClearColor().ToString());
 	}
 

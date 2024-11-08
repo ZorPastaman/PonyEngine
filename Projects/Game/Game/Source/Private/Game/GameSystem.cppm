@@ -19,6 +19,7 @@ import <cstdint>;
 import <functional>;
 import <string_view>;
 
+import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Geometry;
 import PonyMath.Space;
@@ -377,8 +378,8 @@ namespace Game
 			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 12> triangles = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
 				PonyMath::Core::Vector3<std::uint32_t>(0, 4, 1), PonyMath::Core::Vector3<std::uint32_t>(1, 4, 5), PonyMath::Core::Vector3<std::uint32_t>(1, 5, 2), PonyMath::Core::Vector3<std::uint32_t>(2, 5, 6),
 				PonyMath::Core::Vector3<std::uint32_t>(2, 6, 3), PonyMath::Core::Vector3<std::uint32_t>(3, 6, 7), PonyMath::Core::Vector3<std::uint32_t>(3, 7, 0), PonyMath::Core::Vector3<std::uint32_t>(0, 7, 4) };
-			constexpr std::array<PonyMath::Core::RGBA<float>, 8> vertexColors = { PonyMath::Core::RGBA<float>::Predefined::Red, PonyMath::Core::RGBA<float>::Predefined::Green, PonyMath::Core::RGBA<float>::Predefined::Blue, PonyMath::Core::RGBA<float>::Predefined::Yellow,
-				PonyMath::Core::RGBA<float>::Predefined::Magenta, PonyMath::Core::RGBA<float>::Predefined::Cyan, PonyMath::Core::RGBA<float>::Predefined::Gray, PonyMath::Core::RGBA<float>::Predefined::White };
+			constexpr std::array<PonyMath::Color::RGBA<float>, 8> vertexColors = { PonyMath::Color::RGBA<float>::Predefined::Red, PonyMath::Color::RGBA<float>::Predefined::Green, PonyMath::Color::RGBA<float>::Predefined::Blue, PonyMath::Color::RGBA<float>::Predefined::Yellow,
+				PonyMath::Color::RGBA<float>::Predefined::Magenta, PonyMath::Color::RGBA<float>::Predefined::Cyan, PonyMath::Color::RGBA<float>::Predefined::Gray, PonyMath::Color::RGBA<float>::Predefined::White };
 			auto box = PonyMath::Geometry::Mesh();
 			box.Vertices(vertices);
 			box.Triangles(triangles);

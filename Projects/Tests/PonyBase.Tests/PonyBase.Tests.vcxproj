@@ -80,20 +80,14 @@
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Core\PonyBase.Core.vcxproj">
-      <Project>{dde9fc95-f61b-4c75-87bb-aa10cd7dc4fa}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Memory\PonyBase.Memory.vcxproj">
-      <Project>{9f9401da-e183-4f0a-b73c-81083ca7de4d}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyBase\PonyBase.Utility\PonyBase.Utility.vcxproj">
-      <Project>{b3e69e98-b5f5-443c-a9e1-99e775557c81}</Project>
-    </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
     <ClInclude Include="Memory\Mocks\DerivedWithParams.h" />
     <ClInclude Include="Memory\Mocks\Derived.h" />
     <ClInclude Include="Memory\Mocks\Base.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">
+      <Project>{8a7ec39a-b21b-49fe-bf96-0b9b0ced7323}</Project>
+    </ProjectReference>
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

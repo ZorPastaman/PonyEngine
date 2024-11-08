@@ -27,7 +27,6 @@ import PonyMath.Utility;
 
 import PonyDebug.Log;
 
-import PonyEngine.Screen;
 import PonyEngine.Window.Windows;
 
 import PonyEngine.Render.Core;
