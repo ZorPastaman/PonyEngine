@@ -28,14 +28,15 @@ export namespace Game
 	/// @brief Creates a game system factory.
 	/// @param application Application context.
 	/// @param params Game system factory parameters.
+	/// @param systemParams Game system parameters.
 	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& params);
+	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& params, const GameSystemParams& systemParams);
 }
 
 namespace Game
 {
-	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext&, const GameSystemFactoryParams&)
+	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext&, const GameSystemFactoryParams&, const GameSystemParams&)
 	{
 		auto factory = PonyBase::Memory::UniquePointer<GameSystemFactory>::Create();
 

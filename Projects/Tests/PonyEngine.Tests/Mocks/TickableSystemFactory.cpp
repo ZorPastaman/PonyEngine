@@ -36,16 +36,6 @@ namespace Core
 		};
 	}
 
-	PonyEngine::Core::SystemParams& TickableSystemFactory::SystemParams() noexcept
-	{
-		return systemParams;
-	}
-
-	const PonyEngine::Core::SystemParams& TickableSystemFactory::SystemParams() const noexcept
-	{
-		return systemParams;
-	}
-
 	TickableSystem* TickableSystemFactory::GetSystem() const noexcept
 	{
 		return system;

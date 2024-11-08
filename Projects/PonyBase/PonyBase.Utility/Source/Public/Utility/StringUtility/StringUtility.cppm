@@ -7,14 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Factory;
+export module PonyBase.StringUtility;
 
-export import PonyEngine.Core;
-
-export import :EngineData;
-export import :EngineSystemParams;
-export import :EngineParams;
-export import :IApplication;
-export import :ISystemFactory;
-export import :SystemData;
-export import :SystemFactoriesContainer;
+export import :SafeFormat;
+export import :StringConvert;

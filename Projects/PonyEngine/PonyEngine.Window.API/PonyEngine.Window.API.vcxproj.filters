@@ -60,6 +60,9 @@
     <ClCompile Include="Source\Public\Window.Windows\Factory\WindowsWindowStyle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\Factory\IWindowsClass.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

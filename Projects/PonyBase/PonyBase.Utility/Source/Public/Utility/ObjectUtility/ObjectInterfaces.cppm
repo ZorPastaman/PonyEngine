@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyBase.ObjectUtility;
+export module PonyBase.ObjectUtility:ObjectInterfaces;
 
 import <concepts>;
 import <typeinfo>;

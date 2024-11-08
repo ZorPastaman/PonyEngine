@@ -28,14 +28,15 @@ export namespace PonyEngine::Screen
 	/// @brief Creates a screen system for Windows factory.
 	/// @param application Application context.
 	/// @param params Screen system for Windows factory parameters.
+	/// @param systemParams Screen system for Windows parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext& application, const WindowsScreenSystemFactoryParams& params);
+	PONY_DLL_EXPORT WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext& application, const WindowsScreenSystemFactoryParams& params, const WindowsScreenSystemParams& systemParams);
 }
 
 namespace PonyEngine::Screen
 {
-	WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext&, const WindowsScreenSystemFactoryParams&)
+	WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext&, const WindowsScreenSystemFactoryParams&, const WindowsScreenSystemParams&)
 	{
 		auto factory = PonyBase::Memory::UniquePointer<WindowsScreenSystemFactory>::Create();
 

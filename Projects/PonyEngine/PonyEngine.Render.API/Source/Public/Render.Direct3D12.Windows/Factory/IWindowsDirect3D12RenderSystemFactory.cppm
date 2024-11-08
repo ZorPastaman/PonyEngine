@@ -21,11 +21,6 @@ export namespace PonyEngine::Render
 		IWindowsDirect3D12RenderSystemFactory(const IWindowsDirect3D12RenderSystemFactory&) = delete;
 		IWindowsDirect3D12RenderSystemFactory(IWindowsDirect3D12RenderSystemFactory&&) = delete;
 
-		[[nodiscard("Pure function")]]
-		virtual WindowsDirect3D12RenderSystemParams& SystemParams() noexcept override = 0;
-		[[nodiscard("Pure function")]]
-		virtual const WindowsDirect3D12RenderSystemParams& SystemParams() const noexcept override = 0;
-
 		IWindowsDirect3D12RenderSystemFactory& operator =(const IWindowsDirect3D12RenderSystemFactory&) = delete;
 		IWindowsDirect3D12RenderSystemFactory& operator =(IWindowsDirect3D12RenderSystemFactory&&) = delete;
 

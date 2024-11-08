@@ -9,10 +9,10 @@
 
 export module PonyEngine.Render:IRenderSystem;
 
+import <string_view>;
+
 import PonyMath.Core;
 import PonyMath.Geometry;
-
-import PonyEngine.Core;
 
 import :CameraParams;
 import :RenderObjectHandle;
@@ -20,7 +20,7 @@ import :RenderObjectHandle;
 export namespace PonyEngine::Render
 {
 	/// @brief Render system.
-	class IRenderSystem : public Core::ISystem
+	class IRenderSystem
 	{
 	public:
 		IRenderSystem(const IRenderSystem&) = delete;
@@ -40,6 +40,11 @@ export namespace PonyEngine::Render
 		virtual RenderObjectHandle CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& trs) = 0;
 		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) = 0;
 		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept = 0;
+
+		/// @brief Gets the system name.
+		/// @return System name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;

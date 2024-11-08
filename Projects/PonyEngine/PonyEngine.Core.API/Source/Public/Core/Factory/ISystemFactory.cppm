@@ -15,7 +15,6 @@ import PonyEngine.Core;
 
 import :EngineSystemParams;
 import :SystemData;
-import :SystemParams;
 
 export namespace PonyEngine::Core
 {
@@ -32,15 +31,6 @@ export namespace PonyEngine::Core
 		/// @return Created system data.
 		[[nodiscard("Pure function")]]
 		virtual SystemData Create(IEngineContext& engine, const EngineSystemParams& params) = 0;
-
-		/// @brief Gets the system parameters.
-		/// @return System parameters.
-		[[nodiscard("Pure function")]]
-		virtual SystemParams& SystemParams() noexcept = 0;
-		/// @brief Gets the system parameters.
-		/// @return System parameters.
-		[[nodiscard("Pure function")]]
-		virtual const Core::SystemParams& SystemParams() const noexcept = 0;
 
 		/// @brief Gets the system static name.
 		/// @return System static name.

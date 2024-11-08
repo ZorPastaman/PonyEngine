@@ -10,8 +10,7 @@
 export module PonyEngine.Input:IInputSystem;
 
 import <functional>;
-
-import PonyEngine.Core;
+import <string_view>;
 
 import :Event;
 import :Handle;
@@ -19,7 +18,7 @@ import :Handle;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class IInputSystem : public Core::ISystem
+	class IInputSystem
 	{
 	public:
 		IInputSystem(const IInputSystem&) = delete;
@@ -34,6 +33,11 @@ export namespace PonyEngine::Input
 		/// @brief Unregisters an action by its handle.
 		/// @param handle Action handle.
 		virtual void UnregisterAction(Handle handle) = 0;
+
+		/// @brief Gets the system name.
+		/// @return System name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 
 		IInputSystem& operator =(const IInputSystem&) = delete;
 		IInputSystem& operator =(IInputSystem&&) = delete;

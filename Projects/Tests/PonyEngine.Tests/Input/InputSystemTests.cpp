@@ -69,7 +69,7 @@ namespace Input
 			auto keyboardProvider = KeyboardProvider();
 			
 			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			constexpr auto systemParams = PonyEngine::Core::EngineSystemParams();
 			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
 			Assert::AreEqual(std::size_t{0}, keyboardProvider.version);
@@ -89,7 +89,7 @@ namespace Input
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
@@ -123,7 +123,7 @@ namespace Input
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), std::get<1>(inputSystemBase.system)->Name());
 		}

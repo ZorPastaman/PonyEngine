@@ -35,7 +35,7 @@ namespace Time
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
 			std::get<1>(frameRateSystemBase.system)->Begin();
@@ -58,7 +58,7 @@ namespace Time
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams());
+			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
 

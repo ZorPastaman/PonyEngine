@@ -15,13 +15,25 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Utility\StringUtility.cppm">
+    <ClCompile Include="Source\Public\Utility\StringUtility\StringUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\ObjectUtility.cppm">
+    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectInterfaces.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility\StringUtility\StringConvert.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility\StringUtility\SafeFormat.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.COM\COMUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

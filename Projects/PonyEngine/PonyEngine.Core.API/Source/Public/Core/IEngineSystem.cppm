@@ -9,12 +9,12 @@
 
 export module PonyEngine.Core:IEngineSystem;
 
-import :ISystem;
+import <string_view>;
 
 export namespace PonyEngine::Core
 {
 	/// @brief Engine system.
-	class IEngineSystem : public ISystem
+	class IEngineSystem
 	{
 	public:
 		IEngineSystem(const IEngineSystem&) = delete;
@@ -26,6 +26,11 @@ export namespace PonyEngine::Core
 		/// @brief Ends the system.
 		/// @details It's called once after a last engine tick.
 		virtual void End() = 0;
+
+		/// @brief Gets the system name.
+		/// @return System name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 
 		IEngineSystem& operator =(const IEngineSystem&) = delete;
 		IEngineSystem& operator =(IEngineSystem&&) = delete;

@@ -16,6 +16,5 @@ export namespace PonyEngine::Window
 	/// @brief Window system for Windows factory parameters.
 	struct WindowsWindowSystemFactoryParams final
 	{
-		WindowsClassParams windowsClassParams; ///< Windows class parameters.
 	};
 }

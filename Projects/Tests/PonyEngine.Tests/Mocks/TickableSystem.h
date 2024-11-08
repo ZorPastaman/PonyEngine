@@ -16,7 +16,7 @@ import PonyEngine.Core;
 
 namespace Core
 {
-	class ITickableSystemInterface : PonyEngine::Core::ISystem
+	class ITickableSystemInterface
 	{
 	public:
 		ITickableSystemInterface(const ITickableSystemInterface&) = delete;

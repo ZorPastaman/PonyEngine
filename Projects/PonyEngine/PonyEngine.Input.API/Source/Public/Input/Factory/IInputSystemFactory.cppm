@@ -22,15 +22,6 @@ export namespace PonyEngine::Input
 		IInputSystemFactory(const IInputSystemFactory&) = delete;
 		IInputSystemFactory(IInputSystemFactory&&) = delete;
 
-		/// @brief Gets system parameters.
-		/// @return System parameters.
-		[[nodiscard("Pure function")]]
-		virtual InputSystemParams& SystemParams() noexcept override = 0;
-		/// @brief Gets system parameters.
-		/// @return System parameters.
-		[[nodiscard("Pure function")]]
-		virtual const InputSystemParams& SystemParams() const noexcept override = 0;
-
 		IInputSystemFactory& operator =(const IInputSystemFactory&) = delete;
 		IInputSystemFactory& operator =(IInputSystemFactory&&) = delete;
 

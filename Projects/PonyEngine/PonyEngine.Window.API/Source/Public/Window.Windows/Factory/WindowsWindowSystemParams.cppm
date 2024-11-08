@@ -13,8 +13,11 @@ module;
 
 export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemParams;
 
+import <memory>;
+
 import PonyEngine.Window.Factory;
 
+import :IWindowsClass;
 import :WindowsWindowStyle;
 
 export namespace PonyEngine::Window
@@ -22,6 +25,7 @@ export namespace PonyEngine::Window
 	/// @brief Windows window parameters.
 	struct WindowsWindowSystemParams final : WindowSystemParams
 	{
+		std::shared_ptr<IWindowsClass> windowsClass; ///< Windows class.
 		WindowsWindowStyle windowsWindowStyle; ///< Windows window style.
 		int cmdShow = SW_NORMAL; ///< Window cmdShow.
 	};

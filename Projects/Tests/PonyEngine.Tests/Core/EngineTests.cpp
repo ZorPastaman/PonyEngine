@@ -130,9 +130,6 @@ namespace Core
 
 			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(TickableSystem)));
 			Assert::IsNull(engine.engine->SystemManager().FindSystem<TickableSystem>());
-
-			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(PonyEngine::Core::ISystem)));
-			Assert::IsNull(engine.engine->SystemManager().FindSystem<PonyEngine::Core::ISystem>());
 		}
 	};
 } 

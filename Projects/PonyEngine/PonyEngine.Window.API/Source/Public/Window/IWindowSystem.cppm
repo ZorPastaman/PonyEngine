@@ -14,12 +14,10 @@ import <string_view>;
 import PonyMath.Core;
 import PonyMath.Utility;
 
-import PonyEngine.Core;
-
 export namespace PonyEngine::Window
 {
 	/// @brief Window system.
-	class IWindowSystem : public Core::ISystem
+	class IWindowSystem
 	{
 	public:
 		IWindowSystem(const IWindowSystem&) = delete;
@@ -57,6 +55,11 @@ export namespace PonyEngine::Window
 		/// @return Window resolution.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
+
+		/// @brief Gets the system name.
+		/// @return System name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 
 		IWindowSystem& operator =(const IWindowSystem&) = delete;
 		IWindowSystem& operator =(IWindowSystem&&) = delete;

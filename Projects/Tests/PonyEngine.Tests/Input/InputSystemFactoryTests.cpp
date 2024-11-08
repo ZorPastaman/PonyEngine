@@ -30,7 +30,7 @@ namespace Input
 		TEST_METHOD(CreateTest)
 		{
 			auto application = Core::Application();
-			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.Get());
 		}
 
@@ -41,7 +41,7 @@ namespace Input
 			auto engine = Core::Engine();
 			application.logger = &logger;
 			engine.application = &application;
-			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::IsNotNull(std::get<1>(inputSystem.system).Get());
 		}
@@ -49,14 +49,14 @@ namespace Input
 		TEST_METHOD(GetSystemNameTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), factory.systemFactory->SystemName());
 		}
 
 		TEST_METHOD(GetNameTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams());
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystemFactory"), factory.systemFactory->Name());
 		}
 	};

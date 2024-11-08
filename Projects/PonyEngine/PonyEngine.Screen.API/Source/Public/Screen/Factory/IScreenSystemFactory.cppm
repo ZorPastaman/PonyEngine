@@ -22,11 +22,6 @@ export namespace PonyEngine::Screen
 		IScreenSystemFactory(const IScreenSystemFactory&) = delete;
 		IScreenSystemFactory(IScreenSystemFactory&&) = delete;
 
-		[[nodiscard("Pure function")]]
-		virtual ScreenSystemParams& SystemParams() noexcept override = 0;
-		[[nodiscard("Pure function")]]
-		virtual const ScreenSystemParams& SystemParams() const noexcept override = 0;
-
 		IScreenSystemFactory& operator =(const IScreenSystemFactory&) = delete;
 		IScreenSystemFactory& operator =(IScreenSystemFactory&&) = delete;
 

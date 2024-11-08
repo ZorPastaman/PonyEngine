@@ -15,6 +15,7 @@ export module PonyEngine.Window.Windows.Factory:WindowsWindowStyle;
 
 export namespace PonyEngine::Window
 {
+	/// @brief Windows window style.
 	struct WindowsWindowStyle final
 	{
 		DWORD style = WS_POPUP; ///< Window style.

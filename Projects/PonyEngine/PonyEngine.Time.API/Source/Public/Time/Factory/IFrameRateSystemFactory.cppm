@@ -22,11 +22,6 @@ export namespace PonyEngine::Time
 		IFrameRateSystemFactory(const IFrameRateSystemFactory&) = delete;
 		IFrameRateSystemFactory(IFrameRateSystemFactory&&) = delete;
 
-		[[nodiscard("Pure function")]]
-		virtual FrameRateSystemParams& SystemParams() noexcept override = 0;
-		[[nodiscard("Pure function")]]
-		virtual const FrameRateSystemParams& SystemParams() const noexcept override = 0;
-
 		IFrameRateSystemFactory& operator =(const IFrameRateSystemFactory&) = delete;
 		IFrameRateSystemFactory& operator =(IFrameRateSystemFactory&&) = delete;
 

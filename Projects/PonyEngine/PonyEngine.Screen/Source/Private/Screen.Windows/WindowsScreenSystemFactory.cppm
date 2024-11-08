@@ -41,11 +41,6 @@ export namespace PonyEngine::Screen
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual WindowsScreenSystemParams& SystemParams() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const WindowsScreenSystemParams& SystemParams() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
 
 		[[nodiscard("Pure function")]]
@@ -55,9 +50,6 @@ export namespace PonyEngine::Screen
 		WindowsScreenSystemFactory& operator =(WindowsScreenSystemFactory&&) = delete;
 
 		static constexpr std::string_view StaticName = "PonyEngine::Screen::WindowsScreenSystemFactory"; ///< Class name.
-
-	private:
-		WindowsScreenSystemParams systemParams; ///< Screen system parameters.
 	};
 }
 
@@ -74,16 +66,6 @@ namespace PonyEngine::Screen
 			.system = PonyBase::Memory::UniquePointer<Core::IEngineSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
-	}
-
-	WindowsScreenSystemParams& WindowsScreenSystemFactory::SystemParams() noexcept
-	{
-		return systemParams;
-	}
-
-	const WindowsScreenSystemParams& WindowsScreenSystemFactory::SystemParams() const noexcept
-	{
-		return systemParams;
 	}
 
 	std::string_view WindowsScreenSystemFactory::SystemName() const noexcept
