@@ -9,8 +9,11 @@
 
 #include "CppUnitTest.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
 #include <variant>
 
 #include "Mocks/Application.h"
@@ -57,17 +60,14 @@ namespace Window
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::IsNotNull(std::get<1>(window.system).Get());
 
-			auto it = window.publicInterfaces.Begin();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindowSystem*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
-
-			++it;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
-
-			++it;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
-
-			++it;
-			Assert::IsTrue(it == window.publicInterfaces.End());
+			auto interfaces = window.publicInterfaces.Span();
+			Assert::AreEqual(std::size_t{3}, interfaces.size());
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Window::IWindowSystem)) == std::type_index(interfaces[0].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindowSystem*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Window::IWindowsWindowSystem)) == std::type_index(interfaces[1].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(interfaces[1].second));
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Input::IKeyboardProvider)) == std::type_index(interfaces[2].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(std::get<1>(window.system).Get())), reinterpret_cast<std::uintptr_t>(interfaces[2].second));
 		}
 
 		TEST_METHOD(GetNameTest)

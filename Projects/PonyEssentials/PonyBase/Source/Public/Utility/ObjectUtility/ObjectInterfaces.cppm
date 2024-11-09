@@ -14,6 +14,8 @@ module;
 export module PonyBase.ObjectUtility:ObjectInterfaces;
 
 import <concepts>;
+import <functional>;
+import <span>;
 import <typeinfo>;
 import <vector>;
 
@@ -23,9 +25,6 @@ export namespace PonyBase::Utility
 	class ObjectInterfaces final
 	{
 	public:
-		using Iterator = std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::iterator; ///< Interfaces iterator.
-		using ConstIterator = std::vector<std::pair<std::reference_wrapper<const std::type_info>, void*>>::const_iterator; ///< Interfaces const iterator.
-
 		[[nodiscard("Pure constructor")]]
 		ObjectInterfaces() noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,39 +57,8 @@ export namespace PonyBase::Utility
 		template<typename... Targets, typename Source>
 		void AddInterfacesDeduced(Source& object) requires (... && std::derived_from<Source, Targets>);
 
-		/// @brief Gets a begin iterator.
-		/// @return Begin iterator.
 		[[nodiscard("Pure function")]]
-		Iterator Begin() noexcept;
-		/// @brief Gets a begin iterator.
-		/// @return Begin iterator.
-		[[nodiscard("Pure function")]]
-		ConstIterator Begin() const noexcept;
-		/// @brief Gets an end iterator.
-		/// @return End iterator.
-		[[nodiscard("Pure function")]]
-		Iterator End() noexcept;
-		/// @brief Gets an end iterator.
-		/// @return End iterator.
-		[[nodiscard("Pure function")]]
-		ConstIterator End() const noexcept;
-
-		/// @brief Gets a begin iterator.
-		/// @return Begin iterator.
-		[[nodiscard("Pure function")]]
-		Iterator begin() noexcept;
-		/// @brief Gets a begin iterator.
-		/// @return Begin iterator.
-		[[nodiscard("Pure function")]]
-		ConstIterator begin() const noexcept;
-		/// @brief Gets an end iterator.
-		/// @return End iterator.
-		[[nodiscard("Pure function")]]
-		Iterator end() noexcept;
-		/// @brief Gets an end iterator.
-		/// @return End iterator.
-		[[nodiscard("Pure function")]]
-		ConstIterator end() const noexcept;
+		std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> Span() const noexcept;
 
 		ObjectInterfaces& operator =(const ObjectInterfaces& other) = default;
 		ObjectInterfaces& operator =(ObjectInterfaces&& other) noexcept = default;
@@ -126,43 +94,8 @@ namespace PonyBase::Utility
 		AddInterfaces<Source, Targets...>(object);
 	}
 
-	ObjectInterfaces::Iterator ObjectInterfaces::Begin() noexcept // TODO: Try to use span
+	std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> ObjectInterfaces::Span() const noexcept
 	{
-		return interfaces.begin();
-	}
-
-	ObjectInterfaces::ConstIterator ObjectInterfaces::Begin() const noexcept
-	{
-		return interfaces.begin();
-	}
-
-	ObjectInterfaces::Iterator ObjectInterfaces::End() noexcept
-	{
-		return interfaces.end();
-	}
-
-	ObjectInterfaces::ConstIterator ObjectInterfaces::End() const noexcept
-	{
-		return interfaces.end();
-	}
-
-	ObjectInterfaces::Iterator ObjectInterfaces::begin() noexcept
-	{
-		return Begin();
-	}
-
-	ObjectInterfaces::ConstIterator ObjectInterfaces::begin() const noexcept
-	{
-		return Begin();
-	}
-
-	ObjectInterfaces::Iterator ObjectInterfaces::end() noexcept
-	{
-		return End();
-	}
-
-	ObjectInterfaces::ConstIterator ObjectInterfaces::end() const noexcept
-	{
-		return End();
+		return interfaces;
 	}
 }

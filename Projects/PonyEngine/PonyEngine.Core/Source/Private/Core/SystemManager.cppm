@@ -133,7 +133,7 @@ namespace PonyEngine::Core
 				break;
 			}
 
-			for (const auto [interface, objectPointer] : systemData.publicInterfaces)
+			for (const auto [interface, objectPointer] : systemData.publicInterfaces.Span())
 			{
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
 				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
