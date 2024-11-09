@@ -9,8 +9,6 @@
 
 export module PonyMath.Color:RGBAInt;
 
-import <algorithm>;
-import <array>;
 import <concepts>;
 import <cstddef>;
 import <format>;
@@ -108,6 +106,14 @@ export namespace PonyMath::Color
 		/// @return Color span. The order is r, g, b, a.
 		[[nodiscard("Pure function")]]
 		constexpr std::span<const T, 4> Span() const noexcept;
+		/// @brief Gets the color vector.
+		/// @return Color vector. red -> x, green -> y, blue -> z, alpha -> w.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector4<T>& Vector() noexcept;
+		/// @brief Gets the color vector.
+		/// @return Color vector. red -> x, green -> y, blue -> z, alpha -> w.
+		[[nodiscard("Pure function")]]
+		constexpr const Core::Vector4<T>& Vector() const noexcept;
 
 		/// @brief Gets a minimum among the components.
 		/// @return Minimum component.
@@ -191,7 +197,7 @@ export namespace PonyMath::Color
 		constexpr bool operator ==(const RGBAInt& other) const noexcept;
 
 	private:
-		std::array<T, ComponentCount> components; ///< Component array. The order is r, g, b, a.
+		Core::Vector4<T> components; ///< Component array. The order is r, g, b, a.
 	};
 
 	/// @brief Creates a color consisting of minimal elements of the two colors.
@@ -246,14 +252,14 @@ namespace PonyMath::Color
 {
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::RGBAInt(const T red, const T green, const T blue, const T alpha) noexcept :
-		components{red, green, blue, alpha}
+		components(red, green, blue, alpha)
 	{
 	}
 
 	template<std::unsigned_integral T>
-	constexpr RGBAInt<T>::RGBAInt(const std::span<const T, ComponentCount> span) noexcept
+	constexpr RGBAInt<T>::RGBAInt(const std::span<const T, ComponentCount> span) noexcept :
+		components(span)
 	{
-		Set(span);
 	}
 
 	template<std::unsigned_integral T>
@@ -264,66 +270,78 @@ namespace PonyMath::Color
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::RGBAInt(const Core::Vector4<T>& vector) noexcept :
-		RGBAInt(vector.Span())
+		components(vector)
 	{
 	}
 
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::R() noexcept
 	{
-		return components[0];
+		return components.X();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::R() const noexcept
 	{
-		return components[0];
+		return components.X();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::G() noexcept
 	{
-		return components[1];
+		return components.Y();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::G() const noexcept
 	{
-		return components[1];
+		return components.Y();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::B() noexcept
 	{
-		return components[2];
+		return components.Z();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::B() const noexcept
 	{
-		return components[2];
+		return components.Z();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::A() noexcept
 	{
-		return components[3];
+		return components.W();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::A() const noexcept
 	{
-		return components[3];
+		return components.W();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr std::span<T, 4> RGBAInt<T>::Span() noexcept
 	{
-		return components;
+		return components.Span();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr std::span<const T, 4> RGBAInt<T>::Span() const noexcept
+	{
+		return components.Span();
+	}
+
+	template<std::unsigned_integral T>
+	constexpr Core::Vector4<T>& RGBAInt<T>::Vector() noexcept
+	{
+		return components;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr const Core::Vector4<T>& RGBAInt<T>::Vector() const noexcept
 	{
 		return components;
 	}
@@ -331,41 +349,37 @@ namespace PonyMath::Color
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::Min() noexcept
 	{
-		return *std::ranges::min_element(components);
+		return components.Min();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::Min() const noexcept
 	{
-		return *std::ranges::min_element(components);
+		return components.Min();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr T& RGBAInt<T>::Max() noexcept
 	{
-		return *std::ranges::max_element(components);
+		return components.Max();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr const T& RGBAInt<T>::Max() const noexcept
 	{
-		return *std::ranges::max_element(components);
+		return components.Max();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr std::pair<T&, T&> RGBAInt<T>::MinMax() noexcept
 	{
-		auto [min, max] = std::ranges::minmax_element(components);
-
-		return std::pair<T&, T&>(*min, *max);
+		return components.MinMax();
 	}
 
 	template<std::unsigned_integral T>
 	constexpr std::pair<const T&, const T&> RGBAInt<T>::MinMax() const noexcept
 	{
-		auto [min, max] = std::ranges::minmax_element(components);
-
-		return std::pair<const T&, const T&>(*min, *max);
+		return components.MinMax();
 	}
 
 	template<std::unsigned_integral T>
@@ -389,16 +403,13 @@ namespace PonyMath::Color
 	template<std::unsigned_integral T>
 	constexpr void RGBAInt<T>::Set(const T red, const T green, const T blue, const T alpha) noexcept
 	{
-		R() = red;
-		G() = green;
-		B() = blue;
-		A() = alpha;
+		components.Set(red, green, blue, alpha);
 	}
 
 	template<std::unsigned_integral T>
 	constexpr void RGBAInt<T>::Set(const std::span<const T, ComponentCount> span) noexcept
 	{
-		std::ranges::copy(span, components.data());
+		components.Set(span);
 	}
 
 	template<std::unsigned_integral T>
@@ -410,49 +421,31 @@ namespace PonyMath::Color
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T> Min(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept
 	{
-		RGBAInt<T> min;
-		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
-		{
-			min[i] = std::min(left[i], right[i]);
-		}
-
-		return min;
+		return RGBAInt<T>(Core::Min(left.Vector(), right.Vector()));
 	}
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T> Max(const RGBAInt<T>& left, const RGBAInt<T>& right) noexcept
 	{
-		RGBAInt<T> max;
-		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
-		{
-			max[i] = std::max(left[i], right[i]);
-		}
-
-		return max;
+		return RGBAInt<T>(Core::Max(left.Vector(), right.Vector()));
 	}
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T> Clamp(const RGBAInt<T>& value, const RGBAInt<T>& min, const RGBAInt<T>& max) noexcept
 	{
-		RGBAInt<T> clamped;
-		for (std::size_t i = 0; i < RGBAInt<T>::ComponentCount; ++i)
-		{
-			clamped[i] = std::clamp(value[i], min[i], max[i]);
-		}
-
-		return clamped;
+		return RGBAInt<T>(Core::Clamp(value.Vector(), min.Vector(), max.Vector()));
 	}
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::operator RGBInt<T>() const noexcept
 	{
-		return RGBInt<T>(std::span<const T, RGBInt<T>::ComponentCount>(components.data(), RGBInt<T>::ComponentCount));
+		return RGBInt<T>(Span().subspan<0, RGBInt<T>::ComponentCount>());
 	}
 
 	template<std::unsigned_integral T>
 	constexpr RGBAInt<T>::operator Core::Vector4<T>() const noexcept
 	{
-		return Core::Vector4<T>(Span());
+		return components;
 	}
 
 	template<std::unsigned_integral T>

@@ -159,6 +159,24 @@ namespace Core
 			Assert::AreEqual(a, cColor.Span()[3]);
 		}
 
+		TEST_METHOD(VectorTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			constexpr float a = 0.166f;
+			auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
+			Assert::AreEqual(r, color.Vector()[0]);
+			Assert::AreEqual(g, color.Vector()[1]);
+			Assert::AreEqual(b, color.Vector()[2]);
+			Assert::AreEqual(a, color.Vector()[3]);
+			constexpr auto cColor = PonyMath::Color::RGBA<float>(r, g, b, a);
+			Assert::AreEqual(r, cColor.Vector()[0]);
+			Assert::AreEqual(g, cColor.Vector()[1]);
+			Assert::AreEqual(b, cColor.Vector()[2]);
+			Assert::AreEqual(a, cColor.Vector()[3]);
+		}
+
 		TEST_METHOD(GrayscaleTest)
 		{
 			constexpr float r = 0.85f;
@@ -903,6 +921,7 @@ namespace Core
 			copiedColor.A() -= 1.f;
 
 			movedColor.Span()[0] *= 2.5f;
+			movedColor.Vector()[1] /= 2.f;
 
 			copiedColor.Min() /= 3.f;
 			copiedColor.Max() *= 2.f;
@@ -943,6 +962,7 @@ namespace Core
 			[[maybe_unused]] constexpr float a = color.A();
 
 			[[maybe_unused]] constexpr auto spanElement = color.Span()[0];
+			[[maybe_unused]] constexpr auto vectorElement = color.Vector()[0];
 
 			[[maybe_unused]] constexpr auto grayscale = color.Grayscale();
 

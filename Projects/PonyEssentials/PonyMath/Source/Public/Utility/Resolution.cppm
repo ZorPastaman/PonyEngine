@@ -12,6 +12,7 @@ export module PonyMath.Utility:Resolution;
 import <concepts>;
 import <format>;
 import <ostream>;
+import <span>;
 import <string>;
 
 import PonyMath.Core;
@@ -61,6 +62,22 @@ export namespace PonyMath::Utility
 		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Height() const noexcept;
+		/// @brief Gets the resolution span.
+		/// @return Resolution span. The order is width, height.
+		[[nodiscard("Pure function")]]
+		constexpr std::span<T, 2> Span() noexcept;
+		/// @brief Gets the resolution span.
+		/// @return Resolution span. The order is width, height.
+		[[nodiscard("Pure function")]]
+		constexpr std::span<const T, 2> Span() const noexcept;
+		/// @brief Gets the resolution vector.
+		/// @return Resolution vector. Width -> x, Height -> y.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T>& Vector() noexcept;
+		/// @brief Gets the resolution vector.
+		/// @return Resolution vector. Width -> x, Height -> y.
+		[[nodiscard("Pure function")]]
+		constexpr const Core::Vector2<T>& Vector() const noexcept;
 
 		/// @brief Computes an aspect ratio (width / height).
 		/// @tparam U Aspect ratio type.
@@ -138,6 +155,30 @@ namespace PonyMath::Utility
 	constexpr const T& Resolution<T>::Height() const noexcept
 	{
 		return resolution.Y();
+	}
+
+	template<std::unsigned_integral T>
+	constexpr std::span<T, 2> Resolution<T>::Span() noexcept
+	{
+		return resolution.Span();
+	}
+
+	template<std::unsigned_integral T>
+	constexpr std::span<const T, 2> Resolution<T>::Span() const noexcept
+	{
+		return resolution.Span();
+	}
+
+	template<std::unsigned_integral T>
+	constexpr Core::Vector2<T>& Resolution<T>::Vector() noexcept
+	{
+		return resolution;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr const Core::Vector2<T>& Resolution<T>::Vector() const noexcept
+	{
+		return resolution;
 	}
 
 	template<std::unsigned_integral T>

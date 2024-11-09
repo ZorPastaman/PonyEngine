@@ -120,6 +120,21 @@ namespace Core
 			Assert::AreEqual(b, cColor.Span()[2]);
 		}
 
+		TEST_METHOD(VectorTest)
+		{
+			constexpr std::uint8_t r = 69;
+			constexpr std::uint8_t g = 200;
+			constexpr std::uint8_t b = 228;
+			auto color = PonyMath::Color::RGBInt<std::uint8_t>(r, g, b);
+			Assert::AreEqual(r, color.Vector()[0]);
+			Assert::AreEqual(g, color.Vector()[1]);
+			Assert::AreEqual(b, color.Vector()[2]);
+			constexpr auto cColor = PonyMath::Color::RGBInt<std::uint8_t>(r, g, b);
+			Assert::AreEqual(r, cColor.Vector()[0]);
+			Assert::AreEqual(g, cColor.Vector()[1]);
+			Assert::AreEqual(b, cColor.Vector()[2]);
+		}
+
 		TEST_METHOD(MinTest)
 		{
 			constexpr std::uint8_t r = 211;
@@ -343,6 +358,7 @@ namespace Core
 
 			[[maybe_unused]] const auto span = movedColor.Span();
 			span[0] += 1;
+			[[maybe_unused]] const auto vector = movedColor.Vector();
 
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();
@@ -379,6 +395,7 @@ namespace Core
 			[[maybe_unused]] constexpr bool isWhite = color.IsWhite();
 
 			[[maybe_unused]] constexpr auto spanElement = color.Span()[0];
+			[[maybe_unused]] constexpr auto vec = color.Vector();
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyMath::Core::Vector3<std::uint8_t>>(color);
 
