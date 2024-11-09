@@ -9,8 +9,11 @@
 
 #include "CppUnitTest.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
 #include <utility>
 #include <variant>
 
@@ -47,12 +50,12 @@ namespace Screen
 			auto screenSystem = std::get<0>(system.system).Get();
 			Assert::IsNotNull(screenSystem);
 
-			auto it = system.publicInterfaces.Begin();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::IScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(it->second));
-			++it;
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::IWindowsScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(it->second));
-			++it;
-			Assert::IsTrue(it == system.publicInterfaces.End());
+			auto interfaces = system.publicInterfaces.Span();
+			Assert::AreEqual(std::size_t{2}, interfaces.size());
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Screen::IScreenSystem)) == std::type_index(interfaces[0].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::IScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Screen::IWindowsScreenSystem)) == std::type_index(interfaces[1].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::IWindowsScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(interfaces[1].second));
 		}
 
 		TEST_METHOD(SystemNameTest)

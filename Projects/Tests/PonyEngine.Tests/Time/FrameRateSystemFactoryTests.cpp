@@ -9,8 +9,11 @@
 
 #include "CppUnitTest.h"
 
+#include <cstddef>
 #include <cstdint>
 #include <string_view>
+#include <typeindex>
+#include <typeinfo>
 #include <utility>
 #include <variant>
 
@@ -46,11 +49,10 @@ namespace Time
 			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			Assert::IsNotNull(std::get<1>(frameRateSystem.system).Get());
 
-			auto it = frameRateSystem.publicInterfaces.Begin();
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).Get())), reinterpret_cast<std::uintptr_t>(it->second));
-
-			++it;
-			Assert::IsTrue(it == frameRateSystem.publicInterfaces.End());
+			auto interfaces = frameRateSystem.publicInterfaces.Span();
+			Assert::AreEqual(std::size_t{1}, interfaces.size());
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Time::IFrameRateSystem)) == std::type_index(interfaces[0].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).Get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
 		TEST_METHOD(GetSystemNameTest)
