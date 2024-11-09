@@ -13,8 +13,6 @@ module;
 
 export module PonyBase.COMUtility:GuidUtility;
 
-import <cstdint>;
-import <format>;
 import <stdexcept>;
 import <string>;
 import <type_traits>;
@@ -32,7 +30,7 @@ export namespace PonyBase::Utility
 	/// @param guid GUID.
 	/// @return String representing the @p guid.
 	[[nodiscard("Pure function")]]
-	std::string ToString(const GUID& guid) noexcept;
+	std::string ToString(const GUID& guid);
 }
 
 namespace PonyBase::Utility
@@ -48,7 +46,7 @@ namespace PonyBase::Utility
 		return acquiredGuid;
 	}
 
-	std::string ToString(const GUID& guid) noexcept
+	std::string ToString(const GUID& guid)
 	{
 		auto buffer = std::wstring(39, '\0');
 		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
