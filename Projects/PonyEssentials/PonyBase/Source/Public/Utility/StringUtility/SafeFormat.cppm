@@ -20,9 +20,7 @@ export namespace PonyBase::Utility
 	template<typename T>
 	concept ExceptionHandler = requires (const T & exceptionHandler, const std::exception & e)
 	{
-		{
-			exceptionHandler(e)
-		} noexcept;
+		{ exceptionHandler(e) } noexcept;
 	};
 
 	/// @brief @p std::format() wrapper that doesn't throw.
