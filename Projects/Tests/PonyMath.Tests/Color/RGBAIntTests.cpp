@@ -140,6 +140,24 @@ namespace Color
 			Assert::AreEqual(a, cColor.Span()[3]);
 		}
 
+		TEST_METHOD(VectorTest)
+		{
+			constexpr std::uint8_t r = 69;
+			constexpr std::uint8_t g = 200;
+			constexpr std::uint8_t b = 228;
+			constexpr std::uint8_t a = 200;
+			auto color = PonyMath::Color::RGBAInt<std::uint8_t>(r, g, b, a);
+			Assert::AreEqual(r, color.Vector()[0]);
+			Assert::AreEqual(g, color.Vector()[1]);
+			Assert::AreEqual(b, color.Vector()[2]);
+			Assert::AreEqual(a, color.Vector()[3]);
+			constexpr auto cColor = PonyMath::Color::RGBAInt<std::uint8_t>(r, g, b, a);
+			Assert::AreEqual(r, cColor.Vector()[0]);
+			Assert::AreEqual(g, cColor.Vector()[1]);
+			Assert::AreEqual(b, cColor.Vector()[2]);
+			Assert::AreEqual(a, cColor.Vector()[3]);
+		}
+
 		TEST_METHOD(MinTest)
 		{
 			constexpr std::uint8_t r = 211;
@@ -418,6 +436,7 @@ namespace Color
 
 			[[maybe_unused]] const auto span = movedColor.Span();
 			span[0] -= 1;
+			[[maybe_unused]] const auto vector = movedColor.Vector();
 
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();
@@ -456,6 +475,7 @@ namespace Color
 			[[maybe_unused]] constexpr bool isTransparent = color.IsTransparent();
 
 			[[maybe_unused]] constexpr auto spanElement = color.Span()[0];
+			[[maybe_unused]] constexpr auto vectorElement = color.Vector()[1];
 
 			[[maybe_unused]] constexpr auto gotRgb = static_cast<PonyMath::Color::RGBInt<std::uint8_t>>(color);
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyMath::Core::Vector4<std::uint8_t>>(color);

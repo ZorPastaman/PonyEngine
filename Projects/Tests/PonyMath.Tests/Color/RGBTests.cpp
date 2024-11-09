@@ -130,6 +130,21 @@ namespace Core
 			Assert::AreEqual(b, cColor.Span()[2]);
 		}
 
+		TEST_METHOD(VectorTest)
+		{
+			constexpr float r = 0.49f;
+			constexpr float g = 0.69f;
+			constexpr float b = 0.211f;
+			auto color = PonyMath::Color::RGB<float>(r, g, b);
+			Assert::AreEqual(r, color.Vector()[0]);
+			Assert::AreEqual(g, color.Vector()[1]);
+			Assert::AreEqual(b, color.Vector()[2]);
+			constexpr auto cColor = PonyMath::Color::RGB<float>(r, g, b);
+			Assert::AreEqual(r, cColor.Vector()[0]);
+			Assert::AreEqual(g, cColor.Vector()[1]);
+			Assert::AreEqual(b, cColor.Vector()[2]);
+		}
+
 		TEST_METHOD(GrayscaleTest)
 		{
 			constexpr float r = 0.85f;

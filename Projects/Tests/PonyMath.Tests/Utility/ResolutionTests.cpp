@@ -84,6 +84,32 @@ namespace Utility
 			Assert::AreEqual(520u, resolutionC.Height());
 		}
 
+		TEST_METHOD(SpanTest)
+		{
+			constexpr unsigned int width = 320u;
+			constexpr unsigned int height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			Assert::AreEqual(width, resolution.Span()[0]);
+			Assert::AreEqual(height, resolution.Span()[1]);
+
+			const auto resolutionC = resolution;
+			Assert::AreEqual(width, resolutionC.Span()[0]);
+			Assert::AreEqual(height, resolutionC.Span()[1]);
+		}
+
+		TEST_METHOD(VectorTest)
+		{
+			constexpr unsigned int width = 320u;
+			constexpr unsigned int height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			Assert::AreEqual(width, resolution.Vector()[0]);
+			Assert::AreEqual(height, resolution.Vector()[1]);
+
+			const auto resolutionC = resolution;
+			Assert::AreEqual(width, resolutionC.Vector()[0]);
+			Assert::AreEqual(height, resolutionC.Vector()[1]);
+		}
+
 		TEST_METHOD(AspectTest)
 		{
 			constexpr unsigned int width = 320u;
@@ -168,6 +194,8 @@ namespace Utility
 
 			[[maybe_unused]] auto width = movedResolution.Width();
 			[[maybe_unused]] auto height = movedResolution.Height();
+			[[maybe_unused]] auto span = movedResolution.Span();
+			[[maybe_unused]] auto vector = movedResolution.Vector();
 
 			auto copiedResolution = PonyMath::Utility::Resolution<unsigned int>();
 			copiedResolution = movedResolution;
@@ -187,6 +215,8 @@ namespace Utility
 
 			[[maybe_unused]] constexpr auto width = resolution.Width();
 			[[maybe_unused]] constexpr auto height = resolution.Height();
+			[[maybe_unused]] constexpr auto span = resolution.Span();
+			[[maybe_unused]] constexpr auto vector = resolution.Vector();
 
 			[[maybe_unused]] constexpr auto aspect = resolution.Aspect<float>();
 
