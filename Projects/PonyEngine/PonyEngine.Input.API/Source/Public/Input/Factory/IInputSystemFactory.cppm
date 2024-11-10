@@ -11,8 +11,6 @@ export module PonyEngine.Input.Factory:IInputSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :InputSystemParams;
-
 export namespace PonyEngine::Input
 {
 	/// @brief Input system factory.

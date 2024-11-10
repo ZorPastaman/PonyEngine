@@ -11,8 +11,6 @@ export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12Rend
 
 import PonyBase.Memory;
 
-import PonyEngine.Core.Factory;
-
 import :IWindowsDirect3D12RenderSystemFactory;
 
 export namespace PonyEngine::Render
