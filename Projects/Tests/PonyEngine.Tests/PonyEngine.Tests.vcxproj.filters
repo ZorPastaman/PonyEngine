@@ -78,6 +78,9 @@
     <ClCompile Include="Screen.Windows\WindowsScreenSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Window.Windows\WindowsClassTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Mocks\Application.h">

@@ -11,8 +11,6 @@ export module PonyEngine.Time.Factory:IFrameRateSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :FrameRateSystemParams;
-
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system factory.

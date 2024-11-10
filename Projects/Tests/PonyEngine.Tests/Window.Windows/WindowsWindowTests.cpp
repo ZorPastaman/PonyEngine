@@ -82,7 +82,7 @@ namespace Window
 			auto engine = Core::Engine();
 			engine.application = &application;
 			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = windowsClass });
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
@@ -94,6 +94,13 @@ namespace Window
 			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
 			Assert::AreEqual(title, std::wstring_view(gotTitle));
 			Assert::AreEqual(title, windowsWindow->MainTitle());
+
+			constexpr std::wstring_view secondaryTitle = L"Secondary";
+			windowsWindow->SecondaryTitle(secondaryTitle);
+			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
+			Assert::AreEqual(secondaryTitle, windowsWindow->SecondaryTitle());
+			Assert::AreEqual((std::wstring(title) + L" - " + std::wstring(secondaryTitle)).c_str(), gotTitle);
+
 			std::get<1>(window.system)->End();
 		}
 
@@ -170,9 +177,9 @@ namespace Window
 			auto engine = Core::Engine();
 			engine.application = &application;
 			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = windowsClass };
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = windowsClass};
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
 			std::get<1>(window.system)->Begin();
@@ -183,6 +190,18 @@ namespace Window
 			Assert::AreEqual(0L, rect.top);
 			Assert::AreEqual(static_cast<LONG>(GetSystemMetrics(SM_CXSCREEN)), rect.right);
 			Assert::AreEqual(static_cast<LONG>(GetSystemMetrics(SM_CYSCREEN)), rect.bottom);
+			std::get<1>(window.system)->End();
+
+			systemParams.rect.fullscreen = false;
+			factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			window = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			std::get<1>(window.system)->Begin();
+			windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).Get());
+			GetWindowRect(windowsWindow->WindowHandle(), &rect);
+			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.X()), rect.left);
+			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.Y()), rect.top);
+			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.X() + systemParams.rect.resolution.Width()), rect.right);
+			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.Y() + systemParams.rect.resolution.Height()), rect.bottom);
 			std::get<1>(window.system)->End();
 		}
 

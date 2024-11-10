@@ -11,8 +11,6 @@ export module PonyEngine.Screen.Windows.Factory:IWindowsScreenSystemFactory;
 
 import PonyEngine.Screen.Factory;
 
-import :WindowsScreenSystemParams;
-
 export namespace PonyEngine::Screen
 {
 	/// @brief Windows screen system factory.

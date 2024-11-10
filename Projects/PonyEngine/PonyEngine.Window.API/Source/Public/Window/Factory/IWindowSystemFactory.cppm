@@ -11,8 +11,6 @@ export module PonyEngine.Window.Factory:IWindowSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :WindowSystemParams;
-
 export namespace PonyEngine::Window
 {
 	/// @brief Window system factory.
