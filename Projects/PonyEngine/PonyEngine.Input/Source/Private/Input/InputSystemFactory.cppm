@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Input.Implementation:InputSystemFactory;
 
 import <string_view>;
