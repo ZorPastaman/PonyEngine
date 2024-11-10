@@ -11,8 +11,6 @@ export module PonyEngine.Screen.Factory:IScreenSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :ScreenSystemParams;
-
 export namespace PonyEngine::Screen
 {
 	/// @brief Screen system factory.

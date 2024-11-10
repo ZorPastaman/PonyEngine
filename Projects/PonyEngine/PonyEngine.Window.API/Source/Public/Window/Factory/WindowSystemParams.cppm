@@ -11,8 +11,6 @@ export module PonyEngine.Window.Factory:WindowSystemParams;
 
 import <string>;
 
-import PonyEngine.Core.Factory;
-
 import :WindowRect;
 
 export namespace PonyEngine::Window

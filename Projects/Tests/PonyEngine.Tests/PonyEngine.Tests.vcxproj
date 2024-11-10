@@ -90,6 +90,7 @@
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemTests.cpp" />
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp" />
+    <ClCompile Include="Window.Windows\WindowsClassTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowFactoryTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp" />
   </ItemGroup>

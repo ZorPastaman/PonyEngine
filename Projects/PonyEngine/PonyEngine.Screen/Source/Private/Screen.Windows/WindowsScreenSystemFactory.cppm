@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyEngine.Screen.Windows.Implementation:WindowsScreenSystemFactory;
 
 import <string_view>;

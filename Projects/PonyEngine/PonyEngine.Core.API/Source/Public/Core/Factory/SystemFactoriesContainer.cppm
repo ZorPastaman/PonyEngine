@@ -46,7 +46,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets a begin iterator.
 		/// @return Begin iterator.
 		[[nodiscard("Pure function")]]
-		Iterator Begin() noexcept;
+		Iterator Begin() noexcept; // TODO: Use span
 		/// @brief Gets a begin iterator.
 		/// @return Begin iterator.
 		[[nodiscard("Pure function")]]
