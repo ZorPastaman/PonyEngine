@@ -28,7 +28,6 @@ export namespace PonyEngine::Input
 		/// @param event Condition.
 		/// @param action Action.
 		/// @return Registration handle. It's used to unregister.
-		[[nodiscard("Pure function")]]
 		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) = 0;
 		/// @brief Unregisters an action by its handle.
 		/// @param handle Action handle.

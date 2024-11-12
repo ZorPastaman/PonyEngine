@@ -128,7 +128,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Up input registered.");
@@ -141,7 +141,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(-10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Down input registered.");
@@ -154,7 +154,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, -10.f * PonyMath::Core::DegToRad<float>, 0.f)));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Right input registered.");
@@ -167,7 +167,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, 10.f * PonyMath::Core::DegToRad<float>, 0.f)));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");
@@ -180,7 +180,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, 5.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "W input registered.");
@@ -193,7 +193,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, -5.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "S input registered.");
@@ -206,7 +206,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(-5.f, 0.f, 0.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
@@ -219,7 +219,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(5.f, 0.f, 0.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
@@ -232,7 +232,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 5.f, 0.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Space input registered.");
@@ -245,7 +245,7 @@ namespace Game
 				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, -5.f, 0.f));
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
@@ -260,7 +260,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.X() -= 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Z input registered.");
@@ -275,7 +275,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.X() += 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "X input registered.");
@@ -290,7 +290,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.Y() -= 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "C input registered.");
@@ -305,7 +305,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.Y() += 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "V input registered.");
@@ -320,7 +320,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.Z() -= 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "B input registered.");
@@ -335,7 +335,7 @@ namespace Game
 					auto scale = boxTransform.Scale();
 					scale.Z() += 0.2;
 					boxTransform.Scale(scale);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "N input registered.");
@@ -349,7 +349,7 @@ namespace Game
 				{
 					boxTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f));
 					boxTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity);
-					render->UpdateRenderObjectTrs(boxHandle, boxTransform.TrsMatrix());
+					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
@@ -372,6 +372,11 @@ namespace Game
 
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
+			renderSystem->RenderView().ViewMatrix(PonyMath::Core::Matrix4x4<float>::Predefined::Identity.Inverse());
+			renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderView().Resolution().Aspect<float>(), 0.2f, 1000.f));
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
+
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
 			constexpr std::array<PonyMath::Core::Vector3<float>, 8> vertices = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
 				PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f) };
@@ -384,7 +389,7 @@ namespace Game
 			box.Vertices(vertices);
 			box.Triangles(triangles);
 			box.Colors(vertexColors);
-			boxHandle = renderSystem->CreateRenderObject(box, boxTransform.TrsMatrix());
+			boxHandle = renderSystem->RenderObjectManager().CreateObject(box, boxTransform.TrsMatrix());
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}
 	}
@@ -453,7 +458,7 @@ namespace Game
 		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Destroy triangle.");
-			renderSystem->DestroyRenderObject(boxHandle);
+			renderSystem->RenderObjectManager().DestroyObject(boxHandle);
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle destroyed.");
 		}
 	}

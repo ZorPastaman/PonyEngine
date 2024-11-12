@@ -22,9 +22,11 @@ import PonyBase.StringUtility;
 import PonyMath.Color;
 import PonyMath.Core;
 
+import PonyEngine.Render;
+
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderTarget final
+	class Direct3D12RenderTarget final : public IRenderTarget // TODO: Make IDirect3D12RenderTarget and other interfaces like that
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -35,9 +37,11 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderTarget() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		PonyMath::Color::RGBA<FLOAT>& ClearColor() noexcept;
+		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept override;
+		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
+
 		[[nodiscard("Pure function")]]
-		const PonyMath::Color::RGBA<FLOAT>& ClearColor() const noexcept;
+		const PonyMath::Color::RGBA<FLOAT>& TargetClearColor() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2* GetBackBuffer(UINT index) const noexcept;
@@ -98,12 +102,17 @@ namespace PonyEngine::Render
 		}
 	}
 
-	PonyMath::Color::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() noexcept
+	PonyMath::Color::RGBA<float> Direct3D12RenderTarget::ClearColor() const noexcept
 	{
-		return clearColor;
+		return static_cast<PonyMath::Color::RGBA<float>>(clearColor);
 	}
 
-	const PonyMath::Color::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColor() const noexcept
+	void Direct3D12RenderTarget::ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept
+	{
+		clearColor = static_cast<PonyMath::Color::RGBA<FLOAT>>(color);
+	}
+
+	const PonyMath::Color::RGBA<FLOAT>& Direct3D12RenderTarget::TargetClearColor() const noexcept
 	{
 		return clearColor;
 	}

@@ -121,7 +121,7 @@ export namespace PonyEngine::Window
 		/// @param rect Window rect.
 		/// @return Target window resolution.
 		[[nodiscard("Pure function")]]
-		PonyMath::Utility::Resolution<unsigned int> GetTargetResolution(const WindowRect& rect) const;
+		PonyMath::Core::Vector2<int> GetTargetResolution(const WindowRect& rect) const;
 		/// @brief Gets a Windows window rect.
 		/// @param style Window style.
 		/// @param rect Window rect settings.
@@ -153,7 +153,7 @@ namespace PonyEngine::Window
 	/// @param windowRect Windows window rect.
 	/// @return Pair of a position and a resolution.
 	[[nodiscard("Pure function")]]
-	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Utility::Resolution<unsigned int>> PositionResolution(const RECT& windowRect) noexcept;
+	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> PositionResolution(const RECT& windowRect) noexcept;
 
 	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const WindowsWindowSystemParams& windowParams) :
 		mainTitle(windowParams.title),
@@ -378,11 +378,11 @@ namespace PonyEngine::Window
 			: rect.position;
 	}
 
-	PonyMath::Utility::Resolution<unsigned int> WindowsWindowSystem::GetTargetResolution(const WindowRect& rect) const
+	PonyMath::Core::Vector2<int> WindowsWindowSystem::GetTargetResolution(const WindowRect& rect) const
 	{
 		if (!rect.fullscreen)
 		{
-			return rect.resolution;
+			return static_cast<PonyMath::Core::Vector2<int>>(rect.resolution.Vector());
 		}
 
 		const auto screenSystem = engine->SystemManager().FindSystem<Screen::IScreenSystem>();
@@ -391,19 +391,19 @@ namespace PonyEngine::Window
 			throw std::runtime_error("Failed to find screen system.");
 		}
 
-		return screenSystem->DisplayResolution();
+		return static_cast<PonyMath::Core::Vector2<int>>(screenSystem->DisplayResolution().Vector());
 	}
 
 	RECT WindowsWindowSystem::GetWindowRect(const WindowsWindowStyle& style, const WindowRect& rect) const
 	{
 		PonyMath::Core::Vector2<int> position = GetTargetPosition(rect);
-		PonyMath::Utility::Resolution<unsigned int> resolution = GetTargetResolution(rect);
+		PonyMath::Core::Vector2<int> resolution = GetTargetResolution(rect);
 		auto windowRect = RECT
 		{
 			.left = static_cast<LONG>(position.X()),
 			.top = static_cast<LONG>(position.Y()),
-			.right = static_cast<LONG>(position.X()) + static_cast<LONG>(resolution.Width()),
-			.bottom = static_cast<LONG>(position.Y()) + static_cast<LONG>(resolution.Height())
+			.right = static_cast<LONG>(position.X() + resolution.X()),
+			.bottom = static_cast<LONG>(position.Y() + resolution.Y())
 		};
 		if (!AdjustWindowRectEx(&windowRect, style.style, false, style.extendedStyle))
 		{
@@ -426,7 +426,7 @@ namespace PonyEngine::Window
 			mainTitle.c_str(),
 			style.style,
 			position.X(), position.Y(),
-			resolution.Width(), resolution.Height(),
+			resolution.X(), resolution.Y(),
 			nullptr,
 			nullptr,
 			windowsClass->Instance(),
@@ -441,10 +441,10 @@ namespace PonyEngine::Window
 		return windowHandle;
 	}
 
-	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Utility::Resolution<unsigned int>> PositionResolution(const RECT& windowRect) noexcept
+	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> PositionResolution(const RECT& windowRect) noexcept
 	{
-		const auto position = PonyMath::Core::Vector2<int>(windowRect.left, windowRect.top);
-		const auto resolution = PonyMath::Utility::Resolution<unsigned int>(windowRect.right - windowRect.left, windowRect.bottom - windowRect.top);
+		const auto position = PonyMath::Core::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
+		const auto resolution = PonyMath::Core::Vector2<int>(static_cast<int>(windowRect.right - windowRect.left), static_cast<int>(windowRect.bottom - windowRect.top));
 
 		return std::pair(position, resolution);
 	}

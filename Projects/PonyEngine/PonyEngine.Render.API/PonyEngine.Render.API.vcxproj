@@ -40,11 +40,14 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Render.Direct3D12.Factory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
-    <ClCompile Include="Source\Public\Render\CameraParams.cppm" />
     <ClCompile Include="Source\Public\Render\Factory\IRenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\Factory\Render.Factory.cppm" />
     <ClCompile Include="Source\Public\Render\Factory\RenderSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Render\IRenderObject.cppm" />
+    <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
+    <ClCompile Include="Source\Public\Render\IRenderTarget.cppm" />
+    <ClCompile Include="Source\Public\Render\IRenderView.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />
   </ItemGroup>

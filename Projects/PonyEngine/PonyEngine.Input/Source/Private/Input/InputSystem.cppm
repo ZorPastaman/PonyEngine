@@ -46,7 +46,6 @@ export namespace PonyEngine::Input
 
 		virtual void Tick() override;
 
-		[[nodiscard("Pure function")]]
 		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) override;
 		virtual void UnregisterAction(Handle handle) override;
 

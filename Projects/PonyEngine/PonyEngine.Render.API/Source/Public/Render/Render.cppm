@@ -9,6 +9,9 @@
 
 export module PonyEngine.Render;
 
-export import :CameraParams;
+export import :IRenderObject;
+export import :IRenderObjectManager;
 export import :IRenderSystem;
+export import :IRenderTarget;
+export import :IRenderView;
 export import :RenderObjectHandle;
