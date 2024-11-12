@@ -9,5 +9,4 @@
 
 export module PonyEngine.Render.Direct3D12.Implementation;
 
-export import :Direct3D12CameraParams;
 export import :Direct3D12SubSystem;

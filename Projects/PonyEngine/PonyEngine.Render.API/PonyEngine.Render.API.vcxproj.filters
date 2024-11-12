@@ -73,13 +73,22 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\CameraParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Factory\RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Factory\Direct3D12RenderSystemParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\IRenderTarget.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\IRenderView.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\IRenderObject.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

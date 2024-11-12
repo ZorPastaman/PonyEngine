@@ -41,8 +41,6 @@
     <ClCompile Include="Source\Private\Render.Core\Render.Core.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactory.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Camera.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CameraParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GraphicsPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexBuffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm" />
@@ -55,6 +53,8 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Fence.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderView.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Viewport.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Implementation.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm" />

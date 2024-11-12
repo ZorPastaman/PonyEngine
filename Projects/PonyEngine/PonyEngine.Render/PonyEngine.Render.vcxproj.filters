@@ -76,9 +76,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Material.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Camera.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTarget.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,7 +88,10 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CameraParams.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Viewport.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderView.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

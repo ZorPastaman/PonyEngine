@@ -11,12 +11,9 @@ export module PonyEngine.Render:IRenderSystem;
 
 import <string_view>;
 
-import PonyMath.Color;
-import PonyMath.Core;
-import PonyMath.Geometry;
-
-import :CameraParams;
-import :RenderObjectHandle;
+import :IRenderObjectManager;
+import :IRenderTarget;
+import :IRenderView;
 
 export namespace PonyEngine::Render
 {
@@ -28,19 +25,11 @@ export namespace PonyEngine::Render
 		IRenderSystem(IRenderSystem&&) = delete;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept = 0;
-		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
-
+		virtual IRenderTarget& RenderTarget() const noexcept = 0; // TODO: make const, non-const pairs of functions. Return const from const only.
 		[[nodiscard("Pure function")]]
-		virtual CameraParams CameraParameters() const noexcept = 0; // TODO: Here and in other api interfaces, don't return values, return references.
-		virtual void CameraParameters(const CameraParams& cameraParams) noexcept = 0;
+		virtual IRenderView& RenderView() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Matrix4x4<float> CameraTrsMatrix() const noexcept = 0;
-		virtual void CameraTrsMatrix(const PonyMath::Core::Matrix4x4<float>& trs) noexcept = 0;
-
-		virtual RenderObjectHandle CreateRenderObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& trs) = 0;
-		virtual void DestroyRenderObject(RenderObjectHandle renderObjectHandle) = 0;
-		virtual void UpdateRenderObjectTrs(RenderObjectHandle handle, const PonyMath::Core::Matrix4x4<float>& trs) const noexcept = 0;
+		virtual IRenderObjectManager& RenderObjectManager() const noexcept = 0;
 
 		/// @brief Gets the system name.
 		/// @return System name.

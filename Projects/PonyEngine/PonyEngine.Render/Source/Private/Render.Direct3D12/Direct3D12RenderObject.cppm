@@ -15,15 +15,17 @@ export module PonyEngine.Render.Direct3D12.Implementation:Direct3D12RenderObject
 
 import PonyMath.Core;
 
+import PonyEngine.Render;
+
 import :Direct3D12Mesh;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderObject final
+	class Direct3D12RenderObject final : public IRenderObject
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept;
+		explicit Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderObject(const Direct3D12RenderObject& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -32,28 +34,40 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObject() noexcept = default;
 
 		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Matrix4x4<float> ModelMatrix() const noexcept override;
+		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
+
+		[[nodiscard("Pure function")]]
 		const Direct3D12Mesh& RenderMesh() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyMath::Core::Matrix4x4<FLOAT>& TrsMatrix() noexcept;
-		[[nodiscard("Pure function")]]
-		const PonyMath::Core::Matrix4x4<FLOAT>& TrsMatrix() const noexcept;
+		const PonyMath::Core::Matrix4x4<FLOAT>& TargetModelMatrix() const noexcept;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept = default;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept = default;
 
 	private:
 		Direct3D12Mesh meshResource;
-		PonyMath::Core::Matrix4x4<FLOAT> trsMatrix;
+		PonyMath::Core::Matrix4x4<FLOAT> modelMatrix;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& trs) noexcept :
+	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12Mesh& meshResource, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept :
 		meshResource(meshResource),
-		trsMatrix(trs)
+		modelMatrix(modelMatrix)
 	{
+	}
+
+	PonyMath::Core::Matrix4x4<float> Direct3D12RenderObject::ModelMatrix() const noexcept
+	{
+		return static_cast<PonyMath::Core::Matrix4x4<float>>(modelMatrix);
+	}
+
+	void Direct3D12RenderObject::ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
+	{
+		modelMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix);
 	}
 
 	const Direct3D12Mesh& Direct3D12RenderObject::RenderMesh() const noexcept
@@ -61,13 +75,8 @@ namespace PonyEngine::Render
 		return meshResource;
 	}
 
-	PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::TargetModelMatrix() const noexcept
 	{
-		return trsMatrix;
-	}
-
-	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::TrsMatrix() const noexcept
-	{
-		return trsMatrix;
+		return modelMatrix;
 	}
 }
