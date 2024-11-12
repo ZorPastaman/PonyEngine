@@ -47,9 +47,7 @@ namespace PonyEngine::Window
 {
 	std::shared_ptr<IWindowsClass> CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params)
 	{
-		const auto windowsClass = new WindowsClass(application, params);
-
-		return std::shared_ptr<IWindowsClass>(windowsClass);
+		return std::make_shared<WindowsClass>(application, params);
 	}
 
 	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext&, const WindowsWindowSystemFactoryParams&, const WindowsWindowSystemParams& systemParams)

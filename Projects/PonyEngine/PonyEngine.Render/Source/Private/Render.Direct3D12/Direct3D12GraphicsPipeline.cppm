@@ -126,15 +126,15 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence. Fence timeout: {}.", fenceTimeout);
-		fence.reset(new Direct3DFence(*this->renderer, commandQueue.Get(), fenceTimeout));
+		fence = std::make_unique<Direct3DFence>(*this->renderer, commandQueue.Get(), fenceTimeout);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
-		meshManager.reset(new Direct3D12MeshManager(*this->renderer, device));
+		meshManager = std::make_unique<Direct3D12MeshManager>(*this->renderer, device);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager created.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render object manager.");
-		renderObjectManager.reset(new Direct3D12RenderObjectManager(*this->renderer, *meshManager, device));
+		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*this->renderer, *meshManager, device);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager created.");
 	}
 
@@ -208,10 +208,10 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Command queue device gotten.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render view.");
-		renderView.reset(new Direct3D12RenderView(viewMatrix, projectionMatrix, resolution));
+		renderView = std::make_unique<Direct3D12RenderView>(viewMatrix, projectionMatrix, resolution);
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render view created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target.");
-		renderTarget.reset(new Direct3D12RenderTarget(device.Get(), buffers, rtvFormat));
+		renderTarget = std::make_unique<Direct3D12RenderTarget>(device.Get(), buffers, rtvFormat);
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
@@ -224,7 +224,7 @@ namespace PonyEngine::Render
 		const auto pixelShader = Direct3D12Shader("PixelShader");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
-		material.reset(new Direct3D12Material(device.Get(), rootSignatureShader, vertexShader, pixelShader, rtvFormat));
+		material = std::make_unique<Direct3D12Material>(device.Get(), rootSignatureShader, vertexShader, pixelShader, rtvFormat);
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 

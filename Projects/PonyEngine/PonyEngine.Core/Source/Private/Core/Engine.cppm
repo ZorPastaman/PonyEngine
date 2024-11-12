@@ -252,10 +252,10 @@ namespace PonyEngine::Core
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine logger.");
-			const auto logger = new EngineLogger(*this, application->Logger());
+			auto logger = std::make_unique<EngineLogger>(*this, application->Logger());
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine logger created.");
 
-			return std::unique_ptr<EngineLogger>(logger);
+			return logger;
 		}
 		catch (const std::exception& e)
 		{
@@ -270,10 +270,10 @@ namespace PonyEngine::Core
 		try
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create system manager.");
-			const auto manager = new Core::SystemManager(*this);
+			auto manager = std::make_unique<Core::SystemManager>(*this);
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager created.");
 
-			return std::unique_ptr<Core::SystemManager>(manager);
+			return manager;
 		}
 		catch (const std::exception& e)
 		{
