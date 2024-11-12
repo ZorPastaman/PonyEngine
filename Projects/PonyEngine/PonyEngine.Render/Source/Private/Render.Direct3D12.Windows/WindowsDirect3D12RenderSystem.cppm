@@ -216,18 +216,18 @@ namespace PonyEngine::Render
 	std::unique_ptr<WindowsDirect3D12DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
-		const auto createdDxgiSubSystem = new WindowsDirect3D12DXGISubSystem(*this);
+		auto createdDxgiSubSystem = std::make_unique<WindowsDirect3D12DXGISubSystem>(*this);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
-		return std::unique_ptr<WindowsDirect3D12DXGISubSystem>(createdDxgiSubSystem);
+		return createdDxgiSubSystem;
 	}
 
 	std::unique_ptr<Direct3D12SubSystem> WindowsDirect3D12RenderSystem::CreateDirect3D12SubSystem(const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout)
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 sub-system.");
-		const auto createdDirect3D12SubSystem = new Direct3D12SubSystem(*this, featureLevel, commandQueuePriority, fenceTimeout);
+		auto createdDirect3D12SubSystem = std::make_unique<Direct3D12SubSystem>(*this, featureLevel, commandQueuePriority, fenceTimeout);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system created.");
 
-		return std::unique_ptr<Direct3D12SubSystem>(createdDirect3D12SubSystem);
+		return createdDirect3D12SubSystem;
 	}
 }
