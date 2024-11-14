@@ -33,7 +33,7 @@
     <ClCompile Include="Source\Public\Game\Factory\IGameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\Factory\GameSystemParams.cppm">
+    <ClCompile Include="Source\Public\Game\GameSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -19,7 +19,7 @@
 
 import PonyMath.Utility;
 
-import PonyEngine.Screen.Windows.Implementation;
+import PonyEngine.Screen.Windows.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -35,9 +35,9 @@ namespace Screen
 			auto engine = Core::Engine();
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
-			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams{});
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			std::get<0>(system.system)->Begin();
-			auto screenSystem = dynamic_cast<PonyEngine::Screen::IScreenSystem*>(std::get<0>(system.system).Get());
+			auto screenSystem = dynamic_cast<PonyEngine::Screen::IScreenSystem*>(std::get<0>(system.system).get());
 
 			auto expectedResolution = PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
 			Assert::IsTrue(expectedResolution == screenSystem->DisplayResolution());

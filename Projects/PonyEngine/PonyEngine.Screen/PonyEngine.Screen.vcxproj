@@ -36,7 +36,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystem.cppm" />
     <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Impl.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

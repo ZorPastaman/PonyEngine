@@ -15,3 +15,4 @@ export import :IRenderSystem;
 export import :IRenderTarget;
 export import :IRenderView;
 export import :RenderObjectHandle;
+export import :RenderSystemParams;

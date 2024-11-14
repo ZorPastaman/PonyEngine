@@ -23,7 +23,7 @@
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
-import PonyEngine.Input.Implementation;
+import PonyEngine.Input.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -70,13 +70,13 @@ namespace Input
 			
 			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			constexpr auto systemParams = PonyEngine::Core::EngineSystemParams();
+			constexpr auto systemParams = PonyEngine::Core::SystemParams();
 			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
 			Assert::AreEqual(std::size_t{0}, keyboardProvider.version);
 			std::get<1>(inputSystem.system)->Begin();
 			Assert::AreEqual(std::size_t{1}, keyboardProvider.version);
 			Assert::AreEqual(std::size_t{1}, keyboardProvider.observers.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(std::get<1>(inputSystem.system).Get())), reinterpret_cast<std::uintptr_t>(keyboardProvider.observers[0]));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(std::get<1>(inputSystem.system).get())), reinterpret_cast<std::uintptr_t>(keyboardProvider.observers[0]));
 			std::get<1>(inputSystem.system)->End();
 			Assert::AreEqual(std::size_t{2}, keyboardProvider.version);
 			Assert::AreEqual(std::size_t{0}, keyboardProvider.observers.size());
@@ -90,11 +90,11 @@ namespace Input
 			auto engine = Core::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			bool gotInput = false;
 			std::function<void()> func = [&]{ gotInput = true; };
 			std::get<1>(inputSystemBase.system)->Begin();
-			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(inputSystemBase.system).Get());
+			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(inputSystemBase.system).get());
 			auto message = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true};
 			auto event = PonyEngine::Input::Event{.expectedMessage = message};
 			auto handle = inputSystem->RegisterAction(event, func);
@@ -124,7 +124,7 @@ namespace Input
 			auto engine = Core::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
+			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), std::get<1>(inputSystemBase.system)->Name());
 		}
 	};

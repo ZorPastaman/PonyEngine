@@ -51,7 +51,7 @@
     <ClCompile Include="Source\Public\Input\Factory\IInputSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factory\InputSystemParams.cppm">
+    <ClCompile Include="Source\Public\Input\InputSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

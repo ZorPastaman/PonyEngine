@@ -7,18 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Screen.Windows:WindowsScreenSystemParams;
 
-#include "PonyBase/Core/Windows/Framework.h"
+import PonyEngine.Screen;
 
-export module PonyEngine.Window.Windows.Factory:WindowsWindowStyle;
-
-export namespace PonyEngine::Window
+export namespace PonyEngine::Screen
 {
-	/// @brief Windows window style.
-	struct WindowsWindowStyle final
+	/// @brief Windows system system parameters.
+	struct WindowsScreenSystemParams final : ScreenSystemParams
 	{
-		DWORD style = WS_POPUP; ///< Window style.
-		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
 	};
 }

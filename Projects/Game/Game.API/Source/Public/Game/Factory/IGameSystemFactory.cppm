@@ -11,8 +11,6 @@ export module Game.Factory:IGameSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :GameSystemParams;
-
 export namespace Game
 {
 	/// @brief Game system factory.

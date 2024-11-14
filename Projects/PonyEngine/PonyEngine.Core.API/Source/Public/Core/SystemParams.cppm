@@ -7,14 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Windows.Factory:WindowsDirect3D12RenderSystemParams;
+export module PonyEngine.Core:SystemParams;
 
-import PonyEngine.Render.Direct3D12.Factory;
-
-export namespace PonyEngine::Render
+export namespace PonyEngine::Core
 {
-	/// @brief Windows Direct3D 12 render parameters.
-	struct WindowsDirect3D12RenderSystemParams final : Direct3D12RenderSystemParams
+	/// @brief System parameters.
+	struct SystemParams final
 	{
 	};
 }

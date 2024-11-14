@@ -11,7 +11,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Input.Implementation:InputSystem;
+export module PonyEngine.Input.Impl:InputSystem;
 
 import <format>;
 import <functional>;
@@ -29,17 +29,19 @@ import PonyEngine.Input;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class InputSystem final : public Core::ITickableEngineSystem, public IInputSystem, public IKeyboardObserver
+	class InputSystem final : public Core::TickableSystem, public IInputSystem, public IKeyboardObserver
 	{
 	public:
 		/// @brief Creates an input system
 		/// @param engine Engine context.
+		/// @param systemParams System parameters.
+		/// @param inputParams Input system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit InputSystem(Core::IEngineContext& engine) noexcept;
+		InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams& inputParams) noexcept;
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
-		~InputSystem() noexcept = default;
+		virtual ~InputSystem() noexcept override = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -65,17 +67,15 @@ export namespace PonyEngine::Input
 		std::unordered_map<KeyboardKeyCode, bool> keyStates; ///< Current key states.
 		std::queue<KeyboardMessage> queue; ///< Message queue.
 
-		Core::IEngineContext* engine; ///< Engine.
-
 		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	InputSystem::InputSystem(Core::IEngineContext& engine) noexcept :
-		currentId{1},
-		engine{&engine}
+	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams&) noexcept :
+		TickableSystem(engine, systemParams),
+		currentId{1}
 	{
 	}
 

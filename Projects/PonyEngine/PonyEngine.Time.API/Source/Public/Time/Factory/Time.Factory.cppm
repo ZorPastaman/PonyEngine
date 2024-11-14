@@ -13,5 +13,4 @@ export import PonyEngine.Time;
 
 export import :FrameRateSystemFactoryData;
 export import :FrameRateSystemFactoryParams;
-export import :FrameRateSystemParams;
 export import :IFrameRateSystemFactory;

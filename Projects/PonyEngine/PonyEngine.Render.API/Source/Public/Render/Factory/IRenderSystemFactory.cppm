@@ -11,8 +11,6 @@ export module PonyEngine.Render.Factory:IRenderSystemFactory;
 
 import PonyEngine.Core.Factory;
 
-import :RenderSystemParams;
-
 export namespace PonyEngine::Render
 {
 	class IRenderSystemFactory : public Core::ISystemFactory

@@ -14,7 +14,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystem;
+export module PonyEngine.Render.Direct3D12.Windows.Impl:WindowsDirect3D12RenderSystem;
 
 import <array>;
 import <cstdint>;
@@ -37,28 +37,29 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
-import PonyEngine.Render.Direct3D12.Windows.Factory;
+import PonyEngine.Render.Direct3D12.Windows;
 
 import PonyEngine.Render.Core;
-import PonyEngine.Render.Direct3D12.Implementation;
+import PonyEngine.Render.Direct3D12.Impl;
 
 import :WindowsDirect3D12DXGISubSystem;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows.
-	class WindowsDirect3D12RenderSystem final : public Core::ITickableEngineSystem, public IWindowsDirect3D12RenderSystem, public IRenderer
+	class WindowsDirect3D12RenderSystem final : public Core::TickableSystem, public IWindowsDirect3D12RenderSystem, public IRenderer
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.
-		/// @param engine Engine.
-		/// @param params Render system parameters.
+		/// @param engine Engine context.
+		/// @param systemParams System parameters.
+		/// @param renderParams Render system parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const WindowsDirect3D12RenderSystemParams& params);
+		WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsDirect3D12RenderSystemParams& renderParams);
 		WindowsDirect3D12RenderSystem(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem(WindowsDirect3D12RenderSystem&&) = delete;
 
-		~WindowsDirect3D12RenderSystem() noexcept;
+		virtual ~WindowsDirect3D12RenderSystem() noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -92,8 +93,6 @@ export namespace PonyEngine::Render
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
-		Core::IEngineContext* engine; ///< Engine.
-
 		std::unique_ptr<WindowsDirect3D12DXGISubSystem> dxgiSubSystem; ///< DXGI sub-system.
 		std::unique_ptr<Direct3D12SubSystem> direct3D12SubSystem; ///< Direct3D 12 sub-system.
 	};
@@ -101,10 +100,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const WindowsDirect3D12RenderSystemParams& params) :
-		engine{&engine},
+	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsDirect3D12RenderSystemParams& renderParams) :
+		TickableSystem(engine, systemParams),
 		dxgiSubSystem(CreateDXGISubSystem()),
-		direct3D12SubSystem(CreateDirect3D12SubSystem(params.featureLevel, params.commandQueuePriority, params.fenceTimeout))
+		direct3D12SubSystem(CreateDirect3D12SubSystem(renderParams.featureLevel, renderParams.commandQueuePriority, renderParams.fenceTimeout))
 	{
 		PonyMath::Utility::Resolution<UINT> renderResolution;
 
@@ -112,9 +111,9 @@ namespace PonyEngine::Render
 		{
 			const HWND windowHandle = windowSystem->WindowHandle();
 
-			if (params.resolution.has_value())
+			if (renderParams.resolution.has_value())
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(params.resolution.value());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.resolution.value());
 				PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
@@ -151,7 +150,7 @@ namespace PonyEngine::Render
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
 
-		direct3D12SubSystem->Initialize(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.projectionMatrix), renderResolution, rawBackBuffers, RtvFormat);
+		direct3D12SubSystem->Initialize(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.projectionMatrix), renderResolution, rawBackBuffers, RtvFormat);
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 

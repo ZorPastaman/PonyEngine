@@ -15,7 +15,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystem;
+export module PonyEngine.Window.Windows.Impl:WindowsWindowSystem;
 
 import <algorithm>;
 import <cstdint>;
@@ -38,28 +38,28 @@ import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Screen;
 
-import PonyEngine.Window.Windows.Factory;
+import PonyEngine.Window.Windows;
 
 import :IWindowProc;
 import :KeyCodeUtility;
 import :WindowProcFunction;
-import :WindowsClass;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system.
-	class WindowsWindowSystem final : public Core::ITickableEngineSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
+	class WindowsWindowSystem final : public Core::TickableSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
-		/// @param engine Engine.
-		/// @param windowParams Window parameters.
+		/// @param engine Engine context.
+		/// @param systemParams System parameters.
+		/// @param windowParams Windows window system parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsWindowSystem(Core::IEngineContext& engine, const WindowsWindowSystemParams& windowParams);
+		WindowsWindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsWindowSystemParams& windowParams);
 		WindowsWindowSystem(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem(WindowsWindowSystem&&) = delete;
 
-		~WindowsWindowSystem() noexcept;
+		virtual ~WindowsWindowSystem() noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -138,9 +138,7 @@ export namespace PonyEngine::Window
 		std::wstring mainTitle; ///< Window main title cache.
 		std::wstring secondaryTitle; ///< Window title text cache.
 
-		Core::IEngineContext* engine; ///< Engine.
-
-		std::shared_ptr<IWindowsClass> windowsClass; ///< Windows class.
+		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
 
 		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
@@ -155,9 +153,9 @@ namespace PonyEngine::Window
 	[[nodiscard("Pure function")]]
 	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> PositionResolution(const RECT& windowRect) noexcept;
 
-	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const WindowsWindowSystemParams& windowParams) :
+	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsWindowSystemParams& windowParams) :
+		TickableSystem(engine, systemParams),
 		mainTitle(windowParams.title),
-		engine{&engine},
 		windowsClass(windowParams.windowsClass),
 		hWnd{CreateControlledWindow(windowParams.windowsWindowStyle, windowParams.rect)}
 	{

@@ -13,10 +13,11 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Core.Implementation:SystemManager;
+export module PonyEngine.Core.Impl:SystemManager;
 
 import <algorithm>;
 import <exception>;
+import <memory>;
 import <ranges>;
 import <string>;
 import <typeindex>;
@@ -27,7 +28,6 @@ import <variant>;
 import <vector>;
 
 import PonyBase.Core;
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
 
 import PonyDebug.Log;
@@ -79,17 +79,17 @@ export namespace PonyEngine::Core
 		SystemData CreateSystem(ISystemFactory* factory) const;
 		/// @brief Adds the @p system as a non-tickable system.
 		/// @param system Non-tickable system.
-		void AddNonTickable(PonyBase::Memory::UniquePointer<IEngineSystem> system);
+		void AddNonTickable(std::unique_ptr<System> system);
 		/// @brief Adds the @p system as a tickable system.
 		/// @param system Tickable system.
 		/// @param tickOrder Tick order.
 		/// @param tickableSystemsBuffer Tickable systems buffer.
-		void AddTickable(PonyBase::Memory::UniquePointer<ITickableEngineSystem> system, int tickOrder, std::vector<std::pair<ITickableEngineSystem*, int>>& tickableSystemsBuffer);
+		void AddTickable(std::unique_ptr<TickableSystem> system, int tickOrder, std::vector<std::pair<TickableSystem*, int>>& tickableSystemsBuffer);
 
 		IEngineContext* engine; ///< Engine.
 
-		std::vector<PonyBase::Memory::UniquePointer<IEngineSystem>> systems; ///< Systems.
-		std::vector<ITickableEngineSystem*> tickableSystems; ///< Tickable systems.
+		std::vector<std::unique_ptr<System>> systems; ///< Systems.
+		std::vector<TickableSystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 	};
 }
@@ -113,7 +113,7 @@ namespace PonyEngine::Core
 
 	void SystemManager::CreateSystems(const SystemFactoriesContainer& systemFactories)
 	{
-		auto tickableSystemsBuffer = std::vector<std::pair<ITickableEngineSystem*, int>>();
+		auto tickableSystemsBuffer = std::vector<std::pair<TickableSystem*, int>>();
 
 		for (const auto [factory, tickOrder] : systemFactories)
 		{
@@ -143,9 +143,11 @@ namespace PonyEngine::Core
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System created.");
 		}
 
-		std::ranges::sort(tickableSystemsBuffer, [](const std::pair<ITickableEngineSystem*, int>& left, const std::pair<ITickableEngineSystem*, int>& right){ return left.second < right.second; });
+		std::ranges::sort(tickableSystemsBuffer, [](const std::pair<TickableSystem*, int>& left, const std::pair<TickableSystem*, int>& right){ return left.second < right.second; });
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Tick order:");
 		for (auto tickableSystem : std::views::keys(tickableSystemsBuffer))
 		{
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, tickableSystem->Name());
 			tickableSystems.push_back(tickableSystem);
 		}
 	}
@@ -155,7 +157,7 @@ namespace PonyEngine::Core
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system.", (*system)->Name());
-			system->Reset();
+			system->reset();
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System destroyed.");
 		}
 
@@ -166,7 +168,7 @@ namespace PonyEngine::Core
 
 	void SystemManager::BeginSystems() const
 	{
-		for (const PonyBase::Memory::UniquePointer<IEngineSystem>& system : systems)
+		for (const std::unique_ptr<System>& system : systems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
 			try
@@ -204,7 +206,7 @@ namespace PonyEngine::Core
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
 
-		for (ITickableEngineSystem* const system : tickableSystems)
+		for (TickableSystem* const system : tickableSystems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, system->Name());
 			try
@@ -225,7 +227,7 @@ namespace PonyEngine::Core
 	{
 		try
 		{
-			return factory->Create(*engine, EngineSystemParams{});
+			return factory->Create(*engine, SystemParams{});
 		}
 		catch (const std::exception& e)
 		{
@@ -235,19 +237,18 @@ namespace PonyEngine::Core
 		}
 	}
 
-	void SystemManager::AddNonTickable(PonyBase::Memory::UniquePointer<IEngineSystem> system)
+	void SystemManager::AddNonTickable(std::unique_ptr<System> system)
 	{
 		assert(system && "The system is nullptr.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", system->Name());
 		systems.push_back(std::move(system));
 	}
 
-	void SystemManager::AddTickable(PonyBase::Memory::UniquePointer<ITickableEngineSystem> system, const int tickOrder, std::vector<std::pair<ITickableEngineSystem*, int>>& tickableSystemsBuffer)
+	void SystemManager::AddTickable(std::unique_ptr<TickableSystem> system, const int tickOrder, std::vector<std::pair<TickableSystem*, int>>& tickableSystemsBuffer)
 	{
 		assert(system && "The system is nullptr.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", system->Name());
-		tickableSystemsBuffer.emplace_back(system.Get(), tickOrder);
-		auto baseSystem = PonyBase::Memory::UniquePointer<IEngineSystem>(std::move(system));
-		systems.push_back(std::move(baseSystem));
+		tickableSystemsBuffer.emplace_back(system.get(), tickOrder);
+		systems.push_back(std::move(system));
 	}
 }

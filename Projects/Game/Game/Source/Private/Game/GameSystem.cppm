@@ -11,7 +11,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module Game.Implementation:GameSystem;
+export module Game.Impl:GameSystem;
 
 import <algorithm>;
 import <array>;
@@ -35,17 +35,19 @@ import Game;
 export namespace Game
 {
 	/// @brief Game system.
-	class GameSystem final : public PonyEngine::Core::ITickableEngineSystem, public IGameSystem
+	class GameSystem final : public PonyEngine::Core::TickableSystem, public IGameSystem
 	{
 	public:
 		/// @brief Creates a game system.
-		/// @param engine Engine.
+		/// @param engine Engine context.
+		/// @param systemParams System parameters.
+		/// @param gameParams Game system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit GameSystem(PonyEngine::Core::IEngineContext& engine);
+		explicit GameSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& systemParams, const GameSystemParams& gameParams);
 		GameSystem(const GameSystem&) = delete;
 		GameSystem(GameSystem&&) = delete;
 
-		~GameSystem() noexcept = default;
+		virtual ~GameSystem() noexcept override = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -82,14 +84,13 @@ export namespace Game
 
 		PonyEngine::Render::RenderObjectHandle boxHandle; ///< Box handle.
 		PonyMath::Space::Transform3D boxTransform; ///< Box transform.
-
-		PonyEngine::Core::IEngineContext* const engine; ///< Engine.
 	};
 }
 
 namespace Game
 {
-	GameSystem::GameSystem(PonyEngine::Core::IEngineContext& engine) :
+	GameSystem::GameSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& systemParams, const GameSystemParams& gameParams) :
+		TickableSystem(engine, systemParams),
 		upHandle(),
 		downHandle(),
 		rightHandle(),
@@ -109,8 +110,7 @@ namespace Game
 		enterHandle(),
 		closeHandle(),
 		boxHandle(),
-		boxTransform(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, 5.f),
-		engine{&engine}
+		boxTransform(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, 5.f)
 	{
 	}
 

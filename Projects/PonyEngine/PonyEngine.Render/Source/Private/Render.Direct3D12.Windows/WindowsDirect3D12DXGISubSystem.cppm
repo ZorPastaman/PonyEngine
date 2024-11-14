@@ -15,7 +15,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12DXGISubSystem;
+export module PonyEngine.Render.Direct3D12.Windows.Impl:WindowsDirect3D12DXGISubSystem;
 
 import <cstdint>;
 import <stdexcept>;

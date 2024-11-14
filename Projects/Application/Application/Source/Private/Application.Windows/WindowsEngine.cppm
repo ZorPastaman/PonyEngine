@@ -20,6 +20,7 @@ export module Application.Windows:WindowsEngine;
 import <array>;
 import <exception>;
 import <format>;
+import <memory>;
 import <utility>;
 
 import PonyBase.Core;
@@ -29,14 +30,14 @@ import PonyMath.Core;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Implementation;
-import PonyEngine.Input.Implementation;
-import PonyEngine.Render.Direct3D12.Windows.Implementation;
-import PonyEngine.Screen.Windows.Implementation;
-import PonyEngine.Time.Implementation;
-import PonyEngine.Window.Windows.Implementation;
+import PonyEngine.Core.Impl;
+import PonyEngine.Input.Impl;
+import PonyEngine.Render.Direct3D12.Windows.Impl;
+import PonyEngine.Screen.Windows.Impl;
+import PonyEngine.Time.Impl;
+import PonyEngine.Window.Windows.Impl;
 
-import Game.Implementation;
+import Game.Impl;
 
 export namespace Application
 {
@@ -93,7 +94,7 @@ export namespace Application
 		PonyEngine::Core::EngineData CreateEngine() const;
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
-		PonyBase::Memory::UniquePointer<PonyEngine::Core::IEngine> engine; ///< Engine.
+		std::unique_ptr<PonyEngine::Core::Engine> engine; ///< Engine.
 	};
 }
 
@@ -108,7 +109,7 @@ namespace Application
 	WindowsEngine::~WindowsEngine() noexcept
 	{
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine->Name());
-		engine.Reset();
+		engine.reset();
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
 	}
 
@@ -185,8 +186,8 @@ namespace Application
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
 			const auto windowsClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
-			const auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = windowsClass};
+			auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass)};
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
@@ -279,7 +280,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
-			auto params = PonyEngine::Core::EngineParams{};
+			auto params = PonyEngine::Core::EngineParams();
 			for (const auto& [factory, tickOrder] : systemFactories)
 			{
 				PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' system factory to params", factory->Name());

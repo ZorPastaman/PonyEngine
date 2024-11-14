@@ -19,7 +19,7 @@ namespace Core
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params) override;
+		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		TickableSystem* GetSystem() const noexcept;

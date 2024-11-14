@@ -30,7 +30,7 @@ namespace Core
 		std::unordered_map<std::type_index, void*> types;
 	};
 
-	class Engine final : public PonyEngine::Core::IEngine, public PonyEngine::Core::IEngineContext
+	class Engine final : public PonyEngine::Core::Engine, public PonyEngine::Core::IEngineContext
 	{
 	public:
 		[[nodiscard("Pure function")]]

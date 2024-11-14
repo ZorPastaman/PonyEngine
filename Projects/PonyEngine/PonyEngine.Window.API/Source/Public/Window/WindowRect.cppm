@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Window.Factory:WindowRect;
+export module PonyEngine.Window:WindowRect;
 
 import PonyMath.Core;
 import PonyMath.Utility;

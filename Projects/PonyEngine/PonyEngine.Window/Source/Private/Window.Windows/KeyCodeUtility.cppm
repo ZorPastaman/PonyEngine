@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:KeyCodeUtility;
+export module PonyEngine.Window.Windows.Impl:KeyCodeUtility;
 
 import <unordered_map>;
 

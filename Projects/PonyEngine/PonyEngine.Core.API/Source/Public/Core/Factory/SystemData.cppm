@@ -9,9 +9,9 @@
 
 export module PonyEngine.Core.Factory:SystemData;
 
+import <memory>;
 import <variant>;
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
 
 import PonyEngine.Core;
@@ -21,7 +21,7 @@ export namespace PonyEngine::Core
 	/// @brief System data.
 	struct SystemData final
 	{
-		std::variant<PonyBase::Memory::UniquePointer<IEngineSystem>, PonyBase::Memory::UniquePointer<ITickableEngineSystem>> system; ///< System.
+		std::variant<std::unique_ptr<System>, std::unique_ptr<TickableSystem>> system; ///< System.
 		PonyBase::Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
 	};
 }

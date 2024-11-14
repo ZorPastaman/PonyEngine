@@ -7,14 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Windows.Factory:WindowsScreenSystemParams;
+export module PonyEngine.Window:WindowSystemParams;
 
-import PonyEngine.Screen.Factory;
+import <string>;
 
-export namespace PonyEngine::Screen
+import :WindowRect;
+
+export namespace PonyEngine::Window
 {
-	/// @brief Windows system system parameters.
-	struct WindowsScreenSystemParams final : ScreenSystemParams
+	/// @brief Window system parameters.
+	struct WindowSystemParams
 	{
+		WindowRect rect; ///< Window rect.
+		std::wstring title = L"Pony Engine Window"; ///< Window title.
 	};
 }

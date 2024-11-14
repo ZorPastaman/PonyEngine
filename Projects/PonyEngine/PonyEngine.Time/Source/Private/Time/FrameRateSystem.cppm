@@ -11,7 +11,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Time.Implementation:FrameRateSystem;
+export module PonyEngine.Time.Impl:FrameRateSystem;
 
 import <chrono>;
 import <string_view>;
@@ -24,18 +24,19 @@ import PonyEngine.Time;
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system.
-	class FrameRateSystem final : public Core::ITickableEngineSystem, public IFrameRateSystem
+	class FrameRateSystem final : public Core::TickableSystem, public IFrameRateSystem
 	{
 	public:
 		/// @brief Creates a @p FrameRateSystem.
 		/// @param engine Engine context.
-		/// @param targetFrameTime Target frame time.
+		/// @param systemParams System parameters.
+		/// @param frameRateParams Frame rate system parameters.
 		[[nodiscard("Pure constructor")]]
-		FrameRateSystem(Core::IEngineContext& engine, float targetFrameTime) noexcept;
+		FrameRateSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const FrameRateSystemParams& frameRateParams) noexcept;
 		FrameRateSystem(const FrameRateSystem&) = delete;
 		FrameRateSystem(FrameRateSystem&&) = delete;
 
-		~FrameRateSystem() noexcept = default;
+		virtual ~FrameRateSystem() noexcept override = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -57,16 +58,14 @@ export namespace PonyEngine::Time
 	private:
 		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
 		std::chrono::time_point<std::chrono::steady_clock> previousTickTime; ///< Previous tick time.
-
-		Core::IEngineContext* engine; ///< Engine.
 	};
 }
 
 namespace PonyEngine::Time
 {
-	FrameRateSystem::FrameRateSystem(Core::IEngineContext& engine, const float targetFrameTime) noexcept :
-		targetFrameTime(targetFrameTime),
-		engine{&engine}
+	FrameRateSystem::FrameRateSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const FrameRateSystemParams& frameRateParams) noexcept :
+		TickableSystem(engine, systemParams),
+		targetFrameTime(frameRateParams.targetFrameTime)
 	{
 	}
 

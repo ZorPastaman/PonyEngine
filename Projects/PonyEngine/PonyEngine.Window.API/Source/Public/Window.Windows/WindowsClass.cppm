@@ -11,16 +11,18 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Factory:IWindowsClass;
+export module PonyEngine.Window.Windows:WindowsClass;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows class.
-	class IWindowsClass
+	class WindowsClass
 	{
 	public:
-		IWindowsClass(const IWindowsClass&) = delete;
-		IWindowsClass(IWindowsClass&&) = delete;
+		WindowsClass(const WindowsClass&) = delete;
+		WindowsClass(WindowsClass&&) = delete;
+
+		virtual ~WindowsClass() noexcept = default;
 
 		/// @brief Gets a module instance.
 		/// @return Module instance.
@@ -31,13 +33,11 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual ATOM Class() const noexcept = 0;
 
-		IWindowsClass& operator =(const IWindowsClass&) = delete;
-		IWindowsClass& operator =(IWindowsClass&&) = delete;
+		WindowsClass& operator =(const WindowsClass&) = delete;
+		WindowsClass& operator =(WindowsClass&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		IWindowsClass() noexcept = default;
-
-		~IWindowsClass() noexcept = default;
+		WindowsClass() noexcept = default;
 	};
 }

@@ -7,16 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Render.Direct3D12.Windows.Impl:WindowsDirect3D12RenderSystemFactory;
 
-#include <cassert>
-
-export module PonyEngine.Render.Direct3D12.Windows.Implementation:WindowsDirect3D12RenderSystemFactory;
-
+import <memory>;
 import <string_view>;
 import <utility>;
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
 
 import PonyEngine.Core.Factory;
@@ -31,16 +27,18 @@ export namespace PonyEngine::Render
 	{
 	public:
 		/// @brief Creates a Direct3D 12 render system factory.
-		/// @param renderSystemParams Render system parameters.
+		/// @param application Application context.
+		/// @param factoryParams Render system factory parameters.
+		/// @param systemParams Render system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsDirect3D12RenderSystemFactory(const WindowsDirect3D12RenderSystemParams& renderSystemParams) noexcept;
+		WindowsDirect3D12RenderSystemFactory(Core::IApplicationContext& application, const WindowsDirect3D12RenderSystemFactoryParams& factoryParams, const WindowsDirect3D12RenderSystemParams& systemParams) noexcept;
 		WindowsDirect3D12RenderSystemFactory(const WindowsDirect3D12RenderSystemFactory&) = delete;
 		WindowsDirect3D12RenderSystemFactory(WindowsDirect3D12RenderSystemFactory&&) = delete;
 
 		~WindowsDirect3D12RenderSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
@@ -55,25 +53,28 @@ export namespace PonyEngine::Render
 
 	private:
 		WindowsDirect3D12RenderSystemParams renderSystemParams; ///< Render system parameters
+
+		Core::IApplicationContext* application; ///< Application.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12RenderSystemFactory::WindowsDirect3D12RenderSystemFactory(const WindowsDirect3D12RenderSystemParams& renderSystemParams) noexcept :
-		renderSystemParams(renderSystemParams)
+	WindowsDirect3D12RenderSystemFactory::WindowsDirect3D12RenderSystemFactory(Core::IApplicationContext& application, const WindowsDirect3D12RenderSystemFactoryParams&, const WindowsDirect3D12RenderSystemParams& systemParams) noexcept :
+		renderSystemParams(systemParams),
+		application{&application}
 	{
 	}
 
-	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
+	Core::SystemData WindowsDirect3D12RenderSystemFactory::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = PonyBase::Memory::UniquePointer<WindowsDirect3D12RenderSystem>::Create(engine, renderSystemParams);
+		auto system = std::make_unique<WindowsDirect3D12RenderSystem>(engine, params, renderSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IRenderSystem, IDirect3D12RenderSystem, IWindowsDirect3D12RenderSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
+			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

@@ -24,13 +24,13 @@
     <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\EngineSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemParams.cppm" />
     <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm" />
-    <ClCompile Include="Source\Public\Core\IEngineSystem.cppm" />
-    <ClCompile Include="Source\Public\Core\ITickableEngineSystem.cppm" />
+    <ClCompile Include="Source\Public\Core\System.cppm" />
+    <ClCompile Include="Source\Public\Core\TickableSystem.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\IEngine.cppm" />
+    <ClCompile Include="Source\Public\Core\Engine.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

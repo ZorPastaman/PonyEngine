@@ -11,6 +11,7 @@
 
 #include "CppUnitTest.h"
 
+#include <memory>
 #include <utility>
 
 import PonyBase.Memory;
@@ -20,18 +21,18 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Core
 {
-	PonyEngine::Core::SystemData SystemFactory::Create(PonyEngine::Core::IEngineContext&, const PonyEngine::Core::EngineSystemParams&)
+	PonyEngine::Core::SystemData SystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
 		Assert::IsNull(system);
 
-		auto createdSystem = PonyBase::Memory::UniquePointer<System>::Create();
-		system = createdSystem.Get();
+		auto createdSystem = std::make_unique<System>(engine, params);
+		system = createdSystem.get();
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<ISystemInterface>(*system);
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<PonyEngine::Core::IEngineSystem>(std::move(createdSystem)),
+			.system = std::move(createdSystem),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

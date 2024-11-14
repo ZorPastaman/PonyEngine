@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Screen.Windows.Implementation:WindowsScreenSystem;
+export module PonyEngine.Screen.Windows.Impl:WindowsScreenSystem;
 
 import <string_view>;
 
@@ -27,15 +27,19 @@ import PonyEngine.Screen.Windows;
 export namespace PonyEngine::Screen
 {
 	/// @brief Windows screen system.
-	class WindowsScreenSystem final : public Core::IEngineSystem, public IWindowsScreenSystem
+	class WindowsScreenSystem final : public Core::System, public IWindowsScreenSystem
 	{
 	public:
+		/// @brief Creates a @p WindowsScreenSystem.
+		/// @param engine Engine context.
+		/// @param systemParams System parameters.
+		/// @param screenParams Screen system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsScreenSystem(Core::IEngineContext& engine) noexcept;
+		WindowsScreenSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsScreenSystemParams& screenParams) noexcept;
 		WindowsScreenSystem(const WindowsScreenSystem&) = delete;
 		WindowsScreenSystem(WindowsScreenSystem&&) = delete;
 
-		~WindowsScreenSystem() noexcept = default;
+		virtual ~WindowsScreenSystem() noexcept override = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
@@ -53,8 +57,6 @@ export namespace PonyEngine::Screen
 
 	private:
 		PonyMath::Utility::Resolution<unsigned int> displayResolution; ///< Display resolution.
-
-		Core::IEngineContext* engine; ///< Engine.
 	};
 }
 
@@ -65,9 +67,9 @@ namespace PonyEngine::Screen
 	[[nodiscard("Pure function")]]
 	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept;
 
-	WindowsScreenSystem::WindowsScreenSystem(Core::IEngineContext& engine) noexcept :
-		displayResolution(GetDisplayResolution()),
-		engine{&engine}
+	WindowsScreenSystem::WindowsScreenSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsScreenSystemParams&) noexcept :
+		System(engine, systemParams),
+		displayResolution(GetDisplayResolution())
 	{
 		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
 	}

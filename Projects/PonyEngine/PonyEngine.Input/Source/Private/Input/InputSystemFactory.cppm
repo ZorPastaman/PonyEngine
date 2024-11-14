@@ -7,12 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Implementation:InputSystemFactory;
+export module PonyEngine.Input.Impl:InputSystemFactory;
 
+import <memory>;
 import <string_view>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
+
+import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
 import PonyEngine.Input.Factory;
@@ -25,14 +28,18 @@ export namespace PonyEngine::Input
 	class InputSystemFactory final : public IInputSystemFactory
 	{
 	public:
-		InputSystemFactory() noexcept = default;
+		/// @brief Creates an @p InputSystemFactory.
+		/// @param application Application context.
+		/// @param factoryParams Input system factory parameters.
+		/// @param systemParams Input system parameters.
+		InputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& factoryParams, const InputSystemParams& systemParams) noexcept;
 		InputSystemFactory(const InputSystemFactory&) = delete;
 		InputSystemFactory(InputSystemFactory&&) = delete;
 
 		~InputSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
@@ -44,20 +51,31 @@ export namespace PonyEngine::Input
 		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
 
 		static constexpr auto StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
+
+	private:
+		InputSystemParams inputSystemParams; ///< Input system parameters.
+
+		Core::IApplicationContext* application; ///< Application.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	Core::SystemData InputSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
+	InputSystemFactory::InputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams&, const InputSystemParams& systemParams) noexcept :
+		inputSystemParams(systemParams),
+		application{&application}
 	{
-		auto system = PonyBase::Memory::UniquePointer<InputSystem>::Create(engine);
+	}
+
+	Core::SystemData InputSystemFactory::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
+	{
+		auto system = std::make_unique<InputSystem>(engine, params, inputSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IInputSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
+			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

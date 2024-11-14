@@ -12,4 +12,3 @@ export module PonyEngine.Screen.Factory;
 export import PonyEngine.Screen;
 
 export import :IScreenSystemFactory;
-export import :ScreenSystemParams;

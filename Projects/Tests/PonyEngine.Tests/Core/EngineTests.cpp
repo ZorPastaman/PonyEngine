@@ -23,7 +23,7 @@ import PonyBase.Memory;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Implementation;
+import PonyEngine.Core.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -37,7 +37,7 @@ namespace Core
 			auto application = Application();
 			application.logger = &logger;
 			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
-			Assert::IsNotNull(engine.engine.Get());
+			Assert::IsNotNull(engine.engine.get());
 		}
 
 		TEST_METHOD(GetFrameCountTest)
@@ -65,7 +65,7 @@ namespace Core
 			engine.engine->Stop();
 			Assert::IsFalse(engine.engine->IsRunning());
 			Assert::AreEqual(0, engine.engine->ExitCode());
-			engine.engine.Reset();
+			engine.engine.reset();
 			engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			engine.engine->Stop(100);
 			Assert::AreEqual(100, engine.engine->ExitCode());
@@ -77,7 +77,7 @@ namespace Core
 			auto application = Application();
 			application.logger = &logger;
 			auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
-			Assert::AreEqual(std::string_view("PonyEngine::Core::Engine"), engine.engine->Name());
+			Assert::AreEqual(std::string_view("PonyEngine::Core::EngineImpl"), engine.engine->Name());
 		}
 
 		TEST_METHOD(SystemTickTest)
@@ -103,7 +103,7 @@ namespace Core
 
 			bool ended = false;
 			systemFactory.GetSystem()->onDestructed = &ended;
-			engine.engine.Reset();
+			engine.engine.reset();
 			Assert::IsTrue(ended);
 		}
 

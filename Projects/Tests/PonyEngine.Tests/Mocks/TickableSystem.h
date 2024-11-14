@@ -32,17 +32,17 @@ namespace Core
 		~ITickableSystemInterface() noexcept = default;
 	};
 
-	class TickableSystem final : public PonyEngine::Core::ITickableEngineSystem, public ITickableSystemInterface
+	class TickableSystem final : public PonyEngine::Core::TickableSystem, public ITickableSystemInterface
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		TickableSystem() noexcept = default;
+		TickableSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept;
 		[[nodiscard("Pure constructor")]]
 		TickableSystem(const TickableSystem& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		TickableSystem(TickableSystem&& other) noexcept = default;
 
-		~TickableSystem() noexcept;
+		virtual ~TickableSystem() noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
