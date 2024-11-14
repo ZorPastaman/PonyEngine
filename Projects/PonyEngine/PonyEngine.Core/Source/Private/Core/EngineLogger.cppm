@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Implementation:EngineLogger;
+export module PonyEngine.Core.Impl:EngineLogger;
 
 import <exception>;
 import <string_view>;

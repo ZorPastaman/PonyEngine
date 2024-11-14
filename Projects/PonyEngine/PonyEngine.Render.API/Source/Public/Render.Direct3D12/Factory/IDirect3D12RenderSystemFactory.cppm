@@ -11,8 +11,6 @@ export module PonyEngine.Render.Direct3D12.Factory:IDirect3D12RenderSystemFactor
 
 import PonyEngine.Render.Factory;
 
-import :Direct3D12RenderSystemParams;
-
 export namespace PonyEngine::Render
 {
 	class IDirect3D12RenderSystemFactory : public IRenderSystemFactory

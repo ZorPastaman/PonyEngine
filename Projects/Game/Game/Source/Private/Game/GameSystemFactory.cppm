@@ -11,17 +11,16 @@ module;
 
 #include <cassert>
 
-export module Game.Implementation:GameSystemFactory;
+export module Game.Impl:GameSystemFactory;
 
+import <memory>;
 import <string_view>;
 import <utility>;
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core;
 import PonyEngine.Core.Factory;
 
 import Game.Factory;
@@ -35,15 +34,18 @@ export namespace Game
 	{
 	public:
 		/// @brief Creates a game system factory.
+		/// @param application Application context.
+		/// @param factoryParams Game system factory parameters.
+		/// @param systemParams Game system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit GameSystemFactory() noexcept = default;
+		GameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& factoryParams, const GameSystemParams& systemParams) noexcept;
 		GameSystemFactory(const GameSystemFactory&) = delete;
 		GameSystemFactory(GameSystemFactory&&) = delete;
 
 		~GameSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams& params) override;
+		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
@@ -55,20 +57,31 @@ export namespace Game
 		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
 
 		static constexpr std::string_view StaticName = "Game::GameSystemFactory"; ///< Class name.
+
+	private:
+		GameSystemParams gameSystemParams; ///< Game system parameters.
+
+		PonyEngine::Core::IApplicationContext* application; ///< Application context.
 	};
 }
 
 namespace Game
 {
-	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::EngineSystemParams&)
+	GameSystemFactory::GameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& factoryParams, const GameSystemParams& systemParams) noexcept :
+		gameSystemParams(gameSystemParams),
+		application{&application}
 	{
-		auto system = PonyBase::Memory::UniquePointer<GameSystem>::Create(engine);
+	}
+
+	PonyEngine::Core::SystemData GameSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
+	{
+		auto system = std::make_unique<GameSystem>(engine, params, gameSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<PonyEngine::Core::ITickableEngineSystem>(std::move(system)),
+			.system = std::unique_ptr<PonyEngine::Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:IEngine;
+export module PonyEngine.Core:Engine;
 
 import <cstddef>;
 import <string_view>;
@@ -19,11 +19,13 @@ import :ISystemManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class IEngine
+	class Engine
 	{
 	public:
-		IEngine(const IEngine&) = delete;
-		IEngine(IEngine&&) = delete;
+		Engine(const Engine&) = delete;
+		Engine(Engine&&) = delete;
+
+		virtual ~Engine() noexcept = default;
 
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.
@@ -58,13 +60,11 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;
 
-		IEngine& operator =(const IEngine&) = delete;
-		IEngine& operator =(IEngine&&) = delete;
+		Engine& operator =(const Engine&) = delete;
+		Engine& operator =(Engine&&) = delete;
 
 	protected:
 		[[nodiscard("Pure constructor")]]
-		IEngine() noexcept = default;
-
-		~IEngine() noexcept = default;
+		Engine() noexcept = default;
 	};
 }

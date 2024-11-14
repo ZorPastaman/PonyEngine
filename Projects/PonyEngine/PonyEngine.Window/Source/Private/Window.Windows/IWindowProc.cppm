@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:IWindowProc;
+export module PonyEngine.Window.Windows.Impl:IWindowProc;
 
 export namespace PonyEngine::Window
 {

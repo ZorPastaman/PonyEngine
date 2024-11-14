@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowsClass;
+export module PonyEngine.Window.Windows.Impl:WindowsClassImpl;
 
 import <cstdint>;
 import <stdexcept>;
@@ -30,26 +30,26 @@ import :WindowProcFunction;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows class wrapper.
-	class WindowsClass final : public IWindowsClass
+	class WindowsClassImpl final : public WindowsClass
 	{
 	public:
 		/// @brief Creates a Windows class.
 		/// @param application Application context.
 		/// @param params Windows class parameters.
 		[[nodiscard("Pure constructor")]]
-		WindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
-		WindowsClass(const WindowsClass&) = delete;
-		WindowsClass(WindowsClass&&) = delete;
+		WindowsClassImpl(Core::IApplicationContext& application, const WindowsClassParams& params);
+		WindowsClassImpl(const WindowsClassImpl&) = delete;
+		WindowsClassImpl(WindowsClassImpl&&) = delete;
 
-		~WindowsClass() noexcept;
+		virtual ~WindowsClassImpl() noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual HINSTANCE Instance() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ATOM Class() const noexcept override;
 
-		WindowsClass& operator =(const WindowsClass&) = delete;
-		WindowsClass& operator =(WindowsClass&&) = delete;
+		WindowsClassImpl& operator =(const WindowsClassImpl&) = delete;
+		WindowsClassImpl& operator =(WindowsClassImpl&&) = delete;
 
 	private:
 		/// @brief Gets this dll instance.
@@ -75,14 +75,14 @@ namespace PonyEngine::Window
 	[[nodiscard("Pure function")]]
 	HCURSOR DefaultCursor();
 
-	WindowsClass::WindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params) :
+	WindowsClassImpl::WindowsClassImpl(Core::IApplicationContext& application, const WindowsClassParams& params) :
 		application{&application},
 		hInstance{GetInstance()},
 		classAtom{CreateClass(params)}
 	{
 	}
 
-	WindowsClass::~WindowsClass() noexcept
+	WindowsClassImpl::~WindowsClassImpl() noexcept
 	{
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window class '0x{:X}'.", classAtom);
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
@@ -92,17 +92,17 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window class unregistered.");
 	}
 
-	HINSTANCE WindowsClass::Instance() const noexcept
+	HINSTANCE WindowsClassImpl::Instance() const noexcept
 	{
 		return hInstance;
 	}
 
-	ATOM WindowsClass::Class() const noexcept
+	ATOM WindowsClassImpl::Class() const noexcept
 	{
 		return classAtom;
 	}
 
-	HINSTANCE WindowsClass::GetInstance()
+	HINSTANCE WindowsClassImpl::GetInstance()
 	{
 		HINSTANCE hInstance = nullptr;
 		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
@@ -113,7 +113,7 @@ namespace PonyEngine::Window
 		return hInstance;
 	}
 
-	ATOM WindowsClass::CreateClass(const WindowsClassParams& classParams) const
+	ATOM WindowsClassImpl::CreateClass(const WindowsClassParams& classParams) const
 	{
 		const auto wc = WNDCLASSEXW
 		{

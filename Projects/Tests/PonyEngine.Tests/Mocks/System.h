@@ -32,17 +32,17 @@ namespace Core
 		~ISystemInterface() noexcept = default;
 	};
 
-	class System final : public PonyEngine::Core::IEngineSystem, public ISystemInterface
+	class System final : public PonyEngine::Core::System, public ISystemInterface
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		System() noexcept = default;
+		System(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept;
 		[[nodiscard("Pure constructor")]]
 		System(const System& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		System(System&& other) noexcept = default;
 
-		~System() noexcept;
+		virtual ~System() noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;

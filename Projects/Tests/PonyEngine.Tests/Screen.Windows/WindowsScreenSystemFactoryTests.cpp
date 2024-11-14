@@ -21,7 +21,7 @@
 #include "Mocks/Logger.h"
 #include "Mocks/Engine.h"
 
-import PonyEngine.Screen.Windows.Implementation;
+import PonyEngine.Screen.Windows.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -46,8 +46,8 @@ namespace Screen
 			auto engine = Core::Engine();
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
-			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams{});
-			auto screenSystem = std::get<0>(system.system).Get();
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
+			auto screenSystem = std::get<0>(system.system).get();
 			Assert::IsNotNull(screenSystem);
 
 			auto interfaces = system.publicInterfaces.Span();

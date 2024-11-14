@@ -21,7 +21,7 @@
     <ClCompile Include="Source\Private\Input\InputSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Input.Implementation.cppm">
+    <ClCompile Include="Source\Public\Input\Input.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

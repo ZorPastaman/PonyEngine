@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Factory:InputSystemParams;
+export module PonyEngine.Input:InputSystemParams;
 
 export namespace PonyEngine::Input
 {

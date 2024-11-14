@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Core\Engine.cppm">
+    <ClCompile Include="Source\Private\Core\EngineImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Core\SystemManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Core.Implementation.cppm">
+    <ClCompile Include="Source\Public\Core\Core.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Core\EngineLogger.cppm">

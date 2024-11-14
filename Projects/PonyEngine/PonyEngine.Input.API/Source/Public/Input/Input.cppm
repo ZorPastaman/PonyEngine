@@ -14,5 +14,6 @@ export import :Handle;
 export import :IInputSystem;
 export import :IKeyboardObserver;
 export import :IKeyboardProvider;
+export import :InputSystemParams;
 export import :KeyboardKeyCode;
 export import :KeyboardMessage;

@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Linking.h"
 
-export module Game.Implementation;
+export module Game.Impl;
 
 export import Game.Factory;
 
@@ -27,18 +27,18 @@ export namespace Game
 {
 	/// @brief Creates a game system factory.
 	/// @param application Application context.
-	/// @param params Game system factory parameters.
+	/// @param factoryParams Game system factory parameters.
 	/// @param systemParams Game system parameters.
 	/// @return Game system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& params, const GameSystemParams& systemParams);
+	PONY_DLL_EXPORT GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& factoryParams, const GameSystemParams& systemParams);
 }
 
 namespace Game
 {
-	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext&, const GameSystemFactoryParams&, const GameSystemParams&)
+	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& factoryParams, const GameSystemParams& systemParams)
 	{
-		auto factory = PonyBase::Memory::UniquePointer<GameSystemFactory>::Create();
+		auto factory = PonyBase::Memory::UniquePointer<GameSystemFactory>::Create(application, factoryParams, systemParams);
 
 		return GameSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IGameSystemFactory>(std::move(factory))};
 	}

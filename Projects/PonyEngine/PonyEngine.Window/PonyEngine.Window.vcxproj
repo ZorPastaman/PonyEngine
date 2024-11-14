@@ -20,10 +20,10 @@
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\WindowsClass.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsClassImpl.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">

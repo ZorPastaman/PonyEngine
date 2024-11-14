@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Linking.h"
 
-export module PonyEngine.Input.Implementation;
+export module PonyEngine.Input.Impl;
 
 export import PonyEngine.Input.Factory;
 
@@ -27,18 +27,18 @@ export namespace PonyEngine::Input
 {
 	/// @brief Creates an input system factory.
 	/// @param application Application context.
-	/// @param params Input system factory parameters.
+	/// @param factoryParams Input system factory parameters.
 	/// @param systemParams Input system parameters.
 	/// @return Input system factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& params, const InputSystemParams& systemParams);
+	PONY_DLL_EXPORT InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& factoryParams, const InputSystemParams& systemParams);
 }
 
 namespace PonyEngine::Input
 {
-	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext&, const InputSystemFactoryParams&, const InputSystemParams&)
+	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& factoryParams, const InputSystemParams& systemParams)
 	{
-		auto factory = PonyBase::Memory::UniquePointer<InputSystemFactory>::Create();
+		auto factory = PonyBase::Memory::UniquePointer<InputSystemFactory>::Create(application, factoryParams, systemParams);
 
 		return InputSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IInputSystemFactory>(std::move(factory))};
 	}

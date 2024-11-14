@@ -7,12 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time.Implementation:FrameRateSystemFactory;
+export module PonyEngine.Time.Impl:FrameRateSystemFactory;
 
+import <memory>;
 import <string_view>;
 import <utility>;
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
 
 import PonyEngine.Core.Factory;
@@ -27,16 +27,18 @@ export namespace PonyEngine::Time
 	{
 	public:
 		/// @brief Creates a @p FrameRateSystemFactory.
-		/// @param frameRateSystemParams Frame rate system parameters.
+		/// @param application Application context.
+		/// @param factoryParams Frame rate system factory parameters.
+		/// @param systemParams Frame rate system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit FrameRateSystemFactory(const FrameRateSystemParams& frameRateSystemParams) noexcept;
+		FrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& factoryParams, const FrameRateSystemParams& systemParams) noexcept;
 		FrameRateSystemFactory(const FrameRateSystemFactory&) = delete;
 		FrameRateSystemFactory(FrameRateSystemFactory&&) = delete;
 
 		~FrameRateSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
@@ -51,25 +53,28 @@ export namespace PonyEngine::Time
 
 	private:
 		FrameRateSystemParams frameRateSystemParams; //< Frame rate system parameters.
+
+		Core::IApplicationContext* application; ///< Application context.
 	};
 }
 
 namespace PonyEngine::Time
 {
-	FrameRateSystemFactory::FrameRateSystemFactory(const FrameRateSystemParams& frameRateSystemParams) noexcept :
-		frameRateSystemParams(frameRateSystemParams)
+	FrameRateSystemFactory::FrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams&, const FrameRateSystemParams& systemParams) noexcept :
+		frameRateSystemParams(systemParams),
+		application{&application}
 	{
 	}
 
-	Core::SystemData FrameRateSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
+	Core::SystemData FrameRateSystemFactory::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = PonyBase::Memory::UniquePointer<FrameRateSystem>::Create(engine, frameRateSystemParams.targetFrameTime);
+		auto system = std::make_unique<FrameRateSystem>(engine, params, frameRateSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
 
 		return Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
+			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

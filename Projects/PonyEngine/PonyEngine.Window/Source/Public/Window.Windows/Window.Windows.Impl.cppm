@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Linking.h"
 
-export module PonyEngine.Window.Windows.Implementation;
+export module PonyEngine.Window.Windows.Impl;
 
 export import PonyEngine.Window.Windows.Factory;
 
@@ -22,7 +22,7 @@ import PonyBase.Memory;
 
 import PonyEngine.Core;
 
-import :WindowsClass;
+import :WindowsClassImpl;
 import :WindowsWindowSystemFactory;
 
 export namespace PonyEngine::Window
@@ -32,27 +32,27 @@ export namespace PonyEngine::Window
 	/// @param params Windows class parameters.
 	/// @return Windows class.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT std::shared_ptr<IWindowsClass> CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
+	PONY_DLL_EXPORT std::unique_ptr<WindowsClass> CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
 
 	/// @brief Creates a window system for Windows factory.
-	/// @param application Application.
-	/// @param params Window system for Windows factory parameters.
+	/// @param application Application context.
+	/// @param factoryParams Window system for Windows factory parameters.
 	/// @param systemParams Window system for Windows parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& params, const WindowsWindowSystemParams& systemParams);
+	PONY_DLL_EXPORT WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& factoryParams, const WindowsWindowSystemParams& systemParams);
 }
 
 namespace PonyEngine::Window
 {
-	std::shared_ptr<IWindowsClass> CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params)
+	std::unique_ptr<WindowsClass> CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params) // TODO: Return data
 	{
-		return std::make_shared<WindowsClass>(application, params);
+		return std::make_unique<WindowsClassImpl>(application, params);
 	}
 
-	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext&, const WindowsWindowSystemFactoryParams&, const WindowsWindowSystemParams& systemParams)
+	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& factoryParams, const WindowsWindowSystemParams& systemParams)
 	{
-		auto factory = PonyBase::Memory::UniquePointer<WindowsWindowSystemFactory>::Create(systemParams);
+		auto factory = PonyBase::Memory::UniquePointer<WindowsWindowSystemFactory>::Create(application, factoryParams, systemParams);
 
 		return WindowsWindowSystemFactoryData{.systemFactory = PonyBase::Memory::UniquePointer<IWindowsWindowSystemFactory>(std::move(factory))};
 	}

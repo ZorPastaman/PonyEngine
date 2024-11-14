@@ -11,10 +11,10 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Core\Engine.cppm" />
+    <ClCompile Include="Source\Private\Core\EngineImpl.cppm" />
     <ClCompile Include="Source\Private\Core\EngineLogger.cppm" />
     <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\Core.Implementation.cppm" />
+    <ClCompile Include="Source\Public\Core\Core.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">

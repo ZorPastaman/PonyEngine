@@ -9,4 +9,5 @@
 
 export module Game;
 
+export import :GameSystemParams;
 export import :IGameSystem;

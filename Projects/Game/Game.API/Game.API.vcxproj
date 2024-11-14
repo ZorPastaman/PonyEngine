@@ -14,7 +14,7 @@
     <ClCompile Include="Source\Public\Game\Factory\Game.Factory.cppm" />
     <ClCompile Include="Source\Public\Game\Factory\GameSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Game\Factory\GameSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Game\Factory\GameSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Game\GameSystemParams.cppm" />
     <ClCompile Include="Source\Public\Game\Factory\IGameSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Game\Game.cppm" />
     <ClCompile Include="Source\Public\Game\IGameSystem.cppm" />

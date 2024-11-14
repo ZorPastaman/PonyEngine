@@ -11,6 +11,11 @@
 
 namespace Core
 {
+	TickableSystem::TickableSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept :
+		PonyEngine::Core::TickableSystem(engine, params)
+	{
+	}
+
 	TickableSystem::~TickableSystem() noexcept
 	{
 		if (onDestructed)

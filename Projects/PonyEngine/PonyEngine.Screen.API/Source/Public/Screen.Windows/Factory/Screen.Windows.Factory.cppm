@@ -15,4 +15,3 @@ export import PonyEngine.Screen.Windows;
 export import :IWindowsScreenSystemFactory;
 export import :WindowsScreenSystemFactoryData;
 export import :WindowsScreenSystemFactoryParams;
-export import :WindowsScreenSystemParams;

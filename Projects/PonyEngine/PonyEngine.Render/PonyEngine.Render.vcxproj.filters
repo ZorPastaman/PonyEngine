@@ -28,7 +28,7 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Implementation.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm">
@@ -40,7 +40,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Implementation.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm">

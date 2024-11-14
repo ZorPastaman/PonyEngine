@@ -11,7 +11,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Core.Implementation:Engine;
+export module PonyEngine.Core.Impl:EngineImpl;
 
 import <cstddef>;
 import <exception>;
@@ -31,18 +31,18 @@ import :SystemManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class Engine final : public IEngine, public IEngineContext
+	class EngineImpl final : public Engine, public IEngineContext
 	{
 	public:
 		/// @brief Creates an @p Engine.
 		/// @param application Application context.
 		/// @param systemFactories System factories.
 		[[nodiscard("Pure constructor")]]
-		Engine(IApplicationContext& application, const SystemFactoriesContainer& systemFactories);
-		Engine(const Engine&) = delete;
-		Engine(Engine&&) = delete;
+		EngineImpl(IApplicationContext& application, const SystemFactoriesContainer& systemFactories);
+		EngineImpl(const EngineImpl&) = delete;
+		EngineImpl(EngineImpl&&) = delete;
 
-		~Engine() noexcept;
+		virtual ~EngineImpl() noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::size_t FrameCount() const noexcept override;
@@ -63,10 +63,10 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 
-		Engine& operator =(const Engine&) = delete;
-		Engine& operator =(Engine&&) = delete;
+		EngineImpl& operator =(const EngineImpl&) = delete;
+		EngineImpl& operator =(EngineImpl&&) = delete;
 
-		static constexpr std::string_view StaticName = "PonyEngine::Core::Engine"; ///< Class name.
+		static constexpr std::string_view StaticName = "PonyEngine::Core::EngineImpl"; ///< Class name.
 
 	private:
 		/// @brief Before tick procedure.
@@ -101,7 +101,7 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	Engine::Engine(IApplicationContext& application, const SystemFactoriesContainer& systemFactories) :
+	EngineImpl::EngineImpl(IApplicationContext& application, const SystemFactoriesContainer& systemFactories) :
 		frameCount{0},
 		isRunning{true},
 		isTicking{false},
@@ -136,7 +136,7 @@ namespace PonyEngine::Core
 		}
 	}
 
-	Engine::~Engine() noexcept
+	EngineImpl::~EngineImpl() noexcept
 	{
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "End systems.");
 		systemManager->EndSystems();
@@ -155,34 +155,34 @@ namespace PonyEngine::Core
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine logger destroyed.");
 	}
 
-	std::size_t Engine::FrameCount() const noexcept
+	std::size_t EngineImpl::FrameCount() const noexcept
 	{
 		return frameCount;
 	}
 
-	PonyDebug::Log::ILogger& Engine::Logger() const noexcept
+	PonyDebug::Log::ILogger& EngineImpl::Logger() const noexcept
 	{
 		return *engineLogger;
 	}
 
-	ISystemManager& Engine::SystemManager() const noexcept
+	ISystemManager& EngineImpl::SystemManager() const noexcept
 	{
 		return *systemManager;
 	}
 
-	bool Engine::IsRunning() const noexcept
+	bool EngineImpl::IsRunning() const noexcept
 	{
 		return isRunning;
 	}
 
-	int Engine::ExitCode() const noexcept
+	int EngineImpl::ExitCode() const noexcept
 	{
 		PONY_LOG_IF(isRunning, Logger(), PonyDebug::Log::LogType::Warning, "Tried to get exit code when engine is still running.");
 
 		return engineExitCode;
 	}
 
-	void Engine::Stop(const int exitCode) noexcept
+	void EngineImpl::Stop(const int exitCode) noexcept
 	{
 		if (isRunning)
 		{
@@ -196,7 +196,7 @@ namespace PonyEngine::Core
 		}
 	}
 
-	void Engine::Tick()
+	void EngineImpl::Tick()
 	{
 		BeginTick();
 
@@ -206,12 +206,12 @@ namespace PonyEngine::Core
 		EndTick();
 	}
 
-	std::string_view Engine::Name() const noexcept
+	std::string_view EngineImpl::Name() const noexcept
 	{
 		return StaticName;
 	}
 
-	void Engine::BeginTick()
+	void EngineImpl::BeginTick()
 	{
 		if (!isRunning) [[unlikely]]
 		{
@@ -226,13 +226,13 @@ namespace PonyEngine::Core
 		isTicking = true;
 	}
 
-	void Engine::EndTick() noexcept
+	void EngineImpl::EndTick() noexcept
 	{
 		isTicking = false;
 		++frameCount;
 	}
 
-	void Engine::TickSystems()
+	void EngineImpl::TickSystems()
 	{
 		try
 		{
@@ -247,7 +247,7 @@ namespace PonyEngine::Core
 		}
 	}
 
-	std::unique_ptr<EngineLogger> Engine::CreateEngineLogger()
+	std::unique_ptr<EngineLogger> EngineImpl::CreateEngineLogger()
 	{
 		try
 		{
@@ -265,7 +265,7 @@ namespace PonyEngine::Core
 		}
 	}
 
-	std::unique_ptr<Core::SystemManager> Engine::CreateSystemManager()
+	std::unique_ptr<Core::SystemManager> EngineImpl::CreateSystemManager()
 	{
 		try
 		{

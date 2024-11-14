@@ -7,14 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Factory:RenderSystemParams;
+export module PonyEngine.Render:RenderSystemParams;
 
 import <optional>;
 
 import PonyMath.Core;
 import PonyMath.Utility;
-
-import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {

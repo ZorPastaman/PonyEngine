@@ -19,7 +19,7 @@
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
-import PonyEngine.Input.Implementation;
+import PonyEngine.Input.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -42,8 +42,8 @@ namespace Input
 			application.logger = &logger;
 			engine.application = &application;
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
-			Assert::IsNotNull(std::get<1>(inputSystem.system).Get());
+			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			Assert::IsNotNull(std::get<1>(inputSystem.system).get());
 		}
 
 		TEST_METHOD(GetSystemNameTest)

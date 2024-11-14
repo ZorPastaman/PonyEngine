@@ -11,15 +11,14 @@ module;
 
 #include "PonyBase/Core/Linking.h"
 
-export module PonyEngine.Core.Implementation;
+export module PonyEngine.Core.Impl;
 
 export import PonyEngine.Core.Factory;
 
+import <memory>;
 import <utility>;
 
-import PonyBase.Memory;
-
-import :Engine;
+import :EngineImpl;
 
 export namespace PonyEngine::Core
 {
@@ -35,8 +34,6 @@ namespace PonyEngine::Core
 {
 	EngineData CreateEngine(IApplicationContext& application, const EngineParams& params)
 	{
-		auto engine = PonyBase::Memory::UniquePointer<Engine>::Create(application, params.systemFactories);
-
-		return EngineData{.engine = PonyBase::Memory::UniquePointer<IEngine>(std::move(engine))};
+		return EngineData{.engine = std::make_unique<EngineImpl>(application, params.systemFactories)};
 	}
 }

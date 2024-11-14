@@ -13,7 +13,6 @@ import <string_view>;
 
 import PonyEngine.Core;
 
-import :EngineSystemParams;
 import :SystemData;
 
 export namespace PonyEngine::Core
@@ -26,11 +25,11 @@ export namespace PonyEngine::Core
 		ISystemFactory(ISystemFactory&&) = delete;
 
 		/// @brief Creates a system.
-		///	@param engine Engine context.
-		/// @param params Engine system parameters.
+		/// @param engine Engine context.
+		/// @param params System parameters.
 		/// @return Created system data.
 		[[nodiscard("Pure function")]]
-		virtual SystemData Create(IEngineContext& engine, const EngineSystemParams& params) = 0;
+		virtual SystemData Create(IEngineContext& engine, const SystemParams& params) = 0;
 
 		/// @brief Gets the system static name.
 		/// @return System static name.

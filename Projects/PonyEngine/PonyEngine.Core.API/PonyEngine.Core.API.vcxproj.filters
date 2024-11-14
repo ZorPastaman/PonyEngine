@@ -42,19 +42,19 @@
     <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ITickableEngineSystem.cppm">
+    <ClCompile Include="Source\Public\Core\TickableSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineSystemParams.cppm">
+    <ClCompile Include="Source\Public\Core\SystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\IEngineSystem.cppm">
+    <ClCompile Include="Source\Public\Core\System.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\IEngine.cppm">
+    <ClCompile Include="Source\Public\Core\Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

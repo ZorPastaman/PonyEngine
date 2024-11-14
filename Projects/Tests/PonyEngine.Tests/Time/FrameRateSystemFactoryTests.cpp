@@ -24,7 +24,7 @@
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
-import PonyEngine.Time.Implementation;
+import PonyEngine.Time.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -46,13 +46,13 @@ namespace Time
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
-			Assert::IsNotNull(std::get<1>(frameRateSystem.system).Get());
+			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			Assert::IsNotNull(std::get<1>(frameRateSystem.system).get());
 
 			auto interfaces = frameRateSystem.publicInterfaces.Span();
 			Assert::AreEqual(std::size_t{1}, interfaces.size());
 			Assert::IsTrue(std::type_index(typeid(PonyEngine::Time::IFrameRateSystem)) == std::type_index(interfaces[0].first));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).Get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
 		TEST_METHOD(GetSystemNameTest)

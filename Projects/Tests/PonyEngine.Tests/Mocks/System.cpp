@@ -11,6 +11,11 @@
 
 namespace Core
 {
+	System::System(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept :
+		PonyEngine::Core::System(engine, params)
+	{
+	}
+
 	System::~System() noexcept
 	{
 		if (onDestructed)

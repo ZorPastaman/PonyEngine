@@ -11,22 +11,14 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Factory:WindowsWindowSystemParams;
-
-import <memory>;
-
-import PonyEngine.Window.Factory;
-
-import :IWindowsClass;
-import :WindowsWindowStyle;
+export module PonyEngine.Window.Windows:WindowsWindowStyle;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Windows window parameters.
-	struct WindowsWindowSystemParams final : WindowSystemParams
+	/// @brief Windows window style.
+	struct WindowsWindowStyle final
 	{
-		std::shared_ptr<IWindowsClass> windowsClass; ///< Windows class.
-		WindowsWindowStyle windowsWindowStyle; ///< Windows window style.
-		int cmdShow = SW_NORMAL; ///< Window cmdShow.
+		DWORD style = WS_POPUP; ///< Window style.
+		DWORD extendedStyle = DWORD{0}; ///< Extended window style.
 	};
 }

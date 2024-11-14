@@ -18,7 +18,7 @@ import <string>;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows class parameters. They are used in RegisterClass() function.
-	struct WindowsClassParams final
+	struct WindowsClassParams final // TODO: Seems it's better to remove factory level. Two level (API and Impl) structure is enough.
 	{
 		std::wstring name = L"Pony Engine Class"; ///< Class name. Must be unique.
 		HICON icon = nullptr; ///< Class icon. The default icon is used if it's nullptr.

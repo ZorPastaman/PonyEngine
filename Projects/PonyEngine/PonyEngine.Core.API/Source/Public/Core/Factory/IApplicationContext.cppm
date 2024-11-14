@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core.Factory:IApplication;
+export module PonyEngine.Core.Factory:IApplicationContext;
 
 import <string_view>;
 

@@ -20,7 +20,7 @@
 import PonyDebug.Log;
 
 import PonyEngine.Core.Factory;
-import PonyEngine.Time.Implementation;
+import PonyEngine.Time.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
@@ -36,8 +36,8 @@ namespace Time
 			auto engine = Core::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).get());
 			std::get<1>(frameRateSystemBase.system)->Begin();
 			float frameTime = 5.f;
 			frameRateSystem->TargetFrameTime(frameTime);
@@ -59,8 +59,8 @@ namespace Time
 			auto engine = Core::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::EngineSystemParams());
-			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).Get());
+			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).get());
 
 			Assert::AreEqual(0.f, frameRateSystem->TargetFrameTime());
 

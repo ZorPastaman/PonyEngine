@@ -7,12 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Screen.Factory:ScreenSystemParams;
+export module PonyEngine.Time:FrameRateSystemParams;
 
-export namespace PonyEngine::Screen
+export namespace PonyEngine::Time
 {
-	/// @brief Screen system parameters.
-	struct ScreenSystemParams
+	/// @brief Frame rate system parameters.
+	struct FrameRateSystemParams final
 	{
+		float targetFrameTime; ///< Target frame time.
 	};
 }

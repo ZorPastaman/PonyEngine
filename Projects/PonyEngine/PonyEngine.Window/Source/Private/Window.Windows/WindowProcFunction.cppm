@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowProcFunction;
+export module PonyEngine.Window.Windows.Impl:WindowProcFunction;
 
 import <stdexcept>;
 

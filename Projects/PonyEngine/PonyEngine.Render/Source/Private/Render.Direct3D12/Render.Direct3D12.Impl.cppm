@@ -7,13 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time.Factory:FrameRateSystemParams;
+export module PonyEngine.Render.Direct3D12.Impl;
 
-export namespace PonyEngine::Time
-{
-	/// @brief Frame rate system parameters.
-	struct FrameRateSystemParams final
-	{
-		float targetFrameTime; ///< Target frame time.
-	};
-}
+export import :Direct3D12SubSystem;

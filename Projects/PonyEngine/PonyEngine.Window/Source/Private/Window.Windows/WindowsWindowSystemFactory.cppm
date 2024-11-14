@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Window.Windows.Implementation:WindowsWindowSystemFactory;
+export module PonyEngine.Window.Windows.Impl:WindowsWindowSystemFactory;
 
 import <cstdint>;
 import <exception>;
@@ -43,16 +43,18 @@ export namespace PonyEngine::Window
 	{
 	public:
 		/// @brief Creates a Windows window factory.
-		/// @param params Windows window system parameters.
+		/// @param application Application context.
+		/// @param factoryParams Windows window system factory parameters.
+		/// @param systemParams Windows window system parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsWindowSystemFactory(const WindowsWindowSystemParams& windowSystemParams);
+		explicit WindowsWindowSystemFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& factoryParams, const WindowsWindowSystemParams& systemParams);
 		WindowsWindowSystemFactory(const WindowsWindowSystemFactory&) = delete;
 		WindowsWindowSystemFactory(WindowsWindowSystemFactory&&) = delete;
 
 		~WindowsWindowSystemFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::EngineSystemParams& params) override;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view SystemName() const noexcept override;
@@ -67,25 +69,28 @@ export namespace PonyEngine::Window
 
 	private:
 		WindowsWindowSystemParams windowSystemParams; ///< Window system parameters.
+
+		Core::IApplicationContext* application; ///< Application context.
 	};
 }
 
 namespace PonyEngine::Window
 {
-	WindowsWindowSystemFactory::WindowsWindowSystemFactory(const WindowsWindowSystemParams& windowSystemParams) :
-		windowSystemParams(windowSystemParams)
+	WindowsWindowSystemFactory::WindowsWindowSystemFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams&, const WindowsWindowSystemParams& systemParams) :
+		windowSystemParams(systemParams),
+		application{&application}
 	{
 	}
 
-	Core::SystemData WindowsWindowSystemFactory::Create(Core::IEngineContext& engine, const Core::EngineSystemParams&)
+	Core::SystemData WindowsWindowSystemFactory::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = PonyBase::Memory::UniquePointer<WindowsWindowSystem>::Create(engine, windowSystemParams);
+		auto system = std::make_unique<WindowsWindowSystem>(engine, params, windowSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
 
 		return Core::SystemData
 		{
-			.system = PonyBase::Memory::UniquePointer<Core::ITickableEngineSystem>(std::move(system)),
+			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

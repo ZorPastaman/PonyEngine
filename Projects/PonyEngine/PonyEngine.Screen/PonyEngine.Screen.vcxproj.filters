@@ -28,7 +28,7 @@
     <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Implementation.cppm">
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactory.cppm">
