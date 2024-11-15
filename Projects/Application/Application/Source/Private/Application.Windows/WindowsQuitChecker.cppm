@@ -17,7 +17,7 @@ export module Application.Windows:WindowsQuitChecker;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 
 export namespace Application
 {

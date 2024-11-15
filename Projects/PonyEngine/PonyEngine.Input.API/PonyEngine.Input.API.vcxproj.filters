@@ -18,9 +18,6 @@
     <ClCompile Include="Source\Public\Input\Event.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factory\Input.Factory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Input\Handle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -42,13 +39,13 @@
     <ClCompile Include="Source\Public\Input\KeyboardMessage.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factory\InputSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Input\InputSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factory\InputSystemFactoryData.cppm">
+    <ClCompile Include="Source\Public\Input\InputSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Factory\IInputSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Input\IInputSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input\InputSystemParams.cppm">

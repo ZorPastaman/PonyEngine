@@ -11,7 +11,7 @@
 
 #include "System.h"
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 
 namespace Core
 {

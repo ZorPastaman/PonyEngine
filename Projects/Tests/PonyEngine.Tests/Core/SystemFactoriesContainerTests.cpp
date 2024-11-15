@@ -11,7 +11,7 @@
 
 #include "Mocks/SystemFactory.h"
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

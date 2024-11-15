@@ -12,6 +12,7 @@ export module PonyEngine.Render;
 export import :IRenderObject;
 export import :IRenderObjectManager;
 export import :IRenderSystem;
+export import :IRenderSystemFactory;
 export import :IRenderTarget;
 export import :IRenderView;
 export import :RenderObjectHandle;

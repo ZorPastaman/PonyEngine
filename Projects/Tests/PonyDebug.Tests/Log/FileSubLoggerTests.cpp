@@ -16,7 +16,7 @@
 #include <string>
 #include <string_view>
 
-import PonyDebug.Log.Implementation;
+import PonyDebug.Log.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

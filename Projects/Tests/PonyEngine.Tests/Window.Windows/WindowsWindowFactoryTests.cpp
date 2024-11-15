@@ -22,7 +22,7 @@
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Window.Windows.Impl;
 

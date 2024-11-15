@@ -11,7 +11,7 @@
 
 #include <string_view>
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 
 namespace Core
 {

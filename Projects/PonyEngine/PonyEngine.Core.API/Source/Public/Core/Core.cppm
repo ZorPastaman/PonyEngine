@@ -10,8 +10,14 @@
 export module PonyEngine.Core;
 
 export import :Engine;
+export import :EngineData;
+export import :EngineParams;
+export import :IApplicationContext;
 export import :IEngineContext;
+export import :ISystemFactory;
 export import :ISystemManager;
 export import :System;
+export import :SystemData;
+export import :SystemFactoriesContainer;
 export import :SystemParams;
 export import :TickableSystem;

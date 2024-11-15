@@ -18,14 +18,13 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm" />
+    <ClCompile Include="Source\Public\Core\EngineData.cppm" />
+    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\ISystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemData.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemFactoriesContainer.cppm" />
     <ClCompile Include="Source\Public\Core\SystemParams.cppm" />
-    <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm" />
+    <ClCompile Include="Source\Public\Core\IApplicationContext.cppm" />
     <ClCompile Include="Source\Public\Core\System.cppm" />
     <ClCompile Include="Source\Public\Core\TickableSystem.cppm" />
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />

@@ -57,6 +57,8 @@ export namespace PonyBase::Utility
 		template<typename... Targets, typename Source>
 		void AddInterfacesDeduced(Source& object) requires (... && std::derived_from<Source, Targets>);
 
+		/// @brief Gets interfaces.
+		/// @return Interfaces. Pairs of types and object pointers.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> Span() const noexcept;
 

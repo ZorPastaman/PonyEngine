@@ -19,7 +19,7 @@
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 import PonyEngine.Time.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -39,7 +39,7 @@ namespace Time
 			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			auto frameRateSystem = dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystemBase.system).get());
 			std::get<1>(frameRateSystemBase.system)->Begin();
-			float frameTime = 5.f;
+			float frameTime = 1.f;
 			frameRateSystem->TargetFrameTime(frameTime);
 			auto now = std::chrono::steady_clock::now();
 			std::get<1>(frameRateSystemBase.system)->Tick();

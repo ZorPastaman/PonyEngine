@@ -9,5 +9,8 @@
 
 export module Game;
 
+export import :GameSystemFactoryData;
+export import :GameSystemFactoryParams;
 export import :GameSystemParams;
 export import :IGameSystem;
+export import :IGameSystemFactory;
