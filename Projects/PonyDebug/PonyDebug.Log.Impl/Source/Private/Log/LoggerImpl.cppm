@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyDebug.Log.Detail:Logger;
+export module PonyDebug.Log.Detail:LoggerImpl;
 
 import <algorithm>;
 import <chrono>;
@@ -27,17 +27,19 @@ import PonyDebug.Log;
 
 export namespace PonyDebug::Log
 {
-	/// @brief Logger.
+	/// @brief Logger implementation.
 	/// @details It just resends logs to its sub-loggers.
-	class Logger final : public ILogger
+	class LoggerImpl final : public Logger
 	{
 	public:
+		/// @brief Creates a @p LoggerImpl.
+		/// @param params Logger parameters.
 		[[nodiscard("Pure constructor")]]
-		Logger() noexcept = default;
-		Logger(const Logger&) = delete;
-		Logger(Logger&&) noexcept = delete;
+		explicit LoggerImpl(const LoggerParams& params) noexcept;
+		LoggerImpl(const LoggerImpl&) = delete;
+		LoggerImpl(LoggerImpl&&) noexcept = delete;
 
-		~Logger() noexcept = default;
+		virtual ~LoggerImpl() noexcept override = default;
 
 		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
@@ -48,8 +50,8 @@ export namespace PonyDebug::Log
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
 
-		Logger& operator =(const Logger&) = delete;
-		Logger& operator =(Logger&&) = delete;
+		LoggerImpl& operator =(const LoggerImpl&) = delete;
+		LoggerImpl& operator =(LoggerImpl&&) = delete;
 
 		static constexpr std::string_view StaticName = "PonyDebug::Log::Logger"; ///< Class name.
 
@@ -60,7 +62,12 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	void Logger::Log(const LogType logType, const LogInput& logInput) noexcept
+	LoggerImpl::LoggerImpl(const LoggerParams& params) noexcept :
+		Logger(params)
+	{
+	}
+
+	void LoggerImpl::Log(const LogType logType, const LogInput& logInput) noexcept
 	{
 		const auto logEntry = LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 
@@ -70,7 +77,7 @@ namespace PonyDebug::Log
 		}
 	}
 
-	void Logger::LogException(const std::exception& exception, const LogInput& logInput) noexcept
+	void LoggerImpl::LogException(const std::exception& exception, const LogInput& logInput) noexcept
 	{
 		const auto logEntry = LogEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 
@@ -80,14 +87,14 @@ namespace PonyDebug::Log
 		}
 	}
 
-	void Logger::AddSubLogger(ISubLogger& subLogger)
+	void LoggerImpl::AddSubLogger(ISubLogger& subLogger)
 	{
 		assert(std::ranges::find(std::as_const(subLoggers), &subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
 		subLoggers.push_back(&subLogger);
 		PONY_CONSOLE(LogType::Debug, "'{}' sub-logger added.", subLogger.Name());
 	}
 
-	void Logger::RemoveSubLogger(ISubLogger& subLogger)
+	void LoggerImpl::RemoveSubLogger(ISubLogger& subLogger)
 	{
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), &subLogger); position != subLoggers.cend()) [[likely]]
 		{
@@ -100,7 +107,7 @@ namespace PonyDebug::Log
 		}
 	}
 
-	std::string_view Logger::Name() const noexcept
+	std::string_view LoggerImpl::Name() const noexcept
 	{
 		return StaticName;
 	}

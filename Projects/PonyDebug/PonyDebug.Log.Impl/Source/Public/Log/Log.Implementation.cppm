@@ -16,9 +16,8 @@ export module PonyDebug.Log.Impl;
 export import PonyDebug.Log;
 
 import <filesystem>;
+import <memory>;
 import <utility>;
-
-import PonyBase.Memory;
 
 import PonyDebug.Log.Detail;
 
@@ -44,24 +43,18 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	LoggerData CreateLogger(const LoggerParams&)
+	LoggerData CreateLogger(const LoggerParams& params)
 	{
-		auto logger = PonyBase::Memory::UniquePointer<Logger>::Create();
-
-		return LoggerData{.logger = PonyBase::Memory::UniquePointer<ILogger>(std::move(logger))};
+		return LoggerData{.logger = std::make_unique<LoggerImpl>(params)};
 	}
 
-	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams&)
+	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams& params)
 	{
-		auto consoleSubLogger = PonyBase::Memory::UniquePointer<ConsoleSubLogger>::Create();
-
-		return ConsoleSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(consoleSubLogger))};
+		return ConsoleSubLoggerData{.subLogger = std::make_unique<ConsoleSubLogger>(params)};
 	}
 
 	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		auto fileSubLogger = PonyBase::Memory::UniquePointer<FileSubLogger>::Create(params.logPath);
-
-		return FileSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<ISubLogger>(std::move(fileSubLogger))};
+		return FileSubLoggerData{.subLogger = std::make_unique<FileSubLogger>(params)};
 	}
 }

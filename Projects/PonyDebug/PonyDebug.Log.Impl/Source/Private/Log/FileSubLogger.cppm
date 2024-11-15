@@ -26,17 +26,17 @@ import PonyDebug.Log;
 export namespace PonyDebug::Log
 {
 	/// @brief Sub-logger that logs to a file.
-	class FileSubLogger final : public ISubLogger
+	class FileSubLogger final : public SubLogger
 	{
 	public:
 		/// @brief Creates a @p FileSubLogger.
-		/// @param logPath Path to a log file.
+		/// @param params File sub-logger parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit FileSubLogger(const std::filesystem::path& logPath);
+		explicit FileSubLogger(const FileSubLoggerParams& params);
 		FileSubLogger(const FileSubLogger&) = delete;
 		FileSubLogger(FileSubLogger&&) = delete;
 
-		~FileSubLogger() noexcept;
+		virtual ~FileSubLogger() noexcept override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -55,15 +55,16 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	FileSubLogger::FileSubLogger(const std::filesystem::path& logPath) :
-		logFile(logPath)
+	FileSubLogger::FileSubLogger(const FileSubLoggerParams& params) :
+		SubLogger(params),
+		logFile(params.logPath)
 	{
-		PONY_CONSOLE(LogType::Debug, "Log file stream created at path '{}'.", logPath.string());
-
 		if (!logFile.is_open()) [[unlikely]]
 		{
-			throw std::runtime_error(SafeFormat("Failed to open log file at path '{}'.", logPath.string()));
+			throw std::runtime_error(SafeFormat("Failed to open log file at path '{}'.", params.logPath.string()));
 		}
+
+		PONY_CONSOLE(LogType::Debug, "Log file stream created at path '{}'.", params.logPath.string());
 	}
 
 	FileSubLogger::~FileSubLogger() noexcept

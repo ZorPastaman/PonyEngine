@@ -79,10 +79,16 @@
     <ClCompile Include="Source\Public\Log.Windows\OutputDebugStringSubLoggerParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Log.Windows\IWindowsSubLogger.cppm">
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Log.Windows\Log.Windows.cppm">
+    <ClCompile Include="Source\Public\Log\Logger.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log\SubLogger.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Log\SubLoggerParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

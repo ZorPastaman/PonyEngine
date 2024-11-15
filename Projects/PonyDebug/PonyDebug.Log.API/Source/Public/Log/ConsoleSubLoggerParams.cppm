@@ -9,10 +9,12 @@
 
 export module PonyDebug.Log:ConsoleSubLoggerParams;
 
+import :SubLoggerParams;
+
 export namespace PonyDebug::Log
 {
 	/// @brief Console sub-logger parameters.
-	struct ConsoleSubLoggerParams final
+	struct ConsoleSubLoggerParams final : SubLoggerParams
 	{
 	};
 }

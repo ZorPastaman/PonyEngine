@@ -22,15 +22,17 @@ import PonyDebug.Log;
 export namespace PonyDebug::Log
 {
 	/// @brief Sub-logger that sends logs to std::cout, std::clog and std::cerr.
-	class ConsoleSubLogger final : public ISubLogger
+	class ConsoleSubLogger final : public SubLogger
 	{
 	public:
+		/// @brief Creates a @p ConsoleSubLogger.
+		/// @param params Console sub-logger parameters.
 		[[nodiscard("Pure constructor")]]
-		ConsoleSubLogger() noexcept = default;
+		explicit ConsoleSubLogger(const ConsoleSubLoggerParams& params) noexcept;
 		ConsoleSubLogger(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger(ConsoleSubLogger&&) = delete;
 
-		~ConsoleSubLogger() noexcept = default;
+		virtual ~ConsoleSubLogger() noexcept override = default;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -46,6 +48,11 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
+	ConsoleSubLogger::ConsoleSubLogger(const ConsoleSubLoggerParams& params) noexcept :
+		SubLogger(params)
+	{
+	}
+
 	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
