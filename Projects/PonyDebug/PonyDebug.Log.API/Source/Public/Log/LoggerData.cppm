@@ -9,15 +9,15 @@
 
 export module PonyDebug.Log:LoggerData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :ILogger;
+import :Logger;
 
 export namespace PonyDebug::Log
 {
 	/// @brief Logger data.
 	struct LoggerData final
 	{
-		PonyBase::Memory::UniquePointer<ILogger> logger; ///< Logger unique_ptr.
+		std::unique_ptr<Logger> logger; ///< Logger.
 	};
 }

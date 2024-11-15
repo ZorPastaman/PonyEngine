@@ -9,15 +9,15 @@
 
 export module PonyDebug.Log.Windows:OutputDebugStringSubLoggerData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :IWindowsSubLogger;
+import PonyDebug.Log;
 
 export namespace PonyDebug::Log
 {
 	/// @brief Output debug string sub-logger data.
 	struct OutputDebugStringSubLoggerData final
 	{
-		PonyBase::Memory::UniquePointer<IWindowsSubLogger> subLogger; ///< Sub-logger.
+		std::unique_ptr<SubLogger> subLogger; ///< Sub-logger.
 	};
 }

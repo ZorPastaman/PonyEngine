@@ -7,26 +7,36 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log.Windows:IWindowsSubLogger;
+export module PonyDebug.Log:Logger;
 
-import PonyDebug.Log;
+import :ILogger;
+import :LoggerParams;
 
 export namespace PonyDebug::Log
 {
-	/// @brief Windows sub-logger.
-	class IWindowsSubLogger : public ISubLogger
+	/// @brief Logger.
+	class Logger : public ILogger
 	{
 	public:
-		IWindowsSubLogger(const IWindowsSubLogger&) = delete;
-		IWindowsSubLogger(IWindowsSubLogger&&) = delete;
+		Logger(const Logger&) = delete;
+		Logger(Logger&&) = delete;
 
-		IWindowsSubLogger& operator =(const IWindowsSubLogger&) = delete;
-		IWindowsSubLogger& operator =(IWindowsSubLogger&&) = delete;
+		virtual ~Logger() noexcept = default;
+
+		Logger& operator =(const Logger&) = delete;
+		Logger& operator =(Logger&&) = delete;
 
 	protected:
+		/// @brief Creates a @Logger.
+		/// @param params Logger parameters.
 		[[nodiscard("Pure constructor")]]
-		IWindowsSubLogger() noexcept = default;
-
-		~IWindowsSubLogger() noexcept = default;
+		explicit Logger(const LoggerParams& params) noexcept;
 	};
+}
+
+namespace PonyDebug::Log
+{
+	Logger::Logger(const LoggerParams&) noexcept
+	{
+	}
 }

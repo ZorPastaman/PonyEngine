@@ -18,8 +18,7 @@ export module Application.Windows:WindowsLogger;
 import <array>;
 import <exception>;
 import <format>;
-
-import PonyBase.Memory;
+import <memory>;
 
 import PonyDebug.Log.Windows.Impl;
 
@@ -64,8 +63,8 @@ export namespace Application
 		[[nodiscard("Pure function")]]
 		static PonyDebug::Log::FileSubLoggerData CreateFileSubLogger();
 
-		PonyBase::Memory::UniquePointer<PonyDebug::Log::ILogger> logger; ///< Logger.
-		std::array<PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>, 3> subLoggers; ///< Sub-loggers.
+		std::unique_ptr<PonyDebug::Log::Logger> logger; ///< Logger.
+		std::array<std::unique_ptr<PonyDebug::Log::SubLogger>, 3> subLoggers; ///< Sub-loggers.
 	};
 }
 
@@ -76,12 +75,12 @@ namespace Application
 		subLoggers
 		{
 			CreateConsoleSubLogger().subLogger,
-			static_cast<PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>>(CreateOutputDebugStringSubLogger().subLogger),
+			CreateOutputDebugStringSubLogger().subLogger,
 			CreateFileSubLogger().subLogger
 		}
 	{
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
-		for (PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>& subLogger : subLoggers)
+		for (std::unique_ptr<PonyDebug::Log::SubLogger>& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
 			logger->AddSubLogger(*subLogger);
@@ -109,16 +108,14 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy sub-loggers.");
 		for (auto it = subLoggers.rbegin(); it != subLoggers.rend(); ++it)
 		{
-			PonyBase::Memory::UniquePointer<PonyDebug::Log::ISubLogger>& subLogger = *it;
-
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", subLogger->Name());
-			subLogger.Reset();
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", (*it)->Name());
+			it->reset();
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-logger destroyed.");
 		}
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers destroyed.");
 
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' logger.", logger->Name());
-		logger.Reset();
+		logger.reset();
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Logger destroyed.");
 	}
 

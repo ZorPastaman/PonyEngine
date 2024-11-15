@@ -11,10 +11,12 @@ export module PonyDebug.Log:FileSubLoggerParams;
 
 import <filesystem>;
 
+import :SubLoggerParams;
+
 export namespace PonyDebug::Log
 {
 	/// @brief File sub-logger parameters.
-	struct FileSubLoggerParams final
+	struct FileSubLoggerParams final : SubLoggerParams
 	{
 		std::filesystem::path logPath; ///< Log file path.
 	};

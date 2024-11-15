@@ -9,10 +9,12 @@
 
 export module PonyDebug.Log.Windows:OutputDebugStringSubLoggerParams;
 
+import PonyDebug.Log;
+
 export namespace PonyDebug::Log
 {
 	/// @brief Output debug string sub-logger parameters
-	struct OutputDebugStringSubLoggerParams final
+	struct OutputDebugStringSubLoggerParams final : SubLoggerParams
 	{
 	};
 }

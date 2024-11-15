@@ -21,15 +21,17 @@ import PonyDebug.Log.Windows;
 export namespace PonyDebug::Log
 {
 	/// @brief Sub-logger that puts logs into the @p OutputDebugString.
-	class OutputDebugStringSubLogger final : public IWindowsSubLogger
+	class OutputDebugStringSubLogger final : public SubLogger
 	{
 	public:
+		/// @brief Creates an @p OutputDebugStringSubLogger.
+		/// @param params Output debug string sub-logger parameters.
 		[[nodiscard("Pure constructor")]]
-		OutputDebugStringSubLogger() noexcept = default;
+		explicit OutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params) noexcept;
 		OutputDebugStringSubLogger(const OutputDebugStringSubLogger&) = delete;
 		OutputDebugStringSubLogger(OutputDebugStringSubLogger&&) = delete;
 
-		~OutputDebugStringSubLogger() noexcept = default;
+		virtual ~OutputDebugStringSubLogger() noexcept override = default;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -41,6 +43,14 @@ export namespace PonyDebug::Log
 
 		static constexpr std::string_view StaticName = "PonyDebug::Log::OutputDebugStringSubLogger"; ///< Class name.
 	};
+}
+
+namespace PonyDebug::Log
+{
+	OutputDebugStringSubLogger::OutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params) noexcept :
+		SubLogger(params)
+	{
+	}
 
 	void OutputDebugStringSubLogger::Log(const LogEntry& logEntry) noexcept
 	{

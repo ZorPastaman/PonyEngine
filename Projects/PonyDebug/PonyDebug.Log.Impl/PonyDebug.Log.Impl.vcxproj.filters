@@ -21,7 +21,7 @@
     <ClCompile Include="Source\Private\Log\FileSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Log\Logger.cppm">
+    <ClCompile Include="Source\Private\Log\LoggerImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Log\Log.Implementation.cppm">

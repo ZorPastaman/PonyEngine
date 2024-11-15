@@ -7,17 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:ConsoleSubLoggerData;
-
-import <memory>;
-
-import :SubLogger;
+export module PonyDebug.Log:SubLoggerParams;
 
 export namespace PonyDebug::Log
 {
-	/// @brief Console sub-logger data.
-	struct ConsoleSubLoggerData final
+	/// @brief Sub-logger parameters.
+	struct SubLoggerParams
 	{
-		std::unique_ptr<SubLogger> subLogger; ///< Sub-logger.
 	};
 }

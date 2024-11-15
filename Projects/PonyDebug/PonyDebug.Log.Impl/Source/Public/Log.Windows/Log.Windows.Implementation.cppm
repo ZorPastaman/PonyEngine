@@ -9,6 +9,8 @@
 
 module;
 
+#include <memory>
+
 #include "PonyBase/Core/Linking.h"
 
 export module PonyDebug.Log.Windows.Impl;
@@ -16,9 +18,8 @@ export module PonyDebug.Log.Windows.Impl;
 export import PonyDebug.Log.Impl;
 export import PonyDebug.Log.Windows;
 
+import <memory>;
 import <utility>;
-
-import PonyBase.Memory;
 
 import PonyDebug.Log.Windows.Detail;
 
@@ -33,10 +34,8 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams&)
+	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params)
 	{
-		auto outputDebugStringSubLogger = PonyBase::Memory::UniquePointer<OutputDebugStringSubLogger>::Create();
-
-		return OutputDebugStringSubLoggerData{.subLogger = PonyBase::Memory::UniquePointer<IWindowsSubLogger>(std::move(outputDebugStringSubLogger))};
+		return OutputDebugStringSubLoggerData{.subLogger = std::make_unique<OutputDebugStringSubLogger>(params)};
 	}
 }

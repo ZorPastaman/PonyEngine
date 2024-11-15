@@ -11,4 +11,4 @@ export module PonyDebug.Log.Detail;
 
 export import :ConsoleSubLogger;
 export import :FileSubLogger;
-export import :Logger;
+export import :LoggerImpl;
