@@ -18,13 +18,10 @@
     <ClCompile Include="Source\Public\Core\Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\Core.Factory.cppm">
+    <ClCompile Include="Source\Public\Core\EngineParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\ISystemFactory.cppm">
+    <ClCompile Include="Source\Public\Core\ISystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\IEngineContext.cppm">
@@ -33,13 +30,13 @@
     <ClCompile Include="Source\Public\Core\ISystemManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\EngineData.cppm">
+    <ClCompile Include="Source\Public\Core\EngineData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\SystemFactoriesContainer.cppm">
+    <ClCompile Include="Source\Public\Core\SystemFactoriesContainer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\SystemData.cppm">
+    <ClCompile Include="Source\Public\Core\SystemData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\TickableSystem.cppm">
@@ -48,7 +45,7 @@
     <ClCompile Include="Source\Public\Core\SystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Factory\IApplicationContext.cppm">
+    <ClCompile Include="Source\Public\Core\IApplicationContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\System.cppm">

@@ -17,7 +17,7 @@ export module Application.Windows:WindowsApplication;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 
 import :WindowsLogger;
 import :WindowsEngine;

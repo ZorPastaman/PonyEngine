@@ -10,3 +10,5 @@
 export module PonyDebug.Log.Windows;
 
 export import :IWindowsSubLogger;
+export import :OutputDebugStringSubLoggerData;
+export import :OutputDebugStringSubLoggerParams;

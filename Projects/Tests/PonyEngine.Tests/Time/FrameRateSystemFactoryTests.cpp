@@ -23,7 +23,7 @@
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 import PonyEngine.Time.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

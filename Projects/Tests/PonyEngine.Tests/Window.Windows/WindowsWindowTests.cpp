@@ -12,7 +12,6 @@
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include <cstddef>
-#include <exception>
 #include <string>
 #include <string_view>
 #include <typeinfo>
@@ -27,7 +26,7 @@ import PonyMath.Utility;
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 import PonyEngine.Input;
 import PonyEngine.Screen;
 import PonyEngine.Window.Windows.Impl;

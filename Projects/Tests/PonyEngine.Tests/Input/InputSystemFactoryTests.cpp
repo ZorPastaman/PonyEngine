@@ -18,7 +18,7 @@
 
 import PonyDebug.Log;
 
-import PonyEngine.Core.Factory;
+import PonyEngine.Core;
 import PonyEngine.Input.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;

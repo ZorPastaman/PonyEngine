@@ -21,7 +21,7 @@ import <format>;
 
 import PonyBase.Memory;
 
-import PonyDebug.Log.Windows.Implementation;
+import PonyDebug.Log.Windows.Impl;
 
 export namespace Application
 {

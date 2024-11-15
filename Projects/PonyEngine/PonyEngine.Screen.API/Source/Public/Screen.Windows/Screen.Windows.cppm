@@ -12,4 +12,7 @@ export module PonyEngine.Screen.Windows;
 export import PonyEngine.Screen;
 
 export import :IWindowsScreenSystem;
+export import :IWindowsScreenSystemFactory;
+export import :WindowsScreenSystemFactoryData;
+export import :WindowsScreenSystemFactoryParams;
 export import :WindowsScreenSystemParams;

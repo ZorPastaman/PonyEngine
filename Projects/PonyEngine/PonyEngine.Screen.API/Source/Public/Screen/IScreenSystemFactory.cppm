@@ -1,0 +1,32 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyEngine.Screen:IScreenSystemFactory;
+
+import PonyEngine.Core;
+
+export namespace PonyEngine::Screen
+{
+	/// @brief Screen system factory.
+	class IScreenSystemFactory : public Core::ISystemFactory
+	{
+	public:
+		IScreenSystemFactory(const IScreenSystemFactory&) = delete;
+		IScreenSystemFactory(IScreenSystemFactory&&) = delete;
+
+		IScreenSystemFactory& operator =(const IScreenSystemFactory&) = delete;
+		IScreenSystemFactory& operator =(IScreenSystemFactory&&) = delete;
+
+	protected:
+		[[nodiscard("Pure constructor")]]
+		IScreenSystemFactory() noexcept = default;
+
+		~IScreenSystemFactory() noexcept = default;
+	};
+}

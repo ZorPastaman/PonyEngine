@@ -17,7 +17,7 @@
 
 #include "Mocks/SubLogger.h"
 
-import PonyDebug.Log.Implementation;
+import PonyDebug.Log.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
