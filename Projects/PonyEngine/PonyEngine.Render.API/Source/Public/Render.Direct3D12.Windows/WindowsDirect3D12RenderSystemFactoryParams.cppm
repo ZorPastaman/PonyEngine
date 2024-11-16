@@ -9,10 +9,12 @@
 
 export module PonyEngine.Render.Direct3D12.Windows:WindowsDirect3D12RenderSystemFactoryParams;
 
+import PonyEngine.Render.Direct3D12;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows factory parameters.
-	struct WindowsDirect3D12RenderSystemFactoryParams final
+	struct WindowsDirect3D12RenderSystemFactoryParams final : Direct3D12RenderSystemFactoryParams
 	{
 	};
 }

@@ -9,15 +9,15 @@
 
 export module PonyEngine.Window.Windows:WindowsWindowSystemFactoryData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :IWindowsWindowSystemFactory;
+import PonyEngine.Window;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Window system for Windows factory data.
 	struct WindowsWindowSystemFactoryData final
 	{
-		PonyBase::Memory::UniquePointer<IWindowsWindowSystemFactory> systemFactory; ///< System factory.
+		std::unique_ptr<WindowSystemFactory> systemFactory; ///< System factory.
 	};
 }

@@ -28,13 +28,13 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Screen.Windows\IWindowsScreenSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemParams.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\IWindowsScreenSystem.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.cppm" />
-    <ClCompile Include="Source\Public\Screen\IScreenSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Screen\ScreenSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Screen\ScreenSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Screen\ScreenSystemParams.cppm" />
     <ClCompile Include="Source\Public\Screen\IScreenSystem.cppm" />
     <ClCompile Include="Source\Public\Screen\Screen.cppm" />

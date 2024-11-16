@@ -9,15 +9,15 @@
 
 export module PonyEngine.Screen.Windows:WindowsScreenSystemFactoryData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :IWindowsScreenSystemFactory;
+import PonyEngine.Screen;
 
 export namespace PonyEngine::Screen
 {
 	/// @brief Windows screen system factory data.
 	struct WindowsScreenSystemFactoryData final
 	{
-		PonyBase::Memory::UniquePointer<IWindowsScreenSystemFactory> systemFactory; ///< System factory.
+		std::unique_ptr<ScreenSystemFactory> systemFactory; ///< System factory.
 	};
 }

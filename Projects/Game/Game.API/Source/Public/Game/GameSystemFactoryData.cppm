@@ -9,17 +9,15 @@
 
 export module Game:GameSystemFactoryData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import PonyEngine.Core;
-
-import :IGameSystemFactory;
+import :GameSystemFactory;
 
 export namespace Game
 {
 	/// @brief Game system factory data.
 	struct GameSystemFactoryData final
 	{
-		PonyBase::Memory::UniquePointer<IGameSystemFactory> systemFactory; ///< Game system factory.
+		std::unique_ptr<GameSystemFactory> systemFactory; ///< Game system factory.
 	};
 }

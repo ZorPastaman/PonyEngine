@@ -69,14 +69,6 @@ namespace Log
 		++version;
 	}
 
-	void Logger::AddSubLogger(PonyDebug::Log::ISubLogger&)
-	{
-	}
-
-	void Logger::RemoveSubLogger(PonyDebug::Log::ISubLogger&)
-	{
-	}
-
 	std::string_view Logger::Name() const noexcept
 	{
 		return "TestLogger";

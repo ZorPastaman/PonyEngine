@@ -36,7 +36,7 @@ namespace Time
 		{
 			auto application = Core::Application();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			Assert::IsNotNull(factory.systemFactory.Get());
+			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)

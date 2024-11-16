@@ -41,8 +41,8 @@ namespace Window
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass)});
-			Assert::IsNotNull(factory.systemFactory.Get());
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
+			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
@@ -54,7 +54,7 @@ namespace Window
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass)};
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
 			systemParams.rect.fullscreen = false;
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
@@ -79,7 +79,7 @@ namespace Window
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass)});
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystemFactory"), factory.systemFactory->Name());
 		}
 
@@ -92,7 +92,7 @@ namespace Window
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass)});
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystem"), factory.systemFactory->SystemName());
 		}
 	};

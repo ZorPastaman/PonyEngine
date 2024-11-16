@@ -12,7 +12,6 @@ export module PonyDebug.Log:ILogger;
 import <exception>;
 import <string_view>;
 
-import :ISubLogger;
 import :LogInput;
 import :LogType;
 
@@ -34,13 +33,6 @@ export namespace PonyDebug::Log
 		/// @param exception Exception to log.
 		/// @param logInput Log input.
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept = 0;
-
-		/// @brief Adds the @p subLogger to the list of sub-loggers.
-		/// @param subLogger Sub-logger to add. It mustn't be already added.
-		virtual void AddSubLogger(ISubLogger& subLogger) = 0;
-		/// @brief Removes the @p subLogger from the list of sub-loggers.
-		/// @param subLogger Sub-logger to remove.
-		virtual void RemoveSubLogger(ISubLogger& subLogger) = 0;
 
 		/// @brief Gets the logger name.
 		/// @return Logger name.

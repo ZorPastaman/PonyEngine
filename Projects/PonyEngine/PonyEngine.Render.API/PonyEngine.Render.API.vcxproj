@@ -28,17 +28,17 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderObject.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm" />

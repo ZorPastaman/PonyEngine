@@ -35,7 +35,7 @@ namespace Screen
 			auto application = Core::Application();
 			application.logger = &logger;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
-			Assert::IsNotNull(factory.systemFactory.Get());
+			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)

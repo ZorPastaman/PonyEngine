@@ -10,7 +10,7 @@
 export module PonyDebug.Log:Logger;
 
 import :ILogger;
-import :LoggerParams;
+import :ISubLogger;
 
 export namespace PonyDebug::Log
 {
@@ -23,20 +23,18 @@ export namespace PonyDebug::Log
 
 		virtual ~Logger() noexcept = default;
 
+		/// @brief Adds the @p subLogger to the list of sub-loggers.
+		/// @param subLogger Sub-logger to add. It mustn't be already added.
+		virtual void AddSubLogger(ISubLogger& subLogger) = 0;
+		/// @brief Removes the @p subLogger from the list of sub-loggers.
+		/// @param subLogger Sub-logger to remove.
+		virtual void RemoveSubLogger(ISubLogger& subLogger) = 0;
+
 		Logger& operator =(const Logger&) = delete;
 		Logger& operator =(Logger&&) = delete;
 
 	protected:
-		/// @brief Creates a @Logger.
-		/// @param params Logger parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit Logger(const LoggerParams& params) noexcept;
+		Logger() noexcept = default;
 	};
-}
-
-namespace PonyDebug::Log
-{
-	Logger::Logger(const LoggerParams&) noexcept
-	{
-	}
 }

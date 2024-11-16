@@ -9,10 +9,12 @@
 
 export module PonyEngine.Window.Windows:WindowsWindowSystemFactoryParams;
 
+import PonyEngine.Window;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Window system for Windows factory parameters.
-	struct WindowsWindowSystemFactoryParams final
+	struct WindowsWindowSystemFactoryParams final : WindowSystemFactoryParams
 	{
 	};
 }

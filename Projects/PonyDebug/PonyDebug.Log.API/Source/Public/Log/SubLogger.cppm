@@ -10,7 +10,6 @@
 export module PonyDebug.Log:SubLogger;
 
 import :ISubLogger;
-import :SubLoggerParams;
 
 export namespace PonyDebug::Log
 {
@@ -27,16 +26,7 @@ export namespace PonyDebug::Log
 		SubLogger& operator =(SubLogger&&) = delete;
 
 	protected:
-		/// @brief Creates a @p SubLogger.
-		/// @param params Sub-logger parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit SubLogger(const SubLoggerParams& params) noexcept;
+		SubLogger() noexcept = default;
 	};
-}
-
-namespace PonyDebug::Log
-{
-	SubLogger::SubLogger(const SubLoggerParams&) noexcept
-	{
-	}
 }

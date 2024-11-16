@@ -40,9 +40,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystemFactory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -52,13 +49,10 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm">
@@ -80,6 +74,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

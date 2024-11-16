@@ -25,4 +25,3 @@ export import :LogHelper;
 export import :LogInput;
 export import :LogType;
 export import :SubLogger;
-export import :SubLoggerParams;
