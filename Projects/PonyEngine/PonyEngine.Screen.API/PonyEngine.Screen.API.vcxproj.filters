@@ -37,7 +37,7 @@
     <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen\IScreenSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Screen\ScreenSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Screen\ScreenSystemParams.cppm">
@@ -52,7 +52,7 @@
     <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\IWindowsScreenSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Screen\ScreenSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

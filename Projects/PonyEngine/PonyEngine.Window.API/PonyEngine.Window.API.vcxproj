@@ -18,7 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowStyle.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemFactoryData.cppm" />
@@ -26,8 +26,9 @@
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
-    <ClCompile Include="Source\Public\Window\IWindowSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Window\WindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\WindowRect.cppm" />
+    <ClCompile Include="Source\Public\Window\WindowSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window\IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />

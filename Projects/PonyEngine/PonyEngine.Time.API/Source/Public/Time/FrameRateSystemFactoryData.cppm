@@ -9,15 +9,15 @@
 
 export module PonyEngine.Time:FrameRateSystemFactoryData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :IFrameRateSystemFactory;
+import :FrameRateSystemFactory;
 
 export namespace PonyEngine::Time
 {
 	/// @brief Frame rate system factory data.
 	struct FrameRateSystemFactoryData final
 	{
-		PonyBase::Memory::UniquePointer<IFrameRateSystemFactory> systemFactory; ///< Frame rate system factory.
+		std::unique_ptr<FrameRateSystemFactory> systemFactory; ///< System factory.
 	};
 }

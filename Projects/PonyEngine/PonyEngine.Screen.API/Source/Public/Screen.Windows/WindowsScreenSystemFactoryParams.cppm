@@ -9,10 +9,12 @@
 
 export module PonyEngine.Screen.Windows:WindowsScreenSystemFactoryParams;
 
+import PonyEngine.Screen;
+
 export namespace PonyEngine::Screen
 {
 	/// @brief Windows screen system factory parameters.
-	struct WindowsScreenSystemFactoryParams final
+	struct WindowsScreenSystemFactoryParams final : ScreenSystemFactoryParams
 	{
 	};
 }

@@ -9,15 +9,15 @@
 
 export module PonyEngine.Input:InputSystemFactoryData;
 
-import PonyBase.Memory;
+import <memory>;
 
-import :IInputSystemFactory;
+import :InputSystemFactory;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Input system factory data.
 	struct InputSystemFactoryData final
 	{
-		PonyBase::Memory::UniquePointer<IInputSystemFactory> systemFactory; ///< Input system factory.
+		std::unique_ptr<InputSystemFactory> systemFactory; ///< Input system factory.
 	};
 }

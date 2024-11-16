@@ -38,7 +38,6 @@
     <ClCompile Include="Source\Public\Log\LogInput.cppm" />
     <ClCompile Include="Source\Public\Log\LogType.cppm" />
     <ClCompile Include="Source\Public\Log\SubLogger.cppm" />
-    <ClCompile Include="Source\Public\Log\SubLoggerParams.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

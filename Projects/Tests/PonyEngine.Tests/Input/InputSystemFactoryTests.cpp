@@ -31,7 +31,7 @@ namespace Input
 		{
 			auto application = Core::Application();
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			Assert::IsNotNull(factory.systemFactory.Get());
+			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
