@@ -25,8 +25,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\ExitCodes.cppm" />
-    <ClCompile Include="Source\Public\Memory\Memory.cppm" />
-    <ClCompile Include="Source\Public\Memory\UniquePointer.cppm" />
     <ClCompile Include="Source\Public\Utility.COM\COMUtility.cppm" />
     <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm" />
     <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectInterfaces.cppm" />

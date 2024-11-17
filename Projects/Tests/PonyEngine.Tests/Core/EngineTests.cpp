@@ -19,8 +19,6 @@
 #include "Mocks/TickableSystem.h"
 #include "Mocks/TickableSystemFactory.h"
 
-import PonyBase.Memory;
-
 import PonyDebug.Log;
 
 import PonyEngine.Core.Impl;
