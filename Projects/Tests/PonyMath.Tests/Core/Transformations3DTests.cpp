@@ -8308,7 +8308,7 @@ namespace Core
 
 		TEST_METHOD(OrthographicMatrixTest)
 		{
-			const auto orthographicMatrix = PonyMath::Core::OrthographicMatrix(20.f, 1.7f, 0.2f, 1000.f);
+			const auto orthographicMatrix = PonyMath::Core::OrthographicMatrix(20.f * 1.7f, 20.f, 0.2f, 1000.f);
 			Assert::AreEqual(0.058, static_cast<double>(orthographicMatrix.M00()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M10()), 0.001);
 			Assert::AreEqual(0., static_cast<double>(orthographicMatrix.M20()), 0.001);

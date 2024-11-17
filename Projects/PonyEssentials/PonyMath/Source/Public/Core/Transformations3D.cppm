@@ -253,13 +253,13 @@ export namespace PonyMath::Core
 	Matrix4x4<T> PerspectiveMatrix(T fov, T aspect, T nearPlane, T farPlane) noexcept;
 	/// @brief Creates a 3D orthographic projection matrix.
 	/// @tparam T Value type.
+	/// @param width Width. Must be positive.
 	/// @param height Height. Must be positive.
-	/// @param aspect Aspect ratio (width / height). Must be positive.
 	/// @param nearPlane Distance between a camera and a near clipping plane. Must be positive.
 	/// @param farPlane Distance between a camera and a far clipping plane. Must be positive and greater than the @p nearPlane.
 	/// @return Orthographic projection matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr Matrix4x4<T> OrthographicMatrix(T height, T aspect, T nearPlane, T farPlane) noexcept; // TODO: Try width and height instead of aspect
+	constexpr Matrix4x4<T> OrthographicMatrix(T width, T height, T nearPlane, T farPlane) noexcept;
 
 	/// @brief Extracts a translation from the 3D translation-rotation-scaling matrix.
 	/// @tparam T Value type.
@@ -902,9 +902,8 @@ namespace PonyMath::Core
 	}
 
 	template<std::floating_point T>
-	constexpr Matrix4x4<T> OrthographicMatrix(const T height, const T aspect, const T nearPlane, const T farPlane) noexcept
+	constexpr Matrix4x4<T> OrthographicMatrix(const T width, const T height, const T nearPlane, const T farPlane) noexcept
 	{
-		const T width = height * aspect;
 		const T inverseDepth = T{1} / (farPlane - nearPlane);
 
 		Matrix4x4<T> orthographic = Matrix4x4<T>::Predefined::Identity;
