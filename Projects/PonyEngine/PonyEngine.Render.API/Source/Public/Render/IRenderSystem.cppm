@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Render:IRenderSystem;
 
 import :IRenderObjectManager;
@@ -18,24 +22,19 @@ export namespace PonyEngine::Render
 	/// @brief Render system.
 	class IRenderSystem
 	{
-	public:
-		IRenderSystem(const IRenderSystem&) = delete;
-		IRenderSystem(IRenderSystem&&) = delete;
+		INTERFACE_BODY(IRenderSystem)
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderTarget& RenderTarget() const noexcept = 0; // TODO: make const, non-const pairs of functions. Return const from const only.
+		virtual IRenderTarget& RenderTarget() noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual IRenderView& RenderView() const noexcept = 0;
+		virtual const IRenderTarget& RenderTarget() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() const noexcept = 0;
-
-		IRenderSystem& operator =(const IRenderSystem&) = delete;
-		IRenderSystem& operator =(IRenderSystem&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IRenderSystem() noexcept = default;
-
-		~IRenderSystem() noexcept = default;
+		virtual IRenderView& RenderView() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IRenderView& RenderView() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual IRenderObjectManager& RenderObjectManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IRenderObjectManager& RenderObjectManager() const noexcept = 0;
 	};
 }

@@ -17,7 +17,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Log
 {
-	void Logger::Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept
+	void Logger::Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept
 	{
 		if (expectedLogType)
 		{
@@ -43,7 +43,7 @@ namespace Log
 		++version;
 	}
 
-	void Logger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept
+	void Logger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept
 	{
 		if (expectedException)
 		{

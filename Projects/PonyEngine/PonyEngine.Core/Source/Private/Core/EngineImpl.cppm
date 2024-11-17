@@ -47,9 +47,13 @@ export namespace PonyEngine::Core
 		virtual std::size_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& SystemManager() const noexcept override;
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual ISystemManager& SystemManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ISystemManager& SystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept override;
@@ -154,12 +158,22 @@ namespace PonyEngine::Core
 		return frameCount;
 	}
 
-	PonyDebug::Log::ILogger& EngineImpl::Logger() const noexcept
+	PonyDebug::Log::ILogger& EngineImpl::Logger() noexcept
 	{
 		return *engineLogger;
 	}
 
-	ISystemManager& EngineImpl::SystemManager() const noexcept
+	const PonyDebug::Log::ILogger& EngineImpl::Logger() const noexcept
+	{
+		return *engineLogger;
+	}
+
+	ISystemManager& EngineImpl::SystemManager() noexcept
+	{
+		return *systemManager;
+	}
+
+	const ISystemManager& EngineImpl::SystemManager() const noexcept
 	{
 		return *systemManager;
 	}

@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Render:IRenderView;
 
 import PonyMath.Core;
@@ -16,9 +20,7 @@ export namespace PonyEngine::Render
 {
 	class IRenderView
 	{
-	public:
-		IRenderView(const IRenderView&) = delete;
-		IRenderView(IRenderView&&) = delete;
+		INTERFACE_BODY(IRenderView)
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Core::Matrix4x4<float> ViewMatrix() const noexcept = 0;
@@ -30,14 +32,5 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
-
-		IRenderView& operator =(const IRenderView&) = delete;
-		IRenderView& operator =(IRenderView&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IRenderView() noexcept = default;
-
-		~IRenderView() noexcept = default;
 	};
 }

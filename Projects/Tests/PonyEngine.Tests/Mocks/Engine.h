@@ -35,9 +35,13 @@ namespace Core
 		virtual size_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::ISystemManager& SystemManager() const noexcept override;
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual PonyEngine::Core::ISystemManager& SystemManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyEngine::Core::ISystemManager& SystemManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsRunning() const noexcept override;

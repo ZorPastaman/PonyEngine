@@ -11,7 +11,12 @@
 
 namespace Core
 {
-	PonyDebug::Log::ILogger& Application::Logger() const noexcept
+	PonyDebug::Log::ILogger& Application::Logger() noexcept
+	{
+		return *logger;
+	}
+
+	const PonyDebug::Log::ILogger& Application::Logger() const noexcept
 	{
 		return *logger;
 	}

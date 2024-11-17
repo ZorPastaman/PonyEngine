@@ -17,7 +17,7 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Log
 {
-	void SubLogger::Log(const PonyDebug::Log::LogEntry& logEntry) noexcept
+	void SubLogger::Log(const PonyDebug::Log::LogEntry& logEntry) const noexcept
 	{
 		if (expectedMessage)
 		{

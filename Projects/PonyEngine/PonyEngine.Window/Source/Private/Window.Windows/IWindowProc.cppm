@@ -10,6 +10,7 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
+#include "PonyBase/Utility/Interface.h"
 
 export module PonyEngine.Window.Windows.Detail:IWindowProc;
 
@@ -18,9 +19,7 @@ export namespace PonyEngine::Window
 	/// @brief Window proc manager.
 	class IWindowProc
 	{
-	public:
-		IWindowProc(const IWindowProc&) = delete;
-		IWindowProc(IWindowProc&&) = delete;
+		INTERFACE_BODY(IWindowProc)
 
 		/// @brief Window proc function.
 		/// @param uMsg Message.
@@ -28,14 +27,5 @@ export namespace PonyEngine::Window
 		/// @param lParam LParam.
 		/// @return Result code.
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
-
-		IWindowProc& operator =(const IWindowProc&) = delete;
-		IWindowProc& operator =(IWindowProc&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IWindowProc() noexcept = default;
-
-		~IWindowProc() noexcept = default;
 	};
 }

@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Render:IRenderObjectManager;
 
 import PonyMath.Geometry;
@@ -18,23 +22,12 @@ export namespace PonyEngine::Render
 {
 	class IRenderObjectManager
 	{
-	public:
-		IRenderObjectManager(const IRenderObjectManager&) = delete;
-		IRenderObjectManager(IRenderObjectManager&&) = delete;
+		INTERFACE_BODY(IRenderObjectManager)
 
 		virtual RenderObjectHandle CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity) = 0;
 		virtual void DestroyObject(RenderObjectHandle handle) noexcept = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObject* FindRenderObject(RenderObjectHandle handle) noexcept = 0;
-
-		IRenderObjectManager& operator =(const IRenderObjectManager&) = delete;
-		IRenderObjectManager& operator =(IRenderObjectManager&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IRenderObjectManager() noexcept = default;
-
-		~IRenderObjectManager() noexcept = default;
+		virtual IRenderObject* FindRenderObject(RenderObjectHandle handle) const noexcept = 0;
 	};
 }

@@ -16,6 +16,7 @@ export module PonyDebug.Log.Detail:FileSubLogger;
 import <exception>;
 import <filesystem>;
 import <fstream>;
+import <memory>;
 import <stdexcept>;
 
 import PonyBase.StringUtility;
@@ -37,53 +38,70 @@ export namespace PonyDebug::Log
 
 		virtual ~FileSubLogger() noexcept override;
 
-		virtual void Log(const LogEntry& logEntry) noexcept override;
+		virtual void Log(const LogEntry& logEntry) const noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
 	private:
-		std::ofstream logFile; ///< Log file stream.
+		/// @brief Creates a log file stream.
+		/// @param logPath Log file path.
+		/// @return Log file stream.
+		[[nodiscard("Pure function")]]
+		static std::unique_ptr<std::ofstream> CreateLogFileStream(const std::filesystem::path& logPath);
+
+		std::unique_ptr<std::ofstream> logFile; ///< Log file stream.
 	};
 }
 
 namespace PonyDebug::Log
 {
 	FileSubLogger::FileSubLogger(const FileSubLoggerParams& params) :
-		logFile(params.logPath)
+		logFile(CreateLogFileStream(params.logPath))
 	{
-		if (!logFile.is_open()) [[unlikely]]
+		if (!logFile->is_open()) [[unlikely]]
 		{
 			throw std::runtime_error(SafeFormat("Failed to open log file at path '{}'.", params.logPath.string()));
 		}
-
-		PONY_CONSOLE(LogType::Debug, "Log file stream created at path '{}'.", params.logPath.string());
 	}
 
 	FileSubLogger::~FileSubLogger() noexcept
 	{
-		if (logFile.is_open())
+		if (logFile->is_open())
 		{
 			try
 			{
-				logFile.close();
+				logFile->close();
 			}
 			catch (const std::exception& e)
 			{
 				PONY_CONSOLE_E(e, "On closing log file.");
 			}
 		}
+
+		PONY_CONSOLE(LogType::Info, "Destroy log file stream.");
+		logFile.reset();
+		PONY_CONSOLE(LogType::Info, "Log file stream destroyed.");
 	}
 
-	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
+	void FileSubLogger::Log(const LogEntry& logEntry) const noexcept
 	{
 		try
 		{
-			logFile << logEntry;
+			*logFile << logEntry;
 		}
 		catch (const std::exception& e)
 		{
 			PONY_CONSOLE_E(e, "On writing to log file.");
 		}
+	}
+
+	std::unique_ptr<std::ofstream> FileSubLogger::CreateLogFileStream(const std::filesystem::path& logPath)
+	{
+		PONY_CONSOLE(LogType::Info, "Create log file stream at '{}'.", logPath.string());
+		auto logFileStream = std::make_unique<std::ofstream>(logPath);
+		PONY_CONSOLE(LogType::Info, "Log file stream created.");
+
+		return logFileStream;
 	}
 }

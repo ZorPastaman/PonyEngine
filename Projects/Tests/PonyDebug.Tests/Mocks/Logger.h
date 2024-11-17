@@ -21,8 +21,8 @@ namespace Log
 	class Logger final : public PonyDebug::Log::ILogger
 	{
 	public:
-		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override;
-		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
+		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
+		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		std::size_t Version() const noexcept;
@@ -33,6 +33,6 @@ namespace Log
 		std::optional<std::optional<std::size_t>> expectedFrameCount = {};
 
 	private:
-		std::size_t version = 0;
+		mutable std::size_t version = 0;
 	};
 }

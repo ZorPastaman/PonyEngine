@@ -40,7 +40,11 @@ export namespace Application
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		PonyDebug::Log::ILogger& Logger() const noexcept;
+		PonyDebug::Log::ILogger& Logger() noexcept;
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		const PonyDebug::Log::ILogger& Logger() const noexcept;
 
 		WindowsLogger& operator =(const WindowsLogger&) = delete;
 		WindowsLogger& operator =(WindowsLogger&&) = delete;
@@ -120,7 +124,12 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Logger destroyed.");
 	}
 
-	PonyDebug::Log::ILogger& WindowsLogger::Logger() const noexcept
+	PonyDebug::Log::ILogger& WindowsLogger::Logger() noexcept
+	{
+		return *logger;
+	}
+
+	const PonyDebug::Log::ILogger& WindowsLogger::Logger() const noexcept
 	{
 		return *logger;
 	}

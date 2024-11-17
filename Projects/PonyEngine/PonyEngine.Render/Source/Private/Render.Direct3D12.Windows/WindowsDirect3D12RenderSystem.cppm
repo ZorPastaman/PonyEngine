@@ -66,14 +66,22 @@ export namespace PonyEngine::Render
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderTarget& RenderTarget() const noexcept override;
+		virtual IRenderTarget& RenderTarget() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual IRenderView& RenderView() const noexcept override;
+		virtual const IRenderTarget& RenderTarget() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() const noexcept override;
+		virtual IRenderView& RenderView() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IRenderView& RenderView() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual IRenderObjectManager& RenderObjectManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IRenderObjectManager& RenderObjectManager() const noexcept override;
 
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem& operator =(WindowsDirect3D12RenderSystem&&) = delete;
@@ -181,22 +189,42 @@ namespace PonyEngine::Render
 		direct3D12SubSystem->WaitForEndOfFrame();
 	}
 
-	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept
+	PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() noexcept
 	{
 		return engine->Logger();
 	}
 
-	IRenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
+	const PonyDebug::Log::ILogger& WindowsDirect3D12RenderSystem::Logger() const noexcept
+	{
+		return engine->Logger();
+	}
+
+	IRenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept
 	{
 		return *direct3D12SubSystem->RenderTarget();
 	}
 
-	IRenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
+	const IRenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
+	{
+		return *direct3D12SubSystem->RenderTarget();
+	}
+
+	IRenderView& WindowsDirect3D12RenderSystem::RenderView() noexcept
 	{
 		return *direct3D12SubSystem->RenderView();
 	}
 
-	IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
+	const IRenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
+	{
+		return *direct3D12SubSystem->RenderView();
+	}
+
+	IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept
+	{
+		return *direct3D12SubSystem->RenderObjectManager();
+	}
+
+	const IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
 	{
 		return *direct3D12SubSystem->RenderObjectManager();
 	}

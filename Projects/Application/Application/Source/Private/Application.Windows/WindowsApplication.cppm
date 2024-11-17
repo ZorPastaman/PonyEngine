@@ -38,11 +38,13 @@ export namespace Application
 		~WindowsApplication() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		/// @brief Runs the engine.
 		/// @return Exit code.
-		int Run() const;
+		int Run();
 
 		WindowsApplication& operator =(const WindowsApplication&) = delete;
 		WindowsApplication& operator =(WindowsApplication&&) = delete;
@@ -69,12 +71,17 @@ namespace Application
 		SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 	}
 
-	PonyDebug::Log::ILogger& WindowsApplication::Logger() const noexcept
+	PonyDebug::Log::ILogger& WindowsApplication::Logger() noexcept
 	{
 		return logger.Logger();
 	}
 
-	int WindowsApplication::Run() const
+	const PonyDebug::Log::ILogger& WindowsApplication::Logger() const noexcept
+	{
+		return logger.Logger();
+	}
+
+	int WindowsApplication::Run()
 	{
 		int exitCode = 0;
 		bool isRunning;

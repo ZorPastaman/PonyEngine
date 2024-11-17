@@ -142,7 +142,7 @@ export namespace PonyMath::Space
 		Core::Vector3<float> scale; ///< Scale.
 
 		/// @brief Translation-rotation-scaling matrix.
-		/// It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix and if it's nullopt.
+		/// 	It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix if it's nullopt.
 		mutable std::optional<Core::Matrix4x4<float>> trs;
 	};
 

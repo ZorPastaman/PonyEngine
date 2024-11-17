@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Input:IInputSystem;
 
 import <functional>;
@@ -19,9 +23,7 @@ export namespace PonyEngine::Input
 	/// @brief Input system.
 	class IInputSystem
 	{
-	public:
-		IInputSystem(const IInputSystem&) = delete;
-		IInputSystem(IInputSystem&&) = delete;
+		INTERFACE_BODY(IInputSystem)
 
 		/// @brief Registers the action that's raised if the event meets the condition.
 		/// @param event Condition.
@@ -31,14 +33,5 @@ export namespace PonyEngine::Input
 		/// @brief Unregisters an action by its handle.
 		/// @param handle Action handle.
 		virtual void UnregisterAction(Handle handle) = 0;
-
-		IInputSystem& operator =(const IInputSystem&) = delete;
-		IInputSystem& operator =(IInputSystem&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IInputSystem() noexcept = default;
-
-		~IInputSystem() noexcept = default;
 	};
 }

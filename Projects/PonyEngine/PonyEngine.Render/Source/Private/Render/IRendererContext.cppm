@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Render.Detail:IRendererContext;
 
 import PonyDebug.Log;
@@ -15,20 +19,11 @@ export namespace PonyEngine::Render
 {
 	class IRendererContext
 	{
-	public:
-		IRendererContext(const IRendererContext&) = delete;
-		IRendererContext(IRendererContext&&) = delete;
+		INTERFACE_BODY(IRendererContext)
 
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
-
-		IRendererContext& operator =(const IRendererContext&) = delete;
-		IRendererContext& operator =(IRendererContext&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IRendererContext() noexcept = default;
-
-		~IRendererContext() noexcept = default;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 	};
 }

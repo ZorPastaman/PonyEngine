@@ -17,7 +17,9 @@ namespace Core
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		PonyDebug::Log::ILogger* logger = nullptr;
 	};

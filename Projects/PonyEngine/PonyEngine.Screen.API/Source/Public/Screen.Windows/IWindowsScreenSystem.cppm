@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Screen.Windows:IWindowsScreenSystem;
 
 import PonyEngine.Screen;
@@ -16,17 +20,6 @@ export namespace PonyEngine::Screen
 	/// @brief Windows screen system.
 	class IWindowsScreenSystem : public IScreenSystem
 	{
-	public:
-		IWindowsScreenSystem(const IWindowsScreenSystem&) = delete;
-		IWindowsScreenSystem(IWindowsScreenSystem&&) = delete;
-
-		IWindowsScreenSystem& operator =(const IWindowsScreenSystem&) = delete;
-		IWindowsScreenSystem& operator =(IWindowsScreenSystem&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IWindowsScreenSystem() noexcept = default;
-
-		~IWindowsScreenSystem() noexcept = default;
+		INTERFACE_BODY(IWindowsScreenSystem)
 	};
 }

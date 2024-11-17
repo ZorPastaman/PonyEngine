@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Core:IEngineContext;
 
 import <cstddef>;
@@ -22,9 +26,7 @@ export namespace PonyEngine::Core
 	/// @brief Engine context.
 	class IEngineContext
 	{
-	public:
-		IEngineContext(const IEngineContext&) = delete;
-		IEngineContext(IEngineContext&&) = delete;
+		INTERFACE_BODY(IEngineContext)
 
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.
@@ -34,11 +36,19 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the engine logger.
+		/// @return Engine logger.
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& SystemManager() const noexcept = 0;
+		virtual ISystemManager& SystemManager() noexcept = 0;
+		/// @brief Gets the engine system manager.
+		/// @return Engine system manager.
+		[[nodiscard("Pure function")]]
+		virtual const ISystemManager& SystemManager() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().
@@ -54,14 +64,5 @@ export namespace PonyEngine::Core
 		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept = 0;
-
-		IEngineContext& operator =(const IEngineContext&) = delete;
-		IEngineContext& operator =(IEngineContext&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IEngineContext() noexcept = default;
-
-		~IEngineContext() noexcept = default;
 	};
 }

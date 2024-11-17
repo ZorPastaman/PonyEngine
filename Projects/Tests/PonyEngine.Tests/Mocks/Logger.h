@@ -18,7 +18,7 @@ namespace Core
 	class Logger final : public PonyDebug::Log::ILogger
 	{
 	public:
-		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override;
-		virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
+		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
+		virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
 	};
 }

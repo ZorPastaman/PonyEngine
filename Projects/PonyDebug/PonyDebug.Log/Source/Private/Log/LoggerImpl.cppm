@@ -41,8 +41,8 @@ export namespace PonyDebug::Log
 
 		virtual ~LoggerImpl() noexcept override = default;
 
-		virtual void Log(LogType logType, const LogInput& logInput) noexcept override;
-		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept override;
+		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
+		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept override;
 
 		virtual void AddSubLogger(ISubLogger& subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
@@ -61,21 +61,21 @@ namespace PonyDebug::Log
 	{
 	}
 
-	void LoggerImpl::Log(const LogType logType, const LogInput& logInput) noexcept
+	void LoggerImpl::Log(const LogType logType, const LogInput& logInput) const noexcept
 	{
 		const auto logEntry = LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 
-		for (ISubLogger* const subLogger : subLoggers)
+		for (const ISubLogger* const subLogger : subLoggers)
 		{
 			subLogger->Log(logEntry);
 		}
 	}
 
-	void LoggerImpl::LogException(const std::exception& exception, const LogInput& logInput) noexcept
+	void LoggerImpl::LogException(const std::exception& exception, const LogInput& logInput) const noexcept
 	{
 		const auto logEntry = LogEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 
-		for (ISubLogger* const subLogger : subLoggers)
+		for (const ISubLogger* const subLogger : subLoggers)
 		{
 			subLogger->Log(logEntry);
 		}

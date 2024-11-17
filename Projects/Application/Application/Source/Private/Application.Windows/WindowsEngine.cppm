@@ -57,7 +57,7 @@ export namespace Application
 		/// @brief Ticks the engine.
 		/// @param exitCode Engine exit code.
 		/// @return @a True if the engine is running; @a false otherwise.
-		bool Tick(int& exitCode) const;
+		bool Tick(int& exitCode);
 
 		WindowsEngine& operator =(const WindowsEngine&) = delete;
 		WindowsEngine& operator =(WindowsEngine&&) = delete;
@@ -113,7 +113,7 @@ namespace Application
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
 	}
 
-	bool WindowsEngine::Tick(int& exitCode) const
+	bool WindowsEngine::Tick(int& exitCode)
 	{
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine.");
 
