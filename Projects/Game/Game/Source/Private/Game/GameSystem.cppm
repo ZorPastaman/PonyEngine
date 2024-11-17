@@ -110,146 +110,146 @@ namespace Game
 
 	void GameSystem::Begin()
 	{
-		if (const auto inputSystem = engine->SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
+		if (const auto inputSystem = Engine().SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register up input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register up input.");
 			constexpr auto upMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowUp, .isDown = true};
 			constexpr auto upEvent = PonyEngine::Input::Event{.expectedMessage = upMessage};
 			upHandle = inputSystem->RegisterAction(upEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Up input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Up input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register down input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register down input.");
 			constexpr auto downMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowDown, .isDown = true};
 			constexpr auto downEvent = PonyEngine::Input::Event{.expectedMessage = downMessage};
 			downHandle = inputSystem->RegisterAction(downEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(-10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f)));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Down input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Down input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register right input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register right input.");
 			constexpr auto rightMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowRight, .isDown = true};
 			constexpr auto rightEvent = PonyEngine::Input::Event{.expectedMessage = rightMessage};
 			rightHandle = inputSystem->RegisterAction(rightEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, -10.f * PonyMath::Core::DegToRad<float>, 0.f)));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Right input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Right input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register left input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register left input.");
 			constexpr auto leftMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::ArrowLeft, .isDown = true};
 			constexpr auto leftEvent = PonyEngine::Input::Event{.expectedMessage = leftMessage};
 			leftHandle = inputSystem->RegisterAction(leftEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, 10.f * PonyMath::Core::DegToRad<float>, 0.f)));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Left input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register w input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register w input.");
 			constexpr auto wMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::W, .isDown = true};
 			constexpr auto wEvent = PonyEngine::Input::Event{.expectedMessage = wMessage};
 			wHandle = inputSystem->RegisterAction(wEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, 5.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "W input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "W input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register s input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register s input.");
 			constexpr auto sMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::S, .isDown = true};
 			constexpr auto sEvent = PonyEngine::Input::Event{.expectedMessage = sMessage};
 			sHandle = inputSystem->RegisterAction(sEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, -5.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "S input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "S input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register a input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register a input.");
 			constexpr auto aMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::A, .isDown = true};
 			constexpr auto aEvent = PonyEngine::Input::Event{.expectedMessage = aMessage};
 			aHandle = inputSystem->RegisterAction(aEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(-5.f, 0.f, 0.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register d input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register d input.");
 			constexpr auto dMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::D, .isDown = true};
 			constexpr auto dEvent = PonyEngine::Input::Event{.expectedMessage = dMessage};
 			dHandle = inputSystem->RegisterAction(dEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(5.f, 0.f, 0.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "A input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register space input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register space input.");
 			constexpr auto spaceMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Space, .isDown = true};
 			constexpr auto spaceEvent = PonyEngine::Input::Event{.expectedMessage = spaceMessage};
 			spaceHandle = inputSystem->RegisterAction(spaceEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 5.f, 0.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Space input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Space input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register control input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register control input.");
 			constexpr auto controlMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftCtrl, .isDown = true};
 			constexpr auto controlEvent = PonyEngine::Input::Event{.expectedMessage = controlMessage};
 			controlHandle = inputSystem->RegisterAction(controlEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, -5.f, 0.f));
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register z input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register z input.");
 			constexpr auto zMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Z, .isDown = true};
 			constexpr auto zEvent = PonyEngine::Input::Event{.expectedMessage = zMessage};
 			zHandle = inputSystem->RegisterAction(zEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.X() -= 0.2;
@@ -257,14 +257,14 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Z input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Z input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register x input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register x input.");
 			constexpr auto xMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::X, .isDown = true};
 			constexpr auto xEvent = PonyEngine::Input::Event{.expectedMessage = xMessage};
 			xHandle = inputSystem->RegisterAction(xEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.X() += 0.2;
@@ -272,14 +272,14 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "X input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "X input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register c input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register c input.");
 			constexpr auto cMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::C, .isDown = true};
 			constexpr auto cEvent = PonyEngine::Input::Event{.expectedMessage = cMessage};
 			cHandle = inputSystem->RegisterAction(cEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.Y() -= 0.2;
@@ -287,14 +287,14 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "C input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "C input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register v input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register v input.");
 			constexpr auto vMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = true};
 			constexpr auto vEvent = PonyEngine::Input::Event{.expectedMessage = vMessage};
 			vHandle = inputSystem->RegisterAction(vEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.Y() += 0.2;
@@ -302,14 +302,14 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "V input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "V input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register b input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register b input.");
 			constexpr auto bMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::B, .isDown = true};
 			constexpr auto bEvent = PonyEngine::Input::Event{.expectedMessage = bMessage};
 			bHandle = inputSystem->RegisterAction(bEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.Z() -= 0.2;
@@ -317,14 +317,14 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "B input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "B input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register n input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register n input.");
 			constexpr auto nMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::N, .isDown = true};
 			constexpr auto nEvent = PonyEngine::Input::Event{.expectedMessage = nMessage};
 			nHandle = inputSystem->RegisterAction(nEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					auto scale = boxTransform.Scale();
 					scale.Z() += 0.2;
@@ -332,46 +332,46 @@ namespace Game
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "N input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "N input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register enter input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register enter input.");
 			constexpr auto enterMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Enter, .isDown = true};
 			constexpr auto enterEvent = PonyEngine::Input::Event{.expectedMessage = enterMessage};
 			enterHandle = inputSystem->RegisterAction(enterEvent, std::bind([&]
 			{
-				if (const auto render = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+				if (const auto render = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 				{
 					boxTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f));
 					boxTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity);
 					render->RenderObjectManager().FindRenderObject(boxHandle)->ModelMatrix(boxTransform.TrsMatrix());
 				}
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Control input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Register close input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Register close input.");
 			constexpr auto escapeMessage = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::Escape, .isDown = false};
 			constexpr auto escapeEvent = PonyEngine::Input::Event{.expectedMessage = escapeMessage};
 			closeHandle = inputSystem->RegisterAction(escapeEvent, std::bind([&]
 			{
-				engine->Stop();
+				Engine().Stop();
 			}));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Close input registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Close input registered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 		}
 		else
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Warning, "No input system found.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Warning, "No input system found.");
 		}
 
-		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+		if (const auto renderSystem = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
 			renderSystem->RenderView().ViewMatrix(PonyMath::Core::Matrix4x4<float>::Predefined::Identity.Inverse());
 			renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderView().Resolution().Aspect<float>(), 0.2f, 1000.f));
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
 			constexpr std::array<PonyMath::Core::Vector3<float>, 8> vertices = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
 				PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f) };
 			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 12> triangles = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
@@ -384,81 +384,81 @@ namespace Game
 			box.Triangles(triangles);
 			box.Colors(vertexColors);
 			boxHandle = renderSystem->RenderObjectManager().CreateObject(box, boxTransform.TrsMatrix());
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}
 	}
 
 	void GameSystem::End()
 	{
-		if (PonyEngine::Input::IInputSystem* const inputSystem = engine->SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
+		if (PonyEngine::Input::IInputSystem* const inputSystem = Engine().SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Unregister inputs.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Unregister inputs.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister up input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister up input.");
 			inputSystem->UnregisterAction(upHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Up input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister down input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Up input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister down input.");
 			inputSystem->UnregisterAction(downHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Down input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister right input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Down input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister right input.");
 			inputSystem->UnregisterAction(rightHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Right input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister left input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Right input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister left input.");
 			inputSystem->UnregisterAction(leftHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Left input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister w input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Left input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister w input.");
 			inputSystem->UnregisterAction(wHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "W input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister s input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "W input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister s input.");
 			inputSystem->UnregisterAction(sHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "S input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister a input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "S input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister a input.");
 			inputSystem->UnregisterAction(aHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "A input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister d input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "A input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister d input.");
 			inputSystem->UnregisterAction(dHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "D input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister space input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "D input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister space input.");
 			inputSystem->UnregisterAction(spaceHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Space input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister control input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Space input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister control input.");
 			inputSystem->UnregisterAction(controlHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Control input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister z input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Control input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister z input.");
 			inputSystem->UnregisterAction(zHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Z input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister x input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Z input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister x input.");
 			inputSystem->UnregisterAction(xHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "X input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister c input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "X input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister c input.");
 			inputSystem->UnregisterAction(cHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "C input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister v input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "C input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister v input.");
 			inputSystem->UnregisterAction(vHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "V input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister b input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "V input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister b input.");
 			inputSystem->UnregisterAction(bHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "B input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister n input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "B input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister n input.");
 			inputSystem->UnregisterAction(nHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "N input unregistered.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Unregister close input.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "N input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Unregister close input.");
 			inputSystem->UnregisterAction(closeHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Close input unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Close input unregistered.");
 
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Inputs unregistered.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs unregistered.");
 		}
 
-		if (const auto renderSystem = engine->SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
+		if (const auto renderSystem = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Destroy triangle.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Destroy triangle.");
 			renderSystem->RenderObjectManager().DestroyObject(boxHandle);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Triangle destroyed.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Triangle destroyed.");
 		}
 	}
 
 	void GameSystem::Tick()
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
 	}
 }

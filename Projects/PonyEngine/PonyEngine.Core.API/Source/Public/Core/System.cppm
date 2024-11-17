@@ -40,7 +40,12 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure constructor")]]
 		System(IEngineContext& engine, const SystemParams& params) noexcept;
 
-		// TODO: Make private
+		/// @brief Gets the engine context.
+		/// @return Engine context.
+		[[nodiscard("Pure function")]]
+		IEngineContext& Engine() const noexcept;
+
+	private:
 		IEngineContext* engine; ///< Engine context.
 	};
 }
@@ -50,5 +55,10 @@ namespace PonyEngine::Core
 	System::System(IEngineContext& engine, const SystemParams&) noexcept :
 		engine{&engine}
 	{
+	}
+
+	IEngineContext& System::Engine() const noexcept
+	{
+		return *engine;
 	}
 }

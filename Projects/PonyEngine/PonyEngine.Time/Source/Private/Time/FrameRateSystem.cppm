@@ -73,7 +73,7 @@ namespace PonyEngine::Time
 
 	void FrameRateSystem::Tick()
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for target frame time: '{}'.", targetFrameTime);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for target frame time: '{}'.", targetFrameTime);
 		std::chrono::time_point<std::chrono::steady_clock> now;
 
 		do
@@ -92,6 +92,6 @@ namespace PonyEngine::Time
 	void FrameRateSystem::TargetFrameTime(const float frameTime) noexcept
 	{
 		targetFrameTime = std::chrono::duration<float>(frameTime);
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Target frame time set to '{}'.", targetFrameTime);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Target frame time set to '{}'.", targetFrameTime);
 	}
 }
