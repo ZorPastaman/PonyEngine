@@ -49,12 +49,6 @@
     <ClCompile Include="Source\Public\Core\ExitCodes.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Memory\Memory.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Memory\UniquePointer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Utility.COM\COMUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
