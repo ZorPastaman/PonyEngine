@@ -11,11 +11,11 @@
 
 namespace Core
 {
-	void Logger::Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) noexcept
+	void Logger::Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) const noexcept
 	{
 	}
 
-	void Logger::LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept
+	void Logger::LogException(const std::exception&, const PonyDebug::Log::LogInput&) const noexcept
 	{
 	}
 }

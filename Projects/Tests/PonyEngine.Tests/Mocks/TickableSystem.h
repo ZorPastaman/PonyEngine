@@ -11,24 +11,15 @@
 
 #include <cstddef>
 
+#include "PonyBase/Utility/Interface.h"
+
 import PonyEngine.Core;
 
 namespace Core
 {
 	class ITickableSystemInterface
 	{
-	public:
-		ITickableSystemInterface(const ITickableSystemInterface&) = delete;
-		ITickableSystemInterface(ITickableSystemInterface&&) = delete;
-
-		ITickableSystemInterface& operator =(const ITickableSystemInterface&) = delete;
-		ITickableSystemInterface& operator =(ITickableSystemInterface&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		ITickableSystemInterface() noexcept = default;
-
-		~ITickableSystemInterface() noexcept = default;
+		INTERFACE_BODY(ITickableSystemInterface)
 	};
 
 	class TickableSystem final : public PonyEngine::Core::TickableSystem, public ITickableSystemInterface

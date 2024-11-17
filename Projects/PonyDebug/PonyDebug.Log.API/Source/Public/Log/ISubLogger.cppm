@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyDebug.Log:ISubLogger;
 
 import :LogEntry;
@@ -16,21 +20,10 @@ export namespace PonyDebug::Log
 	/// @brief Sub-logger.
 	class ISubLogger
 	{
-	public:
-		ISubLogger(const ISubLogger&) = delete;
-		ISubLogger(ISubLogger&&) = delete;
+		INTERFACE_BODY(ISubLogger)
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
-		virtual void Log(const LogEntry& logEntry) noexcept = 0;
-
-		ISubLogger& operator =(const ISubLogger&) = delete;
-		ISubLogger& operator =(ISubLogger&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		ISubLogger() noexcept = default;
-
-		~ISubLogger() noexcept = default;
+		virtual void Log(const LogEntry& logEntry) const noexcept = 0;
 	};
 }

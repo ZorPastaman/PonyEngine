@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Window:IWindowSystem;
 
 import <string_view>;
@@ -19,9 +23,7 @@ export namespace PonyEngine::Window
 	/// @brief Window system.
 	class IWindowSystem
 	{
-	public:
-		IWindowSystem(const IWindowSystem&) = delete;
-		IWindowSystem(IWindowSystem&&) = delete;
+		INTERFACE_BODY(IWindowSystem)
 
 		/// @brief Gets the window title.
 		/// @return Window title.
@@ -55,14 +57,5 @@ export namespace PonyEngine::Window
 		/// @return Window resolution.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
-
-		IWindowSystem& operator =(const IWindowSystem&) = delete;
-		IWindowSystem& operator =(IWindowSystem&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IWindowSystem() noexcept = default;
-
-		~IWindowSystem() noexcept = default;
 	};
 }

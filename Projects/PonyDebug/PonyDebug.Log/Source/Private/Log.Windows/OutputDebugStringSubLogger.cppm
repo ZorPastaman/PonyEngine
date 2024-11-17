@@ -32,7 +32,7 @@ export namespace PonyDebug::Log
 
 		virtual ~OutputDebugStringSubLogger() noexcept override = default;
 
-		virtual void Log(const LogEntry& logEntry) noexcept override;
+		virtual void Log(const LogEntry& logEntry) const noexcept override;
 
 		OutputDebugStringSubLogger& operator =(const OutputDebugStringSubLogger&) = delete;
 		OutputDebugStringSubLogger& operator =(OutputDebugStringSubLogger&&) = delete;
@@ -45,7 +45,7 @@ namespace PonyDebug::Log
 	{
 	}
 
-	void OutputDebugStringSubLogger::Log(const LogEntry& logEntry) noexcept
+	void OutputDebugStringSubLogger::Log(const LogEntry& logEntry) const noexcept
 	{
 		OutputDebugStringA(logEntry.ToString().data());
 	}

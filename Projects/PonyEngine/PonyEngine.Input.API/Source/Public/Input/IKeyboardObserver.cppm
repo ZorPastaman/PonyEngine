@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Input:IKeyboardObserver;
 
 import :KeyboardMessage;
@@ -16,21 +20,10 @@ export namespace PonyEngine::Input
 	/// @brief Keyboard input observer.
 	class IKeyboardObserver
 	{
-	public:
-		IKeyboardObserver(const IKeyboardObserver&) = delete;
-		IKeyboardObserver(IKeyboardObserver&&) = delete;
+		INTERFACE_BODY(IKeyboardObserver)
 
 		/// @brief Receives a keyboard input.
 		/// @param keyboardMessage Keyboard message.
 		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
-
-		IKeyboardObserver& operator =(const IKeyboardObserver&) = delete;
-		IKeyboardObserver& operator =(IKeyboardObserver&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IKeyboardObserver() noexcept = default;
-
-		~IKeyboardObserver() noexcept = default;
 	};
 }

@@ -49,7 +49,7 @@ export namespace PonyEngine::Render
 		virtual void DestroyObject(RenderObjectHandle handle) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObject* FindRenderObject(RenderObjectHandle handle) noexcept override;
+		virtual IRenderObject* FindRenderObject(RenderObjectHandle handle) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		RenderObjectIterator RenderObjectBegin() const noexcept;
@@ -65,7 +65,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 		Direct3D12MeshManager* meshManager;
 
-		std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects;
+		mutable std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
 		std::size_t nextRenderObjectId;
 	};
 }
@@ -105,7 +105,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	IRenderObject* Direct3D12RenderObjectManager::FindRenderObject(const RenderObjectHandle handle) noexcept
+	IRenderObject* Direct3D12RenderObjectManager::FindRenderObject(const RenderObjectHandle handle) const noexcept
 	{
 		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
 		{

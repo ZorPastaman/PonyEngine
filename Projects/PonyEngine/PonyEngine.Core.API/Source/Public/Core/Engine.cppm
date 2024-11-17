@@ -34,7 +34,11 @@ export namespace PonyEngine::Core
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
-		virtual ISystemManager& SystemManager() const noexcept = 0;
+		virtual ISystemManager& SystemManager() noexcept = 0;
+		/// @brief Gets the engine system manager.
+		/// @return Engine system manager.
+		[[nodiscard("Pure function")]]
+		virtual const ISystemManager& SystemManager() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().

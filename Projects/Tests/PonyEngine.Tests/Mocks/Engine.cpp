@@ -26,12 +26,22 @@ namespace Core
 		return frameCount;
 	}
 
-	PonyDebug::Log::ILogger& Engine::Logger() const noexcept
+	PonyDebug::Log::ILogger& Engine::Logger() noexcept
 	{
 		return application->Logger();
 	}
 
-	PonyEngine::Core::ISystemManager& Engine::SystemManager() const noexcept
+	const PonyDebug::Log::ILogger& Engine::Logger() const noexcept
+	{
+		return application->Logger();
+	}
+
+	PonyEngine::Core::ISystemManager& Engine::SystemManager() noexcept
+	{
+		return systemManager;
+	}
+
+	const PonyEngine::Core::ISystemManager& Engine::SystemManager() const noexcept
 	{
 		return systemManager;
 	}

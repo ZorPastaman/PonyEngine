@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Core:ISystemFactory;
 
 import <typeinfo>;
@@ -20,9 +24,7 @@ export namespace PonyEngine::Core
 	/// @brief System factory.
 	class ISystemFactory
 	{
-	public:
-		ISystemFactory(const ISystemFactory&) = delete;
-		ISystemFactory(ISystemFactory&&) = delete;
+		INTERFACE_BODY(ISystemFactory)
 
 		/// @brief Creates a system.
 		/// @param engine Engine context.
@@ -35,14 +37,5 @@ export namespace PonyEngine::Core
 		/// @return System type.
 		[[nodiscard("Pure function")]]
 		virtual const std::type_info& SystemType() const noexcept = 0;
-
-		ISystemFactory& operator =(const ISystemFactory&) = delete;
-		ISystemFactory& operator =(ISystemFactory&&) = delete;
-
-	protected:
-		[[nodiscard("Pure function")]]
-		ISystemFactory() noexcept = default;
-
-		~ISystemFactory() noexcept = default;
 	};
 }

@@ -29,7 +29,7 @@ namespace Log
 
 		~SubLogger() noexcept = default;
 
-		virtual void Log(const PonyDebug::Log::LogEntry& logEntry) noexcept override;
+		virtual void Log(const PonyDebug::Log::LogEntry& logEntry) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		std::size_t Version() const noexcept;
@@ -44,6 +44,6 @@ namespace Log
 		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
 
 	private:
-		std::size_t version = 0;
+		mutable std::size_t version = 0;
 	};
 }

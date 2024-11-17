@@ -23,7 +23,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
 	try
 	{
-		const auto application = Application::WindowsApplication();
+		auto application = Application::WindowsApplication();
 
 		try
 		{

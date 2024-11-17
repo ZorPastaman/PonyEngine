@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Render:IRenderTarget;
 
 import PonyMath.Color;
@@ -15,21 +19,10 @@ export namespace PonyEngine::Render
 {
 	class IRenderTarget
 	{
-	public:
-		IRenderTarget(const IRenderTarget&) = delete;
-		IRenderTarget(IRenderTarget&&) = delete;
+		INTERFACE_BODY(IRenderTarget)
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept = 0;
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
-
-		IRenderTarget& operator =(const IRenderTarget&) = delete;
-		IRenderTarget& operator =(IRenderTarget&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		IRenderTarget() noexcept = default; // TODO: Make INTERFACE_BODY() macro
-
-		~IRenderTarget() noexcept = default;
 	};
 }

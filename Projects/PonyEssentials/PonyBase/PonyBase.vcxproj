@@ -17,6 +17,7 @@
     <ClInclude Include="Include\Public\PonyBase\Core\Linking.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Optimization.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Windows\Framework.h" />
+    <ClInclude Include="Include\Public\PonyBase\Utility\Interface.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

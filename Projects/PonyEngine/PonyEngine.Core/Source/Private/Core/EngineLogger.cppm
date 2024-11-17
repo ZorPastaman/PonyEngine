@@ -31,8 +31,8 @@ export namespace PonyEngine::Core
 
 		~EngineLogger() noexcept = default;
 
-		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override;
-		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
+		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
+		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
 
 		EngineLogger& operator =(const EngineLogger&) = delete;
 		EngineLogger& operator =(EngineLogger&&) = delete;
@@ -57,13 +57,13 @@ namespace PonyEngine::Core
 	{
 	}
 
-	void EngineLogger::Log(const PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept
+	void EngineLogger::Log(const PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept
 	{
 		const PonyDebug::Log::LogInput engineLogInput = ConvertToEngineLogInput(logInput);
 		externalLogger->Log(logType, engineLogInput);
 	}
 
-	void EngineLogger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept
+	void EngineLogger::LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept
 	{
 		const PonyDebug::Log::LogInput engineLogInput = ConvertToEngineLogInput(logInput);
 		externalLogger->LogException(exception, engineLogInput);

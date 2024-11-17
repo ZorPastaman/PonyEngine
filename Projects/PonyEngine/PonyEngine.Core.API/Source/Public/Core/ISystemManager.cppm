@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyEngine.Core:ISystemManager;
 
 import <typeinfo>;
@@ -16,9 +20,7 @@ export namespace PonyEngine::Core
 	/// @brief System manager.
 	class ISystemManager
 	{
-	public:
-		ISystemManager(const ISystemManager&) = delete;
-		ISystemManager(ISystemManager&&) = delete;
+		INTERFACE_BODY(ISystemManager)
 
 		/// @brief Tries to find a system of the type described by the @p typeInfo.
 		/// @param typeInfo System type info.
@@ -30,15 +32,6 @@ export namespace PonyEngine::Core
 		/// @return Pointer to the system if it's found; nullptr if it's not found.
 		template<typename T> [[nodiscard("Pure function")]]
 		T* FindSystem() const noexcept;
-
-		ISystemManager& operator =(const ISystemManager&) = delete;
-		ISystemManager& operator =(ISystemManager&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		ISystemManager() noexcept = default;
-
-		~ISystemManager() noexcept = default;
 	};
 }
 

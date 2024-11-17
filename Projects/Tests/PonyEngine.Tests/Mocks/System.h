@@ -11,24 +11,15 @@
 
 #include <cstddef>
 
+#include "PonyBase/Utility/Interface.h"
+
 import PonyEngine.Core;
 
 namespace Core
 {
 	class ISystemInterface
 	{
-	public:
-		ISystemInterface(const ISystemInterface&) = delete;
-		ISystemInterface(ISystemInterface&&) = delete;
-
-		ISystemInterface& operator =(const ISystemInterface&) = delete;
-		ISystemInterface& operator =(ISystemInterface&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		ISystemInterface() noexcept = default;
-
-		~ISystemInterface() noexcept = default;
+		INTERFACE_BODY(ISystemInterface)
 	};
 
 	class System final : public PonyEngine::Core::System, public ISystemInterface

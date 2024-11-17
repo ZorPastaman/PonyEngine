@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Interface.h"
+
 export module PonyDebug.Log:ILogger;
 
 import <exception>;
@@ -20,26 +24,15 @@ export namespace PonyDebug::Log
 	/// @details The logger is an entry point for logs. It translates logs via its sub-loggers.
 	class ILogger
 	{
-	public:
-		ILogger(const ILogger&) noexcept = delete;
-		ILogger(ILogger&& other) noexcept = delete;
+		INTERFACE_BODY(ILogger)
 
 		/// @brief Logs via the current sub-loggers.
 		/// @param logType Log type.
 		/// @param logInput Log input.
-		virtual void Log(LogType logType, const LogInput& logInput) noexcept = 0;
+		virtual void Log(LogType logType, const LogInput& logInput) const noexcept = 0;
 		/// @brief Logs the exception via the current sub-loggers.
 		/// @param exception Exception to log.
 		/// @param logInput Log input.
-		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept = 0;
-
-		ILogger& operator =(const ILogger& other) noexcept = delete;
-		ILogger& operator =(ILogger&& other) noexcept = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		ILogger() noexcept = default;
-
-		~ILogger() noexcept = default;
+		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept = 0;
 	};
 }
