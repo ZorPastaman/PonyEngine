@@ -64,7 +64,7 @@ namespace PonyEngine::Screen
 		System(engine, systemParams),
 		displayResolution(GetDisplayResolution())
 	{
-		PONY_LOG(this->engine->Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
 	}
 
 	void WindowsScreenSystem::Begin()
