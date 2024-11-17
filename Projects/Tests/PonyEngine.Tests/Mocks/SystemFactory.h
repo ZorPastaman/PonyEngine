@@ -9,6 +9,9 @@
 
 #pragma once
 
+#include <cstddef>
+#include <typeinfo>
+
 #include "System.h"
 
 import PonyEngine.Core;
@@ -22,16 +25,15 @@ namespace Core
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
+		virtual const type_info& SystemType() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		System* GetSystem() const noexcept;
-		void Reset() noexcept;
-
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		std::size_t Version() const noexcept;
 
 	private:
-		System* system = nullptr;
+		System* createdSystem = nullptr;
+		std::size_t version = 0;
 	};
 }

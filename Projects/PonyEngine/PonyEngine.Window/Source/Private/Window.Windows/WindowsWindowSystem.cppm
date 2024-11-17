@@ -23,7 +23,7 @@ import <exception>;
 import <memory>;
 import <stdexcept>;
 import <string>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 import <vector>;
 
@@ -90,15 +90,10 @@ export namespace PonyEngine::Window
 		virtual void AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
 		WindowsWindowSystem& operator =(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem& operator =(WindowsWindowSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Window::WindowsWindowSystem"; ///< Class name.
 
 	private:
 		/// @brief Update the window title.
@@ -279,7 +274,7 @@ namespace PonyEngine::Window
 	{
 		assert(std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added.");
 		keyboardMessageObservers.push_back(&keyboardMessageObserver);
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "'{}' keyboard message observer added.", keyboardMessageObserver.Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "'{}' keyboard message observer added.", typeid(keyboardMessageObserver).name());
 	}
 
 	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
@@ -287,17 +282,12 @@ namespace PonyEngine::Window
 		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
 		{
 			keyboardMessageObservers.erase(position);
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "{} keyboard message observer removed.", keyboardMessageObserver.Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "{} keyboard message observer removed.", typeid(keyboardMessageObserver).name());
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", keyboardMessageObserver.Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", typeid(keyboardMessageObserver).name());
 		}
-	}
-
-	std::string_view WindowsWindowSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	LRESULT WindowsWindowSystem::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)

@@ -117,7 +117,7 @@ namespace PonyEngine::Core
 
 		for (const auto [factory, tickOrder] : systemFactories)
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
 			SystemData systemData = CreateSystem(factory);
 
 			switch (systemData.system.index())
@@ -147,7 +147,7 @@ namespace PonyEngine::Core
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Tick order:");
 		for (auto tickableSystem : std::views::keys(tickableSystemsBuffer))
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, tickableSystem->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, typeid(*tickableSystem).name());
 			tickableSystems.push_back(tickableSystem);
 		}
 	}
@@ -156,7 +156,7 @@ namespace PonyEngine::Core
 	{
 		for (auto system = systems.rbegin(); system != systems.rend(); ++system)
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system.", (*system)->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system.", typeid(**system).name());
 			system->reset();
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System destroyed.");
 		}
@@ -170,14 +170,14 @@ namespace PonyEngine::Core
 	{
 		for (const std::unique_ptr<System>& system : systems)
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", system->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", typeid(*system).name());
 			try
 			{
 				system->Begin();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine->Logger(), e, "On beginning '{}' system.", system->Name());
+				PONY_LOG_E(engine->Logger(), e, "On beginning '{}' system.", typeid(*system).name());
 
 				throw;
 			}
@@ -189,14 +189,14 @@ namespace PonyEngine::Core
 	{
 		for (auto system = systems.crbegin(); system != systems.crend(); ++system)
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End '{}' system.", (*system)->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "End '{}' system.", typeid(**system).name());
 			try
 			{
 				(*system)->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine->Logger(), e, "On ending '{}' system.", (*system)->Name());
+				PONY_LOG_E(engine->Logger(), e, "On ending '{}' system.", typeid(**system).name());
 			}
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "System ended.");
 		}
@@ -208,14 +208,14 @@ namespace PonyEngine::Core
 
 		for (TickableSystem* const system : tickableSystems)
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, system->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, typeid(*system).name());
 			try
 			{
 				system->Tick();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(engine->Logger(), e, "On ticking '{}' system.", system->Name());
+				PONY_LOG_E(engine->Logger(), e, "On ticking '{}' system.", typeid(*system).name());
 				engine->Stop(static_cast<int>(PonyBase::Core::ExitCodes::SystemTickException));
 
 				throw;
@@ -231,7 +231,7 @@ namespace PonyEngine::Core
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(engine->Logger(), e, "On creating '{}' system with '{}' factory.", factory->SystemName(), factory->Name());
+			PONY_LOG_E(engine->Logger(), e, "On creating '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
 
 			throw;
 		}
@@ -240,14 +240,14 @@ namespace PonyEngine::Core
 	void SystemManager::AddNonTickable(std::unique_ptr<System> system)
 	{
 		assert(system && "The system is nullptr.");
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", system->Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", typeid(*system).name());
 		systems.push_back(std::move(system));
 	}
 
 	void SystemManager::AddTickable(std::unique_ptr<TickableSystem> system, const int tickOrder, std::vector<std::pair<TickableSystem*, int>>& tickableSystemsBuffer)
 	{
 		assert(system && "The system is nullptr.");
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", system->Name());
+		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", typeid(*system).name());
 		tickableSystemsBuffer.emplace_back(system.get(), tickOrder);
 		systems.push_back(std::move(system));
 	}

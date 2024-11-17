@@ -10,9 +10,7 @@
 #pragma once
 
 #include <optional>
-#include <string_view>
 #include <typeindex>
-#include <typeinfo>
 #include <unordered_map>
 
 #include "Application.h"
@@ -48,9 +46,6 @@ namespace Core
 		virtual void Stop(int exitCodeToSet) noexcept override;
 
 		virtual void Tick() override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
 
 		std::size_t frameCount = 0;
 		std::optional<int> exitCode = {};

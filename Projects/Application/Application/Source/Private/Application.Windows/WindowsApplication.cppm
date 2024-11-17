@@ -44,9 +44,6 @@ export namespace Application
 		/// @return Exit code.
 		int Run() const;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		WindowsApplication& operator =(const WindowsApplication&) = delete;
 		WindowsApplication& operator =(WindowsApplication&&) = delete;
 
@@ -88,11 +85,6 @@ namespace Application
 		} while (isRunning);
 
 		return exitCode;
-	}
-
-	std::string_view WindowsApplication::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	void WindowsApplication::SetProcessPriority(const DWORD priority) const noexcept

@@ -9,8 +9,6 @@
 
 export module PonyEngine.Input:IKeyboardObserver;
 
-import <string_view>;
-
 import :KeyboardMessage;
 
 export namespace PonyEngine::Input
@@ -25,11 +23,6 @@ export namespace PonyEngine::Input
 		/// @brief Receives a keyboard input.
 		/// @param keyboardMessage Keyboard message.
 		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
-
-		/// @brief Gets the observer name.
-		/// @return Observer name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IKeyboardObserver& operator =(const IKeyboardObserver&) = delete;
 		IKeyboardObserver& operator =(IKeyboardObserver&&) = delete;

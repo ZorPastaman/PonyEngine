@@ -11,7 +11,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string_view>
 #include <typeindex>
 #include <typeinfo>
 #include <utility>
@@ -55,18 +54,15 @@ namespace Time
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
-		TEST_METHOD(GetSystemNameTest)
+		TEST_METHOD(SystemTypeTest)
 		{
+			auto logger = Core::Logger();
 			auto application = Core::Application();
+			application.logger = &logger;
+			auto engine = Core::Engine();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Time::FrameRateSystem"), factory.systemFactory->SystemName());
-		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			auto application = Core::Application();
-			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Time::FrameRateSystemFactory"), factory.systemFactory->Name());
+			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			Assert::IsTrue(typeid(*std::get<1>(frameRateSystem.system)) == factory.systemFactory->SystemType());
 		}
 	};
 }

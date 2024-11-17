@@ -11,7 +11,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string_view>
 #include <typeindex>
 #include <typeinfo>
 #include <utility>
@@ -58,22 +57,16 @@ namespace Screen
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::IWindowsScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(interfaces[1].second));
 		}
 
-		TEST_METHOD(SystemNameTest)
+		TEST_METHOD(SystemTypeTest)
 		{
 			auto logger = Core::Logger();
 			auto application = Core::Application();
 			application.logger = &logger;
+			auto engine = Core::Engine();
+			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Screen::WindowsScreenSystem"), factory.systemFactory->SystemName());
-		}
-
-		TEST_METHOD(NameTest)
-		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
-			application.logger = &logger;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Screen::WindowsScreenSystemFactory"), factory.systemFactory->Name());
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
+			Assert::IsTrue(typeid(*std::get<0>(system.system)) == factory.systemFactory->SystemType());
 		}
 	};
 }

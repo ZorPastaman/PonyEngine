@@ -10,7 +10,6 @@
 export module PonyDebug.Log:ILogger;
 
 import <exception>;
-import <string_view>;
 
 import :LogInput;
 import :LogType;
@@ -33,11 +32,6 @@ export namespace PonyDebug::Log
 		/// @param exception Exception to log.
 		/// @param logInput Log input.
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) noexcept = 0;
-
-		/// @brief Gets the logger name.
-		/// @return Logger name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		ILogger& operator =(const ILogger& other) noexcept = delete;
 		ILogger& operator =(ILogger&& other) noexcept = delete;

@@ -9,8 +9,6 @@
 
 export module PonyDebug.Log:ISubLogger;
 
-import <string_view>;
-
 import :LogEntry;
 
 export namespace PonyDebug::Log
@@ -25,11 +23,6 @@ export namespace PonyDebug::Log
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
 		virtual void Log(const LogEntry& logEntry) noexcept = 0;
-
-		/// @brief Gets the sub-logger name.
-		/// @return Sub-logger name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		ISubLogger& operator =(const ISubLogger&) = delete;
 		ISubLogger& operator =(ISubLogger&&) = delete;

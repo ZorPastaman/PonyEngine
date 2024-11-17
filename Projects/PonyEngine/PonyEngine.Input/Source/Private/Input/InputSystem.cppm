@@ -17,7 +17,7 @@ import <format>;
 import <functional>;
 import <queue>;
 import <string>;
-import <string_view>;
+import <typeinfo>;
 import <unordered_map>;
 import <utility>;
 
@@ -53,13 +53,8 @@ export namespace PonyEngine::Input
 
 		virtual void Observe(const KeyboardMessage& keyboardMessage) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Input::InputSystem"; ///< Class name.
 
 	private:
 		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
@@ -83,7 +78,7 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Subscribe to '{}' keyboard provider.", keyboardProvider->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Subscribe to '{}' keyboard provider.", typeid(*keyboardProvider).name());
 			keyboardProvider->AddKeyboardObserver(*this);
 		}
 		else [[unlikely]]
@@ -96,7 +91,7 @@ namespace PonyEngine::Input
 	{
 		if (IKeyboardProvider* const keyboardProvider = engine->SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
 		{
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", keyboardProvider->Name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", typeid(*keyboardProvider).name());
 			keyboardProvider->RemoveKeyboardObserver(*this);
 		}
 	}
@@ -148,10 +143,5 @@ namespace PonyEngine::Input
 
 		keyStates.insert_or_assign(keyboardMessage.keyCode, keyboardMessage.isDown);
 		queue.push(KeyboardMessage{.keyCode = keyboardMessage.keyCode, .isDown = keyboardMessage.isDown});
-	}
-
-	std::string_view InputSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

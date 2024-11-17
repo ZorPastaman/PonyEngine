@@ -9,8 +9,6 @@
 
 #pragma once
 
-#include <string_view>
-
 import PonyEngine.Core;
 
 namespace Core
@@ -20,8 +18,6 @@ namespace Core
 	public:
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
 
 		PonyDebug::Log::ILogger* logger = nullptr;
 	};

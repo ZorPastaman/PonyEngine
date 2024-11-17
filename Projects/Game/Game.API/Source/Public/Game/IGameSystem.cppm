@@ -9,8 +9,6 @@
 
 export module Game:IGameSystem;
 
-import <string_view>;
-
 export namespace Game
 {
 	/// @brief Game system.
@@ -19,11 +17,6 @@ export namespace Game
 	public:
 		IGameSystem(const IGameSystem&) = delete;
 		IGameSystem(IGameSystem&&) = delete;
-
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IGameSystem& operator =(const IGameSystem&) = delete;
 		IGameSystem& operator =(IGameSystem&&) = delete;

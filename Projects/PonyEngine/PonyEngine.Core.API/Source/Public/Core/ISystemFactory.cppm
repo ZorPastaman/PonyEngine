@@ -9,7 +9,7 @@
 
 export module PonyEngine.Core:ISystemFactory;
 
-import <string_view>;
+import <typeinfo>;
 
 import :IEngineContext;
 import :SystemData;
@@ -31,15 +31,10 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual SystemData Create(IEngineContext& engine, const SystemParams& params) = 0;
 
-		/// @brief Gets the system static name.
-		/// @return System static name.
+		/// @brief Gets a system type.
+		/// @return System type.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept = 0;
-
-		/// @brief Gets the system factory name.
-		/// @return System factory name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
+		virtual const std::type_info& SystemType() const noexcept = 0;
 
 		ISystemFactory& operator =(const ISystemFactory&) = delete;
 		ISystemFactory& operator =(ISystemFactory&&) = delete;

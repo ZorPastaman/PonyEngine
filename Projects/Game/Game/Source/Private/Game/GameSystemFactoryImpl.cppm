@@ -14,7 +14,7 @@ module;
 export module Game.Detail:GameSystemFactory;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -48,15 +48,10 @@ export namespace Game
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		GameSystemFactoryImpl& operator =(const GameSystemFactoryImpl&) = delete;
 		GameSystemFactoryImpl& operator =(GameSystemFactoryImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "Game::GameSystemFactoryImpl"; ///< Class name.
 
 	private:
 		GameSystemParams gameSystemParams; ///< Game system parameters.
@@ -86,13 +81,8 @@ namespace Game
 		};
 	}
 
-	std::string_view GameSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& GameSystemFactoryImpl::SystemType() const noexcept
 	{
-		return GameSystem::StaticName;
-	}
-
-	std::string_view GameSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(GameSystem);
 	}
 }

@@ -10,7 +10,6 @@
 #pragma once
 
 #include <cstddef>
-#include <string_view>
 
 import PonyEngine.Core;
 
@@ -55,9 +54,6 @@ namespace Core
 		std::size_t EndCount() const noexcept;
 		[[nodiscard("Pure function")]]
 		std::size_t TickCount() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
 
 		TickableSystem& operator =(const TickableSystem& other) noexcept = default;
 		TickableSystem& operator =(TickableSystem&& other) noexcept = default;

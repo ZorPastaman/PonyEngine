@@ -32,9 +32,6 @@ namespace Log
 		virtual void Log(const PonyDebug::Log::LogEntry& logEntry) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		std::size_t Version() const noexcept;
 
 		SubLogger& operator =(const SubLogger&) = delete;

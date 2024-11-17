@@ -27,11 +27,6 @@ export namespace PonyEngine::Input
 		/// @param keyboardObserver Keyboard input observer.
 		virtual void RemoveKeyboardObserver(IKeyboardObserver& keyboardObserver) = 0;
 
-		/// @brief Gets the provider name.
-		/// @return Provider name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-
 		IKeyboardProvider& operator =(const IKeyboardProvider&) = delete;
 		IKeyboardProvider& operator =(IKeyboardProvider&&) = delete;
 

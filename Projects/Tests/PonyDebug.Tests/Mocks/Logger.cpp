@@ -69,11 +69,6 @@ namespace Log
 		++version;
 	}
 
-	std::string_view Logger::Name() const noexcept
-	{
-		return "TestLogger";
-	}
-
 	std::size_t Logger::Version() const noexcept
 	{
 		return version;

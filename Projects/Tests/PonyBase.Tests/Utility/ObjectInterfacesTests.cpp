@@ -10,6 +10,7 @@
 #include "CppUnitTest.h"
 
 #include <cstddef>
+#include <typeinfo>
 
 import PonyBase.ObjectUtility;
 

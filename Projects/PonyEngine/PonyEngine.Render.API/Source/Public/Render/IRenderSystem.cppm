@@ -9,8 +9,6 @@
 
 export module PonyEngine.Render:IRenderSystem;
 
-import <string_view>;
-
 import :IRenderObjectManager;
 import :IRenderTarget;
 import :IRenderView;
@@ -30,11 +28,6 @@ export namespace PonyEngine::Render
 		virtual IRenderView& RenderView() const noexcept = 0;
 		[[nodiscard("Pure function")]]
 		virtual IRenderObjectManager& RenderObjectManager() const noexcept = 0;
-
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IRenderSystem& operator =(const IRenderSystem&) = delete;
 		IRenderSystem& operator =(IRenderSystem&&) = delete;

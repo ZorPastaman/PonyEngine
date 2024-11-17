@@ -15,7 +15,6 @@ export module PonyDebug.Log.Detail:ConsoleSubLogger;
 
 import <exception>;
 import <ostream>;
-import <string_view>;
 
 import PonyDebug.Log;
 
@@ -36,13 +35,8 @@ export namespace PonyDebug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyDebug::Log::ConsoleSubLogger"; ///< Class name.
 	};
 }
 
@@ -62,10 +56,5 @@ namespace PonyDebug::Log
 		{
 			PONY_CONSOLE_E(e, "On writing to console.");
 		}
-	}
-
-	std::string_view ConsoleSubLogger::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

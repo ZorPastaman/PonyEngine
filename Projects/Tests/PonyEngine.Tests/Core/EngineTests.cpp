@@ -10,7 +10,7 @@
 #include "CppUnitTest.h"
 
 #include <cstddef>
-#include <string_view>
+#include <typeinfo>
 
 #include "Mocks/Application.h"
 #include "Mocks/Logger.h"
@@ -71,15 +71,6 @@ namespace Core
 			Assert::AreEqual(100, engine.engine->ExitCode());
 		}
 
-		TEST_METHOD(GetNameTest)
-		{
-			auto logger = Logger();
-			auto application = Application();
-			application.logger = &logger;
-			auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
-			Assert::AreEqual(std::string_view("PonyEngine::Core::EngineImpl"), engine.engine->Name());
-		}
-
 		TEST_METHOD(SystemTickTest)
 		{
 			auto logger = Logger();
@@ -91,6 +82,7 @@ namespace Core
 			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
 			Assert::IsNotNull(systemFactory.GetSystem());
+			Assert::AreEqual(std::size_t{1}, systemFactory.Version());
 			Assert::AreEqual(std::size_t{1}, systemFactory.GetSystem()->BeginCount());
 
 			Assert::AreEqual(std::size_t{0}, systemFactory.GetSystem()->TickCount());

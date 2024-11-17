@@ -9,51 +9,41 @@
 
 #include "SystemFactory.h"
 
-#include "CppUnitTest.h"
-
 #include <memory>
 #include <utility>
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Core
 {
 	PonyEngine::Core::SystemData SystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		Assert::IsNull(system);
-
-		auto createdSystem = std::make_unique<System>(engine, params);
-		system = createdSystem.get();
+		auto system = std::make_unique<System>(engine, params);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<ISystemInterface>(*system);
 
+		createdSystem = system.get();
+		++version;
+
 		return PonyEngine::Core::SystemData
 		{
-			.system = std::move(createdSystem),
+			.system = std::move(system),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
 
+	const type_info& SystemFactory::SystemType() const noexcept
+	{
+		return typeid(System);
+	}
+
 	System* SystemFactory::GetSystem() const noexcept
 	{
-		return system;
+		return createdSystem;
 	}
 
-	void SystemFactory::Reset() noexcept
+	std::size_t SystemFactory::Version() const noexcept
 	{
-		system = nullptr;
-	}
-
-	std::string_view SystemFactory::SystemName() const noexcept
-	{
-		return "TestSystem";
-	}
-
-	std::string_view SystemFactory::Name() const noexcept
-	{
-		return "TestSystemFactory";
+		return version;
 	}
 }

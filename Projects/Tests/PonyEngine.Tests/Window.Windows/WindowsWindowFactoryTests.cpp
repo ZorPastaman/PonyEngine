@@ -11,7 +11,6 @@
 
 #include <cstddef>
 #include <cstdint>
-#include <string_view>
 #include <typeindex>
 #include <typeinfo>
 #include <variant>
@@ -39,7 +38,7 @@ namespace Window
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			Assert::IsNotNull(factory.systemFactory.get());
@@ -70,30 +69,20 @@ namespace Window
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(std::get<1>(window.system).get())), reinterpret_cast<std::uintptr_t>(interfaces[2].second));
 		}
 
-		TEST_METHOD(GetNameTest)
+		TEST_METHOD(SystemTypeTest)
 		{
 			auto logger = Core::Logger();
 			auto application = Core::Application();
 			application.logger = &logger;
 			auto engine = Core::Engine();
 			engine.application = &application;
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
-			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystemFactory"), factory.systemFactory->Name());
-		}
-
-		TEST_METHOD(GetSystemName)
-		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
-			application.logger = &logger;
-			auto engine = Core::Engine();
-			engine.application = &application;
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
-			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystem"), factory.systemFactory->SystemName());
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			systemParams.rect.fullscreen = false;
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			Assert::IsTrue(typeid(*std::get<1>(window.system)) == factory.systemFactory->SystemType());
 		}
 	};
 }

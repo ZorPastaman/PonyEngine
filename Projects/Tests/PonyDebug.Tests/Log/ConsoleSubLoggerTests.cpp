@@ -78,11 +78,5 @@ namespace Log
 			std::clog.rdbuf(clogBuffer);
 			std::cerr.rdbuf(cerrBuffer);
 		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			const PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams());
-			Assert::AreEqual(std::string_view("PonyDebug::Log::ConsoleSubLogger"), consoleSubLogger.subLogger->Name());
-		}
 	};
 }

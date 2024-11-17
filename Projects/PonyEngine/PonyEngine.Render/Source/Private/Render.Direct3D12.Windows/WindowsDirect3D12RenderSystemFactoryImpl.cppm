@@ -10,7 +10,7 @@
 export module PonyEngine.Render.Direct3D12.Windows.Detail:WindowsDirect3D12RenderSystemFactory;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -41,15 +41,10 @@ export namespace PonyEngine::Render
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		WindowsDirect3D12RenderSystemFactoryImpl& operator =(const WindowsDirect3D12RenderSystemFactoryImpl&) = delete;
 		WindowsDirect3D12RenderSystemFactoryImpl& operator =(WindowsDirect3D12RenderSystemFactoryImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryImpl"; ///< Class name.
 
 	private:
 		WindowsDirect3D12RenderSystemParams renderSystemParams; ///< Render system parameters
@@ -79,13 +74,8 @@ namespace PonyEngine::Render
 		};
 	}
 
-	std::string_view WindowsDirect3D12RenderSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& WindowsDirect3D12RenderSystemFactoryImpl::SystemType() const noexcept
 	{
-		return WindowsDirect3D12RenderSystem::StaticName;
-	}
-
-	std::string_view WindowsDirect3D12RenderSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(WindowsDirect3D12RenderSystem);
 	}
 }

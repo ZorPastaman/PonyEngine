@@ -56,11 +56,6 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
 
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
-
 		IWindowSystem& operator =(const IWindowSystem&) = delete;
 		IWindowSystem& operator =(IWindowSystem&&) = delete;
 

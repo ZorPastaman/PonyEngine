@@ -10,7 +10,6 @@
 export module PonyEngine.Core.Detail:EngineLogger;
 
 import <exception>;
-import <string_view>;
 
 import PonyDebug.Log;
 
@@ -35,13 +34,8 @@ export namespace PonyEngine::Core
 		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override;
 		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		EngineLogger& operator =(const EngineLogger&) = delete;
 		EngineLogger& operator =(EngineLogger&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Core::EngineLogger"; ///< Class name.
 
 	private:
 		/// @brief Converts the @p logInput to an engine log input.
@@ -73,11 +67,6 @@ namespace PonyEngine::Core
 	{
 		const PonyDebug::Log::LogInput engineLogInput = ConvertToEngineLogInput(logInput);
 		externalLogger->LogException(exception, engineLogInput);
-	}
-
-	std::string_view EngineLogger::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	PonyDebug::Log::LogInput EngineLogger::ConvertToEngineLogInput(const PonyDebug::Log::LogInput& logInput) const noexcept

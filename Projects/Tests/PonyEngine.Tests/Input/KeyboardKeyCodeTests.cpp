@@ -10,6 +10,8 @@
 #include "CppUnitTest.h"
 
 #include <cstdint>
+#include <ostream>
+#include <string>
 
 import PonyEngine.Input;
 

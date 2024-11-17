@@ -17,7 +17,6 @@ import <algorithm>;
 import <array>;
 import <cstdint>;
 import <functional>;
-import <string_view>;
 
 import PonyMath.Color;
 import PonyMath.Core;
@@ -54,13 +53,8 @@ export namespace Game
 
 		virtual void Tick() override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		GameSystem& operator =(const GameSystem&) = delete;
 		GameSystem& operator =(GameSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "Game::GameSystem"; ///< Class name.
 
 	private:
 		PonyEngine::Input::Handle upHandle; ///< Up arrow input handle.
@@ -466,10 +460,5 @@ namespace Game
 	void GameSystem::Tick()
 	{
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
-	}
-
-	std::string_view GameSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

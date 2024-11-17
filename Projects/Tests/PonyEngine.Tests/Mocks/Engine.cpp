@@ -55,9 +55,4 @@ namespace Core
 	{
 		++frameCount;
 	}
-
-	std::string_view Engine::Name() const noexcept
-	{
-		return "TestEngine";
-	}
 }

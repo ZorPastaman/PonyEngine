@@ -13,7 +13,7 @@ import <concepts>;
 import <type_traits>;
 import <utility>;
 
-namespace PonyBase::Memory
+namespace PonyBase::Memory // TODO: Remove file
 {
 	/// @brief Object owner.
 	///	@details It deletes an owned object on its destruction.

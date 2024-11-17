@@ -10,7 +10,6 @@
 export module PonyEngine.Core:Engine;
 
 import <cstddef>;
-import <string_view>;
 
 import PonyBase.Core;
 
@@ -54,11 +53,6 @@ export namespace PonyEngine::Core
 
 		/// @brief Ticks the engine.
 		virtual void Tick() = 0;
-
-		/// @brief Gets the engine name.
-		/// @return Engine name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		Engine& operator =(const Engine&) = delete;
 		Engine& operator =(Engine&&) = delete;

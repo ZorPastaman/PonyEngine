@@ -51,11 +51,6 @@ namespace Log
 		++version;
 	}
 
-	std::string_view SubLogger::Name() const noexcept
-	{
-		return "TestSubLogger";
-	}
-
 	std::size_t SubLogger::Version() const noexcept
 	{
 		return version;

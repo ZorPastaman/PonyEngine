@@ -54,14 +54,5 @@ namespace Log
 
 			std::filesystem::remove(testLogPath);
 		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = testLogPath};
-			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
-			Assert::AreEqual(std::string_view("PonyDebug::Log::FileSubLogger"), fileSubLogger.subLogger->Name());
-			fileSubLogger.subLogger.reset();
-			std::filesystem::remove(testLogPath);
-		}
 	};
 }

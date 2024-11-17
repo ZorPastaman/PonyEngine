@@ -7,14 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyBase/Core/Windows/Framework.h"
-
 export module PonyEngine.Window.Windows.Detail:WindowsWindowSystemFactoryImpl;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -45,15 +41,10 @@ export namespace PonyEngine::Window
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		WindowsWindowSystemFactoryImpl& operator =(const WindowsWindowSystemFactoryImpl&) = delete;
 		WindowsWindowSystemFactoryImpl& operator =(WindowsWindowSystemFactoryImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Window::WindowsWindowSystemFactoryImpl"; ///< Class name.
 
 	private:
 		WindowsWindowSystemParams windowSystemParams; ///< Window system parameters.
@@ -83,13 +74,8 @@ namespace PonyEngine::Window
 		};
 	}
 
-	std::string_view WindowsWindowSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& WindowsWindowSystemFactoryImpl::SystemType() const noexcept
 	{
-		return WindowsWindowSystem::StaticName;
-	}
-
-	std::string_view WindowsWindowSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(WindowsWindowSystem);
 	}
 }

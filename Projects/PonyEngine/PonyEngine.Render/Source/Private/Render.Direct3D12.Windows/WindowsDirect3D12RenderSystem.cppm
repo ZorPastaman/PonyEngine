@@ -22,7 +22,6 @@ import <memory>;
 import <optional>;
 import <span>;
 import <stdexcept>;
-import <string_view>;
 import <type_traits>;
 
 import PonyBase.StringUtility;
@@ -76,13 +75,8 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual IRenderObjectManager& RenderObjectManager() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem& operator =(WindowsDirect3D12RenderSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Render::WindowsDirect3D12RenderSystem"; ///< Class name.
 
 	private:
 		[[nodiscard("Pure function")]]
@@ -205,11 +199,6 @@ namespace PonyEngine::Render
 	IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
 	{
 		return *direct3D12SubSystem->RenderObjectManager();
-	}
-
-	std::string_view WindowsDirect3D12RenderSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	std::unique_ptr<WindowsDirect3D12DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()

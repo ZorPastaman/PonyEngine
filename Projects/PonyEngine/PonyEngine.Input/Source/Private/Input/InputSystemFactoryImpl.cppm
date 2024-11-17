@@ -10,7 +10,7 @@
 export module PonyEngine.Input.Detail:InputSystemFactoryImpl;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -40,15 +40,10 @@ export namespace PonyEngine::Input
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		InputSystemFactoryImpl& operator =(const InputSystemFactoryImpl&) = delete;
 		InputSystemFactoryImpl& operator =(InputSystemFactoryImpl&&) = delete;
-
-		static constexpr auto StaticName = "PonyEngine::Input::InputSystemFactory"; ///< Class name.
 
 	private:
 		InputSystemParams inputSystemParams; ///< Input system parameters.
@@ -78,13 +73,8 @@ namespace PonyEngine::Input
 		};
 	}
 
-	std::string_view InputSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& InputSystemFactoryImpl::SystemType() const noexcept
 	{
-		return InputSystem::StaticName;
-	}
-
-	std::string_view InputSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(InputSystem);
 	}
 }

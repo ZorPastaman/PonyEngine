@@ -15,9 +15,4 @@ namespace Core
 	{
 		return *logger;
 	}
-
-	std::string_view Application::Name() const noexcept
-	{
-		return "TestApplication";
-	}
 }
