@@ -43,9 +43,4 @@ namespace Core
 	{
 		return endCount;
 	}
-
-	std::string_view System::Name() const noexcept
-	{
-		return "TestSystem";
-	}
 }

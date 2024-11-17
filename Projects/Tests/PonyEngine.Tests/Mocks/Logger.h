@@ -10,7 +10,6 @@
 #pragma once
 
 #include <exception>
-#include <string_view>
 
 import PonyDebug.Log;
 
@@ -21,8 +20,5 @@ namespace Core
 	public:
 		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) noexcept override;
 		virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
 	};
 }

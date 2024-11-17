@@ -9,8 +9,6 @@
 
 export module PonyEngine.Screen:IScreenSystem;
 
-import <string_view>;
-
 import PonyMath.Utility;
 
 export namespace PonyEngine::Screen
@@ -26,11 +24,6 @@ export namespace PonyEngine::Screen
 		/// @return Display resolution.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept = 0;
-
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IScreenSystem& operator =(const IScreenSystem&) = delete;
 		IScreenSystem& operator =(IScreenSystem&&) = delete;

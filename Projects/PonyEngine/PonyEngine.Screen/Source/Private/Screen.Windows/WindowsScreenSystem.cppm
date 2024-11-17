@@ -15,8 +15,6 @@ module;
 
 export module PonyEngine.Screen.Windows.Detail:WindowsScreenSystem;
 
-import <string_view>;
-
 import PonyMath.Utility;
 
 import PonyDebug.Log;
@@ -47,13 +45,8 @@ export namespace PonyEngine::Screen
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		WindowsScreenSystem& operator =(const WindowsScreenSystem&) = delete;
 		WindowsScreenSystem& operator =(WindowsScreenSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Screen::WindowsScreenSystem"; ///< Class name.
 
 	private:
 		PonyMath::Utility::Resolution<unsigned int> displayResolution; ///< Display resolution.
@@ -85,11 +78,6 @@ namespace PonyEngine::Screen
 	PonyMath::Utility::Resolution<unsigned int> WindowsScreenSystem::DisplayResolution() const noexcept
 	{
 		return displayResolution;
-	}
-
-	std::string_view WindowsScreenSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept

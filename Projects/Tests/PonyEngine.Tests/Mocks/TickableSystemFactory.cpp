@@ -9,51 +9,41 @@
 
 #include "TickableSystemFactory.h"
 
-#include "CppUnitTest.h"
-
 #include <memory>
 #include <utility>
 
-import PonyBase.Memory;
 import PonyBase.ObjectUtility;
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Core
 {
 	PonyEngine::Core::SystemData TickableSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		Assert::IsNull(system);
-
-		auto tickableSystem = std::make_unique<TickableSystem>(engine, params);
-		system = tickableSystem.get();
+		auto system = std::make_unique<TickableSystem>(engine, params);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<ITickableSystemInterface>(*tickableSystem);
+		interfaces.AddInterfacesDeduced<ITickableSystemInterface>(*system);
+
+		createdSystem = system.get();
+		++version;
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = std::unique_ptr<PonyEngine::Core::TickableSystem>(std::move(tickableSystem)),
+			.system = std::unique_ptr<PonyEngine::Core::TickableSystem>(std::move(system)),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}
 
+	const type_info& TickableSystemFactory::SystemType() const noexcept
+	{
+		return typeid(TickableSystem);
+	}
+
 	TickableSystem* TickableSystemFactory::GetSystem() const noexcept
 	{
-		return system;
+		return createdSystem;
 	}
 
-	void TickableSystemFactory::Reset() noexcept
+	std::size_t TickableSystemFactory::Version() const noexcept
 	{
-		system = nullptr;
-	}
-
-	std::string_view TickableSystemFactory::SystemName() const noexcept
-	{
-		return "TestTickableSystem";
-	}
-
-	std::string_view TickableSystemFactory::Name() const noexcept
-	{
-		return "TestTickableSystemFactory";
+		return version;
 	}
 }

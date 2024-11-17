@@ -10,7 +10,6 @@
 export module PonyEngine.Core:IEngineContext;
 
 import <cstddef>;
-import <string_view>;
 
 import PonyBase.Core;
 
@@ -55,11 +54,6 @@ export namespace PonyEngine::Core
 		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
 		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept = 0;
-
-		/// @brief Gets the engine name.
-		/// @return Engine name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IEngineContext& operator =(const IEngineContext&) = delete;
 		IEngineContext& operator =(IEngineContext&&) = delete;

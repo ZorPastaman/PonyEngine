@@ -53,9 +53,4 @@ namespace Core
 	{
 		return tickCount;
 	}
-
-	std::string_view TickableSystem::Name() const noexcept
-	{
-		return "TestTickableSystem";
-	}
 }

@@ -14,7 +14,6 @@ module;
 export module PonyEngine.Time.Detail:FrameRateSystem;
 
 import <chrono>;
-import <string_view>;
 
 import PonyDebug.Log;
 
@@ -47,13 +46,8 @@ export namespace PonyEngine::Time
 		virtual float TargetFrameTime() const noexcept override;
 		virtual void TargetFrameTime(float frameTime) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		FrameRateSystem& operator =(const FrameRateSystem&) = delete;
 		FrameRateSystem& operator =(FrameRateSystem&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Time::FrameRateSystem"; ///< Class name.
 
 	private:
 		std::chrono::duration<float> targetFrameTime; ///< Target frame time.
@@ -99,10 +93,5 @@ namespace PonyEngine::Time
 	{
 		targetFrameTime = std::chrono::duration<float>(frameTime);
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Target frame time set to '{}'.", targetFrameTime);
-	}
-
-	std::string_view FrameRateSystem::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

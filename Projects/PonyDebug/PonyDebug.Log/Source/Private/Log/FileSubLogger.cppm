@@ -17,7 +17,6 @@ import <exception>;
 import <filesystem>;
 import <fstream>;
 import <stdexcept>;
-import <string_view>;
 
 import PonyBase.StringUtility;
 
@@ -40,13 +39,8 @@ export namespace PonyDebug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyDebug::Log::FileSubLogger"; ///< Class name.
 
 	private:
 		std::ofstream logFile; ///< Log file stream.
@@ -91,10 +85,5 @@ namespace PonyDebug::Log
 		{
 			PONY_CONSOLE_E(e, "On writing to log file.");
 		}
-	}
-
-	std::string_view FileSubLogger::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

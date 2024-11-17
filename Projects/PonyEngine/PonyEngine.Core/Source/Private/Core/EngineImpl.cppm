@@ -17,7 +17,6 @@ import <cstddef>;
 import <exception>;
 import <memory>;
 import <stdexcept>;
-import <string_view>;
 
 import PonyBase.Core;
 
@@ -60,13 +59,8 @@ export namespace PonyEngine::Core
 
 		virtual void Tick() override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		EngineImpl& operator =(const EngineImpl&) = delete;
 		EngineImpl& operator =(EngineImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Core::EngineImpl"; ///< Class name.
 
 	private:
 		/// @brief Before tick procedure.
@@ -204,11 +198,6 @@ namespace PonyEngine::Core
 		TickSystems();
 
 		EndTick();
-	}
-
-	std::string_view EngineImpl::Name() const noexcept
-	{
-		return StaticName;
 	}
 
 	void EngineImpl::BeginTick()

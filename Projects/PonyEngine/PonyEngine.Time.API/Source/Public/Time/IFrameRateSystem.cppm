@@ -9,8 +9,6 @@
 
 export module PonyEngine.Time:IFrameRateSystem;
 
-import <string_view>;
-
 export namespace PonyEngine::Time
 {
 	/// @brief System that controls a frame rate of an engine.
@@ -27,11 +25,6 @@ export namespace PonyEngine::Time
 		/// @brief Sets the target frame time.
 		/// @param frameTime Target frame time in seconds. 0 means no target frame time (it's not restricted).
 		virtual void TargetFrameTime(float frameTime) noexcept = 0;
-
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 
 		IFrameRateSystem& operator =(const IFrameRateSystem&) = delete;
 		IFrameRateSystem& operator =(IFrameRateSystem&&) = delete;

@@ -19,7 +19,7 @@ import <algorithm>;
 import <chrono>;
 import <format>;
 import <exception>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 import <vector>;
 
@@ -47,13 +47,8 @@ export namespace PonyDebug::Log
 		virtual void AddSubLogger(ISubLogger& subLogger) override;
 		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		LoggerImpl& operator =(const LoggerImpl&) = delete;
 		LoggerImpl& operator =(LoggerImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyDebug::Log::Logger"; ///< Class name.
 
 	private:
 		std::vector<ISubLogger*> subLoggers; ///< Sub-loggers container.
@@ -90,7 +85,7 @@ namespace PonyDebug::Log
 	{
 		assert(std::ranges::find(std::as_const(subLoggers), &subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
 		subLoggers.push_back(&subLogger);
-		PONY_CONSOLE(LogType::Debug, "'{}' sub-logger added.", subLogger.Name());
+		PONY_CONSOLE(LogType::Debug, "'{}' sub-logger added.", typeid(subLogger).name());
 	}
 
 	void LoggerImpl::RemoveSubLogger(ISubLogger& subLogger)
@@ -98,16 +93,11 @@ namespace PonyDebug::Log
 		if (const auto position = std::ranges::find(std::as_const(subLoggers), &subLogger); position != subLoggers.cend()) [[likely]]
 		{
 			subLoggers.erase(position);
-			PONY_CONSOLE(LogType::Debug, "'{}' sub-logger removed.", subLogger.Name());
+			PONY_CONSOLE(LogType::Debug, "'{}' sub-logger removed.", typeid(subLogger).name());
 		}
 		else [[unlikely]]
 		{
-			PONY_CONSOLE(LogType::Warning, "Tried to remove not added '{}' sub-logger.", subLogger.Name());
+			PONY_CONSOLE(LogType::Warning, "Tried to remove not added '{}' sub-logger.", typeid(subLogger).name());
 		}
-	}
-
-	std::string_view LoggerImpl::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

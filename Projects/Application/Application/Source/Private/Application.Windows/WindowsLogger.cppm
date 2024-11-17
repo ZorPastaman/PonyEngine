@@ -19,6 +19,7 @@ import <array>;
 import <exception>;
 import <format>;
 import <memory>;
+import <typeinfo>;
 
 import PonyDebug.Log.Windows.Impl;
 
@@ -82,7 +83,7 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
 		for (std::unique_ptr<PonyDebug::Log::SubLogger>& subLogger : subLoggers)
 		{
-			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", typeid(*subLogger).name());
 			logger->AddSubLogger(*subLogger);
 		}
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers added.");
@@ -93,7 +94,7 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Remove sub-loggers.");
 		for (auto it = subLoggers.crbegin(); it != subLoggers.crend(); ++it)
 		{
-			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Remove '{}' sub-logger.", (*it)->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Remove '{}' sub-logger.", typeid(**it).name());
 			try
 			{
 				logger->RemoveSubLogger(**it);
@@ -108,13 +109,13 @@ namespace Application
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy sub-loggers.");
 		for (auto it = subLoggers.rbegin(); it != subLoggers.rend(); ++it)
 		{
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", (*it)->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' sub-logger.", typeid(**it).name());
 			it->reset();
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-logger destroyed.");
 		}
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Sub-loggers destroyed.");
 
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' logger.", logger->Name());
+		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Destroy '{}' logger.", typeid(*logger).name());
 		logger.reset();
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Logger destroyed.");
 	}
@@ -131,7 +132,7 @@ namespace Application
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
 			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{});
 			assert(logger.logger && "The logger is nullptr.");
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", logger.logger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", typeid(*logger.logger).name());
 
 			return logger;
 		}
@@ -150,7 +151,7 @@ namespace Application
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create console sub-logger.");
 			PonyDebug::Log::ConsoleSubLoggerData consoleSubLogger = PonyDebug::Log::CreateConsoleSubLogger(PonyDebug::Log::ConsoleSubLoggerParams{});
 			assert(consoleSubLogger.subLogger && "The console sub-logger is nullptr.");
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", consoleSubLogger.subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' console sub-logger created.", typeid(*consoleSubLogger.subLogger).name());
 
 			return consoleSubLogger;
 		}
@@ -169,7 +170,7 @@ namespace Application
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create output debug string sub-logger.");
 			PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams{});
 			assert(outputDebugStringSubLogger.subLogger && "The output debug string sub-logger is nullptr.");
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", outputDebugStringSubLogger.subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' output debug string sub-logger created.", typeid(*outputDebugStringSubLogger.subLogger).name());
 
 			return outputDebugStringSubLogger;
 		}
@@ -189,7 +190,7 @@ namespace Application
 			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Log.log"};
 			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
 			assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
-			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", fileSubLogger.subLogger->Name());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", typeid(*fileSubLogger.subLogger).name());
 
 			return fileSubLogger;
 		}

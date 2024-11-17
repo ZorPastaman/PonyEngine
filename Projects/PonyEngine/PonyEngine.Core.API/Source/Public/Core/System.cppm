@@ -9,8 +9,6 @@
 
 export module PonyEngine.Core:System;
 
-import <string_view>;
-
 import :IEngineContext;
 import :SystemParams;
 
@@ -31,11 +29,6 @@ export namespace PonyEngine::Core
 		/// @brief Ends the system.
 		/// @details It's called once after a last engine tick.
 		virtual void End() = 0;
-
-		/// @brief Gets the system name.
-		/// @return System name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0; // TODO: Replace with typeid().name. So, no need for such a function.
 
 		System& operator =(const System&) = delete;
 		System& operator =(System&&) = delete;

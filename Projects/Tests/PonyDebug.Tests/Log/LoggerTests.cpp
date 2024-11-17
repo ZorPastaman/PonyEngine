@@ -10,10 +10,7 @@
 #include "CppUnitTest.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <exception>
-#include <string_view>
-#include <type_traits>
 
 #include "Mocks/SubLogger.h"
 
@@ -56,12 +53,6 @@ namespace Log
 			logger.logger->RemoveSubLogger(testSubLogger);
 			logger.logger->Log(PonyDebug::Log::LogType::Info, logInput);
 			Assert::AreEqual(std::size_t{2}, testSubLogger.Version());
-		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			const PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams());
-			Assert::AreEqual(std::string_view("PonyDebug::Log::Logger"), logger.logger->Name());
 		}
 	};
 }

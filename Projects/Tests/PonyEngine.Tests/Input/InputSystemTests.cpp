@@ -13,7 +13,7 @@
 #include <cstddef>
 #include <cstdint>
 #include <functional>
-#include <string_view>
+#include <typeinfo>
 #include <variant>
 #include <vector>
 
@@ -50,12 +50,6 @@ namespace Input
 					observers.erase(position);
 					++version;
 				}
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::string_view Name() const noexcept override
-			{
-				return "";
 			}
 		};
 
@@ -114,18 +108,6 @@ namespace Input
 			std::get<1>(inputSystemBase.system)->Tick();
 			Assert::IsFalse(gotInput);
 			std::get<1>(inputSystemBase.system)->End();
-		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
-			application.logger = &logger;
-			auto engine = Core::Engine();
-			engine.application = &application;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), std::get<1>(inputSystemBase.system)->Name());
 		}
 	};
 }

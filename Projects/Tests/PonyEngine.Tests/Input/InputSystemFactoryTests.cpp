@@ -9,7 +9,7 @@
 
 #include "CppUnitTest.h"
 
-#include <string_view>
+#include <typeinfo>
 #include <variant>
 
 #include "Mocks/Application.h"
@@ -43,21 +43,25 @@ namespace Input
 			engine.application = &application;
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			Assert::IsNotNull(std::get<1>(inputSystem.system).get());
+			auto system = std::get<1>(inputSystem.system).get();
+			Assert::IsNotNull(system);
+
+			auto interfaces = inputSystem.publicInterfaces.Span();
+			Assert::AreEqual(std::size_t{1}, interfaces.size());
+			Assert::IsTrue(std::type_index(typeid(PonyEngine::Input::IInputSystem)) == std::type_index(interfaces[0].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputSystem*>(system)), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
-		TEST_METHOD(GetSystemNameTest)
+		TEST_METHOD(SystemTypeTest)
 		{
 			auto application = Core::Application();
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystem"), factory.systemFactory->SystemName());
-		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			auto application = Core::Application();
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			Assert::AreEqual(std::string_view("PonyEngine::Input::InputSystemFactory"), factory.systemFactory->Name());
+			auto logger = Core::Logger();
+			auto engine = Core::Engine();
+			application.logger = &logger;
+			engine.application = &application;
+			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
+			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			Assert::IsTrue(typeid(*std::get<1>(inputSystem.system)) == factory.systemFactory->SystemType());
 		}
 	};
 }

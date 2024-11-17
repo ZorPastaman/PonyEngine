@@ -14,7 +14,6 @@ module;
 export module PonyDebug.Log.Windows.Detail:OutputDebugStringSubLogger;
 
 import <exception>;
-import <string_view>;
 
 import PonyDebug.Log.Windows;
 
@@ -35,13 +34,8 @@ export namespace PonyDebug::Log
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
-
 		OutputDebugStringSubLogger& operator =(const OutputDebugStringSubLogger&) = delete;
 		OutputDebugStringSubLogger& operator =(OutputDebugStringSubLogger&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyDebug::Log::OutputDebugStringSubLogger"; ///< Class name.
 	};
 }
 
@@ -54,10 +48,5 @@ namespace PonyDebug::Log
 	void OutputDebugStringSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		OutputDebugStringA(logEntry.ToString().data());
-	}
-
-	std::string_view OutputDebugStringSubLogger::Name() const noexcept
-	{
-		return StaticName;
 	}
 }

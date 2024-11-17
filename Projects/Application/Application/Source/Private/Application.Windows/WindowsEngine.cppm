@@ -21,6 +21,7 @@ import <array>;
 import <exception>;
 import <format>;
 import <memory>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.Core;
@@ -107,7 +108,7 @@ namespace Application
 
 	WindowsEngine::~WindowsEngine() noexcept
 	{
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", engine->Name());
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' engine.", typeid(*engine).name());
 		engine.reset();
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine destroyed.");
 	}
@@ -146,7 +147,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows screen system factory.");
 			PonyEngine::Screen::WindowsScreenSystemFactoryData factory = PonyEngine::Screen::CreateWindowsScreenFactory(*application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			assert(factory.systemFactory && "The Windows screen system factory is nullptr.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows screen system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -167,7 +168,7 @@ namespace Application
 			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The frame rate system factory is nullptr.");
 
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -191,7 +192,7 @@ namespace Application
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
 
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -210,7 +211,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
 			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, PonyEngine::Input::InputSystemParams{});
 			assert(factory.systemFactory && "The input system factory is nullptr");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -231,7 +232,7 @@ namespace Application
 				PonyEngine::Render::WindowsDirect3D12RenderSystemParams{});
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
 
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -250,7 +251,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create game system factory.");
 			Game::GameSystemFactoryData factory = Game::CreateGameSystemFactory(*application, Game::GameSystemFactoryParams{}, Game::GameSystemParams{});
 			assert(factory.systemFactory && "The game system factory is nullptr");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.", factory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' game system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
 		}
@@ -291,22 +292,22 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", gameSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*gameSystemFactory.systemFactory).name());
 			gameSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", renderSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*renderSystemFactory.systemFactory).name());
 			renderSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", inputSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*inputSystemFactory.systemFactory).name());
 			inputSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", windowSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*windowSystemFactory.systemFactory).name());
 			windowSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", frameRateSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*frameRateSystemFactory.systemFactory).name());
 			frameRateSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", screenSystemFactory.systemFactory->Name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*screenSystemFactory.systemFactory).name());
 			screenSystemFactory.systemFactory.reset();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");

@@ -10,7 +10,7 @@
 export module PonyEngine.Time.Detail:FrameRateSystemFactory;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -41,15 +41,10 @@ export namespace PonyEngine::Time
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		FrameRateSystemFactoryImpl& operator =(const FrameRateSystemFactoryImpl&) = delete;
 		FrameRateSystemFactoryImpl& operator =(FrameRateSystemFactoryImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Time::FrameRateSystemFactoryImpl"; ///< Class name.
 
 	private:
 		FrameRateSystemParams frameRateSystemParams; //< Frame rate system parameters.
@@ -79,13 +74,8 @@ namespace PonyEngine::Time
 		};
 	}
 
-	std::string_view FrameRateSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& FrameRateSystemFactoryImpl::SystemType() const noexcept
 	{
-		return FrameRateSystem::StaticName;
-	}
-
-	std::string_view FrameRateSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(FrameRateSystem);
 	}
 }

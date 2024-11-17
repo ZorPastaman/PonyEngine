@@ -48,12 +48,6 @@ namespace Window
 				lastMessage = keyboardMessage;
 				++version;
 			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::string_view Name() const noexcept override
-			{
-				return "";
-			}
 		};
 
 		class ScreenSystem final : public PonyEngine::Screen::IScreenSystem
@@ -63,12 +57,6 @@ namespace Window
 			virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept override
 			{
 				return PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
-			}
-
-			[[nodiscard("Pure function")]]
-			virtual std::string_view Name() const noexcept override
-			{
-				return "";
 			}
 		};
 
@@ -101,25 +89,6 @@ namespace Window
 			Assert::AreEqual((std::wstring(title) + L" - " + std::wstring(secondaryTitle)).c_str(), gotTitle);
 
 			std::get<1>(window.system)->End();
-		}
-
-		TEST_METHOD(GetNameTest)
-		{
-			auto logger = Core::Logger();
-			auto screenSystem = ScreenSystem();
-			auto application = Core::Application();
-			application.logger = &logger;
-			auto engine = Core::Engine();
-			engine.application = &application;
-			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
-			systemParams.rect.fullscreen = false;
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
-			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
-			Assert::AreEqual(std::string_view("PonyEngine::Window::WindowsWindowSystem"), windowsWindow->Name());
 		}
 
 		TEST_METHOD(ShowHideWindowTest)

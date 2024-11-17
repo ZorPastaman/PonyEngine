@@ -25,9 +25,6 @@ namespace Log
 		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual ::std::string_view Name() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		std::size_t Version() const noexcept;
 
 		std::optional<PonyDebug::Log::LogType> expectedLogType = {};

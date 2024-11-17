@@ -18,9 +18,4 @@ namespace Core
 	void Logger::LogException(const std::exception&, const PonyDebug::Log::LogInput&) noexcept
 	{
 	}
-
-	std::string_view Logger::Name() const noexcept
-	{
-		return "TestLogger";
-	}
 }

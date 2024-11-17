@@ -10,7 +10,7 @@
 export module PonyEngine.Screen.Windows.Detail:WindowsScreenSystemFactoryImpl;
 
 import <memory>;
-import <string_view>;
+import <typeinfo>;
 import <utility>;
 
 import PonyBase.ObjectUtility;
@@ -41,15 +41,10 @@ export namespace PonyEngine::Screen
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SystemName() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		WindowsScreenSystemFactoryImpl& operator =(const WindowsScreenSystemFactoryImpl&) = delete;
 		WindowsScreenSystemFactoryImpl& operator =(WindowsScreenSystemFactoryImpl&&) = delete;
-
-		static constexpr std::string_view StaticName = "PonyEngine::Screen::WindowsScreenSystemFactoryImpl"; ///< Class name.
 
 	private:
 		WindowsScreenSystemParams screenSystemParams; ///< Screen system parameters.
@@ -79,13 +74,8 @@ namespace PonyEngine::Screen
 		};
 	}
 
-	std::string_view WindowsScreenSystemFactoryImpl::SystemName() const noexcept
+	const std::type_info& WindowsScreenSystemFactoryImpl::SystemType() const noexcept
 	{
-		return WindowsScreenSystem::StaticName;
-	}
-
-	std::string_view WindowsScreenSystemFactoryImpl::Name() const noexcept
-	{
-		return StaticName;
+		return typeid(WindowsScreenSystem);
 	}
 }
