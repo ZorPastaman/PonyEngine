@@ -15,13 +15,13 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderView;
 
 import PonyMath.Core;
 
-import PonyEngine.Render;
+import PonyEngine.Render.Direct3D12;
 
 import :Direct3D12Viewport;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderView final : public IRenderView
+	class Direct3D12RenderView final : public IDirect3D12RenderView
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

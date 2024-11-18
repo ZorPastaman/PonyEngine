@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:RenderSystemParams;
+module;
 
-import :RenderTargetParams;
-import :RenderViewParams;
+#include "PonyBase/Core/Direct3D12/Framework.h"
+
+export module PonyEngine.Render.Direct3D12:Direct3D12FenceParams;
 
 export namespace PonyEngine::Render
 {
-	struct RenderSystemParams
+	struct Direct3D12FenceParams final
 	{
-		RenderTargetParams renderTargetParams;
-		RenderViewParams renderViewParams;
+		DWORD fenceTimeout = 20000;
 	};
 }

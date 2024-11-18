@@ -31,6 +31,8 @@ import PonyMath.Utility;
 
 import PonyDebug.Log;
 
+import PonyEngine.Render.Direct3D12;
+
 import :Direct3D12Fence;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
@@ -55,11 +57,11 @@ export namespace PonyEngine::Render
 		ID3D12CommandQueue* GetCommandQueue() const;
 
 		[[nodiscard("Pure function")]]
-		IRenderTarget* RenderTarget() const noexcept;
+		IDirect3D12RenderTarget* RenderTarget() const noexcept;
 		[[nodiscard("Pure function")]]
-		IRenderView* RenderView() const noexcept;
+		IDirect3D12RenderView* RenderView() const noexcept;
 		[[nodiscard("Pure function")]]
-		IRenderObjectManager* RenderObjectManager() const noexcept;
+		IDirect3D12RenderObjectManager* RenderObjectManager() const noexcept;
 
 		void Initialize(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix, const PonyMath::Utility::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
@@ -182,17 +184,17 @@ namespace PonyEngine::Render
 		return commandQueue.Get();
 	}
 
-	IRenderTarget* Direct3D12GraphicsPipeline::RenderTarget() const noexcept
+	IDirect3D12RenderTarget* Direct3D12GraphicsPipeline::RenderTarget() const noexcept
 	{
 		return renderTarget.get();
 	}
 
-	IRenderView* Direct3D12GraphicsPipeline::RenderView() const noexcept
+	IDirect3D12RenderView* Direct3D12GraphicsPipeline::RenderView() const noexcept
 	{
 		return renderView.get();
 	}
 
-	IRenderObjectManager* Direct3D12GraphicsPipeline::RenderObjectManager() const noexcept
+	IDirect3D12RenderObjectManager* Direct3D12GraphicsPipeline::RenderObjectManager() const noexcept
 	{
 		return renderObjectManager.get();
 	}
@@ -278,7 +280,7 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (auto renderObject = renderObjectManager->RenderObjectBegin(); renderObject != renderObjectManager->RenderObjectEnd(); ++renderObject)
-		{
+		{ 
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject->first.id);
 			const Direct3D12Mesh& renderMesh = renderObject->second.RenderMesh();
 			commandList->IASetVertexBuffers(0, 1, &renderMesh.VerticesView());
