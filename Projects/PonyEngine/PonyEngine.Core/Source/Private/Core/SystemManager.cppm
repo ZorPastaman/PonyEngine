@@ -54,7 +54,7 @@ export namespace PonyEngine::Core
 
 		/// @brief Creates systems.
 		/// @param systemFactories System factories.
-		void CreateSystems(const SystemFactoriesContainer& systemFactories);
+		void CreateSystems(const std::span<const std::pair<ISystemFactory*, int>> systemFactories);
 		/// @brief Destroys systems.
 		void DestroySystems() noexcept;
 
@@ -111,12 +111,13 @@ namespace PonyEngine::Core
 		return nullptr;
 	}
 
-	void SystemManager::CreateSystems(const SystemFactoriesContainer& systemFactories)
+	void SystemManager::CreateSystems(const std::span<const std::pair<ISystemFactory*, int>> systemFactories)
 	{
 		auto tickableSystemsBuffer = std::vector<std::pair<TickableSystem*, int>>();
 
 		for (const auto [factory, tickOrder] : systemFactories)
 		{
+			assert(factory && "The system factory is nullptr.");
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
 			SystemData systemData = CreateSystem(factory);
 
@@ -240,6 +241,8 @@ namespace PonyEngine::Core
 	void SystemManager::AddNonTickable(std::unique_ptr<System> system)
 	{
 		assert(system && "The system is nullptr.");
+		assert(std::ranges::find_if(std::as_const(systems), [&](const std::unique_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
+			"The system has already been added.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", typeid(*system).name());
 		systems.push_back(std::move(system));
 	}
@@ -247,6 +250,8 @@ namespace PonyEngine::Core
 	void SystemManager::AddTickable(std::unique_ptr<TickableSystem> system, const int tickOrder, std::vector<std::pair<TickableSystem*, int>>& tickableSystemsBuffer)
 	{
 		assert(system && "The system is nullptr.");
+		assert(std::ranges::find_if(std::as_const(systems), [&](const std::unique_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
+			"The system has already been added.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", typeid(*system).name());
 		tickableSystemsBuffer.emplace_back(system.get(), tickOrder);
 		systems.push_back(std::move(system));

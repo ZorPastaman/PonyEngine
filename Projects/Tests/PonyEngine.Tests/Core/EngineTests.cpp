@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+#include <array>
 #include <cstddef>
 #include <typeinfo>
 
@@ -75,8 +76,11 @@ namespace Core
 			auto application = Application();
 			application.logger = &logger;
 			TickableSystemFactory systemFactory;
-			auto params = PonyEngine::Core::EngineParams();
-			params.systemFactories.AddSystemFactory(systemFactory);
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 1>
+			{
+				std::pair(&systemFactory, 0)
+			};
+			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
 			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
 			Assert::IsNotNull(systemFactory.GetSystem());
@@ -104,9 +108,12 @@ namespace Core
 			application.logger = &logger;
 			auto systemFactory = SystemFactory();
 			auto tickableSystemFactory = TickableSystemFactory();
-			auto params = PonyEngine::Core::EngineParams();
-			params.systemFactories.AddSystemFactory(systemFactory);
-			params.systemFactories.AddSystemFactory(tickableSystemFactory);
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 2>
+			{
+				std::pair(&systemFactory, 0),
+				std::pair(&tickableSystemFactory, 0)
+			};
+			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
 			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<ISystemInterface*>(systemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(ISystemInterface))));

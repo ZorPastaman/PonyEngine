@@ -33,6 +33,6 @@ namespace PonyEngine::Core
 {
 	EngineData CreateEngine(IApplicationContext& application, const EngineParams& params)
 	{
-		return EngineData{.engine = std::make_unique<EngineImpl>(application, params.systemFactories)};
+		return EngineData{.engine = std::make_unique<EngineImpl>(application, params)};
 	}
 }

@@ -9,14 +9,16 @@
 
 export module PonyEngine.Core:EngineParams;
 
-import :SystemFactoriesContainer;
+import <span>;
+import <utility>;
+
+import :ISystemFactory;
 
 export namespace PonyEngine::Core
 {
 	/// @brief Engine parameters.
 	struct EngineParams final
 	{
-		// TODO: Use just span here instead. Inside SystemManager add a validation code.
-		SystemFactoriesContainer systemFactories; ///< System factories.
+		std::span<const std::pair<ISystemFactory*, int>> systemFactories; ///< Pairs of system factories and tick orders. System factories must be unique.
 	};
 }

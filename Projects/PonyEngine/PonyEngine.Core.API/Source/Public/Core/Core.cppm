@@ -18,6 +18,5 @@ export import :ISystemFactory;
 export import :ISystemManager;
 export import :System;
 export import :SystemData;
-export import :SystemFactoriesContainer;
 export import :SystemParams;
 export import :TickableSystem;

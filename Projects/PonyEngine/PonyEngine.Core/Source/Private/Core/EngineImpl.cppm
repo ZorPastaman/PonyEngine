@@ -35,9 +35,9 @@ export namespace PonyEngine::Core
 	public:
 		/// @brief Creates an @p Engine.
 		/// @param application Application context.
-		/// @param systemFactories System factories.
+		/// @param params Engine parameters.
 		[[nodiscard("Pure constructor")]]
-		EngineImpl(IApplicationContext& application, const SystemFactoriesContainer& systemFactories);
+		EngineImpl(IApplicationContext& application, const EngineParams& params);
 		EngineImpl(const EngineImpl&) = delete;
 		EngineImpl(EngineImpl&&) = delete;
 
@@ -99,7 +99,7 @@ export namespace PonyEngine::Core
 
 namespace PonyEngine::Core
 {
-	EngineImpl::EngineImpl(IApplicationContext& application, const SystemFactoriesContainer& systemFactories) :
+	EngineImpl::EngineImpl(IApplicationContext& application, const EngineParams& params) :
 		frameCount{0},
 		isRunning{true},
 		isTicking{false},
@@ -110,7 +110,7 @@ namespace PonyEngine::Core
 		try
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create systems.");
-			systemManager->CreateSystems(systemFactories);
+			systemManager->CreateSystems(params.systemFactories);
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Systems created.");
 		}
 		catch (const std::exception& e)

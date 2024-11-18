@@ -33,9 +33,6 @@
     <ClCompile Include="Source\Public\Core\EngineData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\SystemFactoriesContainer.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Core\SystemData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
