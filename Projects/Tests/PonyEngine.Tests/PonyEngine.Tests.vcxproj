@@ -79,7 +79,6 @@
     <ClCompile Include="Mocks\SystemFactory.cpp" />
     <ClCompile Include="Mocks\TickableSystem.cpp" />
     <ClCompile Include="Mocks\TickableSystemFactory.cpp" />
-    <ClCompile Include="Core\SystemFactoriesContainerTests.cpp" />
     <ClCompile Include="Input\HandleTests.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
     <ClCompile Include="Input\InputSystemTests.cpp" />

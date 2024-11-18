@@ -45,9 +45,6 @@
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Core\SystemFactoriesContainerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

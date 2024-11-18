@@ -276,17 +276,17 @@ namespace Application
 			auto gameSystemFactory = CreateGameSystemFactory();
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Create engine params.");
-			auto params = PonyEngine::Core::EngineParams();
-			params.systemFactories.AddSystemFactory(*screenSystemFactory.systemFactory.get());
-			params.systemFactories.AddSystemFactory(*frameRateSystemFactory.systemFactory.get(), 1);
-			params.systemFactories.AddSystemFactory(*windowSystemFactory.systemFactory.get(), 2);
-			params.systemFactories.AddSystemFactory(*inputSystemFactory.systemFactory.get(), 3);
-			params.systemFactories.AddSystemFactory(*renderSystemFactory.systemFactory.get(), 5);
-			params.systemFactories.AddSystemFactory(*gameSystemFactory.systemFactory.get(), 4);
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Debug, "Engine params created.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 6>
+			{
+				std::pair(screenSystemFactory.systemFactory.get(), 0),
+				std::pair(frameRateSystemFactory.systemFactory.get(), 1),
+				std::pair(windowSystemFactory.systemFactory.get(), 2),
+				std::pair(inputSystemFactory.systemFactory.get(), 3),
+				std::pair(renderSystemFactory.systemFactory.get(), 5),
+				std::pair(gameSystemFactory.systemFactory.get(), 4),
+			};
+			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
 			PonyEngine::Core::EngineData engineData = PonyEngine::Core::CreateEngine(*application, params);
 			assert(engineData.engine && "The engine is nullptr.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine created.");
