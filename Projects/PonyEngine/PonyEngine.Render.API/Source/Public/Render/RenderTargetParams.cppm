@@ -7,16 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:RenderSystemParams;
+export module PonyEngine.Render:RenderTargetParams;
 
-import :RenderTargetParams;
-import :RenderViewParams;
+import PonyMath.Color;
 
 export namespace PonyEngine::Render
 {
-	struct RenderSystemParams
+	struct RenderTargetParams final
 	{
-		RenderTargetParams renderTargetParams;
-		RenderViewParams renderViewParams;
+		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black;
 	};
 }

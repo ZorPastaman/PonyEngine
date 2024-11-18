@@ -22,11 +22,11 @@ import PonyBase.StringUtility;
 import PonyMath.Color;
 import PonyMath.Core;
 
-import PonyEngine.Render;
+import PonyEngine.Render.Direct3D12;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderTarget final : public IRenderTarget // TODO: Make IDirect3D12RenderTarget and other interfaces like that
+	class Direct3D12RenderTarget final : public IDirect3D12RenderTarget
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

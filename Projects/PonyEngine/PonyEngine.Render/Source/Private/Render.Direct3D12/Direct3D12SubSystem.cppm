@@ -33,6 +33,7 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 
 import PonyEngine.Render.Detail;
+import PonyEngine.Render.Direct3D12;
 
 import :Direct3D12GraphicsPipeline;
 
@@ -53,11 +54,11 @@ export namespace PonyEngine::Render
 		ID3D12CommandQueue* GetCommandQueue() const;
 
 		[[nodiscard("Pure function")]]
-		IRenderTarget* RenderTarget() const noexcept;
+		IDirect3D12RenderTarget* RenderTarget() const noexcept;
 		[[nodiscard("Pure function")]]
-		IRenderView* RenderView() const noexcept;
+		IDirect3D12RenderView* RenderView() const noexcept;
 		[[nodiscard("Pure function")]]
-		IRenderObjectManager* RenderObjectManager() const noexcept;
+		IDirect3D12RenderObjectManager* RenderObjectManager() const noexcept;
 
 		void Initialize(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix, const PonyMath::Utility::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat) const;
 
@@ -130,17 +131,17 @@ namespace PonyEngine::Render
 		return graphicsPipeline->GetCommandQueue();
 	}
 
-	IRenderTarget* Direct3D12SubSystem::RenderTarget() const noexcept
+	IDirect3D12RenderTarget* Direct3D12SubSystem::RenderTarget() const noexcept
 	{
 		return graphicsPipeline->RenderTarget();
 	}
 
-	IRenderView* Direct3D12SubSystem::RenderView() const noexcept
+	IDirect3D12RenderView* Direct3D12SubSystem::RenderView() const noexcept
 	{
 		return graphicsPipeline->RenderView();
 	}
 
-	IRenderObjectManager* Direct3D12SubSystem::RenderObjectManager() const noexcept
+	IDirect3D12RenderObjectManager* Direct3D12SubSystem::RenderObjectManager() const noexcept
 	{
 		return graphicsPipeline->RenderObjectManager();
 	}

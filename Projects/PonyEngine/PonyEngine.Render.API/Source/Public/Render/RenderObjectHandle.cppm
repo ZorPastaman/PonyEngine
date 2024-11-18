@@ -13,7 +13,7 @@ import <cstddef>;
 
 export namespace PonyEngine::Render
 {
-	struct RenderObjectHandle final // TODO: Think about unique_handle that automatically closes handle. And make handle struct universal.
+	struct RenderObjectHandle final
 	{
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const RenderObjectHandle& other) const noexcept = default;

@@ -71,17 +71,17 @@ export namespace PonyEngine::Render
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderTarget& RenderTarget() noexcept override;
+		virtual IDirect3D12RenderTarget& RenderTarget() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderTarget& RenderTarget() const noexcept override;
+		virtual const IDirect3D12RenderTarget& RenderTarget() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual IRenderView& RenderView() noexcept override;
+		virtual IDirect3D12RenderView& RenderView() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderView& RenderView() const noexcept override;
+		virtual const IDirect3D12RenderView& RenderView() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() noexcept override;
+		virtual IDirect3D12RenderObjectManager& RenderObjectManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManager& RenderObjectManager() const noexcept override;
+		virtual const IDirect3D12RenderObjectManager& RenderObjectManager() const noexcept override;
 
 		WindowsDirect3D12RenderSystem& operator =(const WindowsDirect3D12RenderSystem&) = delete;
 		WindowsDirect3D12RenderSystem& operator =(WindowsDirect3D12RenderSystem&&) = delete;
@@ -105,7 +105,7 @@ namespace PonyEngine::Render
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsDirect3D12RenderSystemParams& renderParams) :
 		TickableSystem(engine, systemParams),
 		dxgiSubSystem(CreateDXGISubSystem()),
-		direct3D12SubSystem(CreateDirect3D12SubSystem(renderParams.featureLevel, renderParams.commandQueuePriority, renderParams.fenceTimeout))
+		direct3D12SubSystem(CreateDirect3D12SubSystem(renderParams.featureLevel, renderParams.commandQueuePriority, renderParams.fenceParams.fenceTimeout))
 	{
 		PonyMath::Utility::Resolution<UINT> renderResolution;
 
@@ -113,9 +113,9 @@ namespace PonyEngine::Render
 		{
 			const HWND windowHandle = windowSystem->WindowHandle();
 
-			if (renderParams.resolution.has_value())
+			if (renderParams.renderViewParams.resolution.has_value())
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.resolution.value());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.renderViewParams.resolution.value());
 				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
@@ -152,7 +152,7 @@ namespace PonyEngine::Render
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
 
-		direct3D12SubSystem->Initialize(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.projectionMatrix), renderResolution, rawBackBuffers, RtvFormat);
+		direct3D12SubSystem->Initialize(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.projectionMatrix), renderResolution, rawBackBuffers, RtvFormat);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -199,32 +199,32 @@ namespace PonyEngine::Render
 		return Engine().Logger();
 	}
 
-	IRenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept
+	IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept
 	{
 		return *direct3D12SubSystem->RenderTarget();
 	}
 
-	const IRenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
+	const IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
 	{
 		return *direct3D12SubSystem->RenderTarget();
 	}
 
-	IRenderView& WindowsDirect3D12RenderSystem::RenderView() noexcept
+	IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() noexcept
 	{
 		return *direct3D12SubSystem->RenderView();
 	}
 
-	const IRenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
+	const IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
 	{
 		return *direct3D12SubSystem->RenderView();
 	}
 
-	IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept
+	IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept
 	{
 		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
-	const IRenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
+	const IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
 	{
 		return *direct3D12SubSystem->RenderObjectManager();
 	}

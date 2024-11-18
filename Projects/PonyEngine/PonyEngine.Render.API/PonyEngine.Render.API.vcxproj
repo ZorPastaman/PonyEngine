@@ -33,9 +33,14 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12FenceParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObject.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderTarget.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderView.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm" />
@@ -47,6 +52,8 @@
     <ClCompile Include="Source\Public\Render\IRenderView.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
     <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />
+    <ClCompile Include="Source\Public\Render\RenderTargetParams.cppm" />
+    <ClCompile Include="Source\Public\Render\RenderViewParams.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

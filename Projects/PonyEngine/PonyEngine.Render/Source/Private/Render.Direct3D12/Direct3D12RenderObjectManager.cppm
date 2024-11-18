@@ -24,7 +24,7 @@ import PonyMath.Core;
 
 import PonyDebug.Log;
 
-import PonyEngine.Render;
+import PonyEngine.Render.Direct3D12;
 import PonyEngine.Render.Detail;
 
 import :Direct3D12Mesh;
@@ -33,7 +33,7 @@ import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderObjectManager final : public IRenderObjectManager
+	class Direct3D12RenderObjectManager final : public IDirect3D12RenderObjectManager
 	{
 	public:
 		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
@@ -49,7 +49,7 @@ export namespace PonyEngine::Render
 		virtual void DestroyObject(RenderObjectHandle handle) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObject* FindRenderObject(RenderObjectHandle handle) const noexcept override;
+		virtual IDirect3D12RenderObject* FindRenderObject(RenderObjectHandle handle) const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		RenderObjectIterator RenderObjectBegin() const noexcept;
@@ -105,7 +105,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	IRenderObject* Direct3D12RenderObjectManager::FindRenderObject(const RenderObjectHandle handle) const noexcept
+	IDirect3D12RenderObject* Direct3D12RenderObjectManager::FindRenderObject(const RenderObjectHandle handle) const noexcept
 	{
 		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
 		{

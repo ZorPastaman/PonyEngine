@@ -15,13 +15,14 @@ export module PonyEngine.Render.Direct3D12:Direct3D12RenderSystemParams;
 
 import PonyEngine.Render;
 
+import :Direct3D12FenceParams;
+
 export namespace PonyEngine::Render
 {
 	struct Direct3D12RenderSystemParams : RenderSystemParams
 	{
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
-
-		DWORD fenceTimeout = 20000;
+		Direct3D12FenceParams fenceParams;
 	};
 }

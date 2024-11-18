@@ -18,3 +18,5 @@ export import :RenderObjectHandle;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
+export import :RenderTargetParams;
+export import :RenderViewParams;
