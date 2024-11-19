@@ -47,7 +47,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12GraphicsPipeline(IRendererContext& renderer, ID3D12Device10* device, INT commandQueuePriority, DWORD fenceTimeout);
+		Direct3D12GraphicsPipeline(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, ID3D12Device10* device);
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline(Direct3D12GraphicsPipeline&&) = delete;
 
@@ -74,7 +74,7 @@ export namespace PonyEngine::Render
 
 	private:
 		GUID guid;
-		IRendererContext* renderer;
+		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
@@ -91,7 +91,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRendererContext& renderer, ID3D12Device10* const device, const INT commandQueuePriority, const DWORD fenceTimeout) :
+	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, ID3D12Device10* const device) :
 		guid{PonyBase::Utility::AcquireGuid()},
 		renderer{&renderer}
 	{
@@ -99,11 +99,11 @@ namespace PonyEngine::Render
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline guid: '{}'.", PonyBase::Utility::ToString(guid));
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 command queue. Priority: '{}'.", commandQueuePriority);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 command queue. Priority: '{}'.", params.commandQueuePriority);
 		const auto commandQueueDescription = D3D12_COMMAND_QUEUE_DESC
 		{
 			.Type = commandListType,
-			.Priority = commandQueuePriority,
+			.Priority = params.commandQueuePriority,
 			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
 			.NodeMask = 0u
 		};
@@ -127,8 +127,8 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence. Fence timeout: {}.", fenceTimeout);
-		fence = std::make_unique<Direct3DFence>(*this->renderer, commandQueue.Get(), fenceTimeout);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence. Fence timeout: {}.", params.fenceParams.fenceTimeout);
+		fence = std::make_unique<Direct3DFence>(*this->renderer, commandQueue.Get(), params.fenceParams);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");

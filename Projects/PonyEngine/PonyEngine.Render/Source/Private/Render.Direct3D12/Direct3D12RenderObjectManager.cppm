@@ -39,7 +39,7 @@ export namespace PonyEngine::Render
 		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObjectManager(IRendererContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
+		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
@@ -60,7 +60,7 @@ export namespace PonyEngine::Render
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
 
 	private:
-		IRendererContext* renderer;
+		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 		Direct3D12MeshManager* meshManager;
@@ -72,7 +72,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRendererContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
 		renderer{&renderer},
 		device(device),
 		meshManager{&meshManager},

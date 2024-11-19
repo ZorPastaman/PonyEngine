@@ -9,4 +9,4 @@
 
 export module PonyEngine.Render.Detail;
 
-export import :IRendererContext;
+export import :IRenderContext;

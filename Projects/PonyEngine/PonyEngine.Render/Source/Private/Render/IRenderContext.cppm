@@ -11,15 +11,15 @@ module;
 
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.Detail:IRendererContext;
+export module PonyEngine.Render.Detail:IRenderContext;
 
 import PonyDebug.Log;
 
 export namespace PonyEngine::Render
 {
-	class IRendererContext
+	class IRenderContext
 	{
-		INTERFACE_BODY(IRendererContext)
+		INTERFACE_BODY(IRenderContext)
 
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;

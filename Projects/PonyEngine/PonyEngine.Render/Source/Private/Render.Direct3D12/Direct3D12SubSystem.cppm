@@ -44,7 +44,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		Direct3D12SubSystem(IRendererContext& renderer, D3D_FEATURE_LEVEL featureLevel, INT commandQueuePriority, DWORD fenceTimeout);
+		Direct3D12SubSystem(IRenderContext& renderer, const Direct3D12RenderSystemParams& params);
 		Direct3D12SubSystem(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem(Direct3D12SubSystem&&) = delete;
 
@@ -70,7 +70,7 @@ export namespace PonyEngine::Render
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
 
 	private:
-		IRendererContext* renderer;
+		IRenderContext* renderer;
 
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug;
@@ -82,7 +82,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12SubSystem::Direct3D12SubSystem(IRendererContext& renderer, const D3D_FEATURE_LEVEL featureLevel, const INT commandQueuePriority, const DWORD fenceTimeout) :
+	Direct3D12SubSystem::Direct3D12SubSystem(IRenderContext& renderer, const Direct3D12RenderSystemParams& params) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -97,15 +97,15 @@ namespace PonyEngine::Render
 		debug->EnableDebugLayer();
 #endif
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 device. Feature level: '0x{:X}.'", static_cast<unsigned int>(featureLevel));
-		if (const HRESULT result = D3D12CreateDevice(nullptr, featureLevel, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 device. Feature level: '0x{:X}.'", static_cast<unsigned int>(params.featureLevel));
+		if (const HRESULT result = D3D12CreateDevice(nullptr, params.featureLevel, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 graphics pipeline.");
-		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*this->renderer, device.Get(), commandQueuePriority, fenceTimeout);
+		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*this->renderer, params, device.Get());
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline created.'");
 	}
 

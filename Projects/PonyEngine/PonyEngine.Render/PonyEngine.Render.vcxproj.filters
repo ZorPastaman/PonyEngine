@@ -49,7 +49,7 @@
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\IRendererContext.cppm">
+    <ClCompile Include="Source\Private\Render\IRenderContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm">
