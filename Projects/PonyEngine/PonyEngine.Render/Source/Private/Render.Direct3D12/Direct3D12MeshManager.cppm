@@ -43,7 +43,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MeshManager(IRendererContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
+		Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
 
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) const;
@@ -65,7 +65,7 @@ export namespace PonyEngine::Render
 			.VisibleNodeMask = 0u
 		};
 
-		IRendererContext* renderer;
+		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 	};
@@ -73,7 +73,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12MeshManager::Direct3D12MeshManager(IRendererContext& renderer, ID3D12Device10* const device) :
+	Direct3D12MeshManager::Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* const device) :
 		renderer{&renderer},
 		device(device)
 	{

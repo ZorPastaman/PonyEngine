@@ -38,7 +38,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsDirect3D12DXGISubSystem(IRendererContext& renderer);
+		explicit WindowsDirect3D12DXGISubSystem(IRenderContext& renderer);
 		WindowsDirect3D12DXGISubSystem(const WindowsDirect3D12DXGISubSystem&) = delete;
 		WindowsDirect3D12DXGISubSystem(WindowsDirect3D12DXGISubSystem&&) = delete;
 
@@ -57,7 +57,7 @@ export namespace PonyEngine::Render
 		WindowsDirect3D12DXGISubSystem& operator =(WindowsDirect3D12DXGISubSystem&&) = delete;
 
 	private:
-		IRendererContext* renderer;
+		IRenderContext* renderer;
 
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
@@ -69,7 +69,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12DXGISubSystem::WindowsDirect3D12DXGISubSystem(IRendererContext& renderer) :
+	WindowsDirect3D12DXGISubSystem::WindowsDirect3D12DXGISubSystem(IRenderContext& renderer) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
