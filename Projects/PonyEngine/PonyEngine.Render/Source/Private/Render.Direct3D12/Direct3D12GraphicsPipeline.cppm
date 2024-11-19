@@ -47,27 +47,19 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12GraphicsPipeline(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, ID3D12Device10* device);
+		Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* device, const Direct3D12RenderSystemParams& params);
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline(Direct3D12GraphicsPipeline&&) = delete;
 
 		~Direct3D12GraphicsPipeline() noexcept;
 
+		void Initialize(const Direct3D12RenderTarget* renderTarget, const Direct3D12RenderView* renderView, const Direct3D12Material* material, const Direct3D12RenderObjectManager* renderObjectManager);
+
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GetCommandQueue() const;
 
-		[[nodiscard("Pure function")]]
-		IDirect3D12RenderTarget* RenderTarget() const noexcept;
-		[[nodiscard("Pure function")]]
-		IDirect3D12RenderView* RenderView() const noexcept;
-		[[nodiscard("Pure function")]]
-		IDirect3D12RenderObjectManager* RenderObjectManager() const noexcept;
-
-		void Initialize(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix, const PonyMath::Utility::Resolution<UINT>& resolution, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
-
 		void PopulateCommands(UINT bufferIndex) const;
 		void Execute() const;
-		void WaitForEndOfFrame() const;
 
 		Direct3D12GraphicsPipeline& operator =(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline& operator =(Direct3D12GraphicsPipeline&&) = delete;
@@ -79,19 +71,17 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
-		std::unique_ptr<Direct3D12Waiter> waiter;
 
-		std::unique_ptr<Direct3D12RenderTarget> renderTarget;
-		std::unique_ptr<Direct3D12RenderView> renderView;
-		std::unique_ptr<Direct3D12Material> material;
-		std::unique_ptr<Direct3D12MeshManager> meshManager;
-		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager;
+		const Direct3D12RenderTarget* renderTarget;
+		const Direct3D12RenderView* renderView;
+		const Direct3D12Material* material;
+		const Direct3D12RenderObjectManager* renderObjectManager;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, ID3D12Device10* const device) :
+	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* const device, const Direct3D12RenderSystemParams& params) :
 		guid{PonyBase::Utility::AcquireGuid()},
 		renderer{&renderer}
 	{
@@ -126,46 +116,10 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 waiter. Wait timeout: {}.", params.renderTimeout);
-		waiter = std::make_unique<Direct3D12Waiter>(*this->renderer, commandQueue.Get(), params.renderTimeout);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 wait created.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
-		meshManager = std::make_unique<Direct3D12MeshManager>(*this->renderer, device);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager created.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render object manager.");
-		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*this->renderer, *meshManager, device);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager created.");
 	}
 
 	Direct3D12GraphicsPipeline::~Direct3D12GraphicsPipeline() noexcept
 	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 render object manager.");
-		renderObjectManager.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager destroyed.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 mesh manager.");
-		meshManager.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager destroyed.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 material.");
-		material.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material destroyed.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 render view.");
-		renderView.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target view.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 render target.");
-		renderTarget.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target destroyed.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 waiter.");
-		waiter.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 waiter destroyed.");
-
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command list.");
 		commandList.Reset();
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list released.");
@@ -179,55 +133,17 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
 	}
 
+	void Direct3D12GraphicsPipeline::Initialize(const Direct3D12RenderTarget* renderTarget, const Direct3D12RenderView* renderView, const Direct3D12Material* material, const Direct3D12RenderObjectManager* renderObjectManager)
+	{
+		this->renderTarget = renderTarget;
+		this->renderView = renderView;
+		this->material = material;
+		this->renderObjectManager = renderObjectManager;
+	}
+
 	ID3D12CommandQueue* Direct3D12GraphicsPipeline::GetCommandQueue() const
 	{
 		return commandQueue.Get();
-	}
-
-	IDirect3D12RenderTarget* Direct3D12GraphicsPipeline::RenderTarget() const noexcept
-	{
-		return renderTarget.get();
-	}
-
-	IDirect3D12RenderView* Direct3D12GraphicsPipeline::RenderView() const noexcept
-	{
-		return renderView.get();
-	}
-
-	IDirect3D12RenderObjectManager* Direct3D12GraphicsPipeline::RenderObjectManager() const noexcept
-	{
-		return renderObjectManager.get();
-	}
-
-	void Direct3D12GraphicsPipeline::Initialize(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix, const PonyMath::Utility::Resolution<UINT>& resolution, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
-	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Get command queue device.");
-		Microsoft::WRL::ComPtr<ID3D12Device10> device;
-		if (const HRESULT result = commandQueue->GetDevice(IID_PPV_ARGS(device.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Command queue device gotten.");
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render view.");
-		renderView = std::make_unique<Direct3D12RenderView>(viewMatrix, projectionMatrix, resolution);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render view created.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target.");
-		renderTarget = std::make_unique<Direct3D12RenderTarget>(device.Get(), buffers, rtvFormat);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
-		const auto rootSignatureShader = Direct3D12Shader("RootSignature");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
-		const auto vertexShader = Direct3D12Shader("VertexShader");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
-		const auto pixelShader = Direct3D12Shader("PixelShader");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
-		material = std::make_unique<Direct3D12Material>(device.Get(), rootSignatureShader, vertexShader, pixelShader, rtvFormat);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateCommands(const UINT bufferIndex) const
@@ -318,10 +234,5 @@ namespace PonyEngine::Render
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command list.");
 		ID3D12CommandList* const commandLists[] = { commandList.Get() };
 		commandQueue->ExecuteCommandLists(1, commandLists);
-	}
-
-	void Direct3D12GraphicsPipeline::WaitForEndOfFrame() const
-	{
-		waiter->Wait();
 	}
 }
