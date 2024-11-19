@@ -23,7 +23,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh(const Direct3D12VertexBuffer& verticesBuffer, const Direct3D12VertexBuffer& vertexColorsBuffer, const Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept;
+		Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh(const Direct3D12Mesh& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,7 +58,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Mesh::Direct3D12Mesh(const Direct3D12VertexBuffer& verticesBuffer, const Direct3D12VertexBuffer& vertexColorsBuffer, const Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept :
+	Direct3D12Mesh::Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept :
 		vertices(verticesBuffer.GetVerticesResource()),
 		vertexColors(vertexColorsBuffer.GetVerticesResource()),
 		vertexIndices(vertexIndicesBuffer.GetIndicesResource()),

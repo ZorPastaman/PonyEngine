@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderView;
 
+import <optional>;
+
 import PonyMath.Core;
 
 import PonyEngine.Render.Direct3D12;
@@ -45,9 +47,7 @@ export namespace PonyEngine::Render
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		const PonyMath::Core::Matrix4x4<FLOAT>& TargetViewMatrix() const noexcept;
-		[[nodiscard("Pure function")]]
-		const PonyMath::Core::Matrix4x4<FLOAT>& TargetProjectionMatrix() const noexcept;
+		const PonyMath::Core::Matrix4x4<FLOAT>& VpMatrix() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		const Direct3D12Viewport& Viewport() const noexcept;
@@ -58,6 +58,7 @@ export namespace PonyEngine::Render
 	private:
 		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix;
 		PonyMath::Core::Matrix4x4<FLOAT> projectionMatrix;
+		mutable std::optional<PonyMath::Core::Matrix4x4<FLOAT>> vpMatrix;
 
 		Direct3D12Viewport viewport;
 	};
@@ -101,14 +102,14 @@ namespace PonyEngine::Render
 		return resolution;
 	}
 
-	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::TargetViewMatrix() const noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::VpMatrix() const noexcept
 	{
-		return viewMatrix;
-	}
+		if (!vpMatrix)
+		{
+			vpMatrix = projectionMatrix * viewMatrix;
+		}
 
-	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::TargetProjectionMatrix() const noexcept
-	{
-		return projectionMatrix;
+		return vpMatrix.value();
 	}
 
 	const Direct3D12Viewport& Direct3D12RenderView::Viewport() const noexcept

@@ -91,13 +91,13 @@ namespace PonyEngine::Render
 		};
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertices.");
-		const Direct3D12VertexBuffer vertices = CreateVertices(mesh.Vertices());
+		Direct3D12VertexBuffer vertices = CreateVertices(mesh.Vertices());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertices created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertex colors.");
-		const Direct3D12VertexBuffer colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
+		Direct3D12VertexBuffer colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
-		const Direct3D12IndexBuffer indices = CreateVertexIndices(mesh.Triangles());
+		Direct3D12IndexBuffer indices = CreateVertexIndices(mesh.Triangles());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh.");

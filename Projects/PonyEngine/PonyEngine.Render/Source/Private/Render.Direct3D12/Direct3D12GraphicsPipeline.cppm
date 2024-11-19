@@ -276,7 +276,7 @@ namespace PonyEngine::Render
 		commandList->SetPipelineState(material->GetPipelineState());
 		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 
-		const PonyMath::Core::Matrix4x4<FLOAT> vp = renderView->TargetProjectionMatrix() * renderView->TargetViewMatrix();
+		const PonyMath::Core::Matrix4x4<FLOAT>& vp = renderView->VpMatrix();
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (auto renderObject = renderObjectManager->RenderObjectBegin(); renderObject != renderObjectManager->RenderObjectEnd(); ++renderObject)
