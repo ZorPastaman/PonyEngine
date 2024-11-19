@@ -33,13 +33,13 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
-import :Direct3D12Fence;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
 import :Direct3D12Material;
 import :Direct3D12RenderTarget;
 import :Direct3D12RenderObjectManager;
 import :Direct3D12RenderView;
+import :Direct3D12Waiter;
 
 export namespace PonyEngine::Render
 {
@@ -79,7 +79,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
-		std::unique_ptr<Direct3DFence> fence;
+		std::unique_ptr<Direct3D12Waiter> waiter;
 
 		std::unique_ptr<Direct3D12RenderTarget> renderTarget;
 		std::unique_ptr<Direct3D12RenderView> renderView;
@@ -127,9 +127,9 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 fence. Fence timeout: {}.", params.fenceParams.fenceTimeout);
-		fence = std::make_unique<Direct3DFence>(*this->renderer, commandQueue.Get(), params.fenceParams);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence created.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 waiter. Wait timeout: {}.", params.renderTimeout);
+		waiter = std::make_unique<Direct3D12Waiter>(*this->renderer, commandQueue.Get(), params.renderTimeout);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 wait created.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
 		meshManager = std::make_unique<Direct3D12MeshManager>(*this->renderer, device);
@@ -162,9 +162,9 @@ namespace PonyEngine::Render
 		renderTarget.reset();
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target destroyed.");
 
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
-		fence.reset();
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 waiter.");
+		waiter.reset();
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 waiter destroyed.");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command list.");
 		commandList.Reset();
@@ -322,6 +322,6 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::WaitForEndOfFrame() const
 	{
-		fence->Wait();
+		waiter->Wait();
 	}
 }

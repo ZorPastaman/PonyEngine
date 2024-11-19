@@ -100,8 +100,5 @@
     <ClCompile Include="Source\Public\Render\RenderTargetParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12FenceParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

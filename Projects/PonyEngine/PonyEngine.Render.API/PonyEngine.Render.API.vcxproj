@@ -33,7 +33,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12FenceParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObject.cppm" />

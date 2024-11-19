@@ -28,39 +28,42 @@ import PonyEngine.Render.Detail;
 
 export namespace PonyEngine::Render
 {
-	class Direct3DFence final
+	class Direct3D12Fence final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3DFence(IRenderContext& render, ID3D12CommandQueue* commandQueue, const Direct3D12FenceParams& fenceParams);
-		Direct3DFence(const Direct3DFence&) = delete;
+		Direct3D12Fence(IRenderContext& render, ID3D12CommandQueue* commandQueue);
+		Direct3D12Fence(const Direct3D12Fence&) = delete;
 		[[nodiscard("Pure constructor")]]
-		Direct3DFence(Direct3DFence&& other) noexcept = default;
+		Direct3D12Fence(Direct3D12Fence&& other) noexcept = default;
 
-		~Direct3DFence() noexcept;
+		~Direct3D12Fence() noexcept;
 
-		void Wait();
+		[[nodiscard("Pure function")]]
+		UINT64 CurrentFenceValue() const noexcept;
+		[[nodiscard("Pure function")]]
+		UINT64 CompletedFenceValue() const noexcept;
 
-		Direct3DFence& operator =(const Direct3DFence&) = delete;
-		Direct3DFence& operator =(Direct3DFence&&) noexcept = default;
+		void Signal();
+		void SetEvent(UINT64 fenceValue, HANDLE event);
+
+		Direct3D12Fence& operator =(const Direct3D12Fence&) = delete;
+		Direct3D12Fence& operator =(Direct3D12Fence&&) noexcept = default;
 
 	private:
-		DWORD fenceTimeout;
-		UINT64 fenceValue;
+		UINT64 currentFenceValue;
 
 		IRenderContext* render;
 
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
 		Microsoft::WRL::ComPtr<ID3D12Fence1> fence;
-		HANDLE fenceEvent;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3DFence::Direct3DFence(IRenderContext& render, ID3D12CommandQueue* const commandQueue, const Direct3D12FenceParams& fenceParams) :
-		fenceTimeout{fenceParams.fenceTimeout},
-		fenceValue{0LL},
+	Direct3D12Fence::Direct3D12Fence(IRenderContext& render, ID3D12CommandQueue* const commandQueue) :
+		currentFenceValue{0LL},
 		render{&render},
 		commandQueue(commandQueue)
 	{
@@ -73,29 +76,15 @@ namespace PonyEngine::Render
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Command queue device gotten.");
 
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Acquire Direct3D 12 fence.");
-		if (const HRESULT result = device->CreateFence(fenceValue++, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = device->CreateFence(currentFenceValue++, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(fence.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 fence with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
-
-		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Create fence event.");
-		if ((fenceEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create fence event. Error code: '0x{:X}'.", GetLastError()));
-		}
-		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Fence event created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fenceEvent));
 	}
 
-	Direct3DFence::~Direct3DFence() noexcept
+	Direct3D12Fence::~Direct3D12Fence() noexcept
 	{
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Close fence event.");
-		if (!CloseHandle(fenceEvent)) [[unlikely]]
-		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Error, "Failed to close fence event. Error code: '0x{:X}'", GetLastError());
-		}
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Fence event closed.");
-
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 fence.");
 		fence.Reset();
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence released.");
@@ -105,30 +94,31 @@ namespace PonyEngine::Render
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
 	}
 
-	void Direct3DFence::Wait()
+	UINT64 Direct3D12Fence::CurrentFenceValue() const noexcept
 	{
-		const UINT64 currentFenceValue = fenceValue++;
+		return currentFenceValue;
+	}
+
+	UINT64 Direct3D12Fence::CompletedFenceValue() const noexcept
+	{
+		return fence->GetCompletedValue();
+	}
+
+	void Direct3D12Fence::Signal()
+	{
+		++currentFenceValue;
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Fence value: '{}'.", currentFenceValue);
 		if (const HRESULT result = commandQueue->Signal(fence.Get(), currentFenceValue); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentFenceValue));
 		}
+	}
 
-		if (fence->GetCompletedValue() < currentFenceValue)
+	void Direct3D12Fence::SetEvent(const UINT64 fenceValue, const HANDLE event)
+	{
+		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, event); FAILED(result)) [[unlikely]]
 		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for fence. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, fenceTimeout);
-			if (const HRESULT result = fence->SetEventOnCompletion(currentFenceValue, fenceEvent); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			if (const DWORD result = WaitForSingleObjectEx(fenceEvent, fenceTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-		}
-		else
-		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 	}
 }
