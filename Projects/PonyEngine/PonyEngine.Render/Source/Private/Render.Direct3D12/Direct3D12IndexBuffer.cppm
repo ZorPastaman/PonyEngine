@@ -30,7 +30,9 @@ export namespace PonyEngine::Render
 		~Direct3D12IndexBuffer() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetIndicesResource() const noexcept;
+		ID3D12Resource2* GetIndicesResource() noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12Resource2* GetIndicesResource() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT IndexFormat() const noexcept;
@@ -58,7 +60,12 @@ namespace PonyEngine::Render
 	{
 	}
 
-	ID3D12Resource2* Direct3D12IndexBuffer::GetIndicesResource() const noexcept
+	ID3D12Resource2* Direct3D12IndexBuffer::GetIndicesResource() noexcept
+	{
+		return indicesResource.Get();
+	}
+
+	const ID3D12Resource2* Direct3D12IndexBuffer::GetIndicesResource() const noexcept
 	{
 		return indicesResource.Get();
 	}

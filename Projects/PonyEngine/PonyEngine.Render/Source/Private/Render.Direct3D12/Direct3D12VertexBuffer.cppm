@@ -28,7 +28,9 @@ export namespace PonyEngine::Render
 		~Direct3D12VertexBuffer() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetVerticesResource() const noexcept;
+		ID3D12Resource2* GetVerticesResource() noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12Resource2* GetVerticesResource() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		UINT VertexSize() const noexcept;
@@ -54,7 +56,12 @@ namespace PonyEngine::Render
 	{
 	}
 
-	ID3D12Resource2* Direct3D12VertexBuffer::GetVerticesResource() const noexcept
+	ID3D12Resource2* Direct3D12VertexBuffer::GetVerticesResource() noexcept
+	{
+		return verticesResource.Get();
+	}
+
+	const ID3D12Resource2* Direct3D12VertexBuffer::GetVerticesResource() const noexcept
 	{
 		return verticesResource.Get();
 	}
