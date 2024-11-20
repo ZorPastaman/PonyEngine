@@ -47,6 +47,10 @@ export namespace PonyEngine::Render
 		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		PonyMath::Utility::Resolution<UINT> ResolutionD3D12() const noexcept;
+		void ResolutionD3D12(const PonyMath::Utility::Resolution<UINT>& resolution) noexcept;
+
+		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<FLOAT>& VpMatrix() const noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -100,6 +104,20 @@ namespace PonyEngine::Render
 		resolution.Height() = static_cast<unsigned int>(viewport.Rect().bottom - viewport.Rect().top);
 
 		return resolution;
+	}
+
+	PonyMath::Utility::Resolution<UINT> Direct3D12RenderView::ResolutionD3D12() const noexcept
+	{
+		PonyMath::Utility::Resolution<UINT> resolution;
+		resolution.Width() = static_cast<UINT>(viewport.Rect().right - viewport.Rect().left);
+		resolution.Height() = static_cast<UINT>(viewport.Rect().bottom - viewport.Rect().top);
+
+		return resolution;
+	}
+
+	void Direct3D12RenderView::ResolutionD3D12(const PonyMath::Utility::Resolution<UINT>& resolution) noexcept
+	{
+		viewport = Direct3D12Viewport(resolution);
 	}
 
 	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::VpMatrix() const noexcept

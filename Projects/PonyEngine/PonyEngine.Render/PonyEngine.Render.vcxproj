@@ -38,6 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialHandle.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHandle.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm" />
     <ClCompile Include="Source\Private\Render\IRenderContext.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm" />

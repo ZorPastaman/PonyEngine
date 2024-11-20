@@ -40,6 +40,11 @@ export namespace PonyEngine::Render
 		~Direct3D12Fence() noexcept;
 
 		[[nodiscard("Pure function")]]
+		ID3D12Fence1* GetFence() noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12Fence1* GetFence() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		UINT64 CurrentFenceValue() const noexcept;
 		[[nodiscard("Pure function")]]
 		UINT64 CompletedFenceValue() const noexcept;
@@ -92,6 +97,16 @@ namespace PonyEngine::Render
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Release Direct3D 12 command queue.");
 		commandQueue.Reset();
 		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 command queue released.");
+	}
+
+	ID3D12Fence1* Direct3D12Fence::GetFence() noexcept
+	{
+		return fence.Get();
+	}
+
+	const ID3D12Fence1* Direct3D12Fence::GetFence() const noexcept
+	{
+		return fence.Get();
 	}
 
 	UINT64 Direct3D12Fence::CurrentFenceValue() const noexcept

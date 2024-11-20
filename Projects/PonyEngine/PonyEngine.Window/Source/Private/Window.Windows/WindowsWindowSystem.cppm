@@ -403,6 +403,8 @@ namespace PonyEngine::Window
 
 	HWND WindowsWindowSystem::CreateControlledWindow(const WindowsWindowStyle& style, const WindowRect& rect)
 	{
+		assert(windowsClass && "The windows class is nullptr.");
+
 		const auto [position, resolution] = PositionResolution(GetWindowRect(style, rect));
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",

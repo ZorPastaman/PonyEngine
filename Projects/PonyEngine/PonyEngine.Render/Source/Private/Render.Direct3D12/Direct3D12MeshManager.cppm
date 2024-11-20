@@ -22,6 +22,7 @@ import <cstring>;
 import <span>;
 import <stdexcept>;
 import <type_traits>;
+import <unordered_map>;
 
 import PonyBase.StringUtility;
 
@@ -34,6 +35,7 @@ import PonyDebug.Log;
 import PonyEngine.Render.Detail;
 
 import :Direct3D12Mesh;
+import :Direct3D12MeshHandle;
 import :Direct3D12IndexBuffer;
 import :Direct3D12VertexBuffer;
 
@@ -46,7 +48,11 @@ export namespace PonyEngine::Render
 		Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) const;
+		Direct3D12MeshHandle CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh);
+		void DestroyDirect3D12Mesh(const Direct3D12MeshHandle& handle) noexcept;
+
+		[[nodiscard("Pure constructor")]]
+		Direct3D12Mesh* FindDirect3D12Mesh(const Direct3D12MeshHandle& handle) const noexcept;
 
 	private:
 		[[nodiscard("Pure constructor")]]
@@ -68,6 +74,9 @@ export namespace PonyEngine::Render
 		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+
+		mutable std::unordered_map<Direct3D12MeshHandle, Direct3D12Mesh, Direct3D12MeshHandleHash> meshes; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
+		std::size_t nextId;
 	};
 }
 
@@ -75,11 +84,12 @@ namespace PonyEngine::Render
 {
 	Direct3D12MeshManager::Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* const device) :
 		renderer{&renderer},
-		device(device)
+		device(device),
+		nextId{1}
 	{
 	}
 
-	Direct3D12Mesh Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) const
+	Direct3D12MeshHandle Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh)
 	{
 		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -100,11 +110,28 @@ namespace PonyEngine::Render
 		Direct3D12IndexBuffer indices = CreateVertexIndices(mesh.Triangles());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh.");
-		const auto renderMesh = Direct3D12Mesh(vertices, colors, indices);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh created.");
+		const auto handle = Direct3D12MeshHandle{.id = nextId++};
+		meshes.try_emplace(handle, vertices, colors, indices);
 
-		return renderMesh;
+		return handle;
+	}
+
+	void Direct3D12MeshManager::DestroyDirect3D12Mesh(const Direct3D12MeshHandle& handle) noexcept
+	{
+		if (const auto position = meshes.find(handle); position != meshes.cend())
+		{
+			meshes.erase(position);
+		}
+	}
+
+	Direct3D12Mesh* Direct3D12MeshManager::FindDirect3D12Mesh(const Direct3D12MeshHandle& handle) const noexcept
+	{
+		if (const auto position = meshes.find(handle); position != meshes.cend())
+		{
+			return &position->second;
+		}
+
+		return nullptr;
 	}
 
 	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const

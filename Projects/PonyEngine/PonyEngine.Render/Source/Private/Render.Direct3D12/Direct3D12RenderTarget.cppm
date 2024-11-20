@@ -30,23 +30,27 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderTarget(ID3D12Device10* device, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
+		explicit Direct3D12RenderTarget(const PonyMath::Color::RGBA<FLOAT>& clearColor);
 		Direct3D12RenderTarget(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget(Direct3D12RenderTarget&&) = delete;
 
 		~Direct3D12RenderTarget() noexcept = default;
+
+		void Initialize(ID3D12Device10* device, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept override;
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		const PonyMath::Color::RGBA<FLOAT>& TargetClearColor() const noexcept;
+		const PonyMath::Color::RGBA<FLOAT>& ClearColorD3D12() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* GetBackBuffer(UINT index) const noexcept;
+		ID3D12Resource2* GetBackBuffer(UINT index) noexcept;
 		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) const noexcept;
+		const ID3D12Resource2* GetBackBuffer(UINT index) const noexcept;
+		[[nodiscard("Pure function")]]
+		D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) noexcept;
 
 		Direct3D12RenderTarget& operator =(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
@@ -62,8 +66,12 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderTarget::Direct3D12RenderTarget(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat) :
-		clearColor(PonyMath::Color::RGBA<FLOAT>::Predefined::Black)
+	Direct3D12RenderTarget::Direct3D12RenderTarget(const PonyMath::Color::RGBA<FLOAT>& clearColor) :
+		clearColor(clearColor)
+	{
+	}
+
+	void Direct3D12RenderTarget::Initialize(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
 	{
 		backBuffers.resize(buffers.size());
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
@@ -112,17 +120,22 @@ namespace PonyEngine::Render
 		clearColor = static_cast<PonyMath::Color::RGBA<FLOAT>>(color);
 	}
 
-	const PonyMath::Color::RGBA<FLOAT>& Direct3D12RenderTarget::TargetClearColor() const noexcept
+	const PonyMath::Color::RGBA<FLOAT>& Direct3D12RenderTarget::ClearColorD3D12() const noexcept
 	{
 		return clearColor;
 	}
 
-	ID3D12Resource2* Direct3D12RenderTarget::GetBackBuffer(const UINT index) const noexcept
+	ID3D12Resource2* Direct3D12RenderTarget::GetBackBuffer(const UINT index) noexcept
 	{
 		return backBuffers[index].Get();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::GetRtvHandle(const UINT index) const noexcept
+	const ID3D12Resource2* Direct3D12RenderTarget::GetBackBuffer(const UINT index) const noexcept
+	{
+		return backBuffers[index].Get();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::GetRtvHandle(const UINT index) noexcept
 	{
 		return rtvHandles[index];
 	}
