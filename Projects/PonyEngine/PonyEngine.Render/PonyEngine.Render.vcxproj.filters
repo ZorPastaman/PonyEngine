@@ -100,6 +100,15 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHandle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialHandle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

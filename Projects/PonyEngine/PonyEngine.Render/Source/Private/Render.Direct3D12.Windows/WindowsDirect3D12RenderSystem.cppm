@@ -152,7 +152,7 @@ namespace PonyEngine::Render
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
 
-		direct3D12SubSystem->Initialize(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.projectionMatrix), renderResolution, rawBackBuffers, RtvFormat);
+		direct3D12SubSystem->Initialize(renderResolution, rawBackBuffers);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -241,7 +241,7 @@ namespace PonyEngine::Render
 	std::unique_ptr<Direct3D12SubSystem> WindowsDirect3D12RenderSystem::CreateDirect3D12SubSystem(const Direct3D12RenderSystemParams& params)
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 sub-system.");
-		auto createdDirect3D12SubSystem = std::make_unique<Direct3D12SubSystem>(*this, params);
+		auto createdDirect3D12SubSystem = std::make_unique<Direct3D12SubSystem>(*this, params, RtvFormat);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system created.");
 
 		return createdDirect3D12SubSystem;

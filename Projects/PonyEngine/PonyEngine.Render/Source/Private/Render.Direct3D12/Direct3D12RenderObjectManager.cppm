@@ -27,6 +27,8 @@ import PonyDebug.Log;
 import PonyEngine.Render.Direct3D12;
 import PonyEngine.Render.Detail;
 
+import :Direct3D12MaterialHandle;
+import :Direct3D12MaterialManager;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
 import :Direct3D12RenderObject;
@@ -39,7 +41,7 @@ export namespace PonyEngine::Render
 		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
+		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
@@ -63,27 +65,43 @@ export namespace PonyEngine::Render
 		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+		Direct3D12MaterialManager* materialManager;
 		Direct3D12MeshManager* meshManager;
 
 		mutable std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
 		std::size_t nextRenderObjectId;
+
+		Direct3D12MaterialHandle defaultMaterial;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
 		renderer{&renderer},
 		device(device),
+		materialManager{&materialManager},
 		meshManager{&meshManager},
 		nextRenderObjectId{1}
 	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
+		const auto rootSignatureShader = Direct3D12Shader("RootSignature");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		const auto vertexShader = Direct3D12Shader("VertexShader");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		const auto pixelShader = Direct3D12Shader("PixelShader");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
+		defaultMaterial = materialManager.CreateMaterial(rootSignatureShader, vertexShader, pixelShader);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 
 	RenderObjectHandle Direct3D12RenderObjectManager::CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
 	{
 		const auto handle = RenderObjectHandle{.id = nextRenderObjectId++};
-		if (const auto result = renderObjects.try_emplace(handle, meshManager->CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)); !result.second) [[unlikely]]
+		if (const auto result = renderObjects.try_emplace(handle, defaultMaterial, meshManager->CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)); !result.second) [[unlikely]]
 		{
 			throw std::runtime_error("Failed to create a render object.");
 		}
@@ -96,6 +114,7 @@ namespace PonyEngine::Render
 	{
 		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
 		{
+			meshManager->DestroyDirect3D12Mesh(position->second.RenderMesh());
 			renderObjects.erase(position);
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object with '{}' id destroyed.", handle.id);
 		}
