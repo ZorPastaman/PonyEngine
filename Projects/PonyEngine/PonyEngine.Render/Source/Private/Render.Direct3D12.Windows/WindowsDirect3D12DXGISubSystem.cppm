@@ -38,7 +38,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsDirect3D12DXGISubSystem(IRenderContext& renderer);
+		WindowsDirect3D12DXGISubSystem(IRenderContext& renderer, IUnknown* device, HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 		WindowsDirect3D12DXGISubSystem(const WindowsDirect3D12DXGISubSystem&) = delete;
 		WindowsDirect3D12DXGISubSystem(WindowsDirect3D12DXGISubSystem&&) = delete;
 
@@ -48,8 +48,6 @@ export namespace PonyEngine::Render
 		UINT GetCurrentBackBufferIndex() const noexcept;
 		template<typename T>
 		HRESULT GetBuffer(UINT bufferIndex, T** buffer) const noexcept;
-
-		void Initialize(IUnknown* device, HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 
 		void Present() const;
 
@@ -69,7 +67,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	WindowsDirect3D12DXGISubSystem::WindowsDirect3D12DXGISubSystem(IRenderContext& renderer) :
+	WindowsDirect3D12DXGISubSystem::WindowsDirect3D12DXGISubSystem(IRenderContext& renderer, IUnknown* const device, const HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -95,6 +93,46 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "DXGI factory acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(factory.Get()));
+
+		assert(device && "The device is nullptr.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.",
+			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd), resolution.ToString(), static_cast<int>(rtvFormat), bufferCount);
+
+		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
+		{
+			.Width = resolution.Width(),
+			.Height = resolution.Height(),
+			.Format = rtvFormat,
+			.Stereo = false,
+			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
+			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
+			.BufferCount = bufferCount,
+			.Scaling = DXGI_SCALING_STRETCH,
+			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
+			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
+			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
+		};
+		Microsoft::WRL::ComPtr<IDXGISwapChain1> acquiredSwapChain;
+		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (const HRESULT result = acquiredSwapChain->QueryInterface(swapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		if (const HRESULT result = factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to make window association with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		if (const HRESULT result = swapChain->SetFullscreenState(false, nullptr); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to disable fullscreen with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
 	}
 
 	WindowsDirect3D12DXGISubSystem::~WindowsDirect3D12DXGISubSystem() noexcept
@@ -134,49 +172,6 @@ namespace PonyEngine::Render
 		assert(swapChain && "The swap chain is nullptr.");
 
 		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
-	}
-
-	void WindowsDirect3D12DXGISubSystem::Initialize(IUnknown* const device, const HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
-	{
-		assert(device && "The device is nullptr.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.", 
-			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(hWnd), resolution.ToString(), static_cast<int>(rtvFormat), bufferCount);
-
-		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
-		{
-			.Width = resolution.Width(),
-			.Height = resolution.Height(),
-			.Format = rtvFormat,
-			.Stereo = false,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
-			.BufferCount = bufferCount,
-			.Scaling = DXGI_SCALING_STRETCH,
-			.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD,
-			.AlphaMode = DXGI_ALPHA_MODE_IGNORE,
-			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
-		};
-		Microsoft::WRL::ComPtr<IDXGISwapChain1> acquiredSwapChain;
-		if (const HRESULT result = factory->CreateSwapChainForHwnd(device, hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = acquiredSwapChain->QueryInterface(swapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		if (const HRESULT result = factory->MakeWindowAssociation(hWnd, DXGI_MWA_NO_ALT_ENTER); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to make window association with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = swapChain->SetFullscreenState(false, nullptr); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to disable fullscreen with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
 	}
 
 	void WindowsDirect3D12DXGISubSystem::Present() const

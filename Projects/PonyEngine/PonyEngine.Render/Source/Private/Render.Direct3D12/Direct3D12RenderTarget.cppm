@@ -36,7 +36,7 @@ export namespace PonyEngine::Render
 
 		~Direct3D12RenderTarget() noexcept = default;
 
-		void Initialize(ID3D12Device10* device, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
+		void SetBuffers(ID3D12Device10* device, std::span<ID3D12Resource2*> buffers, DXGI_FORMAT rtvFormat);
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept override;
@@ -71,7 +71,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	void Direct3D12RenderTarget::Initialize(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
+	void Direct3D12RenderTarget::SetBuffers(ID3D12Device10* const device, const std::span<ID3D12Resource2*> buffers, const DXGI_FORMAT rtvFormat)
 	{
 		backBuffers.resize(buffers.size());
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
@@ -86,7 +86,7 @@ namespace PonyEngine::Render
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
-		if (const HRESULT result = device->CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = device->CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.ReleaseAndGetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

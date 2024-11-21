@@ -88,7 +88,7 @@ export namespace PonyEngine::Render
 
 	private:
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<WindowsDirect3D12DXGISubSystem> CreateDXGISubSystem();
+		std::unique_ptr<WindowsDirect3D12DXGISubSystem> CreateDXGISubSystem(IUnknown* device, HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, DXGI_FORMAT rtvFormat, UINT bufferCount);
 		[[nodiscard("Pure function")]]
 		std::unique_ptr<Direct3D12SubSystem> CreateDirect3D12SubSystem(const Direct3D12RenderSystemParams& params);
 
@@ -103,15 +103,14 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsDirect3D12RenderSystemParams& renderParams) :
-		TickableSystem(engine, systemParams),
-		dxgiSubSystem(CreateDXGISubSystem()),
-		direct3D12SubSystem(CreateDirect3D12SubSystem(renderParams))
+		TickableSystem(engine, systemParams)
 	{
 		PonyMath::Utility::Resolution<UINT> renderResolution;
 
+		HWND windowHandle;
 		if (const auto windowSystem = Engine().SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
-			const HWND windowHandle = windowSystem->WindowHandle();
+			windowHandle = windowSystem->WindowHandle();
 
 			if (renderParams.renderViewParams.resolution.has_value())
 			{
@@ -123,15 +122,17 @@ namespace PonyEngine::Render
 				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(windowSystem->Resolution());
 				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
-
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Initialize DXGI sub-system.");
-			dxgiSubSystem->Initialize(direct3D12SubSystem->GetCommandQueue(), windowHandle, renderResolution, RtvFormat, BufferCount);
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system initialized.");
 		}
 		else [[unlikely]]
 		{
 			throw std::runtime_error("Failed to find Windows window system.");
 		}
+
+		Direct3D12RenderSystemParams direct3D12RenderParams = renderParams;
+		direct3D12RenderParams.renderViewParams.resolution = renderResolution;
+		direct3D12SubSystem = CreateDirect3D12SubSystem(direct3D12RenderParams);
+
+		dxgiSubSystem = CreateDXGISubSystem(direct3D12SubSystem->GetCommandQueue(), windowHandle, renderResolution, RtvFormat, BufferCount);
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
 		std::array<Microsoft::WRL::ComPtr<ID3D12Resource2>, BufferCount> backBuffers;
@@ -145,14 +146,14 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Initialize Direct3D 12 sub-system.");
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "SetBuffers Direct3D 12 sub-system.");
 		std::array<ID3D12Resource2*, BufferCount> rawBackBuffers;
 		for (std::size_t i = 0; i < BufferCount; ++i)
 		{
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
 
-		direct3D12SubSystem->Initialize(renderResolution, rawBackBuffers);
+		direct3D12SubSystem->SetBuffers(rawBackBuffers);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -229,10 +230,10 @@ namespace PonyEngine::Render
 		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
-	std::unique_ptr<WindowsDirect3D12DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()
+	std::unique_ptr<WindowsDirect3D12DXGISubSystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem(IUnknown* const device, const HWND hWnd, const PonyMath::Utility::Resolution<UINT>& resolution, const DXGI_FORMAT rtvFormat, const UINT bufferCount)
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
-		auto createdDxgiSubSystem = std::make_unique<WindowsDirect3D12DXGISubSystem>(*this);
+		auto createdDxgiSubSystem = std::make_unique<WindowsDirect3D12DXGISubSystem>(*this, device, hWnd, resolution, rtvFormat, bufferCount);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
 		return createdDxgiSubSystem;

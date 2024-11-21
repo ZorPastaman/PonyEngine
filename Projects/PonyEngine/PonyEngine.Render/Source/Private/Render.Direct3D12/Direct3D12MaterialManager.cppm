@@ -140,19 +140,19 @@ namespace PonyEngine::Render
 		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC // TODO: Many of these settings have to come with parameters.
 		{
 			.pRootSignature = rootSignature.Get(),
-			.VS = D3D12_SHADER_BYTECODE{ .pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size() },
-			.PS = D3D12_SHADER_BYTECODE{ .pShaderBytecode = pixelShader.Data(), .BytecodeLength = pixelShader.Size() },
+			.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size()},
+			.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShader.Data(), .BytecodeLength = pixelShader.Size()},
 			.BlendState = blendState,
 			.SampleMask = UINT_MAX,
 			.RasterizerState = rasterizerState,
 			.DepthStencilState = depthStencilState,
-			.InputLayout = D3D12_INPUT_LAYOUT_DESC{ .pInputElementDescs = inputLayout, .NumElements = _countof(inputLayout) },
+			.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = inputLayout, .NumElements = _countof(inputLayout)},
 			.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
 			.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 			.NumRenderTargets = 1,
 			.RTVFormats = { rtvFormat },
-			.DSVFormat = DXGI_FORMAT_D24_UNORM_S8_UINT,
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1, .Quality = 0 },
+			.DSVFormat = DXGI_FORMAT_D32_FLOAT,
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0},
 			.NodeMask = 0u,
 			.Flags = D3D12_PIPELINE_STATE_FLAG_NONE
 		};
