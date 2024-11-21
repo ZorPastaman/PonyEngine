@@ -17,10 +17,11 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render system parameters.
 	struct Direct3D12RenderSystemParams : RenderSystemParams
 	{
-		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2;
-		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH;
-		DWORD renderTimeout = 20000;
+		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2; ///< Feature level.
+		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH; ///< Command queue priority. It will be used for every command queue.
+		DWORD renderTimeout = 20000; ///< Render timeout in milliseconds. The system throws an exception if the render time exceeds this value.
 	};
 }

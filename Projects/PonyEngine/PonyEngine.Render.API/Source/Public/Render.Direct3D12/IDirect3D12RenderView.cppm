@@ -17,6 +17,7 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render view.
 	class IDirect3D12RenderView : public IRenderView
 	{
 		INTERFACE_BODY(IDirect3D12RenderView)

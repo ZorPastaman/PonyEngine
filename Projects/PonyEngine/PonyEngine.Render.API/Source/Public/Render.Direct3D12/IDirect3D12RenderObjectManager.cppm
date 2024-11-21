@@ -19,6 +19,7 @@ import :IDirect3D12RenderObject;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render object manager.
 	class IDirect3D12RenderObjectManager : public IRenderObjectManager
 	{
 		INTERFACE_BODY(IDirect3D12RenderObjectManager)

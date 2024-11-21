@@ -21,6 +21,7 @@ import :IDirect3D12RenderObjectManager;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render system.
 	class IDirect3D12RenderSystem : public IRenderSystem
 	{
 		INTERFACE_BODY(IDirect3D12RenderSystem)

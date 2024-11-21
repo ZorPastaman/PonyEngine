@@ -383,6 +383,12 @@ namespace Game
 			box.Vertices(vertices);
 			box.Triangles(triangles);
 			box.Colors(vertexColors);
+
+			auto backgroundTransform = boxTransform;
+			backgroundTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f));
+			backgroundTransform.Scale(PonyMath::Core::Vector3<float>(15.f, 15.f, 1.f));
+			renderSystem->RenderObjectManager().CreateObject(box, backgroundTransform.TrsMatrix());
+
 			boxHandle = renderSystem->RenderObjectManager().CreateObject(box, boxTransform.TrsMatrix());
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
 		}

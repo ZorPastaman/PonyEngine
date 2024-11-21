@@ -13,6 +13,7 @@ import PonyEngine.Core;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render system factory.
 	class RenderSystemFactory : public Core::ISystemFactory
 	{
 	public:

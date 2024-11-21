@@ -17,12 +17,17 @@ import PonyMath.Color;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render target.
 	class IRenderTarget
 	{
 		INTERFACE_BODY(IRenderTarget)
 
+		/// @brief Gets the clear color.
+		/// @return Clear color.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept = 0;
+		/// @brief Sets the clear color.
+		/// @param color Clear color.
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
 	};
 }

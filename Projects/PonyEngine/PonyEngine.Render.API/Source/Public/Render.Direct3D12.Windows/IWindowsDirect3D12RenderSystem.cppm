@@ -17,6 +17,7 @@ import PonyEngine.Render.Direct3D12;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Windows Direct3D12 render system.
 	class IWindowsDirect3D12RenderSystem : public IDirect3D12RenderSystem
 	{
 		INTERFACE_BODY(IWindowsDirect3D12RenderSystem)
