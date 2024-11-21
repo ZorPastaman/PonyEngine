@@ -14,9 +14,10 @@ import :RenderViewParams;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render system parameters.
 	struct RenderSystemParams
 	{
-		RenderTargetParams renderTargetParams;
-		RenderViewParams renderViewParams;
+		RenderTargetParams renderTargetParams; ///< Render target parameters.
+		RenderViewParams renderViewParams; ///< Render view parameters.
 	};
 }

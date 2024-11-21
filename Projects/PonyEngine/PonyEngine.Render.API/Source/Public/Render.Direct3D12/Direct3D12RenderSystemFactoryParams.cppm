@@ -13,6 +13,7 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render system parameters.
 	struct Direct3D12RenderSystemFactoryParams : RenderSystemFactoryParams
 	{
 	};

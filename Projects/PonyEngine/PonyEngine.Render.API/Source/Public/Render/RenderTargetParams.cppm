@@ -13,8 +13,9 @@ import PonyMath.Color;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render target parameters.
 	struct RenderTargetParams final
 	{
-		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black;
+		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
 	};
 }

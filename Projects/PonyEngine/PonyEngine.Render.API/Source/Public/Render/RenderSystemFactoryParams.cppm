@@ -11,6 +11,7 @@ export module PonyEngine.Render:RenderSystemFactoryParams;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render system factory parameters.
 	struct RenderSystemFactoryParams
 	{
 	};

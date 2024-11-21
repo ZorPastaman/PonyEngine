@@ -13,16 +13,21 @@ import <cstddef>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render object handle.
 	struct RenderObjectHandle final
 	{
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const RenderObjectHandle& other) const noexcept = default;
 
-		std::size_t id;
+		std::size_t id; ///< Render object id.
 	};
 
+	/// @brief Render object handle hash function.
 	struct RenderObjectHandleHash final
 	{
+		/// @brief Computes a render object handle hash.
+		/// @param handle Render object handle.
+		/// @return Hash.
 		[[nodiscard("Pure operator")]]
 		std::size_t operator ()(const RenderObjectHandle& handle) const noexcept;
 	};
