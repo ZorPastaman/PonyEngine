@@ -17,12 +17,17 @@ import PonyDebug.Log;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render system context.
 	class IRenderContext
 	{
 		INTERFACE_BODY(IRenderContext)
 
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 	};

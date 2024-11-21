@@ -33,6 +33,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
+import :Direct3D12DepthStencil;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
 import :Direct3D12Material;
@@ -48,8 +49,8 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* device, const Direct3D12RenderSystemParams& params, Direct3D12RenderTarget* renderTarget, Direct3D12RenderView* renderView, 
-			Direct3D12MaterialManager* materialManager, Direct3D12MeshManager* meshManager, Direct3D12RenderObjectManager* renderObjectManager);
+		Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* device, const Direct3D12RenderSystemParams& params, Direct3D12RenderTarget* renderTarget, Direct3D12DepthStencil* depthBuffer,
+			Direct3D12RenderView* renderView, Direct3D12MaterialManager* materialManager, Direct3D12MeshManager* meshManager, Direct3D12RenderObjectManager* renderObjectManager);
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline(Direct3D12GraphicsPipeline&&) = delete;
 
@@ -83,6 +84,7 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
 
 		Direct3D12RenderTarget* renderTarget;
+		Direct3D12DepthStencil* depthBuffer;
 		Direct3D12RenderView* renderView;
 		Direct3D12MaterialManager* materialManager;
 		Direct3D12MeshManager* meshManager;
@@ -93,10 +95,11 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* const device, const Direct3D12RenderSystemParams& params, Direct3D12RenderTarget* const renderTarget, 
-		Direct3D12RenderView* const renderView, Direct3D12MaterialManager* const materialManager, Direct3D12MeshManager* const meshManager, Direct3D12RenderObjectManager* const renderObjectManager) :
+		Direct3D12DepthStencil* depthBuffer, Direct3D12RenderView* const renderView, Direct3D12MaterialManager* const materialManager, Direct3D12MeshManager* const meshManager, Direct3D12RenderObjectManager* const renderObjectManager) :
 		guid{PonyBase::Utility::AcquireGuid()},
 		renderer{&renderer},
 		renderTarget{renderTarget},
+		depthBuffer{depthBuffer},
 		renderView{renderView},
 		materialManager{materialManager},
 		meshManager{meshManager},
@@ -217,9 +220,11 @@ namespace PonyEngine::Render
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render target.");
 		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget->GetRtvHandle(bufferIndex);
-		commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthBuffer->DsvHandle();
+		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color to {}.", renderTarget->ClearColor().ToString());
 		commandList->ClearRenderTargetView(rtvHandle, renderTarget->ClearColorD3D12().Span().data(), 0, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateView()
