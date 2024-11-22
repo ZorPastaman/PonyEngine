@@ -24,9 +24,8 @@ import PonyMath.Utility;
 
 import PonyDebug.Log;
 
-import PonyEngine.Render.Detail;
-
 import :Direct3D12Constants;
+import :IDirect3D12RenderContext;
 
 export namespace PonyEngine::Render
 {
@@ -36,11 +35,12 @@ export namespace PonyEngine::Render
 	public:
 		/// @brief Creates a @p Direct3D12DepthStencil.
 		/// @param render Render context.
-		/// @param device Render device.
-		/// @param resolution Render resolution.
-		Direct3D12DepthStencil(IRenderContext& render, ID3D12Device10& device, const PonyMath::Utility::Resolution<UINT>& resolution);
-		Direct3D12DepthStencil(const Direct3D12DepthStencil&) = delete;
-		Direct3D12DepthStencil(Direct3D12DepthStencil&&) = delete;
+		[[nodiscard("Pure constructor")]]
+		explicit Direct3D12DepthStencil(IDirect3D12RenderContext& render);
+		[[nodiscard("Pure constructor")]]
+		Direct3D12DepthStencil(const Direct3D12DepthStencil& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		Direct3D12DepthStencil(Direct3D12DepthStencil&& other) noexcept = default;
 
 		~Direct3D12DepthStencil() noexcept;
 
@@ -49,11 +49,11 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept;
 
-		Direct3D12DepthStencil& operator =(const Direct3D12DepthStencil&) = delete;
-		Direct3D12DepthStencil& operator =(Direct3D12DepthStencil&&) = delete;
+		Direct3D12DepthStencil& operator =(const Direct3D12DepthStencil& other) noexcept = default;
+		Direct3D12DepthStencil& operator =(Direct3D12DepthStencil&& other) noexcept = default;
 
 	private:
-		IRenderContext* render; ///< Render context.
+		IDirect3D12RenderContext* render; ///< Render context.
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> depthStencilBuffer; ///< Depth stencil buffer.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> dsvHeap; ///< Depth stencil view heap.
@@ -63,9 +63,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12DepthStencil::Direct3D12DepthStencil(IRenderContext& render, ID3D12Device10& device, const PonyMath::Utility::Resolution<UINT>& resolution) :
+	Direct3D12DepthStencil::Direct3D12DepthStencil(IDirect3D12RenderContext& render) :
 		render{&render}
 	{
+		const PonyMath::Utility::Resolution<UINT> resolution = this->render->RenderTarget().ResolutionD3D12();
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Acquire depth stencil buffer. Resolution: '{}'; Format: '{}'.", resolution.ToString(), static_cast<std::underlying_type_t<DXGI_FORMAT>>(DepthStencilFormat));
 		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -92,12 +93,13 @@ namespace PonyEngine::Render
 		constexpr auto clearValue = D3D12_CLEAR_VALUE
 		{
 			.Format = DepthStencilFormat,
-			.DepthStencil = D3D12_DEPTH_STENCIL_VALUE{.Depth = D3D12_MAX_DEPTH, .Stencil = 0u}
+			.DepthStencil = D3D12_DEPTH_STENCIL_VALUE{.Depth = MaxDepth, .Stencil = Stencil}
 		};
+		ID3D12Device10& device = render.Device();
 		if (const HRESULT result = device.CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE, &clearValue, 
-			nullptr, 0u, nullptr, IID_PPV_ARGS(depthStencilBuffer.GetAddressOf())); FAILED(result))
+			nullptr, 0u, nullptr, IID_PPV_ARGS(depthStencilBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 depth stencil buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire depth stencil buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil buffer acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(depthStencilBuffer.Get()));
 
@@ -109,7 +111,7 @@ namespace PonyEngine::Render
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
-		if (const HRESULT result = device.CreateDescriptorHeap(&dsvDescriptorHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = device.CreateDescriptorHeap(&dsvDescriptorHeapDesc, IID_PPV_ARGS(dsvHeap.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire dsv heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

@@ -112,9 +112,9 @@ namespace PonyEngine::Render
 		{
 			windowHandle = windowSystem->WindowHandle();
 
-			if (renderParams.renderViewParams.resolution.has_value())
+			if (renderParams.renderTargetParams.resolution.has_value())
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.renderViewParams.resolution.value());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.renderTargetParams.resolution.value());
 				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
@@ -129,7 +129,7 @@ namespace PonyEngine::Render
 		}
 
 		Direct3D12RenderSystemParams direct3D12RenderParams = renderParams;
-		direct3D12RenderParams.renderViewParams.resolution = renderResolution;
+		direct3D12RenderParams.renderTargetParams.resolution = renderResolution;
 		direct3D12SubSystem = CreateDirect3D12SubSystem(direct3D12RenderParams);
 
 		dxgiSubSystem = CreateDXGISubSystem(direct3D12SubSystem->GetCommandQueue(), windowHandle, renderResolution, RtvFormat, BufferCount);
@@ -202,22 +202,22 @@ namespace PonyEngine::Render
 
 	IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept
 	{
-		return *direct3D12SubSystem->RenderTarget();
+		return direct3D12SubSystem->RenderTarget();
 	}
 
 	const IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
 	{
-		return *direct3D12SubSystem->RenderTarget();
+		return direct3D12SubSystem->RenderTarget();
 	}
 
 	IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() noexcept
 	{
-		return *direct3D12SubSystem->RenderView();
+		return direct3D12SubSystem->RenderView();
 	}
 
 	const IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
 	{
-		return *direct3D12SubSystem->RenderView();
+		return direct3D12SubSystem->RenderView();
 	}
 
 	IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept

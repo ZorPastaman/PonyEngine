@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Render:IRenderTarget;
 
 import PonyMath.Color;
+import PonyMath.Utility;
 
 export namespace PonyEngine::Render
 {
@@ -29,5 +30,10 @@ export namespace PonyEngine::Render
 		/// @brief Sets the clear color.
 		/// @param color Clear color.
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
+
+		/// @brief Gets the render target resolution.
+		/// @return Render target resolution.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
 	};
 }

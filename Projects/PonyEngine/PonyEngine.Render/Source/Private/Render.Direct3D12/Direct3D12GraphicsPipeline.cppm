@@ -33,6 +33,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
+import :Direct3D12Constants;
 import :Direct3D12DepthStencil;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
@@ -40,6 +41,7 @@ import :Direct3D12Material;
 import :Direct3D12MaterialManager;
 import :Direct3D12RenderTarget;
 import :Direct3D12RenderObjectManager;
+import :Direct3D12RootSignatureManager;
 import :Direct3D12RenderView;
 import :Direct3D12Waiter;
 
@@ -50,7 +52,7 @@ export namespace PonyEngine::Render
 	public:
 		[[nodiscard("Pure constructor")]]
 		Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* device, const Direct3D12RenderSystemParams& params, Direct3D12RenderTarget* renderTarget, Direct3D12DepthStencil* depthBuffer,
-			Direct3D12RenderView* renderView, Direct3D12MaterialManager* materialManager, Direct3D12MeshManager* meshManager, Direct3D12RenderObjectManager* renderObjectManager);
+			Direct3D12RenderView* renderView, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager* materialManager, Direct3D12MeshManager* meshManager, Direct3D12RenderObjectManager* renderObjectManager);
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline(Direct3D12GraphicsPipeline&&) = delete;
 
@@ -69,11 +71,11 @@ export namespace PonyEngine::Render
 
 	private:
 		void ResetQueue();
-		void PopulateResourceBarriersBegin(UINT bufferIndex);
+		void PopulateResourceBarriersIn(UINT bufferIndex);
 		void PopulateTarget(UINT bufferIndex);
 		void PopulateView();
 		void PopulateRenderObjects();
-		void PopulateResourceBarriersEnd(UINT bufferIndex);
+		void PopulateResourceBarriersOut(UINT bufferIndex);
 		void CloseQueue();
 
 		GUID guid;
@@ -86,6 +88,7 @@ export namespace PonyEngine::Render
 		Direct3D12RenderTarget* renderTarget;
 		Direct3D12DepthStencil* depthBuffer;
 		Direct3D12RenderView* renderView;
+		Direct3D12RootSignatureManager* rootSignatureManager;
 		Direct3D12MaterialManager* materialManager;
 		Direct3D12MeshManager* meshManager;
 		Direct3D12RenderObjectManager* renderObjectManager;
@@ -95,12 +98,14 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12GraphicsPipeline::Direct3D12GraphicsPipeline(IRenderContext& renderer, ID3D12Device10* const device, const Direct3D12RenderSystemParams& params, Direct3D12RenderTarget* const renderTarget, 
-		Direct3D12DepthStencil* depthBuffer, Direct3D12RenderView* const renderView, Direct3D12MaterialManager* const materialManager, Direct3D12MeshManager* const meshManager, Direct3D12RenderObjectManager* const renderObjectManager) :
+		Direct3D12DepthStencil* depthBuffer, Direct3D12RenderView* const renderView, Direct3D12RootSignatureManager* const rootSignatureManager, Direct3D12MaterialManager* const materialManager, 
+		Direct3D12MeshManager* const meshManager, Direct3D12RenderObjectManager* const renderObjectManager) :
 		guid{PonyBase::Utility::AcquireGuid()},
 		renderer{&renderer},
 		renderTarget{renderTarget},
 		depthBuffer{depthBuffer},
 		renderView{renderView},
+		rootSignatureManager{rootSignatureManager},
 		materialManager{materialManager},
 		meshManager{meshManager},
 		renderObjectManager{renderObjectManager}
@@ -166,11 +171,11 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateCommands(const UINT bufferIndex)
 	{
 		ResetQueue();
-		PopulateResourceBarriersBegin(bufferIndex);
+		PopulateResourceBarriersIn(bufferIndex);
 		PopulateTarget(bufferIndex);
 		PopulateView();
 		PopulateRenderObjects();
-		PopulateResourceBarriersEnd(bufferIndex);
+		PopulateResourceBarriersOut(bufferIndex);
 		CloseQueue();
 	}
 
@@ -196,7 +201,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersBegin(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateResourceBarriersIn(const UINT bufferIndex)
 	{
 		ID3D12Resource2* const backBuffer = renderTarget->GetBackBuffer(bufferIndex);
 
@@ -224,29 +229,30 @@ namespace PonyEngine::Render
 		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color to {}.", renderTarget->ClearColor().ToString());
 		commandList->ClearRenderTargetView(rtvHandle, renderTarget->ClearColorD3D12().Span().data(), 0, nullptr);
-		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, MaxDepth, Stencil, 0u, nullptr);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateView()
 	{
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render view.");
-		commandList->RSSetViewports(1, &renderView->Viewport().Viewport());
-		commandList->RSSetScissorRects(1, &renderView->Viewport().Rect());
+		const PonyMath::Utility::Resolution<UINT> resolution = renderTarget->ResolutionD3D12();
+		const auto viewport = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.Width()), .Height = static_cast<FLOAT>(resolution.Height()), .MinDepth = MinDepth, .MaxDepth = MaxDepth};
+		commandList->RSSetViewports(1, &viewport);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateRenderObjects()
 	{
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-
-		const PonyMath::Core::Matrix4x4<FLOAT>& vp = renderView->VpMatrix();
+		const PonyMath::Core::Matrix4x4<FLOAT> vp = renderView->ProjectionMatrixD3D12() * renderView->ViewMatrixD3D12();
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
 		for (auto renderObject = renderObjectManager->RenderObjectBegin(); renderObject != renderObjectManager->RenderObjectEnd(); ++renderObject)
 		{
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state.");
 			Direct3D12Material* const material = materialManager->FindMaterial(renderObject->second.Material());
-			commandList->SetGraphicsRootSignature(material->GetRootSignature());
+			Direct3D12RootSignature* const rootSignature = rootSignatureManager->FindRootSignature(material->RootSignatureHandle());
+			commandList->SetGraphicsRootSignature(rootSignature->RootSignature());
 			commandList->SetPipelineState(material->GetPipelineState());
+			commandList->IASetPrimitiveTopology(material->PrimitiveTopology());
 
 			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object with '{}' id.", renderObject->first.id);
 			Direct3D12Mesh* const renderMesh = meshManager->FindDirect3D12Mesh(renderObject->second.RenderMesh());
@@ -255,12 +261,12 @@ namespace PonyEngine::Render
 			commandList->IASetIndexBuffer(&renderMesh->VertexIndicesView());
 
 			const PonyMath::Core::Matrix4x4<FLOAT> mvp = vp * renderObject->second.ModelMatrixD3D12();
-			commandList->SetGraphicsRoot32BitConstants(0u, mvp.ComponentCount, mvp.Span().data(), 0); // TODO: Data must come from root signature. So, it seems that I need a root signature class.
+			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0); // TODO: Data must come from root signature. So, it seems that I need a root signature class.
 			commandList->DrawIndexedInstanced(renderMesh->IndexCount(), 1, 0, 0, 0);
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersEnd(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateResourceBarriersOut(const UINT bufferIndex)
 	{
 		ID3D12Resource2* const backBuffer = renderTarget->GetBackBuffer(bufferIndex);
 

@@ -25,7 +25,7 @@ export namespace PonyMath::Geometry
 {
 	/// @brief Mesh implementation.
 	/// @remark Vertex colors are optional.
-	class Mesh final
+	class Mesh final // TODO: Here and everywhere, think about types and their sizes
 	{
 	public:
 		using VertexType = Core::Vector3<float>; ///< Vertex type.

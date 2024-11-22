@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Mesh;
 
-import :Direct3D12IndexBuffer;
+import :Direct3D12IndexArray;
 import :Direct3D12IndexFormat;
 import :Direct3D12VertexBuffer;
 
@@ -23,7 +23,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept;
+		Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexArray& vertexIndicesBuffer) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh(const Direct3D12Mesh& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,10 +58,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Mesh::Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexBuffer& vertexIndicesBuffer) noexcept :
+	Direct3D12Mesh::Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexArray& vertexIndicesBuffer) noexcept :
 		vertices(verticesBuffer.GetVerticesResource()),
 		vertexColors(vertexColorsBuffer.GetVerticesResource()),
-		vertexIndices(vertexIndicesBuffer.GetIndicesResource()),
+		vertexIndices(&vertexIndicesBuffer.IndexResource()),
 		verticesView{.BufferLocation = vertices->GetGPUVirtualAddress(), .SizeInBytes = verticesBuffer.VertexSize() * verticesBuffer.VertexCount(), .StrideInBytes = verticesBuffer.VertexSize()},
 		vertexColorsView{.BufferLocation = vertexColors->GetGPUVirtualAddress(), .SizeInBytes = vertexColorsBuffer.VertexSize() * vertexColorsBuffer.VertexCount(), .StrideInBytes = vertexColorsBuffer.VertexSize()},
 		vertexIndicesView{.BufferLocation = vertexIndices->GetGPUVirtualAddress(), .SizeInBytes = vertexIndicesBuffer.IndexSize() * vertexIndicesBuffer.IndexCount(), .Format = vertexIndicesBuffer.IndexFormat()},

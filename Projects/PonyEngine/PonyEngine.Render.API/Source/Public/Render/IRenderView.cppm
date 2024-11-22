@@ -38,10 +38,5 @@ export namespace PonyEngine::Render
 		/// @brief Sets the projection matrix.
 		/// @param matrix Projection matrix.
 		virtual void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
-
-		/// @brief Gets the render resolution.
-		/// @return Render resolution.
-		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
 	};
 }

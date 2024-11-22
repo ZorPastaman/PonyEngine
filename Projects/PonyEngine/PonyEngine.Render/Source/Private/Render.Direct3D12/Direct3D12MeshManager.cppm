@@ -36,7 +36,7 @@ import PonyEngine.Render.Detail;
 
 import :Direct3D12Mesh;
 import :Direct3D12MeshHandle;
-import :Direct3D12IndexBuffer;
+import :Direct3D12IndexArray;
 import :Direct3D12VertexBuffer;
 
 export namespace PonyEngine::Render
@@ -60,7 +60,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors, std::size_t vertexCount) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexBuffer CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
+		Direct3D12IndexArray CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
 		static constexpr auto HeapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -107,7 +107,7 @@ namespace PonyEngine::Render
 		Direct3D12VertexBuffer colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
-		Direct3D12IndexBuffer indices = CreateVertexIndices(mesh.Triangles());
+		Direct3D12IndexArray indices = CreateVertexIndices(mesh.Triangles());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
 		const auto handle = Direct3D12MeshHandle{.id = nextId++};
@@ -215,7 +215,7 @@ namespace PonyEngine::Render
 		return Direct3D12VertexBuffer(colorsResource.Get(), colorSize, colorCount);
 	}
 
-	Direct3D12IndexBuffer Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const
+	Direct3D12IndexArray Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const
 	{
 		constexpr std::size_t indexSize = sizeof(std::uint32_t);
 		const UINT indexCount = static_cast<UINT>(triangles.size() * PonyMath::Core::Vector3<std::uint32_t>::ComponentCount);
@@ -249,6 +249,6 @@ namespace PonyEngine::Render
 		std::memcpy(indicesData, triangles.data(), indexBufferSize);
 		indicesResource->Unmap(0, nullptr);
 
-		return Direct3D12IndexBuffer(indicesResource.Get(), Direct3D12IndexFormat(indexSize), indexCount);
+		return Direct3D12IndexArray(*indicesResource.Get(), Direct3D12IndexFormat(indexSize), indexCount);
 	}
 }
