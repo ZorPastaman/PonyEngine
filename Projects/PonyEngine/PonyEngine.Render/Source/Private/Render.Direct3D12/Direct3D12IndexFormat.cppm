@@ -17,9 +17,12 @@ import <stdexcept>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 index format.
 	class Direct3D12IndexFormat final
 	{
 	public:
+		/// @brief Creates a @p Direct3D12IndexFormat.
+		/// @param indexSize Index size. Must be 2 or 4.
 		[[nodiscard("Pure constructor")]]
 		explicit Direct3D12IndexFormat(UINT indexSize);
 		[[nodiscard("Pure constructor")]]
@@ -29,8 +32,12 @@ export namespace PonyEngine::Render
 
 		~Direct3D12IndexFormat() noexcept = default;
 
+		/// @brief Gets the index size.
+		/// @return Index size.
 		[[nodiscard("Pure function")]]
 		UINT IndexSize() const noexcept;
+		/// @brief Gets the index format.
+		/// @return Index format.
 		[[nodiscard("Pure function")]]
 		DXGI_FORMAT IndexFormat() const noexcept;
 
@@ -41,12 +48,15 @@ export namespace PonyEngine::Render
 		bool operator ==(const Direct3D12IndexFormat&) const noexcept = default;
 
 	private:
-		UINT indexSize;
+		UINT indexSize; ///< Index size.
 	};
 }
 
 namespace PonyEngine::Render
 {
+	/// @brief Gets an index format by the index size.
+	/// @param indexSize Index size. Must be 2 or 4.
+	/// @return Index format.
 	[[nodiscard("Pure constructor")]]
 	DXGI_FORMAT GetFormat(UINT indexSize);
 

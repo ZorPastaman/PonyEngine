@@ -20,6 +20,7 @@ import PonyEngine.Render.Detail;
 
 import :Direct3D12Material;
 import :Direct3D12MaterialHandle;
+import :Direct3D12RootSignatureManager;
 
 export namespace PonyEngine::Render
 {
@@ -27,13 +28,13 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, DXGI_FORMAT rtvFormat) noexcept;
+		Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, DXGI_FORMAT rtvFormat) noexcept;
 		Direct3D12MaterialManager(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager(Direct3D12MaterialManager&&) = delete;
 
 		~Direct3D12MaterialManager() noexcept = default;
 
-		Direct3D12MaterialHandle CreateMaterial(const Direct3D12Shader& rootSignatureShader, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader);
+		Direct3D12MaterialHandle CreateMaterial(const Direct3D12RootSignatureHandle& rootSignatureHandle, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader);
 		void DestroyMaterial(const Direct3D12MaterialHandle& handle) noexcept;
 
 		[[nodiscard("Pure function")]]
@@ -49,6 +50,8 @@ export namespace PonyEngine::Render
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 
+		Direct3D12RootSignatureManager* rootSignatureManager;
+
 		mutable std::unordered_map<Direct3D12MaterialHandle, Direct3D12Material, Direct3D12MaterialHandleHash> materials; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
 		std::size_t nextId;
 	};
@@ -56,22 +59,17 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12MaterialManager::Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, const DXGI_FORMAT rtvFormat) noexcept :
+	Direct3D12MaterialManager::Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, const DXGI_FORMAT rtvFormat) noexcept :
 		rtvFormat{rtvFormat},
 		render{&render},
 		device(device),
+		rootSignatureManager{rootSignatureManager},
 		nextId{1}
 	{
 	}
 
-	Direct3D12MaterialHandle Direct3D12MaterialManager::CreateMaterial(const Direct3D12Shader& rootSignatureShader, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader)
+	Direct3D12MaterialHandle Direct3D12MaterialManager::CreateMaterial(const Direct3D12RootSignatureHandle& rootSignatureHandle, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader)
 	{
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-		if (const HRESULT result = device->CreateRootSignature(0, rootSignatureShader.Data(), rootSignatureShader.Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
 		auto blendState = D3D12_BLEND_DESC
 		{
 			.AlphaToCoverageEnable = false,
@@ -139,7 +137,7 @@ namespace PonyEngine::Render
 		};
 		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC // TODO: Many of these settings have to come with parameters.
 		{
-			.pRootSignature = rootSignature.Get(),
+			.pRootSignature = rootSignatureManager->FindRootSignature(rootSignatureHandle)->RootSignature(),
 			.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size()},
 			.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShader.Data(), .BytecodeLength = pixelShader.Size()},
 			.BlendState = blendState,
@@ -164,7 +162,7 @@ namespace PonyEngine::Render
 		}
 
 		const auto handle = Direct3D12MaterialHandle{.id = nextId++};
-		materials.try_emplace(handle, rootSignature.Get(), pipelineState.Get());
+		materials.try_emplace(handle, pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, rootSignatureHandle);
 
 		return handle;
 	}

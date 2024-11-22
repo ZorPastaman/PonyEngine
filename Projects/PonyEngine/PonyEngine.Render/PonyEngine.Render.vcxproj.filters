@@ -61,7 +61,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexBuffer.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexArray.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm">
@@ -88,9 +88,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Viewport.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderView.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -113,6 +110,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Constants.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureHandle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -18,6 +18,7 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Waiter;
 import <memory>;
 
 import :Direct3D12Fence;
+import :IDirect3D12RenderContext;
 
 export namespace PonyEngine::Render
 {
@@ -25,7 +26,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Waiter(IRenderContext& render, ID3D12CommandQueue* commandQueue, DWORD waitTimeout);
+		Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue* commandQueue, DWORD waitTimeout);
 		Direct3D12Waiter(const Direct3D12Waiter&) = delete;
 		Direct3D12Waiter(Direct3D12Waiter&&) = delete;
 
@@ -39,7 +40,7 @@ export namespace PonyEngine::Render
 	private:
 		DWORD waitTimeout;
 
-		IRenderContext* render;
+		IDirect3D12RenderContext* render;
 
 		std::unique_ptr<Direct3D12Fence> fence;
 		HANDLE waitEvent;
@@ -48,10 +49,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Waiter::Direct3D12Waiter(IRenderContext& render, ID3D12CommandQueue* const commandQueue, const DWORD waitTimeout) :
+	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue* const commandQueue, const DWORD waitTimeout) :
 		waitTimeout{waitTimeout},
 		render{&render},
-		fence(std::make_unique<Direct3D12Fence>(render, commandQueue))
+		fence(std::make_unique<Direct3D12Fence>(render, *commandQueue))
 	{
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Create wait event.");
 		if ((waitEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
@@ -79,7 +80,7 @@ namespace PonyEngine::Render
 	{
 		fence->Signal();
 
-		if (const UINT64 currentFenceValue = fence->CurrentFenceValue(); fence->CompletedFenceValue() < currentFenceValue)
+		if (const UINT64 currentFenceValue = fence->CurrentValue(); fence->CompletedValue() < currentFenceValue)
 		{
 			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "Set wait event. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, waitTimeout);
 			fence->SetEvent(currentFenceValue, waitEvent);

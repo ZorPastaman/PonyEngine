@@ -41,7 +41,7 @@ export namespace PonyEngine::Render
 		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
+		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
@@ -65,6 +65,7 @@ export namespace PonyEngine::Render
 		IRenderContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+		Direct3D12RootSignatureManager* rootSignatureManager;
 		Direct3D12MaterialManager* materialManager;
 		Direct3D12MeshManager* meshManager;
 
@@ -77,15 +78,16 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
 		renderer{&renderer},
 		device(device),
+		rootSignatureManager{rootSignatureManager},
 		materialManager{&materialManager},
 		meshManager{&meshManager},
 		nextRenderObjectId{1}
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
-		const auto rootSignatureShader = Direct3D12Shader("RootSignature");
+		const auto rootSignatureHandle = rootSignatureManager->CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
 		const auto vertexShader = Direct3D12Shader("VertexShader");
@@ -94,7 +96,7 @@ namespace PonyEngine::Render
 		const auto pixelShader = Direct3D12Shader("PixelShader");
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
-		defaultMaterial = materialManager.CreateMaterial(rootSignatureShader, vertexShader, pixelShader);
+		defaultMaterial = materialManager.CreateMaterial(rootSignatureHandle, vertexShader, pixelShader);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 

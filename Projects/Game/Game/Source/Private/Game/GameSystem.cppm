@@ -368,7 +368,7 @@ namespace Game
 		{
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
 			renderSystem->RenderView().ViewMatrix(PonyMath::Core::Matrix4x4<float>::Predefined::Identity.Inverse());
-			renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderView().Resolution().Aspect<float>(), 0.2f, 1000.f));
+			renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderTarget().Resolution().Aspect<float>(), 0.2f, 1000.f));
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");

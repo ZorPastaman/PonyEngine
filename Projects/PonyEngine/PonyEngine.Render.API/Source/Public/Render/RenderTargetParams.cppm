@@ -9,13 +9,17 @@
 
 export module PonyEngine.Render:RenderTargetParams;
 
+import <optional>;
+
 import PonyMath.Color;
+import PonyMath.Utility;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Render target parameters.
 	struct RenderTargetParams final
 	{
+		std::optional<PonyMath::Utility::Resolution<unsigned int>> resolution = {}; ///< Render resolution. If it's @a nullopt, the render resolution will be the same as a window resolution.
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
 	};
 }
