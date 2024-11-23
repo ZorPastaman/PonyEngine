@@ -48,7 +48,7 @@ namespace PonyBase::Utility
 
 	std::string ToString(const GUID& guid)
 	{
-		auto buffer = std::wstring(39, '\0');
+		auto buffer = std::wstring(39, L'\0');
 		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
 
 		return ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));

@@ -13,6 +13,7 @@ import <cstddef>;
 import <format>;
 import <fstream>;
 import <stdexcept>;
+import <string_view>;
 import <vector>;
 
 import PonyBase.StringUtility;
@@ -23,7 +24,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12Shader(const char* shaderName);
+		explicit Direct3D12Shader(std::string_view shaderName);
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Shader(const Direct3D12Shader& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -46,7 +47,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Shader::Direct3D12Shader(const char* const shaderName)
+	Direct3D12Shader::Direct3D12Shader(const std::string_view shaderName)
 	{
 		const std::string path = std::format("{}.cso", shaderName);
 		auto stream = std::ifstream(path, std::ios::binary | std::ios::ate);

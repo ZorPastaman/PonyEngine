@@ -777,7 +777,7 @@ namespace Core
 			[[maybe_unused]] constexpr auto defaultColor = PonyMath::Color::RGB<float>();
 			[[maybe_unused]] constexpr auto color = PonyMath::Color::RGB<float>(0.3f, 0.4f, 0.6f);
 			[[maybe_unused]] constexpr auto spanColor = PonyMath::Color::RGB<float>(std::array<float, 3>{0.4f, 0.1f, 0.2f});
-			[[maybe_unused]] constexpr auto rgbIntColor = PonyMath::Color::RGB<float>(PonyMath::Color::RGBInt<unsigned int>(54, 38, 90));
+			[[maybe_unused]] constexpr auto rgbIntColor = PonyMath::Color::RGB<float>(PonyMath::Color::RGBInt<std::uint32_t>(54, 38, 90));
 			[[maybe_unused]] constexpr auto vectorColor = PonyMath::Color::RGB<float>(PonyMath::Core::Vector3<float>(0.4f, 0.69f, 0.228f));
 			[[maybe_unused]] constexpr auto movedColor = RGBConstexpr();
 
@@ -799,7 +799,7 @@ namespace Core
 			[[maybe_unused]] constexpr bool isAlmostWhite = color.IsAlmostWhite();
 
 			[[maybe_unused]] constexpr auto rgb = static_cast<PonyMath::Color::RGB<double>>(color);
-			[[maybe_unused]] constexpr auto rgbInt = static_cast<PonyMath::Color::RGBInt<unsigned int>>(color);
+			[[maybe_unused]] constexpr auto rgbInt = static_cast<PonyMath::Color::RGBInt<std::uint32_t>>(color);
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyMath::Core::Vector3<float>>(color);
 

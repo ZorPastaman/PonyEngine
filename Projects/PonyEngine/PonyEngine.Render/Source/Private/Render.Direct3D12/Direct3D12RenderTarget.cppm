@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderTarget;
 
+import <cstdint>;
 import <span>;
 import <stdexcept>;
 import <vector>;
@@ -43,7 +44,7 @@ export namespace PonyEngine::Render
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept override;
+		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<FLOAT> ClearColorD3D12() const noexcept override;
@@ -97,9 +98,9 @@ namespace PonyEngine::Render
 		clearColor = static_cast<PonyMath::Color::RGBA<FLOAT>>(color);
 	}
 
-	PonyMath::Utility::Resolution<unsigned int> Direct3D12RenderTarget::Resolution() const noexcept
+	PonyMath::Utility::Resolution<std::uint32_t> Direct3D12RenderTarget::Resolution() const noexcept
 	{
-		return static_cast<PonyMath::Utility::Resolution<unsigned int>>(resolution);
+		return static_cast<PonyMath::Utility::Resolution<std::uint32_t>>(resolution);
 	}
 
 	PonyMath::Color::RGBA<FLOAT> Direct3D12RenderTarget::ClearColorD3D12() const noexcept

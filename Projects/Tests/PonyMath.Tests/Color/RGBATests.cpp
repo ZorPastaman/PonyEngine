@@ -951,8 +951,8 @@ namespace Core
 			[[maybe_unused]] constexpr auto color = PonyMath::Color::RGBA<float>(0.3f, 0.4f, 0.6f, 0.69f);
 			[[maybe_unused]] constexpr auto spanColor = PonyMath::Color::RGBA<float>(std::array<float, 4>{0.4f, 0.1f, 0.2f, 0.9f});
 			[[maybe_unused]] constexpr auto rgbColor = PonyMath::Color::RGBA<float>(PonyMath::Color::RGB<float>(0.1f, 0.2f, 0.3f), 0.4f);
-			[[maybe_unused]] constexpr auto rgbIntColor = PonyMath::Color::RGBA<float>(PonyMath::Color::RGBInt<unsigned int>(54, 38, 90), 0.4f);
-			[[maybe_unused]] constexpr auto rgbaColor = PonyMath::Color::RGBA<float>(PonyMath::Color::RGBAInt<unsigned short>(215, 574, 136, 907));
+			[[maybe_unused]] constexpr auto rgbIntColor = PonyMath::Color::RGBA<float>(PonyMath::Color::RGBInt<std::uint32_t>(54, 38, 90), 0.4f);
+			[[maybe_unused]] constexpr auto rgbaColor = PonyMath::Color::RGBA<float>(PonyMath::Color::RGBAInt<std::uint16_t>(215, 574, 136, 907));
 			[[maybe_unused]] constexpr auto vectorColor = PonyMath::Color::RGBA<float>(PonyMath::Core::Vector4<float>(0.4f, 0.69f, 0.228f, 0.322f));
 			[[maybe_unused]] constexpr auto movedColor = RGBAConstexpr();
 
@@ -979,8 +979,8 @@ namespace Core
 
 			[[maybe_unused]] constexpr auto rgba = static_cast<PonyMath::Color::RGBA<double>>(color);
 			[[maybe_unused]] constexpr auto rgb = static_cast<PonyMath::Color::RGB<float>>(color);
-			[[maybe_unused]] constexpr auto rgbaInt = static_cast<PonyMath::Color::RGBAInt<unsigned int>>(color);
-			[[maybe_unused]] constexpr auto rgbInt = static_cast<PonyMath::Color::RGBInt<unsigned int>>(color);
+			[[maybe_unused]] constexpr auto rgbaInt = static_cast<PonyMath::Color::RGBAInt<std::uint32_t>>(color);
+			[[maybe_unused]] constexpr auto rgbInt = static_cast<PonyMath::Color::RGBInt<std::uint32_t>>(color);
 
 			[[maybe_unused]] constexpr auto vector = static_cast<PonyMath::Core::Vector4<float>>(color);
 

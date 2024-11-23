@@ -11,6 +11,7 @@
 
 #include <array>
 #include <cstddef>
+#include <cstdint>
 #include <typeinfo>
 
 #include "Mocks/Application.h"
@@ -76,7 +77,7 @@ namespace Core
 			auto application = Application();
 			application.logger = &logger;
 			TickableSystemFactory systemFactory;
-			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 1>
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 1>
 			{
 				std::pair(&systemFactory, 0)
 			};
@@ -108,7 +109,7 @@ namespace Core
 			application.logger = &logger;
 			auto systemFactory = SystemFactory();
 			auto tickableSystemFactory = TickableSystemFactory();
-			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 2>
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 2>
 			{
 				std::pair(&systemFactory, 0),
 				std::pair(&tickableSystemFactory, 0)

@@ -20,7 +20,7 @@ import <type_traits>;
 export namespace PonyDebug::Log
 {
 	/// @brief Severity of a log.
-	enum class LogType : std::uint_fast8_t
+	enum class LogType : std::uint8_t
 	{
 		/// @brief Special name for the zero flag state.
 		None = 0,

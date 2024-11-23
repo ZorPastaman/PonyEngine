@@ -15,6 +15,8 @@ module;
 
 export module PonyEngine.Screen.Windows.Detail:WindowsScreenSystem;
 
+import <cstdint>;
+
 import PonyMath.Utility;
 
 import PonyDebug.Log;
@@ -43,13 +45,13 @@ export namespace PonyEngine::Screen
 		virtual void End() override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept override;
+		virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept override;
 
 		WindowsScreenSystem& operator =(const WindowsScreenSystem&) = delete;
 		WindowsScreenSystem& operator =(WindowsScreenSystem&&) = delete;
 
 	private:
-		PonyMath::Utility::Resolution<unsigned int> displayResolution; ///< Display resolution.
+		PonyMath::Utility::Resolution<std::uint32_t> displayResolution; ///< Display resolution.
 	};
 }
 
@@ -58,7 +60,7 @@ namespace PonyEngine::Screen
 	/// @brief Gets a current display resolution.
 	/// @return Display resolution.
 	[[nodiscard("Pure function")]]
-	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept;
+	PonyMath::Utility::Resolution<std::uint32_t> GetDisplayResolution() noexcept;
 
 	WindowsScreenSystem::WindowsScreenSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsScreenSystemParams&) noexcept :
 		System(engine, systemParams),
@@ -75,16 +77,16 @@ namespace PonyEngine::Screen
 	{
 	}
 
-	PonyMath::Utility::Resolution<unsigned int> WindowsScreenSystem::DisplayResolution() const noexcept
+	PonyMath::Utility::Resolution<std::uint32_t> WindowsScreenSystem::DisplayResolution() const noexcept
 	{
 		return displayResolution;
 	}
 
-	PonyMath::Utility::Resolution<unsigned int> GetDisplayResolution() noexcept
+	PonyMath::Utility::Resolution<std::uint32_t> GetDisplayResolution() noexcept
 	{
-		PonyMath::Utility::Resolution<unsigned int> resolution;
-		resolution.Width() = static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN));
-		resolution.Height() = static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN));
+		PonyMath::Utility::Resolution<std::uint32_t> resolution;
+		resolution.Width() = static_cast<std::uint32_t>(GetSystemMetrics(SM_CXSCREEN));
+		resolution.Height() = static_cast<std::uint32_t>(GetSystemMetrics(SM_CYSCREEN));
 
 		return resolution;
 	}

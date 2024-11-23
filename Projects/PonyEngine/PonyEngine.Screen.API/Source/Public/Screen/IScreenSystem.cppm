@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Screen:IScreenSystem;
 
+import <cstdint>;
+
 import PonyMath.Utility;
 
 export namespace PonyEngine::Screen
@@ -25,6 +27,6 @@ export namespace PonyEngine::Screen
 		/// @brief Gets a display resolution.
 		/// @return Display resolution.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept = 0;
+		virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept = 0;
 	};
 }

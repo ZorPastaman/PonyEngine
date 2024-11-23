@@ -12,6 +12,7 @@
 #include <array>
 #include <cmath>
 #include <cstddef>
+#include <cstdint>
 #include <format>
 #include <ostream>
 #include <span>
@@ -29,20 +30,20 @@ namespace Core
 	{
 		TEST_METHOD(TypesTest)
 		{
-			Assert::IsTrue(std::is_same_v<char, PonyMath::Core::Matrix4x4<char>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<char>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int8_t, PonyMath::Core::Matrix4x4<std::int8_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<std::int8_t>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<short, PonyMath::Core::Matrix4x4<short>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<short>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int16_t, PonyMath::Core::Matrix4x4<std::int16_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<std::int16_t>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<int, PonyMath::Core::Matrix4x4<int>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<int>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int32_t, PonyMath::Core::Matrix4x4<std::int32_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<std::int32_t>::ComputationalType>);
 
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<float>::ValueType>);
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Matrix4x4<float>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<long long, PonyMath::Core::Matrix4x4<long long>::ValueType>);
-			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Matrix4x4<long long>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int64_t, PonyMath::Core::Matrix4x4<std::int64_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Matrix4x4<std::int64_t>::ComputationalType>);
 
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Matrix4x4<double>::ValueType>);
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Matrix4x4<double>::ComputationalType>);
@@ -53,49 +54,49 @@ namespace Core
 			Assert::AreEqual(std::size_t{4}, PonyMath::Core::Matrix4x4<float>::Dimension);
 			Assert::AreEqual(std::size_t{16}, PonyMath::Core::Matrix4x4<float>::ComponentCount);
 
-			Assert::AreEqual(std::size_t{4}, PonyMath::Core::Matrix4x4<short>::Dimension);
-			Assert::AreEqual(std::size_t{16}, PonyMath::Core::Matrix4x4<short>::ComponentCount);
+			Assert::AreEqual(std::size_t{4}, PonyMath::Core::Matrix4x4<std::int16_t>::Dimension);
+			Assert::AreEqual(std::size_t{16}, PonyMath::Core::Matrix4x4<std::int16_t>::ComponentCount);
 		}
 
 		TEST_METHOD(RowToVector4ShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 
-			const PonyMath::Core::Vector4<short> row0 = matrix[0];
+			const PonyMath::Core::Vector4<std::int16_t> row0 = matrix[0];
 			Assert::AreEqual(m00, row0.X());
 			Assert::AreEqual(m01, row0.Y());
 			Assert::AreEqual(m02, row0.Z());
 			Assert::AreEqual(m03, row0.W());
 
-			const PonyMath::Core::Vector4<short> row1 = matrix[1];
+			const PonyMath::Core::Vector4<std::int16_t> row1 = matrix[1];
 			Assert::AreEqual(m10, row1.X());
 			Assert::AreEqual(m11, row1.Y());
 			Assert::AreEqual(m12, row1.Z());
 			Assert::AreEqual(m13, row1.W());
 
-			const PonyMath::Core::Vector4<short> row2 = matrix[2];
+			const PonyMath::Core::Vector4<std::int16_t> row2 = matrix[2];
 			Assert::AreEqual(m20, row2.X());
 			Assert::AreEqual(m21, row2.Y());
 			Assert::AreEqual(m22, row2.Z());
 			Assert::AreEqual(m23, row2.W());
 
-			const PonyMath::Core::Vector4<short> row3 = matrix[3];
+			const PonyMath::Core::Vector4<std::int16_t> row3 = matrix[3];
 			Assert::AreEqual(m30, row3.X());
 			Assert::AreEqual(m31, row3.Y());
 			Assert::AreEqual(m32, row3.Z());
@@ -150,7 +151,7 @@ namespace Core
 		TEST_METHOD(CastTest)
 		{
 			constexpr auto floatMatrix = PonyMath::Core::Matrix4x4<float>(3.1f, -2.2f, 4.4f, -2.1f, -5.9f, 4.8f, 7.1f, -6.5f, 12.f, 11.5f, -13.4f, -12.1f, 15.8f, -16.9f, 10.f, -1.f);
-			const auto intMatrix = static_cast<PonyMath::Core::Matrix4x4<int>>(floatMatrix);
+			const auto intMatrix = static_cast<PonyMath::Core::Matrix4x4<std::int32_t>>(floatMatrix);
 			Assert::AreEqual(3, intMatrix.M00());
 			Assert::AreEqual(-2, intMatrix.M10());
 			Assert::AreEqual(4, intMatrix.M20());
@@ -171,23 +172,23 @@ namespace Core
 
 		TEST_METHOD(AccessOperatorReadShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 
 			Assert::AreEqual(m00, matrix[0][0]);
 			Assert::AreEqual(m01, matrix[0][1]);
@@ -247,40 +248,40 @@ namespace Core
 
 		TEST_METHOD(AccessOperatorWriteShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 
-			constexpr short m00New = 20;
-			constexpr short m10New = 30;
-			constexpr short m20New = 30;
-			constexpr short m30New = 21;
-			constexpr short m01New = -40;
-			constexpr short m11New = -50;
-			constexpr short m21New = 330;
-			constexpr short m31New = -10;
-			constexpr short m02New = 60;
-			constexpr short m12New = 70;
-			constexpr short m22New = 190;
-			constexpr short m32New = -100;
-			constexpr short m03New = 160;
-			constexpr short m13New = 170;
-			constexpr short m23New = 180;
-			constexpr short m33New = -130;
+			constexpr std::int16_t m00New = 20;
+			constexpr std::int16_t m10New = 30;
+			constexpr std::int16_t m20New = 30;
+			constexpr std::int16_t m30New = 21;
+			constexpr std::int16_t m01New = -40;
+			constexpr std::int16_t m11New = -50;
+			constexpr std::int16_t m21New = 330;
+			constexpr std::int16_t m31New = -10;
+			constexpr std::int16_t m02New = 60;
+			constexpr std::int16_t m12New = 70;
+			constexpr std::int16_t m22New = 190;
+			constexpr std::int16_t m32New = -100;
+			constexpr std::int16_t m03New = 160;
+			constexpr std::int16_t m13New = 170;
+			constexpr std::int16_t m23New = 180;
+			constexpr std::int16_t m33New = -130;
 			matrix[0][0] = m00New;
 			matrix[0][1] = m01New;
 			matrix[0][2] = m02New;
@@ -389,44 +390,44 @@ namespace Core
 
 		TEST_METHOD(Vector4ToRowShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 
-			constexpr short m00New = 20;
-			constexpr short m10New = 30;
-			constexpr short m20New = 30;
-			constexpr short m30New = 21;
-			constexpr short m01New = -40;
-			constexpr short m11New = -50;
-			constexpr short m21New = 330;
-			constexpr short m31New = -10;
-			constexpr short m02New = 60;
-			constexpr short m12New = 70;
-			constexpr short m22New = 190;
-			constexpr short m32New = -100;
-			constexpr short m03New = 160;
-			constexpr short m13New = 170;
-			constexpr short m23New = 180;
-			constexpr short m33New = -130;
-			matrix[0] = PonyMath::Core::Vector4<short>(m00New, m01New, m02New, m03New);
-			matrix[1] = PonyMath::Core::Vector4<short>(m10New, m11New, m12New, m13New);
-			matrix[2] = PonyMath::Core::Vector4<short>(m20New, m21New, m22New, m23New);
-			matrix[3] = PonyMath::Core::Vector4<short>(m30New, m31New, m32New, m33New);
+			constexpr std::int16_t m00New = 20;
+			constexpr std::int16_t m10New = 30;
+			constexpr std::int16_t m20New = 30;
+			constexpr std::int16_t m30New = 21;
+			constexpr std::int16_t m01New = -40;
+			constexpr std::int16_t m11New = -50;
+			constexpr std::int16_t m21New = 330;
+			constexpr std::int16_t m31New = -10;
+			constexpr std::int16_t m02New = 60;
+			constexpr std::int16_t m12New = 70;
+			constexpr std::int16_t m22New = 190;
+			constexpr std::int16_t m32New = -100;
+			constexpr std::int16_t m03New = 160;
+			constexpr std::int16_t m13New = 170;
+			constexpr std::int16_t m23New = 180;
+			constexpr std::int16_t m33New = -130;
+			matrix[0] = PonyMath::Core::Vector4<std::int16_t>(m00New, m01New, m02New, m03New);
+			matrix[1] = PonyMath::Core::Vector4<std::int16_t>(m10New, m11New, m12New, m13New);
+			matrix[2] = PonyMath::Core::Vector4<std::int16_t>(m20New, m21New, m22New, m23New);
+			matrix[3] = PonyMath::Core::Vector4<std::int16_t>(m30New, m31New, m32New, m33New);
 
 			Assert::AreEqual(m00New, matrix[0][0]);
 			Assert::AreEqual(m01New, matrix[0][1]);
@@ -507,23 +508,23 @@ namespace Core
 
 		TEST_METHOD(DefaultConstructorShortTest)
 		{
-			const auto defaultMatrix = PonyMath::Core::Matrix4x4<short>();
-			Assert::AreEqual(short{}, defaultMatrix.M00());
-			Assert::AreEqual(short{}, defaultMatrix.M10());
-			Assert::AreEqual(short{}, defaultMatrix.M20());
-			Assert::AreEqual(short{}, defaultMatrix.M30());
-			Assert::AreEqual(short{}, defaultMatrix.M01());
-			Assert::AreEqual(short{}, defaultMatrix.M11());
-			Assert::AreEqual(short{}, defaultMatrix.M21());
-			Assert::AreEqual(short{}, defaultMatrix.M31());
-			Assert::AreEqual(short{}, defaultMatrix.M02());
-			Assert::AreEqual(short{}, defaultMatrix.M12());
-			Assert::AreEqual(short{}, defaultMatrix.M22());
-			Assert::AreEqual(short{}, defaultMatrix.M32());
-			Assert::AreEqual(short{}, defaultMatrix.M03());
-			Assert::AreEqual(short{}, defaultMatrix.M13());
-			Assert::AreEqual(short{}, defaultMatrix.M23());
-			Assert::AreEqual(short{}, defaultMatrix.M33());
+			const auto defaultMatrix = PonyMath::Core::Matrix4x4<std::int16_t>();
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M00());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M10());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M20());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M30());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M01());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M11());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M21());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M31());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M02());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M12());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M22());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M32());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M03());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M13());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M23());
+			Assert::AreEqual(std::int16_t{}, defaultMatrix.M33());
 		}
 
 		TEST_METHOD(DefaultConstructorFloatTest)
@@ -549,23 +550,23 @@ namespace Core
 
 		TEST_METHOD(ConstructorShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -623,27 +624,27 @@ namespace Core
 
 		TEST_METHOD(ConstructorColumnShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto column0 = PonyMath::Core::Vector4<short>(m00, m10, m20, m30);
-			constexpr auto column1 = PonyMath::Core::Vector4<short>(m01, m11, m21, m31);
-			constexpr auto column2 = PonyMath::Core::Vector4<short>(m02, m12, m22, m32);
-			constexpr auto column3 = PonyMath::Core::Vector4<short>(m03, m13, m23, m33);
-			const auto matrix = PonyMath::Core::Matrix4x4<short>(column0, column1, column2, column3);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto column0 = PonyMath::Core::Vector4<std::int16_t>(m00, m10, m20, m30);
+			constexpr auto column1 = PonyMath::Core::Vector4<std::int16_t>(m01, m11, m21, m31);
+			constexpr auto column2 = PonyMath::Core::Vector4<std::int16_t>(m02, m12, m22, m32);
+			constexpr auto column3 = PonyMath::Core::Vector4<std::int16_t>(m03, m13, m23, m33);
+			const auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(column0, column1, column2, column3);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -705,24 +706,24 @@ namespace Core
 
 		TEST_METHOD(ConstructorSpanShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr std::array<short, 16> array{ m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33 };
-			const auto matrix = PonyMath::Core::Matrix4x4<short>(array);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr std::array<std::int16_t, 16> array{ m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33 };
+			const auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -781,23 +782,23 @@ namespace Core
 
 		TEST_METHOD(ConstructorCopyShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto copiedMatrix = matrix;
 			Assert::AreEqual(m00, copiedMatrix.M00());
 			Assert::AreEqual(m10, copiedMatrix.M10());
@@ -857,23 +858,23 @@ namespace Core
 
 		TEST_METHOD(ConstructorMoveShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto movedMatrix = std::move(matrix);
 			Assert::AreEqual(m00, movedMatrix.M00());
 			Assert::AreEqual(m10, movedMatrix.M10());
@@ -933,24 +934,24 @@ namespace Core
 
 		TEST_METHOD(ComponentAccessShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
 
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
 			Assert::AreEqual(m20, matrix.M20());
@@ -984,7 +985,7 @@ namespace Core
 			Assert::AreEqual(m23, matrix.Component(14));
 			Assert::AreEqual(m33, matrix.Component(15));
 
-			constexpr auto matrixC = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.M00());
 			Assert::AreEqual(m10, matrixC.M10());
 			Assert::AreEqual(m20, matrixC.M20());
@@ -1109,24 +1110,24 @@ namespace Core
 
 		TEST_METHOD(SpanShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
 
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrix.Span()[0]);
 			Assert::AreEqual(m10, matrix.Span()[1]);
 			Assert::AreEqual(m20, matrix.Span()[2]);
@@ -1160,7 +1161,7 @@ namespace Core
 			Assert::AreEqual(m23, matrix.Span(3)[2]);
 			Assert::AreEqual(m33, matrix.Span(3)[3]);
 
-			constexpr auto matrixC = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrixC.Span()[0]);
 			Assert::AreEqual(m10, matrixC.Span()[1]);
 			Assert::AreEqual(m20, matrixC.Span()[2]);
@@ -1285,23 +1286,23 @@ namespace Core
 
 		TEST_METHOD(GetRowShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto row0 = matrix.Row(0);
 			const auto row1 = matrix.Row(1);
 			const auto row2 = matrix.Row(2);
@@ -1367,27 +1368,27 @@ namespace Core
 
 		TEST_METHOD(SetRowShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
-			constexpr auto row0 = PonyMath::Core::Vector4<short>(m00, m01, m02, m03);
-			constexpr auto row1 = PonyMath::Core::Vector4<short>(m10, m11, m12, m13);
-			constexpr auto row2 = PonyMath::Core::Vector4<short>(m20, m21, m22, m23);
-			constexpr auto row3 = PonyMath::Core::Vector4<short>(m30, m31, m32, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
+			constexpr auto row0 = PonyMath::Core::Vector4<std::int16_t>(m00, m01, m02, m03);
+			constexpr auto row1 = PonyMath::Core::Vector4<std::int16_t>(m10, m11, m12, m13);
+			constexpr auto row2 = PonyMath::Core::Vector4<std::int16_t>(m20, m21, m22, m23);
+			constexpr auto row3 = PonyMath::Core::Vector4<std::int16_t>(m30, m31, m32, m33);
 			matrix.Row(0, row0);
 			matrix.Row(1, row1);
 			matrix.Row(2, row2);
@@ -1457,23 +1458,23 @@ namespace Core
 
 		TEST_METHOD(GetColumnShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto column0 = matrix.Column(0);
 			const auto column1 = matrix.Column(1);
 			const auto column2 = matrix.Column(2);
@@ -1539,27 +1540,27 @@ namespace Core
 
 		TEST_METHOD(SetColumnShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
-			constexpr auto column0 = PonyMath::Core::Vector4<short>(m00, m10, m20, m30);
-			constexpr auto column1 = PonyMath::Core::Vector4<short>(m01, m11, m21, m31);
-			constexpr auto column2 = PonyMath::Core::Vector4<short>(m02, m12, m22, m32);
-			constexpr auto column3 = PonyMath::Core::Vector4<short>(m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
+			constexpr auto column0 = PonyMath::Core::Vector4<std::int16_t>(m00, m10, m20, m30);
+			constexpr auto column1 = PonyMath::Core::Vector4<std::int16_t>(m01, m11, m21, m31);
+			constexpr auto column2 = PonyMath::Core::Vector4<std::int16_t>(m02, m12, m22, m32);
+			constexpr auto column3 = PonyMath::Core::Vector4<std::int16_t>(m03, m13, m23, m33);
 			matrix.Column(0, column0);
 			matrix.Column(1, column1);
 			matrix.Column(2, column2);
@@ -1629,23 +1630,23 @@ namespace Core
 
 		TEST_METHOD(GetDiagonalShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto diagonal = matrix.Diagonal();
 			Assert::AreEqual(m00, diagonal.X());
 			Assert::AreEqual(m11, diagonal.Y());
@@ -1681,28 +1682,28 @@ namespace Core
 
 		TEST_METHOD(SetDiagonalShortTest)
 		{
-			constexpr short m00 = 3;
-			constexpr short m11 = -2;
-			constexpr short m22 = 19;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
-			constexpr auto diagonal = PonyMath::Core::Vector4<short>(m00, m11, m22, m33);
+			constexpr std::int16_t m00 = 3;
+			constexpr std::int16_t m11 = -2;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
+			constexpr auto diagonal = PonyMath::Core::Vector4<std::int16_t>(m00, m11, m22, m33);
 			matrix.Diagonal(diagonal);
 			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(short{}, matrix.M10());
-			Assert::AreEqual(short{}, matrix.M20());
-			Assert::AreEqual(short{}, matrix.M30());
-			Assert::AreEqual(short{}, matrix.M01());
+			Assert::AreEqual(std::int16_t{}, matrix.M10());
+			Assert::AreEqual(std::int16_t{}, matrix.M20());
+			Assert::AreEqual(std::int16_t{}, matrix.M30());
+			Assert::AreEqual(std::int16_t{}, matrix.M01());
 			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(short{}, matrix.M21());
-			Assert::AreEqual(short{}, matrix.M31());
-			Assert::AreEqual(short{}, matrix.M02());
-			Assert::AreEqual(short{}, matrix.M12());
+			Assert::AreEqual(std::int16_t{}, matrix.M21());
+			Assert::AreEqual(std::int16_t{}, matrix.M31());
+			Assert::AreEqual(std::int16_t{}, matrix.M02());
+			Assert::AreEqual(std::int16_t{}, matrix.M12());
 			Assert::AreEqual(m22, matrix.M22());
-			Assert::AreEqual(short{}, matrix.M32());
-			Assert::AreEqual(short{}, matrix.M03());
-			Assert::AreEqual(short{}, matrix.M13());
-			Assert::AreEqual(short{}, matrix.M23());
+			Assert::AreEqual(std::int16_t{}, matrix.M32());
+			Assert::AreEqual(std::int16_t{}, matrix.M03());
+			Assert::AreEqual(std::int16_t{}, matrix.M13());
+			Assert::AreEqual(std::int16_t{}, matrix.M23());
 			Assert::AreEqual(m33, matrix.M33());
 		}
 
@@ -1735,23 +1736,23 @@ namespace Core
 
 		TEST_METHOD(GetCounterDiagonalShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto counterDiagonal = matrix.CounterDiagonal();
 			Assert::AreEqual(m03, counterDiagonal.X());
 			Assert::AreEqual(m12, counterDiagonal.Y());
@@ -1787,29 +1788,29 @@ namespace Core
 
 		TEST_METHOD(SetCounterDiagonalShortTest)
 		{
-			constexpr short m03 = 3;
-			constexpr short m12 = -2;
-			constexpr short m21 = 19;
-			constexpr short m30 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
-			constexpr auto counterDiagonal = PonyMath::Core::Vector4<short>(m03, m12, m21, m30);
+			constexpr std::int16_t m03 = 3;
+			constexpr std::int16_t m12 = -2;
+			constexpr std::int16_t m21 = 19;
+			constexpr std::int16_t m30 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
+			constexpr auto counterDiagonal = PonyMath::Core::Vector4<std::int16_t>(m03, m12, m21, m30);
 			matrix.CounterDiagonal(counterDiagonal);
-			Assert::AreEqual(short{}, matrix.M00());
-			Assert::AreEqual(short{}, matrix.M10());
-			Assert::AreEqual(short{}, matrix.M20());
+			Assert::AreEqual(std::int16_t{}, matrix.M00());
+			Assert::AreEqual(std::int16_t{}, matrix.M10());
+			Assert::AreEqual(std::int16_t{}, matrix.M20());
 			Assert::AreEqual(m30, matrix.M30());
-			Assert::AreEqual(short{}, matrix.M01());
-			Assert::AreEqual(short{}, matrix.M11());
+			Assert::AreEqual(std::int16_t{}, matrix.M01());
+			Assert::AreEqual(std::int16_t{}, matrix.M11());
 			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(short{}, matrix.M31());
-			Assert::AreEqual(short{}, matrix.M02());
+			Assert::AreEqual(std::int16_t{}, matrix.M31());
+			Assert::AreEqual(std::int16_t{}, matrix.M02());
 			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(short{}, matrix.M22());
-			Assert::AreEqual(short{}, matrix.M32());
+			Assert::AreEqual(std::int16_t{}, matrix.M22());
+			Assert::AreEqual(std::int16_t{}, matrix.M32());
 			Assert::AreEqual(m03, matrix.M03());
-			Assert::AreEqual(short{}, matrix.M13());
-			Assert::AreEqual(short{}, matrix.M23());
-			Assert::AreEqual(short{}, matrix.M33());
+			Assert::AreEqual(std::int16_t{}, matrix.M13());
+			Assert::AreEqual(std::int16_t{}, matrix.M23());
+			Assert::AreEqual(std::int16_t{}, matrix.M33());
 		}
 
 		TEST_METHOD(SetCounterDiagonalFloatTest)
@@ -1841,24 +1842,24 @@ namespace Core
 
 		TEST_METHOD(TraceShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			Assert::AreEqual(short{11}, matrix.Trace());
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			Assert::AreEqual(std::int16_t{11}, matrix.Trace());
 		}
 
 		TEST_METHOD(TraceFloatTest)
@@ -1885,24 +1886,24 @@ namespace Core
 
 		TEST_METHOD(DeterminantShortTest)
 		{
-			constexpr short m00 = 1;
-			constexpr short m10 = -5;
-			constexpr short m20 = 3;
-			constexpr short m30 = 2;
-			constexpr short m01 = 5;
-			constexpr short m11 = -2;
-			constexpr short m21 = 3;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = -2;
-			constexpr short m03 = -1;
-			constexpr short m13 = 1;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			Assert::AreEqual(short{578}, matrix.Determinant());
+			constexpr std::int16_t m00 = 1;
+			constexpr std::int16_t m10 = -5;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 2;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -2;
+			constexpr std::int16_t m21 = 3;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = -2;
+			constexpr std::int16_t m03 = -1;
+			constexpr std::int16_t m13 = 1;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			Assert::AreEqual(std::int16_t{578}, matrix.Determinant());
 		}
 
 		TEST_METHOD(DeterminantFloatTest)
@@ -1929,40 +1930,40 @@ namespace Core
 
 		TEST_METHOD(AdjugateShortTest)
 		{
-			constexpr short m00 = 1;
-			constexpr short m10 = -5;
-			constexpr short m20 = 3;
-			constexpr short m30 = 2;
-			constexpr short m01 = 5;
-			constexpr short m11 = -2;
-			constexpr short m21 = 3;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = -2;
-			constexpr short m03 = -1;
-			constexpr short m13 = 1;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 1;
+			constexpr std::int16_t m10 = -5;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 2;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -2;
+			constexpr std::int16_t m21 = 3;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = -2;
+			constexpr std::int16_t m03 = -1;
+			constexpr std::int16_t m13 = 1;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto adjugate = matrix.Adjugate();
-			Assert::AreEqual(short{-96}, adjugate.M00());
-			Assert::AreEqual(short{160}, adjugate.M10());
-			Assert::AreEqual(short{-22}, adjugate.M20());
-			Assert::AreEqual(short{-6}, adjugate.M30());
-			Assert::AreEqual(short{-53}, adjugate.M01());
-			Assert::AreEqual(short{-8}, adjugate.M11());
-			Assert::AreEqual(short{30}, adjugate.M21());
-			Assert::AreEqual(short{87}, adjugate.M31());
-			Assert::AreEqual(short{113}, adjugate.M02());
-			Assert::AreEqual(short{-92}, adjugate.M12());
-			Assert::AreEqual(short{56}, adjugate.M22());
-			Assert::AreEqual(short{-11}, adjugate.M32());
-			Assert::AreEqual(short{35}, adjugate.M03());
-			Assert::AreEqual(short{38}, adjugate.M13());
-			Assert::AreEqual(short{2}, adjugate.M23());
-			Assert::AreEqual(short{237}, adjugate.M33());
+			Assert::AreEqual(std::int16_t{-96}, adjugate.M00());
+			Assert::AreEqual(std::int16_t{160}, adjugate.M10());
+			Assert::AreEqual(std::int16_t{-22}, adjugate.M20());
+			Assert::AreEqual(std::int16_t{-6}, adjugate.M30());
+			Assert::AreEqual(std::int16_t{-53}, adjugate.M01());
+			Assert::AreEqual(std::int16_t{-8}, adjugate.M11());
+			Assert::AreEqual(std::int16_t{30}, adjugate.M21());
+			Assert::AreEqual(std::int16_t{87}, adjugate.M31());
+			Assert::AreEqual(std::int16_t{113}, adjugate.M02());
+			Assert::AreEqual(std::int16_t{-92}, adjugate.M12());
+			Assert::AreEqual(std::int16_t{56}, adjugate.M22());
+			Assert::AreEqual(std::int16_t{-11}, adjugate.M32());
+			Assert::AreEqual(std::int16_t{35}, adjugate.M03());
+			Assert::AreEqual(std::int16_t{38}, adjugate.M13());
+			Assert::AreEqual(std::int16_t{2}, adjugate.M23());
+			Assert::AreEqual(std::int16_t{237}, adjugate.M33());
 		}
 
 		TEST_METHOD(AdjugateFloatTest)
@@ -2005,23 +2006,23 @@ namespace Core
 
 		TEST_METHOD(TransposeShortTest)
 		{
-			constexpr short m00 = 1;
-			constexpr short m10 = -5;
-			constexpr short m20 = 3;
-			constexpr short m30 = 2;
-			constexpr short m01 = 5;
-			constexpr short m11 = -2;
-			constexpr short m21 = 3;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = -2;
-			constexpr short m03 = -1;
-			constexpr short m13 = 1;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 1;
+			constexpr std::int16_t m10 = -5;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 2;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -2;
+			constexpr std::int16_t m21 = 3;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = -2;
+			constexpr std::int16_t m03 = -1;
+			constexpr std::int16_t m13 = 1;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto transpose = matrix.Transpose();
 			Assert::AreEqual(m00, transpose.M00());
 			Assert::AreEqual(m01, transpose.M10());
@@ -2119,16 +2120,16 @@ namespace Core
 
 		TEST_METHOD(IsZeroShortTest)
 		{
-			Assert::IsTrue(PonyMath::Core::Matrix4x4<short>::Predefined::Zero.IsZero());
+			Assert::IsTrue(PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Zero.IsZero());
 
-			auto matrix = PonyMath::Core::Matrix4x4<short>::Predefined::Zero;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Zero;
 			Assert::IsTrue(matrix.IsZero());
 
 			for (std::size_t i = 0; i < PonyMath::Core::Matrix4x4<float>::ComponentCount; ++i)
 			{
 				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Span()[i] = PonyMath::Core::Matrix4x4<short>::Predefined::Zero.Span()[i];
+				matrix.Span()[i] = PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -2171,9 +2172,9 @@ namespace Core
 
 		TEST_METHOD(IsIdentityShortTest)
 		{
-			Assert::IsTrue(PonyMath::Core::Matrix4x4<short>::Predefined::Identity.IsIdentity());
+			Assert::IsTrue(PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Identity.IsIdentity());
 
-			auto matrix = PonyMath::Core::Matrix4x4<short>::Predefined::Identity;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Identity;
 			Assert::IsTrue(matrix.IsIdentity());
 
 			for (std::size_t i = 0; i < PonyMath::Core::Matrix4x4<float>::ComponentCount; ++i)
@@ -2181,7 +2182,7 @@ namespace Core
 				Assert::IsTrue(matrix.IsIdentity());
 				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsIdentity());
-				matrix.Span()[i] = PonyMath::Core::Matrix4x4<short>::Predefined::Identity.Span()[i];
+				matrix.Span()[i] = PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Identity.Span()[i];
 			}
 		}
 
@@ -2241,23 +2242,23 @@ namespace Core
 
 		TEST_METHOD(SetShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
 			matrix.Set(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
@@ -2317,27 +2318,27 @@ namespace Core
 
 		TEST_METHOD(SetColumnsShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr auto column0 = PonyMath::Core::Vector4<short>(m00, m10, m20, m30);
-			constexpr auto column1 = PonyMath::Core::Vector4<short>(m01, m11, m21, m31);
-			constexpr auto column2 = PonyMath::Core::Vector4<short>(m02, m12, m22, m32);
-			constexpr auto column3 = PonyMath::Core::Vector4<short>(m03, m13, m23, m33);
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto column0 = PonyMath::Core::Vector4<std::int16_t>(m00, m10, m20, m30);
+			constexpr auto column1 = PonyMath::Core::Vector4<std::int16_t>(m01, m11, m21, m31);
+			constexpr auto column2 = PonyMath::Core::Vector4<std::int16_t>(m02, m12, m22, m32);
+			constexpr auto column3 = PonyMath::Core::Vector4<std::int16_t>(m03, m13, m23, m33);
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
 			matrix.Set(column0, column1, column2, column3);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
@@ -2401,24 +2402,24 @@ namespace Core
 
 		TEST_METHOD(SetSpanShortTest)
 		{
-			constexpr short m00 = 10;
-			constexpr short m10 = -15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 22;
-			constexpr short m01 = 5;
-			constexpr short m11 = -20;
-			constexpr short m21 = 33;
-			constexpr short m31 = 11;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 19;
-			constexpr short m32 = -22;
-			constexpr short m03 = -12;
-			constexpr short m13 = 31;
-			constexpr short m23 = -1;
-			constexpr short m33 = 2;
-			constexpr std::array<short, 16> array{ m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33 };
-			auto matrix = PonyMath::Core::Matrix4x4<short>();
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr std::array<std::int16_t, 16> array{ m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33 };
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>();
 			matrix.Set(array);
 			Assert::AreEqual(m00, matrix.M00());
 			Assert::AreEqual(m10, matrix.M10());
@@ -2479,57 +2480,57 @@ namespace Core
 
 		TEST_METHOD(ScaleThisShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 5;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 5;
-			constexpr short m11 = 2;
-			constexpr short m21 = 3;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 2;
-			constexpr short m03 = 3;
-			constexpr short m13 = 1;
-			constexpr short m23 = 1;
-			constexpr short m33 = 1;
-			constexpr short m00S = 3;
-			constexpr short m10S = -2;
-			constexpr short m20S = 5;
-			constexpr short m30S = 7;
-			constexpr short m01S = 4;
-			constexpr short m11S = -1;
-			constexpr short m21S = 7;
-			constexpr short m31S = -3;
-			constexpr short m02S = -5;
-			constexpr short m12S = 6;
-			constexpr short m22S = -7;
-			constexpr short m32S = 8;
-			constexpr short m03S = 4;
-			constexpr short m13S = -1;
-			constexpr short m23S = 9;
-			constexpr short m33S = -8;
-			auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			constexpr auto scale = PonyMath::Core::Matrix4x4<short>(m00S, m10S, m20S, m30S, m01S, m11S, m21S, m31S, m02S, m12S, m22S, m32S, m03S, m13S, m23S, m33S);
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 5;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 3;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 2;
+			constexpr std::int16_t m03 = 3;
+			constexpr std::int16_t m13 = 1;
+			constexpr std::int16_t m23 = 1;
+			constexpr std::int16_t m33 = 1;
+			constexpr std::int16_t m00S = 3;
+			constexpr std::int16_t m10S = -2;
+			constexpr std::int16_t m20S = 5;
+			constexpr std::int16_t m30S = 7;
+			constexpr std::int16_t m01S = 4;
+			constexpr std::int16_t m11S = -1;
+			constexpr std::int16_t m21S = 7;
+			constexpr std::int16_t m31S = -3;
+			constexpr std::int16_t m02S = -5;
+			constexpr std::int16_t m12S = 6;
+			constexpr std::int16_t m22S = -7;
+			constexpr std::int16_t m32S = 8;
+			constexpr std::int16_t m03S = 4;
+			constexpr std::int16_t m13S = -1;
+			constexpr std::int16_t m23S = 9;
+			constexpr std::int16_t m33S = -8;
+			auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr auto scale = PonyMath::Core::Matrix4x4<std::int16_t>(m00S, m10S, m20S, m30S, m01S, m11S, m21S, m31S, m02S, m12S, m22S, m32S, m03S, m13S, m23S, m33S);
 			matrix.Scale(scale);
-			Assert::AreEqual(static_cast<short>(m00 * m00S), matrix.M00());
-			Assert::AreEqual(static_cast<short>(m10 * m10S), matrix.M10());
-			Assert::AreEqual(static_cast<short>(m20 * m20S), matrix.M20());
-			Assert::AreEqual(static_cast<short>(m30 * m30S), matrix.M30());
-			Assert::AreEqual(static_cast<short>(m01 * m01S), matrix.M01());
-			Assert::AreEqual(static_cast<short>(m11 * m11S), matrix.M11());
-			Assert::AreEqual(static_cast<short>(m21 * m21S), matrix.M21());
-			Assert::AreEqual(static_cast<short>(m31 * m31S), matrix.M31());
-			Assert::AreEqual(static_cast<short>(m02 * m02S), matrix.M02());
-			Assert::AreEqual(static_cast<short>(m12 * m12S), matrix.M12());
-			Assert::AreEqual(static_cast<short>(m22 * m22S), matrix.M22());
-			Assert::AreEqual(static_cast<short>(m32 * m32S), matrix.M32());
-			Assert::AreEqual(static_cast<short>(m03 * m03S), matrix.M03());
-			Assert::AreEqual(static_cast<short>(m13 * m13S), matrix.M13());
-			Assert::AreEqual(static_cast<short>(m23 * m23S), matrix.M23());
-			Assert::AreEqual(static_cast<short>(m33 * m33S), matrix.M33());
+			Assert::AreEqual(static_cast<std::int16_t>(m00 * m00S), matrix.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10 * m10S), matrix.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20 * m20S), matrix.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30 * m30S), matrix.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01 * m01S), matrix.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11 * m11S), matrix.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21 * m21S), matrix.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31 * m31S), matrix.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02 * m02S), matrix.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12 * m12S), matrix.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22 * m22S), matrix.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32 * m32S), matrix.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03 * m03S), matrix.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13 * m13S), matrix.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23 * m23S), matrix.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33 * m33S), matrix.M33());
 		}
 
 		TEST_METHOD(ScaleThisFloatTest)
@@ -2589,23 +2590,23 @@ namespace Core
 
 		TEST_METHOD(ToStringShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrix = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
 			const auto expectedString = std::format("({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})({}, {}, {}, {})", m00, m01, m02, m03, m10, m11, m12, m13, m20, m21, m22, m23, m30, m31, m32, m33);
 			Assert::AreEqual(expectedString, matrix.ToString());
 			std::ostringstream ss;
@@ -2641,25 +2642,25 @@ namespace Core
 
 		TEST_METHOD(AssignmentCopyShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			PonyMath::Core::Matrix4x4<short> matrixC;
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC = matrixR;
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			PonyMath::Core::Matrix4x4<std::int16_t> matrixC;
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC = matrixR;
 			Assert::AreEqual(m00, matrixC.M00());
 			Assert::AreEqual(m10, matrixC.M10());
 			Assert::AreEqual(m20, matrixC.M20());
@@ -2721,25 +2722,25 @@ namespace Core
 
 		TEST_METHOD(AssignmentMoveShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			PonyMath::Core::Matrix4x4<short> matrixC;
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC = std::move(matrixR);
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			PonyMath::Core::Matrix4x4<std::int16_t> matrixC;
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC = std::move(matrixR);
 			Assert::AreEqual(m00, matrixC.M00());
 			Assert::AreEqual(m10, matrixC.M10());
 			Assert::AreEqual(m20, matrixC.M20());
@@ -2801,57 +2802,57 @@ namespace Core
 
 		TEST_METHOD(AssignmentSumShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			constexpr short m00C = 3;
-			constexpr short m10C = -2;
-			constexpr short m20C = 5;
-			constexpr short m30C = 15;
-			constexpr short m01C = 4;
-			constexpr short m11C = -1;
-			constexpr short m21C = 7;
-			constexpr short m31C = 17;
-			constexpr short m02C = -5;
-			constexpr short m12C = 6;
-			constexpr short m22C = -7;
-			constexpr short m32C = -17;
-			constexpr short m03C = 5;
-			constexpr short m13C = -6;
-			constexpr short m23C = 7;
-			constexpr short m33C = 17;
-			auto matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC += matrixR;
-			Assert::AreEqual(static_cast<short>(m00 + m00C), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10 + m10C), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20 + m20C), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30 + m30C), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01 + m01C), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11 + m11C), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21 + m21C), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31 + m31C), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02 + m02C), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12 + m12C), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22 + m22C), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32 + m32C), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03 + m03C), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13 + m13C), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23 + m23C), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33 + m33C), matrixC.M33());
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00C = 3;
+			constexpr std::int16_t m10C = -2;
+			constexpr std::int16_t m20C = 5;
+			constexpr std::int16_t m30C = 15;
+			constexpr std::int16_t m01C = 4;
+			constexpr std::int16_t m11C = -1;
+			constexpr std::int16_t m21C = 7;
+			constexpr std::int16_t m31C = 17;
+			constexpr std::int16_t m02C = -5;
+			constexpr std::int16_t m12C = 6;
+			constexpr std::int16_t m22C = -7;
+			constexpr std::int16_t m32C = -17;
+			constexpr std::int16_t m03C = 5;
+			constexpr std::int16_t m13C = -6;
+			constexpr std::int16_t m23C = 7;
+			constexpr std::int16_t m33C = 17;
+			auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC += matrixR;
+			Assert::AreEqual(static_cast<std::int16_t>(m00 + m00C), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10 + m10C), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20 + m20C), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30 + m30C), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01 + m01C), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11 + m11C), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21 + m21C), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31 + m31C), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02 + m02C), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12 + m12C), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22 + m22C), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32 + m32C), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03 + m03C), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13 + m13C), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23 + m23C), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33 + m33C), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
 		}
 
@@ -2913,57 +2914,57 @@ namespace Core
 
 		TEST_METHOD(AssignmentSubtractShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			constexpr short m00C = 3;
-			constexpr short m10C = -2;
-			constexpr short m20C = 5;
-			constexpr short m30C = 15;
-			constexpr short m01C = 4;
-			constexpr short m11C = -1;
-			constexpr short m21C = 7;
-			constexpr short m31C = 17;
-			constexpr short m02C = -5;
-			constexpr short m12C = 6;
-			constexpr short m22C = -7;
-			constexpr short m32C = -17;
-			constexpr short m03C = 5;
-			constexpr short m13C = -6;
-			constexpr short m23C = 7;
-			constexpr short m33C = 17;
-			auto matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC -= matrixR;
-			Assert::AreEqual(static_cast<short>(m00C - m00), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10C - m10), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20C - m20), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30C - m30), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01C - m01), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11C - m11), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21C - m21), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31C - m31), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02C - m02), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12C - m12), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22C - m22), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32C - m32), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03C - m03), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13C - m13), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23C - m23), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33C - m33), matrixC.M33());
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00C = 3;
+			constexpr std::int16_t m10C = -2;
+			constexpr std::int16_t m20C = 5;
+			constexpr std::int16_t m30C = 15;
+			constexpr std::int16_t m01C = 4;
+			constexpr std::int16_t m11C = -1;
+			constexpr std::int16_t m21C = 7;
+			constexpr std::int16_t m31C = 17;
+			constexpr std::int16_t m02C = -5;
+			constexpr std::int16_t m12C = 6;
+			constexpr std::int16_t m22C = -7;
+			constexpr std::int16_t m32C = -17;
+			constexpr std::int16_t m03C = 5;
+			constexpr std::int16_t m13C = -6;
+			constexpr std::int16_t m23C = 7;
+			constexpr std::int16_t m33C = 17;
+			auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC -= matrixR;
+			Assert::AreEqual(static_cast<std::int16_t>(m00C - m00), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10C - m10), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20C - m20), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30C - m30), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01C - m01), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11C - m11), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21C - m21), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31C - m31), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02C - m02), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12C - m12), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22C - m22), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32C - m32), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03C - m03), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13C - m13), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23C - m23), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33C - m33), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
 		}
 
@@ -3025,62 +3026,62 @@ namespace Core
 
 		TEST_METHOD(AssignmentMultiplyNumberShortTest)
 		{
-			constexpr short multiplierI = 3;
-			constexpr short m00C = 3;
-			constexpr short m10C = -2;
-			constexpr short m20C = 5;
-			constexpr short m30C = 15;
-			constexpr short m01C = 4;
-			constexpr short m11C = -1;
-			constexpr short m21C = 7;
-			constexpr short m31C = 17;
-			constexpr short m02C = -5;
-			constexpr short m12C = 6;
-			constexpr short m22C = -7;
-			constexpr short m32C = -17;
-			constexpr short m03C = 5;
-			constexpr short m13C = -6;
-			constexpr short m23C = 7;
-			constexpr short m33C = 17;
-			auto matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC *= multiplierI;
-			Assert::AreEqual(static_cast<short>(m00C * multiplierI), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10C * multiplierI), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20C * multiplierI), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30C * multiplierI), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01C * multiplierI), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11C * multiplierI), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21C * multiplierI), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31C * multiplierI), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02C * multiplierI), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12C * multiplierI), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22C * multiplierI), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32C * multiplierI), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03C * multiplierI), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13C * multiplierI), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23C * multiplierI), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33C * multiplierI), matrixC.M33());
+			constexpr std::int16_t multiplierI = 3;
+			constexpr std::int16_t m00C = 3;
+			constexpr std::int16_t m10C = -2;
+			constexpr std::int16_t m20C = 5;
+			constexpr std::int16_t m30C = 15;
+			constexpr std::int16_t m01C = 4;
+			constexpr std::int16_t m11C = -1;
+			constexpr std::int16_t m21C = 7;
+			constexpr std::int16_t m31C = 17;
+			constexpr std::int16_t m02C = -5;
+			constexpr std::int16_t m12C = 6;
+			constexpr std::int16_t m22C = -7;
+			constexpr std::int16_t m32C = -17;
+			constexpr std::int16_t m03C = 5;
+			constexpr std::int16_t m13C = -6;
+			constexpr std::int16_t m23C = 7;
+			constexpr std::int16_t m33C = 17;
+			auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC *= multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(m00C * multiplierI), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10C * multiplierI), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20C * multiplierI), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30C * multiplierI), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01C * multiplierI), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11C * multiplierI), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21C * multiplierI), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31C * multiplierI), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02C * multiplierI), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12C * multiplierI), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22C * multiplierI), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32C * multiplierI), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03C * multiplierI), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13C * multiplierI), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23C * multiplierI), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33C * multiplierI), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
 
 			constexpr float multiplierF = 5.f;
-			matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL1 = matrixC *= multiplierF;
-			Assert::AreEqual(static_cast<short>(m00C * multiplierF), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10C * multiplierF), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20C * multiplierF), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30C * multiplierF), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01C * multiplierF), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11C * multiplierF), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21C * multiplierF), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31C * multiplierF), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02C * multiplierF), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12C * multiplierF), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22C * multiplierF), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32C * multiplierF), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03C * multiplierF), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13C * multiplierF), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23C * multiplierF), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33C * multiplierF), matrixC.M33());
+			matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL1 = matrixC *= multiplierF;
+			Assert::AreEqual(static_cast<std::int16_t>(m00C * multiplierF), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10C * multiplierF), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20C * multiplierF), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30C * multiplierF), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01C * multiplierF), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11C * multiplierF), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21C * multiplierF), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31C * multiplierF), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02C * multiplierF), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12C * multiplierF), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22C * multiplierF), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32C * multiplierF), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03C * multiplierF), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13C * multiplierF), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23C * multiplierF), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33C * multiplierF), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
@@ -3126,57 +3127,57 @@ namespace Core
 
 		TEST_METHOD(AssignmentMultiplyMatrixShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			constexpr short m00C = 3;
-			constexpr short m10C = -2;
-			constexpr short m20C = 5;
-			constexpr short m30C = 15;
-			constexpr short m01C = 4;
-			constexpr short m11C = -1;
-			constexpr short m21C = 7;
-			constexpr short m31C = 17;
-			constexpr short m02C = -5;
-			constexpr short m12C = 6;
-			constexpr short m22C = -7;
-			constexpr short m32C = -17;
-			constexpr short m03C = 5;
-			constexpr short m13C = -6;
-			constexpr short m23C = 7;
-			constexpr short m33C = 17;
-			auto matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC *= matrixR;
-			Assert::AreEqual(short{103}, matrixC.M00());
-			Assert::AreEqual(short{-49}, matrixC.M10());
-			Assert::AreEqual(short{174}, matrixC.M20());
-			Assert::AreEqual(short{454}, matrixC.M30());
-			Assert::AreEqual(short{28}, matrixC.M01());
-			Assert::AreEqual(short{62}, matrixC.M11());
-			Assert::AreEqual(short{86}, matrixC.M21());
-			Assert::AreEqual(short{366}, matrixC.M31());
-			Assert::AreEqual(short{106}, matrixC.M02());
-			Assert::AreEqual(short{-91}, matrixC.M12());
-			Assert::AreEqual(short{163}, matrixC.M22());
-			Assert::AreEqual(short{413}, matrixC.M32());
-			Assert::AreEqual(short{-84}, matrixC.M03());
-			Assert::AreEqual(short{118}, matrixC.M13());
-			Assert::AreEqual(short{-114}, matrixC.M23());
-			Assert::AreEqual(short{-314}, matrixC.M33());
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			constexpr std::int16_t m00C = 3;
+			constexpr std::int16_t m10C = -2;
+			constexpr std::int16_t m20C = 5;
+			constexpr std::int16_t m30C = 15;
+			constexpr std::int16_t m01C = 4;
+			constexpr std::int16_t m11C = -1;
+			constexpr std::int16_t m21C = 7;
+			constexpr std::int16_t m31C = 17;
+			constexpr std::int16_t m02C = -5;
+			constexpr std::int16_t m12C = 6;
+			constexpr std::int16_t m22C = -7;
+			constexpr std::int16_t m32C = -17;
+			constexpr std::int16_t m03C = 5;
+			constexpr std::int16_t m13C = -6;
+			constexpr std::int16_t m23C = 7;
+			constexpr std::int16_t m33C = 17;
+			auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC *= matrixR;
+			Assert::AreEqual(std::int16_t{103}, matrixC.M00());
+			Assert::AreEqual(std::int16_t{-49}, matrixC.M10());
+			Assert::AreEqual(std::int16_t{174}, matrixC.M20());
+			Assert::AreEqual(std::int16_t{454}, matrixC.M30());
+			Assert::AreEqual(std::int16_t{28}, matrixC.M01());
+			Assert::AreEqual(std::int16_t{62}, matrixC.M11());
+			Assert::AreEqual(std::int16_t{86}, matrixC.M21());
+			Assert::AreEqual(std::int16_t{366}, matrixC.M31());
+			Assert::AreEqual(std::int16_t{106}, matrixC.M02());
+			Assert::AreEqual(std::int16_t{-91}, matrixC.M12());
+			Assert::AreEqual(std::int16_t{163}, matrixC.M22());
+			Assert::AreEqual(std::int16_t{413}, matrixC.M32());
+			Assert::AreEqual(std::int16_t{-84}, matrixC.M03());
+			Assert::AreEqual(std::int16_t{118}, matrixC.M13());
+			Assert::AreEqual(std::int16_t{-114}, matrixC.M23());
+			Assert::AreEqual(std::int16_t{-314}, matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
 		}
 
@@ -3238,62 +3239,62 @@ namespace Core
 
 		TEST_METHOD(AssignmentDivideNumberShortTest)
 		{
-			constexpr short multiplierI = 3;
-			constexpr short m00C = 3;
-			constexpr short m10C = -2;
-			constexpr short m20C = 5;
-			constexpr short m30C = 15;
-			constexpr short m01C = 4;
-			constexpr short m11C = -1;
-			constexpr short m21C = 7;
-			constexpr short m31C = 17;
-			constexpr short m02C = -5;
-			constexpr short m12C = 6;
-			constexpr short m22C = -7;
-			constexpr short m32C = -17;
-			constexpr short m03C = 5;
-			constexpr short m13C = -6;
-			constexpr short m23C = 7;
-			constexpr short m33C = 17;
-			auto matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL = matrixC /= multiplierI;
-			Assert::AreEqual(static_cast<short>(m00C / multiplierI), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10C / multiplierI), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20C / multiplierI), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30C / multiplierI), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01C / multiplierI), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11C / multiplierI), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21C / multiplierI), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31C / multiplierI), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02C / multiplierI), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12C / multiplierI), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22C / multiplierI), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32C / multiplierI), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03C / multiplierI), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13C / multiplierI), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23C / multiplierI), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33C / multiplierI), matrixC.M33());
+			constexpr std::int16_t multiplierI = 3;
+			constexpr std::int16_t m00C = 3;
+			constexpr std::int16_t m10C = -2;
+			constexpr std::int16_t m20C = 5;
+			constexpr std::int16_t m30C = 15;
+			constexpr std::int16_t m01C = 4;
+			constexpr std::int16_t m11C = -1;
+			constexpr std::int16_t m21C = 7;
+			constexpr std::int16_t m31C = 17;
+			constexpr std::int16_t m02C = -5;
+			constexpr std::int16_t m12C = 6;
+			constexpr std::int16_t m22C = -7;
+			constexpr std::int16_t m32C = -17;
+			constexpr std::int16_t m03C = 5;
+			constexpr std::int16_t m13C = -6;
+			constexpr std::int16_t m23C = 7;
+			constexpr std::int16_t m33C = 17;
+			auto matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL = matrixC /= multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(m00C / multiplierI), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10C / multiplierI), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20C / multiplierI), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30C / multiplierI), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01C / multiplierI), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11C / multiplierI), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21C / multiplierI), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31C / multiplierI), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02C / multiplierI), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12C / multiplierI), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22C / multiplierI), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32C / multiplierI), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03C / multiplierI), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13C / multiplierI), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23C / multiplierI), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33C / multiplierI), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL));
 
 			constexpr float multiplierF = 5.f;
-			matrixC = PonyMath::Core::Matrix4x4<short>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
-			PonyMath::Core::Matrix4x4<short>& matrixL1 = matrixC /= multiplierF;
-			Assert::AreEqual(static_cast<short>(m00C / multiplierF), matrixC.M00());
-			Assert::AreEqual(static_cast<short>(m10C / multiplierF), matrixC.M10());
-			Assert::AreEqual(static_cast<short>(m20C / multiplierF), matrixC.M20());
-			Assert::AreEqual(static_cast<short>(m30C / multiplierF), matrixC.M30());
-			Assert::AreEqual(static_cast<short>(m01C / multiplierF), matrixC.M01());
-			Assert::AreEqual(static_cast<short>(m11C / multiplierF), matrixC.M11());
-			Assert::AreEqual(static_cast<short>(m21C / multiplierF), matrixC.M21());
-			Assert::AreEqual(static_cast<short>(m31C / multiplierF), matrixC.M31());
-			Assert::AreEqual(static_cast<short>(m02C / multiplierF), matrixC.M02());
-			Assert::AreEqual(static_cast<short>(m12C / multiplierF), matrixC.M12());
-			Assert::AreEqual(static_cast<short>(m22C / multiplierF), matrixC.M22());
-			Assert::AreEqual(static_cast<short>(m32C / multiplierF), matrixC.M32());
-			Assert::AreEqual(static_cast<short>(m03C / multiplierF), matrixC.M03());
-			Assert::AreEqual(static_cast<short>(m13C / multiplierF), matrixC.M13());
-			Assert::AreEqual(static_cast<short>(m23C / multiplierF), matrixC.M23());
-			Assert::AreEqual(static_cast<short>(m33C / multiplierF), matrixC.M33());
+			matrixC = PonyMath::Core::Matrix4x4<std::int16_t>(m00C, m10C, m20C, m30C, m01C, m11C, m21C, m31C, m02C, m12C, m22C, m32C, m03C, m13C, m23C, m33C);
+			PonyMath::Core::Matrix4x4<std::int16_t>& matrixL1 = matrixC /= multiplierF;
+			Assert::AreEqual(static_cast<std::int16_t>(m00C / multiplierF), matrixC.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10C / multiplierF), matrixC.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20C / multiplierF), matrixC.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30C / multiplierF), matrixC.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01C / multiplierF), matrixC.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11C / multiplierF), matrixC.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21C / multiplierF), matrixC.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31C / multiplierF), matrixC.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02C / multiplierF), matrixC.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12C / multiplierF), matrixC.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22C / multiplierF), matrixC.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32C / multiplierF), matrixC.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03C / multiplierF), matrixC.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13C / multiplierF), matrixC.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23C / multiplierF), matrixC.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33C / multiplierF), matrixC.M33());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&matrixC), reinterpret_cast<std::uintptr_t>(&matrixL1));
 		}
 
@@ -3339,29 +3340,29 @@ namespace Core
 
 		TEST_METHOD(EqualityOperatorShortTest)
 		{
-			constexpr short m00 = 11;
-			constexpr short m10 = 15;
-			constexpr short m20 = 3;
-			constexpr short m30 = 5;
-			constexpr short m01 = 55;
-			constexpr short m11 = 2;
-			constexpr short m21 = 30;
-			constexpr short m31 = 1;
-			constexpr short m02 = 6;
-			constexpr short m12 = 7;
-			constexpr short m22 = 9;
-			constexpr short m32 = 21;
-			constexpr short m03 = -13;
-			constexpr short m13 = 10;
-			constexpr short m23 = 11;
-			constexpr short m33 = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
-			PonyMath::Core::Matrix4x4<short> matrixL = matrixR;
+			constexpr std::int16_t m00 = 11;
+			constexpr std::int16_t m10 = 15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 5;
+			constexpr std::int16_t m01 = 55;
+			constexpr std::int16_t m11 = 2;
+			constexpr std::int16_t m21 = 30;
+			constexpr std::int16_t m31 = 1;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 9;
+			constexpr std::int16_t m32 = 21;
+			constexpr std::int16_t m03 = -13;
+			constexpr std::int16_t m13 = 10;
+			constexpr std::int16_t m23 = 11;
+			constexpr std::int16_t m33 = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00, m10, m20, m30, m01, m11, m21, m31, m02, m12, m22, m32, m03, m13, m23, m33);
+			PonyMath::Core::Matrix4x4<std::int16_t> matrixL = matrixR;
 
 			Assert::IsTrue(matrixL == matrixR);
 			Assert::IsFalse(matrixL != matrixR);
 
-			for (std::size_t i = 0; i < PonyMath::Core::Matrix4x4<short>::ComponentCount; ++i)
+			for (std::size_t i = 0; i < PonyMath::Core::Matrix4x4<std::int16_t>::ComponentCount; ++i)
 			{
 				matrixL.Span()[i] += 1;
 				Assert::IsFalse(matrixL == matrixR);
@@ -3411,63 +3412,63 @@ namespace Core
 			Assert::IsTrue(PonyMath::Core::Matrix4x4<float>::Predefined::Identity == PonyMath::Core::Matrix4x4<float>(1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f, 0.f, 0.f, 0.f, 0.f, 1.f));
 			Assert::IsTrue(PonyMath::Core::Matrix4x4<float>::Predefined::Zero == PonyMath::Core::Matrix4x4<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f, 0.f));
 
-			Assert::IsTrue(PonyMath::Core::Matrix4x4<short>::Predefined::Identity == PonyMath::Core::Matrix4x4<short>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
-			Assert::IsTrue(PonyMath::Core::Matrix4x4<short>::Predefined::Zero == PonyMath::Core::Matrix4x4<short>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
+			Assert::IsTrue(PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Identity == PonyMath::Core::Matrix4x4<std::int16_t>(1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1, 0, 0, 0, 0, 1));
+			Assert::IsTrue(PonyMath::Core::Matrix4x4<std::int16_t>::Predefined::Zero == PonyMath::Core::Matrix4x4<std::int16_t>(0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0));
 		}
 
 		TEST_METHOD(ScaleShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr short m01R = 55;
-			constexpr short m11R = 2;
-			constexpr short m21R = 30;
-			constexpr short m31R = 1;
-			constexpr short m02R = 6;
-			constexpr short m12R = 7;
-			constexpr short m22R = 9;
-			constexpr short m32R = 21;
-			constexpr short m03R = -13;
-			constexpr short m13R = 10;
-			constexpr short m23R = 11;
-			constexpr short m33R = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			const PonyMath::Core::Matrix4x4<short> scaled = PonyMath::Core::Scale(matrixL, matrixR);
-			Assert::AreEqual(static_cast<short>(m00L * m00R), scaled.M00());
-			Assert::AreEqual(static_cast<short>(m10L * m10R), scaled.M10());
-			Assert::AreEqual(static_cast<short>(m20L * m20R), scaled.M20());
-			Assert::AreEqual(static_cast<short>(m30L * m30R), scaled.M30());
-			Assert::AreEqual(static_cast<short>(m01L * m01R), scaled.M01());
-			Assert::AreEqual(static_cast<short>(m11L * m11R), scaled.M11());
-			Assert::AreEqual(static_cast<short>(m21L * m21R), scaled.M21());
-			Assert::AreEqual(static_cast<short>(m31L * m31R), scaled.M31());
-			Assert::AreEqual(static_cast<short>(m02L * m02R), scaled.M02());
-			Assert::AreEqual(static_cast<short>(m12L * m12R), scaled.M12());
-			Assert::AreEqual(static_cast<short>(m22L * m22R), scaled.M22());
-			Assert::AreEqual(static_cast<short>(m32L * m32R), scaled.M32());
-			Assert::AreEqual(static_cast<short>(m03L * m03R), scaled.M03());
-			Assert::AreEqual(static_cast<short>(m13L * m13R), scaled.M13());
-			Assert::AreEqual(static_cast<short>(m23L * m23R), scaled.M23());
-			Assert::AreEqual(static_cast<short>(m33L * m33R), scaled.M33());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr std::int16_t m01R = 55;
+			constexpr std::int16_t m11R = 2;
+			constexpr std::int16_t m21R = 30;
+			constexpr std::int16_t m31R = 1;
+			constexpr std::int16_t m02R = 6;
+			constexpr std::int16_t m12R = 7;
+			constexpr std::int16_t m22R = 9;
+			constexpr std::int16_t m32R = 21;
+			constexpr std::int16_t m03R = -13;
+			constexpr std::int16_t m13R = 10;
+			constexpr std::int16_t m23R = 11;
+			constexpr std::int16_t m33R = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			const PonyMath::Core::Matrix4x4<std::int16_t> scaled = PonyMath::Core::Scale(matrixL, matrixR);
+			Assert::AreEqual(static_cast<std::int16_t>(m00L * m00R), scaled.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L * m10R), scaled.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L * m20R), scaled.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L * m30R), scaled.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L * m01R), scaled.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L * m11R), scaled.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L * m21R), scaled.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L * m31R), scaled.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L * m02R), scaled.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L * m12R), scaled.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L * m22R), scaled.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L * m32R), scaled.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L * m03R), scaled.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L * m13R), scaled.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L * m23R), scaled.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L * m33R), scaled.M33());
 		}
 
 		TEST_METHOD(ScaleFloatTest)
@@ -3559,57 +3560,57 @@ namespace Core
 
 		TEST_METHOD(AddShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr short m01R = 55;
-			constexpr short m11R = 2;
-			constexpr short m21R = 30;
-			constexpr short m31R = 1;
-			constexpr short m02R = 6;
-			constexpr short m12R = 7;
-			constexpr short m22R = 9;
-			constexpr short m32R = 21;
-			constexpr short m03R = -13;
-			constexpr short m13R = 10;
-			constexpr short m23R = 11;
-			constexpr short m33R = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Matrix4x4<short> sum = matrixL + matrixR;
-			Assert::AreEqual(static_cast<short>(m00L + m00R), sum.M00());
-			Assert::AreEqual(static_cast<short>(m10L + m10R), sum.M10());
-			Assert::AreEqual(static_cast<short>(m20L + m20R), sum.M20());
-			Assert::AreEqual(static_cast<short>(m30L + m30R), sum.M30());
-			Assert::AreEqual(static_cast<short>(m01L + m01R), sum.M01());
-			Assert::AreEqual(static_cast<short>(m11L + m11R), sum.M11());
-			Assert::AreEqual(static_cast<short>(m21L + m21R), sum.M21());
-			Assert::AreEqual(static_cast<short>(m31L + m31R), sum.M31());
-			Assert::AreEqual(static_cast<short>(m02L + m02R), sum.M02());
-			Assert::AreEqual(static_cast<short>(m12L + m12R), sum.M12());
-			Assert::AreEqual(static_cast<short>(m22L + m22R), sum.M22());
-			Assert::AreEqual(static_cast<short>(m32L + m32R), sum.M32());
-			Assert::AreEqual(static_cast<short>(m03L + m03R), sum.M03());
-			Assert::AreEqual(static_cast<short>(m13L + m13R), sum.M13());
-			Assert::AreEqual(static_cast<short>(m23L + m23R), sum.M23());
-			Assert::AreEqual(static_cast<short>(m33L + m33R), sum.M33());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr std::int16_t m01R = 55;
+			constexpr std::int16_t m11R = 2;
+			constexpr std::int16_t m21R = 30;
+			constexpr std::int16_t m31R = 1;
+			constexpr std::int16_t m02R = 6;
+			constexpr std::int16_t m12R = 7;
+			constexpr std::int16_t m22R = 9;
+			constexpr std::int16_t m32R = 21;
+			constexpr std::int16_t m03R = -13;
+			constexpr std::int16_t m13R = 10;
+			constexpr std::int16_t m23R = 11;
+			constexpr std::int16_t m33R = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Matrix4x4<std::int16_t> sum = matrixL + matrixR;
+			Assert::AreEqual(static_cast<std::int16_t>(m00L + m00R), sum.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L + m10R), sum.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L + m20R), sum.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L + m30R), sum.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L + m01R), sum.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L + m11R), sum.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L + m21R), sum.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L + m31R), sum.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L + m02R), sum.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L + m12R), sum.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L + m22R), sum.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L + m32R), sum.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L + m03R), sum.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L + m13R), sum.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L + m23R), sum.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L + m33R), sum.M33());
 		}
 
 		TEST_METHOD(AddFloatTest)
@@ -3669,40 +3670,40 @@ namespace Core
 
 		TEST_METHOD(NegateShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr short m01R = 55;
-			constexpr short m11R = 2;
-			constexpr short m21R = 30;
-			constexpr short m31R = 1;
-			constexpr short m02R = 6;
-			constexpr short m12R = 7;
-			constexpr short m22R = 9;
-			constexpr short m32R = 21;
-			constexpr short m03R = -13;
-			constexpr short m13R = 10;
-			constexpr short m23R = 11;
-			constexpr short m33R = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
-			PonyMath::Core::Matrix4x4<short> negated = -matrixR;
-			Assert::AreEqual(static_cast<short>(-m00R), negated.M00());
-			Assert::AreEqual(static_cast<short>(-m10R), negated.M10());
-			Assert::AreEqual(static_cast<short>(-m20R), negated.M20());
-			Assert::AreEqual(static_cast<short>(-m30R), negated.M30());
-			Assert::AreEqual(static_cast<short>(-m01R), negated.M01());
-			Assert::AreEqual(static_cast<short>(-m11R), negated.M11());
-			Assert::AreEqual(static_cast<short>(-m21R), negated.M21());
-			Assert::AreEqual(static_cast<short>(-m31R), negated.M31());
-			Assert::AreEqual(static_cast<short>(-m02R), negated.M02());
-			Assert::AreEqual(static_cast<short>(-m12R), negated.M12());
-			Assert::AreEqual(static_cast<short>(-m22R), negated.M22());
-			Assert::AreEqual(static_cast<short>(-m32R), negated.M32());
-			Assert::AreEqual(static_cast<short>(-m03R), negated.M03());
-			Assert::AreEqual(static_cast<short>(-m13R), negated.M13());
-			Assert::AreEqual(static_cast<short>(-m23R), negated.M23());
-			Assert::AreEqual(static_cast<short>(-m33R), negated.M33());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr std::int16_t m01R = 55;
+			constexpr std::int16_t m11R = 2;
+			constexpr std::int16_t m21R = 30;
+			constexpr std::int16_t m31R = 1;
+			constexpr std::int16_t m02R = 6;
+			constexpr std::int16_t m12R = 7;
+			constexpr std::int16_t m22R = 9;
+			constexpr std::int16_t m32R = 21;
+			constexpr std::int16_t m03R = -13;
+			constexpr std::int16_t m13R = 10;
+			constexpr std::int16_t m23R = 11;
+			constexpr std::int16_t m33R = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
+			PonyMath::Core::Matrix4x4<std::int16_t> negated = -matrixR;
+			Assert::AreEqual(static_cast<std::int16_t>(-m00R), negated.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(-m10R), negated.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(-m20R), negated.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(-m30R), negated.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(-m01R), negated.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(-m11R), negated.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(-m21R), negated.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(-m31R), negated.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(-m02R), negated.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(-m12R), negated.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(-m22R), negated.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(-m32R), negated.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(-m03R), negated.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(-m13R), negated.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(-m23R), negated.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(-m33R), negated.M33());
 		}
 
 		TEST_METHOD(NegateFloatTest)
@@ -3745,57 +3746,57 @@ namespace Core
 
 		TEST_METHOD(SubtractShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr short m01R = 55;
-			constexpr short m11R = 2;
-			constexpr short m21R = 30;
-			constexpr short m31R = 1;
-			constexpr short m02R = 6;
-			constexpr short m12R = 7;
-			constexpr short m22R = 9;
-			constexpr short m32R = 21;
-			constexpr short m03R = -13;
-			constexpr short m13R = 10;
-			constexpr short m23R = 11;
-			constexpr short m33R = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Matrix4x4<short> sum = matrixL - matrixR;
-			Assert::AreEqual(static_cast<short>(m00L - m00R), sum.M00());
-			Assert::AreEqual(static_cast<short>(m10L - m10R), sum.M10());
-			Assert::AreEqual(static_cast<short>(m20L - m20R), sum.M20());
-			Assert::AreEqual(static_cast<short>(m30L - m30R), sum.M30());
-			Assert::AreEqual(static_cast<short>(m01L - m01R), sum.M01());
-			Assert::AreEqual(static_cast<short>(m11L - m11R), sum.M11());
-			Assert::AreEqual(static_cast<short>(m21L - m21R), sum.M21());
-			Assert::AreEqual(static_cast<short>(m31L - m31R), sum.M31());
-			Assert::AreEqual(static_cast<short>(m02L - m02R), sum.M02());
-			Assert::AreEqual(static_cast<short>(m12L - m12R), sum.M12());
-			Assert::AreEqual(static_cast<short>(m22L - m22R), sum.M22());
-			Assert::AreEqual(static_cast<short>(m32L - m32R), sum.M32());
-			Assert::AreEqual(static_cast<short>(m03L - m03R), sum.M03());
-			Assert::AreEqual(static_cast<short>(m13L - m13R), sum.M13());
-			Assert::AreEqual(static_cast<short>(m23L - m23R), sum.M23());
-			Assert::AreEqual(static_cast<short>(m33L - m33R), sum.M33());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr std::int16_t m01R = 55;
+			constexpr std::int16_t m11R = 2;
+			constexpr std::int16_t m21R = 30;
+			constexpr std::int16_t m31R = 1;
+			constexpr std::int16_t m02R = 6;
+			constexpr std::int16_t m12R = 7;
+			constexpr std::int16_t m22R = 9;
+			constexpr std::int16_t m32R = 21;
+			constexpr std::int16_t m03R = -13;
+			constexpr std::int16_t m13R = 10;
+			constexpr std::int16_t m23R = 11;
+			constexpr std::int16_t m33R = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Matrix4x4<std::int16_t> sum = matrixL - matrixR;
+			Assert::AreEqual(static_cast<std::int16_t>(m00L - m00R), sum.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L - m10R), sum.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L - m20R), sum.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L - m30R), sum.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L - m01R), sum.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L - m11R), sum.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L - m21R), sum.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L - m31R), sum.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L - m02R), sum.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L - m12R), sum.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L - m22R), sum.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L - m32R), sum.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L - m03R), sum.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L - m13R), sum.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L - m23R), sum.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L - m33R), sum.M33());
 		}
 
 		TEST_METHOD(SubtractFloatTest)
@@ -3855,61 +3856,61 @@ namespace Core
 
 		TEST_METHOD(MultiplyNumberShortTest)
 		{
-			constexpr short multiplierI = 2;
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Matrix4x4<short> product = matrixL * multiplierI;
-			Assert::AreEqual(static_cast<short>(m00L * multiplierI), product.M00());
-			Assert::AreEqual(static_cast<short>(m10L * multiplierI), product.M10());
-			Assert::AreEqual(static_cast<short>(m20L * multiplierI), product.M20());
-			Assert::AreEqual(static_cast<short>(m30L * multiplierI), product.M30());
-			Assert::AreEqual(static_cast<short>(m01L * multiplierI), product.M01());
-			Assert::AreEqual(static_cast<short>(m11L * multiplierI), product.M11());
-			Assert::AreEqual(static_cast<short>(m21L * multiplierI), product.M21());
-			Assert::AreEqual(static_cast<short>(m31L * multiplierI), product.M31());
-			Assert::AreEqual(static_cast<short>(m02L * multiplierI), product.M02());
-			Assert::AreEqual(static_cast<short>(m12L * multiplierI), product.M12());
-			Assert::AreEqual(static_cast<short>(m22L * multiplierI), product.M22());
-			Assert::AreEqual(static_cast<short>(m32L * multiplierI), product.M32());
-			Assert::AreEqual(static_cast<short>(m03L * multiplierI), product.M03());
-			Assert::AreEqual(static_cast<short>(m13L * multiplierI), product.M13());
-			Assert::AreEqual(static_cast<short>(m23L * multiplierI), product.M23());
-			Assert::AreEqual(static_cast<short>(m33L * multiplierI), product.M33());
+			constexpr std::int16_t multiplierI = 2;
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Matrix4x4<std::int16_t> product = matrixL * multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(m00L * multiplierI), product.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L * multiplierI), product.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L * multiplierI), product.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L * multiplierI), product.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L * multiplierI), product.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L * multiplierI), product.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L * multiplierI), product.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L * multiplierI), product.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L * multiplierI), product.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L * multiplierI), product.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L * multiplierI), product.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L * multiplierI), product.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L * multiplierI), product.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L * multiplierI), product.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L * multiplierI), product.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L * multiplierI), product.M33());
 			Assert::IsTrue(multiplierI * matrixL == matrixL * multiplierI);
 
 			constexpr float multiplierF = 3;
 			product = matrixL * multiplierF;
-			Assert::AreEqual(static_cast<short>(m00L * multiplierF), product.M00());
-			Assert::AreEqual(static_cast<short>(m10L * multiplierF), product.M10());
-			Assert::AreEqual(static_cast<short>(m20L * multiplierF), product.M20());
-			Assert::AreEqual(static_cast<short>(m30L * multiplierF), product.M30());
-			Assert::AreEqual(static_cast<short>(m01L * multiplierF), product.M01());
-			Assert::AreEqual(static_cast<short>(m11L * multiplierF), product.M11());
-			Assert::AreEqual(static_cast<short>(m21L * multiplierF), product.M21());
-			Assert::AreEqual(static_cast<short>(m31L * multiplierF), product.M31());
-			Assert::AreEqual(static_cast<short>(m02L * multiplierF), product.M02());
-			Assert::AreEqual(static_cast<short>(m12L * multiplierF), product.M12());
-			Assert::AreEqual(static_cast<short>(m22L * multiplierF), product.M22());
-			Assert::AreEqual(static_cast<short>(m32L * multiplierF), product.M32());
-			Assert::AreEqual(static_cast<short>(m03L * multiplierF), product.M03());
-			Assert::AreEqual(static_cast<short>(m13L * multiplierF), product.M13());
-			Assert::AreEqual(static_cast<short>(m23L * multiplierF), product.M23());
-			Assert::AreEqual(static_cast<short>(m33L * multiplierF), product.M33());
+			Assert::AreEqual(static_cast<std::int16_t>(m00L * multiplierF), product.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L * multiplierF), product.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L * multiplierF), product.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L * multiplierF), product.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L * multiplierF), product.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L * multiplierF), product.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L * multiplierF), product.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L * multiplierF), product.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L * multiplierF), product.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L * multiplierF), product.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L * multiplierF), product.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L * multiplierF), product.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L * multiplierF), product.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L * multiplierF), product.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L * multiplierF), product.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L * multiplierF), product.M33());
 			Assert::IsTrue(multiplierF * matrixL == matrixL * multiplierF);
 		}
 
@@ -3955,57 +3956,57 @@ namespace Core
 
 		TEST_METHOD(MultiplyMatrixShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr short m01R = 55;
-			constexpr short m11R = 2;
-			constexpr short m21R = 30;
-			constexpr short m31R = 1;
-			constexpr short m02R = 6;
-			constexpr short m12R = 7;
-			constexpr short m22R = 9;
-			constexpr short m32R = 21;
-			constexpr short m03R = -13;
-			constexpr short m13R = 10;
-			constexpr short m23R = 11;
-			constexpr short m33R = -6;
-			constexpr auto matrixR = PonyMath::Core::Matrix4x4<short>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Matrix4x4<short> product = matrixL * matrixR;
-			Assert::AreEqual(short{103}, product.M00());
-			Assert::AreEqual(short{-49}, product.M10());
-			Assert::AreEqual(short{174}, product.M20());
-			Assert::AreEqual(short{454}, product.M30());
-			Assert::AreEqual(short{28}, product.M01());
-			Assert::AreEqual(short{62}, product.M11());
-			Assert::AreEqual(short{86}, product.M21());
-			Assert::AreEqual(short{366}, product.M31());
-			Assert::AreEqual(short{106}, product.M02());
-			Assert::AreEqual(short{-91}, product.M12());
-			Assert::AreEqual(short{163}, product.M22());
-			Assert::AreEqual(short{413}, product.M32());
-			Assert::AreEqual(short{-84}, product.M03());
-			Assert::AreEqual(short{118}, product.M13());
-			Assert::AreEqual(short{-114}, product.M23());
-			Assert::AreEqual(short{-314}, product.M33());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr std::int16_t m01R = 55;
+			constexpr std::int16_t m11R = 2;
+			constexpr std::int16_t m21R = 30;
+			constexpr std::int16_t m31R = 1;
+			constexpr std::int16_t m02R = 6;
+			constexpr std::int16_t m12R = 7;
+			constexpr std::int16_t m22R = 9;
+			constexpr std::int16_t m32R = 21;
+			constexpr std::int16_t m03R = -13;
+			constexpr std::int16_t m13R = 10;
+			constexpr std::int16_t m23R = 11;
+			constexpr std::int16_t m33R = -6;
+			constexpr auto matrixR = PonyMath::Core::Matrix4x4<std::int16_t>(m00R, m10R, m20R, m30R, m01R, m11R, m21R, m31R, m02R, m12R, m22R, m32R, m03R, m13R, m23R, m33R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Matrix4x4<std::int16_t> product = matrixL * matrixR;
+			Assert::AreEqual(std::int16_t{103}, product.M00());
+			Assert::AreEqual(std::int16_t{-49}, product.M10());
+			Assert::AreEqual(std::int16_t{174}, product.M20());
+			Assert::AreEqual(std::int16_t{454}, product.M30());
+			Assert::AreEqual(std::int16_t{28}, product.M01());
+			Assert::AreEqual(std::int16_t{62}, product.M11());
+			Assert::AreEqual(std::int16_t{86}, product.M21());
+			Assert::AreEqual(std::int16_t{366}, product.M31());
+			Assert::AreEqual(std::int16_t{106}, product.M02());
+			Assert::AreEqual(std::int16_t{-91}, product.M12());
+			Assert::AreEqual(std::int16_t{163}, product.M22());
+			Assert::AreEqual(std::int16_t{413}, product.M32());
+			Assert::AreEqual(std::int16_t{-84}, product.M03());
+			Assert::AreEqual(std::int16_t{118}, product.M13());
+			Assert::AreEqual(std::int16_t{-114}, product.M23());
+			Assert::AreEqual(std::int16_t{-314}, product.M33());
 		}
 
 		TEST_METHOD(MultiplyMatrixFloatTest)
@@ -4065,33 +4066,33 @@ namespace Core
 
 		TEST_METHOD(MultiplyVectorShortTest)
 		{
-			constexpr short m00R = 11;
-			constexpr short m10R = 15;
-			constexpr short m20R = 3;
-			constexpr short m30R = 5;
-			constexpr auto vectorR = PonyMath::Core::Vector4<short>(m00R, m10R, m20R, m30R);
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Vector4<short> product = matrixL * vectorR;
-			Assert::AreEqual(short{103}, product.X());
-			Assert::AreEqual(short{-49}, product.Y());
-			Assert::AreEqual(short{174}, product.Z());
-			Assert::AreEqual(short{454}, product.W());
+			constexpr std::int16_t m00R = 11;
+			constexpr std::int16_t m10R = 15;
+			constexpr std::int16_t m20R = 3;
+			constexpr std::int16_t m30R = 5;
+			constexpr auto vectorR = PonyMath::Core::Vector4<std::int16_t>(m00R, m10R, m20R, m30R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Vector4<std::int16_t> product = matrixL * vectorR;
+			Assert::AreEqual(std::int16_t{103}, product.X());
+			Assert::AreEqual(std::int16_t{-49}, product.Y());
+			Assert::AreEqual(std::int16_t{174}, product.Z());
+			Assert::AreEqual(std::int16_t{454}, product.W());
 		}
 
 		TEST_METHOD(MultiplyVectorFloatTest)
@@ -4127,61 +4128,61 @@ namespace Core
 
 		TEST_METHOD(DivideShortTest)
 		{
-			constexpr short multiplierI = 2;
-			constexpr short m00L = 3;
-			constexpr short m10L = -2;
-			constexpr short m20L = 5;
-			constexpr short m30L = 15;
-			constexpr short m01L = 4;
-			constexpr short m11L = -1;
-			constexpr short m21L = 7;
-			constexpr short m31L = 17;
-			constexpr short m02L = -5;
-			constexpr short m12L = 6;
-			constexpr short m22L = -7;
-			constexpr short m32L = -17;
-			constexpr short m03L = 5;
-			constexpr short m13L = -6;
-			constexpr short m23L = 7;
-			constexpr short m33L = 17;
-			constexpr auto matrixL = PonyMath::Core::Matrix4x4<short>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
-			PonyMath::Core::Matrix4x4<short> product = matrixL / multiplierI;
-			Assert::AreEqual(static_cast<short>(m00L / multiplierI), product.M00());
-			Assert::AreEqual(static_cast<short>(m10L / multiplierI), product.M10());
-			Assert::AreEqual(static_cast<short>(m20L / multiplierI), product.M20());
-			Assert::AreEqual(static_cast<short>(m30L / multiplierI), product.M30());
-			Assert::AreEqual(static_cast<short>(m01L / multiplierI), product.M01());
-			Assert::AreEqual(static_cast<short>(m11L / multiplierI), product.M11());
-			Assert::AreEqual(static_cast<short>(m21L / multiplierI), product.M21());
-			Assert::AreEqual(static_cast<short>(m31L / multiplierI), product.M31());
-			Assert::AreEqual(static_cast<short>(m02L / multiplierI), product.M02());
-			Assert::AreEqual(static_cast<short>(m12L / multiplierI), product.M12());
-			Assert::AreEqual(static_cast<short>(m22L / multiplierI), product.M22());
-			Assert::AreEqual(static_cast<short>(m32L / multiplierI), product.M32());
-			Assert::AreEqual(static_cast<short>(m03L / multiplierI), product.M03());
-			Assert::AreEqual(static_cast<short>(m13L / multiplierI), product.M13());
-			Assert::AreEqual(static_cast<short>(m23L / multiplierI), product.M23());
-			Assert::AreEqual(static_cast<short>(m33L / multiplierI), product.M33());
+			constexpr std::int16_t multiplierI = 2;
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m30L = 15;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m31L = 17;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr std::int16_t m32L = -17;
+			constexpr std::int16_t m03L = 5;
+			constexpr std::int16_t m13L = -6;
+			constexpr std::int16_t m23L = 7;
+			constexpr std::int16_t m33L = 17;
+			constexpr auto matrixL = PonyMath::Core::Matrix4x4<std::int16_t>(m00L, m10L, m20L, m30L, m01L, m11L, m21L, m31L, m02L, m12L, m22L, m32L, m03L, m13L, m23L, m33L);
+			PonyMath::Core::Matrix4x4<std::int16_t> product = matrixL / multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(m00L / multiplierI), product.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L / multiplierI), product.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L / multiplierI), product.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L / multiplierI), product.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L / multiplierI), product.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L / multiplierI), product.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L / multiplierI), product.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L / multiplierI), product.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L / multiplierI), product.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L / multiplierI), product.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L / multiplierI), product.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L / multiplierI), product.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L / multiplierI), product.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L / multiplierI), product.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L / multiplierI), product.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L / multiplierI), product.M33());
 			Assert::IsTrue(multiplierI * matrixL == matrixL * multiplierI);
 
 			constexpr float multiplierF = 3;
 			product = matrixL / multiplierF;
-			Assert::AreEqual(static_cast<short>(m00L / multiplierF), product.M00());
-			Assert::AreEqual(static_cast<short>(m10L / multiplierF), product.M10());
-			Assert::AreEqual(static_cast<short>(m20L / multiplierF), product.M20());
-			Assert::AreEqual(static_cast<short>(m30L / multiplierF), product.M30());
-			Assert::AreEqual(static_cast<short>(m01L / multiplierF), product.M01());
-			Assert::AreEqual(static_cast<short>(m11L / multiplierF), product.M11());
-			Assert::AreEqual(static_cast<short>(m21L / multiplierF), product.M21());
-			Assert::AreEqual(static_cast<short>(m31L / multiplierF), product.M31());
-			Assert::AreEqual(static_cast<short>(m02L / multiplierF), product.M02());
-			Assert::AreEqual(static_cast<short>(m12L / multiplierF), product.M12());
-			Assert::AreEqual(static_cast<short>(m22L / multiplierF), product.M22());
-			Assert::AreEqual(static_cast<short>(m32L / multiplierF), product.M32());
-			Assert::AreEqual(static_cast<short>(m03L / multiplierF), product.M03());
-			Assert::AreEqual(static_cast<short>(m13L / multiplierF), product.M13());
-			Assert::AreEqual(static_cast<short>(m23L / multiplierF), product.M23());
-			Assert::AreEqual(static_cast<short>(m33L / multiplierF), product.M33());
+			Assert::AreEqual(static_cast<std::int16_t>(m00L / multiplierF), product.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L / multiplierF), product.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L / multiplierF), product.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m30L / multiplierF), product.M30());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L / multiplierF), product.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L / multiplierF), product.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L / multiplierF), product.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m31L / multiplierF), product.M31());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L / multiplierF), product.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L / multiplierF), product.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L / multiplierF), product.M22());
+			Assert::AreEqual(static_cast<std::int16_t>(m32L / multiplierF), product.M32());
+			Assert::AreEqual(static_cast<std::int16_t>(m03L / multiplierF), product.M03());
+			Assert::AreEqual(static_cast<std::int16_t>(m13L / multiplierF), product.M13());
+			Assert::AreEqual(static_cast<std::int16_t>(m23L / multiplierF), product.M23());
+			Assert::AreEqual(static_cast<std::int16_t>(m33L / multiplierF), product.M33());
 			Assert::IsTrue(multiplierF * matrixL == matrixL * multiplierF);
 		}
 
@@ -4225,10 +4226,10 @@ namespace Core
 			Assert::IsTrue(multiplier * matrixL == matrixL * multiplier);
 		}
 
-		static constexpr PonyMath::Core::Matrix4x4<int> MatrixConstexpr()
+		static constexpr PonyMath::Core::Matrix4x4<std::int32_t> MatrixConstexpr()
 		{
-			[[maybe_unused]] auto matrix = PonyMath::Core::Matrix4x4<int>();
-			PonyMath::Core::Matrix4x4<int> movedMatrix = std::move(matrix);
+			[[maybe_unused]] auto matrix = PonyMath::Core::Matrix4x4<std::int32_t>();
+			PonyMath::Core::Matrix4x4<std::int32_t> movedMatrix = std::move(matrix);
 
 			movedMatrix.M00() += 1;
 			movedMatrix.M10() -= 2;
@@ -4250,23 +4251,23 @@ namespace Core
 			movedMatrix.Span()[0] -= 3;
 			movedMatrix.Span(1)[0] /= 2;
 
-			[[maybe_unused]] constexpr auto constMatrix = PonyMath::Core::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
+			[[maybe_unused]] constexpr auto constMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
 
-			movedMatrix.Row(0, PonyMath::Core::Vector4<int>(3, 6, 9, 5));
-			movedMatrix.Column(1, PonyMath::Core::Vector4<int>(3, 6, 9, 3));
-			movedMatrix.Diagonal(PonyMath::Core::Vector4<int>(3, 6, 9, 4));
-			movedMatrix.CounterDiagonal(PonyMath::Core::Vector4<int>(3, 6, 9, 3));
+			movedMatrix.Row(0, PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5));
+			movedMatrix.Column(1, PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 3));
+			movedMatrix.Diagonal(PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 4));
+			movedMatrix.CounterDiagonal(PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 3));
 
 			movedMatrix.Set(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			movedMatrix.Set(PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5));
-			movedMatrix.Set(std::array<int, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8});
+			movedMatrix.Set(PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5));
+			movedMatrix.Set(std::array<std::int32_t, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8});
 
 			movedMatrix.Scale(constMatrix);
 
 			movedMatrix[1][1] = 5;
-			movedMatrix[1] = PonyMath::Core::Vector4<int>(9, 4, 8, 5);
+			movedMatrix[1] = PonyMath::Core::Vector4<std::int32_t>(9, 4, 8, 5);
 
-			[[maybe_unused]] auto copyAssigned = PonyMath::Core::Matrix4x4<int>();
+			[[maybe_unused]] auto copyAssigned = PonyMath::Core::Matrix4x4<std::int32_t>();
 			copyAssigned = movedMatrix;
 			movedMatrix = std::move(copyAssigned);
 
@@ -4283,45 +4284,45 @@ namespace Core
 
 		TEST_METHOD(ConstexprCompilationTest)
 		{
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> identity = PonyMath::Core::Matrix4x4<int>::Predefined::Identity;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> zero = PonyMath::Core::Matrix4x4<int>::Predefined::Zero;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> identity = PonyMath::Core::Matrix4x4<std::int32_t>::Predefined::Identity;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> zero = PonyMath::Core::Matrix4x4<std::int32_t>::Predefined::Zero;
 
-			[[maybe_unused]] constexpr auto defaultMatrix = PonyMath::Core::Matrix4x4<int>();
-			[[maybe_unused]] constexpr auto matrix = PonyMath::Core::Matrix4x4<int>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
-			[[maybe_unused]] constexpr auto columnMatrix = PonyMath::Core::Matrix4x4<int>(PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5), PonyMath::Core::Vector4<int>(3, 6, 9, 5));
-			[[maybe_unused]] constexpr auto arrayMatrix = PonyMath::Core::Matrix4x4<int>(std::array<int, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8});
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> copiedMatrix = matrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> movedMatrix = MatrixConstexpr();
+			[[maybe_unused]] constexpr auto defaultMatrix = PonyMath::Core::Matrix4x4<std::int32_t>();
+			[[maybe_unused]] constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int32_t>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
+			[[maybe_unused]] constexpr auto columnMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5));
+			[[maybe_unused]] constexpr auto arrayMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8});
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> copiedMatrix = matrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> movedMatrix = MatrixConstexpr();
 
-			[[maybe_unused]] constexpr int m00 = matrix.M00();
-			[[maybe_unused]] constexpr int m10 = matrix.M10();
-			[[maybe_unused]] constexpr int m20 = matrix.M20();
-			[[maybe_unused]] constexpr int m30 = matrix.M30();
-			[[maybe_unused]] constexpr int m01 = matrix.M01();
-			[[maybe_unused]] constexpr int m11 = matrix.M11();
-			[[maybe_unused]] constexpr int m21 = matrix.M21();
-			[[maybe_unused]] constexpr int m31 = matrix.M31();
-			[[maybe_unused]] constexpr int m02 = matrix.M02();
-			[[maybe_unused]] constexpr int m12 = matrix.M12();
-			[[maybe_unused]] constexpr int m22 = matrix.M22();
-			[[maybe_unused]] constexpr int m32 = matrix.M32();
-			[[maybe_unused]] constexpr int m03 = matrix.M03();
-			[[maybe_unused]] constexpr int m13 = matrix.M13();
-			[[maybe_unused]] constexpr int m23 = matrix.M23();
-			[[maybe_unused]] constexpr int m33 = matrix.M33();
+			[[maybe_unused]] constexpr std::int32_t m00 = matrix.M00();
+			[[maybe_unused]] constexpr std::int32_t m10 = matrix.M10();
+			[[maybe_unused]] constexpr std::int32_t m20 = matrix.M20();
+			[[maybe_unused]] constexpr std::int32_t m30 = matrix.M30();
+			[[maybe_unused]] constexpr std::int32_t m01 = matrix.M01();
+			[[maybe_unused]] constexpr std::int32_t m11 = matrix.M11();
+			[[maybe_unused]] constexpr std::int32_t m21 = matrix.M21();
+			[[maybe_unused]] constexpr std::int32_t m31 = matrix.M31();
+			[[maybe_unused]] constexpr std::int32_t m02 = matrix.M02();
+			[[maybe_unused]] constexpr std::int32_t m12 = matrix.M12();
+			[[maybe_unused]] constexpr std::int32_t m22 = matrix.M22();
+			[[maybe_unused]] constexpr std::int32_t m32 = matrix.M32();
+			[[maybe_unused]] constexpr std::int32_t m03 = matrix.M03();
+			[[maybe_unused]] constexpr std::int32_t m13 = matrix.M13();
+			[[maybe_unused]] constexpr std::int32_t m23 = matrix.M23();
+			[[maybe_unused]] constexpr std::int32_t m33 = matrix.M33();
 
 			[[maybe_unused]] constexpr auto spanElement = matrix.Span()[0];
 			[[maybe_unused]] constexpr auto columnSpanElement = matrix.Span(1)[0];
 
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> row = matrix.Row(1);
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> column = matrix.Column(0);
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> diagonal = matrix.Diagonal();
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> counterDiagonal = matrix.CounterDiagonal();
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> row = matrix.Row(1);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> column = matrix.Column(0);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> diagonal = matrix.Diagonal();
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> counterDiagonal = matrix.CounterDiagonal();
 
-			[[maybe_unused]] constexpr int trace = matrix.Trace();
-			[[maybe_unused]] constexpr int determinant = matrix.Determinant();
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> adjugate = matrix.Adjugate();
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> transpose = matrix.Transpose();
+			[[maybe_unused]] constexpr std::int32_t trace = matrix.Trace();
+			[[maybe_unused]] constexpr std::int32_t determinant = matrix.Determinant();
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> adjugate = matrix.Adjugate();
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> transpose = matrix.Transpose();
 			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<float> inverse = PonyMath::Core::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8).Inverse();
 
 			[[maybe_unused]] constexpr bool isZero = matrix.IsZero();
@@ -4331,26 +4332,26 @@ namespace Core
 
 			[[maybe_unused]] constexpr auto floatMatrix = static_cast<PonyMath::Core::Matrix4x4<float>>(matrix);
 
-			[[maybe_unused]] constexpr int m10A = matrix[1][0];
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> columnV = matrix[0];
+			[[maybe_unused]] constexpr std::int32_t m10A = matrix[1][0];
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> columnV = matrix[0];
 
 			[[maybe_unused]] constexpr bool equal = matrix == defaultMatrix;
 			[[maybe_unused]] constexpr bool notEqual = matrix != defaultMatrix;
 
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> scaled = PonyMath::Core::Scale(matrix, columnMatrix);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> scaled = PonyMath::Core::Scale(matrix, columnMatrix);
 			[[maybe_unused]] constexpr bool areAlmostEqual = PonyMath::Core::AreAlmostEqual(PonyMath::Core::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8), PonyMath::Core::Matrix4x4<float>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8));
 
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> sum = matrix + columnMatrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> negated = -matrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> difference = matrix - columnMatrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> productNumR = matrix * 3;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> productNumL = 3 * matrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> productNumFR = matrix * 3.f;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> productNumFL = 3.f * matrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> product = matrix * columnMatrix;
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<int> productV = matrix * PonyMath::Core::Vector4<int>(4, 6, 1, 5);
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> quotient = matrix / 3;
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<int> quotientF = matrix / 3.f;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> sum = matrix + columnMatrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> negated = -matrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> difference = matrix - columnMatrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> productNumR = matrix * 3;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> productNumL = 3 * matrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> productNumFR = matrix * 3.f;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> productNumFL = 3.f * matrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> product = matrix * columnMatrix;
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<std::int32_t> productV = matrix * PonyMath::Core::Vector4<std::int32_t>(4, 6, 1, 5);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> quotient = matrix / 3;
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> quotientF = matrix / 3.f;
 		}
 	};
 }

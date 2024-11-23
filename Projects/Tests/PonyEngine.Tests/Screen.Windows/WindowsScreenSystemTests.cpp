@@ -11,6 +11,7 @@
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+#include <cstdint>
 #include <variant>
 
 #include "Mocks/Application.h"
@@ -39,7 +40,7 @@ namespace Screen
 			std::get<0>(system.system)->Begin();
 			auto screenSystem = dynamic_cast<PonyEngine::Screen::IScreenSystem*>(std::get<0>(system.system).get());
 
-			auto expectedResolution = PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
+			auto expectedResolution = PonyMath::Utility::Resolution<std::uint32_t>(static_cast<std::uint32_t>(GetSystemMetrics(SM_CXSCREEN)), static_cast<std::uint32_t>(GetSystemMetrics(SM_CYSCREEN)));
 			Assert::IsTrue(expectedResolution == screenSystem->DisplayResolution());
 
 			std::get<0>(system.system)->End();

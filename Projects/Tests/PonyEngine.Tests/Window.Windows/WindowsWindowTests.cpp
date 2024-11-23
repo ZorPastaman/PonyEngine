@@ -12,6 +12,8 @@
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include <cstddef>
+#include <cstdint>
+#include <format>
 #include <string>
 #include <string_view>
 #include <typeinfo>
@@ -20,6 +22,8 @@
 #include "Mocks/Application.h"
 #include "Mocks/Engine.h"
 #include "Mocks/Logger.h"
+
+import PonyBase.StringUtility;
 
 import PonyMath.Core;
 import PonyMath.Utility;
@@ -54,9 +58,9 @@ namespace Window
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual PonyMath::Utility::Resolution<unsigned int> DisplayResolution() const noexcept override
+			virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept override
 			{
-				return PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(GetSystemMetrics(SM_CXSCREEN)), static_cast<unsigned int>(GetSystemMetrics(SM_CYSCREEN)));
+				return PonyMath::Utility::Resolution<std::uint32_t>(static_cast<std::uint32_t>(GetSystemMetrics(SM_CXSCREEN)), static_cast<std::uint32_t>(GetSystemMetrics(SM_CYSCREEN)));
 			}
 		};
 
@@ -75,18 +79,18 @@ namespace Window
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
-			constexpr std::wstring_view title = L"Test title";
+			constexpr std::string_view title = "Test title";
 			windowsWindow->MainTitle(title);
 			wchar_t gotTitle[64];
 			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
-			Assert::AreEqual(title, std::wstring_view(gotTitle));
+			Assert::AreEqual(title.data(), PonyBase::Utility::ConvertToString(gotTitle).c_str());
 			Assert::AreEqual(title, windowsWindow->MainTitle());
 
-			constexpr std::wstring_view secondaryTitle = L"Secondary";
+			constexpr std::string_view secondaryTitle = "Secondary";
 			windowsWindow->SecondaryTitle(secondaryTitle);
 			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
 			Assert::AreEqual(secondaryTitle, windowsWindow->SecondaryTitle());
-			Assert::AreEqual((std::wstring(title) + L" - " + std::wstring(secondaryTitle)).c_str(), gotTitle);
+			Assert::AreEqual(std::format("{} - {}", title, secondaryTitle).c_str(), PonyBase::Utility::ConvertToString(gotTitle).c_str());
 
 			std::get<1>(window.system)->End();
 		}
@@ -124,7 +128,7 @@ namespace Window
 			auto engine = Core::Engine();
 			engine.application = &application;
 			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			std::wstring title = L"Test title";
+			std::string title = "Test title";
 			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
 			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
@@ -133,7 +137,7 @@ namespace Window
 			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
-			Assert::AreEqual(std::wstring_view(title), windowsWindow->MainTitle());
+			Assert::AreEqual(std::string_view(title), windowsWindow->MainTitle());
 		}
 
 		TEST_METHOD(WindowRectTest)

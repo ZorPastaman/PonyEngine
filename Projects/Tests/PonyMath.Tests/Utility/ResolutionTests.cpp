@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+#include <cstdint>
 #include <ostream>
 #include <string>
 #include <type_traits>
@@ -25,25 +26,26 @@ namespace Utility
 	{
 		TEST_METHOD(TypesTest)
 		{
-			Assert::IsTrue(std::is_same_v<unsigned int, PonyMath::Utility::Resolution<unsigned int>::ValueType>);
-			Assert::IsTrue(std::is_same_v<unsigned long, PonyMath::Utility::Resolution<unsigned long>::ValueType>);
-			Assert::IsTrue(std::is_same_v<unsigned long long, PonyMath::Utility::Resolution<unsigned long long>::ValueType>);
+			Assert::IsTrue(std::is_same_v<std::uint8_t, PonyMath::Utility::Resolution<std::uint8_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<std::uint16_t, PonyMath::Utility::Resolution<std::uint16_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<std::uint32_t, PonyMath::Utility::Resolution<std::uint32_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<std::uint64_t, PonyMath::Utility::Resolution<std::uint64_t>::ValueType>);
 		}
 
 		TEST_METHOD(ConstructorTest)
 		{
-			const auto defaultResolution = PonyMath::Utility::Resolution<unsigned int>();
+			const auto defaultResolution = PonyMath::Utility::Resolution<std::uint32_t>();
 			Assert::AreEqual(0u, defaultResolution.Width());
 			Assert::AreEqual(0u, defaultResolution.Height());
 
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(width, resolution.Width());
 			Assert::AreEqual(height, resolution.Height());
 
-			constexpr auto vector = PonyMath::Core::Vector2<unsigned int>(width, height);
-			const auto vectorResolution = PonyMath::Utility::Resolution<unsigned int>(vector);
+			constexpr auto vector = PonyMath::Core::Vector2<std::uint32_t>(width, height);
+			const auto vectorResolution = PonyMath::Utility::Resolution<std::uint32_t>(vector);
 			Assert::AreEqual(width, vectorResolution.Width());
 			Assert::AreEqual(height, vectorResolution.Height());
 
@@ -58,9 +60,9 @@ namespace Utility
 
 		TEST_METHOD(WidthTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(width, resolution.Width());
 
 			resolution.Width() = 520u;
@@ -72,9 +74,9 @@ namespace Utility
 
 		TEST_METHOD(HeightTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(width, resolution.Width());
 
 			resolution.Height() = 520u;
@@ -86,9 +88,9 @@ namespace Utility
 
 		TEST_METHOD(SpanTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(width, resolution.Span()[0]);
 			Assert::AreEqual(height, resolution.Span()[1]);
 
@@ -99,9 +101,9 @@ namespace Utility
 
 		TEST_METHOD(VectorTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(width, resolution.Vector()[0]);
 			Assert::AreEqual(height, resolution.Vector()[1]);
 
@@ -112,17 +114,17 @@ namespace Utility
 
 		TEST_METHOD(AspectTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual(320. / 240., static_cast<double>(resolution.Aspect<float>()), 0.001);
 		}
 
 		TEST_METHOD(ToStringTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 			Assert::AreEqual("320x240", resolution.ToString().c_str());
 
 			std::ostringstream ss;
@@ -132,36 +134,36 @@ namespace Utility
 
 		TEST_METHOD(CastTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
-			const auto longResolution = static_cast<PonyMath::Utility::Resolution<unsigned long long>>(resolution);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
+			const auto longResolution = static_cast<PonyMath::Utility::Resolution<std::uint64_t>>(resolution);
 			Assert::AreEqual(320ULL, longResolution.Width());
 			Assert::AreEqual(240ULL, longResolution.Height());
 		}
 
 		TEST_METHOD(VectorCastTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
-			const auto vector = static_cast<PonyMath::Core::Vector2<unsigned int>>(resolution);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
+			const auto vector = static_cast<PonyMath::Core::Vector2<std::uint32_t>>(resolution);
 			Assert::AreEqual(width, vector.X());
 			Assert::AreEqual(height, vector.Y());
 		}
 
 		TEST_METHOD(AssignmentTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 
-			auto copiedResolution = PonyMath::Utility::Resolution<unsigned int>();
+			auto copiedResolution = PonyMath::Utility::Resolution<std::uint32_t>();
 			copiedResolution = resolution;
 			Assert::AreEqual(width, copiedResolution.Width());
 			Assert::AreEqual(height, copiedResolution.Height());
 
-			auto movedResolution = PonyMath::Utility::Resolution<unsigned int>();
+			auto movedResolution = PonyMath::Utility::Resolution<std::uint32_t>();
 			movedResolution = std::move(resolution);
 			Assert::AreEqual(width, movedResolution.Width());
 			Assert::AreEqual(height, movedResolution.Height());
@@ -169,9 +171,9 @@ namespace Utility
 
 		TEST_METHOD(EqualTest)
 		{
-			constexpr unsigned int width = 320u;
-			constexpr unsigned int height = 240u;
-			constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(width, height);
+			constexpr std::uint32_t width = 320u;
+			constexpr std::uint32_t height = 240u;
+			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
 
 			auto otherResolution = resolution;
 			Assert::IsTrue(resolution == otherResolution);
@@ -187,9 +189,9 @@ namespace Utility
 			Assert::IsTrue(resolution != otherResolution);
 		}
 
-		static constexpr PonyMath::Utility::Resolution<unsigned int> GetConstexpr()
+		static constexpr PonyMath::Utility::Resolution<std::uint32_t> GetConstexpr()
 		{
-			auto resolution = PonyMath::Utility::Resolution<unsigned int>(1024u, 768u);
+			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(1024u, 768u);
 			auto movedResolution = std::move(resolution);
 
 			[[maybe_unused]] auto width = movedResolution.Width();
@@ -197,9 +199,9 @@ namespace Utility
 			[[maybe_unused]] auto span = movedResolution.Span();
 			[[maybe_unused]] auto vector = movedResolution.Vector();
 
-			auto copiedResolution = PonyMath::Utility::Resolution<unsigned int>();
+			auto copiedResolution = PonyMath::Utility::Resolution<std::uint32_t>();
 			copiedResolution = movedResolution;
-			auto movedCopy = PonyMath::Utility::Resolution<unsigned int>();
+			auto movedCopy = PonyMath::Utility::Resolution<std::uint32_t>();
 			movedCopy = std::move(copiedResolution);
 
 			return movedResolution;
@@ -207,9 +209,9 @@ namespace Utility
 
 		TEST_METHOD(ConstexprTest)
 		{
-			[[maybe_unused]] constexpr auto defaultResolution = PonyMath::Utility::Resolution<unsigned int>();
-			[[maybe_unused]] constexpr auto resolution = PonyMath::Utility::Resolution<unsigned int>(1024u, 768u);
-			[[maybe_unused]] constexpr auto vectorResolution = PonyMath::Utility::Resolution<unsigned int>(PonyMath::Core::Vector2<unsigned int>(800u, 600u));
+			[[maybe_unused]] constexpr auto defaultResolution = PonyMath::Utility::Resolution<std::uint32_t>();
+			[[maybe_unused]] constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(1024u, 768u);
+			[[maybe_unused]] constexpr auto vectorResolution = PonyMath::Utility::Resolution<std::uint32_t>(PonyMath::Core::Vector2<std::uint32_t>(800u, 600u));
 			[[maybe_unused]] constexpr auto copiedResolution = resolution;
 			[[maybe_unused]] constexpr auto movedResolution = GetConstexpr();
 
@@ -220,9 +222,9 @@ namespace Utility
 
 			[[maybe_unused]] constexpr auto aspect = resolution.Aspect<float>();
 
-			[[maybe_unused]] constexpr auto castResolution = static_cast<PonyMath::Utility::Resolution<unsigned long long>>(resolution);
+			[[maybe_unused]] constexpr auto castResolution = static_cast<PonyMath::Utility::Resolution<std::uint64_t>>(resolution);
 
-			[[maybe_unused]] constexpr auto resolutionVector = static_cast<PonyMath::Core::Vector2<unsigned int>>(resolution);
+			[[maybe_unused]] constexpr auto resolutionVector = static_cast<PonyMath::Core::Vector2<std::uint32_t>>(resolution);
 
 			[[maybe_unused]] constexpr bool equal = resolution == copiedResolution;
 			[[maybe_unused]] constexpr bool notEqual = resolution != copiedResolution;

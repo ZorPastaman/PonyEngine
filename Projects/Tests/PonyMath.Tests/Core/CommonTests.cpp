@@ -36,11 +36,11 @@ namespace Core
 
 		TEST_METHOD(FloatingBySizeTest)
 		{
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::FloatingBySize<char>>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::FloatingBySize<int>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::FloatingBySize<std::int8_t>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::FloatingBySize<std::int32_t>>);
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::FloatingBySize<float>>);
 
-			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::FloatingBySize<long long>>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::FloatingBySize<std::int64_t>>);
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::FloatingBySize<double>>);
 		}
 
@@ -48,17 +48,17 @@ namespace Core
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<bool>>);
 
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<signed char>>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<unsigned char>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::int8_t>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::uint8_t>>);
 
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<signed short>>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<unsigned short>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::int16_t>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::uint16_t>>);
 
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<signed int>>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<unsigned int>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::int32_t>>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<std::uint32_t>>);
 
-			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::ComputationalFor<signed long long>>);
-			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::ComputationalFor<unsigned long long>>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::ComputationalFor<std::int64_t>>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::ComputationalFor<std::uint64_t>>);
 
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::ComputationalFor<float>>);
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::ComputationalFor<double>>);
@@ -88,9 +88,9 @@ namespace Core
 
 		TEST_METHOD(SignShortTest)
 		{
-			Assert::AreEqual(short{1}, PonyMath::Core::Sign(short{0}));
-			Assert::AreEqual(short{1}, PonyMath::Core::Sign(short{39}));
-			Assert::AreEqual(short{-1}, PonyMath::Core::Sign(short{-42}));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Sign(std::int16_t{0}));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Sign(std::int16_t{39}));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::Sign(std::int16_t{-42}));
 		}
 
 		TEST_METHOD(SignFloatTest)
@@ -104,9 +104,9 @@ namespace Core
 
 		TEST_METHOD(SignumShortTest)
 		{
-			Assert::AreEqual(short{0}, PonyMath::Core::Signum(short{0}));
-			Assert::AreEqual(short{1}, PonyMath::Core::Signum(short{39}));
-			Assert::AreEqual(short{-1}, PonyMath::Core::Signum(short{-42}));
+			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::Signum(std::int16_t{0}));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Signum(std::int16_t{39}));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::Signum(std::int16_t{-42}));
 		}
 
 		TEST_METHOD(SignumFloatTest)
@@ -120,32 +120,32 @@ namespace Core
 
 		TEST_METHOD(RoundToIntegralShortTest)
 		{
-			Assert::AreEqual(short{0}, PonyMath::Core::RoundToIntegral<float, short>(0.f));
-			Assert::AreEqual(short{0}, PonyMath::Core::RoundToIntegral<float, short>(0.3f));
-			Assert::AreEqual(short{0}, PonyMath::Core::RoundToIntegral<float, short>(-0.3f));
-			Assert::AreEqual(short{1}, PonyMath::Core::RoundToIntegral<float, short>(0.7f));
-			Assert::AreEqual(short{-1}, PonyMath::Core::RoundToIntegral<float, short>(-0.7f));
-			Assert::AreEqual(short{1}, PonyMath::Core::RoundToIntegral<float, short>(1.2f));
-			Assert::AreEqual(short{-1}, PonyMath::Core::RoundToIntegral<float, short>(-1.2f));
-			Assert::AreEqual(short{10}, PonyMath::Core::RoundToIntegral<float, short>(10.3f));
-			Assert::AreEqual(short{-10}, PonyMath::Core::RoundToIntegral<float, short>(-10.3f));
-			Assert::AreEqual(short{11}, PonyMath::Core::RoundToIntegral<float, short>(10.7f));
-			Assert::AreEqual(short{-11}, PonyMath::Core::RoundToIntegral<float, short>(-10.7f));
+			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(0.f));
+			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(0.3f));
+			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(-0.3f));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(0.7f));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(-0.7f));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(1.2f));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(-1.2f));
+			Assert::AreEqual(std::int16_t{10}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(10.3f));
+			Assert::AreEqual(std::int16_t{-10}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(-10.3f));
+			Assert::AreEqual(std::int16_t{11}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(10.7f));
+			Assert::AreEqual(std::int16_t{-11}, PonyMath::Core::RoundToIntegral<float, std::int16_t>(-10.7f));
 		}
 
 		TEST_METHOD(RoundToIntegralLongLongTest)
 		{
-			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, long long>(0.));
-			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, long long>(0.3));
-			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, long long>(-0.3));
-			Assert::AreEqual(1LL, PonyMath::Core::RoundToIntegral<double, long long>(0.7));
-			Assert::AreEqual(-1LL, PonyMath::Core::RoundToIntegral<double, long long>(-0.7));
-			Assert::AreEqual(1LL, PonyMath::Core::RoundToIntegral<double, long long>(1.2));
-			Assert::AreEqual(-1LL, PonyMath::Core::RoundToIntegral<double, long long>(-1.2));
-			Assert::AreEqual(10LL, PonyMath::Core::RoundToIntegral<double, long long>(10.3));
-			Assert::AreEqual(-10LL, PonyMath::Core::RoundToIntegral<double, long long>(-10.3));
-			Assert::AreEqual(11LL, PonyMath::Core::RoundToIntegral<double, long long>(10.7));
-			Assert::AreEqual(-11LL, PonyMath::Core::RoundToIntegral<double, long long>(-10.7));
+			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(0.));
+			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(0.3));
+			Assert::AreEqual(0LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-0.3));
+			Assert::AreEqual(1LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(0.7));
+			Assert::AreEqual(-1LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-0.7));
+			Assert::AreEqual(1LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(1.2));
+			Assert::AreEqual(-1LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-1.2));
+			Assert::AreEqual(10LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(10.3));
+			Assert::AreEqual(-10LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-10.3));
+			Assert::AreEqual(11LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(10.7));
+			Assert::AreEqual(-11LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-10.7));
 		}
 
 		TEST_METHOD(ConstexprCompilationTest)
@@ -154,7 +154,7 @@ namespace Core
 			[[maybe_unused]] constexpr float radToDeg = PonyMath::Core::RadToDeg<float>;
 			[[maybe_unused]] constexpr float sign = PonyMath::Core::Sign<float>(4.f);
 			[[maybe_unused]] constexpr float signum = PonyMath::Core::Signum<float>(3.f);
-			[[maybe_unused]] constexpr int round = PonyMath::Core::RoundToIntegral<float, int>(3.5f);
+			[[maybe_unused]] constexpr std::int32_t round = PonyMath::Core::RoundToIntegral<float, std::int32_t>(3.5f);
 		}
 	};
 }
