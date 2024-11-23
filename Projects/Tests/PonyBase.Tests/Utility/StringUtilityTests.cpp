@@ -37,6 +37,15 @@ namespace Utility
 			Assert::AreEqual(0, origin.compare(converted));
 		}
 
+		TEST_METHOD(ConvertStringToWStringTest)
+		{
+			const auto origin = std::wstring(L"Pony. Engine, Convert- String!");
+			const auto narrowOrigin = std::string("Pony. Engine, Convert- String!");
+
+			const std::wstring converted = PonyBase::Utility::ConvertToWideString(narrowOrigin);
+			Assert::AreEqual(0, origin.compare(converted));
+		}
+
 		TEST_METHOD(SafeFormatTest)
 		{
 			const auto format = "Format {}.";

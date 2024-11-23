@@ -12,6 +12,7 @@
 #include <cstdint>
 #include <ostream>
 #include <string>
+#include <string_view>
 
 import PonyEngine.Input;
 
@@ -21,12 +22,12 @@ namespace Input
 {
 	TEST_CLASS(KeyboardKeyCodeTests)
 	{
-		static void AssertString(const PonyEngine::Input::KeyboardKeyCode keyCode, const char* stringValue)
+		static void AssertString(const PonyEngine::Input::KeyboardKeyCode keyCode, const std::string_view stringValue)
 		{
 			Assert::AreEqual(stringValue, PonyEngine::Input::ToString(keyCode));
 			std::ostringstream ss;
 			ss << keyCode;
-			Assert::AreEqual(stringValue, ss.str().c_str());
+			Assert::AreEqual(stringValue.data(), ss.str().c_str());
 		}
 
 		TEST_METHOD(ValueTest)

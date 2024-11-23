@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render:IRenderTarget;
 
+import <cstdint>;
+
 import PonyMath.Color;
 import PonyMath.Utility;
 
@@ -34,6 +36,6 @@ export namespace PonyEngine::Render
 		/// @brief Gets the render target resolution.
 		/// @return Render target resolution.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept = 0;
+		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
 	};
 }

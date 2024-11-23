@@ -9,14 +9,16 @@
 
 export module PonyEngine.Input:KeyboardKeyCode;
 
+import <cstdint>;
 import <ostream>;
 import <string>;
+import <string_view>;
 import <unordered_map>;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Keyboard key codes.
-	enum class KeyboardKeyCode : std::uint_fast8_t
+	enum class KeyboardKeyCode : std::uint8_t
 	{
 		// Special
 		None,
@@ -135,7 +137,7 @@ export namespace PonyEngine::Input
 	/// @param keyCode Key code.
 	/// @return Key code string.
 	[[nodiscard("Pure function")]]
-	const char* ToString(KeyboardKeyCode keyCode);
+	std::string_view ToString(KeyboardKeyCode keyCode);
 
 	/// @brief Puts a string representing the @p keyCode into the @p stream.
 	/// @param stream Target.
@@ -147,7 +149,7 @@ export namespace PonyEngine::Input
 namespace PonyEngine::Input
 {
 	/// @brief Key code to its name map.
-	const std::unordered_map<KeyboardKeyCode, const char*> KeyCodeStrings
+	const std::unordered_map<KeyboardKeyCode, std::string_view> KeyCodeStrings
 	{
 		// Special
 		{ KeyboardKeyCode::None, "None" },
@@ -262,7 +264,7 @@ namespace PonyEngine::Input
 		{ KeyboardKeyCode::NumpadEnter, "Numpad Enter" }
 	};
 
-	const char* ToString(const KeyboardKeyCode keyCode)
+	std::string_view ToString(const KeyboardKeyCode keyCode)
 	{
 		if (const auto position = KeyCodeStrings.find(keyCode); position != KeyCodeStrings.end()) [[likely]]
 		{

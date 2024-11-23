@@ -31,20 +31,20 @@ namespace Core
 	{
 		TEST_METHOD(TypesTest)
 		{
-			Assert::IsTrue(std::is_same_v<char, PonyMath::Core::Vector2<char>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<char>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int8_t, PonyMath::Core::Vector2<std::int8_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<std::int8_t>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<short, PonyMath::Core::Vector2<short>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<short>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int16_t, PonyMath::Core::Vector2<std::int16_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<std::int16_t>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<int, PonyMath::Core::Vector2<int>::ValueType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<int>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int32_t, PonyMath::Core::Vector2<std::int32_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<std::int32_t>::ComputationalType>);
 
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<float>::ValueType>);
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Core::Vector2<float>::ComputationalType>);
 
-			Assert::IsTrue(std::is_same_v<long long, PonyMath::Core::Vector2<long long>::ValueType>);
-			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Vector2<long long>::ComputationalType>);
+			Assert::IsTrue(std::is_same_v<std::int64_t, PonyMath::Core::Vector2<std::int64_t>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Vector2<std::int64_t>::ComputationalType>);
 
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Vector2<double>::ValueType>);
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Core::Vector2<double>::ComputationalType>);
@@ -53,14 +53,14 @@ namespace Core
 		TEST_METHOD(StaticDataTest)
 		{
 			Assert::AreEqual(std::size_t{2}, PonyMath::Core::Vector2<float>::ComponentCount);
-			Assert::AreEqual(std::size_t{2}, PonyMath::Core::Vector2<short>::ComponentCount);
+			Assert::AreEqual(std::size_t{2}, PonyMath::Core::Vector2<std::int16_t>::ComponentCount);
 		}
 
 		TEST_METHOD(DefaultConstructorShortTest)
 		{
-			const auto vector = PonyMath::Core::Vector2<short>();
-			Assert::AreEqual(short{}, vector.X());
-			Assert::AreEqual(short{}, vector.Y());
+			const auto vector = PonyMath::Core::Vector2<std::int16_t>();
+			Assert::AreEqual(std::int16_t{}, vector.X());
+			Assert::AreEqual(std::int16_t{}, vector.Y());
 		}
 
 		TEST_METHOD(DefaultConstructorFloatTest)
@@ -72,9 +72,9 @@ namespace Core
 
 		TEST_METHOD(ConstructorShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			const auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			const auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 		}
@@ -90,9 +90,9 @@ namespace Core
 
 		TEST_METHOD(ConstructorSpanShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			const auto vector = PonyMath::Core::Vector2<short>(std::array<short, 2>{x, y});
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			const auto vector = PonyMath::Core::Vector2<std::int16_t>(std::array<std::int16_t, 2>{x, y});
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 		}
@@ -108,10 +108,10 @@ namespace Core
 
 		TEST_METHOD(ConstructorCopyShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const PonyMath::Core::Vector2<short> copiedVector = vector;
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const PonyMath::Core::Vector2<std::int16_t> copiedVector = vector;
 			Assert::AreEqual(x, copiedVector.X());
 			Assert::AreEqual(y, copiedVector.Y());
 		}
@@ -128,10 +128,10 @@ namespace Core
 
 		TEST_METHOD(ConstructorMoveShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const PonyMath::Core::Vector2<short> copiedVector = std::move(vector);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const PonyMath::Core::Vector2<std::int16_t> copiedVector = std::move(vector);
 			Assert::AreEqual(x, copiedVector.X());
 			Assert::AreEqual(y, copiedVector.Y());
 		}
@@ -148,13 +148,13 @@ namespace Core
 
 		TEST_METHOD(ComponentAccessShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vector.X());
 			Assert::AreEqual(y, vector.Y());
 
-			constexpr auto vectorC = PonyMath::Core::Vector2<short>(x, y);
+			constexpr auto vectorC = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vectorC.X());
 			Assert::AreEqual(y, vectorC.Y());
 		}
@@ -174,13 +174,13 @@ namespace Core
 
 		TEST_METHOD(SpanShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vector.Span()[0]);
 			Assert::AreEqual(y, vector.Span()[1]);
 
-			constexpr auto vectorC = PonyMath::Core::Vector2<short>(x, y);
+			constexpr auto vectorC = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vectorC.Span()[0]);
 			Assert::AreEqual(y, vectorC.Span()[1]);
 		}
@@ -200,12 +200,12 @@ namespace Core
 
 		TEST_METHOD(MagnitudeShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(3.606, static_cast<double>(vector.Magnitude()), 0.001);
 
-			Assert::AreEqual(0.f, PonyMath::Core::Vector2<short>::Predefined::Zero.Magnitude());
+			Assert::AreEqual(0.f, PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.Magnitude());
 		}
 
 		TEST_METHOD(MagnitudeFloatTest)
@@ -220,12 +220,12 @@ namespace Core
 
 		TEST_METHOD(MagnitudeSquaredShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			Assert::AreEqual(short{13}, vector.MagnitudeSquared());
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			Assert::AreEqual(std::int16_t{13}, vector.MagnitudeSquared());
 
-			Assert::AreEqual(short{0}, PonyMath::Core::Vector2<short>::Predefined::Zero.MagnitudeSquared());
+			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.MagnitudeSquared());
 		}
 
 		TEST_METHOD(MagnitudeSquaredFloatTest)
@@ -252,14 +252,14 @@ namespace Core
 
 		TEST_METHOD(MinShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const short min = vector.Min();
-			Assert::AreEqual(short{-3}, min);
-			constexpr auto cVector = PonyMath::Core::Vector2<short>(x, y);
-			const short cMin = cVector.Min();
-			Assert::AreEqual(short{-3}, cMin);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const std::int16_t min = vector.Min();
+			Assert::AreEqual(std::int16_t{-3}, min);
+			constexpr auto cVector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const std::int16_t cMin = cVector.Min();
+			Assert::AreEqual(std::int16_t{-3}, cMin);
 		}
 
 		TEST_METHOD(MinFloatTest)
@@ -276,14 +276,14 @@ namespace Core
 
 		TEST_METHOD(MaxShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const short max = vector.Max();
-			Assert::AreEqual(short{2}, max);
-			constexpr auto cVector = PonyMath::Core::Vector2<short>(x, y);
-			const short cMax = cVector.Max();
-			Assert::AreEqual(short{2}, cMax);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const std::int16_t max = vector.Max();
+			Assert::AreEqual(std::int16_t{2}, max);
+			constexpr auto cVector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const std::int16_t cMax = cVector.Max();
+			Assert::AreEqual(std::int16_t{2}, cMax);
 		}
 
 		TEST_METHOD(MaxFloatTest)
@@ -300,13 +300,13 @@ namespace Core
 
 		TEST_METHOD(MinMaxShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			auto pair = vector.MinMax();
 			Assert::AreEqual(y, pair.first);
 			Assert::AreEqual(x, pair.second);
-			constexpr auto cVector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr auto cVector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			auto cPair = cVector.MinMax();
 			Assert::AreEqual(y, pair.first);
 			Assert::AreEqual(x, pair.second);
@@ -328,11 +328,11 @@ namespace Core
 
 		TEST_METHOD(SumThisShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const short sum = vector.Sum();
-			Assert::AreEqual(short{-1}, sum);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const std::int16_t sum = vector.Sum();
+			Assert::AreEqual(std::int16_t{-1}, sum);
 		}
 
 		TEST_METHOD(SumThisFloatTest)
@@ -346,10 +346,10 @@ namespace Core
 
 		TEST_METHOD(SwapShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			const PonyMath::Core::Vector2<short> swapped = vector.Swapped();
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			const PonyMath::Core::Vector2<std::int16_t> swapped = vector.Swapped();
 			Assert::AreEqual(y, swapped.X());
 			Assert::AreEqual(x, swapped.Y());
 			vector.Swap();
@@ -370,16 +370,16 @@ namespace Core
 
 		TEST_METHOD(IsZeroShortTest)
 		{
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Zero.IsZero());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.IsZero());
 
-			auto matrix = PonyMath::Core::Vector2<short>::Predefined::Zero;
+			auto matrix = PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero;
 			Assert::IsTrue(matrix.IsZero());
 
 			for (std::size_t i = 0; i < PonyMath::Core::Vector2<float>::ComponentCount; ++i)
 			{
 				matrix.Span()[i] += 1;
 				Assert::IsFalse(matrix.IsZero());
-				matrix.Span()[i] = PonyMath::Core::Vector2<short>::Predefined::Zero.Span()[i];
+				matrix.Span()[i] = PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.Span()[i];
 			}
 		}
 
@@ -422,10 +422,10 @@ namespace Core
 
 		TEST_METHOD(IsUnitShortTest)
 		{
-			Assert::IsFalse(PonyMath::Core::Vector2<short>::Predefined::Zero.IsUnit());
-			Assert::IsFalse(PonyMath::Core::Vector2<short>::Predefined::One.IsUnit());
-			Assert::IsTrue(PonyMath::Core::Vector2<short>(1, 0).IsUnit());
-			Assert::IsTrue(PonyMath::Core::Vector2<short>(0, 1).IsUnit());
+			Assert::IsFalse(PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.IsUnit());
+			Assert::IsFalse(PonyMath::Core::Vector2<std::int16_t>::Predefined::One.IsUnit());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>(1, 0).IsUnit());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>(0, 1).IsUnit());
 		}
 
 		TEST_METHOD(IsUnitFloatTest)
@@ -448,10 +448,10 @@ namespace Core
 
 		TEST_METHOD(IsUniformShortTest)
 		{
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Zero.IsUniform());
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::One.IsUniform());
-			Assert::IsFalse(PonyMath::Core::Vector2<short>(1, 0).IsUniform());
-			Assert::IsFalse(PonyMath::Core::Vector2<short>(0, 1).IsUniform());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero.IsUniform());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::One.IsUniform());
+			Assert::IsFalse(PonyMath::Core::Vector2<std::int16_t>(1, 0).IsUniform());
+			Assert::IsFalse(PonyMath::Core::Vector2<std::int16_t>(0, 1).IsUniform());
 		}
 
 		TEST_METHOD(IsUniformFloatTest)
@@ -489,11 +489,11 @@ namespace Core
 
 		TEST_METHOD(SetShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short xNew = 4;
-			constexpr short yNew = 7;
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t xNew = 4;
+			constexpr std::int16_t yNew = 7;
 			vector.Set(xNew, yNew);
 			Assert::AreEqual(xNew, vector.X());
 			Assert::AreEqual(yNew, vector.Y());
@@ -513,12 +513,12 @@ namespace Core
 
 		TEST_METHOD(SetSpanShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short xNew = 4;
-			constexpr short yNew = 7;
-			vector.Set(std::array<short, 2>{xNew, yNew});
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t xNew = 4;
+			constexpr std::int16_t yNew = 7;
+			vector.Set(std::array<std::int16_t, 2>{xNew, yNew});
 			Assert::AreEqual(xNew, vector.X());
 			Assert::AreEqual(yNew, vector.Y());
 		}
@@ -537,15 +537,15 @@ namespace Core
 
 		TEST_METHOD(ScaleThisShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short xS = 4;
-			constexpr short yS = 7;
-			constexpr auto scale = PonyMath::Core::Vector2<short>(xS, yS);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t xS = 4;
+			constexpr std::int16_t yS = 7;
+			constexpr auto scale = PonyMath::Core::Vector2<std::int16_t>(xS, yS);
 			vector.Scale(scale);
-			Assert::AreEqual(short{x * xS}, vector.X());
-			Assert::AreEqual(short{y * yS}, vector.Y());
+			Assert::AreEqual(std::int16_t{x * xS}, vector.X());
+			Assert::AreEqual(std::int16_t{y * yS}, vector.Y());
 		}
 
 		TEST_METHOD(ScaleThisFloatTest)
@@ -563,9 +563,9 @@ namespace Core
 
 		TEST_METHOD(ToStringShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			const std::string expectedString = std::format("({}, {})", x, y);
 			Assert::AreEqual(expectedString, vector.ToString());
 
@@ -590,20 +590,20 @@ namespace Core
 		TEST_METHOD(CastTest)
 		{
 			constexpr auto floatVector = PonyMath::Core::Vector2<float>(3.1f, -2.2f);
-			const auto intVector = static_cast<PonyMath::Core::Vector2<int>>(floatVector);
+			const auto intVector = static_cast<PonyMath::Core::Vector2<std::int32_t>>(floatVector);
 			Assert::AreEqual(3, intVector.X());
 			Assert::AreEqual(-2, intVector.Y());
 		}
 
 		TEST_METHOD(AccessShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vector[0]);
 			Assert::AreEqual(y, vector[1]);
 
-			constexpr  auto vectorC = PonyMath::Core::Vector2<short>(x, y);
+			constexpr  auto vectorC = PonyMath::Core::Vector2<std::int16_t>(x, y);
 			Assert::AreEqual(x, vectorC[0]);
 			Assert::AreEqual(y, vectorC[1]);
 		}
@@ -623,10 +623,10 @@ namespace Core
 
 		TEST_METHOD(CopyAssignmentShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			auto copiedVector = PonyMath::Core::Vector2<short>();
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			auto copiedVector = PonyMath::Core::Vector2<std::int16_t>();
 			copiedVector = vector;
 			Assert::AreEqual(x, copiedVector.X());
 			Assert::AreEqual(y, copiedVector.Y());
@@ -645,10 +645,10 @@ namespace Core
 
 		TEST_METHOD(MoveAssignmentShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			auto vector = PonyMath::Core::Vector2<short>(x, y);
-			auto copiedVector = PonyMath::Core::Vector2<short>();
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			auto copiedVector = PonyMath::Core::Vector2<std::int16_t>();
 			copiedVector = std::move(vector);
 			Assert::AreEqual(x, copiedVector.X());
 			Assert::AreEqual(y, copiedVector.Y());
@@ -667,15 +667,15 @@ namespace Core
 
 		TEST_METHOD(SumAssignmentShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xC = 6;
-			constexpr short yC = 4;
-			auto vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL = vectorC += vectorR;
-			Assert::AreEqual(static_cast<short>(xC + xR), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC + yR), vectorC.Y());
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xC = 6;
+			constexpr std::int16_t yC = 4;
+			auto vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL = vectorC += vectorR;
+			Assert::AreEqual(static_cast<std::int16_t>(xC + xR), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC + yR), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL));
 		}
 
@@ -695,15 +695,15 @@ namespace Core
 
 		TEST_METHOD(SubtractAssignmentShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xC = 6;
-			constexpr short yC = 4;
-			auto vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL = vectorC -= vectorR;
-			Assert::AreEqual(static_cast<short>(xC - xR), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC - yR), vectorC.Y());
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xC = 6;
+			constexpr std::int16_t yC = 4;
+			auto vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL = vectorC -= vectorR;
+			Assert::AreEqual(static_cast<std::int16_t>(xC - xR), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC - yR), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL));
 		}
 
@@ -723,20 +723,20 @@ namespace Core
 
 		TEST_METHOD(MultiplyAssignmentShortTest)
 		{
-			constexpr short multiplierI = 4;
-			constexpr short xC = 6;
-			constexpr short yC = 4;
-			auto vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL = vectorC *= multiplierI;
-			Assert::AreEqual(static_cast<short>(xC * multiplierI), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC * multiplierI), vectorC.Y());
+			constexpr std::int16_t multiplierI = 4;
+			constexpr std::int16_t xC = 6;
+			constexpr std::int16_t yC = 4;
+			auto vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL = vectorC *= multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(xC * multiplierI), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC * multiplierI), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL));
 
 			constexpr float multiplierF = -3;
-			vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL1 = vectorC *= multiplierF;
-			Assert::AreEqual(static_cast<short>(xC * multiplierF), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC * multiplierF), vectorC.Y());
+			vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL1 = vectorC *= multiplierF;
+			Assert::AreEqual(static_cast<std::int16_t>(xC * multiplierF), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC * multiplierF), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL1));
 		}
 
@@ -754,20 +754,20 @@ namespace Core
 
 		TEST_METHOD(DivideAssignmentShortTest)
 		{
-			constexpr short multiplierI = 4;
-			constexpr short xC = 6;
-			constexpr short yC = 4;
-			auto vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL = vectorC /= multiplierI;
-			Assert::AreEqual(static_cast<short>(xC / multiplierI), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC / multiplierI), vectorC.Y());
+			constexpr std::int16_t multiplierI = 4;
+			constexpr std::int16_t xC = 6;
+			constexpr std::int16_t yC = 4;
+			auto vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL = vectorC /= multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(xC / multiplierI), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC / multiplierI), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL));
 
 			constexpr float multiplierF = -3;
-			vectorC = PonyMath::Core::Vector2<short>(xC, yC);
-			PonyMath::Core::Vector2<short>& vectorL1 = vectorC /= multiplierF;
-			Assert::AreEqual(static_cast<short>(xC / multiplierF), vectorC.X());
-			Assert::AreEqual(static_cast<short>(yC / multiplierF), vectorC.Y());
+			vectorC = PonyMath::Core::Vector2<std::int16_t>(xC, yC);
+			PonyMath::Core::Vector2<std::int16_t>& vectorL1 = vectorC /= multiplierF;
+			Assert::AreEqual(static_cast<std::int16_t>(xC / multiplierF), vectorC.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yC / multiplierF), vectorC.Y());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&vectorC), reinterpret_cast<std::uintptr_t>(&vectorL1));
 		}
 
@@ -785,15 +785,15 @@ namespace Core
 
 		TEST_METHOD(EqualityShortTest)
 		{
-			constexpr short x = 2;
-			constexpr short y = -3;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			PonyMath::Core::Vector2<short> otherVector = vector;
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			PonyMath::Core::Vector2<std::int16_t> otherVector = vector;
 
 			Assert::IsTrue(vector == otherVector);
 			Assert::IsFalse(vector != otherVector);
 
-			for (std::size_t i = 0; i < PonyMath::Core::Vector2<short>::ComponentCount; ++i)
+			for (std::size_t i = 0; i < PonyMath::Core::Vector2<std::int16_t>::ComponentCount; ++i)
 			{
 				otherVector.Span()[i] += 1;
 				Assert::IsFalse(vector == otherVector);
@@ -834,43 +834,43 @@ namespace Core
 			Assert::IsTrue(PonyMath::Core::Vector2<float>::Predefined::Zero == PonyMath::Core::Vector2<float>(0, 0));
 			Assert::IsTrue(PonyMath::Core::Vector2<float>::Predefined::Negative == PonyMath::Core::Vector2<float>(-1, -1));
 
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Up == PonyMath::Core::Vector2<short>(0, 1));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Down == PonyMath::Core::Vector2<short>(0, -1));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Right == PonyMath::Core::Vector2<short>(1, 0));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Left == PonyMath::Core::Vector2<short>(-1, 0));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::One == PonyMath::Core::Vector2<short>(1, 1));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Zero == PonyMath::Core::Vector2<short>(0, 0));
-			Assert::IsTrue(PonyMath::Core::Vector2<short>::Predefined::Negative == PonyMath::Core::Vector2<short>(-1, -1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Up == PonyMath::Core::Vector2<std::int16_t>(0, 1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Down == PonyMath::Core::Vector2<std::int16_t>(0, -1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Right == PonyMath::Core::Vector2<std::int16_t>(1, 0));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Left == PonyMath::Core::Vector2<std::int16_t>(-1, 0));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::One == PonyMath::Core::Vector2<std::int16_t>(1, 1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Zero == PonyMath::Core::Vector2<std::int16_t>(0, 0));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int16_t>::Predefined::Negative == PonyMath::Core::Vector2<std::int16_t>(-1, -1));
 		}
 
 		TEST_METHOD(DotShortTest)
 		{
-			short xR = 2;
-			short yR = -3;
-			auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			short xL = 6;
-			short yL = 1;
-			auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
-			short dot = PonyMath::Core::Dot(vectorL, vectorR);
-			Assert::AreEqual(short{9}, dot);
+			std::int16_t xR = 2;
+			std::int16_t yR = -3;
+			auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			std::int16_t xL = 6;
+			std::int16_t yL = 1;
+			auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
+			std::int16_t dot = PonyMath::Core::Dot(vectorL, vectorR);
+			Assert::AreEqual(std::int16_t{9}, dot);
 
 			xR = -2;
 			yR = -3;
-			vectorR = PonyMath::Core::Vector2<short>(xR, yR);
+			vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
 			xL = 6;
 			yL = 1;
-			vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 			dot = PonyMath::Core::Dot(vectorL, vectorR);
-			Assert::AreEqual(short{-15}, dot);
+			Assert::AreEqual(std::int16_t{-15}, dot);
 
 			xR = 1;
 			yR = 6;
-			vectorR = PonyMath::Core::Vector2<short>(xR, yR);
+			vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
 			xL = 6;
 			yL = -1;
-			vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 			dot = PonyMath::Core::Dot(vectorL, vectorR);
-			Assert::AreEqual(short{0}, dot);
+			Assert::AreEqual(std::int16_t{0}, dot);
 		}
 
 		TEST_METHOD(DotFloatTest)
@@ -905,14 +905,14 @@ namespace Core
 
 		TEST_METHOD(DistanceShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 			Assert::AreEqual(8.062, static_cast<double>(PonyMath::Core::Distance(vectorL, vectorR)), 0.001);
-			Assert::AreEqual(short{65}, PonyMath::Core::DistanceSquared(vectorR, vectorL));
+			Assert::AreEqual(std::int16_t{65}, PonyMath::Core::DistanceSquared(vectorR, vectorL));
 		}
 
 		TEST_METHOD(DistanceFloatTest)
@@ -1133,15 +1133,15 @@ namespace Core
 
 		TEST_METHOD(ScaleShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
-			const PonyMath::Core::Vector2<short> scaled = PonyMath::Core::Scale(vectorL, vectorR);
-			Assert::AreEqual(static_cast<short>(xL * xR), scaled.X());
-			Assert::AreEqual(static_cast<short>(yL * yR), scaled.Y());
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
+			const PonyMath::Core::Vector2<std::int16_t> scaled = PonyMath::Core::Scale(vectorL, vectorR);
+			Assert::AreEqual(static_cast<std::int16_t>(xL * xR), scaled.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL * yR), scaled.Y());
 		}
 
 		TEST_METHOD(ScaleFloatTest)
@@ -1159,12 +1159,12 @@ namespace Core
 
 		TEST_METHOD(MinCombinedShortTest)
 		{
-			constexpr short x = 8;
-			constexpr short y = 12;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short x1 = 10;
-			constexpr short y1 = 6;
-			constexpr auto vector1 = PonyMath::Core::Vector2<short>(x1, y1);
+			constexpr std::int16_t x = 8;
+			constexpr std::int16_t y = 12;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t x1 = 10;
+			constexpr std::int16_t y1 = 6;
+			constexpr auto vector1 = PonyMath::Core::Vector2<std::int16_t>(x1, y1);
 			auto min = PonyMath::Core::Min(vector, vector1);
 			Assert::AreEqual(x, min.X());
 			Assert::AreEqual(y1, min.Y());
@@ -1185,12 +1185,12 @@ namespace Core
 
 		TEST_METHOD(MaxCombinedShortTest)
 		{
-			constexpr short x = 8;
-			constexpr short y = 12;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short x1 = 10;
-			constexpr short y1 = 6;
-			constexpr auto vector1 = PonyMath::Core::Vector2<short>(x1, y1);
+			constexpr std::int16_t x = 8;
+			constexpr std::int16_t y = 12;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t x1 = 10;
+			constexpr std::int16_t y1 = 6;
+			constexpr auto vector1 = PonyMath::Core::Vector2<std::int16_t>(x1, y1);
 			auto min = PonyMath::Core::Max(vector, vector1);
 			Assert::AreEqual(x1, min.X());
 			Assert::AreEqual(y, min.Y());
@@ -1211,15 +1211,15 @@ namespace Core
 
 		TEST_METHOD(ClampShortTest)
 		{
-			constexpr short x = 8;
-			constexpr short y = 2;
-			constexpr auto vector = PonyMath::Core::Vector2<short>(x, y);
-			constexpr short x1 = 10;
-			constexpr short y1 = 6;
-			constexpr auto vector1 = PonyMath::Core::Vector2<short>(x1, y1);
-			constexpr short x2 = 9;
-			constexpr short y2 = 8;
-			constexpr auto vector2 = PonyMath::Core::Vector2<short>(x2, y2);
+			constexpr std::int16_t x = 8;
+			constexpr std::int16_t y = 2;
+			constexpr auto vector = PonyMath::Core::Vector2<std::int16_t>(x, y);
+			constexpr std::int16_t x1 = 10;
+			constexpr std::int16_t y1 = 6;
+			constexpr auto vector1 = PonyMath::Core::Vector2<std::int16_t>(x1, y1);
+			constexpr std::int16_t x2 = 9;
+			constexpr std::int16_t y2 = 8;
+			constexpr auto vector2 = PonyMath::Core::Vector2<std::int16_t>(x2, y2);
 
 			auto clamped = PonyMath::Core::Clamp(vector2, vector, vector1);
 			Assert::AreEqual(x2, clamped.X());
@@ -1249,14 +1249,14 @@ namespace Core
 
 		TEST_METHOD(LerpShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 
-			PonyMath::Core::Vector2<short> lerped = PonyMath::Core::Lerp(vectorL, vectorR, 0.f);
+			PonyMath::Core::Vector2<std::int16_t> lerped = PonyMath::Core::Lerp(vectorL, vectorR, 0.f);
 			Assert::AreEqual(xL, lerped.X());
 			Assert::AreEqual(yL, lerped.Y());
 
@@ -1265,16 +1265,16 @@ namespace Core
 			Assert::AreEqual(yR, lerped.Y());
 
 			lerped = PonyMath::Core::Lerp(vectorL, vectorR, 0.5f);
-			Assert::AreEqual(short{ 4 }, lerped.X());
-			Assert::AreEqual(short{ 1 }, lerped.Y());
+			Assert::AreEqual(std::int16_t{ 4 }, lerped.X());
+			Assert::AreEqual(std::int16_t{ 1 }, lerped.Y());
 
 			lerped = PonyMath::Core::Lerp(vectorL, vectorR, 2.f);
-			Assert::AreEqual(short{ -2 }, lerped.X());
-			Assert::AreEqual(short{ -10 }, lerped.Y());
+			Assert::AreEqual(std::int16_t{ -2 }, lerped.X());
+			Assert::AreEqual(std::int16_t{ -10 }, lerped.Y());
 
 			lerped = PonyMath::Core::Lerp(vectorL, vectorR, -1.f);
-			Assert::AreEqual(short{ 10 }, lerped.X());
-			Assert::AreEqual(short{ 11 }, lerped.Y());
+			Assert::AreEqual(std::int16_t{ 10 }, lerped.X());
+			Assert::AreEqual(std::int16_t{ 11 }, lerped.Y());
 		}
 
 		TEST_METHOD(LerpFloatTest)
@@ -1328,16 +1328,16 @@ namespace Core
 
 		TEST_METHOD(SumShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 
-			const PonyMath::Core::Vector2<short> sum = vectorL + vectorR;
-			Assert::AreEqual(static_cast<short>(xL + xR), sum.X());
-			Assert::AreEqual(static_cast<short>(yL + yR), sum.Y());
+			const PonyMath::Core::Vector2<std::int16_t> sum = vectorL + vectorR;
+			Assert::AreEqual(static_cast<std::int16_t>(xL + xR), sum.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL + yR), sum.Y());
 		}
 
 		TEST_METHOD(SumFloatTest)
@@ -1356,13 +1356,13 @@ namespace Core
 
 		TEST_METHOD(NegateShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
 
-			const PonyMath::Core::Vector2<short> negated = -vectorR;
-			Assert::AreEqual(static_cast<short>(-xR), negated.X());
-			Assert::AreEqual(static_cast<short>(-yR), negated.Y());
+			const PonyMath::Core::Vector2<std::int16_t> negated = -vectorR;
+			Assert::AreEqual(static_cast<std::int16_t>(-xR), negated.X());
+			Assert::AreEqual(static_cast<std::int16_t>(-yR), negated.Y());
 		}
 
 		TEST_METHOD(NegateFloatTest)
@@ -1378,16 +1378,16 @@ namespace Core
 
 		TEST_METHOD(SubtractShortTest)
 		{
-			constexpr short xR = 2;
-			constexpr short yR = -3;
-			constexpr auto vectorR = PonyMath::Core::Vector2<short>(xR, yR);
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr auto vectorR = PonyMath::Core::Vector2<std::int16_t>(xR, yR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 
-			const PonyMath::Core::Vector2<short> difference = vectorL - vectorR;
-			Assert::AreEqual(static_cast<short>(xL - xR), difference.X());
-			Assert::AreEqual(static_cast<short>(yL - yR), difference.Y());
+			const PonyMath::Core::Vector2<std::int16_t> difference = vectorL - vectorR;
+			Assert::AreEqual(static_cast<std::int16_t>(xL - xR), difference.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL - yR), difference.Y());
 		}
 
 		TEST_METHOD(SubtractFloatTest)
@@ -1406,20 +1406,20 @@ namespace Core
 
 		TEST_METHOD(MultiplyShortTest)
 		{
-			constexpr short multiplierI = 3;
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t multiplierI = 3;
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 
-			PonyMath::Core::Vector2<short> product = vectorL * multiplierI;
-			Assert::AreEqual(static_cast<short>(xL * multiplierI), product.X());
-			Assert::AreEqual(static_cast<short>(yL * multiplierI), product.Y());
+			PonyMath::Core::Vector2<std::int16_t> product = vectorL * multiplierI;
+			Assert::AreEqual(static_cast<std::int16_t>(xL * multiplierI), product.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL * multiplierI), product.Y());
 			Assert::IsTrue(multiplierI * vectorL == vectorL * multiplierI);
 
 			constexpr float multiplierF = 4;
 			product = vectorL * multiplierF;
-			Assert::AreEqual(static_cast<short>(xL * multiplierF), product.X());
-			Assert::AreEqual(static_cast<short>(yL * multiplierF), product.Y());
+			Assert::AreEqual(static_cast<std::int16_t>(xL * multiplierF), product.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL * multiplierF), product.Y());
 			Assert::IsTrue(multiplierF * vectorL == vectorL * multiplierF);
 		}
 
@@ -1438,19 +1438,19 @@ namespace Core
 
 		TEST_METHOD(DivideShortTest)
 		{
-			constexpr short divisorI = 3;
-			constexpr short xL = 6;
-			constexpr short yL = 4;
-			constexpr auto vectorL = PonyMath::Core::Vector2<short>(xL, yL);
+			constexpr std::int16_t divisorI = 3;
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr auto vectorL = PonyMath::Core::Vector2<std::int16_t>(xL, yL);
 
-			PonyMath::Core::Vector2<short> product = vectorL / divisorI;
-			Assert::AreEqual(static_cast<short>(xL / divisorI), product.X());
-			Assert::AreEqual(static_cast<short>(yL / divisorI), product.Y());
+			PonyMath::Core::Vector2<std::int16_t> product = vectorL / divisorI;
+			Assert::AreEqual(static_cast<std::int16_t>(xL / divisorI), product.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL / divisorI), product.Y());
 
 			constexpr float divisorF = 4;
 			product = vectorL / divisorF;
-			Assert::AreEqual(static_cast<short>(xL / divisorF), product.X());
-			Assert::AreEqual(static_cast<short>(yL / divisorF), product.Y());
+			Assert::AreEqual(static_cast<std::int16_t>(xL / divisorF), product.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL / divisorF), product.Y());
 		}
 
 		TEST_METHOD(DivideFloatTest)
@@ -1533,7 +1533,7 @@ namespace Core
 			[[maybe_unused]] constexpr bool isUnit = vector.IsUnit();
 			[[maybe_unused]] constexpr bool isUniform = vector.IsUniform();
 
-			[[maybe_unused]] constexpr auto intVector = static_cast<PonyMath::Core::Vector2<int>>(vector);
+			[[maybe_unused]] constexpr auto intVector = static_cast<PonyMath::Core::Vector2<std::int32_t>>(vector);
 
 			[[maybe_unused]] constexpr float value = vector[0];
 
@@ -1562,8 +1562,8 @@ namespace Core
 			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> product = vector * 3.f;
 			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> productL = 3.f * vector;
 			[[maybe_unused]] constexpr PonyMath::Core::Vector2<float> quotient = vector / 2.f;
-			[[maybe_unused]] constexpr PonyMath::Core::Vector2<int> productI = PonyMath::Core::Vector2<int>(4, 5) * 3;
-			[[maybe_unused]] constexpr PonyMath::Core::Vector2<int> productIL = 3 * PonyMath::Core::Vector2<int>(4, 5);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector2<std::int32_t> productI = PonyMath::Core::Vector2<std::int32_t>(4, 5) * 3;
+			[[maybe_unused]] constexpr PonyMath::Core::Vector2<std::int32_t> productIL = 3 * PonyMath::Core::Vector2<std::int32_t>(4, 5);
 		}
 	};
 }

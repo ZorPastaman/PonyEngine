@@ -20,6 +20,7 @@ export module PonyEngine.Window.Windows.Detail:WindowsWindowSystem;
 import <algorithm>;
 import <cstdint>;
 import <exception>;
+import <format>;
 import <memory>;
 import <stdexcept>;
 import <string>;
@@ -67,12 +68,12 @@ export namespace PonyEngine::Window
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::wstring_view MainTitle() const noexcept override;
-		virtual void MainTitle(std::wstring_view title) override;
+		virtual std::string_view MainTitle() const noexcept override;
+		virtual void MainTitle(std::string_view title) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::wstring_view SecondaryTitle() const noexcept override;
-		virtual void SecondaryTitle(std::wstring_view title) override;
+		virtual std::string_view SecondaryTitle() const noexcept override;
+		virtual void SecondaryTitle(std::string_view title) override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
@@ -80,9 +81,9 @@ export namespace PonyEngine::Window
 		virtual void HideWindow() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Vector2<int> Position() const noexcept override;
+		virtual PonyMath::Core::Vector2<std::int32_t> Position() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<unsigned int> Resolution() const noexcept override;
+		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
@@ -130,8 +131,8 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		HWND CreateControlledWindow(const WindowsWindowStyle& style, const WindowRect& rect);
 
-		std::wstring mainTitle; ///< Window main title cache.
-		std::wstring secondaryTitle; ///< Window title text cache.
+		std::string mainTitle; ///< Window main title cache.
+		std::string secondaryTitle; ///< Window title text cache.
 
 		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
@@ -208,27 +209,27 @@ namespace PonyEngine::Window
 		}
 	}
 
-	std::wstring_view WindowsWindowSystem::MainTitle() const noexcept
+	std::string_view WindowsWindowSystem::MainTitle() const noexcept
 	{
 		return mainTitle;
 	}
 
-	void WindowsWindowSystem::MainTitle(const std::wstring_view title)
+	void WindowsWindowSystem::MainTitle(const std::string_view title)
 	{
 		mainTitle = title;
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", PonyBase::Utility::ConvertToString(mainTitle));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", mainTitle);
 		UpdateWindowTitle();
 	}
 
-	std::wstring_view WindowsWindowSystem::SecondaryTitle() const noexcept
+	std::string_view WindowsWindowSystem::SecondaryTitle() const noexcept
 	{
 		return secondaryTitle;
 	}
 
-	void WindowsWindowSystem::SecondaryTitle(const std::wstring_view title)
+	void WindowsWindowSystem::SecondaryTitle(const std::string_view title)
 	{
 		secondaryTitle = title;
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", PonyBase::Utility::ConvertToString(secondaryTitle));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", secondaryTitle);
 		UpdateWindowTitle();
 	}
 
@@ -249,20 +250,20 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Hide window.");
 	}
 
-	PonyMath::Core::Vector2<int> WindowsWindowSystem::Position() const noexcept
+	PonyMath::Core::Vector2<std::int32_t> WindowsWindowSystem::Position() const noexcept
 	{
 		RECT rect;
 		GetClientRect(hWnd, &rect);
 
-		return PonyMath::Core::Vector2<int>(static_cast<int>(rect.left), static_cast<int>(rect.right));
+		return PonyMath::Core::Vector2<std::int32_t>(static_cast<std::int32_t>(rect.left), static_cast<std::int32_t>(rect.right));
 	}
 
-	PonyMath::Utility::Resolution<unsigned int> WindowsWindowSystem::Resolution() const noexcept
+	PonyMath::Utility::Resolution<std::uint32_t> WindowsWindowSystem::Resolution() const noexcept
 	{
 		RECT rect;
 		GetClientRect(hWnd, &rect);
 
-		return PonyMath::Utility::Resolution<unsigned int>(static_cast<unsigned int>(rect.right - rect.left), static_cast<unsigned int>(rect.bottom - rect.top));
+		return PonyMath::Utility::Resolution<std::uint32_t>(static_cast<std::uint32_t>(rect.right - rect.left), static_cast<std::uint32_t>(rect.bottom - rect.top));
 	}
 
 	HWND WindowsWindowSystem::WindowHandle() const noexcept
@@ -323,14 +324,14 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::UpdateWindowTitle() const
 	{
-		const std::wstring titleToSet = secondaryTitle.length() > 0 ? mainTitle + L" - " + secondaryTitle : mainTitle;
+		const std::string titleToSet = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
 
-		if (!SetWindowTextW(hWnd, titleToSet.c_str()))
+		if (!SetWindowTextW(hWnd, PonyBase::Utility::ConvertToWideString(titleToSet).c_str()))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", PonyBase::Utility::ConvertToString(titleToSet));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", titleToSet);
 	}
 
 	void WindowsWindowSystem::Destroy() const noexcept
@@ -408,12 +409,12 @@ namespace PonyEngine::Window
 		const auto [position, resolution] = PositionResolution(GetWindowRect(style, rect));
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
-			windowsClass->Class(), style.style, style.extendedStyle, PonyBase::Utility::ConvertToString(mainTitle), position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
+			windowsClass->Class(), style.style, style.extendedStyle, mainTitle, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
 
 		const HWND windowHandle = CreateWindowExW(
 			style.extendedStyle,
 			reinterpret_cast<LPCWSTR>(windowsClass->Class()),
-			mainTitle.c_str(),
+			PonyBase::Utility::ConvertToWideString(mainTitle).c_str(),
 			style.style,
 			position.X(), position.Y(),
 			resolution.X(), resolution.Y(),

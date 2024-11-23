@@ -143,7 +143,7 @@ namespace PonyDebug::Log
 	{
 		try
 		{
-			switch ((!message.empty()) << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
+			switch (!message.empty() << 2 | (exception != nullptr) << 1 | frameCount.has_value() << 0)
 			{
 			case 0:
 				return LogFormat(logType, timePoint);

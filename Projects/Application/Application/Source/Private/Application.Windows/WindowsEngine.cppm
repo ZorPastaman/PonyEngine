@@ -18,6 +18,7 @@ module;
 export module Application.Windows:WindowsEngine;
 
 import <array>;
+import <cstdint>;
 import <exception>;
 import <format>;
 import <memory>;
@@ -277,7 +278,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
-			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, int>, 6>
+			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 6>
 			{
 				std::pair(screenSystemFactory.systemFactory.get(), 0),
 				std::pair(frameRateSystemFactory.systemFactory.get(), 1),
