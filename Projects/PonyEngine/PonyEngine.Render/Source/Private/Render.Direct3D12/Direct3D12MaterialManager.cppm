@@ -21,20 +21,22 @@ import PonyEngine.Render.Detail;
 
 import :Direct3D12Material;
 import :Direct3D12RootSignatureManager;
+import :IDirect3D12MaterialManagerPrivate;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12MaterialManager final
+	class Direct3D12MaterialManager final : public IDirect3D12MaterialManagerPrivate
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MaterialManager(IRenderSystemContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, DXGI_FORMAT rtvFormat) noexcept;
+		Direct3D12MaterialManager(IDirect3D12SystemContext& renderSystem, DXGI_FORMAT rtvFormat) noexcept;
 		Direct3D12MaterialManager(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager(Direct3D12MaterialManager&&) = delete;
 
 		~Direct3D12MaterialManager() noexcept = default;
 
-		std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader);
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader) override;
 
 		Direct3D12MaterialManager& operator =(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager& operator =(Direct3D12MaterialManager&&) = delete;
@@ -42,21 +44,15 @@ export namespace PonyEngine::Render
 	private:
 		DXGI_FORMAT rtvFormat;
 
-		IRenderSystemContext* render;
-
-		Microsoft::WRL::ComPtr<ID3D12Device10> device;
-
-		Direct3D12RootSignatureManager* rootSignatureManager;
+		IDirect3D12SystemContext* renderSystem;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MaterialManager::Direct3D12MaterialManager(IRenderSystemContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, const DXGI_FORMAT rtvFormat) noexcept :
+	Direct3D12MaterialManager::Direct3D12MaterialManager(IDirect3D12SystemContext& renderSystem, const DXGI_FORMAT rtvFormat) noexcept :
 		rtvFormat{rtvFormat},
-		render{&render},
-		device(device),
-		rootSignatureManager{rootSignatureManager}
+		renderSystem{&renderSystem}
 	{
 	}
 
@@ -148,11 +144,11 @@ namespace PonyEngine::Render
 		};
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
-		if (const HRESULT result = device->CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = renderSystem->Device().CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<Direct3D12Material>(*pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, rootSignature);
+		return std::make_shared<Direct3D12Material>(rootSignature, *pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 }

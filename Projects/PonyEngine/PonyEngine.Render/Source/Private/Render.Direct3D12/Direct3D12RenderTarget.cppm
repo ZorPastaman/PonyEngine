@@ -25,7 +25,8 @@ import PonyMath.Utility;
 
 import PonyEngine.Render.Direct3D12;
 
-import :IDirect3D12RenderContext;
+import :Direct3D12RenderTargetParams;
+import :IDirect3D12SystemContext;
 import :IDirect3D12RenderTargetPrivate;
 
 export namespace PonyEngine::Render
@@ -34,7 +35,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderTarget(IDirect3D12RenderContext& render, const RenderTargetParams& renderTargetParams, DXGI_FORMAT rtvFormat);
+		Direct3D12RenderTarget(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params);
 		Direct3D12RenderTarget(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget(Direct3D12RenderTarget&&) = delete;
 
@@ -61,17 +62,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) const noexcept override;
 
-		void SetBuffers(std::span<ID3D12Resource2*> buffers);
-
 		Direct3D12RenderTarget& operator =(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
 
 	private:
 		PonyMath::Utility::Resolution<UINT> resolution;
 		PonyMath::Color::RGBA<FLOAT> clearColor;
-		DXGI_FORMAT rtvFormat;
 
-		IDirect3D12RenderContext* render;
+		IDirect3D12SystemContext* d3d12System;
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
@@ -81,12 +79,47 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderTarget::Direct3D12RenderTarget(IDirect3D12RenderContext& render, const RenderTargetParams& renderTargetParams, const DXGI_FORMAT rtvFormat) :
-		resolution(renderTargetParams.resolution.value()),
-		clearColor(renderTargetParams.clearColor),
-		rtvFormat{rtvFormat},
-		render{&render}
+	Direct3D12RenderTarget::Direct3D12RenderTarget(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params) :
+		resolution(params.resolution),
+		clearColor(params.clearColor),
+		d3d12System{&d3d12System}
 	{
+		backBuffers.resize(params.backBuffers.size());
+		for (std::size_t i = 0; i < backBuffers.size(); ++i)
+		{
+			backBuffers[i] = params.backBuffers[i];
+		}
+
+		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
+		{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
+			.NumDescriptors = static_cast<UINT>(backBuffers.size()),
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
+			.NodeMask = 0u
+		};
+		ID3D12Device10& device = d3d12System.Device();
+		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.ReleaseAndGetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		rtvHandles.resize(backBuffers.size());
+		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+		const UINT rtvDescriptorHandleIncrement = device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
+		for (std::size_t i = 1; i < rtvHandles.size(); ++i)
+		{
+			rtvHandles[i].ptr = rtvHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
+		}
+
+		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
+		{
+			.Format = params.rtvFormat,
+			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
+			.Texture2D = D3D12_TEX2D_RTV{}
+		};
+		for (std::size_t i = 0; i < backBuffers.size(); ++i)
+		{
+			device.CreateRenderTargetView(backBuffers[i].Get(), &rtvDescription, rtvHandles[i]);
+		}
 	}
 
 	PonyMath::Utility::Resolution<std::uint32_t> Direct3D12RenderTarget::Resolution() const noexcept
@@ -132,45 +165,5 @@ namespace PonyEngine::Render
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::GetRtvHandle(const UINT index) const noexcept
 	{
 		return rtvHandles[index];
-	}
-
-	void Direct3D12RenderTarget::SetBuffers(const std::span<ID3D12Resource2*> buffers)
-	{
-		backBuffers.resize(buffers.size());
-		for (std::size_t i = 0; i < backBuffers.size(); ++i)
-		{
-			backBuffers[i] = buffers[i];
-		}
-
-		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			.NumDescriptors = static_cast<UINT>(buffers.size()),
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		ID3D12Device10& device = render->Device();
-		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.ReleaseAndGetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		rtvHandles.resize(buffers.size());
-		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
-		const UINT rtvDescriptorHandleIncrement = device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
-		for (std::size_t i = 1; i < rtvHandles.size(); ++i)
-		{
-			rtvHandles[i].ptr = rtvHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
-		}
-
-		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
-		{
-			.Format = rtvFormat,
-			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
-			.Texture2D = D3D12_TEX2D_RTV{}
-		};
-		for (std::size_t i = 0; i < buffers.size(); ++i)
-		{
-			device.CreateRenderTargetView(buffers[i], &rtvDescription, rtvHandles[i]);
-		}
 	}
 }

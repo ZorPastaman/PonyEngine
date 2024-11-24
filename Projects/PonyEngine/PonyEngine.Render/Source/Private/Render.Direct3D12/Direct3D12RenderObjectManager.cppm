@@ -34,15 +34,15 @@ import :Direct3D12MaterialManager;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
 import :Direct3D12RenderObject;
+import :IDirect3D12RenderObjectManagerPrivate;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderObjectManager final : public IDirect3D12RenderObjectManager
+	class Direct3D12RenderObjectManager final : public IDirect3D12RenderObjectManagerPrivate
 	{
 	public:
-
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObjectManager(IRenderSystemContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
+		explicit Direct3D12RenderObjectManager(IDirect3D12SystemContext& d3d12System) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
@@ -51,18 +51,14 @@ export namespace PonyEngine::Render
 		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
 		virtual std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) override;
 
-		std::span<const std::weak_ptr<Direct3D12RenderObject>> RenderObjects() noexcept;
+		[[nodiscard("Pure function")]]
+		virtual std::span<const std::weak_ptr<Direct3D12RenderObject>> RenderObjects() noexcept override;
 
 		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
 
 	private:
-		IRenderSystemContext* renderer;
-
-		Microsoft::WRL::ComPtr<ID3D12Device10> device;
-		Direct3D12RootSignatureManager* rootSignatureManager;
-		Direct3D12MaterialManager* materialManager;
-		Direct3D12MeshManager* meshManager;
+		IDirect3D12SystemContext* d3d12System;
 
 		std::vector<std::weak_ptr<Direct3D12RenderObject>> renderObjects;
 
@@ -72,25 +68,21 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderSystemContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
-		renderer{&renderer},
-		device(device),
-		rootSignatureManager{rootSignatureManager},
-		materialManager{&materialManager},
-		meshManager{&meshManager}
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IDirect3D12SystemContext& d3d12System) noexcept :
+		d3d12System{&d3d12System}
 	{
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
-		const auto rootSignatureHandle = rootSignatureManager->CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
+		const auto rootSignature = this->d3d12System->RootSignatureManager().CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
 		const auto vertexShader = Direct3D12Shader("VertexShader");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
 		const auto pixelShader = Direct3D12Shader("PixelShader");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
-		defaultMaterial = materialManager.CreateMaterial(rootSignatureHandle, vertexShader, pixelShader);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
+		defaultMaterial = this->d3d12System->MaterialManager().CreateMaterial(rootSignature, vertexShader, pixelShader);
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 
 	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
@@ -100,7 +92,7 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IDirect3D12RenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
 	{
-		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, meshManager->CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
+		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, d3d12System->MeshManager().CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
 		renderObjects.push_back(renderObject);
 
 		return renderObject;
@@ -108,7 +100,7 @@ namespace PonyEngine::Render
 
 	std::span<const std::weak_ptr<Direct3D12RenderObject>> Direct3D12RenderObjectManager::RenderObjects() noexcept
 	{
-		for (std::size_t i = renderObjects.size(); i-- > 0; )
+		for (std::size_t i = renderObjects.size(); i-- > 0; ) // TODO: Clean via a custom deleter.
 		{
 			if (renderObjects[i].expired())
 			{

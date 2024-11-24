@@ -9,22 +9,24 @@
 
 module;
 
-#include "PonyBase/Core/DXGI/Framework.h"
+#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.DXGI.Detail:IDXGISwapChain;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12MaterialManagerPrivate;
+
+import <memory>;
+
+import :Direct3D12Material;
+import :Direct3D12RootSignature;
+import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
 {
-	class IDXGISwapChain
+	class IDirect3D12MaterialManagerPrivate
 	{
-		INTERFACE_BODY(IDXGISwapChain)
+		INTERFACE_BODY(IDirect3D12MaterialManagerPrivate)
 
 		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual UINT GetCurrentBackBufferIndex() const noexcept = 0;
-		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept = 0;
+		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader) = 0;
 	};
 }

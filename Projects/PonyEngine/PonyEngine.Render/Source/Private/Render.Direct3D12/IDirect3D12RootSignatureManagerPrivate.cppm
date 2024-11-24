@@ -10,15 +10,22 @@
 module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
+#include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Constants;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RootSignatureManagerPrivate;
+
+import <memory>;
+
+import :Direct3D12RootSignature;
+import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
 {
-	constexpr DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT; ///< Default depth stencil format.
-	constexpr FLOAT MinDepth = D3D12_MIN_DEPTH; ///< Default minimal depth value.
-	constexpr FLOAT MaxDepth = D3D12_MAX_DEPTH; ///< Default maximum depth value.
-	constexpr UINT8 Stencil = 0u; ///< Default stencil value.
+	class IDirect3D12RootSignatureManagerPrivate
+	{
+		INTERFACE_BODY(IDirect3D12RootSignatureManagerPrivate)
 
-	constexpr auto SampleDescription = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}; ///< Default sample description.
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) = 0;
+	};
 }

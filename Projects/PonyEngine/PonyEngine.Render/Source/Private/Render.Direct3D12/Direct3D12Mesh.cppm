@@ -34,7 +34,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		const D3D12_VERTEX_BUFFER_VIEW& VertexBufferView() const noexcept;
 		[[nodiscard("Pure function")]]
-		const D3D12_VERTEX_BUFFER_VIEW& VertexColorBufferView() const noexcept;
+		const D3D12_VERTEX_BUFFER_VIEW& VertexColorBufferView() const noexcept; // TODO: Make it optional
 		[[nodiscard("Pure function")]]
 		const D3D12_INDEX_BUFFER_VIEW& VertexIndexBufferView() const noexcept;
 		[[nodiscard("Pure function")]]

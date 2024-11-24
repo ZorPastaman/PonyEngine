@@ -18,7 +18,7 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Waiter;
 import <memory>;
 
 import :Direct3D12Fence;
-import :IDirect3D12RenderContext;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
@@ -26,7 +26,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue& commandQueue, DWORD waitTimeout);
+		Direct3D12Waiter(IDirect3D12SystemContext& render, ID3D12CommandQueue& commandQueue, DWORD waitTimeout);
 		Direct3D12Waiter(const Direct3D12Waiter&) = delete;
 		Direct3D12Waiter(Direct3D12Waiter&&) = delete;
 
@@ -40,7 +40,7 @@ export namespace PonyEngine::Render
 	private:
 		DWORD waitTimeout;
 
-		IDirect3D12RenderContext* render;
+		IDirect3D12SystemContext* render;
 
 		std::unique_ptr<Direct3D12Fence> fence;
 		HANDLE waitEvent;
@@ -49,7 +49,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue& commandQueue, const DWORD waitTimeout) :
+	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12SystemContext& render, ID3D12CommandQueue& commandQueue, const DWORD waitTimeout) :
 		waitTimeout{waitTimeout},
 		render{&render},
 		fence(std::make_unique<Direct3D12Fence>(render, commandQueue))

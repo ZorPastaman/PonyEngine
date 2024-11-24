@@ -38,17 +38,19 @@ import PonyEngine.Render.Detail;
 import :Direct3D12Mesh;
 import :Direct3D12IndexArray;
 import :Direct3D12VertexArray;
+import :IDirect3D12MeshManagerPrivate;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12MeshManager final
+	class Direct3D12MeshManager final : public IDirect3D12MeshManagerPrivate
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MeshManager(IRenderSystemContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
+		explicit Direct3D12MeshManager(IDirect3D12SystemContext& renderContext); // TODO: Add other constructors and destructor.
 
 		[[nodiscard("Pure constructor")]]
-		std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh);
+		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) override;
 
 	private:
 		[[nodiscard("Pure constructor")]]
@@ -67,40 +69,28 @@ export namespace PonyEngine::Render
 			.VisibleNodeMask = 0u
 		};
 
-		IRenderSystemContext* renderer;
-
-		Microsoft::WRL::ComPtr<ID3D12Device10> device;
+		IDirect3D12SystemContext* renderContext;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MeshManager::Direct3D12MeshManager(IRenderSystemContext& renderer, ID3D12Device10* const device) :
-		renderer{&renderer},
-		device(device)
+	Direct3D12MeshManager::Direct3D12MeshManager(IDirect3D12SystemContext& renderContext) :
+		renderContext{&renderContext}
 	{
 	}
 
 	std::shared_ptr<Direct3D12Mesh> Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh)
 	{
-		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = D3D12_HEAP_TYPE_UPLOAD,
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
-
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertices.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertices.");
 		Direct3D12VertexArray vertices = CreateVertices(mesh.Vertices());
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertices created.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertex colors.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertices created.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertex colors.");
 		Direct3D12VertexArray colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
 		Direct3D12IndexArray indices = CreateVertexIndices(mesh.Triangles());
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
+		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
 		return std::make_shared<Direct3D12Mesh>(vertices, colors, indices);
 	}
@@ -126,7 +116,7 @@ namespace PonyEngine::Render
 		};
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> verticesResource;
-		if (const HRESULT result = device->CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &verticesDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(verticesResource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = renderContext->Device().CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &verticesDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(verticesResource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertices resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -163,7 +153,7 @@ namespace PonyEngine::Render
 		};
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> colorsResource;
-		if (const HRESULT result = device->CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &colorsDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(colorsResource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = renderContext->Device().CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &colorsDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(colorsResource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex colors resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -207,7 +197,7 @@ namespace PonyEngine::Render
 		};
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> indicesResource;
-		if (const HRESULT result = device->CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &indicesDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(indicesResource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = renderContext->Device().CreateCommittedResource3(&HeapProperties, D3D12_HEAP_FLAG_NONE, &indicesDescription, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(indicesResource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex indices resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

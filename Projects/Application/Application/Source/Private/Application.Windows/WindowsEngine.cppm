@@ -95,6 +95,7 @@ export namespace Application
 		PonyEngine::Core::EngineData CreateEngine() const;
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
+
 		std::unique_ptr<PonyEngine::Core::Engine> engine; ///< Engine.
 	};
 }
@@ -288,8 +289,8 @@ namespace Application
 				std::pair(gameSystemFactory.systemFactory.get(), 4),
 			};
 			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
-			PonyEngine::Core::EngineData engineData = PonyEngine::Core::CreateEngine(*application, params);
-			assert(engineData.engine && "The engine is nullptr.");
+			PonyEngine::Core::EngineData engine = PonyEngine::Core::CreateEngine(*application, params);
+			assert(engine.engine && "The engine is nullptr.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
@@ -313,7 +314,7 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
 
-			return engineData;
+			return engine;
 		}
 		catch (const std::exception& e)
 		{

@@ -43,6 +43,9 @@ export namespace PonyEngine::Render
 		~DXGISwapChain() noexcept;
 
 		[[nodiscard("Pure function")]]
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual UINT GetCurrentBackBufferIndex() const noexcept override;
 		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept override;
 
@@ -74,7 +77,7 @@ namespace PonyEngine::Render
 			.Height = swapChainParams.resolution.Height(),
 			.Format = swapChainParams.rtvFormat,
 			.Stereo = false,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}, // TODO: Sample desc to params.
+			.SampleDesc = SampleDesc(),
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
 			.BufferCount = swapChainParams.bufferCount,
 			.Scaling = DXGI_SCALING_STRETCH,
@@ -99,6 +102,11 @@ namespace PonyEngine::Render
 		PONY_LOG(dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Release swap chain.");
 		swapChain.Reset();
 		PONY_LOG(dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Swap chain released.");
+	}
+
+	DXGI_SAMPLE_DESC DXGISwapChain::SampleDesc() const noexcept
+	{
+		return DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u};
 	}
 
 	UINT DXGISwapChain::GetCurrentBackBufferIndex() const noexcept
