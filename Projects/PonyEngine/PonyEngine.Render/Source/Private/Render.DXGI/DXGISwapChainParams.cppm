@@ -7,15 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render;
+module;
 
-export import :IRenderObject;
-export import :IRenderObjectManager;
-export import :IRenderSystem;
-export import :IRenderTarget;
-export import :IRenderView;
-export import :RenderSystemFactory;
-export import :RenderSystemFactoryParams;
-export import :RenderSystemParams;
-export import :RenderTargetParams;
-export import :RenderViewParams;
+#include "PonyBase/Core/DXGI/Framework.h"
+
+export module PonyEngine.Render.DXGI.Detail:DXGISwapChainParams;
+
+import PonyMath.Utility;
+
+export namespace PonyEngine::Render
+{
+	struct DXGISwapChainParams final
+	{
+		HWND hWnd;
+		PonyMath::Utility::Resolution<UINT> resolution;
+		DXGI_FORMAT rtvFormat;
+		UINT bufferCount;
+	};
+}

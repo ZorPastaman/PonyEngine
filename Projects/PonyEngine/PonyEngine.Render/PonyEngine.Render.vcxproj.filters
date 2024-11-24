@@ -37,9 +37,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -49,7 +46,7 @@
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\IRenderContext.cppm">
+    <ClCompile Include="Source\Private\Render\IRenderSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm">
@@ -58,7 +55,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexArray.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexArray.cppm">
@@ -97,12 +94,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHandle.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialHandle.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -115,13 +106,37 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureHandle.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderContext.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12DepthStencilPrivate.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderTargetPrivate.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGIRenderSystemContext.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGISystemContext.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChain.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISystem.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChainParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGISwapChain.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

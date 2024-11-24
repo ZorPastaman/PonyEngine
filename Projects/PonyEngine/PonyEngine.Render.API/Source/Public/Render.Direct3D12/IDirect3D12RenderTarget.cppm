@@ -26,17 +26,17 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IDirect3D12RenderTarget)
 
-		/// @brief Gets the clear color.
-		/// @return Clear color.
-		[[nodiscard("Pure function")]]
-		virtual PonyMath::Color::RGBA<FLOAT> ClearColorD3D12() const noexcept = 0;
-		/// @brief Sets the clear color.
-		/// @param color Clear color.
-		virtual void ClearColorD3D12(const PonyMath::Color::RGBA<FLOAT>& color) noexcept = 0;
-
 		/// @brief Gets the render target resolution.
 		/// @return Render target resolution.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<UINT> ResolutionD3D12() const noexcept = 0;
+		virtual const PonyMath::Utility::Resolution<UINT>& ResolutionD3D12() const noexcept = 0;
+
+		/// @brief Gets the clear color.
+		/// @return Clear color.
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Color::RGBA<FLOAT>& ClearColorD3D12() const noexcept = 0;
+		/// @brief Sets the clear color.
+		/// @param color Clear color.
+		virtual void ClearColorD3D12(const PonyMath::Color::RGBA<FLOAT>& color) noexcept = 0;
 	};
 }

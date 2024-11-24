@@ -26,7 +26,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue* commandQueue, DWORD waitTimeout);
+		Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue& commandQueue, DWORD waitTimeout);
 		Direct3D12Waiter(const Direct3D12Waiter&) = delete;
 		Direct3D12Waiter(Direct3D12Waiter&&) = delete;
 
@@ -49,10 +49,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue* const commandQueue, const DWORD waitTimeout) :
+	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12RenderContext& render, ID3D12CommandQueue& commandQueue, const DWORD waitTimeout) :
 		waitTimeout{waitTimeout},
 		render{&render},
-		fence(std::make_unique<Direct3D12Fence>(render, *commandQueue))
+		fence(std::make_unique<Direct3D12Fence>(render, commandQueue))
 	{
 		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Create wait event.");
 		if ((waitEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]

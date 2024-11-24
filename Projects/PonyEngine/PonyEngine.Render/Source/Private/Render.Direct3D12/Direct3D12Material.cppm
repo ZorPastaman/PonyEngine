@@ -14,10 +14,11 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Material;
 
 import <cstddef>;
+import <memory>;
 import <stdexcept>;
 import <type_traits>;
 
-import :Direct3D12RootSignatureHandle;
+import :Direct3D12RootSignature;
 import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
@@ -26,7 +27,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Material(ID3D12PipelineState* pipelineState, D3D_PRIMITIVE_TOPOLOGY primitiveTopology, Direct3D12RootSignatureHandle rootSignatureHandle);
+		Direct3D12Material(ID3D12PipelineState& pipelineState, D3D_PRIMITIVE_TOPOLOGY primitiveTopology, const std::shared_ptr<Direct3D12RootSignature>& rootSignature);
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Material(const Direct3D12Material& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -43,7 +44,7 @@ export namespace PonyEngine::Render
 		D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		Direct3D12RootSignatureHandle RootSignatureHandle() const noexcept;
+		Direct3D12RootSignature& RootSignature() const noexcept;
 
 		Direct3D12Material& operator =(const Direct3D12Material& other) noexcept = default;
 		Direct3D12Material& operator =(Direct3D12Material&& other) noexcept = default;
@@ -51,16 +52,16 @@ export namespace PonyEngine::Render
 	private:
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 		D3D_PRIMITIVE_TOPOLOGY primitiveTopology;
-		Direct3D12RootSignatureHandle rootSignatureHandle;
+		std::shared_ptr<Direct3D12RootSignature> rootSignature;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12Material::Direct3D12Material(ID3D12PipelineState* const pipelineState, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology, const Direct3D12RootSignatureHandle rootSignatureHandle) :
-		pipelineState(pipelineState),
+	Direct3D12Material::Direct3D12Material(ID3D12PipelineState& pipelineState, const D3D_PRIMITIVE_TOPOLOGY primitiveTopology, const std::shared_ptr<Direct3D12RootSignature>& rootSignature) :
+		pipelineState(&pipelineState),
 		primitiveTopology{primitiveTopology},
-		rootSignatureHandle(rootSignatureHandle)
+		rootSignature(rootSignature)
 	{
 	}
 
@@ -79,8 +80,8 @@ namespace PonyEngine::Render
 		return primitiveTopology;
 	}
 
-	Direct3D12RootSignatureHandle Direct3D12Material::RootSignatureHandle() const noexcept
+	Direct3D12RootSignature& Direct3D12Material::RootSignature() const noexcept
 	{
-		return rootSignatureHandle;
+		return *rootSignature;
 	}
 }

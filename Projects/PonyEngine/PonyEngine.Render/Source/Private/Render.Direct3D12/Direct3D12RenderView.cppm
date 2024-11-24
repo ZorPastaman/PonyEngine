@@ -42,16 +42,15 @@ export namespace PonyEngine::Render
 		virtual void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Matrix4x4<FLOAT> ViewMatrixD3D12() const noexcept override;
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ViewMatrixD3D12() const noexcept override;
 		virtual void ViewMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Matrix4x4<FLOAT> ProjectionMatrixD3D12() const noexcept override;
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ProjectionMatrixD3D12() const noexcept override;
 		virtual void ProjectionMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
 
 		Direct3D12RenderView& operator =(const Direct3D12RenderView& other) noexcept = default;
 		Direct3D12RenderView& operator =(Direct3D12RenderView&& other) noexcept = default;
-
 
 	private:
 		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix;
@@ -69,25 +68,25 @@ namespace PonyEngine::Render
 
 	PonyMath::Core::Matrix4x4<float> Direct3D12RenderView::ViewMatrix() const noexcept
 	{
-		return static_cast<PonyMath::Core::Matrix4x4<float>>(viewMatrix);
+		return static_cast<PonyMath::Core::Matrix4x4<float>>(ViewMatrixD3D12());
 	}
 
 	void Direct3D12RenderView::ViewMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
-		viewMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix);
+		ViewMatrixD3D12(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix));
 	}
 
 	PonyMath::Core::Matrix4x4<float> Direct3D12RenderView::ProjectionMatrix() const noexcept
 	{
-		return static_cast<PonyMath::Core::Matrix4x4<float>>(projectionMatrix);
+		return static_cast<PonyMath::Core::Matrix4x4<float>>(ProjectionMatrixD3D12());
 	}
 
 	void Direct3D12RenderView::ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
-		projectionMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix);
+		ProjectionMatrixD3D12(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix));
 	}
 
-	PonyMath::Core::Matrix4x4<FLOAT> Direct3D12RenderView::ViewMatrixD3D12() const noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::ViewMatrixD3D12() const noexcept
 	{
 		return viewMatrix;
 	}
@@ -97,7 +96,7 @@ namespace PonyEngine::Render
 		viewMatrix = matrix;
 	}
 
-	PonyMath::Core::Matrix4x4<FLOAT> Direct3D12RenderView::ProjectionMatrixD3D12() const noexcept
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderView::ProjectionMatrixD3D12() const noexcept
 	{
 		return projectionMatrix;
 	}

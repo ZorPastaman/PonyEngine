@@ -13,12 +13,14 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderObject;
 
+import <memory>;
+
 import PonyMath.Core;
 
 import PonyEngine.Render.Direct3D12;
 
-import :Direct3D12MaterialHandle;
-import :Direct3D12MeshHandle;
+import :Direct3D12Material;
+import :Direct3D12Mesh;
 
 export namespace PonyEngine::Render
 {
@@ -26,7 +28,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderObject(const Direct3D12MaterialHandle& materialHandle, const Direct3D12MeshHandle& meshHandle, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept;
+		Direct3D12RenderObject(const std::shared_ptr<Direct3D12Material>& material, const std::shared_ptr<Direct3D12Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderObject(const Direct3D12RenderObject& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -39,28 +41,34 @@ export namespace PonyEngine::Render
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		const Direct3D12MaterialHandle& Material() const noexcept;
+		Direct3D12Material& Material() noexcept;
 		[[nodiscard("Pure function")]]
-		const Direct3D12MeshHandle& RenderMesh() const noexcept;
+		Direct3D12Mesh& RenderMesh() noexcept;
 
 		[[nodiscard("Pure function")]]
-		const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept;
+		const Direct3D12Material& Material() const noexcept;
+		[[nodiscard("Pure function")]]
+		const Direct3D12Mesh& RenderMesh() const noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept override;
+		virtual void ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept = default;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept = default;
 
 	private:
-		Direct3D12MaterialHandle materialHandle;
-		Direct3D12MeshHandle meshHandle;
+		std::shared_ptr<Direct3D12Material> materialHandle;
+		std::shared_ptr<Direct3D12Mesh> meshHandle;
 		PonyMath::Core::Matrix4x4<FLOAT> modelMatrix;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObject::Direct3D12RenderObject(const Direct3D12MaterialHandle& materialHandle, const Direct3D12MeshHandle& meshHandle, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept :
-		materialHandle(materialHandle),
-		meshHandle(meshHandle),
+	Direct3D12RenderObject::Direct3D12RenderObject(const std::shared_ptr<Direct3D12Material>& material, const std::shared_ptr<Direct3D12Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) noexcept :
+		materialHandle(material),
+		meshHandle(mesh),
 		modelMatrix(modelMatrix)
 	{
 	}
@@ -75,18 +83,33 @@ namespace PonyEngine::Render
 		modelMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix);
 	}
 
-	const Direct3D12MaterialHandle& Direct3D12RenderObject::Material() const noexcept
+	Direct3D12Material& Direct3D12RenderObject::Material() noexcept
 	{
-		return materialHandle;
+		return *materialHandle;
 	}
 
-	const Direct3D12MeshHandle& Direct3D12RenderObject::RenderMesh() const noexcept
+	Direct3D12Mesh& Direct3D12RenderObject::RenderMesh() noexcept
 	{
-		return meshHandle;
+		return *meshHandle;
+	}
+
+	const Direct3D12Material& Direct3D12RenderObject::Material() const noexcept
+	{
+		return *materialHandle;
+	}
+
+	const Direct3D12Mesh& Direct3D12RenderObject::RenderMesh() const noexcept
+	{
+		return *meshHandle;
 	}
 
 	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::ModelMatrixD3D12() const noexcept
 	{
 		return modelMatrix;
+	}
+
+	void Direct3D12RenderObject::ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept
+	{
+		modelMatrix = matrix;
 	}
 }

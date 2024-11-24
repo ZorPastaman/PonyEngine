@@ -30,9 +30,9 @@ export namespace PonyEngine::Render
 		~Direct3D12RootSignature() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		ID3D12RootSignature* RootSignature() noexcept;
+		ID3D12RootSignature& RootSignature() noexcept;
 		[[nodiscard("Pure function")]]
-		const ID3D12RootSignature* RootSignature() const noexcept;
+		const ID3D12RootSignature& RootSignature() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		UINT MvpIndex() const noexcept;
@@ -54,14 +54,14 @@ namespace PonyEngine::Render
 	{
 	}
 
-	ID3D12RootSignature* Direct3D12RootSignature::RootSignature() noexcept
+	ID3D12RootSignature& Direct3D12RootSignature::RootSignature() noexcept
 	{
-		return rootSignature.Get();
+		return *rootSignature.Get();
 	}
 
-	const ID3D12RootSignature* Direct3D12RootSignature::RootSignature() const noexcept
+	const ID3D12RootSignature& Direct3D12RootSignature::RootSignature() const noexcept
 	{
-		return rootSignature.Get();
+		return *rootSignature.Get();
 	}
 
 	UINT Direct3D12RootSignature::MvpIndex() const noexcept

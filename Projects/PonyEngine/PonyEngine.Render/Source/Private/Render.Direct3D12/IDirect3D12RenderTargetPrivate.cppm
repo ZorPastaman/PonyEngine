@@ -9,26 +9,24 @@
 
 module;
 
+#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.Detail:IRenderContext;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderTargetPrivate;
 
-import PonyDebug.Log;
+import PonyEngine.Render.Direct3D12;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render system context.
-	class IRenderContext
+	class IDirect3D12RenderTargetPrivate : public IDirect3D12RenderTarget
 	{
-		INTERFACE_BODY(IRenderContext)
+		INTERFACE_BODY(IDirect3D12RenderTargetPrivate)
 
-		/// @brief Gets the logger.
-		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
-		/// @brief Gets the logger.
-		/// @return Logger.
+		virtual ID3D12Resource2& GetBackBuffer(UINT index) noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+		virtual const ID3D12Resource2& GetBackBuffer(UINT index) const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) const noexcept = 0;
 	};
 }

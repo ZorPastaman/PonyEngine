@@ -40,15 +40,21 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Constants.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12DepthStencil.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialHandle.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshHandle.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureHandle.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12DepthStencilPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderContext.cppm" />
-    <ClCompile Include="Source\Private\Render\IRenderContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderTargetPrivate.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChain.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISystem.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGIRenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGISwapChain.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\IDXGISystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChainParams.cppm" />
+    <ClCompile Include="Source\Private\Render\IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryImpl.cppm" />
@@ -61,13 +67,12 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObjectManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTarget.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Shader.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexBuffer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexArray.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Fence.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderView.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12DXGISubSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>
