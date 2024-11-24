@@ -17,7 +17,14 @@ module;
 
 export module PonyEngine.Render.DXGI.Detail:DXGISystem;
 
+import <cstdint>;
 import <memory>;
+import <stdexcept>;
+import <type_traits>;
+
+import PonyBase.StringUtility;
+
+import PonyDebug.Log;
 
 import :DXGISwapChain;
 import :IDXGIRenderSystemContext;
@@ -140,6 +147,8 @@ namespace PonyEngine::Render
 
 	IDXGISwapChain& DXGISystem::CreateSwapChain(const DXGISwapChainParams& swapChainParams)
 	{
+		assert(!swapChain && "The swap chain has already been created.");
+
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
 		swapChain = std::make_unique<DXGISwapChain>(*static_cast<IDXGISystemContext*>(this), swapChainParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain created.");

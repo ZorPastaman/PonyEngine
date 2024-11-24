@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderView;
 
-import <optional>;
-
 import PonyMath.Core;
 
 import PonyEngine.Render.Direct3D12;

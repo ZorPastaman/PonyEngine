@@ -7,11 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Detail;
+module;
 
-export import PonyEngine.Render.Detail;
+#include "PonyBase/Core/Direct3D12/Framework.h"
+#include "PonyBase/Utility/Interface.h"
 
-export import :Direct3D12RenderTargetParams;
-export import :Direct3D12System;
-export import :Direct3D12SystemParams;
-export import :IDirect3D12RenderSystemContext;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderSystemContext;
+
+import PonyEngine.Render.Detail;
+
+export namespace PonyEngine::Render
+{
+	class IDirect3D12RenderSystemContext : public IRenderSystemContext
+	{
+		INTERFACE_BODY(IDirect3D12RenderSystemContext)
+	};
+}

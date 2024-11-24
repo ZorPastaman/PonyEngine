@@ -21,34 +21,36 @@ import PonyEngine.Render.Detail;
 
 import :Direct3D12RootSignature;
 import :Direct3D12Shader;
-import :IDirect3D12RenderContext;
+import :IDirect3D12RootSignatureManagerPrivate;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12RootSignatureManager final
+	class Direct3D12RootSignatureManager final : public IDirect3D12RootSignatureManagerPrivate
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RootSignatureManager(IDirect3D12RenderContext& render) noexcept;
+		explicit Direct3D12RootSignatureManager(IDirect3D12SystemContext& render) noexcept;
 		Direct3D12RootSignatureManager(const Direct3D12RootSignatureManager&) = delete;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RootSignatureManager(Direct3D12RootSignatureManager&& other) noexcept = default;
 
 		~Direct3D12RootSignatureManager() noexcept = default;
 
-		std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex);
+		[[nodiscard("Pure function")]]
+		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) override;
 
 		Direct3D12RootSignatureManager& operator =(const Direct3D12RootSignatureManager&) = delete;
 		Direct3D12RootSignatureManager& operator =(Direct3D12RootSignatureManager&& other) noexcept = default;
 
 	private:
-		IDirect3D12RenderContext* render;
+		IDirect3D12SystemContext* render;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RootSignatureManager::Direct3D12RootSignatureManager(IDirect3D12RenderContext& render) noexcept :
+	Direct3D12RootSignatureManager::Direct3D12RootSignatureManager(IDirect3D12SystemContext& render) noexcept :
 		render{&render}
 	{
 	}

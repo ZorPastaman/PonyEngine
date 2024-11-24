@@ -46,7 +46,7 @@ import PonyEngine.Render.DXGI.Detail;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D 12 render system for Windows.
-	class WindowsDirect3D12RenderSystem final : public Core::TickableSystem, public IWindowsDirect3D12RenderSystem, public IRenderSystemContext, public IDXGIRenderSystemContext
+	class WindowsDirect3D12RenderSystem final : public Core::TickableSystem, public IWindowsDirect3D12RenderSystem, private IDXGIRenderSystemContext, private IDirect3D12RenderSystemContext
 	{
 	public:
 		/// @brief Creates a @p WindowsDirect3D12RenderSystem.
@@ -95,13 +95,13 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		std::unique_ptr<DXGISystem> CreateDXGISubSystem();
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<Direct3D12SubSystem> CreateDirect3D12SubSystem(const Direct3D12RenderSystemParams& params);
+		std::unique_ptr<Direct3D12System> CreateDirect3D12SubSystem(const Direct3D12SystemParams& params);
 
 		static constexpr UINT BufferCount = 2u; ///< Buffer count.
 		static constexpr DXGI_FORMAT RtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM;
 
 		std::unique_ptr<DXGISystem> dxgiSubSystem; ///< DXGI sub-system.
-		std::unique_ptr<Direct3D12SubSystem> direct3D12SubSystem; ///< Direct3D 12 sub-system.
+		std::unique_ptr<Direct3D12System> direct3D12SubSystem; ///< Direct3D 12 sub-system.
 	};
 }
 
@@ -135,9 +135,14 @@ namespace PonyEngine::Render
 
 		dxgiSubSystem = CreateDXGISubSystem();
 
-		Direct3D12RenderSystemParams direct3D12RenderParams = renderParams;
-		direct3D12RenderParams.renderTargetParams.resolution = renderResolution;
-		direct3D12SubSystem = CreateDirect3D12SubSystem(direct3D12RenderParams);
+		const auto direct3D12SystemParams = Direct3D12SystemParams
+		{
+			.featureLevel = renderParams.featureLevel,
+			.commandQueuePriority = renderParams.commandQueuePriority,
+			.renderTimeout = renderParams.renderTimeout,
+			.renderViewParams = renderParams.renderViewParams
+		};
+		direct3D12SubSystem = CreateDirect3D12SubSystem(direct3D12SystemParams);
 
 		dxgiSubSystem->CreateSwapChain(DXGISwapChainParams{.hWnd = windowHandle, .resolution = renderResolution, .rtvFormat = RtvFormat, .bufferCount = BufferCount});
 
@@ -160,7 +165,15 @@ namespace PonyEngine::Render
 			rawBackBuffers[i] = backBuffers[i].Get();
 		}
 
-		direct3D12SubSystem->SetBuffers(rawBackBuffers);
+		const auto params = Direct3D12RenderTargetParams
+		{
+			.backBuffers = rawBackBuffers,
+			.resolution = renderResolution,
+			.clearColor = renderParams.renderTargetParams.clearColor,
+			.rtvFormat = RtvFormat,
+			.sampleDesc = dxgiSubSystem->SwapChain()->SampleDesc()
+		};
+		direct3D12SubSystem->CreateRenderTarget(params);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system initialized.");
 	}
 
@@ -229,37 +242,37 @@ namespace PonyEngine::Render
 
 	IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManager();
+		return direct3D12SubSystem->RenderObjectManager();
 	}
 
 	const IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManager();
+		return direct3D12SubSystem->RenderObjectManager();
 	}
 
 	IUnknown* WindowsDirect3D12RenderSystem::Device() noexcept
 	{
-		return direct3D12SubSystem->GetCommandQueue();
+		return direct3D12SubSystem->GraphicsCommandQueue();
 	}
 
 	const IUnknown* WindowsDirect3D12RenderSystem::Device() const noexcept
 	{
-		return direct3D12SubSystem->GetCommandQueue();
+		return direct3D12SubSystem->GraphicsCommandQueue();
 	}
 
 	std::unique_ptr<DXGISystem> WindowsDirect3D12RenderSystem::CreateDXGISubSystem()
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
-		auto createdDxgiSubSystem = std::make_unique<DXGISystem>(*this);
+		auto createdDxgiSubSystem = std::make_unique<DXGISystem>(*static_cast<IDXGIRenderSystemContext*>(this));
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
 		return createdDxgiSubSystem;
 	}
 
-	std::unique_ptr<Direct3D12SubSystem> WindowsDirect3D12RenderSystem::CreateDirect3D12SubSystem(const Direct3D12RenderSystemParams& params)
+	std::unique_ptr<Direct3D12System> WindowsDirect3D12RenderSystem::CreateDirect3D12SubSystem(const Direct3D12SystemParams& params)
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 sub-system.");
-		auto createdDirect3D12SubSystem = std::make_unique<Direct3D12SubSystem>(*static_cast<IRenderSystemContext*>(static_cast<IDXGIRenderSystemContext*>(this)), params, RtvFormat);
+		auto createdDirect3D12SubSystem = std::make_unique<Direct3D12System>(*static_cast<IDirect3D12RenderSystemContext*>(this), params);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 sub-system created.");
 
 		return createdDirect3D12SubSystem;

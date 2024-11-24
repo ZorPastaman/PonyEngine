@@ -9,22 +9,25 @@
 
 module;
 
-#include "PonyBase/Core/DXGI/Framework.h"
+#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.DXGI.Detail:IDXGISwapChain;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderObjectManagerPrivate;
+
+import <memory>;
+import <span>;
+
+import PonyEngine.Render.Direct3D12;
+
+import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
 {
-	class IDXGISwapChain
+	class IDirect3D12RenderObjectManagerPrivate : public IDirect3D12RenderObjectManager
 	{
-		INTERFACE_BODY(IDXGISwapChain)
+		INTERFACE_BODY(IDirect3D12RenderObjectManagerPrivate)
 
 		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual UINT GetCurrentBackBufferIndex() const noexcept = 0;
-		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept = 0;
+		virtual std::span<const std::weak_ptr<Direct3D12RenderObject>> RenderObjects() noexcept = 0; // TODO: Fill span with simple pointers.
 	};
 }

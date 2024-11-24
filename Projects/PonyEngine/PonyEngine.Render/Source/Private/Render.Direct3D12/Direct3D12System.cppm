@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12SubSystem;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12System;
 
 import <cstdint>;
 import <memory>;
@@ -36,27 +36,51 @@ import PonyEngine.Render.Detail;
 import PonyEngine.Render.Direct3D12;
 
 import :Direct3D12GraphicsPipeline;
-import :IDirect3D12RenderContext;
+import :Direct3D12SystemParams;
+import :IDirect3D12RenderSystemContext;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D 12 sys-system.
-	class Direct3D12SubSystem final : public IDirect3D12RenderContext
+	/// @brief Direct3D 12 system.
+	class Direct3D12System final : private IDirect3D12SystemContext
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		Direct3D12SubSystem(IRenderSystemContext& renderer, const Direct3D12RenderSystemParams& params, DXGI_FORMAT rtvFormat);
-		Direct3D12SubSystem(const Direct3D12SubSystem&) = delete;
-		Direct3D12SubSystem(Direct3D12SubSystem&&) = delete;
+		Direct3D12System(IDirect3D12RenderSystemContext& renderer, const Direct3D12SystemParams& params);
+		Direct3D12System(const Direct3D12System&) = delete;
+		Direct3D12System(Direct3D12System&&) = delete;
 
-		~Direct3D12SubSystem() noexcept;
-
-		[[nodiscard("Pure function")]]
-		ID3D12CommandQueue* GetCommandQueue() const;
+		~Direct3D12System() noexcept;
 
 		[[nodiscard("Pure function")]]
-		IDirect3D12RenderObjectManager* RenderObjectManager() const noexcept;
+		virtual IDirect3D12RenderTargetPrivate& RenderTarget() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12RenderTargetPrivate& RenderTarget() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12RenderView& RenderView() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12RenderView& RenderView() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12RenderObjectManagerPrivate& RenderObjectManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12RenderObjectManagerPrivate& RenderObjectManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		ID3D12CommandQueue* GraphicsCommandQueue() const;
+
+		void CreateRenderTarget(const Direct3D12RenderTargetParams& params);
+
+		void PopulateCommands(UINT bufferIndex) const;
+		void Execute() const;
+		void WaitForEndOfFrame() const;
+
+		Direct3D12System& operator =(const Direct3D12System&) = delete;
+		Direct3D12System& operator =(Direct3D12System&&) = delete;
+
+	private:
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -68,30 +92,25 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderTargetPrivate& RenderTarget() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderTargetPrivate& RenderTarget() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual IDirect3D12DepthStencilPrivate& DepthStencil() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IDirect3D12DepthStencilPrivate& DepthStencil() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderView& RenderView() noexcept override;
+		virtual IDirect3D12RootSignatureManagerPrivate& RootSignatureManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderView& RenderView() const noexcept override;
+		virtual const IDirect3D12RootSignatureManagerPrivate& RootSignatureManager() const noexcept override;
 
-		void SetBuffers(std::span<ID3D12Resource2*> buffers);
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12MaterialManagerPrivate& MaterialManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12MaterialManagerPrivate& MaterialManager() const noexcept override;
 
-		void PopulateCommands(UINT bufferIndex) const;
-		void Execute() const;
-		void WaitForEndOfFrame() const;
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12MeshManagerPrivate& MeshManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12MeshManagerPrivate& MeshManager() const noexcept override;
 
-		Direct3D12SubSystem& operator =(const Direct3D12SubSystem&) = delete;
-		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
-
-	private:
 		IRenderSystemContext* renderer;
 
 #ifdef _DEBUG
@@ -100,12 +119,13 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 
 		std::unique_ptr<Direct3D12RenderTarget> renderTarget;
-		std::unique_ptr<Direct3D12DepthStencil> depthBuffer;
+		std::unique_ptr<Direct3D12DepthStencil> depthStencil;
 		std::unique_ptr<Direct3D12RenderView> renderView;
 		std::unique_ptr<Direct3D12RootSignatureManager> rootSignatureManager;
 		std::unique_ptr<Direct3D12MaterialManager> materialManager;
 		std::unique_ptr<Direct3D12MeshManager> meshManager;
 		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager;
+
 		std::unique_ptr<Direct3D12GraphicsPipeline> graphicsPipeline;
 		std::unique_ptr<Direct3D12Waiter> waiter;
 	};
@@ -113,7 +133,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12SubSystem::Direct3D12SubSystem(IRenderSystemContext& renderer, const Direct3D12RenderSystemParams& params, const DXGI_FORMAT rtvFormat) :
+	Direct3D12System::Direct3D12System(IDirect3D12RenderSystemContext& renderer, const Direct3D12SystemParams& params) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -135,39 +155,20 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
-		rootSignatureManager = std::make_unique<Direct3D12RootSignatureManager>(*this);
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material manager.");
-		materialManager = std::make_unique<Direct3D12MaterialManager>(*this->renderer, device.Get(), rootSignatureManager.get(), rtvFormat);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material manager created.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
-		meshManager = std::make_unique<Direct3D12MeshManager>(*this->renderer, device.Get());
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager created.");
-
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render object manager.");
-		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*this->renderer, rootSignatureManager.get(), *materialManager, *meshManager, device.Get());
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager created.");
-
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render view.");
 		renderView = std::make_unique<Direct3D12RenderView>(params.renderViewParams.viewMatrix, params.renderViewParams.projectionMatrix);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render view created.");
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target.");
-		renderTarget = std::make_unique<Direct3D12RenderTarget>(*this, params.renderTargetParams, rtvFormat);
-		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
-
-		depthBuffer = std::make_unique<Direct3D12DepthStencil>(*this);
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 graphics pipeline.");
-		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*this->renderer, device.Get(), params, renderTarget.get(), depthBuffer.get(), renderView.get(), rootSignatureManager.get(), materialManager.get(), meshManager.get(), renderObjectManager.get());
+		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*static_cast<IDirect3D12SystemContext*>(this), params.commandQueuePriority);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline created.'");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 waiter. Wait timeout: {}.", params.renderTimeout);
-		waiter = std::make_unique<Direct3D12Waiter>(*this, *graphicsPipeline->GetCommandQueue(), params.renderTimeout);
+		waiter = std::make_unique<Direct3D12Waiter>(*static_cast<IDirect3D12SystemContext*>(this), *GraphicsCommandQueue(), params.renderTimeout);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 wait created.");
 	}
 
-	Direct3D12SubSystem::~Direct3D12SubSystem() noexcept
+	Direct3D12System::~Direct3D12System() noexcept
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 waiter.");
 		waiter.reset();
@@ -208,84 +209,133 @@ namespace PonyEngine::Render
 #endif
 	}
 
-	ID3D12CommandQueue* Direct3D12SubSystem::GetCommandQueue() const
+	ID3D12CommandQueue* Direct3D12System::GraphicsCommandQueue() const
 	{
-		return graphicsPipeline->GetCommandQueue();
+		return &graphicsPipeline->CommandQueue();
 	}
 
-	IDirect3D12RenderObjectManager* Direct3D12SubSystem::RenderObjectManager() const noexcept
-	{
-		return renderObjectManager.get();
-	}
-
-	PonyDebug::Log::ILogger& Direct3D12SubSystem::Logger() noexcept
+	PonyDebug::Log::ILogger& Direct3D12System::Logger() noexcept
 	{
 		return renderer->Logger();
 	}
 
-	const PonyDebug::Log::ILogger& Direct3D12SubSystem::Logger() const noexcept
+	const PonyDebug::Log::ILogger& Direct3D12System::Logger() const noexcept
 	{
 		return renderer->Logger();
 	}
 
-	ID3D12Device10& Direct3D12SubSystem::Device() noexcept
+	ID3D12Device10& Direct3D12System::Device() noexcept
 	{
 		return *device.Get();
 	}
 
-	const ID3D12Device10& Direct3D12SubSystem::Device() const noexcept
+	const ID3D12Device10& Direct3D12System::Device() const noexcept
 	{
 		return *device.Get();
 	}
 
-	IDirect3D12RenderTargetPrivate& Direct3D12SubSystem::RenderTarget() noexcept
+	IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTarget() noexcept
 	{
 		return *renderTarget;
 	}
 
-	const IDirect3D12RenderTargetPrivate& Direct3D12SubSystem::RenderTarget() const noexcept
+	const IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTarget() const noexcept
 	{
 		return *renderTarget;
 	}
 
-	IDirect3D12DepthStencilPrivate& Direct3D12SubSystem::DepthStencil() noexcept
+	IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencil() noexcept
 	{
-		return *depthBuffer;
+		return *depthStencil;
 	}
 
-	const IDirect3D12DepthStencilPrivate& Direct3D12SubSystem::DepthStencil() const noexcept
+	const IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencil() const noexcept
 	{
-		return *depthBuffer;
+		return *depthStencil;
 	}
 
-	IDirect3D12RenderView& Direct3D12SubSystem::RenderView() noexcept
+	IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManager() noexcept
+	{
+		return *rootSignatureManager;
+	}
+
+	const IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManager() const noexcept
+	{
+		return *rootSignatureManager;
+	}
+
+	IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManager() noexcept
+	{
+		return *materialManager;
+	}
+
+	const IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManager() const noexcept
+	{
+		return *materialManager;
+	}
+
+	IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManager() noexcept
+	{
+		return *meshManager;
+	}
+
+	const IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManager() const noexcept
+	{
+		return *meshManager;
+	}
+
+	IDirect3D12RenderView& Direct3D12System::RenderView() noexcept
 	{
 		return *renderView;
 	}
 
-	const IDirect3D12RenderView& Direct3D12SubSystem::RenderView() const noexcept
+	const IDirect3D12RenderView& Direct3D12System::RenderView() const noexcept
 	{
 		return *renderView;
 	}
 
-	void Direct3D12SubSystem::SetBuffers(const std::span<ID3D12Resource2*> buffers)
+	IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManager() noexcept
 	{
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "SetBuffers Direct3D 12 render target.");
-		renderTarget->SetBuffers(buffers);
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target initialized.");
+		return *renderObjectManager;
 	}
 
-	void Direct3D12SubSystem::PopulateCommands(const UINT bufferIndex) const
+	const IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManager() const noexcept
+	{
+		return *renderObjectManager;
+	}
+
+	void Direct3D12System::CreateRenderTarget(const Direct3D12RenderTargetParams& params)
+	{
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target.");
+		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), params);
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
+
+		depthStencil = std::make_unique<Direct3D12DepthStencil>(*static_cast<IDirect3D12SystemContext*>(this), params);
+
+		rootSignatureManager = std::make_unique<Direct3D12RootSignatureManager>(*static_cast<IDirect3D12SystemContext*>(this));
+
+		materialManager = std::make_unique<Direct3D12MaterialManager>(*static_cast<IDirect3D12SystemContext*>(this), params.rtvFormat);
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
+		meshManager = std::make_unique<Direct3D12MeshManager>(*static_cast<IDirect3D12SystemContext*>(this));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 mesh manager created.");
+
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render object manager.");
+		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*static_cast<IDirect3D12SystemContext*>(this));
+		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render object manager created.");
+	}
+
+	void Direct3D12System::PopulateCommands(const UINT bufferIndex) const
 	{
 		graphicsPipeline->PopulateCommands(bufferIndex);
 	}
 
-	void Direct3D12SubSystem::Execute() const
+	void Direct3D12System::Execute() const
 	{
 		graphicsPipeline->Execute();
 	}
 
-	void Direct3D12SubSystem::WaitForEndOfFrame() const
+	void Direct3D12System::WaitForEndOfFrame() const
 	{
 		waiter->Wait();
 	}

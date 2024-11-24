@@ -42,7 +42,7 @@ export namespace PonyEngine::Render
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-		UINT mvpIndex;
+		UINT mvpIndex; // TODO: Make optional
 	};
 }
 
