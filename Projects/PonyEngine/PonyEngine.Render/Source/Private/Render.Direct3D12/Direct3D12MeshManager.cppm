@@ -19,6 +19,7 @@ import <algorithm>;
 import <cstddef>;
 import <cstdint>;
 import <cstring>;
+import <memory>;
 import <span>;
 import <stdexcept>;
 import <type_traits>;
@@ -35,9 +36,8 @@ import PonyDebug.Log;
 import PonyEngine.Render.Detail;
 
 import :Direct3D12Mesh;
-import :Direct3D12MeshHandle;
 import :Direct3D12IndexArray;
-import :Direct3D12VertexBuffer;
+import :Direct3D12VertexArray;
 
 export namespace PonyEngine::Render
 {
@@ -45,20 +45,16 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
+		Direct3D12MeshManager(IRenderSystemContext& renderer, ID3D12Device10* device); // TODO: Add other constructors and destructor.
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MeshHandle CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh);
-		void DestroyDirect3D12Mesh(const Direct3D12MeshHandle& handle) noexcept;
-
-		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh* FindDirect3D12Mesh(const Direct3D12MeshHandle& handle) const noexcept;
+		std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh);
 
 	private:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
+		Direct3D12VertexArray CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12VertexBuffer CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors, std::size_t vertexCount) const;
+		Direct3D12VertexArray CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors, std::size_t vertexCount) const;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12IndexArray CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
@@ -71,25 +67,21 @@ export namespace PonyEngine::Render
 			.VisibleNodeMask = 0u
 		};
 
-		IRenderContext* renderer;
+		IRenderSystemContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
-
-		mutable std::unordered_map<Direct3D12MeshHandle, Direct3D12Mesh, Direct3D12MeshHandleHash> meshes; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
-		std::size_t nextId;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MeshManager::Direct3D12MeshManager(IRenderContext& renderer, ID3D12Device10* const device) :
+	Direct3D12MeshManager::Direct3D12MeshManager(IRenderSystemContext& renderer, ID3D12Device10* const device) :
 		renderer{&renderer},
-		device(device),
-		nextId{1}
+		device(device)
 	{
 	}
 
-	Direct3D12MeshHandle Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh)
+	std::shared_ptr<Direct3D12Mesh> Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh)
 	{
 		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -101,40 +93,19 @@ namespace PonyEngine::Render
 		};
 
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertices.");
-		Direct3D12VertexBuffer vertices = CreateVertices(mesh.Vertices());
+		Direct3D12VertexArray vertices = CreateVertices(mesh.Vertices());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertices created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh vertex colors.");
-		Direct3D12VertexBuffer colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
+		Direct3D12VertexArray colors = CreateVertexColors(mesh.Colors(), mesh.VertexCount());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh vertex colors created.");
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Create mesh indices.");
 		Direct3D12IndexArray indices = CreateVertexIndices(mesh.Triangles());
 		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
-		const auto handle = Direct3D12MeshHandle{.id = nextId++};
-		meshes.try_emplace(handle, vertices, colors, indices);
-
-		return handle;
+		return std::make_shared<Direct3D12Mesh>(vertices, colors, indices);
 	}
 
-	void Direct3D12MeshManager::DestroyDirect3D12Mesh(const Direct3D12MeshHandle& handle) noexcept
-	{
-		if (const auto position = meshes.find(handle); position != meshes.cend())
-		{
-			meshes.erase(position);
-		}
-	}
-
-	Direct3D12Mesh* Direct3D12MeshManager::FindDirect3D12Mesh(const Direct3D12MeshHandle& handle) const noexcept
-	{
-		if (const auto position = meshes.find(handle); position != meshes.cend())
-		{
-			return &position->second;
-		}
-
-		return nullptr;
-	}
-
-	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const
+	Direct3D12VertexArray Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const
 	{
 		constexpr UINT vertexSize = sizeof(PonyMath::Core::Vector3<float>);
 		const UINT vertexCount = static_cast<UINT>(vertices.size());
@@ -168,10 +139,10 @@ namespace PonyEngine::Render
 		std::memcpy(verticesData, vertices.data(), vertexBufferSize);
 		verticesResource->Unmap(0, nullptr);
 
-		return Direct3D12VertexBuffer(verticesResource.Get(), vertexSize, vertexCount);
+		return Direct3D12VertexArray(*verticesResource.Get(), vertexSize, vertexCount);
 	}
 
-	Direct3D12VertexBuffer Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Color::RGBA<float>> colors, const std::size_t vertexCount) const
+	Direct3D12VertexArray Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Color::RGBA<float>> colors, const std::size_t vertexCount) const
 	{
 		constexpr UINT colorSize = sizeof(PonyMath::Color::RGBA<float>);
 		const UINT colorCount = static_cast<UINT>(colors.size() > 0 ? colors.size() : vertexCount);
@@ -212,7 +183,7 @@ namespace PonyEngine::Render
 		}
 		colorsResource->Unmap(0, nullptr);
 
-		return Direct3D12VertexBuffer(colorsResource.Get(), colorSize, colorCount);
+		return Direct3D12VertexArray(*colorsResource.Get(), colorSize, colorCount);
 	}
 
 	Direct3D12IndexArray Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const

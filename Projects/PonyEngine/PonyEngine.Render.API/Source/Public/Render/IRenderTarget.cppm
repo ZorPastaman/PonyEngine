@@ -25,6 +25,11 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IRenderTarget)
 
+		/// @brief Gets the render target resolution.
+		/// @return Render target resolution.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
+
 		/// @brief Gets the clear color.
 		/// @return Clear color.
 		[[nodiscard("Pure function")]]
@@ -32,10 +37,5 @@ export namespace PonyEngine::Render
 		/// @brief Sets the clear color.
 		/// @param color Clear color.
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
-
-		/// @brief Gets the render target resolution.
-		/// @return Render target resolution.
-		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
 	};
 }

@@ -22,11 +22,11 @@ export namespace PonyEngine::Render
 	{
 	public:
 		/// @brief Creates a @p Direct3D12IndexArray.
-		/// @param indexResource Index resource.
+		/// @param indexBuffer Index buffer.
 		/// @param indexFormat Index format.
 		/// @param indexCount Index count.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexArray(ID3D12Resource2& indexResource, const Direct3D12IndexFormat& indexFormat, UINT indexCount) noexcept;
+		Direct3D12IndexArray(ID3D12Resource2& indexBuffer, const Direct3D12IndexFormat& indexFormat, UINT indexCount) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12IndexArray(const Direct3D12IndexArray& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -34,14 +34,14 @@ export namespace PonyEngine::Render
 
 		~Direct3D12IndexArray() noexcept = default;
 
-		/// @brief Gets the index resource.
-		/// @return Index resource.
+		/// @brief Gets the index buffer.
+		/// @return Index buffer.
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2& IndexResource() noexcept;
-		/// @brief Gets the index resource.
-		/// @return Index resource.
+		ID3D12Resource2& IndexBuffer() noexcept;
+		/// @brief Gets the index buffer.
+		/// @return Index buffer.
 		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& IndexResource() const noexcept;
+		const ID3D12Resource2& IndexBuffer() const noexcept;
 
 		/// @brief Gets the index format.
 		/// @return Index format.
@@ -60,7 +60,7 @@ export namespace PonyEngine::Render
 		Direct3D12IndexArray& operator =(Direct3D12IndexArray&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> indexResource; ///< Index resource.
+		Microsoft::WRL::ComPtr<ID3D12Resource2> indexBuffer; ///< Index buffer.
 		Direct3D12IndexFormat indexFormat; ///< Index format.
 		UINT indexCount; ///< Index count.
 	};
@@ -68,21 +68,21 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12IndexArray::Direct3D12IndexArray(ID3D12Resource2& indexResource, const Direct3D12IndexFormat& indexFormat, const UINT indexCount) noexcept :
-		indexResource(&indexResource),
+	Direct3D12IndexArray::Direct3D12IndexArray(ID3D12Resource2& indexBuffer, const Direct3D12IndexFormat& indexFormat, const UINT indexCount) noexcept :
+		indexBuffer(&indexBuffer),
 		indexFormat(indexFormat),
 		indexCount{indexCount}
 	{
 	}
 
-	ID3D12Resource2& Direct3D12IndexArray::IndexResource() noexcept
+	ID3D12Resource2& Direct3D12IndexArray::IndexBuffer() noexcept
 	{
-		return *indexResource.Get();
+		return *indexBuffer.Get();
 	}
 
-	const ID3D12Resource2& Direct3D12IndexArray::IndexResource() const noexcept
+	const ID3D12Resource2& Direct3D12IndexArray::IndexBuffer() const noexcept
 	{
-		return *indexResource.Get();
+		return *indexBuffer.Get();
 	}
 
 	DXGI_FORMAT Direct3D12IndexArray::IndexFormat() const noexcept

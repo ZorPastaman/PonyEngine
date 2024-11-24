@@ -40,9 +40,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

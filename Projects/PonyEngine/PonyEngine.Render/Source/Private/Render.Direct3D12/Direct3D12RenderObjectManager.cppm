@@ -16,9 +16,11 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderObjectManager;
 
 import <cstddef>;
+import <memory>;
+import <span>;
 import <stdexcept>;
-import <unordered_map>;
 import <utility>;
+import <vector>;
 
 import PonyMath.Core;
 
@@ -27,7 +29,7 @@ import PonyDebug.Log;
 import PonyEngine.Render.Direct3D12;
 import PonyEngine.Render.Detail;
 
-import :Direct3D12MaterialHandle;
+import :Direct3D12Material;
 import :Direct3D12MaterialManager;
 import :Direct3D12Mesh;
 import :Direct3D12MeshManager;
@@ -38,53 +40,44 @@ export namespace PonyEngine::Render
 	class Direct3D12RenderObjectManager final : public IDirect3D12RenderObjectManager
 	{
 	public:
-		using RenderObjectIterator = std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash>::const_iterator;
 
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
+		Direct3D12RenderObjectManager(IRenderSystemContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* device) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
 
 		~Direct3D12RenderObjectManager() noexcept = default;
 
-		virtual RenderObjectHandle CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
-		virtual void DestroyObject(RenderObjectHandle handle) noexcept override;
+		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
+		virtual std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) override;
 
-		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderObject* FindRenderObject(RenderObjectHandle handle) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		RenderObjectIterator RenderObjectBegin() const noexcept;
-		[[nodiscard("Pure function")]]
-		RenderObjectIterator RenderObjectEnd() const noexcept;
+		std::span<const std::weak_ptr<Direct3D12RenderObject>> RenderObjects() noexcept;
 
 		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
 
 	private:
-		IRenderContext* renderer;
+		IRenderSystemContext* renderer;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 		Direct3D12RootSignatureManager* rootSignatureManager;
 		Direct3D12MaterialManager* materialManager;
 		Direct3D12MeshManager* meshManager;
 
-		mutable std::unordered_map<RenderObjectHandle, Direct3D12RenderObject, RenderObjectHandleHash> renderObjects; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
-		std::size_t nextRenderObjectId;
+		std::vector<std::weak_ptr<Direct3D12RenderObject>> renderObjects;
 
-		Direct3D12MaterialHandle defaultMaterial;
+		std::shared_ptr<Direct3D12Material> defaultMaterial;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
+	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IRenderSystemContext& renderer, Direct3D12RootSignatureManager* rootSignatureManager, Direct3D12MaterialManager& materialManager, Direct3D12MeshManager& meshManager, ID3D12Device10* const device) noexcept :
 		renderer{&renderer},
 		device(device),
 		rootSignatureManager{rootSignatureManager},
 		materialManager{&materialManager},
-		meshManager{&meshManager},
-		nextRenderObjectId{1}
+		meshManager{&meshManager}
 	{
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
 		const auto rootSignatureHandle = rootSignatureManager->CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
@@ -100,49 +93,29 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
 	}
 
-	RenderObjectHandle Direct3D12RenderObjectManager::CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
+	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
 	{
-		const auto handle = RenderObjectHandle{.id = nextRenderObjectId++};
-		if (const auto result = renderObjects.try_emplace(handle, defaultMaterial, meshManager->CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)); !result.second) [[unlikely]]
-		{
-			throw std::runtime_error("Failed to create a render object.");
-		}
-		PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object created with '{}' id.", handle.id);
-
-		return handle;
+		return std::static_pointer_cast<IRenderObject>(CreateObjectD3D12(mesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)));
 	}
 
-	void Direct3D12RenderObjectManager::DestroyObject(const RenderObjectHandle handle) noexcept
+	std::shared_ptr<IDirect3D12RenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
 	{
-		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
-		{
-			meshManager->DestroyDirect3D12Mesh(position->second.RenderMesh());
-			renderObjects.erase(position);
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Info, "Render object with '{}' id destroyed.", handle.id);
-		}
-		else [[unlikely]]
-		{
-			PONY_LOG(renderer->Logger(), PonyDebug::Log::LogType::Warning, "Tried to destroy a non-existing render object. ID: '{}'.", handle.id);
-		}
+		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, meshManager->CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
+		renderObjects.push_back(renderObject);
+
+		return renderObject;
 	}
 
-	IDirect3D12RenderObject* Direct3D12RenderObjectManager::FindRenderObject(const RenderObjectHandle handle) const noexcept
+	std::span<const std::weak_ptr<Direct3D12RenderObject>> Direct3D12RenderObjectManager::RenderObjects() noexcept
 	{
-		if (const auto position = renderObjects.find(handle); position != renderObjects.cend()) [[likely]]
+		for (std::size_t i = renderObjects.size(); i-- > 0; )
 		{
-			return &position->second;
+			if (renderObjects[i].expired())
+			{
+				renderObjects.erase(renderObjects.begin() + i);
+			}
 		}
 
-		return nullptr;
-	}
-
-	Direct3D12RenderObjectManager::RenderObjectIterator Direct3D12RenderObjectManager::RenderObjectBegin() const noexcept
-	{
-		return renderObjects.cbegin();
-	}
-
-	Direct3D12RenderObjectManager::RenderObjectIterator Direct3D12RenderObjectManager::RenderObjectEnd() const noexcept
-	{
-		return renderObjects.cend();
+		return renderObjects;
 	}
 }

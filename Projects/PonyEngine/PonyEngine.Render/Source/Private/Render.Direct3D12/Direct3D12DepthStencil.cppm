@@ -25,12 +25,13 @@ import PonyMath.Utility;
 import PonyDebug.Log;
 
 import :Direct3D12Constants;
+import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12RenderContext;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 depth stencil.
-	class Direct3D12DepthStencil final
+	class Direct3D12DepthStencil final : public IDirect3D12DepthStencilPrivate
 	{
 	public:
 		/// @brief Creates a @p Direct3D12DepthStencil.
@@ -44,10 +45,8 @@ export namespace PonyEngine::Render
 
 		~Direct3D12DepthStencil() noexcept;
 
-		/// @brief Gets the depth stencil view handle.
-		/// @return Depth stencil view handle.
 		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept override;
 
 		Direct3D12DepthStencil& operator =(const Direct3D12DepthStencil& other) noexcept = default;
 		Direct3D12DepthStencil& operator =(Direct3D12DepthStencil&& other) noexcept = default;

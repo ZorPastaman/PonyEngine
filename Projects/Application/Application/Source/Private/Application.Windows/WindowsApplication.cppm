@@ -26,7 +26,7 @@ import :WindowsQuitChecker;
 export namespace Application
 {
 	/// @brief Application for Windows.
-	class WindowsApplication final : PonyEngine::Core::IApplicationContext
+	class WindowsApplication final : private PonyEngine::Core::IApplicationContext
 	{
 	public:
 		/// @brief Creates a @p WindowsApplication.
@@ -36,11 +36,6 @@ export namespace Application
 		WindowsApplication(WindowsApplication&&) = delete;
 
 		~WindowsApplication() noexcept = default;
-
-		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		/// @brief Runs the engine.
 		/// @return Exit code.
@@ -52,6 +47,11 @@ export namespace Application
 		static constexpr auto StaticName = "Application::WindowsApplication"; ///< Class name.
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+
 		/// @brief Sets the process priority.
 		/// @param priority Priority to set.
 		void SetProcessPriority(DWORD priority) const noexcept;
@@ -71,16 +71,6 @@ namespace Application
 		SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 	}
 
-	PonyDebug::Log::ILogger& WindowsApplication::Logger() noexcept
-	{
-		return logger.Logger();
-	}
-
-	const PonyDebug::Log::ILogger& WindowsApplication::Logger() const noexcept
-	{
-		return logger.Logger();
-	}
-
 	int WindowsApplication::Run()
 	{
 		int exitCode = 0;
@@ -92,6 +82,16 @@ namespace Application
 		} while (isRunning);
 
 		return exitCode;
+	}
+
+	PonyDebug::Log::ILogger& WindowsApplication::Logger() noexcept
+	{
+		return logger.Logger();
+	}
+
+	const PonyDebug::Log::ILogger& WindowsApplication::Logger() const noexcept
+	{
+		return logger.Logger();
 	}
 
 	void WindowsApplication::SetProcessPriority(const DWORD priority) const noexcept

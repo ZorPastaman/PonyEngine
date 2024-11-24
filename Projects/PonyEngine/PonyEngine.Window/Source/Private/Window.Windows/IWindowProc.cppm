@@ -17,7 +17,7 @@ export module PonyEngine.Window.Windows.Detail:IWindowProc;
 export namespace PonyEngine::Window
 {
 	/// @brief Window proc manager.
-	class IWindowProc
+	class IWindowProc // TODO: The interface must be public for custom WindowsClasses.
 	{
 		INTERFACE_BODY(IWindowProc)
 

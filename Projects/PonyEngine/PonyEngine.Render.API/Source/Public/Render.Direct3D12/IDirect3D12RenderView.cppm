@@ -29,7 +29,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the view translation-rotation-scaling matrix.
 		/// @return View matrix.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Matrix4x4<FLOAT> ViewMatrixD3D12() const noexcept = 0;
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ViewMatrixD3D12() const noexcept = 0;
 		/// @brief Sets the view translation-rotation-scaling matrix.
 		/// @param matrix View matrix.
 		virtual void ViewMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept = 0;
@@ -37,7 +37,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the projection matrix.
 		/// @return Projection matrix.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Matrix4x4<FLOAT> ProjectionMatrixD3D12() const noexcept = 0;
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ProjectionMatrixD3D12() const noexcept = 0;
 		/// @brief Sets the projection matrix.
 		/// @param matrix Projection matrix.
 		virtual void ProjectionMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept = 0;

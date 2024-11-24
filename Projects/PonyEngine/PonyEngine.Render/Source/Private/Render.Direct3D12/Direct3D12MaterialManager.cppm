@@ -14,12 +14,12 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12MaterialManager;
 
 import <cstddef>;
+import <memory>;
 import <unordered_map>;
 
 import PonyEngine.Render.Detail;
 
 import :Direct3D12Material;
-import :Direct3D12MaterialHandle;
 import :Direct3D12RootSignatureManager;
 
 export namespace PonyEngine::Render
@@ -28,17 +28,13 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, DXGI_FORMAT rtvFormat) noexcept;
+		Direct3D12MaterialManager(IRenderSystemContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, DXGI_FORMAT rtvFormat) noexcept;
 		Direct3D12MaterialManager(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager(Direct3D12MaterialManager&&) = delete;
 
 		~Direct3D12MaterialManager() noexcept = default;
 
-		Direct3D12MaterialHandle CreateMaterial(const Direct3D12RootSignatureHandle& rootSignatureHandle, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader);
-		void DestroyMaterial(const Direct3D12MaterialHandle& handle) noexcept;
-
-		[[nodiscard("Pure function")]]
-		Direct3D12Material* FindMaterial(const Direct3D12MaterialHandle& handle) const noexcept;
+		std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader);
 
 		Direct3D12MaterialManager& operator =(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager& operator =(Direct3D12MaterialManager&&) = delete;
@@ -46,29 +42,25 @@ export namespace PonyEngine::Render
 	private:
 		DXGI_FORMAT rtvFormat;
 
-		IRenderContext* render;
+		IRenderSystemContext* render;
 
 		Microsoft::WRL::ComPtr<ID3D12Device10> device;
 
 		Direct3D12RootSignatureManager* rootSignatureManager;
-
-		mutable std::unordered_map<Direct3D12MaterialHandle, Direct3D12Material, Direct3D12MaterialHandleHash> materials; // TODO: It should not be mutable. So, maybe it should create RenderObjects in heap and use unique_ptr here.
-		std::size_t nextId;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MaterialManager::Direct3D12MaterialManager(IRenderContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, const DXGI_FORMAT rtvFormat) noexcept :
+	Direct3D12MaterialManager::Direct3D12MaterialManager(IRenderSystemContext& render, ID3D12Device10* device, Direct3D12RootSignatureManager* rootSignatureManager, const DXGI_FORMAT rtvFormat) noexcept :
 		rtvFormat{rtvFormat},
 		render{&render},
 		device(device),
-		rootSignatureManager{rootSignatureManager},
-		nextId{1}
+		rootSignatureManager{rootSignatureManager}
 	{
 	}
 
-	Direct3D12MaterialHandle Direct3D12MaterialManager::CreateMaterial(const Direct3D12RootSignatureHandle& rootSignatureHandle, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader)
+	std::shared_ptr<Direct3D12Material> Direct3D12MaterialManager::CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader)
 	{
 		auto blendState = D3D12_BLEND_DESC
 		{
@@ -137,7 +129,7 @@ namespace PonyEngine::Render
 		};
 		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC // TODO: Many of these settings have to come with parameters.
 		{
-			.pRootSignature = rootSignatureManager->FindRootSignature(rootSignatureHandle)->RootSignature(),
+			.pRootSignature = &rootSignature->RootSignature(),
 			.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size()},
 			.PS = D3D12_SHADER_BYTECODE{.pShaderBytecode = pixelShader.Data(), .BytecodeLength = pixelShader.Size()},
 			.BlendState = blendState,
@@ -161,27 +153,6 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		const auto handle = Direct3D12MaterialHandle{.id = nextId++};
-		materials.try_emplace(handle, pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, rootSignatureHandle);
-
-		return handle;
-	}
-
-	void Direct3D12MaterialManager::DestroyMaterial(const Direct3D12MaterialHandle& handle) noexcept
-	{
-		if (const auto position = materials.find(handle); position != materials.cend())
-		{
-			materials.erase(position);
-		}
-	}
-
-	Direct3D12Material* Direct3D12MaterialManager::FindMaterial(const Direct3D12MaterialHandle& handle) const noexcept
-	{
-		if (const auto position = materials.find(handle); position != materials.cend())
-		{
-			return &position->second;
-		}
-
-		return nullptr;
+		return std::make_shared<Direct3D12Material>(*pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST, rootSignature);
 	}
 }

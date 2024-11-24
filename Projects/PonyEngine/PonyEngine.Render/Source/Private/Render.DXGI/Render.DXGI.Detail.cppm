@@ -7,15 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render;
+export module PonyEngine.Render.DXGI.Detail;
 
-export import :IRenderObject;
-export import :IRenderObjectManager;
-export import :IRenderSystem;
-export import :IRenderTarget;
-export import :IRenderView;
-export import :RenderSystemFactory;
-export import :RenderSystemFactoryParams;
-export import :RenderSystemParams;
-export import :RenderTargetParams;
-export import :RenderViewParams;
+export import :DXGISwapChainParams;
+export import :DXGISystem;
+export import :IDXGISwapChain;
+export import :IDXGIRenderSystemContext;

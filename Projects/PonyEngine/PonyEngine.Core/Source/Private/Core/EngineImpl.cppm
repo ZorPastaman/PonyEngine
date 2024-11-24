@@ -30,7 +30,7 @@ import :SystemManager;
 export namespace PonyEngine::Core
 {
 	/// @brief Engine.
-	class EngineImpl final : public Engine, public IEngineContext
+	class EngineImpl final : public Engine, private IEngineContext
 	{
 	public:
 		/// @brief Creates an @p Engine.
@@ -46,10 +46,6 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::size_t FrameCount() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& SystemManager() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -67,6 +63,11 @@ export namespace PonyEngine::Core
 		EngineImpl& operator =(EngineImpl&&) = delete;
 
 	private:
+		[[nodiscard("Pure function")]]
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+
 		/// @brief Before tick procedure.
 		void BeginTick();
 		/// @brief After tick procedure.
@@ -158,16 +159,6 @@ namespace PonyEngine::Core
 		return frameCount;
 	}
 
-	PonyDebug::Log::ILogger& EngineImpl::Logger() noexcept
-	{
-		return *engineLogger;
-	}
-
-	const PonyDebug::Log::ILogger& EngineImpl::Logger() const noexcept
-	{
-		return *engineLogger;
-	}
-
 	ISystemManager& EngineImpl::SystemManager() noexcept
 	{
 		return *systemManager;
@@ -214,6 +205,16 @@ namespace PonyEngine::Core
 		EndTick();
 	}
 
+	PonyDebug::Log::ILogger& EngineImpl::Logger() noexcept
+	{
+		return *engineLogger;
+	}
+
+	const PonyDebug::Log::ILogger& EngineImpl::Logger() const noexcept
+	{
+		return *engineLogger;
+	}
+
 	void EngineImpl::BeginTick()
 	{
 		if (!isRunning) [[unlikely]]
@@ -255,7 +256,7 @@ namespace PonyEngine::Core
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine logger.");
-			auto logger = std::make_unique<EngineLogger>(*this, application->Logger());
+			auto logger = std::make_unique<EngineLogger>(*static_cast<IEngineContext*>(this), application->Logger());
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine logger created.");
 
 			return logger;
@@ -273,7 +274,7 @@ namespace PonyEngine::Core
 		try
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create system manager.");
-			auto manager = std::make_unique<Core::SystemManager>(*this);
+			auto manager = std::make_unique<Core::SystemManager>(*static_cast<IEngineContext*>(this));
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "System manager created.");
 
 			return manager;

@@ -45,7 +45,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		Direct3D12SubSystem(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, DXGI_FORMAT rtvFormat);
+		Direct3D12SubSystem(IRenderSystemContext& renderer, const Direct3D12RenderSystemParams& params, DXGI_FORMAT rtvFormat);
 		Direct3D12SubSystem(const Direct3D12SubSystem&) = delete;
 		Direct3D12SubSystem(Direct3D12SubSystem&&) = delete;
 
@@ -68,9 +68,14 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderTarget& RenderTarget() noexcept override;
+		virtual IDirect3D12RenderTargetPrivate& RenderTarget() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderTarget& RenderTarget() const noexcept override;
+		virtual const IDirect3D12RenderTargetPrivate& RenderTarget() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12DepthStencilPrivate& DepthStencil() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12DepthStencilPrivate& DepthStencil() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IDirect3D12RenderView& RenderView() noexcept override;
@@ -87,7 +92,7 @@ export namespace PonyEngine::Render
 		Direct3D12SubSystem& operator =(Direct3D12SubSystem&&) = delete;
 
 	private:
-		IRenderContext* renderer;
+		IRenderSystemContext* renderer;
 
 #ifdef _DEBUG
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug;
@@ -108,7 +113,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12SubSystem::Direct3D12SubSystem(IRenderContext& renderer, const Direct3D12RenderSystemParams& params, const DXGI_FORMAT rtvFormat) :
+	Direct3D12SubSystem::Direct3D12SubSystem(IRenderSystemContext& renderer, const Direct3D12RenderSystemParams& params, const DXGI_FORMAT rtvFormat) :
 		renderer{&renderer}
 	{
 #ifdef _DEBUG
@@ -130,7 +135,7 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
-		rootSignatureManager = std::make_unique<Direct3D12RootSignatureManager>(*this->renderer, *device.Get());
+		rootSignatureManager = std::make_unique<Direct3D12RootSignatureManager>(*this);
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material manager.");
 		materialManager = std::make_unique<Direct3D12MaterialManager>(*this->renderer, device.Get(), rootSignatureManager.get(), rtvFormat);
@@ -148,7 +153,7 @@ namespace PonyEngine::Render
 		renderView = std::make_unique<Direct3D12RenderView>(params.renderViewParams.viewMatrix, params.renderViewParams.projectionMatrix);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render view created.");
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render target.");
-		renderTarget = std::make_unique<Direct3D12RenderTarget>(*this, params.renderTargetParams.resolution.value(), params.renderTargetParams.clearColor, rtvFormat);
+		renderTarget = std::make_unique<Direct3D12RenderTarget>(*this, params.renderTargetParams, rtvFormat);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
 
 		depthBuffer = std::make_unique<Direct3D12DepthStencil>(*this);
@@ -158,7 +163,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 graphics pipeline created.'");
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 waiter. Wait timeout: {}.", params.renderTimeout);
-		waiter = std::make_unique<Direct3D12Waiter>(*this, graphicsPipeline->GetCommandQueue(), params.renderTimeout);
+		waiter = std::make_unique<Direct3D12Waiter>(*this, *graphicsPipeline->GetCommandQueue(), params.renderTimeout);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 wait created.");
 	}
 
@@ -233,14 +238,24 @@ namespace PonyEngine::Render
 		return *device.Get();
 	}
 
-	IDirect3D12RenderTarget& Direct3D12SubSystem::RenderTarget() noexcept
+	IDirect3D12RenderTargetPrivate& Direct3D12SubSystem::RenderTarget() noexcept
 	{
 		return *renderTarget;
 	}
 
-	const IDirect3D12RenderTarget& Direct3D12SubSystem::RenderTarget() const noexcept
+	const IDirect3D12RenderTargetPrivate& Direct3D12SubSystem::RenderTarget() const noexcept
 	{
 		return *renderTarget;
+	}
+
+	IDirect3D12DepthStencilPrivate& Direct3D12SubSystem::DepthStencil() noexcept
+	{
+		return *depthBuffer;
+	}
+
+	const IDirect3D12DepthStencilPrivate& Direct3D12SubSystem::DepthStencil() const noexcept
+	{
+		return *depthBuffer;
 	}
 
 	IDirect3D12RenderView& Direct3D12SubSystem::RenderView() noexcept

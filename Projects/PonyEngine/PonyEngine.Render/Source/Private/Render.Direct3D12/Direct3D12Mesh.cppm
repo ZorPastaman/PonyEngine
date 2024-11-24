@@ -15,7 +15,7 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Mesh;
 
 import :Direct3D12IndexArray;
 import :Direct3D12IndexFormat;
-import :Direct3D12VertexBuffer;
+import :Direct3D12VertexArray;
 
 export namespace PonyEngine::Render
 {
@@ -23,7 +23,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexArray& vertexIndicesBuffer) noexcept;
+		Direct3D12Mesh(Direct3D12VertexArray& vertexArray, Direct3D12VertexArray& vertexColorArray, Direct3D12IndexArray& vertexIndexArray) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh(const Direct3D12Mesh& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -32,11 +32,11 @@ export namespace PonyEngine::Render
 		~Direct3D12Mesh() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		const D3D12_VERTEX_BUFFER_VIEW& VerticesView() const noexcept;
+		const D3D12_VERTEX_BUFFER_VIEW& VertexBufferView() const noexcept;
 		[[nodiscard("Pure function")]]
-		const D3D12_VERTEX_BUFFER_VIEW& VertexColorsView() const noexcept;
+		const D3D12_VERTEX_BUFFER_VIEW& VertexColorBufferView() const noexcept;
 		[[nodiscard("Pure function")]]
-		const D3D12_INDEX_BUFFER_VIEW& VertexIndicesView() const noexcept;
+		const D3D12_INDEX_BUFFER_VIEW& VertexIndexBufferView() const noexcept;
 		[[nodiscard("Pure function")]]
 		UINT IndexCount() const noexcept;
 
@@ -44,13 +44,13 @@ export namespace PonyEngine::Render
 		Direct3D12Mesh& operator =(Direct3D12Mesh&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertices;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexColors;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexIndices;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexColorBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexIndexBuffer;
 
-		D3D12_VERTEX_BUFFER_VIEW verticesView;
-		D3D12_VERTEX_BUFFER_VIEW vertexColorsView;
-		D3D12_INDEX_BUFFER_VIEW vertexIndicesView;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
+		D3D12_VERTEX_BUFFER_VIEW vertexColorBufferView;
+		D3D12_INDEX_BUFFER_VIEW vertexIndexView;
 
 		UINT indexCount;
 	};
@@ -58,30 +58,30 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12Mesh::Direct3D12Mesh(Direct3D12VertexBuffer& verticesBuffer, Direct3D12VertexBuffer& vertexColorsBuffer, Direct3D12IndexArray& vertexIndicesBuffer) noexcept :
-		vertices(verticesBuffer.GetVerticesResource()),
-		vertexColors(vertexColorsBuffer.GetVerticesResource()),
-		vertexIndices(&vertexIndicesBuffer.IndexResource()),
-		verticesView{.BufferLocation = vertices->GetGPUVirtualAddress(), .SizeInBytes = verticesBuffer.VertexSize() * verticesBuffer.VertexCount(), .StrideInBytes = verticesBuffer.VertexSize()},
-		vertexColorsView{.BufferLocation = vertexColors->GetGPUVirtualAddress(), .SizeInBytes = vertexColorsBuffer.VertexSize() * vertexColorsBuffer.VertexCount(), .StrideInBytes = vertexColorsBuffer.VertexSize()},
-		vertexIndicesView{.BufferLocation = vertexIndices->GetGPUVirtualAddress(), .SizeInBytes = vertexIndicesBuffer.IndexSize() * vertexIndicesBuffer.IndexCount(), .Format = vertexIndicesBuffer.IndexFormat()},
-		indexCount{vertexIndicesBuffer.IndexCount()}
+	Direct3D12Mesh::Direct3D12Mesh(Direct3D12VertexArray& vertexArray, Direct3D12VertexArray& vertexColorArray, Direct3D12IndexArray& vertexIndexArray) noexcept :
+		vertexBuffer(&vertexArray.VertexBuffer()),
+		vertexColorBuffer(&vertexColorArray.VertexBuffer()),
+		vertexIndexBuffer(&vertexIndexArray.IndexBuffer()),
+		vertexBufferView{.BufferLocation = vertexBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexArray.VertexSize() * vertexArray.VertexCount(), .StrideInBytes = vertexArray.VertexSize()},
+		vertexColorBufferView{.BufferLocation = vertexColorBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexColorArray.VertexSize() * vertexColorArray.VertexCount(), .StrideInBytes = vertexColorArray.VertexSize()},
+		vertexIndexView{.BufferLocation = vertexIndexBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexIndexArray.IndexSize() * vertexIndexArray.IndexCount(), .Format = vertexIndexArray.IndexFormat()},
+		indexCount{vertexIndexArray.IndexCount()}
 	{
 	}
 
-	const D3D12_VERTEX_BUFFER_VIEW& Direct3D12Mesh::VerticesView() const noexcept
+	const D3D12_VERTEX_BUFFER_VIEW& Direct3D12Mesh::VertexBufferView() const noexcept
 	{
-		return verticesView;
+		return vertexBufferView;
 	}
 
-	const D3D12_VERTEX_BUFFER_VIEW& Direct3D12Mesh::VertexColorsView() const noexcept
+	const D3D12_VERTEX_BUFFER_VIEW& Direct3D12Mesh::VertexColorBufferView() const noexcept
 	{
-		return vertexColorsView;
+		return vertexColorBufferView;
 	}
 
-	const D3D12_INDEX_BUFFER_VIEW& Direct3D12Mesh::VertexIndicesView() const noexcept
+	const D3D12_INDEX_BUFFER_VIEW& Direct3D12Mesh::VertexIndexBufferView() const noexcept
 	{
-		return vertexIndicesView;
+		return vertexIndexView;
 	}
 
 	UINT Direct3D12Mesh::IndexCount() const noexcept

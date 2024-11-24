@@ -50,7 +50,6 @@
     <ClCompile Include="Source\Public\Render\IRenderTarget.cppm" />
     <ClCompile Include="Source\Public\Render\IRenderView.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderObjectHandle.cppm" />
     <ClCompile Include="Source\Public\Render\RenderTargetParams.cppm" />
     <ClCompile Include="Source\Public\Render\RenderViewParams.cppm" />
   </ItemGroup>

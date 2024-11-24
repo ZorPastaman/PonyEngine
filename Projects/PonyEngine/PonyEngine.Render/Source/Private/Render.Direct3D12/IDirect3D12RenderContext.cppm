@@ -17,9 +17,12 @@ export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderContext;
 import PonyEngine.Render.Detail;
 import PonyEngine.Render.Direct3D12;
 
+import :IDirect3D12DepthStencilPrivate;
+import :IDirect3D12RenderTargetPrivate;
+
 export namespace PonyEngine::Render
 {
-	class IDirect3D12RenderContext : public IRenderContext
+	class IDirect3D12RenderContext : public IRenderSystemContext
 	{
 		INTERFACE_BODY(IDirect3D12RenderContext)
 
@@ -29,9 +32,14 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Device10& Device() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderTarget& RenderTarget() noexcept = 0;
+		virtual IDirect3D12RenderTargetPrivate& RenderTarget() noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderTarget& RenderTarget() const noexcept = 0;
+		virtual const IDirect3D12RenderTargetPrivate& RenderTarget() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12DepthStencilPrivate& DepthStencil() noexcept = 0; // TODO: Check if other system need private interfaces as well.
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12DepthStencilPrivate& DepthStencil() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual IDirect3D12RenderView& RenderView() noexcept = 0;
