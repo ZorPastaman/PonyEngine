@@ -9,20 +9,20 @@
 
 module;
 
-#include "PonyBase/Core/DXGI/Framework.h"
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.DXGI.Detail:DXGISwapChainParams;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12MaterialParams;
 
-import PonyMath.Utility;
+import <optional>;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Swap chain parameters.
-	struct DXGISwapChainParams final
+	/// @brief Direct3D12 material parameters.
+	struct Direct3D12MaterialParams final
 	{
-		HWND hWnd; ///< Window handle. Must be an alive window.
-		PonyMath::Utility::Resolution<UINT> resolution; ///< Swap chain resolution.
-		DXGI_FORMAT rtvFormat; ///< Render target view format.
-		UINT bufferCount; ///< Back buffer count.
+		D3D_PRIMITIVE_TOPOLOGY primitiveTopology; ///< Primitive topology.
+
+		UINT vertexSlot; ///< Vertex slot.
+		std::optional<UINT> vertexColorSlot; ///< Vertex color slot. It's @a nullopt if the material doesn't support it.
 	};
 }

@@ -39,6 +39,15 @@ import :Direct3D12GraphicsPipeline;
 import :Direct3D12SystemParams;
 import :IDirect3D12RenderSystemContext;
 import :IDirect3D12SystemContext;
+import :Direct3D12RenderTargetParams;
+import :Direct3D12DepthStencil;
+import :Direct3D12RenderTarget;
+import :Direct3D12RenderView;
+import :Direct3D12Fence;
+import :Direct3D12RootSignatureManager;
+import :Direct3D12MaterialManager;
+import :Direct3D12RenderObjectManager;
+import :Direct3D12Waiter;
 
 export namespace PonyEngine::Render
 {
@@ -46,7 +55,7 @@ export namespace PonyEngine::Render
 	class Direct3D12System final : private IDirect3D12SystemContext
 	{
 	public:
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Pure constructor")]]
 		Direct3D12System(IDirect3D12RenderSystemContext& renderer, const Direct3D12SystemParams& params);
 		Direct3D12System(const Direct3D12System&) = delete;
 		Direct3D12System(Direct3D12System&&) = delete;
@@ -54,19 +63,19 @@ export namespace PonyEngine::Render
 		~Direct3D12System() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderTargetPrivate& RenderTarget() noexcept override;
+		IDirect3D12RenderTarget* RenderTarget() noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderTargetPrivate& RenderTarget() const noexcept override;
+		const IDirect3D12RenderTarget* RenderTarget() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderView& RenderView() noexcept override;
+		IDirect3D12RenderView* RenderView() noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderView& RenderView() const noexcept override;
+		const IDirect3D12RenderView* RenderView() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RenderObjectManagerPrivate& RenderObjectManager() noexcept override;
+		IDirect3D12RenderObjectManager* RenderObjectManager() noexcept;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RenderObjectManagerPrivate& RenderObjectManager() const noexcept override;
+		const IDirect3D12RenderObjectManager* RenderObjectManager() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue* GraphicsCommandQueue() const;
@@ -92,24 +101,39 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12DepthStencilPrivate& DepthStencil() noexcept override;
+		virtual IDirect3D12RenderTargetPrivate& RenderTargetPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12DepthStencilPrivate& DepthStencil() const noexcept override;
+		virtual const IDirect3D12RenderTargetPrivate& RenderTargetPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12RootSignatureManagerPrivate& RootSignatureManager() noexcept override;
+		virtual IDirect3D12DepthStencilPrivate& DepthStencilPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12RootSignatureManagerPrivate& RootSignatureManager() const noexcept override;
+		virtual const IDirect3D12DepthStencilPrivate& DepthStencilPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12MaterialManagerPrivate& MaterialManager() noexcept override;
+		virtual IDirect3D12RenderViewPrivate& RenderViewPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12MaterialManagerPrivate& MaterialManager() const noexcept override;
+		virtual const IDirect3D12RenderViewPrivate& RenderViewPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12MeshManagerPrivate& MeshManager() noexcept override;
+		virtual IDirect3D12RootSignatureManagerPrivate& RootSignatureManagerPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12MeshManagerPrivate& MeshManager() const noexcept override;
+		virtual const IDirect3D12RootSignatureManagerPrivate& RootSignatureManagerPrivate() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12MaterialManagerPrivate& MaterialManagerPrivate() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12MaterialManagerPrivate& MaterialManagerPrivate() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12MeshManagerPrivate& MeshManagerPrivate() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12MeshManagerPrivate& MeshManagerPrivate() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12RenderObjectManagerPrivate& RenderObjectManagerPrivate() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12RenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept override;
 
 		IRenderSystemContext* renderer;
 
@@ -209,6 +233,36 @@ namespace PonyEngine::Render
 #endif
 	}
 
+	IDirect3D12RenderTarget* Direct3D12System::RenderTarget() noexcept
+	{
+		return renderTarget.get();
+	}
+
+	const IDirect3D12RenderTarget* Direct3D12System::RenderTarget() const noexcept
+	{
+		return renderTarget.get();
+	}
+
+	IDirect3D12RenderView* Direct3D12System::RenderView() noexcept
+	{
+		return renderView.get();
+	}
+
+	const IDirect3D12RenderView* Direct3D12System::RenderView() const noexcept
+	{
+		return renderView.get();
+	}
+
+	IDirect3D12RenderObjectManager* Direct3D12System::RenderObjectManager() noexcept
+	{
+		return renderObjectManager.get();
+	}
+
+	const IDirect3D12RenderObjectManager* Direct3D12System::RenderObjectManager() const noexcept
+	{
+		return renderObjectManager.get();
+	}
+
 	ID3D12CommandQueue* Direct3D12System::GraphicsCommandQueue() const
 	{
 		return &graphicsPipeline->CommandQueue();
@@ -234,72 +288,72 @@ namespace PonyEngine::Render
 		return *device.Get();
 	}
 
-	IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTarget() noexcept
+	IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTargetPrivate() noexcept
 	{
 		return *renderTarget;
 	}
 
-	const IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTarget() const noexcept
+	const IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTargetPrivate() const noexcept
 	{
 		return *renderTarget;
 	}
 
-	IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencil() noexcept
+	IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencilPrivate() noexcept
 	{
 		return *depthStencil;
 	}
 
-	const IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencil() const noexcept
+	const IDirect3D12DepthStencilPrivate& Direct3D12System::DepthStencilPrivate() const noexcept
 	{
 		return *depthStencil;
 	}
 
-	IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManager() noexcept
+	IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManagerPrivate() noexcept
 	{
 		return *rootSignatureManager;
 	}
 
-	const IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManager() const noexcept
+	const IDirect3D12RootSignatureManagerPrivate& Direct3D12System::RootSignatureManagerPrivate() const noexcept
 	{
 		return *rootSignatureManager;
 	}
 
-	IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManager() noexcept
+	IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManagerPrivate() noexcept
 	{
 		return *materialManager;
 	}
 
-	const IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManager() const noexcept
+	const IDirect3D12MaterialManagerPrivate& Direct3D12System::MaterialManagerPrivate() const noexcept
 	{
 		return *materialManager;
 	}
 
-	IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManager() noexcept
+	IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManagerPrivate() noexcept
 	{
 		return *meshManager;
 	}
 
-	const IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManager() const noexcept
+	const IDirect3D12MeshManagerPrivate& Direct3D12System::MeshManagerPrivate() const noexcept
 	{
 		return *meshManager;
 	}
 
-	IDirect3D12RenderView& Direct3D12System::RenderView() noexcept
+	IDirect3D12RenderViewPrivate& Direct3D12System::RenderViewPrivate() noexcept
 	{
 		return *renderView;
 	}
 
-	const IDirect3D12RenderView& Direct3D12System::RenderView() const noexcept
+	const IDirect3D12RenderViewPrivate& Direct3D12System::RenderViewPrivate() const noexcept
 	{
 		return *renderView;
 	}
 
-	IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManager() noexcept
+	IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManagerPrivate() noexcept
 	{
 		return *renderObjectManager;
 	}
 
-	const IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManager() const noexcept
+	const IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManagerPrivate() const noexcept
 	{
 		return *renderObjectManager;
 	}
@@ -310,11 +364,11 @@ namespace PonyEngine::Render
 		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), params);
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 render target created.");
 
-		depthStencil = std::make_unique<Direct3D12DepthStencil>(*static_cast<IDirect3D12SystemContext*>(this), params);
+		depthStencil = std::make_unique<Direct3D12DepthStencil>(*static_cast<IDirect3D12SystemContext*>(this));
 
 		rootSignatureManager = std::make_unique<Direct3D12RootSignatureManager>(*static_cast<IDirect3D12SystemContext*>(this));
 
-		materialManager = std::make_unique<Direct3D12MaterialManager>(*static_cast<IDirect3D12SystemContext*>(this), params.rtvFormat);
+		materialManager = std::make_unique<Direct3D12MaterialManager>(*static_cast<IDirect3D12SystemContext*>(this));
 
 		PONY_LOG(this->renderer->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 mesh manager.");
 		meshManager = std::make_unique<Direct3D12MeshManager>(*static_cast<IDirect3D12SystemContext*>(this));
@@ -327,7 +381,10 @@ namespace PonyEngine::Render
 
 	void Direct3D12System::PopulateCommands(const UINT bufferIndex) const
 	{
-		graphicsPipeline->PopulateCommands(bufferIndex);
+		renderTarget->CurrentBackBufferIndex(bufferIndex);
+		renderObjectManager->Clean();
+		materialManager->Clean();
+		graphicsPipeline->PopulateCommands();
 	}
 
 	void Direct3D12System::Execute() const

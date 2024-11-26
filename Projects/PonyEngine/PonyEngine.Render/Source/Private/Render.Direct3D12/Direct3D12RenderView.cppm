@@ -17,9 +17,11 @@ import PonyMath.Core;
 
 import PonyEngine.Render.Direct3D12;
 
+import :IDirect3D12RenderViewPrivate;
+
 export namespace PonyEngine::Render
 {
-	class Direct3D12RenderView final : public IDirect3D12RenderView
+	class Direct3D12RenderView final : public IDirect3D12RenderViewPrivate
 	{
 	public:
 		[[nodiscard("Pure constructor")]]

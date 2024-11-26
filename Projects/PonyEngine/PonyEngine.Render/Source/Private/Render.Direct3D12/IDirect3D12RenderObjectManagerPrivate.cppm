@@ -14,6 +14,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderObjectManagerPrivate;
 
+import <cstddef>;
 import <memory>;
 import <span>;
 
@@ -28,6 +29,10 @@ export namespace PonyEngine::Render
 		INTERFACE_BODY(IDirect3D12RenderObjectManagerPrivate)
 
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::weak_ptr<Direct3D12RenderObject>> RenderObjects() noexcept = 0; // TODO: Fill span with simple pointers.
+		virtual std::size_t RenderObjectCount() const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual Direct3D12RenderObject& RenderObject(std::size_t index) noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const Direct3D12RenderObject& RenderObject(std::size_t index) const noexcept = 0;
 	};
 }

@@ -23,10 +23,16 @@ export namespace PonyEngine::Render
 		INTERFACE_BODY(IDirect3D12RenderTargetPrivate)
 
 		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& GetBackBuffer(UINT index) noexcept = 0;
+		virtual DXGI_FORMAT RtvFormat() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& GetBackBuffer(UINT index) const noexcept = 0;
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
+
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) const noexcept = 0;
+		virtual ID3D12Resource2& CurrentBackBuffer() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept = 0;
 	};
 }

@@ -36,15 +36,17 @@ export namespace PonyEngine::Render
 	public:
 		/// @brief Creates a @p Direct3D12DepthStencil.
 		/// @param d3d12System Direct3D12 system context.
-		/// @param params Render target parameters.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12DepthStencil(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params);
+		explicit Direct3D12DepthStencil(IDirect3D12SystemContext& d3d12System);
 		[[nodiscard("Pure constructor")]]
 		Direct3D12DepthStencil(const Direct3D12DepthStencil& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12DepthStencil(Direct3D12DepthStencil&& other) noexcept = default;
 
 		~Direct3D12DepthStencil() noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual DXGI_FORMAT DsvFormat() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept override;
@@ -63,12 +65,10 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Direct3D12DepthStencil::Direct3D12DepthStencil(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params) :
+	Direct3D12DepthStencil::Direct3D12DepthStencil(IDirect3D12SystemContext& d3d12System) :
 		d3d12System{&d3d12System}
 	{
-		constexpr DXGI_FORMAT depthFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
-
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire depth stencil buffer. Resolution: '{}'.", params.resolution.ToString());
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire depth stencil buffer.");
 		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
 		{
 			.Type = D3D12_HEAP_TYPE_DEFAULT,
@@ -77,23 +77,25 @@ namespace PonyEngine::Render
 			.CreationNodeMask = 0u,
 			.VisibleNodeMask = 0u
 		};
+		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System.RenderTargetPrivate();
+		const PonyMath::Utility::Resolution<UINT>& resolution = renderTarget.ResolutionD3D12();
 		const auto bufferDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
 			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = params.resolution.Width(),
-			.Height = params.resolution.Height(),
+			.Width = resolution.Width(),
+			.Height = resolution.Height(),
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
-			.Format = depthFormat,
-			.SampleDesc = params.sampleDesc,
+			.Format = DsvFormat(),
+			.SampleDesc = renderTarget.SampleDesc(),
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
 			.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
-		constexpr auto clearValue = D3D12_CLEAR_VALUE
+		const auto clearValue = D3D12_CLEAR_VALUE
 		{
-			.Format = depthFormat,
+			.Format = DsvFormat(),
 			.DepthStencil = D3D12_DEPTH_STENCIL_VALUE{.Depth = D3D12_MAX_DEPTH, .Stencil = 0u}
 		};
 		ID3D12Device10& device = d3d12System.Device();
@@ -118,9 +120,9 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Dsv heap acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(dsvHeap.Get()));
 
-		constexpr auto dsvDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
+		const auto dsvDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
 		{
-			.Format = depthFormat,
+			.Format = DsvFormat(),
 			.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D,
 			.Flags = D3D12_DSV_FLAG_NONE
 		};
@@ -137,6 +139,11 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release depth stencil buffer.");
 		depthStencilBuffer.Reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil buffer released.");
+	}
+
+	DXGI_FORMAT Direct3D12DepthStencil::DsvFormat() const noexcept
+	{
+		return DXGI_FORMAT_D24_UNORM_S8_UINT;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12DepthStencil::DsvHandle() const noexcept

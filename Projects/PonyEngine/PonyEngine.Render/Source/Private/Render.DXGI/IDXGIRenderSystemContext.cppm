@@ -18,12 +18,17 @@ import PonyEngine.Render.Detail;
 
 export namespace PonyEngine::Render
 {
+	/// @brief DXGI render system context.
 	class IDXGIRenderSystemContext : public IRenderSystemContext
 	{
 		INTERFACE_BODY(IDXGIRenderSystemContext)
 
+		/// @brief Gets the graphics device.
+		/// @return Graphics device.
 		[[nodiscard("Pure function")]]
 		virtual IUnknown* Device() noexcept = 0;
+		/// @brief Gets the graphics device.
+		/// @return Graphics device.
 		[[nodiscard("Pure function")]]
 		virtual const IUnknown* Device() const noexcept = 0;
 	};

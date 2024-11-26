@@ -39,7 +39,10 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12DepthStencil.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12InputElementParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SystemParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTargetParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm" />
@@ -50,6 +53,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MeshManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderObjectManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderViewPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RootSignatureManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12SystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderTargetPrivate.cppm" />

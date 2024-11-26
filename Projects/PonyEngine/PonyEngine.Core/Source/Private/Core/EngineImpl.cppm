@@ -79,7 +79,7 @@ export namespace PonyEngine::Core
 		/// @brief Creates an engine logger.
 		/// @return Created engine logger.
 		[[nodiscard("Pure function")]]
-		std::unique_ptr<EngineLogger> CreateEngineLogger();
+		std::unique_ptr<EngineLogger> CreateEngineLogger(); // TODO: Think about removing those create functions.
 
 		/// @brief Creates a system manager.
 		/// @return Created system manager.

@@ -18,6 +18,7 @@ import <memory>;
 
 import :Direct3D12Material;
 import :Direct3D12RootSignature;
+import :Direct3D12PipelineParams;
 import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
@@ -27,6 +28,7 @@ export namespace PonyEngine::Render
 		INTERFACE_BODY(IDirect3D12MaterialManagerPrivate)
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader) = 0;
+		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
+			const Direct3D12PipelineParams& pipelineParams) = 0;
 	};
 }

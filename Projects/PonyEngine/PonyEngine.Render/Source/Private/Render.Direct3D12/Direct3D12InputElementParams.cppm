@@ -7,9 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.DXGI.Detail;
+module;
 
-export import :DXGISwapChainParams;
-export import :DXGISystem;
-export import :IDXGIRenderSystemContext;
-export import :IDXGISwapChain;
+#include "PonyBase/Core/Direct3D12/Framework.h"
+
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12InputElementParams;
+
+export namespace PonyEngine::Render
+{
+	/// @brief Direct3D12 input element parameters.
+	struct Direct3D12InputElementParams final
+	{
+		LPCSTR semanticName; ///< Semantic name.
+		UINT semanticIndex; ///< Semantic index.
+		UINT inputSlot; ///< Input slot.
+	};
+}

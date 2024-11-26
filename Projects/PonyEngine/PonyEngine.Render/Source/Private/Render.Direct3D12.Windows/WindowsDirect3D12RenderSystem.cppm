@@ -222,32 +222,32 @@ namespace PonyEngine::Render
 
 	IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept
 	{
-		return direct3D12SubSystem->RenderTarget();
+		return *direct3D12SubSystem->RenderTarget();
 	}
 
 	const IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() const noexcept
 	{
-		return direct3D12SubSystem->RenderTarget();
+		return *direct3D12SubSystem->RenderTarget();
 	}
 
 	IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() noexcept
 	{
-		return direct3D12SubSystem->RenderView();
+		return *direct3D12SubSystem->RenderView();
 	}
 
 	const IDirect3D12RenderView& WindowsDirect3D12RenderSystem::RenderView() const noexcept
 	{
-		return direct3D12SubSystem->RenderView();
+		return *direct3D12SubSystem->RenderView();
 	}
 
 	IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() noexcept
 	{
-		return direct3D12SubSystem->RenderObjectManager();
+		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
 	const IDirect3D12RenderObjectManager& WindowsDirect3D12RenderSystem::RenderObjectManager() const noexcept
 	{
-		return direct3D12SubSystem->RenderObjectManager();
+		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
 	IUnknown* WindowsDirect3D12RenderSystem::Device() noexcept

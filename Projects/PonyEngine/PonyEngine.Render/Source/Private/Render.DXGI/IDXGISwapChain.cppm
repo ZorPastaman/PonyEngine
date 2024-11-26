@@ -16,15 +16,24 @@ export module PonyEngine.Render.DXGI.Detail:IDXGISwapChain;
 
 export namespace PonyEngine::Render
 {
+	/// @brief DXGI swap chain.
 	class IDXGISwapChain
 	{
 		INTERFACE_BODY(IDXGISwapChain)
 
+		/// @brief Gets a sample description of the swap chain.
+		/// @return Sample description.
 		[[nodiscard("Pure function")]]
 		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
 
+		/// @brief Gets a current back buffer index.
+		/// @return Current back buffer index.
 		[[nodiscard("Pure function")]]
 		virtual UINT GetCurrentBackBufferIndex() const noexcept = 0;
+		/// @brief Gets a back buffer.
+		/// @param bufferIndex Back buffer index.
+		/// @param buffer Buffer pointer.
+		/// @return Result of the call.
 		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept = 0;
 	};
 }
