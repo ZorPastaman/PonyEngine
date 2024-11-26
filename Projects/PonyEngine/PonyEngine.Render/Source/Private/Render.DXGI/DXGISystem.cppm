@@ -32,6 +32,7 @@ import :IDXGISystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief DXGI system.
 	class DXGISystem final : private IDXGISystemContext
 	{
 	public:
@@ -43,12 +44,23 @@ export namespace PonyEngine::Render
 
 		~DXGISystem() noexcept;
 
+		/// @brief Gets the swap chain.
+		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
 		IDXGISwapChain* SwapChain() noexcept;
+		/// @brief Gets the swap chain.
+		/// @return Swap chain.
 		[[nodiscard("Pure function")]]
 		const IDXGISwapChain* SwapChain() const noexcept;
+		/// @brief Creates a swap chain.
+		/// @note The context must be ready to provide a device to call this function.
+		/// @note The function may be called only once.
+		/// @param swapChainParams Swap chain parameters.
+		/// @return Created swap chain.
 		IDXGISwapChain& CreateSwapChain(const DXGISwapChainParams& swapChainParams);
 
+		/// @brief Presents a new frame.
+		/// @note It may be called only after creation of a swap chain.
 		void Present();
 
 		DXGISystem& operator =(const DXGISystem&) = delete;
@@ -70,14 +82,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const IUnknown& Device() const noexcept override;
 
-		IDXGIRenderSystemContext* renderSystem;
+		IDXGIRenderSystemContext* renderSystem; ///< Render system context.
 
 #ifdef _DEBUG
-		Microsoft::WRL::ComPtr<IDXGIDebug1> debug;
+		Microsoft::WRL::ComPtr<IDXGIDebug1> debug; ///< DXGI debug.
 #endif
-		Microsoft::WRL::ComPtr<IDXGIFactory7> factory;
+		Microsoft::WRL::ComPtr<IDXGIFactory7> factory; ///< DXGI factory.
 
-		std::unique_ptr<DXGISwapChain> swapChain;
+		std::unique_ptr<DXGISwapChain> swapChain; ///< Swap chain.
 	};
 }
 
@@ -192,13 +204,15 @@ namespace PonyEngine::Render
 
 	IUnknown& DXGISystem::Device() noexcept
 	{
-		assert(renderSystem->Device() && "The render system device is nullptr.");
-		return *renderSystem->Device();
+		IUnknown* const device = renderSystem->Device();
+		assert(device && "The render system device is nullptr.");
+		return *device;
 	}
 
 	const IUnknown& DXGISystem::Device() const noexcept
 	{
-		assert(renderSystem->Device() && "The render system device is nullptr.");
-		return *renderSystem->Device();
+		const IUnknown* const device = renderSystem->Device();
+		assert(device && "The render system device is nullptr.");
+		return *device;
 	}
 }

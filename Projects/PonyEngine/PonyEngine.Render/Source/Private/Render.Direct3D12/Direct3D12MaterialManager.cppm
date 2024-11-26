@@ -15,49 +15,68 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12MaterialManager;
 
 import <cstddef>;
 import <memory>;
-import <unordered_map>;
+import <optional>;
+import <stdexcept>;
+import <type_traits>;
+import <vector>;
 
-import PonyEngine.Render.Detail;
-
+import :Direct3D12InputElementParams;
 import :Direct3D12Material;
-import :Direct3D12RootSignatureManager;
+import :Direct3D12PipelineParams;
+import :Direct3D12RootSignature;
+import :Direct3D12Shader;
+import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12MaterialManagerPrivate;
+import :IDirect3D12RenderTargetPrivate;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 material manager.
 	class Direct3D12MaterialManager final : public IDirect3D12MaterialManagerPrivate
 	{
 	public:
+		/// @brief Creates a @p Direct3D12MaterialManager.
+		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12MaterialManager(IDirect3D12SystemContext& renderSystem, DXGI_FORMAT rtvFormat) noexcept;
+		explicit Direct3D12MaterialManager(IDirect3D12SystemContext& d3d12System) noexcept;
 		Direct3D12MaterialManager(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager(Direct3D12MaterialManager&&) = delete;
 
 		~Direct3D12MaterialManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader) override;
+		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
+			const Direct3D12PipelineParams& pipelineParams) override;
+
+		/// @brief Cleans dead materials.
+		void Clean() noexcept;
 
 		Direct3D12MaterialManager& operator =(const Direct3D12MaterialManager&) = delete;
 		Direct3D12MaterialManager& operator =(Direct3D12MaterialManager&&) = delete;
 
 	private:
-		DXGI_FORMAT rtvFormat;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		IDirect3D12SystemContext* renderSystem;
+		std::vector<std::shared_ptr<Direct3D12Material>> materials; ///< Materials.
+
+		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout; ///< Input layout cache.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12MaterialManager::Direct3D12MaterialManager(IDirect3D12SystemContext& renderSystem, const DXGI_FORMAT rtvFormat) noexcept :
-		rtvFormat{rtvFormat},
-		renderSystem{&renderSystem}
+	Direct3D12MaterialManager::Direct3D12MaterialManager(IDirect3D12SystemContext& d3d12System) noexcept :
+		d3d12System{&d3d12System}
 	{
 	}
 
-	std::shared_ptr<Direct3D12Material> Direct3D12MaterialManager::CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader)
+	std::shared_ptr<Direct3D12Material> Direct3D12MaterialManager::CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
+		const Direct3D12PipelineParams& pipelineParams)
 	{
+		// TODO: It should try to find a material with the same parameters first. Seems that's the only thing I need to do is to make std::shared_ptv<Direct3D12Shader>.
+		// TODO: Later it must use Resource system types.
+
 		auto blendState = D3D12_BLEND_DESC
 		{
 			.AlphaToCoverageEnable = false,
@@ -79,6 +98,7 @@ namespace PonyEngine::Render
 				.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
 			};
 		}
+
 		constexpr auto rasterizerState = D3D12_RASTERIZER_DESC
 		{
 			.FillMode = D3D12_FILL_MODE_SOLID,
@@ -93,37 +113,60 @@ namespace PonyEngine::Render
 			.ForcedSampleCount = 0u,
 			.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
 		};
+
 		constexpr auto depthStencilState = D3D12_DEPTH_STENCIL_DESC
 		{
 			.DepthEnable = true,
 			.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
 			.DepthFunc = D3D12_COMPARISON_FUNC_LESS,
-			.StencilEnable = false
-		};
-		constexpr D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-		{
-			D3D12_INPUT_ELEMENT_DESC
+			.StencilEnable = true,
+			.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK,
+			.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK,
+			.FrontFace = D3D12_DEPTH_STENCILOP_DESC
 			{
-				.SemanticName = "POSITION",
-				.SemanticIndex = 0u,
-				.Format = DXGI_FORMAT_R32G32B32_FLOAT,
-				.InputSlot = 0u,
-				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-				.InstanceDataStepRate = 0u
-		},
-			D3D12_INPUT_ELEMENT_DESC
+				.StencilFailOp = D3D12_STENCIL_OP_KEEP,
+				.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP,
+				.StencilPassOp = D3D12_STENCIL_OP_KEEP,
+				.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
+			},
+			.BackFace = D3D12_DEPTH_STENCILOP_DESC
 			{
-				.SemanticName = "COLOR",
-				.SemanticIndex = 0u,
-				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
-				.InputSlot = 1u,
-				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
-				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
-				.InstanceDataStepRate = 0u
+				.StencilFailOp = D3D12_STENCIL_OP_KEEP,
+				.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP,
+				.StencilPassOp = D3D12_STENCIL_OP_KEEP,
+				.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
 			}
 		};
-		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC // TODO: Many of these settings have to come with parameters.
+
+		inputLayout.clear();
+		const Direct3D12InputElementParams& vertexInput = pipelineParams.vertexInputParams;
+		inputLayout.push_back(D3D12_INPUT_ELEMENT_DESC
+		{
+			.SemanticName = vertexInput.semanticName,
+			.SemanticIndex = vertexInput.semanticIndex,
+			.Format = DXGI_FORMAT_R32G32B32_FLOAT,
+			.InputSlot = vertexInput.inputSlot,
+			.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+			.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+			.InstanceDataStepRate = 0u
+		});
+		if (pipelineParams.vertexColorInputParams)
+		{
+			const Direct3D12InputElementParams& vertexColorInput = pipelineParams.vertexColorInputParams.value();
+			inputLayout.push_back(D3D12_INPUT_ELEMENT_DESC
+			{
+				.SemanticName = vertexColorInput.semanticName,
+				.SemanticIndex = vertexColorInput.semanticIndex,
+				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
+				.InputSlot = vertexColorInput.inputSlot,
+				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
+				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
+				.InstanceDataStepRate = 0u
+			});
+		}
+
+		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
+		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC
 		{
 			.pRootSignature = &rootSignature->RootSignature(),
 			.VS = D3D12_SHADER_BYTECODE{.pShaderBytecode = vertexShader.Data(), .BytecodeLength = vertexShader.Size()},
@@ -132,23 +175,43 @@ namespace PonyEngine::Render
 			.SampleMask = UINT_MAX,
 			.RasterizerState = rasterizerState,
 			.DepthStencilState = depthStencilState,
-			.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = inputLayout, .NumElements = _countof(inputLayout)},
+			.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = inputLayout.data(), .NumElements = static_cast<UINT>(inputLayout.size())},
 			.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
 			.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 			.NumRenderTargets = 1,
-			.RTVFormats = { rtvFormat },
-			.DSVFormat = DXGI_FORMAT_D32_FLOAT,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1, .Quality = 0},
+			.RTVFormats = { renderTarget.RtvFormat() },
+			.DSVFormat = d3d12System->DepthStencilPrivate().DsvFormat(),
+			.SampleDesc = renderTarget.SampleDesc(),
 			.NodeMask = 0u,
 			.Flags = D3D12_PIPELINE_STATE_FLAG_NONE
 		};
 
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
-		if (const HRESULT result = renderSystem->Device().CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = d3d12System->Device().CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire Direct3D 12 graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<Direct3D12Material>(rootSignature, *pipelineState.Get(), D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+		const auto materialParams = Direct3D12MaterialParams
+		{
+			.primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
+			.vertexSlot = pipelineParams.vertexInputParams.inputSlot,
+			.vertexColorSlot = pipelineParams.vertexColorInputParams ? std::optional<UINT>(pipelineParams.vertexColorInputParams.value().inputSlot) : std::nullopt
+		};
+		const auto material = std::make_shared<Direct3D12Material>(rootSignature, *pipelineState.Get(), materialParams);
+		materials.push_back(material);
+
+		return material;
+	}
+
+	void Direct3D12MaterialManager::Clean() noexcept
+	{
+		for (std::size_t i = materials.size(); i-- > 0; )
+		{
+			if (materials[i].use_count() <= 1L)
+			{
+				materials.erase(materials.cbegin() + i);
+			}
+		}
 	}
 }

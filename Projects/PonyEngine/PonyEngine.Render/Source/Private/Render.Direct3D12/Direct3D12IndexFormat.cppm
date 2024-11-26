@@ -22,7 +22,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		/// @brief Creates a @p Direct3D12IndexFormat.
-		/// @param indexSize Index size. Must be 2 or 4.
+		/// @param indexSize Index size in bytes. Must be 2 or 4.
 		[[nodiscard("Pure constructor")]]
 		explicit Direct3D12IndexFormat(UINT indexSize);
 		[[nodiscard("Pure constructor")]]
@@ -33,7 +33,7 @@ export namespace PonyEngine::Render
 		~Direct3D12IndexFormat() noexcept = default;
 
 		/// @brief Gets the index size.
-		/// @return Index size.
+		/// @return Index size in bytes.
 		[[nodiscard("Pure function")]]
 		UINT IndexSize() const noexcept;
 		/// @brief Gets the index format.
@@ -55,10 +55,10 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	/// @brief Gets an index format by the index size.
-	/// @param indexSize Index size. Must be 2 or 4.
+	/// @param indexSize Index size in bytes. Must be 2 or 4.
 	/// @return Index format.
 	[[nodiscard("Pure constructor")]]
-	DXGI_FORMAT GetFormat(UINT indexSize);
+	DXGI_FORMAT GetFormat(UINT indexSize); // TODO: Move functions like this to Utility sub-module.
 
 	Direct3D12IndexFormat::Direct3D12IndexFormat(const UINT indexSize) :
 		indexSize{indexSize}

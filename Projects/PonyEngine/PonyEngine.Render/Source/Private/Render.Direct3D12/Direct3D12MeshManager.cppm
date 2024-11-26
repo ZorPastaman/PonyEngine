@@ -92,7 +92,7 @@ namespace PonyEngine::Render
 		Direct3D12IndexArray indices = CreateVertexIndices(mesh.Triangles());
 		PONY_LOG(renderContext->Logger(), PonyDebug::Log::LogType::Debug, "Mesh indices created.");
 
-		return std::make_shared<Direct3D12Mesh>(vertices, colors, indices);
+		return std::make_shared<Direct3D12Mesh>(vertices, &colors, indices);
 	}
 
 	Direct3D12VertexArray Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const

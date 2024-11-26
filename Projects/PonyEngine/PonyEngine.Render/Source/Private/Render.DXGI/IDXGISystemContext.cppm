@@ -18,22 +18,35 @@ import PonyDebug.Log;
 
 export namespace PonyEngine::Render
 {
+	/// @brief DXGI system context.
 	class IDXGISystemContext
 	{
 		INTERFACE_BODY(IDXGISystemContext)
 
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 
+		/// @brief Gets the DXGI factory.
+		/// @return Factory.
 		[[nodiscard("Pure function")]]
 		virtual IDXGIFactory7& Factory() noexcept = 0;
+		/// @brief Gets the DXGI factory.
+		/// @return Factory.
 		[[nodiscard("Pure function")]]
 		virtual const IDXGIFactory7& Factory() const noexcept = 0;
 
+		/// @brief Gets the graphics device.
+		/// @return Graphics device.
 		[[nodiscard("Pure function")]]
 		virtual IUnknown& Device() noexcept = 0;
+		/// @brief Gets the graphics device.
+		/// @return Graphics device.
 		[[nodiscard("Pure function")]]
 		virtual const IUnknown& Device() const noexcept = 0;
 	};

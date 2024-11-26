@@ -31,9 +31,13 @@ import :IDXGISwapChain;
 
 export namespace PonyEngine::Render
 {
+	/// @brief DXGI swap chain.
 	class DXGISwapChain final : public IDXGISwapChain
 	{
 	public:
+		/// @brief Creates a @p DXGISwapChain.
+		/// @param dxgiSystem DXGI system context.
+		/// @param swapChainParams Swap chain parameters.
 		[[nodiscard("Pure constructor")]]
 		DXGISwapChain(IDXGISystemContext& dxgiSystem, const DXGISwapChainParams& swapChainParams);
 		DXGISwapChain(const DXGISwapChain&) = delete;
@@ -49,17 +53,20 @@ export namespace PonyEngine::Render
 		virtual UINT GetCurrentBackBufferIndex() const noexcept override;
 		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept override;
 
+		/// @brief Sets the fullscreen state.
+		/// @param fullscreen Is fullscreen?
 		void SetFullscreenState(bool fullscreen);
 
+		/// @brief Calls the swap chain present function.
 		void Present();
 
 		DXGISwapChain& operator =(const DXGISwapChain&) = delete;
 		DXGISwapChain& operator =(DXGISwapChain&& other) noexcept = default;
 
 	private:
-		IDXGISystemContext* dxgiSystem;
+		IDXGISystemContext* dxgiSystem; ///< DXGI system context.
 
-		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain;
+		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
 	};
 }
 
@@ -68,7 +75,7 @@ namespace PonyEngine::Render
 	DXGISwapChain::DXGISwapChain(IDXGISystemContext& dxgiSystem, const DXGISwapChainParams& swapChainParams) :
 		dxgiSystem{&dxgiSystem}
 	{
-		IUnknown* device = &this->dxgiSystem->Device();
+		IUnknown* const device = &this->dxgiSystem->Device();
 		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.",
 			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), static_cast<int>(swapChainParams.rtvFormat), swapChainParams.bufferCount);
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1

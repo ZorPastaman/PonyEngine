@@ -41,6 +41,10 @@ export namespace PonyEngine::Render
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept override;
+		virtual void ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
+
+		[[nodiscard("Pure function")]]
 		Direct3D12Material& Material() noexcept;
 		[[nodiscard("Pure function")]]
 		const Direct3D12Material& Material() const noexcept;
@@ -49,10 +53,6 @@ export namespace PonyEngine::Render
 		Direct3D12Mesh& Mesh() noexcept;
 		[[nodiscard("Pure function")]]
 		const Direct3D12Mesh& Mesh() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept override;
-		virtual void ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
 
 		Direct3D12RenderObject& operator =(const Direct3D12RenderObject& other) noexcept = default;
 		Direct3D12RenderObject& operator =(Direct3D12RenderObject&& other) noexcept = default;
@@ -83,6 +83,16 @@ namespace PonyEngine::Render
 		modelMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(matrix);
 	}
 
+	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::ModelMatrixD3D12() const noexcept
+	{
+		return modelMatrix;
+	}
+
+	void Direct3D12RenderObject::ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept
+	{
+		modelMatrix = matrix;
+	}
+
 	Direct3D12Material& Direct3D12RenderObject::Material() noexcept
 	{
 		return *material;
@@ -101,15 +111,5 @@ namespace PonyEngine::Render
 	const Direct3D12Mesh& Direct3D12RenderObject::Mesh() const noexcept
 	{
 		return *mesh;
-	}
-
-	const PonyMath::Core::Matrix4x4<FLOAT>& Direct3D12RenderObject::ModelMatrixD3D12() const noexcept
-	{
-		return modelMatrix;
-	}
-
-	void Direct3D12RenderObject::ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept
-	{
-		modelMatrix = matrix;
 	}
 }

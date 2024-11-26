@@ -7,9 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.DXGI.Detail;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12PipelineParams;
 
-export import :DXGISwapChainParams;
-export import :DXGISystem;
-export import :IDXGIRenderSystemContext;
-export import :IDXGISwapChain;
+import <optional>;
+
+import :Direct3D12InputElementParams;
+
+export namespace PonyEngine::Render
+{
+	struct Direct3D12PipelineParams final
+	{
+		Direct3D12InputElementParams vertexInputParams;
+		std::optional<Direct3D12InputElementParams> vertexColorInputParams;
+	};
+}

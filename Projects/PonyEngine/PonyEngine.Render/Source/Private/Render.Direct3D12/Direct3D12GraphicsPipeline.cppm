@@ -15,41 +15,40 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12GraphicsPipeline;
 
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <cstdint>;
-import <memory>;
-import <span>;
 import <stdexcept>;
 import <type_traits>;
+import <vector>;
 
 import PonyBase.COMUtility;
 import PonyBase.StringUtility;
 
 import PonyMath.Color;
 import PonyMath.Core;
-import PonyMath.Geometry;
 import PonyMath.Utility;
 
-import PonyDebug.Log;
-
-import PonyEngine.Render.Direct3D12;
-
-import :Direct3D12DepthStencil;
-import :Direct3D12Mesh;
-import :Direct3D12MeshManager;
 import :Direct3D12Material;
-import :Direct3D12MaterialManager;
-import :Direct3D12RenderTarget;
-import :Direct3D12RenderObjectManager;
-import :Direct3D12RootSignatureManager;
-import :Direct3D12RenderView;
-import :Direct3D12Waiter;
+import :Direct3D12Mesh;
+import :Direct3D12RootSignature;
+import :Direct3D12RenderObject;
+import :IDirect3D12DepthStencilPrivate;
+import :IDirect3D12RenderObjectManagerPrivate;
+import :IDirect3D12RenderTargetPrivate;
+import :IDirect3D12RenderViewPrivate;
 import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 graphics pipeline.
 	class Direct3D12GraphicsPipeline final
 	{
 	public:
+		/// @brief Creates a @p Direct3D12GraphicsPipeline.
+		/// @param d3d12System Direct3D12 system context.
+		/// @param commandQueuePriority Command queue priority.
 		[[nodiscard("Pure constructor")]]
 		Direct3D12GraphicsPipeline(IDirect3D12SystemContext& d3d12System, INT commandQueuePriority);
 		Direct3D12GraphicsPipeline(const Direct3D12GraphicsPipeline&) = delete;
@@ -57,32 +56,55 @@ export namespace PonyEngine::Render
 
 		~Direct3D12GraphicsPipeline() noexcept;
 
+		/// @brief Gets the main command queue.
+		/// @return Command queue.
 		[[nodiscard("Pure function")]]
 		ID3D12CommandQueue& CommandQueue() noexcept;
+		/// @brief Gets the main command queue.
+		/// @return Command queue.
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
-		void PopulateCommands(UINT bufferIndex);
+		/// @brief Populates commands. All the system components must be ready.
+		void PopulateCommands();
+		/// @brief Executes populated commands.
 		void Execute();
 
 		Direct3D12GraphicsPipeline& operator =(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline& operator =(Direct3D12GraphicsPipeline&&) = delete;
 
 	private:
-		void ResetQueue();
-		void PopulateResourceBarriersIn(UINT bufferIndex);
-		void PopulateRenderTarget(UINT bufferIndex);
+		/// @brief Direct3D12 render object entry. It's used in the cache.
+		struct Direct3D12RenderObjectEntry final
+		{
+			Direct3D12RenderObject* renderObject; ///< Render object.
+			PonyMath::Core::Matrix4x4<FLOAT> mvpMatrix; ///< Model-view-projection matrix.
+		};
+
+		/// @brief Resets command lists.
+		void ResetLists();
+		/// @brief Populates resource barriers to make resources ready for rendering.
+		void PopulateResourceBarriersIn();
+		/// @brief Populates render target commands.
+		void PopulateRenderTarget();
+		/// @brief Gets render objects to render and sorts them. The result is in the @p renderObjects.
+		void GetRenderObjects();
+		/// @brief Populates render objects that were gotten in the @p GetRenderObjects().
 		void PopulateRenderObjects();
-		void PopulateResourceBarriersOut(UINT bufferIndex);
-		void CloseQueue();
+		/// @brief Populates resource barriers back.
+		void PopulateResourceBarriersOut();
+		/// @brief Closes command lists.
+		void CloseLists();
 
-		GUID guid;
+		GUID guid; ///< Graphics pipeline guid.
 
-		IDirect3D12SystemContext* d3d12System;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue;
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator;
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList;
+		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue; ///< Graphics command queue.
+		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
+		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
+
+		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects cache.
 	};
 }
 
@@ -111,34 +133,34 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command queue acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandQueue.Get()));
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire command allocator.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire direct command allocator.");
 		if (const HRESULT result = device.CreateCommandAllocator(commandListType, IID_PPV_ARGS(commandAllocator.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire direct command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command allocator acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandAllocator.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command allocator acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandAllocator.Get()));
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire command list.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire direct command list.");
 		if (const HRESULT result = device.CreateCommandList1(0, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire direct command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 	}
 
 	Direct3D12GraphicsPipeline::~Direct3D12GraphicsPipeline() noexcept
 	{
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release command list.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release direct command list.");
 		commandList.Reset();
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command list released.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command list released.");
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release command allocator.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release direct command allocator.");
 		commandAllocator.Reset();
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command allocator released.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command allocator released.");
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release command queue.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release direct command queue.");
 		commandQueue.Reset();
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command queue released.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command queue released.");
 	}
 
 	ID3D12CommandQueue& Direct3D12GraphicsPipeline::CommandQueue() noexcept
@@ -151,144 +173,183 @@ namespace PonyEngine::Render
 		return *commandQueue.Get();
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateCommands(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateCommands()
 	{
-		ResetQueue();
-		PopulateResourceBarriersIn(bufferIndex);
-		PopulateRenderTarget(bufferIndex);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command lists.");
+		ResetLists();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers in.");
+		PopulateResourceBarriersIn();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render target.");
+		PopulateRenderTarget();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Get render objects.");
+		GetRenderObjects();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render objects.");
 		PopulateRenderObjects();
-		PopulateResourceBarriersOut(bufferIndex);
-		CloseQueue();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers out.");
+		PopulateResourceBarriersOut();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Close command lists.");
+		CloseLists();
 	}
 
 	void Direct3D12GraphicsPipeline::Execute()
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command list.");
-		ID3D12CommandList* const commandLists[] = { commandList.Get() };
-		commandQueue->ExecuteCommandLists(1, commandLists);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command lists.");
+		const auto commandLists = std::array<ID3D12CommandList*, 1> { commandList.Get() };
+		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 	}
 
-	void Direct3D12GraphicsPipeline::ResetQueue()
+	void Direct3D12GraphicsPipeline::ResetLists()
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command allocator.");
 		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command list.");
 		if (const HRESULT result = commandList->Reset(commandAllocator.Get(), nullptr); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersIn(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateResourceBarriersIn()
 	{
-		ID3D12Resource2& backBuffer = d3d12System->RenderTarget().GetBackBuffer(bufferIndex);
-
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
 			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = &backBuffer,
-				.Subresource = 0,
+				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
+				.Subresource = 0u,
 				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
 				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 			}
 		};
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' as render target.", reinterpret_cast<std::uintptr_t>(&backBuffer));
-		commandList->ResourceBarrier(1, &renderTargetBarrier);
+		commandList->ResourceBarrier(1u, &renderTargetBarrier);
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateRenderTarget(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateRenderTarget()
 	{
-		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTarget();
-		const IDirect3D12DepthStencilPrivate& depthStencil = d3d12System->DepthStencil();
-
-		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.GetRtvHandle(bufferIndex);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set '0x{:X}' render target view.", rtvHandle.ptr);
-		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = depthStencil.DsvHandle();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set '0x{:X}' depth stencil view.", dsvHandle.ptr);
-		commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set clear color to {}.", renderTarget.ClearColorD3D12().ToString());
-		commandList->ClearRenderTargetView(rtvHandle, renderTarget.ClearColorD3D12().Span().data(), 0, nullptr);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Clear depth stencil view.");
+		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.CurrentRtvHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12System->DepthStencilPrivate().DsvHandle();
+		commandList->OMSetRenderTargets(1u, &rtvHandle, false, &dsvHandle);
+		commandList->ClearRenderTargetView(rtvHandle, renderTarget.ClearColorD3D12().Span().data(), 0u, nullptr);
 		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 
 		const PonyMath::Utility::Resolution<UINT>& resolution = renderTarget.ResolutionD3D12();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set render resolution to '{}'.", resolution.ToString());
 		const auto viewport = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.Width()), .Height = static_cast<FLOAT>(resolution.Height()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
 		commandList->RSSetViewports(1u, &viewport);
-		const auto rect = D3D12_RECT{ .left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height()) };
+		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height())};
 		commandList->RSSetScissorRects(1u, &rect);
+	}
+
+	void Direct3D12GraphicsPipeline::GetRenderObjects()
+	{
+		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
+		const PonyMath::Core::Matrix4x4<FLOAT> vp = renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12();
+
+		IDirect3D12RenderObjectManagerPrivate& renderObjectManager = d3d12System->RenderObjectManagerPrivate();
+		const std::size_t renderObjectCount = renderObjectManager.RenderObjectCount();
+		renderObjects.clear();
+		renderObjects.reserve(renderObjectCount);
+		for (std::size_t i = 0; i < renderObjectCount; ++i)
+		{
+			Direct3D12RenderObject& renderObject = renderObjectManager.RenderObject(i);
+			renderObjects.push_back(Direct3D12RenderObjectEntry{.renderObject = &renderObject, .mvpMatrix = vp * renderObject.ModelMatrix()});
+		}
+
+		std::ranges::sort(renderObjects, [](const Direct3D12RenderObjectEntry& left, const Direct3D12RenderObjectEntry& right)
+		{
+			const Direct3D12Material* const leftMaterial = &left.renderObject->Material();
+			const Direct3D12Material* const rightMaterial = &right.renderObject->Material();
+			const Direct3D12RootSignature* const leftRootSignature = &leftMaterial->RootSignature();
+			const Direct3D12RootSignature* const rightRootSignature = &rightMaterial->RootSignature();
+			if (leftRootSignature != rightRootSignature)
+			{
+				return reinterpret_cast<std::uintptr_t>(leftRootSignature) < reinterpret_cast<std::uintptr_t>(rightRootSignature);
+			}
+			if (leftMaterial != rightMaterial)
+			{
+				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
+			}
+
+			const Direct3D12Mesh* const leftMesh = &left.renderObject->Mesh();
+			const Direct3D12Mesh* const rightMesh = &right.renderObject->Mesh();
+			if (leftMesh != rightMesh)
+			{
+				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
+			}
+
+			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() < PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
+		});
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateRenderObjects()
 	{
-		const IDirect3D12RenderView& renderView = d3d12System->RenderView();
-		const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix = renderView.ViewMatrixD3D12();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set view matrix to '{}'.", viewMatrix.ToString());
-		const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix = renderView.ProjectionMatrixD3D12();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set projection matrix to '{}'.", projectionMatrix.ToString());
-		const PonyMath::Core::Matrix4x4<FLOAT> vp = projectionMatrix * viewMatrix;
+		const Direct3D12RootSignature* prevRootSignature = nullptr;
+		const Direct3D12Material* prevMaterial = nullptr;
+		const Direct3D12Mesh* prevMesh = nullptr;
 
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set render objects.");
-		for (auto renderObjectWeak : d3d12System->RenderObjectManager().RenderObjects())
+		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
-			std::shared_ptr<Direct3D12RenderObject> renderObject = renderObjectWeak.lock(); // TODO: Sort before rendering in the order RootSignature, PipelineState, Mesh.
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set render object at '0x{:X}.'", reinterpret_cast<std::uintptr_t>(renderObject.get()));
+			Direct3D12RenderObject* const renderObject = renderObjectEntry.renderObject;
 
-			Direct3D12Material& material = renderObject->Material();
-			Direct3D12RootSignature& rootSignature = material.RootSignature();
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set root signature at '0x{:X}.'", reinterpret_cast<std::uintptr_t>(&rootSignature.RootSignature()));
-			commandList->SetGraphicsRootSignature(&rootSignature.RootSignature());
-			ID3D12PipelineState& pipelineState = material.GetPipelineState();
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set pipeline state at '0x{:X}.'", reinterpret_cast<std::uintptr_t>(&pipelineState));
-			commandList->SetPipelineState(&pipelineState);
-			commandList->IASetPrimitiveTopology(material.PrimitiveTopology());
+			Direct3D12Material* const material = &renderObject->Material();
+			Direct3D12RootSignature* const rootSignature = &material->RootSignature();
+			if (rootSignature != prevRootSignature)
+			{
+				commandList->SetGraphicsRootSignature(&rootSignature->RootSignature());
+			}
+			if (material != prevMaterial)
+			{
+				commandList->SetPipelineState(&material->GetPipelineState());
+				commandList->IASetPrimitiveTopology(material->PrimitiveTopology());
+			}
 
-			Direct3D12Mesh& renderMesh = renderObject->Mesh();
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set render mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&renderMesh));
-			commandList->IASetVertexBuffers(0, 1, &renderMesh.VertexBufferView()); // TODO: Material has to tell slots for buffers.
-			commandList->IASetVertexBuffers(1, 1, &renderMesh.VertexColorBufferView());
-			commandList->IASetIndexBuffer(&renderMesh.VertexIndexBufferView());
+			const Direct3D12Mesh* const mesh = &renderObject->Mesh();
+			if (mesh != prevMesh || material != prevMaterial)
+			{
+				commandList->IASetVertexBuffers(material->VertexSlot(), 1, &mesh->VertexBufferView());
+				if (material->VertexColorSlot() && mesh->VertexColorBufferView())
+				{
+					commandList->IASetVertexBuffers(material->VertexColorSlot().value(), 1, &mesh->VertexColorBufferView().value());
+				}
+			}
+			if (mesh != prevMesh)
+			{
+				commandList->IASetIndexBuffer(&mesh->VertexIndexBufferView());
+			}
 
-			const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix = renderObject->ModelMatrixD3D12();
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set model matrix to '{}'.", modelMatrix.ToString());
-			const PonyMath::Core::Matrix4x4<FLOAT> mvp = vp * modelMatrix;
-			commandList->SetGraphicsRoot32BitConstants(rootSignature.MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Draw.");
-			commandList->DrawIndexedInstanced(renderMesh.IndexCount(), 1, 0, 0, 0);
+			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObjectEntry.mvpMatrix;
+			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
+
+			commandList->DrawIndexedInstanced(mesh->IndexCount(), 1, 0, 0, 0);
+
+			prevRootSignature = rootSignature;
+			prevMaterial = material;
+			prevMesh = mesh;
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersOut(const UINT bufferIndex)
+	void Direct3D12GraphicsPipeline::PopulateResourceBarriersOut()
 	{
-		ID3D12Resource2& backBuffer = d3d12System->RenderTarget().GetBackBuffer(bufferIndex);
-
 		const auto presentBarrier = D3D12_RESOURCE_BARRIER
 		{
 			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
-				.pResource = &backBuffer,
-				.Subresource = 0,
+				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
+				.Subresource = 0u,
 				.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
 				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
 			}
 		};
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer at '0x{:X}' at index '{}' as present.", reinterpret_cast<std::uintptr_t>(&backBuffer), bufferIndex);
-		commandList->ResourceBarrier(1, &presentBarrier);
+		commandList->ResourceBarrier(1u, &presentBarrier);
 	}
 
-	void Direct3D12GraphicsPipeline::CloseQueue()
+	void Direct3D12GraphicsPipeline::CloseLists()
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Close command list.");
 		if (const HRESULT result = commandList->Close(); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));

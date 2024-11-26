@@ -56,18 +56,32 @@ export namespace PonyEngine::Render
 		virtual void ClearColorD3D12(const PonyMath::Color::RGBA<FLOAT>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& GetBackBuffer(UINT index) noexcept override;
+		virtual DXGI_FORMAT RtvFormat() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& GetBackBuffer(UINT index) const noexcept override;
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
+
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE GetRtvHandle(UINT index) const noexcept override;
+		UINT CurrentBackBufferIndex() const noexcept;
+		void CurrentBackBufferIndex(UINT index) noexcept;
+
+		[[nodiscard("Pure function")]]
+		virtual ID3D12Resource2& CurrentBackBuffer() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept override;
 
 		Direct3D12RenderTarget& operator =(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
 
 	private:
+		DXGI_FORMAT rtvFormat;
+		DXGI_SAMPLE_DESC sampleDesc;
+
 		PonyMath::Utility::Resolution<UINT> resolution;
 		PonyMath::Color::RGBA<FLOAT> clearColor;
+
+		UINT currentBackBufferIndex;
 
 		IDirect3D12SystemContext* d3d12System;
 
@@ -80,8 +94,11 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	Direct3D12RenderTarget::Direct3D12RenderTarget(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params) :
+		rtvFormat{params.rtvFormat},
+		sampleDesc{params.sampleDesc},
 		resolution(params.resolution),
 		clearColor(params.clearColor),
+		currentBackBufferIndex{0u},
 		d3d12System{&d3d12System}
 	{
 		backBuffers.resize(params.backBuffers.size());
@@ -112,7 +129,7 @@ namespace PonyEngine::Render
 
 		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
 		{
-			.Format = params.rtvFormat,
+			.Format = rtvFormat,
 			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
 			.Texture2D = D3D12_TEX2D_RTV{}
 		};
@@ -152,18 +169,38 @@ namespace PonyEngine::Render
 		clearColor = color;
 	}
 
-	ID3D12Resource2& Direct3D12RenderTarget::GetBackBuffer(const UINT index) noexcept
+	DXGI_FORMAT Direct3D12RenderTarget::RtvFormat() const noexcept
 	{
-		return *backBuffers[index].Get();
+		return rtvFormat;
 	}
 
-	const ID3D12Resource2& Direct3D12RenderTarget::GetBackBuffer(const UINT index) const noexcept
+	DXGI_SAMPLE_DESC Direct3D12RenderTarget::SampleDesc() const noexcept
 	{
-		return *backBuffers[index].Get();
+		return sampleDesc;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::GetRtvHandle(const UINT index) const noexcept
+	UINT Direct3D12RenderTarget::CurrentBackBufferIndex() const noexcept
 	{
-		return rtvHandles[index];
+		return currentBackBufferIndex;
+	}
+
+	void Direct3D12RenderTarget::CurrentBackBufferIndex(const UINT index) noexcept
+	{
+		currentBackBufferIndex = index;
+	}
+
+	ID3D12Resource2& Direct3D12RenderTarget::CurrentBackBuffer() noexcept
+	{
+		return *backBuffers[currentBackBufferIndex].Get();
+	}
+
+	const ID3D12Resource2& Direct3D12RenderTarget::CurrentBackBuffer() const noexcept
+	{
+		return *backBuffers[currentBackBufferIndex].Get();
+	}
+
+	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::CurrentRtvHandle() const noexcept
+	{
+		return rtvHandles[currentBackBufferIndex];
 	}
 }
