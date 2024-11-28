@@ -22,58 +22,65 @@ import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 waiter.
+	/// @details It's a wrapper over @p Direct3D12Fence that adds a wait event.
 	class Direct3D12Waiter final
 	{
 	public:
+		/// @brief Creates a @p Direct3D12Waiter.
+		/// @param d3d12System Direct3D12 system context.
+		/// @param commandQueue Command queue.
+		/// @param waitTimeout Wait timeout.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Waiter(IDirect3D12SystemContext& render, ID3D12CommandQueue& commandQueue, DWORD waitTimeout);
+		Direct3D12Waiter(IDirect3D12SystemContext& d3d12System, ID3D12CommandQueue& commandQueue, DWORD waitTimeout);
 		Direct3D12Waiter(const Direct3D12Waiter&) = delete;
 		Direct3D12Waiter(Direct3D12Waiter&&) = delete;
 
 		~Direct3D12Waiter() noexcept;
 
+		/// @brief Waits for the command queue fence.
 		void Wait();
 
 		Direct3D12Waiter& operator =(const Direct3D12Waiter&) = delete;
 		Direct3D12Waiter& operator =(Direct3D12Waiter&&) = delete;
 
 	private:
-		DWORD waitTimeout;
+		DWORD waitTimeout; ///< Wait timeout.
 
-		IDirect3D12SystemContext* render;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::unique_ptr<Direct3D12Fence> fence;
-		HANDLE waitEvent;
+		std::unique_ptr<Direct3D12Fence> fence; ///< Fence.
+		HANDLE waitEvent; ///< Wait event.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12SystemContext& render, ID3D12CommandQueue& commandQueue, const DWORD waitTimeout) :
+	Direct3D12Waiter::Direct3D12Waiter(IDirect3D12SystemContext& d3d12System, ID3D12CommandQueue& commandQueue, const DWORD waitTimeout) :
 		waitTimeout{waitTimeout},
-		render{&render},
-		fence(std::make_unique<Direct3D12Fence>(render, commandQueue))
+		d3d12System{&d3d12System},
+		fence(std::make_unique<Direct3D12Fence>(d3d12System, commandQueue))
 	{
-		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Create wait event.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create wait event.");
 		if ((waitEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create wait event. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->render->Logger(), PonyDebug::Log::LogType::Info, "Wait event created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(waitEvent));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Wait event created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(waitEvent));
 	}
 
 	Direct3D12Waiter::~Direct3D12Waiter() noexcept
 	{
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Close wait event.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Close wait event.");
 		if (!CloseHandle(waitEvent)) [[unlikely]]
 		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Error, "Failed to close wait event. Error code: '0x{:X}'", GetLastError());
+			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Error, "Failed to close wait event. Error code: '0x{:X}'", GetLastError());
 		}
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Wait event closed.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Wait event closed.");
 
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D 12 fence.");
 		fence.reset();
-		PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 fence destroyed.");
 	}
 
 	void Direct3D12Waiter::Wait()
@@ -82,7 +89,7 @@ namespace PonyEngine::Render
 
 		if (const UINT64 currentFenceValue = fence->CurrentValue(); fence->CompletedValue() < currentFenceValue)
 		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "Set wait event. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, waitTimeout);
+			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set wait event. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, waitTimeout);
 			fence->SetEvent(currentFenceValue, waitEvent);
 			if (const DWORD result = WaitForSingleObjectEx(waitEvent, waitTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
 			{
@@ -91,7 +98,7 @@ namespace PonyEngine::Render
 		}
 		else
 		{
-			PONY_LOG(render->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
+			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
 		}
 	}
 }

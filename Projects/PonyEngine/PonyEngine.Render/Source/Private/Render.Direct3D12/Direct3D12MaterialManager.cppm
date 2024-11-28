@@ -11,14 +11,19 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12MaterialManager;
 
 import <cstddef>;
+import <cstdint>;
 import <memory>;
 import <optional>;
 import <stdexcept>;
 import <type_traits>;
 import <vector>;
+
+import PonyDebug.Log;
 
 import :Direct3D12InputElementParams;
 import :Direct3D12Material;
@@ -27,6 +32,7 @@ import :Direct3D12RootSignature;
 import :Direct3D12Shader;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12MaterialManagerPrivate;
+import :IDirect3D12MeshManagerPrivate;
 import :IDirect3D12RenderTargetPrivate;
 import :IDirect3D12SystemContext;
 
@@ -49,7 +55,7 @@ export namespace PonyEngine::Render
 		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
 			const Direct3D12PipelineParams& pipelineParams) override;
 
-		/// @brief Cleans dead materials.
+		/// @brief Cleans out of dead materials.
 		void Clean() noexcept;
 
 		Direct3D12MaterialManager& operator =(const Direct3D12MaterialManager&) = delete;
@@ -74,8 +80,7 @@ namespace PonyEngine::Render
 	std::shared_ptr<Direct3D12Material> Direct3D12MaterialManager::CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
 		const Direct3D12PipelineParams& pipelineParams)
 	{
-		// TODO: It should try to find a material with the same parameters first. Seems that's the only thing I need to do is to make std::shared_ptv<Direct3D12Shader>.
-		// TODO: Later it must use Resource system types.
+		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
 
 		auto blendState = D3D12_BLEND_DESC
 		{
@@ -138,13 +143,15 @@ namespace PonyEngine::Render
 			}
 		};
 
-		inputLayout.clear();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Set input layout.");
+		const IDirect3D12MeshManagerPrivate& meshManager = d3d12System->MeshManagerPrivate();
 		const Direct3D12InputElementParams& vertexInput = pipelineParams.vertexInputParams;
+		inputLayout.clear();
 		inputLayout.push_back(D3D12_INPUT_ELEMENT_DESC
 		{
 			.SemanticName = vertexInput.semanticName,
 			.SemanticIndex = vertexInput.semanticIndex,
-			.Format = DXGI_FORMAT_R32G32B32_FLOAT,
+			.Format = meshManager.VertexFormat().VertexFormat(),
 			.InputSlot = vertexInput.inputSlot,
 			.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
 			.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
@@ -157,14 +164,16 @@ namespace PonyEngine::Render
 			{
 				.SemanticName = vertexColorInput.semanticName,
 				.SemanticIndex = vertexColorInput.semanticIndex,
-				.Format = DXGI_FORMAT_R32G32B32A32_FLOAT,
+				.Format = meshManager.VertexColorFormat().VertexFormat(),
 				.InputSlot = vertexColorInput.inputSlot,
 				.AlignedByteOffset = D3D12_APPEND_ALIGNED_ELEMENT,
 				.InputSlotClass = D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA,
 				.InstanceDataStepRate = 0u
 			});
 		}
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Input layout set.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline state.");
 		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
 		const auto gfxPsd = D3D12_GRAPHICS_PIPELINE_STATE_DESC
 		{
@@ -185,12 +194,12 @@ namespace PonyEngine::Render
 			.NodeMask = 0u,
 			.Flags = D3D12_PIPELINE_STATE_FLAG_NONE
 		};
-
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
 		if (const HRESULT result = d3d12System->Device().CreateGraphicsPipelineState(&gfxPsd, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline state created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.Get()));
 
 		const auto materialParams = Direct3D12MaterialParams
 		{

@@ -15,6 +15,8 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12IndexFormat;
 
 import <stdexcept>;
 
+import PonyBase.StringUtility;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 index format.
@@ -24,31 +26,32 @@ export namespace PonyEngine::Render
 		/// @brief Creates a @p Direct3D12IndexFormat.
 		/// @param indexSize Index size in bytes. Must be 2 or 4.
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12IndexFormat(UINT indexSize);
+		constexpr explicit Direct3D12IndexFormat(UINT indexSize);
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexFormat(const Direct3D12IndexFormat& other) noexcept = default;
+		constexpr Direct3D12IndexFormat(const Direct3D12IndexFormat& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		Direct3D12IndexFormat(Direct3D12IndexFormat&& other) noexcept = default;
+		constexpr Direct3D12IndexFormat(Direct3D12IndexFormat&& other) noexcept = default;
 
-		~Direct3D12IndexFormat() noexcept = default;
+		constexpr ~Direct3D12IndexFormat() noexcept = default;
 
 		/// @brief Gets the index size.
 		/// @return Index size in bytes.
 		[[nodiscard("Pure function")]]
-		UINT IndexSize() const noexcept;
+		constexpr UINT IndexSize() const noexcept;
 		/// @brief Gets the index format.
 		/// @return Index format.
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT IndexFormat() const noexcept;
+		constexpr DXGI_FORMAT IndexFormat() const noexcept;
 
-		Direct3D12IndexFormat& operator =(const Direct3D12IndexFormat& other) noexcept = default;
-		Direct3D12IndexFormat& operator =(Direct3D12IndexFormat&&) noexcept = default;
+		constexpr Direct3D12IndexFormat& operator =(const Direct3D12IndexFormat& other) noexcept = default;
+		constexpr Direct3D12IndexFormat& operator =(Direct3D12IndexFormat&&) noexcept = default;
 
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const Direct3D12IndexFormat&) const noexcept = default;
+		constexpr bool operator ==(const Direct3D12IndexFormat&) const noexcept = default;
 
 	private:
 		UINT indexSize; ///< Index size.
+		DXGI_FORMAT indexFormat; ///< Index format.
 	};
 }
 
@@ -58,25 +61,25 @@ namespace PonyEngine::Render
 	/// @param indexSize Index size in bytes. Must be 2 or 4.
 	/// @return Index format.
 	[[nodiscard("Pure constructor")]]
-	DXGI_FORMAT GetFormat(UINT indexSize); // TODO: Move functions like this to Utility sub-module.
+	constexpr DXGI_FORMAT GetFormat(UINT indexSize); // TODO: Move functions like this to Utility sub-module.
 
-	Direct3D12IndexFormat::Direct3D12IndexFormat(const UINT indexSize) :
-		indexSize{indexSize}
+	constexpr Direct3D12IndexFormat::Direct3D12IndexFormat(const UINT indexSize) :
+		indexSize{indexSize},
+		indexFormat{GetFormat(this->indexSize)}
 	{
-		[[maybe_unused]] const DXGI_FORMAT format = GetFormat(indexSize); // Throws an exception if the indexSize is incorrect to invalidate the instance.
 	}
 
-	UINT Direct3D12IndexFormat::IndexSize() const noexcept
+	constexpr UINT Direct3D12IndexFormat::IndexSize() const noexcept
 	{
 		return indexSize;
 	}
 
-	DXGI_FORMAT Direct3D12IndexFormat::IndexFormat() const noexcept
+	constexpr DXGI_FORMAT Direct3D12IndexFormat::IndexFormat() const noexcept
 	{
-		return GetFormat(indexSize);
+		return indexFormat;
 	}
 
-	DXGI_FORMAT GetFormat(const UINT indexSize)
+	constexpr DXGI_FORMAT GetFormat(const UINT indexSize)
 	{
 		switch (indexSize)
 		{
@@ -85,7 +88,7 @@ namespace PonyEngine::Render
 		case 4:
 			return DXGI_FORMAT_R32_UINT;
 		default: [[unlikely]]
-			throw std::invalid_argument("Unsupported index size.");
+			throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported index size. Index size: '{}'. But supported index sizes are 2 and 4 only.", indexSize));
 		}
 	}
 }

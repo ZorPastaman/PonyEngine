@@ -21,10 +21,15 @@ import :Direct3D12Shader;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 root signature manager.
 	class IDirect3D12RootSignatureManagerPrivate
 	{
 		INTERFACE_BODY(IDirect3D12RootSignatureManagerPrivate)
 
+		/// @brief Creates a root signature.
+		/// @param rootSignatureShader Root signature shader.
+		/// @param mvpIndex Model-view-projection matrix slot index.
+		/// @return 
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) = 0;
 	};

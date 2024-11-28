@@ -9,17 +9,18 @@
 
 module;
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderSystemContext;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderViewParams;
 
-import PonyEngine.Render.Detail;
+import PonyMath.Core;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render system context.
-	class IDirect3D12RenderSystemContext : public IRenderSystemContext
+	/// @brief Direct3D12 render view parameters.
+	struct Direct3D12RenderViewParams final
 	{
-		INTERFACE_BODY(IDirect3D12RenderSystemContext)
+		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix; ///< View matrix.
+		PonyMath::Core::Matrix4x4<FLOAT> projectionMatrix; ///< Projection matrix.
 	};
 }

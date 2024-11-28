@@ -7,12 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Detail;
+module;
 
-export import PonyEngine.Render.Detail;
+#include "PonyBase/Core/Direct3D12/Framework.h"
 
-export import :Direct3D12RenderTargetParams;
-export import :Direct3D12RenderViewParams;
-export import :Direct3D12System;
-export import :Direct3D12SystemParams;
-export import :IDirect3D12RenderSystemContext;
+export module PonyEngine.Render.Direct3D12:Direct3D12SwapChainParams;
+
+export namespace PonyEngine::Render
+{
+	/// @brief Direct3D12 render target parameters.
+	struct Direct3D12SwapChainParams final
+	{
+		DXGI_FORMAT rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Render target view format.
+		UINT bufferCount = 2u; ///< Buffer count.
+	};
+}

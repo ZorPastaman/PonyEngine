@@ -43,10 +43,13 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderViewParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SystemParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTargetParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexDataType.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexFormat.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12DepthStencilPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MaterialManagerPrivate.cppm" />

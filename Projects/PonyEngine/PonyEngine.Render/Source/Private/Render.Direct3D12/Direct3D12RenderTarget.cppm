@@ -11,11 +11,14 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderTarget;
 
+import <cstddef>;
 import <cstdint>;
-import <span>;
 import <stdexcept>;
+import <type_traits>;
 import <vector>;
 
 import PonyBase.StringUtility;
@@ -23,17 +26,21 @@ import PonyBase.StringUtility;
 import PonyMath.Color;
 import PonyMath.Utility;
 
-import PonyEngine.Render.Direct3D12;
+import PonyDebug.Log;
 
 import :Direct3D12RenderTargetParams;
-import :IDirect3D12SystemContext;
 import :IDirect3D12RenderTargetPrivate;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render target.
 	class Direct3D12RenderTarget final : public IDirect3D12RenderTargetPrivate
 	{
 	public:
+		/// @brief Creates a @p Direct3D12RenderTarget.
+		/// @param d3d12System Direct3D12 system context.
+		/// @param params Render target parameters.
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderTarget(IDirect3D12SystemContext& d3d12System, const Direct3D12RenderTargetParams& params);
 		Direct3D12RenderTarget(const Direct3D12RenderTarget&) = delete;
@@ -61,33 +68,37 @@ export namespace PonyEngine::Render
 		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		UINT CurrentBackBufferIndex() const noexcept;
-		void CurrentBackBufferIndex(UINT index) noexcept;
-
-		[[nodiscard("Pure function")]]
 		virtual ID3D12Resource2& CurrentBackBuffer() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept override;
 
+		/// @brief Gets the current back buffer index.
+		/// @return Current back buffer index.
+		[[nodiscard("Pure function")]]
+		UINT CurrentBackBufferIndex() const noexcept;
+		/// @brief Sets the current back buffer index.
+		/// @param index Current back buffer index to set.
+		void CurrentBackBufferIndex(UINT index) noexcept;
+
 		Direct3D12RenderTarget& operator =(const Direct3D12RenderTarget&) = delete;
 		Direct3D12RenderTarget& operator =(Direct3D12RenderTarget&&) = delete;
 
 	private:
-		DXGI_FORMAT rtvFormat;
-		DXGI_SAMPLE_DESC sampleDesc;
+		DXGI_FORMAT rtvFormat; ///< Rtv format.
+		DXGI_SAMPLE_DESC sampleDesc; ///< Rtv sample description.
 
-		PonyMath::Utility::Resolution<UINT> resolution;
-		PonyMath::Color::RGBA<FLOAT> clearColor;
+		PonyMath::Utility::Resolution<UINT> resolution; ///< Back buffers resolution.
+		PonyMath::Color::RGBA<FLOAT> clearColor; ///< Clear color.
 
-		UINT currentBackBufferIndex;
+		UINT currentBackBufferIndex; ///< Current back buffer index.
 
-		IDirect3D12SystemContext* d3d12System;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers;
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap;
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvDescriptorHeap; ///< Rtv descriptor heap.
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> rtvHandles; ///< Rtv handles.
 	};
 }
 
@@ -107,6 +118,7 @@ namespace PonyEngine::Render
 			backBuffers[i] = params.backBuffers[i];
 		}
 
+		PONY_LOG(d3d12System.Logger(), PonyDebug::Log::LogType::Info, "Create rtv descriptor heap.");
 		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
@@ -119,6 +131,8 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(d3d12System.Logger(), PonyDebug::Log::LogType::Info, "Rtv descriptor heap created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rtvDescriptorHeap.Get()));
+
 		rtvHandles.resize(backBuffers.size());
 		rtvHandles[0].ptr = rtvDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 		const UINT rtvDescriptorHandleIncrement = device.GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_RTV);
@@ -179,16 +193,6 @@ namespace PonyEngine::Render
 		return sampleDesc;
 	}
 
-	UINT Direct3D12RenderTarget::CurrentBackBufferIndex() const noexcept
-	{
-		return currentBackBufferIndex;
-	}
-
-	void Direct3D12RenderTarget::CurrentBackBufferIndex(const UINT index) noexcept
-	{
-		currentBackBufferIndex = index;
-	}
-
 	ID3D12Resource2& Direct3D12RenderTarget::CurrentBackBuffer() noexcept
 	{
 		return *backBuffers[currentBackBufferIndex].Get();
@@ -202,5 +206,15 @@ namespace PonyEngine::Render
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::CurrentRtvHandle() const noexcept
 	{
 		return rtvHandles[currentBackBufferIndex];
+	}
+
+	UINT Direct3D12RenderTarget::CurrentBackBufferIndex() const noexcept
+	{
+		return currentBackBufferIndex;
+	}
+
+	void Direct3D12RenderTarget::CurrentBackBufferIndex(const UINT index) noexcept
+	{
+		currentBackBufferIndex = index;
 	}
 }

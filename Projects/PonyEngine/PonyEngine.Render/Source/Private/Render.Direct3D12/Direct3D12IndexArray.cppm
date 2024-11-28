@@ -46,15 +46,14 @@ export namespace PonyEngine::Render
 		/// @brief Gets the index format.
 		/// @return Index format.
 		[[nodiscard("Pure function")]]
-		DXGI_FORMAT IndexFormat() const noexcept;
-		/// @brief Gets the index size.
-		/// @return Index size.
-		[[nodiscard("Pure function")]]
-		UINT IndexSize() const noexcept;
+		const Direct3D12IndexFormat& IndexFormat() const noexcept;
 		/// @brief Gets the index count.
 		/// @return Index count.
 		[[nodiscard("Pure function")]]
 		UINT IndexCount() const noexcept;
+
+		[[nodiscard("Pure function")]]
+		UINT ArraySize() const noexcept;
 
 		Direct3D12IndexArray& operator =(const Direct3D12IndexArray& other) noexcept = default;
 		Direct3D12IndexArray& operator =(Direct3D12IndexArray&& other) noexcept = default;
@@ -85,18 +84,18 @@ namespace PonyEngine::Render
 		return *indexBuffer.Get();
 	}
 
-	DXGI_FORMAT Direct3D12IndexArray::IndexFormat() const noexcept
+	const Direct3D12IndexFormat& Direct3D12IndexArray::IndexFormat() const noexcept
 	{
-		return indexFormat.IndexFormat();
-	}
-
-	UINT Direct3D12IndexArray::IndexSize() const noexcept
-	{
-		return indexFormat.IndexSize();
+		return indexFormat;
 	}
 
 	UINT Direct3D12IndexArray::IndexCount() const noexcept
 	{
 		return indexCount;
+	}
+
+	UINT Direct3D12IndexArray::ArraySize() const noexcept
+	{
+		return indexFormat.IndexSize() * indexCount;
 	}
 }

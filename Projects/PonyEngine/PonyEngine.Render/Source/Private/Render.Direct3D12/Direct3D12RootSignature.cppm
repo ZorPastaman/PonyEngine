@@ -13,13 +13,15 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RootSignature;
 
-import :Direct3D12Shader;
-
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 root signature.
 	class Direct3D12RootSignature final
 	{
 	public:
+		/// @brief Creates a @p Direct3D12RootSignature.
+		/// @param rootSignature Root signature.
+		/// @param mvpIndex Model-view-projection matrix slot index.
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RootSignature(ID3D12RootSignature& rootSignature, UINT mvpIndex);
 		[[nodiscard("Pure constructor")]]
@@ -29,11 +31,17 @@ export namespace PonyEngine::Render
 
 		~Direct3D12RootSignature() noexcept = default;
 
+		/// @brief Gets the root signature.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		ID3D12RootSignature& RootSignature() noexcept;
+		/// @brief Gets the root signature.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		const ID3D12RootSignature& RootSignature() const noexcept;
 
+		/// @brief Gets the model-view-projection matrix slot index.
+		/// @return Model-view-projection matrix slot index.
 		[[nodiscard("Pure function")]]
 		UINT MvpIndex() const noexcept;
 
@@ -41,8 +49,8 @@ export namespace PonyEngine::Render
 		Direct3D12RootSignature& operator =(Direct3D12RootSignature&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-		UINT mvpIndex; // TODO: Make optional
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
+		UINT mvpIndex; ///< Model-view-projection matrix slot index.
 	};
 }
 

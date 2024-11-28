@@ -16,31 +16,32 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderObjectManager;
 
 import <cstddef>;
+import <cstdint>;
 import <memory>;
-import <span>;
-import <stdexcept>;
-import <utility>;
 import <vector>;
 
 import PonyMath.Core;
+import PonyMath.Geometry;
 
 import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
-import PonyEngine.Render.Detail;
 
 import :Direct3D12Material;
-import :Direct3D12MaterialManager;
-import :Direct3D12Mesh;
-import :Direct3D12MeshManager;
 import :Direct3D12RenderObject;
+import :Direct3D12RootSignature;
+import :Direct3D12Shader;
 import :IDirect3D12RenderObjectManagerPrivate;
+import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render object manager.
 	class Direct3D12RenderObjectManager final : public IDirect3D12RenderObjectManagerPrivate
 	{
 	public:
+		/// @brief Creates a @p Direct3D12RenderObjectManager.
+		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
 		explicit Direct3D12RenderObjectManager(IDirect3D12SystemContext& d3d12System) noexcept;
 		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
@@ -58,17 +59,19 @@ export namespace PonyEngine::Render
 		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
 		virtual std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) override;
 
+		/// @brief Cleans out of dead render objects.
 		void Clean() const noexcept;
 
 		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
 
 	private:
-		IDirect3D12SystemContext* d3d12System;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		mutable std::vector<std::shared_ptr<Direct3D12RenderObject>> renderObjects;
+		mutable std::vector<std::shared_ptr<Direct3D12RenderObject>> renderObjects; ///< Render objects.
 
-		std::shared_ptr<Direct3D12Material> defaultMaterial;
+		// TODO: There should not be a default material. The user must create their own materials.
+		std::shared_ptr<Direct3D12Material> defaultMaterial; ///< Default material.
 	};
 }
 
@@ -77,23 +80,26 @@ namespace PonyEngine::Render
 	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(IDirect3D12SystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 root signature shader.");
+		// TODO: Add ShaderManager. But seems that there's no need of exactly ShaderManager for d3d12. I just need a ShaderResource in a ResourceSystem.
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create default material.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 root signature shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 vertex shader.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load vertex shader.");
 		const auto vertexShader = Direct3D12Shader("VertexShader");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 vertex shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load Direct3D 12 pixel shader.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Vertex shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load pixel shader.");
 		const auto pixelShader = Direct3D12Shader("PixelShader");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 pixel shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 material.");
-		const auto pipelineParams = Direct3D12PipelineParams
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pixel shader loaded.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create material.");
+		constexpr auto pipelineParams = Direct3D12PipelineParams
 		{
 			.vertexInputParams = {.semanticName = "POSITION", .semanticIndex = 0u, .inputSlot = 0u},
 			.vertexColorInputParams = Direct3D12InputElementParams{.semanticName = "COLOR", .semanticIndex = 0u, .inputSlot = 1}
 		};
 		defaultMaterial = this->d3d12System->MaterialManagerPrivate().CreateMaterial(rootSignature, vertexShader, pixelShader, pipelineParams);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct3D 12 material created.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
 	std::size_t Direct3D12RenderObjectManager::RenderObjectCount() const noexcept
@@ -118,7 +124,12 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IDirect3D12RenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
 	{
-		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
+		const std::shared_ptr<Direct3D12Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
+		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 		renderObjects.push_back(renderObject);
 
 		return renderObject;

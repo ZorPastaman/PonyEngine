@@ -55,6 +55,8 @@ export namespace PonyEngine::Render
 		Direct3D12DepthStencil& operator =(Direct3D12DepthStencil&& other) noexcept = default;
 
 	private:
+		static constexpr DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT; ///< Depth stencil format.
+
 		IDirect3D12SystemContext* d3d12System; ///< Render system context.
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> depthStencilBuffer; ///< Depth stencil buffer.
@@ -87,7 +89,7 @@ namespace PonyEngine::Render
 			.Height = resolution.Height(),
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
-			.Format = DsvFormat(),
+			.Format = DepthStencilFormat,
 			.SampleDesc = renderTarget.SampleDesc(),
 			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
 			.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
@@ -95,7 +97,7 @@ namespace PonyEngine::Render
 		};
 		const auto clearValue = D3D12_CLEAR_VALUE
 		{
-			.Format = DsvFormat(),
+			.Format = DepthStencilFormat,
 			.DepthStencil = D3D12_DEPTH_STENCIL_VALUE{.Depth = D3D12_MAX_DEPTH, .Stencil = 0u}
 		};
 		ID3D12Device10& device = d3d12System.Device();
@@ -122,7 +124,7 @@ namespace PonyEngine::Render
 
 		const auto dsvDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
 		{
-			.Format = DsvFormat(),
+			.Format = DepthStencilFormat,
 			.ViewDimension = D3D12_DSV_DIMENSION_TEXTURE2D,
 			.Flags = D3D12_DSV_FLAG_NONE
 		};
@@ -143,7 +145,7 @@ namespace PonyEngine::Render
 
 	DXGI_FORMAT Direct3D12DepthStencil::DsvFormat() const noexcept
 	{
-		return DXGI_FORMAT_D24_UNORM_S8_UINT;
+		return DepthStencilFormat;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12DepthStencil::DsvHandle() const noexcept

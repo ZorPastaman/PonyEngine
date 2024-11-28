@@ -178,7 +178,6 @@ namespace PonyEngine::Render
 
 	void DXGISystem::Present()
 	{
-		assert(swapChain && "The swap chain is nullptr.");
 		swapChain->Present();
 	}
 
