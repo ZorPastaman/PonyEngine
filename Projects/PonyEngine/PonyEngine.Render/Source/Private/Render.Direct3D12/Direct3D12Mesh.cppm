@@ -21,9 +21,14 @@ import :Direct3D12VertexArray;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 mesh.
 	class Direct3D12Mesh final
 	{
 	public:
+		/// @brief Creates a @p Direct3D12Mesh.
+		/// @param vertexArray Vertex array.
+		/// @param vertexColorArray Vertex color array. It may be @a nullptr if the mesh doesn't contain vertex colors.
+		/// @param vertexIndexArray Vertex index array.
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh(Direct3D12VertexArray& vertexArray, Direct3D12VertexArray* vertexColorArray, Direct3D12IndexArray& vertexIndexArray) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -33,12 +38,21 @@ export namespace PonyEngine::Render
 
 		~Direct3D12Mesh() noexcept = default;
 
+		/// @brief Gets the vertex buffer view.
+		/// @return Vertex buffer view.
 		[[nodiscard("Pure function")]]
 		const D3D12_VERTEX_BUFFER_VIEW& VertexBufferView() const noexcept;
+		/// @brief Gets the vertex color buffer view.
+		/// @return Vertex color buffer view. May be @a nullopt if the mesh doesn't contain vertex colors.
 		[[nodiscard("Pure function")]]
 		const std::optional<D3D12_VERTEX_BUFFER_VIEW>& VertexColorBufferView() const noexcept;
+		/// @brief Gets the vertex index buffer view.
+		/// @return Vertex index buffer view.
 		[[nodiscard("Pure function")]]
 		const D3D12_INDEX_BUFFER_VIEW& VertexIndexBufferView() const noexcept;
+
+		/// @brief Gets the index count.
+		/// @return Index count.
 		[[nodiscard("Pure function")]]
 		UINT IndexCount() const noexcept;
 
@@ -46,15 +60,15 @@ export namespace PonyEngine::Render
 		Direct3D12Mesh& operator =(Direct3D12Mesh&& other) noexcept = default;
 
 	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexColorBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexIndexBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexBuffer; ///< Vertex buffer.
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexColorBuffer; ///< Vertex color buffer.
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexIndexBuffer; ///< Vertex index buffer.
 
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-		std::optional<D3D12_VERTEX_BUFFER_VIEW> vertexColorBufferView;
-		D3D12_INDEX_BUFFER_VIEW vertexIndexView;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView; ///< Vertex buffer view.
+		std::optional<D3D12_VERTEX_BUFFER_VIEW> vertexColorBufferView; ///< Vertex color buffer view.
+		D3D12_INDEX_BUFFER_VIEW vertexIndexBufferView; ///< Vertex index buffer view.
 
-		UINT indexCount;
+		UINT indexCount; ///< Index count.
 	};
 }
 
@@ -64,9 +78,28 @@ namespace PonyEngine::Render
 		vertexBuffer(&vertexArray.VertexBuffer()),
 		vertexColorBuffer(vertexColorArray ? &vertexColorArray->VertexBuffer() : nullptr),
 		vertexIndexBuffer(&vertexIndexArray.IndexBuffer()),
-		vertexBufferView{.BufferLocation = vertexBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexArray.VertexSize() * vertexArray.VertexCount(), .StrideInBytes = vertexArray.VertexSize()},
-		vertexColorBufferView(vertexColorArray ? D3D12_VERTEX_BUFFER_VIEW{.BufferLocation = vertexColorBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexColorArray->VertexSize() * vertexColorArray->VertexCount(), .StrideInBytes = vertexColorArray->VertexSize()} : std::optional<D3D12_VERTEX_BUFFER_VIEW>(std::nullopt)),
-		vertexIndexView{.BufferLocation = vertexIndexBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexIndexArray.IndexSize() * vertexIndexArray.IndexCount(), .Format = vertexIndexArray.IndexFormat()},
+		vertexBufferView
+		{
+			.BufferLocation = vertexBuffer->GetGPUVirtualAddress(),
+			.SizeInBytes = vertexArray.ArraySize(),
+			.StrideInBytes = vertexArray.VertexFormat().VertexSize()
+		},
+		vertexColorBufferView(
+			vertexColorArray 
+				? D3D12_VERTEX_BUFFER_VIEW
+				{
+					.BufferLocation = vertexColorBuffer->GetGPUVirtualAddress(),
+					.SizeInBytes = vertexColorArray->ArraySize(),
+					.StrideInBytes = vertexColorArray->VertexFormat().VertexSize()
+				} 
+				: std::optional<D3D12_VERTEX_BUFFER_VIEW>(std::nullopt)
+		),
+		vertexIndexBufferView
+		{
+			.BufferLocation = vertexIndexBuffer->GetGPUVirtualAddress(),
+			.SizeInBytes = vertexIndexArray.ArraySize(),
+			.Format = vertexIndexArray.IndexFormat().IndexFormat()
+		},
 		indexCount{vertexIndexArray.IndexCount()}
 	{
 	}
@@ -83,7 +116,7 @@ namespace PonyEngine::Render
 
 	const D3D12_INDEX_BUFFER_VIEW& Direct3D12Mesh::VertexIndexBufferView() const noexcept
 	{
-		return vertexIndexView;
+		return vertexIndexBufferView;
 	}
 
 	UINT Direct3D12Mesh::IndexCount() const noexcept

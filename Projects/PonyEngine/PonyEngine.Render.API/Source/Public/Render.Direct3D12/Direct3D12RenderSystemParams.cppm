@@ -15,6 +15,8 @@ export module PonyEngine.Render.Direct3D12:Direct3D12RenderSystemParams;
 
 import PonyEngine.Render;
 
+import :Direct3D12SwapChainParams;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 render system parameters.
@@ -23,5 +25,7 @@ export namespace PonyEngine::Render
 		D3D_FEATURE_LEVEL featureLevel = D3D_FEATURE_LEVEL_12_2; ///< Feature level.
 		INT commandQueuePriority = D3D12_COMMAND_QUEUE_PRIORITY_HIGH; ///< Command queue priority. It will be used for every command queue.
 		DWORD renderTimeout = 20000; ///< Render timeout in milliseconds. The system throws an exception if the render time exceeds this value.
+
+		Direct3D12SwapChainParams swapChainParams; ///< Swap chain parameters.
 	};
 }

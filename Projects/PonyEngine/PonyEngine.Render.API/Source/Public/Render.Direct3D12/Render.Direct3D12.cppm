@@ -13,6 +13,7 @@ export import PonyEngine.Render;
 
 export import :Direct3D12RenderSystemFactoryParams;
 export import :Direct3D12RenderSystemParams;
+export import :Direct3D12SwapChainParams;
 export import :IDirect3D12RenderObject;
 export import :IDirect3D12RenderObjectManager;
 export import :IDirect3D12RenderSystem;

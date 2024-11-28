@@ -13,6 +13,7 @@ import <cstddef>;
 import <format>;
 import <fstream>;
 import <stdexcept>;
+import <string>;
 import <string_view>;
 import <vector>;
 
@@ -20,9 +21,12 @@ import PonyBase.StringUtility;
 
 export namespace PonyEngine::Render
 {
-	class Direct3D12Shader final // TODO: code here is too generic. So, maybe, it's better to make a generic class.
+	/// @brief Direct3D12 shader.
+	class Direct3D12Shader final // TODO: code here is too generic. So, maybe, it's better to make a generic class. It's better to change with a ResourceSystem.
 	{
 	public:
+		/// @brief Creates a @p Direct3D12Shader.
+		/// @param shaderName Shader name.
 		[[nodiscard("Pure constructor")]]
 		explicit Direct3D12Shader(std::string_view shaderName);
 		[[nodiscard("Pure constructor")]]
@@ -32,8 +36,12 @@ export namespace PonyEngine::Render
 
 		~Direct3D12Shader() noexcept = default;
 
+		/// @brief Gets the shader byte code.
+		/// @return Shader byte code.
 		[[nodiscard("Pure function")]]
 		const char* Data() const noexcept;
+		/// @brief Gets the shader byte code size.
+		/// @return Shader byte code size in bytes.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
 
@@ -41,7 +49,7 @@ export namespace PonyEngine::Render
 		Direct3D12Shader& operator =(Direct3D12Shader&& other) noexcept = default;
 
 	private:
-		std::vector<char> data;
+		std::vector<char> data; ///< Shader byte code.
 	};
 }
 

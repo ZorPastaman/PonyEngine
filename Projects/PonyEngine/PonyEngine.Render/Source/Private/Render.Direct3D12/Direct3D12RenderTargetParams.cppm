@@ -20,12 +20,13 @@ import PonyMath.Utility;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render target parameters.
 	struct Direct3D12RenderTargetParams final
 	{
-		std::span<ID3D12Resource2*> backBuffers;
-		PonyMath::Utility::Resolution<UINT> resolution;
-		PonyMath::Color::RGBA<FLOAT> clearColor;
-		DXGI_FORMAT rtvFormat;
-		DXGI_SAMPLE_DESC sampleDesc;
+		std::span<ID3D12Resource2*> backBuffers; ///< Back buffers.
+		PonyMath::Utility::Resolution<UINT> resolution; ///< Back buffer resolution.
+		PonyMath::Color::RGBA<FLOAT> clearColor; ///< Clear color.
+		DXGI_FORMAT rtvFormat; ///< Rtv format.
+		DXGI_SAMPLE_DESC sampleDesc; ///< Sample description.
 	};
 }

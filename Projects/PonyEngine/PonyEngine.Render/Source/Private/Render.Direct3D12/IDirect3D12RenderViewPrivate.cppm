@@ -9,7 +9,6 @@
 
 module;
 
-#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderViewPrivate;
@@ -18,6 +17,7 @@ import PonyEngine.Render.Direct3D12;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render target view.
 	class IDirect3D12RenderViewPrivate : public IDirect3D12RenderView
 	{
 		INTERFACE_BODY(IDirect3D12RenderViewPrivate)

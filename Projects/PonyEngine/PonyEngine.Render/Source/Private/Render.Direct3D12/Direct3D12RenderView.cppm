@@ -15,17 +15,19 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderView;
 
 import PonyMath.Core;
 
-import PonyEngine.Render.Direct3D12;
-
+import :Direct3D12RenderViewParams;
 import :IDirect3D12RenderViewPrivate;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 render view.
 	class Direct3D12RenderView final : public IDirect3D12RenderViewPrivate
 	{
 	public:
+		/// @brief Creates a @p Direct3D12RenderView.
+		/// @param params Render view parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderView(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix) noexcept;
+		explicit Direct3D12RenderView(const Direct3D12RenderViewParams& params) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RenderView(const Direct3D12RenderView& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -53,16 +55,16 @@ export namespace PonyEngine::Render
 		Direct3D12RenderView& operator =(Direct3D12RenderView&& other) noexcept = default;
 
 	private:
-		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix;
-		PonyMath::Core::Matrix4x4<FLOAT> projectionMatrix;
+		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix; ///< View matrix.
+		PonyMath::Core::Matrix4x4<FLOAT> projectionMatrix; ///< Projection matrix.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RenderView::Direct3D12RenderView(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix) noexcept :
-		viewMatrix(viewMatrix),
-		projectionMatrix(projectionMatrix)
+	Direct3D12RenderView::Direct3D12RenderView(const Direct3D12RenderViewParams& params) noexcept :
+		viewMatrix(params.viewMatrix),
+		projectionMatrix(params.projectionMatrix)
 	{
 	}
 
@@ -103,6 +105,6 @@ namespace PonyEngine::Render
 
 	void Direct3D12RenderView::ProjectionMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept
 	{
-		projectionMatrix = matrix;
+		projectionMatrix = matrix; // TODO: Add logs for different changes
 	}
 }

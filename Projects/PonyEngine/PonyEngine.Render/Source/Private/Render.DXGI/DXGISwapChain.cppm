@@ -64,6 +64,8 @@ export namespace PonyEngine::Render
 		DXGISwapChain& operator =(DXGISwapChain&& other) noexcept = default;
 
 	private:
+		static constexpr auto SampleDescription = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}; ///< Sample description.
+
 		IDXGISystemContext* dxgiSystem; ///< DXGI system context.
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
@@ -84,7 +86,7 @@ namespace PonyEngine::Render
 			.Height = swapChainParams.resolution.Height(),
 			.Format = swapChainParams.rtvFormat,
 			.Stereo = false,
-			.SampleDesc = SampleDesc(),
+			.SampleDesc = SampleDescription,
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
 			.BufferCount = swapChainParams.bufferCount,
 			.Scaling = DXGI_SCALING_STRETCH,
@@ -113,7 +115,7 @@ namespace PonyEngine::Render
 
 	DXGI_SAMPLE_DESC DXGISwapChain::SampleDesc() const noexcept
 	{
-		return DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u};
+		return SampleDescription;
 	}
 
 	UINT DXGISwapChain::GetCurrentBackBufferIndex() const noexcept
