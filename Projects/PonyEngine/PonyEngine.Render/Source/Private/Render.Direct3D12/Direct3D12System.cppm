@@ -26,8 +26,10 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
+import :Direct3D12CopyPipeline;
+import :Direct3D12CpuWaiter;
 import :Direct3D12DepthStencil;
-import :Direct3D12Fence;
+import :Direct3D12GpuWaiter;
 import :Direct3D12GraphicsPipeline;
 import :Direct3D12MaterialManager;
 import :Direct3D12MeshManager;
@@ -38,8 +40,9 @@ import :Direct3D12RenderView;
 import :Direct3D12RenderViewParams;
 import :Direct3D12RootSignatureManager;
 import :Direct3D12SystemParams;
-import :Direct3D12Waiter;
+import :IDirect3D12CopyPipeline;
 import :IDirect3D12DepthStencilPrivate;
+import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12MaterialManagerPrivate;
 import :IDirect3D12MeshManagerPrivate;
 import :IDirect3D12RenderObjectManagerPrivate;
@@ -112,13 +115,13 @@ export namespace PonyEngine::Render
 		/// @param renderViewParams Render view parameters.
 		void CreateRenderSystem(const Direct3D12RenderTargetParams& renderTargetParams, const Direct3D12RenderViewParams& renderViewParams);
 
-		/// @brief Populates render commands.
+		/// @brief Begins a new frame.
+		void BeginFrame();
+		/// @brief Renders to the back buffer at the @p bufferIndex.
 		/// @param bufferIndex Current back buffer index.
-		void PopulateCommands(UINT bufferIndex) const;
-		/// @brief Executes populated commands.
-		void Execute() const;
-		/// @brief Waits for the end of the render frame.
-		void WaitForEndOfFrame() const;
+		void Render(UINT bufferIndex);
+		/// @brief Ends a current frame.
+		void EndFrame();
 
 		Direct3D12System& operator =(const Direct3D12System&) = delete;
 		Direct3D12System& operator =(Direct3D12System&&) = delete;
@@ -169,6 +172,16 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const IDirect3D12RenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept override;
 
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12CopyPipeline& CopyPipeline() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12CopyPipeline& CopyPipeline() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12GraphicsPipeline& GraphicsPipeline() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12GraphicsPipeline& GraphicsPipeline() const noexcept override;
+
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 #ifdef _DEBUG
@@ -185,8 +198,11 @@ export namespace PonyEngine::Render
 		std::unique_ptr<Direct3D12MaterialManager> materialManager; ///< Material manager.
 		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager; ///< Render object manager.
 
+		std::unique_ptr<Direct3D12CopyPipeline> copyPipeline; ///< Copy pipeline.
 		std::unique_ptr<Direct3D12GraphicsPipeline> graphicsPipeline; ///< Graphics pipeline.
-		std::unique_ptr<Direct3D12Waiter> graphicsWaiter; ///< Graphics pipeline waiter.
+
+		std::unique_ptr<Direct3D12GpuWaiter> copyWaiter; ///< Copy pipeline waiter.
+		std::unique_ptr<Direct3D12CpuWaiter> graphicsWaiter; ///< Graphics pipeline waiter.
 	};
 }
 
@@ -214,12 +230,20 @@ namespace PonyEngine::Render
 		}
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline.");
+		copyPipeline = std::make_unique<Direct3D12CopyPipeline>(*static_cast<IDirect3D12SystemContext*>(this), params.commandQueuePriority);
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(copyPipeline.get()));
+
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline.");
 		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*static_cast<IDirect3D12SystemContext*>(this), params.commandQueuePriority);
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline created at '0x{:X}'.'", reinterpret_cast<std::uintptr_t>(graphicsPipeline.get()));
 
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline waiter.");
+		copyWaiter = std::make_unique<Direct3D12GpuWaiter>(*static_cast<IDirect3D12SystemContext*>(this), copyPipeline->CommandQueue(), graphicsPipeline->CommandQueue());
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(copyWaiter.get()));
+
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline waiter. Wait timeout: {}.", params.renderTimeout);
-		graphicsWaiter = std::make_unique<Direct3D12Waiter>(*static_cast<IDirect3D12SystemContext*>(this), graphicsPipeline->CommandQueue(), params.renderTimeout);
+		graphicsWaiter = std::make_unique<Direct3D12CpuWaiter>(*static_cast<IDirect3D12SystemContext*>(this), graphicsPipeline->CommandQueue(), params.renderTimeout);
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline waiter created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(graphicsWaiter.get()));
 	}
 
@@ -229,9 +253,17 @@ namespace PonyEngine::Render
 		graphicsWaiter.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline waiter destroyed.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline waiter.'");
+		copyWaiter.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter destroyed.'");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy graphics pipeline.'");
 		graphicsPipeline.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline destroyed.'");
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline.'");
+		copyPipeline.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline destroyed.'");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy render object manager.");
 		renderObjectManager.reset();
@@ -339,7 +371,7 @@ namespace PonyEngine::Render
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 	}
 
-	void Direct3D12System::PopulateCommands(const UINT bufferIndex) const
+	void Direct3D12System::BeginFrame()
 	{
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clean render object manager.");
 		renderObjectManager->Clean();
@@ -349,23 +381,37 @@ namespace PonyEngine::Render
 		materialManager->Clean();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clean root signature manager.");
 		rootSignatureManager->Clean();
+	}
+
+	void Direct3D12System::Render(const UINT bufferIndex)
+	{
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Populate copy pipeline commands.");
+		copyPipeline->PopulateCommands();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Execute copy pipeline.");
+		copyPipeline->Execute();
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer index to '{}'.", bufferIndex);
 		renderTarget->CurrentBackBufferIndex(bufferIndex);
+		renderObjectManager->AddRenderTasks();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Populate graphics pipeline commands.");
 		graphicsPipeline->PopulateCommands();
-	}
 
-	void Direct3D12System::Execute() const
-	{
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for copy pipeline waiter.");
+		copyWaiter->Wait();
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Execute graphics pipeline.");
 		graphicsPipeline->Execute();
 	}
 
-	void Direct3D12System::WaitForEndOfFrame() const
+	void Direct3D12System::EndFrame()
 	{
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Waits for graphics pipeline waiter.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for graphics pipeline waiter.");
 		graphicsWaiter->Wait();
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clean copy pipeline.");
+		copyPipeline->Clean();
+
+		graphicsPipeline->Clean();
 	}
 
 	PonyDebug::Log::ILogger& Direct3D12System::Logger() noexcept
@@ -456,5 +502,25 @@ namespace PonyEngine::Render
 	const IDirect3D12RenderObjectManagerPrivate& Direct3D12System::RenderObjectManagerPrivate() const noexcept
 	{
 		return *renderObjectManager;
+	}
+
+	IDirect3D12CopyPipeline& Direct3D12System::CopyPipeline() noexcept
+	{
+		return *copyPipeline;
+	}
+
+	const IDirect3D12CopyPipeline& Direct3D12System::CopyPipeline() const noexcept
+	{
+		return *copyPipeline;
+	}
+
+	IDirect3D12GraphicsPipeline& Direct3D12System::GraphicsPipeline() noexcept
+	{
+		return *graphicsPipeline;
+	}
+
+	const IDirect3D12GraphicsPipeline& Direct3D12System::GraphicsPipeline() const noexcept
+	{
+		return *graphicsPipeline;
 	}
 }

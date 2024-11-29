@@ -16,7 +16,9 @@ export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12SystemContext;
 
 import PonyDebug.Log;
 
+import :IDirect3D12CopyPipeline;
 import :IDirect3D12DepthStencilPrivate;
+import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12MaterialManagerPrivate;
 import :IDirect3D12MeshManagerPrivate;
 import :IDirect3D12RenderObjectManagerPrivate;
@@ -110,5 +112,23 @@ export namespace PonyEngine::Render
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
 		virtual const IDirect3D12RenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept = 0;
+
+		/// @brief Gets the copy pipeline.
+		/// @return Copy pipeline.
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12CopyPipeline& CopyPipeline() noexcept = 0;
+		/// @brief Gets the copy pipeline.
+		/// @return Copy pipeline.
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12CopyPipeline& CopyPipeline() const noexcept = 0;
+
+		/// @brief Gets the graphics pipeline.
+		/// @return Graphics pipeline.
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12GraphicsPipeline& GraphicsPipeline() noexcept = 0;
+		/// @brief Gets the graphics pipeline.
+		/// @return Graphics pipeline.
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12GraphicsPipeline& GraphicsPipeline() const noexcept = 0;
 	};
 }

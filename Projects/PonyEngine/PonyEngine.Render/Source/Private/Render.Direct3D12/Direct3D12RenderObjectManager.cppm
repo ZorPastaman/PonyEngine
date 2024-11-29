@@ -31,6 +31,7 @@ import :Direct3D12Material;
 import :Direct3D12RenderObject;
 import :Direct3D12RootSignature;
 import :Direct3D12Shader;
+import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12RenderObjectManagerPrivate;
 import :IDirect3D12SystemContext;
 
@@ -49,18 +50,13 @@ export namespace PonyEngine::Render
 
 		~Direct3D12RenderObjectManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual std::size_t RenderObjectCount() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual Direct3D12RenderObject& RenderObject(std::size_t index) noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12RenderObject& RenderObject(std::size_t index) const noexcept override;
-
 		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
 		virtual std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix) override;
 
+		void AddRenderTasks();
+
 		/// @brief Cleans out of dead render objects.
-		void Clean() const noexcept;
+		void Clean() noexcept;
 
 		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
@@ -68,7 +64,7 @@ export namespace PonyEngine::Render
 	private:
 		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		mutable std::vector<std::shared_ptr<Direct3D12RenderObject>> renderObjects; ///< Render objects.
+		std::vector<std::shared_ptr<Direct3D12RenderObject>> renderObjects; ///< Render objects.
 
 		// TODO: There should not be a default material. The user must create their own materials.
 		std::shared_ptr<Direct3D12Material> defaultMaterial; ///< Default material.
@@ -102,21 +98,6 @@ namespace PonyEngine::Render
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
-	std::size_t Direct3D12RenderObjectManager::RenderObjectCount() const noexcept
-	{
-		return renderObjects.size();
-	}
-
-	Direct3D12RenderObject& Direct3D12RenderObjectManager::RenderObject(const std::size_t index) noexcept
-	{
-		return *renderObjects[index].get();
-	}
-
-	const Direct3D12RenderObject& Direct3D12RenderObjectManager::RenderObject(const std::size_t index) const noexcept
-	{
-		return *renderObjects[index].get();
-	}
-
 	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
 	{
 		return std::static_pointer_cast<IRenderObject>(CreateObjectD3D12(mesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)));
@@ -129,13 +110,22 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
 		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 		renderObjects.push_back(renderObject);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 
 		return renderObject;
 	}
 
-	void Direct3D12RenderObjectManager::Clean() const noexcept
+	void Direct3D12RenderObjectManager::AddRenderTasks()
+	{
+		IDirect3D12GraphicsPipeline& graphicsPipeline = d3d12System->GraphicsPipeline();
+		for (const std::shared_ptr<Direct3D12RenderObject>& renderObject : renderObjects)
+		{
+			graphicsPipeline.AddRenderTask(renderObject);
+		}
+	}
+
+	void Direct3D12RenderObjectManager::Clean() noexcept
 	{
 		for (std::size_t i = renderObjects.size(); i-- > 0; )
 		{

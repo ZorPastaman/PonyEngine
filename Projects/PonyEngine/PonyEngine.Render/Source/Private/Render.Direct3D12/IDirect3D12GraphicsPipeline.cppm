@@ -11,19 +11,20 @@ module;
 
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderObjectManagerPrivate;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12GraphicsPipeline;
 
-import <cstddef>;
-
-import PonyEngine.Render.Direct3D12;
+import <memory>;
 
 import :Direct3D12RenderObject;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render object manager.
-	class IDirect3D12RenderObjectManagerPrivate : public IDirect3D12RenderObjectManager
+	class IDirect3D12GraphicsPipeline
 	{
-		INTERFACE_BODY(IDirect3D12RenderObjectManagerPrivate)
+		INTERFACE_BODY(IDirect3D12GraphicsPipeline)
+
+		virtual void AddVertexInitializationTask(ID3D12Resource2& vertexBuffer) = 0;
+		virtual void AddIndexInitializationTask(ID3D12Resource2& indexBuffer) = 0;
+		virtual void AddRenderTask(const std::shared_ptr<Direct3D12RenderObject>& renderObject) = 0;
 	};
 }

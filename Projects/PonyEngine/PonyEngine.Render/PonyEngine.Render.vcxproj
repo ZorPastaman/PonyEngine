@@ -38,7 +38,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12DepthStencil.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GpuWaiter.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12InputElementParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm" />
@@ -50,8 +52,10 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexDataType.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexFormat.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CpuWaiter.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12CopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12DepthStencilPrivate.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12GraphicsPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MaterialManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MeshManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderObjectManagerPrivate.cppm" />
