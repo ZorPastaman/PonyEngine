@@ -19,6 +19,7 @@ import <algorithm>;
 import <array>;
 import <cstddef>;
 import <cstdint>;
+import <memory>;
 import <stdexcept>;
 import <type_traits>;
 import <vector>;
@@ -30,12 +31,13 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Utility;
 
+import :Direct3D12Fence;
 import :Direct3D12Material;
 import :Direct3D12Mesh;
 import :Direct3D12RootSignature;
 import :Direct3D12RenderObject;
 import :IDirect3D12DepthStencilPrivate;
-import :IDirect3D12RenderObjectManagerPrivate;
+import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12RenderTargetPrivate;
 import :IDirect3D12RenderViewPrivate;
 import :IDirect3D12SystemContext;
@@ -43,7 +45,7 @@ import :IDirect3D12SystemContext;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 graphics pipeline.
-	class Direct3D12GraphicsPipeline final
+	class Direct3D12GraphicsPipeline final : public IDirect3D12GraphicsPipeline
 	{
 	public:
 		/// @brief Creates a @p Direct3D12GraphicsPipeline.
@@ -65,10 +67,15 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
+		virtual void AddVertexInitializationTask(ID3D12Resource2& vertexBuffer) override;
+		virtual void AddIndexInitializationTask(ID3D12Resource2& indexBuffer) override;
+		virtual void AddRenderTask(const std::shared_ptr<Direct3D12RenderObject>& renderObject) override;
+
 		/// @brief Populates commands. All the system components must be ready.
 		void PopulateCommands();
 		/// @brief Executes populated commands.
 		void Execute();
+		void Clean() noexcept;
 
 		Direct3D12GraphicsPipeline& operator =(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline& operator =(Direct3D12GraphicsPipeline&&) = delete;
@@ -77,7 +84,7 @@ export namespace PonyEngine::Render
 		/// @brief Direct3D12 render object entry. It's used in the cache.
 		struct Direct3D12RenderObjectEntry final
 		{
-			Direct3D12RenderObject* renderObject; ///< Render object.
+			std::shared_ptr<Direct3D12RenderObject> renderObject; ///< Render object.
 			PonyMath::Core::Matrix4x4<FLOAT> mvpMatrix; ///< Model-view-projection matrix.
 		};
 
@@ -85,10 +92,12 @@ export namespace PonyEngine::Render
 		void ResetLists();
 		/// @brief Populates resource barriers to make resources ready for rendering.
 		void PopulateResourceBarriersIn();
+		void PopulateVertexBarriers();
+		void PopulateIndexBarriers();
 		/// @brief Populates render target commands.
 		void PopulateRenderTarget();
-		/// @brief Gets render objects to render and sorts them. The result is in the @p renderObjects.
-		void GetRenderObjects();
+		void UpdateMvps();
+		void SortRenderObjects();
 		/// @brief Populates render objects that were gotten in the @p GetRenderObjects().
 		void PopulateRenderObjects();
 		/// @brief Populates resource barriers back.
@@ -104,7 +113,11 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
-		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects cache.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> vertices;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> indices;
+		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects.
+
+		std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers; ///< Resource barriers cache.
 	};
 }
 
@@ -173,16 +186,33 @@ namespace PonyEngine::Render
 		return *commandQueue.Get();
 	}
 
+	void Direct3D12GraphicsPipeline::AddVertexInitializationTask(ID3D12Resource2& vertexBuffer)
+	{
+		vertices.emplace_back(&vertexBuffer);
+	}
+
+	void Direct3D12GraphicsPipeline::AddIndexInitializationTask(ID3D12Resource2& indexBuffer)
+	{
+		indices.emplace_back(&indexBuffer);
+	}
+
+	void Direct3D12GraphicsPipeline::AddRenderTask(const std::shared_ptr<Direct3D12RenderObject>& renderObject)
+	{
+		renderObjects.push_back(Direct3D12RenderObjectEntry{.renderObject = renderObject});
+	}
+
 	void Direct3D12GraphicsPipeline::PopulateCommands()
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command lists.");
 		ResetLists();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers in.");
 		PopulateResourceBarriersIn();
+		PopulateVertexBarriers();
+		PopulateIndexBarriers();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render target.");
 		PopulateRenderTarget();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Get render objects.");
-		GetRenderObjects();
+		UpdateMvps();
+		SortRenderObjects();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render objects.");
 		PopulateRenderObjects();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers out.");
@@ -196,6 +226,13 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command lists.");
 		const auto commandLists = std::array<ID3D12CommandList*, 1> { commandList.Get() };
 		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+	}
+
+	void Direct3D12GraphicsPipeline::Clean() noexcept
+	{
+		vertices.clear();
+		indices.clear();
+		renderObjects.clear();
 	}
 
 	void Direct3D12GraphicsPipeline::ResetLists()
@@ -219,12 +256,72 @@ namespace PonyEngine::Render
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
 				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
-				.Subresource = 0u,
+				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
 				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 			}
 		};
 		commandList->ResourceBarrier(1u, &renderTargetBarrier);
+	}
+
+	void Direct3D12GraphicsPipeline::PopulateVertexBarriers()
+	{
+		if (vertices.empty())
+		{
+			return;
+		}
+
+		resourceBarriers.clear();
+		resourceBarriers.reserve(vertices.size());
+
+		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexBuffer : vertices)
+		{
+			const auto vertexBarrier = D3D12_RESOURCE_BARRIER
+			{
+				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+				.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
+				{
+					.pResource = vertexBuffer.Get(),
+					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+					.StateBefore = D3D12_RESOURCE_STATE_COMMON,
+					.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER
+				}
+			};
+			resourceBarriers.push_back(vertexBarrier);
+		}
+
+		commandList->ResourceBarrier(static_cast<UINT>(resourceBarriers.size()), resourceBarriers.data());
+	}
+
+	void Direct3D12GraphicsPipeline::PopulateIndexBarriers()
+	{
+		if (indices.empty())
+		{
+			return;
+		}
+
+		resourceBarriers.clear();
+		resourceBarriers.reserve(indices.size());
+
+		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& indexBuffer : indices)
+		{
+			const auto indexBarrier = D3D12_RESOURCE_BARRIER
+			{
+				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+				.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
+				{
+					.pResource = indexBuffer.Get(),
+					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+					.StateBefore = D3D12_RESOURCE_STATE_COMMON,
+					.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER
+				}
+			};
+			resourceBarriers.push_back(indexBarrier);
+		}
+
+		commandList->ResourceBarrier(static_cast<UINT>(resourceBarriers.size()), resourceBarriers.data());
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateRenderTarget()
@@ -243,21 +340,18 @@ namespace PonyEngine::Render
 		commandList->RSSetScissorRects(1u, &rect);
 	}
 
-	void Direct3D12GraphicsPipeline::GetRenderObjects()
+	void Direct3D12GraphicsPipeline::UpdateMvps()
 	{
 		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
 		const PonyMath::Core::Matrix4x4<FLOAT> vp = renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12();
-
-		IDirect3D12RenderObjectManagerPrivate& renderObjectManager = d3d12System->RenderObjectManagerPrivate();
-		const std::size_t renderObjectCount = renderObjectManager.RenderObjectCount();
-		renderObjects.clear();
-		renderObjects.reserve(renderObjectCount);
-		for (std::size_t i = 0; i < renderObjectCount; ++i)
+		for (Direct3D12RenderObjectEntry& renderObject : renderObjects)
 		{
-			Direct3D12RenderObject& renderObject = renderObjectManager.RenderObject(i);
-			renderObjects.push_back(Direct3D12RenderObjectEntry{.renderObject = &renderObject, .mvpMatrix = vp * renderObject.ModelMatrix()});
+			renderObject.mvpMatrix = vp * renderObject.renderObject->ModelMatrixD3D12();
 		}
+	}
 
+	void Direct3D12GraphicsPipeline::SortRenderObjects()
+	{
 		std::ranges::sort(renderObjects, [](const Direct3D12RenderObjectEntry& left, const Direct3D12RenderObjectEntry& right)
 		{
 			const Direct3D12Material* const leftMaterial = &left.renderObject->Material();
@@ -290,11 +384,9 @@ namespace PonyEngine::Render
 		const Direct3D12Material* prevMaterial = nullptr;
 		const Direct3D12Mesh* prevMesh = nullptr;
 
-		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		for (const Direct3D12RenderObjectEntry& renderObject : renderObjects)
 		{
-			Direct3D12RenderObject* const renderObject = renderObjectEntry.renderObject;
-
-			Direct3D12Material* const material = &renderObject->Material();
+			Direct3D12Material* const material = &renderObject.renderObject->Material();
 			Direct3D12RootSignature* const rootSignature = &material->RootSignature();
 			if (rootSignature != prevRootSignature)
 			{
@@ -306,7 +398,7 @@ namespace PonyEngine::Render
 				commandList->IASetPrimitiveTopology(material->PrimitiveTopology());
 			}
 
-			const Direct3D12Mesh* const mesh = &renderObject->Mesh();
+			const Direct3D12Mesh* const mesh = &renderObject.renderObject->Mesh();
 			if (mesh != prevMesh || material != prevMaterial)
 			{
 				commandList->IASetVertexBuffers(material->VertexSlot(), 1, &mesh->VertexBufferView());
@@ -320,7 +412,7 @@ namespace PonyEngine::Render
 				commandList->IASetIndexBuffer(&mesh->VertexIndexBufferView());
 			}
 
-			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObjectEntry.mvpMatrix;
+			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObject.mvpMatrix;
 			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
 
 			commandList->DrawIndexedInstanced(mesh->IndexCount(), 1, 0, 0, 0);
@@ -340,7 +432,7 @@ namespace PonyEngine::Render
 			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
 			{
 				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
-				.Subresource = 0u,
+				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 				.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
 				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
 			}

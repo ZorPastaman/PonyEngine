@@ -17,32 +17,22 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Windows.Detail:WindowsDirect3D12RenderSystem;
 
-import <array>;
+import <cstddef>;
 import <cstdint>;
 import <memory>;
-import <optional>;
-import <span>;
 import <stdexcept>;
 import <type_traits>;
 import <vector>;
 
 import PonyBase.StringUtility;
 
-import PonyMath.Color;
-import PonyMath.Core;
-import PonyMath.Geometry;
-import PonyMath.Utility;
-
 import PonyDebug.Log;
 
 import PonyEngine.Core;
-import PonyEngine.Window.Windows;
-
 import PonyEngine.Render.Direct3D12.Windows;
-
-import PonyEngine.Render.Detail;
 import PonyEngine.Render.Direct3D12.Detail;
 import PonyEngine.Render.DXGI.Detail;
+import PonyEngine.Window.Windows;
 
 export namespace PonyEngine::Render
 {
@@ -217,16 +207,14 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Tick()
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Populate commands.");
-		direct3D12SubSystem->PopulateCommands(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex());
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Execute.");
-		direct3D12SubSystem->Execute();
-
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
+		direct3D12SubSystem->BeginFrame();
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Render.");
+		direct3D12SubSystem->Render(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex());
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
 		dxgiSubSystem->Present();
-
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of previous frame.");
-		direct3D12SubSystem->WaitForEndOfFrame();
+		direct3D12SubSystem->EndFrame();
 	}
 
 	IDirect3D12RenderTarget& WindowsDirect3D12RenderSystem::RenderTarget() noexcept

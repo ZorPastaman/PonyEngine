@@ -9,21 +9,17 @@
 
 module;
 
+#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12RenderObjectManagerPrivate;
-
-import <cstddef>;
-
-import PonyEngine.Render.Direct3D12;
-
-import :Direct3D12RenderObject;
+export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12CopyPipeline;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render object manager.
-	class IDirect3D12RenderObjectManagerPrivate : public IDirect3D12RenderObjectManager
+	class IDirect3D12CopyPipeline
 	{
-		INTERFACE_BODY(IDirect3D12RenderObjectManagerPrivate)
+		INTERFACE_BODY(IDirect3D12CopyPipeline)
+
+		virtual void AddCopyTask(ID3D12Resource2& source, ID3D12Resource2& destination) = 0;
 	};
 }

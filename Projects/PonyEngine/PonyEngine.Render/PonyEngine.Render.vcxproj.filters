@@ -91,7 +91,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Waiter.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CpuWaiter.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm">
@@ -176,6 +176,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderViewParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CopyPipeline.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12CopyPipeline.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GpuWaiter.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12GraphicsPipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
