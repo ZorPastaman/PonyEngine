@@ -49,6 +49,10 @@ export namespace PonyEngine::Render
 		virtual DXGI_FORMAT DsvFormat() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual ID3D12Resource2& DepthStencilBuffer() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12Resource2& DepthStencilBuffer() const noexcept override;
+		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept override;
 
 		Direct3D12DepthStencil& operator =(const Direct3D12DepthStencil& other) noexcept = default;
@@ -146,6 +150,16 @@ namespace PonyEngine::Render
 	DXGI_FORMAT Direct3D12DepthStencil::DsvFormat() const noexcept
 	{
 		return DepthStencilFormat;
+	}
+
+	ID3D12Resource2& Direct3D12DepthStencil::DepthStencilBuffer() noexcept
+	{
+		return *depthStencilBuffer.Get();
+	}
+
+	const ID3D12Resource2& Direct3D12DepthStencil::DepthStencilBuffer() const noexcept
+	{
+		return *depthStencilBuffer.Get();
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12DepthStencil::DsvHandle() const noexcept
