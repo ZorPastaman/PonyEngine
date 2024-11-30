@@ -213,7 +213,7 @@ namespace PonyEngine::Render
 		direct3D12SubSystem->Render(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex());
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
 		dxgiSubSystem->Present();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of previous frame.");
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of frame.");
 		direct3D12SubSystem->EndFrame();
 	}
 

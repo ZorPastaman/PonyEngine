@@ -39,6 +39,7 @@ import :Direct3D12Mesh;
 import :Direct3D12VertexArray;
 import :Direct3D12VertexFormat;
 import :IDirect3D12CopyPipeline;
+import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12MeshManagerPrivate;
 import :IDirect3D12SystemContext;
 
@@ -213,7 +214,9 @@ namespace PonyEngine::Render
 		d3d12System->CopyPipeline().AddCopyTask(*uploadVertexBuffer.Get(), *gpuVertexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
 		d3d12System->GraphicsPipeline().AddVertexInitializationTask(*gpuVertexBuffer.Get());
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
 
 		return Direct3D12VertexArray(*gpuVertexBuffer.Get(), MeshVertexFormat, vertexCount);
 	}
@@ -271,7 +274,9 @@ namespace PonyEngine::Render
 		d3d12System->CopyPipeline().AddCopyTask(*uploadColorBuffer.Get(), *gpuColorBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
 		d3d12System->GraphicsPipeline().AddVertexInitializationTask(*gpuColorBuffer.Get());
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
 
 		return Direct3D12VertexArray(*gpuColorBuffer.Get(), MeshVertexColorFormat, colorCount);
 	}
@@ -324,7 +329,9 @@ namespace PonyEngine::Render
 		d3d12System->CopyPipeline().AddCopyTask(*uploadIndexBuffer.Get(), *gpuIndexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
 		d3d12System->GraphicsPipeline().AddIndexInitializationTask(*gpuIndexBuffer.Get());
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
 
 		return Direct3D12IndexArray(*gpuIndexBuffer.Get(), MeshIndexFormat, indexCount);
 	}

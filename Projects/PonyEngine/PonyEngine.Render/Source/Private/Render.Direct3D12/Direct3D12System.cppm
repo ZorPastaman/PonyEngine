@@ -392,11 +392,12 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer index to '{}'.", bufferIndex);
 		renderTarget->CurrentBackBufferIndex(bufferIndex);
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Add render tasks.");
 		renderObjectManager->AddRenderTasks();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Populate graphics pipeline commands.");
 		graphicsPipeline->PopulateCommands();
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for copy pipeline waiter.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for copy pipeline to finish.");
 		copyWaiter->Wait();
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Execute graphics pipeline.");
@@ -405,13 +406,13 @@ namespace PonyEngine::Render
 
 	void Direct3D12System::EndFrame()
 	{
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for graphics pipeline waiter.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Wait for graphics pipeline to finish.");
 		graphicsWaiter->Wait();
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clean copy pipeline.");
-		copyPipeline->Clean();
-
-		graphicsPipeline->Clean();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clear copy pipeline.");
+		copyPipeline->Clear();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clear graphics pipeline.");
+		graphicsPipeline->Clear();
 	}
 
 	PonyDebug::Log::ILogger& Direct3D12System::Logger() noexcept

@@ -28,6 +28,7 @@ import :IDirect3D12RootSignatureManagerPrivate;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 system context.
 	class IDirect3D12SystemContext
 	{
 		INTERFACE_BODY(IDirect3D12SystemContext)

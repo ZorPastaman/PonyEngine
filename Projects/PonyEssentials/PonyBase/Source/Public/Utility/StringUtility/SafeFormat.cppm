@@ -77,13 +77,20 @@ namespace PonyBase::Utility
 	{
 		try
 		{
-			return std::format(format, std::forward<Args>(args)...);
-		}
-		catch (const std::exception& e)
-		{
-			exceptionHandler(e);
+			try
+			{
+				return std::format(format, std::forward<Args>(args)...);
+			}
+			catch (const std::exception& e)
+			{
+				exceptionHandler(e);
 
-			return std::string(e.what());
+				return std::string(e.what());
+			}
+		}
+		catch (...)
+		{
+			return std::string();
 		}
 	}
 }
