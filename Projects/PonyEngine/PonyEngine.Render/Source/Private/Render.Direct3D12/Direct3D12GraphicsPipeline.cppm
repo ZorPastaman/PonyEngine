@@ -31,7 +31,6 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Utility;
 
-import :Direct3D12Fence;
 import :Direct3D12Material;
 import :Direct3D12Mesh;
 import :Direct3D12RootSignature;
@@ -75,7 +74,8 @@ export namespace PonyEngine::Render
 		void PopulateCommands();
 		/// @brief Executes populated commands.
 		void Execute();
-		void Clean() noexcept;
+		/// @brief Clears the tasks. Must be called only after finishing execution.
+		void Clear() noexcept;
 
 		Direct3D12GraphicsPipeline& operator =(const Direct3D12GraphicsPipeline&) = delete;
 		Direct3D12GraphicsPipeline& operator =(Direct3D12GraphicsPipeline&&) = delete;
@@ -90,18 +90,22 @@ export namespace PonyEngine::Render
 
 		/// @brief Resets command lists.
 		void ResetLists();
-		/// @brief Populates resource barriers to make resources ready for rendering.
-		void PopulateResourceBarriersIn();
+		/// @brief Populates render texture barriers to make resources ready for rendering.
+		void PopulateRenderTextureBarriersIn();
+		/// @brief Populates vertex initialization barriers.
 		void PopulateVertexBarriers();
+		/// @brief Populates index initialization barriers.
 		void PopulateIndexBarriers();
 		/// @brief Populates render target commands.
 		void PopulateRenderTarget();
+		/// @brief Updates model-view-projection matrices of render objects.
 		void UpdateMvps();
+		/// @brief Sorts render objects.
 		void SortRenderObjects();
 		/// @brief Populates render objects that were gotten in the @p GetRenderObjects().
 		void PopulateRenderObjects();
-		/// @brief Populates resource barriers back.
-		void PopulateResourceBarriersOut();
+		/// @brief Populates render texture barriers back.
+		void PopulateRenderTextureBarriersOut();
 		/// @brief Closes command lists.
 		void CloseLists();
 
@@ -113,8 +117,8 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> vertices;
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> indices;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> vertices; ///< Uninitialized vertices.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> indices; ///< Uninitialized indices.
 		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects.
 
 		std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers; ///< Resource barriers cache.
@@ -205,18 +209,22 @@ namespace PonyEngine::Render
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command lists.");
 		ResetLists();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers in.");
-		PopulateResourceBarriersIn();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render texture barriers in.");
+		PopulateRenderTextureBarriersIn();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate vertex barriers.");
 		PopulateVertexBarriers();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate index barriers.");
 		PopulateIndexBarriers();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render target.");
 		PopulateRenderTarget();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Update render object MVPs.");
 		UpdateMvps();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Sort render objects.");
 		SortRenderObjects();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render objects.");
 		PopulateRenderObjects();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers out.");
-		PopulateResourceBarriersOut();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render texture barriers out.");
+		PopulateRenderTextureBarriersOut();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Close command lists.");
 		CloseLists();
 	}
@@ -228,7 +236,7 @@ namespace PonyEngine::Render
 		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 	}
 
-	void Direct3D12GraphicsPipeline::Clean() noexcept
+	void Direct3D12GraphicsPipeline::Clear() noexcept
 	{
 		vertices.clear();
 		indices.clear();
@@ -247,7 +255,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersIn()
+	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersIn()
 	{
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
@@ -436,7 +444,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateResourceBarriersOut()
+	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersOut()
 	{
 		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{

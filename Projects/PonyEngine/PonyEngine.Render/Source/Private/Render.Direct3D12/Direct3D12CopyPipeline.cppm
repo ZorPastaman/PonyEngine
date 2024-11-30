@@ -15,9 +15,16 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12CopyPipeline;
 
-import PonyBase.COMUtility;
-
+import <array>;
+import <cstdint>;
+import <stdexcept>;
+import <type_traits>;
 import <vector>;
+
+import PonyBase.COMUtility;
+import PonyBase.StringUtility;
+
+import PonyDebug.Log;
 
 import :IDirect3D12CopyPipeline;
 import :IDirect3D12SystemContext;
@@ -50,8 +57,8 @@ export namespace PonyEngine::Render
 		void PopulateCommands();
 		/// @brief Executes populated commands.
 		void Execute();
-		/// @brief Cleans copy tasks. Must be called only after finishing execution.
-		void Clean() noexcept;
+		/// @brief Clears copy tasks. Must be called only after finishing execution.
+		void Clear() noexcept;
 
 		Direct3D12CopyPipeline& operator =(const Direct3D12CopyPipeline&) = delete;
 		Direct3D12CopyPipeline& operator =(Direct3D12CopyPipeline&&) = delete;
@@ -92,8 +99,11 @@ export namespace PonyEngine::Render
 		guid{PonyBase::Utility::AcquireGuid()},
 		d3d12System{&d3d12System}
 	{
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline guid: '{}'.", PonyBase::Utility::ToString(guid));
+
 		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_COPY;
 
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command queue. Priority: '{}'.", commandQueuePriority);
 		const auto commandQueueDescription = D3D12_COMMAND_QUEUE_DESC
 		{
 			.Type = commandListType,
@@ -106,28 +116,42 @@ export namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command queue with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command queue acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandQueue.Get()));
 
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command allocator.");
 		if (const HRESULT result = device.CreateCommandAllocator(commandListType, IID_PPV_ARGS(commandAllocator.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command allocator acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandAllocator.Get()));
 
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command list.");
 		if (const HRESULT result = device.CreateCommandList1(0, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command list acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(commandList.Get()));
 	}
 
 	Direct3D12CopyPipeline::~Direct3D12CopyPipeline() noexcept
 	{
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command list.");
 		commandList.Reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command list released.");
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command allocator.");
 		commandAllocator.Reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command allocator released.");
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command queue.");
 		commandQueue.Reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command queue released.");
 	}
 
 	void Direct3D12CopyPipeline::AddCopyTask(ID3D12Resource2& source, ID3D12Resource2& destination)
 	{
 		copyTasks.push_back(CopyTask{.source = &source, .destination = &destination});
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Debug, "Copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	ID3D12CommandQueue& Direct3D12CopyPipeline::CommandQueue() noexcept
@@ -142,10 +166,15 @@ export namespace PonyEngine::Render
 
 	void Direct3D12CopyPipeline::PopulateCommands()
 	{
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command lists.");
 		ResetLists();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers in.");
 		PopulateResourceBarriersIn();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Copy.");
 		Copy();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate resource barriers out.");
 		PopulateResourceBarriersOut();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Close command lists.");
 		CloseLists();
 	}
 
@@ -156,7 +185,7 @@ export namespace PonyEngine::Render
 		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 	}
 
-	void Direct3D12CopyPipeline::Clean() noexcept
+	void Direct3D12CopyPipeline::Clear() noexcept
 	{
 		copyTasks.clear();
 	}
