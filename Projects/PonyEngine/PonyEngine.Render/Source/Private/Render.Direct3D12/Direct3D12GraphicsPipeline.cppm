@@ -261,7 +261,20 @@ namespace PonyEngine::Render
 				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
 			}
 		};
-		commandList->ResourceBarrier(1u, &renderTargetBarrier);
+		const auto depthStencilBarrier = D3D12_RESOURCE_BARRIER
+		{
+			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
+			{
+				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
+				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.StateBefore = D3D12_RESOURCE_STATE_COMMON,
+				.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE
+			}
+		};
+		const auto barriers = std::array<D3D12_RESOURCE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
+		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateVertexBarriers()
@@ -425,7 +438,7 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::PopulateResourceBarriersOut()
 	{
-		const auto presentBarrier = D3D12_RESOURCE_BARRIER
+		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
 		{
 			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
 			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
@@ -437,7 +450,20 @@ namespace PonyEngine::Render
 				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
 			}
 		};
-		commandList->ResourceBarrier(1u, &presentBarrier);
+		const auto depthStencilBarrier = D3D12_RESOURCE_BARRIER
+		{
+			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
+			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
+			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
+			{
+				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
+				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE,
+				.StateAfter = D3D12_RESOURCE_STATE_COMMON
+			}
+		};
+		const auto barriers = std::array<D3D12_RESOURCE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
+		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
 	}
 
 	void Direct3D12GraphicsPipeline::CloseLists()

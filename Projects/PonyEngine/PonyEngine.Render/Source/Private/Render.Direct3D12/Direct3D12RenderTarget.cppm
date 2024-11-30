@@ -127,7 +127,7 @@ namespace PonyEngine::Render
 			.NodeMask = 0u
 		};
 		ID3D12Device10& device = d3d12System.Device();
-		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.ReleaseAndGetAddressOf())); FAILED(result))
+		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(rtvDescriptorHeap.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

@@ -196,6 +196,7 @@ export namespace PonyEngine::Render
 					.StateAfter = D3D12_RESOURCE_STATE_COPY_SOURCE
 				}
 			};
+			resourceBarriers.push_back(copySourceBarrier);
 			const auto copyDestinationBarrier = D3D12_RESOURCE_BARRIER
 			{
 				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
@@ -208,7 +209,6 @@ export namespace PonyEngine::Render
 					.StateAfter = D3D12_RESOURCE_STATE_COPY_DEST
 				}
 			};
-			resourceBarriers.push_back(copySourceBarrier);
 			resourceBarriers.push_back(copyDestinationBarrier);
 		}
 
@@ -245,6 +245,7 @@ export namespace PonyEngine::Render
 					.StateAfter = D3D12_RESOURCE_STATE_COMMON
 				}
 			};
+			resourceBarriers.push_back(copySourceBarrier);
 			const auto copyDestinationBarrier = D3D12_RESOURCE_BARRIER
 			{
 				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
@@ -257,7 +258,6 @@ export namespace PonyEngine::Render
 					.StateAfter = D3D12_RESOURCE_STATE_COMMON
 				}
 			};
-			resourceBarriers.push_back(copySourceBarrier);
 			resourceBarriers.push_back(copyDestinationBarrier);
 		}
 
