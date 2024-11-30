@@ -105,6 +105,6 @@ namespace PonyEngine::Render
 
 	void Direct3D12RenderView::ProjectionMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept
 	{
-		projectionMatrix = matrix; // TODO: Add logs for different changes
+		projectionMatrix = matrix;
 	}
 }
