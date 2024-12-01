@@ -16,7 +16,7 @@
 
 import PonyEngine.Core;
 
-namespace Core
+namespace Mocks
 {
 	class SystemFactory final : public PonyEngine::Core::ISystemFactory
 	{

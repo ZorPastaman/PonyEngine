@@ -14,7 +14,7 @@
 
 import PonyBase.ObjectUtility;
 
-namespace Core
+namespace Mocks
 {
 	PonyEngine::Core::SystemData SystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{

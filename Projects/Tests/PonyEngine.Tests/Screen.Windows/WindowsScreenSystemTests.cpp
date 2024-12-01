@@ -30,10 +30,10 @@ namespace Screen
 	{
 		TEST_METHOD(DisplayResolutionTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});

@@ -75,6 +75,7 @@
     <ClCompile Include="Mocks\Application.cpp" />
     <ClCompile Include="Mocks\Engine.cpp" />
     <ClCompile Include="Mocks\Logger.cpp" />
+    <ClCompile Include="Mocks\ScreenSystem.cpp" />
     <ClCompile Include="Mocks\System.cpp" />
     <ClCompile Include="Mocks\SystemFactory.cpp" />
     <ClCompile Include="Mocks\TickableSystem.cpp" />
@@ -84,6 +85,11 @@
     <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input\KeyboardKeyCodeTests.cpp" />
     <ClCompile Include="Input\KeyboardMessageTests.cpp" />
+    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp" />
+    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectTests.cpp" />
+    <ClCompile Include="Render.Direct3D12.Windows\RenderSystemFactoryTests.cpp" />
+    <ClCompile Include="Render.Direct3D12.Windows\RenderTargetTests.cpp" />
+    <ClCompile Include="Render.Direct3D12.Windows\RenderViewTests.cpp" />
     <ClCompile Include="Screen.Windows\WindowsScreenSystemFactoryTests.cpp" />
     <ClCompile Include="Screen.Windows\WindowsScreenSystemTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
@@ -118,6 +124,12 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input\PonyEngine.Input.vcxproj">
       <Project>{7f22adbe-2c5a-44be-b885-c2d041337190}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render.API\PonyEngine.Render.API.vcxproj">
+      <Project>{9a54f3c1-1617-4da7-a874-8c16b37e018a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Render\PonyEngine.Render.vcxproj">
+      <Project>{abd4e8f3-04fb-41f8-a7b0-b628fe63a030}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
       <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>
     </ProjectReference>
@@ -141,6 +153,7 @@
     <ClInclude Include="Mocks\Application.h" />
     <ClInclude Include="Mocks\Engine.h" />
     <ClInclude Include="Mocks\Logger.h" />
+    <ClInclude Include="Mocks\ScreenSystem.h" />
     <ClInclude Include="Mocks\System.h" />
     <ClInclude Include="Mocks\SystemFactory.h" />
     <ClInclude Include="Mocks\TickableSystem.h" />

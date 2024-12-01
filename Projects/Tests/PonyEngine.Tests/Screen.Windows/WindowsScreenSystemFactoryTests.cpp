@@ -30,8 +30,8 @@ namespace Screen
 	{
 		TEST_METHOD(CreateTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.get());
@@ -39,10 +39,10 @@ namespace Screen
 
 		TEST_METHOD(CreateSystemTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
@@ -59,10 +59,10 @@ namespace Screen
 
 		TEST_METHOD(SystemTypeTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});

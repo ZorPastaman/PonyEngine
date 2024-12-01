@@ -16,7 +16,7 @@ import PonyBase.ObjectUtility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Core
+namespace Utility
 {
 	TEST_CLASS(ObjectInterfacesTests)
 	{
@@ -134,6 +134,33 @@ namespace Core
 
 			Assert::IsTrue(typeid(Class1) == span[2].first.get());
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&class1Object), reinterpret_cast<std::uintptr_t>(span[2].second));
+		}
+
+		TEST_METHOD(CountTest)
+		{
+			auto classObject = Class();
+			auto class1Object = Class1();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
+			interfaces.AddInterfacesDeduced<IInterface>(classObject);
+			interfaces.AddInterfacesDeduced<IInterface1, Class1>(class1Object);
+
+			Assert::AreEqual(std::size_t{3}, interfaces.Count());
+		}
+
+		TEST_METHOD(AccessOperatorTest)
+		{
+			auto classObject = Class();
+			auto class1Object = Class1();
+			auto interfaces = PonyBase::Utility::ObjectInterfaces();
+			interfaces.AddInterfacesDeduced<IInterface>(classObject);
+			interfaces.AddInterfacesDeduced<IInterface1, Class1>(class1Object);
+
+			Assert::IsTrue(interfaces.Span()[0].first.get() == interfaces[0].first.get());
+			Assert::IsTrue(interfaces.Span()[0].second == interfaces[0].second);
+			Assert::IsTrue(interfaces.Span()[1].first.get() == interfaces[1].first.get());
+			Assert::IsTrue(interfaces.Span()[1].second == interfaces[1].second);
+			Assert::IsTrue(interfaces.Span()[2].first.get() == interfaces[2].first.get());
+			Assert::IsTrue(interfaces.Span()[2].second == interfaces[2].second);
 		}
 
 		TEST_METHOD(AssignmentTest)

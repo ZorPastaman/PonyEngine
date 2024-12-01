@@ -9,7 +9,7 @@
 
 #include "Logger.h"
 
-namespace Core
+namespace Mocks
 {
 	void Logger::Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) const noexcept
 	{

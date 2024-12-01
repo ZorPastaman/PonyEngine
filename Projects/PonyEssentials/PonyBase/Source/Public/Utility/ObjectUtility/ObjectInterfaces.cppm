@@ -57,10 +57,21 @@ export namespace PonyBase::Utility
 		template<typename... Targets, typename Source>
 		void AddInterfacesDeduced(Source& object) requires (... && std::derived_from<Source, Targets>);
 
+		/// @brief Gets the interface count.
+		/// @return Interface count.
+		[[nodiscard("Pure function")]]
+		std::size_t Count() const noexcept;
+
 		/// @brief Gets interfaces.
 		/// @return Interfaces. Pairs of types and object pointers.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> Span() const noexcept;
+
+		/// @brief Gets an interface by the @p index.
+		/// @param index Interface index.
+		/// @return Interface.
+		[[nodiscard("Pure function")]]
+		const std::pair<std::reference_wrapper<const std::type_info>, void*>& operator [](std::size_t index) const noexcept;
 
 		ObjectInterfaces& operator =(const ObjectInterfaces& other) = default;
 		ObjectInterfaces& operator =(ObjectInterfaces&& other) noexcept = default;
@@ -96,8 +107,18 @@ namespace PonyBase::Utility
 		AddInterfaces<Source, Targets...>(object);
 	}
 
+	std::size_t ObjectInterfaces::Count() const noexcept
+	{
+		return interfaces.size();
+	}
+
 	std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> ObjectInterfaces::Span() const noexcept
 	{
 		return interfaces;
+	}
+
+	const std::pair<std::reference_wrapper<const std::type_info>, void*>& ObjectInterfaces::operator [](const std::size_t index) const noexcept
+	{
+		return interfaces[index];
 	}
 }

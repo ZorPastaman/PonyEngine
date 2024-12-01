@@ -9,7 +9,7 @@
 
 #include "System.h"
 
-namespace Core
+namespace Mocks
 {
 	System::System(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept :
 		PonyEngine::Core::System(engine, params)

@@ -16,7 +16,7 @@
 
 import PonyEngine.Core;
 
-namespace Core
+namespace Mocks
 {
 	class TickableSystemFactory final : public PonyEngine::Core::ISystemFactory
 	{

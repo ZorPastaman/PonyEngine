@@ -17,7 +17,7 @@
 
 import PonyEngine.Core;
 
-namespace Core
+namespace Mocks
 {
 	class SystemManager final : public PonyEngine::Core::ISystemManager
 	{
@@ -57,6 +57,6 @@ namespace Core
 		Application* application = nullptr;
 
 	private:
-		mutable Core::SystemManager systemManager;
+		mutable Mocks::SystemManager systemManager;
 	};
 }

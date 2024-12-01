@@ -9,12 +9,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 ### Added
 
-- Common module.
+- Base module.
+- Math module.
+- Log module.
 - Core module.
 - Input module.
-- Log module.
-- Math module.
-- Utility module.
+- Render module.
+- Screen module.
+- Time module.
 - Window module.
 - Game & Launcher implementation example.
 

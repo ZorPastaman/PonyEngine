@@ -14,7 +14,7 @@
 
 import PonyBase.ObjectUtility;
 
-namespace Core
+namespace Mocks
 {
 	PonyEngine::Core::SystemData TickableSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{

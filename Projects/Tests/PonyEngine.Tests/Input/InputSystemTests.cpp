@@ -55,14 +55,14 @@ namespace Input
 
 		TEST_METHOD(BeginEndTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto keyboardProvider = KeyboardProvider();
 			
-			static_cast<Core::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			constexpr auto systemParams = PonyEngine::Core::SystemParams();
 			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
@@ -78,10 +78,10 @@ namespace Input
 
 		TEST_METHOD(TickTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());

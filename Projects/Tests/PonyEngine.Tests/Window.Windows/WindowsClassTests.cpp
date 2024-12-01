@@ -27,8 +27,8 @@ namespace Window
 	{
 		TEST_METHOD(CreateWindowsClassTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
 			const auto params = PonyEngine::Window::WindowsClassParams{.name = L"Test", .icon = nullptr, .smallIcon = nullptr, .cursor = nullptr}; // TODO: Add tests for all the fields.
 			std::unique_ptr<PonyEngine::Window::WindowsClass> windowsClass = PonyEngine::Window::CreateWindowsClass(application, params).windowsClass;

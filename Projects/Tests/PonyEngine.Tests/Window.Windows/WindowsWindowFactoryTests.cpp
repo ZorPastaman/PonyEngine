@@ -33,10 +33,10 @@ namespace Window
 	{
 		TEST_METHOD(CreateTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
@@ -46,10 +46,10 @@ namespace Window
 
 		TEST_METHOD(CreateSystemTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
@@ -71,10 +71,10 @@ namespace Window
 
 		TEST_METHOD(SystemTypeTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);

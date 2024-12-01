@@ -11,7 +11,7 @@
 
 import PonyEngine.Core;
 
-namespace Core
+namespace Mocks
 {
 	class Application final : public PonyEngine::Core::IApplicationContext
 	{

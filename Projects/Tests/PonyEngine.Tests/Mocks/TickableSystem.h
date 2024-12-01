@@ -15,7 +15,7 @@
 
 import PonyEngine.Core;
 
-namespace Core
+namespace Mocks
 {
 	class ITickableSystemInterface
 	{
