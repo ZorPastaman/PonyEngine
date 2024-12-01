@@ -348,17 +348,18 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateRenderTarget()
 	{
 		const IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
-		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.CurrentRtvHandle();
-		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12System->DepthStencilPrivate().DsvHandle();
-		commandList->OMSetRenderTargets(1u, &rtvHandle, false, &dsvHandle);
-		commandList->ClearRenderTargetView(rtvHandle, renderTarget.ClearColorD3D12().Span().data(), 0u, nullptr);
-		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 
 		const PonyMath::Utility::Resolution<UINT>& resolution = renderTarget.ResolutionD3D12();
 		const auto viewport = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.Width()), .Height = static_cast<FLOAT>(resolution.Height()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
 		commandList->RSSetViewports(1u, &viewport);
 		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height())};
 		commandList->RSSetScissorRects(1u, &rect);
+
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.CurrentRtvHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12System->DepthStencilPrivate().DsvHandle();
+		commandList->OMSetRenderTargets(1u, &rtvHandle, false, &dsvHandle);
+		commandList->ClearRenderTargetView(rtvHandle, renderTarget.ClearColorD3D12().Span().data(), 0u, nullptr);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
 	void Direct3D12GraphicsPipeline::UpdateMvps()

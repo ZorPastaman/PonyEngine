@@ -29,16 +29,16 @@ namespace Input
 	{
 		TEST_METHOD(CreateTest)
 		{
-			auto application = Core::Application();
+			auto application = Mocks::Application();
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
 		{
-			auto application = Core::Application();
-			auto logger = Core::Logger();
-			auto engine = Core::Engine();
+			auto application = Mocks::Application();
+			auto logger = Mocks::Logger();
+			auto engine = Mocks::Engine();
 			application.logger = &logger;
 			engine.application = &application;
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
@@ -54,9 +54,9 @@ namespace Input
 
 		TEST_METHOD(SystemTypeTest)
 		{
-			auto application = Core::Application();
-			auto logger = Core::Logger();
-			auto engine = Core::Engine();
+			auto application = Mocks::Application();
+			auto logger = Mocks::Logger();
+			auto engine = Mocks::Engine();
 			application.logger = &logger;
 			engine.application = &application;
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});

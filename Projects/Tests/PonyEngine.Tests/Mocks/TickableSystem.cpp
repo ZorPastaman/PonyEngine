@@ -9,7 +9,7 @@
 
 #include "TickableSystem.h"
 
-namespace Core
+namespace Mocks
 {
 	TickableSystem::TickableSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept :
 		PonyEngine::Core::TickableSystem(engine, params)

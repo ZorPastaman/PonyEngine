@@ -33,17 +33,17 @@ namespace Time
 	{
 		TEST_METHOD(CreateTest)
 		{
-			auto application = Core::Application();
+			auto application = Mocks::Application();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			Assert::IsNotNull(factory.systemFactory.get());
 		}
 
 		TEST_METHOD(CreateSystemTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			Assert::IsNotNull(std::get<1>(frameRateSystem.system).get());
@@ -56,10 +56,10 @@ namespace Time
 
 		TEST_METHOD(SystemTypeTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			Assert::IsTrue(typeid(*std::get<1>(frameRateSystem.system)) == factory.systemFactory->SystemType());

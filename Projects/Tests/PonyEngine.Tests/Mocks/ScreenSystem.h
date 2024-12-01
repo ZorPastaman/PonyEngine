@@ -7,19 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+#pragma once
 
-#include "PonyBase/Utility/Interface.h"
+#include <cstdint>
 
-export module PonyEngine.Render.Direct3D12:IDirect3D12RenderView;
+import PonyMath.Utility;
 
-import PonyEngine.Render;
+import PonyEngine.Screen;
 
-export namespace PonyEngine::Render
+namespace Mocks
 {
-	/// @brief Direct3D12 render view.
-	class IDirect3D12RenderView : public IRenderView
+	class ScreenSystem final : public PonyEngine::Screen::IScreenSystem
 	{
-		INTERFACE_BODY(IDirect3D12RenderView)
+	public:
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept override;
 	};
 }

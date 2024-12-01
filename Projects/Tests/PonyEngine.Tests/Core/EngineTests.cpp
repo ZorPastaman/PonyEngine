@@ -33,8 +33,8 @@ namespace Core
 	{
 		TEST_METHOD(CreateTest)
 		{
-			auto logger = Logger();
-			auto application = Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
 			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::IsNotNull(engine.engine.get());
@@ -42,8 +42,8 @@ namespace Core
 
 		TEST_METHOD(GetFrameCountTest)
 		{
-			auto logger = Logger();
-			auto application = Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
 			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 
@@ -57,8 +57,8 @@ namespace Core
 
 		TEST_METHOD(ExitTest)
 		{
-			auto logger = Logger();
-			auto application = Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
 			auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 			Assert::IsTrue(engine.engine->IsRunning());
@@ -73,10 +73,10 @@ namespace Core
 
 		TEST_METHOD(SystemTickTest)
 		{
-			auto logger = Logger();
-			auto application = Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			TickableSystemFactory systemFactory;
+			Mocks::TickableSystemFactory systemFactory;
 			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 1>
 			{
 				std::pair(&systemFactory, 0)
@@ -104,11 +104,11 @@ namespace Core
 
 		TEST_METHOD(FindSystemTest)
 		{
-			auto logger = Logger();
-			auto application = Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto systemFactory = SystemFactory();
-			auto tickableSystemFactory = TickableSystemFactory();
+			auto systemFactory = Mocks::SystemFactory();
+			auto tickableSystemFactory = Mocks::TickableSystemFactory();
 			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 2>
 			{
 				std::pair(&systemFactory, 0),
@@ -117,17 +117,17 @@ namespace Core
 			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
 			auto engine = PonyEngine::Core::CreateEngine(application, params);
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<ISystemInterface*>(systemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(ISystemInterface))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<ISystemInterface*>(systemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<ISystemInterface>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<Mocks::ISystemInterface*>(systemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(Mocks::ISystemInterface))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<Mocks::ISystemInterface*>(systemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<Mocks::ISystemInterface>()));
 
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<ITickableSystemInterface*>(tickableSystemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(ITickableSystemInterface))));
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<ITickableSystemInterface*>(tickableSystemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<ITickableSystemInterface>()));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<Mocks::ITickableSystemInterface*>(tickableSystemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem(typeid(Mocks::ITickableSystemInterface))));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<Mocks::ITickableSystemInterface*>(tickableSystemFactory.GetSystem())), reinterpret_cast<std::uintptr_t>(engine.engine->SystemManager().FindSystem<Mocks::ITickableSystemInterface>()));
 
-			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(System)));
-			Assert::IsNull(engine.engine->SystemManager().FindSystem<System>());
+			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(Mocks::System)));
+			Assert::IsNull(engine.engine->SystemManager().FindSystem<Mocks::System>());
 
-			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(TickableSystem)));
-			Assert::IsNull(engine.engine->SystemManager().FindSystem<TickableSystem>());
+			Assert::IsNull(engine.engine->SystemManager().FindSystem(typeid(Mocks::TickableSystem)));
+			Assert::IsNull(engine.engine->SystemManager().FindSystem<Mocks::TickableSystem>());
 		}
 	};
 } 

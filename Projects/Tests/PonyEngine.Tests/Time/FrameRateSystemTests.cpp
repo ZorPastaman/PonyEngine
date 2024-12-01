@@ -30,10 +30,10 @@ namespace Time
 	{
 		TEST_METHOD(TickTest)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
@@ -53,10 +53,10 @@ namespace Time
 
 		TEST_METHOD(GetSetFrameTimeRate)
 		{
-			auto logger = Core::Logger();
-			auto application = Core::Application();
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
 			application.logger = &logger;
-			auto engine = Core::Engine();
+			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());

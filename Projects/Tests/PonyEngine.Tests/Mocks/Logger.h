@@ -13,7 +13,7 @@
 
 import PonyDebug.Log;
 
-namespace Core
+namespace Mocks
 {
 	class Logger final : public PonyDebug::Log::ILogger
 	{

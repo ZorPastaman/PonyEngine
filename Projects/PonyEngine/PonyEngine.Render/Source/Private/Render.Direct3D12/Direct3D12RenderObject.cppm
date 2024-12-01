@@ -45,9 +45,13 @@ export namespace PonyEngine::Render
 		virtual PonyMath::Core::Matrix4x4<float> ModelMatrix() const noexcept override;
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
 
+		/// @brief Gets the translation-rotation-scaling matrix of the object.
+		/// @return Translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		virtual const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept override;
-		virtual void ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept override;
+		const PonyMath::Core::Matrix4x4<FLOAT>& ModelMatrixD3D12() const noexcept;
+		/// @brief Sets the translation-rotation-scaling matrix of the object.
+		/// @param matrix Translation-rotation-scaling matrix.
+		void ModelMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept;
 
 		/// @brief Gets the material.
 		/// @return Material.

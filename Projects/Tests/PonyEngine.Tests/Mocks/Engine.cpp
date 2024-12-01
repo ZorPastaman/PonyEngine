@@ -9,7 +9,7 @@
 
 #include "Engine.h"
 
-namespace Core
+namespace Mocks
 {
 	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
 	{

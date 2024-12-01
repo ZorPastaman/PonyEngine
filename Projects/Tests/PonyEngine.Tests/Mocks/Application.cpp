@@ -9,7 +9,7 @@
 
 #include "Application.h"
 
-namespace Core
+namespace Mocks
 {
 	PonyDebug::Log::ILogger& Application::Logger() noexcept
 	{
