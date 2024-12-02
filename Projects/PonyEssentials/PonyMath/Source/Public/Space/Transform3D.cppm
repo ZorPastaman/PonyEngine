@@ -143,7 +143,7 @@ export namespace PonyMath::Space
 
 		/// @brief Translation-rotation-scaling matrix.
 		/// 	It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix if it's nullopt.
-		mutable std::optional<Core::Matrix4x4<float>> trs;
+		mutable std::optional<Core::Matrix4x4<float>> trs; // TODO: Remove this and add TransformState.
 	};
 
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.

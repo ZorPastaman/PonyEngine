@@ -99,13 +99,13 @@ namespace PonyEngine::Render
 			.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
-		const auto clearValue = D3D12_CLEAR_VALUE
+		constexpr auto clearValue = D3D12_CLEAR_VALUE
 		{
 			.Format = DepthStencilFormat,
 			.DepthStencil = D3D12_DEPTH_STENCIL_VALUE{.Depth = D3D12_MAX_DEPTH, .Stencil = 0u}
 		};
 		ID3D12Device10& device = d3d12System.Device();
-		if (const HRESULT result = device.CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE, &clearValue, 
+		if (const HRESULT result = device.CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ, &clearValue, 
 			nullptr, 0u, nullptr, IID_PPV_ARGS(depthStencilBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire depth stencil buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
