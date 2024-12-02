@@ -24,13 +24,6 @@ namespace Space
 {
 	TEST_CLASS(Transform3DTests)
 	{
-		TEST_METHOD(TypesTest)
-		{
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<float>, PonyMath::Space::Transform3D::PositionType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Quaternion<float>, PonyMath::Space::Transform3D::RotationType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<float>, PonyMath::Space::Transform3D::ScaleType>);
-		}
-
 		TEST_METHOD(ConstructorTest)
 		{
 			const auto defaultTransform = PonyMath::Space::Transform3D();

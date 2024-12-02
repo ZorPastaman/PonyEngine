@@ -25,13 +25,6 @@ namespace Space
 {
 	TEST_CLASS(Transform2DTests)
 	{
-		TEST_METHOD(TypesTest)
-		{
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector2<float>, PonyMath::Space::Transform2D::PositionType>);
-			Assert::IsTrue(std::is_same_v<float, PonyMath::Space::Transform2D::RotationType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector2<float>, PonyMath::Space::Transform2D::ScaleType>);
-		}
-
 		TEST_METHOD(ConstructorTest)
 		{
 			const auto defaultTransform = PonyMath::Space::Transform2D();

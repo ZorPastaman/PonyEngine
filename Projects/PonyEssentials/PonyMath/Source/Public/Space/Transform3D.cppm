@@ -22,10 +22,6 @@ export namespace PonyMath::Space
 	class Transform3D final
 	{
 	public:
-		using PositionType = Core::Vector3<float>; ///< Position type.
-		using RotationType = Core::Quaternion<float>; ///< Rotation type.
-		using ScaleType = Core::Vector3<float>; ///< Scale type.
-
 		/// @brief Creates a transform with a zero position, identity rotation and scale of one.
 		[[nodiscard("Pure constructor")]]
 		Transform3D() noexcept;

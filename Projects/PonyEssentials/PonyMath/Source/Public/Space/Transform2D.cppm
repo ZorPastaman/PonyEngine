@@ -22,10 +22,6 @@ export namespace PonyMath::Space
 	class Transform2D final
 	{
 	public:
-		using PositionType = Core::Vector2<float>; ///< Position type.
-		using RotationType = float; ///< Rotation type.
-		using ScaleType = Core::Vector2<float>; ///< Scale type.
-
 		/// @brief Creates a transform with a zero position, zero rotation and scale of one.
 		[[nodiscard("Pure constructor")]]
 		Transform2D() noexcept;

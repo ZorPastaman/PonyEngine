@@ -28,11 +28,6 @@ export namespace PonyMath::Geometry
 	class Mesh final
 	{
 	public:
-		// TODO: Remove non-generic usings
-		using VertexType = Core::Vector3<float>; ///< Vertex type.
-		using TriangleType = Core::Vector3<std::uint32_t>; ///< Triangle type.
-		using VertexColorType = Color::RGBA<float>; ///< Vertex color type.
-
 		/// @brief Creates an empty mesh.
 		[[nodiscard("Pure constructor")]]
 		Mesh() noexcept = default;
