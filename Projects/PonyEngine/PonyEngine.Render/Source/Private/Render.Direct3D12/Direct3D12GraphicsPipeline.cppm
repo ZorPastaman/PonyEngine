@@ -277,7 +277,7 @@ namespace PonyEngine::Render
 			{
 				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
 				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-				.StateBefore = D3D12_RESOURCE_STATE_COMMON,
+				.StateBefore = D3D12_RESOURCE_STATE_DEPTH_READ,
 				.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE
 			}
 		};
@@ -468,7 +468,7 @@ namespace PonyEngine::Render
 				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
 				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 				.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE,
-				.StateAfter = D3D12_RESOURCE_STATE_COMMON
+				.StateAfter = D3D12_RESOURCE_STATE_DEPTH_READ
 			}
 		};
 		const auto barriers = std::array<D3D12_RESOURCE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
