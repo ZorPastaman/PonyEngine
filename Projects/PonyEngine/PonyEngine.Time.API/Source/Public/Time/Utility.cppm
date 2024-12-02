@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Time:FrameTimeFrameRateConversion;
+export module PonyEngine.Time:Utility;
 
 import <concepts>;
 

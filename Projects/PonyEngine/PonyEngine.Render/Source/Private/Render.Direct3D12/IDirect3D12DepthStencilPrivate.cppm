@@ -26,8 +26,12 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT DsvFormat() const noexcept = 0;
 
+		/// @brief Gets the depth stencil buffer.
+		/// @return Depth stencil buffer.
 		[[nodiscard("Pure function")]]
 		virtual ID3D12Resource2& DepthStencilBuffer() noexcept = 0;
+		/// @brief Gets the depth stencil buffer.
+		/// @return Depth stencil buffer.
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Resource2& DepthStencilBuffer() const noexcept = 0;
 		/// @brief Gets the depth stencil view handle.

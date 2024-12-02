@@ -9,8 +9,6 @@
 
 module;
 
-#include "PonyBase/Core/Windows/Framework.h"
-
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Screen.Windows.Detail:WindowsScreenSystem;
@@ -23,6 +21,8 @@ import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Screen.Windows;
+
+import :Utility;
 
 export namespace PonyEngine::Screen
 {
@@ -57,11 +57,6 @@ export namespace PonyEngine::Screen
 
 namespace PonyEngine::Screen
 {
-	/// @brief Gets a current display resolution.
-	/// @return Display resolution.
-	[[nodiscard("Pure function")]]
-	PonyMath::Utility::Resolution<std::uint32_t> GetDisplayResolution() noexcept;
-
 	WindowsScreenSystem::WindowsScreenSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsScreenSystemParams&) noexcept :
 		System(engine, systemParams),
 		displayResolution(GetDisplayResolution())
@@ -80,14 +75,5 @@ namespace PonyEngine::Screen
 	PonyMath::Utility::Resolution<std::uint32_t> WindowsScreenSystem::DisplayResolution() const noexcept
 	{
 		return displayResolution;
-	}
-
-	PonyMath::Utility::Resolution<std::uint32_t> GetDisplayResolution() noexcept
-	{
-		PonyMath::Utility::Resolution<std::uint32_t> resolution;
-		resolution.Width() = static_cast<std::uint32_t>(GetSystemMetrics(SM_CXSCREEN));
-		resolution.Height() = static_cast<std::uint32_t>(GetSystemMetrics(SM_CYSCREEN));
-
-		return resolution;
 	}
 }

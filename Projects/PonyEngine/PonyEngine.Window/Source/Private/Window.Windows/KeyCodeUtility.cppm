@@ -29,7 +29,7 @@ export namespace PonyEngine::Window
 namespace PonyEngine::Window
 {
 	/// @brief Virtual key code to Pony Engine key code map.
-	const std::unordered_map<WORD, Input::KeyboardKeyCode> KeyCodeMap
+	static const std::unordered_map<WORD, Input::KeyboardKeyCode> KeyCodeMap
 	{
 		// Letters
 		{ WORD{0x001E}, Input::KeyboardKeyCode::A },

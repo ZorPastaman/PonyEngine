@@ -88,7 +88,7 @@ namespace PonyDebug::Log
 	/// @brief Logs to a standard console and a system console.
 	/// @param logType Log type.
 	/// @param log Formatted log message.
-	void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
+	static void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
 
 	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
 	{
@@ -170,7 +170,7 @@ namespace PonyDebug::Log
 		return PonyBase::Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
-	void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
+	static void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
 	{
 #ifdef PONY_CONSOLE_LOG
 		try

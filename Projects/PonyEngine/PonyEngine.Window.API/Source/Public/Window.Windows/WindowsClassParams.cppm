@@ -27,4 +27,3 @@ export namespace PonyEngine::Window
 		UINT style = CS_OWNDC; ///< Class style;
 	};
 }
-

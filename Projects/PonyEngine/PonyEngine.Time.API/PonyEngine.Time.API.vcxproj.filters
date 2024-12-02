@@ -31,7 +31,7 @@
     <ClCompile Include="Source\Public\Time\Time.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Time\FrameTimeFrameRateConversion.cppm">
+    <ClCompile Include="Source\Public\Time\Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Time\FrameRateSystemFactoryData.cppm">

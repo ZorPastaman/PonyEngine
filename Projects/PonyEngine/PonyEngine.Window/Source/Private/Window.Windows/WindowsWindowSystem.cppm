@@ -43,6 +43,7 @@ import PonyEngine.Window.Windows;
 
 import :IWindowProc;
 import :KeyCodeUtility;
+import :Utility;
 import :WindowProcFunction;
 
 export namespace PonyEngine::Window
@@ -143,12 +144,6 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Converts a Windows window rect to a pair of a position and a resolution.
-	/// @param windowRect Windows window rect.
-	/// @return Pair of a position and a resolution.
-	[[nodiscard("Pure function")]]
-	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> PositionResolution(const RECT& windowRect) noexcept;
-
 	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsWindowSystemParams& windowParams) :
 		TickableSystem(engine, systemParams),
 		mainTitle(windowParams.title),
@@ -430,13 +425,5 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
 
 		return windowHandle;
-	}
-
-	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> PositionResolution(const RECT& windowRect) noexcept
-	{
-		const auto position = PonyMath::Core::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));
-		const auto resolution = PonyMath::Core::Vector2<int>(static_cast<int>(windowRect.right - windowRect.left), static_cast<int>(windowRect.bottom - windowRect.top));
-
-		return std::pair(position, resolution);
 	}
 }

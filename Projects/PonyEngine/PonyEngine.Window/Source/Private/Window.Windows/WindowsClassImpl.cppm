@@ -25,6 +25,7 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
+import :Utility;
 import :WindowProcFunction;
 
 export namespace PonyEngine::Window
@@ -70,11 +71,6 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	/// @brief Gets a default cursor.
-	/// @return Default cursor.
-	[[nodiscard("Pure function")]]
-	HCURSOR DefaultCursor();
-
 	WindowsClassImpl::WindowsClassImpl(Core::IApplicationContext& application, const WindowsClassParams& params) :
 		application{&application},
 		hInstance{GetInstance()},
@@ -142,16 +138,5 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window class '0x{:X}' registered.", atom);
 
 		return atom;
-	}
-
-	HCURSOR DefaultCursor()
-	{
-		const auto cursor = static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
-		if (!cursor)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		return cursor;
 	}
 }

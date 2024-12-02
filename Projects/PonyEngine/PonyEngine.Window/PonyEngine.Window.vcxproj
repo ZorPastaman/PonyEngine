@@ -19,6 +19,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\Utility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowProcFunction.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsClassImpl.cppm" />

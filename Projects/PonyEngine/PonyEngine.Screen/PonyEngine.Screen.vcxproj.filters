@@ -37,5 +37,8 @@
     <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Screen.Windows\Utility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
