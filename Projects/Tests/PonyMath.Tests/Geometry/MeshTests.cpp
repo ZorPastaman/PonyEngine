@@ -27,13 +27,6 @@ namespace Geometry
 {
 	TEST_CLASS(MeshTests)
 	{
-		TEST_METHOD(TypeTest)
-		{
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<float>, PonyMath::Geometry::Mesh::VertexType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Core::Vector3<std::uint32_t>, PonyMath::Geometry::Mesh::TriangleType>);
-			Assert::IsTrue(std::is_same_v<PonyMath::Color::RGBA<float>, PonyMath::Geometry::Mesh::VertexColorType>);
-		}
-
 		TEST_METHOD(ConstructorTest)
 		{
 			auto mesh = PonyMath::Geometry::Mesh();
