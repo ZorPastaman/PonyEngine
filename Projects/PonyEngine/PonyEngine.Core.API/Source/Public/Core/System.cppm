@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module PonyEngine.Core:System;
 
 import :IEngineContext;
@@ -17,21 +21,15 @@ export namespace PonyEngine::Core
 	/// @brief System.
 	class System
 	{
+		BASE_BODY_WITHOUT_CONSTRUCTOR(System)
+
 	public:
-		System(const System&) = delete;
-		System(System&&) = delete;
-
-		virtual ~System() noexcept = default;
-
 		/// @brief Begins the system.
 		/// @details It's called once before a first engine tick.
 		virtual void Begin() = 0;
 		/// @brief Ends the system.
 		/// @details It's called once after a last engine tick.
 		virtual void End() = 0;
-
-		System& operator =(const System&) = delete;
-		System& operator =(System&&) = delete;
 
 	protected:
 		/// @brief Creates a system.

@@ -44,7 +44,7 @@ import PonyEngine.Window.Windows;
 import :IWindowProc;
 import :KeyCodeUtility;
 import :Utility;
-import :WindowProcFunction;
+import :WindowProc;
 
 export namespace PonyEngine::Window
 {
@@ -125,12 +125,6 @@ export namespace PonyEngine::Window
 		/// @return Windows window rect.
 		[[nodiscard("Pure function")]]
 		RECT GetWindowRect(const WindowsWindowStyle& style, const WindowRect& rect) const;
-		/// @brief Creates a window.
-		/// @param style Window style.
-		/// @param rect Window rect.
-		/// @return Created window.
-		[[nodiscard("Pure function")]]
-		HWND CreateControlledWindow(const WindowsWindowStyle& style, const WindowRect& rect);
 
 		std::string mainTitle; ///< Window main title cache.
 		std::string secondaryTitle; ///< Window title text cache.
@@ -147,9 +141,31 @@ namespace PonyEngine::Window
 	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsWindowSystemParams& windowParams) :
 		TickableSystem(engine, systemParams),
 		mainTitle(windowParams.title),
-		windowsClass(windowParams.windowsClass),
-		hWnd{CreateControlledWindow(windowParams.windowsWindowStyle, windowParams.rect)}
+		windowsClass(windowParams.windowsClass)
 	{
+		assert(windowsClass && "The windows class is nullptr.");
+
+		const auto [position, resolution] = PositionResolution(GetWindowRect(windowParams.windowsWindowStyle, windowParams.rect));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
+			windowsClass->Class(), windowParams.windowsWindowStyle.style, windowParams.windowsWindowStyle.extendedStyle, mainTitle, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
+		hWnd = CreateWindowExW(
+			windowParams.windowsWindowStyle.extendedStyle,
+			reinterpret_cast<LPCWSTR>(windowsClass->Class()),
+			PonyBase::Utility::ConvertToWideString(mainTitle).c_str(),
+			windowParams.windowsWindowStyle.style,
+			position.X(), position.Y(),
+			resolution.X(), resolution.Y(),
+			nullptr,
+			nullptr,
+			windowsClass->Instance(),
+			static_cast<IWindowProc*>(this)
+		);
+		if (!hWnd)
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
@@ -395,35 +411,5 @@ namespace PonyEngine::Window
 		}
 
 		return windowRect;
-	}
-
-	HWND WindowsWindowSystem::CreateControlledWindow(const WindowsWindowStyle& style, const WindowRect& rect)
-	{
-		assert(windowsClass && "The windows class is nullptr.");
-
-		const auto [position, resolution] = PositionResolution(GetWindowRect(style, rect));
-
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
-			windowsClass->Class(), style.style, style.extendedStyle, mainTitle, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
-
-		const HWND windowHandle = CreateWindowExW(
-			style.extendedStyle,
-			reinterpret_cast<LPCWSTR>(windowsClass->Class()),
-			PonyBase::Utility::ConvertToWideString(mainTitle).c_str(),
-			style.style,
-			position.X(), position.Y(),
-			resolution.X(), resolution.Y(),
-			nullptr,
-			nullptr,
-			windowsClass->Instance(),
-			static_cast<IWindowProc*>(this)
-		);
-		if (!windowHandle)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
-		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(windowHandle));
-
-		return windowHandle;
 	}
 }

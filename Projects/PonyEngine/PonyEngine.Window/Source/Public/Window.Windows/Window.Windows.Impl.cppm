@@ -30,6 +30,7 @@ export namespace PonyEngine::Window
 	PONY_DLL_EXPORT WindowsClassData CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
 
 	/// @brief Creates a window system for Windows factory.
+	/// @note Windows class must be made with the @p CreateWindowsClass.
 	/// @param application Application context.
 	/// @param factoryParams Window system for Windows factory parameters.
 	/// @param systemParams Window system for Windows parameters.

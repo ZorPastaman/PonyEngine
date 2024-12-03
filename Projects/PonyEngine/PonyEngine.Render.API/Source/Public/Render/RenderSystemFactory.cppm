@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module PonyEngine.Render:RenderSystemFactory;
 
 import PonyEngine.Core;
@@ -16,17 +20,6 @@ export namespace PonyEngine::Render
 	/// @brief Render system factory.
 	class RenderSystemFactory : public Core::ISystemFactory
 	{
-	public:
-		RenderSystemFactory(const RenderSystemFactory&) = delete;
-		RenderSystemFactory(RenderSystemFactory&&) = delete;
-
-		virtual ~RenderSystemFactory() noexcept = default;
-
-		RenderSystemFactory& operator =(const RenderSystemFactory&) = delete;
-		RenderSystemFactory& operator =(RenderSystemFactory&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		RenderSystemFactory() noexcept = default;
+		BASE_BODY(RenderSystemFactory)
 	};
 }

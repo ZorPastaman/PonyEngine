@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module PonyEngine.Input:InputSystemFactory;
 
 import PonyEngine.Core;
@@ -16,17 +20,6 @@ export namespace PonyEngine::Input
 	/// @brief Input system factory.
 	class InputSystemFactory : public Core::ISystemFactory
 	{
-	public:
-		InputSystemFactory(const InputSystemFactory&) = delete;
-		InputSystemFactory(InputSystemFactory&&) = delete;
-
-		virtual ~InputSystemFactory() noexcept = default;
-
-		InputSystemFactory& operator =(const InputSystemFactory&) = delete;
-		InputSystemFactory& operator =(InputSystemFactory&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		InputSystemFactory() noexcept = default;
+		BASE_BODY(InputSystemFactory)
 	};
 }

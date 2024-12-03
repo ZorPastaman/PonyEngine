@@ -68,7 +68,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R8G8B8A8_SINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte signed supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte signed supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 2:
 				switch (componentCount)
@@ -80,7 +80,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R16G16B16A16_SINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte signed supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte signed supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 4:
 				switch (componentCount)
@@ -94,10 +94,10 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R32G32B32A32_SINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte signed supports 1, 2, 3 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte signed supports 1, 2, 3 and 4 counts only.", componentCount));
 				}
 			default: [[unlikely]]
-					   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Signed supports 1, 2 and 4 sizes only.", componentSize));
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Signed supports 1, 2 and 4 sizes only.", componentSize));
 			}
 		case Direct3D12VertexDataType::Unsigned:
 			switch (componentSize)
@@ -112,7 +112,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R8G8B8A8_UINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte unsigned supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte unsigned supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 2:
 				switch (componentCount)
@@ -124,7 +124,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R16G16B16A16_UINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte unsigned supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte unsigned supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 4:
 				switch (componentCount)
@@ -138,10 +138,10 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R32G32B32A32_UINT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte unsigned supports 1, 2, 3 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte unsigned supports 1, 2, 3 and 4 counts only.", componentCount));
 				}
 			default: [[unlikely]]
-					   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Unsigned supports 1, 2 and 4 sizes only.", componentSize));
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Unsigned supports 1, 2 and 4 sizes only.", componentSize));
 			}
 		case Direct3D12VertexDataType::SignedNormalized:
 			switch (componentSize)
@@ -156,7 +156,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R8G8B8A8_SNORM;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte signed normalized supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte signed normalized supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 2:
 				switch (componentCount)
@@ -168,10 +168,10 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R16G16B16A16_SNORM;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte signed normalized supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte signed normalized supports 1, 2 and 4 counts only.", componentCount));
 				}
 			default: [[unlikely]]
-					   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Signed normalized supports 1 and 2 sizes only.", componentSize));
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Signed normalized supports 1 and 2 sizes only.", componentSize));
 			}
 		case Direct3D12VertexDataType::UnsignedNormalized:
 			switch (componentSize)
@@ -186,7 +186,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R8G8B8A8_UNORM;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte unsigned normalized supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 1-byte unsigned normalized supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 2:
 				switch (componentCount)
@@ -198,10 +198,10 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R16G16B16A16_UNORM;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte unsigned normalized supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte unsigned normalized supports 1, 2 and 4 counts only.", componentCount));
 				}
 			default: [[unlikely]]
-					   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Unsigned normalized supports 1 and 2 sizes only.", componentSize));
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Unsigned normalized supports 1 and 2 sizes only.", componentSize));
 			}
 		case Direct3D12VertexDataType::Float:
 			switch (componentSize)
@@ -216,7 +216,7 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R16G16B16A16_FLOAT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte float supports 1, 2 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 2-byte float supports 1, 2 and 4 counts only.", componentCount));
 				}
 			case 4:
 				switch (componentCount)
@@ -230,13 +230,13 @@ namespace PonyEngine::Render
 				case 4:
 					return DXGI_FORMAT_R32G32B32A32_FLOAT;
 				default: [[unlikely]]
-						   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte float supports 1, 2, 3 and 4 counts only.", componentCount));
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component count. Component count: '{}'. 4-byte float supports 1, 2, 3 and 4 counts only.", componentCount));
 				}
 			default: [[unlikely]]
-					   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Float supports 2 and 4 sizes only.", componentSize));
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported component size. Component size: '{}'. Float supports 2 and 4 sizes only.", componentSize));
 			}
 		default: [[unlikely]]
-				   throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported vertex data type. Vertex data type: '{}'. Supported vertex data types are Signed, Unsigned, Signed Normalized, Unsigned Normalized and Float.", ToString(dataType)));
+			throw std::invalid_argument(PonyBase::Utility::SafeFormat("Unsupported vertex data type. Vertex data type: '{}'. Supported vertex data types are Signed, Unsigned, Signed Normalized, Unsigned Normalized and Float.", ToString(dataType)));
 		}
 	}
 }
