@@ -19,7 +19,7 @@ import PonyMath.Core;
 export namespace PonyMath::Space
 {
 	/// @brief 3D transform implementation.
-	class Transform3D final
+	class Transform3D final // TODO: Add TransformData class (position, rotation and scale only class) and Transform class (data, version, cache) and TransformComponent (Entity component that has Transform). I'm not sure about some fields if they should be in Transform or TransformComponent. So, it's much better to implement it with a World system.
 	{
 	public:
 		/// @brief Creates a transform with a zero position, identity rotation and scale of one.
@@ -139,7 +139,7 @@ export namespace PonyMath::Space
 
 		/// @brief Translation-rotation-scaling matrix.
 		/// 	It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix if it's nullopt.
-		mutable std::optional<Core::Matrix4x4<float>> trs; // TODO: Remove this and add TransformState.
+		mutable std::optional<Core::Matrix4x4<float>> trs;
 	};
 
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.

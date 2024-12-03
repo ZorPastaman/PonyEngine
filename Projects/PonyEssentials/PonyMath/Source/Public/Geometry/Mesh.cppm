@@ -25,7 +25,7 @@ export namespace PonyMath::Geometry
 {
 	/// @brief Mesh implementation.
 	/// @remark Vertex colors are optional.
-	class Mesh final
+	class Mesh final // TODO: Rename to MeshData and add Mesh class with version (later it's possible to add onChanged callbacks). It's better to do with a ResourceSystem.
 	{
 	public:
 		/// @brief Creates an empty mesh.

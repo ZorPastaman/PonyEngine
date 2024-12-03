@@ -10,3 +10,4 @@
 export module Application.Windows;
 
 export import :WindowsApplication;
+export import :WindowsUtility;

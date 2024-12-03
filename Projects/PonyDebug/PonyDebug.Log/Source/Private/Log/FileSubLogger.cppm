@@ -44,21 +44,18 @@ export namespace PonyDebug::Log
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
 
 	private:
-		/// @brief Creates a log file stream.
-		/// @param logPath Log file path.
-		/// @return Log file stream.
-		[[nodiscard("Pure function")]]
-		static std::unique_ptr<std::ofstream> CreateLogFileStream(const std::filesystem::path& logPath);
-
 		std::unique_ptr<std::ofstream> logFile; ///< Log file stream.
 	};
 }
 
 namespace PonyDebug::Log
 {
-	FileSubLogger::FileSubLogger(const FileSubLoggerParams& params) :
-		logFile(CreateLogFileStream(params.logPath))
+	FileSubLogger::FileSubLogger(const FileSubLoggerParams& params)
 	{
+		PONY_CONSOLE(LogType::Info, "Create log file stream at '{}'.", params.logPath.string());
+		logFile = std::make_unique<std::ofstream>(params.logPath);
+		PONY_CONSOLE(LogType::Info, "Log file stream created.");
+
 		if (!logFile->is_open()) [[unlikely]]
 		{
 			throw std::runtime_error(SafeFormat("Failed to open log file at path '{}'.", params.logPath.string()));
@@ -94,14 +91,5 @@ namespace PonyDebug::Log
 		{
 			PONY_CONSOLE_E(e, "On writing to log file.");
 		}
-	}
-
-	std::unique_ptr<std::ofstream> FileSubLogger::CreateLogFileStream(const std::filesystem::path& logPath)
-	{
-		PONY_CONSOLE(LogType::Info, "Create log file stream at '{}'.", logPath.string());
-		auto logFileStream = std::make_unique<std::ofstream>(logPath);
-		PONY_CONSOLE(LogType::Info, "Log file stream created.");
-
-		return logFileStream;
 	}
 }

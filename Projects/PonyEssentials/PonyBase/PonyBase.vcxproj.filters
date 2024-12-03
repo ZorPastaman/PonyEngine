@@ -39,6 +39,9 @@
     <ClInclude Include="Include\Public\PonyBase\Utility\Interface.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Public\PonyBase\Utility\Base.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyBase.rc">

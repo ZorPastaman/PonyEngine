@@ -26,7 +26,7 @@ import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
 import :Utility;
-import :WindowProcFunction;
+import :WindowProc;
 
 export namespace PonyEngine::Window
 {
@@ -53,16 +53,6 @@ export namespace PonyEngine::Window
 		WindowsClassImpl& operator =(WindowsClassImpl&&) = delete;
 
 	private:
-		/// @brief Gets this dll instance.
-		/// @return Instance.
-		[[nodiscard("Pure function")]]
-		static HINSTANCE GetInstance();
-		/// @brief Creates Windows class.
-		/// @param classParams Class parameters.
-		/// @return Created class.
-		[[nodiscard("Pure function")]]
-		ATOM CreateClass(const WindowsClassParams& classParams) const;
-
 		Core::IApplicationContext* application; ///< Application.
 		HINSTANCE hInstance; ///< Module instance.
 		ATOM classAtom; /// Registered class.
@@ -72,10 +62,38 @@ export namespace PonyEngine::Window
 namespace PonyEngine::Window
 {
 	WindowsClassImpl::WindowsClassImpl(Core::IApplicationContext& application, const WindowsClassParams& params) :
-		application{&application},
-		hInstance{GetInstance()},
-		classAtom{CreateClass(params)}
+		application{&application}
 	{
+		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		const auto wc = WNDCLASSEXW
+		{
+			.cbSize = sizeof(WNDCLASSEXW),
+			.style = params.style,
+			.lpfnWndProc = &WindowProc,
+			.cbClsExtra = 0,
+			.cbWndExtra = 0,
+			.hInstance = hInstance,
+			.hIcon = params.icon,
+			.hCursor = params.cursor ? params.cursor : DefaultCursor(),
+			.hbrBackground = nullptr,
+			.lpszMenuName = nullptr,
+			.lpszClassName = params.name.c_str(),
+			.hIconSm = params.smallIcon
+		};
+
+		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '0x{:X}'; Style: '0x{:X}'; Icon: '0x{:X}'; Cursor: '0x{:X}'; Small icon: '0x{:X}'.",
+			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon),
+			reinterpret_cast<std::uintptr_t>(wc.hCursor), reinterpret_cast<std::uintptr_t>(wc.hIconSm));
+		classAtom = RegisterClassExW(&wc);
+		if (!classAtom)
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
+		}
+		PONY_LOG(this->application->Logger(), PonyDebug::Log::LogType::Info, "Window class '0x{:X}' registered.", classAtom);
 	}
 
 	WindowsClassImpl::~WindowsClassImpl() noexcept
@@ -96,47 +114,5 @@ namespace PonyEngine::Window
 	ATOM WindowsClassImpl::Class() const noexcept
 	{
 		return classAtom;
-	}
-
-	HINSTANCE WindowsClassImpl::GetInstance()
-	{
-		HINSTANCE hInstance = nullptr;
-		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&DefaultCursor), &hInstance) || !hInstance)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to find dll module to create window. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		return hInstance;
-	}
-
-	ATOM WindowsClassImpl::CreateClass(const WindowsClassParams& classParams) const
-	{
-		const auto wc = WNDCLASSEXW
-		{
-			.cbSize = sizeof(WNDCLASSEXW),
-			.style = classParams.style,
-			.lpfnWndProc = &WindowProc,
-			.cbClsExtra = 0,
-			.cbWndExtra = 0,
-			.hInstance = hInstance,
-			.hIcon = classParams.icon,
-			.hCursor = classParams.cursor ? classParams.cursor : DefaultCursor(),
-			.hbrBackground = nullptr,
-			.lpszMenuName = nullptr,
-			.lpszClassName = classParams.name.c_str(),
-			.hIconSm = classParams.smallIcon
-		};
-
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Register window class '{}'. HInstance: '0x{:X}'; Style: '0x{:X}'; Icon: '0x{:X}'; Cursor: '0x{:X}'; Small icon: '0x{:X}'.",
-			PonyBase::Utility::ConvertToString(wc.lpszClassName), reinterpret_cast<std::uintptr_t>(wc.hInstance), wc.style, reinterpret_cast<std::uintptr_t>(wc.hIcon),
-			reinterpret_cast<std::uintptr_t>(wc.hCursor), reinterpret_cast<std::uintptr_t>(wc.hIconSm));
-		const ATOM atom = RegisterClassExW(&wc);
-		if (!atom)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register class. Error code: '0x{:X}'.", GetLastError()));
-		}
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window class '0x{:X}' registered.", atom);
-
-		return atom;
 	}
 }

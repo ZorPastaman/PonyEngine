@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module PonyEngine.Core:Engine;
 
 import <cstddef>;
@@ -20,12 +24,9 @@ export namespace PonyEngine::Core
 	/// @brief Engine.
 	class Engine
 	{
+		BASE_BODY(Engine)
+
 	public:
-		Engine(const Engine&) = delete;
-		Engine(Engine&&) = delete;
-
-		virtual ~Engine() noexcept = default;
-
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
@@ -57,12 +58,5 @@ export namespace PonyEngine::Core
 
 		/// @brief Ticks the engine.
 		virtual void Tick() = 0;
-
-		Engine& operator =(const Engine&) = delete;
-		Engine& operator =(Engine&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		Engine() noexcept = default;
 	};
 }

@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module PonyEngine.Core:TickableSystem;
 
 import :IEngineContext;
@@ -18,17 +22,11 @@ export namespace PonyEngine::Core
 	/// @brief Tickable system.
 	class TickableSystem : public System
 	{
+		BASE_BODY_WITHOUT_CONSTRUCTOR(TickableSystem)
+
 	public:
-		TickableSystem(const TickableSystem&) = delete;
-		TickableSystem(TickableSystem&&) = delete;
-
-		virtual ~TickableSystem() noexcept override = default;
-
 		/// @brief Ticks the system.
 		virtual void Tick() = 0;
-
-		TickableSystem& operator =(const TickableSystem&) = delete;
-		TickableSystem& operator =(TickableSystem&&) = delete;
 
 	protected:
 		/// @brief Creates a tickable system.

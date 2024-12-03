@@ -9,20 +9,20 @@
 
 #pragma once
 
-/// @brief Interface body macro. It must be used inside an interface body.
-/// @param InterfaceName Interface name. Must be the same as the class name where the body is declared.
-#define INTERFACE_BODY(InterfaceName) \
+/// @brief Interface body macro. It must be used inside an interface class.
+/// @param interfaceName Interface name. Must be the same as a class name where the body is declared.
+#define INTERFACE_BODY(interfaceName) \
 	protected: \
 		[[nodiscard("Pure constructor")]] \
-		InterfaceName() noexcept = default; \
+		interfaceName() noexcept = default; \
 		[[nodiscard("Pure constructor")]] \
-		InterfaceName(const InterfaceName& other) noexcept = default; \
+		interfaceName(const interfaceName& other) noexcept = default; \
 		[[nodiscard("Pure constructor")]] \
-		InterfaceName(InterfaceName&& other) noexcept = default; \
+		interfaceName(interfaceName&& other) noexcept = default; \
 		 \
-		~InterfaceName() noexcept = default; \
+		~interfaceName() noexcept = default; \
 		 \
-		InterfaceName& operator =(const InterfaceName& other) noexcept = default; \
-		InterfaceName& operator =(InterfaceName&& other) noexcept = default; \
+		interfaceName& operator =(const interfaceName& other) noexcept = default; \
+		interfaceName& operator =(interfaceName&& other) noexcept = default; \
 		 \
 	public:

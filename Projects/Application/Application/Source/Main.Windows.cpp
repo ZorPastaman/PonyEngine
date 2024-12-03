@@ -23,6 +23,8 @@ import Application.Windows;
 
 int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
+	Application::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
+
 	try
 	{
 		auto application = Application::WindowsApplication();

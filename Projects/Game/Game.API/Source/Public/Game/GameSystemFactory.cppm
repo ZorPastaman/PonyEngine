@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Base.h"
+
 export module Game:GameSystemFactory;
 
 import PonyEngine.Core;
@@ -16,17 +20,6 @@ export namespace Game
 	/// @brief Game system factory.
 	class GameSystemFactory : public PonyEngine::Core::ISystemFactory
 	{
-	public:
-		GameSystemFactory(const GameSystemFactory&) = delete;
-		GameSystemFactory(GameSystemFactory&&) = delete;
-
-		virtual ~GameSystemFactory() noexcept = default;
-
-		GameSystemFactory& operator =(const GameSystemFactory&) = delete;
-		GameSystemFactory& operator =(GameSystemFactory&&) = delete;
-
-	protected:
-		[[nodiscard("Pure constructor")]]
-		GameSystemFactory() noexcept = default;
+		BASE_BODY(GameSystemFactory)
 	};
 }
