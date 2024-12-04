@@ -22,10 +22,14 @@ import <cstdint>;
 import <exception>;
 import <format>;
 import <memory>;
+import <ranges>;
+import <span>;
 import <stdexcept>;
 import <string>;
+import <string_view>;
 import <typeinfo>;
 import <utility>;
+import <unordered_map>;
 import <vector>;
 
 import PonyBase.StringUtility;
@@ -36,20 +40,18 @@ import PonyMath.Utility;
 import PonyDebug.Log;
 
 import PonyEngine.Core;
-import PonyEngine.Input;
 import PonyEngine.Screen;
 
 import PonyEngine.Window.Windows;
 
 import :IWindowProc;
-import :KeyCodeUtility;
 import :Utility;
 import :WindowProc;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system.
-	class WindowsWindowSystem final : public Core::TickableSystem, public IWindowsWindowSystem, public IWindowProc, public Input::IKeyboardProvider
+	class WindowsWindowSystem final : public Core::TickableSystem, public IWindowsWindowSystem, public IWindowProc
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
@@ -89,8 +91,8 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
 
-		virtual void AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
-		virtual void RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver) override;
+		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<UINT> messageTypes) override;
+		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -103,11 +105,6 @@ export namespace PonyEngine::Window
 
 		/// @brief Responds to a destroy message.
 		void Destroy() const noexcept;
-
-		/// @brief Sends a keyboard message to the @p keyboardMessageObservers.
-		/// @param lParam Windows key info.
-		/// @param isDown @a True if the button is pressed, @a false if it's up.
-		void PushKeyboardKeyMessage(LPARAM lParam, bool isDown) const;
 
 		/// @brief Gets a target window position.
 		/// @param rect Window rect.
@@ -132,7 +129,7 @@ export namespace PonyEngine::Window
 		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
 
-		std::vector<Input::IKeyboardObserver*> keyboardMessageObservers; ///< Keyboard message observers.
+		std::unordered_map<UINT, std::vector<IWindowsMessageObserver*>> observers; ///< Message observers.
 	};
 }
 
@@ -282,31 +279,35 @@ namespace PonyEngine::Window
 		return hWnd;
 	}
 
-	void WindowsWindowSystem::AddKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
+	void WindowsWindowSystem::AddMessageObserver(IWindowsMessageObserver& observer, const std::span<UINT> messageTypes)
 	{
-		assert(std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver) == keyboardMessageObservers.cend() && "The observer has already been added.");
-		keyboardMessageObservers.push_back(&keyboardMessageObserver);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' keyboard message observer added.", typeid(keyboardMessageObserver).name());
+		for (const auto messageType : messageTypes)
+		{
+			std::vector<IWindowsMessageObserver*>& observerArray = observers[messageType];
+			assert(std::ranges::find(observerArray, &observer) == observerArray.cend() && "The window message observer has already been added.");
+			observerArray.push_back(&observer);
+		}
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' window message observer added.", typeid(observer).name());
 	}
 
-	void WindowsWindowSystem::RemoveKeyboardObserver(Input::IKeyboardObserver& keyboardMessageObserver)
+	void WindowsWindowSystem::RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept
 	{
-		if (const auto position = std::ranges::find(std::as_const(keyboardMessageObservers), &keyboardMessageObserver); position != keyboardMessageObservers.cend()) [[likely]]
+		for (std::vector<IWindowsMessageObserver*>& observerArray : std::ranges::views::values(observers))
 		{
-			keyboardMessageObservers.erase(position);
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "{} keyboard message observer removed.", typeid(keyboardMessageObserver).name());
+			if (const auto position = std::ranges::find(observerArray, &observer); position != observerArray.cend())
+			{
+				observerArray.erase(position);
+			}
 		}
-		else [[unlikely]]
-		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Warning, "Tried to remove not added keyboard message observer '{}'.", typeid(keyboardMessageObserver).name());
-		}
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' window message observer removed.", typeid(observer).name());
 	}
 
 	LRESULT WindowsWindowSystem::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
 	{
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Received '{}' command.", uMsg);
+
 		switch (uMsg)
 		{
-		// Main
 		case WM_CREATE:
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Received create command.");
 			break;
@@ -314,20 +315,16 @@ namespace PonyEngine::Window
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Received destroy command.");
 			Destroy();
 			break;
-		// Input
-		case WM_SYSKEYDOWN:
-		case WM_KEYDOWN:
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Received key down command with code '0x{:X}'.", lParam);
-			PushKeyboardKeyMessage(lParam, true);
-			break;
-		case WM_SYSKEYUP:
-		case WM_KEYUP:
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Received key up command with code '0x{:X}'.", lParam);
-			PushKeyboardKeyMessage(lParam, false);
-			break;
 		default:
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Received unhandled message. Type: '0x{:X}'", uMsg);
 			break;
+		}
+
+		if (const auto position = observers.find(uMsg); position != observers.cend())
+		{
+			for (IWindowsMessageObserver* const observer : position->second)
+			{
+				observer->Observe(uMsg, wParam, lParam);
+			}
 		}
 
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
@@ -348,27 +345,6 @@ namespace PonyEngine::Window
 	void WindowsWindowSystem::Destroy() const noexcept
 	{
 		Engine().Stop();
-	}
-
-	void WindowsWindowSystem::PushKeyboardKeyMessage(const LPARAM lParam, const bool isDown) const
-	{
-		if (const Input::KeyboardKeyCode keyCode = ConvertToKeyCode(lParam); keyCode != Input::KeyboardKeyCode::None)
-		{
-			const auto keyboardMessage = Input::KeyboardMessage{.keyCode = keyCode, .isDown = isDown};
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Push keyboard message '{}' to observers.", keyboardMessage.ToString());
-
-			for (Input::IKeyboardObserver* const observer : keyboardMessageObservers)
-			{
-				try
-				{
-					observer->Observe(keyboardMessage);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(Engine().Logger(), e, "On observing keyboard key message");
-				}
-			}
-		}
 	}
 
 	PonyMath::Core::Vector2<int> WindowsWindowSystem::GetTargetPosition(const WindowRect& rect) noexcept
