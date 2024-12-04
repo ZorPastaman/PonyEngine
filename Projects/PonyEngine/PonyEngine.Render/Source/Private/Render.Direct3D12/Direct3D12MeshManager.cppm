@@ -65,7 +65,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const Direct3D12IndexFormat& VertexIndexFormat() const noexcept override;
 
-		[[nodiscard("Pure constructor")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) override;
 
 		/// @brief Cleans out of dead meshes.

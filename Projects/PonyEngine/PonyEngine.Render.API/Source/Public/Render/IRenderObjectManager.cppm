@@ -31,6 +31,7 @@ export namespace PonyEngine::Render
 		/// @param mesh Render object mesh.
 		/// @param modelMatrix Render object translation-rotation-scaling matrix.
 		/// @return Render object handle.
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity) = 0;
 	};
 }

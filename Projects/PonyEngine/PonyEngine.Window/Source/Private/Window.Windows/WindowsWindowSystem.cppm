@@ -91,7 +91,7 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
 
-		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<UINT> messageTypes) override;
+		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) override;
 		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
@@ -279,7 +279,7 @@ namespace PonyEngine::Window
 		return hWnd;
 	}
 
-	void WindowsWindowSystem::AddMessageObserver(IWindowsMessageObserver& observer, const std::span<UINT> messageTypes)
+	void WindowsWindowSystem::AddMessageObserver(IWindowsMessageObserver& observer, const std::span<const UINT> messageTypes)
 	{
 		for (const auto messageType : messageTypes)
 		{

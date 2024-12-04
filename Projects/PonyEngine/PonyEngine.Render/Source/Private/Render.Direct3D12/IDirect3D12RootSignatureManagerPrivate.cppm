@@ -30,7 +30,7 @@ export namespace PonyEngine::Render
 		/// @param rootSignatureShader Root signature shader.
 		/// @param mvpIndex Model-view-projection matrix slot index.
 		/// @return 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) = 0;
 	};
 }

@@ -7,20 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputSystemParams;
+export module PonyEngine.Input.Windows.Detail;
 
-import <span>;
-import <unordered_map>;
-
-import :IInputDeviceFactory;
-import :InputBindingEntry;
-
-export namespace PonyEngine::Input
-{
-	/// @brief Input system parameters.
-	struct InputSystemParams final
-	{
-		std::span<IInputDeviceFactory*> inputDeviceFactories;
-		std::unordered_map<std::string_view, std::span<const InputBindingEntry>> inputBindings;
-	};
-}
+export import :WindowsKeyboardDeviceFactory;

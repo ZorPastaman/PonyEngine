@@ -46,7 +46,7 @@ export namespace PonyEngine::Render
 
 		~Direct3D12RootSignatureManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) override;
 
 		/// @brief Cleans out of dead root signatures.

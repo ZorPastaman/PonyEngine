@@ -7,18 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:Event;
+export module PonyEngine.Input:InputBindingEntry;
 
-import :KeyboardMessage;
+import <span>;
+import <string_view>;
+import <utility>;
+
+import :InputCode;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input event.
-	struct Event final
+	struct InputBindingEntry final
 	{
-		[[nodiscard("Pure operator")]]
-		bool operator ==(const Event& other) const noexcept = default;
-
-		KeyboardMessage expectedMessage; ///< The event is raised if the input system receives such an event.
+		InputCode inputCode;
+		float multiplier = 1.f;
 	};
 }
