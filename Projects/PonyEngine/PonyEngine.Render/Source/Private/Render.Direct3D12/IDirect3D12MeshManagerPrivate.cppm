@@ -44,7 +44,7 @@ export namespace PonyEngine::Render
 		/// @brief Creates a render mesh.
 		/// @param mesh Mesh.
 		/// @return Render mesh.
-		[[nodiscard("Pure constructor")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) = 0;
 	};
 }

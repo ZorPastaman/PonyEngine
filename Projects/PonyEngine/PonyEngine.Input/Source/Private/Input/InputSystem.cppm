@@ -9,17 +9,20 @@
 
 module;
 
+#include <ranges>
+
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Input.Detail:InputSystem;
 
-import <format>;
+import <algorithm>;
 import <functional>;
-import <queue>;
-import <string>;
-import <typeinfo>;
+import <memory>;
+import <span>;
+import <string_view>;
 import <unordered_map>;
 import <utility>;
+import <vector>;
 
 import PonyDebug.Log;
 
@@ -29,7 +32,7 @@ import PonyEngine.Input;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class InputSystem final : public Core::TickableSystem, public IInputSystem, public IKeyboardObserver
+	class InputSystem final : public Core::TickableSystem, public IInputSystem, private IInputSystemContext
 	{
 	public:
 		/// @brief Creates an input system
@@ -41,107 +44,183 @@ export namespace PonyEngine::Input
 		InputSystem(const InputSystem&) = delete;
 		InputSystem(InputSystem&&) = delete;
 
-		virtual ~InputSystem() noexcept override = default;
+		virtual ~InputSystem() noexcept override;
 
 		virtual void Begin() override;
 		virtual void End() override;
 
 		virtual void Tick() override;
 
-		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) override;
-		virtual void UnregisterAction(Handle handle) override;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(bool)>& action) override;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(float)>& action) override;
 
-		virtual void Observe(const KeyboardMessage& keyboardMessage) noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual Core::ISystemManager& SystemManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const Core::ISystemManager& SystemManager() const noexcept override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
 
 	private:
-		std::size_t currentId; ///< ID that will be given to a new event. It's incremented every time.
+		struct InputMappingEntryInfo final
+		{
+			std::string id;
+			float multiplier;
+		};
 
-		std::unordered_map<KeyboardKeyCode, bool> keyStates; ///< Current key states.
-		std::queue<KeyboardMessage> queue; ///< Message queue.
+		struct BoolBinding final
+		{
+			std::shared_ptr<InputHandle> handle;
+			std::function<void(bool)> function;
+		};
+		struct FloatBinding final
+		{
+			std::shared_ptr<InputHandle> handle;
+			std::function<void(float)> function;
+		};
 
-		std::unordered_map<Handle, std::pair<Event, std::function<void()>>, HandleHash> events; ///< Input event action map.
+		std::vector<std::unique_ptr<InputDevice>> devices;
+		std::unordered_map<InputCode, std::vector<InputMappingEntryInfo>> inputMapping;
+
+		std::unordered_map<std::string, std::vector<BoolBinding>> boolBindings;
+		std::unordered_map<std::string, std::vector<FloatBinding>> floatBindings;
 	};
 }
 
 namespace PonyEngine::Input
 {
-	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams&) noexcept :
-		TickableSystem(engine, systemParams),
-		currentId{1}
+	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams& inputParams) noexcept :
+		TickableSystem(engine, systemParams)
 	{
+		for (IInputDeviceFactory* const deviceFactory : inputParams.inputDeviceFactories)
+		{
+			devices.push_back(deviceFactory->CreateDevice(*static_cast<IInputSystemContext*>(this)));
+		}
+
+		for (const auto& [id, inputBindingEntries] : inputParams.inputBindings)
+		{
+			for (const InputBindingEntry& bindingEntry : inputBindingEntries)
+			{
+				inputMapping[bindingEntry.inputCode].push_back(InputMappingEntryInfo{.id = std::string(id), .multiplier = bindingEntry.multiplier});
+			}
+		}
+	}
+
+	InputSystem::~InputSystem() noexcept
+	{
+		for (auto it = devices.rbegin(); it != devices.rend(); ++it)
+		{
+			it->reset();
+		}
 	}
 
 	void InputSystem::Begin()
 	{
-		if (IKeyboardProvider* const keyboardProvider = Engine().SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
+		for (const std::unique_ptr<InputDevice>& device : devices)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Subscribe to '{}' keyboard provider.", typeid(*keyboardProvider).name());
-			keyboardProvider->AddKeyboardObserver(*this);
-		}
-		else [[unlikely]]
-		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Warning, "Couldn't find keyboard provider, keyboard input won't work.");
+			device->Begin();
 		}
 	}
 
 	void InputSystem::End()
 	{
-		if (IKeyboardProvider* const keyboardProvider = Engine().SystemManager().FindSystem<IKeyboardProvider>()) [[likely]]
+		for (auto it = devices.crbegin(); it != devices.crend(); ++it)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Unsubscribe to '{}' keyboard provider.", typeid(*keyboardProvider).name());
-			keyboardProvider->RemoveKeyboardObserver(*this);
+			try
+			{
+				(*it)->End();
+			}
+			catch (const std::exception& e)
+			{
+				
+			}
 		}
 	}
 
 	void InputSystem::Tick()
 	{
-		while (!queue.empty())
+		for (std::vector<BoolBinding>& binding : std::ranges::views::values(boolBindings))
 		{
-			const KeyboardMessage message = queue.front();
-			queue.pop();
-			
-			for (const auto& [handle, eventPair] : events)
+			for (std::size_t i = binding.size(); i-- > 0; )
 			{
-				if (eventPair.first.expectedMessage == message)
+				if (binding[i].handle.use_count() <= 1)
 				{
-					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Tick an action. ID: '{}'.", handle.id);
-					eventPair.second();
+					binding.erase(binding.cbegin() + i);
+				}
+			}
+		}
+		for (std::vector<FloatBinding>& binding : std::ranges::views::values(floatBindings))
+		{
+			for (std::size_t i = binding.size(); i-- > 0; )
+			{
+				if (binding[i].handle.use_count() <= 1)
+				{
+					binding.erase(binding.cbegin() + i);
+				}
+			}
+		}
+
+		for (const std::unique_ptr<InputDevice>& device : devices)
+		{
+			device->Tick();
+		}
+
+		for (const std::unique_ptr<InputDevice>& device : devices)
+		{
+			for (const InputEntry& inputEntry : device->GetInputs())
+			{
+				if (const auto& mappingPosition = inputMapping.find(inputEntry.inputCode); mappingPosition != inputMapping.cend())
+				{
+					for (const InputMappingEntryInfo& inputMappingEntryInfo : mappingPosition->second)
+					{
+						if (const auto& boolBinding = boolBindings.find(inputMappingEntryInfo.id); boolBinding != boolBindings.cend())
+						{
+							const bool value = inputEntry.value;
+							for (const BoolBinding& binding : boolBinding->second)
+							{
+								binding.function(value);
+							}
+						}
+
+						if (const auto& floatBinding = floatBindings.find(inputMappingEntryInfo.id); floatBinding != floatBindings.cend())
+						{
+							for (const FloatBinding& binding : floatBinding->second)
+							{
+								binding.function(inputEntry.value * inputMappingEntryInfo.multiplier);
+							}
+						}
+					}
 				}
 			}
 		}
 	}
 
-	Handle InputSystem::RegisterAction(const Event& event, const std::function<void()>& action)
+	std::shared_ptr<InputHandle> InputSystem::Bind(const std::string_view id, const std::function<void(bool)>& action)
 	{
-		const auto handle = Handle{.id = currentId++};
-		const std::pair<Event, std::function<void()>> eventAction(event, action);
-		events.insert(std::pair(handle, eventAction));
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Action registered. ExpectedMessage: '{}', ID: '{}'.", event.expectedMessage.ToString(), handle.id);
+		const auto handle = std::make_shared<InputHandle>();
+		boolBindings[std::string(id)].push_back(BoolBinding{.handle = handle, .function = action});
 
 		return handle;
 	}
 
-	void InputSystem::UnregisterAction(const Handle handle)
+	std::shared_ptr<InputHandle> InputSystem::Bind(const std::string_view id, const std::function<void(float)>& action)
 	{
-		events.erase(handle);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Action unregistered. ID: '{}'.", handle.id);
+		const auto handle = std::make_shared<InputHandle>();
+		floatBindings[std::string(id)].push_back(FloatBinding{.handle = handle, .function = action});
+
+		return handle;
 	}
 
-	void InputSystem::Observe(const KeyboardMessage& keyboardMessage) noexcept
+	Core::ISystemManager& InputSystem::SystemManager() noexcept
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Received keyboard message: '{}'.", keyboardMessage.ToString());
+		return Engine().SystemManager();
+	}
 
-		if (const auto pair = keyStates.find(keyboardMessage.keyCode); pair != keyStates.cend() && pair->second == keyboardMessage.isDown)
-		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Ignore keyboard message 'cause it doesn't change state.");
-
-			return;
-		}
-
-		keyStates.insert_or_assign(keyboardMessage.keyCode, keyboardMessage.isDown);
-		queue.push(KeyboardMessage{.keyCode = keyboardMessage.keyCode, .isDown = keyboardMessage.isDown});
+	const Core::ISystemManager& InputSystem::SystemManager() const noexcept
+	{
+		return Engine().SystemManager();
 	}
 }

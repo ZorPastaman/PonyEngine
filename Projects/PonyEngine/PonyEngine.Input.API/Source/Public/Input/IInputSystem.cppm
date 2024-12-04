@@ -14,9 +14,10 @@ module;
 export module PonyEngine.Input:IInputSystem;
 
 import <functional>;
+import <memory>;
+import <string_view>;
 
-import :Event;
-import :Handle;
+import :InputHandle;
 
 export namespace PonyEngine::Input
 {
@@ -25,13 +26,9 @@ export namespace PonyEngine::Input
 	{
 		INTERFACE_BODY(IInputSystem)
 
-		/// @brief Registers the action that's raised if the event meets the condition.
-		/// @param event Condition.
-		/// @param action Action.
-		/// @return Registration handle. It's used to unregister.
-		virtual Handle RegisterAction(const Event& event, const std::function<void()>& action) = 0;
-		/// @brief Unregisters an action by its handle.
-		/// @param handle Action handle.
-		virtual void UnregisterAction(Handle handle) = 0;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(bool)>& action) = 0;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(float)>& action) = 0;
 	};
 }

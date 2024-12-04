@@ -7,20 +7,30 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputSystemParams;
+module;
+
+#include "PonyBase/Utility/Base.h"
+
+export module PonyEngine.Input:InputDevice;
 
 import <span>;
-import <unordered_map>;
+import <utility>;
 
-import :IInputDeviceFactory;
-import :InputBindingEntry;
+import :InputEntry;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input system parameters.
-	struct InputSystemParams final
+	class InputDevice
 	{
-		std::span<IInputDeviceFactory*> inputDeviceFactories;
-		std::unordered_map<std::string_view, std::span<const InputBindingEntry>> inputBindings;
+		BASE_BODY(InputDevice)
+
+	public:
+		virtual void Begin() = 0;
+		virtual void End() = 0;
+
+		virtual void Tick() = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::span<const InputEntry> GetInputs() const noexcept = 0;
 	};
 }

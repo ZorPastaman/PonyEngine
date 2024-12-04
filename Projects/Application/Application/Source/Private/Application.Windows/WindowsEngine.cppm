@@ -32,7 +32,7 @@ import PonyMath.Core;
 import PonyDebug.Log;
 
 import PonyEngine.Core.Impl;
-import PonyEngine.Input.Impl;
+import PonyEngine.Input.Windows.Impl;
 import PonyEngine.Render.Direct3D12.Windows.Impl;
 import PonyEngine.Screen.Windows.Impl;
 import PonyEngine.Time.Impl;
@@ -79,7 +79,7 @@ export namespace Application
 		/// @brief Creates an input system factory.
 		/// @return Input system factory.
 		[[nodiscard("Pure function")]]
-		PonyEngine::Input::InputSystemFactoryData CreateInputSystemFactory() const;
+		PonyEngine::Input::InputSystemFactoryData CreateInputSystemFactory();
 		/// @brief Creates a render system factory.
 		/// @return Render system factory.
 		[[nodiscard("Pure function")]]
@@ -92,11 +92,15 @@ export namespace Application
 		/// @brief Creates an engine.
 		/// @return Created engine.
 		[[nodiscard("Pure function")]]
-		PonyEngine::Core::EngineData CreateEngine() const;
+		PonyEngine::Core::EngineData CreateEngine();
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
 
 		std::unique_ptr<PonyEngine::Core::Engine> engine; ///< Engine.
+
+		std::unique_ptr<PonyEngine::Input::InputDeviceFactory> keyboardDevice; // TODO: Remove, make it better
+		std::array<PonyEngine::Input::IInputDeviceFactory*, 1> devices;
+		std::array<PonyEngine::Input::InputBindingEntry, 2> forward;
 	};
 }
 
@@ -104,7 +108,8 @@ namespace Application
 {
 	WindowsEngine::WindowsEngine(PonyEngine::Core::IApplicationContext& application) :
 		application{&application},
-		engine{CreateEngine().engine}
+		engine{CreateEngine().engine},
+		keyboardDevice(nullptr)
 	{
 	}
 
@@ -206,12 +211,75 @@ namespace Application
 		}
 	}
 
-	PonyEngine::Input::InputSystemFactoryData WindowsEngine::CreateInputSystemFactory() const
+	PonyEngine::Input::InputSystemFactoryData WindowsEngine::CreateInputSystemFactory()
 	{
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
-			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, PonyEngine::Input::InputSystemParams{});
+			keyboardDevice.release();
+			keyboardDevice = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory();
+			devices = std::array<PonyEngine::Input::IInputDeviceFactory*, 1>{ keyboardDevice.get() };
+			auto inputParams = PonyEngine::Input::InputSystemParams{};
+			inputParams.inputDeviceFactories = devices;
+			forward = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::W, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::S, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Forward"] = forward;
+			constexpr auto right = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::D, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::A, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Right"] = right;
+			constexpr auto up = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Up"] = up;
+			constexpr auto rotateRight = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::ArrowRight, .multiplier = -1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::ArrowLeft, .multiplier = 1.f},
+			};
+			inputParams.inputBindings["RotateRight"] = rotateRight;
+			constexpr auto rotateUp = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::ArrowUp, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::ArrowDown, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Forward"] = forward;
+			constexpr auto xScale = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::X, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::Z, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["XScale"] = xScale;
+			constexpr auto yScale = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::V, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::C, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["YScale"] = yScale;
+			constexpr auto zScale = std::array<PonyEngine::Input::InputBindingEntry, 2>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::N, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::B, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["ZScale"] = zScale;
+			constexpr auto reset = std::array<PonyEngine::Input::InputBindingEntry, 1>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["Reset"] = reset;
+			constexpr auto exit = std::array<PonyEngine::Input::InputBindingEntry, 1>
+			{
+				PonyEngine::Input::InputBindingEntry{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["Exit"] = exit;
+			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, inputParams);
 			assert(factory.systemFactory && "The input system factory is nullptr");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", typeid(*factory.systemFactory).name());
 
@@ -265,7 +333,7 @@ namespace Application
 		}
 	}
 
-	PonyEngine::Core::EngineData WindowsEngine::CreateEngine() const
+	PonyEngine::Core::EngineData WindowsEngine::CreateEngine()
 	{
 		try
 		{

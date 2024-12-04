@@ -11,19 +11,20 @@ module;
 
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Input:IKeyboardObserver;
+export module PonyEngine.Input:IInputDeviceFactory;
 
-import :KeyboardMessage;
+import <memory>;
+
+import :IInputSystemContext;
+import :InputDevice;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Keyboard input observer.
-	class IKeyboardObserver
+	class IInputDeviceFactory
 	{
-		INTERFACE_BODY(IKeyboardObserver)
+		INTERFACE_BODY(IInputDeviceFactory)
 
-		/// @brief Receives a keyboard input.
-		/// @param keyboardMessage Keyboard message.
-		virtual void Observe(const KeyboardMessage& keyboardMessage) = 0;
+		[[nodiscard("Pure function")]]
+		virtual std::unique_ptr<InputDevice> CreateDevice(IInputSystemContext& inputSystem) = 0;
 	};
 }

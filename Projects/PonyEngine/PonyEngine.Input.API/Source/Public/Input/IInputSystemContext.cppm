@@ -7,20 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputSystemParams;
+module;
 
-import <span>;
-import <unordered_map>;
+#include "PonyBase/Utility/Interface.h"
 
-import :IInputDeviceFactory;
-import :InputBindingEntry;
+export module PonyEngine.Input:IInputSystemContext;
+
+import PonyEngine.Core;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input system parameters.
-	struct InputSystemParams final
+	class IInputSystemContext
 	{
-		std::span<IInputDeviceFactory*> inputDeviceFactories;
-		std::unordered_map<std::string_view, std::span<const InputBindingEntry>> inputBindings;
+		INTERFACE_BODY(IInputSystemContext)
+
+		[[nodiscard("Pure function")]]
+		virtual Core::ISystemManager& SystemManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const Core::ISystemManager& SystemManager() const noexcept = 0;
 	};
 }

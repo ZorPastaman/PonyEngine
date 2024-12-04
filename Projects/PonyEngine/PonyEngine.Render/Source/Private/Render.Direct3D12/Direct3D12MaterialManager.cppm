@@ -51,7 +51,7 @@ export namespace PonyEngine::Render
 
 		~Direct3D12MaterialManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
 			const Direct3D12PipelineParams& pipelineParams) override;
 
