@@ -83,14 +83,14 @@ namespace PonyDebug::Log
 
 	void LoggerImpl::AddSubLogger(ISubLogger& subLogger)
 	{
-		assert(std::ranges::find(std::as_const(subLoggers), &subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
+		assert(std::ranges::find(subLoggers, &subLogger) == subLoggers.cend() && "The sub-logger has already been added.");
 		subLoggers.push_back(&subLogger);
 		PONY_CONSOLE(LogType::Debug, "'{}' sub-logger added.", typeid(subLogger).name());
 	}
 
 	void LoggerImpl::RemoveSubLogger(ISubLogger& subLogger)
 	{
-		if (const auto position = std::ranges::find(std::as_const(subLoggers), &subLogger); position != subLoggers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(subLoggers, &subLogger); position != subLoggers.cend()) [[likely]]
 		{
 			subLoggers.erase(position);
 			PONY_CONSOLE(LogType::Debug, "'{}' sub-logger removed.", typeid(subLogger).name());

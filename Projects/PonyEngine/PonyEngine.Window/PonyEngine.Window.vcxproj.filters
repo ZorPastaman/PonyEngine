@@ -28,9 +28,6 @@
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\WindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
