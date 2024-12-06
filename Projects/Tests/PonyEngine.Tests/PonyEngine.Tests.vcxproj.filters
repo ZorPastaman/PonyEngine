@@ -21,16 +21,7 @@
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Input\HandleTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\KeyboardKeyCodeTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\KeyboardMessageTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Input\InputSystemTests.cpp">
+    <ClCompile Include="Input\InputCodeTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Input\InputSystemFactoryTests.cpp">

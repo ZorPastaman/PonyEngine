@@ -80,11 +80,8 @@
     <ClCompile Include="Mocks\SystemFactory.cpp" />
     <ClCompile Include="Mocks\TickableSystem.cpp" />
     <ClCompile Include="Mocks\TickableSystemFactory.cpp" />
-    <ClCompile Include="Input\HandleTests.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
-    <ClCompile Include="Input\InputSystemTests.cpp" />
-    <ClCompile Include="Input\KeyboardKeyCodeTests.cpp" />
-    <ClCompile Include="Input\KeyboardMessageTests.cpp" />
+    <ClCompile Include="Input\InputCodeTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderObjectTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderSystemFactoryTests.cpp" />

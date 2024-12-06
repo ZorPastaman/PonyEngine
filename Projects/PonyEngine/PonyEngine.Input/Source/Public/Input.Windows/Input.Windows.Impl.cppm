@@ -14,21 +14,28 @@ module;
 export module PonyEngine.Input.Windows.Impl;
 
 export import PonyEngine.Input.Impl;
+export import PonyEngine.Input.Windows;
 
 import <memory>;
 
+import PonyEngine.Core;
 import PonyEngine.Input.Windows.Detail;
 
 export namespace PonyEngine::Input
 {
-	[[nodiscard("Pure function")]] // TODO: Add data and params
-	PONY_DLL_EXPORT std::unique_ptr<InputDeviceFactory> CreateWindowsKeyboardDeviceFactory();
+	/// @brief Creates a Windows keyboard device factory.
+	/// @param application Application context.
+	/// @param factoryParams Windows keyboard device factory parameters.
+	/// @param deviceParams Windows keyboard device parameters.
+	/// @return Windows keyboard device factory.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT WindowsKeyboardDeviceFactoryData CreateWindowsKeyboardDeviceFactory(Core::IApplicationContext& application, const WindowsKeyboardDeviceFactoryParams& factoryParams, const WindowsKeyboardDeviceParams& deviceParams);
 }
 
 namespace PonyEngine::Input
 {
-	std::unique_ptr<InputDeviceFactory> CreateWindowsKeyboardDeviceFactory()
+	WindowsKeyboardDeviceFactoryData CreateWindowsKeyboardDeviceFactory(Core::IApplicationContext& application, const WindowsKeyboardDeviceFactoryParams& factoryParams, const WindowsKeyboardDeviceParams& deviceParams)
 	{
-		return std::make_unique<WindowsKeyboardDeviceFactory>();
+		return WindowsKeyboardDeviceFactoryData{.inputDeviceFactory = std::make_unique<WindowsKeyboardDeviceFactory>(application, factoryParams, deviceParams)};
 	}
 }

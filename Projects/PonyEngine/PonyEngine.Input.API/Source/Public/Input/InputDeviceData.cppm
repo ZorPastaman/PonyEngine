@@ -7,19 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Input:InputDeviceData;
 
-#include "PonyBase/Utility/Base.h"
+import <memory>;
 
-export module PonyEngine.Input:InputDeviceFactory;
-
-import :IInputDeviceFactory;
+import :InputDevice;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input device factory.
-	class InputDeviceFactory : public IInputDeviceFactory
+	/// @brief Input device data.
+	struct InputDeviceData final
 	{
-		BASE_BODY(InputDeviceFactory)
+		std::unique_ptr<InputDevice> inputDevice; ///< Input device.
 	};
 }

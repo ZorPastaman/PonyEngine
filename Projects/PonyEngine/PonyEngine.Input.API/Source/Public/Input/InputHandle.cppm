@@ -11,6 +11,7 @@ export module PonyEngine.Input:InputHandle;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Input handle. It's just a marker to determine if an input binding is still actual.
 	class InputHandle final
 	{
 	};

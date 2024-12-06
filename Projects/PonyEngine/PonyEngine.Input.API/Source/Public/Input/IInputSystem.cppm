@@ -26,8 +26,17 @@ export namespace PonyEngine::Input
 	{
 		INTERFACE_BODY(IInputSystem)
 
+		/// @brief Binds the action to the input.
+		/// @param id Input ID.
+		/// @param action Action to bind.
+		/// @param magnitudeThreshold Magnitude threshold. The input is @a true if its magnitude is greater than this value.
+		/// @return Input handle. It must be kept till the input is needed.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(bool)>& action) = 0;
+		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(bool)>& action, float magnitudeThreshold = 0.2f) = 0;
+		/// @brief Binds the action to the input.
+		/// @param id Input ID.
+		/// @param action Action to bind.
+		/// @return Input handle. It must be kept till the input is needed.
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(float)>& action) = 0;
 	};

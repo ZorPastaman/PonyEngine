@@ -37,10 +37,10 @@ export namespace PonyEngine::Input
 		virtual ~InputSystemFactoryImpl() noexcept override = default;
 
 		[[nodiscard("Pure function")]]
-		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override final;
+		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override final;
+		virtual const std::type_info& SystemType() const noexcept override;
 
 		InputSystemFactoryImpl& operator =(const InputSystemFactoryImpl&) = delete;
 		InputSystemFactoryImpl& operator =(InputSystemFactoryImpl&&) = delete;

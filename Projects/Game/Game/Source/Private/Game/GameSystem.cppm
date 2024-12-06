@@ -9,16 +9,14 @@
 
 module;
 
-#include <memory>
-
 #include "PonyDebug/Log/Log.h"
 
 export module Game.Detail:GameSystem;
 
-import <algorithm>;
 import <array>;
 import <cstdint>;
 import <functional>;
+import <memory>;
 
 import PonyMath.Color;
 import PonyMath.Core;
@@ -91,6 +89,29 @@ namespace Game
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
 
 			forwardHandle = inputSystem->Bind("Forward", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, 5.f) * input); }));
+			rightHandle = inputSystem->Bind("Right", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(5.f, 0.f, 0.f) * input); }));
+			upHandle = inputSystem->Bind("Up", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 5.f, 0.f) * input); }));
+			rotateRightHandle = inputSystem->Bind("RotateRight", std::function<void(float)>([&](const float input) { boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, -10.f * PonyMath::Core::DegToRad<float>, 0.f) * input)); }));
+			rotateUpHandle = inputSystem->Bind("RotateUp", std::function<void(float)>([&](const float input) { boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f) * input)); }));
+			xHandle = inputSystem->Bind("XScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.1f, 0.f, 0.f) * input); }));
+			yHandle = inputSystem->Bind("YScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.f, 0.1f, 0.f) * input); }));
+			zHandle = inputSystem->Bind("ZScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.f, 0.f, 0.1f) * input); }));
+			resetHandle = inputSystem->Bind("Reset", std::function<void(bool)>([&](const bool input)
+			{
+				if (input)
+				{
+					boxTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f));
+					boxTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity);
+					boxTransform.Scale(5.f);
+				}
+			}));
+			exitHandle = inputSystem->Bind("Exit", std::function<void(bool)>([&](const bool input)
+			{
+				if (!input)
+				{
+					Engine().Stop();
+				}
+			}));
 
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 		}
@@ -131,12 +152,6 @@ namespace Game
 
 	void GameSystem::End()
 	{
-		if (PonyEngine::Input::IInputSystem* const inputSystem = Engine().SystemManager().FindSystem<PonyEngine::Input::IInputSystem>())
-		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Unregister inputs.");
-
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs unregistered.");
-		}
 	}
 
 	void GameSystem::Tick()

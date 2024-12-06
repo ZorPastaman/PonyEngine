@@ -12,7 +12,6 @@
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include <cstddef>
-#include <cstdint>
 #include <format>
 #include <string>
 #include <string_view>
@@ -42,16 +41,20 @@ namespace Window
 {
 	TEST_CLASS(WindowsWindowTests)
 	{
-		class KeyboardObserver final : public PonyEngine::Input::IKeyboardObserver
+		class MessageObserver final : public PonyEngine::Window::IWindowsMessageObserver
 		{
 		public:
-			PonyEngine::Input::KeyboardMessage lastMessage;
-			std::size_t version = 0;
+			std::size_t version;
+			UINT lastMessage;
+			WPARAM lastWParam;
+			LPARAM lastLParam;
 
-			virtual void Observe(const PonyEngine::Input::KeyboardMessage& keyboardMessage) override
+			virtual void Observe(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) override
 			{
-				lastMessage = keyboardMessage;
 				++version;
+				lastMessage = uMsg;
+				lastWParam = wParam;
+				lastLParam = lParam;
 			}
 		};
 
@@ -190,7 +193,7 @@ namespace Window
 			std::get<1>(window.system)->End();
 		}
 
-		TEST_METHOD(InputMessageTest)
+		TEST_METHOD(MessageObserverTest)
 		{
 			auto logger = Mocks::Logger();
 			auto screenSystem = Mocks::ScreenSystem();
@@ -201,25 +204,38 @@ namespace Window
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
 			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
+			const auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
-			auto keyboardObserver = KeyboardObserver();
-			auto keyboardProvider = dynamic_cast<PonyEngine::Input::IKeyboardProvider*>(std::get<1>(window.system).get());
-			keyboardProvider->AddKeyboardObserver(keyboardObserver);
-			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, LPARAM{1310721});
+			auto messageObserver = MessageObserver();
+			constexpr auto messages = std::array<UINT, 2>{ WM_KEYDOWN, WM_KEYUP };
+			windowsWindow->AddMessageObserver(messageObserver, messages);
+
+			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, 1310721);
 			std::get<1>(window.system)->Tick();
-			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::T, .isDown = true});
-			PostMessageW(windowsWindow->WindowHandle(), WM_KEYUP, 0, LPARAM{3080193});
+			Assert::AreEqual(std::size_t{1}, messageObserver.version);
+			Assert::AreEqual(static_cast<UINT>(WM_KEYDOWN), messageObserver.lastMessage);
+			Assert::AreEqual(static_cast<WPARAM>(0), messageObserver.lastWParam);
+			Assert::AreEqual(static_cast<LPARAM>(1310721), messageObserver.lastLParam);
+
+			PostMessageW(windowsWindow->WindowHandle(), WM_KEYUP, 0, 3080193);
 			std::get<1>(window.system)->Tick();
-			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::V, .isDown = false});
-			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYDOWN, 0, LPARAM{540540929});
+			Assert::AreEqual(std::size_t{2}, messageObserver.version);
+			Assert::AreEqual(static_cast<UINT>(WM_KEYUP), messageObserver.lastMessage);
+			Assert::AreEqual(static_cast<WPARAM>(0), messageObserver.lastWParam);
+			Assert::AreEqual(static_cast<LPARAM>(3080193), messageObserver.lastLParam);
+
+			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYUP, 0, 3080193);
 			std::get<1>(window.system)->Tick();
-			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::LeftAlt, .isDown = true});
-			PostMessageW(windowsWindow->WindowHandle(), WM_SYSKEYUP, 0, LPARAM{557318145});
+			Assert::AreEqual(std::size_t{2}, messageObserver.version);
+
+			windowsWindow->RemoveMessageObserver(messageObserver);
+			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, 1310721);
 			std::get<1>(window.system)->Tick();
-			Assert::IsTrue(keyboardObserver.lastMessage == PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::RightAlt, .isDown = false});
+			Assert::AreEqual(std::size_t{2}, messageObserver.version);
+
 			std::get<1>(window.system)->End();
 		}
 	};

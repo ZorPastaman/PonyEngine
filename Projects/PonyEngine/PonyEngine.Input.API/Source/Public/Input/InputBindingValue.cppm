@@ -7,15 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputEntry;
+export module PonyEngine.Input:InputBindingValue;
 
 import :InputCode;
 
 export namespace PonyEngine::Input
 {
-	struct InputEntry final
+	/// @brief Input binding value. It's the second element a table pair.
+	struct InputBindingValue final
 	{
-		InputCode inputCode;
-		float value;
+		InputCode inputCode; ///< Input code.
+		float multiplier = 1.f; ///< Input multiplier.
 	};
 }

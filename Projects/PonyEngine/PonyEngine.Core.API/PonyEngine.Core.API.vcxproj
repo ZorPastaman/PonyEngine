@@ -22,6 +22,7 @@
     <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
     <ClCompile Include="Source\Public\Core\ISystemFactory.cppm" />
     <ClCompile Include="Source\Public\Core\SystemData.cppm" />
+    <ClCompile Include="Source\Public\Core\SystemFactoryEntry.cppm" />
     <ClCompile Include="Source\Public\Core\SystemParams.cppm" />
     <ClCompile Include="Source\Public\Core\IApplicationContext.cppm" />
     <ClCompile Include="Source\Public\Core\System.cppm" />

@@ -9,18 +9,19 @@
 
 export module PonyEngine.Input:InputSystemParams;
 
-import <span>;
+import <memory>;
 import <unordered_map>;
+import <vector>;
 
 import :IInputDeviceFactory;
-import :InputBindingEntry;
+import :InputBindingValue;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Input system parameters.
 	struct InputSystemParams final
 	{
-		std::span<IInputDeviceFactory*> inputDeviceFactories;
-		std::unordered_map<std::string_view, std::span<const InputBindingEntry>> inputBindings;
+		std::vector<std::shared_ptr<IInputDeviceFactory>> inputDeviceFactories; ///< Input device factories.
+		std::unordered_map<std::string, std::vector<InputBindingValue>> inputBindings; ///< Input bindings.
 	};
 }

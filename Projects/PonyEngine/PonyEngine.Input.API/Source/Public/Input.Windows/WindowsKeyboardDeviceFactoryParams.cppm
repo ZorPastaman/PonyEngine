@@ -7,19 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyBase/Utility/Base.h"
-
-export module PonyEngine.Input:InputDeviceFactory;
-
-import :IInputDeviceFactory;
+export module PonyEngine.Input.Windows:WindowsKeyboardDeviceFactoryParams;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input device factory.
-	class InputDeviceFactory : public IInputDeviceFactory
+	/// @brief Windows keyboard device factory parameters.
+	struct WindowsKeyboardDeviceFactoryParams final
 	{
-		BASE_BODY(InputDeviceFactory)
 	};
 }
