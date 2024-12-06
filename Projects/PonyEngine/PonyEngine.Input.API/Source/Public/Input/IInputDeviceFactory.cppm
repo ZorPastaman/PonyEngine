@@ -14,17 +14,29 @@ module;
 export module PonyEngine.Input:IInputDeviceFactory;
 
 import <memory>;
+import <typeinfo>;
 
 import :IInputSystemContext;
-import :InputDevice;
+import :InputDeviceData;
+import :InputDeviceParams;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Input device factory.
 	class IInputDeviceFactory
 	{
 		INTERFACE_BODY(IInputDeviceFactory)
 
+		/// @brief Creates a device.
+		/// @param inputSystem Input system context.
+		/// @param deviceParams Input device parameters.
+		/// @return Input device.
+		[[nodiscard("Pure function")]] // TODO: Rename some to Redundant call
+		virtual InputDeviceData CreateDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams) = 0;
+
+		/// @brief Gets the device type that the factory creates.
+		/// @return Device type.
 		[[nodiscard("Pure function")]]
-		virtual std::unique_ptr<InputDevice> CreateDevice(IInputSystemContext& inputSystem) = 0;
+		virtual const std::type_info& DeviceType() const noexcept = 0;
 	};
 }

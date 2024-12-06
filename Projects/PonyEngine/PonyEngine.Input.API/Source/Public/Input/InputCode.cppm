@@ -168,6 +168,8 @@ namespace PonyEngine::Input
 	{
 		// Special
 		{ InputCode::None, "None" },
+
+		// Keyboard
 		// Letters
 		{ InputCode::A, "A" },
 		{ InputCode::B, "B" },
@@ -276,7 +278,18 @@ namespace PonyEngine::Input
 		{ InputCode::NumpadComma, "Numpad ," },
 		{ InputCode::NumpadPeriod, "Numpad ." },
 		// Numpad system keys
-		{ InputCode::NumpadEnter, "Numpad Enter" }
+		{ InputCode::NumpadEnter, "Numpad Enter" },
+
+		// Mouse
+		// Axis
+		{ InputCode::MouseX, "Mouse X Axis" },
+		{ InputCode::MouseY, "Mouse Y Axis" },
+		{ InputCode::MouseLeftButton, "Mouse Left Button" },
+		{ InputCode::MouseRightButton, "Mouse Right Button" },
+		{ InputCode::MouseMiddleButton, "Mouse Middle Button" },
+		{ InputCode::MouseButton4, "Mouse Button 4" },
+		{ InputCode::MouseButton5, "Mouse Button 5" },
+		{ InputCode::MouseWheel, "Mouse Wheel" }
 	};
 
 	std::string_view ToString(const InputCode inputCode)

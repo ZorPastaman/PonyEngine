@@ -14,41 +14,40 @@ module;
 export module PonyEngine.Input.Windows.Detail:WindowsKeyboardDevice;
 
 import <array>;
-import <queue>;
-import <span>;
 import <unordered_map>;
-import <utility>;
-import <vector>;
 
-import PonyEngine.Input;
-import PonyEngine.Input.Detail;
+import PonyEngine.Input.Windows;
 import PonyEngine.Window.Windows;
 
 export namespace PonyEngine::Input
 {
+	/// @brief Windows keyboard device.
 	class WindowsKeyboardDevice final : public InputDevice, private Window::IWindowsMessageObserver
 	{
 	public:
+		/// @brief Creates a @p WindowsKeyboardDevice.
+		/// @param inputSystem Input system context.
+		/// @param deviceParams Input device parameters.
+		/// @param keyboardParams Keyboard parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit WindowsKeyboardDevice(IInputSystemContext& inputSystem);
+		WindowsKeyboardDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsKeyboardDeviceParams& keyboardParams);
+		WindowsKeyboardDevice(const WindowsKeyboardDevice&) = delete;
+		WindowsKeyboardDevice(WindowsKeyboardDevice&&) = delete;
+
+		virtual ~WindowsKeyboardDevice() noexcept override = default;
 
 		virtual void Begin() override;
 		virtual void End() override;
 
 		virtual void Tick() override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::span<const InputEntry> GetInputs() const noexcept override;
+		WindowsKeyboardDevice& operator =(const WindowsKeyboardDevice&) = delete;
+		WindowsKeyboardDevice& operator =(WindowsKeyboardDevice&&) = delete;
 
 	private:
 		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-		IInputSystemContext* inputSystem;
-
-		std::queue<std::pair<InputCode, bool>> inputQueue;
-		std::unordered_map<WORD, bool> lastInputValues;
-
-		std::vector<InputEntry> inputs;
+		std::unordered_map<WORD, bool> lastInputValues; ///< Last input values. It's used to prevent recreating an input event when a user holds a button.
 	};
 }
 
@@ -167,14 +166,14 @@ namespace PonyEngine::Input
 		{ WORD{0xE01C}, InputCode::NumpadEnter }
 	};
 
-	WindowsKeyboardDevice::WindowsKeyboardDevice(IInputSystemContext& inputSystem) :
-		inputSystem{&inputSystem}
+	WindowsKeyboardDevice::WindowsKeyboardDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsKeyboardDeviceParams&) :
+		InputDevice(inputSystem, deviceParams)
 	{
 	}
 
 	void WindowsKeyboardDevice::Begin()
 	{
-		if (const auto windowSystem = inputSystem->SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
 			constexpr auto messageTypes = std::array<UINT, 4> { WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP };
 			windowSystem->AddMessageObserver(*this, messageTypes);
@@ -183,7 +182,7 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::End()
 	{
-		if (const auto windowSystem = inputSystem->SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
 			windowSystem->RemoveMessageObserver(*this);
 		}
@@ -191,18 +190,6 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::Tick()
 	{
-		inputs.clear();
-		while (!inputQueue.empty())
-		{
-			const auto [inputCode, inputValue] = inputQueue.front();
-			inputQueue.pop();
-			inputs.push_back(InputEntry{.inputCode = inputCode, .value = static_cast<float>(inputValue)});
-		}
-	}
-
-	std::span<const InputEntry> WindowsKeyboardDevice::GetInputs() const noexcept
-	{
-		return inputs;
 	}
 
 	void WindowsKeyboardDevice::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam)
@@ -223,7 +210,7 @@ namespace PonyEngine::Input
 
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
-			inputQueue.emplace(keyCodeMapPosition->second, inputValue);
+			InputSystem().AddInputEvent(InputEvent{.inputCode = keyCodeMapPosition->second, .value = static_cast<float>(inputValue)});
 		}
 	}
 }

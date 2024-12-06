@@ -55,7 +55,7 @@ export namespace PonyEngine::Core
 
 		/// @brief Creates systems.
 		/// @param systemFactories System factories.
-		void CreateSystems(std::span<const std::pair<ISystemFactory*, std::int32_t>> systemFactories);
+		void CreateSystems(std::span<const SystemFactoryEntry> systemFactories);
 		/// @brief Destroys systems.
 		void DestroySystems() noexcept;
 
@@ -112,15 +112,15 @@ namespace PonyEngine::Core
 		return nullptr;
 	}
 
-	void SystemManager::CreateSystems(const std::span<const std::pair<ISystemFactory*, std::int32_t>> systemFactories)
+	void SystemManager::CreateSystems(const std::span<const SystemFactoryEntry> systemFactories)
 	{
 		auto tickableSystemsBuffer = std::vector<std::pair<TickableSystem*, std::int32_t>>();
 
-		for (const auto [factory, tickOrder] : systemFactories)
+		for (const auto& [factory, tickOrder] : systemFactories)
 		{
 			assert(factory && "The system factory is nullptr.");
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
-			SystemData systemData = CreateSystem(factory);
+			SystemData systemData = CreateSystem(factory.get());
 
 			switch (systemData.system.index())
 			{
@@ -135,7 +135,7 @@ namespace PonyEngine::Core
 				break;
 			}
 
-			for (const auto [interface, objectPointer] : systemData.publicInterfaces.Span())
+			for (const auto& [interface, objectPointer] : systemData.publicInterfaces.Span())
 			{
 				PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' interface.", interface.get().name());
 				assert(!systemInterfaces.contains(interface.get()) && "The interface has already been added.");
@@ -147,7 +147,7 @@ namespace PonyEngine::Core
 
 		std::ranges::sort(tickableSystemsBuffer, [](const std::pair<TickableSystem*, std::int32_t>& left, const std::pair<TickableSystem*, std::int32_t>& right){ return left.second < right.second; });
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Tick order:");
-		for (auto tickableSystem : std::views::keys(tickableSystemsBuffer))
+		for (TickableSystem* const tickableSystem : std::views::keys(tickableSystemsBuffer))
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, typeid(*tickableSystem).name());
 			tickableSystems.push_back(tickableSystem);

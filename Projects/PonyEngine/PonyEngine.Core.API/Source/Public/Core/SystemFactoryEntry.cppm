@@ -7,19 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Core:SystemFactoryEntry;
 
-#include "PonyBase/Utility/Base.h"
+import <cstdint>;
+import <memory>;
 
-export module PonyEngine.Input:InputDeviceFactory;
+import :ISystemFactory;
 
-import :IInputDeviceFactory;
-
-export namespace PonyEngine::Input
+export namespace PonyEngine::Core
 {
-	/// @brief Input device factory.
-	class InputDeviceFactory : public IInputDeviceFactory
+	/// @brief System factory entry.
+	struct SystemFactoryEntry final
 	{
-		BASE_BODY(InputDeviceFactory)
+		std::shared_ptr<ISystemFactory> factory; ///< System factory. Mustn't be @a nullptr.
+		std::int32_t tickOrder = 0; ///< Tick order.
 	};
 }

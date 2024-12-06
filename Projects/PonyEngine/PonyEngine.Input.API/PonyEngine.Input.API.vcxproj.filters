@@ -39,7 +39,7 @@
     <ClCompile Include="Source\Public\Input\InputHandle.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\InputBindingEntry.cppm">
+    <ClCompile Include="Source\Public\Input\InputBindingValue.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input\IInputSystemContext.cppm">
@@ -54,7 +54,25 @@
     <ClCompile Include="Source\Public\Input\InputDeviceFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\InputEntry.cppm">
+    <ClCompile Include="Source\Public\Input\InputEvent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input\InputDeviceData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input\InputDeviceParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

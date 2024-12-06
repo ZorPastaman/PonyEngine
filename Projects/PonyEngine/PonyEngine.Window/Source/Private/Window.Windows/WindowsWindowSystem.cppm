@@ -281,7 +281,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::AddMessageObserver(IWindowsMessageObserver& observer, const std::span<const UINT> messageTypes)
 	{
-		for (const auto messageType : messageTypes)
+		for (const UINT messageType : messageTypes)
 		{
 			std::vector<IWindowsMessageObserver*>& observerArray = observers[messageType];
 			assert(std::ranges::find(observerArray, &observer) == observerArray.cend() && "The window message observer has already been added.");
@@ -323,7 +323,14 @@ namespace PonyEngine::Window
 		{
 			for (IWindowsMessageObserver* const observer : position->second)
 			{
-				observer->Observe(uMsg, wParam, lParam);
+				try
+				{
+					observer->Observe(uMsg, wParam, lParam);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(Engine().Logger(), e, "On calling '{}' Windows message observer.", typeid(*observer).name());
+				}
 			}
 		}
 

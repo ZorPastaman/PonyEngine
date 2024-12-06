@@ -51,7 +51,7 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
+		virtual std::shared_ptr<IRenderObject> CreateObject(const PonyMath::Geometry::Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override; // TODO: Add tests to test cleaning (via weak_ptr).
 		/// @brief Creates a render object.
 		/// @param mesh Render object mesh.
 		/// @param modelMatrix Render object translation-rotation-scaling matrix.
@@ -137,7 +137,7 @@ namespace PonyEngine::Render
 		{
 			if (renderObjects[i].use_count() <= 1L)
 			{
-				renderObjects.erase(renderObjects.cbegin() + i);
+				renderObjects.erase(renderObjects.cbegin() + i); // TODO: Should add logs to things like this.
 			}
 		}
 	}

@@ -7,19 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputBindingEntry;
-
-import <span>;
-import <string_view>;
-import <utility>;
-
-import :InputCode;
+export module PonyEngine.Input:InputDeviceParams;
 
 export namespace PonyEngine::Input
 {
-	struct InputBindingEntry final
+	/// @brief Input device parameters.
+	struct InputDeviceParams
 	{
-		InputCode inputCode;
-		float multiplier = 1.f;
 	};
 }
