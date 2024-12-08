@@ -31,7 +31,7 @@ export namespace PonyEngine::Input
 		/// @param inputSystem Input system context.
 		/// @param deviceParams Input device parameters.
 		/// @return Input device.
-		[[nodiscard("Pure function")]] // TODO: Rename some to Redundant call
+		[[nodiscard("Redundant call")]]
 		virtual InputDeviceData CreateDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams) = 0;
 
 		/// @brief Gets the device type that the factory creates.

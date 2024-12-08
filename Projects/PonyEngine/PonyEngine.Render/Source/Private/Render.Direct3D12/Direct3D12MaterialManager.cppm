@@ -219,7 +219,9 @@ namespace PonyEngine::Render
 		{
 			if (materials[i].use_count() <= 1L)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
 				materials.erase(materials.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
 			}
 		}
 	}

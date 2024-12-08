@@ -34,7 +34,7 @@ export namespace PonyEngine::Input
 
 		virtual ~WindowsKeyboardDeviceFactory() noexcept override = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual InputDeviceData CreateDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams) override;
 
 		[[nodiscard("Pure function")]]

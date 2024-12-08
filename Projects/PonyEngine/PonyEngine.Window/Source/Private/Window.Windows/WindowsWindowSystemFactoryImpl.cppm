@@ -37,7 +37,7 @@ export namespace PonyEngine::Window
 
 		virtual ~WindowsWindowSystemFactoryImpl() noexcept override = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]

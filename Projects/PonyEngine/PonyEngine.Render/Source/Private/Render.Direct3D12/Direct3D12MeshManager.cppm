@@ -78,17 +78,17 @@ export namespace PonyEngine::Render
 		/// @brief Creates a Direct3D12 vertex array.
 		/// @param vertices Vertices source.
 		/// @return Vertex array.
-		[[nodiscard("Pure constructor")]]
+		[[nodiscard("Redundant call")]]
 		Direct3D12VertexArray CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
 		/// @brief Creates a Direct3D12 vertex color array.
 		/// @param colors Colors source.
 		/// @return Color array.
-		[[nodiscard("Pure constructor")]]
+		[[nodiscard("Redundant call")]]
 		std::optional<Direct3D12VertexArray> CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors) const;
 		/// @brief Creates a Direct3D12 index array.
 		/// @param triangles Triangle source.
 		/// @return Index array.
-		[[nodiscard("Pure constructor")]]
+		[[nodiscard("Redundant call")]]
 		Direct3D12IndexArray CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
 		static constexpr auto MeshVertexFormat = Direct3D12VertexFormat(4u, 3u, Direct3D12VertexDataType::Float); ///< Vertex format.
@@ -160,7 +160,9 @@ namespace PonyEngine::Render
 		{
 			if (meshes[i].use_count() <= 1)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(meshes[i].get()));
 				meshes.erase(meshes.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh destroyed.");
 			}
 		}
 	}
