@@ -30,7 +30,7 @@ export namespace PonyEngine::Core
 		/// @param engine Engine context.
 		/// @param params System parameters.
 		/// @return Created system data.
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual SystemData Create(IEngineContext& engine, const SystemParams& params) = 0;
 
 		/// @brief Gets a system type.

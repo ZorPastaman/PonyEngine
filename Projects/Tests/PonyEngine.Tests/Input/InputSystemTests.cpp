@@ -9,20 +9,16 @@
 
 #include "CppUnitTest.h"
 
-#include <algorithm>
-#include <cstddef>
-#include <cstdint>
 #include <functional>
-#include <typeinfo>
+#include <memory>
 #include <variant>
 #include <vector>
 
-#include "Mocks/Engine.h"
+#include "Mocks/Application.h"
+#include "Mocks/InputDeviceFactory.h"
 #include "Mocks/Logger.h"
+#include "Mocks/Engine.h"
 
-import PonyDebug.Log;
-
-import PonyEngine.Core;
 import PonyEngine.Input.Impl;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -31,83 +27,154 @@ namespace Input
 {
 	TEST_CLASS(InputSystemTests)
 	{
-		class KeyboardProvider final : public PonyEngine::Input::IKeyboardProvider
-		{
-		public:
-			std::vector<PonyEngine::Input::IKeyboardObserver*> observers;
-			std::size_t version;
-
-			virtual void AddKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
-			{
-				observers.push_back(&keyboardObserver);
-				++version;
-			}
-
-			virtual void RemoveKeyboardObserver(PonyEngine::Input::IKeyboardObserver& keyboardObserver) override
-			{
-				if (const auto position = std::ranges::find(observers, &keyboardObserver); position != observers.cend())
-				{
-					observers.erase(position);
-					++version;
-				}
-			}
-		};
-
-		TEST_METHOD(BeginEndTest)
+		TEST_METHOD(BoolBindTest)
 		{
 			auto logger = Mocks::Logger();
 			auto application = Mocks::Application();
 			application.logger = &logger;
 			auto engine = Mocks::Engine();
 			engine.application = &application;
-			auto keyboardProvider = KeyboardProvider();
-			
-			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Input::IKeyboardProvider), static_cast<PonyEngine::Input::IKeyboardProvider*>(&keyboardProvider));
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			constexpr auto systemParams = PonyEngine::Core::SystemParams();
-			auto inputSystem = factory.systemFactory->Create(engine, systemParams);
-			Assert::AreEqual(std::size_t{0}, keyboardProvider.version);
-			std::get<1>(inputSystem.system)->Begin();
-			Assert::AreEqual(std::size_t{1}, keyboardProvider.version);
-			Assert::AreEqual(std::size_t{1}, keyboardProvider.observers.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(std::get<1>(inputSystem.system).get())), reinterpret_cast<std::uintptr_t>(keyboardProvider.observers[0]));
-			std::get<1>(inputSystem.system)->End();
-			Assert::AreEqual(std::size_t{2}, keyboardProvider.version);
-			Assert::AreEqual(std::size_t{0}, keyboardProvider.observers.size());
+			const auto deviceFactory = std::make_shared<Mocks::InputDeviceFactory>();
+			auto params = PonyEngine::Input::InputSystemParams{};
+			params.inputDeviceFactories.push_back(deviceFactory);
+			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H}
+			};
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
+			std::get<1>(system.system)->Begin();
+			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(system.system).get());
+			Assert::AreEqual(std::size_t{1}, deviceFactory->version);
+
+			std::size_t tVal = 0;
+			std::size_t fVal = 0;
+			auto handle = inputSystem->Bind("Mock", std::function<void(bool)>([&](const bool input) { tVal += input; fVal += !input; }));
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{1}, tVal);
+			Assert::AreEqual(std::size_t{0}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.1f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{1}, tVal);
+			Assert::AreEqual(std::size_t{1}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = -0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{1}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = -0.1f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{2}, fVal);
+
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{2}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::A, .value = -0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{2}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::A, .value = -0.1f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{2}, fVal);
+
+			const auto weakHandle = std::weak_ptr(handle);
+			handle.reset();
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, tVal);
+			Assert::AreEqual(std::size_t{2}, fVal);
+			Assert::IsTrue(weakHandle.expired());
+
+			std::get<1>(system.system)->End();
 		}
 
-		TEST_METHOD(TickTest)
+		TEST_METHOD(BoolBindMagnitudeTest)
 		{
 			auto logger = Mocks::Logger();
 			auto application = Mocks::Application();
 			application.logger = &logger;
 			auto engine = Mocks::Engine();
 			engine.application = &application;
-			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
-			auto inputSystemBase = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			bool gotInput = false;
-			std::function<void()> func = [&]{ gotInput = true; };
-			std::get<1>(inputSystemBase.system)->Begin();
-			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(inputSystemBase.system).get());
-			auto message = PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true};
-			auto event = PonyEngine::Input::Event{.expectedMessage = message};
-			auto handle = inputSystem->RegisterAction(event, func);
-			auto inputObserver = dynamic_cast<PonyEngine::Input::IKeyboardObserver*>(inputSystem);
-			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true});
-			std::get<1>(inputSystemBase.system)->Tick();
-			Assert::IsTrue(gotInput);
-			gotInput = false;
-			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = false});
-			std::get<1>(inputSystemBase.system)->Tick();
-			Assert::IsFalse(gotInput);
-			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::W, .isDown = true});
-			std::get<1>(inputSystemBase.system)->Tick();
-			Assert::IsFalse(gotInput);
-			inputSystem->UnregisterAction(handle);
-			inputObserver->Observe(PonyEngine::Input::KeyboardMessage{.keyCode = PonyEngine::Input::KeyboardKeyCode::H, .isDown = true});
-			std::get<1>(inputSystemBase.system)->Tick();
-			Assert::IsFalse(gotInput);
-			std::get<1>(inputSystemBase.system)->End();
+			const auto deviceFactory = std::make_shared<Mocks::InputDeviceFactory>();
+			auto params = PonyEngine::Input::InputSystemParams{};
+			params.inputDeviceFactories.push_back(deviceFactory);
+			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H}
+			};
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
+			std::get<1>(system.system)->Begin();
+			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(system.system).get());
+
+			std::size_t tVal = 0;
+			std::size_t fVal = 0;
+			auto handle = inputSystem->Bind("Mock", std::function<void(bool)>([&](const bool input) { tVal += input; fVal += !input; }), 1.f);
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{0}, tVal);
+			Assert::AreEqual(std::size_t{1}, fVal);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{ .inputCode = PonyEngine::Input::InputCode::H, .value = 1.3f });
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{1}, tVal);
+			Assert::AreEqual(std::size_t{1}, fVal);
+
+			std::get<1>(system.system)->End();
+		}
+
+		TEST_METHOD(FloatBindTest)
+		{
+			auto logger = Mocks::Logger();
+			auto application = Mocks::Application();
+			application.logger = &logger;
+			auto engine = Mocks::Engine();
+			engine.application = &application;
+			const auto deviceFactory = std::make_shared<Mocks::InputDeviceFactory>();
+			auto params = PonyEngine::Input::InputSystemParams{};
+			params.inputDeviceFactories.push_back(deviceFactory);
+			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{ .inputCode = PonyEngine::Input::InputCode::H }
+			};
+			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
+			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
+			std::get<1>(system.system)->Begin();
+			auto inputSystem = dynamic_cast<PonyEngine::Input::IInputSystem*>(std::get<1>(system.system).get());
+			Assert::AreEqual(std::size_t{1}, deviceFactory->version);
+
+			std::size_t version = 0;
+			float value = 0;
+			auto handle = inputSystem->Bind("Mock", std::function<void(float)>([&](const float input) { ++version; value = input; }));
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{1}, version);
+			Assert::AreEqual(0.3f, value);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = -0.1f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, version);
+			Assert::AreEqual(-0.1f, value);
+
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::A, .value = -0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, version);
+
+			const auto weakHandle = std::weak_ptr(handle);
+			handle.reset();
+			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .value = 0.3f});
+			std::get<1>(system.system)->Tick();
+			Assert::AreEqual(std::size_t{2}, version);
+			Assert::IsTrue(weakHandle.expired());
+
+			std::get<1>(system.system)->End();
 		}
 	};
 }

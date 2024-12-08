@@ -9,14 +9,18 @@
 
 export module PonyEngine.Input;
 
-export import :Event;
-export import :Handle;
+export import :IInputDeviceFactory;
 export import :IInputSystem;
-export import :IKeyboardObserver;
-export import :IKeyboardProvider;
+export import :IInputSystemContext;
+export import :InputBindingValue;
+export import :InputCode;
+export import :InputDevice;
+export import :InputDeviceData;
+export import :InputDeviceFactory;
+export import :InputDeviceParams;
+export import :InputEvent;
+export import :InputHandle;
 export import :InputSystemFactory;
 export import :InputSystemFactoryData;
 export import :InputSystemFactoryParams;
 export import :InputSystemParams;
-export import :KeyboardKeyCode;
-export import :KeyboardMessage;

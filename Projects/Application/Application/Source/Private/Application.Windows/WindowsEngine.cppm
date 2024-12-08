@@ -24,6 +24,7 @@ import <format>;
 import <memory>;
 import <typeinfo>;
 import <utility>;
+import <vector>;
 
 import PonyBase.Core;
 
@@ -32,7 +33,7 @@ import PonyMath.Core;
 import PonyDebug.Log;
 
 import PonyEngine.Core.Impl;
-import PonyEngine.Input.Impl;
+import PonyEngine.Input.Windows.Impl;
 import PonyEngine.Render.Direct3D12.Windows.Impl;
 import PonyEngine.Screen.Windows.Impl;
 import PonyEngine.Time.Impl;
@@ -210,8 +211,68 @@ namespace Application
 	{
 		try
 		{
+			auto inputParams = PonyEngine::Input::InputSystemParams{};
+
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input device factories.");
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows keyboard device factory.");
+			PonyEngine::Input::WindowsKeyboardDeviceFactoryData keyboardDeviceFactory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(*application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows keyboard device factory created.", typeid(*keyboardDeviceFactory.inputDeviceFactory).name());
+			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
+
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
+			inputParams.inputBindings["Forward"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::W, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::S, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Right"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::D, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::A, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Up"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["RotateRight"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowRight, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowLeft, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["RotateUp"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowUp, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowDown, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["XScale"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::X, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Z, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["YScale"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::V, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::C, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["ZScale"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::N, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::B, .multiplier = -1.f},
+			};
+			inputParams.inputBindings["Reset"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["Exit"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
+			};
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
+
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
-			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, PonyEngine::Input::InputSystemParams{});
+			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, inputParams);
 			assert(factory.systemFactory && "The input system factory is nullptr");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' input system factory created.", typeid(*factory.systemFactory).name());
 
@@ -269,50 +330,21 @@ namespace Application
 	{
 		try
 		{
+			auto params = PonyEngine::Core::EngineParams{};
+
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create system factories.");
-			auto screenSystemFactory = CreateScreenSystemFactory();
-			auto frameRateSystemFactory = CreateFrameRateSystemFactory();
-			auto windowSystemFactory = CreateWindowSystemFactory();
-			auto inputSystemFactory = CreateInputSystemFactory();
-			auto renderSystemFactory = CreateRenderSystemFactory();
-			auto gameSystemFactory = CreateGameSystemFactory();
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Screen::ScreenSystemFactory>(std::move(CreateScreenSystemFactory().systemFactory))});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Time::FrameRateSystemFactory>(std::move(CreateFrameRateSystemFactory().systemFactory)), .tickOrder = 1});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Window::WindowSystemFactory>(std::move(CreateWindowSystemFactory().systemFactory)), .tickOrder = 2});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Input::InputSystemFactory>(std::move(CreateInputSystemFactory().systemFactory)), .tickOrder = 3});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Render::RenderSystemFactory>(std::move(CreateRenderSystemFactory().systemFactory)), .tickOrder = 5});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<Game::GameSystemFactory>(std::move(CreateGameSystemFactory().systemFactory)), .tickOrder = 4});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
-			const auto systemFactories = std::array<const std::pair<PonyEngine::Core::ISystemFactory*, std::int32_t>, 6>
-			{
-				std::pair(screenSystemFactory.systemFactory.get(), 0),
-				std::pair(frameRateSystemFactory.systemFactory.get(), 1),
-				std::pair(windowSystemFactory.systemFactory.get(), 2),
-				std::pair(inputSystemFactory.systemFactory.get(), 3),
-				std::pair(renderSystemFactory.systemFactory.get(), 5),
-				std::pair(gameSystemFactory.systemFactory.get(), 4),
-			};
-			const auto params = PonyEngine::Core::EngineParams{.systemFactories = systemFactories};
 			PonyEngine::Core::EngineData engineData = PonyEngine::Core::CreateEngine(*application, params);
 			assert(engineData.engine && "The engine is nullptr.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine created.");
-
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy system factories.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*gameSystemFactory.systemFactory).name());
-			gameSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*renderSystemFactory.systemFactory).name());
-			renderSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*inputSystemFactory.systemFactory).name());
-			inputSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*windowSystemFactory.systemFactory).name());
-			windowSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*frameRateSystemFactory.systemFactory).name());
-			frameRateSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' system factory.", typeid(*screenSystemFactory.systemFactory).name());
-			screenSystemFactory.systemFactory.reset();
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factory destroyed.");
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories destroyed.");
 
 			return engineData;
 		}

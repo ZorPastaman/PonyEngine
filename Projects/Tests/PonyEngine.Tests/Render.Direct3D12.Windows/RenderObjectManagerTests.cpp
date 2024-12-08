@@ -55,7 +55,16 @@ namespace Render
 			Assert::IsTrue(PonyMath::Core::Matrix4x4<float>::Predefined::Identity == renderObjectManager.CreateObject(triangle)->ModelMatrix());
 
 			PonyMath::Core::Matrix4x4<float> expectedMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(2.f, 4.f, 7.f), PonyMath::Core::Vector3<float>(1.1f, 0.7f, -0.3f), PonyMath::Core::Vector3<float>(2.f, 1.1f, 0.7f));
-			Assert::IsTrue(expectedMatrix == renderObjectManager.CreateObject(triangle, expectedMatrix)->ModelMatrix());
+			auto object = renderObjectManager.CreateObject(triangle, expectedMatrix);
+			Assert::IsTrue(expectedMatrix == object->ModelMatrix());
+
+			std::get<1>(renderSystem.system)->Tick();
+			Assert::IsNotNull(object.get());
+
+			auto weakObject = std::weak_ptr(object);
+			object.reset();
+			std::get<1>(renderSystem.system)->Tick();
+			Assert::IsTrue(weakObject.expired());
 		}
 	};
 }

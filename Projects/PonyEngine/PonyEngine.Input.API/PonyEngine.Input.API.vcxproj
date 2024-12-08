@@ -17,18 +17,26 @@
     <ResourceCompile Include="PonyEngine.Input.API.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Input\Event.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input\IInputDeviceFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\IInputSystemContext.cppm" />
+    <ClCompile Include="Source\Public\Input\InputBindingValue.cppm" />
+    <ClCompile Include="Source\Public\Input\InputDevice.cppm" />
+    <ClCompile Include="Source\Public\Input\InputDeviceData.cppm" />
+    <ClCompile Include="Source\Public\Input\InputDeviceFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\InputDeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input\InputEvent.cppm" />
+    <ClCompile Include="Source\Public\Input\InputHandle.cppm" />
     <ClCompile Include="Source\Public\Input\InputSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Input\InputSystemFactoryData.cppm" />
     <ClCompile Include="Source\Public\Input\InputSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Input\InputSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Input\Handle.cppm" />
     <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
-    <ClCompile Include="Source\Public\Input\IKeyboardObserver.cppm" />
-    <ClCompile Include="Source\Public\Input\IKeyboardProvider.cppm" />
     <ClCompile Include="Source\Public\Input\Input.cppm" />
-    <ClCompile Include="Source\Public\Input\KeyboardKeyCode.cppm" />
-    <ClCompile Include="Source\Public\Input\KeyboardMessage.cppm" />
+    <ClCompile Include="Source\Public\Input\InputCode.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">
@@ -74,11 +82,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input\Factory;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

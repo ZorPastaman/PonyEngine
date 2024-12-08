@@ -38,19 +38,6 @@ export namespace PonyEngine::Render
 
 		~Direct3D12Mesh() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2& VertexBuffer() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& VertexBuffer() const noexcept;
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2* VertexColorBuffer() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2* VertexColorBuffer() const noexcept;
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2& VertexIndexBuffer() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& VertexIndexBuffer() const noexcept;
-
 		/// @brief Gets the vertex buffer view.
 		/// @return Vertex buffer view.
 		[[nodiscard("Pure function")]]
@@ -115,36 +102,6 @@ namespace PonyEngine::Render
 		},
 		indexCount{vertexIndexArray.IndexCount()}
 	{
-	}
-
-	ID3D12Resource2& Direct3D12Mesh::VertexBuffer() noexcept
-	{
-		return *vertexBuffer.Get();
-	}
-
-	const ID3D12Resource2& Direct3D12Mesh::VertexBuffer() const noexcept
-	{
-		return *vertexBuffer.Get();
-	}
-
-	ID3D12Resource2* Direct3D12Mesh::VertexColorBuffer() noexcept
-	{
-		return vertexColorBuffer.Get();
-	}
-
-	const ID3D12Resource2* Direct3D12Mesh::VertexColorBuffer() const noexcept
-	{
-		return vertexColorBuffer.Get();
-	}
-
-	ID3D12Resource2& Direct3D12Mesh::VertexIndexBuffer() noexcept
-	{
-		return *vertexIndexBuffer.Get();
-	}
-
-	const ID3D12Resource2& Direct3D12Mesh::VertexIndexBuffer() const noexcept
-	{
-		return *vertexIndexBuffer.Get();
 	}
 
 	const D3D12_VERTEX_BUFFER_VIEW& Direct3D12Mesh::VertexBufferView() const noexcept

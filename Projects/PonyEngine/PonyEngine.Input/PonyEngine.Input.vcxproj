@@ -29,11 +29,18 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj">
       <Project>{245050d3-3c78-445c-89b1-9972e3fcc379}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
+      <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail.cppm" />
+    <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDevice.cppm" />
+    <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDeviceFactory.cppm" />
     <ClCompile Include="Source\Private\Input\Input.Detail.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystemFactoryImpl.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows.Impl.cppm" />
     <ClCompile Include="Source\Public\Input\Input.Impl.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -72,11 +79,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Input;$(ProjectDir)\Source\Public\Input.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

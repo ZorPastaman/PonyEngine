@@ -51,7 +51,7 @@ export namespace PonyEngine::Render
 
 		~Direct3D12MaterialManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
 			const Direct3D12PipelineParams& pipelineParams) override;
 
@@ -219,7 +219,9 @@ namespace PonyEngine::Render
 		{
 			if (materials[i].use_count() <= 1L)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
 				materials.erase(materials.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
 			}
 		}
 	}

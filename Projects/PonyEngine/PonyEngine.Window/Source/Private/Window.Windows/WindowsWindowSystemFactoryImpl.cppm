@@ -37,7 +37,7 @@ export namespace PonyEngine::Window
 
 		virtual ~WindowsWindowSystemFactoryImpl() noexcept override = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
@@ -65,7 +65,7 @@ namespace PonyEngine::Window
 	{
 		auto system = std::make_unique<WindowsWindowSystem>(engine, params, windowSystemParams);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem, Input::IKeyboardProvider>(*system);
+		interfaces.AddInterfacesDeduced<IWindowSystem, IWindowsWindowSystem>(*system);
 
 		return Core::SystemData
 		{
