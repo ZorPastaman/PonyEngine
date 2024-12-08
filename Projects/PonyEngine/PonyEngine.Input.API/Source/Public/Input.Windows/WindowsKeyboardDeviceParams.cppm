@@ -7,18 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:Event;
-
-import :KeyboardMessage;
+export module PonyEngine.Input.Windows:WindowsKeyboardDeviceParams;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input event.
-	struct Event final
+	/// @brief Windows keyboard device parameters.
+	struct WindowsKeyboardDeviceParams final
 	{
-		[[nodiscard("Pure operator")]]
-		bool operator ==(const Event& other) const noexcept = default;
-
-		KeyboardMessage expectedMessage; ///< The event is raised if the input system receives such an event.
 	};
 }

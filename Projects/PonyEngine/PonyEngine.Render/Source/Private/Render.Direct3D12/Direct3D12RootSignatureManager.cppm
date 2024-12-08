@@ -46,7 +46,7 @@ export namespace PonyEngine::Render
 
 		~Direct3D12RootSignatureManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) override;
 
 		/// @brief Cleans out of dead root signatures.
@@ -91,7 +91,9 @@ namespace PonyEngine::Render
 		{
 			if (rootSignatures[i].use_count() <= 1L)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignatures[i].get()));
 				rootSignatures.erase(rootSignatures.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature destroyed.");
 			}
 		}
 	}

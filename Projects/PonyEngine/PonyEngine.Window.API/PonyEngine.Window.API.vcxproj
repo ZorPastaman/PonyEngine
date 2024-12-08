@@ -17,6 +17,7 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />

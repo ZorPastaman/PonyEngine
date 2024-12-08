@@ -18,7 +18,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\KeyCodeUtility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Utility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowProc.cppm" />
@@ -42,9 +41,6 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
-    </ProjectReference>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Input.API\PonyEngine.Input.API.vcxproj">
-      <Project>{245050d3-3c78-445c-89b1-9972e3fcc379}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Screen.API\PonyEngine.Screen.API.vcxproj">
       <Project>{af990672-c1e8-41c8-9e42-a4dc871ae69b}</Project>

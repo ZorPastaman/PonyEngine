@@ -7,23 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "CppUnitTest.h"
+export module PonyEngine.Input:InputDeviceParams;
 
-#include <cstddef>
-
-import PonyEngine.Input;
-
-using namespace Microsoft::VisualStudio::CppUnitTestFramework;
-
-namespace Input
+export namespace PonyEngine::Input
 {
-	TEST_CLASS(HandleTests)
+	/// @brief Input device parameters.
+	struct InputDeviceParams
 	{
-		TEST_METHOD(HandleHashTest)
-		{
-			constexpr std::size_t id = 125;
-			const auto handle = PonyEngine::Input::Handle{.id = id};
-			Assert::AreEqual(id, PonyEngine::Input::HandleHash()(handle));
-		}
 	};
 }
