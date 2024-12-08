@@ -7,13 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input.Windows;
+export module PonyEngine.Input.Windows:WindowsMouseDeviceFactoryData;
 
-export import PonyEngine.Input;
+import <memory>;
 
-export import :WindowsKeyboardDeviceFactoryData;
-export import :WindowsKeyboardDeviceFactoryParams;
-export import :WindowsKeyboardDeviceParams;
-export import :WindowsMouseDeviceFactoryData;
-export import :WindowsMouseDeviceFactoryParams;
-export import :WindowsMouseDeviceParams;
+import PonyEngine.Input;
+
+export namespace PonyEngine::Input
+{
+	/// @brief Windows mouse device factory data.
+	struct WindowsMouseDeviceFactoryData final
+	{
+		std::unique_ptr<InputDeviceFactory> inputDeviceFactory; ///< Windows mouse device factory.
+	};
+}

@@ -39,6 +39,12 @@
     <ClCompile Include="Source\Public\Input.Windows\Input.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDevice.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDeviceFactory.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

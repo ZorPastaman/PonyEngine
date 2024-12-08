@@ -11,10 +11,14 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Input.Windows.Detail:WindowsKeyboardDevice;
 
 import <array>;
 import <unordered_map>;
+
+import PonyDebug.Log;
 
 import PonyEngine.Input.Windows;
 import PonyEngine.Window.Windows;
@@ -47,7 +51,7 @@ export namespace PonyEngine::Input
 	private:
 		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
-		std::unordered_map<WORD, bool> lastInputValues; ///< Last input values. It's used to prevent recreating an input event when a user holds a button.
+		std::unordered_map<WORD, bool> prevInputValues; ///< Previous input values. It's used to prevent recreating an input event when a user holds a button.
 	};
 }
 
@@ -178,6 +182,10 @@ namespace PonyEngine::Input
 			constexpr auto messageTypes = std::array<UINT, 4> { WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP };
 			windowSystem->AddMessageObserver(*this, messageTypes);
 		}
+		else
+		{
+			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Couldn't find Windows window system. Keyboard input won't work.");
+		}
 	}
 
 	void WindowsKeyboardDevice::End()
@@ -202,11 +210,11 @@ namespace PonyEngine::Input
 
 		const bool inputValue = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
 
-		if (const auto lastInputPosition = lastInputValues.find(key); lastInputPosition != lastInputValues.cend() && lastInputPosition->second == inputValue)
+		if (const auto prevInputPosition = prevInputValues.find(key); prevInputPosition != prevInputValues.cend() && prevInputPosition->second == inputValue)
 		{
 			return;
 		}
-		lastInputValues[key] = inputValue;
+		prevInputValues[key] = inputValue;
 
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
