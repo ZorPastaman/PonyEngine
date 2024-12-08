@@ -76,7 +76,7 @@ export namespace PonyEngine::Core
 		/// @brief Creates a system.
 		/// @param factory Factory to use.
 		/// @return Created system.
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Redundant call")]]
 		SystemData CreateSystem(ISystemFactory* factory) const;
 		/// @brief Adds the @p system as a non-tickable system.
 		/// @param system Non-tickable system.

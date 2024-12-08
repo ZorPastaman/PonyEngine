@@ -91,7 +91,9 @@ namespace PonyEngine::Render
 		{
 			if (rootSignatures[i].use_count() <= 1L)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignatures[i].get()));
 				rootSignatures.erase(rootSignatures.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature destroyed.");
 			}
 		}
 	}
