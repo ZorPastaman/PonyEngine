@@ -45,7 +45,7 @@ export namespace PonyEngine::Input
 		virtual const Core::ISystemManager& SystemManager() const noexcept = 0;
 
 		/// @brief Adds the event to an input queue.
-		/// @param inputEntry Input event.
-		virtual void AddInputEvent(const InputEvent& inputEntry) = 0;
+		/// @param inputEvent Input event.
+		virtual void AddInputEvent(const InputEvent& inputEvent) = 0;
 	};
 }
