@@ -72,8 +72,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\EngineTests.cpp" />
+    <ClCompile Include="Input\InputSystemTests.cpp" />
+    <ClCompile Include="Input.Windows\WindowsKeyboardDeviceFactoryTests.cpp" />
+    <ClCompile Include="Input.Windows\WindowsKeyboardDeviceTests.cpp" />
     <ClCompile Include="Mocks\Application.cpp" />
     <ClCompile Include="Mocks\Engine.cpp" />
+    <ClCompile Include="Mocks\InputDevice.cpp" />
+    <ClCompile Include="Mocks\InputDeviceFactory.cpp" />
+    <ClCompile Include="Mocks\InputSystem.cpp" />
     <ClCompile Include="Mocks\Logger.cpp" />
     <ClCompile Include="Mocks\ScreenSystem.cpp" />
     <ClCompile Include="Mocks\System.cpp" />
@@ -149,6 +155,9 @@
   <ItemGroup>
     <ClInclude Include="Mocks\Application.h" />
     <ClInclude Include="Mocks\Engine.h" />
+    <ClInclude Include="Mocks\InputDevice.h" />
+    <ClInclude Include="Mocks\InputDeviceFactory.h" />
+    <ClInclude Include="Mocks\InputSystem.h" />
     <ClInclude Include="Mocks\Logger.h" />
     <ClInclude Include="Mocks\ScreenSystem.h" />
     <ClInclude Include="Mocks\System.h" />

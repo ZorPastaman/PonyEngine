@@ -152,7 +152,7 @@ export namespace PonyEngine::Input
 	/// @param inputCode Input code.
 	/// @return Input code string.
 	[[nodiscard("Pure function")]]
-	std::string_view ToString(InputCode inputCode);
+	std::string_view ToString(InputCode inputCode) noexcept;
 
 	/// @brief Puts a string representing the @p inputCode into the @p stream.
 	/// @param stream Target.
@@ -292,7 +292,7 @@ namespace PonyEngine::Input
 		{ InputCode::MouseWheel, "Mouse Wheel" }
 	};
 
-	std::string_view ToString(const InputCode inputCode)
+	std::string_view ToString(const InputCode inputCode) noexcept
 	{
 		if (const auto position = KeyCodeStrings.find(inputCode); position != KeyCodeStrings.end()) [[likely]]
 		{
