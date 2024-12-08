@@ -191,6 +191,7 @@ namespace Application
 			const auto windowsClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
 			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			systemParams.rect.fullscreen = false;
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
@@ -217,7 +218,11 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows keyboard device factory.");
 			PonyEngine::Input::WindowsKeyboardDeviceFactoryData keyboardDeviceFactory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(*application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows keyboard device factory created.", typeid(*keyboardDeviceFactory.inputDeviceFactory).name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows mouse device factory.");
+			PonyEngine::Input::WindowsMouseDeviceFactoryData mouseDeviceFactory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(*application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows mouse device factory created.", typeid(*mouseDeviceFactory.inputDeviceFactory).name());
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
+			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
