@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />

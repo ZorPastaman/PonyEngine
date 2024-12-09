@@ -19,6 +19,7 @@ import <span>;
 import PonyEngine.Window;
 
 import :IWindowsMessageObserver;
+import :IWindowsRawInputObserver;
 
 export namespace PonyEngine::Window
 {
@@ -34,10 +35,17 @@ export namespace PonyEngine::Window
 
 		/// @brief Adds the message observer.
 		/// @param observer Observer to add.
-		/// @param messageTypes Message types to observe.
+		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
 		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
-		/// @brief Removed the message observer.
+		/// @brief Removes the message observer.
 		/// @param observer Observer to remove.
 		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept = 0;
+		/// @brief Adds the raw input observer.
+		/// @param observer Observer to add.
+		/// @param rawInputTypes Raw input types. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
+		virtual void AddRawInputObserver(IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) = 0;
+		/// @brief Removes the raw input observer.
+		/// @param observer Observer to remove.
+		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept = 0;
 	};
 }

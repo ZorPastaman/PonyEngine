@@ -30,7 +30,7 @@ namespace Application
 	{
 		if (!SetPriorityClass(GetCurrentProcess(), priority))
 		{
-			PONY_CONSOLE(PonyDebug::Log::LogType::Error, "Couldn't set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError());
+			PONY_CONSOLE(PonyDebug::Log::LogType::Error, "Failed to set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError());
 		}
 
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Current process priority set to '0x{:X}'.", priority);

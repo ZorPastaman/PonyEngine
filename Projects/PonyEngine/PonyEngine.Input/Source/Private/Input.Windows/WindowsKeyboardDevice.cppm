@@ -50,8 +50,6 @@ export namespace PonyEngine::Input
 
 	private:
 		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-		std::unordered_map<WORD, bool> prevInputValues; ///< Previous input values. It's used to prevent recreating an input event when a user holds a button.
 	};
 }
 
@@ -210,11 +208,10 @@ namespace PonyEngine::Input
 
 		const bool inputValue = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
 
-		if (const auto prevInputPosition = prevInputValues.find(key); prevInputPosition != prevInputValues.cend() && prevInputPosition->second == inputValue)
+		if (inputValue == ((lParam & (1 << 30)) != 0)) // If the previous input is the same.
 		{
 			return;
 		}
-		prevInputValues[key] = inputValue;
 
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{

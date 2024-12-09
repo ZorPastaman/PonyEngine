@@ -25,9 +25,14 @@ import PonyEngine.Window.Windows;
 
 export namespace PonyEngine::Input
 {
-	class WindowsMouseDevice final : public InputDevice, private Window::IWindowsMessageObserver
+	/// @brief Windows mouse device.
+	class WindowsMouseDevice final : public InputDevice, private Window::IWindowsMessageObserver, private Window::IWindowsRawInputObserver
 	{
 	public:
+		/// @brief Creates a @p WindowsMouseDevice.
+		/// @param inputSystem Input system context.
+		/// @param deviceParams Device parameters.
+		/// @param mouseParams Mouse parameters.
 		WindowsMouseDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsMouseDeviceParams& mouseParams) noexcept;
 		WindowsMouseDevice(const WindowsMouseDevice&) = delete;
 		WindowsMouseDevice(WindowsMouseDevice&&) = delete;
@@ -39,17 +44,17 @@ export namespace PonyEngine::Input
 
 		virtual void Tick() override;
 
-		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
 		WindowsMouseDevice& operator =(const WindowsMouseDevice&) = delete;
 		WindowsMouseDevice& operator =(WindowsMouseDevice&&) = delete;
 
 	private:
-		void ObserveMouseMove(LPARAM lParam);
-		void ObserveXButton(WPARAM wParam, bool isDown);
+		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		virtual void Observe(const RAWINPUT& input) override;
 
-		int prevMouseX;
-		int prevMouseY;
+		/// @brief Observes X button.
+		/// @param wParam WParam.
+		/// @param isDown Is the key down?
+		void ObserveXButton(WPARAM wParam, bool isDown);
 	};
 }
 
@@ -58,18 +63,6 @@ namespace PonyEngine::Input
 	WindowsMouseDevice::WindowsMouseDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsMouseDeviceParams&) noexcept :
 		InputDevice(inputSystem, deviceParams)
 	{
-		POINT point;
-		if (!GetCursorPos(&point))
-		{
-			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Error, "Couldn't get initial cursor position. First delta may be incorrect. Error code: '0x{:X}'.", GetLastError());
-			prevMouseX = 0;
-			prevMouseY = 0;
-
-			return;
-		}
-
-		prevMouseX = static_cast<int>(point.x);
-		prevMouseY = static_cast<int>(point.y);
 	}
 
 	void WindowsMouseDevice::Begin()
@@ -78,10 +71,12 @@ namespace PonyEngine::Input
 		{
 			constexpr auto messageTypes = std::array<UINT, 10> { WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WM_MOUSEWHEEL };
 			windowSystem->AddMessageObserver(*this, messageTypes);
+			constexpr auto rawInputTypes = std::array<DWORD, 1> { RIM_TYPEMOUSE };
+			windowSystem->AddRawInputObserver(*this, rawInputTypes);
 		}
 		else
 		{
-			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Couldn't find Windows window system. Mouse input won't work.");
+			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Failed to find Windows window system. Mouse input won't work.");
 		}
 	}
 
@@ -89,6 +84,7 @@ namespace PonyEngine::Input
 	{
 		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
+			windowSystem->RemoveRawInputObserver(*this);
 			windowSystem->RemoveMessageObserver(*this);
 		}
 	}
@@ -102,7 +98,8 @@ namespace PonyEngine::Input
 		switch (uMsg)
 		{
 		case WM_MOUSEMOVE:
-			ObserveMouseMove(lParam);
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseX, .value = static_cast<float>(GET_X_LPARAM(lParam))});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseY, .value = static_cast<float>(GET_Y_LPARAM(lParam))});
 			break;
 		case WM_LBUTTONDOWN:
 			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseLeftButton, .value = 1.f});
@@ -136,19 +133,15 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void WindowsMouseDevice::ObserveMouseMove(const LPARAM lParam)
+	void WindowsMouseDevice::Observe(const RAWINPUT& input)
 	{
-		const int x = GET_X_LPARAM(lParam);
-		const int y = GET_Y_LPARAM(lParam);
+		if (input.data.mouse.usFlags != MOUSE_MOVE_RELATIVE)
+		{
+			return;
+		}
 
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseX, .value = static_cast<float>(x)});
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseY, .value = static_cast<float>(y)});
-
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(x - prevMouseX)});
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(y - prevMouseY)});
-
-		prevMouseX = x;
-		prevMouseY = y;
+		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(input.data.mouse.lLastX)});
+		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(input.data.mouse.lLastY)});
 	}
 
 	void WindowsMouseDevice::ObserveXButton(const WPARAM wParam, const bool isDown)

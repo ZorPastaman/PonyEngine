@@ -191,7 +191,6 @@ namespace Application
 			const auto windowsClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
 			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
-			systemParams.rect.fullscreen = false;
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
@@ -273,6 +272,14 @@ namespace Application
 			inputParams.inputBindings["Exit"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["MouseX"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseXDelta, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["MouseY"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = 1.f}
 			};
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
 

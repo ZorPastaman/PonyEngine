@@ -93,6 +93,8 @@ export namespace PonyEngine::Window
 
 		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) override;
 		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept override;
+		virtual void AddRawInputObserver(IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override;
+		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept override;
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
@@ -103,8 +105,29 @@ export namespace PonyEngine::Window
 		/// @brief Update the window title.
 		void UpdateWindowTitle() const;
 
+		/// @brief Registers the raw input type.
+		/// @param rawInputType Raw input type to register. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
+		void RegisterRawInputType(DWORD rawInputType);
+		/// @brief Unregisters the raw input type.
+		/// @param rawInputType Raw input type to unregister. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
+		void UnregisterRawInputType(DWORD rawInputType);
+		/// @brief Registers the raw input type.
+		/// @param rawInputType Raw input type to register. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
+		/// @param flags Registation flags.
+		/// @param windowHandle Window handle.
+		void RegisterRawInputType(DWORD rawInputType, DWORD flags, HWND windowHandle);
+
 		/// @brief Responds to a destroy message.
 		void Destroy() const noexcept;
+
+		/// @brief Calls message observers.
+		/// @param uMsg Message type.
+		/// @param wParam WParam.
+		/// @param lParam LParam.
+		void ObserveMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) const noexcept;
+		/// @brief Calls raw input observers.
+		/// @param lParam LParam.
+		void ObserveRawInput(LPARAM lParam) const noexcept;
 
 		/// @brief Gets a target window position.
 		/// @param rect Window rect.
@@ -129,7 +152,10 @@ export namespace PonyEngine::Window
 		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
 
-		std::unordered_map<UINT, std::vector<IWindowsMessageObserver*>> observers; ///< Message observers.
+		std::unordered_map<UINT, std::vector<IWindowsMessageObserver*>> messageObservers; ///< Message observers.
+		std::unordered_map<DWORD, std::vector<IWindowsRawInputObserver*>> rawInputObservers; ///< Raw input observers.
+
+		mutable std::vector<BYTE> rawInput; ///< Raw input cache.
 	};
 }
 
@@ -283,7 +309,7 @@ namespace PonyEngine::Window
 	{
 		for (const UINT messageType : messageTypes)
 		{
-			std::vector<IWindowsMessageObserver*>& observerArray = observers[messageType];
+			std::vector<IWindowsMessageObserver*>& observerArray = messageObservers[messageType];
 			assert(std::ranges::find(observerArray, &observer) == observerArray.cend() && "The window message observer has already been added.");
 			observerArray.push_back(&observer);
 		}
@@ -292,7 +318,7 @@ namespace PonyEngine::Window
 
 	void WindowsWindowSystem::RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept
 	{
-		for (std::vector<IWindowsMessageObserver*>& observerArray : std::ranges::views::values(observers))
+		for (std::vector<IWindowsMessageObserver*>& observerArray : std::ranges::views::values(messageObservers))
 		{
 			if (const auto position = std::ranges::find(observerArray, &observer); position != observerArray.cend())
 			{
@@ -300,6 +326,48 @@ namespace PonyEngine::Window
 			}
 		}
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' window message observer removed.", typeid(observer).name());
+	}
+
+	void WindowsWindowSystem::AddRawInputObserver(IWindowsRawInputObserver& observer, const std::span<const DWORD> rawInputTypes)
+	{
+		for (const DWORD rawInputType : rawInputTypes)
+		{
+			assert(rawInputType == RIM_TYPEMOUSE || rawInputType == RIM_TYPEMOUSE && "Incorrect raw input type: '{}'. But only RIM_TYPEMOUSE and RIM_TYPEMOUSE are supported.");
+
+			if (const auto typePosition = rawInputObservers.find(rawInputType); typePosition == rawInputObservers.cend() || typePosition->second.empty())
+			{
+				RegisterRawInputType(rawInputType);
+			}
+
+			std::vector<IWindowsRawInputObserver*>& observers = rawInputObservers[rawInputType];
+			assert(std::ranges::find(observers, &observer) == observers.cend() && "The raw input observer has already been added.");
+			observers.push_back(&observer);
+		}
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input observer added.", typeid(observer).name());
+	}
+
+	void WindowsWindowSystem::RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept
+	{
+		for (auto& [inputType, observers] : rawInputObservers)
+		{
+			if (const auto position = std::ranges::find(observers, &observer); position != observers.cend())
+			{
+				observers.erase(position);
+
+				if (observers.empty())
+				{
+					try
+					{
+						UnregisterRawInputType(inputType);
+					}
+					catch (const std::exception& e)
+					{
+						PONY_LOG_E(Engine().Logger(), e, "On unregistering raw input type {}.", inputType);
+					}
+				}
+			}
+		}
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input observer removed.", typeid(observer).name());
 	}
 
 	LRESULT WindowsWindowSystem::WindowProc(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
@@ -315,24 +383,14 @@ namespace PonyEngine::Window
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Received destroy command.");
 			Destroy();
 			break;
+		case WM_INPUT:
+			ObserveRawInput(lParam);
+			break;
 		default:
 			break;
 		}
 
-		if (const auto position = observers.find(uMsg); position != observers.cend())
-		{
-			for (IWindowsMessageObserver* const observer : position->second)
-			{
-				try
-				{
-					observer->Observe(uMsg, wParam, lParam);
-				}
-				catch (const std::exception& e)
-				{
-					PONY_LOG_E(Engine().Logger(), e, "On calling '{}' Windows message observer.", typeid(*observer).name());
-				}
-			}
-		}
+		ObserveMessage(uMsg, wParam, lParam);
 
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
@@ -349,9 +407,102 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", titleToSet);
 	}
 
+	void WindowsWindowSystem::RegisterRawInputType(const DWORD rawInputType)
+	{
+		RegisterRawInputType(rawInputType, DWORD{0}, hWnd);
+	}
+
+	void WindowsWindowSystem::UnregisterRawInputType(const DWORD rawInputType)
+	{
+		RegisterRawInputType(rawInputType, RIDEV_REMOVE, nullptr);
+	}
+
+	void WindowsWindowSystem::RegisterRawInputType(const DWORD rawInputType, const DWORD flags, const HWND windowHandle)
+	{
+		auto rid = RAWINPUTDEVICE{.dwFlags = flags, .hwndTarget = windowHandle};
+
+		switch (rawInputType)
+		{
+		case RIM_TYPEMOUSE:
+			rid.usUsagePage = 0x01;
+			rid.usUsage = 0x02;
+			break;
+		case RIM_TYPEKEYBOARD:
+			rid.usUsagePage = 0x01;
+			rid.usUsage = 0x06;
+			break;
+		default:
+			return;
+		}
+
+		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register raw input device. Flags: '0x{:X}'. Error code: '0x{:X}'.", flags, GetLastError()));
+		}
+	}
+
 	void WindowsWindowSystem::Destroy() const noexcept
 	{
 		Engine().Stop();
+	}
+
+	void WindowsWindowSystem::ObserveMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) const noexcept
+	{
+		if (const auto position = messageObservers.find(uMsg); position != messageObservers.cend())
+		{
+			for (IWindowsMessageObserver* const observer : position->second)
+			{
+				try
+				{
+					observer->Observe(uMsg, wParam, lParam);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(Engine().Logger(), e, "On calling '{}' Windows message observer.", typeid(*observer).name());
+				}
+			}
+		}
+	}
+
+	void WindowsWindowSystem::ObserveRawInput(const LPARAM lParam) const noexcept
+	{
+		const auto hRawInput = reinterpret_cast<HRAWINPUT>(lParam);
+
+		UINT size = 0u;
+		if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)))
+		{
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to get raw input size. Error code: '0x{:X}'.", GetLastError());
+
+			return;
+		}
+		if (size < 1u)
+		{
+			return;
+		}
+
+		rawInput.reserve(size);
+		if (GetRawInputData(hRawInput, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) != size)
+		{
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
+
+			return;
+		}
+
+		const auto input = reinterpret_cast<RAWINPUT*>(rawInput.data());
+		if (const auto observerPosition = rawInputObservers.find(input->header.dwType); observerPosition != rawInputObservers.cend())
+		{
+			for (IWindowsRawInputObserver* const observer : observerPosition->second)
+			{
+				try
+				{
+					observer->Observe(*input);
+				}
+				catch (const std::exception& e)
+				{
+					PONY_LOG_E(Engine().Logger(), e, "On calling '{}' Windows raw input observer.", typeid(*observer).name());
+				}
+			}
+		}
 	}
 
 	PonyMath::Core::Vector2<int> WindowsWindowSystem::GetTargetPosition(const WindowRect& rect) noexcept
