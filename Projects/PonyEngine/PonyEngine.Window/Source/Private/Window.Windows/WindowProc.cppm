@@ -11,11 +11,15 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Window.Windows.Detail:WindowProc;
 
 import <stdexcept>;
 
 import PonyBase.StringUtility;
+
+import PonyDebug.Log;
 
 import :IWindowProc;
 
@@ -77,7 +81,9 @@ namespace PonyEngine::Window
 				return windowProc->WindowProc(uMsg, wParam, lParam);
 			}
 
-			throw std::logic_error("Wrong Windows window has been created.");
+			PONY_CONSOLE(PonyDebug::Log::LogType::Error, "Wrong Windows window has been created. No IWindowProc interface found.");
+
+			return -1;
 		}
 
 		SetLastError(DWORD{0});

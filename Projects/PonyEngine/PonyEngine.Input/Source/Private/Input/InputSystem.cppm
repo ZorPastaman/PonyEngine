@@ -158,7 +158,7 @@ namespace PonyEngine::Input
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy devices.");
 		for (auto it = devices.rbegin(); it != devices.rend(); ++it)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(*it).name());
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(**it).name());
 			it->reset();
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Device destroyed.");
 		}

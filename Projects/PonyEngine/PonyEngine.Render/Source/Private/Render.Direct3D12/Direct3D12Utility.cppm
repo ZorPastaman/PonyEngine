@@ -51,7 +51,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	constexpr DXGI_FORMAT GetFormat(const UINT componentSize, const UINT componentCount, const Direct3D12VertexDataType dataType)
+	constexpr DXGI_FORMAT GetFormat(const UINT componentSize, const UINT componentCount, const Direct3D12VertexDataType dataType) // TODO: Swap the arguments: accept DXGI_FORMAT and return meta-data about it. And change exceptions to assert here.
 	{
 		switch (dataType)
 		{

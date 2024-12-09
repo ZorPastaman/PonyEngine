@@ -12,6 +12,7 @@ export module PonyEngine.Window.Windows;
 export import PonyEngine.Window;
 
 export import :IWindowsMessageObserver;
+export import :IWindowsRawInputObserver;
 export import :IWindowsWindowSystem;
 export import :WindowsClass;
 export import :WindowsClassData;
