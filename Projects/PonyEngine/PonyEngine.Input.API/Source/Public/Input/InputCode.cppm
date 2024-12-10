@@ -136,8 +136,8 @@ export namespace PonyEngine::Input
 
 		// Mouse
 		// Axis
-		MouseX,
-		MouseY,
+		MouseXPosition,
+		MouseYPosition,
 		MouseXDelta,
 		MouseYDelta,
 		// Buttons
@@ -284,8 +284,8 @@ namespace PonyEngine::Input
 
 		// Mouse
 		// Axis
-		{ InputCode::MouseX, "Mouse X Axis" },
-		{ InputCode::MouseY, "Mouse Y Axis" },
+		{ InputCode::MouseXPosition, "Mouse X Position" },
+		{ InputCode::MouseYPosition, "Mouse Y Position" },
 		{ InputCode::MouseXDelta, "Mouse X Delta" },
 		{ InputCode::MouseYDelta, "Mouse Y Delta" },
 		// Buttons

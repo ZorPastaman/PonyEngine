@@ -153,11 +153,13 @@ namespace PonyMath::Geometry
 		if (vertexCount < VertexCount())
 		{
 			vertices.resize(vertexCount);
+			vertices.shrink_to_fit();
 			triangles.clear(); // Any triangle may become invalid.
 
 			if (HasColors())
 			{
 				colors.resize(vertexCount);
+				colors.shrink_to_fit();
 			}
 
 			return;
@@ -189,6 +191,7 @@ namespace PonyMath::Geometry
 		}
 
 		triangles.resize(triangleCount);
+		triangles.shrink_to_fit();
 	}
 
 	bool Mesh::HasColors() const noexcept
@@ -199,6 +202,7 @@ namespace PonyMath::Geometry
 	void Mesh::HasColors(const bool hasColors)
 	{
 		colors.resize(hasColors ? VertexCount() : 0);
+		colors.shrink_to_fit();
 	}
 
 	const Core::Vector3<float>& Mesh::Vertex(const std::uint32_t vertexIndex) const noexcept
@@ -287,6 +291,7 @@ namespace PonyMath::Geometry
 		if (colorsToSet.size() == 0)
 		{
 			colors.resize(0);
+			colors.shrink_to_fit();
 
 			return;
 		}
@@ -297,6 +302,7 @@ namespace PonyMath::Geometry
 		}
 
 		colors.resize(colorsToSet.size());
+		colors.shrink_to_fit();
 		std::ranges::copy(colorsToSet, colors.begin());
 	}
 }
