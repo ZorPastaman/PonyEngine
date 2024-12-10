@@ -240,31 +240,6 @@ namespace Application
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["RotateRight"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowRight, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowLeft, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["RotateUp"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowUp, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowDown, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["XScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::X, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Z, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["YScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::V, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::C, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["ZScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::N, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::B, .multiplier = -1.f},
-			};
 			inputParams.inputBindings["Reset"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}

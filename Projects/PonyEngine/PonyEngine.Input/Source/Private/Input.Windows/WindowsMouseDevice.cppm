@@ -98,8 +98,8 @@ namespace PonyEngine::Input
 		switch (uMsg)
 		{
 		case WM_MOUSEMOVE:
-			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseX, .value = static_cast<float>(GET_X_LPARAM(lParam))});
-			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseY, .value = static_cast<float>(GET_Y_LPARAM(lParam))});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXPosition, .value = static_cast<float>(GET_X_LPARAM(lParam))});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYPosition, .value = static_cast<float>(GET_Y_LPARAM(lParam))});
 			break;
 		case WM_LBUTTONDOWN:
 			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseLeftButton, .value = 1.f});

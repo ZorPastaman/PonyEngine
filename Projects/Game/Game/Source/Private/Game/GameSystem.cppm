@@ -57,22 +57,16 @@ export namespace Game
 		GameSystem& operator =(GameSystem&&) = delete;
 
 	private:
-		std::shared_ptr<PonyEngine::Input::InputHandle> forwardHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> rightHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> upHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> rotateRightHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> rotateUpHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> xHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> yHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> zHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> resetHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> exitHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> mouseXHandle;
-		std::shared_ptr<PonyEngine::Input::InputHandle> mouseYHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> forwardHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> rightHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> upHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> resetHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> exitHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> mouseXHandle;
+		std::shared_ptr<PonyEngine::Input::InputReceiver> mouseYHandle;
 
-		std::shared_ptr<PonyEngine::Render::IRenderObject> boxHandle; ///< Box handle.
-		std::shared_ptr<PonyEngine::Render::IRenderObject> background;
-		PonyMath::Space::Transform3D boxTransform; ///< Box transform.
+		std::shared_ptr<PonyEngine::Render::IRenderObject> boxHandle;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> bigBoxHandle;
 
 		PonyMath::Space::Transform3D cameraTransform;
 	};
@@ -82,7 +76,6 @@ namespace Game
 {
 	GameSystem::GameSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& systemParams, const GameSystemParams&) :
 		TickableSystem(engine, systemParams),
-		boxTransform(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, 5.f),
 		cameraTransform(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One)
 	{
 	}
@@ -93,32 +86,13 @@ namespace Game
 		{
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
 
-			forwardHandle = inputSystem->Bind("Forward", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 0.f, 5.f) * input); }));
-			rightHandle = inputSystem->Bind("Right", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(5.f, 0.f, 0.f) * input); }));
-			upHandle = inputSystem->Bind("Up", std::function<void(float)>([&](const float input) { boxTransform.Translate(PonyMath::Core::Vector3<float>(0.f, 5.f, 0.f) * input); }));
-			rotateRightHandle = inputSystem->Bind("RotateRight", std::function<void(float)>([&](const float input) { boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, -10.f * PonyMath::Core::DegToRad<float>, 0.f) * input)); }));
-			rotateUpHandle = inputSystem->Bind("RotateUp", std::function<void(float)>([&](const float input) { boxTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(10.f * PonyMath::Core::DegToRad<float>, 0.f, 0.f) * input)); }));
-			xHandle = inputSystem->Bind("XScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.1f, 0.f, 0.f) * input); }));
-			yHandle = inputSystem->Bind("YScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.f, 0.1f, 0.f) * input); }));
-			zHandle = inputSystem->Bind("ZScale", std::function<void(float)>([&](const float input) { boxTransform.Scale(boxTransform.Scale() + PonyMath::Core::Vector3<float>(0.f, 0.f, 0.1f) * input); }));
-			resetHandle = inputSystem->Bind("Reset", std::function<void(bool)>([&](const bool input)
-			{
-				if (input)
-				{
-					boxTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f));
-					boxTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity);
-					boxTransform.Scale(5.f);
-				}
-			}));
-			exitHandle = inputSystem->Bind("Exit", std::function<void(bool)>([&](const bool input)
-			{
-				if (!input)
-				{
-					Engine().Stop();
-				}
-			}));
-			mouseXHandle = inputSystem->Bind("MouseX", std::function<void(float)>([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, input * 0.001f, 0.f))); }));
-			mouseYHandle = inputSystem->Bind("MouseY", std::function<void(float)>([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(input * 0.001f, 0.f, 0.f))); }));
+			(forwardHandle = inputSystem->CreateReceiver("Forward"))->Action([&](const float input) { cameraTransform.Translate(cameraTransform.Forward() * input); });
+			(rightHandle = inputSystem->CreateReceiver("Right"))->Action([&](const float input) { cameraTransform.Translate(cameraTransform.Right() * input); });
+			(upHandle = inputSystem->CreateReceiver("Up"))->Action([&](const float input) { cameraTransform.Translate(cameraTransform.Up() * input); });
+			(resetHandle = inputSystem->CreateReceiver("Reset"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { cameraTransform.Position(PonyMath::Core::Vector3<float>::Predefined::Zero); cameraTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity); cameraTransform.Scale(PonyMath::Core::Vector3<float>::Predefined::One); })));
+			(exitHandle = inputSystem->CreateReceiver("Exit"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { Engine().Stop(); }, false)));
+			(mouseXHandle = inputSystem->CreateReceiver("MouseX"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Up(), input * 0.001f)); });
+			(mouseYHandle = inputSystem->CreateReceiver("MouseY"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Right(), input * 0.001f)); });
 
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 		}
@@ -134,7 +108,7 @@ namespace Game
 			renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderTarget().Resolution().Aspect<float>(), 0.2f, 1000.f));
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create triangle.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
 			constexpr std::array<PonyMath::Core::Vector3<float>, 8> vertices = { PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
 				PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f), PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f), PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f) };
 			constexpr std::array<PonyMath::Core::Vector3<std::uint32_t>, 12> triangles = { PonyMath::Core::Vector3<std::uint32_t>(0, 1, 2), PonyMath::Core::Vector3<std::uint32_t>(0, 2, 3), PonyMath::Core::Vector3<std::uint32_t>(4, 6, 5), PonyMath::Core::Vector3<std::uint32_t>(4, 7, 6),
@@ -147,13 +121,9 @@ namespace Game
 			box.Triangles(triangles);
 			box.Colors(vertexColors);
 
-			auto backgroundTransform = boxTransform;
-			backgroundTransform.Position(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f));
-			backgroundTransform.Scale(PonyMath::Core::Vector3<float>(20.f, 20.f, 1.f));
-			background = renderSystem->RenderObjectManager().CreateObject(box, backgroundTransform.TrsMatrix());
-
-			boxHandle = renderSystem->RenderObjectManager().CreateObject(box, boxTransform.TrsMatrix());
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Triangle created.");
+			boxHandle = renderSystem->RenderObjectManager().CreateObject(box, PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One * 5.f));
+			bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(box, PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f)));
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render objects created.");
 		}
 	}
 
@@ -164,7 +134,6 @@ namespace Game
 	void GameSystem::Tick()
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
-		boxHandle->ModelMatrix(boxTransform.TrsMatrix());
 
 		if (const auto renderSystem = Engine().SystemManager().FindSystem<PonyEngine::Render::IRenderSystem>())
 		{

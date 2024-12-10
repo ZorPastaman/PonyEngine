@@ -131,8 +131,8 @@ namespace Input
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(96), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::NumpadComma));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(97), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::NumpadPeriod));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(98), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::NumpadEnter));
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(99), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseX));
-			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(100), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseY));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(99), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseXPosition));
+			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(100), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseYPosition));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(101), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseLeftButton));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(102), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseRightButton));
 			Assert::AreEqual(static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(103), static_cast<std::underlying_type_t<PonyEngine::Input::InputCode>>(PonyEngine::Input::InputCode::MouseMiddleButton));
@@ -242,8 +242,8 @@ namespace Input
 			AssertString(PonyEngine::Input::InputCode::NumpadComma, "Numpad ,");
 			AssertString(PonyEngine::Input::InputCode::NumpadPeriod, "Numpad .");
 			AssertString(PonyEngine::Input::InputCode::NumpadEnter, "Numpad Enter");
-			AssertString(PonyEngine::Input::InputCode::MouseX, "Mouse X Axis");
-			AssertString(PonyEngine::Input::InputCode::MouseY, "Mouse Y Axis");
+			AssertString(PonyEngine::Input::InputCode::MouseXPosition, "Mouse X Axis");
+			AssertString(PonyEngine::Input::InputCode::MouseYPosition, "Mouse Y Axis");
 			AssertString(PonyEngine::Input::InputCode::MouseLeftButton, "Mouse Left Button");
 			AssertString(PonyEngine::Input::InputCode::MouseRightButton, "Mouse Right Button");
 			AssertString(PonyEngine::Input::InputCode::MouseMiddleButton, "Mouse Middle Button");

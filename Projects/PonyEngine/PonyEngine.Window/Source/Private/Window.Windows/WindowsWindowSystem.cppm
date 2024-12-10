@@ -332,7 +332,7 @@ namespace PonyEngine::Window
 	{
 		for (const DWORD rawInputType : rawInputTypes)
 		{
-			assert(rawInputType == RIM_TYPEMOUSE || rawInputType == RIM_TYPEMOUSE && "Incorrect raw input type: '{}'. But only RIM_TYPEMOUSE and RIM_TYPEMOUSE are supported.");
+			assert(rawInputType == RIM_TYPEMOUSE || rawInputType == RIM_TYPEKEYBOARD && "Incorrect raw input type: '{}'. But only RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported.");
 
 			if (const auto typePosition = rawInputObservers.find(rawInputType); typePosition == rawInputObservers.cend() || typePosition->second.empty())
 			{
@@ -480,8 +480,8 @@ namespace PonyEngine::Window
 			return;
 		}
 
-		rawInput.reserve(size);
-		if (GetRawInputData(hRawInput, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) != size)
+		rawInput.resize(size);
+		if (GetRawInputData(hRawInput, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) != rawInput.size())
 		{
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 
