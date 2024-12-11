@@ -55,13 +55,16 @@ export namespace PonyEngine::Input
 		/// @param wParam WParam.
 		/// @param isDown Is the key down?
 		void ObserveXButton(WPARAM wParam, bool isDown);
+
+		float sensitivity; ///< Mouse sensitivity.
 	};
 }
 
 namespace PonyEngine::Input
 {
-	WindowsMouseDevice::WindowsMouseDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsMouseDeviceParams&) noexcept :
-		InputDevice(inputSystem, deviceParams)
+	WindowsMouseDevice::WindowsMouseDevice(IInputSystemContext& inputSystem, const InputDeviceParams& deviceParams, const WindowsMouseDeviceParams& mouseParams) noexcept :
+		InputDevice(inputSystem, deviceParams),
+		sensitivity{mouseParams.sensitivity}
 	{
 	}
 
@@ -140,8 +143,8 @@ namespace PonyEngine::Input
 			return;
 		}
 
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(input.data.mouse.lLastX)});
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(input.data.mouse.lLastY)});
+		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(input.data.mouse.lLastX) * sensitivity});
+		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(input.data.mouse.lLastY) * sensitivity});
 	}
 
 	void WindowsMouseDevice::ObserveXButton(const WPARAM wParam, const bool isDown)
