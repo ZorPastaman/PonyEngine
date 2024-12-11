@@ -200,18 +200,18 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam)
 	{
-		const WORD keyFlags = HIWORD(lParam);
-		const WORD scanCode = LOBYTE(keyFlags);
-		const WORD extended = keyFlags & KF_EXTENDED;
-		const WORD extendedPrefix = extended << WORD{7} | extended << WORD{6} | extended << WORD{5}; // 0xE000 if it's extended; 0 otherwise.
-		const WORD key = scanCode | extendedPrefix;
-
 		const bool inputValue = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
 
 		if (inputValue == ((lParam & (1 << 30)) != 0)) // If the previous input is the same.
 		{
 			return;
 		}
+
+		const WORD keyFlags = HIWORD(lParam);
+		const WORD scanCode = LOBYTE(keyFlags);
+		const WORD extended = keyFlags & KF_EXTENDED;
+		const WORD extendedPrefix = extended << WORD{7} | extended << WORD{6} | extended << WORD{5}; // 0xE000 if it's extended; 0 otherwise.
+		const WORD key = scanCode | extendedPrefix;
 
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{

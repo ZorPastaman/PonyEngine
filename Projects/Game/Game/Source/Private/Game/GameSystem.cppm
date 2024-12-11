@@ -91,8 +91,8 @@ namespace Game
 			(upHandle = inputSystem->CreateReceiver("Up"))->Action([&](const float input) { cameraTransform.Translate(cameraTransform.Up() * input); });
 			(resetHandle = inputSystem->CreateReceiver("Reset"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { cameraTransform.Position(PonyMath::Core::Vector3<float>::Predefined::Zero); cameraTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity); cameraTransform.Scale(PonyMath::Core::Vector3<float>::Predefined::One); })));
 			(exitHandle = inputSystem->CreateReceiver("Exit"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { Engine().Stop(); }, false)));
-			(mouseXHandle = inputSystem->CreateReceiver("MouseX"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Up(), input * 0.001f)); });
-			(mouseYHandle = inputSystem->CreateReceiver("MouseY"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Right(), input * 0.001f)); });
+			(mouseXHandle = inputSystem->CreateReceiver("MouseX"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Up(), input)); });
+			(mouseYHandle = inputSystem->CreateReceiver("MouseY"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Right(), input)); });
 
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 		}

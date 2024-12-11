@@ -218,7 +218,7 @@ namespace Application
 			PonyEngine::Input::WindowsKeyboardDeviceFactoryData keyboardDeviceFactory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(*application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows keyboard device factory created.", typeid(*keyboardDeviceFactory.inputDeviceFactory).name());
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows mouse device factory.");
-			PonyEngine::Input::WindowsMouseDeviceFactoryData mouseDeviceFactory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(*application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
+			PonyEngine::Input::WindowsMouseDeviceFactoryData mouseDeviceFactory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(*application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{.sensitivity = 0.001f});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows mouse device factory created.", typeid(*mouseDeviceFactory.inputDeviceFactory).name());
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));

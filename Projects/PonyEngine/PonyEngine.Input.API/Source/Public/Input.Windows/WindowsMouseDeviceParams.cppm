@@ -14,5 +14,6 @@ export namespace PonyEngine::Input
 	/// @brief Windows mouse device parameters.
 	struct WindowsMouseDeviceParams final
 	{
+		float sensitivity = 1.f; ///< Mouse sensitivity.
 	};
 }

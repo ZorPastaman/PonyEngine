@@ -64,6 +64,9 @@ namespace Input
 				addedObserver = nullptr;
 			}
 
+			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override {}
+			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer) noexcept override {}
+
 			std::size_t version = 0;
 			PonyEngine::Window::IWindowsMessageObserver* addedObserver;
 			std::vector<UINT> observerMessageTypes;
@@ -116,27 +119,27 @@ namespace Input
 			device.inputDevice->Begin();
 
 			window.addedObserver->Observe(WM_KEYDOWN, 0, LPARAM{3014657});
-			Assert::AreEqual(std::size_t{1}, inputSystem.version);
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.lastEvent.inputCode));
-			Assert::AreEqual(1.f, inputSystem.lastEvent.value);
+			Assert::AreEqual(std::size_t{1}, inputSystem.events.size());
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(1.f, inputSystem.events.back().value);
 
-			window.addedObserver->Observe(WM_KEYDOWN, 0, LPARAM{3014657});
-			Assert::AreEqual(std::size_t{1}, inputSystem.version);
+			window.addedObserver->Observe(WM_KEYDOWN, 0, LPARAM{3014657 | (1 << 30)});
+			Assert::AreEqual(std::size_t{1}, inputSystem.events.size());
 
-			window.addedObserver->Observe(WM_KEYUP, 0, LPARAM{2293761});
-			Assert::AreEqual(std::size_t{2}, inputSystem.version);
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.lastEvent.inputCode));
-			Assert::AreEqual(0.f, inputSystem.lastEvent.value);
+			window.addedObserver->Observe(WM_KEYUP, 0, LPARAM{2293761 | (1 << 30)});
+			Assert::AreEqual(std::size_t{2}, inputSystem.events.size());
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(0.f, inputSystem.events.back().value);
 
-			window.addedObserver->Observe(WM_SYSKEYUP, 0, LPARAM{3014657});
-			Assert::AreEqual(std::size_t{3}, inputSystem.version);
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.lastEvent.inputCode));
-			Assert::AreEqual(0.f, inputSystem.lastEvent.value);
+			window.addedObserver->Observe(WM_SYSKEYUP, 0, LPARAM{3014657 | (1 << 30)});
+			Assert::AreEqual(std::size_t{3}, inputSystem.events.size());
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(0.f, inputSystem.events.back().value);
 
 			window.addedObserver->Observe(WM_SYSKEYDOWN, 0, LPARAM{2293761});
-			Assert::AreEqual(std::size_t{4}, inputSystem.version);
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.lastEvent.inputCode));
-			Assert::AreEqual(1.f, inputSystem.lastEvent.value);
+			Assert::AreEqual(std::size_t{4}, inputSystem.events.size());
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(1.f, inputSystem.events.back().value);
 
 			device.inputDevice->End();
 		}
