@@ -9,23 +9,16 @@
 
 module;
 
-#include "PonyBase/Core/Windows/Framework.h"
 #include "PonyBase/Utility/Interface.h"
 
-export module PonyEngine.Window.Windows.Detail:IWindowProc;
+export module PonyEngine.Window.Windows:IWindowsWindowTitleBar;
+
+import PonyEngine.Window;
 
 export namespace PonyEngine::Window
 {
-	/// @brief Window proc manager.
-	class IWindowProc
+	class IWindowsWindowTitleBar : public IWindowTitleBar
 	{
-		INTERFACE_BODY(IWindowProc)
-
-		/// @brief Window proc function.
-		/// @param uMsg Message.
-		/// @param wParam WParam.
-		/// @param lParam LParam.
-		/// @return Result code.
-		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+		INTERFACE_BODY(IWindowsWindowTitleBar)
 	};
 }

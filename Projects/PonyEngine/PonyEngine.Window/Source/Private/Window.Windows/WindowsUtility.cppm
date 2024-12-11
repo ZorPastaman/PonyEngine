@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-export module PonyEngine.Window.Windows.Detail:Utility;
+export module PonyEngine.Window.Windows.Detail:WindowsUtility;
 
 import <stdexcept>;
 import <utility>;

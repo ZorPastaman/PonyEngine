@@ -14,6 +14,7 @@ export import PonyEngine.Window;
 export import :IWindowsMessageObserver;
 export import :IWindowsRawInputObserver;
 export import :IWindowsWindowSystem;
+export import :IWindowsWindowTitleBar;
 export import :WindowsClass;
 export import :WindowsClassData;
 export import :WindowsClassParams;

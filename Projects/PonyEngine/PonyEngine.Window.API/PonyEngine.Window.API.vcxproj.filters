@@ -66,6 +66,12 @@
     <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputObserver.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Window\IWindowTitleBar.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowTitleBar.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">

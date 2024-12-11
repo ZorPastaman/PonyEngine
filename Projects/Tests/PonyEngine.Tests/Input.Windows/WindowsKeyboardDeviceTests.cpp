@@ -28,7 +28,7 @@ namespace Input
 {
 	TEST_CLASS(WindowsKeyboardDeviceTests)
 	{
-		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		class WindowsWindowTitleBar final : public PonyEngine::Window::IWindowsWindowTitleBar
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -38,6 +38,17 @@ namespace Input
 			[[nodiscard("Pure function")]]
 			virtual std::string_view SecondaryTitle() const noexcept override { return ""; }
 			virtual void SecondaryTitle(std::string_view title) override {}
+		};
+
+		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		{
+		public:
+			WindowsWindowTitleBar titleBar;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() noexcept override { return titleBar; }
+			[[nodiscard("Pure function")]]
+			virtual const PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() const noexcept override { return titleBar; }
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override { return false; }
@@ -58,14 +69,14 @@ namespace Input
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
 			{
 				++version;
 				addedObserver = nullptr;
 			}
 
-			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override {}
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer) noexcept override {}
+			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&, std::span<const DWORD>) override {}
+			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override {}
 
 			std::size_t version = 0;
 			PonyEngine::Window::IWindowsMessageObserver* addedObserver;

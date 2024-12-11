@@ -25,10 +25,10 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\IWindowProc.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowProc.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowProc.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm">
@@ -46,7 +46,13 @@
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\Utility.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\WindowsUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowTitleBar.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

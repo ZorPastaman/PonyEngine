@@ -20,6 +20,7 @@ import PonyEngine.Window;
 
 import :IWindowsMessageObserver;
 import :IWindowsRawInputObserver;
+import :IWindowsWindowTitleBar;
 
 export namespace PonyEngine::Window
 {
@@ -27,6 +28,15 @@ export namespace PonyEngine::Window
 	class IWindowsWindowSystem : public IWindowSystem
 	{
 		INTERFACE_BODY(IWindowsWindowSystem)
+
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsWindowTitleBar& TitleBar() noexcept override = 0;
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override = 0;
 
 		/// @brief Gets the window handle.
 		/// @return Window handle.
