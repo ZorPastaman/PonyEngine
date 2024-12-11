@@ -20,7 +20,6 @@ export module PonyEngine.Window.Windows.Detail:WindowsWindowSystem;
 import <algorithm>;
 import <cstdint>;
 import <exception>;
-import <format>;
 import <memory>;
 import <ranges>;
 import <span>;
@@ -44,14 +43,16 @@ import PonyEngine.Screen;
 
 import PonyEngine.Window.Windows;
 
-import :IWindowProc;
-import :Utility;
-import :WindowProc;
+import :IWindowsWindowProc;
+import :IWindowsWindowSystemContext;
+import :WindowsUtility;
+import :WindowsWindowProc;
+import :WindowsWindowTitleBar;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system.
-	class WindowsWindowSystem final : public Core::TickableSystem, public IWindowsWindowSystem, public IWindowProc
+	class WindowsWindowSystem final : public Core::TickableSystem, public IWindowsWindowSystem, public IWindowsWindowProc, private IWindowsWindowSystemContext
 	{
 	public:
 		/// @brief Creates a @p WindowsWindowSystem.
@@ -71,12 +72,9 @@ export namespace PonyEngine::Window
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::string_view MainTitle() const noexcept override;
-		virtual void MainTitle(std::string_view title) override;
-
+		virtual IWindowsWindowTitleBar& TitleBar() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SecondaryTitle() const noexcept override;
-		virtual void SecondaryTitle(std::string_view title) override;
+		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
@@ -98,13 +96,15 @@ export namespace PonyEngine::Window
 
 		virtual LRESULT WindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 
+		[[nodiscard("Pure function")]]
+		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+
 		WindowsWindowSystem& operator =(const WindowsWindowSystem&) = delete;
 		WindowsWindowSystem& operator =(WindowsWindowSystem&&) = delete;
 
 	private:
-		/// @brief Update the window title.
-		void UpdateWindowTitle() const;
-
 		/// @brief Registers the raw input type.
 		/// @param rawInputType Raw input type to register. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
 		void RegisterRawInputType(DWORD rawInputType);
@@ -146,15 +146,14 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		RECT GetWindowRect(const WindowsWindowStyle& style, const WindowRect& rect) const;
 
-		std::string mainTitle; ///< Window main title cache.
-		std::string secondaryTitle; ///< Window title text cache.
-
 		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
 		HWND hWnd; ///< Window handler.
 
-		std::unordered_map<UINT, std::vector<IWindowsMessageObserver*>> messageObservers; ///< Message observers.
-		std::unordered_map<DWORD, std::vector<IWindowsRawInputObserver*>> rawInputObservers; ///< Raw input observers.
+		std::unique_ptr<WindowsWindowTitleBar> titleBar; ///< Windows window title bar.
 
+		std::unordered_map<UINT, std::vector<IWindowsMessageObserver*>> messageObservers; ///< Message observers.
+
+		std::unordered_map<DWORD, std::vector<IWindowsRawInputObserver*>> rawInputObservers; ///< Raw input observers.
 		mutable std::vector<BYTE> rawInput; ///< Raw input cache.
 	};
 }
@@ -163,31 +162,34 @@ namespace PonyEngine::Window
 {
 	WindowsWindowSystem::WindowsWindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsWindowSystemParams& windowParams) :
 		TickableSystem(engine, systemParams),
-		mainTitle(windowParams.title),
 		windowsClass(windowParams.windowsClass)
 	{
 		assert(windowsClass && "The windows class is nullptr.");
 
 		const auto [position, resolution] = PositionResolution(GetWindowRect(windowParams.windowsWindowStyle, windowParams.rect));
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Windows window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
-			windowsClass->Class(), windowParams.windowsWindowStyle.style, windowParams.windowsWindowStyle.extendedStyle, mainTitle, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
+			windowsClass->Class(), windowParams.windowsWindowStyle.style, windowParams.windowsWindowStyle.extendedStyle, windowParams.title, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
 		hWnd = CreateWindowExW(
 			windowParams.windowsWindowStyle.extendedStyle,
 			reinterpret_cast<LPCWSTR>(windowsClass->Class()),
-			PonyBase::Utility::ConvertToWideString(mainTitle).c_str(),
+			PonyBase::Utility::ConvertToWideString(windowParams.title).c_str(),
 			windowParams.windowsWindowStyle.style,
 			position.X(), position.Y(),
 			resolution.X(), resolution.Y(),
 			nullptr,
 			nullptr,
 			windowsClass->Instance(),
-			static_cast<IWindowProc*>(this)
+			static_cast<IWindowsWindowProc*>(this)
 		);
 		if (!hWnd)
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create window title bar.");
+		titleBar = std::make_unique<WindowsWindowTitleBar>(*static_cast<IWindowsWindowSystemContext*>(this), windowParams.title);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window title bar created at '0x{:X}.", reinterpret_cast<std::uintptr_t>(titleBar.get()));
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
@@ -195,18 +197,22 @@ namespace PonyEngine::Window
 
 	WindowsWindowSystem::~WindowsWindowSystem() noexcept
 	{
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy window title bar.");
+		titleBar.reset();
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window title bar destroyed.");
+
 		if (IsWindow(hWnd))
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Windows window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			if (!DestroyWindow(hWnd)) [[unlikely]]
 			{
-				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Error on destroying Windows window. Error code: '0x{:X}'.", GetLastError());
+				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Error on destroying window. Error code: '0x{:X}'.", GetLastError());
 			}
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows window destroyed.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window destroyed.");
 		}
 		else
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Skip destroying Windows window 'cause it's already been destroyed.");
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Skip destroying window 'cause it's already been destroyed.");
 		}
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Release Windows class.");
@@ -243,28 +249,14 @@ namespace PonyEngine::Window
 		}
 	}
 
-	std::string_view WindowsWindowSystem::MainTitle() const noexcept
+	IWindowsWindowTitleBar& WindowsWindowSystem::TitleBar() noexcept
 	{
-		return mainTitle;
+		return *titleBar;
 	}
 
-	void WindowsWindowSystem::MainTitle(const std::string_view title)
+	const IWindowsWindowTitleBar& WindowsWindowSystem::TitleBar() const noexcept
 	{
-		mainTitle = title;
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", mainTitle);
-		UpdateWindowTitle();
-	}
-
-	std::string_view WindowsWindowSystem::SecondaryTitle() const noexcept
-	{
-		return secondaryTitle;
-	}
-
-	void WindowsWindowSystem::SecondaryTitle(const std::string_view title)
-	{
-		secondaryTitle = title;
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", secondaryTitle);
-		UpdateWindowTitle();
+		return *titleBar;
 	}
 
 	bool WindowsWindowSystem::IsVisible() const noexcept
@@ -395,16 +387,14 @@ namespace PonyEngine::Window
 		return DefWindowProcW(hWnd, uMsg, wParam, lParam);
 	}
 
-	void WindowsWindowSystem::UpdateWindowTitle() const
+	PonyDebug::Log::ILogger& WindowsWindowSystem::Logger() noexcept
 	{
-		const std::string titleToSet = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
+		return Engine().Logger();
+	}
 
-		if (!SetWindowTextW(hWnd, PonyBase::Utility::ConvertToWideString(titleToSet).c_str()))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", titleToSet);
+	const PonyDebug::Log::ILogger& WindowsWindowSystem::Logger() const noexcept
+	{
+		return Engine().Logger();
 	}
 
 	void WindowsWindowSystem::RegisterRawInputType(const DWORD rawInputType)
@@ -437,7 +427,7 @@ namespace PonyEngine::Window
 
 		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register raw input device. Flags: '0x{:X}'. Error code: '0x{:X}'.", flags, GetLastError()));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}
 	}
 

@@ -28,7 +28,7 @@ namespace Input
 {
 	TEST_CLASS(WindowsMouseDeviceTests)
 	{
-		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		class WindowsWindowTitleBar final : public PonyEngine::Window::IWindowsWindowTitleBar
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -47,6 +47,24 @@ namespace Input
 			}
 			virtual void SecondaryTitle(std::string_view title) override
 			{
+			}
+		};
+
+		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		{
+		public:
+			WindowsWindowTitleBar titleBar;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() noexcept override
+			{
+				return titleBar;
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual const PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() const noexcept override
+			{
+				return titleBar;
 			}
 
 			[[nodiscard("Pure function")]]
@@ -84,7 +102,7 @@ namespace Input
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
 			{
 				++version;
 				addedMessageObserver = nullptr;
@@ -97,7 +115,7 @@ namespace Input
 				observerRawTypes.assign(rawInputTypes.begin(), rawInputTypes.end());
 			}
 
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer) noexcept override
+			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override
 			{
 				++version;
 				addedRawObserver = nullptr;
@@ -221,7 +239,7 @@ namespace Input
 			Assert::AreEqual(std::size_t{13}, inputSystem.events.size());
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseWheel), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().value);
-			window.addedMessageObserver->Observe(WM_MOUSEWHEEL, -240 << 16, 0);
+			window.addedMessageObserver->Observe(WM_MOUSEWHEEL, static_cast<WPARAM>(-240 << 16), 0);
 			Assert::AreEqual(std::size_t{14}, inputSystem.events.size());
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseWheel), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
 			Assert::AreEqual(-2.f, inputSystem.events.back().value);

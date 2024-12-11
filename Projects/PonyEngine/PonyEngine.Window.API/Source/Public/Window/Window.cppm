@@ -10,6 +10,7 @@
 export module PonyEngine.Window;
 
 export import :IWindowSystem;
+export import :IWindowTitleBar;
 export import :WindowRect;
 export import :WindowSystemFactory;
 export import :WindowSystemFactoryParams;

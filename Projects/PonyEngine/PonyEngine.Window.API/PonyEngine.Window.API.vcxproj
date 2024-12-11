@@ -19,6 +19,7 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowTitleBar.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />
@@ -28,6 +29,7 @@
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
+    <ClCompile Include="Source\Public\Window\IWindowTitleBar.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\WindowRect.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemFactoryParams.cppm" />

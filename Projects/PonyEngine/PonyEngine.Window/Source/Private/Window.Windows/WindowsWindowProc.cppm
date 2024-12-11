@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Window.Windows.Detail:WindowProc;
+export module PonyEngine.Window.Windows.Detail:WindowsWindowProc;
 
 import <stdexcept>;
 
@@ -21,14 +21,14 @@ import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
-import :IWindowProc;
+import :IWindowsWindowProc;
 
 export namespace PonyEngine::Window
 {
 	/// @brief Registers a window proc manager to use a correct window proc. The used window class must point to @p WindowProc function from this file.
 	/// @param hWnd Window handle.
 	/// @param windowProc Window proc manager.
-	void RegisterWindowProc(HWND hWnd, IWindowProc* windowProc);
+	void RegisterWindowProc(HWND hWnd, IWindowsWindowProc* windowProc);
 	/// @brief Unregister a previous registered window proc manager.
 	/// @param hWnd Window handle.
 	void UnregisterWindowProc(HWND hWnd);
@@ -46,7 +46,7 @@ export namespace PonyEngine::Window
 
 namespace PonyEngine::Window
 {
-	void RegisterWindowProc(const HWND hWnd, IWindowProc* const windowProc)
+	void RegisterWindowProc(const HWND hWnd, IWindowsWindowProc* const windowProc)
 	{
 		SetLastError(DWORD{0});
 
@@ -76,7 +76,7 @@ namespace PonyEngine::Window
 	{
 		if (uMsg == WM_CREATE)
 		{
-			if (const auto windowProc = reinterpret_cast<IWindowProc*>(reinterpret_cast<CREATESTRUCTW*>(lParam)->lpCreateParams)) [[likely]]
+			if (const auto windowProc = reinterpret_cast<IWindowsWindowProc*>(reinterpret_cast<CREATESTRUCTW*>(lParam)->lpCreateParams)) [[likely]]
 			{
 				return windowProc->WindowProc(uMsg, wParam, lParam);
 			}
@@ -88,7 +88,7 @@ namespace PonyEngine::Window
 
 		SetLastError(DWORD{0});
 
-		if (const auto windowProc = reinterpret_cast<IWindowProc*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA))) [[likely]]
+		if (const auto windowProc = reinterpret_cast<IWindowsWindowProc*>(GetWindowLongPtrW(hWnd, GWLP_USERDATA))) [[likely]]
 		{
 			return windowProc->WindowProc(uMsg, wParam, lParam);
 		}

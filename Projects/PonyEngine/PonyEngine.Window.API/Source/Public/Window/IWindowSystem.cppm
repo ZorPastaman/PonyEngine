@@ -14,10 +14,11 @@ module;
 export module PonyEngine.Window:IWindowSystem;
 
 import <cstdint>;
-import <string_view>;
 
 import PonyMath.Core;
 import PonyMath.Utility;
+
+import :IWindowTitleBar;
 
 export namespace PonyEngine::Window
 {
@@ -26,20 +27,14 @@ export namespace PonyEngine::Window
 	{
 		INTERFACE_BODY(IWindowSystem)
 
-		/// @brief Gets the window title.
-		/// @return Window title.
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view MainTitle() const noexcept = 0;
-		/// @brief Sets the window title.
-		/// @param title Window title to set.
-		virtual void MainTitle(std::string_view title) = 0;
-		/// @brief Gets the window title text.
-		/// @return Window title text.
+		virtual IWindowTitleBar& TitleBar() noexcept = 0;
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SecondaryTitle() const noexcept = 0;
-		/// @brief Sets the window title text.
-		/// @param title Window title text to set.
-		virtual void SecondaryTitle(std::string_view title) = 0;
+		virtual const IWindowTitleBar& TitleBar() const noexcept = 0;
 
 		/// @brief Checks if the window is visible.
 		/// @return @a True if it's visible; @a false otherwise.

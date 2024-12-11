@@ -25,8 +25,8 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
-import :Utility;
-import :WindowProc;
+import :WindowsUtility;
+import :WindowsWindowProc;
 
 export namespace PonyEngine::Window
 {
