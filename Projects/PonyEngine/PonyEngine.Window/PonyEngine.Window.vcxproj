@@ -17,11 +17,11 @@
     <ResourceCompile Include="PonyEngine.Window.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsMessagePump.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsRawInputManager.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsUtility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowProc.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsClassImpl.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactoryImpl.cppm" />

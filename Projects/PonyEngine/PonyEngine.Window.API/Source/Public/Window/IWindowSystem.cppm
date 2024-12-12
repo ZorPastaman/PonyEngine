@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Window:IWindowSystem;
 
 import <cstdint>;
+import <utility>;
 
 import PonyMath.Core;
 import PonyMath.Utility;
@@ -45,13 +46,13 @@ export namespace PonyEngine::Window
 		/// @brief Hides the window.
 		virtual void HideWindow() = 0;
 
-		/// @brief Gets the window position.
-		/// @return Window position.
+		/// @brief Gets window rect.
+		/// @return Left-upper point as position and resolution of the window rect.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Vector2<std::int32_t> Position() const noexcept = 0;
-		/// @brief Gets the window resolution.
-		/// @return Window resolution.
+		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowRect() const = 0;
+		/// @brief Gets window client rect.
+		/// @return Left-upper point as position and resolution of the window client rect.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
+		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowClientRect() const = 0;
 	};
 }

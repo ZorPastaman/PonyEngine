@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/Windows/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -72,10 +74,8 @@ namespace PonyEngine::Input
 	{
 		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			constexpr auto messageTypes = std::array<UINT, 10> { WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WM_MOUSEWHEEL };
-			windowSystem->AddMessageObserver(*this, messageTypes);
-			constexpr auto rawInputTypes = std::array<DWORD, 1> { RIM_TYPEMOUSE };
-			windowSystem->AddRawInputObserver(*this, rawInputTypes);
+			windowSystem->MessagePump().AddMessageObserver(*this, std::array<UINT, 10> { WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WM_MOUSEWHEEL });
+			windowSystem->RawInputManager().AddRawInputObserver(*this, std::array<DWORD, 1> { RIM_TYPEMOUSE });
 		}
 		else
 		{
@@ -87,8 +87,8 @@ namespace PonyEngine::Input
 	{
 		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			windowSystem->RemoveRawInputObserver(*this);
-			windowSystem->RemoveMessageObserver(*this);
+			windowSystem->RawInputManager().RemoveRawInputObserver(*this);
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
 		}
 	}
 
@@ -132,16 +132,14 @@ namespace PonyEngine::Input
 			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseWheel, .value = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA)});
 			break;
 		default:
+			assert(false && "The incorrect message type has been received.");
 			break;
 		}
 	}
 
 	void WindowsMouseDevice::Observe(const RAWINPUT& input)
 	{
-		if (input.data.mouse.usFlags != MOUSE_MOVE_RELATIVE)
-		{
-			return;
-		}
+		assert(input.data.mouse.usFlags == MOUSE_MOVE_RELATIVE && "The incorrect raw input type has been received.");
 
 		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(input.data.mouse.lLastX) * sensitivity});
 		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(input.data.mouse.lLastY) * sensitivity});

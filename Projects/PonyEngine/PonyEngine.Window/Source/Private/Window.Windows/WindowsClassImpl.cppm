@@ -26,7 +26,6 @@ import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
 import :WindowsUtility;
-import :WindowsWindowProc;
 
 export namespace PonyEngine::Window
 {
