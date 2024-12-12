@@ -16,6 +16,8 @@ export module PonyEngine.Window.Windows.Detail:IWindowsWindowSystemContext;
 
 import PonyDebug.Log;
 
+import PonyEngine.Window.Windows;
+
 export namespace PonyEngine::Window
 {
 	/// @brief Windows window system context.
@@ -31,6 +33,15 @@ export namespace PonyEngine::Window
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsMessagePump& MessagePump() noexcept = 0;
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsMessagePump& MessagePump() const noexcept = 0;
 
 		/// @brief Gets the window handle.
 		/// @return Window handle.

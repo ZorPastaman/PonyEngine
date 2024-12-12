@@ -25,12 +25,6 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowProc.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowProc.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -53,6 +47,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowSystemContext.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\WindowsMessagePump.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\WindowsRawInputManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -108,6 +108,11 @@ namespace PonyEngine::Window
 
 	void WindowsWindowTitleBar::UpdateWindowTitle() const
 	{
+		if (!IsWindow(windowSystem->WindowHandle()))
+		{
+			return;
+		}
+
 		const std::string titleToSet = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
 
 		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(titleToSet).c_str()))

@@ -14,12 +14,10 @@ module;
 
 export module PonyEngine.Window.Windows:IWindowsWindowSystem;
 
-import <span>;
-
 import PonyEngine.Window;
 
-import :IWindowsMessageObserver;
-import :IWindowsRawInputObserver;
+import :IWindowsMessagePump;
+import :IWindowsRawInputManager;
 import :IWindowsWindowTitleBar;
 
 export namespace PonyEngine::Window
@@ -38,24 +36,27 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override = 0;
 
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsMessagePump& MessagePump() noexcept = 0;
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsMessagePump& MessagePump() const noexcept = 0;
+
+		/// @brief Gets the raw input manager.
+		/// @return Raw input manager.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsRawInputManager& RawInputManager() noexcept = 0;
+		/// @brief Gets the raw input manager.
+		/// @return Raw input manager.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsRawInputManager& RawInputManager() const noexcept = 0;
+
 		/// @brief Gets the window handle.
 		/// @return Window handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept = 0;
-
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageTypes Message types to observe. Examples: WM_KEYDOWN, WM_KEYUP.
-		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
-		/// @brief Removes the message observer.
-		/// @param observer Observer to remove.
-		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept = 0;
-		/// @brief Adds the raw input observer.
-		/// @param observer Observer to add.
-		/// @param rawInputTypes Raw input types. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are supported only.
-		virtual void AddRawInputObserver(IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) = 0;
-		/// @brief Removes the raw input observer.
-		/// @param observer Observer to remove.
-		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept = 0;
 	};
 }

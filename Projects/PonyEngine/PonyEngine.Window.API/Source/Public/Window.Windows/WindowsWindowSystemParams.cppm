@@ -25,7 +25,7 @@ export namespace PonyEngine::Window
 	/// @brief Windows window parameters.
 	struct WindowsWindowSystemParams final : WindowSystemParams
 	{
-		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class.
+		std::shared_ptr<WindowsClass> windowsClass; ///< Windows class. The window class must support @p IWindowsMessageHandler that is set in CreateWindow().
 		WindowsWindowStyle windowsWindowStyle; ///< Windows window style.
 		int cmdShow = SW_NORMAL; ///< Window cmdShow.
 	};

@@ -134,7 +134,7 @@ namespace Window
 			Assert::AreEqual(std::string_view(title), windowsWindow->TitleBar().MainTitle());
 		}
 
-		TEST_METHOD(WindowRectTest)
+		TEST_METHOD(CreateWindowRectTest)
 		{
 			auto logger = Mocks::Logger();
 			auto screenSystem = Mocks::ScreenSystem();
@@ -151,7 +151,7 @@ namespace Window
 			std::get<1>(window.system)->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
 			RECT rect;
-			GetWindowRect(windowsWindow->WindowHandle(), &rect);
+			GetClientRect(windowsWindow->WindowHandle(), &rect);
 			Assert::AreEqual(0L, rect.left);
 			Assert::AreEqual(0L, rect.top);
 			Assert::AreEqual(static_cast<LONG>(screenSystem.DisplayResolution().Width()), rect.right);
@@ -159,15 +159,70 @@ namespace Window
 			std::get<1>(window.system)->End();
 
 			systemParams.rect.fullscreen = false;
+			systemParams.rect.position = PonyMath::Core::Vector2<std::int32_t>(120, 130);
+			systemParams.rect.resolution = PonyMath::Utility::Resolution<std::uint32_t>(1200u, 670u);
 			factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
 			windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
-			GetWindowRect(windowsWindow->WindowHandle(), &rect);
+			GetClientRect(windowsWindow->WindowHandle(), &rect);
+			auto leftTop = POINT{.x = rect.left, .y = rect.top};
+			auto rightBottom = POINT{.x = rect.right, .y = rect.bottom};
+			ClientToScreen(windowsWindow->WindowHandle(), &leftTop);
+			ClientToScreen(windowsWindow->WindowHandle(), &rightBottom);
+			rect.left = leftTop.x;
+			rect.top = leftTop.y;
+			rect.right = rightBottom.x;
+			rect.bottom = rightBottom.y;
 			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.X()), rect.left);
 			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.Y()), rect.top);
 			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.X() + systemParams.rect.resolution.Width()), rect.right);
 			Assert::AreEqual(static_cast<LONG>(systemParams.rect.position.Y() + systemParams.rect.resolution.Height()), rect.bottom);
+			std::get<1>(window.system)->End();
+		}
+
+		TEST_METHOD(WindowRectTest)
+		{
+			auto logger = Mocks::Logger();
+			auto screenSystem = Mocks::ScreenSystem();
+			auto application = Mocks::Application();
+			application.logger = &logger;
+			auto engine = Mocks::Engine();
+			engine.application = &application;
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
+			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			systemParams.rect.fullscreen = false;
+			systemParams.windowsWindowStyle.style = WS_OVERLAPPEDWINDOW;
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			std::get<1>(window.system)->Begin();
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+
+			RECT rect;
+			GetWindowRect(windowsWindow->WindowHandle(), &rect);
+			std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> posRes = windowsWindow->WindowRect();
+			Assert::AreEqual(rect.left, static_cast<LONG>(posRes.first.X()));
+			Assert::AreEqual(rect.top, static_cast<LONG>(posRes.first.Y()));
+			Assert::AreEqual(rect.right, static_cast<LONG>(posRes.first.X() + posRes.second.Width()));
+			Assert::AreEqual(rect.bottom, static_cast<LONG>(posRes.first.Y() + posRes.second.Height()));
+
+			GetClientRect(windowsWindow->WindowHandle(), &rect);
+			auto leftTop = POINT{ .x = rect.left, .y = rect.top };
+			auto rightBottom = POINT{ .x = rect.right, .y = rect.bottom };
+			ClientToScreen(windowsWindow->WindowHandle(), &leftTop);
+			ClientToScreen(windowsWindow->WindowHandle(), &rightBottom);
+			rect.left = leftTop.x;
+			rect.top = leftTop.y;
+			rect.right = rightBottom.x;
+			rect.bottom = rightBottom.y;
+			posRes = windowsWindow->WindowClientRect();
+			Assert::AreEqual(rect.left, static_cast<LONG>(posRes.first.X()));
+			Assert::AreEqual(rect.top, static_cast<LONG>(posRes.first.Y()));
+			Assert::AreEqual(rect.right, static_cast<LONG>(posRes.first.X() + posRes.second.Width()));
+			Assert::AreEqual(rect.bottom, static_cast<LONG>(posRes.first.Y() + posRes.second.Height()));
+
 			std::get<1>(window.system)->End();
 		}
 
@@ -211,7 +266,7 @@ namespace Window
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
 			auto messageObserver = MessageObserver();
 			constexpr auto messages = std::array<UINT, 2>{ WM_KEYDOWN, WM_KEYUP };
-			windowsWindow->AddMessageObserver(messageObserver, messages);
+			windowsWindow->MessagePump().AddMessageObserver(messageObserver, messages);
 
 			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, 1310721);
 			std::get<1>(window.system)->Tick();
@@ -231,7 +286,7 @@ namespace Window
 			std::get<1>(window.system)->Tick();
 			Assert::AreEqual(std::size_t{2}, messageObserver.version);
 
-			windowsWindow->RemoveMessageObserver(messageObserver);
+			windowsWindow->MessagePump().RemoveMessageObserver(messageObserver);
 			PostMessageW(windowsWindow->WindowHandle(), WM_KEYDOWN, 0, 1310721);
 			std::get<1>(window.system)->Tick();
 			Assert::AreEqual(std::size_t{2}, messageObserver.version);

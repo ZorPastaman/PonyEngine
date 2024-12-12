@@ -110,7 +110,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(windowSystem->Resolution());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(windowSystem->WindowClientRect().second);
 				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
 			}
 		}

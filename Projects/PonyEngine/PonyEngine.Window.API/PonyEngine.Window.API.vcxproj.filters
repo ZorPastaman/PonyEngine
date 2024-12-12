@@ -72,6 +72,15 @@
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowTitleBar.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessagePump.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="resource.h">
