@@ -21,11 +21,11 @@ import <array>;
 import <cstdint>;
 import <memory>;
 import <stdexcept>;
-import <utility>;
 
 import PonyBase.StringUtility;
 
 import PonyMath.Core;
+import PonyMath.Shape;
 import PonyMath.Utility;
 
 import PonyEngine.Core;
@@ -33,6 +33,7 @@ import PonyEngine.Screen;
 import PonyEngine.Window.Windows;
 
 import :IWindowsWindowSystemContext;
+import :WindowsCursor;
 import :WindowsMessagePump;
 import :WindowsRawInputManager;
 import :WindowsUtility;
@@ -66,14 +67,24 @@ export namespace PonyEngine::Window
 		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IWindowsCursor& Cursor() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsCursor& Cursor() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
 		virtual void ShowWindow() noexcept override;
 		virtual void HideWindow() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowRect() const override;
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowRect() const override;
 		[[nodiscard("Pure function")]]
-		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowClientRect() const override;
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const override;
+
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const override;
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const override;
 
 		[[nodiscard("Pure function")]]
 		virtual IWindowsMessagePump& MessagePump() noexcept override;
@@ -84,6 +95,11 @@ export namespace PonyEngine::Window
 		virtual IWindowsRawInputManager& RawInputManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IWindowsRawInputManager& RawInputManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual RECT WindowRectWindows() const override;
+		[[nodiscard("Pure function")]]
+		virtual RECT WindowClientRectWindows() const override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
@@ -125,6 +141,7 @@ export namespace PonyEngine::Window
 		std::unique_ptr<WindowsWindowTitleBar> titleBar; ///< Windows window title bar.
 		std::unique_ptr<WindowsMessagePump> messagePump; ///< Windows message pump.
 		std::unique_ptr<WindowsRawInputManager> rawInputManager; ///< Windows raw input manager.
+		std::unique_ptr<WindowsCursor> cursor; ///< Windows cursor.
 	};
 }
 
@@ -170,6 +187,10 @@ namespace PonyEngine::Window
 		rawInputManager = std::make_unique<WindowsRawInputManager>(*static_cast<IWindowsWindowSystemContext*>(this));
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Raw input manager created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rawInputManager.get()));
 
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create cursor.");
+		cursor = std::make_unique<WindowsCursor>(*static_cast<IWindowsWindowSystemContext*>(this), windowParams.cursorParams);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Cursor created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(cursor.get()));
+
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
@@ -189,6 +210,10 @@ namespace PonyEngine::Window
 		{
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Skip destroying window 'cause it's already been destroyed.");
 		}
+
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy cursor.");
+		cursor.reset();
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Cursor destroyed.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy raw input manager.");
 		rawInputManager.reset();
@@ -232,6 +257,16 @@ namespace PonyEngine::Window
 		return *titleBar;
 	}
 
+	IWindowsCursor& WindowsWindowSystem::Cursor() noexcept
+	{
+		return *cursor;
+	}
+
+	const IWindowsCursor& WindowsWindowSystem::Cursor() const noexcept
+	{
+		return *cursor;
+	}
+
 	bool WindowsWindowSystem::IsVisible() const noexcept
 	{
 		return IsWindowVisible(hWnd);
@@ -249,38 +284,36 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Hide window.");
 	}
 
-	std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowsWindowSystem::WindowRect() const
+	PonyMath::Shape::Rect<std::int32_t> WindowsWindowSystem::WindowRect() const
 	{
-		RECT rect;
-		if (!::GetWindowRect(hWnd, &rect))
-		{
-			throw std::runtime_error("Failed to get window rect.");
-		}
-
-		return ConvertToWindowRect(rect);
+		return ConvertToRect(WindowRectWindows());
 	}
 
-	std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowsWindowSystem::WindowClientRect() const
+	PonyMath::Shape::Rect<std::int32_t> WindowsWindowSystem::WindowClientRect() const
 	{
-		RECT rect;
-		if (!GetClientRect(hWnd, &rect))
+		return ConvertToRect(WindowClientRectWindows());
+	}
+
+	PonyMath::Core::Vector2<std::int32_t> WindowsWindowSystem::ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const
+	{
+		auto screenPoint = POINT{.x = static_cast<LONG>(clientPoint.X()), .y = static_cast<LONG>(clientPoint.Y())};
+		if (!::ClientToScreen(hWnd, &screenPoint)) [[unlikely]]
 		{
-			throw std::runtime_error("Failed to get client rect.");
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		auto leftTop = POINT{.x = rect.left, .y = rect.top};
-		auto rightBottom = POINT{.x = rect.right, .y = rect.bottom};
-		if (!ClientToScreen(hWnd, &leftTop) || !ClientToScreen(hWnd, &rightBottom))
+		return PonyMath::Core::Vector2<std::int32_t>(static_cast<std::int32_t>(screenPoint.x), static_cast<std::int32_t>(screenPoint.y));
+	}
+
+	PonyMath::Core::Vector2<std::int32_t> WindowsWindowSystem::ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const
+	{
+		auto clientPoint = POINT{.x = static_cast<LONG>(screenPoint.X()), .y = static_cast<LONG>(screenPoint.Y())};
+		if (!::ScreenToClient(hWnd, &clientPoint)) [[unlikely]]
 		{
-			throw std::runtime_error("Failed to get screen point.");
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get client point. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		rect.left = leftTop.x;
-		rect.top = leftTop.y;
-		rect.right = rightBottom.x;
-		rect.bottom = rightBottom.y;
-
-		return ConvertToWindowRect(rect);
+		return PonyMath::Core::Vector2<std::int32_t>(static_cast<std::int32_t>(clientPoint.x), static_cast<std::int32_t>(clientPoint.y));
 	}
 
 	IWindowsMessagePump& WindowsWindowSystem::MessagePump() noexcept
@@ -301,6 +334,40 @@ namespace PonyEngine::Window
 	const IWindowsRawInputManager& WindowsWindowSystem::RawInputManager() const noexcept
 	{
 		return *rawInputManager;
+	}
+
+	RECT WindowsWindowSystem::WindowRectWindows() const
+	{
+		RECT rect;
+		if (!::GetWindowRect(hWnd, &rect)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		return rect;
+	}
+
+	RECT WindowsWindowSystem::WindowClientRectWindows() const
+	{
+		RECT rect;
+		if (!GetClientRect(hWnd, &rect)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		auto leftTop = POINT{ .x = rect.left, .y = rect.top };
+		auto rightBottom = POINT{ .x = rect.right, .y = rect.bottom };
+		if (!::ClientToScreen(hWnd, &leftTop) || !::ClientToScreen(hWnd, &rightBottom)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		rect.left = leftTop.x;
+		rect.top = leftTop.y;
+		rect.right = rightBottom.x;
+		rect.bottom = rightBottom.y;
+
+		return rect;
 	}
 
 	HWND WindowsWindowSystem::WindowHandle() const noexcept
@@ -357,13 +424,7 @@ namespace PonyEngine::Window
 	{
 		PonyMath::Core::Vector2<int> position = GetTargetPosition(rect);
 		PonyMath::Core::Vector2<int> resolution = GetTargetResolution(rect);
-		auto windowRect = RECT
-		{
-			.left = static_cast<LONG>(position.X()),
-			.top = static_cast<LONG>(position.Y()),
-			.right = static_cast<LONG>(position.X() + resolution.X()),
-			.bottom = static_cast<LONG>(position.Y() + resolution.Y())
-		};
+		RECT windowRect = ConvertToWindowsRect(PonyMath::Shape::Rect<int>(position, resolution));
 		if (!AdjustWindowRectEx(&windowRect, style.style, false, style.extendedStyle))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to adjust window rect. Error code: '0x{:X}'.", GetLastError()));

@@ -17,6 +17,7 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsCursor.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsMessagePump.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputManager.cppm" />
@@ -32,6 +33,8 @@
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
+    <ClCompile Include="Source\Public\Window\CursorParams.cppm" />
+    <ClCompile Include="Source\Public\Window\ICursor.cppm" />
     <ClCompile Include="Source\Public\Window\IWindowTitleBar.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\WindowRect.cppm" />

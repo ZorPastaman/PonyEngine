@@ -140,19 +140,19 @@ namespace PonyEngine::Window
 		const auto hRawInput = reinterpret_cast<HRAWINPUT>(lParam);
 
 		UINT size = 0u;
-		if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER)))
+		if (GetRawInputData(hRawInput, RID_INPUT, nullptr, &size, sizeof(RAWINPUTHEADER))) [[unlikely]]
 		{
 			PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Error, "Failed to get raw input size. Error code: '0x{:X}'.", GetLastError());
 
 			return;
 		}
-		if (size < 1u)
+		if (size < 1u) [[unlikely]]
 		{
 			return;
 		}
 
 		rawInput.resize(size);
-		if (GetRawInputData(hRawInput, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) != rawInput.size())
+		if (GetRawInputData(hRawInput, RID_INPUT, rawInput.data(), &size, sizeof(RAWINPUTHEADER)) != rawInput.size()) [[unlikely]]
 		{
 			PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Error, "Failed to get raw input. Error code: '0x{:X}'.", GetLastError());
 
@@ -202,12 +202,12 @@ namespace PonyEngine::Window
 			rid.usUsagePage = 0x01;
 			rid.usUsage = 0x06;
 			break;
-		default:
+		default: [[unlikely]]
 			assert(false && "The raw input type is incorrect. RIM_TYPEMOUSE and RIM_TYPEKEYBOARD are only supported.");
 			return;
 		}
 
-		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid)))
+		if (!RegisterRawInputDevices(&rid, 1, sizeof(rid))) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to register raw input device. Usage page: '0x{:X}'; Usage: '0x{:X}'; Flags: '0x{:X}'; Window handle: '0x{:X}'. Error code: '0x{:X}'.", rid.usUsagePage, rid.usUsage, rid.dwFlags, reinterpret_cast<std::uintptr_t>(rid.hwndTarget), GetLastError()));
 		}

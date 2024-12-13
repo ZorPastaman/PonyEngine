@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Render.Direct3D12:IDirect3D12RenderObject;
 

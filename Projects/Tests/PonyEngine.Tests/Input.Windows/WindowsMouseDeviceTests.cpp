@@ -92,12 +92,35 @@ namespace Input
 			}
 		};
 
+		class Cursor final : public PonyEngine::Window::IWindowsCursor
+		{
+		public:
+			[[nodiscard("Pure function")]]
+			virtual PonyMath::Core::Vector2<std::int32_t> CursorPosition() const override
+			{
+				return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero;
+			}
+			virtual void CursorPosition(const PonyMath::Core::Vector2<std::int32_t>& position) override
+			{
+			}
+
+			[[nodiscard("Pure function")]]
+			virtual bool IsVisible() const noexcept override
+			{
+				return false;
+			}
+			virtual void IsVisible(bool isVisible) override
+			{
+			}
+		};
+
 		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
 		{
 		public:
 			WindowsWindowTitleBar titleBar;
 			class MessagePump messagePump;
 			class RawInputManager rawInputManager;
+			class Cursor cursor;
 
 			[[nodiscard("Pure function")]]
 			virtual PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() noexcept override
@@ -110,6 +133,11 @@ namespace Input
 			{
 				return titleBar;
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyEngine::Window::IWindowsCursor& Cursor() noexcept override { return cursor; }
+			[[nodiscard("Pure function")]]
+			virtual const PonyEngine::Window::IWindowsCursor& Cursor() const noexcept override { return cursor; }
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override
@@ -130,14 +158,14 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowRect() const noexcept override
+			virtual PonyMath::Shape::Rect<std::int32_t> WindowRect() const noexcept override
 			{
-				return std::pair(PonyMath::Core::Vector2<std::int32_t>(10, 10), PonyMath::Utility::Resolution<std::uint32_t>(100u, 100u));
+				return PonyMath::Shape::Rect<std::int32_t>(PonyMath::Core::Vector2<std::int32_t>(10, 10), PonyMath::Core::Vector2<std::int32_t>(100, 100));
 			}
 			[[nodiscard("Pure function")]]
-			virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowClientRect() const noexcept override
+			virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const noexcept override
 			{
-				return std::pair(PonyMath::Core::Vector2<std::int32_t>(10, 10), PonyMath::Utility::Resolution<std::uint32_t>(100u, 100u));
+				return PonyMath::Shape::Rect<std::int32_t>(PonyMath::Core::Vector2<std::int32_t>(10, 10), PonyMath::Core::Vector2<std::int32_t>(100, 100));
 			}
 
 			[[nodiscard("Pure function")]]
@@ -161,6 +189,11 @@ namespace Input
 			{
 				return rawInputManager;
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
+			[[nodiscard("Pure function")]]
+			virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
 		};
 
 		TEST_METHOD(SubscriptionTest)

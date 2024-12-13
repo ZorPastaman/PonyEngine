@@ -131,7 +131,7 @@ namespace PonyEngine::Input
 		case WM_MOUSEWHEEL:
 			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseWheel, .value = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA)});
 			break;
-		default:
+		default: [[unlikely]]
 			assert(false && "The incorrect message type has been received.");
 			break;
 		}

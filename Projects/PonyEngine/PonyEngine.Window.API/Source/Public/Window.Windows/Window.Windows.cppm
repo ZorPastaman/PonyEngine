@@ -11,6 +11,7 @@ export module PonyEngine.Window.Windows;
 
 export import PonyEngine.Window;
 
+export import :IWindowsCursor;
 export import :IWindowsMessageHandler;
 export import :IWindowsMessageObserver;
 export import :IWindowsMessagePump;

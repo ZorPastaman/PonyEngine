@@ -10,12 +10,13 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window.Windows:IWindowsWindowSystem;
 
 import PonyEngine.Window;
 
+import :IWindowsCursor;
 import :IWindowsMessagePump;
 import :IWindowsRawInputManager;
 import :IWindowsWindowTitleBar;
@@ -35,6 +36,15 @@ export namespace PonyEngine::Window
 		/// @return Window title bar.
 		[[nodiscard("Pure function")]]
 		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override = 0;
+
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsCursor& Cursor() noexcept override = 0;
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsCursor& Cursor() const noexcept override = 0;
 
 		/// @brief Gets the message pump.
 		/// @return Message pump.

@@ -18,6 +18,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\WindowsCursor.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsMessagePump.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsRawInputManager.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\WindowsUtility.cppm" />

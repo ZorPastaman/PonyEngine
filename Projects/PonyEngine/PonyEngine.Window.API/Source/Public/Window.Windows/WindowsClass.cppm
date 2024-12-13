@@ -10,7 +10,7 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
-#include "PonyBase/Utility/Base.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window.Windows:WindowsClass;
 

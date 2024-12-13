@@ -29,6 +29,7 @@ import <vector>;
 import PonyBase.Core;
 
 import PonyMath.Core;
+import PonyMath.Shape;
 
 import PonyDebug.Log;
 
@@ -191,6 +192,8 @@ namespace Application
 			const auto windowsClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
 			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			systemParams.cursorParams.visible = false;
+			systemParams.cursorParams.cursorClipping = PonyMath::Shape::Rect<float>(0.5f, 0.5f, 0.f, 0.f);
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");

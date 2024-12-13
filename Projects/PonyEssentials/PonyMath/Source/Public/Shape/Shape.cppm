@@ -7,19 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyMath.Shape;
 
-#include "PonyBase/Utility/ObjectBody.h"
-
-export module Game:GameSystemFactory;
-
-import PonyEngine.Core;
-
-export namespace Game
-{
-	/// @brief Game system factory.
-	class GameSystemFactory : public PonyEngine::Core::ISystemFactory
-	{
-		BASE_BODY(GameSystemFactory)
-	};
-}
+export import :Rect;
