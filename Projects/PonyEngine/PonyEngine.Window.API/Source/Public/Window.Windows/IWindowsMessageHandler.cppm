@@ -10,7 +10,7 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 #include "PonyDebug/Log/Log.h"
 

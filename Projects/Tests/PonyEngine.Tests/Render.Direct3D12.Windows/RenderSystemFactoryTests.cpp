@@ -104,7 +104,7 @@ namespace Render
 			auto system = renderFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			auto renderSystem = std::get<1>(system.system).get();
 
-			Assert::IsTrue(dynamic_cast<PonyEngine::Window::IWindowSystem*>(std::get<1>(window.system).get())->WindowClientRect().second == dynamic_cast<PonyEngine::Render::IRenderSystem*>(renderSystem)->RenderTarget().Resolution());
+			Assert::IsTrue(static_cast<PonyMath::Core::Vector2<std::uint32_t>>(dynamic_cast<PonyEngine::Window::IWindowSystem*>(std::get<1>(window.system).get())->WindowClientRect().Size()) == static_cast<PonyMath::Core::Vector2<std::uint32_t>>(dynamic_cast<PonyEngine::Render::IRenderSystem*>(renderSystem)->RenderTarget().Resolution()));
 		}
 
 		TEST_METHOD(CustomResolutionTest)

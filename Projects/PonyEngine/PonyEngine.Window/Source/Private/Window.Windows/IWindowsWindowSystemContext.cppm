@@ -10,9 +10,13 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window.Windows.Detail:IWindowsWindowSystemContext;
+
+import <cstdint>;
+
+import PonyMath.Shape;
 
 import PonyDebug.Log;
 
@@ -42,6 +46,23 @@ export namespace PonyEngine::Window
 		/// @return Message pump.
 		[[nodiscard("Pure function")]]
 		virtual const IWindowsMessagePump& MessagePump() const noexcept = 0;
+
+		/// @brief Gets window rect.
+		/// @return Window rect.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowRect() const = 0;
+		/// @brief Gets window client rect.
+		/// @return Window client rect.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const = 0;
+		/// @brief Gets window rect.
+		/// @return Window rect.
+		[[nodiscard("Pure function")]]
+		virtual RECT WindowRectWindows() const = 0;
+		/// @brief Gets window client rect.
+		/// @return Window client rect.
+		[[nodiscard("Pure function")]]
+		virtual RECT WindowClientRectWindows() const = 0;
 
 		/// @brief Gets the window handle.
 		/// @return Window handle.

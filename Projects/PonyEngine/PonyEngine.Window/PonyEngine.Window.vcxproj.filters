@@ -55,5 +55,8 @@
     <ClCompile Include="Source\Private\Window.Windows\WindowsRawInputManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Window.Windows\WindowsCursor.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

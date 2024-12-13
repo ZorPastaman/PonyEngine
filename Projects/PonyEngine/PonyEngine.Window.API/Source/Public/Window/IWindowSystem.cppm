@@ -9,16 +9,15 @@
 
 module;
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window:IWindowSystem;
 
 import <cstdint>;
-import <utility>;
 
-import PonyMath.Core;
-import PonyMath.Utility;
+import PonyMath.Shape;
 
+import :ICursor;
 import :IWindowTitleBar;
 
 export namespace PonyEngine::Window
@@ -37,6 +36,15 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual const IWindowTitleBar& TitleBar() const noexcept = 0;
 
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual ICursor& Cursor() noexcept = 0;
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual const ICursor& Cursor() const noexcept = 0;
+
 		/// @brief Checks if the window is visible.
 		/// @return @a True if it's visible; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -47,12 +55,23 @@ export namespace PonyEngine::Window
 		virtual void HideWindow() = 0;
 
 		/// @brief Gets window rect.
-		/// @return Left-upper point as position and resolution of the window rect.
+		/// @return Window rect.
 		[[nodiscard("Pure function")]]
-		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowRect() const = 0;
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowRect() const = 0;
 		/// @brief Gets window client rect.
-		/// @return Left-upper point as position and resolution of the window client rect.
+		/// @return Window client rect.
 		[[nodiscard("Pure function")]]
-		virtual std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> WindowClientRect() const = 0;
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const = 0;
+
+		/// @brief Converts the client point to a screen point.
+		/// @param clientPoint Client point.
+		/// @return Screen point.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const = 0;
+		/// @brief Converts the screen point to a client point.
+		/// @param screenPoint Screen point.
+		/// @return Client point.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const = 0;
 	};
 }

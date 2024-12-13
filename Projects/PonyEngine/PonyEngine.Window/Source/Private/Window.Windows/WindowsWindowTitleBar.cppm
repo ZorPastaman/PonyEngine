@@ -108,14 +108,14 @@ namespace PonyEngine::Window
 
 	void WindowsWindowTitleBar::UpdateWindowTitle() const
 	{
-		if (!IsWindow(windowSystem->WindowHandle()))
+		if (!IsWindow(windowSystem->WindowHandle())) [[unlikely]]
 		{
 			return;
 		}
 
 		const std::string titleToSet = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
 
-		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(titleToSet).c_str()))
+		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(titleToSet).c_str())) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}

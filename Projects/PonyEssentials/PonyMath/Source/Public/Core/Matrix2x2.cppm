@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Matrix2x2;
 
 import <array>;
@@ -447,7 +451,7 @@ export namespace PonyMath::Core
 	template<Arithmetic T>
 	struct Matrix2x2<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Identity = Matrix2x2(T(1), T(0), T(0), T(1)); ///< Identity matrix.
 		static constexpr auto Zero = Matrix2x2(T(0), T(0), T(0), T(0)); ///< Zero matrix.

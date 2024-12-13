@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window.Windows:IWindowsWindowTitleBar;
 

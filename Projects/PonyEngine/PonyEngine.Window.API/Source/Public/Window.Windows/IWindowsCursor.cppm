@@ -11,15 +11,15 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module Game:GameSystemFactory;
+export module PonyEngine.Window.Windows:IWindowsCursor;
 
-import PonyEngine.Core;
+import PonyEngine.Window;
 
-export namespace Game
+export namespace PonyEngine::Window
 {
-	/// @brief Game system factory.
-	class GameSystemFactory : public PonyEngine::Core::ISystemFactory
+	/// @brief Windows cursor.
+	class IWindowsCursor : public ICursor
 	{
-		BASE_BODY(GameSystemFactory)
+		INTERFACE_BODY(IWindowsCursor)
 	};
 }

@@ -9,7 +9,7 @@
 
 module;
 
-#include "PonyBase/Utility/Base.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Input:InputSystemFactory;
 

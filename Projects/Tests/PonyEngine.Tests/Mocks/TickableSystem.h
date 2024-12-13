@@ -11,7 +11,7 @@
 
 #include <cstddef>
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 import PonyEngine.Core;
 

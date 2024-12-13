@@ -202,11 +202,11 @@ namespace Window
 
 			RECT rect;
 			GetWindowRect(windowsWindow->WindowHandle(), &rect);
-			std::pair<PonyMath::Core::Vector2<std::int32_t>, PonyMath::Utility::Resolution<std::uint32_t>> posRes = windowsWindow->WindowRect();
-			Assert::AreEqual(rect.left, static_cast<LONG>(posRes.first.X()));
-			Assert::AreEqual(rect.top, static_cast<LONG>(posRes.first.Y()));
-			Assert::AreEqual(rect.right, static_cast<LONG>(posRes.first.X() + posRes.second.Width()));
-			Assert::AreEqual(rect.bottom, static_cast<LONG>(posRes.first.Y() + posRes.second.Height()));
+			PonyMath::Shape::Rect<std::int32_t> windowRect = windowsWindow->WindowRect();
+			Assert::AreEqual(rect.left, static_cast<LONG>(windowRect.MinX()));
+			Assert::AreEqual(rect.top, static_cast<LONG>(windowRect.MinY()));
+			Assert::AreEqual(rect.right, static_cast<LONG>(windowRect.MaxX()));
+			Assert::AreEqual(rect.bottom, static_cast<LONG>(windowRect.MaxY()));
 
 			GetClientRect(windowsWindow->WindowHandle(), &rect);
 			auto leftTop = POINT{ .x = rect.left, .y = rect.top };
@@ -217,11 +217,11 @@ namespace Window
 			rect.top = leftTop.y;
 			rect.right = rightBottom.x;
 			rect.bottom = rightBottom.y;
-			posRes = windowsWindow->WindowClientRect();
-			Assert::AreEqual(rect.left, static_cast<LONG>(posRes.first.X()));
-			Assert::AreEqual(rect.top, static_cast<LONG>(posRes.first.Y()));
-			Assert::AreEqual(rect.right, static_cast<LONG>(posRes.first.X() + posRes.second.Width()));
-			Assert::AreEqual(rect.bottom, static_cast<LONG>(posRes.first.Y() + posRes.second.Height()));
+			windowRect = windowsWindow->WindowClientRect();
+			Assert::AreEqual(rect.left, static_cast<LONG>(windowRect.MinX()));
+			Assert::AreEqual(rect.top, static_cast<LONG>(windowRect.MinY()));
+			Assert::AreEqual(rect.right, static_cast<LONG>(windowRect.MaxX()));
+			Assert::AreEqual(rect.bottom, static_cast<LONG>(windowRect.MaxY()));
 
 			std::get<1>(window.system)->End();
 		}
