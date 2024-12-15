@@ -63,6 +63,8 @@
 		 \
 	public:
 
+/// @brief Non-constructible class body macro. It must be used inside a base class.
+/// @param objectName Class name. Must be the same as a class name where the body is declared.
 #define NON_CONSTRUCTIBLE_BODY(objectName) \
 	public: \
 		objectName() = delete; \

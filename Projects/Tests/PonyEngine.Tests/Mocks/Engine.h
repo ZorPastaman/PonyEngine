@@ -9,6 +9,7 @@
 
 #pragma once
 
+#include <cstdint>
 #include <optional>
 #include <typeindex>
 #include <unordered_map>
@@ -32,7 +33,7 @@ namespace Mocks
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		virtual size_t FrameCount() const noexcept override;
+		virtual std::int64_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
@@ -51,7 +52,7 @@ namespace Mocks
 
 		virtual void Tick() override;
 
-		std::size_t frameCount = 0;
+		std::int64_t frameCount = 0;
 		std::optional<int> exitCode = {};
 
 		Application* application = nullptr;

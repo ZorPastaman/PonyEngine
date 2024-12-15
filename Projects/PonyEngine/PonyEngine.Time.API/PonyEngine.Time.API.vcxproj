@@ -29,6 +29,11 @@
     <ClCompile Include="Source\Public\Time\FrameRateSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Time\FrameRateSystemParams.cppm" />
     <ClCompile Include="Source\Public\Time\FrameRateSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Time\ITimeSystem.cppm" />
+    <ClCompile Include="Source\Public\Time\TimeSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Time\TimeSystemFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Time\TimeSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Time\TimeSystemParams.cppm" />
     <ClCompile Include="Source\Public\Time\Utility.cppm" />
     <ClCompile Include="Source\Public\Time\IFrameRateSystem.cppm" />
     <ClCompile Include="Source\Public\Time\Time.cppm" />

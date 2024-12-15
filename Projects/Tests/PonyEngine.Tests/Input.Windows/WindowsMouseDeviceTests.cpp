@@ -115,7 +115,7 @@ namespace Input
 
 			[[nodiscard("Pure function")]]
 			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const override { return std::nullopt; }
-			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) override {}
+			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>&) override {}
 		};
 
 		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
