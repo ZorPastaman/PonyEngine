@@ -9,12 +9,18 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/Windows/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Input.Windows.Detail:WindowsKeyboardDevice;
 
 import <array>;
 import <unordered_map>;
+
+import PonyDebug.Log;
 
 import PonyEngine.Input.Windows;
 import PonyEngine.Window.Windows;
@@ -46,8 +52,6 @@ export namespace PonyEngine::Input
 
 	private:
 		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
-
-		std::unordered_map<WORD, bool> lastInputValues; ///< Last input values. It's used to prevent recreating an input event when a user holds a button.
 	};
 }
 
@@ -175,8 +179,11 @@ namespace PonyEngine::Input
 	{
 		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			constexpr auto messageTypes = std::array<UINT, 4> { WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP };
-			windowSystem->AddMessageObserver(*this, messageTypes);
+			windowSystem->MessagePump().AddMessageObserver(*this, std::array<UINT, 4> { WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP });
+		}
+		else
+		{
+			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Couldn't find Windows window system. Keyboard input won't work.");
 		}
 	}
 
@@ -184,7 +191,7 @@ namespace PonyEngine::Input
 	{
 		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
 		{
-			windowSystem->RemoveMessageObserver(*this);
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
 		}
 	}
 
@@ -194,20 +201,19 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam)
 	{
+		assert (uMsg == WM_KEYDOWN || uMsg == WM_KEYUP || uMsg == WM_SYSKEYDOWN || uMsg == WM_SYSKEYUP && "The incorrect input message has been received.");
+
+		const bool inputValue = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
+		if (inputValue == ((lParam & (1 << 30)) != 0)) // If the previous input is the same.
+		{
+			return;
+		}
+
 		const WORD keyFlags = HIWORD(lParam);
 		const WORD scanCode = LOBYTE(keyFlags);
 		const WORD extended = keyFlags & KF_EXTENDED;
 		const WORD extendedPrefix = extended << WORD{7} | extended << WORD{6} | extended << WORD{5}; // 0xE000 if it's extended; 0 otherwise.
 		const WORD key = scanCode | extendedPrefix;
-
-		const bool inputValue = uMsg == WM_KEYDOWN || uMsg == WM_SYSKEYDOWN;
-
-		if (const auto lastInputPosition = lastInputValues.find(key); lastInputPosition != lastInputValues.cend() && lastInputPosition->second == inputValue)
-		{
-			return;
-		}
-		lastInputValues[key] = inputValue;
-
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
 			InputSystem().AddInputEvent(InputEvent{.inputCode = keyCodeMapPosition->second, .value = static_cast<float>(inputValue)});

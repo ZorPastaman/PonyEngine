@@ -23,6 +23,7 @@ import PonyEngine.Window.Windows.Detail;
 export namespace PonyEngine::Window
 {
 	/// @brief Creates a Windows class.
+	/// @note The window that uses this class must set a pointer to @p IWindowsMessageHandler in CreateWindow() to correctly use this class.
 	/// @param application Application context.
 	/// @param params Windows class parameters.
 	/// @return Windows class.
@@ -30,7 +31,7 @@ export namespace PonyEngine::Window
 	PONY_DLL_EXPORT WindowsClassData CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
 
 	/// @brief Creates a window system for Windows factory.
-	/// @note Windows class must be made with the @p CreateWindowsClass.
+	/// @note The window class must support @p IWindowsMessageHandler that is set in CreateWindow().
 	/// @param application Application context.
 	/// @param factoryParams Window system for Windows factory parameters.
 	/// @param systemParams Window system for Windows parameters.

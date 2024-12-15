@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Matrix3x3;
 
 import <array>;
@@ -500,7 +504,7 @@ export namespace PonyMath::Core
 	template<Arithmetic T>
 	struct Matrix3x3<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Identity = Matrix3x3(T(1), T(0), T(0), T(0), T(1), T(0), T(0), T(0), T(1)); ///< Identity matrix.
 		static constexpr auto Zero = Matrix3x3(T(0), T(0), T(0), T(0), T(0), T(0), T(0), T(0), T(0)); ///< Zero matrix.

@@ -10,15 +10,16 @@
 module;
 
 #include "PonyBase/Core/Windows/Framework.h"
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window.Windows:IWindowsWindowSystem;
 
-import <span>;
-
 import PonyEngine.Window;
 
-import :IWindowsMessageObserver;
+import :IWindowsCursor;
+import :IWindowsMessagePump;
+import :IWindowsRawInputManager;
+import :IWindowsWindowTitleBar;
 
 export namespace PonyEngine::Window
 {
@@ -27,17 +28,45 @@ export namespace PonyEngine::Window
 	{
 		INTERFACE_BODY(IWindowsWindowSystem)
 
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsWindowTitleBar& TitleBar() noexcept override = 0;
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsWindowTitleBar& TitleBar() const noexcept override = 0;
+
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsCursor& Cursor() noexcept override = 0;
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsCursor& Cursor() const noexcept override = 0;
+
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsMessagePump& MessagePump() noexcept = 0;
+		/// @brief Gets the message pump.
+		/// @return Message pump.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsMessagePump& MessagePump() const noexcept = 0;
+
+		/// @brief Gets the raw input manager.
+		/// @return Raw input manager.
+		[[nodiscard("Pure function")]]
+		virtual IWindowsRawInputManager& RawInputManager() noexcept = 0;
+		/// @brief Gets the raw input manager.
+		/// @return Raw input manager.
+		[[nodiscard("Pure function")]]
+		virtual const IWindowsRawInputManager& RawInputManager() const noexcept = 0;
+
 		/// @brief Gets the window handle.
 		/// @return Window handle.
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept = 0;
-
-		/// @brief Adds the message observer.
-		/// @param observer Observer to add.
-		/// @param messageTypes Message types to observe.
-		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
-		/// @brief Removed the message observer.
-		/// @param observer Observer to remove.
-		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept = 0;
 	};
 }

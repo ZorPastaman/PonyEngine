@@ -33,7 +33,6 @@ namespace Mocks
 
 	void InputSystem::AddInputEvent(const PonyEngine::Input::InputEvent& inputEntry)
 	{
-		++version;
-		lastEvent = inputEntry;
+		events.push_back(inputEntry);
 	}
 }

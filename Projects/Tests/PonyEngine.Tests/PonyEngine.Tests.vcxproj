@@ -72,6 +72,9 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\EngineTests.cpp" />
+    <ClCompile Include="Input.Windows\WindowsMouseDeviceFactoryTests.cpp" />
+    <ClCompile Include="Input.Windows\WindowsMouseDeviceTests.cpp" />
+    <ClCompile Include="Input\ActionConversionTests.cpp" />
     <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceFactoryTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceTests.cpp" />

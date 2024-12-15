@@ -9,15 +9,16 @@
 
 module;
 
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Window:IWindowSystem;
 
 import <cstdint>;
-import <string_view>;
 
-import PonyMath.Core;
-import PonyMath.Utility;
+import PonyMath.Shape;
+
+import :ICursor;
+import :IWindowTitleBar;
 
 export namespace PonyEngine::Window
 {
@@ -26,20 +27,23 @@ export namespace PonyEngine::Window
 	{
 		INTERFACE_BODY(IWindowSystem)
 
-		/// @brief Gets the window title.
-		/// @return Window title.
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view MainTitle() const noexcept = 0;
-		/// @brief Sets the window title.
-		/// @param title Window title to set.
-		virtual void MainTitle(std::string_view title) = 0;
-		/// @brief Gets the window title text.
-		/// @return Window title text.
+		virtual IWindowTitleBar& TitleBar() noexcept = 0;
+		/// @brief Gets the window title bar.
+		/// @return Window title bar.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view SecondaryTitle() const noexcept = 0;
-		/// @brief Sets the window title text.
-		/// @param title Window title text to set.
-		virtual void SecondaryTitle(std::string_view title) = 0;
+		virtual const IWindowTitleBar& TitleBar() const noexcept = 0;
+
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual ICursor& Cursor() noexcept = 0;
+		/// @brief Gets the cursor.
+		/// @return Cursor.
+		[[nodiscard("Pure function")]]
+		virtual const ICursor& Cursor() const noexcept = 0;
 
 		/// @brief Checks if the window is visible.
 		/// @return @a True if it's visible; @a false otherwise.
@@ -50,13 +54,24 @@ export namespace PonyEngine::Window
 		/// @brief Hides the window.
 		virtual void HideWindow() = 0;
 
-		/// @brief Gets the window position.
-		/// @return Window position.
+		/// @brief Gets window rect.
+		/// @return Window rect.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Core::Vector2<std::int32_t> Position() const noexcept = 0;
-		/// @brief Gets the window resolution.
-		/// @return Window resolution.
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowRect() const = 0;
+		/// @brief Gets window client rect.
+		/// @return Window client rect.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
+		virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const = 0;
+
+		/// @brief Converts the client point to a screen point.
+		/// @param clientPoint Client point.
+		/// @return Screen point.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const = 0;
+		/// @brief Converts the screen point to a client point.
+		/// @param screenPoint Screen point.
+		/// @return Client point.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const = 0;
 	};
 }

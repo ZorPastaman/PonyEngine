@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Vector2;
 
 import <algorithm>;
@@ -426,7 +430,7 @@ export namespace PonyMath::Core
 	template<Arithmetic T>
 	struct Vector2<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Up = Vector2(T(0), T(1)); ///< Vector2(0, 1).
 		static constexpr auto Down = Vector2(T(0), T(-1)); ///< Vector2(0, -1).

@@ -17,7 +17,13 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsCursor.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessagePump.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputManager.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageHandler.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowTitleBar.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />
@@ -27,6 +33,9 @@
     <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemParams.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
+    <ClCompile Include="Source\Public\Window\CursorParams.cppm" />
+    <ClCompile Include="Source\Public\Window\ICursor.cppm" />
+    <ClCompile Include="Source\Public\Window\IWindowTitleBar.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Window\WindowRect.cppm" />
     <ClCompile Include="Source\Public\Window\WindowSystemFactoryParams.cppm" />
@@ -40,6 +49,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
       <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
+      <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>

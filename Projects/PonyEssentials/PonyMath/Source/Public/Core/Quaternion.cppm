@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Quaternion;
 
 import <array>;
@@ -284,7 +288,7 @@ export namespace PonyMath::Core
 	template<std::floating_point T>
 	struct Quaternion<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Identity = Quaternion(T(0), T(0), T(0), T(1)); ///< Identity quaternion.
 	};

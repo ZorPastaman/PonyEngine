@@ -26,6 +26,9 @@
     <ClCompile Include="Core\Vector3Tests.cpp" />
     <ClCompile Include="Core\Vector4Tests.cpp" />
     <ClCompile Include="Geometry\MeshTests.cpp" />
+    <ClCompile Include="Shape\InsideTests.cpp" />
+    <ClCompile Include="Shape\IntersectingTests.cpp" />
+    <ClCompile Include="Shape\RectTests.cpp" />
     <ClCompile Include="Space\Transform2DTests.cpp" />
     <ClCompile Include="Space\Transform3DTests.cpp" />
     <ClCompile Include="Utility\ResolutionTests.cpp" />

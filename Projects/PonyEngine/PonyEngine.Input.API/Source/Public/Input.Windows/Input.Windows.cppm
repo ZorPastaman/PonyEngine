@@ -14,3 +14,6 @@ export import PonyEngine.Input;
 export import :WindowsKeyboardDeviceFactoryData;
 export import :WindowsKeyboardDeviceFactoryParams;
 export import :WindowsKeyboardDeviceParams;
+export import :WindowsMouseDeviceFactoryData;
+export import :WindowsMouseDeviceFactoryParams;
+export import :WindowsMouseDeviceParams;

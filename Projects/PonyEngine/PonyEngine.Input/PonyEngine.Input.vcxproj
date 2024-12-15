@@ -37,6 +37,8 @@
     <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDevice.cppm" />
     <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDeviceFactory.cppm" />
+    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDevice.cppm" />
+    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDeviceFactory.cppm" />
     <ClCompile Include="Source\Private\Input\Input.Detail.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystem.cppm" />
     <ClCompile Include="Source\Private\Input\InputSystemFactoryImpl.cppm" />

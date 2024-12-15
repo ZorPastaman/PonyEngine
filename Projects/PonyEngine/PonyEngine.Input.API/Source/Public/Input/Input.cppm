@@ -9,6 +9,7 @@
 
 export module PonyEngine.Input;
 
+export import :ActionConversion;
 export import :IInputDeviceFactory;
 export import :IInputSystem;
 export import :IInputSystemContext;
@@ -19,7 +20,7 @@ export import :InputDeviceData;
 export import :InputDeviceFactory;
 export import :InputDeviceParams;
 export import :InputEvent;
-export import :InputHandle;
+export import :InputReceiver;
 export import :InputSystemFactory;
 export import :InputSystemFactoryData;
 export import :InputSystemFactoryParams;

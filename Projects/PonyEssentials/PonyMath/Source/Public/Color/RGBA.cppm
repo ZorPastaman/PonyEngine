@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Color:RGBA;
 
 import <concepts>;
@@ -404,7 +408,7 @@ export namespace PonyMath::Color
 	template<std::floating_point T>
 	struct RGBA<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Red = RGBA(T(1), T(0), T(0), T(1)); ///< RGBA(1, 0, 0, 1).
 		static constexpr auto Green = RGBA(T(0), T(1), T(0), T(1)); ///< RGBA(0, 1, 0, 1).

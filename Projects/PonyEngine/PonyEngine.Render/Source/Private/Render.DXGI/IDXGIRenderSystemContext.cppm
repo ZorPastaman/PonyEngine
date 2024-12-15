@@ -10,7 +10,7 @@
 module;
 
 #include "PonyBase/Core/DXGI/Framework.h"
-#include "PonyBase/Utility/Interface.h"
+#include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Render.DXGI.Detail:IDXGIRenderSystemContext;
 
