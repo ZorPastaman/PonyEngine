@@ -15,11 +15,9 @@ module;
 
 export module PonyEngine.Input.Detail:InputSystem;
 
-import <cmath>;
 import <cstddef>;
 import <cstdint>;
 import <exception>;
-import <functional>;
 import <memory>;
 import <queue>;
 import <ranges>;
@@ -58,9 +56,7 @@ export namespace PonyEngine::Input
 		virtual void Tick() override;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(bool)>& action, float magnitudeThreshold) override;
-		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<InputHandle> Bind(std::string_view id, const std::function<void(float)>& action) override;
+		virtual std::shared_ptr<InputReceiver> CreateReceiver(std::string_view id) override;
 
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
@@ -71,20 +67,6 @@ export namespace PonyEngine::Input
 		{
 			std::string id; ///< Binding id.
 			float multiplier; ///< Input multiplier.
-		};
-
-		/// @brief Bool action binding.
-		struct BoolBinding final
-		{
-			std::shared_ptr<InputHandle> handle; ///< Input handle.
-			std::function<void(bool)> action; ///< Input action.
-			float magnitudeThreshold; ///< Input magnitude threshold to be @true.
-		};
-		/// @brief Float action binding.
-		struct FloatBinding final
-		{
-			std::shared_ptr<InputHandle> handle; ///< Input handle.
-			std::function<void(float)> action; ///< Input action.
 		};
 
 		[[nodiscard("Pure function")]]
@@ -112,15 +94,14 @@ export namespace PonyEngine::Input
 		/// @brief Execute bound actions.
 		/// @param mapping Mapping to execute.
 		/// @param value Input event value.
-		void ExecuteActions(const InputMappingValue& mapping, float value);
+		void ExecuteReceivers(const InputMappingValue& mapping, float value);
 
 		std::vector<std::unique_ptr<InputDevice>> devices; ///< Input devices.
 		std::unordered_map<InputCode, std::vector<InputMappingValue>> inputMapping; ///< Input mapping.
 
 		std::queue<InputEvent> inputQueue; ///< Current input queue.
 
-		std::unordered_map<std::string, std::vector<BoolBinding>> boolBindings; ///< Bool input bindings.
-		std::unordered_map<std::string, std::vector<FloatBinding>> floatBindings; ///< Float input bindings.
+		std::unordered_map<std::string, std::vector<std::shared_ptr<InputReceiver>>> inputReceivers; ///< Input receivers.
 	};
 }
 
@@ -158,7 +139,7 @@ namespace PonyEngine::Input
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy devices.");
 		for (auto it = devices.rbegin(); it != devices.rend(); ++it)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(*it).name());
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(**it).name());
 			it->reset();
 			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Device destroyed.");
 		}
@@ -206,22 +187,13 @@ namespace PonyEngine::Input
 		ProcessInput();
 	}
 
-	std::shared_ptr<InputHandle> InputSystem::Bind(const std::string_view id, const std::function<void(bool)>& action, const float magnitudeThreshold)
+	std::shared_ptr<InputReceiver> InputSystem::CreateReceiver(const std::string_view id)
 	{
-		const auto handle = std::make_shared<InputHandle>();
-		boolBindings[std::string(id)].push_back(BoolBinding{.handle = handle, .action = action, .magnitudeThreshold = magnitudeThreshold});
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Bool input binding added with '{}' ID. Handle: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(handle.get()));
+		auto receiver = std::make_shared<InputReceiver>();
+		inputReceivers[std::string(id)].push_back(receiver);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Input receiver added with '{}' ID. Receiver: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(receiver.get()));
 
-		return handle;
-	}
-
-	std::shared_ptr<InputHandle> InputSystem::Bind(const std::string_view id, const std::function<void(float)>& action)
-	{
-		const auto handle = std::make_shared<InputHandle>();
-		floatBindings[std::string(id)].push_back(FloatBinding{.handle = handle, .action = action});
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Float input binding added with '{}' ID. Handle: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(handle.get()));
-
-		return handle;
+		return receiver;
 	}
 
 	PonyDebug::Log::ILogger& InputSystem::Logger() noexcept
@@ -252,28 +224,15 @@ namespace PonyEngine::Input
 
 	void InputSystem::Clean() noexcept
 	{
-		for (std::vector<BoolBinding>& binding : std::ranges::views::values(boolBindings))
+		for (std::vector<std::shared_ptr<InputReceiver>>& receivers : std::ranges::views::values(inputReceivers))
 		{
-			for (std::size_t i = binding.size(); i-- > 0; )
+			for (std::size_t i = receivers.size(); i-- > 0; )
 			{
-				const std::shared_ptr<InputHandle>& handle = binding[i].handle;
-				if (handle.use_count() <= 1)
+				if (receivers[i].use_count() <= 1)
 				{
-					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Bool input binding with '0x{:X}' handled removed.", reinterpret_cast<std::uintptr_t>(handle.get()));
-					binding.erase(binding.cbegin() + i);
-				}
-			}
-		}
-
-		for (std::vector<FloatBinding>& binding : std::ranges::views::values(floatBindings))
-		{
-			for (std::size_t i = binding.size(); i-- > 0; )
-			{
-				const std::shared_ptr<InputHandle>& handle = binding[i].handle;
-				if (handle.use_count() <= 1)
-				{
-					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Float input binding with '0x{:X}' handled removed.", reinterpret_cast<std::uintptr_t>(handle.get()));
-					binding.erase(binding.cbegin() + i);
+					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Destroy input receiver at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(receivers[i].get()));
+					receivers.erase(receivers.cbegin() + i);
+					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Input receiver destroyed.");
 				}
 			}
 		}
@@ -302,28 +261,19 @@ namespace PonyEngine::Input
 		{
 			for (const InputMappingValue& inputMappingValue : mappingPosition->second)
 			{
-				ExecuteActions(inputMappingValue, inputEvent.value);
+				ExecuteReceivers(inputMappingValue, inputEvent.value);
 			}
 		}
 	}
 
-	void InputSystem::ExecuteActions(const InputMappingValue& mapping, const float value)
+	void InputSystem::ExecuteReceivers(const InputMappingValue& mapping, const float value)
 	{
-		const float inputValue = value * mapping.multiplier;
-
-		if (const auto& boolBinding = boolBindings.find(mapping.id); boolBinding != boolBindings.cend())
+		if (const auto& receivers = inputReceivers.find(mapping.id); receivers != inputReceivers.cend())
 		{
-			for (const BoolBinding& binding : boolBinding->second)
+			const float inputValue = value * mapping.multiplier;
+			for (const std::shared_ptr<InputReceiver>& receiver : receivers->second)
 			{
-				binding.action(std::abs(inputValue) > binding.magnitudeThreshold);
-			}
-		}
-
-		if (const auto& floatBinding = floatBindings.find(mapping.id); floatBinding != floatBindings.cend())
-		{
-			for (const FloatBinding& binding : floatBinding->second)
-			{
-				binding.action(inputValue);
+				receiver->Execute(inputValue);
 			}
 		}
 	}

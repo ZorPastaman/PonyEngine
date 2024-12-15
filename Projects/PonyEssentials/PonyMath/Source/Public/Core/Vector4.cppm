@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Vector4;
 
 import <algorithm>;
@@ -413,7 +417,7 @@ export namespace PonyMath::Core
 	template<Arithmetic T>
 	struct Vector4<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto One = Vector4(T(1), T(1), T(1), T(1)); ///< Vector4(1, 1, 1, 1).
 		static constexpr auto Zero = Vector4(T(0), T(0), T(0), T(0)); ///< Vector4(0, 0, 0, 0).

@@ -7,12 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputHandle;
+export module PonyEngine.Input.Windows:WindowsMouseDeviceFactoryData;
+
+import <memory>;
+
+import PonyEngine.Input;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input handle. It's just a marker to determine if an input binding is still actual.
-	class InputHandle final
+	/// @brief Windows mouse device factory data.
+	struct WindowsMouseDeviceFactoryData final
 	{
+		std::unique_ptr<InputDeviceFactory> inputDeviceFactory; ///< Windows mouse device factory.
 	};
 }

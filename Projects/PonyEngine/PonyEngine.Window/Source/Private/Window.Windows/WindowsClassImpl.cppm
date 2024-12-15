@@ -25,8 +25,7 @@ import PonyDebug.Log;
 import PonyEngine.Core;
 import PonyEngine.Window.Windows;
 
-import :Utility;
-import :WindowProc;
+import :WindowsUtility;
 
 export namespace PonyEngine::Window
 {
@@ -101,7 +100,7 @@ namespace PonyEngine::Window
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Unregister window class '0x{:X}'.", classAtom);
 		if (!UnregisterClassW(reinterpret_cast<LPCWSTR>(classAtom), hInstance))
 		{
-			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Error, "Couldn't unregister class. Error code: '0x{:X}'.", GetLastError());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Error, "Failed to unregister class. Error code: '0x{:X}'.", GetLastError());
 		}
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Window class unregistered.");
 	}

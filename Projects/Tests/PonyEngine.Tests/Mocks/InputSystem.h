@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstddef>
+#include <vector>
 
 import PonyEngine.Core;
 import PonyEngine.Input;
@@ -31,8 +32,7 @@ namespace Mocks
 
 		virtual void AddInputEvent(const PonyEngine::Input::InputEvent& inputEntry) override;
 
-		std::size_t version = 0;
-		PonyEngine::Input::InputEvent lastEvent;
+		std::vector<PonyEngine::Input::InputEvent> events;
 
 		PonyEngine::Core::IEngineContext* engine = nullptr;
 	};

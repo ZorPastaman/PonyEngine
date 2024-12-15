@@ -29,6 +29,7 @@ import <vector>;
 import PonyBase.Core;
 
 import PonyMath.Core;
+import PonyMath.Shape;
 
 import PonyDebug.Log;
 
@@ -191,6 +192,8 @@ namespace Application
 			const auto windowsClassParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Game"};
 			auto windowsClass = PonyEngine::Window::CreateWindowsClass(*application, windowsClassParams);
 			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			systemParams.cursorParams.visible = false;
+			systemParams.cursorParams.cursorClipping = PonyMath::Shape::Rect<float>(0.5f, 0.5f, 0.f, 0.f);
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
@@ -217,7 +220,11 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows keyboard device factory.");
 			PonyEngine::Input::WindowsKeyboardDeviceFactoryData keyboardDeviceFactory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(*application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows keyboard device factory created.", typeid(*keyboardDeviceFactory.inputDeviceFactory).name());
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows mouse device factory.");
+			PonyEngine::Input::WindowsMouseDeviceFactoryData mouseDeviceFactory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(*application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{.sensitivity = 0.001f});
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows mouse device factory created.", typeid(*mouseDeviceFactory.inputDeviceFactory).name());
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
+			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
@@ -236,31 +243,6 @@ namespace Application
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["RotateRight"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowRight, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowLeft, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["RotateUp"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowUp, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::ArrowDown, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["XScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::X, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Z, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["YScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::V, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::C, .multiplier = -1.f},
-			};
-			inputParams.inputBindings["ZScale"] = std::vector<PonyEngine::Input::InputBindingValue>
-			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::N, .multiplier = 1.f},
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::B, .multiplier = -1.f},
-			};
 			inputParams.inputBindings["Reset"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
@@ -268,6 +250,14 @@ namespace Application
 			inputParams.inputBindings["Exit"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["MouseX"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseXDelta, .multiplier = 1.f}
+			};
+			inputParams.inputBindings["MouseY"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = 1.f}
 			};
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
 

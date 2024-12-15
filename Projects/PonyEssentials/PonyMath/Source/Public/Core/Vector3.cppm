@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Core:Vector3;
 
 import <algorithm>;
@@ -446,7 +450,7 @@ export namespace PonyMath::Core
 	template<Arithmetic T>
 	struct Vector3<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Forward = Vector3(T(0), T(0), T(1)); ///< Vector3(0, 0, 1).
 		static constexpr auto Back = Vector3(T(0), T(0), T(-1)); ///< Vector3(0, 0, -1).

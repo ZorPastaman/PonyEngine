@@ -136,8 +136,10 @@ export namespace PonyEngine::Input
 
 		// Mouse
 		// Axis
-		MouseX,
-		MouseY,
+		MouseXPosition,
+		MouseYPosition,
+		MouseXDelta,
+		MouseYDelta,
 		// Buttons
 		MouseLeftButton,
 		MouseRightButton,
@@ -282,13 +284,17 @@ namespace PonyEngine::Input
 
 		// Mouse
 		// Axis
-		{ InputCode::MouseX, "Mouse X Axis" },
-		{ InputCode::MouseY, "Mouse Y Axis" },
+		{ InputCode::MouseXPosition, "Mouse X Position" },
+		{ InputCode::MouseYPosition, "Mouse Y Position" },
+		{ InputCode::MouseXDelta, "Mouse X Delta" },
+		{ InputCode::MouseYDelta, "Mouse Y Delta" },
+		// Buttons
 		{ InputCode::MouseLeftButton, "Mouse Left Button" },
 		{ InputCode::MouseRightButton, "Mouse Right Button" },
 		{ InputCode::MouseMiddleButton, "Mouse Middle Button" },
 		{ InputCode::MouseButton4, "Mouse Button 4" },
 		{ InputCode::MouseButton5, "Mouse Button 5" },
+		// Wheel
 		{ InputCode::MouseWheel, "Mouse Wheel" }
 	};
 

@@ -11,6 +11,7 @@ export module PonyEngine.Window:WindowSystemParams;
 
 import <string>;
 
+import :CursorParams;
 import :WindowRect;
 
 export namespace PonyEngine::Window
@@ -19,6 +20,7 @@ export namespace PonyEngine::Window
 	struct WindowSystemParams
 	{
 		WindowRect rect; ///< Window rect.
+		CursorParams cursorParams; ///< Cursor parameters.
 		std::string title = "Pony Engine Window"; ///< Window title.
 	};
 }

@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Color:RGBAInt;
 
 import <concepts>;
@@ -234,7 +238,7 @@ export namespace PonyMath::Color
 	template<std::unsigned_integral T>
 	struct RGBAInt<T>::Predefined final
 	{
-		Predefined() = delete;
+		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Red = RGBAInt(MaxValue, T(0), T(0), MaxValue); ///< RGBInt(MaxValue, 0, 0, MaxValue).
 		static constexpr auto Green = RGBAInt(T(0), MaxValue, T(0), MaxValue); ///< RGBInt(0, MaxValue, 0, MaxValue).
