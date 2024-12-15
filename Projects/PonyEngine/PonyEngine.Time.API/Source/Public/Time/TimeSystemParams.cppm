@@ -7,18 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogInput;
+export module PonyEngine.Time:TimeSystemParams;
 
-import <cstdint>;
-import <optional>;
-import <string_view>;
-
-export namespace PonyDebug::Log
+export namespace PonyEngine::Time
 {
-	/// @brief Log data input.
-	struct LogInput final
+	/// @brief Time system parameters.
+	struct TimeSystemParams final
 	{
-		std::string_view message; ///< Log message.
-		std::optional<std::int64_t> frameCount = {}; ///< Engine frame count.
+		float deltaTimeCap = 0.5f; ///< Delta time cap.
+		float timeScale = 1.f; ///< Time scale.
+		float fixedTimePeriod = 1.f / 60.f; ///< Fixed time period.
 	};
 }

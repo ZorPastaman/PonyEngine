@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Core:Engine;
 
-import <cstddef>;
+import <cstdint>;
 
 import PonyBase.Core;
 
@@ -30,7 +30,7 @@ export namespace PonyEngine::Core
 		/// @brief Gets the current frame count.
 		/// @return Current frame count.
 		[[nodiscard("Pure function")]]
-		virtual std::size_t FrameCount() const noexcept = 0;
+		virtual std::int64_t FrameCount() const noexcept = 0;
 
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
