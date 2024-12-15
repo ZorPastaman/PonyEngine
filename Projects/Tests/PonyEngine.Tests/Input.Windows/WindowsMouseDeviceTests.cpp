@@ -112,6 +112,10 @@ namespace Input
 			virtual void IsVisible(bool) override
 			{
 			}
+
+			[[nodiscard("Pure function")]]
+			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const override { return std::nullopt; }
+			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) override {}
 		};
 
 		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem

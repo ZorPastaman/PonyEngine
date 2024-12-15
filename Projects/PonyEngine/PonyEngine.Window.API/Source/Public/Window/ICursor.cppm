@@ -14,8 +14,10 @@ module;
 export module PonyEngine.Window:ICursor;
 
 import <cstdint>;
+import <optional>;
 
 import PonyMath.Core;
+import PonyMath.Shape;
 
 export namespace PonyEngine::Window
 {
@@ -41,5 +43,13 @@ export namespace PonyEngine::Window
 		/// @note The function sets an internal state that is applied only when the window is active.
 		/// @param isVisible True if the cursor is visible; @a false otherwise.
 		virtual void IsVisible(bool isVisible) = 0;
+
+		/// @brief Gets the cursor clipping rect.
+		/// @return Cursor clipping rect. It's a normalized rect. If it's nullopt, the cursor isn't clipped.
+		[[nodiscard("Pure function")]]
+		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const = 0;
+		/// @brief Sets the cursor clipping rect.
+		/// @param clippingRect Cursor clipping rect to set. It must be a normalized rect. If it's nullopt, the cursor isn't clipped.
+		virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) = 0;
 	};
 }

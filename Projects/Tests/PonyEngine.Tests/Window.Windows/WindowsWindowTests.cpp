@@ -13,6 +13,7 @@
 
 #include <cstddef>
 #include <format>
+#include <optional>
 #include <string>
 #include <string_view>
 #include <typeinfo>
@@ -134,6 +135,29 @@ namespace Window
 			Assert::AreEqual(std::string_view(title), windowsWindow->TitleBar().MainTitle());
 		}
 
+		TEST_METHOD(CreateCursorTest)
+		{
+			auto logger = Mocks::Logger();
+			auto screenSystem = Mocks::ScreenSystem();
+			auto application = Mocks::Application();
+			application.logger = &logger;
+			auto engine = Mocks::Engine();
+			engine.application = &application;
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
+			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			systemParams.rect.fullscreen = false;
+			systemParams.cursorParams.visible = false;
+			const auto clipping = PonyMath::Shape::Rect<float>(0.25f, 0.25f, 0.5f, 0.5f);;
+			systemParams.cursorParams.cursorClipping = clipping;
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			Assert::IsFalse(windowsWindow->Cursor().IsVisible());
+			Assert::IsTrue(clipping == windowsWindow->Cursor().ClippingRect());
+		}
+
 		TEST_METHOD(CreateWindowRectTest)
 		{
 			auto logger = Mocks::Logger();
@@ -224,6 +248,33 @@ namespace Window
 			Assert::AreEqual(rect.bottom, static_cast<LONG>(windowRect.MaxY()));
 
 			std::get<1>(window.system)->End();
+		}
+
+		TEST_METHOD(CursorClippingTest)
+		{
+			auto logger = Mocks::Logger();
+			auto screenSystem = Mocks::ScreenSystem();
+			auto application = Mocks::Application();
+			application.logger = &logger;
+			auto engine = Mocks::Engine();
+			engine.application = &application;
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
+			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
+			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			systemParams.rect.fullscreen = false;
+			systemParams.windowsWindowStyle.style = WS_OVERLAPPEDWINDOW;
+			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
+			std::get<1>(window.system)->Begin();
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+
+			auto rect = PonyMath::Shape::Rect<float>(0.1f, 0.1f, 0.7f, 0.7f);
+			windowsWindow->Cursor().ClippingRect(rect);
+			Assert::IsTrue(rect == windowsWindow->Cursor().ClippingRect());
+
+			windowsWindow->Cursor().ClippingRect(std::nullopt);
+			Assert::IsTrue(std::nullopt == windowsWindow->Cursor().ClippingRect());
 		}
 
 		TEST_METHOD(DestroyMessageTest)
