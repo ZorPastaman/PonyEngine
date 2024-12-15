@@ -36,7 +36,7 @@ namespace Input
 			{
 				return "";
 			}
-			virtual void MainTitle(std::string_view title) override
+			virtual void MainTitle(std::string_view) override
 			{
 			}
 
@@ -45,7 +45,7 @@ namespace Input
 			{
 				return "";
 			}
-			virtual void SecondaryTitle(std::string_view title) override
+			virtual void SecondaryTitle(std::string_view) override
 			{
 			}
 		};
@@ -64,7 +64,7 @@ namespace Input
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
 			{
 				++version;
 				addedMessageObserver = nullptr;
@@ -85,7 +85,7 @@ namespace Input
 				observerRawTypes.assign(rawInputTypes.begin(), rawInputTypes.end());
 			}
 
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer) noexcept override
+			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override
 			{
 				++version;
 				addedRawObserver = nullptr;
@@ -100,7 +100,7 @@ namespace Input
 			{
 				return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero;
 			}
-			virtual void CursorPosition(const PonyMath::Core::Vector2<std::int32_t>& position) override
+			virtual void CursorPosition(const PonyMath::Core::Vector2<std::int32_t>&) override
 			{
 			}
 
@@ -109,7 +109,7 @@ namespace Input
 			{
 				return false;
 			}
-			virtual void IsVisible(bool isVisible) override
+			virtual void IsVisible(bool) override
 			{
 			}
 		};
@@ -191,9 +191,9 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
+			virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>&) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
 			[[nodiscard("Pure function")]]
-			virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
+			virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>&) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
 		};
 
 		TEST_METHOD(SubscriptionTest)

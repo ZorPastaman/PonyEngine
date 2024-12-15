@@ -33,11 +33,11 @@ namespace Input
 		public:
 			[[nodiscard("Pure function")]]
 			virtual std::string_view MainTitle() const noexcept override { return ""; }
-			virtual void MainTitle(std::string_view title) override {}
+			virtual void MainTitle(std::string_view) override {}
 
 			[[nodiscard("Pure function")]]
 			virtual std::string_view SecondaryTitle() const noexcept override { return ""; }
-			virtual void SecondaryTitle(std::string_view title) override {}
+			virtual void SecondaryTitle(std::string_view) override {}
 		};
 
 		class MessagePump final : public PonyEngine::Window::IWindowsMessagePump
@@ -54,7 +54,7 @@ namespace Input
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
 			{
 				++version;
 				addedObserver = nullptr;
@@ -64,8 +64,8 @@ namespace Input
 		class RawInputManager final : public PonyEngine::Window::IWindowsRawInputManager
 		{
 		public:
-			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override {}
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer) noexcept override {}
+			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&, std::span<const DWORD>) override {}
+			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override {}
 		};
 
 		class Cursor final : public PonyEngine::Window::IWindowsCursor
@@ -73,11 +73,11 @@ namespace Input
 		public:
 			[[nodiscard("Pure function")]]
 			virtual PonyMath::Core::Vector2<std::int32_t> CursorPosition() const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
-			virtual void CursorPosition(const PonyMath::Core::Vector2<std::int32_t>& position) override {}
+			virtual void CursorPosition(const PonyMath::Core::Vector2<std::int32_t>&) override {}
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override { return false; }
-			virtual void IsVisible(bool isVisible) override {}
+			virtual void IsVisible(bool) override {}
 		};
 
 		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
@@ -128,9 +128,9 @@ namespace Input
 			virtual HWND WindowHandle() const noexcept override { return nullptr; }
 
 			[[nodiscard("Pure function")]]
-			virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
+			virtual PonyMath::Core::Vector2<std::int32_t> ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>&) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
 			[[nodiscard("Pure function")]]
-			virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>& screenPoint) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
+			virtual PonyMath::Core::Vector2<std::int32_t> ScreenToClient(const PonyMath::Core::Vector2<std::int32_t>&) const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
 		};
 
 		TEST_METHOD(SubscriptionTest)

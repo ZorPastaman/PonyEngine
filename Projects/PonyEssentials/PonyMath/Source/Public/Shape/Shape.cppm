@@ -9,4 +9,6 @@
 
 export module PonyMath.Shape;
 
+export import :Inside;
+export import :Intersecting;
 export import :Rect;
