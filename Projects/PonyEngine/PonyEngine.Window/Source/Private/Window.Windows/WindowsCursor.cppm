@@ -37,7 +37,7 @@ import :WindowsUtility;
 export namespace PonyEngine::Window
 {
 	/// @brief Windows cursor.
-	class WindowsCursor final : public IWindowsCursor, private IWindowsMessageObserver // TODO: Add tests
+	class WindowsCursor final : public IWindowsCursor, private IWindowsMessageObserver
 	{
 	public:
 		/// @brief Creates a @p WindowsCursor.
@@ -57,6 +57,10 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible() const noexcept override;
 		virtual void IsVisible(bool isVisible) override;
+
+		[[nodiscard("Pure function")]]
+		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const override;
+		virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) override;
 
 		WindowsCursor& operator =(const WindowsCursor&) = delete;
 		WindowsCursor& operator =(WindowsCursor&&) = delete;
@@ -150,6 +154,22 @@ namespace PonyEngine::Window
 		{
 			ShowCursor(visible);
 		}
+	}
+
+	std::optional<PonyMath::Shape::Rect<float>> WindowsCursor::ClippingRect() const
+	{
+		return clipping;
+	}
+
+	void WindowsCursor::ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect)
+	{
+		if (clipping == clippingRect)
+		{
+			return;
+		}
+
+		clipping = clippingRect;
+		UpdateClipping();
 	}
 
 	void WindowsCursor::Observe(const UINT uMsg, const WPARAM wParam, const LPARAM)
