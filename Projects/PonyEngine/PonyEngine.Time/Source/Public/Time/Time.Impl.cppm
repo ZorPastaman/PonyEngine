@@ -29,6 +29,14 @@ export namespace PonyEngine::Time
 	/// @return Frame rate system factory.
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& factoryParams, const FrameRateSystemParams& systemParams);
+	/// @brief Creates a time system factory.
+	/// @param application Application context.
+	/// @param factoryParams Time system factory parameters.
+	/// @param systemParams Time system parameters.
+	/// @return Time system factory.
+	[[nodiscard("Pure function")]]
+	PONY_DLL_EXPORT TimeSystemFactoryData CreateTimeSystemFactory(Core::IApplicationContext& application, const TimeSystemFactoryParams& factoryParams, const TimeSystemParams& systemParams);
+
 }
 
 namespace PonyEngine::Time
@@ -36,5 +44,10 @@ namespace PonyEngine::Time
 	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& factoryParams, const FrameRateSystemParams& systemParams)
 	{
 		return FrameRateSystemFactoryData{.systemFactory = std::make_unique<FrameRateSystemFactoryImpl>(application, factoryParams, systemParams)};
+	}
+
+	TimeSystemFactoryData CreateTimeSystemFactory(Core::IApplicationContext& application, const TimeSystemFactoryParams& factoryParams, const TimeSystemParams& systemParams)
+	{
+		return TimeSystemFactoryData{.systemFactory = std::make_unique<TimeSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

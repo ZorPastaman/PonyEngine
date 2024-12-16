@@ -31,6 +31,6 @@ export namespace PonyEngine::Window
 		virtual void AddRawInputObserver(IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) = 0;
 		/// @brief Removes the raw input observer.
 		/// @param observer Observer to remove.
-		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept = 0;
+		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) = 0;
 	};
 }

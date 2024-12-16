@@ -44,7 +44,7 @@ export namespace PonyEngine::Input
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Tick() override;
+		virtual void Tick() noexcept override;
 
 		WindowsMouseDevice& operator =(const WindowsMouseDevice&) = delete;
 		WindowsMouseDevice& operator =(WindowsMouseDevice&&) = delete;
@@ -92,7 +92,7 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void WindowsMouseDevice::Tick()
+	void WindowsMouseDevice::Tick() noexcept
 	{
 	}
 
@@ -141,8 +141,17 @@ namespace PonyEngine::Input
 	{
 		assert(input.data.mouse.usFlags == MOUSE_MOVE_RELATIVE && "The incorrect raw input type has been received.");
 
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(input.data.mouse.lLastX) * sensitivity});
-		InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(input.data.mouse.lLastY) * sensitivity});
+		const LONG deltaX = input.data.mouse.lLastX;
+		const LONG deltaY = input.data.mouse.lLastY;
+
+		if (deltaX != 0L)
+		{
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .value = static_cast<float>(deltaX) * sensitivity});
+		}
+		if (deltaY != 0L)
+		{
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .value = static_cast<float>(deltaY) * sensitivity});
+		}
 	}
 
 	void WindowsMouseDevice::ObserveXButton(const WPARAM wParam, const bool isDown)

@@ -80,7 +80,7 @@ namespace Input
 			virtual void IsVisible(bool) override {}
 
 			[[nodiscard("Pure function")]]
-			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const override { return std::nullopt; }
+			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept override { return std::nullopt; }
 			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>&) override {}
 		};
 

@@ -18,13 +18,13 @@ export namespace PonyEngine::Time
 	/// @param value Value to convert.
 	/// @return 1/value if the @p value is greater than 0; 0 otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	T ConvertFrameRateFrameTime(T value) noexcept;
+	constexpr T ConvertFrameRateFrameTime(T value) noexcept;
 }
 
 namespace PonyEngine::Time
 {
 	template<std::floating_point T>
-	T ConvertFrameRateFrameTime(const T value) noexcept
+	constexpr T ConvertFrameRateFrameTime(const T value) noexcept
 	{
 		return value > T{0} ? T{1} / value : T{0};
 	}

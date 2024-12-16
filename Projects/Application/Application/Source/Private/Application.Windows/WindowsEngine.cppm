@@ -74,6 +74,10 @@ export namespace Application
 		/// @return Frame rate system factory.
 		[[nodiscard("Pure function")]]
 		PonyEngine::Time::FrameRateSystemFactoryData CreateFrameRateSystemFactory() const;
+		/// @brief Creates a time system factory.
+		/// @return Time system factory.
+		[[nodiscard("Pure function")]]
+		PonyEngine::Time::TimeSystemFactoryData CreateTimeSystemFactory() const;
 		/// @brief Creates a window system factory.
 		/// @return Window system factory.
 		[[nodiscard("Pure function")]]
@@ -168,7 +172,7 @@ namespace Application
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create frame rate system factory.");
-			const auto systemParams = PonyEngine::Time::FrameRateSystemParams{.targetFrameTime = PonyEngine::Time::ConvertFrameRateFrameTime(60.f)};
+			constexpr auto systemParams = PonyEngine::Time::FrameRateSystemParams{.targetFrameTime = PonyEngine::Time::ConvertFrameRateFrameTime(60.f)};
 			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The frame rate system factory is nullptr.");
 
@@ -179,6 +183,27 @@ namespace Application
 		catch (const std::exception& e)
 		{
 			PONY_LOG_E(application->Logger(), e, "On creating frame rate system factory.");
+
+			throw;
+		}
+	}
+
+	PonyEngine::Time::TimeSystemFactoryData WindowsEngine::CreateTimeSystemFactory() const
+	{
+		try
+		{
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create time system factory.");
+			constexpr auto systemParams = PonyEngine::Time::TimeSystemParams{};
+			PonyEngine::Time::TimeSystemFactoryData factory = PonyEngine::Time::CreateTimeSystemFactory(*application, PonyEngine::Time::TimeSystemFactoryParams{}, systemParams);
+			assert(factory.systemFactory && "The time system factory is nullptr.");
+
+			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' time system factory created.", typeid(*factory.systemFactory).name());
+
+			return factory;
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(application->Logger(), e, "On creating time system factory.");
 
 			throw;
 		}
@@ -325,10 +350,11 @@ namespace Application
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create system factories.");
 			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Screen::ScreenSystemFactory>(std::move(CreateScreenSystemFactory().systemFactory))});
 			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Time::FrameRateSystemFactory>(std::move(CreateFrameRateSystemFactory().systemFactory)), .tickOrder = 1});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Window::WindowSystemFactory>(std::move(CreateWindowSystemFactory().systemFactory)), .tickOrder = 2});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Input::InputSystemFactory>(std::move(CreateInputSystemFactory().systemFactory)), .tickOrder = 3});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Render::RenderSystemFactory>(std::move(CreateRenderSystemFactory().systemFactory)), .tickOrder = 5});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<Game::GameSystemFactory>(std::move(CreateGameSystemFactory().systemFactory)), .tickOrder = 4});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Time::TimeSystemFactory>(std::move(CreateTimeSystemFactory().systemFactory)), .tickOrder = 2});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Window::WindowSystemFactory>(std::move(CreateWindowSystemFactory().systemFactory)), .tickOrder = 3});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Input::InputSystemFactory>(std::move(CreateInputSystemFactory().systemFactory)), .tickOrder = 4});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Render::RenderSystemFactory>(std::move(CreateRenderSystemFactory().systemFactory)), .tickOrder = 6});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<Game::GameSystemFactory>(std::move(CreateGameSystemFactory().systemFactory)), .tickOrder = 5});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");
