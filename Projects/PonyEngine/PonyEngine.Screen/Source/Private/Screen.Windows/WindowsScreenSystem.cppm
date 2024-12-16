@@ -41,8 +41,8 @@ export namespace PonyEngine::Screen
 
 		virtual ~WindowsScreenSystem() noexcept override = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
+		virtual void Begin() noexcept override;
+		virtual void End() noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept override;
@@ -64,11 +64,11 @@ namespace PonyEngine::Screen
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Display resolution is '{}'.", displayResolution.ToString());
 	}
 
-	void WindowsScreenSystem::Begin()
+	void WindowsScreenSystem::Begin() noexcept
 	{
 	}
 
-	void WindowsScreenSystem::End()
+	void WindowsScreenSystem::End() noexcept
 	{
 	}
 

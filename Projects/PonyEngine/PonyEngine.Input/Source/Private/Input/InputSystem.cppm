@@ -51,7 +51,7 @@ export namespace PonyEngine::Input
 		virtual ~InputSystem() noexcept override;
 
 		virtual void Begin() override;
-		virtual void End() override;
+		virtual void End() noexcept override;
 
 		virtual void Tick() override;
 
@@ -158,7 +158,7 @@ namespace PonyEngine::Input
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Devices begun.");
 	}
 
-	void InputSystem::End()
+	void InputSystem::End() noexcept
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "End devices.");
 		for (auto it = devices.crbegin(); it != devices.crend(); ++it)

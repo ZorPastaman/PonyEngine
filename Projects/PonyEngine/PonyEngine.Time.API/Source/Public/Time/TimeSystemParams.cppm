@@ -14,8 +14,8 @@ export namespace PonyEngine::Time
 	/// @brief Time system parameters.
 	struct TimeSystemParams final
 	{
-		float deltaTimeCap = 0.5f; ///< Delta time cap.
+		float deltaTimeCap = 0.1f; ///< Delta time cap.
 		float timeScale = 1.f; ///< Time scale.
-		float fixedTimePeriod = 1.f / 60.f; ///< Fixed time period.
+		float framePeriod = 1.f / 60.f; ///< Frame period.
 	};
 }

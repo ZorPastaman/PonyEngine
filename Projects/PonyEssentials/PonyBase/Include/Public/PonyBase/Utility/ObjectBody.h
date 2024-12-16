@@ -30,7 +30,7 @@
 
  /// @brief Base body macro that doesn't add a default constructor. It must be used inside a base class.
  /// @param baseName Base name. Must be the same as a class name where the body is declared.
-#define BASE_BODY_WITHOUT_CONSTRUCTOR(baseName) \
+#define BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(baseName) \
 	public: \
 		virtual ~baseName() noexcept = default; \
 	 \

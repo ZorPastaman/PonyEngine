@@ -21,7 +21,7 @@ export namespace PonyEngine::Input
 	/// @brief Input device.
 	class InputDevice
 	{
-		BASE_BODY_WITHOUT_CONSTRUCTOR(InputDevice)
+		BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(InputDevice)
 
 	public:
 		/// @brief Begins an input capture. It's called before a first tick.

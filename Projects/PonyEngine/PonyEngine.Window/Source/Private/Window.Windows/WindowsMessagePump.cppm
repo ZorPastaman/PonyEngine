@@ -49,10 +49,10 @@ export namespace PonyEngine::Window
 		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) override;
 		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept override;
 
-		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		virtual LRESULT HandleMessage(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 		/// @brief Pumps messages.
-		void Pump() noexcept;
+		void Pump();
 
 		WindowsMessagePump& operator =(const WindowsMessagePump&) = delete;
 		WindowsMessagePump& operator =(WindowsMessagePump&&) = delete;
@@ -94,7 +94,7 @@ namespace PonyEngine::Window
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' window message observer removed.", typeid(observer).name());
 	}
 
-	LRESULT WindowsMessagePump::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam)
+	LRESULT WindowsMessagePump::HandleMessage(const UINT uMsg, const WPARAM wParam, const LPARAM lParam) noexcept
 	{
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Received '{}' command.", uMsg);
 
@@ -116,7 +116,7 @@ namespace PonyEngine::Window
 		return DefWindowProcW(windowSystem->WindowHandle(), uMsg, wParam, lParam);
 	}
 
-	void WindowsMessagePump::Pump() noexcept
+	void WindowsMessagePump::Pump()
 	{
 		const HWND hWnd = windowSystem->WindowHandle();
 

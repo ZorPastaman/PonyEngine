@@ -10,3 +10,4 @@
 export module PonyEngine.Time.Detail;
 
 export import :FrameRateSystemFactory;
+export import :TimeSystemFactoryImpl;

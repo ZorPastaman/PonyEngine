@@ -45,7 +45,7 @@ export namespace PonyEngine::Input
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Tick() override;
+		virtual void Tick() noexcept override;
 
 		WindowsKeyboardDevice& operator =(const WindowsKeyboardDevice&) = delete;
 		WindowsKeyboardDevice& operator =(WindowsKeyboardDevice&&) = delete;
@@ -195,7 +195,7 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void WindowsKeyboardDevice::Tick()
+	void WindowsKeyboardDevice::Tick() noexcept
 	{
 	}
 

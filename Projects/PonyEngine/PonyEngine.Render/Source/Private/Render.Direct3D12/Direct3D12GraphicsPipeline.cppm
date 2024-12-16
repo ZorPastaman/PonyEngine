@@ -257,32 +257,33 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersIn()
 	{
-		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
+		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
-			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-			{
-				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
-				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-				.StateBefore = D3D12_RESOURCE_STATE_PRESENT,
-				.StateAfter = D3D12_RESOURCE_STATE_RENDER_TARGET
-			}
+			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+			.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
+			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
+			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+			.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
+			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto depthStencilBarrier = D3D12_RESOURCE_BARRIER
+		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
-			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-			{
-				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
-				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-				.StateBefore = D3D12_RESOURCE_STATE_DEPTH_READ,
-				.StateAfter = D3D12_RESOURCE_STATE_DEPTH_WRITE
-			}
+			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ,
+			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
+			.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
+			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto barriers = std::array<D3D12_RESOURCE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
-		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
+		const auto barriers = std::array<D3D12_TEXTURE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
+		const auto barrierGroup = D3D12_BARRIER_GROUP{.Type = D3D12_BARRIER_TYPE_TEXTURE, .NumBarriers = static_cast<UINT32>(barriers.size()), .pTextureBarriers = barriers.data()};
+		commandList->Barrier(1u, &barrierGroup);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateVertexBarriers()
@@ -437,7 +438,7 @@ namespace PonyEngine::Render
 			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObject.mvpMatrix;
 			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
 
-			commandList->DrawIndexedInstanced(mesh->IndexCount(), 1, 0, 0, 0);
+			commandList->DrawIndexedInstanced(mesh->IndexCount(), 1, 0, 0, 0); // TODO: Draw via mesh shaders
 
 			prevRootSignature = rootSignature;
 			prevMaterial = material;
@@ -447,32 +448,33 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersOut()
 	{
-		const auto renderTargetBarrier = D3D12_RESOURCE_BARRIER
+		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER // TODO: Make enhanced barrier everywhere
 		{
-			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-			{
-				.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
-				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-				.StateBefore = D3D12_RESOURCE_STATE_RENDER_TARGET,
-				.StateAfter = D3D12_RESOURCE_STATE_PRESENT
-			}
+			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+			.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+			.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
+			.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
+			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto depthStencilBarrier = D3D12_RESOURCE_BARRIER
+		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
-			.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-			.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-			.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-			{
-				.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
-				.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-				.StateBefore = D3D12_RESOURCE_STATE_DEPTH_WRITE,
-				.StateAfter = D3D12_RESOURCE_STATE_DEPTH_READ
-			}
+			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
+			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
+			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+			.pResource = &d3d12System->DepthStencilPrivate().DepthStencilBuffer(),
+			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto barriers = std::array<D3D12_RESOURCE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
-		commandList->ResourceBarrier(static_cast<UINT>(barriers.size()), barriers.data());
+		const auto barriers = std::array<D3D12_TEXTURE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
+		const auto barrierGroup = D3D12_BARRIER_GROUP{ .Type = D3D12_BARRIER_TYPE_TEXTURE, .NumBarriers = static_cast<UINT32>(barriers.size()), .pTextureBarriers = barriers.data() };
+		commandList->Barrier(1u, &barrierGroup);
 	}
 
 	void Direct3D12GraphicsPipeline::CloseLists()
