@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Input:ActionConversion;
+export module PonyEngine.Input:InputValueConversion;
 
 import <cmath>;
 import <cstdint>;
@@ -42,6 +42,14 @@ export namespace PonyEngine::Input
 	/// @return Action that accepts bool.
 	[[nodiscard("Pure function")]]
 	std::function<void(bool)> BoolToEventAction(const std::function<void()>& action, bool trigger = true);
+
+	/// @brief Transforms a float value to bool via the comparison with the magnitude and calls the action that accepts bool. The conversion is dependent on the comparison mode.
+	/// @param value Value.
+	/// @param magnitude Magnitude to compare with.
+	/// @param comparisonMode Comparison mode.
+	/// @return Comparison result.
+	[[nodiscard("Pure function")]]
+	bool FloatToBool(float value, float magnitude = 0.2f, ComparisonMode comparisonMode = ComparisonMode::Greater);
 }
 
 namespace PonyEngine::Input
@@ -70,7 +78,7 @@ namespace PonyEngine::Input
 			{
 				action(std::abs(value) >= magnitude);
 			};
-		default:
+		default: [[unlikely]]
 			assert(false && "The comparison mode is incorrect.");
 			return [](const float){};
 		}
@@ -85,5 +93,23 @@ namespace PonyEngine::Input
 				action();
 			}
 		};
+	}
+
+	bool FloatToBool(const float value, const float magnitude, const ComparisonMode comparisonMode)
+	{
+		switch (comparisonMode)
+		{
+		case ComparisonMode::Less:
+			return std::abs(value) < magnitude;
+		case ComparisonMode::LessOrEqual:
+			return std::abs(value) <= magnitude;
+		case ComparisonMode::Greater:
+			return std::abs(value) > magnitude;
+		case ComparisonMode::GreaterOrEqual:
+			return std::abs(value) >= magnitude;
+		default: [[unlikely]]
+			assert(false && "The comparison mode is incorrect.");
+			return false;
+		}
 	}
 }
