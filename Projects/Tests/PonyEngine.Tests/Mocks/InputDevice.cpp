@@ -33,6 +33,6 @@ namespace Mocks
 
 	void InputDevice::AddInput(const PonyEngine::Input::InputEvent& input)
 	{
-		InputSystem().AddInputEvent(input);
+		InputSystem().AddInputEvent(*this, input);
 	}
 }

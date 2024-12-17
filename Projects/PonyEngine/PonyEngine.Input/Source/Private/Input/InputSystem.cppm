@@ -19,14 +19,17 @@ import <cstddef>;
 import <cstdint>;
 import <exception>;
 import <memory>;
+import <numeric>;
 import <queue>;
-import <ranges>;
+import <stdexcept>;
 import <string>;
 import <string_view>;
 import <typeinfo>;
 import <unordered_map>;
 import <utility>;
 import <vector>;
+
+import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
@@ -58,6 +61,9 @@ export namespace PonyEngine::Input
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<InputReceiver> CreateReceiver(std::string_view id) override;
 
+		[[nodiscard("Pure function")]]
+		virtual float State(std::string_view id) const override;
+
 		InputSystem& operator =(const InputSystem&) = delete;
 		InputSystem& operator =(InputSystem&&) = delete;
 
@@ -65,7 +71,7 @@ export namespace PonyEngine::Input
 		/// @brief Input mapping value.
 		struct InputMappingValue final
 		{
-			std::string id; ///< Binding id.
+			std::size_t idIndex; ///< Binding id index.
 			float multiplier; ///< Input multiplier.
 		};
 
@@ -79,7 +85,18 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual const Core::ISystemManager& SystemManager() const noexcept override;
 
-		virtual void AddInputEvent(const InputEvent& inputEvent) override;
+		virtual void AddInputEvent(const IInputDevice& inputSource, const InputEvent& inputEvent) override;
+
+		/// @brief Gets an index of the @p id.
+		/// @param id Id.
+		/// @return Index.
+		[[nodiscard("Pure function")]]
+		std::size_t IdIndex(std::string_view id) const;
+		/// @brief Gets an index of the @p device.
+		/// @param device Device.
+		/// @return Device index.
+		[[nodiscard("Pure function")]]
+		std::size_t DeviceIndex(const IInputDevice& device) const;
 
 		/// @brief Cleans out of dead handles.
 		void Clean() noexcept;
@@ -89,19 +106,25 @@ export namespace PonyEngine::Input
 		void ProcessInput();
 
 		/// @brief Processes the @p inputEvent.
-		/// @param inputEvent Input event to process.
-		void ProcessInputEvent(const InputEvent& inputEvent);
+		/// @param input Input event to process.
+		void ProcessInputEvent(const std::pair<const IInputDevice*, InputEvent>& input);
+		/// @brief Updates an input state.
+		/// @param inputSource Input source.
+		/// @param idIndex ID index.
+		/// @param value Input value.
+		void UpdateInputState(const IInputDevice& inputSource, std::size_t idIndex, float value);
 		/// @brief Execute bound actions.
-		/// @param mapping Mapping to execute.
-		/// @param value Input event value.
-		void ExecuteReceivers(const InputMappingValue& mapping, float value);
+		/// @param idIndex ID index.
+		/// @param value Input value.
+		void ExecuteReceivers(std::size_t idIndex, float value);
 
 		std::vector<std::unique_ptr<InputDevice>> devices; ///< Input devices.
+		std::vector<std::string> inputIds; ///< Input ids.
 		std::unordered_map<InputCode, std::vector<InputMappingValue>> inputMapping; ///< Input mapping.
 
-		std::queue<InputEvent> inputQueue; ///< Current input queue.
-
-		std::unordered_map<std::string, std::vector<std::shared_ptr<InputReceiver>>> inputReceivers; ///< Input receivers.
+		std::queue<std::pair<const IInputDevice*, InputEvent>> inputQueue; ///< Current input queue.
+		std::vector<std::vector<float>> states; ///< Input state. First level is bound to the @p inputIds via index. Second level is bound to the @p devices via index.
+		std::vector<std::vector<std::shared_ptr<InputReceiver>>> inputReceivers; ///< Input receivers. First level is bound to the @p inputIds via index.
 	};
 }
 
@@ -125,13 +148,23 @@ namespace PonyEngine::Input
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Set input bindings.");
 		for (const auto& [id, binding] : inputParams.inputBindings)
 		{
+			inputIds.push_back(id);
 			for (const InputBindingValue& bindingValue : binding)
 			{
 				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set input binding. ID: '{}'; Input code: '{}'; Multiplier: '{}'.", id, ToString(bindingValue.inputCode), bindingValue.multiplier);
-				inputMapping[bindingValue.inputCode].push_back(InputMappingValue{.id = id, .multiplier = bindingValue.multiplier});
+				inputMapping[bindingValue.inputCode].push_back(InputMappingValue{.idIndex = inputIds.size() - 1, .multiplier = bindingValue.multiplier});
 			}
 		}
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Input bindings set.");
+
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Prewarm caches.");
+		states.resize(inputIds.size());
+		for (auto& state : states)
+		{
+			state.resize(devices.size());
+		}
+		inputReceivers.resize(inputIds.size());
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Caches prewarmed.");
 	}
 
 	InputSystem::~InputSystem() noexcept
@@ -190,10 +223,17 @@ namespace PonyEngine::Input
 	std::shared_ptr<InputReceiver> InputSystem::CreateReceiver(const std::string_view id)
 	{
 		auto receiver = std::make_shared<InputReceiver>();
-		inputReceivers[std::string(id)].push_back(receiver);
+		inputReceivers[IdIndex(id)].push_back(receiver);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Input receiver added with '{}' ID. Receiver: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(receiver.get()));
 
 		return receiver;
+	}
+
+	float InputSystem::State(const std::string_view id) const
+	{
+		const std::vector<float>& state = states[IdIndex(id)];
+
+		return std::reduce(state.begin(), state.end());
 	}
 
 	PonyDebug::Log::ILogger& InputSystem::Logger() noexcept
@@ -216,15 +256,41 @@ namespace PonyEngine::Input
 		return Engine().SystemManager();
 	}
 
-	void InputSystem::AddInputEvent(const InputEvent& inputEvent)
+	void InputSystem::AddInputEvent(const IInputDevice& inputSource, const InputEvent& inputEvent)
 	{
-		inputQueue.push(inputEvent);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Input event added with '{}' input code.", ToString(inputEvent.inputCode));
+		inputQueue.emplace(&inputSource, inputEvent);
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Input event from '0x{:X}' added with '{}' input code.", reinterpret_cast<std::uintptr_t>(&inputSource), ToString(inputEvent.inputCode));
+	}
+
+	std::size_t InputSystem::IdIndex(const std::string_view id) const
+	{
+		for (std::size_t i = 0; i < inputIds.size(); ++i)
+		{
+			if (id == inputIds[i])
+			{
+				return i;
+			}
+		}
+
+		throw std::invalid_argument(PonyBase::Utility::SafeFormat("No input is bound to '{}' id.", id));
+	}
+
+	std::size_t InputSystem::DeviceIndex(const IInputDevice& device) const
+	{
+		for (std::size_t i = 0; i < devices.size(); ++i)
+		{
+			if (static_cast<const IInputDevice*>(devices[i].get()) == &device)
+			{
+				return i;
+			}
+		}
+
+		throw std::invalid_argument(PonyBase::Utility::SafeFormat("No device is bound by interface at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&device)));
 	}
 
 	void InputSystem::Clean() noexcept
 	{
-		for (std::vector<std::shared_ptr<InputReceiver>>& receivers : std::ranges::views::values(inputReceivers))
+		for (std::vector<std::shared_ptr<InputReceiver>>& receivers : inputReceivers)
 		{
 			for (std::size_t i = receivers.size(); i-- > 0; )
 			{
@@ -255,26 +321,29 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void InputSystem::ProcessInputEvent(const InputEvent& inputEvent)
+	void InputSystem::ProcessInputEvent(const std::pair<const IInputDevice*, InputEvent>& input)
 	{
-		if (const auto& mappingPosition = inputMapping.find(inputEvent.inputCode); mappingPosition != inputMapping.cend())
+		if (const auto& mappingPosition = inputMapping.find(input.second.inputCode); mappingPosition != inputMapping.cend())
 		{
 			for (const InputMappingValue& inputMappingValue : mappingPosition->second)
 			{
-				ExecuteReceivers(inputMappingValue, inputEvent.value);
+				const float value = input.second.value * inputMappingValue.multiplier;
+				UpdateInputState(*input.first, inputMappingValue.idIndex, value);
+				ExecuteReceivers(inputMappingValue.idIndex, value);
 			}
 		}
 	}
 
-	void InputSystem::ExecuteReceivers(const InputMappingValue& mapping, const float value)
+	void InputSystem::UpdateInputState(const IInputDevice& inputSource, const std::size_t idIndex, const float value)
 	{
-		if (const auto& receivers = inputReceivers.find(mapping.id); receivers != inputReceivers.cend())
+		states[idIndex][DeviceIndex(inputSource)] = value;
+	}
+
+	void InputSystem::ExecuteReceivers(const std::size_t idIndex, const float value)
+	{
+		for (const std::shared_ptr<InputReceiver>& receiver : inputReceivers[idIndex])
 		{
-			const float inputValue = value * mapping.multiplier;
-			for (const std::shared_ptr<InputReceiver>& receiver : receivers->second)
-			{
-				receiver->Execute(inputValue);
-			}
+			receiver->Execute(value);
 		}
 	}
 }

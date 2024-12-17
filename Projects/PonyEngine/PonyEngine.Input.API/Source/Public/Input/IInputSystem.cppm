@@ -30,5 +30,11 @@ export namespace PonyEngine::Input
 		/// @return Input receiver.
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<InputReceiver> CreateReceiver(std::string_view id) = 0;
+
+		/// @brief Gets the input state - a sum of all inputs with the same ID.
+		/// @param id Input ID.
+		/// @return Input state.
+		[[nodiscard("Pure function")]]
+		virtual float State(std::string_view id) const = 0;
 	};
 }
