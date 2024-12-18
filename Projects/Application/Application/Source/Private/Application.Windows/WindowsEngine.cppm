@@ -268,6 +268,11 @@ namespace Application
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
 			};
+			inputParams.inputBindings["Rotate"] = std::vector<PonyEngine::Input::InputBindingValue>
+			{
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Q, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::E, .multiplier = -1.f},
+			};
 			inputParams.inputBindings["Reset"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
@@ -282,7 +287,7 @@ namespace Application
 			};
 			inputParams.inputBindings["MouseY"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = 1.f}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = -1.f}
 			};
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
 

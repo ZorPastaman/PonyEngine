@@ -25,4 +25,5 @@ export import :InputSystemFactory;
 export import :InputSystemFactoryData;
 export import :InputSystemFactoryParams;
 export import :InputSystemParams;
+export import :InputType;
 export import :InputValueConversion;

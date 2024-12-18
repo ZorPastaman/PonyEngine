@@ -216,7 +216,7 @@ namespace PonyEngine::Input
 		const WORD key = scanCode | extendedPrefix;
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = keyCodeMapPosition->second, .value = static_cast<float>(inputValue)});
+			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = keyCodeMapPosition->second, .inputValue = static_cast<float>(inputValue), .inputType = InputType::State});
 		}
 	}
 }

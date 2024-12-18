@@ -19,6 +19,7 @@ export module PonyEngine.Window.Windows.Detail:WindowsCursor;
 
 import <array>;
 import <cstdint>;
+import <exception>;
 import <optional>;
 import <stdexcept>;
 
@@ -110,8 +111,16 @@ namespace PonyEngine::Window
 		{
 			ShowCursor(true);
 		}
+		ClipCursor(nullptr);
 
-		windowSystem->MessagePump().RemoveMessageObserver(*this);
+		try
+		{
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(windowSystem->Logger(), e, "On removing message observer.");
+		}
 	}
 
 	PonyMath::Core::Vector2<std::int32_t> WindowsCursor::CursorPosition() const
@@ -215,6 +224,13 @@ namespace PonyEngine::Window
 			if (!ClipCursor(&rect)) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to clip cursor. Error code: '0x{:X}'.", GetLastError()));
+			}
+		}
+		else
+		{
+			if (!ClipCursor(nullptr)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to free cursor. Error code: '0x{:X}'.", GetLastError()));
 			}
 		}
 	}

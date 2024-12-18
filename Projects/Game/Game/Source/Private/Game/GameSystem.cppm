@@ -65,8 +65,6 @@ export namespace Game
 
 		std::shared_ptr<PonyEngine::Input::InputReceiver> resetHandle;
 		std::shared_ptr<PonyEngine::Input::InputReceiver> exitHandle;
-		std::shared_ptr<PonyEngine::Input::InputReceiver> mouseXHandle;
-		std::shared_ptr<PonyEngine::Input::InputReceiver> mouseYHandle;
 
 		std::shared_ptr<PonyEngine::Render::IRenderObject> boxHandle;
 		std::shared_ptr<PonyEngine::Render::IRenderObject> bigBoxHandle;
@@ -80,6 +78,7 @@ namespace Game
 	GameSystem::GameSystem(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& systemParams, const GameSystemParams&) :
 		TickableSystem(engine, systemParams),
 		inputSystem{nullptr},
+		renderSystem{nullptr},
 		timeSystem{nullptr},
 		cameraTransform(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One)
 	{
@@ -106,8 +105,6 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
 		(resetHandle = inputSystem->CreateReceiver("Reset"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { cameraTransform.Position(PonyMath::Core::Vector3<float>::Predefined::Zero); cameraTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity); cameraTransform.Scale(PonyMath::Core::Vector3<float>::Predefined::One); })));
 		(exitHandle = inputSystem->CreateReceiver("Exit"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { Engine().Stop(); }, false)));
-		(mouseXHandle = inputSystem->CreateReceiver("MouseX"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Up(), input)); });
-		(mouseYHandle = inputSystem->CreateReceiver("MouseY"))->Action([&](const float input) { cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Right(), input)); });
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
@@ -139,6 +136,17 @@ namespace Game
 	void GameSystem::Tick()
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
+
+		const auto mouse = cameraTransform.Rotation() * PonyMath::Core::Vector3<float>(inputSystem->State("MouseX"), inputSystem->State("MouseY"), 0.f);
+		auto rotationAxis = PonyMath::Core::Cross(cameraTransform.Forward(), mouse);
+		const auto rotation = rotationAxis.Magnitude();
+		rotationAxis *= 1.f / rotation;
+		if (rotationAxis.IsFinite())
+		{
+			cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(rotationAxis, rotation));
+		}
+
+		cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Forward(), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime())));
 
 		auto moveDirection = PonyMath::Core::Vector3<float>(inputSystem->State("Right"), inputSystem->State("Up"), inputSystem->State("Forward"));
 		moveDirection.Normalize();
