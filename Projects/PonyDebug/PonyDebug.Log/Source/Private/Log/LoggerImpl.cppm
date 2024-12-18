@@ -45,7 +45,7 @@ export namespace PonyDebug::Log
 		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept override;
 
 		virtual void AddSubLogger(ISubLogger& subLogger) override;
-		virtual void RemoveSubLogger(ISubLogger& subLogger) override;
+		virtual void RemoveSubLogger(ISubLogger& subLogger) noexcept override;
 
 		LoggerImpl& operator =(const LoggerImpl&) = delete;
 		LoggerImpl& operator =(LoggerImpl&&) = delete;
@@ -88,7 +88,7 @@ namespace PonyDebug::Log
 		PONY_CONSOLE(LogType::Debug, "'{}' sub-logger added.", typeid(subLogger).name());
 	}
 
-	void LoggerImpl::RemoveSubLogger(ISubLogger& subLogger)
+	void LoggerImpl::RemoveSubLogger(ISubLogger& subLogger) noexcept
 	{
 		if (const auto position = std::ranges::find(subLoggers, &subLogger); position != subLoggers.cend()) [[likely]]
 		{

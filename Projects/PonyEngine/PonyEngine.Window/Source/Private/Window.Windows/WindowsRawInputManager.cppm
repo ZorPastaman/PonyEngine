@@ -52,7 +52,7 @@ export namespace PonyEngine::Window
 		virtual void AddRawInputObserver(IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override;
 		virtual void RemoveRawInputObserver(IWindowsRawInputObserver& observer) noexcept override;
 
-		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 		WindowsRawInputManager& operator =(const WindowsRawInputManager&) = delete;
 		WindowsRawInputManager& operator =(WindowsRawInputManager&&) = delete;
@@ -88,7 +88,14 @@ namespace PonyEngine::Window
 
 	WindowsRawInputManager::~WindowsRawInputManager() noexcept
 	{
-		windowSystem->MessagePump().RemoveMessageObserver(*this);
+		try
+		{
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(windowSystem->Logger(), e, "On removing message observer.");
+		}
 	}
 
 	void WindowsRawInputManager::AddRawInputObserver(IWindowsRawInputObserver& observer, const std::span<const DWORD> rawInputTypes)
@@ -133,7 +140,7 @@ namespace PonyEngine::Window
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input observer removed.", typeid(observer).name());
 	}
 
-	void WindowsRawInputManager::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam)
+	void WindowsRawInputManager::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam) noexcept
 	{
 		assert(uMsg == WM_INPUT && "The message type is incorrect.");
 

@@ -48,7 +48,7 @@ namespace Core
 			application.logger = &logger;
 			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 
-			for (std::size_t i = 0; i < 10; ++i)
+			for (std::int64_t i = 0; i < 10; ++i)
 			{
 				Assert::AreEqual(i, engine.engine->FrameCount());
 				engine.engine->Tick();

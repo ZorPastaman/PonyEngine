@@ -102,7 +102,7 @@ namespace PonyEngine::Window
 	void WindowsWindowTitleBar::SecondaryTitle(const std::string_view title)
 	{
 		secondaryTitle = title;
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "Secondary title set to '{}'.", secondaryTitle);
+		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Secondary title set to '{}'.", secondaryTitle);
 		UpdateWindowTitle();
 	}
 
@@ -120,6 +120,6 @@ namespace PonyEngine::Window
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "Window title set to '{}'.", titleToSet);
+		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to '{}'.", titleToSet);
 	}
 }

@@ -13,15 +13,16 @@ module;
 
 export module PonyEngine.Input:InputDevice;
 
+import :IInputDevice;
 import :IInputSystemContext;
 import :InputDeviceParams;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Input device.
-	class InputDevice
+	class InputDevice : public IInputDevice
 	{
-		BASE_BODY_WITHOUT_CONSTRUCTOR(InputDevice)
+		BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(InputDevice)
 
 	public:
 		/// @brief Begins an input capture. It's called before a first tick.

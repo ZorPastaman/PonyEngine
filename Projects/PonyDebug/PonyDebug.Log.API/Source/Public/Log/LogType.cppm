@@ -10,12 +10,11 @@
 export module PonyDebug.Log:LogType;
 
 import <array>;
-import <bit>;
+import <cmath>;
 import <cstddef>;
 import <cstdint>;
 import <ostream>;
 import <string_view>;
-import <type_traits>;
 
 export namespace PonyDebug::Log
 {
@@ -80,27 +79,78 @@ export namespace PonyDebug::Log
 namespace PonyDebug::Log
 {
 	/// @brief Log type names by index.
-	constexpr std::array<std::string_view, 7> LogTypeNames
+	constexpr std::array<std::string_view, 65> LogTypeNames
 	{
+		"None",
 		"Verbose",
 		"Debug",
+		"Verbose | Debug",
 		"Info",
+		"Verbose | Info",
+		"Debug | Info",
+		"Verbose | Debug | Info",
 		"Warning",
+		"Verbose | Warning",
+		"Debug | Warning",
+		"Verbose | Debug | Warning",
+		"Info | Warning",
+		"Verbose | Info | Warning",
+		"Debug | Info | Warning",
+		"Verbose | Debug | Info | Warning",
 		"Error",
+		"Verbose | Error",
+		"Debug | Error",
+		"Verbose | Debug | Error",
+		"Info | Error",
+		"Verbose | Info | Error",
+		"Debug | Info | Error",
+		"Verbose | Debug | Info | Error",
+		"Warning | Error",
+		"Verbose | Warning | Error",
+		"Debug | Warning | Error",
+		"Verbose | Debug | Warning | Error",
+		"Info | Warning | Error",
+		"Verbose | Info | Warning | Error",
+		"Debug | Info | Warning | Error",
+		"Verbose | Debug | Info | Warning | Error",
 		"Exception",
+		"Verbose | Exception",
+		"Debug | Exception",
+		"Verbose | Debug | Exception",
+		"Info | Exception",
+		"Verbose | Info | Exception",
+		"Debug | Info | Exception",
+		"Verbose | Debug | Info | Exception",
+		"Warning | Exception",
+		"Verbose | Warning | Exception",
+		"Debug | Warning | Exception",
+		"Verbose | Debug | Warning | Exception",
+		"Info | Warning | Exception",
+		"Verbose | Info | Warning | Exception",
+		"Debug | Info | Warning | Exception",
+		"Verbose | Debug | Info | Warning | Exception",
+		"Error | Exception",
+		"Verbose | Error | Exception",
+		"Debug | Error | Exception",
+		"Verbose | Debug | Error | Exception",
+		"Info | Error | Exception",
+		"Verbose | Info | Error | Exception",
+		"Debug | Info | Error | Exception",
+		"Verbose | Debug | Info | Error | Exception",
+		"Warning | Error | Exception",
+		"Verbose | Warning | Error | Exception",
+		"Debug | Warning | Error | Exception",
+		"Verbose | Debug | Warning | Error | Exception",
+		"Info | Warning | Error | Exception",
+		"Verbose | Info | Warning | Error | Exception",
+		"Debug | Info | Warning | Error | Exception",
+		"Verbose | Debug | Info | Warning | Error | Exception", 
 		"Unknown"
 	};
 
 	constexpr std::string_view ToString(const LogType logType) noexcept
 	{
-		constexpr auto exceptionUnderlyingLogType = static_cast<std::underlying_type_t<LogType>>(LogType::Exception);
-
-		const auto underlyingLogType = static_cast<std::underlying_type_t<LogType>>(logType);
-		const std::size_t index = std::has_single_bit(underlyingLogType) && underlyingLogType <= exceptionUnderlyingLogType
-			? std::countr_zero(underlyingLogType)
-			: LogTypeNames.size() - 1;
-
-		return LogTypeNames[index];
+		return LogTypeNames[std::min(static_cast<std::size_t>(logType), LogTypeNames.size() - 1)];
 	}
 
 	constexpr LogType operator ~(const LogType logType) noexcept

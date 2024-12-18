@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Core.Detail:EngineImpl;
 
-import <cstddef>;
+import <cstdint>;
 import <exception>;
 import <memory>;
 import <stdexcept>;
@@ -44,7 +44,7 @@ export namespace PonyEngine::Core
 		virtual ~EngineImpl() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::size_t FrameCount() const noexcept override;
+		virtual std::int64_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual ISystemManager& SystemManager() noexcept override;
@@ -76,7 +76,7 @@ export namespace PonyEngine::Core
 		/// @brief Ticks systems.
 		void TickSystems();
 
-		std::size_t frameCount; ///< Frame count.
+		std::int64_t frameCount; ///< Frame count.
 		int engineExitCode; ///< Exit code. It's defined only if @p isRunning is @a true.
 		bool isRunning; ///< @a True if the engine is running; @a false otherwise.
 		bool isTicking; ///< @a True if the engine is ticking now; @a false otherwise.
@@ -168,7 +168,7 @@ namespace PonyEngine::Core
 		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Engine logger destroyed.");
 	}
 
-	std::size_t EngineImpl::FrameCount() const noexcept
+	std::int64_t EngineImpl::FrameCount() const noexcept
 	{
 		return frameCount;
 	}

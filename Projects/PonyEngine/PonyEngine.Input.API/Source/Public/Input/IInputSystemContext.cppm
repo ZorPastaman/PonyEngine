@@ -17,6 +17,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Core;
 
+import :IInputDevice;
 import :InputEvent;
 
 export namespace PonyEngine::Input
@@ -45,7 +46,8 @@ export namespace PonyEngine::Input
 		virtual const Core::ISystemManager& SystemManager() const noexcept = 0;
 
 		/// @brief Adds the event to an input queue.
+		/// @param inputSource Input source.
 		/// @param inputEvent Input event.
-		virtual void AddInputEvent(const InputEvent& inputEvent) = 0;
+		virtual void AddInputEvent(const IInputDevice& inputSource, const InputEvent& inputEvent) = 0;
 	};
 }

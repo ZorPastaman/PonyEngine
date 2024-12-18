@@ -32,6 +32,6 @@ export namespace PonyEngine::Window
 		virtual void AddMessageObserver(IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) = 0;
 		/// @brief Removes the message observer.
 		/// @param observer Observer to remove.
-		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) noexcept = 0;
+		virtual void RemoveMessageObserver(IWindowsMessageObserver& observer) = 0;
 	};
 }

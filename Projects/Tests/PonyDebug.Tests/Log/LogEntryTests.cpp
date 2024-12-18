@@ -31,7 +31,7 @@ namespace Log
 			constexpr std::string_view message = "Message.";
 			const auto exception = std::exception("Exception text.");
 			constexpr auto timePoint = std::chrono::time_point<std::chrono::system_clock>(std::chrono::seconds(450780));
-			constexpr std::size_t frameCount = 98407;
+			constexpr std::int64_t frameCount = 98407;
 			constexpr auto logType = PonyDebug::Log::LogType::Warning;
 			constexpr auto exceptionLogType = PonyDebug::Log::LogType::Exception;
 

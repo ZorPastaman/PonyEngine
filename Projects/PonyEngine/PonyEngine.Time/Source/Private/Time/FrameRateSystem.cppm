@@ -37,10 +37,10 @@ export namespace PonyEngine::Time
 
 		virtual ~FrameRateSystem() noexcept override = default;
 
-		virtual void Begin() override;
-		virtual void End() override;
+		virtual void Begin() noexcept override;
+		virtual void End() noexcept override;
 
-		virtual void Tick() override;
+		virtual void Tick() noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual float TargetFrameTime() const noexcept override;
@@ -63,15 +63,15 @@ namespace PonyEngine::Time
 	{
 	}
 
-	void FrameRateSystem::Begin()
+	void FrameRateSystem::Begin() noexcept
 	{
 	}
 
-	void FrameRateSystem::End()
+	void FrameRateSystem::End() noexcept
 	{
 	}
 
-	void FrameRateSystem::Tick()
+	void FrameRateSystem::Tick() noexcept
 	{
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for target frame time: '{}'.", targetFrameTime);
 		std::chrono::time_point<std::chrono::steady_clock> now;

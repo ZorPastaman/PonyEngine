@@ -34,6 +34,8 @@
     <ClCompile Include="Source\Private\Time\FrameRateSystem.cppm" />
     <ClCompile Include="Source\Private\Time\FrameRateSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Private\Time\Time.Detail.cppm" />
+    <ClCompile Include="Source\Private\Time\TimeSystem.cppm" />
+    <ClCompile Include="Source\Private\Time\TimeSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Public\Time\Time.Impl.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

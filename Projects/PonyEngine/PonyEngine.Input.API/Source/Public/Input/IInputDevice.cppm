@@ -7,18 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogInput;
+module;
 
-import <cstdint>;
-import <optional>;
-import <string_view>;
+#include "PonyBase/Utility/ObjectBody.h"
 
-export namespace PonyDebug::Log
+export module PonyEngine.Input:IInputDevice;
+
+export namespace PonyEngine::Input
 {
-	/// @brief Log data input.
-	struct LogInput final
+	class IInputDevice
 	{
-		std::string_view message; ///< Log message.
-		std::optional<std::int64_t> frameCount = {}; ///< Engine frame count.
+		INTERFACE_BODY(IInputDevice)
 	};
 }

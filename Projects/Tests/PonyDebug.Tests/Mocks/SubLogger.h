@@ -11,6 +11,7 @@
 
 #include <chrono>
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <optional>
 #include <string_view>
@@ -40,7 +41,7 @@ namespace Log
 		std::optional<std::string_view> expectedMessage = {};
 		std::optional<const std::exception*> expectedException = {};
 		std::optional<std::chrono::time_point<std::chrono::system_clock>> expectedTime = {};
-		std::optional<std::optional<std::size_t>> expectedFrameCount = {};
+		std::optional<std::optional<std::int64_t>> expectedFrameCount = {};
 		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
 
 	private:

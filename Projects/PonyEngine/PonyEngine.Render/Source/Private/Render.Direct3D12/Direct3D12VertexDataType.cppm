@@ -10,6 +10,8 @@
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12VertexDataType;
 
 import <array>;
+import <cmath>;
+import <cstddef>;
 import <cstdint>;
 import <ostream>;
 import <string_view>;
@@ -53,9 +55,7 @@ namespace PonyEngine::Render
 
 	constexpr std::string_view ToString(const Direct3D12VertexDataType dataType) noexcept
 	{
-		const std::size_t index = static_cast<std::size_t>(dataType);
-
-		return index < DataTypeNames.size() ? DataTypeNames[index] : DataTypeNames.back();
+		return DataTypeNames[std::min(static_cast<std::size_t>(dataType), DataTypeNames.size() - 1)];
 	}
 
 	std::ostream& operator <<(std::ostream& stream, const Direct3D12VertexDataType dataType)
