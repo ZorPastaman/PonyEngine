@@ -45,7 +45,7 @@ export namespace PonyEngine::Input
 		virtual void Begin() override;
 		virtual void End() override;
 
-		virtual void Tick() override;
+		virtual void Tick() noexcept override;
 
 		WindowsKeyboardDevice& operator =(const WindowsKeyboardDevice&) = delete;
 		WindowsKeyboardDevice& operator =(WindowsKeyboardDevice&&) = delete;
@@ -195,7 +195,7 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void WindowsKeyboardDevice::Tick()
+	void WindowsKeyboardDevice::Tick() noexcept
 	{
 	}
 
@@ -216,7 +216,7 @@ namespace PonyEngine::Input
 		const WORD key = scanCode | extendedPrefix;
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
-			InputSystem().AddInputEvent(InputEvent{.inputCode = keyCodeMapPosition->second, .value = static_cast<float>(inputValue)});
+			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = keyCodeMapPosition->second, .inputValue = static_cast<float>(inputValue), .inputType = InputType::State});
 		}
 	}
 }

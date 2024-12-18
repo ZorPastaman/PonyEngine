@@ -84,7 +84,13 @@
     <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\ActionConversion.cppm">
+    <ClCompile Include="Source\Public\Input\InputValueConversion.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input\IInputDevice.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Input\InputType.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

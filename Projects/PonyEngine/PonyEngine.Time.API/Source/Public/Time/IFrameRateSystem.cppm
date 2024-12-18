@@ -21,11 +21,11 @@ export namespace PonyEngine::Time
 		INTERFACE_BODY(IFrameRateSystem)
 
 		/// @brief Gets the target frame time.
-		/// @return Target frame time in seconds. 0 means no target frame time (it's not restricted).
+		/// @return Target frame time in seconds. 0 or less means no target frame time (it's not restricted).
 		[[nodiscard("Pure function")]]
 		virtual float TargetFrameTime() const noexcept = 0;
 		/// @brief Sets the target frame time.
-		/// @param frameTime Target frame time in seconds. 0 means no target frame time (it's not restricted).
+		/// @param frameTime Target frame time in seconds. 0 or less means no target frame time (it's not restricted).
 		virtual void TargetFrameTime(float frameTime) noexcept = 0;
 	};
 }

@@ -19,6 +19,7 @@ export module PonyEngine.Window.Windows.Detail:WindowsCursor;
 
 import <array>;
 import <cstdint>;
+import <exception>;
 import <optional>;
 import <stdexcept>;
 
@@ -59,7 +60,7 @@ export namespace PonyEngine::Window
 		virtual void IsVisible(bool isVisible) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const override;
+		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept override;
 		virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) override;
 
 		WindowsCursor& operator =(const WindowsCursor&) = delete;
@@ -110,8 +111,16 @@ namespace PonyEngine::Window
 		{
 			ShowCursor(true);
 		}
+		ClipCursor(nullptr);
 
-		windowSystem->MessagePump().RemoveMessageObserver(*this);
+		try
+		{
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(windowSystem->Logger(), e, "On removing message observer.");
+		}
 	}
 
 	PonyMath::Core::Vector2<std::int32_t> WindowsCursor::CursorPosition() const
@@ -156,7 +165,7 @@ namespace PonyEngine::Window
 		}
 	}
 
-	std::optional<PonyMath::Shape::Rect<float>> WindowsCursor::ClippingRect() const
+	std::optional<PonyMath::Shape::Rect<float>> WindowsCursor::ClippingRect() const noexcept
 	{
 		return clipping;
 	}
@@ -215,6 +224,13 @@ namespace PonyEngine::Window
 			if (!ClipCursor(&rect)) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to clip cursor. Error code: '0x{:X}'.", GetLastError()));
+			}
+		}
+		else
+		{
+			if (!ClipCursor(nullptr)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to free cursor. Error code: '0x{:X}'.", GetLastError()));
 			}
 		}
 	}

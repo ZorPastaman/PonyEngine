@@ -14,7 +14,7 @@ module;
 export module PonyDebug.Log:LogEntry;
 
 import <chrono>;
-import <cstddef>;
+import <cstdint>;
 import <exception>;
 import <optional>;
 import <string>;
@@ -37,7 +37,7 @@ export namespace PonyDebug::Log
 		/// @param frameCount Frame when the log entry has been created.
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
-		LogEntry(std::string_view message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::size_t> frameCount, LogType logType) noexcept;
+		LogEntry(std::string_view message, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::int64_t> frameCount, LogType logType) noexcept;
 		LogEntry(const LogEntry&) = delete;
 		LogEntry(LogEntry&&) = delete;
 
@@ -58,7 +58,7 @@ export namespace PonyDebug::Log
 		/// @brief Gets the frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
-		std::optional<std::size_t> FrameCount() const noexcept;
+		std::optional<std::int64_t> FrameCount() const noexcept;
 		/// @brief Gets the log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
@@ -80,7 +80,7 @@ export namespace PonyDebug::Log
 		const std::string_view message; ///< Log message.
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
-		const std::optional<std::size_t> frameCount; ///< Frame when the log entry is created.
+		const std::optional<std::int64_t> frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
 		mutable std::optional<std::string> stringCache; ///< ToString() cache.
@@ -95,7 +95,7 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	LogEntry::LogEntry(const std::string_view message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::size_t> frameCount, const Log::LogType logType) noexcept :
+	LogEntry::LogEntry(const std::string_view message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::int64_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		exception{exception},
 		timePoint{timePoint},
@@ -119,7 +119,7 @@ namespace PonyDebug::Log
 		return timePoint;
 	}
 
-	std::optional<std::size_t> LogEntry::FrameCount() const noexcept
+	std::optional<std::int64_t> LogEntry::FrameCount() const noexcept
 	{
 		return frameCount;
 	}

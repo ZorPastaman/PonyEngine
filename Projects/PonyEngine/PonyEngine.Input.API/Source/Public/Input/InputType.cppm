@@ -7,18 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogInput;
+export module PonyEngine.Input:InputType;
 
 import <cstdint>;
-import <optional>;
-import <string_view>;
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Input
 {
-	/// @brief Log data input.
-	struct LogInput final
+	/// @brief Input type.
+	enum class InputType : std::uint8_t
 	{
-		std::string_view message; ///< Log message.
-		std::optional<std::int64_t> frameCount = {}; ///< Engine frame count.
+		State, ///< Input state change. It's kept across ticks and can be only changed.
+		Delta ///< Input delta. It's zeroed every tick and can only be added.
 	};
 }

@@ -30,9 +30,9 @@ namespace Mocks
 		[[nodiscard("Pure function")]]
 		virtual const PonyEngine::Core::ISystemManager& SystemManager() const noexcept override;
 
-		virtual void AddInputEvent(const PonyEngine::Input::InputEvent& inputEntry) override;
+		virtual void AddInputEvent(const PonyEngine::Input::IInputDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent) override;
 
-		std::vector<PonyEngine::Input::InputEvent> events;
+		std::vector<std::pair<const PonyEngine::Input::IInputDevice*, PonyEngine::Input::InputEvent>> events;
 
 		PonyEngine::Core::IEngineContext* engine = nullptr;
 	};

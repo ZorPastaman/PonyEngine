@@ -51,8 +51,8 @@ export namespace PonyEngine::Render
 
 		virtual ~WindowsDirect3D12RenderSystem() noexcept override;
 
-		virtual void Begin() override;
-		virtual void End() override;
+		virtual void Begin() noexcept override;
+		virtual void End() noexcept override;
 
 		virtual void Tick() override;
 
@@ -187,11 +187,11 @@ namespace PonyEngine::Render
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system destroyed.");
 	}
 
-	void WindowsDirect3D12RenderSystem::Begin()
+	void WindowsDirect3D12RenderSystem::Begin() noexcept
 	{
 	}
 
-	void WindowsDirect3D12RenderSystem::End()
+	void WindowsDirect3D12RenderSystem::End() noexcept
 	{
 	}
 

@@ -37,5 +37,11 @@
     <ClCompile Include="Source\Private\Time\Time.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Time\TimeSystem.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Time\TimeSystemFactoryImpl.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

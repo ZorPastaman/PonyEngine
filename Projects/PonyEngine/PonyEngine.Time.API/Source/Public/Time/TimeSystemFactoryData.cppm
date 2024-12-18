@@ -7,18 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogInput;
+export module PonyEngine.Time:TimeSystemFactoryData;
 
-import <cstdint>;
-import <optional>;
-import <string_view>;
+import <memory>;
 
-export namespace PonyDebug::Log
+import :TimeSystemFactory;
+
+export namespace PonyEngine::Time
 {
-	/// @brief Log data input.
-	struct LogInput final
+	/// @brief Time system factory data.
+	struct TimeSystemFactoryData final
 	{
-		std::string_view message; ///< Log message.
-		std::optional<std::int64_t> frameCount = {}; ///< Engine frame count.
+		std::unique_ptr<TimeSystemFactory> systemFactory; ///< System factory.
 	};
 }

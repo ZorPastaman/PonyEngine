@@ -56,8 +56,8 @@ export namespace PonyEngine::Window
 
 		virtual ~WindowsWindowSystem() noexcept override;
 
-		virtual void Begin() override;
-		virtual void End() override;
+		virtual void Begin() noexcept override;
+		virtual void End() noexcept override;
 
 		virtual void Tick() override;
 
@@ -113,7 +113,7 @@ export namespace PonyEngine::Window
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
-		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
 		/// @brief Responds to a destroy message.
 		void Destroy() const noexcept;
@@ -220,7 +220,14 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Raw input manager destroyed.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy message pump.");
-		messagePump->RemoveMessageObserver(*this);
+		try
+		{
+			messagePump->RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(Engine().Logger(), e, "On removing message observer.");
+		}
 		messagePump.reset();
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Message pump destroyed.");
 
@@ -233,11 +240,11 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Windows class released.");
 	}
 
-	void WindowsWindowSystem::Begin()
+	void WindowsWindowSystem::Begin() noexcept
 	{
 	}
 
-	void WindowsWindowSystem::End()
+	void WindowsWindowSystem::End() noexcept
 	{
 	}
 
@@ -385,7 +392,7 @@ namespace PonyEngine::Window
 		return Engine().Logger();
 	}
 
-	void WindowsWindowSystem::Observe(const UINT uMsg, const WPARAM, const LPARAM)
+	void WindowsWindowSystem::Observe(const UINT uMsg, const WPARAM, const LPARAM) noexcept
 	{
 		assert(uMsg == WM_DESTROY && "The incorrect window message has been received.");
 

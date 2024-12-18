@@ -10,6 +10,7 @@
 #pragma once
 
 #include <cstddef>
+#include <cstdint>
 #include <exception>
 #include <optional>
 #include <string_view>
@@ -30,7 +31,7 @@ namespace Log
 		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
 		std::optional<const std::exception*> expectedException = {};
 		std::optional<std::string_view> expectedMessage = {};
-		std::optional<std::optional<std::size_t>> expectedFrameCount = {};
+		std::optional<std::optional<std::int64_t>> expectedFrameCount = {};
 
 	private:
 		mutable std::size_t version = 0;

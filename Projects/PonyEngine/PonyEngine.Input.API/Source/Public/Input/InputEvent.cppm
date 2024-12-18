@@ -10,6 +10,7 @@
 export module PonyEngine.Input:InputEvent;
 
 import :InputCode;
+import :InputType;
 
 export namespace PonyEngine::Input
 {
@@ -17,6 +18,7 @@ export namespace PonyEngine::Input
 	struct InputEvent final
 	{
 		InputCode inputCode; ///< Input code.
-		float value; ///< Input value.
+		float inputValue; ///< Input value.
+		InputType inputType; ///< Input type.
 	};
 }
