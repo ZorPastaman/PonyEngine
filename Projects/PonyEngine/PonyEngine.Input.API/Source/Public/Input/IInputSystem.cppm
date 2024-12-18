@@ -35,6 +35,6 @@ export namespace PonyEngine::Input
 		/// @param id Input ID.
 		/// @return Input state.
 		[[nodiscard("Pure function")]]
-		virtual float State(std::string_view id) const = 0;
+		virtual float State(std::string_view id) const noexcept = 0;
 	};
 }

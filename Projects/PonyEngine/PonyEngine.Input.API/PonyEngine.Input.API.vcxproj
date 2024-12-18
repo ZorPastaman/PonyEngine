@@ -24,6 +24,7 @@
     <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceFactoryData.cppm" />
     <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input\InputType.cppm" />
     <ClCompile Include="Source\Public\Input\InputValueConversion.cppm" />
     <ClCompile Include="Source\Public\Input\IInputDevice.cppm" />
     <ClCompile Include="Source\Public\Input\IInputDeviceFactory.cppm" />

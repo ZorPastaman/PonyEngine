@@ -88,7 +88,14 @@ namespace PonyEngine::Window
 
 	WindowsRawInputManager::~WindowsRawInputManager() noexcept
 	{
-		windowSystem->MessagePump().RemoveMessageObserver(*this);
+		try
+		{
+			windowSystem->MessagePump().RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(windowSystem->Logger(), e, "On removing message observer.");
+		}
 	}
 
 	void WindowsRawInputManager::AddRawInputObserver(IWindowsRawInputObserver& observer, const std::span<const DWORD> rawInputTypes)

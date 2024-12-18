@@ -59,16 +59,113 @@ namespace Log
 
 		TEST_METHOD(ToStringTest)
 		{
-			ToStringTestElement(PonyDebug::Log::LogType::None, "Unknown");
+			ToStringTestElement(PonyDebug::Log::LogType::None, "None");
 			ToStringTestElement(PonyDebug::Log::LogType::Verbose, "Verbose");
 			ToStringTestElement(PonyDebug::Log::LogType::Debug, "Debug");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug, "Verbose | Debug");
 			ToStringTestElement(PonyDebug::Log::LogType::Info, "Info");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info, "Verbose | Info");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info, "Debug | Info");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info, "Verbose | Debug | Info");
 			ToStringTestElement(PonyDebug::Log::LogType::Warning, "Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Warning, "Verbose | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning, "Debug | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning, "Verbose | Debug | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning, "Info | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning, "Verbose | Info | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning, "Debug | Info | Warning");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning, "Verbose | Debug | Info | Warning");
 			ToStringTestElement(PonyDebug::Log::LogType::Error, "Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Error,
+				"Verbose | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Error,
+				"Debug | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Error,
+				"Verbose | Debug | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error,
+				"Info | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error,
+				"Verbose | Info | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error,
+				"Debug | Info | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error,
+				"Verbose | Debug | Info | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Verbose | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Debug | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Verbose | Debug | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Info | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Verbose | Info | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error,
+				"Debug | Info | Warning | Error");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error, 
+				"Verbose | Debug | Info | Warning | Error");
 			ToStringTestElement(PonyDebug::Log::LogType::Exception, "Exception");
-			ToStringTestElement(PonyDebug::Log::LogType::All, "Unknown");
-			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Debug, "Unknown");
-			ToStringTestElement(static_cast<PonyDebug::Log::LogType>(111), "Unknown");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Exception,
+				"Verbose | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Exception,
+				"Debug | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Verbose | Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Debug | Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Verbose | Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Debug | Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Info | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Exception,
+				"Warning | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Exception,
+				"Verbose | Warning | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Exception,
+				"Debug | Warning | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Warning | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Debug | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Info | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Info | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Debug | Info | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Info | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Debug | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Info | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Info | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Debug | Info | Warning | Error | Exception");
+			ToStringTestElement(PonyDebug::Log::LogType::Verbose | PonyDebug::Log::LogType::Debug | PonyDebug::Log::LogType::Info | PonyDebug::Log::LogType::Warning | PonyDebug::Log::LogType::Error | PonyDebug::Log::LogType::Exception,
+				"Verbose | Debug | Info | Warning | Error | Exception");
+			ToStringTestElement(static_cast<PonyDebug::Log::LogType>(64), "Unknown");
 		}
 
 		TEST_METHOD(ConstexprCompilationTest)

@@ -220,7 +220,14 @@ namespace PonyEngine::Window
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Raw input manager destroyed.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy message pump.");
-		messagePump->RemoveMessageObserver(*this);
+		try
+		{
+			messagePump->RemoveMessageObserver(*this);
+		}
+		catch (const std::exception& e)
+		{
+			PONY_LOG_E(Engine().Logger(), e, "On removing message observer.");
+		}
 		messagePump.reset();
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Message pump destroyed.");
 
