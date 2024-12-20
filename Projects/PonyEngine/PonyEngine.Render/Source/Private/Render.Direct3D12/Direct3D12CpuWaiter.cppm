@@ -18,6 +18,8 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12CpuWaiter;
 import <cstdint>;
 import <memory>;
 import <stdexcept>;
+import <string>;
+import <string_view>;
 import <type_traits>;
 
 import PonyBase.StringUtility;
@@ -42,6 +44,10 @@ export namespace PonyEngine::Render
 		Direct3D12CpuWaiter(Direct3D12CpuWaiter&&) = delete;
 
 		~Direct3D12CpuWaiter() noexcept;
+
+		/// @brief Sets the name to the cpu waiter components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		/// @brief Waits for the command queue fence.
 		void Wait();
@@ -86,6 +92,11 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy fence.");
 		fence.reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Fence destroyed.");
+	}
+
+	void Direct3D12CpuWaiter::Name(const std::string_view name)
+	{
+		fence->Name(name);
 	}
 
 	void Direct3D12CpuWaiter::Wait()

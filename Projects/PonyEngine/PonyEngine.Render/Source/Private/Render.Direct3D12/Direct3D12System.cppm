@@ -40,6 +40,7 @@ import :Direct3D12RenderView;
 import :Direct3D12RenderViewParams;
 import :Direct3D12RootSignatureManager;
 import :Direct3D12SystemParams;
+import :Direct3D12Utility;
 import :IDirect3D12CopyPipeline;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12GraphicsPipeline;
@@ -228,22 +229,27 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+		SetName(*device.Get(), "RenderDevice");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(device.Get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline.");
 		copyPipeline = std::make_unique<Direct3D12CopyPipeline>(*static_cast<IDirect3D12SystemContext*>(this), params.commandQueuePriority);
+		copyPipeline->Name("CopyPipeline");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(copyPipeline.get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline.");
 		graphicsPipeline = std::make_unique<Direct3D12GraphicsPipeline>(*static_cast<IDirect3D12SystemContext*>(this), params.commandQueuePriority);
+		graphicsPipeline->Name("GraphicsPipeline");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline created at '0x{:X}'.'", reinterpret_cast<std::uintptr_t>(graphicsPipeline.get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline waiter.");
 		copyWaiter = std::make_unique<Direct3D12GpuWaiter>(*static_cast<IDirect3D12SystemContext*>(this), copyPipeline->CommandQueue(), graphicsPipeline->CommandQueue());
+		copyWaiter->Name("CopyToGraphicsWaiter");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(copyWaiter.get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline waiter. Wait timeout: {}.", params.renderTimeout);
 		graphicsWaiter = std::make_unique<Direct3D12CpuWaiter>(*static_cast<IDirect3D12SystemContext*>(this), graphicsPipeline->CommandQueue(), params.renderTimeout);
+		graphicsWaiter->Name("GraphicsEndWaiter");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline waiter created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(graphicsWaiter.get()));
 	}
 
@@ -352,6 +358,7 @@ namespace PonyEngine::Render
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create depth stencil.");
 		depthStencil = std::make_unique<Direct3D12DepthStencil>(*static_cast<IDirect3D12SystemContext*>(this));
+		depthStencil->Name("DepthStencil");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(depthStencil.get()));
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create mesh manager.");

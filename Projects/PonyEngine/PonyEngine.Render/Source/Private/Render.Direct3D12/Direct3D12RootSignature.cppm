@@ -13,6 +13,11 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RootSignature;
 
+import <string>;
+import <string_view>;
+
+import :Direct3D12Utility;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 root signature.
@@ -45,6 +50,10 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		UINT MvpIndex() const noexcept;
 
+		/// @brief Sets the name to the root signature components.
+		/// @param name Name.
+		void Name(std::string_view name);
+
 		Direct3D12RootSignature& operator =(const Direct3D12RootSignature& other) = default;
 		Direct3D12RootSignature& operator =(Direct3D12RootSignature&& other) noexcept = default;
 
@@ -75,5 +84,14 @@ namespace PonyEngine::Render
 	UINT Direct3D12RootSignature::MvpIndex() const noexcept
 	{
 		return mvpIndex;
+	}
+
+	void Direct3D12RootSignature::Name(const std::string_view name)
+	{
+		constexpr std::string_view rootSignatureName = " - RootSignature";
+		auto componentName = std::string();
+		componentName.reserve(name.size() + rootSignatureName.size());
+		componentName.append(name).append(rootSignatureName);
+		SetName(*rootSignature.Get(), componentName);
 	}
 }

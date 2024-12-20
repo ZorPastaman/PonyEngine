@@ -91,9 +91,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Redundant call")]]
 		Direct3D12IndexArray CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
 
-		static constexpr auto MeshVertexFormat = Direct3D12VertexFormat(4u, 3u, Direct3D12VertexDataType::Float); ///< Vertex format.
-		static constexpr auto MeshVertexColorFormat = Direct3D12VertexFormat(4u, 4u, Direct3D12VertexDataType::Float); ///< Vertex color format.
-		static constexpr auto MeshIndexFormat = Direct3D12IndexFormat(4u); ///< Index format.
+		static constexpr auto MeshVertexFormat = Direct3D12VertexFormat(DXGI_FORMAT_R32G32B32_FLOAT); ///< Vertex format.
+		static constexpr auto MeshVertexColorFormat = Direct3D12VertexFormat(DXGI_FORMAT_R32G32B32A32_FLOAT); ///< Vertex color format.
+		static constexpr auto MeshIndexFormat = Direct3D12IndexFormat(DXGI_FORMAT_R32_UINT); ///< Index format.
 
 		/// @brief Upload heap properties.
 		static constexpr auto UploadHeapProperties = D3D12_HEAP_PROPERTIES
@@ -213,7 +213,7 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu vertex buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuVertexBuffer.Get()));
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddCopyTask(*uploadVertexBuffer.Get(), *gpuVertexBuffer.Get());
+		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadVertexBuffer.Get(), *gpuVertexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
@@ -273,7 +273,7 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu vertex color buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuColorBuffer.Get()));
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddCopyTask(*uploadColorBuffer.Get(), *gpuColorBuffer.Get());
+		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadColorBuffer.Get(), *gpuColorBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
@@ -328,7 +328,7 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu index buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuIndexBuffer.Get()));
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddCopyTask(*uploadIndexBuffer.Get(), *gpuIndexBuffer.Get());
+		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadIndexBuffer.Get(), *gpuIndexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");

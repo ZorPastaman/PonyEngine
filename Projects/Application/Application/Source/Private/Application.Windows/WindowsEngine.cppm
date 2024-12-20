@@ -123,7 +123,7 @@ namespace Application
 
 	bool WindowsEngine::Tick(int& exitCode)
 	{
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine.");
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine."); // TODO: Recheck verbose logs. Many of them are redundant.
 
 		try
 		{

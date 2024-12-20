@@ -86,6 +86,7 @@ namespace PonyEngine::Render
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create default material.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
+		rootSignature->Name("DefaultRootSignature");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load vertex shader.");
 		const auto vertexShader = Direct3D12Shader("VertexShader");
@@ -100,6 +101,7 @@ namespace PonyEngine::Render
 			.vertexColorInputParams = Direct3D12InputElementParams{.semanticName = "COLOR", .semanticIndex = 0u, .inputSlot = 1}
 		};
 		defaultMaterial = this->d3d12System->MaterialManagerPrivate().CreateMaterial(rootSignature, vertexShader, pixelShader, pipelineParams);
+		defaultMaterial->Name("DefaultMaterial");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
@@ -113,6 +115,7 @@ namespace PonyEngine::Render
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Direct3D12Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh);
+		renderMesh->Name("Mesh");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
 		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));

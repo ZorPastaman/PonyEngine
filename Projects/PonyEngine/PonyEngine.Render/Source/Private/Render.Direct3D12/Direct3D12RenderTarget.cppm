@@ -35,7 +35,7 @@ import :IDirect3D12SystemContext;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 render target.
-	class Direct3D12RenderTarget final : public IDirect3D12RenderTargetPrivate
+	class Direct3D12RenderTarget final : public IDirect3D12RenderTargetPrivate // TODO: Add Direct3D12BackBufferManager for back buffers. This one must contain msaa render target texture. Add Name() functions to both.
 	{
 	public:
 		/// @brief Creates a @p Direct3D12RenderTarget.
