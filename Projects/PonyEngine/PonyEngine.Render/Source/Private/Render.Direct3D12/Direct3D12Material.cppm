@@ -17,9 +17,12 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Material;
 
 import <memory>;
 import <optional>;
+import <string>;
+import <string_view>;
 
 import :Direct3D12MaterialParams;
 import :Direct3D12RootSignature;
+import :Direct3D12Utility;
 
 export namespace PonyEngine::Render
 {
@@ -52,11 +55,11 @@ export namespace PonyEngine::Render
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		ID3D12PipelineState& GetPipelineState() noexcept;
+		ID3D12PipelineState& PipelineState() noexcept;
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		const ID3D12PipelineState& GetPipelineState() const noexcept;
+		const ID3D12PipelineState& PipelineState() const noexcept;
 		/// @brief Gets the primitive topology.
 		/// @return Primitive topology.
 		[[nodiscard("Pure function")]]
@@ -70,6 +73,10 @@ export namespace PonyEngine::Render
 		/// @return Vertex color slot. It's @a nullopt if the material doesn't support it.
 		[[nodiscard("Pure function")]]
 		std::optional<UINT> VertexColorSlot() const noexcept;
+
+		/// @brief Sets the name to the material components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		Direct3D12Material& operator =(const Direct3D12Material& other) noexcept = default;
 		Direct3D12Material& operator =(Direct3D12Material&& other) noexcept = default;
@@ -106,12 +113,12 @@ namespace PonyEngine::Render
 		return *rootSignature;
 	}
 
-	ID3D12PipelineState& Direct3D12Material::GetPipelineState() noexcept
+	ID3D12PipelineState& Direct3D12Material::PipelineState() noexcept
 	{
 		return *pipelineState.Get();
 	}
 
-	const ID3D12PipelineState& Direct3D12Material::GetPipelineState() const noexcept
+	const ID3D12PipelineState& Direct3D12Material::PipelineState() const noexcept
 	{
 		return *pipelineState.Get();
 	}
@@ -129,5 +136,14 @@ namespace PonyEngine::Render
 	std::optional<UINT> Direct3D12Material::VertexColorSlot() const noexcept
 	{
 		return vertexColorSlot;
+	}
+
+	void Direct3D12Material::Name(const std::string_view name)
+	{
+		constexpr std::string_view pipelineStateName = " - PipelineState";
+		auto componentName = std::string();
+		componentName.reserve(name.size() + pipelineStateName.size());
+		componentName.append(name).append(pipelineStateName);
+		SetName(*pipelineState.Get(), componentName);
 	}
 }

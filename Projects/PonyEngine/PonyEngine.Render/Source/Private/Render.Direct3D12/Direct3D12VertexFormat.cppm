@@ -18,7 +18,6 @@ import <stdexcept>;
 import PonyBase.StringUtility;
 
 import :Direct3D12Utility;
-import :Direct3D12VertexDataType;
 
 export namespace PonyEngine::Render
 {
@@ -27,11 +26,9 @@ export namespace PonyEngine::Render
 	{
 	public:
 		/// @brief Creates a @p Direct3D12VertexFormat.
-		/// @param componentSize Vertex component size in bytes.
-		/// @param componentCount Vertex component count.
-		/// @param dataType Vertex data type.
+		/// @param format Vertex format.
 		[[nodiscard("Pure constructor")]]
-		constexpr Direct3D12VertexFormat(UINT componentSize, UINT componentCount, Direct3D12VertexDataType dataType);
+		explicit constexpr Direct3D12VertexFormat(DXGI_FORMAT format);
 		[[nodiscard("Pure constructor")]]
 		constexpr Direct3D12VertexFormat(const Direct3D12VertexFormat& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -39,6 +36,10 @@ export namespace PonyEngine::Render
 
 		constexpr ~Direct3D12VertexFormat() noexcept = default;
 
+		/// @brief Gets the vertex format.
+		/// @return Vertex format.
+		[[nodiscard("Pure function")]]
+		constexpr DXGI_FORMAT VertexFormat() const noexcept;
 		/// @brief Gets the vertex component size.
 		/// @return Vertex component size.
 		[[nodiscard("Pure function")]]
@@ -51,30 +52,34 @@ export namespace PonyEngine::Render
 		/// @return Vertex size in bytes.
 		[[nodiscard("Pure function")]]
 		constexpr UINT VertexSize() const noexcept;
-		/// @brief Gets the vertex format.
-		/// @return Vertex format.
-		[[nodiscard("Pure function")]]
-		constexpr DXGI_FORMAT VertexFormat() const noexcept;
 
 		constexpr Direct3D12VertexFormat& operator =(const Direct3D12VertexFormat& other) noexcept = default;
 		constexpr Direct3D12VertexFormat& operator =(Direct3D12VertexFormat&& other) noexcept = default;
 
+		/// @brief Checks if the two formats are the same.
+		/// @param other Format to compare to.
+		/// @return @a True if they're equal; @a false otherwise.
+		[[nodiscard("Pure operator")]]
+		constexpr bool operator ==(const Direct3D12VertexFormat& other) const noexcept;
+
 	private:
+		DXGI_FORMAT vertexFormat; ///< Vertex format.
 		UINT componentSize; ///< Vertex component size.
 		UINT componentCount; ///< Vertex component count.
-		Direct3D12VertexDataType dataType; ///< Vertex data type.
-		DXGI_FORMAT vertexFormat; ///< Vertex format.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	constexpr Direct3D12VertexFormat::Direct3D12VertexFormat(const UINT componentSize, const UINT componentCount, const Direct3D12VertexDataType dataType) :
-		componentSize{componentSize},
-		componentCount{componentCount},
-		dataType{dataType},
-		vertexFormat{GetFormat(this->componentSize, this->componentCount, this->dataType)}
+	constexpr Direct3D12VertexFormat::Direct3D12VertexFormat(const DXGI_FORMAT format) :
+		vertexFormat{format}
 	{
+		GetVertexFormatInfo(vertexFormat, componentSize, componentCount);
+	}
+
+	constexpr DXGI_FORMAT Direct3D12VertexFormat::VertexFormat() const noexcept
+	{
+		return vertexFormat;
 	}
 
 	constexpr UINT Direct3D12VertexFormat::ComponentSize() const noexcept
@@ -89,11 +94,11 @@ namespace PonyEngine::Render
 
 	constexpr UINT Direct3D12VertexFormat::VertexSize() const noexcept
 	{
-		return ComponentSize() * ComponentCount();
+		return componentSize * componentCount;
 	}
 
-	constexpr DXGI_FORMAT Direct3D12VertexFormat::VertexFormat() const noexcept
+	constexpr bool Direct3D12VertexFormat::operator ==(const Direct3D12VertexFormat& other) const noexcept
 	{
-		return vertexFormat;
+		return vertexFormat == other.vertexFormat;
 	}
 }

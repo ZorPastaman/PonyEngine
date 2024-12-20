@@ -17,12 +17,15 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Fence;
 
 import <cstdint>;
 import <stdexcept>;
+import <string>;
+import <string_view>;
 import <type_traits>;
 
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
+import :Direct3D12Utility;
 import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
@@ -59,6 +62,10 @@ export namespace PonyEngine::Render
 		/// @return Completed fence value.
 		[[nodiscard("Pure function")]]
 		UINT64 CompletedValue() const noexcept;
+
+		/// @brief Sets the name to the fence components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		/// @brief Increases the current fence value and signals the fence.
 		void Signal();
@@ -124,6 +131,16 @@ namespace PonyEngine::Render
 	UINT64 Direct3D12Fence::CompletedValue() const noexcept
 	{
 		return fence->GetCompletedValue();
+	}
+
+	void Direct3D12Fence::Name(const std::string_view name)
+	{
+		constexpr std::string_view fenceName = " - Fence";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + fenceName.size());
+		componentName.append(name).append(fenceName);
+		SetName(*fence.Get(), componentName);
 	}
 
 	void Direct3D12Fence::Signal()

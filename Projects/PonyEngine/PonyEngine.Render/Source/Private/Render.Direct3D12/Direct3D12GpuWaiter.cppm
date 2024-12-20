@@ -41,6 +41,10 @@ export namespace PonyEngine::Render
 
 		~Direct3D12GpuWaiter() noexcept;
 
+		/// @brief Sets the name to the cpu waiter components.
+		/// @param name Name.
+		void Name(std::string_view name);
+
 		/// @brief Submit a wait command.
 		void Wait();
 
@@ -73,6 +77,11 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy fence.");
 		fence.reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Fence destroyed.");
+	}
+
+	void Direct3D12GpuWaiter::Name(const std::string_view name)
+	{
+		fence->Name(name);
 	}
 
 	void Direct3D12GpuWaiter::Wait()

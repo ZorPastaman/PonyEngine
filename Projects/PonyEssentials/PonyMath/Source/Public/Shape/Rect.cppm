@@ -26,7 +26,7 @@ export namespace PonyMath::Shape
 	/// @brief Rectangle implementation.
 	/// @tparam T Value type.
 	template<Core::Arithmetic T>
-	class Rect final // TODO: Add docs and tests
+	class Rect final
 	{
 	public:
 		using ValueType = T; ///< Value type.

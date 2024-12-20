@@ -16,6 +16,8 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12DepthStencil;
 
 import <stdexcept>;
+import <string>;
+import <string_view>;
 import <type_traits>;
 
 import PonyBase.StringUtility;
@@ -25,6 +27,7 @@ import PonyMath.Utility;
 import PonyDebug.Log;
 
 import :Direct3D12RenderTargetParams;
+import :Direct3D12Utility;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12SystemContext;
 
@@ -54,6 +57,10 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Resource2& DepthStencilBuffer() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept override;
+
+		/// @brief Sets the name to the depth stencil components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		Direct3D12DepthStencil& operator =(const Direct3D12DepthStencil& other) noexcept = default;
 		Direct3D12DepthStencil& operator =(Direct3D12DepthStencil&& other) noexcept = default;
@@ -165,5 +172,21 @@ namespace PonyEngine::Render
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12DepthStencil::DsvHandle() const noexcept
 	{
 		return dsvHandle;
+	}
+
+	void Direct3D12DepthStencil::Name(const std::string_view name)
+	{
+		constexpr std::string_view bufferName = " - Buffer";
+		constexpr std::string_view heapName = " - ViewHeap";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + heapName.size());
+
+		componentName.append(name).append(bufferName);
+		SetName(*depthStencilBuffer.Get(), componentName);
+
+		componentName.erase();
+		componentName.append(name).append(heapName);
+		SetName(*dsvHeap.Get(), componentName);
 	}
 }

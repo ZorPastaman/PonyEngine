@@ -122,7 +122,7 @@ namespace PonyEngine::Render
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D12 sub-system.");
 		const auto direct3D12SystemParams = Direct3D12SystemParams
 		{
-			.featureLevel = renderParams.featureLevel,
+			.featureLevel = D3D_FEATURE_LEVEL_12_2,
 			.commandQueuePriority = renderParams.commandQueuePriority,
 			.renderTimeout = renderParams.renderTimeout,
 		};

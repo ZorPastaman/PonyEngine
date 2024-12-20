@@ -14,10 +14,13 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Mesh;
 
 import <optional>;
+import <string>;
+import <string_view>;
 
 import :Direct3D12IndexArray;
 import :Direct3D12IndexFormat;
 import :Direct3D12VertexArray;
+import :Direct3D12Utility;
 
 export namespace PonyEngine::Render
 {
@@ -55,6 +58,10 @@ export namespace PonyEngine::Render
 		/// @return Index count.
 		[[nodiscard("Pure function")]]
 		UINT IndexCount() const noexcept;
+
+		/// @brief Sets the name to the mesh components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		Direct3D12Mesh& operator =(const Direct3D12Mesh& other) noexcept = default;
 		Direct3D12Mesh& operator =(Direct3D12Mesh&& other) noexcept = default;
@@ -122,5 +129,29 @@ namespace PonyEngine::Render
 	UINT Direct3D12Mesh::IndexCount() const noexcept
 	{
 		return indexCount;
+	}
+
+	void Direct3D12Mesh::Name(const std::string_view name)
+	{
+		constexpr std::string_view vertexName = " - VertexBuffer";
+		constexpr std::string_view colorName = " - ColorBuffer";
+		constexpr std::string_view indexName = " - IndexBuffer";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + vertexName.size());
+
+		componentName.append(name).append(vertexName);
+		SetName(*vertexBuffer.Get(), componentName);
+
+		if (vertexColorBuffer)
+		{
+			componentName.erase();
+			componentName.append(name).append(colorName);
+			SetName(*vertexColorBuffer.Get(), componentName);
+		}
+
+		componentName.erase();
+		componentName.append(name).append(indexName);
+		SetName(*vertexIndexBuffer.Get(), componentName);
 	}
 }

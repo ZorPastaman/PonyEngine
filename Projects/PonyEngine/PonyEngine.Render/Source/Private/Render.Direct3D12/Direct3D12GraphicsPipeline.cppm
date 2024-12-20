@@ -21,6 +21,8 @@ import <cstddef>;
 import <cstdint>;
 import <memory>;
 import <stdexcept>;
+import <string>;
+import <string_view>;
 import <type_traits>;
 import <vector>;
 
@@ -35,6 +37,7 @@ import :Direct3D12Material;
 import :Direct3D12Mesh;
 import :Direct3D12RootSignature;
 import :Direct3D12RenderObject;
+import :Direct3D12Utility;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12RenderTargetPrivate;
@@ -70,6 +73,10 @@ export namespace PonyEngine::Render
 		virtual void AddIndexInitializationTask(ID3D12Resource2& indexBuffer) override;
 		virtual void AddRenderTask(const std::shared_ptr<Direct3D12RenderObject>& renderObject) override;
 
+		/// @brief Sets the name to the graphics pipeline components.
+		/// @param name Name.
+		void Name(std::string_view name);
+
 		/// @brief Populates commands. All the system components must be ready.
 		void PopulateCommands();
 		/// @brief Executes populated commands.
@@ -90,12 +97,14 @@ export namespace PonyEngine::Render
 
 		/// @brief Resets command lists.
 		void ResetLists();
-		/// @brief Populates render texture barriers to make resources ready for rendering.
-		void PopulateRenderTextureBarriersIn();
-		/// @brief Populates vertex initialization barriers.
-		void PopulateVertexBarriers();
-		/// @brief Populates index initialization barriers.
-		void PopulateIndexBarriers();
+		/// @brief Reserves caches for required amount of data for barriers in.
+		void ReserveCachesIn();
+		/// @brief Updates uninitialized vertex barriers.
+		void UpdateUninitializedVertexBarriers();
+		/// @brief Updates uninitialized vertex barriers.
+		void UpdateUninitializedIndexBarriers();
+		/// @brief Updates render texture barriers to make resources ready for rendering.
+		void UpdateRenderTextureBarriersIn();
 		/// @brief Populates render target commands.
 		void PopulateRenderTarget();
 		/// @brief Updates model-view-projection matrices of render objects.
@@ -104,10 +113,15 @@ export namespace PonyEngine::Render
 		void SortRenderObjects();
 		/// @brief Populates render objects that were gotten in the @p GetRenderObjects().
 		void PopulateRenderObjects();
-		/// @brief Populates render texture barriers back.
-		void PopulateRenderTextureBarriersOut();
+		/// @brief Reserves caches for required amount of data for barriers out.
+		void ReserveCachesOut();
+		/// @brief Updates render texture barriers back.
+		void UpdateRenderTextureBarriersOut();
 		/// @brief Closes command lists.
 		void CloseLists();
+
+		/// @brief Populates barrier groups.
+		void PopulateBarrierGroups();
 
 		GUID guid; ///< Graphics pipeline guid.
 
@@ -117,11 +131,13 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> vertices; ///< Uninitialized vertices.
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> indices; ///< Uninitialized indices.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uninitializedVertices; ///< Uninitialized vertex buffers.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uninitializedIndices; ///< Uninitialized index buffers.
 		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects.
 
-		std::vector<D3D12_RESOURCE_BARRIER> resourceBarriers; ///< Resource barriers cache.
+		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
+		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
+		std::vector<D3D12_BARRIER_GROUP> barrierGroups; ///< Barrier groups cache.
 	};
 }
 
@@ -192,12 +208,12 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::AddVertexInitializationTask(ID3D12Resource2& vertexBuffer)
 	{
-		vertices.emplace_back(&vertexBuffer);
+		uninitializedVertices.emplace_back(&vertexBuffer);
 	}
 
 	void Direct3D12GraphicsPipeline::AddIndexInitializationTask(ID3D12Resource2& indexBuffer)
 	{
-		indices.emplace_back(&indexBuffer);
+		uninitializedIndices.emplace_back(&indexBuffer);
 	}
 
 	void Direct3D12GraphicsPipeline::AddRenderTask(const std::shared_ptr<Direct3D12RenderObject>& renderObject)
@@ -205,41 +221,55 @@ namespace PonyEngine::Render
 		renderObjects.push_back(Direct3D12RenderObjectEntry{.renderObject = renderObject});
 	}
 
+	void Direct3D12GraphicsPipeline::Name(const std::string_view name)
+	{
+		constexpr std::string_view commandQueueName = " - CommandQueue";
+		constexpr std::string_view commandAllocatorName = " - CommandAllocator";
+		constexpr std::string_view commandListName = " - CommandList";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + commandAllocatorName.size());
+
+		componentName.append(name).append(commandQueueName);
+		SetName(*commandQueue.Get(), componentName);
+
+		componentName.clear();
+		componentName.append(name).append(commandAllocatorName);
+		SetName(*commandAllocator.Get(), componentName);
+
+		componentName.clear();
+		componentName.append(name).append(commandListName);
+		SetName(*commandList.Get(), componentName);
+	}
+
 	void Direct3D12GraphicsPipeline::PopulateCommands()
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Reset command lists.");
 		ResetLists();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render texture barriers in.");
-		PopulateRenderTextureBarriersIn();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate vertex barriers.");
-		PopulateVertexBarriers();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate index barriers.");
-		PopulateIndexBarriers();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render target.");
+		ReserveCachesIn();
+		UpdateUninitializedVertexBarriers();
+		UpdateUninitializedIndexBarriers();
+		UpdateRenderTextureBarriersIn();
+		PopulateBarrierGroups();
 		PopulateRenderTarget();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Update render object MVPs.");
 		UpdateMvps();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Sort render objects.");
 		SortRenderObjects();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render objects.");
 		PopulateRenderObjects();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Populate render texture barriers out.");
-		PopulateRenderTextureBarriersOut();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Close command lists.");
+		ReserveCachesOut();
+		UpdateRenderTextureBarriersOut();
+		PopulateBarrierGroups();
 		CloseLists();
 	}
 
 	void Direct3D12GraphicsPipeline::Execute()
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Execute command lists.");
 		const auto commandLists = std::array<ID3D12CommandList*, 1> { commandList.Get() };
 		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
 	}
 
 	void Direct3D12GraphicsPipeline::Clear() noexcept
 	{
-		vertices.clear();
-		indices.clear();
+		uninitializedVertices.clear();
+		uninitializedIndices.clear();
 		renderObjects.clear();
 	}
 
@@ -255,7 +285,52 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersIn()
+	void Direct3D12GraphicsPipeline::ReserveCachesIn()
+	{
+		bufferBarriers.clear();
+		bufferBarriers.reserve(uninitializedVertices.size() + uninitializedIndices.size());
+
+		textureBarriers.clear();
+		textureBarriers.reserve(2); // Render target + Depth stencil.
+	}
+
+	void Direct3D12GraphicsPipeline::UpdateUninitializedVertexBarriers()
+	{
+		for (Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexBuffer : uninitializedVertices)
+		{
+			const auto barrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
+				.pResource = vertexBuffer.Get(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			bufferBarriers.push_back(barrier);
+		}
+	}
+
+	void Direct3D12GraphicsPipeline::UpdateUninitializedIndexBarriers()
+	{
+		for (Microsoft::WRL::ComPtr<ID3D12Resource2>& indexBuffer : uninitializedIndices)
+		{
+			const auto barrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
+				.pResource = indexBuffer.Get(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			bufferBarriers.push_back(barrier);
+		}
+	}
+
+	void Direct3D12GraphicsPipeline::UpdateRenderTextureBarriersIn()
 	{
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
@@ -269,6 +344,7 @@ namespace PonyEngine::Render
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
+		textureBarriers.push_back(renderTargetBarrier);
 		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
@@ -281,69 +357,7 @@ namespace PonyEngine::Render
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto barriers = std::array<D3D12_TEXTURE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
-		const auto barrierGroup = D3D12_BARRIER_GROUP{.Type = D3D12_BARRIER_TYPE_TEXTURE, .NumBarriers = static_cast<UINT32>(barriers.size()), .pTextureBarriers = barriers.data()};
-		commandList->Barrier(1u, &barrierGroup);
-	}
-
-	void Direct3D12GraphicsPipeline::PopulateVertexBarriers()
-	{
-		if (vertices.empty())
-		{
-			return;
-		}
-
-		resourceBarriers.clear();
-		resourceBarriers.reserve(vertices.size());
-
-		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexBuffer : vertices)
-		{
-			const auto vertexBarrier = D3D12_RESOURCE_BARRIER
-			{
-				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-				.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-				{
-					.pResource = vertexBuffer.Get(),
-					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-					.StateBefore = D3D12_RESOURCE_STATE_COMMON,
-					.StateAfter = D3D12_RESOURCE_STATE_VERTEX_AND_CONSTANT_BUFFER
-				}
-			};
-			resourceBarriers.push_back(vertexBarrier);
-		}
-
-		commandList->ResourceBarrier(static_cast<UINT>(resourceBarriers.size()), resourceBarriers.data());
-	}
-
-	void Direct3D12GraphicsPipeline::PopulateIndexBarriers()
-	{
-		if (indices.empty())
-		{
-			return;
-		}
-
-		resourceBarriers.clear();
-		resourceBarriers.reserve(indices.size());
-
-		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& indexBuffer : indices)
-		{
-			const auto indexBarrier = D3D12_RESOURCE_BARRIER
-			{
-				.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION,
-				.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE,
-				.Transition = D3D12_RESOURCE_TRANSITION_BARRIER
-				{
-					.pResource = indexBuffer.Get(),
-					.Subresource = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-					.StateBefore = D3D12_RESOURCE_STATE_COMMON,
-					.StateAfter = D3D12_RESOURCE_STATE_INDEX_BUFFER
-				}
-			};
-			resourceBarriers.push_back(indexBarrier);
-		}
-
-		commandList->ResourceBarrier(static_cast<UINT>(resourceBarriers.size()), resourceBarriers.data());
+		textureBarriers.push_back(depthStencilBarrier);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateRenderTarget()
@@ -417,7 +431,7 @@ namespace PonyEngine::Render
 			}
 			if (material != prevMaterial)
 			{
-				commandList->SetPipelineState(&material->GetPipelineState());
+				commandList->SetPipelineState(&material->PipelineState());
 				commandList->IASetPrimitiveTopology(material->PrimitiveTopology());
 			}
 
@@ -446,9 +460,17 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateRenderTextureBarriersOut()
+	void Direct3D12GraphicsPipeline::ReserveCachesOut()
 	{
-		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER // TODO: Make enhanced barrier everywhere
+		bufferBarriers.clear();
+
+		textureBarriers.clear();
+		textureBarriers.reserve(2); // Render target + Depth stencil.
+	}
+
+	void Direct3D12GraphicsPipeline::UpdateRenderTextureBarriersOut()
+	{
+		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
 			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
@@ -460,6 +482,7 @@ namespace PonyEngine::Render
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
+		textureBarriers.push_back(renderTargetBarrier);
 		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
@@ -472,9 +495,7 @@ namespace PonyEngine::Render
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		const auto barriers = std::array<D3D12_TEXTURE_BARRIER, 2> { renderTargetBarrier, depthStencilBarrier };
-		const auto barrierGroup = D3D12_BARRIER_GROUP{ .Type = D3D12_BARRIER_TYPE_TEXTURE, .NumBarriers = static_cast<UINT32>(barriers.size()), .pTextureBarriers = barriers.data() };
-		commandList->Barrier(1u, &barrierGroup);
+		textureBarriers.push_back(depthStencilBarrier);
 	}
 
 	void Direct3D12GraphicsPipeline::CloseLists()
@@ -482,6 +503,39 @@ namespace PonyEngine::Render
 		if (const HRESULT result = commandList->Close(); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+	}
+
+	void Direct3D12GraphicsPipeline::PopulateBarrierGroups()
+	{
+		barrierGroups.clear();
+		barrierGroups.reserve(2);
+
+		if (bufferBarriers.size() > 0)
+		{
+			const auto bufferBarrierGroup = D3D12_BARRIER_GROUP
+			{
+				.Type = D3D12_BARRIER_TYPE_BUFFER,
+				.NumBarriers = static_cast<UINT32>(bufferBarriers.size()),
+				.pBufferBarriers = bufferBarriers.data()
+			};
+			barrierGroups.push_back(bufferBarrierGroup);
+		}
+
+		if (textureBarriers.size() > 0)
+		{
+			const auto textureBarrierGroup = D3D12_BARRIER_GROUP
+			{
+				.Type = D3D12_BARRIER_TYPE_TEXTURE,
+				.NumBarriers = static_cast<UINT32>(textureBarriers.size()),
+				.pTextureBarriers = textureBarriers.data()
+			};
+			barrierGroups.push_back(textureBarrierGroup);
+		}
+
+		if (barrierGroups.size() > 0)
+		{
+			commandList->Barrier(static_cast<UINT32>(barrierGroups.size()), barrierGroups.data());
 		}
 	}
 }
