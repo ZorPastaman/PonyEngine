@@ -97,26 +97,18 @@ export namespace PonyEngine::Render
 
 		/// @brief Resets command lists.
 		void ResetLists();
-		/// @brief Reserves caches for required amount of data for barriers in.
-		void ReserveCachesIn();
-		/// @brief Updates uninitialized vertex barriers.
-		void UpdateUninitializedVertexBarriers();
-		/// @brief Updates uninitialized vertex barriers.
-		void UpdateUninitializedIndexBarriers();
-		/// @brief Updates render texture barriers to make resources ready for rendering.
-		void UpdateRenderTextureBarriersIn();
+		/// @brief Populates begin to render barriers.
+		void PopulateBeginToRenderBarriers();
 		/// @brief Populates render target commands.
 		void PopulateRenderTarget();
-		/// @brief Updates model-view-projection matrices of render objects.
-		void UpdateMvps();
-		/// @brief Sorts render objects.
-		void SortRenderObjects();
-		/// @brief Populates render objects that were gotten in the @p GetRenderObjects().
+		/// @brief Populates render objects.
 		void PopulateRenderObjects();
-		/// @brief Reserves caches for required amount of data for barriers out.
-		void ReserveCachesOut();
-		/// @brief Updates render texture barriers back.
-		void UpdateRenderTextureBarriersOut();
+		/// @brief Populates render to resolve barriers.
+		void PopulateRenderToResolveBarriers();
+		/// @brief Populates resolve commands.
+		void PopulateResolveCommands();
+		/// @brief Populates resolve to end barriers.
+		void PopulateResolveToEndBarriers();
 		/// @brief Closes command lists.
 		void CloseLists();
 
@@ -245,18 +237,12 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateCommands()
 	{
 		ResetLists();
-		ReserveCachesIn();
-		UpdateUninitializedVertexBarriers();
-		UpdateUninitializedIndexBarriers();
-		UpdateRenderTextureBarriersIn();
-		PopulateBarrierGroups();
+		PopulateBeginToRenderBarriers();
 		PopulateRenderTarget();
-		UpdateMvps();
-		SortRenderObjects();
 		PopulateRenderObjects();
-		ReserveCachesOut();
-		UpdateRenderTextureBarriersOut();
-		PopulateBarrierGroups();
+		PopulateRenderToResolveBarriers();
+		PopulateResolveCommands();
+		PopulateResolveToEndBarriers();
 		CloseLists();
 	}
 
@@ -285,17 +271,10 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::ReserveCachesIn()
+	void Direct3D12GraphicsPipeline::PopulateBeginToRenderBarriers()
 	{
 		bufferBarriers.clear();
 		bufferBarriers.reserve(uninitializedVertices.size() + uninitializedIndices.size());
-
-		textureBarriers.clear();
-		textureBarriers.reserve(2); // Render target + Depth stencil.
-	}
-
-	void Direct3D12GraphicsPipeline::UpdateUninitializedVertexBarriers()
-	{
 		for (Microsoft::WRL::ComPtr<ID3D12Resource2>& vertexBuffer : uninitializedVertices)
 		{
 			const auto barrier = D3D12_BUFFER_BARRIER
@@ -310,10 +289,6 @@ namespace PonyEngine::Render
 			};
 			bufferBarriers.push_back(barrier);
 		}
-	}
-
-	void Direct3D12GraphicsPipeline::UpdateUninitializedIndexBarriers()
-	{
 		for (Microsoft::WRL::ComPtr<ID3D12Resource2>& indexBuffer : uninitializedIndices)
 		{
 			const auto barrier = D3D12_BUFFER_BARRIER
@@ -328,19 +303,18 @@ namespace PonyEngine::Render
 			};
 			bufferBarriers.push_back(barrier);
 		}
-	}
 
-	void Direct3D12GraphicsPipeline::UpdateRenderTextureBarriersIn()
-	{
+		textureBarriers.clear();
+		textureBarriers.reserve(2);
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
 			.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
 			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
+			.pResource = &d3d12System->RenderTargetPrivate().RenderTargetBuffer(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -358,6 +332,8 @@ namespace PonyEngine::Render
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
 		textureBarriers.push_back(depthStencilBarrier);
+
+		PopulateBarrierGroups();
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateRenderTarget()
@@ -370,14 +346,14 @@ namespace PonyEngine::Render
 		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height())};
 		commandList->RSSetScissorRects(1u, &rect);
 
-		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.CurrentRtvHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = renderTarget.RtvHandle();
 		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12System->DepthStencilPrivate().DsvHandle();
 		commandList->OMSetRenderTargets(1u, &rtvHandle, false, &dsvHandle);
 		commandList->ClearRenderTargetView(rtvHandle, renderTarget.ClearColorD3D12().Span().data(), 0u, nullptr);
 		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
-	void Direct3D12GraphicsPipeline::UpdateMvps()
+	void Direct3D12GraphicsPipeline::PopulateRenderObjects()
 	{
 		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
 		const PonyMath::Core::Matrix4x4<FLOAT> vp = renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12();
@@ -385,10 +361,7 @@ namespace PonyEngine::Render
 		{
 			renderObject.mvpMatrix = vp * renderObject.renderObject->ModelMatrixD3D12();
 		}
-	}
 
-	void Direct3D12GraphicsPipeline::SortRenderObjects()
-	{
 		std::ranges::sort(renderObjects, [](const Direct3D12RenderObjectEntry& left, const Direct3D12RenderObjectEntry& right)
 		{
 			const Direct3D12Material* const leftMaterial = &left.renderObject->Material();
@@ -413,14 +386,10 @@ namespace PonyEngine::Render
 
 			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() < PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
 		});
-	}
 
-	void Direct3D12GraphicsPipeline::PopulateRenderObjects()
-	{
 		const Direct3D12RootSignature* prevRootSignature = nullptr;
 		const Direct3D12Material* prevMaterial = nullptr;
 		const Direct3D12Mesh* prevMesh = nullptr;
-
 		for (const Direct3D12RenderObjectEntry& renderObject : renderObjects)
 		{
 			Direct3D12Material* const material = &renderObject.renderObject->Material();
@@ -460,29 +429,66 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::ReserveCachesOut()
+	void Direct3D12GraphicsPipeline::PopulateRenderToResolveBarriers()
 	{
 		bufferBarriers.clear();
 
 		textureBarriers.clear();
-		textureBarriers.reserve(2); // Render target + Depth stencil.
-	}
-
-	void Direct3D12GraphicsPipeline::UpdateRenderTextureBarriersOut()
-	{
-		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+		textureBarriers.reserve(3);
+		if (d3d12System->RenderTargetPrivate().SampleDesc().Count > 1u)
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
-			.pResource = &d3d12System->RenderTargetPrivate().CurrentBackBuffer(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		textureBarriers.push_back(renderTargetBarrier);
+			const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.SyncAfter = D3D12_BARRIER_SYNC_RESOLVE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.AccessAfter = D3D12_BARRIER_ACCESS_RESOLVE_SOURCE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE,
+				.pResource = &d3d12System->RenderTargetPrivate().RenderTargetBuffer(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			textureBarriers.push_back(renderTargetBarrier);
+			const auto backBufferBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_RESOLVE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_RESOLVE_DEST,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_RESOLVE_DEST,
+				.pResource = &d3d12System->BackBufferPrivate().CurrentBackBuffer()
+			};
+			textureBarriers.push_back(backBufferBarrier);
+		}
+		else
+		{
+			const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
+				.pResource = &d3d12System->RenderTargetPrivate().RenderTargetBuffer(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			textureBarriers.push_back(renderTargetBarrier);
+			const auto backBufferBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_DEST,
+				.pResource = &d3d12System->BackBufferPrivate().CurrentBackBuffer()
+			};
+			textureBarriers.push_back(backBufferBarrier);
+		}
 		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
@@ -496,6 +502,86 @@ namespace PonyEngine::Render
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
 		textureBarriers.push_back(depthStencilBarrier);
+
+		PopulateBarrierGroups();
+	}
+
+	void Direct3D12GraphicsPipeline::PopulateResolveCommands()
+	{
+		if (d3d12System->RenderTargetPrivate().SampleDesc().Count > 1u)
+		{
+			commandList->ResolveSubresource(&d3d12System->BackBufferPrivate().CurrentBackBuffer(), 0u, 
+				&d3d12System->RenderTargetPrivate().RenderTargetBuffer(), 0u, 
+				d3d12System->RenderTargetPrivate().Format());
+		}
+		else
+		{
+			commandList->CopyResource(&d3d12System->BackBufferPrivate().CurrentBackBuffer(), &d3d12System->RenderTargetPrivate().RenderTargetBuffer());
+		}
+	}
+
+	void Direct3D12GraphicsPipeline::PopulateResolveToEndBarriers()
+	{
+		bufferBarriers.clear();
+
+		textureBarriers.clear();
+		textureBarriers.reserve(2);
+		if (d3d12System->RenderTargetPrivate().SampleDesc().Count > 1u)
+		{
+			const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RESOLVE,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RESOLVE_SOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &d3d12System->RenderTargetPrivate().RenderTargetBuffer(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			textureBarriers.push_back(renderTargetBarrier);
+			const auto backBufferBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RESOLVE,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RESOLVE_DEST,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RESOLVE_DEST,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
+				.pResource = &d3d12System->BackBufferPrivate().CurrentBackBuffer()
+			};
+			textureBarriers.push_back(backBufferBarrier);
+		}
+		else
+		{
+			const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &d3d12System->RenderTargetPrivate().RenderTargetBuffer(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			textureBarriers.push_back(renderTargetBarrier);
+			const auto backBufferBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_DEST,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
+				.pResource = &d3d12System->BackBufferPrivate().CurrentBackBuffer()
+			};
+			textureBarriers.push_back(backBufferBarrier);
+		}
+
+		PopulateBarrierGroups();
 	}
 
 	void Direct3D12GraphicsPipeline::CloseLists()
@@ -509,7 +595,7 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateBarrierGroups()
 	{
 		barrierGroups.clear();
-		barrierGroups.reserve(2);
+		barrierGroups.reserve((bufferBarriers.size() > 0) + (textureBarriers.size() > 0));
 
 		if (bufferBarriers.size() > 0)
 		{
@@ -521,7 +607,6 @@ namespace PonyEngine::Render
 			};
 			barrierGroups.push_back(bufferBarrierGroup);
 		}
-
 		if (textureBarriers.size() > 0)
 		{
 			const auto textureBarrierGroup = D3D12_BARRIER_GROUP

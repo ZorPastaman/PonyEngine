@@ -100,5 +100,8 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12SwapChainParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Render\MSAAParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

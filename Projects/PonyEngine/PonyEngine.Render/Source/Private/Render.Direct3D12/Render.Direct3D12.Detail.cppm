@@ -11,6 +11,7 @@ export module PonyEngine.Render.Direct3D12.Detail;
 
 export import PonyEngine.Render.Detail;
 
+export import :Direct3D12BackBufferParams;
 export import :Direct3D12RenderTargetParams;
 export import :Direct3D12RenderViewParams;
 export import :Direct3D12System;
