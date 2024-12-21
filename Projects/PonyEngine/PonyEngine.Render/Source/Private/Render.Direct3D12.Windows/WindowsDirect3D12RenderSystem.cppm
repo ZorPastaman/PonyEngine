@@ -159,20 +159,23 @@ namespace PonyEngine::Render
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
-		const auto renderTargetParams = Direct3D12RenderTargetParams
+		const auto backBufferParams = Direct3D12BackBufferParams
 		{
 			.backBuffers = rawBackBuffers,
+			.backBufferFormat = swapChainParams.rtvFormat,
+		};
+		const auto renderTargetParams = Direct3D12RenderTargetParams
+		{
 			.resolution = renderResolution,
 			.clearColor = renderParams.renderTargetParams.clearColor,
-			.rtvFormat = swapChainParams.rtvFormat,
-			.sampleDesc = dxgiSubSystem->SwapChain()->SampleDesc()
+			.msaaParams = renderParams.renderTargetParams.msaaParams
 		};
 		const auto renderViewParams = Direct3D12RenderViewParams
 		{
 			.viewMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.viewMatrix),
 			.projectionMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.projectionMatrix)
 		};
-		direct3D12SubSystem->CreateRenderSystem(renderTargetParams, renderViewParams);
+		direct3D12SubSystem->CreateRenderSystem(backBufferParams, renderTargetParams, renderViewParams);
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
 	}
 

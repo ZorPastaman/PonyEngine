@@ -11,20 +11,16 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RenderTargetParams;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12BackBufferParams;
 
-import PonyMath.Color;
-import PonyMath.Utility;
-
-import PonyEngine.Render;
+import <span>;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render target parameters.
-	struct Direct3D12RenderTargetParams final
+	/// @brief Direct3D12 back buffer parameters.
+	struct Direct3D12BackBufferParams final
 	{
-		PonyMath::Utility::Resolution<UINT> resolution; ///< Render target resolution.
-		PonyMath::Color::RGBA<FLOAT> clearColor; ///< Clear color.
-		MSAAParams msaaParams; ///< MSAA parameters.
+		std::span<ID3D12Resource2*> backBuffers; ///< Back buffers.
+		DXGI_FORMAT backBufferFormat; ///< Back buffer format.
 	};
 }

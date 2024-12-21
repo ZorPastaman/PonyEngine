@@ -311,8 +311,9 @@ namespace Application
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
-			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{},
-				PonyEngine::Render::WindowsDirect3D12RenderSystemParams{});
+			auto renderParams = PonyEngine::Render::WindowsDirect3D12RenderSystemParams{};
+			renderParams.renderTargetParams.msaaParams.sampleCount = 4;
+			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{}, renderParams);
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", typeid(*factory.systemFactory).name());

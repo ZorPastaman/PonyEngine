@@ -26,6 +26,8 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
+import :Direct3D12BackBuffer;
+import :Direct3D12BackBufferParams;
 import :Direct3D12CopyPipeline;
 import :Direct3D12CpuWaiter;
 import :Direct3D12DepthStencil;
@@ -112,9 +114,10 @@ export namespace PonyEngine::Render
 		const ID3D12CommandQueue& GraphicsCommandQueue() const noexcept;
 
 		/// @brief Creates a render system.
+		/// @param backBufferParams Back buffer parameters.
 		/// @param renderTargetParams Render target parameters.
 		/// @param renderViewParams Render view parameters.
-		void CreateRenderSystem(const Direct3D12RenderTargetParams& renderTargetParams, const Direct3D12RenderViewParams& renderViewParams);
+		void CreateRenderSystem(const Direct3D12BackBufferParams& backBufferParams, const Direct3D12RenderTargetParams& renderTargetParams, const Direct3D12RenderViewParams& renderViewParams);
 
 		/// @brief Begins a new frame.
 		void BeginFrame();
@@ -137,6 +140,11 @@ export namespace PonyEngine::Render
 		virtual ID3D12Device10& Device() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Device10& Device() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDirect3D12BackBufferPrivate& BackBufferPrivate() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDirect3D12BackBufferPrivate& BackBufferPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IDirect3D12RenderTargetPrivate& RenderTargetPrivate() noexcept override;
@@ -190,6 +198,7 @@ export namespace PonyEngine::Render
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
+		std::unique_ptr<Direct3D12BackBuffer> backBuffer; ///< Back buffer.
 		std::unique_ptr<Direct3D12RenderTarget> renderTarget; ///< Render target.
 		std::unique_ptr<Direct3D12DepthStencil> depthStencil; ///< Depth stencil.
 		std::unique_ptr<Direct3D12RenderView> renderView; ///< Render view.
@@ -295,6 +304,10 @@ namespace PonyEngine::Render
 		renderTarget.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target destroyed.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy back buffer.");
+		backBuffer.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back buffer destroyed.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Release device.");
 		device.Reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device released.");
@@ -346,10 +359,14 @@ namespace PonyEngine::Render
 		return graphicsPipeline->CommandQueue();
 	}
 
-	void Direct3D12System::CreateRenderSystem(const Direct3D12RenderTargetParams& renderTargetParams, const Direct3D12RenderViewParams& renderViewParams)
+	void Direct3D12System::CreateRenderSystem(const Direct3D12BackBufferParams& backBufferParams, const Direct3D12RenderTargetParams& renderTargetParams, const Direct3D12RenderViewParams& renderViewParams)
 	{
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back buffer.");
+		backBuffer = std::make_unique<Direct3D12BackBuffer>(*static_cast<IDirect3D12SystemContext*>(this), backBufferParams);
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backBuffer.get()));
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render target.");
-		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), renderTargetParams);
+		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), renderTargetParams); // TODO: SetName
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderTarget.get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render view.");
@@ -398,7 +415,7 @@ namespace PonyEngine::Render
 		copyPipeline->Execute();
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Set back buffer index to '{}'.", bufferIndex);
-		renderTarget->CurrentBackBufferIndex(bufferIndex);
+		backBuffer->CurrentBackBufferIndex(bufferIndex);
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Add render tasks.");
 		renderObjectManager->AddRenderTasks();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Populate graphics pipeline commands.");
@@ -440,6 +457,16 @@ namespace PonyEngine::Render
 	const ID3D12Device10& Direct3D12System::Device() const noexcept
 	{
 		return *device.Get();
+	}
+
+	IDirect3D12BackBufferPrivate& Direct3D12System::BackBufferPrivate() noexcept
+	{
+		return *backBuffer;
+	}
+
+	const IDirect3D12BackBufferPrivate& Direct3D12System::BackBufferPrivate() const noexcept
+	{
+		return *backBuffer;
 	}
 
 	IDirect3D12RenderTargetPrivate& Direct3D12System::RenderTargetPrivate() noexcept

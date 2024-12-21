@@ -26,6 +26,28 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IDirect3D12RenderTargetPrivate)
 
+		/// @brief Gets the rtv format.
+		/// @return Rtv format.
+		[[nodiscard("Pure function")]]
+		virtual DXGI_FORMAT Format() const noexcept = 0;
+		/// @brief Gets the rtv sample description.
+		/// @return Sample description.
+		[[nodiscard("Pure function")]]
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
+
+		/// @brief Gets the render target buffer.
+		/// @return Render target buffer.
+		[[nodiscard("Pure function")]]
+		virtual ID3D12Resource2& RenderTargetBuffer() noexcept = 0;
+		/// @brief Gets the render target buffer.
+		/// @return Render target buffer.
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12Resource2& RenderTargetBuffer() const noexcept = 0;
+		/// @brief Gets the rtv handle.
+		/// @return Rtv handle.
+		[[nodiscard("Pure function")]]
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept = 0;
+
 		/// @brief Gets the render target resolution.
 		/// @return Render target resolution.
 		[[nodiscard("Pure function")]]
@@ -38,28 +60,5 @@ export namespace PonyEngine::Render
 		/// @brief Sets the clear color.
 		/// @param color Clear color.
 		virtual void ClearColorD3D12(const PonyMath::Color::RGBA<FLOAT>& color) noexcept = 0;
-
-		/// @brief Gets the rtv format.
-		/// @return Rtv format.
-		[[nodiscard("Pure function")]]
-		virtual DXGI_FORMAT RtvFormat() const noexcept = 0;
-		/// @brief Gets the rtv sample description.
-		/// @return Sample description.
-		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
-
-		/// @brief Gets a current back buffer.
-		/// @return Current back buffer.
-		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& CurrentBackBuffer() noexcept = 0;
-		/// @brief Gets a current back buffer.
-		/// @return Current back buffer.
-		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept = 0;
-
-		/// @brief Gets the current rtv handle.
-		/// @return Rtv handle.
-		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept = 0;
 	};
 }

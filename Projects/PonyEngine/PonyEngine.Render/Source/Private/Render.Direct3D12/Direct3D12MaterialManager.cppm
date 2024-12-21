@@ -188,7 +188,7 @@ namespace PonyEngine::Render
 			.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
 			.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 			.NumRenderTargets = 1,
-			.RTVFormats = { renderTarget.RtvFormat() },
+			.RTVFormats = { renderTarget.Format() },
 			.DSVFormat = d3d12System->DepthStencilPrivate().DsvFormat(),
 			.SampleDesc = renderTarget.SampleDesc(),
 			.NodeMask = 0u,

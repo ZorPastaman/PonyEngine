@@ -81,16 +81,12 @@ export namespace PonyEngine::Render
 
 		/// @brief Resets command lists.
 		void ResetLists();
-		/// @brief Updates buffer barriers to make them ready for copying.
-		void UpdateBufferBarriersIn();
-		/// @brief Updates texture barriers to make them ready for copying.
-		void UpdateTextureBarriersIn();
+		/// @brief Populates begin to copy barriers.
+		void PopulateBeginToCopyBarriers();
 		/// @brief Populates copies.
 		void PopulateCopies();
-		/// @brief Updates buffer barriers back.
-		void UpdateBufferBarriersOut();
-		/// @brief Updates texture barriers back.
-		void UpdateTextureBarriersOut();
+		/// @brief Populates copy to end barriers.
+		void PopulateCopyToEndBarriers();
 		/// @brief Closes command lists.
 		void CloseLists();
 
@@ -212,13 +208,9 @@ export namespace PonyEngine::Render
 	void Direct3D12CopyPipeline::PopulateCommands()
 	{
 		ResetLists();
-		UpdateBufferBarriersIn();
-		UpdateTextureBarriersIn();
-		PopulateBarrierGroups();
+		PopulateBeginToCopyBarriers();
 		PopulateCopies();
-		UpdateBufferBarriersOut();
-		UpdateTextureBarriersOut();
-		PopulateBarrierGroups();
+		PopulateCopyToEndBarriers();
 		CloseLists();
 	}
 
@@ -246,11 +238,10 @@ export namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12CopyPipeline::UpdateBufferBarriersIn()
+	void Direct3D12CopyPipeline::PopulateBeginToCopyBarriers()
 	{
 		bufferBarriers.clear();
 		bufferBarriers.reserve(bufferCopyTasks.size() * 2);
-
 		for (const auto& [source, destination] : bufferCopyTasks)
 		{
 			const auto sourceBarrier = D3D12_BUFFER_BARRIER
@@ -276,13 +267,9 @@ export namespace PonyEngine::Render
 			bufferBarriers.push_back(sourceBarrier);
 			bufferBarriers.push_back(destinationBarrier);
 		}
-	}
 
-	void Direct3D12CopyPipeline::UpdateTextureBarriersIn()
-	{
 		textureBarriers.clear();
 		textureBarriers.reserve(textureCopyTasks.size() * 2);
-
 		for (const auto& [source, destination] : textureCopyTasks)
 		{
 			const auto sourceBarrier = D3D12_TEXTURE_BARRIER
@@ -312,6 +299,8 @@ export namespace PonyEngine::Render
 			textureBarriers.push_back(sourceBarrier);
 			textureBarriers.push_back(destinationBarrier);
 		}
+
+		PopulateBarrierGroups();
 	}
 
 	void Direct3D12CopyPipeline::PopulateCopies()
@@ -327,10 +316,9 @@ export namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12CopyPipeline::UpdateBufferBarriersOut()
+	void Direct3D12CopyPipeline::PopulateCopyToEndBarriers()
 	{
 		bufferBarriers.clear();
-
 		for (const auto& [source, destination] : bufferCopyTasks)
 		{
 			const auto sourceBarrier = D3D12_BUFFER_BARRIER
@@ -356,12 +344,8 @@ export namespace PonyEngine::Render
 			bufferBarriers.push_back(sourceBarrier);
 			bufferBarriers.push_back(destinationBarrier);
 		}
-	}
 
-	void Direct3D12CopyPipeline::UpdateTextureBarriersOut()
-	{
 		textureBarriers.clear();
-
 		for (const auto& [source, destination] : textureCopyTasks)
 		{
 			const auto sourceBarrier = D3D12_TEXTURE_BARRIER
@@ -391,6 +375,8 @@ export namespace PonyEngine::Render
 			textureBarriers.push_back(sourceBarrier);
 			textureBarriers.push_back(destinationBarrier);
 		}
+
+		PopulateBarrierGroups();
 	}
 
 	void Direct3D12CopyPipeline::CloseLists()
@@ -404,7 +390,7 @@ export namespace PonyEngine::Render
 	void Direct3D12CopyPipeline::PopulateBarrierGroups()
 	{
 		barrierGroups.clear();
-		barrierGroups.reserve(2);
+		barrierGroups.reserve((bufferBarriers.size() > 0) + (textureBarriers.size() > 0));
 
 		if (bufferBarriers.size() > 0)
 		{
@@ -416,7 +402,6 @@ export namespace PonyEngine::Render
 			};
 			barrierGroups.push_back(bufferBarrierGroup);
 		}
-
 		if (textureBarriers.size() > 0)
 		{
 			const auto textureBarrierGroup = D3D12_BARRIER_GROUP

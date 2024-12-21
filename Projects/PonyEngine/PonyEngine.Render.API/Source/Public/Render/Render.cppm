@@ -14,6 +14,7 @@ export import :IRenderObjectManager;
 export import :IRenderSystem;
 export import :IRenderTarget;
 export import :IRenderView;
+export import :MSAAParams;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
