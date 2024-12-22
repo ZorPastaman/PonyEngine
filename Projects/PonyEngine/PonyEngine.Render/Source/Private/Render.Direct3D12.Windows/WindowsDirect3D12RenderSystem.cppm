@@ -135,7 +135,7 @@ namespace PonyEngine::Render
 		{
 			.hWnd = windowHandle,
 			.resolution = renderResolution,
-			.rtvFormat = renderParams.swapChainParams.rtvFormat,
+			.backBufferFormat = renderParams.swapChainParams.backBufferFormat,
 			.bufferCount = bufferCount
 		};
 		IDXGISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
@@ -144,7 +144,7 @@ namespace PonyEngine::Render
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
 		auto backBufferParams = Direct3D12BackBufferParams
 		{
-			.backBufferFormat = swapChainParams.rtvFormat,
+			.backBufferFormat = swapChainParams.backBufferFormat,
 		};
 		backBufferParams.backBuffers.reserve(bufferCount);
 		for (UINT i = 0u; i < bufferCount; ++i)
