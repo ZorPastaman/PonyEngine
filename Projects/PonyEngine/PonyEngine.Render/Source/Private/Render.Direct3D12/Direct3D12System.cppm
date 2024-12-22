@@ -363,10 +363,12 @@ namespace PonyEngine::Render
 	{
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back buffer.");
 		backBuffer = std::make_unique<Direct3D12BackBuffer>(*static_cast<IDirect3D12SystemContext*>(this), backBufferParams);
+		backBuffer->Name("BackBuffer");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backBuffer.get()));
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render target.");
-		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), renderTargetParams); // TODO: SetName
+		renderTarget = std::make_unique<Direct3D12RenderTarget>(*static_cast<IDirect3D12SystemContext*>(this), renderTargetParams);
+		renderTarget->Name("RenderTarget");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderTarget.get()));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render view.");

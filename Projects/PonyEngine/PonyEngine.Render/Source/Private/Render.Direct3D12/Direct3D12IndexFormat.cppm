@@ -24,7 +24,7 @@ export namespace PonyEngine::Render
 		/// @brief Creates a @p Direct3D12IndexFormat.
 		/// @param format Index format. Must be DXGI_FORMAT_R16_UINT or DXGI_FORMAT_R32_UINT.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Direct3D12IndexFormat(DXGI_FORMAT format);
+		explicit constexpr Direct3D12IndexFormat(DXGI_FORMAT format) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Direct3D12IndexFormat(const Direct3D12IndexFormat& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,7 +58,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	constexpr Direct3D12IndexFormat::Direct3D12IndexFormat(const DXGI_FORMAT format) :
+	constexpr Direct3D12IndexFormat::Direct3D12IndexFormat(const DXGI_FORMAT format) noexcept :
 		indexFormat{format}
 	{
 		GetIndexFormatInfo(indexFormat, indexSize);

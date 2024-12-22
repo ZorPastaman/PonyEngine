@@ -106,7 +106,6 @@ export namespace PonyEngine::Render
 
 		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
 		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
-		std::vector<D3D12_BARRIER_GROUP> barrierGroups; ///< Barrier groups cache.
 	};
 
 	Direct3D12CopyPipeline::Direct3D12CopyPipeline(IDirect3D12SystemContext& d3d12System, const INT commandQueuePriority) :
@@ -389,33 +388,30 @@ export namespace PonyEngine::Render
 
 	void Direct3D12CopyPipeline::PopulateBarrierGroups()
 	{
-		barrierGroups.clear();
-		barrierGroups.reserve((bufferBarriers.size() > 0) + (textureBarriers.size() > 0));
-
+		auto barrierGroups = std::array<D3D12_BARRIER_GROUP, 2>();
+		UINT32 count = 0u;
 		if (bufferBarriers.size() > 0)
 		{
-			const auto bufferBarrierGroup = D3D12_BARRIER_GROUP
+			barrierGroups[count++] = D3D12_BARRIER_GROUP
 			{
 				.Type = D3D12_BARRIER_TYPE_BUFFER,
 				.NumBarriers = static_cast<UINT32>(bufferBarriers.size()),
 				.pBufferBarriers = bufferBarriers.data()
 			};
-			barrierGroups.push_back(bufferBarrierGroup);
 		}
 		if (textureBarriers.size() > 0)
 		{
-			const auto textureBarrierGroup = D3D12_BARRIER_GROUP
+			barrierGroups[count++] = D3D12_BARRIER_GROUP
 			{
 				.Type = D3D12_BARRIER_TYPE_TEXTURE,
 				.NumBarriers = static_cast<UINT32>(textureBarriers.size()),
 				.pTextureBarriers = textureBarriers.data()
 			};
-			barrierGroups.push_back(textureBarrierGroup);
 		}
 
-		if (barrierGroups.size() > 0)
+		if (count > 0u)
 		{
-			commandList->Barrier(static_cast<UINT32>(barrierGroups.size()), barrierGroups.data());
+			commandList->Barrier(count, barrierGroups.data());
 		}
 	}
 }

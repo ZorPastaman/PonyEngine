@@ -9,6 +9,7 @@
 
 #pragma once
 
+#define NOMINMAX
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include <dxgi1_6.h>
