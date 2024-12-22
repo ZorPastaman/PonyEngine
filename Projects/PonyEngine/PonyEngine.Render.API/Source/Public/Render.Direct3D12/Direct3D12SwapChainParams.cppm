@@ -18,7 +18,7 @@ export namespace PonyEngine::Render
 	/// @brief Direct3D12 render target parameters.
 	struct Direct3D12SwapChainParams final
 	{
-		DXGI_FORMAT rtvFormat = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Render target view format.
+		DXGI_FORMAT backBufferFormat = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Back buffer format.
 		UINT bufferCount = 2u; ///< Buffer count.
 	};
 }

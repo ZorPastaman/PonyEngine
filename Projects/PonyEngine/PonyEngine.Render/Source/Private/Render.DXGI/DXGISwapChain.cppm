@@ -79,12 +79,12 @@ namespace PonyEngine::Render
 	{
 		IUnknown* const device = &this->dxgiSystem->Device();
 		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.",
-			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), static_cast<int>(swapChainParams.rtvFormat), swapChainParams.bufferCount);
+			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), static_cast<int>(swapChainParams.backBufferFormat), swapChainParams.bufferCount);
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
 			.Width = swapChainParams.resolution.Width(),
 			.Height = swapChainParams.resolution.Height(),
-			.Format = swapChainParams.rtvFormat,
+			.Format = swapChainParams.backBufferFormat,
 			.Stereo = false,
 			.SampleDesc = SampleDescription,
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,

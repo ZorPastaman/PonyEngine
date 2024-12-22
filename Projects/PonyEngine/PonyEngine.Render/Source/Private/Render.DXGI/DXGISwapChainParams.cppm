@@ -22,7 +22,7 @@ export namespace PonyEngine::Render
 	{
 		HWND hWnd; ///< Window handle. Must be an alive window.
 		PonyMath::Utility::Resolution<UINT> resolution; ///< Swap chain resolution.
-		DXGI_FORMAT rtvFormat; ///< Render target view format.
+		DXGI_FORMAT backBufferFormat; ///< Back buffer format.
 		UINT bufferCount; ///< Back buffer count.
 	};
 }
