@@ -9,6 +9,7 @@
 
 #pragma once
 
+#define NOMINMAX
 #include "PonyBase/Core/COM/Framework.h"
 
 #include <d3d12.h>

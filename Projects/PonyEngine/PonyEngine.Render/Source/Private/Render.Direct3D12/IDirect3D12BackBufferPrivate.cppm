@@ -18,6 +18,7 @@ import PonyMath.Utility;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 back buffer.
 	class IDirect3D12BackBufferPrivate
 	{
 		INTERFACE_BODY(IDirect3D12BackBufferPrivate)

@@ -142,28 +142,24 @@ namespace PonyEngine::Render
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&swapChain));
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
-		auto backBuffers = std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>(bufferCount);
+		auto backBufferParams = Direct3D12BackBufferParams
+		{
+			.backBufferFormat = swapChainParams.rtvFormat,
+		};
+		backBufferParams.backBuffers.reserve(bufferCount);
 		for (UINT i = 0u; i < bufferCount; ++i)
 		{
-			if (const HRESULT result = dxgiSubSystem->SwapChain()->GetBackBuffer(i, backBuffers[i].GetAddressOf()); FAILED(result)) [[unlikely]]
+			Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffer;
+			if (const HRESULT result = dxgiSubSystem->SwapChain()->GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get swap chain buffer at index '{}' with '0x{:X}' result.", i, static_cast<std::make_unsigned_t<HRESULT>>(result)));
 			}
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(backBuffers[i].Get()));
-		}
-		auto rawBackBuffers = std::vector<ID3D12Resource2*>(bufferCount);
-		for (std::size_t i = 0; i < bufferCount; ++i)
-		{
-			rawBackBuffers[i] = backBuffers[i].Get();
+			backBufferParams.backBuffers.push_back(backBuffer);
+			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(backBuffer.Get()));
 		}
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
-		const auto backBufferParams = Direct3D12BackBufferParams
-		{
-			.backBuffers = rawBackBuffers,
-			.backBufferFormat = swapChainParams.rtvFormat,
-		};
 		const auto renderTargetParams = Direct3D12RenderTargetParams
 		{
 			.resolution = renderResolution,
