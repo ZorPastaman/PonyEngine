@@ -236,8 +236,8 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.708, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.836, static_cast<double>(gamma.G()), 0.001);
+			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
+			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
 			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
 			Assert::AreEqual(a, gamma.A());
 		}
@@ -250,8 +250,8 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.49, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.69, static_cast<double>(linear.G()), 0.001);
+			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
 			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
 			Assert::AreEqual(a, linear.A());
 		}

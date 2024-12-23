@@ -99,7 +99,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire fence with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Fence acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(fence.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Fence acquired.");
 	}
 
 	Direct3D12Fence::~Direct3D12Fence() noexcept
@@ -146,7 +146,6 @@ namespace PonyEngine::Render
 	void Direct3D12Fence::Signal()
 	{
 		++currentValue;
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Signal command queue. Fence value: '{}'.", currentValue);
 		if (const HRESULT result = commandQueue->Signal(fence.Get(), currentValue); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to signal command queue with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
@@ -155,7 +154,6 @@ namespace PonyEngine::Render
 
 	void Direct3D12Fence::SetEvent(const UINT64 fenceValue, const HANDLE event) const
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set fence event. Fence value: '{}'; Handle: '0x{:X}'.", fenceValue, reinterpret_cast<std::uintptr_t>(event));
 		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, event); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));

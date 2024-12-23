@@ -16,7 +16,7 @@ export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12SystemContext;
 
 import PonyDebug.Log;
 
-import :IDirect3D12BackBufferPrivate;
+import :IDirect3D12BackPrivate;
 import :IDirect3D12CopyPipeline;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12GraphicsPipeline;
@@ -52,14 +52,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Device10& Device() const noexcept = 0;
 
-		/// @brief Gets the back buffer.
-		/// @return Back buffer.
+		/// @brief Gets the back.
+		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual IDirect3D12BackBufferPrivate& BackBufferPrivate() noexcept = 0;
-		/// @brief Gets the back buffer.
-		/// @return Back buffer.
+		virtual IDirect3D12BackPrivate& BackPrivate() noexcept = 0;
+		/// @brief Gets the back.
+		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual const IDirect3D12BackBufferPrivate& BackBufferPrivate() const noexcept = 0;
+		virtual const IDirect3D12BackPrivate& BackPrivate() const noexcept = 0;
 
 		/// @brief Gets the render target.
 		/// @return Render target.

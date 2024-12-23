@@ -209,6 +209,7 @@ namespace PonyEngine::Render
 		};
 		const auto material = std::make_shared<Direct3D12Material>(rootSignature, *pipelineState.Get(), materialParams);
 		materials.push_back(material);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
 
 		return material;
 	}

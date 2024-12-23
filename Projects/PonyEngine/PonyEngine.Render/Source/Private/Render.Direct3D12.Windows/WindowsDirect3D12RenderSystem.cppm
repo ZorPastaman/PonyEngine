@@ -93,9 +93,9 @@ namespace PonyEngine::Render
 	WindowsDirect3D12RenderSystem::WindowsDirect3D12RenderSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowsDirect3D12RenderSystemParams& renderParams) :
 		TickableSystem(engine, systemParams)
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create DXGI sub-system.");
 		dxgiSubSystem = std::make_unique<DXGISystem>(*static_cast<IDXGIRenderSystemContext*>(this));
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(dxgiSubSystem.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
 		PonyMath::Utility::Resolution<UINT> renderResolution;
 		HWND windowHandle;
@@ -106,12 +106,12 @@ namespace PonyEngine::Render
 			if (renderParams.renderTargetParams.resolution.has_value())
 			{
 				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.renderTargetParams.resolution.value());
-				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
 			{
 				renderResolution = PonyMath::Utility::Resolution<UINT>(static_cast<PonyMath::Core::Vector2<UINT>>(windowSystem->WindowClientRect().Size()));
-				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution.");
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution: '{}'.", renderResolution.ToString());
 			}
 		}
 		else [[unlikely]]
@@ -119,7 +119,7 @@ namespace PonyEngine::Render
 			throw std::runtime_error("Failed to find Windows window system.");
 		}
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D12 sub-system.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D12 sub-system.");
 		const auto direct3D12SystemParams = Direct3D12SystemParams
 		{
 			.featureLevel = D3D_FEATURE_LEVEL_12_2,
@@ -127,39 +127,37 @@ namespace PonyEngine::Render
 			.renderTimeout = renderParams.renderTimeout,
 		};
 		direct3D12SubSystem = std::make_unique<Direct3D12System>(*static_cast<IDirect3D12RenderSystemContext*>(this), direct3D12SystemParams);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(direct3D12SubSystem.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system created.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
 		const UINT bufferCount = renderParams.swapChainParams.bufferCount;
 		const auto swapChainParams = DXGISwapChainParams
 		{
 			.hWnd = windowHandle,
 			.resolution = renderResolution,
-			.backBufferFormat = renderParams.swapChainParams.backBufferFormat,
 			.bufferCount = bufferCount
 		};
-		IDXGISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&swapChain));
+		const IDXGISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain created.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
-		auto backBufferParams = Direct3D12BackBufferParams
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
+		auto backParams = Direct3D12BackParams
 		{
-			.backBufferFormat = swapChainParams.backBufferFormat,
+			.backViewFormat = swapChain.Format(),
 		};
-		backBufferParams.backBuffers.reserve(bufferCount);
+		backParams.backBuffers.reserve(bufferCount);
 		for (UINT i = 0u; i < bufferCount; ++i)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffer;
-			if (const HRESULT result = dxgiSubSystem->SwapChain()->GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]
+			if (const HRESULT result = swapChain.GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get swap chain buffer at index '{}' with '0x{:X}' result.", i, static_cast<std::make_unsigned_t<HRESULT>>(result)));
 			}
-			backBufferParams.backBuffers.push_back(backBuffer);
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Buffer at index '{}' gotten at '0x{:X}'.", i, reinterpret_cast<std::uintptr_t>(backBuffer.Get()));
+			backParams.backBuffers.push_back(backBuffer);
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
 		const auto renderTargetParams = Direct3D12RenderTargetParams
 		{
 			.resolution = renderResolution,
@@ -171,19 +169,19 @@ namespace PonyEngine::Render
 			.viewMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.viewMatrix),
 			.projectionMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.projectionMatrix)
 		};
-		direct3D12SubSystem->CreateRenderSystem(backBufferParams, renderTargetParams, renderViewParams);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
+		direct3D12SubSystem->CreateRenderSystem(backParams, renderTargetParams, renderViewParams);
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
 	}
 
 	WindowsDirect3D12RenderSystem::~WindowsDirect3D12RenderSystem() noexcept
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D12 sub-system.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy Direct3D12 sub-system.");
 		direct3D12SubSystem.reset();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system destroyed.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system destroyed.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy DXGI sub-system.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy DXGI sub-system.");
 		dxgiSubSystem.reset();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system destroyed.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system destroyed.");
 	}
 
 	void WindowsDirect3D12RenderSystem::Begin() noexcept
@@ -196,13 +194,13 @@ namespace PonyEngine::Render
 
 	void WindowsDirect3D12RenderSystem::Tick()
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
 		direct3D12SubSystem->BeginFrame();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Render.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Render.");
 		direct3D12SubSystem->Render(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex());
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
 		dxgiSubSystem->Present();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for end of frame.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");
 		direct3D12SubSystem->EndFrame();
 	}
 

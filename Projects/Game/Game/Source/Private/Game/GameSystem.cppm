@@ -135,8 +135,6 @@ namespace Game
 
 	void GameSystem::Tick()
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Game tick.");
-
 		const auto mouse = cameraTransform.Rotation() * PonyMath::Core::Vector3<float>(inputSystem->State("MouseX"), inputSystem->State("MouseY"), 0.f);
 		auto rotationAxis = PonyMath::Core::Cross(cameraTransform.Forward(), mouse);
 		const auto rotation = rotationAxis.Magnitude();

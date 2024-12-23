@@ -190,13 +190,13 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12BackBuffer.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Back.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12BackBufferPrivate.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12BackPrivate.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12BackBufferParams.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12BackParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

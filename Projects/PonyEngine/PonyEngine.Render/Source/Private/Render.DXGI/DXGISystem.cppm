@@ -104,7 +104,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI debug interface with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(debug.Get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI debug interface acquired.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Enable DXGI leak tracking.");
 		debug->EnableLeakTrackingForThread();
@@ -120,7 +120,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire DXGI factory with '0x{:X} result.'", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI factory acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(factory.Get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI factory acquired.");
 	}
 
 	DXGISystem::~DXGISystem() noexcept

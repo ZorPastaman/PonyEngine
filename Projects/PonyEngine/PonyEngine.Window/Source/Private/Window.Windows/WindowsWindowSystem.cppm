@@ -153,13 +153,13 @@ namespace PonyEngine::Window
 	{
 		assert(windowsClass && "The windows class is nullptr.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create message pump.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create message pump.");
 		messagePump = std::make_unique<WindowsMessagePump>(*static_cast<IWindowsWindowSystemContext*>(this));
 		messagePump->AddMessageObserver(*this, std::array<UINT, 1>{ WM_DESTROY });
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Message pump created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(messagePump.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Message pump created.");
 
 		const auto [position, resolution] = ConvertToPositionResolution(GetWindowRect(windowParams.windowsWindowStyle, windowParams.rect));
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create window of class '0x{:X}'. Style: '0x{:X}'; Extended style: '0x{:X}'; Title: '{}'; Position: '{}'; Resolution: '{}'; HInstance: '0x{:X}'.",
 			windowsClass->Class(), windowParams.windowsWindowStyle.style, windowParams.windowsWindowStyle.extendedStyle, windowParams.title, position.ToString(), resolution.ToString(), reinterpret_cast<std::uintptr_t>(windowsClass->Instance()));
 		hWnd = CreateWindowExW(
 			windowParams.windowsWindowStyle.extendedStyle,
@@ -177,21 +177,21 @@ namespace PonyEngine::Window
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create window. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Window created. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create window title bar.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create window title bar.");
 		titleBar = std::make_unique<WindowsWindowTitleBar>(*static_cast<IWindowsWindowSystemContext*>(this), windowParams.title);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window title bar created at '0x{:X}.", reinterpret_cast<std::uintptr_t>(titleBar.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Window title bar created.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create raw input manager.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create raw input manager.");
 		rawInputManager = std::make_unique<WindowsRawInputManager>(*static_cast<IWindowsWindowSystemContext*>(this));
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Raw input manager created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rawInputManager.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Raw input manager created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rawInputManager.get()));
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create cursor.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create cursor.");
 		cursor = std::make_unique<WindowsCursor>(*static_cast<IWindowsWindowSystemContext*>(this), windowParams.cursorParams);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Cursor created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(cursor.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Cursor created.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Show window with command '{}'.", windowParams.cmdShow);
 		::ShowWindow(hWnd, windowParams.cmdShow);
 	}
 
@@ -199,27 +199,27 @@ namespace PonyEngine::Window
 	{
 		if (IsWindow(hWnd))
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy window. Window handle: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(hWnd));
 			if (!DestroyWindow(hWnd)) [[unlikely]]
 			{
-				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Error, "Error on destroying window. Error code: '0x{:X}'.", GetLastError());
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Error, "Error on destroying window. Error code: '0x{:X}'.", GetLastError());
 			}
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Window destroyed.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Window destroyed.");
 		}
 		else
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Skip destroying window 'cause it's already been destroyed.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Skip destroying window 'cause it's already been destroyed.");
 		}
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy cursor.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy cursor.");
 		cursor.reset();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Cursor destroyed.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Cursor destroyed.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy raw input manager.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy raw input manager.");
 		rawInputManager.reset();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Raw input manager destroyed.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Raw input manager destroyed.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy message pump.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy message pump.");
 		try
 		{
 			messagePump->RemoveMessageObserver(*this);

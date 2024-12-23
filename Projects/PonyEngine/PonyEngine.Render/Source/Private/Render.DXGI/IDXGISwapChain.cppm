@@ -21,10 +21,10 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IDXGISwapChain)
 
-		/// @brief Gets a sample description of the swap chain.
-		/// @return Sample description.
+		/// @brief Gets a format of the swap chain.
+		/// @return Format.
 		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
+		virtual DXGI_FORMAT Format() const noexcept = 0;
 
 		/// @brief Gets a current back buffer index.
 		/// @return Current back buffer index.

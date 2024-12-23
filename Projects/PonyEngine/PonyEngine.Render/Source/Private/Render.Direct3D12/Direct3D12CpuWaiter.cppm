@@ -15,7 +15,6 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12CpuWaiter;
 
-import <cstdint>;
 import <memory>;
 import <stdexcept>;
 import <string>;
@@ -77,7 +76,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create wait event. Error code: '0x{:X}'.", GetLastError()));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Wait event created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(waitEvent));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Wait event created.");
 	}
 
 	Direct3D12CpuWaiter::~Direct3D12CpuWaiter() noexcept
@@ -105,16 +104,11 @@ namespace PonyEngine::Render
 
 		if (const UINT64 currentFenceValue = fence->CurrentValue(); fence->CompletedValue() < currentFenceValue)
 		{
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set wait event. Fence value: '{}'. Timeout: '{} ms'.", currentFenceValue, waitTimeout);
 			fence->SetEvent(currentFenceValue, waitEvent);
 			if (const DWORD result = WaitForSingleObjectEx(waitEvent, waitTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 			}
-		}
-		else
-		{
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
 		}
 	}
 }

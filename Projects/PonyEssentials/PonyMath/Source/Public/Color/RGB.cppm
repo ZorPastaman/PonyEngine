@@ -34,7 +34,7 @@ export namespace PonyMath::Color
 	public:
 		using ValueType = T; ///< Component type.
 
-		static constexpr T GammaValue = T{2.2}; ///< Gamma value.
+		static constexpr T GammaValue = T{2.4}; ///< Gamma value.
 		static constexpr std::size_t ComponentCount = 3; ///< Component count. For any RGB, it's always 3.
 
 		struct Predefined; ///< Predefined colors.
