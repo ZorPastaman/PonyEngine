@@ -47,7 +47,7 @@ export namespace PonyEngine::Render
 		~DXGISwapChain() noexcept;
 
 		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
+		virtual DXGI_FORMAT Format() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual UINT GetCurrentBackBufferIndex() const noexcept override;
@@ -64,7 +64,7 @@ export namespace PonyEngine::Render
 		DXGISwapChain& operator =(DXGISwapChain&& other) noexcept = default;
 
 	private:
-		static constexpr auto SampleDescription = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}; ///< Sample description.
+		static constexpr DXGI_FORMAT BackViewFormat = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Back view format
 
 		IDXGISystemContext* dxgiSystem; ///< DXGI system context.
 
@@ -78,15 +78,15 @@ namespace PonyEngine::Render
 		dxgiSystem{&dxgiSystem}
 	{
 		IUnknown* const device = &this->dxgiSystem->Device();
-		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; RTV format: {}; Buffer count : {}.",
-			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), static_cast<int>(swapChainParams.backBufferFormat), swapChainParams.bufferCount);
+		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; Buffer count : {}.",
+			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), swapChainParams.bufferCount);
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
 			.Width = swapChainParams.resolution.Width(),
 			.Height = swapChainParams.resolution.Height(),
-			.Format = swapChainParams.backBufferFormat,
+			.Format = BackViewFormat,
 			.Stereo = false,
-			.SampleDesc = SampleDescription,
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
 			.BufferCount = swapChainParams.bufferCount,
 			.Scaling = DXGI_SCALING_STRETCH,
@@ -103,7 +103,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to query swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(swapChain.Get()));
+		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Swap chain acquired.");
 	}
 
 	DXGISwapChain::~DXGISwapChain() noexcept
@@ -113,9 +113,9 @@ namespace PonyEngine::Render
 		PONY_LOG(dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Swap chain released.");
 	}
 
-	DXGI_SAMPLE_DESC DXGISwapChain::SampleDesc() const noexcept
+	DXGI_FORMAT DXGISwapChain::Format() const noexcept
 	{
-		return SampleDescription;
+		return BackViewFormat;
 	}
 
 	UINT DXGISwapChain::GetCurrentBackBufferIndex() const noexcept

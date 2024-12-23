@@ -213,7 +213,7 @@ namespace PonyEngine::Core
 	{
 		BeginTick();
 
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Tick system manager.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
 		TickSystems();
 
 		EndTick();

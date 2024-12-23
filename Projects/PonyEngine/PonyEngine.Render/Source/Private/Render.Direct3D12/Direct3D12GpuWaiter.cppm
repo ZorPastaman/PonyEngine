@@ -90,15 +90,10 @@ namespace PonyEngine::Render
 
 		if (const UINT64 currentValue = fence->CurrentValue(); fence->CompletedValue() < currentValue)
 		{
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Set wait. Fence value: {}.", currentValue);
 			if (const HRESULT result = waitingCommandQueue->Wait(&fence->Fence(), currentValue); FAILED(result)) [[unlikely]]
 			{
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set gpu wait with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
 			}
-		}
-		else
-		{
-			PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "No need to wait for fence.");
 		}
 	}
 }

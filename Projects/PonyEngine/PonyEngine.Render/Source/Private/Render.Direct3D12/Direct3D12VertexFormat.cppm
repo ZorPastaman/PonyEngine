@@ -28,7 +28,7 @@ export namespace PonyEngine::Render
 		/// @brief Creates a @p Direct3D12VertexFormat.
 		/// @param format Vertex format.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Direct3D12VertexFormat(DXGI_FORMAT format);
+		explicit constexpr Direct3D12VertexFormat(DXGI_FORMAT format) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Direct3D12VertexFormat(const Direct3D12VertexFormat& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -71,7 +71,7 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	constexpr Direct3D12VertexFormat::Direct3D12VertexFormat(const DXGI_FORMAT format) :
+	constexpr Direct3D12VertexFormat::Direct3D12VertexFormat(const DXGI_FORMAT format) noexcept :
 		vertexFormat{format}
 	{
 		GetVertexFormatInfo(vertexFormat, componentSize, componentCount);

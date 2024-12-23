@@ -118,7 +118,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire depth stencil buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil buffer acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(depthStencilBuffer.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil buffer acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire dsv descriptor heap.");
 		constexpr auto dsvDescriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
@@ -132,7 +132,7 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire dsv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Dsv descriptor heap acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(dsvHeap.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Dsv descriptor heap acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create depth stencil handle.");
 		const auto dsvDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
@@ -143,7 +143,7 @@ namespace PonyEngine::Render
 		};
 		dsvHandle = dsvHeap->GetCPUDescriptorHandleForHeapStart();
 		device.CreateDepthStencilView(depthStencilBuffer.Get(), &dsvDesc, dsvHandle);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil handle created at '{}'.", dsvHandle.ptr);
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil handle created.");
 	}
 
 	Direct3D12DepthStencil::~Direct3D12DepthStencil() noexcept

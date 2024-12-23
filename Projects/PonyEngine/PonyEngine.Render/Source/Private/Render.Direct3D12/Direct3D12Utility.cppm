@@ -32,12 +32,17 @@ export namespace PonyEngine::Render
 	/// @param componentSize Component size in bytes.
 	/// @param componentCount Component count.
 	/// @return Index format.
-	constexpr void GetVertexFormatInfo(DXGI_FORMAT format, UINT& componentSize, UINT& componentCount);
+	constexpr void GetVertexFormatInfo(DXGI_FORMAT format, UINT& componentSize, UINT& componentCount) noexcept;
 	/// @brief Gets the index format info.
 	/// @param format Index format. Must be DXGI_FORMAT_R16_UINT or DXGI_FORMAT_R32_UINT.
 	/// @param indexSize Index size in bytes.
 	/// @return Index format.
-	constexpr void GetIndexFormatInfo(DXGI_FORMAT format, UINT& indexSize);
+	constexpr void GetIndexFormatInfo(DXGI_FORMAT format, UINT& indexSize) noexcept;
+
+	/// @brief Gets an srgb version of the @p sourceFormat.
+	/// @param sourceFormat Source format.
+	/// @return Srgb format.
+	constexpr DXGI_FORMAT GetSrgbFormat(DXGI_FORMAT sourceFormat) noexcept;
 }
 
 namespace PonyEngine::Render
@@ -50,7 +55,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	constexpr void GetVertexFormatInfo(const DXGI_FORMAT format, UINT& componentSize, UINT& componentCount)
+	constexpr void GetVertexFormatInfo(const DXGI_FORMAT format, UINT& componentSize, UINT& componentCount) noexcept
 	{
 		switch (format)
 		{
@@ -124,11 +129,13 @@ namespace PonyEngine::Render
 			break;
 		default: [[unlikely]]
 			assert(false && "Incorrect vertex format");
+			componentSize = 0u;
+			componentCount = 0u;
 			break;
 		}
 	}
 
-	constexpr void GetIndexFormatInfo(const DXGI_FORMAT format, UINT& indexSize)
+	constexpr void GetIndexFormatInfo(const DXGI_FORMAT format, UINT& indexSize) noexcept
 	{
 		switch (format)
 		{
@@ -140,7 +147,32 @@ namespace PonyEngine::Render
 			break;
 		default: [[unlikely]]
 			assert(false && "Incorrect index format");
+			indexSize = 0u;
 			break;
+		}
+	}
+
+	constexpr DXGI_FORMAT GetSrgbFormat(const DXGI_FORMAT sourceFormat) noexcept
+	{
+		switch (sourceFormat)
+		{
+		case DXGI_FORMAT_R8G8B8A8_UNORM:
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
+		case DXGI_FORMAT_BC1_UNORM:
+			return DXGI_FORMAT_BC1_UNORM_SRGB;
+		case DXGI_FORMAT_BC2_UNORM:
+			return DXGI_FORMAT_BC2_UNORM_SRGB;
+		case DXGI_FORMAT_BC3_UNORM:
+			return DXGI_FORMAT_BC3_UNORM_SRGB;
+		case DXGI_FORMAT_B8G8R8A8_UNORM:
+			return DXGI_FORMAT_B8G8R8A8_UNORM_SRGB;
+		case DXGI_FORMAT_B8G8R8X8_UNORM:
+			return DXGI_FORMAT_B8G8R8X8_UNORM_SRGB;
+		case DXGI_FORMAT_BC7_UNORM:
+			return DXGI_FORMAT_BC7_UNORM_SRGB;
+		default: [[unlikely]]
+			assert(false && "Incorrect source format");
+			return DXGI_FORMAT_R8G8B8A8_UNORM_SRGB;
 		}
 	}
 }

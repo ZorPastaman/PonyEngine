@@ -13,40 +13,46 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12BackBuffer;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Back;
 
 import <cmath>;
+import <cstddef>;
 import <format>;
+import <stdexcept>;
 import <string>;
 import <string_view>;
+import <type_traits>;
+import <vector>;
 
 import PonyBase.StringUtility;
 
 import PonyDebug.Log;
 
-import :Direct3D12BackBufferParams;
+import :Direct3D12BackParams;
 import :Direct3D12Utility;
-import :IDirect3D12BackBufferPrivate;
+import :IDirect3D12BackPrivate;
 import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 back buffer.
-	class Direct3D12BackBuffer final : public IDirect3D12BackBufferPrivate
+	/// @brief Direct3D12 back.
+	class Direct3D12Back final : public IDirect3D12BackPrivate
 	{
 	public:
-		/// @brief Creates a @p Direct3D12BackBuffer.
+		/// @brief Creates a @p Direct3D12Back.
 		/// @param d3d12System Direct3D12 system context.
-		/// @param params Direct3D12 back buffer parameters.
+		/// @param params Direct3D12 Back parameters.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12BackBuffer(IDirect3D12SystemContext& d3d12System, const Direct3D12BackBufferParams& params);
-		Direct3D12BackBuffer(const Direct3D12BackBuffer&) = delete;
-		Direct3D12BackBuffer(Direct3D12BackBuffer&&) = delete;
+		Direct3D12Back(IDirect3D12SystemContext& d3d12System, const Direct3D12BackParams& params);
+		Direct3D12Back(const Direct3D12Back&) = delete;
+		Direct3D12Back(Direct3D12Back&&) = delete;
 
-		~Direct3D12BackBuffer() noexcept;
+		~Direct3D12Back() noexcept;
 
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT Format() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual DXGI_FORMAT FormatSrgb() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual ID3D12Resource2& CurrentBackBuffer() noexcept override;
@@ -54,9 +60,9 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackBufferHandle() const noexcept override;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackViewHandle() const noexcept override;
 
-		/// @brief Sets the name to the back buffer components.
+		/// @brief Sets the name to the back components.
 		/// @param name Name to set.
 		void Name(std::string_view name);
 
@@ -68,26 +74,28 @@ export namespace PonyEngine::Render
 		/// @param index Current back buffer index to set.
 		void CurrentBackBufferIndex(UINT index) noexcept;
 
-		Direct3D12BackBuffer& operator =(const Direct3D12BackBuffer&) = delete;
-		Direct3D12BackBuffer& operator =(Direct3D12BackBuffer&&) = delete;
+		Direct3D12Back& operator =(const Direct3D12Back&) = delete;
+		Direct3D12Back& operator =(Direct3D12Back&&) = delete;
 
 	private:
-		DXGI_FORMAT backBufferFormat; ///< Back buffer format.
+		DXGI_FORMAT backViewFormat; ///< Back view format.
+		DXGI_FORMAT srgbBackViewFormat; ///< Srgb back view format.
 
 		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
 		UINT currentBackBufferIndex; ///< Current back buffer index.
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> backBufferDescriptorHeap; ///< Rtv descriptor heap.
-		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> backBufferHandles; ///< Rtv handles.
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> backViewHeap; ///< Back view descriptor heap.
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> backViewHandles; ///< Back view handles.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12BackBuffer::Direct3D12BackBuffer(IDirect3D12SystemContext& d3d12System, const Direct3D12BackBufferParams& params) :
-		backBufferFormat{params.backBufferFormat},
+	Direct3D12Back::Direct3D12Back(IDirect3D12SystemContext& d3d12System, const Direct3D12BackParams& params) :
+		backViewFormat{params.backViewFormat},
+		srgbBackViewFormat{GetSrgbFormat(backViewFormat)},
 		d3d12System{&d3d12System},
 		currentBackBufferIndex{0u}
 	{
@@ -97,7 +105,7 @@ namespace PonyEngine::Render
 		backBuffers = params.backBuffers;
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffers set.");
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back buffer descriptor heap.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back view descriptor heap.");
 		const auto rtvDescriptorHeapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = descHeapType,
@@ -106,69 +114,73 @@ namespace PonyEngine::Render
 			.NodeMask = 0u
 		};
 		ID3D12Device10& device = this->d3d12System->Device();
-		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(backBufferDescriptorHeap.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDescriptor, IID_PPV_ARGS(backViewHeap.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire back buffer descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire back view descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer descriptor heap created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(backBufferDescriptorHeap.Get()));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view descriptor heap created.");
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back buffer handles.");
-		backBufferHandles.resize(backBuffers.size());
-		backBufferHandles[0].ptr = backBufferDescriptorHeap->GetCPUDescriptorHandleForHeapStart().ptr;
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back view handles.");
+		backViewHandles.resize(backBuffers.size());
+		backViewHandles[0].ptr = backViewHeap->GetCPUDescriptorHandleForHeapStart().ptr;
 		const UINT rtvDescriptorHandleIncrement = device.GetDescriptorHandleIncrementSize(descHeapType);
-		for (std::size_t i = 1; i < backBufferHandles.size(); ++i)
+		for (std::size_t i = 1; i < backViewHandles.size(); ++i)
 		{
-			backBufferHandles[i].ptr = backBufferHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
+			backViewHandles[i].ptr = backViewHandles[i - 1].ptr + rtvDescriptorHandleIncrement;
 		}
 		const auto rtvDescription = D3D12_RENDER_TARGET_VIEW_DESC
 		{
-			.Format = backBufferFormat,
+			.Format = srgbBackViewFormat,
 			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
 			.Texture2D = D3D12_TEX2D_RTV{}
 		};
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
 		{
-			device.CreateRenderTargetView(backBuffers[i].Get(), &rtvDescription, backBufferHandles[i]);
-			PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer handle at '{}' index created at '{}'.", i, backBufferHandles[i].ptr);
+			device.CreateRenderTargetView(backBuffers[i].Get(), &rtvDescription, backViewHandles[i]);
 		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer handles created.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view handles created.");
 	}
 
-	Direct3D12BackBuffer::~Direct3D12BackBuffer() noexcept
+	Direct3D12Back::~Direct3D12Back() noexcept
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back buffer descriptor heap.");
-		backBufferDescriptorHeap.Reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer descriptor heap released.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back view descriptor heap.");
+		backViewHeap.Reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view descriptor heap released.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back buffers.");
 		backBuffers.clear();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffers released.");
 	}
 
-	DXGI_FORMAT Direct3D12BackBuffer::Format() const noexcept
+	DXGI_FORMAT Direct3D12Back::Format() const noexcept
 	{
-		return backBufferFormat;
+		return backViewFormat;
 	}
 
-	ID3D12Resource2& Direct3D12BackBuffer::CurrentBackBuffer() noexcept
+	DXGI_FORMAT Direct3D12Back::FormatSrgb() const noexcept
+	{
+		return srgbBackViewFormat;
+	}
+
+	ID3D12Resource2& Direct3D12Back::CurrentBackBuffer() noexcept
 	{
 		return *backBuffers[currentBackBufferIndex].Get();
 	}
 
-	const ID3D12Resource2& Direct3D12BackBuffer::CurrentBackBuffer() const noexcept
+	const ID3D12Resource2& Direct3D12Back::CurrentBackBuffer() const noexcept
 	{
 		return *backBuffers[currentBackBufferIndex].Get();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12BackBuffer::CurrentBackBufferHandle() const noexcept
+	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12Back::CurrentBackViewHandle() const noexcept
 	{
-		return backBufferHandles[currentBackBufferIndex];
+		return backViewHandles[currentBackBufferIndex];
 	}
 
-	void Direct3D12BackBuffer::Name(const std::string_view name)
+	void Direct3D12Back::Name(const std::string_view name)
 	{
 		constexpr std::string_view bufferFormat = "{} - Buffer{}";
-		constexpr std::string_view heapDescName = " - HeapDescriptor";
+		constexpr std::string_view heapDescName = " - ViewHeap";
 
 		auto componentName = std::string();
 		componentName.reserve(name.size() + heapDescName.size());
@@ -182,15 +194,15 @@ namespace PonyEngine::Render
 
 		componentName.erase();
 		componentName.append(name).append(heapDescName);
-		SetName(*backBufferDescriptorHeap.Get(), componentName);
+		SetName(*backViewHeap.Get(), componentName);
 	}
 
-	UINT Direct3D12BackBuffer::CurrentBackBufferIndex() const noexcept
+	UINT Direct3D12Back::CurrentBackBufferIndex() const noexcept
 	{
 		return currentBackBufferIndex;
 	}
 
-	void Direct3D12BackBuffer::CurrentBackBufferIndex(const UINT index) noexcept
+	void Direct3D12Back::CurrentBackBufferIndex(const UINT index) noexcept
 	{
 		currentBackBufferIndex = index;
 	}

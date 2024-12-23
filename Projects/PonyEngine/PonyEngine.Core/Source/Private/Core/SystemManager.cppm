@@ -206,8 +206,6 @@ namespace PonyEngine::Core
 
 	void SystemManager::TickSystems() const
 	{
-		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, "Tick systems.");
-
 		for (TickableSystem* const system : tickableSystems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Verbose, typeid(*system).name());

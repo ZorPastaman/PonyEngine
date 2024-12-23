@@ -48,6 +48,20 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept = 0;
 
+		/// @brief Gets the msaa render target buffer.
+		/// @return Render target buffer.
+		[[nodiscard("Pure function")]]
+		virtual ID3D12Resource2* RenderTargetBufferMsaa() noexcept = 0;
+		/// @brief Gets the msaa render target buffer.
+		/// @return Render target buffer.
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12Resource2* RenderTargetBufferMsaa() const noexcept = 0;
+		/// @brief Gets the msaa rtv handle.
+		/// @note It's invalid if the @p RenderTargetBufferMsaa() return @a nullptr.
+		/// @return Rtv handle.
+		[[nodiscard("Pure function")]]
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandleMsaa() const noexcept = 0;
+
 		/// @brief Gets the render target resolution.
 		/// @return Render target resolution.
 		[[nodiscard("Pure function")]]

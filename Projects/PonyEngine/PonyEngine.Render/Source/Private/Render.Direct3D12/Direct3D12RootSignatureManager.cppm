@@ -77,10 +77,11 @@ namespace PonyEngine::Render
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.Get()));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created.");
 
 		const auto d3d12RootSignature = std::make_shared<Direct3D12RootSignature>(*rootSignature.Get(), mvpIndex);
 		rootSignatures.push_back(d3d12RootSignature);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(d3d12RootSignature.get()));
 
 		return d3d12RootSignature;
 	}

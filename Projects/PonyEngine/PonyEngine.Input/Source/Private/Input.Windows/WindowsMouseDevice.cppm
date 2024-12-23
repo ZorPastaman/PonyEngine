@@ -72,12 +72,12 @@ namespace PonyEngine::Input
 
 	void WindowsMouseDevice::Begin()
 	{
-		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
 			windowSystem->MessagePump().AddMessageObserver(*this, std::array<UINT, 10> { WM_MOUSEMOVE, WM_LBUTTONDOWN, WM_LBUTTONUP, WM_RBUTTONDOWN, WM_RBUTTONUP, WM_MBUTTONDOWN, WM_MBUTTONUP, WM_XBUTTONDOWN, WM_XBUTTONUP, WM_MOUSEWHEEL });
 			windowSystem->RawInputManager().AddRawInputObserver(*this, std::array<DWORD, 1> { RIM_TYPEMOUSE });
 		}
-		else
+		else [[unlikely]]
 		{
 			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Failed to find Windows window system. Mouse input won't work.");
 		}
@@ -85,7 +85,7 @@ namespace PonyEngine::Input
 
 	void WindowsMouseDevice::End()
 	{
-		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
 			windowSystem->RawInputManager().RemoveRawInputObserver(*this);
 			windowSystem->MessagePump().RemoveMessageObserver(*this);

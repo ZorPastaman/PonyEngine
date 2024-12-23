@@ -150,6 +150,7 @@ namespace PonyEngine::Render
 
 		const auto renderMesh = std::make_shared<Direct3D12Mesh>(vertices, colors ? &colors.value() : nullptr, indices);
 		meshes.push_back(renderMesh);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 
 		return renderMesh;
 	}

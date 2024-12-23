@@ -123,7 +123,7 @@ namespace Application
 
 	bool WindowsEngine::Tick(int& exitCode)
 	{
-		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine."); // TODO: Recheck verbose logs. Many of them are redundant.
+		PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Verbose, "Tick engine.");
 
 		try
 		{
@@ -175,7 +175,6 @@ namespace Application
 			constexpr auto systemParams = PonyEngine::Time::FrameRateSystemParams{.targetFrameTime = PonyEngine::Time::ConvertFrameRateFrameTime(60.f)};
 			PonyEngine::Time::FrameRateSystemFactoryData factory = PonyEngine::Time::CreateFrameRateSystemFactory(*application, PonyEngine::Time::FrameRateSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The frame rate system factory is nullptr.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' frame rate system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
@@ -196,7 +195,6 @@ namespace Application
 			constexpr auto systemParams = PonyEngine::Time::TimeSystemParams{};
 			PonyEngine::Time::TimeSystemFactoryData factory = PonyEngine::Time::CreateTimeSystemFactory(*application, PonyEngine::Time::TimeSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The time system factory is nullptr.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' time system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
@@ -222,7 +220,6 @@ namespace Application
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
 			PonyEngine::Window::WindowsWindowSystemFactoryData factory = PonyEngine::Window::CreateWindowsWindowFactory(*application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
 			assert(factory.systemFactory && "The Windows window system factory is nullptr.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows window system factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;
@@ -251,7 +248,6 @@ namespace Application
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::InputDeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
 			inputParams.inputBindings["Forward"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
@@ -290,7 +286,6 @@ namespace Application
 				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = -1.f}
 			};
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
 			PonyEngine::Input::InputSystemFactoryData factory = PonyEngine::Input::CreateInputSystemFactory(*application, PonyEngine::Input::InputSystemFactoryParams{}, inputParams);
 			assert(factory.systemFactory && "The input system factory is nullptr");
@@ -312,10 +307,9 @@ namespace Application
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
 			auto renderParams = PonyEngine::Render::WindowsDirect3D12RenderSystemParams{};
-			renderParams.renderTargetParams.msaaParams.sampleCount = 1;
+			renderParams.renderTargetParams.msaaParams.sampleCount = 4;
 			PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryData factory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(*application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{}, renderParams);
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", typeid(*factory.systemFactory).name());
 
 			return factory;

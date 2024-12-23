@@ -37,7 +37,7 @@ namespace Core
 		TEST_METHOD(StaticDataTest)
 		{
 			Assert::AreEqual(std::size_t{3}, PonyMath::Color::RGB<float>::ComponentCount);
-			Assert::AreEqual(2.2f, PonyMath::Color::RGB<float>::GammaValue);
+			Assert::AreEqual(2.4f, PonyMath::Color::RGB<float>::GammaValue);
 		}
 
 		TEST_METHOD(PredefinedTest)
@@ -199,8 +199,8 @@ namespace Core
 			constexpr float b = 0.002f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.708, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.836, static_cast<double>(gamma.G()), 0.001);
+			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
+			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
 			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
 		}
 
@@ -211,8 +211,8 @@ namespace Core
 			constexpr float b = 0.026f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.49, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.69, static_cast<double>(linear.G()), 0.001);
+			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
 			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
 		}
 

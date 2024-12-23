@@ -177,11 +177,11 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::Begin()
 	{
-		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
 			windowSystem->MessagePump().AddMessageObserver(*this, std::array<UINT, 4> { WM_KEYDOWN, WM_KEYUP, WM_SYSKEYDOWN, WM_SYSKEYUP });
 		}
-		else
+		else [[unlikely]]
 		{
 			PONY_LOG(InputSystem().Logger(), PonyDebug::Log::LogType::Warning, "Couldn't find Windows window system. Keyboard input won't work.");
 		}
@@ -189,7 +189,7 @@ namespace PonyEngine::Input
 
 	void WindowsKeyboardDevice::End()
 	{
-		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>())
+		if (const auto windowSystem = InputSystem().SystemManager().FindSystem<Window::IWindowsWindowSystem>()) [[likely]]
 		{
 			windowSystem->MessagePump().RemoveMessageObserver(*this);
 		}

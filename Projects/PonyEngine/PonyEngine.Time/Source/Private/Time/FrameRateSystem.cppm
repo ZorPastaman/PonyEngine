@@ -73,14 +73,11 @@ namespace PonyEngine::Time
 
 	void FrameRateSystem::Tick() noexcept
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Wait for target frame time: '{}'.", targetFrameTime);
 		std::chrono::time_point<std::chrono::steady_clock> now;
-
 		do
 		{
 			now = std::chrono::steady_clock::now();
 		} while (std::chrono::duration<float>(now - previousTickTime) < targetFrameTime);
-
 		previousTickTime = now;
 	}
 

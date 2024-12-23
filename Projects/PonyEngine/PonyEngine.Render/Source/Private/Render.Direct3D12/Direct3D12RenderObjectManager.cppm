@@ -116,7 +116,7 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Direct3D12Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh);
 		renderMesh->Name("Mesh");
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
 		auto renderObject = std::make_shared<Direct3D12RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
 		renderObjects.push_back(renderObject);

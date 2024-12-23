@@ -178,6 +178,7 @@ namespace PonyEngine::Window
 		}
 
 		clipping = clippingRect;
+		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "Clipping rect set to '{}'.", clipping ? clipping->ToString() : "nullopt");
 		UpdateClipping();
 	}
 

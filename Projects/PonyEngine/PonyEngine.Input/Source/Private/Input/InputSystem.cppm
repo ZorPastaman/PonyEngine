@@ -149,87 +149,87 @@ namespace PonyEngine::Input
 	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams& inputParams) noexcept :
 		TickableSystem(engine, systemParams)
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create devices.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create devices.");
 		for (const std::shared_ptr<IInputDeviceFactory>& deviceFactory : inputParams.inputDeviceFactories)
 		{
 			assert(deviceFactory && "The device factory is nullptr.");
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Create '{}' device with '{}' factory.", deviceFactory->DeviceType().name(), typeid(*deviceFactory).name());
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create '{}' device with '{}' factory.", deviceFactory->DeviceType().name(), typeid(*deviceFactory).name());
 			InputDeviceData device = deviceFactory->CreateDevice(*static_cast<IInputSystemContext*>(this), InputDeviceParams{});
 			assert(device.inputDevice && "The device is nullptr");
 			devices.push_back(std::move(device.inputDevice));
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Device created.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Device created.");
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Devices created.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Devices created.");
 
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Set input bindings.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Set input bindings.");
 		for (const auto& [id, binding] : inputParams.inputBindings)
 		{
 			inputIds.push_back(id);
 			const std::size_t idIndex = inputIds.size() - 1;
 			for (const auto& [inputCode, multiplier] : binding)
 			{
-				PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set input binding. ID: '{}'; Input code: '{}'; Multiplier: '{}'.", id, ToString(inputCode), multiplier);
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Set input binding. ID: '{}'; Input code: '{}'; Multiplier: '{}'.", id, ToString(inputCode), multiplier);
 				inputMapping.push_back(InputMappingEntry{.idIndex = idIndex, .inputCode = inputCode, .multiplier = multiplier});
 				const std::size_t entryIndex = inputMapping.size() - 1;
 				idToInputMapping[idIndex].push_back(entryIndex);
 				codeToInputMapping[inputCode].push_back(entryIndex);
 			}
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Input bindings set.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Input bindings set.");
 	}
 
 	InputSystem::~InputSystem() noexcept
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy devices.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy devices.");
 		for (auto it = devices.rbegin(); it != devices.rend(); ++it)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(**it).name());
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Destroy '{}' device.", typeid(**it).name());
 			it->reset();
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Device destroyed.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Device destroyed.");
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Devices destroyed.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Devices destroyed.");
 	}
 
 	void InputSystem::Begin()
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Begin devices.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Begin devices.");
 		for (const std::unique_ptr<InputDevice>& device : devices)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Begin '{}' device.", typeid(*device).name());
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Begin '{}' device.", typeid(*device).name());
 			device->Begin();
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Device begun.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Device begun.");
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Devices begun.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Devices begun.");
 	}
 
 	void InputSystem::End() noexcept
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "End devices.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "End devices.");
 		for (auto it = devices.crbegin(); it != devices.crend(); ++it)
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "End '{}' device.", typeid(**it).name());
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "End '{}' device.", typeid(**it).name());
 			try
 			{
 				(*it)->End();
 			}
 			catch (const std::exception& e)
 			{
-				PONY_LOG_E(Engine().Logger(), e, "On ending '{}' device.", typeid(**it).name());
+				PONY_LOG_E(Logger(), e, "On ending '{}' device.", typeid(**it).name());
 			}
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Device ended.");
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Device ended.");
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Devices ended.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Devices ended.");
 	}
 
 	void InputSystem::Tick()
 	{
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Zero deltas.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Zero deltas.");
 		ZeroDeltas();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Clean.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Clean.");
 		Clean();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Tick devices.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Tick devices.");
 		TickDevices();
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Process input.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Process input.");
 		ProcessInput();
 	}
 
@@ -242,9 +242,9 @@ namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Warning, "Input receiver created for a not bound input ID: '{}'.", id);
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Warning, "Input receiver created for a not bound input ID: '{}'.", id);
 		}
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Input receiver created with '{}' ID. Receiver: '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(receiver.get()));
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Input receiver created with '{}' ID at '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(receiver.get()));
 
 		return receiver;
 	}
@@ -272,7 +272,7 @@ namespace PonyEngine::Input
 		}
 		else [[unlikely]]
 		{
-			PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "No input is bound by '{}' ID.", id);
+			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "No input is bound with '{}' ID.", id);
 		}
 
 		return value;
@@ -301,7 +301,6 @@ namespace PonyEngine::Input
 	void InputSystem::AddInputEvent(const IInputDevice& inputSource, const InputEvent& inputEvent)
 	{
 		inputQueue.emplace(&inputSource, inputEvent);
-		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Verbose, "Input event from '0x{:X}' added with '{}' input code.", reinterpret_cast<std::uintptr_t>(&inputSource), ToString(inputEvent.inputCode));
 	}
 
 	void InputSystem::ZeroDeltas() noexcept
@@ -317,9 +316,9 @@ namespace PonyEngine::Input
 			{
 				if (receivers[i].use_count() <= 1)
 				{
-					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Destroy input receiver at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(receivers[i].get()));
+					PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Destroy input receiver at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(receivers[i].get()));
 					receivers.erase(receivers.cbegin() + i);
-					PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Input receiver destroyed.");
+					PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Input receiver destroyed.");
 				}
 			}
 		}

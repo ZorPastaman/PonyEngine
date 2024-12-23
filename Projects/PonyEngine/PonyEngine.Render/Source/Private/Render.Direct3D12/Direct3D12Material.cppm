@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Material;
@@ -100,7 +98,6 @@ namespace PonyEngine::Render
 		vertexSlot{params.vertexSlot},
 		vertexColorSlot(params.vertexColorSlot)
 	{
-		assert(this->rootSignature && "The root signature is nullptr.");
 	}
 
 	Direct3D12RootSignature& Direct3D12Material::RootSignature() noexcept
