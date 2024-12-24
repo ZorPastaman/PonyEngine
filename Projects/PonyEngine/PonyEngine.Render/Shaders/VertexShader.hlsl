@@ -23,7 +23,7 @@ struct VertexOutput
 	float4 color : COLOR;
 };
 
-[RootSignature(ROOT_SIGNATURE)]
+[RootSignature(ROOT_SIGNATURE)] // TODO: Try to set it in properties
 VertexOutput main(VertexInput input)
 {
 	VertexOutput output;

@@ -47,6 +47,18 @@ export namespace PonyEngine::Render
 		/// @return Rtv handle.
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept = 0;
+		/// @brief Gets the srv heap.
+		/// @return Srv heap.
+		[[nodiscard("Pure function")]]
+		virtual ID3D12DescriptorHeap& SrvHeap() noexcept = 0;
+		/// @brief Gets the srv heap.
+		/// @return Srv heap.
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12DescriptorHeap& SrvHeap() const noexcept = 0;
+		/// @brief Gets the srv handle.
+		/// @return Srv handle.
+		[[nodiscard("Pure function")]]
+		virtual D3D12_GPU_DESCRIPTOR_HANDLE SrvHandle() const noexcept = 0;
 
 		/// @brief Gets the msaa render target buffer.
 		/// @return Render target buffer.

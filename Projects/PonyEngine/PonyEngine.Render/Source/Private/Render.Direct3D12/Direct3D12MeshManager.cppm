@@ -217,10 +217,6 @@ namespace PonyEngine::Render
 		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadVertexBuffer.Get(), *gpuVertexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
-		d3d12System->GraphicsPipeline().AddVertexInitializationTask(*gpuVertexBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
-
 		return Direct3D12VertexArray(*gpuVertexBuffer.Get(), MeshVertexFormat, vertexCount);
 	}
 
@@ -277,10 +273,6 @@ namespace PonyEngine::Render
 		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadColorBuffer.Get(), *gpuColorBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
 
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
-		d3d12System->GraphicsPipeline().AddVertexInitializationTask(*gpuColorBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
-
 		return Direct3D12VertexArray(*gpuColorBuffer.Get(), MeshVertexColorFormat, colorCount);
 	}
 
@@ -331,10 +323,6 @@ namespace PonyEngine::Render
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
 		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadIndexBuffer.Get(), *gpuIndexBuffer.Get());
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create initialization task.");
-		d3d12System->GraphicsPipeline().AddIndexInitializationTask(*gpuIndexBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Initialization task created.");
 
 		return Direct3D12IndexArray(*gpuIndexBuffer.Get(), MeshIndexFormat, indexCount);
 	}

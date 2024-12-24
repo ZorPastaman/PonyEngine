@@ -7,13 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct PixelInput
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
+// t0: Render target.
+// s0: Render target sampler.
 
-float4 main(PixelInput input) : SV_TARGET
-{
-	return input.color;
-}
+#define SRGB_OUTPUT_ROOT_SIGNATURE \
+	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
+	"DescriptorTable(SRV(t0, numDescriptors = 1)), " \
+	"StaticSampler(s0, Filter = FILTER_MIN_MAG_MIP_POINT, AddressU = TEXTURE_ADDRESS_CLAMP, AddressV = TEXTURE_ADDRESS_CLAMP)"

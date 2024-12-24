@@ -7,13 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct PixelInput
+struct VertexInput
 {
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
+	float3 position : POSITION;
+	float2 uv : TEXCOORD;
 };
 
-float4 main(PixelInput input) : SV_TARGET
+struct VertexOutput
 {
-	return input.color;
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+VertexOutput main(VertexInput input)
+{
+	VertexOutput output;
+	output.position = float4(input.position, 1.f);
+	output.uv = input.uv;
+
+	return output;
 }
