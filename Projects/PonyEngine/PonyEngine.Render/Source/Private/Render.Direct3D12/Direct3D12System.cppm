@@ -395,6 +395,10 @@ namespace PonyEngine::Render
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render object manager.");
 		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*static_cast<IDirect3D12SystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output quad.");
+		graphicsPipeline->CreateSrgbOutputQuad();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Srgb output quad created.");
 	}
 
 	void Direct3D12System::BeginFrame()

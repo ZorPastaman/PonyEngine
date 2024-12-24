@@ -82,27 +82,27 @@ namespace PonyEngine::Render
 	{
 		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
 
-		auto blendState = D3D12_BLEND_DESC
+		constexpr auto blendState = D3D12_BLEND_DESC
 		{
 			.AlphaToCoverageEnable = false,
 			.IndependentBlendEnable = false,
-		};
-		for (D3D12_RENDER_TARGET_BLEND_DESC& renderTarget : blendState.RenderTarget)
-		{
-			renderTarget = D3D12_RENDER_TARGET_BLEND_DESC
+			.RenderTarget = 
 			{
-				.BlendEnable = false,
-				.LogicOpEnable = false,
-				.SrcBlend = D3D12_BLEND_ONE,
-				.DestBlend = D3D12_BLEND_ZERO,
-				.BlendOp = D3D12_BLEND_OP_ADD,
-				.SrcBlendAlpha = D3D12_BLEND_ONE,
-				.DestBlendAlpha = D3D12_BLEND_ZERO,
-				.BlendOpAlpha = D3D12_BLEND_OP_ADD,
-				.LogicOp = D3D12_LOGIC_OP_NOOP,
-				.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
-			};
-		}
+				D3D12_RENDER_TARGET_BLEND_DESC
+				{
+					.BlendEnable = false,
+					.LogicOpEnable = false,
+					.SrcBlend = D3D12_BLEND_ONE,
+					.DestBlend = D3D12_BLEND_ZERO,
+					.BlendOp = D3D12_BLEND_OP_ADD,
+					.SrcBlendAlpha = D3D12_BLEND_ONE,
+					.DestBlendAlpha = D3D12_BLEND_ZERO,
+					.BlendOpAlpha = D3D12_BLEND_OP_ADD,
+					.LogicOp = D3D12_LOGIC_OP_NOOP,
+					.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
+				}
+			}
+		};
 
 		constexpr auto rasterizerState = D3D12_RASTERIZER_DESC
 		{
@@ -113,7 +113,7 @@ namespace PonyEngine::Render
 			.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP,
 			.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
 			.DepthClipEnable = true,
-			.MultisampleEnable = false,
+			.MultisampleEnable = true,
 			.AntialiasedLineEnable = false,
 			.ForcedSampleCount = 0u,
 			.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF

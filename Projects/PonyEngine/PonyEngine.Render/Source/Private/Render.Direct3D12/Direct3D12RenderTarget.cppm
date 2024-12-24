@@ -61,6 +61,12 @@ export namespace PonyEngine::Render
 		virtual const ID3D12Resource2& RenderTargetBuffer() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual ID3D12DescriptorHeap& SrvHeap() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ID3D12DescriptorHeap& SrvHeap() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual D3D12_GPU_DESCRIPTOR_HANDLE SrvHandle() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual ID3D12Resource2* RenderTargetBufferMsaa() noexcept override;
@@ -102,6 +108,8 @@ export namespace PonyEngine::Render
 		Microsoft::WRL::ComPtr<ID3D12Resource2> renderTargetBuffer; ///< Render target buffer.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap; ///< Rtv descriptor heap.
 		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle; ///< Rtv handle.
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap; ///< Srv descriptor heap.
+		D3D12_GPU_DESCRIPTOR_HANDLE srvHandle; ///< Srv handle.
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> msaaRenderTargetBuffer; ///< Msaa render target buffer.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> msaaRtvHeap; ///< Msaa rtv descriptor heap.
@@ -182,6 +190,33 @@ namespace PonyEngine::Render
 		rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
 		device.CreateRenderTargetView(renderTargetBuffer.Get(), &rtvDesc, rtvHandle);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Rtv handle created.");
+
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire srv descriptor heap.");
+		constexpr auto srvDescriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
+		{
+			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
+			.NumDescriptors = 1u,
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+			.NodeMask = 0u
+		};
+		if (const HRESULT result = device.CreateDescriptorHeap(&srvDescriptorHeapDesc, IID_PPV_ARGS(srvHeap.GetAddressOf())); FAILED(result))
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire srv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srv descriptor heap acquired.");
+
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srv handle.");
+		const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+		{
+			.Format = rtvFormat,
+			.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+			.Texture2D = D3D12_TEX2D_SRV{.MostDetailedMip = 0u, .MipLevels = 1u, .PlaneSlice = 0u, .ResourceMinLODClamp = 0.f}
+		};
+		D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = srvHeap->GetCPUDescriptorHandleForHeapStart();
+		device.CreateShaderResourceView(renderTargetBuffer.Get(), &srvDesc, srvCpuHandle);
+		srvHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srv handle created.");
 
 		if (params.msaaParams.sampleCount <= 1u)
 		{
@@ -293,6 +328,7 @@ namespace PonyEngine::Render
 	{
 		constexpr std::string_view bufferName = " - Buffer";
 		constexpr std::string_view heapName = " - ViewHeap";
+		constexpr std::string_view srvHeapName = " - SrvHeap";
 		constexpr std::string_view msaaBufferName = " - BufferMsaa";
 		constexpr std::string_view msaaHeapName = " - ViewHeapMsaa";
 
@@ -305,6 +341,10 @@ namespace PonyEngine::Render
 		componentName.erase();
 		componentName.append(name).append(heapName);
 		SetName(*rtvHeap.Get(), componentName);
+
+		componentName.erase();
+		componentName.append(name).append(srvHeapName);
+		SetName(*srvHeap.Get(), componentName);
 
 		if (msaaRenderTargetBuffer)
 		{
@@ -344,6 +384,21 @@ namespace PonyEngine::Render
 	D3D12_CPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::RtvHandle() const noexcept
 	{
 		return rtvHandle;
+	}
+
+	ID3D12DescriptorHeap& Direct3D12RenderTarget::SrvHeap() noexcept
+	{
+		return *srvHeap.Get();
+	}
+
+	const ID3D12DescriptorHeap& Direct3D12RenderTarget::SrvHeap() const noexcept
+	{
+		return *srvHeap.Get();
+	}
+
+	D3D12_GPU_DESCRIPTOR_HANDLE Direct3D12RenderTarget::SrvHandle() const noexcept
+	{
+		return srvHandle;
 	}
 
 	ID3D12Resource2* Direct3D12RenderTarget::RenderTargetBufferMsaa() noexcept
