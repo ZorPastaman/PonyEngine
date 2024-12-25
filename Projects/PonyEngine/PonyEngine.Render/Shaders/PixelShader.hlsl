@@ -13,7 +13,15 @@ struct PixelInput
 	float4 color : COLOR;
 };
 
-float4 main(PixelInput input) : SV_TARGET
+struct PixelOutput
 {
-	return input.color;
+	float4 color : SV_TARGET;
+};
+
+PixelOutput main(PixelInput input)
+{
+	PixelOutput output;
+	output.color = input.color;
+
+	return output;
 }

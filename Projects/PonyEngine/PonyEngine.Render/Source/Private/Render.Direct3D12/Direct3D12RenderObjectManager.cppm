@@ -85,7 +85,7 @@ namespace PonyEngine::Render
 		// TODO: Add ShaderManager. But seems that there's no need of exactly ShaderManager for d3d12. I just need a ShaderResource in a ResourceSystem.
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create default material.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
-		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Direct3D12Shader("RootSignature"), 0u);
+		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Direct3D12Shader("RootSig"), 0u);
 		rootSignature->Name("DefaultRootSignature");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load vertex shader.");

@@ -207,19 +207,19 @@
     <FxCompile Include="Shaders\PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\RootSignature.hlsli">
+    <FxCompile Include="Shaders\RootSig.hlsli">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\VertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\SrgbOutputRootSignature.hlsli">
+    <FxCompile Include="Shaders\OutputRootSig.hlsli">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\SrgbOutputVertexShader.hlsl">
+    <FxCompile Include="Shaders\OutputVertexShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\SrgbOutputPixelShader.hlsl">
+    <FxCompile Include="Shaders\OutputPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
   </ItemGroup>

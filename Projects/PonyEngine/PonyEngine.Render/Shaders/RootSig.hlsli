@@ -7,19 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "SrgbOutputRootSignature.hlsli"
+// b0: MVP matrix
 
-Texture2D RenderTargetTexture : register(t0);
-sampler RenderTargetSampler : register(s0);
-
-struct PixelInput
-{
-	float4 position : SV_POSITION;
-	float2 uv : TEXCOORD;
-};
-
-[RootSignature(SRGB_OUTPUT_ROOT_SIGNATURE)]
-float4 main(PixelInput input) : SV_TARGET
-{
-	return RenderTargetTexture.Sample(RenderTargetSampler, input.uv);
-}
+#define ROOT_SIG \
+	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
+	"RootConstants(num32BitConstants=16, b0)"
