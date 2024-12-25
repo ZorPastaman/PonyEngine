@@ -20,8 +20,6 @@ export namespace PonyEngine::Render
 	/// @brief Direct3D12 material parameters.
 	struct Direct3D12MaterialParams final
 	{
-		D3D_PRIMITIVE_TOPOLOGY primitiveTopology; ///< Primitive topology.
-
 		UINT vertexSlot; ///< Vertex slot.
 		std::optional<UINT> vertexColorSlot; ///< Vertex color slot. It's @a nullopt if the material doesn't support it.
 	};

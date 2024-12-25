@@ -58,10 +58,6 @@ export namespace PonyEngine::Render
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		const ID3D12PipelineState& PipelineState() const noexcept;
-		/// @brief Gets the primitive topology.
-		/// @return Primitive topology.
-		[[nodiscard("Pure function")]]
-		D3D_PRIMITIVE_TOPOLOGY PrimitiveTopology() const noexcept;
 
 		/// @brief Gets vertex slot.
 		/// @return Vertex slot.
@@ -82,7 +78,6 @@ export namespace PonyEngine::Render
 	private:
 		std::shared_ptr<Direct3D12RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
-		D3D_PRIMITIVE_TOPOLOGY primitiveTopology; ///< Primitive topology.
 
 		UINT vertexSlot; ///< Vertex slot.
 		std::optional<UINT> vertexColorSlot; ///< Vertex color slot.
@@ -94,7 +89,6 @@ namespace PonyEngine::Render
 	Direct3D12Material::Direct3D12Material(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const Direct3D12MaterialParams& params) noexcept :
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
-		primitiveTopology{params.primitiveTopology},
 		vertexSlot{params.vertexSlot},
 		vertexColorSlot(params.vertexColorSlot)
 	{
@@ -118,11 +112,6 @@ namespace PonyEngine::Render
 	const ID3D12PipelineState& Direct3D12Material::PipelineState() const noexcept
 	{
 		return *pipelineState.Get();
-	}
-
-	D3D_PRIMITIVE_TOPOLOGY Direct3D12Material::PrimitiveTopology() const noexcept
-	{
-		return primitiveTopology;
 	}
 
 	UINT Direct3D12Material::VertexSlot() const noexcept

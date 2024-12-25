@@ -69,7 +69,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Resource2* RenderTargetBufferMsaa() const noexcept = 0;
 		/// @brief Gets the msaa rtv handle.
-		/// @note It's invalid if the @p RenderTargetBufferMsaa() return @a nullptr.
+		/// @note It's invalid if the @p RenderTargetBufferMsaa() returns @a nullptr.
 		/// @return Rtv handle.
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE RtvHandleMsaa() const noexcept = 0;

@@ -15,6 +15,9 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12SrgbOutputQuad;
 
+import <array>;
+import <cstddef>;
+import <cstring>;
 import <stdexcept>;
 import <string>;
 import <string_view>;
@@ -29,14 +32,17 @@ import :IDirect3D12SystemContext;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Direct3D12 srgb output quad.
 	class Direct3D12SrgbOutputQuad final
 	{
 	public:
-		static constexpr UINT VertexSlot = 0u;
-		static constexpr UINT UvSlot = 1u;
-		static constexpr UINT RenderTargetSlot = 0u;
-		static constexpr UINT IndexCount = 6u;
+		static constexpr UINT VertexSlot = 0u; ///< Vertex buffer slot.
+		static constexpr UINT UvSlot = 1u; ///< Uv buffer slot.
+		static constexpr UINT RenderTargetSlot = 0u; ///< Render target texture slot.
+		static constexpr UINT IndexCount = 6u; ///< Quad index count.
 
+		/// @brief Creates a @p Direct3D12SrgbOutputQuad.
+		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
 		explicit Direct3D12SrgbOutputQuad(IDirect3D12SystemContext& d3d12System);
 		Direct3D12SrgbOutputQuad(const Direct3D12SrgbOutputQuad&) = delete;
@@ -45,53 +51,81 @@ export namespace PonyEngine::Render
 
 		~Direct3D12SrgbOutputQuad() noexcept;
 
+		/// @brief Gets the root signature.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		ID3D12RootSignature& RootSignature() noexcept;
+		/// @brief Gets the root signature.
+		/// @return Root signature.
 		[[nodiscard("Pure function")]]
 		const ID3D12RootSignature& RootSignature() const noexcept;
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		ID3D12PipelineState& PipelineState() noexcept;
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
 		const ID3D12PipelineState& PipelineState() const noexcept;
 
+		/// @brief Gets the vertex buffer.
+		/// @return Vertex buffer.
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& VertexBuffer() noexcept;
+		/// @brief Gets the vertex buffer.
+		/// @return Vertex buffer.
 		[[nodiscard("Pure function")]]
 		const ID3D12Resource2& VertexBuffer() const noexcept;
+		/// @brief Gets the uv buffer.
+		/// @return Uv buffer.
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& UvBuffer() noexcept;
+		/// @brief Gets the uv buffer.
+		/// @return Uv buffer.
 		[[nodiscard("Pure function")]]
 		const ID3D12Resource2& UvBuffer() const noexcept;
+		/// @brief Gets the index buffer.
+		/// @return Index buffer.
 		[[nodiscard("Pure function")]]
 		ID3D12Resource2& IndexBuffer() noexcept;
+		/// @brief Gets the index buffer.
+		/// @return Index buffer.
 		[[nodiscard("Pure function")]]
 		const ID3D12Resource2& IndexBuffer() const noexcept;
 
+		/// @brief Gets the vertex buffer view.
+		/// @return Vertex buffer view.
 		[[nodiscard("Pure function")]]
 		const D3D12_VERTEX_BUFFER_VIEW& VertexBufferView() const noexcept;
+		/// @brief Gets the uv buffer view.
+		/// @return Uv buffer view.
 		[[nodiscard("Pure function")]]
 		const D3D12_VERTEX_BUFFER_VIEW& UvBufferView() const noexcept;
+		/// @brief Gets the index buffer view.
+		/// @return Index buffer view.
 		[[nodiscard("Pure function")]]
 		const D3D12_INDEX_BUFFER_VIEW& IndexBufferView() const noexcept;
 
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
 
 		Direct3D12SrgbOutputQuad& operator =(const Direct3D12SrgbOutputQuad&) = delete;
 		Direct3D12SrgbOutputQuad& operator =(Direct3D12SrgbOutputQuad&& other) noexcept = default;
 
 	private:
-		IDirect3D12SystemContext* d3d12System;
+		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
-		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> uvBuffer;
-		Microsoft::WRL::ComPtr<ID3D12Resource2> indexBuffer;
+		Microsoft::WRL::ComPtr<ID3D12Resource2> vertexBuffer; ///< Vertex buffer.
+		Microsoft::WRL::ComPtr<ID3D12Resource2> uvBuffer; ///< Uv buffer.
+		Microsoft::WRL::ComPtr<ID3D12Resource2> indexBuffer; ///< Index buffer.
 
-		D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
-		D3D12_VERTEX_BUFFER_VIEW uvBufferView;
-		D3D12_INDEX_BUFFER_VIEW indexBufferView;
+		D3D12_VERTEX_BUFFER_VIEW vertexBufferView; ///< Vertex buffer view.
+		D3D12_VERTEX_BUFFER_VIEW uvBufferView; ///< Uv buffer view.
+		D3D12_INDEX_BUFFER_VIEW indexBufferView; ///< Index buffer view.
 	};
 }
 
@@ -178,12 +212,12 @@ namespace PonyEngine::Render
 			.BlendState = blendState,
 			.SampleMask = UINT_MAX,
 			.RasterizerState = rasterizerState,
-			.InputLayout = D3D12_INPUT_LAYOUT_DESC{ .pInputElementDescs = inputLayout.data(), .NumElements = static_cast<UINT>(inputLayout.size()) },
+			.InputLayout = D3D12_INPUT_LAYOUT_DESC{.pInputElementDescs = inputLayout.data(), .NumElements = static_cast<UINT>(inputLayout.size())},
 			.IBStripCutValue = D3D12_INDEX_BUFFER_STRIP_CUT_VALUE_DISABLED,
 			.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE,
 			.NumRenderTargets = 1,
 			.RTVFormats = { this->d3d12System->BackPrivate().FormatSrgb() },
-			.SampleDesc = DXGI_SAMPLE_DESC{ .Count = 1u, .Quality = 0u },
+			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.NodeMask = 0u,
 			.Flags = D3D12_PIPELINE_STATE_FLAG_NONE
 		};
@@ -229,6 +263,7 @@ namespace PonyEngine::Render
 			.CreationNodeMask = 0u,
 			.VisibleNodeMask = 0u
 		};
+
 		constexpr std::size_t vertexBufferSize = sizeof(quadVertices);
 		constexpr auto vertexBufferDesc = D3D12_RESOURCE_DESC1
 		{
@@ -264,6 +299,7 @@ namespace PonyEngine::Render
 		}
 		IDirect3D12CopyPipeline& copyPipeline = this->d3d12System->CopyPipeline();
 		copyPipeline.AddBufferCopyTask(*uploadVertexBuffer.Get(), *vertexBuffer.Get());
+
 		constexpr std::size_t uvBufferSize = sizeof(quadUvs);
 		constexpr auto uvBufferDesc = D3D12_RESOURCE_DESC1
 		{
@@ -298,6 +334,7 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu uv buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		copyPipeline.AddBufferCopyTask(*uploadUvBuffer.Get(), *uvBuffer.Get());
+
 		constexpr std::size_t indexBufferSize = sizeof(quadTriangles);
 		constexpr auto indexBufferDesc = D3D12_RESOURCE_DESC1
 		{
@@ -332,6 +369,7 @@ namespace PonyEngine::Render
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu index buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		copyPipeline.AddBufferCopyTask(*uploadIndexBuffer.Get(), *indexBuffer.Get());
+
 		vertexBufferView = D3D12_VERTEX_BUFFER_VIEW{.BufferLocation = vertexBuffer->GetGPUVirtualAddress(), .SizeInBytes = vertexBufferSize, .StrideInBytes = sizeof(PonyMath::Core::Vector3<FLOAT>)};
 		uvBufferView = D3D12_VERTEX_BUFFER_VIEW{.BufferLocation = uvBuffer->GetGPUVirtualAddress(), .SizeInBytes = uvBufferSize, .StrideInBytes = sizeof(PonyMath::Core::Vector2<FLOAT>)};
 		indexBufferView = D3D12_INDEX_BUFFER_VIEW{.BufferLocation = indexBuffer->GetGPUVirtualAddress(), .SizeInBytes = indexBufferSize, .Format = DXGI_FORMAT_R32_UINT};
