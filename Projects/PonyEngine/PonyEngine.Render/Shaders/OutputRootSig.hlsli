@@ -7,8 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-// b0: MVP matrix
+// t0: Render target.
+// s0: Render target sampler.
 
-#define ROOT_SIGNATURE \
+#define SRGB_OUTPUT_ROOT_SIG \
 	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
-	"RootConstants(num32BitConstants=16, b0)"
+	"DescriptorTable(SRV(t0, numDescriptors = 1)), " \
+	"StaticSampler(s0, Filter = FILTER_MIN_MAG_MIP_POINT, AddressU = TEXTURE_ADDRESS_CLAMP, AddressV = TEXTURE_ADDRESS_CLAMP)"

@@ -7,10 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-// t0: Render target.
-// s0: Render target sampler.
+Texture2D RenderTargetTexture : register(t0);
+sampler RenderTargetSampler : register(s0);
 
-#define SRGB_OUTPUT_ROOT_SIGNATURE \
-	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
-	"DescriptorTable(SRV(t0, numDescriptors = 1)), " \
-	"StaticSampler(s0, Filter = FILTER_MIN_MAG_MIP_POINT, AddressU = TEXTURE_ADDRESS_CLAMP, AddressV = TEXTURE_ADDRESS_CLAMP)"
+struct PixelInput
+{
+	float4 position : SV_POSITION;
+	float2 uv : TEXCOORD;
+};
+
+struct PixelOutput
+{
+	float4 color : SV_TARGET;
+};
+
+PixelOutput main(PixelInput input)
+{
+	PixelOutput output;
+	output.color = RenderTargetTexture.Sample(RenderTargetSampler, input.uv);
+
+	return output;
+}

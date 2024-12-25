@@ -135,7 +135,7 @@ namespace PonyEngine::Render
 		d3d12System{&d3d12System}
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output root signature.");
-		const auto rootSignatureShader = Direct3D12Shader("SrgbOutputRootSignature");
+		const auto rootSignatureShader = Direct3D12Shader("OutputRootSig");
 		ID3D12Device10& device = this->d3d12System->Device();
 		if (const HRESULT result = device.CreateRootSignature(0u, rootSignatureShader.Data(), rootSignatureShader.Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
 		{
@@ -144,8 +144,8 @@ namespace PonyEngine::Render
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srgb output root signature created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output pipeline state.");
-		const auto vertexShader = Direct3D12Shader("SrgbOutputVertexShader");
-		const auto pixelShader = Direct3D12Shader("SrgbOutputPixelShader");
+		const auto vertexShader = Direct3D12Shader("OutputVertexShader");
+		const auto pixelShader = Direct3D12Shader("OutputPixelShader");
 		constexpr auto blendState = D3D12_BLEND_DESC
 		{
 			.AlphaToCoverageEnable = false,
