@@ -103,11 +103,8 @@ export namespace PonyEngine::Render
 		/// @brief Closes command lists.
 		void CloseLists();
 
-		/// @brief Populates commands in a non-msaa context.
-		void PopulateCommandsNonMsaa();
-		/// @brief Populates commands in a msaa-context.
-		void PopulateCommandsMsaa();
-
+		/// @brief Populates global commands.
+		void PopulateGlobalCommands();
 		/// @brief Populates begin to render barriers in an msaa context.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param depthStencilBuffer Depth stencil buffer.
@@ -134,7 +131,8 @@ export namespace PonyEngine::Render
 		/// @brief Populates render to output barriers.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param backBuffer Back buffer.
-		void PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer);
+		/// @param depthStencilBuffer Depth stencil buffer.
+		void PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer);
 
 		/// @brief Populates render to resolve barriers.
 		/// @param resolveSourceBuffer Resolve source buffer.
@@ -275,15 +273,36 @@ namespace PonyEngine::Render
 
 	void Direct3D12GraphicsPipeline::PopulateCommands()
 	{
+		IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
+		IDirect3D12DepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
+		IDirect3D12BackPrivate& back = d3d12System->BackPrivate();
+		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
+
+		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
+		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
+		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilBuffer();
+		ID3D12Resource2& backBuffer = back.CurrentBackBuffer();
+
+		ID3D12Resource2& mainRenderTargetBuffer = msaaRenderTargetBuffer ? *msaaRenderTargetBuffer : renderTargetBuffer;
+		const D3D12_CPU_DESCRIPTOR_HANDLE mainRenderTargetHandle = msaaRenderTargetBuffer ? renderTarget.RtvHandleMsaa() : renderTarget.RtvHandle();
+
 		ResetLists();
-		if (d3d12System->RenderTargetPrivate().RenderTargetBufferMsaa())
+		PopulateGlobalCommands();
+		PopulateBeginToRenderBarriers(mainRenderTargetBuffer, depthStencilBuffer);
+		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), mainRenderTargetHandle, depthStencil.DsvHandle());
+		PopulateRenderObjects(renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12());
+		if (msaaRenderTargetBuffer)
 		{
-			PopulateCommandsMsaa();
+			PopulateRenderToResolveBarriers(mainRenderTargetBuffer, renderTargetBuffer, depthStencilBuffer);
+			PopulateResolve(mainRenderTargetBuffer, renderTargetBuffer, renderTarget.Format());
+			PopulateResolveToOutputBarriers(mainRenderTargetBuffer, renderTargetBuffer, backBuffer);
 		}
 		else
 		{
-			PopulateCommandsNonMsaa();
+			PopulateRenderToOutputBarriers(mainRenderTargetBuffer, backBuffer, depthStencilBuffer);
 		}
+		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackViewHandle());
+		PopulateOutputToEndBarriers(renderTargetBuffer, backBuffer);
 		CloseLists();
 	}
 
@@ -318,45 +337,9 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateCommandsNonMsaa()
+	void Direct3D12GraphicsPipeline::PopulateGlobalCommands()
 	{
-		IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
-		IDirect3D12DepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
-		IDirect3D12BackPrivate& back = d3d12System->BackPrivate();
-		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
-
-		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
-		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilBuffer();
-		ID3D12Resource2& backBuffer = back.CurrentBackBuffer();
-
-		PopulateBeginToRenderBarriers(renderTargetBuffer, depthStencilBuffer);
-		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), renderTarget.RtvHandle(), depthStencil.DsvHandle());
-		PopulateRenderObjects(renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12());
-		PopulateRenderToOutputBarriers(renderTargetBuffer, backBuffer);
-		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackViewHandle());
-		PopulateOutputToEndBarriers(renderTargetBuffer, backBuffer);
-	}
-
-	void Direct3D12GraphicsPipeline::PopulateCommandsMsaa()
-	{
-		IDirect3D12RenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
-		IDirect3D12DepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
-		IDirect3D12BackPrivate& back = d3d12System->BackPrivate();
-		const IDirect3D12RenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
-
-		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
-		ID3D12Resource2& msaaRenderTargetBuffer = *renderTarget.RenderTargetBufferMsaa();
-		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilBuffer();
-		ID3D12Resource2& backBuffer = back.CurrentBackBuffer();
-
-		PopulateBeginToRenderBarriers(msaaRenderTargetBuffer, depthStencilBuffer);
-		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), renderTarget.RtvHandleMsaa(), depthStencil.DsvHandle());
-		PopulateRenderObjects(renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12());
-		PopulateRenderToResolveBarriers(msaaRenderTargetBuffer, renderTargetBuffer, depthStencilBuffer);
-		PopulateResolve(msaaRenderTargetBuffer, renderTargetBuffer, renderTarget.Format());
-		PopulateResolveToOutputBarriers(msaaRenderTargetBuffer, renderTargetBuffer, backBuffer);
-		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackViewHandle());
-		PopulateOutputToEndBarriers(renderTargetBuffer, backBuffer);
+		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
@@ -420,9 +403,9 @@ namespace PonyEngine::Render
 		textureBarriers.push_back(renderTargetBarrier);
 		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
 			.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
-			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ, // TODO: Check no access for depth stencil
+			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
@@ -493,7 +476,6 @@ namespace PonyEngine::Render
 			if (material != prevMaterial)
 			{
 				commandList->SetPipelineState(&material->PipelineState());
-				commandList->IASetPrimitiveTopology(material->PrimitiveTopology());
 			}
 
 			const Direct3D12Mesh* const mesh = &renderObject.renderObject->Mesh();
@@ -527,7 +509,6 @@ namespace PonyEngine::Render
 
 		commandList->SetGraphicsRootSignature(&outputQuad->RootSignature());
 		commandList->SetPipelineState(&outputQuad->PipelineState());
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST); // TODO: Set it only once. PonyEngine is all around triangles.
 
 		commandList->IASetVertexBuffers(outputQuad->VertexSlot, 1u, &outputQuad->VertexBufferView());
 		commandList->IASetVertexBuffers(outputQuad->UvSlot, 1u, &outputQuad->UvBufferView());
@@ -608,7 +589,7 @@ namespace PonyEngine::Render
 		PopulateBarrierGroups();
 	}
 
-	void Direct3D12GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer)
+	void Direct3D12GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
@@ -686,7 +667,7 @@ namespace PonyEngine::Render
 		bufferBarriers.push_back(outputIndexBarrier);
 
 		textureBarriers.clear();
-		textureBarriers.reserve(2);
+		textureBarriers.reserve(3);
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
@@ -713,6 +694,19 @@ namespace PonyEngine::Render
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
 		textureBarriers.push_back(backBufferBarrier);
+		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
+		{
+			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
+			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
+			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+			.pResource = &depthStencilBuffer,
+			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+		};
+		textureBarriers.push_back(depthStencilBarrier);
 
 		PopulateBarrierGroups();
 	}
@@ -792,9 +786,9 @@ namespace PonyEngine::Render
 		const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
-			.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
-			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_READ,
+			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
 			.pResource = &depthStencilBuffer,
@@ -866,7 +860,7 @@ namespace PonyEngine::Render
 		const auto resolveDestinationBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RESOLVE,
-			.SyncAfter = D3D12_BARRIER_SYNC_PIXEL_SHADING,
+			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 			.AccessBefore = D3D12_BARRIER_ACCESS_RESOLVE_DEST,
 			.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RESOLVE_DEST,

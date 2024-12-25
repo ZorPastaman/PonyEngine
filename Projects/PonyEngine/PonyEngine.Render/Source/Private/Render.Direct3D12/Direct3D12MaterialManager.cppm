@@ -203,7 +203,6 @@ namespace PonyEngine::Render
 
 		const auto materialParams = Direct3D12MaterialParams
 		{
-			.primitiveTopology = D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST,
 			.vertexSlot = pipelineParams.vertexInputParams.inputSlot,
 			.vertexColorSlot = pipelineParams.vertexColorInputParams ? std::optional<UINT>(pipelineParams.vertexColorInputParams.value().inputSlot) : std::nullopt
 		};

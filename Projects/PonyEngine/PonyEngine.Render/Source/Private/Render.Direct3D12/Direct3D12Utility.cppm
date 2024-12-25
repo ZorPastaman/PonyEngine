@@ -49,7 +49,7 @@ namespace PonyEngine::Render
 {
 	void SetName(ID3D12Object& object, const std::string_view name)
 	{
-		if (const HRESULT result = object.SetPrivateData(WKPDID_D3DDebugObjectName, name.size(), name.data()); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = object.SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<UINT>(name.size()), name.data()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set name with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
