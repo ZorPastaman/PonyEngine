@@ -9,6 +9,6 @@
 
 export module PonyMath.Shape;
 
-export import :Inside;
-export import :Intersecting;
+export import :Inside2D;
+export import :Intersecting2D;
 export import :Rect;

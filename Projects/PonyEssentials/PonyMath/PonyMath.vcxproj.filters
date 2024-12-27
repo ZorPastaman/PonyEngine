@@ -100,10 +100,10 @@
     <ClCompile Include="Source\Public\Shape\Rect.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Intersecting.cppm">
+    <ClCompile Include="Source\Public\Shape\Intersecting2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Inside.cppm">
+    <ClCompile Include="Source\Public\Shape\Inside2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,7 +10,6 @@
 export module PonyMath.Space:Transform3D;
 
 import <format>;
-import <optional>;
 import <ostream>;
 import <string>;
 
@@ -19,7 +18,7 @@ import PonyMath.Core;
 export namespace PonyMath::Space
 {
 	/// @brief 3D transform implementation.
-	class Transform3D final // TODO: Add TransformData class (position, rotation and scale only class) and Transform class (data, version, cache) and TransformComponent (Entity component that has Transform). I'm not sure about some fields if they should be in Transform or TransformComponent. So, it's much better to implement it with a World system.
+	class Transform3D final
 	{
 	public:
 		/// @brief Creates a transform with a zero position, identity rotation and scale of one.
@@ -31,12 +30,6 @@ export namespace PonyMath::Space
 		/// @param scale Scale.
 		[[nodiscard("Pure constructor")]]
 		Transform3D(const Core::Vector3<float>& position, const Core::Quaternion<float>& rotation, const Core::Vector3<float>& scale) noexcept;
-		/// @brief Creates a transform with arguments.
-		/// @param position Position.
-		/// @param rotation Rotation. Must be unit.
-		/// @param uniformScale Scale. It will be applied to all the axis.
-		[[nodiscard("Pure constructor")]]
-		Transform3D(const Core::Vector3<float>& position, const Core::Quaternion<float>& rotation, float uniformScale) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Transform3D(const Transform3D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -47,34 +40,34 @@ export namespace PonyMath::Space
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
+		Core::Vector3<float>& Position() noexcept;
+		/// @brief Gets the position.
+		/// @return Position.
+		[[nodiscard("Pure function")]]
 		const Core::Vector3<float>& Position() const noexcept;
-		/// @brief Sets the position.
-		/// @param positionToSet Position to set.
-		void Position(const Core::Vector3<float>& positionToSet) noexcept;
 
 		/// @brief Gets the rotation.
 		/// @return Rotation.
 		[[nodiscard("Pure function")]]
+		Core::Quaternion<float>& Rotation() noexcept;
+		/// @brief Gets the rotation.
+		/// @return Rotation.
+		[[nodiscard("Pure function")]]
 		const Core::Quaternion<float>& Rotation() const noexcept;
-		/// @brief Sets the rotation.
-		/// @param rotationToSet Rotation to set.
-		void Rotation(const Core::Quaternion<float>& rotationToSet) noexcept;
 
 		/// @brief Gets the scale.
 		/// @return Scale.
 		[[nodiscard("Pure function")]]
+		Core::Vector3<float>& Scale() noexcept;
+		/// @brief Gets the scale.
+		/// @return Scale.
+		[[nodiscard("Pure function")]]
 		const Core::Vector3<float>& Scale() const noexcept;
-		/// @brief Sets the scale.
-		/// @param scaleToSet Scale to set.
-		void Scale(const Core::Vector3<float>& scaleToSet) noexcept;
-		/// @brief Sets the uniform scale.
-		/// @param uniformScale Scale.
-		void Scale(float uniformScale) noexcept;
 
-		/// @brief Gets the translation-rotation-scaling matrix.
+		/// @brief Computes a translation-rotation-scaling matrix.
 		/// @return Translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		const Core::Matrix4x4<float>& TrsMatrix() const noexcept;
+		Core::Matrix4x4<float> TrsMatrix() const noexcept;
 
 		/// @brief Gets the transform forward vector.
 		/// @return Forward.
@@ -136,10 +129,6 @@ export namespace PonyMath::Space
 		Core::Vector3<float> position; ///< Position.
 		Core::Quaternion<float> rotation; ///< Rotation.
 		Core::Vector3<float> scale; ///< Scale.
-
-		/// @brief Translation-rotation-scaling matrix.
-		/// 	It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix if it's nullopt.
-		mutable std::optional<Core::Matrix4x4<float>> trs;
 	};
 
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.
@@ -171,9 +160,9 @@ namespace PonyMath::Space
 	{
 	}
 
-	Transform3D::Transform3D(const Core::Vector3<float>& position, const Core::Quaternion<float>& rotation, const float uniformScale) noexcept :
-		Transform3D(position, rotation, Core::Vector3<float>(uniformScale, uniformScale, uniformScale))
+	Core::Vector3<float>& Transform3D::Position() noexcept
 	{
+		return position;
 	}
 
 	const Core::Vector3<float>& Transform3D::Position() const noexcept
@@ -181,10 +170,9 @@ namespace PonyMath::Space
 		return position;
 	}
 
-	void Transform3D::Position(const Core::Vector3<float>& positionToSet) noexcept
+	Core::Quaternion<float>& Transform3D::Rotation() noexcept
 	{
-		position = positionToSet;
-		trs = std::nullopt;
+		return rotation;
 	}
 
 	const Core::Quaternion<float>& Transform3D::Rotation() const noexcept
@@ -192,10 +180,9 @@ namespace PonyMath::Space
 		return rotation;
 	}
 
-	void Transform3D::Rotation(const Core::Quaternion<float>& rotationToSet) noexcept
+	Core::Vector3<float>& Transform3D::Scale() noexcept
 	{
-		rotation = rotationToSet;
-		trs = std::nullopt;
+		return scale;
 	}
 
 	const Core::Vector3<float>& Transform3D::Scale() const noexcept
@@ -203,25 +190,9 @@ namespace PonyMath::Space
 		return scale;
 	}
 
-	void Transform3D::Scale(const Core::Vector3<float>& scaleToSet) noexcept
+	Core::Matrix4x4<float> Transform3D::TrsMatrix() const noexcept
 	{
-		scale = scaleToSet;
-		trs = std::nullopt;
-	}
-
-	void Transform3D::Scale(const float uniformScale) noexcept
-	{
-		Scale(Core::Vector3<float>(uniformScale, uniformScale, uniformScale));
-	}
-
-	const Core::Matrix4x4<float>& Transform3D::TrsMatrix() const noexcept
-	{
-		if (!trs)
-		{
-			trs = Core::TrsMatrix(position, rotation, scale);
-		}
-
-		return trs.value();
+		return Core::TrsMatrix(position, rotation, scale);
 	}
 
 	Core::Vector3<float> Transform3D::Forward() const noexcept
@@ -257,26 +228,23 @@ namespace PonyMath::Space
 	void Transform3D::Translate(const Core::Vector3<float>& translation) noexcept
 	{
 		position += translation;
-		trs = std::nullopt;
 	}
 
 	void Transform3D::Rotate(const Core::Quaternion<float>& rotationToAdd) noexcept
 	{
 		rotation = rotationToAdd * rotation;
-		trs = std::nullopt;
 	}
 
 	void Transform3D::LookIn(const Core::Vector3<float>& direction, const Core::Vector3<float>& up) noexcept
 	{
 		rotation = Core::LookInRotationQuaternion(direction, up);
-		trs = std::nullopt;
 	}
 
 	void Transform3D::LookAt(const Core::Vector3<float>& point, const Core::Vector3<float>& up) noexcept
 	{
-		if (!Core::AreAlmostEqual(point, position))
+		if (const Core::Vector3<float> direction = (point - position).Normalized(); direction.IsFinite())
 		{
-			LookIn((point - position).Normalized(), up);
+			LookIn(direction, up);
 		}
 	}
 
