@@ -163,7 +163,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineParams.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineStateParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12InputElementParams.cppm">
@@ -187,7 +187,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12GraphicsPipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Utility.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12FormatUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Back.cppm">
@@ -200,6 +200,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SrgbOutputQuad.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineStateUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12ObjectUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -216,7 +222,7 @@
     <FxCompile Include="Shaders\OutputRootSig.hlsli">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputVertexShader.hlsl">
+    <FxCompile Include="Shaders\OutputMeshShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\OutputPixelShader.hlsl">

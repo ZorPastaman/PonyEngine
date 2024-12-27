@@ -35,10 +35,10 @@ import PonyMath.Utility;
 
 import :Direct3D12Material;
 import :Direct3D12Mesh;
+import :Direct3D12ObjectUtility;
 import :Direct3D12RootSignature;
 import :Direct3D12RenderObject;
 import :Direct3D12SrgbOutputQuad;
-import :Direct3D12Utility;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12GraphicsPipeline;
 import :IDirect3D12RenderTargetPrivate;
@@ -345,6 +345,7 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
+		bufferBarriers.reserve(renderObjects.size() * 3);
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
 			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
@@ -510,52 +511,15 @@ namespace PonyEngine::Render
 		commandList->SetGraphicsRootSignature(&outputQuad->RootSignature());
 		commandList->SetPipelineState(&outputQuad->PipelineState());
 
-		commandList->IASetVertexBuffers(outputQuad->VertexSlot, 1u, &outputQuad->VertexBufferView());
-		commandList->IASetVertexBuffers(outputQuad->UvSlot, 1u, &outputQuad->UvBufferView());
-		commandList->IASetIndexBuffer(&outputQuad->IndexBufferView());
-
-		commandList->SetDescriptorHeaps(1u, (std::array<ID3D12DescriptorHeap*, 1> { &renderTargetHeap }).data());
+		commandList->SetDescriptorHeaps(1u, std::array<ID3D12DescriptorHeap*, 1> { &renderTargetHeap }.data());
 		commandList->SetGraphicsRootDescriptorTable(outputQuad->RenderTargetSlot, renderTargetHandle);
 
-		commandList->DrawIndexedInstanced(outputQuad->IndexCount, 1u, 0u, 0u, 0u);
+		commandList->DispatchMesh(1u, 1u, 1u);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateOutputToEndBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer)
 	{
 		bufferBarriers.clear();
-		const auto outputVertexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.pResource = &outputQuad->VertexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputVertexBarrier);
-		const auto outputUvBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.pResource = &outputQuad->UvBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputUvBarrier);
-		const auto outputIndexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.pResource = &outputQuad->IndexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputIndexBarrier);
 
 		textureBarriers.clear();
 		textureBarriers.reserve(2);
@@ -592,6 +556,7 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
+		bufferBarriers.reserve(renderObjects.size() * 3);
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
 			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
@@ -632,39 +597,6 @@ namespace PonyEngine::Render
 			};
 			bufferBarriers.push_back(vertexIndexBarrier);
 		}
-		const auto outputVertexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.pResource = &outputQuad->VertexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputVertexBarrier);
-		const auto outputUvBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.pResource = &outputQuad->UvBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputUvBarrier);
-		const auto outputIndexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-			.pResource = &outputQuad->IndexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputIndexBarrier);
 
 		textureBarriers.clear();
 		textureBarriers.reserve(3);
@@ -808,39 +740,6 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateResolveToOutputBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& backBuffer)
 	{
 		bufferBarriers.clear();
-		const auto outputVertexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.pResource = &outputQuad->VertexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputVertexBarrier);
-		const auto outputUvBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-			.pResource = &outputQuad->UvBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputUvBarrier);
-		const auto outputIndexBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-			.pResource = &outputQuad->IndexBuffer(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		bufferBarriers.push_back(outputIndexBarrier);
 
 		textureBarriers.clear();
 		textureBarriers.reserve(3);

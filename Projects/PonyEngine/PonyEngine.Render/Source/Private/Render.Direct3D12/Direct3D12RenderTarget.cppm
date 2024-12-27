@@ -30,7 +30,7 @@ import PonyMath.Utility;
 import PonyDebug.Log;
 
 import :Direct3D12RenderTargetParams;
-import :Direct3D12Utility;
+import :Direct3D12ObjectUtility;
 import :IDirect3D12RenderTargetPrivate;
 import :IDirect3D12SystemContext;
 

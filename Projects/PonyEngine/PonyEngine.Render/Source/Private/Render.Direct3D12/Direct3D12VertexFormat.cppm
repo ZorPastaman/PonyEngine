@@ -17,7 +17,7 @@ import <stdexcept>;
 
 import PonyBase.StringUtility;
 
-import :Direct3D12Utility;
+import :Direct3D12FormatUtility;
 
 export namespace PonyEngine::Render
 {

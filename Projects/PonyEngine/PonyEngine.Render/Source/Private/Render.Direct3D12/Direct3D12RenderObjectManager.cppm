@@ -95,7 +95,7 @@ namespace PonyEngine::Render
 		const auto pixelShader = Direct3D12Shader("PixelShader");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pixel shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create material.");
-		constexpr auto pipelineParams = Direct3D12PipelineParams
+		constexpr auto pipelineParams = Direct3D12PipelineStateParams
 		{
 			.vertexInputParams = {.semanticName = "POSITION", .semanticIndex = 0u, .inputSlot = 0u},
 			.vertexColorInputParams = Direct3D12InputElementParams{.semanticName = "COLOR", .semanticIndex = 0u, .inputSlot = 1}
