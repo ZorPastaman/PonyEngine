@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Core/Direct3D12/Framework.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Shader;
 
 import <cstddef>;
@@ -22,7 +26,7 @@ import PonyBase.StringUtility;
 export namespace PonyEngine::Render
 {
 	/// @brief Direct3D12 shader.
-	class Direct3D12Shader final // TODO: code here is too generic. So, maybe, it's better to make a generic class. It's better to change with a ResourceSystem.
+	class Direct3D12Shader final
 	{
 	public:
 		/// @brief Creates a @p Direct3D12Shader.
@@ -44,6 +48,8 @@ export namespace PonyEngine::Render
 		/// @return Shader byte code size in bytes.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
+		[[nodiscard("Pure function")]]
+		D3D12_SHADER_BYTECODE ByteCode() const noexcept;
 
 		Direct3D12Shader& operator =(const Direct3D12Shader& other) = default;
 		Direct3D12Shader& operator =(Direct3D12Shader&& other) noexcept = default;
@@ -81,5 +87,10 @@ namespace PonyEngine::Render
 	std::size_t Direct3D12Shader::Size() const noexcept
 	{
 		return data.size();
+	}
+
+	D3D12_SHADER_BYTECODE Direct3D12Shader::ByteCode() const noexcept
+	{
+		return D3D12_SHADER_BYTECODE{.pShaderBytecode = Data(), .BytecodeLength = Size()};
 	}
 }

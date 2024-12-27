@@ -26,8 +26,8 @@ import PonyMath.Utility;
 
 import PonyDebug.Log;
 
+import :Direct3D12ObjectUtility;
 import :Direct3D12RenderTargetParams;
-import :Direct3D12Utility;
 import :IDirect3D12DepthStencilPrivate;
 import :IDirect3D12SystemContext;
 

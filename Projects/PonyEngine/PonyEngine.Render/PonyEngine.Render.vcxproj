@@ -46,14 +46,16 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12InputElementParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12ObjectUtility.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineStateParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineStateUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderViewParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SrgbOutputQuad.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SystemParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTargetParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Utility.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12FormatUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexFormat.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CpuWaiter.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12BackPrivate.cppm" />
@@ -121,10 +123,10 @@
       <SetRootSignature Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
       </SetRootSignature>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputVertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
+    <FxCompile Include="Shaders\OutputMeshShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mesh</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
     </FxCompile>
     <FxCompile Include="Shaders\VertexShader.hlsl">

@@ -27,7 +27,7 @@ import PonyDebug.Log;
 
 import :Direct3D12InputElementParams;
 import :Direct3D12Material;
-import :Direct3D12PipelineParams;
+import :Direct3D12PipelineStateParams;
 import :Direct3D12RootSignature;
 import :Direct3D12Shader;
 import :IDirect3D12DepthStencilPrivate;
@@ -53,7 +53,7 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Direct3D12Material> CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
-			const Direct3D12PipelineParams& pipelineParams) override;
+			const Direct3D12PipelineStateParams& pipelineParams) override;
 
 		/// @brief Cleans out of dead materials.
 		void Clean() noexcept;
@@ -78,7 +78,7 @@ namespace PonyEngine::Render
 	}
 
 	std::shared_ptr<Direct3D12Material> Direct3D12MaterialManager::CreateMaterial(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, const Direct3D12Shader& vertexShader, const Direct3D12Shader& pixelShader,
-		const Direct3D12PipelineParams& pipelineParams)
+		const Direct3D12PipelineStateParams& pipelineParams)
 	{
 		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
 

@@ -16,7 +16,7 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RootSignature;
 import <string>;
 import <string_view>;
 
-import :Direct3D12Utility;
+import :Direct3D12ObjectUtility;
 
 export namespace PonyEngine::Render
 {

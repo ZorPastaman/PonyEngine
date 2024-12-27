@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Direct3D12IndexFormat;
 
-import :Direct3D12Utility;
+import :Direct3D12FormatUtility;
 
 export namespace PonyEngine::Render
 {

@@ -17,10 +17,11 @@ import <optional>;
 import <string>;
 import <string_view>;
 
+import :Direct3D12FormatUtility;
 import :Direct3D12IndexArray;
 import :Direct3D12IndexFormat;
+import :Direct3D12ObjectUtility;
 import :Direct3D12VertexArray;
-import :Direct3D12Utility;
 
 export namespace PonyEngine::Render
 {

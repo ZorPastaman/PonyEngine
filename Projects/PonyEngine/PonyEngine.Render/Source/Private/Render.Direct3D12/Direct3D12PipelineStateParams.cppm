@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12PipelineParams;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12PipelineStateParams;
 
 import <optional>;
 
@@ -15,8 +15,8 @@ import :Direct3D12InputElementParams;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 pipeline parameters.
-	struct Direct3D12PipelineParams final
+	/// @brief Direct3D12 pipeline state parameters.
+	struct Direct3D12PipelineStateParams final
 	{
 		Direct3D12InputElementParams vertexInputParams; ///< Vertex input parameters.
 		std::optional<Direct3D12InputElementParams> vertexColorInputParams; ///< Vertex color input parameters. May be @a nullopt if it's not supported.

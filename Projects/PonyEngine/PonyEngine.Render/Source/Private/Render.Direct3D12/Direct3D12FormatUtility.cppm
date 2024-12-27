@@ -13,20 +13,10 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Utility;
-
-import <stdexcept>;
-import <string_view>;
-
-import PonyBase.StringUtility;
+export module PonyEngine.Render.Direct3D12.Detail:Direct3D12FormatUtility;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Sets the @p name to the @p object.
-	/// @param object Object to set a name to.
-	/// @param name Name to set.
-	void SetName(ID3D12Object& object, std::string_view name);
-
 	/// @brief Gets the vertex format info.
 	/// @param format Vertex format.
 	/// @param componentSize Component size in bytes.
@@ -47,14 +37,6 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	void SetName(ID3D12Object& object, const std::string_view name)
-	{
-		if (const HRESULT result = object.SetPrivateData(WKPDID_D3DDebugObjectName, static_cast<UINT>(name.size()), name.data()); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set name with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-	}
-
 	constexpr void GetVertexFormatInfo(const DXGI_FORMAT format, UINT& componentSize, UINT& componentCount) noexcept
 	{
 		switch (format)

@@ -19,8 +19,8 @@ import <string>;
 import <string_view>;
 
 import :Direct3D12MaterialParams;
+import :Direct3D12ObjectUtility;
 import :Direct3D12RootSignature;
-import :Direct3D12Utility;
 
 export namespace PonyEngine::Render
 {
