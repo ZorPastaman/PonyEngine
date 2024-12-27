@@ -10,7 +10,6 @@
 export module PonyMath.Space:Transform2D;
 
 import <format>;
-import <optional>;
 import <ostream>;
 import <string>;
 
@@ -18,7 +17,7 @@ import PonyMath.Core;
 
 export namespace PonyMath::Space
 {
-	/// @brief 3D transform implementation.
+	/// @brief 2D transform implementation.
 	class Transform2D final
 	{
 	public:
@@ -31,12 +30,6 @@ export namespace PonyMath::Space
 		/// @param scale Scale.
 		[[nodiscard("Pure constructor")]]
 		Transform2D(const Core::Vector2<float>& position, float rotation, const Core::Vector2<float>& scale) noexcept;
-		/// @brief Creates a transform with arguments.
-		/// @param position Position.
-		/// @param rotation Rotation in radians.
-		/// @param uniformScale Scale. It will be applied to all the axis.
-		[[nodiscard("Pure constructor")]]
-		Transform2D(const Core::Vector2<float>& position, float rotation, float uniformScale) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Transform2D(const Transform2D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -47,34 +40,34 @@ export namespace PonyMath::Space
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
+		Core::Vector2<float>& Position() noexcept;
+		/// @brief Gets the position.
+		/// @return Position.
+		[[nodiscard("Pure function")]]
 		const Core::Vector2<float>& Position() const noexcept;
-		/// @brief Sets the position.
-		/// @param positionToSet Position to set.
-		void Position(const Core::Vector2<float>& positionToSet) noexcept;
 
 		/// @brief Gets the rotation.
 		/// @return Rotation in radians.
 		[[nodiscard("Pure function")]]
-		float Rotation() const noexcept;
-		/// @brief Sets the rotation.
-		/// @param rotationToSet Rotation in radians to set.
-		void Rotation(float rotationToSet) noexcept;
+		float& Rotation() noexcept;
+		/// @brief Gets the rotation.
+		/// @return Rotation in radians.
+		[[nodiscard("Pure function")]]
+		const float& Rotation() const noexcept;
 
 		/// @brief Gets the scale.
 		/// @return Scale.
 		[[nodiscard("Pure function")]]
+		Core::Vector2<float>& Scale() noexcept;
+		/// @brief Gets the scale.
+		/// @return Scale.
+		[[nodiscard("Pure function")]]
 		const Core::Vector2<float>& Scale() const noexcept;
-		/// @brief Sets the scale.
-		/// @param scaleToSet Scale to set.
-		void Scale(const Core::Vector2<float>& scaleToSet) noexcept;
-		/// @brief Sets the uniform scale.
-		/// @param uniformScale Scale.
-		void Scale(float uniformScale) noexcept;
 
-		/// @brief Gets the translation-rotation-scaling matrix.
+		/// @brief Computes a translation-rotation-scaling matrix.
 		/// @return Translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		const Core::Matrix3x3<float>& TrsMatrix() const noexcept;
+		Core::Matrix3x3<float> TrsMatrix() const noexcept;
 
 		/// @brief Gets the transform up vector.
 		/// @return Up.
@@ -126,10 +119,6 @@ export namespace PonyMath::Space
 		Core::Vector2<float> position; ///< Position.
 		float rotation; ///< Rotation.
 		Core::Vector2<float> scale; ///< Scale.
-
-		/// @brief Translation-rotation-scaling matrix.
-		/// 	It becomes nullopt everytime something is changed in the transform. The function @p TrsMatrix() sets a new matrix if it's nullopt.
-		mutable std::optional<Core::Matrix3x3<float>> trs;
 	};
 
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.
@@ -161,9 +150,9 @@ namespace PonyMath::Space
 	{
 	}
 
-	Transform2D::Transform2D(const Core::Vector2<float>& position, const float rotation, const float uniformScale) noexcept :
-		Transform2D(position, rotation, Core::Vector2<float>(uniformScale, uniformScale))
+	Core::Vector2<float>& Transform2D::Position() noexcept
 	{
+		return position;
 	}
 
 	const Core::Vector2<float>& Transform2D::Position() const noexcept
@@ -171,21 +160,19 @@ namespace PonyMath::Space
 		return position;
 	}
 
-	void Transform2D::Position(const Core::Vector2<float>& positionToSet) noexcept
-	{
-		position = positionToSet;
-		trs = std::nullopt;
-	}
-
-	float Transform2D::Rotation() const noexcept
+	float& Transform2D::Rotation() noexcept
 	{
 		return rotation;
 	}
 
-	void Transform2D::Rotation(const float rotationToSet) noexcept
+	const float& Transform2D::Rotation() const noexcept
 	{
-		rotation = rotationToSet;
-		trs = std::nullopt;
+		return rotation;
+	}
+
+	Core::Vector2<float>& Transform2D::Scale() noexcept
+	{
+		return scale;
 	}
 
 	const Core::Vector2<float>& Transform2D::Scale() const noexcept
@@ -193,25 +180,9 @@ namespace PonyMath::Space
 		return scale;
 	}
 
-	void Transform2D::Scale(const Core::Vector2<float>& scaleToSet) noexcept
+	Core::Matrix3x3<float> Transform2D::TrsMatrix() const noexcept
 	{
-		scale = scaleToSet;
-		trs = std::nullopt;
-	}
-
-	void Transform2D::Scale(const float uniformScale) noexcept
-	{
-		Scale(Core::Vector2<float>(uniformScale, uniformScale));
-	}
-
-	const Core::Matrix3x3<float>& Transform2D::TrsMatrix() const noexcept
-	{
-		if (!trs)
-		{
-			trs = Core::TrsMatrix(position, rotation, scale);
-		}
-
-		return trs.value();
+		return Core::TrsMatrix(position, rotation, scale);
 	}
 
 	Core::Vector2<float> Transform2D::Up() const noexcept
@@ -237,26 +208,23 @@ namespace PonyMath::Space
 	void Transform2D::Translate(const Core::Vector2<float>& translation) noexcept
 	{
 		position += translation;
-		trs = std::nullopt;
 	}
 
 	void Transform2D::Rotate(const float rotationToAdd) noexcept
 	{
 		rotation += rotationToAdd;
-		trs = std::nullopt;
 	}
 
 	void Transform2D::LookIn(const Core::Vector2<float>& direction) noexcept
 	{
 		rotation = Core::AngleSigned(Core::Vector2<float>::Predefined::Right, direction);
-		trs = std::nullopt;
 	}
 
 	void Transform2D::LookAt(const Core::Vector2<float>& point) noexcept
 	{
-		if (!Core::AreAlmostEqual(point, position))
+		if (const Core::Vector2<float> direction = (point - position).Normalized(); direction.IsFinite())
 		{
-			LookIn((point - position).Normalized());
+			LookIn(direction);
 		}
 	}
 

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyMath.Shape:Inside;
+export module PonyMath.Shape:Intersecting2D;
 
 import PonyMath.Core;
 
@@ -15,20 +15,20 @@ import :Rect;
 
 export namespace PonyMath::Shape
 {
-	/// @brief Checks if the @p small is fully inside the @p large.
+	/// @brief Checks if two rects are intersecting.
 	/// @tparam T Value type.
-	/// @param small Small rect.
-	/// @param large Large rect.
-	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
+	/// @param left Left rect.
+	/// @param right Right rect.
+	/// @return @a True if they intersect; @a false otherwise.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept;
+	constexpr bool AreIntersecting(const Rect<T>& left, const Rect<T>& right) noexcept;
 }
 
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept
+	constexpr bool AreIntersecting(const Rect<T>& left, const Rect<T>& right) noexcept
 	{
-		return large.MinX() <= small.MinX() && large.MinY() <= small.MinY() && large.MaxX() >= small.MaxX() && large.MaxY() >= small.MaxY();
+		return !(left.MinX() > right.MaxX() || left.MaxX() < right.MinX() || left.MinY() > right.MaxY() || left.MaxY() < right.MinY());
 	}
 }

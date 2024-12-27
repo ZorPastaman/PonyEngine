@@ -103,7 +103,7 @@ namespace Game
 		}
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Register inputs.");
-		(resetHandle = inputSystem->CreateReceiver("Reset"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { cameraTransform.Position(PonyMath::Core::Vector3<float>::Predefined::Zero); cameraTransform.Rotation(PonyMath::Core::Quaternion<float>::Predefined::Identity); cameraTransform.Scale(PonyMath::Core::Vector3<float>::Predefined::One); })));
+		(resetHandle = inputSystem->CreateReceiver("Reset"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { cameraTransform.Position() = PonyMath::Core::Vector3<float>::Predefined::Zero; cameraTransform.Rotation() = PonyMath::Core::Quaternion<float>::Predefined::Identity; cameraTransform.Scale() = PonyMath::Core::Vector3<float>::Predefined::One; })));
 		(exitHandle = inputSystem->CreateReceiver("Exit"))->Action(PonyEngine::Input::FloatToBoolAction(PonyEngine::Input::BoolToEventAction([&] { Engine().Stop(); }, false)));
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 
