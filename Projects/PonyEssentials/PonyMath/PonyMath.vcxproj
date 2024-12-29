@@ -33,8 +33,6 @@
     <ClCompile Include="Source\Public\Core\Vector2.cppm" />
     <ClCompile Include="Source\Public\Core\Vector3.cppm" />
     <ClCompile Include="Source\Public\Core\Vector4.cppm" />
-    <ClCompile Include="Source\Public\Geometry\Geometry.cppm" />
-    <ClCompile Include="Source\Public\Geometry\Mesh.cppm" />
     <ClCompile Include="Source\Public\Shape\Inside2D.cppm" />
     <ClCompile Include="Source\Public\Shape\Intersecting2D.cppm" />
     <ClCompile Include="Source\Public\Shape\Rect.cppm" />

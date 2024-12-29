@@ -9,6 +9,9 @@
 
 #define VERTEX_COUNT 4
 #define TRIANGLE_COUNT 2
+#define THREAD_COUNT_X VERTEX_COUNT
+#define THREAD_COUNT_Y 1
+#define THREAD_COUNT_Z 1
 
 struct Vertex
 {
@@ -39,7 +42,7 @@ static const uint3 QuadTriangles[] =
 };
 
 [outputtopology("triangle")]
-[numthreads(4, 1, 1)]
+[numthreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
 void main(in uint groupThreadId : SV_GROUPTHREADID, 
 	out vertices Vertex outVertices[VERTEX_COUNT],
 	out indices uint3 outTriangles[TRIANGLE_COUNT])

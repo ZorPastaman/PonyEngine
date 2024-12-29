@@ -15,7 +15,7 @@ export module PonyEngine.Render.Direct3D12.Detail:IDirect3D12MeshManagerPrivate;
 
 import <memory>;
 
-import PonyMath.Geometry;
+import PonyEngine.Render;
 
 import :Direct3D12IndexFormat;
 import :Direct3D12Mesh;
@@ -28,23 +28,10 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IDirect3D12MeshManagerPrivate)
 
-		/// @brief Gets the vertex format.
-		/// @return Vertex format.
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12VertexFormat& VertexFormat() const noexcept = 0;
-		/// @brief Gets the vertex color format.
-		/// @return Vertex color format.
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12VertexFormat& VertexColorFormat() const noexcept = 0;
-		/// @brief Gets the index format.
-		/// @return Index format.
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12IndexFormat& VertexIndexFormat() const noexcept = 0;
-
 		/// @brief Creates a render mesh.
 		/// @param mesh Mesh.
 		/// @return Render mesh.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) = 0;
+		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const Mesh& mesh) = 0;
 	};
 }

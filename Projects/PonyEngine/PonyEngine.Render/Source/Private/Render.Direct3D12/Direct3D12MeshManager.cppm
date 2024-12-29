@@ -29,7 +29,6 @@ import PonyBase.StringUtility;
 
 import PonyMath.Color;
 import PonyMath.Core;
-import PonyMath.Geometry;
 
 import PonyDebug.Log;
 
@@ -58,15 +57,8 @@ export namespace PonyEngine::Render
 
 		~Direct3D12MeshManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12VertexFormat& VertexFormat() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12VertexFormat& VertexColorFormat() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Direct3D12IndexFormat& VertexIndexFormat() const noexcept override;
-
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh) override;
+		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const Mesh& mesh) override;
 
 		/// @brief Cleans out of dead meshes.
 		void Clean() noexcept;
@@ -75,26 +67,7 @@ export namespace PonyEngine::Render
 		Direct3D12MeshManager& operator =(Direct3D12MeshManager&&) = delete;
 
 	private:
-		/// @brief Creates a Direct3D12 vertex array.
-		/// @param vertices Vertices source.
-		/// @return Vertex array.
-		[[nodiscard("Redundant call")]]
-		Direct3D12VertexArray CreateVertices(std::span<const PonyMath::Core::Vector3<float>> vertices) const;
-		/// @brief Creates a Direct3D12 vertex color array.
-		/// @param colors Colors source.
-		/// @return Color array.
-		[[nodiscard("Redundant call")]]
-		std::optional<Direct3D12VertexArray> CreateVertexColors(std::span<const PonyMath::Color::RGBA<float>> colors) const;
-		/// @brief Creates a Direct3D12 index array.
-		/// @param triangles Triangle source.
-		/// @return Index array.
-		[[nodiscard("Redundant call")]]
-		Direct3D12IndexArray CreateVertexIndices(std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const;
-
-		static constexpr auto MeshVertexFormat = Direct3D12VertexFormat(DXGI_FORMAT_R32G32B32_FLOAT); ///< Vertex format.
-		static constexpr auto MeshVertexColorFormat = Direct3D12VertexFormat(DXGI_FORMAT_R32G32B32A32_FLOAT); ///< Vertex color format.
-		static constexpr auto MeshIndexFormat = Direct3D12IndexFormat(DXGI_FORMAT_R32_UINT); ///< Index format.
-
+		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE descHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 		/// @brief Upload heap properties.
 		static constexpr auto UploadHeapProperties = D3D12_HEAP_PROPERTIES
 		{
@@ -127,28 +100,91 @@ namespace PonyEngine::Render
 	{
 	}
 
-	const Direct3D12VertexFormat& Direct3D12MeshManager::VertexFormat() const noexcept
+	std::shared_ptr<Direct3D12Mesh> Direct3D12MeshManager::CreateDirect3D12Mesh(const Mesh& mesh)
 	{
-		return MeshVertexFormat;
-	}
+		ID3D12Device10& device = d3d12System->Device();
+		const auto heapDesc = D3D12_DESCRIPTOR_HEAP_DESC
+		{
+			.Type = descHeapType,
+			.NumDescriptors = static_cast<UINT>(mesh.Buffers().size()),
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+			.NodeMask = 0u
+		};
+		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
+		if (const HRESULT result = device.CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(heap.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create mesh descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
+		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = heap->GetGPUDescriptorHandleForHeapStart();
+		const UINT handleIncrement = device.GetDescriptorHandleIncrementSize(descHeapType);
 
-	const Direct3D12VertexFormat& Direct3D12MeshManager::VertexColorFormat() const noexcept
-	{
-		return MeshVertexColorFormat;
-	}
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadBuffers;
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuBuffers;
+		std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE> handles;
+		for (const auto& [dataType, buffer] : mesh.Buffers())
+		{
+			const auto bufferDesc = D3D12_RESOURCE_DESC1
+			{
+				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+				.Width = static_cast<UINT64>(buffer.Size()),
+				.Height = 1u,
+				.DepthOrArraySize = 1u,
+				.MipLevels = 1u,
+				.Format = DXGI_FORMAT_UNKNOWN,
+				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
+				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+				.Flags = D3D12_RESOURCE_FLAG_NONE,
+				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+			};
 
-	const Direct3D12IndexFormat& Direct3D12MeshManager::VertexIndexFormat() const noexcept
-	{
-		return MeshIndexFormat;
-	}
+			uploadBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
+			Microsoft::WRL::ComPtr<ID3D12Resource2>& uploadBuffer = uploadBuffers.back();
+			if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+			void* data;
+			if (const HRESULT result = uploadBuffer->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+			std::memcpy(data, buffer.Data(), buffer.Size());
+			uploadBuffer->Unmap(0, nullptr);
 
-	std::shared_ptr<Direct3D12Mesh> Direct3D12MeshManager::CreateDirect3D12Mesh(const PonyMath::Geometry::Mesh& mesh)
-	{
-		Direct3D12VertexArray vertices = CreateVertices(mesh.Vertices());
-		std::optional<Direct3D12VertexArray> colors = CreateVertexColors(mesh.Colors());
-		Direct3D12IndexArray indices = CreateVertexIndices(mesh.Triangles());
+			gpuBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
+			Microsoft::WRL::ComPtr<ID3D12Resource2>& gpuBuffer = gpuBuffers.back();
+			if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
 
-		const auto renderMesh = std::make_shared<Direct3D12Mesh>(vertices, colors ? &colors.value() : nullptr, indices);
+			d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer.Get());
+
+			const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+			{
+				.Format = DXGI_FORMAT_UNKNOWN,
+				.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+				.Buffer = D3D12_BUFFER_SRV
+				{
+					.FirstElement = 0UL,
+					.NumElements = static_cast<UINT>(buffer.Count()),
+					.StructureByteStride = static_cast<UINT>(buffer.Stride()),
+					.Flags = D3D12_BUFFER_SRV_FLAG_NONE
+				}
+			};
+			device.CreateShaderResourceView(gpuBuffer.Get(), &srvDesc, cpuHandle);
+			handles[dataType] = gpuHandle;
+
+			cpuHandle.ptr += handleIncrement;
+			gpuHandle.ptr += handleIncrement;
+		}
+
+		const auto renderMesh = std::make_shared<Direct3D12Mesh>(gpuBuffers, heap, handles, mesh.ThreadGroupCounts());
 		meshes.push_back(renderMesh);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 
@@ -166,164 +202,5 @@ namespace PonyEngine::Render
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh destroyed.");
 			}
 		}
-	}
-
-	Direct3D12VertexArray Direct3D12MeshManager::CreateVertices(const std::span<const PonyMath::Core::Vector3<float>> vertices) const
-	{
-		const UINT vertexCount = static_cast<UINT>(vertices.size());
-		const std::size_t vertexBufferSize = MeshVertexFormat.VertexSize() * vertexCount;
-
-		const auto vertexBufferDesc = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = static_cast<UINT64>(vertexBufferSize),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create upload vertex buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> uploadVertexBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED, 
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadVertexBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload vertex buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		void* vertexData;
-		if (const HRESULT result = uploadVertexBuffer->Map(0, nullptr, &vertexData); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map vertex buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		std::memcpy(vertexData, vertices.data(), vertexBufferSize);
-		uploadVertexBuffer->Unmap(0, nullptr);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Upload vertex buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(uploadVertexBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create gpu vertex buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> gpuVertexBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &vertexBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED, 
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuVertexBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu vertex buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu vertex buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuVertexBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadVertexBuffer.Get(), *gpuVertexBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
-
-		return Direct3D12VertexArray(*gpuVertexBuffer.Get(), MeshVertexFormat, vertexCount);
-	}
-
-	std::optional<Direct3D12VertexArray> Direct3D12MeshManager::CreateVertexColors(const std::span<const PonyMath::Color::RGBA<float>> colors) const
-	{
-		if (colors.size() == 0)
-		{
-			return std::nullopt;
-		}
-
-		const UINT colorCount = static_cast<UINT>(colors.size());
-		const std::size_t colorBufferSize = MeshVertexColorFormat.VertexSize() * colorCount;
-
-		const auto colorBufferDesc = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = static_cast<UINT64>(colorBufferSize),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create upload vertex color buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> uploadColorBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &colorBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadColorBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create vertex color buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		void* colorData;
-		if (const HRESULT result = uploadColorBuffer->Map(0, nullptr, &colorData); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map vertex color buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		std::memcpy(colorData, colors.data(), colorBufferSize);
-		uploadColorBuffer->Unmap(0, nullptr);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Upload vertex color buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(uploadColorBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create gpu vertex color buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> gpuColorBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &colorBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuColorBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu vertex color buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu vertex color buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuColorBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadColorBuffer.Get(), *gpuColorBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
-
-		return Direct3D12VertexArray(*gpuColorBuffer.Get(), MeshVertexColorFormat, colorCount);
-	}
-
-	Direct3D12IndexArray Direct3D12MeshManager::CreateVertexIndices(const std::span<const PonyMath::Core::Vector3<std::uint32_t>> triangles) const
-	{
-		const UINT indexCount = static_cast<UINT>(triangles.size() * PonyMath::Core::Vector3<std::uint32_t>::ComponentCount);
-		const std::size_t indexBufferSize = MeshIndexFormat.IndexSize() * indexCount;
-
-		const auto indexBufferDesc = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = static_cast<UINT64>(indexBufferSize),
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create upload index buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> uploadIndexBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED, nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadIndexBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create index buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		void* indexData;
-		if (const HRESULT result = uploadIndexBuffer->Map(0, nullptr, &indexData); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map index buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		std::memcpy(indexData, triangles.data(), indexBufferSize);
-		uploadIndexBuffer->Unmap(0, nullptr);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Upload index buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(uploadIndexBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create gpu index buffer.");
-		Microsoft::WRL::ComPtr<ID3D12Resource2> gpuIndexBuffer;
-		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &indexBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuIndexBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu index buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Gpu index buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(gpuIndexBuffer.Get()));
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create copy task.");
-		d3d12System->CopyPipeline().AddBufferCopyTask(*uploadIndexBuffer.Get(), *gpuIndexBuffer.Get());
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy task created.");
-
-		return Direct3D12IndexArray(*gpuIndexBuffer.Get(), MeshIndexFormat, indexCount);
 	}
 }

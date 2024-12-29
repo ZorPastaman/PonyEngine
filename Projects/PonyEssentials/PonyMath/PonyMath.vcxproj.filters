@@ -73,12 +73,6 @@
     <ClCompile Include="Source\Public\Color\Color.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Geometry\Geometry.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Geometry\Mesh.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Space\Space.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

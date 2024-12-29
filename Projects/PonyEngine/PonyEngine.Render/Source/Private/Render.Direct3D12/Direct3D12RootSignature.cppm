@@ -15,6 +15,7 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12RootSignature;
 
 import <string>;
 import <string_view>;
+import <unordered_map>;
 
 import :Direct3D12ObjectUtility;
 
@@ -28,7 +29,7 @@ export namespace PonyEngine::Render
 		/// @param rootSignature Root signature.
 		/// @param mvpIndex Model-view-projection matrix slot index.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12RootSignature(ID3D12RootSignature& rootSignature, UINT mvpIndex);
+		Direct3D12RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& meshDataSlots, UINT mvpIndex);
 		[[nodiscard("Pure constructor")]]
 		Direct3D12RootSignature(const Direct3D12RootSignature& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -50,6 +51,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		UINT MvpIndex() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		const std::unordered_map<std::string, UINT>& MeshDataSlots() const noexcept;
+
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
 		void Name(std::string_view name);
@@ -59,14 +63,16 @@ export namespace PonyEngine::Render
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
+		std::unordered_map<std::string, UINT> meshDataSlots; ///< Mesh data slots.
 		UINT mvpIndex; ///< Model-view-projection matrix slot index.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12RootSignature::Direct3D12RootSignature(ID3D12RootSignature& rootSignature, const UINT mvpIndex) :
+	Direct3D12RootSignature::Direct3D12RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& meshDataSlots, const UINT mvpIndex) :
 		rootSignature(&rootSignature),
+		meshDataSlots(meshDataSlots),
 		mvpIndex{mvpIndex}
 	{
 	}
@@ -84,6 +90,11 @@ namespace PonyEngine::Render
 	UINT Direct3D12RootSignature::MvpIndex() const noexcept
 	{
 		return mvpIndex;
+	}
+
+	const std::unordered_map<std::string, UINT>& Direct3D12RootSignature::MeshDataSlots() const noexcept
+	{
+		return meshDataSlots;
 	}
 
 	void Direct3D12RootSignature::Name(const std::string_view name)

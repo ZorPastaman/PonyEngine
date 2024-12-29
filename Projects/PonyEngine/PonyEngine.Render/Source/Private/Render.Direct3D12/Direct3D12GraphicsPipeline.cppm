@@ -349,42 +349,20 @@ namespace PonyEngine::Render
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
 			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			const auto vertexBarrier = D3D12_BUFFER_BARRIER
+			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
 			{
-				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-				.pResource = &mesh.VertexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexBarrier);
-			if (ID3D12Resource2* const vertexColorBuffer = mesh.VertexColorBuffer())
-			{
-				const auto vertexColorBarrier = D3D12_BUFFER_BARRIER
+				const auto bufferBarrier = D3D12_BUFFER_BARRIER
 				{
 					.SyncBefore = D3D12_BARRIER_SYNC_NONE,
 					.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 					.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.AccessAfter = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-					.pResource = vertexColorBuffer,
+					.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+					.pResource = &mesh.Buffer(i),
 					.Offset = 0UL,
 					.Size = UINT64_MAX
 				};
-				bufferBarriers.push_back(vertexColorBarrier);
+				bufferBarriers.push_back(bufferBarrier);
 			}
-			const auto vertexIndexBarrier = D3D12_BUFFER_BARRIER
-			{
-				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.AccessAfter = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-				.pResource = &mesh.VertexIndexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexIndexBarrier);
 		}
 
 		textureBarriers.clear();
@@ -460,7 +438,7 @@ namespace PonyEngine::Render
 				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() < PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
+			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() > PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
 		});
 
 		const Direct3D12RootSignature* prevRootSignature = nullptr;
@@ -479,24 +457,27 @@ namespace PonyEngine::Render
 				commandList->SetPipelineState(&material->PipelineState());
 			}
 
-			const Direct3D12Mesh* const mesh = &renderObject.renderObject->Mesh();
-			if (mesh != prevMesh || material != prevMaterial)
+			Direct3D12Mesh* const mesh = &renderObject.renderObject->Mesh();
+			if (mesh != prevMesh || rootSignature != prevRootSignature)
 			{
-				commandList->IASetVertexBuffers(material->VertexSlot(), 1, &mesh->VertexBufferView());
-				if (material->VertexColorSlot() && mesh->VertexColorBufferView())
+				ID3D12DescriptorHeap* const heap = &mesh->Heap();
+				commandList->SetDescriptorHeaps(1u, &heap);
+
+				for (const auto& [meshDataType, slot] : rootSignature->MeshDataSlots())
 				{
-					commandList->IASetVertexBuffers(material->VertexColorSlot().value(), 1, &mesh->VertexColorBufferView().value());
+					if (const std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle = mesh->FindHandle(meshDataType))
+					{
+						commandList->SetGraphicsRootDescriptorTable(slot, handle.value());
+						break;
+					}
 				}
-			}
-			if (mesh != prevMesh)
-			{
-				commandList->IASetIndexBuffer(&mesh->VertexIndexBufferView());
 			}
 
 			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObject.mvpMatrix;
 			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
 
-			commandList->DrawIndexedInstanced(mesh->IndexCount(), 1u, 0u, 0u, 0u); // TODO: Draw via mesh shaders
+			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
+			commandList->DispatchMesh(threadGroupCounts[0], threadGroupCounts[1], threadGroupCounts[2]);
 
 			prevRootSignature = rootSignature;
 			prevMaterial = material;
@@ -511,10 +492,11 @@ namespace PonyEngine::Render
 		commandList->SetGraphicsRootSignature(&outputQuad->RootSignature());
 		commandList->SetPipelineState(&outputQuad->PipelineState());
 
-		commandList->SetDescriptorHeaps(1u, std::array<ID3D12DescriptorHeap*, 1> { &renderTargetHeap }.data());
+		ID3D12DescriptorHeap* const heap = &renderTargetHeap;
+		commandList->SetDescriptorHeaps(1u, &heap);
 		commandList->SetGraphicsRootDescriptorTable(outputQuad->RenderTargetSlot, renderTargetHandle);
 
-		commandList->DispatchMesh(1u, 1u, 1u);
+		commandList->DispatchMesh(outputQuad->ThreadGroupXCount, outputQuad->ThreadGroupYCount, outputQuad->ThreadGroupZCount);
 	}
 
 	void Direct3D12GraphicsPipeline::PopulateOutputToEndBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer)
@@ -560,42 +542,20 @@ namespace PonyEngine::Render
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
 			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			const auto vertexBarrier = D3D12_BUFFER_BARRIER
+			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
 			{
-				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-				.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = &mesh.VertexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexBarrier);
-			if (ID3D12Resource2* const vertexColorBuffer = mesh.VertexColorBuffer())
-			{
-				const auto vertexColorBarrier = D3D12_BUFFER_BARRIER
+				const auto bufferBarrier = D3D12_BUFFER_BARRIER
 				{
 					.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
 					.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-					.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
+					.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 					.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.pResource = vertexColorBuffer,
+					.pResource = &mesh.Buffer(i),
 					.Offset = 0UL,
 					.Size = UINT64_MAX
 				};
-				bufferBarriers.push_back(vertexColorBarrier);
+				bufferBarriers.push_back(bufferBarrier);
 			}
-			const auto vertexIndexBarrier = D3D12_BUFFER_BARRIER
-			{
-				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-				.AccessBefore = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = &mesh.VertexIndexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexIndexBarrier);
 		}
 
 		textureBarriers.clear();
@@ -649,42 +609,20 @@ namespace PonyEngine::Render
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
 			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			const auto vertexBarrier = D3D12_BUFFER_BARRIER
+			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
 			{
-				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-				.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
-				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = &mesh.VertexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexBarrier);
-			if (ID3D12Resource2* const vertexColorBuffer = mesh.VertexColorBuffer())
-			{
-				const auto vertexColorBarrier = D3D12_BUFFER_BARRIER
+				const auto bufferBarrier = D3D12_BUFFER_BARRIER
 				{
 					.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
 					.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-					.AccessBefore = D3D12_BARRIER_ACCESS_VERTEX_BUFFER,
+					.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 					.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.pResource = vertexColorBuffer,
+					.pResource = &mesh.Buffer(i),
 					.Offset = 0UL,
 					.Size = UINT64_MAX
 				};
-				bufferBarriers.push_back(vertexColorBarrier);
+				bufferBarriers.push_back(bufferBarrier);
 			}
-			const auto vertexIndexBarrier = D3D12_BUFFER_BARRIER
-			{
-				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-				.AccessBefore = D3D12_BARRIER_ACCESS_INDEX_BUFFER,
-				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = &mesh.VertexIndexBuffer(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			bufferBarriers.push_back(vertexIndexBarrier);
 		}
 
 		textureBarriers.clear();

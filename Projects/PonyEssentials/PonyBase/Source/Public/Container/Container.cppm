@@ -7,6 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyMath.Geometry;
+export module PonyBase.Container;
 
-export import :Mesh;
+export import :Buffer;
+export import :BufferView;
