@@ -18,8 +18,8 @@
 struct Meshlet
 {
 	uint vertexOffset;
-	uint vertexCount;
 	uint primitiveOffset;
+	uint vertexCount;
 	uint primitiveCount;
 };
 

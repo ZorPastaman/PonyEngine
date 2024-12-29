@@ -216,7 +216,7 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure operator")]]
 		constexpr const T& operator [](std::size_t index) const noexcept;
 
-		constexpr Vector3& operator =(const Vector3& other) noexcept = default;
+		constexpr Vector3& operator =(const Vector3& other) noexcept = default; // TODO: Add operators with std::span as arg.
 		constexpr Vector3& operator =(Vector3&& other) noexcept = default;
 		/// @brief Adds the @p other to @a this.
 		/// @param other Vector to add.

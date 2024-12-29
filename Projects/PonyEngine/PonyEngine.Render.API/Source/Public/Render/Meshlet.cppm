@@ -16,8 +16,8 @@ export namespace PonyEngine::Render
 	struct Meshlet final
 	{
 		std::uint32_t vertexOffset;
-		std::uint32_t vertexCount;
 		std::uint32_t primitiveOffset;
+		std::uint32_t vertexCount;
 		std::uint32_t primitiveCount;
 	};
 }

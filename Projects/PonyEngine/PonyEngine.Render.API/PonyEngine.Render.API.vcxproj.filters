@@ -109,7 +109,7 @@
     <ClCompile Include="Source\Public\Render\Meshlet.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Primitive.cppm">
+    <ClCompile Include="Source\Public\Render\PackedPrimitive.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -122,8 +122,11 @@ namespace PonyEngine::Render
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadBuffers;
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuBuffers;
 		std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE> handles;
+
 		for (const auto& [dataType, bufferTable] : mesh.BufferTables())
 		{
+			handles[dataType] = gpuHandle;
+
 			for (const auto& buffer : bufferTable)
 			{
 				const auto bufferDesc = D3D12_RESOURCE_DESC1
@@ -180,11 +183,6 @@ namespace PonyEngine::Render
 					}
 				};
 				device.CreateShaderResourceView(gpuBuffer.Get(), &srvDesc, cpuHandle);
-
-				if (!handles.contains(dataType))
-				{
-					handles[dataType] = gpuHandle;
-				}
 
 				cpuHandle.ptr += handleIncrement;
 				gpuHandle.ptr += handleIncrement;
