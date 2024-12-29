@@ -45,7 +45,7 @@
     <ClCompile Include="Source\Public\Render\MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Mesh.cppm" />
     <ClCompile Include="Source\Public\Render\Meshlet.cppm" />
-    <ClCompile Include="Source\Public\Render\Primitive.cppm" />
+    <ClCompile Include="Source\Public\Render\PackedPrimitive.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render\RenderSystemParams.cppm" />
