@@ -18,7 +18,6 @@ import <optional>;
 import <string>;
 import <string_view>;
 
-import :Direct3D12MaterialParams;
 import :Direct3D12ObjectUtility;
 import :Direct3D12RootSignature;
 
@@ -31,9 +30,8 @@ export namespace PonyEngine::Render
 		/// @brief Creates a @p Direct3D12Material.
 		/// @param rootSignature Root signature. Mustn't be nullptr.
 		/// @param pipelineState Pipeline state.
-		/// @param params Material parameters. They must be synced with the @p rootSignature and @p pipelineState.
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Material(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const Direct3D12MaterialParams& params) noexcept;
+		Direct3D12Material(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, ID3D12PipelineState& pipelineState) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Material(const Direct3D12Material& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -78,19 +76,14 @@ export namespace PonyEngine::Render
 	private:
 		std::shared_ptr<Direct3D12RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
-
-		UINT vertexSlot; ///< Vertex slot.
-		std::optional<UINT> vertexColorSlot; ///< Vertex color slot.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12Material::Direct3D12Material(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const Direct3D12MaterialParams& params) noexcept :
+	Direct3D12Material::Direct3D12Material(const std::shared_ptr<Direct3D12RootSignature>& rootSignature, ID3D12PipelineState& pipelineState) noexcept :
 		rootSignature(rootSignature),
-		pipelineState(&pipelineState),
-		vertexSlot{params.vertexSlot},
-		vertexColorSlot(params.vertexColorSlot)
+		pipelineState(&pipelineState)
 	{
 	}
 
@@ -112,16 +105,6 @@ namespace PonyEngine::Render
 	const ID3D12PipelineState& Direct3D12Material::PipelineState() const noexcept
 	{
 		return *pipelineState.Get();
-	}
-
-	UINT Direct3D12Material::VertexSlot() const noexcept
-	{
-		return vertexSlot;
-	}
-
-	std::optional<UINT> Direct3D12Material::VertexColorSlot() const noexcept
-	{
-		return vertexColorSlot;
 	}
 
 	void Direct3D12Material::Name(const std::string_view name)

@@ -39,6 +39,9 @@ export namespace PonyEngine::Render
 	{
 	public:
 		static constexpr UINT RenderTargetSlot = 0u; ///< Render target texture slot.
+		static constexpr UINT ThreadGroupXCount = 1u; ///< Thread group x count.
+		static constexpr UINT ThreadGroupYCount = 1u; ///< Thread group y count.
+		static constexpr UINT ThreadGroupZCount = 1u; ///< Thread group z count.
 
 		/// @brief Creates a @p Direct3D12SrgbOutputQuad.
 		/// @param d3d12System Direct3D12 system context.

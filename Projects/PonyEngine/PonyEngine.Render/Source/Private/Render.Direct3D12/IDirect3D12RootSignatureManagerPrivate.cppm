@@ -31,6 +31,6 @@ export namespace PonyEngine::Render
 		/// @param mvpIndex Model-view-projection matrix slot index.
 		/// @return 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, UINT mvpIndex) = 0;
+		virtual std::shared_ptr<Direct3D12RootSignature> CreateRootSignature(const Direct3D12Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots, UINT mvpIndex) = 0;
 	};
 }

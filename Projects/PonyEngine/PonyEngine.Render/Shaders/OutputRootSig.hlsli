@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+// CPU:
+// 0: Render target.
+
+// GPU:
 // t0: Render target.
 // s0: Render target sampler.
 

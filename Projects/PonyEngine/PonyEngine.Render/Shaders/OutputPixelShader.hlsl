@@ -7,9 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-Texture2D RenderTargetTexture : register(t0);
-sampler RenderTargetSampler : register(s0);
-
 struct PixelInput
 {
 	float4 position : SV_POSITION;
@@ -20,6 +17,9 @@ struct PixelOutput
 {
 	float4 color : SV_TARGET;
 };
+
+Texture2D RenderTargetTexture : register(t0);
+sampler RenderTargetSampler : register(s0);
 
 PixelOutput main(PixelInput input)
 {
