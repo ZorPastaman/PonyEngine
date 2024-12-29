@@ -106,7 +106,7 @@ namespace PonyEngine::Render
 		const auto heapDesc = D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = descHeapType,
-			.NumDescriptors = static_cast<UINT>(mesh.Buffers().size()),
+			.NumDescriptors = static_cast<UINT>(mesh.BufferCount()),
 			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
 			.NodeMask = 0u
 		};
@@ -122,66 +122,73 @@ namespace PonyEngine::Render
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadBuffers;
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuBuffers;
 		std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE> handles;
-		for (const auto& [dataType, buffer] : mesh.Buffers())
+		for (const auto& [dataType, bufferTable] : mesh.BufferTables())
 		{
-			const auto bufferDesc = D3D12_RESOURCE_DESC1
+			for (const auto& buffer : bufferTable)
 			{
-				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-				.Width = static_cast<UINT64>(buffer.Size()),
-				.Height = 1u,
-				.DepthOrArraySize = 1u,
-				.MipLevels = 1u,
-				.Format = DXGI_FORMAT_UNKNOWN,
-				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-				.Flags = D3D12_RESOURCE_FLAG_NONE,
-				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-			};
-
-			uploadBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
-			Microsoft::WRL::ComPtr<ID3D12Resource2>& uploadBuffer = uploadBuffers.back();
-			if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			void* data;
-			if (const HRESULT result = uploadBuffer->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			std::memcpy(data, buffer.Data(), buffer.Size());
-			uploadBuffer->Unmap(0, nullptr);
-
-			gpuBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
-			Microsoft::WRL::ComPtr<ID3D12Resource2>& gpuBuffer = gpuBuffers.back();
-			if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-
-			d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer.Get());
-
-			const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
-			{
-				.Format = DXGI_FORMAT_UNKNOWN,
-				.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-				.Buffer = D3D12_BUFFER_SRV
+				const auto bufferDesc = D3D12_RESOURCE_DESC1
 				{
-					.FirstElement = 0UL,
-					.NumElements = static_cast<UINT>(buffer.Count()),
-					.StructureByteStride = static_cast<UINT>(buffer.Stride()),
-					.Flags = D3D12_BUFFER_SRV_FLAG_NONE
-				}
-			};
-			device.CreateShaderResourceView(gpuBuffer.Get(), &srvDesc, cpuHandle);
-			handles[dataType] = gpuHandle;
+					.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+					.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+					.Width = static_cast<UINT64>(buffer.Size()),
+					.Height = 1u,
+					.DepthOrArraySize = 1u,
+					.MipLevels = 1u,
+					.Format = DXGI_FORMAT_UNKNOWN,
+					.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
+					.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+					.Flags = D3D12_RESOURCE_FLAG_NONE,
+					.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+				};
 
-			cpuHandle.ptr += handleIncrement;
-			gpuHandle.ptr += handleIncrement;
+				uploadBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
+				Microsoft::WRL::ComPtr<ID3D12Resource2>& uploadBuffer = uploadBuffers.back();
+				if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+					nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+				{
+					throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+				}
+				void* data;
+				if (const HRESULT result = uploadBuffer->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
+				{
+					throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+				}
+				std::memcpy(data, buffer.Data(), buffer.Size());
+				uploadBuffer->Unmap(0, nullptr);
+
+				gpuBuffers.push_back(Microsoft::WRL::ComPtr<ID3D12Resource2>());
+				Microsoft::WRL::ComPtr<ID3D12Resource2>& gpuBuffer = gpuBuffers.back();
+				if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+					nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+				{
+					throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+				}
+
+				d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer.Get());
+
+				const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+				{
+					.Format = DXGI_FORMAT_UNKNOWN,
+					.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+					.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+					.Buffer = D3D12_BUFFER_SRV
+					{
+						.FirstElement = 0UL,
+						.NumElements = static_cast<UINT>(buffer.Count()),
+						.StructureByteStride = static_cast<UINT>(buffer.Stride()),
+						.Flags = D3D12_BUFFER_SRV_FLAG_NONE
+					}
+				};
+				device.CreateShaderResourceView(gpuBuffer.Get(), &srvDesc, cpuHandle);
+
+				if (!handles.contains(dataType))
+				{
+					handles[dataType] = gpuHandle;
+				}
+
+				cpuHandle.ptr += handleIncrement;
+				gpuHandle.ptr += handleIncrement;
+			}
 		}
 
 		const auto renderMesh = std::make_shared<Direct3D12Mesh>(gpuBuffers, heap, handles, mesh.ThreadGroupCounts());
