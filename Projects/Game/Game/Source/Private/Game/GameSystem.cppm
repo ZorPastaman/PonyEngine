@@ -117,7 +117,7 @@ namespace Game
 		PonyBase::Container::BufferView<PonyEngine::Render::Meshlet> meshlets = mesh.CreateBuffer<PonyEngine::Render::Meshlet>("Meshlets", 2);
 		meshlets[0] = PonyEngine::Render::Meshlet{.vertexOffset = 0u, .vertexCount = 7u, .primitiveOffset = 0u, .primitiveCount = 6u};
 		meshlets[1] = PonyEngine::Render::Meshlet{.vertexOffset = 7u, .vertexCount = 7u, .primitiveOffset = 0u, .primitiveCount = 6u};
-		PonyBase::Container::BufferView<std::uint32_t> vertexIndices = mesh.CreateBuffer<std::uint32_t>("VertexIndices", 14);
+		PonyBase::Container::BufferView<std::uint32_t> vertexIndices = mesh.CreateBuffer<std::uint32_t>("Meshlets", 14);
 		vertexIndices[0] = 0u;
 		vertexIndices[1] = 1u;
 		vertexIndices[2] = 2u;
@@ -132,7 +132,7 @@ namespace Game
 		vertexIndices[11] = 1u;
 		vertexIndices[12] = 5u;
 		vertexIndices[13] = 4u;
-		PonyBase::Container::BufferView<PonyEngine::Render::Primitive> triangles = mesh.CreateBuffer<PonyEngine::Render::Primitive>("Triangles", 6);
+		PonyBase::Container::BufferView<PonyEngine::Render::Primitive> triangles = mesh.CreateBuffer<PonyEngine::Render::Primitive>("Meshlets", 6);
 		triangles[0] = PonyEngine::Render::Primitive{.indices = { 0u, 1u, 2u, 0u }};
 		triangles[1] = PonyEngine::Render::Primitive{.indices = { 0u, 2u, 3u, 0u }};
 		triangles[2] = PonyEngine::Render::Primitive{.indices = { 4u, 5u, 0u, 0u }};

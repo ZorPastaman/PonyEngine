@@ -9,11 +9,9 @@
 
 // CPU:
 // 0: MVP matrix
-// 1: Meshlets
-// 2: Vertex indices
-// 3: Triangles
-// 4: Positions
-// 5: Colors
+// 1: Meshlets, Vertex indices and Triangles
+// 2: Positions
+// 3: Colors
 
 // GPU:
 // b0: MVP matrix
@@ -26,8 +24,6 @@
 #define ROOT_SIG \
 	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
 	"RootConstants(num32BitConstants=16, b0), " \
-	"DescriptorTable(SRV(t0, numDescriptors = 1)) , " \
-	"DescriptorTable(SRV(t1, numDescriptors = 1)) , " \
-	"DescriptorTable(SRV(t2, numDescriptors = 1)) , " \
+	"DescriptorTable(SRV(t0, numDescriptors = 3)) , " \
 	"DescriptorTable(SRV(t3, numDescriptors = 1)), " \
 	"DescriptorTable(SRV(t4, numDescriptors = 1))"

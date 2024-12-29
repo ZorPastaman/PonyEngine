@@ -11,10 +11,12 @@ export module PonyEngine.Render:Mesh;
 
 import <array>;
 import <cstdint>;
+import <ranges>;
 import <span>;
 import <string>;
 import <string_view>;
 import <unordered_map>;
+import <vector>;
 
 import PonyBase.Container;
 
@@ -39,20 +41,14 @@ export namespace PonyEngine::Render
 		template<typename T>
 		PonyBase::Container::BufferView<T> CreateBuffer(std::string_view dataType, std::uint32_t count);
 
-		void DestroyBuffer(std::string_view dataType) noexcept;
+		void DestroyBuffer(std::string_view dataType, std::size_t index) noexcept;
 		void DestroyBuffer(const PonyBase::Container::Buffer& buffer) noexcept;
+		void DestroyBuffers(std::string_view dataType) noexcept;
 
 		[[nodiscard("Pure function")]]
-		PonyBase::Container::Buffer* FindBuffer(std::string_view dataType) noexcept;
+		std::size_t BufferCount() const noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Container::Buffer* FindBuffer(std::string_view dataType) const noexcept;
-		template<typename T> [[nodiscard("Pure function")]]
-		PonyBase::Container::BufferView<T> FindBuffer(std::string_view dataType) noexcept;
-		template<typename T> [[nodiscard("Pure function")]]
-		PonyBase::Container::BufferView<const T> FindBuffer(std::string_view dataType) const noexcept;
-
-		[[nodiscard("Pure function")]]
-		const std::unordered_map<std::string, PonyBase::Container::Buffer>& Buffers() const noexcept;
+		const std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>>& BufferTables() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
@@ -63,7 +59,7 @@ export namespace PonyEngine::Render
 		Mesh& operator =(Mesh&& other) noexcept = default;
 
 	private:
-		std::unordered_map<std::string, PonyBase::Container::Buffer> buffers;
+		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
 		std::array<std::uint32_t, 3> threadGroupCounts;
 	};
 }
@@ -72,80 +68,73 @@ namespace PonyEngine::Render
 {
 	PonyBase::Container::Buffer& Mesh::CreateBuffer(const std::string_view dataType, const std::uint32_t stride, const std::uint32_t count)
 	{
-		return buffers[std::string(dataType)] = PonyBase::Container::Buffer(stride, count);
+		std::vector<PonyBase::Container::Buffer>& bufferTable = bufferTables[std::string(dataType)];
+		bufferTable.push_back(PonyBase::Container::Buffer(stride, count));
+
+		return bufferTable.back();
 	}
 
 	template<typename T>
 	PonyBase::Container::BufferView<T> Mesh::CreateBuffer(const std::string_view dataType, const std::uint32_t count)
 	{
-		PonyBase::Container::Buffer& buffer = buffers[std::string(dataType)] = PonyBase::Container::Buffer::Create<T>(count);
+		std::vector<PonyBase::Container::Buffer>& bufferTable = bufferTables[std::string(dataType)];
+		bufferTable.push_back(PonyBase::Container::Buffer::Create<T>(count));
 
-		return PonyBase::Container::BufferView<T>(&buffer);
+		return PonyBase::Container::BufferView<T>(&bufferTable.back());
 	}
 
-	void Mesh::DestroyBuffer(const std::string_view dataType) noexcept
+	void Mesh::DestroyBuffer(const std::string_view dataType, const std::size_t index) noexcept
 	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return p.first == dataType; }); position != buffers.cend())
+		if (const auto position = std::ranges::find_if(bufferTables, [&](const auto& p) { return p.first == dataType; }); position != bufferTables.cend())
 		{
-			buffers.erase(position);
+			std::vector<PonyBase::Container::Buffer>& table = position->second;
+			table.erase(table.begin() + index);
+
+			if (table.empty())
+			{
+				bufferTables.erase(position);
+			}
 		}
 	}
 
 	void Mesh::DestroyBuffer(const PonyBase::Container::Buffer& buffer) noexcept
 	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return &p.second == &buffer; }); position != buffers.cend())
+		for (auto& [dataType, bufferTable] : bufferTables)
 		{
-			buffers.erase(position);
+			if (const auto position = std::ranges::find_if(bufferTable, [&](const PonyBase::Container::Buffer& b) { return &b == &buffer; }); position != bufferTable.cend())
+			{
+				bufferTable.erase(position);
+
+				if (bufferTable.empty())
+				{
+					bufferTables.erase(dataType);
+				}
+			}
 		}
 	}
 
-	PonyBase::Container::Buffer* Mesh::FindBuffer(const std::string_view dataType) noexcept
+	void Mesh::DestroyBuffers(std::string_view dataType) noexcept
 	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return p.first == dataType; }); position != buffers.cend())
+		if (const auto position = std::ranges::find_if(bufferTables, [&](const auto& p) { return p.first == dataType; }); position != bufferTables.cend())
 		{
-			return &position->second;
+			bufferTables.erase(position);
 		}
-
-		return nullptr;
 	}
 
-	const PonyBase::Container::Buffer* Mesh::FindBuffer(const std::string_view dataType) const noexcept
+	std::size_t Mesh::BufferCount() const noexcept
 	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return p.first == dataType; }); position != buffers.cend())
+		std::size_t count = 0;
+		for (const auto& bufferTable : std::ranges::views::values(bufferTables))
 		{
-			return &position->second;
+			count += bufferTable.size();
 		}
 
-		return nullptr;
+		return count;
 	}
 
-	template<typename T>
-	PonyBase::Container::BufferView<T> Mesh::FindBuffer(const std::string_view dataType) noexcept
+	const std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>>& Mesh::BufferTables() const noexcept
 	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return p.first == dataType; }); 
-			position != buffers.cend() && position->second.Stride() == sizeof(T))
-		{
-			return PonyBase::Container::BufferView<T>(&position->second);
-		}
-
-		return PonyBase::Container::BufferView<T>();
-	}
-
-	template<typename T>
-	PonyBase::Container::BufferView<const T> Mesh::FindBuffer(const std::string_view dataType) const noexcept
-	{
-		if (const auto position = std::ranges::find_if(buffers, [&](const std::pair<std::string, PonyBase::Container::Buffer>& p) { return p.first == dataType; }); 
-			position != buffers.cend() && position->second.Stride() == sizeof(T))
-		{
-			return PonyBase::Container::BufferView<const T>(&position->second);
-		}
-
-		return PonyBase::Container::BufferView<const T>();
-	}
-
-	const std::unordered_map<std::string, PonyBase::Container::Buffer>& Mesh::Buffers() const noexcept
-	{
-		return buffers;
+		return bufferTables;
 	}
 
 	std::span<std::uint32_t, 3> Mesh::ThreadGroupCounts() noexcept

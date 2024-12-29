@@ -87,10 +87,8 @@ namespace PonyEngine::Render
 		const std::unordered_map<std::string, UINT> dataSlots =
 		{
 			{ "Meshlets", 1u },
-			{ "VertexIndices", 2u },
-			{ "Triangles", 3u },
-			{ "Positions", 4u },
-			{ "Colors", 5u }
+			{ "Positions", 2u },
+			{ "Colors", 3u }
 		};
 		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Direct3D12Shader("RootSig"), dataSlots, 0u);
 		rootSignature->Name("DefaultRootSignature");
