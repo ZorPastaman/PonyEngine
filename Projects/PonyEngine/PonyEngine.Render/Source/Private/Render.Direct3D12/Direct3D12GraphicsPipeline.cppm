@@ -468,7 +468,6 @@ namespace PonyEngine::Render
 					if (const std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle = mesh->FindHandle(meshDataType))
 					{
 						commandList->SetGraphicsRootDescriptorTable(slot, handle.value());
-						break;
 					}
 				}
 			}

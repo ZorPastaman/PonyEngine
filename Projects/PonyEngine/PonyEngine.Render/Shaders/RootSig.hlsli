@@ -26,4 +26,8 @@
 #define ROOT_SIG \
 	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
 	"RootConstants(num32BitConstants=16, b0), " \
-	"DescriptorTable(SRV(t0, numDescriptors = 5))" \
+	"DescriptorTable(SRV(t0, numDescriptors = 1)) , " \
+	"DescriptorTable(SRV(t1, numDescriptors = 1)) , " \
+	"DescriptorTable(SRV(t2, numDescriptors = 1)) , " \
+	"DescriptorTable(SRV(t3, numDescriptors = 1)), " \
+	"DescriptorTable(SRV(t4, numDescriptors = 1))"
