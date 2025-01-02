@@ -42,6 +42,7 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderTarget.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderView.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Public\Render\MeshParams.cppm" />
     <ClCompile Include="Source\Public\Render\MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Mesh.cppm" />
     <ClCompile Include="Source\Public\Render\Meshlet.cppm" />

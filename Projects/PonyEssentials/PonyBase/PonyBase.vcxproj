@@ -25,6 +25,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Container\Buffer.cppm" />
+    <ClCompile Include="Source\Public\Container\BufferParams.cppm" />
     <ClCompile Include="Source\Public\Container\BufferView.cppm" />
     <ClCompile Include="Source\Public\Container\Container.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />

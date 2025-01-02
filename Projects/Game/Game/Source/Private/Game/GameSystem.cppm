@@ -20,6 +20,8 @@ import <memory>;
 import <span>;
 import <stdexcept>;
 
+import PonyBase.Container;
+
 import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Space;
@@ -113,54 +115,52 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
-		auto mesh = PonyEngine::Render::Mesh();
-		PonyBase::Container::BufferView<PonyEngine::Render::Meshlet> meshlets = mesh.CreateBuffer<PonyEngine::Render::Meshlet>("Meshlets", 2);
-		meshlets[0] = PonyEngine::Render::Meshlet{.vertexOffset = 0u, .primitiveOffset = 0u, .vertexCount = 7u, .primitiveCount = 6u};
-		meshlets[1] = PonyEngine::Render::Meshlet{.vertexOffset = 7u, .primitiveOffset = 0u, .vertexCount = 7u, .primitiveCount = 6u};
-		PonyBase::Container::BufferView<std::uint32_t> vertexIndices = mesh.CreateBuffer<std::uint32_t>("Meshlets", 14);
-		vertexIndices[0] = 0u;
-		vertexIndices[1] = 1u;
-		vertexIndices[2] = 2u;
-		vertexIndices[3] = 3u;
-		vertexIndices[4] = 7u;
-		vertexIndices[5] = 4u;
-		vertexIndices[6] = 5u;
-		vertexIndices[7] = 6u;
-		vertexIndices[8] = 7u;
-		vertexIndices[9] = 3u;
-		vertexIndices[10] = 2u;
-		vertexIndices[11] = 1u;
-		vertexIndices[12] = 5u;
-		vertexIndices[13] = 4u;
-		PonyBase::Container::BufferView<PonyEngine::Render::PackedPrimitive> triangles = mesh.CreateBuffer<PonyEngine::Render::PackedPrimitive>("Meshlets", 6);
-		triangles[0] = PonyEngine::Render::PackedPrimitive(0u, 1u, 2u);
-		triangles[1] = PonyEngine::Render::PackedPrimitive(0u, 2u, 3u);
-		triangles[2] = PonyEngine::Render::PackedPrimitive(4u, 5u, 0u);
-		triangles[3] = PonyEngine::Render::PackedPrimitive(4u, 0u, 3u);
-		triangles[4] = PonyEngine::Render::PackedPrimitive(5u, 6u, 1u);
-		triangles[5] = PonyEngine::Render::PackedPrimitive(5u, 1u, 0u);
-		PonyBase::Container::BufferView<PonyMath::Core::Vector3<float>> positions = mesh.CreateBuffer<PonyMath::Core::Vector3<float>>("Positions", 8);
-		positions[0] = PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f);
-		positions[1] = PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f);
-		positions[2] = PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f);
-		positions[3] = PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f);
-		positions[4] = PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f);
-		positions[5] = PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f);
-		positions[6] = PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f);
-		positions[7] = PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f);
-		PonyBase::Container::BufferView<PonyMath::Color::RGBA<float>> colors = mesh.CreateBuffer<PonyMath::Color::RGBA<float>>("Colors", 8);
-		colors[0] = PonyMath::Color::RGBA<float>::Predefined::Red;
-		colors[1] = PonyMath::Color::RGBA<float>::Predefined::Green;
-		colors[2] = PonyMath::Color::RGBA<float>::Predefined::Blue;
-		colors[3] = PonyMath::Color::RGBA<float>::Predefined::Yellow;
-		colors[4] = PonyMath::Color::RGBA<float>::Predefined::Magenta;
-		colors[5] = PonyMath::Color::RGBA<float>::Predefined::Cyan;
-		colors[6] = PonyMath::Color::RGBA<float>::Predefined::Gray;
-		colors[7] = PonyMath::Color::RGBA<float>::Predefined::White;
-		std::span<std::uint32_t> threadGroupCounts = mesh.ThreadGroupCounts();
-		threadGroupCounts[0] = 2u;
-		threadGroupCounts[1] = 1u;
-		threadGroupCounts[2] = 1u;
+		const auto meshlets = PonyBase::Container::Buffer::Create<PonyEngine::Render::Meshlet>(std::array<PonyEngine::Render::Meshlet, 2>
+		{
+			PonyEngine::Render::Meshlet{.vertexOffset = 0u, .primitiveOffset = 0u, .vertexCount = 7u, .primitiveCount = 6u},
+			PonyEngine::Render::Meshlet{.vertexOffset = 7u, .primitiveOffset = 0u, .vertexCount = 7u, .primitiveCount = 6u}
+		});
+		const auto vertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 14>
+		{
+			0u, 1u, 2u, 3u, 7u, 4u, 5u, 6u, 7u, 3u, 2u, 1u, 5u, 4u
+		});
+		const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::PackedPrimitive>(std::array<PonyEngine::Render::PackedPrimitive, 6>
+		{
+			PonyEngine::Render::PackedPrimitive(0u, 1u, 2u),
+			PonyEngine::Render::PackedPrimitive(0u, 2u, 3u),
+			PonyEngine::Render::PackedPrimitive(4u, 5u, 0u),
+			PonyEngine::Render::PackedPrimitive(4u, 0u, 3u),
+			PonyEngine::Render::PackedPrimitive(5u, 6u, 1u),
+			PonyEngine::Render::PackedPrimitive(5u, 1u, 0u)
+		});
+		const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
+		{
+			PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f),
+			PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f),
+			PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f),
+			PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
+			PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f),
+			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f),
+			PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f),
+			PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f)
+		});
+		const auto colors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Gray,
+			PonyMath::Color::RGBA<float>::Predefined::White
+		});
+		auto meshParams = PonyEngine::Render::MeshParams();
+		meshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ meshlets, vertexIndices, triangles };
+		meshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ positions };
+		meshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ colors };
+		meshParams.threadGroupCounts = { 2u, 1u, 1u };
+		const auto mesh = std::make_shared<PonyEngine::Render::Mesh>(meshParams);
 		boxHandle = renderSystem->RenderObjectManager().CreateObject(mesh, PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One * 5.f));
 		bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(mesh, PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f)));
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render objects created.");

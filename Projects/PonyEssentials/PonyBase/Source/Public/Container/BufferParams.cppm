@@ -7,8 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyBase.Container;
+export module PonyBase.Container:BufferParams;
 
-export import :Buffer;
-export import :BufferView;
-export import :BufferParams;
+import <cstdint>;
+
+export namespace PonyBase::Container
+{
+	struct BufferParams final
+	{
+		std::uint32_t stride = 0u;
+		std::uint32_t count = 0u;
+	};
+}

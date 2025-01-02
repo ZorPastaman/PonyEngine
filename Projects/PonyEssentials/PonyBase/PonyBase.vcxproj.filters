@@ -82,5 +82,8 @@
     <ClCompile Include="Source\Public\Container\BufferView.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Container\BufferParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

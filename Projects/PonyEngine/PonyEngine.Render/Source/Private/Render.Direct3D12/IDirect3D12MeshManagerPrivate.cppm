@@ -32,6 +32,6 @@ export namespace PonyEngine::Render
 		/// @param mesh Mesh.
 		/// @return Render mesh.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const Mesh& mesh) = 0;
+		virtual std::shared_ptr<Direct3D12Mesh> CreateDirect3D12Mesh(const std::shared_ptr<const Mesh>& mesh) = 0;
 	};
 }
