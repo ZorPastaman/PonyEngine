@@ -14,7 +14,6 @@
 #define THREAD_COUNT_Y 1
 #define THREAD_COUNT_Z 1
 
-
 struct Meshlet
 {
 	uint vertexOffset;

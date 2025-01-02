@@ -407,6 +407,8 @@ namespace PonyEngine::Render
 		meshManager->Clean();
 		materialManager->Clean();
 		rootSignatureManager->Clean();
+
+		meshManager->Tick();
 	}
 
 	void Direct3D12System::Render(const UINT backBufferIndex)

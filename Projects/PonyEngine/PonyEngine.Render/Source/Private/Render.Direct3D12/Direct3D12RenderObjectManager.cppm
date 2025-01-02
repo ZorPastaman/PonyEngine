@@ -50,13 +50,13 @@ export namespace PonyEngine::Render
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<IRenderObject> CreateObject(const Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
+		virtual std::shared_ptr<IRenderObject> CreateObject(const std::shared_ptr<const Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
 		/// @brief Creates a render object.
 		/// @param mesh Render object mesh.
 		/// @param modelMatrix Render object translation-rotation-scaling matrix.
 		/// @return Render object handle.
 		[[nodiscard("Redundant call")]]
-		std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix = PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity);
+		std::shared_ptr<IDirect3D12RenderObject> CreateObjectD3D12(const std::shared_ptr<const Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix = PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity);
 
 		void AddRenderTasks();
 
@@ -106,12 +106,12 @@ namespace PonyEngine::Render
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
-	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObject(const Mesh& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
+	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObject(const std::shared_ptr<const Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
 	{
 		return std::static_pointer_cast<IRenderObject>(CreateObjectD3D12(mesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)));
 	}
 
-	std::shared_ptr<IDirect3D12RenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const Mesh& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
+	std::shared_ptr<IDirect3D12RenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const std::shared_ptr<const Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Direct3D12Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh);

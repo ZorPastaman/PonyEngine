@@ -22,6 +22,8 @@ import <span>;
 import <stdexcept>;
 import <utility>;
 
+import :BufferParams;
+
 export namespace PonyBase::Container
 {
 	class Buffer final
@@ -32,12 +34,18 @@ export namespace PonyBase::Container
 		[[nodiscard("Pure constructor")]]
 		Buffer(std::uint32_t stride, std::uint32_t count);
 		[[nodiscard("Pure constructor")]]
+		explicit Buffer(const BufferParams& params);
+		[[nodiscard("Pure constructor")]]
+		Buffer(std::uint32_t stride, std::span<const std::byte> data);
+		[[nodiscard("Pure constructor")]]
 		Buffer(const Buffer& other);
 		[[nodiscard("Pure constructor")]]
 		Buffer(Buffer&& other) noexcept = default;
 
 		template<typename T> [[nodiscard("Pure function")]]
 		static Buffer Create(std::uint32_t objectCount);
+		template<typename T> [[nodiscard("Pure function")]]
+		static Buffer Create(std::span<const T> span);
 
 		~Buffer() noexcept = default;
 
@@ -89,6 +97,19 @@ namespace PonyBase::Container
 	{
 	}
 
+	Buffer::Buffer(const BufferParams& params) :
+		Buffer(params.stride, params.count)
+	{
+	}
+
+	Buffer::Buffer(const std::uint32_t stride, const std::span<const std::byte> data) :
+		stride{stride},
+		count{static_cast<std::uint32_t>(data.size() / stride)},
+		data(std::make_unique<std::byte[]>(Size()))
+	{
+		std::memcpy(this->data.get(), data.data(), Size());
+	}
+
 	Buffer::Buffer(const Buffer& other) :
 		Buffer(other.stride, other.count)
 	{
@@ -99,6 +120,15 @@ namespace PonyBase::Container
 	Buffer Buffer::Create(const std::uint32_t objectCount)
 	{
 		return Buffer(sizeof(T), objectCount);
+	}
+
+	template<typename T>
+	Buffer Buffer::Create(const std::span<const T> span)
+	{
+		auto buffer = Create<T>(static_cast<std::uint32_t>(span.size()));
+		std::memcpy(buffer.Data(), span.data(), buffer.Size());
+
+		return buffer;
 	}
 
 	std::uint32_t Buffer::Stride() const noexcept

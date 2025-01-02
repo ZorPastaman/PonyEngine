@@ -15,11 +15,16 @@ export module PonyEngine.Render.Direct3D12.Detail:Direct3D12Mesh;
 
 import <array>;
 import <cstddef>;
+import <format>;
 import <optional>;
 import <span>;
 import <string>;
+import <string_view>;
 import <unordered_map>;
+import <utility>;
 import <vector>;
+
+import :Direct3D12ObjectUtility;
 
 export namespace PonyEngine::Render
 {
@@ -28,21 +33,27 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh(std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap, 
-			const std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE>& handles, std::span<const UINT, 3> threadGroupCounts) noexcept;
+		Direct3D12Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_GPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts);
 		[[nodiscard("Pure constructor")]]
-		Direct3D12Mesh(const Direct3D12Mesh& other) noexcept = default;
+		Direct3D12Mesh(const Direct3D12Mesh&) = delete;
 		[[nodiscard("Pure constructor")]]
 		Direct3D12Mesh(Direct3D12Mesh&& other) noexcept = default;
 
 		~Direct3D12Mesh() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::size_t BufferCount() const noexcept;
+		std::span<const std::string> DataTypes() const noexcept;
+
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2& Buffer(std::size_t index) noexcept;
+		std::optional<std::size_t> BufferCount(std::string_view dataType) const noexcept;
+
 		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& Buffer(std::size_t index) const noexcept;
+		ID3D12Resource2* FindBuffer(std::string_view dataType, std::size_t index) noexcept;
+		[[nodiscard("Pure function")]]
+		const ID3D12Resource2* FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
+
+		[[nodiscard("Pure function")]]
+		std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> FindHandle(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12DescriptorHeap& Heap() noexcept;
@@ -50,8 +61,7 @@ export namespace PonyEngine::Render
 		const ID3D12DescriptorHeap& Heap() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> FindHandle(std::string_view dataType) const noexcept;
-
+		std::span<UINT, 3> ThreadGroupCounts() noexcept;
 		[[nodiscard("Pure function")]]
 		std::span<const UINT, 3> ThreadGroupCounts() const noexcept;
 
@@ -59,41 +69,80 @@ export namespace PonyEngine::Render
 		/// @param name Name.
 		void Name(std::string_view name);
 
-		Direct3D12Mesh& operator =(const Direct3D12Mesh& other) noexcept = default;
+		Direct3D12Mesh& operator =(const Direct3D12Mesh&) = delete;
 		Direct3D12Mesh& operator =(Direct3D12Mesh&& other) noexcept = default;
 
 	private:
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> meshBuffers; ///< Mesh buffers.
+		[[nodiscard("Pure function")]]
+		std::optional<std::size_t> IndexOf(std::string_view dataType) const noexcept;
+
+		std::vector<std::string> dataTypes; ///< Data types.
+		std::vector<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>> meshBuffers; ///< Mesh buffers.
+		std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> meshHandles; ///< Mesh handles.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> meshHeap; ///< Mesh descriptor heap.
-		std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE> meshHandles; ///< Mesh handles.
+
 		std::array<UINT, 3> threadGroupCounts; ///< Thread group counts.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Direct3D12Mesh::Direct3D12Mesh(std::span<const Microsoft::WRL::ComPtr<ID3D12Resource2>> buffers, const Microsoft::WRL::ComPtr<ID3D12DescriptorHeap>& heap,
-		const std::unordered_map<std::string, D3D12_GPU_DESCRIPTOR_HANDLE>& handles, const std::span<const UINT, 3> threadGroupCounts) noexcept :
-		meshBuffers(buffers.begin(), buffers.end()),
-		meshHeap(heap),
-		meshHandles(handles)
+	Direct3D12Mesh::Direct3D12Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_GPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts) :
+		meshHeap(&heap)
 	{
+		for (const auto& [dataType, dataPair] : data)
+		{
+			dataTypes.push_back(dataType);
+			meshBuffers.push_back(dataPair.first);
+			meshHandles.push_back(dataPair.second);
+		}
+
 		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
-	std::size_t Direct3D12Mesh::BufferCount() const noexcept
+	std::span<const std::string> Direct3D12Mesh::DataTypes() const noexcept
 	{
-		return meshBuffers.size();
+		return dataTypes;
 	}
 
-	ID3D12Resource2& Direct3D12Mesh::Buffer(const std::size_t index) noexcept
+	std::optional<std::size_t> Direct3D12Mesh::BufferCount(const std::string_view dataType) const noexcept
 	{
-		return *meshBuffers[index].Get();
+		if (const std::optional<std::size_t> index = IndexOf(dataType))
+		{
+			return meshBuffers[index.value()].size();
+		}
+
+		return std::nullopt;
 	}
 
-	const ID3D12Resource2& Direct3D12Mesh::Buffer(const std::size_t index) const noexcept
+	ID3D12Resource2* Direct3D12Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
 	{
-		return *meshBuffers[index].Get();
+		if (const std::optional<std::size_t> dataTypeIndex = IndexOf(dataType))
+		{
+			return meshBuffers[dataTypeIndex.value()][index].Get();
+		}
+
+		return nullptr;
+	}
+
+	const ID3D12Resource2* Direct3D12Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
+	{
+		if (const std::optional<std::size_t> dataTypeIndex = IndexOf(dataType))
+		{
+			return meshBuffers[dataTypeIndex.value()][index].Get();
+		}
+
+		return nullptr;
+	}
+
+	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> Direct3D12Mesh::FindHandle(const std::string_view dataType) const noexcept
+	{
+		if (const std::optional<std::size_t> dataTypeIndex = IndexOf(dataType))
+		{
+			return meshHandles[dataTypeIndex.value()];
+		}
+
+		return std::nullopt;
 	}
 
 	ID3D12DescriptorHeap& Direct3D12Mesh::Heap() noexcept
@@ -106,14 +155,9 @@ namespace PonyEngine::Render
 		return *meshHeap.Get();
 	}
 
-	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> Direct3D12Mesh::FindHandle(const std::string_view dataType) const noexcept
+	std::span<UINT, 3> Direct3D12Mesh::ThreadGroupCounts() noexcept
 	{
-		if (const auto position = std::ranges::find_if(meshHandles, [&](const std::pair<std::string, D3D12_GPU_DESCRIPTOR_HANDLE>& p) { return p.first == dataType; }); position != meshHandles.cend())
-		{
-			return position->second;
-		}
-
-		return std::nullopt;
+		return threadGroupCounts;
 	}
 
 	std::span<const UINT, 3> Direct3D12Mesh::ThreadGroupCounts() const noexcept
@@ -121,8 +165,39 @@ namespace PonyEngine::Render
 		return threadGroupCounts;
 	}
 
-	void Direct3D12Mesh::Name(std::string_view name)
+	void Direct3D12Mesh::Name(const std::string_view name)
 	{
-		// TODO: Seems buffers and handles must be united so that I can set dataTypes as their names.
+		constexpr std::string_view bufferFormat = "{} - MeshBuffer{}-{}";
+		constexpr std::string_view heapName = " - MeshHeap";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + bufferFormat.size() + 3);
+
+		for (std::size_t i = 0; i < meshBuffers.size(); ++i)
+		{
+			for (std::size_t j = 0; j < meshBuffers[i].size(); ++j)
+			{
+				componentName.resize(std::min(componentName.capacity(), std::formatted_size(bufferFormat, name, i, j)));
+				std::format_to_n(componentName.begin(), componentName.size(), bufferFormat, name, i, j);
+				SetName(*meshBuffers[i][j].Get(), componentName);
+			}
+		}
+
+		componentName.erase();
+		componentName.append(name).append(heapName);
+		SetName(*meshHeap.Get(), componentName);
+	}
+
+	std::optional<std::size_t> Direct3D12Mesh::IndexOf(const std::string_view dataType) const noexcept
+	{
+		for (std::size_t i = 0; i < dataTypes.size(); ++i)
+		{
+			if (dataTypes[i] == dataType)
+			{
+				return i;
+			}
+		}
+
+		return std::nullopt;
 	}
 }

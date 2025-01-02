@@ -170,7 +170,7 @@ namespace PonyEngine::Render
 
 	void PackedPrimitive::Set(const std::uint32_t value) noexcept
 	{
-		*reinterpret_cast<uint32_t*>(indices.data()) = value;
+		*reinterpret_cast<std::uint32_t*>(indices.data()) = value;
 	}
 
 	template<std::size_t N>

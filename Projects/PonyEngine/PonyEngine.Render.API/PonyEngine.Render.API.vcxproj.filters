@@ -112,5 +112,8 @@
     <ClCompile Include="Source\Public\Render\PackedPrimitive.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Render\MeshParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -183,7 +183,7 @@ namespace PonyEngine::Render
 		constexpr std::string_view heapDescName = " - ViewHeap";
 
 		auto componentName = std::string();
-		componentName.reserve(name.size() + heapDescName.size());
+		componentName.reserve(name.size() + bufferFormat.size() + 3);
 
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
 		{

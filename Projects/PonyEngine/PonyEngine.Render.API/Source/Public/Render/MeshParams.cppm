@@ -7,17 +7,21 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:Meshlet;
+export module PonyEngine.Render:MeshParams;
 
+import <array>;
 import <cstdint>;
+import <string>;
+import <unordered_map>;
+import <vector>;
+
+import PonyBase.Container;
 
 export namespace PonyEngine::Render
 {
-	struct Meshlet final
+	struct MeshParams final
 	{
-		std::uint32_t vertexOffset = 0u;
-		std::uint32_t primitiveOffset = 0u;
-		std::uint32_t vertexCount = 0u;
-		std::uint32_t primitiveCount = 0u;
+		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
+		std::array<std::uint32_t, 3> threadGroupCounts;
 	};
 }

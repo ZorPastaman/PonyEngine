@@ -345,23 +345,25 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		bufferBarriers.reserve(renderObjects.size() * 3);
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
-			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
+			for (Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
 			{
-				const auto bufferBarrier = D3D12_BUFFER_BARRIER
+				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
-					.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-					.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-					.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-					.pResource = &mesh.Buffer(i),
-					.Offset = 0UL,
-					.Size = UINT64_MAX
-				};
-				bufferBarriers.push_back(bufferBarrier);
+					const auto bufferBarrier = D3D12_BUFFER_BARRIER
+					{
+						.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+						.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+						.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+						.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+						.pResource = mesh.FindBuffer(dataType, i),
+						.Offset = 0UL,
+						.Size = UINT64_MAX
+					};
+					bufferBarriers.push_back(bufferBarrier);
+				}
 			}
 		}
 
@@ -438,7 +440,7 @@ namespace PonyEngine::Render
 				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() > PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
+			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() < PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
 		});
 
 		const Direct3D12RootSignature* prevRootSignature = nullptr;
@@ -458,11 +460,14 @@ namespace PonyEngine::Render
 			}
 
 			Direct3D12Mesh* const mesh = &renderObject.renderObject->Mesh();
-			if (mesh != prevMesh || rootSignature != prevRootSignature)
+			if (mesh != prevMesh)
 			{
 				ID3D12DescriptorHeap* const heap = &mesh->Heap();
 				commandList->SetDescriptorHeaps(1u, &heap);
+			}
 
+			if (mesh != prevMesh || rootSignature != prevRootSignature)
+			{
 				for (const auto& [meshDataType, slot] : rootSignature->MeshDataSlots())
 				{
 					if (const std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle = mesh->FindHandle(meshDataType))
@@ -537,23 +542,25 @@ namespace PonyEngine::Render
 	void Direct3D12GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		bufferBarriers.reserve(renderObjects.size() * 3);
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
-			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
+			for (Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
 			{
-				const auto bufferBarrier = D3D12_BUFFER_BARRIER
+				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
-					.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-					.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-					.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-					.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.pResource = &mesh.Buffer(i),
-					.Offset = 0UL,
-					.Size = UINT64_MAX
-				};
-				bufferBarriers.push_back(bufferBarrier);
+					const auto bufferBarrier = D3D12_BUFFER_BARRIER
+					{
+						.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+						.pResource = mesh.FindBuffer(dataType, i),
+						.Offset = 0UL,
+						.Size = UINT64_MAX
+					};
+					bufferBarriers.push_back(bufferBarrier);
+				}
 			}
 		}
 
@@ -607,20 +614,23 @@ namespace PonyEngine::Render
 		bufferBarriers.clear();
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
-			Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh();
-			for (std::size_t i = 0, count = mesh.BufferCount(); i < count; ++i)
+			for (Direct3D12Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
 			{
-				const auto bufferBarrier = D3D12_BUFFER_BARRIER
+				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
-					.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-					.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-					.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-					.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.pResource = &mesh.Buffer(i),
-					.Offset = 0UL,
-					.Size = UINT64_MAX
-				};
-				bufferBarriers.push_back(bufferBarrier);
+					const auto bufferBarrier = D3D12_BUFFER_BARRIER
+					{
+						.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+						.pResource = mesh.FindBuffer(dataType, i),
+						.Offset = 0UL,
+						.Size = UINT64_MAX
+					};
+					bufferBarriers.push_back(bufferBarrier);
+				}
 			}
 		}
 
