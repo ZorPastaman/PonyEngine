@@ -90,6 +90,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		static SourceData CreateSourceData(const std::shared_ptr<const Mesh>& mesh);
 
+		void UpdateMesh(Direct3D12Mesh& mesh, SourceData& sourceData) const;
+		void UpdateBuffers(Direct3D12Mesh& mesh, SourceData& sourceData) const;
+
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 		/// @brief Upload heap properties.
 		static constexpr auto UploadHeapProperties = D3D12_HEAP_PROPERTIES
@@ -139,9 +142,6 @@ namespace PonyEngine::Render
 
 	void Direct3D12MeshManager::Tick()
 	{
-		ID3D12Device10& device = d3d12System->Device();
-		IDirect3D12CopyPipeline& copyPipeline = d3d12System->CopyPipeline();
-
 		for (std::size_t meshIndex = 0; meshIndex < meshSources.size(); ++meshIndex)
 		{
 			const std::shared_ptr<Direct3D12Mesh>& mesh = meshes[meshIndex];
@@ -149,26 +149,11 @@ namespace PonyEngine::Render
 
 			if (sourceData.meshVersion != sourceData.mesh->MeshVersion())
 			{
-				*mesh = CreateMesh(*sourceData.mesh);
-				sourceData = CreateSourceData(sourceData.mesh);
+				UpdateMesh(*mesh, sourceData);
 			}
 			else
 			{
-				for (auto& [dataType, bufferVersions] : sourceData.bufferVersions)
-				{
-					for (std::size_t bufferIndex = 0; bufferIndex < bufferVersions.size(); ++bufferIndex)
-					{
-						if (bufferVersions[bufferIndex] != sourceData.mesh->BufferVersion(dataType, bufferIndex))
-						{
-							const PonyBase::Container::Buffer* const sourceBuffer = sourceData.mesh->FindBuffer(dataType, bufferIndex);
-							const D3D12_RESOURCE_DESC1 bufferDesc = CreateBufferDesc(static_cast<UINT64>(sourceBuffer->Size()));
-							Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer = CreateUploadBuffer(device, bufferDesc, *sourceBuffer);
-							ID3D12Resource2* const gpuBuffer = mesh->FindBuffer(dataType, bufferIndex);
-							copyPipeline.AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer);
-							bufferVersions[bufferIndex] = sourceData.mesh->BufferVersion(dataType, bufferIndex).value();
-						}
-					}
-				}
+				UpdateBuffers(*mesh, sourceData);
 			}
 
 			std::ranges::copy(sourceData.mesh->ThreadGroupCounts(), mesh->ThreadGroupCounts().begin());
@@ -314,5 +299,32 @@ namespace PonyEngine::Render
 		}
 
 		return sourceData;
+	}
+
+	void Direct3D12MeshManager::UpdateMesh(Direct3D12Mesh& mesh, SourceData& sourceData) const
+	{
+		mesh = CreateMesh(*sourceData.mesh);
+		sourceData = CreateSourceData(sourceData.mesh);
+	}
+
+	void Direct3D12MeshManager::UpdateBuffers(Direct3D12Mesh& mesh, SourceData& sourceData) const
+	{
+		for (auto& [dataType, bufferVersions] : sourceData.bufferVersions)
+		{
+			for (std::size_t bufferIndex = 0; bufferIndex < bufferVersions.size(); ++bufferIndex)
+			{
+				if (bufferVersions[bufferIndex] != sourceData.mesh->BufferVersion(dataType, bufferIndex))
+				{
+					const PonyBase::Container::Buffer* const sourceBuffer = sourceData.mesh->FindBuffer(dataType, bufferIndex);
+
+					const D3D12_RESOURCE_DESC1 bufferDesc = CreateBufferDesc(static_cast<UINT64>(sourceBuffer->Size()));
+					Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer = CreateUploadBuffer(d3d12System->Device(), bufferDesc, *sourceBuffer);
+					ID3D12Resource2* const gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
+					d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer);
+
+					bufferVersions[bufferIndex] = sourceData.mesh->BufferVersion(dataType, bufferIndex).value();
+				}
+			}
+		}
 	}
 }
