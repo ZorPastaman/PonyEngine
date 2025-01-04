@@ -8,13 +8,21 @@
  ***************************************************/
 
 // CPU:
-// 0: Render target.
+// 0: MVP matrix
+// 1: Meshlets, Vertex indices and Triangles
+// 2: Positions
+// 3: Colors
 
 // GPU:
-// t0: Render target.
-// s0: Render target sampler.
+// b0: MVP matrix
+// t0: Meshlets
+// t1: Vertex indices
+// t2: Triangles
+// t3: Positions
+// t4: Colors
 
-#define SRGB_OUTPUT_ROOT_SIG \
-	"RootFlags(ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT), " \
-	"DescriptorTable(SRV(t0, numDescriptors = 1)), " \
-	"StaticSampler(s0, Filter = FILTER_MIN_MAG_MIP_POINT, AddressU = TEXTURE_ADDRESS_CLAMP, AddressV = TEXTURE_ADDRESS_CLAMP)"
+#define ROOT_SIG \
+	"RootConstants(num32BitConstants=16, b0), " \
+	"DescriptorTable(SRV(t0, numDescriptors = 3)) , " \
+	"DescriptorTable(SRV(t3, numDescriptors = 1)), " \
+	"DescriptorTable(SRV(t4, numDescriptors = 1))"

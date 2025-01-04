@@ -80,18 +80,17 @@ export namespace PonyEngine::Render
 		static Microsoft::WRL::ComPtr<ID3D12Resource2> CreateGpuBuffer(ID3D12Device10& device, const D3D12_RESOURCE_DESC1& bufferDesc);
 		static void CreateSrv(ID3D12Device10& device, const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, ID3D12Resource2& gpuBuffer, const PonyBase::Container::Buffer& sourceBuffer);
 
-		struct SourceData final
+		struct SourceState final
 		{
-			std::shared_ptr<const Mesh> mesh;
 			std::unordered_map<std::string, std::vector<std::size_t>> bufferVersions;
 			std::size_t meshVersion;
 		};
 
 		[[nodiscard("Pure function")]]
-		static SourceData CreateSourceData(const std::shared_ptr<const Mesh>& mesh);
+		static SourceState CreateSourceData(const Mesh& mesh);
 
-		void UpdateMesh(Direct3D12Mesh& mesh, SourceData& sourceData) const;
-		void UpdateBuffers(Direct3D12Mesh& mesh, SourceData& sourceData) const;
+		void UpdateMesh(Direct3D12Mesh& mesh, const Mesh& source, SourceState& sourceState) const;
+		void UpdateBuffers(Direct3D12Mesh& mesh, const Mesh& source, SourceState& sourceState) const;
 
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 		/// @brief Upload heap properties.
@@ -116,7 +115,8 @@ export namespace PonyEngine::Render
 		IDirect3D12SystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Direct3D12Mesh>> meshes; ///< Meshes.
-		std::vector<SourceData> meshSources;
+		std::vector<std::shared_ptr<const Mesh>> sources;
+		std::vector<SourceState> sourceStates;
 	};
 }
 
@@ -129,12 +129,23 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<Direct3D12Mesh> Direct3D12MeshManager::CreateDirect3D12Mesh(const std::shared_ptr<const Mesh>& mesh)
 	{
+		for (std::size_t i = 0; i < sources.size(); ++i)
+		{
+			if (sources[i].get() == mesh.get())
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh reused at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(meshes[i].get()));
+				return meshes[i];
+			}
+		}
+
 		const auto renderMesh = std::make_shared<Direct3D12Mesh>(CreateMesh(*mesh));
-		const auto sourceData = CreateSourceData(mesh);
+		const auto sourceData = CreateSourceData(*mesh);
 		meshes.reserve(meshes.size() + 1);
-		meshSources.reserve(meshes.size() + 1);
+		sources.reserve(sources.size() + 1);
+		sourceStates.reserve(sourceStates.size() + 1);
 		meshes.push_back(renderMesh);
-		meshSources.push_back(sourceData);
+		sources.push_back(mesh);
+		sourceStates.push_back(sourceData);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 
 		return renderMesh;
@@ -142,21 +153,22 @@ namespace PonyEngine::Render
 
 	void Direct3D12MeshManager::Tick()
 	{
-		for (std::size_t meshIndex = 0; meshIndex < meshSources.size(); ++meshIndex)
+		for (std::size_t meshIndex = 0; meshIndex < sourceStates.size(); ++meshIndex)
 		{
 			const std::shared_ptr<Direct3D12Mesh>& mesh = meshes[meshIndex];
-			SourceData& sourceData = meshSources[meshIndex];
+			const std::shared_ptr<const Mesh>& source = sources[meshIndex];
+			SourceState& sourceState = sourceStates[meshIndex];
 
-			if (sourceData.meshVersion != sourceData.mesh->MeshVersion())
+			if (sourceState.meshVersion != source->MeshVersion())
 			{
-				UpdateMesh(*mesh, sourceData);
+				UpdateMesh(*mesh, *source, sourceState);
 			}
 			else
 			{
-				UpdateBuffers(*mesh, sourceData);
+				UpdateBuffers(*mesh, *source, sourceState);
 			}
 
-			std::ranges::copy(sourceData.mesh->ThreadGroupCounts(), mesh->ThreadGroupCounts().begin());
+			std::ranges::copy(source->ThreadGroupCounts(), mesh->ThreadGroupCounts().begin());
 		}
 	}
 
@@ -168,7 +180,8 @@ namespace PonyEngine::Render
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(meshes[i].get()));
 				meshes.erase(meshes.cbegin() + i);
-				meshSources.erase(meshSources.begin() + i);
+				sources.erase(sources.cbegin() + i);
+				sourceStates.erase(sourceStates.begin() + i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh destroyed.");
 			}
 		}
@@ -289,40 +302,40 @@ namespace PonyEngine::Render
 		device.CreateShaderResourceView(&gpuBuffer, &srvDesc, cpuHandle);
 	}
 
-	Direct3D12MeshManager::SourceData Direct3D12MeshManager::CreateSourceData(const std::shared_ptr<const Mesh>& mesh)
+	Direct3D12MeshManager::SourceState Direct3D12MeshManager::CreateSourceData(const Mesh& mesh)
 	{
-		auto sourceData = SourceData{ .mesh = mesh, .meshVersion = mesh->MeshVersion() };
-		for (const std::string& dataType : mesh->DataTypes())
+		auto sourceData = SourceState{.meshVersion = mesh.MeshVersion()};
+		for (const std::string& dataType : mesh.DataTypes())
 		{
-			const std::span<const std::size_t> versions = mesh->BufferVersions(dataType);
+			const std::span<const std::size_t> versions = mesh.BufferVersions(dataType);
 			sourceData.bufferVersions[dataType] = std::vector<std::size_t>(versions.begin(), versions.end());
 		}
 
 		return sourceData;
 	}
 
-	void Direct3D12MeshManager::UpdateMesh(Direct3D12Mesh& mesh, SourceData& sourceData) const
+	void Direct3D12MeshManager::UpdateMesh(Direct3D12Mesh& mesh, const Mesh& source, SourceState& sourceState) const
 	{
-		mesh = CreateMesh(*sourceData.mesh);
-		sourceData = CreateSourceData(sourceData.mesh);
+		mesh = CreateMesh(source);
+		sourceState = CreateSourceData(source);
 	}
 
-	void Direct3D12MeshManager::UpdateBuffers(Direct3D12Mesh& mesh, SourceData& sourceData) const
+	void Direct3D12MeshManager::UpdateBuffers(Direct3D12Mesh& mesh, const Mesh& source, SourceState& sourceState) const
 	{
-		for (auto& [dataType, bufferVersions] : sourceData.bufferVersions)
+		for (auto& [dataType, bufferVersions] : sourceState.bufferVersions)
 		{
 			for (std::size_t bufferIndex = 0; bufferIndex < bufferVersions.size(); ++bufferIndex)
 			{
-				if (bufferVersions[bufferIndex] != sourceData.mesh->BufferVersion(dataType, bufferIndex))
+				if (bufferVersions[bufferIndex] != source.BufferVersion(dataType, bufferIndex))
 				{
-					const PonyBase::Container::Buffer* const sourceBuffer = sourceData.mesh->FindBuffer(dataType, bufferIndex);
+					const PonyBase::Container::Buffer* const sourceBuffer = source.FindBuffer(dataType, bufferIndex);
 
 					const D3D12_RESOURCE_DESC1 bufferDesc = CreateBufferDesc(static_cast<UINT64>(sourceBuffer->Size()));
 					Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer = CreateUploadBuffer(d3d12System->Device(), bufferDesc, *sourceBuffer);
 					ID3D12Resource2* const gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
 					d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer);
 
-					bufferVersions[bufferIndex] = sourceData.mesh->BufferVersion(dataType, bufferIndex).value();
+					bufferVersions[bufferIndex] = source.BufferVersion(dataType, bufferIndex).value();
 				}
 			}
 		}

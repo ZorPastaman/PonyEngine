@@ -69,8 +69,9 @@ export namespace PonyEngine::Render
 			PipelineStateStreamBlend blend;
 			PipelineStateStreamSampleMask sampleMask;
 			PipelineStateStreamRasterizer rasterizer;
-			PipelineStateStreamDepthStencil depthStencil;
+			PipelineStateStreamDepthStencil1 depthStencil;
 			PipelineStateStreamRenderTargetFormats renderTargetFormats;
+			PipelineStateStreamDepthStencilFormat depthStencilFormat;
 			PipelineStateStreamSampleDescription sampleDescription;
 		};
 
@@ -135,7 +136,7 @@ namespace PonyEngine::Render
 				.ForcedSampleCount = 0u,
 				.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
 			},
-			.depthStencil = D3D12_DEPTH_STENCIL_DESC
+			.depthStencil = D3D12_DEPTH_STENCIL_DESC1
 			{
 				.DepthEnable = true,
 				.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
@@ -156,13 +157,15 @@ namespace PonyEngine::Render
 					.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP,
 					.StencilPassOp = D3D12_STENCIL_OP_KEEP,
 					.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
-				}
+				},
+				.DepthBoundsTestEnable = true
 			},
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
 				.RTFormats = { renderTarget.Format() },
 				.NumRenderTargets = 1u
 			},
+			.depthStencilFormat = d3d12System->DepthStencilPrivate().DsvFormat(),
 			.sampleDescription = renderTarget.SampleDesc()
 		};
 		const auto pssDesc = D3D12_PIPELINE_STATE_STREAM_DESC
