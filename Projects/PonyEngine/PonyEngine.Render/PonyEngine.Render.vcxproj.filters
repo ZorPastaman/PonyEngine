@@ -207,13 +207,13 @@
     <FxCompile Include="Shaders\PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\RootSig.hlsli">
+    <FxCompile Include="Shaders\RootSig.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\MeshShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputRootSig.hlsli">
+    <FxCompile Include="Shaders\OutputRootSig.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
     <FxCompile Include="Shaders\OutputMeshShader.hlsl">
