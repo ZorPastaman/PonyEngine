@@ -31,7 +31,7 @@ namespace Mocks
 		return engine->SystemManager();
 	}
 
-	void InputSystem::AddInputEvent(const PonyEngine::Input::IInputDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent)
+	void InputSystem::AddInputEvent(const PonyEngine::Input::IDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent)
 	{
 		events.emplace_back(&inputSource, inputEvent);
 	}

@@ -18,26 +18,26 @@
     <ResourceCompile Include="PonyDebug.Log.API.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Log.Windows\OutputDebugStringSubLoggerData.cppm" />
-    <ClCompile Include="Source\Public\Log.Windows\OutputDebugStringSubLoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows-OutputDebugStringSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log.Windows\Log.Windows-OutputDebugStringSubLoggerParams.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Log.Windows.cppm" />
-    <ClCompile Include="Source\Public\Log\ConsoleSubLoggerData.cppm" />
-    <ClCompile Include="Source\Public\Log\ConsoleSubLoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Log\FileSubLoggerData.cppm" />
-    <ClCompile Include="Source\Public\Log\FileSubLoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Log\Logger.cppm" />
-    <ClCompile Include="Source\Public\Log\LoggerData.cppm" />
-    <ClCompile Include="Source\Public\Log\LoggerParams.cppm" />
-    <ClCompile Include="Source\Public\Log\ILogger.cppm" />
-    <ClCompile Include="Source\Public\Log\ISubLogger.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-ConsoleSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-ConsoleSubLoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-FileSubLoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-FileSubLoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-Logger.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LoggerData.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LoggerParams.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-ILogger.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-ISubLogger.cppm" />
     <ClCompile Include="Source\Public\Log\Log.cppm" />
-    <ClCompile Include="Source\Public\Log\LogConsoleHelper.cppm" />
-    <ClCompile Include="Source\Public\Log\LogEntry.cppm" />
-    <ClCompile Include="Source\Public\Log\LogFormat.cppm" />
-    <ClCompile Include="Source\Public\Log\LogHelper.cppm" />
-    <ClCompile Include="Source\Public\Log\LogInput.cppm" />
-    <ClCompile Include="Source\Public\Log\LogType.cppm" />
-    <ClCompile Include="Source\Public\Log\SubLogger.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogConsoleHelper.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogEntry.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogFormat.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogHelper.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogInput.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-LogType.cppm" />
+    <ClCompile Include="Source\Public\Log\Log-SubLogger.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

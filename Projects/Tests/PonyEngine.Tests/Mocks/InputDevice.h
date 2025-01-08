@@ -15,11 +15,11 @@ import PonyEngine.Input;
 
 namespace Mocks
 {
-	class InputDevice final : public PonyEngine::Input::InputDevice
+	class InputDevice final : public PonyEngine::Input::Device
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		InputDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::InputDeviceParams& deviceParams) noexcept;
+		InputDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams) noexcept;
 
 		virtual void Begin() override;
 		virtual void End() override;

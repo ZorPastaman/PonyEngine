@@ -57,9 +57,6 @@
     <ClCompile Include="Core\Vector4Tests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Geometry\MeshTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Space\Transform2DTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

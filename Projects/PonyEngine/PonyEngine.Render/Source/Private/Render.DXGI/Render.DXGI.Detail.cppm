@@ -9,7 +9,7 @@
 
 export module PonyEngine.Render.DXGI.Detail;
 
-export import :DXGISwapChainParams;
-export import :DXGISystem;
-export import :IDXGIRenderSystemContext;
-export import :IDXGISwapChain;
+export import :IRenderSystemContext;
+export import :ISwapChain;
+export import :SubSystem;
+export import :SwapChainParams;

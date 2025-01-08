@@ -9,5 +9,5 @@
 
 export module PonyEngine.Window.Windows.Detail;
 
-export import :WindowsClassImpl;
-export import :WindowsWindowSystemFactoryImpl;
+export import :ClassImpl;
+export import :WindowSystemFactoryImpl;

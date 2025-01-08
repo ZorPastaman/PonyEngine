@@ -18,8 +18,7 @@ struct Meshlet
 {
 	uint vertexOffset;
 	uint primitiveOffset;
-	uint vertexCount;
-	uint primitiveCount;
+	uint packedCounts;
 };
 
 struct Vertex
@@ -44,9 +43,11 @@ void main(in uint groupId : SV_GROUPID,
 	out indices uint3 outTriangles[TRIANGLE_COUNT])
 {
 	Meshlet meshlet = Meshlets[groupId];
-	SetMeshOutputCounts(meshlet.vertexCount, meshlet.primitiveCount);
+	uint vertexCount = meshlet.packedCounts & 0xFF;
+	uint primitiveCount = meshlet.packedCounts >> 8 & 0xFF;
+	SetMeshOutputCounts(vertexCount, primitiveCount);
 
-	if (groupThreadId < meshlet.vertexCount)
+	if (groupThreadId < vertexCount)
 	{
 		uint vertexIndex = VertexIndices[meshlet.vertexOffset + groupThreadId];
 		outVertices[groupThreadId].position = mul(ModelViewProjection, float4(Positions[vertexIndex], 1.f));
@@ -57,7 +58,7 @@ void main(in uint groupId : SV_GROUPID,
 	for (uint i = 0; i < TRIANGLE_MULTIPLIER; ++i)
 	{
 		uint primitiveIndex = groupThreadId + i * VERTEX_COUNT;
-		if (primitiveIndex < meshlet.primitiveCount)
+		if (primitiveIndex < primitiveCount)
 		{
 			uint packedTriangle = Triangles[meshlet.primitiveOffset + primitiveIndex];
 			outTriangles[primitiveIndex] = uint3(packedTriangle & 0xFF, packedTriangle >> 8 & 0xFF, packedTriangle >> 16 & 0xFF);

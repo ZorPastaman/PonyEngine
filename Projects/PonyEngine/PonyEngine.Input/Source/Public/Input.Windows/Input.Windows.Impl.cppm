@@ -21,7 +21,7 @@ import <memory>;
 import PonyEngine.Core;
 import PonyEngine.Input.Windows.Detail;
 
-export namespace PonyEngine::Input
+export namespace PonyEngine::Input::Windows
 {
 	/// @brief Creates a Windows keyboard device factory.
 	/// @param application Application context.
@@ -29,7 +29,7 @@ export namespace PonyEngine::Input
 	/// @param deviceParams Windows keyboard device parameters.
 	/// @return Windows keyboard device factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsKeyboardDeviceFactoryData CreateWindowsKeyboardDeviceFactory(Core::IApplicationContext& application, const WindowsKeyboardDeviceFactoryParams& factoryParams, const WindowsKeyboardDeviceParams& deviceParams);
+	PONY_DLL_EXPORT KeyboardDeviceFactoryData CreateKeyboardDeviceFactory(Core::IApplicationContext& application, const KeyboardDeviceFactoryParams& factoryParams, const KeyboardDeviceParams& deviceParams);
 
 	/// @brief Creates a Windows mouse device factory.
 	/// @param application Application context.
@@ -37,18 +37,18 @@ export namespace PonyEngine::Input
 	/// @param deviceParams Windows mouse device parameters.
 	/// @return Windows mouse device factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsMouseDeviceFactoryData CreateWindowsMouseDeviceFactory(Core::IApplicationContext& application, const WindowsMouseDeviceFactoryParams& factoryParams, const WindowsMouseDeviceParams& deviceParams);
+	PONY_DLL_EXPORT MouseDeviceFactoryData CreateMouseDeviceFactory(Core::IApplicationContext& application, const MouseDeviceFactoryParams& factoryParams, const MouseDeviceParams& deviceParams);
 }
 
-namespace PonyEngine::Input
+namespace PonyEngine::Input::Windows
 {
-	WindowsKeyboardDeviceFactoryData CreateWindowsKeyboardDeviceFactory(Core::IApplicationContext& application, const WindowsKeyboardDeviceFactoryParams& factoryParams, const WindowsKeyboardDeviceParams& deviceParams)
+	KeyboardDeviceFactoryData CreateKeyboardDeviceFactory(Core::IApplicationContext& application, const KeyboardDeviceFactoryParams& factoryParams, const KeyboardDeviceParams& deviceParams)
 	{
-		return WindowsKeyboardDeviceFactoryData{.inputDeviceFactory = std::make_unique<WindowsKeyboardDeviceFactory>(application, factoryParams, deviceParams)};
+		return KeyboardDeviceFactoryData{.inputDeviceFactory = std::make_unique<KeyboardDeviceFactory>(application, factoryParams, deviceParams)};
 	}
 
-	WindowsMouseDeviceFactoryData CreateWindowsMouseDeviceFactory(Core::IApplicationContext& application, const WindowsMouseDeviceFactoryParams& factoryParams, const WindowsMouseDeviceParams& deviceParams)
+	MouseDeviceFactoryData CreateMouseDeviceFactory(Core::IApplicationContext& application, const MouseDeviceFactoryParams& factoryParams, const MouseDeviceParams& deviceParams)
 	{
-		return WindowsMouseDeviceFactoryData{.inputDeviceFactory = std::make_unique<WindowsMouseDeviceFactory>(application, factoryParams, deviceParams)};
+		return MouseDeviceFactoryData{.inputDeviceFactory = std::make_unique<MouseDeviceFactory>(application, factoryParams, deviceParams)};
 	}
 }

@@ -15,22 +15,22 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Game\GameSystemFactoryData.cppm">
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\GameSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\IGameSystem.cppm">
+    <ClCompile Include="Source\Public\Game\Game-IGameSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Game\Game.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\GameSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Game\GameSystemParams.cppm">
+    <ClCompile Include="Source\Public\Game\Game-GameSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -20,7 +20,7 @@ import <memory>;
 import PonyEngine.Core;
 import PonyEngine.Render.Direct3D12.Windows.Detail;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Direct3D12::Windows
 {
 	/// @brief Creates a Direct3D 12 render system for Windows factory.
 	///	@param application Application context.
@@ -28,15 +28,13 @@ export namespace PonyEngine::Render
 	///	@param systemParams Direct3D 12 render system for Windows parameters.
 	/// @return Direct3D 12 render system for Windows factory
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsDirect3D12RenderSystemFactoryData CreateWindowsDirect3D12RenderSystemFactory(Core::IApplicationContext& application, const WindowsDirect3D12RenderSystemFactoryParams& factoryParams, 
-		const WindowsDirect3D12RenderSystemParams& systemParams);
+	PONY_DLL_EXPORT RenderSystemFactoryData CreateRenderSystemFactory(Core::IApplicationContext& application, const RenderSystemFactoryParams& factoryParams, const RenderSystemParams& systemParams);
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Direct3D12::Windows
 {
-	WindowsDirect3D12RenderSystemFactoryData CreateWindowsDirect3D12RenderSystemFactory(Core::IApplicationContext& application, const WindowsDirect3D12RenderSystemFactoryParams& factoryParams, 
-		const WindowsDirect3D12RenderSystemParams& systemParams)
+	RenderSystemFactoryData CreateRenderSystemFactory(Core::IApplicationContext& application, const RenderSystemFactoryParams& factoryParams, const RenderSystemParams& systemParams)
 	{
-		return WindowsDirect3D12RenderSystemFactoryData{.systemFactory = std::make_unique<WindowsDirect3D12RenderSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return RenderSystemFactoryData{.systemFactory = std::make_unique<RenderSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

@@ -9,16 +9,16 @@
 
 export module PonyEngine.Input;
 
-export import :IInputDevice;
-export import :IInputDeviceFactory;
+export import :Device;
+export import :DeviceData;
+export import :DeviceFactory;
+export import :DeviceParams;
+export import :IDevice;
+export import :IDeviceFactory;
 export import :IInputSystem;
 export import :IInputSystemContext;
 export import :InputBindingValue;
 export import :InputCode;
-export import :InputDevice;
-export import :InputDeviceData;
-export import :InputDeviceFactory;
-export import :InputDeviceParams;
 export import :InputEvent;
 export import :InputReceiver;
 export import :InputSystemFactory;

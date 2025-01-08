@@ -9,5 +9,5 @@
 
 export module Application.Windows;
 
-export import :WindowsApplication;
-export import :WindowsUtility;
+export import :Application;
+export import :Utility;
