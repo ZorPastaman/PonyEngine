@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Game\Game.Detail.cppm" />
-    <ClCompile Include="Source\Private\Game\GameSystem.cppm" />
-    <ClCompile Include="Source\Private\Game\GameSystemFactoryImpl.cppm" />
+    <ClCompile Include="Source\Private\Game\Game.Detail-GameSystem.cppm" />
+    <ClCompile Include="Source\Private\Game\Game.Detail-GameSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Public\Game\Game.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>

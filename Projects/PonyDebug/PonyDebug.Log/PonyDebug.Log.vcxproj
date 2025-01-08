@@ -12,11 +12,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Log.Windows\Log.Windows.Detail.cppm" />
-    <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Log\ConsoleSubLogger.cppm" />
-    <ClCompile Include="Source\Private\Log\FileSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log.Windows\Log.Windows.Detail-OutputDebugStringSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\Log.Detail-ConsoleSubLogger.cppm" />
+    <ClCompile Include="Source\Private\Log\Log.Detail-FileSubLogger.cppm" />
     <ClCompile Include="Source\Private\Log\Log.Detail.cppm" />
-    <ClCompile Include="Source\Private\Log\LoggerImpl.cppm" />
+    <ClCompile Include="Source\Private\Log\Log.Detail-LoggerImpl.cppm" />
     <ClCompile Include="Source\Public\Log.Windows\Log.Windows.Impl.cppm" />
     <ClCompile Include="Source\Public\Log\Log.Impl.cppm" />
   </ItemGroup>

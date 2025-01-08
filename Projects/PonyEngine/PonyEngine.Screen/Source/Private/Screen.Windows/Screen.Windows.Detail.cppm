@@ -9,4 +9,4 @@
 
 export module PonyEngine.Screen.Windows.Detail;
 
-export import :WindowsScreenSystemFactoryImpl;
+export import :ScreenSystemFactoryImpl;

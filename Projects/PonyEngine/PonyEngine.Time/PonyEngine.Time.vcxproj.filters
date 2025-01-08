@@ -25,22 +25,22 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Time\FrameRateSystem.cppm">
+    <ClCompile Include="Source\Private\Time\Time.Detail-FrameRateSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Time\Time.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Time\FrameRateSystemFactoryImpl.cppm">
+    <ClCompile Include="Source\Private\Time\Time.Detail-FrameRateSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Time\Time.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Time\TimeSystem.cppm">
+    <ClCompile Include="Source\Private\Time\Time.Detail-TimeSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Time\TimeSystemFactoryImpl.cppm">
+    <ClCompile Include="Source\Private\Time\Time.Detail-TimeSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

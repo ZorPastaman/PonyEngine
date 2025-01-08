@@ -18,31 +18,31 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Input.Windows\Input.Windows.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsKeyboardDeviceParams.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Input.Windows\WindowsMouseDeviceParams.cppm" />
-    <ClCompile Include="Source\Public\Input\InputType.cppm" />
-    <ClCompile Include="Source\Public\Input\InputValueConversion.cppm" />
-    <ClCompile Include="Source\Public\Input\IInputDevice.cppm" />
-    <ClCompile Include="Source\Public\Input\IInputDeviceFactory.cppm" />
-    <ClCompile Include="Source\Public\Input\IInputSystemContext.cppm" />
-    <ClCompile Include="Source\Public\Input\InputBindingValue.cppm" />
-    <ClCompile Include="Source\Public\Input\InputDevice.cppm" />
-    <ClCompile Include="Source\Public\Input\InputDeviceData.cppm" />
-    <ClCompile Include="Source\Public\Input\InputDeviceFactory.cppm" />
-    <ClCompile Include="Source\Public\Input\InputDeviceParams.cppm" />
-    <ClCompile Include="Source\Public\Input\InputEvent.cppm" />
-    <ClCompile Include="Source\Public\Input\InputReceiver.cppm" />
-    <ClCompile Include="Source\Public\Input\InputSystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Input\InputSystemFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Input\InputSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Input\InputSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Input\IInputSystem.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-KeyboardDeviceFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-KeyboardDeviceFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-KeyboardDeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-MouseDeviceFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-MouseDeviceFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Input.Windows\Input.Windows-MouseDeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputType.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputValueConversion.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-IDevice.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-IDeviceFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-IInputSystemContext.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputBindingValue.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-Device.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-DeviceData.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-DeviceFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-DeviceParams.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputEvent.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputReceiver.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputSystemFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-IInputSystem.cppm" />
     <ClCompile Include="Source\Public\Input\Input.cppm" />
-    <ClCompile Include="Source\Public\Input\InputCode.cppm" />
+    <ClCompile Include="Source\Public\Input\Input-InputCode.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

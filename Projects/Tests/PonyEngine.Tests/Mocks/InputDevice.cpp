@@ -11,8 +11,8 @@
 
 namespace Mocks
 {
-	InputDevice::InputDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::InputDeviceParams& deviceParams) noexcept :
-		PonyEngine::Input::InputDevice(inputSystem, deviceParams)
+	InputDevice::InputDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams) noexcept :
+		PonyEngine::Input::Device(inputSystem, deviceParams)
 	{
 	}
 

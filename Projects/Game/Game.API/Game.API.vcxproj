@@ -11,12 +11,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Game\GameSystemFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Game\GameSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Game\GameSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Game\GameSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Game\Game-GameSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Game\Game-GameSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Game\Game.cppm" />
-    <ClCompile Include="Source\Public\Game\IGameSystem.cppm" />
+    <ClCompile Include="Source\Public\Game\Game-IGameSystem.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

@@ -15,10 +15,10 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Input\InputSystem.cppm">
+    <ClCompile Include="Source\Private\Input\Input.Detail-InputSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input\InputSystemFactoryImpl.cppm">
+    <ClCompile Include="Source\Private\Input\Input.Detail-InputSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input\Input.Impl.cppm">
@@ -30,19 +30,19 @@
     <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDevice.cppm">
+    <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail-KeyboardDevice.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input.Windows\WindowsKeyboardDeviceFactory.cppm">
+    <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail-KeyboardDeviceFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Input.Windows\Input.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDevice.cppm">
+    <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail-MouseDevice.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Input.Windows\WindowsMouseDeviceFactory.cppm">
+    <ClCompile Include="Source\Private\Input.Windows\Input.Windows.Detail-MouseDeviceFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

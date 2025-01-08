@@ -15,7 +15,7 @@
 #include "PonyDebug/Log/Log.h"
 
 import PonyBase.Core;
-import PonyBase.StringUtility;
+import PonyBase.Utility;
 
 import PonyDebug.Log;
 
@@ -27,7 +27,7 @@ int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 
 	try
 	{
-		auto application = Application::WindowsApplication();
+		auto application = Application::Windows::Application();
 
 		try
 		{

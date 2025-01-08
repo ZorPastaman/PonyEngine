@@ -14,13 +14,13 @@
 
 namespace Mocks
 {
-	PonyEngine::Input::InputDeviceData InputDeviceFactory::CreateDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::InputDeviceParams& deviceParams)
+	PonyEngine::Input::DeviceData InputDeviceFactory::CreateDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams)
 	{
 		++version;
 		auto device = std::make_unique<InputDevice>(inputSystem, deviceParams);
 		inputDevice = device.get();
 
-		return PonyEngine::Input::InputDeviceData{.inputDevice = std::move(device)};
+		return PonyEngine::Input::DeviceData{.inputDevice = std::move(device)};
 	}
 
 	const type_info& InputDeviceFactory::DeviceType() const noexcept
