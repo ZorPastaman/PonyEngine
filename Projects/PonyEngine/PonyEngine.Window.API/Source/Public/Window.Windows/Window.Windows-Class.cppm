@@ -25,7 +25,7 @@ export namespace PonyEngine::Window::Windows
 		/// @brief Gets a module handle.
 		/// @return Module handle.
 		[[nodiscard("Pure function")]]
-		virtual HINSTANCE ModuleHandle() const noexcept = 0;
+		virtual HMODULE ModuleHandle() const noexcept = 0;
 		/// @brief Gets a registered class handle.
 		/// @return Registered class handle.
 		[[nodiscard("Pure function")]]

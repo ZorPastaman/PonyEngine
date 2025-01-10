@@ -19,6 +19,7 @@ export import :Meshlet;
 export import :MeshParams;
 export import :MSAAParams;
 export import :PackedPrimitive;
+export import :RenderObjectParams;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;

@@ -7,30 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyBase/Utility/ObjectBody.h"
-
-export module PonyEngine.Render:IRenderObjectManager;
+export module PonyEngine.Render:RenderObjectParams;
 
 import <memory>;
 
 import PonyMath.Core;
 
-import :IRenderObject;
-import :RenderObjectParams;
+import :Mesh;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render object manager.
-	class IRenderObjectManager
+	struct RenderObjectParams final
 	{
-		INTERFACE_BODY(IRenderObjectManager)
-
-		/// @brief Creates a render object.
-		/// @param params Render object parameters.
-		/// @return Render object.
-		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<IRenderObject> CreateObject(const RenderObjectParams& params) = 0;
+		std::shared_ptr<const Mesh> mesh;
+		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity;
 	};
 }

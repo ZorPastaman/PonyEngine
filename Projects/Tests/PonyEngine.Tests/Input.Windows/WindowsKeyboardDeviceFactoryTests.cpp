@@ -25,7 +25,7 @@ namespace Input
 		TEST_METHOD(CreateTest)
 		{
 			auto application = Mocks::Application();
-			auto factory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});
 			Assert::IsNotNull(factory.inputDeviceFactory.get());
 		}
 
@@ -38,8 +38,8 @@ namespace Input
 			engine.application = &application;
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 			Assert::IsNotNull(device.inputDevice.get());
 		}
 
@@ -52,8 +52,8 @@ namespace Input
 			engine.application = &application;
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 			Assert::IsTrue(typeid(*device.inputDevice) == factory.inputDeviceFactory->DeviceType());
 		}
 	};

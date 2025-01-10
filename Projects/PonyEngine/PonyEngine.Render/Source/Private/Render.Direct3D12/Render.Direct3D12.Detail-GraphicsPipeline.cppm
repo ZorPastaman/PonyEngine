@@ -102,8 +102,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Closes command lists.
 		void CloseLists();
 
-		/// @brief Populates global commands.
-		void PopulateGlobalCommands();
 		/// @brief Populates begin to render barriers in an msaa context.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param depthStencilBuffer Depth stencil buffer.
@@ -286,7 +284,6 @@ namespace PonyEngine::Render::Direct3D12
 		const D3D12_CPU_DESCRIPTOR_HANDLE mainRenderTargetHandle = msaaRenderTargetBuffer ? renderTarget.RtvHandleMsaa() : renderTarget.RtvHandle();
 
 		ResetLists();
-		PopulateGlobalCommands();
 		PopulateBeginToRenderBarriers(mainRenderTargetBuffer, depthStencilBuffer);
 		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), mainRenderTargetHandle, depthStencil.DsvHandle());
 		PopulateRenderObjects(renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12());
@@ -336,17 +333,12 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void GraphicsPipeline::PopulateGlobalCommands()
-	{
-		commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	}
-
 	void GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
 		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
 		{
-			for (Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
+			for (Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes()) // TODO: It should distinguish meshes
 			{
 				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)

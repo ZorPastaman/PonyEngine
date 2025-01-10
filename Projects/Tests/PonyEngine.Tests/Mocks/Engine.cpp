@@ -21,7 +21,7 @@ namespace Mocks
 		return nullptr;
 	}
 
-	std::int64_t Engine::FrameCount() const noexcept
+	std::uint64_t Engine::FrameCount() const noexcept
 	{
 		return frameCount;
 	}

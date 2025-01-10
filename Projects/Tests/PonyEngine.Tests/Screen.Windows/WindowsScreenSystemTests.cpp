@@ -35,7 +35,7 @@ namespace Screen
 			application.logger = &logger;
 			auto engine = Mocks::Engine();
 			engine.application = &application;
-			const auto factory = PonyEngine::Screen::CreateWindowsScreenFactory(application, PonyEngine::Screen::WindowsScreenSystemFactoryParams{}, PonyEngine::Screen::WindowsScreenSystemParams{});
+			const auto factory = PonyEngine::Screen::Windows::CreateScreenFactory(application, PonyEngine::Screen::Windows::ScreenSystemFactoryParams{}, PonyEngine::Screen::Windows::ScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			std::get<0>(system.system)->Begin();
 			auto screenSystem = dynamic_cast<PonyEngine::Screen::IScreenSystem*>(std::get<0>(system.system).get());
