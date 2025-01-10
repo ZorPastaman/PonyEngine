@@ -37,12 +37,12 @@ namespace Render
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto windowFactory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) });
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto windowFactory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			auto window = windowFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get()));
-			auto renderFactory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{}, PonyEngine::Render::WindowsDirect3D12RenderSystemParams{});
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get()));
+			auto renderFactory = PonyEngine::Render::Direct3D12::Windows::CreateRenderSystemFactory(application, PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryParams{}, PonyEngine::Render::Direct3D12::Windows::RenderSystemParams{});
 			auto renderSystem = renderFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			auto& renderView = dynamic_cast<PonyEngine::Render::IRenderSystem*>(std::get<1>(renderSystem.system).get())->RenderView();
 
@@ -60,12 +60,12 @@ namespace Render
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto windowFactory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) });
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto windowFactory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			auto window = windowFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get()));
-			auto renderFactory = PonyEngine::Render::CreateWindowsDirect3D12RenderSystemFactory(application, PonyEngine::Render::WindowsDirect3D12RenderSystemFactoryParams{}, PonyEngine::Render::WindowsDirect3D12RenderSystemParams{});
+			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get()));
+			auto renderFactory = PonyEngine::Render::Direct3D12::Windows::CreateRenderSystemFactory(application, PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryParams{}, PonyEngine::Render::Direct3D12::Windows::RenderSystemParams{});
 			auto renderSystem = renderFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			auto& renderView = dynamic_cast<PonyEngine::Render::IRenderSystem*>(std::get<1>(renderSystem.system).get())->RenderView();
 

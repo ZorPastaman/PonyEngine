@@ -33,7 +33,7 @@ namespace Mocks
 	{
 	public:
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t FrameCount() const noexcept override;
+		virtual std::uint64_t FrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept override;

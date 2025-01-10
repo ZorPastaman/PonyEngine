@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <typeinfo>
 
-import PonyBase.ObjectUtility;
+import PonyBase.Utility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

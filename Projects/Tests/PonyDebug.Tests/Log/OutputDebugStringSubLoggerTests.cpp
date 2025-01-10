@@ -19,7 +19,7 @@ namespace Log
 	{
 		TEST_METHOD(CreateTest)
 		{
-			const PonyDebug::Log::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::CreateOutputDebugStringSubLogger(PonyDebug::Log::OutputDebugStringSubLoggerParams());
+			const PonyDebug::Log::Windows::OutputDebugStringSubLoggerData outputDebugStringSubLogger = PonyDebug::Log::Windows::CreateOutputDebugStringSubLogger(PonyDebug::Log::Windows::OutputDebugStringSubLoggerParams());
 			Assert::IsNotNull(outputDebugStringSubLogger.subLogger.get());
 		}
 

@@ -13,7 +13,7 @@
 #include <format>
 #include <string>
 
-import PonyBase.StringUtility;
+import PonyBase.Utility;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 

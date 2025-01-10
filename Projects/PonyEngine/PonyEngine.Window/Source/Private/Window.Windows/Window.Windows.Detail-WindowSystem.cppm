@@ -22,7 +22,7 @@ import <cstdint>;
 import <memory>;
 import <stdexcept>;
 
-import PonyBase.Utility;
+import PonyBase.Utility.Windows;
 
 import PonyMath.Core;
 import PonyMath.Shape;
@@ -151,7 +151,7 @@ namespace PonyEngine::Window::Windows
 	WindowSystem::WindowSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const WindowSystemParams& windowParams) :
 		TickableSystem(engine, systemParams),
 		windowsClass(windowParams.windowsClass),
-		moduleHandle{GetModule()}
+		moduleHandle{ PonyBase::Utility::Windows::GetModule()}
 	{
 		assert(windowsClass && "The windows class is nullptr.");
 

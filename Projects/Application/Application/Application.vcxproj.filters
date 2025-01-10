@@ -33,8 +33,5 @@
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows-QuitChecker.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Utility.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
 </Project>

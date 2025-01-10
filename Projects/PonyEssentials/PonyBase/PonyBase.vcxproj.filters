@@ -82,5 +82,17 @@
     <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Module.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Cursor.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

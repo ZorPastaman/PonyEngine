@@ -15,7 +15,7 @@
 #include "PonyDebug/Log/Log.h"
 
 import PonyBase.Core;
-import PonyBase.Utility;
+import PonyBase.Utility.Windows;
 
 import PonyDebug.Log;
 
@@ -23,10 +23,9 @@ import Application.Windows;
 
 int APIENTRY wWinMain(const HINSTANCE, const HINSTANCE, const LPWSTR, const int)
 {
-	Application::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
-
 	try
 	{
+		PonyBase::Utility::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 		auto application = Application::Windows::Application();
 
 		try

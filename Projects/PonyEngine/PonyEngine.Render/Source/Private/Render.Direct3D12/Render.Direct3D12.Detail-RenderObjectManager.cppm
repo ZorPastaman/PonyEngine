@@ -50,14 +50,9 @@ export namespace PonyEngine::Render::Direct3D12
 		~Direct3D12RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Render::IRenderObject> CreateObject(const std::shared_ptr<const Render::Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) override;
-		/// @brief Creates a render object.
-		/// @param mesh Render object mesh.
-		/// @param modelMatrix Render object translation-rotation-scaling matrix.
-		/// @return Render object handle.
-		[[nodiscard("Redundant call")]]
-		std::shared_ptr<IRenderObject> CreateObjectD3D12(const std::shared_ptr<const Render::Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix = PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity);
+		virtual std::shared_ptr<Render::IRenderObject> CreateObject(const RenderObjectParams& params) override;
 
+		/// @brief Adds render tasks to a graphics pipeline.
 		void AddRenderTasks();
 
 		/// @brief Cleans out of dead render objects.
@@ -65,6 +60,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
 		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
+		
 
 	private:
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
@@ -106,19 +102,14 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
-	std::shared_ptr<Render::IRenderObject> Direct3D12RenderObjectManager::CreateObject(const std::shared_ptr<const Render::Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix)
-	{
-		return std::static_pointer_cast<IRenderObject>(CreateObjectD3D12(mesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix)));
-	}
-
-	std::shared_ptr<IRenderObject> Direct3D12RenderObjectManager::CreateObjectD3D12(const std::shared_ptr<const Render::Mesh>& mesh, const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrix)
+	std::shared_ptr<Render::IRenderObject> Direct3D12RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
-		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(mesh);
+		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateDirect3D12Mesh(params.mesh);
 		renderMesh->Name("Mesh");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
-		auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(modelMatrix));
+		auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
 		renderObjects.push_back(renderObject);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 

@@ -11,28 +11,26 @@ module;
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "PonyDebug/Log/Log.h"
+export module PonyBase.Utility.Windows:Priority;
 
-export module Application.Windows:Utility;
+import <stdexcept>;
 
-import PonyDebug.Log;
+import PonyBase.Utility;
 
-export namespace Application // TODO: Move to base
+export namespace PonyBase::Utility::Windows
 {
 	/// @brief Sets the process priority.
 	/// @param priority Priority to set.
-	void SetProcessPriority(DWORD priority) noexcept;
+	void SetProcessPriority(DWORD priority);
 }
 
-namespace Application
+namespace PonyBase::Utility::Windows
 {
-	void SetProcessPriority(const DWORD priority) noexcept
+	void SetProcessPriority(const DWORD priority)
 	{
 		if (!SetPriorityClass(GetCurrentProcess(), priority))
 		{
-			PONY_CONSOLE(PonyDebug::Log::LogType::Error, "Failed to set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError());
+			throw std::runtime_error(SafeFormat("Failed to set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
 		}
-
-		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Current process priority set to '0x{:X}'.", priority);
 	}
 }

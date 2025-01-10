@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Application.Windows;
+export module PonyBase.Utility.Windows;
 
-export import :Application;
+export import PonyBase.Utility.COM;
+
+export import :Cursor;
+export import :Module;
+export import :Priority;

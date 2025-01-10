@@ -28,7 +28,7 @@ namespace Input
 {
 	TEST_CLASS(WindowsMouseDeviceTests)
 	{
-		class WindowsWindowTitleBar final : public PonyEngine::Window::IWindowsWindowTitleBar
+		class WindowsWindowTitleBar final : public PonyEngine::Window::Windows::ITitleBar
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -50,49 +50,49 @@ namespace Input
 			}
 		};
 
-		class MessagePump final : public PonyEngine::Window::IWindowsMessagePump
+		class MessagePump final : public PonyEngine::Window::Windows::IMessagePump
 		{
 		public:
 			std::size_t version = 0;
-			PonyEngine::Window::IWindowsMessageObserver* addedMessageObserver;
+			PonyEngine::Window::Windows::IMessageObserver* addedMessageObserver;
 			std::vector<UINT> observerMessageTypes;
 
-			virtual void AddMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) override
+			virtual void AddMessageObserver(PonyEngine::Window::Windows::IMessageObserver& observer, std::span<const UINT> messageTypes) override
 			{
 				++version;
 				addedMessageObserver = &observer;
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::Windows::IMessageObserver&) noexcept override
 			{
 				++version;
 				addedMessageObserver = nullptr;
 			}
 		};
 
-		class RawInputManager final : public PonyEngine::Window::IWindowsRawInputManager
+		class RawInputManager final : public PonyEngine::Window::Windows::IRawInputManager
 		{
 		public:
 			std::size_t version = 0;
-			PonyEngine::Window::IWindowsRawInputObserver* addedRawObserver;
+			PonyEngine::Window::Windows::IRawInputObserver* addedRawObserver;
 			std::vector<DWORD> observerRawTypes;
 
-			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override
+			virtual void AddRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override
 			{
 				++version;
 				addedRawObserver = &observer;
 				observerRawTypes.assign(rawInputTypes.begin(), rawInputTypes.end());
 			}
 
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override
+			virtual void RemoveRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver&) noexcept override
 			{
 				++version;
 				addedRawObserver = nullptr;
 			}
 		};
 
-		class Cursor final : public PonyEngine::Window::IWindowsCursor
+		class Cursor final : public PonyEngine::Window::Windows::ICursor
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -118,7 +118,7 @@ namespace Input
 			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>&) override {}
 		};
 
-		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		class WindowsWindowSystem final : public PonyEngine::Window::Windows::IWindowSystem
 		{
 		public:
 			WindowsWindowTitleBar titleBar;
@@ -127,21 +127,21 @@ namespace Input
 			class Cursor cursor;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() noexcept override
+			virtual PonyEngine::Window::Windows::ITitleBar& TitleBar() noexcept override
 			{
 				return titleBar;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() const noexcept override
+			virtual const PonyEngine::Window::Windows::ITitleBar& TitleBar() const noexcept override
 			{
 				return titleBar;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsCursor& Cursor() noexcept override { return cursor; }
+			virtual PonyEngine::Window::Windows::ICursor& Cursor() noexcept override { return cursor; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsCursor& Cursor() const noexcept override { return cursor; }
+			virtual const PonyEngine::Window::Windows::ICursor& Cursor() const noexcept override { return cursor; }
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override
@@ -173,23 +173,23 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsMessagePump& MessagePump() noexcept override
+			virtual PonyEngine::Window::Windows::IMessagePump& MessagePump() noexcept override
 			{
 				return messagePump;
 			}
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsMessagePump& MessagePump() const noexcept override
+			virtual const PonyEngine::Window::Windows::IMessagePump& MessagePump() const noexcept override
 			{
 				return messagePump;
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsRawInputManager& RawInputManager() noexcept override
+			virtual PonyEngine::Window::Windows::IRawInputManager& RawInputManager() noexcept override
 			{
 				return rawInputManager;
 			}
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsRawInputManager& RawInputManager() const noexcept override
+			virtual const PonyEngine::Window::Windows::IRawInputManager& RawInputManager() const noexcept override
 			{
 				return rawInputManager;
 			}
@@ -208,11 +208,11 @@ namespace Input
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto window = WindowsWindowSystem();
-			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), static_cast<PonyEngine::Window::IWindowsWindowSystem*>(&window));
+			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), static_cast<PonyEngine::Window::Windows::IWindowSystem*>(&window));
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 
 			device.inputDevice->Begin();
 
@@ -249,86 +249,86 @@ namespace Input
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto window = WindowsWindowSystem();
-			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), static_cast<PonyEngine::Window::IWindowsWindowSystem*>(&window));
+			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), static_cast<PonyEngine::Window::Windows::IWindowSystem*>(&window));
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 
 			device.inputDevice->Begin();
 
 			window.messagePump.addedMessageObserver->Observe(WM_MOUSEMOVE, 0, LPARAM{DWORD{32} + (DWORD{46} << 16)});
 			Assert::AreEqual(std::size_t{2}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events[0].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events[0].first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseXPosition), static_cast<std::uint32_t>(inputSystem.events[0].second.inputCode));
 			Assert::AreEqual(32.f, inputSystem.events[0].second.inputValue);
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events[1].first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events[1].first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseYPosition), static_cast<std::uint32_t>(inputSystem.events[1].second.inputCode));
 			Assert::AreEqual(46.f, inputSystem.events[1].second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_LBUTTONDOWN, 0, 0);
 			Assert::AreEqual(std::size_t{3}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseLeftButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_LBUTTONUP, 0, 0);
 			Assert::AreEqual(std::size_t{4}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseLeftButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_RBUTTONDOWN, 0, 0);
 			Assert::AreEqual(std::size_t{5}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseRightButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_RBUTTONUP, 0, 0);
 			Assert::AreEqual(std::size_t{6}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseRightButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_MBUTTONDOWN, 0, 0);
 			Assert::AreEqual(std::size_t{7}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseMiddleButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_MBUTTONUP, 0, 0);
 			Assert::AreEqual(std::size_t{8}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseMiddleButton), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_XBUTTONDOWN, 1 << 16, 0);
 			Assert::AreEqual(std::size_t{9}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseButton4), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_XBUTTONUP, 1 << 16, 0);
 			Assert::AreEqual(std::size_t{10}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseButton4), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_XBUTTONDOWN, 2 << 16, 0);
 			Assert::AreEqual(std::size_t{11}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseButton5), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_XBUTTONUP, 2 << 16, 0);
 			Assert::AreEqual(std::size_t{12}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseButton5), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
 
 			window.messagePump.addedMessageObserver->Observe(WM_MOUSEWHEEL, 120 << 16, 0);
 			Assert::AreEqual(std::size_t{13}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseWheel), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
 			window.messagePump.addedMessageObserver->Observe(WM_MOUSEWHEEL, static_cast<WPARAM>(-240 << 16), 0);
 			Assert::AreEqual(std::size_t{14}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
+			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
 			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::MouseWheel), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
 			Assert::AreEqual(-2.f, inputSystem.events.back().second.inputValue);
 

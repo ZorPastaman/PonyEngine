@@ -42,7 +42,6 @@ export namespace Application::Windows
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
-		// TODO: Make all code inside this module more universal.
 		class Logger logger; ///< Logger for Windows.
 		Engine engine; ///< Engine for Windows.
 		QuitChecker quitChecker; /// Quit checker for Windows.

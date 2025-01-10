@@ -23,18 +23,8 @@ import PonyMath.Core;
 import PonyMath.Shape;
 import PonyMath.Utility;
 
-export namespace PonyEngine::Window::Windows // Make different utility classes
+export namespace PonyEngine::Window::Windows
 {
-	/// @brief Gets this dll module.
-	/// @return Dll module.
-	[[nodiscard("Pure function")]]
-	HMODULE GetModule();
-
-	/// @brief Gets a default cursor.
-	/// @return Default cursor.
-	[[nodiscard("Pure function")]]
-	HCURSOR DefaultCursor();
-
 	/// @brief Converts the Windows rect to a pair of a position and a resolution.
 	/// @param windowRect Windows rect.
 	/// @return Pair of a position and a resolution.
@@ -55,28 +45,6 @@ export namespace PonyEngine::Window::Windows // Make different utility classes
 
 namespace PonyEngine::Window::Windows
 {
-	HMODULE GetModule()
-	{
-		HMODULE moduleHandle;
-		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetModule), &moduleHandle) || !moduleHandle)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to find dll module. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		return moduleHandle;
-	}
-
-	HCURSOR DefaultCursor()
-	{
-		const auto cursor = static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
-		if (!cursor)
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		return cursor;
-	}
-
 	std::pair<PonyMath::Core::Vector2<int>, PonyMath::Core::Vector2<int>> ConvertToPositionResolution(const RECT& windowRect) noexcept
 	{
 		const auto position = PonyMath::Core::Vector2<int>(static_cast<int>(windowRect.left), static_cast<int>(windowRect.top));

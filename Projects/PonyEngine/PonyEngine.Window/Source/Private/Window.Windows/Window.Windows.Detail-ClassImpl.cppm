@@ -18,7 +18,7 @@ export module PonyEngine.Window.Windows.Detail:ClassImpl;
 import <cstdint>;
 import <stdexcept>;
 
-import PonyBase.Utility;
+import PonyBase.Utility.Windows;
 
 import PonyDebug.Log;
 
@@ -44,7 +44,7 @@ export namespace PonyEngine::Window::Windows
 		virtual ~ClassImpl() noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual HINSTANCE ModuleHandle() const noexcept override;
+		virtual HMODULE ModuleHandle() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual ATOM ClassHandle() const noexcept override;
 
@@ -53,7 +53,7 @@ export namespace PonyEngine::Window::Windows
 
 	private:
 		Core::IApplicationContext* application; ///< Application.
-		HINSTANCE moduleHandle; ///< Module instance handle.
+		HMODULE moduleHandle; ///< Module instance handle.
 		ATOM classHandle; /// Registered class handle.
 	};
 }
@@ -62,7 +62,7 @@ namespace PonyEngine::Window::Windows
 {
 	ClassImpl::ClassImpl(Core::IApplicationContext& application, const ClassParams& params) :
 		application{&application},
-		moduleHandle{GetModule()}
+		moduleHandle{PonyBase::Utility::Windows::GetModule()}
 	{
 		const auto wc = WNDCLASSEXW
 		{
@@ -73,7 +73,7 @@ namespace PonyEngine::Window::Windows
 			.cbWndExtra = 0,
 			.hInstance = moduleHandle,
 			.hIcon = params.icon,
-			.hCursor = params.cursor ? params.cursor : DefaultCursor(),
+			.hCursor = params.cursor ? params.cursor : PonyBase::Utility::Windows::DefaultCursor(),
 			.hbrBackground = nullptr,
 			.lpszMenuName = nullptr,
 			.lpszClassName = params.name.c_str(),

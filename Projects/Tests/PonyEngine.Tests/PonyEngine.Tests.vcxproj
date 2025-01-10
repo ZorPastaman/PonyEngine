@@ -91,7 +91,6 @@
     <ClCompile Include="Mocks\TickableSystemFactory.cpp" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
     <ClCompile Include="Input\InputCodeTests.cpp" />
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderObjectTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderSystemFactoryTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderTargetTests.cpp" />

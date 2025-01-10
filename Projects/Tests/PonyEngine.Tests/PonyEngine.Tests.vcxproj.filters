@@ -75,9 +75,6 @@
     <ClCompile Include="Mocks\ScreenSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Render.Direct3D12.Windows\RenderTargetTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

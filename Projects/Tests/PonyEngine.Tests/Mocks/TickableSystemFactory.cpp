@@ -12,7 +12,7 @@
 #include <memory>
 #include <utility>
 
-import PonyBase.ObjectUtility;
+import PonyBase.Utility;
 
 namespace Mocks
 {

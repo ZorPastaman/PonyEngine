@@ -17,7 +17,6 @@
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Logger.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows-QuitChecker.cppm" />
     <ClCompile Include="Source\Private\Application.Windows\Application.Windows.cppm" />
-    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Utility.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">
