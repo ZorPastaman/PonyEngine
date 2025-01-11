@@ -11,7 +11,6 @@ export module PonyEngine.Render.Direct3D12;
 
 export import PonyEngine.Render;
 
-export import :IRenderObject;
 export import :IRenderObjectManager;
 export import :IRenderSystem;
 export import :IRenderTarget;

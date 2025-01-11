@@ -14,6 +14,14 @@
 #define THREAD_COUNT_Y 1
 #define THREAD_COUNT_Z 1
 
+struct PonyTransform
+{
+	//float4x4 modelMatrix;
+	//float4x4 viewMatrix;
+	//float4x4 projectionMatrix;
+	float4x4 mvpMatrix;
+};
+
 struct Meshlet
 {
 	uint vertexOffset;
@@ -27,7 +35,7 @@ struct Vertex
 	float4 color : COLOR;
 };
 
-float4x4 ModelViewProjection : register(b0);
+ConstantBuffer<PonyTransform> Transform: register(b0);
 
 StructuredBuffer<Meshlet> Meshlets : register(t0);
 StructuredBuffer<uint> VertexIndices : register(t1);
@@ -50,7 +58,7 @@ void main(in uint groupId : SV_GROUPID,
 	if (groupThreadId < vertexCount)
 	{
 		uint vertexIndex = VertexIndices[meshlet.vertexOffset + groupThreadId];
-		outVertices[groupThreadId].position = mul(ModelViewProjection, float4(Positions[vertexIndex], 1.f));
+		outVertices[groupThreadId].position = mul(Transform.mvpMatrix, float4(Positions[vertexIndex], 1.f));
 		outVertices[groupThreadId].color = Colors[vertexIndex];
 	}
 

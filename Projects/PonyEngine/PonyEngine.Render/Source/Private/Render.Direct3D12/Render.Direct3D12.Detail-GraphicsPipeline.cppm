@@ -20,6 +20,8 @@ import <array>;
 import <cstddef>;
 import <cstdint>;
 import <memory>;
+import <optional>;
+import <set>;
 import <stdexcept>;
 import <string>;
 import <string_view>;
@@ -43,6 +45,7 @@ import :ObjectUtility;
 import :RootSignature;
 import :RenderObject;
 import :SrgbOutputQuad;
+import :Transform;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -94,7 +97,7 @@ export namespace PonyEngine::Render::Direct3D12
 		struct Direct3D12RenderObjectEntry final
 		{
 			std::shared_ptr<RenderObject> renderObject; ///< Render object.
-			PonyMath::Core::Matrix4x4<FLOAT> mvpMatrix; ///< Model-view-projection matrix.
+			Transform transform; ///< Transform.
 		};
 
 		/// @brief Resets command lists.
@@ -102,6 +105,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Closes command lists.
 		void CloseLists();
 
+		/// @brief Updates render object meshes cache.
+		void UpdateMeshes();
 		/// @brief Populates begin to render barriers in an msaa context.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param depthStencilBuffer Depth stencil buffer.
@@ -113,8 +118,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param dsvHandle Dsv handle.
 		void PopulateRenderTarget(const PonyMath::Utility::Resolution<UINT>& resolution, const PonyMath::Color::RGBA<FLOAT>& clearColor, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
 		/// @brief Populates render objects.
-		/// @param vpMatrix View-projection matrix.
-		void PopulateRenderObjects(const PonyMath::Core::Matrix4x4<FLOAT>& vpMatrix);
+		void PopulateRenderObjects();
 		/// @brief Populate output.
 		/// @param renderTargetHeap Render target heap.
 		/// @param renderTargetHandle Render target handle.
@@ -159,6 +163,7 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
 		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects.
+		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
 		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
@@ -273,7 +278,6 @@ namespace PonyEngine::Render::Direct3D12
 		IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
 		IDepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
 		IBackPrivate& back = d3d12System->BackPrivate();
-		const IRenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
 
 		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
 		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
@@ -284,9 +288,10 @@ namespace PonyEngine::Render::Direct3D12
 		const D3D12_CPU_DESCRIPTOR_HANDLE mainRenderTargetHandle = msaaRenderTargetBuffer ? renderTarget.RtvHandleMsaa() : renderTarget.RtvHandle();
 
 		ResetLists();
+		UpdateMeshes();
 		PopulateBeginToRenderBarriers(mainRenderTargetBuffer, depthStencilBuffer);
 		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), mainRenderTargetHandle, depthStencil.DsvHandle());
-		PopulateRenderObjects(renderView.ProjectionMatrixD3D12() * renderView.ViewMatrixD3D12());
+		PopulateRenderObjects();
 		if (msaaRenderTargetBuffer)
 		{
 			PopulateRenderToResolveBarriers(mainRenderTargetBuffer, renderTargetBuffer, depthStencilBuffer);
@@ -333,14 +338,23 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	void GraphicsPipeline::UpdateMeshes()
+	{
+		meshes.clear();
+		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		{
+			meshes.insert(&renderObjectEntry.renderObject->Mesh());
+		}
+	}
+
 	void GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		for (Mesh* const mesh : meshes)
 		{
-			for (Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes()) // TODO: It should distinguish meshes
+			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER
@@ -349,7 +363,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 						.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 						.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-						.pResource = mesh.FindBuffer(dataType, i),
+						.pResource = mesh->FindBuffer(dataType, i),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -402,20 +416,34 @@ namespace PonyEngine::Render::Direct3D12
 		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
-	void GraphicsPipeline::PopulateRenderObjects(const PonyMath::Core::Matrix4x4<FLOAT>& vpMatrix)
+	void GraphicsPipeline::PopulateRenderObjects()
 	{
+		const IRenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
+		const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix = renderView.ViewMatrixD3D12();
+		const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix = renderView.ProjectionMatrixD3D12();
 		for (Direct3D12RenderObjectEntry& renderObject : renderObjects)
 		{
-			renderObject.mvpMatrix = vpMatrix * renderObject.renderObject->ModelMatrixD3D12();
+			renderObject.transform = Transform(renderObject.renderObject->ModelMatrixD3D12(), viewMatrix, projectionMatrix);
 		}
 
 		std::ranges::sort(renderObjects, [](const Direct3D12RenderObjectEntry& left, const Direct3D12RenderObjectEntry& right)
 		{
 			const Material* const leftMaterial = &left.renderObject->Material();
 			const Material* const rightMaterial = &right.renderObject->Material();
-			const RootSignature* const leftRootSignature = &leftMaterial->RootSignature();
-			const RootSignature* const rightRootSignature = &rightMaterial->RootSignature();
-			if (leftRootSignature != rightRootSignature)
+			const bool isLeftTransparent = leftMaterial->IsTransparent();
+			const bool isRightTransparent = rightMaterial->IsTransparent();
+
+			if (isLeftTransparent != isRightTransparent)
+			{
+				return isLeftTransparent < isRightTransparent;
+			}
+
+			if (isLeftTransparent)
+			{
+				return PonyMath::Core::ExtractTranslation(left.transform.MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(right.transform.MvpMatrix()).Z();
+			}
+
+			if (const RootSignature* const leftRootSignature = &leftMaterial->RootSignature(), * const rightRootSignature = &rightMaterial->RootSignature(); leftRootSignature != rightRootSignature)
 			{
 				return reinterpret_cast<std::uintptr_t>(leftRootSignature) < reinterpret_cast<std::uintptr_t>(rightRootSignature);
 			}
@@ -424,14 +452,12 @@ namespace PonyEngine::Render::Direct3D12
 				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
 			}
 
-			const Mesh* const leftMesh = &left.renderObject->Mesh();
-			const Mesh* const rightMesh = &right.renderObject->Mesh();
-			if (leftMesh != rightMesh)
+			if (const Mesh* const leftMesh = &left.renderObject->Mesh(), * const rightMesh = &right.renderObject->Mesh(); leftMesh != rightMesh)
 			{
 				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(left.mvpMatrix).Z() < PonyMath::Core::ExtractTranslation(right.mvpMatrix).Z();
+			return PonyMath::Core::ExtractTranslation(left.transform.MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(right.transform.MvpMatrix()).Z();
 		});
 
 		const RootSignature* prevRootSignature = nullptr;
@@ -459,17 +485,19 @@ namespace PonyEngine::Render::Direct3D12
 
 			if (mesh != prevMesh || rootSignature != prevRootSignature)
 			{
-				for (const auto& [meshDataType, slot] : rootSignature->MeshDataSlots())
+				for (const std::string& dataType : mesh->DataTypes())
 				{
-					if (const std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> handle = mesh->FindHandle(meshDataType))
+					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType))
 					{
-						commandList->SetGraphicsRootDescriptorTable(slot, handle.value());
+						commandList->SetGraphicsRootDescriptorTable(slot.value(), mesh->FindHandle(dataType).value());
 					}
 				}
 			}
 
-			const PonyMath::Core::Matrix4x4<FLOAT>& mvp = renderObject.mvpMatrix;
-			commandList->SetGraphicsRoot32BitConstants(rootSignature->MvpIndex(), mvp.ComponentCount, mvp.Span().data(), 0);
+			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(PonyTransform))
+			{
+				commandList->SetGraphicsRoot32BitConstants(slot.value(), PonyMath::Core::Matrix4x4<FLOAT>::ComponentCount, renderObject.transform.MvpMatrix().Span().data(), 0);
+			}
 
 			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
 			commandList->DispatchMesh(threadGroupCounts[0], threadGroupCounts[1], threadGroupCounts[2]);
@@ -533,11 +561,11 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		for (Mesh* const mesh : meshes)
 		{
-			for (Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
+			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER
@@ -546,7 +574,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = mesh.FindBuffer(dataType, i),
+						.pResource = mesh->FindBuffer(dataType, i),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -603,11 +631,11 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		for (Mesh* const mesh : meshes)
 		{
-			for (Mesh& mesh = renderObjectEntry.renderObject->Mesh(); const std::string& dataType : mesh.DataTypes())
+			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh.BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER
@@ -616,7 +644,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = mesh.FindBuffer(dataType, i),
+						.pResource = mesh->FindBuffer(dataType, i),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};

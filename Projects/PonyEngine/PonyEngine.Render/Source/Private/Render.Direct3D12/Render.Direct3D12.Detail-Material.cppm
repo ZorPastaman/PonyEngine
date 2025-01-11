@@ -57,6 +57,11 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const ID3D12PipelineState& PipelineState() const noexcept;
 
+		/// @brief Gets if the material is transparent.
+		/// @return @a True if the material is transparent; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsTransparent() const noexcept;
+
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
 		void Name(std::string_view name);
@@ -67,6 +72,8 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
+
+		bool isTransparent = false; // TODO: Support material params.
 	};
 }
 
@@ -96,6 +103,11 @@ namespace PonyEngine::Render::Direct3D12
 	const ID3D12PipelineState& Material::PipelineState() const noexcept
 	{
 		return *pipelineState.Get();
+	}
+
+	bool Material::IsTransparent() const noexcept
+	{
+		return isTransparent;
 	}
 
 	void Material::Name(const std::string_view name)

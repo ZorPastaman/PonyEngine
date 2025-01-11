@@ -8,13 +8,13 @@
  ***************************************************/
 
 // CPU:
-// 0: MVP matrix
+// 0: Pony transformation
 // 1: Meshlets, Vertex indices and Triangles
 // 2: Positions
 // 3: Colors
 
 // GPU:
-// b0: MVP matrix
+// b0: Pony transformation
 // t0: Meshlets
 // t1: Vertex indices
 // t2: Triangles

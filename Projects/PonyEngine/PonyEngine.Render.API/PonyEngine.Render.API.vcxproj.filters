@@ -79,9 +79,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObject.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -116,6 +113,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

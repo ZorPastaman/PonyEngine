@@ -48,7 +48,7 @@ export namespace PonyEngine::Render::Direct3D12
 		~RootSignatureManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<RootSignature> CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots, UINT mvpIndex) override;
+		virtual std::shared_ptr<RootSignature> CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots) override;
 
 		/// @brief Cleans out of dead root signatures.
 		void Clean() noexcept;
@@ -70,7 +70,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots, const UINT mvpIndex)
+	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots)
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create root signature.");
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
@@ -80,7 +80,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created.");
 
-		const auto d3d12RootSignature = std::make_shared<RootSignature>(*rootSignature.Get(), meshDataSlots, mvpIndex);
+		const auto d3d12RootSignature = std::make_shared<RootSignature>(*rootSignature.Get(), meshDataSlots);
 		rootSignatures.push_back(d3d12RootSignature);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(d3d12RootSignature.get()));
 
