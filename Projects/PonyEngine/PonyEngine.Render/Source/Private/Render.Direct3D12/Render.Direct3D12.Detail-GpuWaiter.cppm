@@ -87,13 +87,6 @@ namespace PonyEngine::Render::Direct3D12
 	void GpuWaiter::Wait()
 	{
 		fence->Signal();
-
-		if (const UINT64 currentValue = fence->CurrentValue(); fence->CompletedValue() < currentValue)
-		{
-			if (const HRESULT result = waitingCommandQueue->Wait(&fence->ControlledFence(), currentValue); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set gpu wait with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
-			}
-		}
+		fence->Wait(*waitingCommandQueue.Get());
 	}
 }

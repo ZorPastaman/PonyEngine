@@ -13,6 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:RootSignature;
 
+import <optional>;
 import <string>;
 import <string_view>;
 import <unordered_map>;
@@ -27,9 +28,9 @@ export namespace PonyEngine::Render::Direct3D12
 	public:
 		/// @brief Creates a @p RootSignature.
 		/// @param rootSignature Root signature.
-		/// @param mvpIndex Model-view-projection matrix slot index.
+		/// @param dataSlots Data slots.
 		[[nodiscard("Pure constructor")]]
-		RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& meshDataSlots, UINT mvpIndex);
+		RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& dataSlots);
 		[[nodiscard("Pure constructor")]]
 		RootSignature(const RootSignature& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -46,13 +47,8 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const ID3D12RootSignature& ControlledRootSignature() const noexcept;
 
-		/// @brief Gets the model-view-projection matrix slot index.
-		/// @return Model-view-projection matrix slot index.
 		[[nodiscard("Pure function")]]
-		UINT MvpIndex() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		const std::unordered_map<std::string, UINT>& MeshDataSlots() const noexcept;
+		std::optional<UINT> FindDataSlot(std::string_view dataType) const noexcept;
 
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
@@ -63,17 +59,15 @@ export namespace PonyEngine::Render::Direct3D12
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
-		std::unordered_map<std::string, UINT> meshDataSlots; ///< Mesh data slots.
-		UINT mvpIndex; ///< Model-view-projection matrix slot index.
+		std::unordered_map<std::string, UINT> dataSlots; ///< Data slots.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	RootSignature::RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& meshDataSlots, const UINT mvpIndex) :
+	RootSignature::RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& dataSlots) :
 		rootSignature(&rootSignature),
-		meshDataSlots(meshDataSlots),
-		mvpIndex{mvpIndex}
+		dataSlots(dataSlots)
 	{
 	}
 
@@ -87,14 +81,17 @@ namespace PonyEngine::Render::Direct3D12
 		return *rootSignature.Get();
 	}
 
-	UINT RootSignature::MvpIndex() const noexcept
+	std::optional<UINT> RootSignature::FindDataSlot(const std::string_view dataType) const noexcept
 	{
-		return mvpIndex;
-	}
+		for (const auto& [type, slot] : dataSlots)
+		{
+			if (type == dataType)
+			{
+				return slot;
+			}
+		}
 
-	const std::unordered_map<std::string, UINT>& RootSignature::MeshDataSlots() const noexcept
-	{
-		return meshDataSlots;
+		return std::nullopt;
 	}
 
 	void RootSignature::Name(const std::string_view name)

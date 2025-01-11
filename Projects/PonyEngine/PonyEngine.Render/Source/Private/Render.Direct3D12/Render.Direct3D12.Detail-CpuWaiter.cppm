@@ -101,14 +101,6 @@ namespace PonyEngine::Render::Direct3D12
 	void CpuWaiter::Wait()
 	{
 		fence->Signal();
-
-		if (const UINT64 currentFenceValue = fence->CurrentValue(); fence->CompletedValue() < currentFenceValue)
-		{
-			fence->SetEvent(currentFenceValue, waitEvent);
-			if (const DWORD result = WaitForSingleObjectEx(waitEvent, waitTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-		}
+		fence->Wait(waitEvent, waitTimeout);
 	}
 }

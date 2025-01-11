@@ -36,12 +36,12 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemFactoryParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemParams.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-SwapChainParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObject.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderTarget.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderView.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />

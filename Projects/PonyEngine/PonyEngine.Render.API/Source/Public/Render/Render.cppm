@@ -9,6 +9,7 @@
 
 export module PonyEngine.Render;
 
+export import :EngineDataTypes;
 export import :IRenderObject;
 export import :IRenderObjectManager;
 export import :IRenderSystem;

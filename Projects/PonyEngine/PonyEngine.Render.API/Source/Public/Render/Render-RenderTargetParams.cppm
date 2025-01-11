@@ -24,6 +24,6 @@ export namespace PonyEngine::Render
 	{
 		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution = {}; ///< Render resolution. If it's @a nullopt, the render resolution will be the same as a window resolution.
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
-		MSAAParams msaaParams = MSAAParams{.sampleCount = 1u, .sampleQuality = 1.f}; ///< MSAA parameters.
+		MSAAParams msaaParams; ///< MSAA parameters.
 	};
 }

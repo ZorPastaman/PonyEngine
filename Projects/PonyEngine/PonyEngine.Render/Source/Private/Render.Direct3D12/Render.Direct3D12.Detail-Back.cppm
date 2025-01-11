@@ -63,10 +63,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackViewHandle() const noexcept override;
 
-		/// @brief Sets the name to the back components.
-		/// @param name Name to set.
-		void Name(std::string_view name);
-
 		/// @brief Gets the current back buffer index.
 		/// @return Current back buffer index.
 		[[nodiscard("Pure function")]]
@@ -75,16 +71,19 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param index Current back buffer index to set.
 		void CurrentBackBufferIndex(UINT index) noexcept;
 
+		/// @brief Sets the name to the back components.
+		/// @param name Name to set.
+		void Name(std::string_view name);
+
 		Back& operator =(const Back&) = delete;
 		Back& operator =(Back&&) = delete;
 
 	private:
 		DXGI_FORMAT backViewFormat; ///< Back view format.
 		DXGI_FORMAT srgbBackViewFormat; ///< Srgb back view format.
+		UINT currentBackBufferIndex; ///< Current back buffer index.
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
-
-		UINT currentBackBufferIndex; ///< Current back buffer index.
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> backViewHeap; ///< Back view descriptor heap.
@@ -97,8 +96,8 @@ namespace PonyEngine::Render::Direct3D12
 	Back::Back(ISubSystemContext& d3d12System, const BackParams& params) :
 		backViewFormat{params.backViewFormat},
 		srgbBackViewFormat{GetSrgbFormat(backViewFormat)},
-		d3d12System{&d3d12System},
-		currentBackBufferIndex{0u}
+		currentBackBufferIndex{0u},
+		d3d12System{&d3d12System}
 	{
 		constexpr D3D12_DESCRIPTOR_HEAP_TYPE descHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
 
@@ -178,6 +177,16 @@ namespace PonyEngine::Render::Direct3D12
 		return backViewHandles[currentBackBufferIndex];
 	}
 
+	UINT Back::CurrentBackBufferIndex() const noexcept
+	{
+		return currentBackBufferIndex;
+	}
+
+	void Back::CurrentBackBufferIndex(const UINT index) noexcept
+	{
+		currentBackBufferIndex = index;
+	}
+
 	void Back::Name(const std::string_view name)
 	{
 		constexpr std::string_view bufferFormat = "{} - Buffer{}";
@@ -196,15 +205,5 @@ namespace PonyEngine::Render::Direct3D12
 		componentName.erase();
 		componentName.append(name).append(heapDescName);
 		SetName(*backViewHeap.Get(), componentName);
-	}
-
-	UINT Back::CurrentBackBufferIndex() const noexcept
-	{
-		return currentBackBufferIndex;
-	}
-
-	void Back::CurrentBackBufferIndex(const UINT index) noexcept
-	{
-		currentBackBufferIndex = index;
 	}
 }

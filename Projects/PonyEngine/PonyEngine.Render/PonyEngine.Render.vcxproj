@@ -66,6 +66,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRootSignatureManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderTargetPrivate.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChain.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-IRenderSystemContext.cppm" />

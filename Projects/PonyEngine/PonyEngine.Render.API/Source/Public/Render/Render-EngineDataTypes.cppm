@@ -7,19 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Render:EngineDataTypes;
 
-#include "PonyBase/Utility/ObjectBody.h"
+import <string_view>;
 
-export module PonyEngine.Render.Direct3D12:IRenderObject;
-
-import PonyEngine.Render;
-
-export namespace PonyEngine::Render::Direct3D12
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render object.
-	class IRenderObject : public Render::IRenderObject
-	{
-		INTERFACE_BODY(IRenderObject)
-	};
+	constexpr std::string_view PonyTransform = "Pony_Transform";
 }

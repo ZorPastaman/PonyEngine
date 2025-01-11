@@ -69,10 +69,13 @@ export namespace PonyEngine::Render::Direct3D12
 
 		/// @brief Increases the current fence value and signals the fence.
 		void Signal();
-		/// @brief Sets the waiting event.
-		/// @param fenceValue Fence value to wait for.
-		/// @param event Waiting event.
-		void SetEvent(UINT64 fenceValue, HANDLE event) const;
+		/// @brief Sets the wait event and waits for it.
+		/// @param waitEvent Wait event.
+		/// @param waitTimeout Wait timeout.
+		void Wait(HANDLE waitEvent, DWORD waitTimeout) const;
+		/// @brief Sets the waiting command queue to wait for the fence.
+		/// @param waitingCommandQueue Waiting command queue.
+		void Wait(ID3D12CommandQueue& waitingCommandQueue) const;
 
 		Fence& operator =(const Fence&) = delete;
 		Fence& operator =(Fence&& other) noexcept = default;
@@ -152,11 +155,30 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void Fence::SetEvent(const UINT64 fenceValue, const HANDLE event) const
+	void Fence::Wait(const HANDLE waitEvent, const DWORD waitTimeout) const
 	{
-		if (const HRESULT result = fence->SetEventOnCompletion(fenceValue, event); FAILED(result)) [[unlikely]]
+		if (fence->GetCompletedValue() < currentValue)
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set event on completion with '0x{:X}' result", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			if (const HRESULT result = fence->SetEventOnCompletion(currentValue, waitEvent); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set fence event with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
+			}
+
+			if (const DWORD result = WaitForSingleObjectEx(waitEvent, waitTimeout, false); result != WAIT_OBJECT_0) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to wait for fence event with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
+			}
+		}
+	}
+
+	void Fence::Wait(ID3D12CommandQueue& waitingCommandQueue) const
+	{
+		if (fence->GetCompletedValue() < currentValue)
+		{
+			if (const HRESULT result = waitingCommandQueue.Wait(fence.Get(), currentValue); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set gpu wait with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
+			}
 		}
 	}
 }
