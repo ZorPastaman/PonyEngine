@@ -31,10 +31,12 @@ import :BackParams;
 import :CopyPipeline;
 import :CpuWaiter;
 import :DepthStencil;
+import :DescriptorHeapManager;
 import :GpuWaiter;
 import :GraphicsPipeline;
 import :ICopyPipeline;
 import :IDepthStencilPrivate;
+import :IDescriptorHeapManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
@@ -177,6 +179,11 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual IRenderObjectManagerPrivate& RenderObjectManagerPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IRenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept override;
@@ -206,6 +213,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::unique_ptr<MeshManager> meshManager; ///< Mesh manager.
 		std::unique_ptr<RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<MaterialManager> materialManager; ///< Material manager.
+		std::unique_ptr<class DescriptorHeapManager> heapManager;
 		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager; ///< Render object manager.
 
 		std::unique_ptr<class CopyPipeline> copyPipeline; ///< Copy pipeline.
@@ -240,6 +248,10 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		SetName(*device.Get(), "RenderDevice");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device acquired.");
+
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create descriptor heap manager.");
+		heapManager = std::make_unique<class DescriptorHeapManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap manager created.");
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline.");
 		copyPipeline = std::make_unique<class CopyPipeline>(*static_cast<ISubSystemContext*>(this), params.commandQueuePriority);
@@ -413,11 +425,13 @@ namespace PonyEngine::Render::Direct3D12
 
 	void SubSystem::Render(const UINT backBufferIndex)
 	{
+		renderObjectManager->AddRenderTasks();
+		graphicsPipeline->Prepare();
+
 		copyPipeline->PopulateCommands();
 		copyPipeline->Execute();
 
 		back->CurrentBackBufferIndex(backBufferIndex);
-		renderObjectManager->AddRenderTasks();
 		graphicsPipeline->PopulateCommands();
 
 		copyWaiter->Wait();
@@ -510,6 +524,16 @@ namespace PonyEngine::Render::Direct3D12
 	const IMaterialManagerPrivate& SubSystem::MaterialManagerPrivate() const noexcept
 	{
 		return *materialManager;
+	}
+
+	IDescriptorHeapManager& SubSystem::DescriptorHeapManager() noexcept
+	{
+		return *heapManager;
+	}
+
+	const IDescriptorHeapManager& SubSystem::DescriptorHeapManager() const noexcept
+	{
+		return *heapManager;
 	}
 
 	IRenderViewPrivate& SubSystem::RenderViewPrivate() noexcept

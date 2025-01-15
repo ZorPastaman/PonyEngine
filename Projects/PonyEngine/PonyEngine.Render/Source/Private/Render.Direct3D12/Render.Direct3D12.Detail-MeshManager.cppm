@@ -191,7 +191,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.Type = DescHeapType,
 			.NumDescriptors = static_cast<UINT>(mesh.BufferCount()),
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
+			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
@@ -200,14 +200,13 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create mesh descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
-		D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle = heap->GetGPUDescriptorHandleForHeapStart();
 		const UINT handleIncrement = device.GetDescriptorHandleIncrementSize(DescHeapType);
 
 		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
-		std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_GPU_DESCRIPTOR_HANDLE>> data;
+		std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_CPU_DESCRIPTOR_HANDLE>> data;
 		for (const std::string& dataType : mesh.DataTypes())
 		{
-			const D3D12_GPU_DESCRIPTOR_HANDLE gpuStartHandle = gpuHandle;
+			const D3D12_CPU_DESCRIPTOR_HANDLE cpuStartHandle = cpuHandle;
 
 			const std::span<const PonyBase::Container::Buffer> bufferTable = mesh.FindBufferTable(dataType);
 			auto buffers = std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>();
@@ -223,10 +222,9 @@ namespace PonyEngine::Render::Direct3D12
 				CreateSrv(device, cpuHandle, *gpuBuffer.Get(), sourceBuffer);
 
 				cpuHandle.ptr += handleIncrement;
-				gpuHandle.ptr += handleIncrement;
 			}
 
-			data[dataType] = std::pair(buffers, gpuStartHandle);
+			data[dataType] = std::pair(buffers, cpuStartHandle);
 		}
 
 		return Mesh(data, *heap.Get(), mesh.ThreadGroupCounts());

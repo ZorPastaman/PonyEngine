@@ -33,7 +33,7 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_GPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts);
+		Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_CPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts);
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh&) = delete;
 		[[nodiscard("Pure constructor")]]
@@ -53,7 +53,7 @@ export namespace PonyEngine::Render::Direct3D12
 		const ID3D12Resource2* FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> FindHandle(std::string_view dataType) const noexcept;
+		std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> FindHandle(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		ID3D12DescriptorHeap& Heap() noexcept;
@@ -78,7 +78,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 		std::vector<std::string> dataTypes; ///< Data types.
 		std::vector<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>> meshBuffers; ///< Mesh buffers.
-		std::vector<D3D12_GPU_DESCRIPTOR_HANDLE> meshHandles; ///< Mesh handles.
+		std::vector<D3D12_CPU_DESCRIPTOR_HANDLE> meshHandles; ///< Mesh handles.
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> meshHeap; ///< Mesh descriptor heap.
 
 		std::array<UINT, 3> threadGroupCounts; ///< Thread group counts.
@@ -87,7 +87,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Mesh::Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_GPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts) :
+	Mesh::Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_CPU_DESCRIPTOR_HANDLE>>& data, ID3D12DescriptorHeap& heap, std::span<const UINT, 3> threadGroupCounts) :
 		meshHeap(&heap)
 	{
 		for (const auto& [dataType, dataPair] : data)
@@ -135,7 +135,7 @@ namespace PonyEngine::Render::Direct3D12
 		return nullptr;
 	}
 
-	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> Mesh::FindHandle(const std::string_view dataType) const noexcept
+	std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> Mesh::FindHandle(const std::string_view dataType) const noexcept
 	{
 		if (const std::optional<std::size_t> dataTypeIndex = IndexOf(dataType))
 		{
