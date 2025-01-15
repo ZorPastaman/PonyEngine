@@ -19,6 +19,7 @@ import PonyDebug.Log;
 import :IBackPrivate;
 import :ICopyPipeline;
 import :IDepthStencilPrivate;
+import :IDescriptorHeapManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
@@ -114,6 +115,15 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Material manager.
 		[[nodiscard("Pure function")]]
 		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept = 0;
+
+		/// @brief Gets the descriptor heap manager.
+		/// @return Descriptor heap manager.
+		[[nodiscard("Pure function")]]
+		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept = 0;
+		/// @brief Gets the descriptor heap manager.
+		/// @return Descriptor heap manager.
+		[[nodiscard("Pure function")]]
+		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept = 0;
 
 		/// @brief Gets the render object manager.
 		/// @return Render object manager.

@@ -8,13 +8,13 @@
  ***************************************************/
 
 // CPU:
-// 0: Pony transformation
+// 0: Pony Transform
 // 1: Meshlets, Vertex indices and Triangles
 // 2: Positions
 // 3: Colors
 
 // GPU:
-// b0: Pony transformation
+// b0: Pony Transform
 // t0: Meshlets
 // t1: Vertex indices
 // t2: Triangles
@@ -22,7 +22,7 @@
 // t4: Colors
 
 #define ROOT_SIG \
-	"RootConstants(num32BitConstants=16, b0), " \
-	"DescriptorTable(SRV(t0, numDescriptors = 3)) , " \
+	"DescriptorTable(CBV(b0, numDescriptors = 1)), " \
+	"DescriptorTable(SRV(t0, numDescriptors = 3)), " \
 	"DescriptorTable(SRV(t3, numDescriptors = 1)), " \
 	"DescriptorTable(SRV(t4, numDescriptors = 1))"

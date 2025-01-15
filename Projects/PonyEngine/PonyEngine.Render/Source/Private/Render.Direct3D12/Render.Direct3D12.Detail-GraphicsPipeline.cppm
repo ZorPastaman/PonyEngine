@@ -34,7 +34,10 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Utility;
 
+import :DescriptorHeap;
+import :DescriptorHeapManager;
 import :IDepthStencilPrivate;
+import :IDescriptorHeapManager;
 import :IGraphicsPipeline;
 import :IRenderTargetPrivate;
 import :IRenderViewPrivate;
@@ -82,6 +85,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param name Name.
 		void Name(std::string_view name);
 
+		/// @brief Prepares data before populating commands.
+		void Prepare();
 		/// @brief Populates commands. All the system components must be ready.
 		void PopulateCommands();
 		/// @brief Executes populated commands.
@@ -93,12 +98,10 @@ export namespace PonyEngine::Render::Direct3D12
 		GraphicsPipeline& operator =(GraphicsPipeline&&) = delete;
 
 	private:
-		/// @brief Direct3D12 render object entry. It's used in the cache.
-		struct Direct3D12RenderObjectEntry final
-		{
-			std::shared_ptr<RenderObject> renderObject; ///< Render object.
-			Transform transform; ///< Transform.
-		};
+		/// @brief Updates transforms.
+		void UpdateTransforms();
+		/// @brief Updates transforms.
+		void UpdateGpuTransforms();
 
 		/// @brief Resets command lists.
 		void ResetLists();
@@ -117,6 +120,14 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param rtvHandle Rtv handle.
 		/// @param dsvHandle Dsv handle.
 		void PopulateRenderTarget(const PonyMath::Utility::Resolution<UINT>& resolution, const PonyMath::Color::RGBA<FLOAT>& clearColor, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
+		/// @brief Creates transform heaps.
+		void CreateTransformHeaps();
+		/// @brief Merges heaps.
+		void MergeHeaps();
+		/// @brief Prepares render object indirection indices.
+		void PrepareRenderObjectIndices();
+		/// @brief Sorts render objects.
+		void SortRenderObjects();
 		/// @brief Populates render objects.
 		void PopulateRenderObjects();
 		/// @brief Populate output.
@@ -162,11 +173,19 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
-		std::vector<Direct3D12RenderObjectEntry> renderObjects; ///< Render objects.
+		std::vector<std::size_t> renderObjectIndices; ///< Render object indirection indices.
+		std::vector<std::shared_ptr<RenderObject>> renderObjects; ///< Render objects.
+		std::vector<Transform> renderObjectTransforms; ///< Render object transforms.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadTransformBuffers; ///< Upload transform buffers.
+		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuTransformBuffers; ///< Gpu transform buffers.
+		std::unique_ptr<DescriptorHeap> transformHeap; ///< Transform heap.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
 		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
+
+		std::vector<ID3D12DescriptorHeap*> premergedHeaps; ///< Pre-merged heaps.
+		std::unique_ptr<DescriptorHeapMerged> mergedHeap; ///< Merged descriptor heap.
 
 		std::unique_ptr<SrgbOutputQuad> outputQuad; ///< Srgb output quad.
 	};
@@ -218,6 +237,18 @@ namespace PonyEngine::Render::Direct3D12
 		outputQuad.reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srgb output quad destroyed.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy transform descriptor heap.");
+		transformHeap.reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform descriptor heap destroyed.");
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release transform gpu buffers.");
+		gpuTransformBuffers.clear();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform gpu buffers released.");
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release transform upload buffers.");
+		uploadTransformBuffers.clear();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform upload buffers released.");
+
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release direct command list.");
 		commandList.Reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command list released.");
@@ -243,7 +274,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::AddRenderTask(const std::shared_ptr<RenderObject>& renderObject)
 	{
-		renderObjects.push_back(Direct3D12RenderObjectEntry{.renderObject = renderObject});
+		renderObjects.push_back(renderObject);
 	}
 
 	void GraphicsPipeline::CreateSrgbOutputQuad()
@@ -273,6 +304,12 @@ namespace PonyEngine::Render::Direct3D12
 		SetName(*commandList.Get(), componentName);
 	}
 
+	void GraphicsPipeline::Prepare()
+	{
+		UpdateTransforms();
+		UpdateGpuTransforms();
+	}
+
 	void GraphicsPipeline::PopulateCommands()
 	{
 		IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
@@ -291,6 +328,10 @@ namespace PonyEngine::Render::Direct3D12
 		UpdateMeshes();
 		PopulateBeginToRenderBarriers(mainRenderTargetBuffer, depthStencilBuffer);
 		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), mainRenderTargetHandle, depthStencil.DsvHandle());
+		CreateTransformHeaps();
+		MergeHeaps();
+		PrepareRenderObjectIndices();
+		SortRenderObjects();
 		PopulateRenderObjects();
 		if (msaaRenderTargetBuffer)
 		{
@@ -318,6 +359,110 @@ namespace PonyEngine::Render::Direct3D12
 		renderObjects.clear();
 	}
 
+	void GraphicsPipeline::UpdateTransforms()
+	{
+		renderObjectTransforms.clear();
+
+		const IRenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
+		const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix = renderView.ViewMatrixD3D12();
+		const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix = renderView.ProjectionMatrixD3D12();
+
+		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
+		{
+			renderObjectTransforms.push_back(Transform(renderObject->ModelMatrixD3D12(), viewMatrix, projectionMatrix));
+		}
+	}
+
+	void GraphicsPipeline::UpdateGpuTransforms()
+	{
+		ID3D12Device10& device = d3d12System->Device();
+
+		for (std::size_t i = uploadTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
+		{
+			constexpr auto uploadHeapProperties = D3D12_HEAP_PROPERTIES
+			{
+				.Type = D3D12_HEAP_TYPE_UPLOAD,
+				.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+				.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
+				.CreationNodeMask = 0u,
+				.VisibleNodeMask = 0u
+			};
+			constexpr auto uploadBufferDesc = D3D12_RESOURCE_DESC1 // TODO: Make a manager or utility function for this.
+			{
+				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+				.Width = static_cast<UINT64>(sizeof(Transform)),
+				.Height = 1u,
+				.DepthOrArraySize = 1u,
+				.MipLevels = 1u,
+				.Format = DXGI_FORMAT_UNKNOWN,
+				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
+				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+				.Flags = D3D12_RESOURCE_FLAG_NONE,
+				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+			};
+
+			Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer;
+			if (const HRESULT result = device.CreateCommittedResource3(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &uploadBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+			uploadTransformBuffers.push_back(uploadBuffer);
+		}
+
+		for (std::size_t i = gpuTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
+		{
+			constexpr auto gpuHeapProperties = D3D12_HEAP_PROPERTIES
+			{
+				.Type = D3D12_HEAP_TYPE_DEFAULT,
+				.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+				.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
+				.CreationNodeMask = 0u,
+				.VisibleNodeMask = 0u
+			};
+			constexpr auto gpuBufferDesc = D3D12_RESOURCE_DESC1 // TODO: Make a manager or utility function for this.
+			{
+				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
+				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+				.Width = static_cast<UINT64>(sizeof(Transform)),
+				.Height = 1u,
+				.DepthOrArraySize = 1u,
+				.MipLevels = 1u,
+				.Format = DXGI_FORMAT_UNKNOWN,
+				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
+				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
+				.Flags = D3D12_RESOURCE_FLAG_NONE,
+				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+			};
+
+			Microsoft::WRL::ComPtr<ID3D12Resource2> gpuBuffer;
+			if (const HRESULT result = device.CreateCommittedResource3(&gpuHeapProperties, D3D12_HEAP_FLAG_NONE, &gpuBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
+				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+			gpuTransformBuffers.push_back(gpuBuffer);
+		}
+
+		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
+		{
+			void* data;
+			if (const HRESULT result = uploadTransformBuffers[i]->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
+			{
+				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			}
+			std::memcpy(data, renderObjectTransforms[i].Data(), sizeof(Transform));
+			uploadTransformBuffers[i]->Unmap(0, nullptr);
+		}
+
+		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
+		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
+		{
+			copyPipeline.AddBufferCopyTask(*uploadTransformBuffers[i].Get(), *gpuTransformBuffers[i].Get());
+		}
+	}
+
 	void GraphicsPipeline::ResetLists()
 	{
 		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
@@ -341,15 +486,29 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::UpdateMeshes()
 	{
 		meshes.clear();
-		for (const Direct3D12RenderObjectEntry& renderObjectEntry : renderObjects)
+		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
 		{
-			meshes.insert(&renderObjectEntry.renderObject->Mesh());
+			meshes.insert(&renderObject->Mesh());
 		}
 	}
 
 	void GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
+		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		{
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.pResource = transform.Get(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			bufferBarriers.push_back(bufferBarrier);
+		}
 		for (Mesh* const mesh : meshes)
 		{
 			for (const std::string& dataType : mesh->DataTypes())
@@ -416,20 +575,62 @@ namespace PonyEngine::Render::Direct3D12
 		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
-	void GraphicsPipeline::PopulateRenderObjects()
+	void GraphicsPipeline::CreateTransformHeaps()
 	{
-		const IRenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
-		const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix = renderView.ViewMatrixD3D12();
-		const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix = renderView.ProjectionMatrixD3D12();
-		for (Direct3D12RenderObjectEntry& renderObject : renderObjects)
+		if (!transformHeap || transformHeap->Heap().GetDesc().NumDescriptors < gpuTransformBuffers.size())
 		{
-			renderObject.transform = Transform(renderObject.renderObject->ModelMatrixD3D12(), viewMatrix, projectionMatrix);
+			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
 		}
 
-		std::ranges::sort(renderObjects, [](const Direct3D12RenderObjectEntry& left, const Direct3D12RenderObjectEntry& right)
+		ID3D12Device10& device = d3d12System->Device();
+		for (std::size_t i = 0; i < gpuTransformBuffers.size(); ++i)
 		{
-			const Material* const leftMaterial = &left.renderObject->Material();
-			const Material* const rightMaterial = &right.renderObject->Material();
+			constexpr auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+			{
+				.Format = DXGI_FORMAT_UNKNOWN,
+				.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+				.Buffer = D3D12_BUFFER_SRV
+				{
+					.FirstElement = 0ULL,
+					.NumElements = 1u,
+					.StructureByteStride = sizeof(Transform),
+					.Flags = D3D12_BUFFER_SRV_FLAG_NONE
+				}
+			};
+			device.CreateShaderResourceView(gpuTransformBuffers[i].Get(), &srvDesc, transformHeap->CpuHandle(i));
+		}
+	}
+
+	void GraphicsPipeline::MergeHeaps()
+	{
+		premergedHeaps.clear();
+		premergedHeaps.push_back(&transformHeap->Heap());
+		for (Mesh* const mesh : meshes)
+		{
+			premergedHeaps.push_back(&mesh->Heap());
+		}
+
+		mergedHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeapMerged(premergedHeaps, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+	}
+
+	void GraphicsPipeline::PrepareRenderObjectIndices()
+	{
+		renderObjectIndices.clear();
+		for (std::size_t i = 0; i < renderObjects.size(); ++i)
+		{
+			renderObjectIndices.push_back(i);
+		}
+	}
+
+	void GraphicsPipeline::SortRenderObjects()
+	{
+		std::ranges::sort(renderObjectIndices, [&](const std::size_t& leftIndex, const std::size_t& rightIndex)
+		{
+			const RenderObject* const leftRenderObject = renderObjects[leftIndex].get();
+			const RenderObject* const rightRenderObject = renderObjects[rightIndex].get();
+			const Material* const leftMaterial = &leftRenderObject->Material();
+			const Material* const rightMaterial = &rightRenderObject->Material();
 			const bool isLeftTransparent = leftMaterial->IsTransparent();
 			const bool isRightTransparent = rightMaterial->IsTransparent();
 
@@ -440,7 +641,7 @@ namespace PonyEngine::Render::Direct3D12
 
 			if (isLeftTransparent)
 			{
-				return PonyMath::Core::ExtractTranslation(left.transform.MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(right.transform.MvpMatrix()).Z();
+				return PonyMath::Core::ExtractTranslation(renderObjectTransforms[leftIndex].MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(renderObjectTransforms[rightIndex].MvpMatrix()).Z();
 			}
 
 			if (const RootSignature* const leftRootSignature = &leftMaterial->RootSignature(), * const rightRootSignature = &rightMaterial->RootSignature(); leftRootSignature != rightRootSignature)
@@ -452,20 +653,28 @@ namespace PonyEngine::Render::Direct3D12
 				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
 			}
 
-			if (const Mesh* const leftMesh = &left.renderObject->Mesh(), * const rightMesh = &right.renderObject->Mesh(); leftMesh != rightMesh)
+			if (const Mesh* const leftMesh = &leftRenderObject->Mesh(), * const rightMesh = &rightRenderObject->Mesh(); leftMesh != rightMesh)
 			{
 				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(left.transform.MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(right.transform.MvpMatrix()).Z();
+			return PonyMath::Core::ExtractTranslation(renderObjectTransforms[leftIndex].MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(renderObjectTransforms[rightIndex].MvpMatrix()).Z();
 		});
+	}
+
+	void GraphicsPipeline::PopulateRenderObjects()
+	{
+		ID3D12DescriptorHeap* const heap = &mergedHeap->Heap().Heap();
+		commandList->SetDescriptorHeaps(1u, &heap);
 
 		const RootSignature* prevRootSignature = nullptr;
 		const Material* prevMaterial = nullptr;
 		const Mesh* prevMesh = nullptr;
-		for (const Direct3D12RenderObjectEntry& renderObject : renderObjects)
+		for (const std::size_t index : renderObjectIndices)
 		{
-			Material* const material = &renderObject.renderObject->Material();
+			RenderObject* const renderObject = renderObjects[index].get();
+
+			Material* const material = &renderObject->Material();
 			RootSignature* const rootSignature = &material->RootSignature();
 			if (rootSignature != prevRootSignature)
 			{
@@ -476,27 +685,25 @@ namespace PonyEngine::Render::Direct3D12
 				commandList->SetPipelineState(&material->PipelineState());
 			}
 
-			Mesh* const mesh = &renderObject.renderObject->Mesh();
-			if (mesh != prevMesh)
-			{
-				ID3D12DescriptorHeap* const heap = &mesh->Heap();
-				commandList->SetDescriptorHeaps(1u, &heap);
-			}
-
+			Mesh* const mesh = &renderObject->Mesh();
 			if (mesh != prevMesh || rootSignature != prevRootSignature)
 			{
 				for (const std::string& dataType : mesh->DataTypes())
 				{
 					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType))
 					{
-						commandList->SetGraphicsRootDescriptorTable(slot.value(), mesh->FindHandle(dataType).value());
+						const D3D12_CPU_DESCRIPTOR_HANDLE originalHandle = mesh->FindHandle(dataType).value();
+						const UINT handleIndex = (originalHandle.ptr - mesh->Heap().GetCPUDescriptorHandleForHeapStart().ptr) / d3d12System->Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV); // TODO: Change to indexing. 
+						commandList->SetGraphicsRootDescriptorTable(slot.value(), mergedHeap->GpuHandle(mesh->Heap(), handleIndex));
 					}
 				}
 			}
 
 			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(PonyTransform))
 			{
-				commandList->SetGraphicsRoot32BitConstants(slot.value(), PonyMath::Core::Matrix4x4<FLOAT>::ComponentCount, renderObject.transform.MvpMatrix().Span().data(), 0);
+				const D3D12_CPU_DESCRIPTOR_HANDLE originalHandle = transformHeap->CpuHandle(index);
+				const UINT handleIndex = (originalHandle.ptr - transformHeap->Heap().GetCPUDescriptorHandleForHeapStart().ptr) / d3d12System->Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+				commandList->SetGraphicsRootDescriptorTable(slot.value(), mergedHeap->GpuHandle(transformHeap->Heap(), handleIndex));
 			}
 
 			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
@@ -561,6 +768,20 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
+		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		{
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = transform.Get(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			bufferBarriers.push_back(bufferBarrier);
+		}
 		for (Mesh* const mesh : meshes)
 		{
 			for (const std::string& dataType : mesh->DataTypes())
@@ -631,6 +852,20 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
+		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		{
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = transform.Get(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			bufferBarriers.push_back(bufferBarrier);
+		}
 		for (Mesh* const mesh : meshes)
 		{
 			for (const std::string& dataType : mesh->DataTypes())

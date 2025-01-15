@@ -42,6 +42,9 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DepthStencil.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeap.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeapManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeapMerged.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-GpuWaiter.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MaterialManager.cppm" />
@@ -67,6 +70,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderTargetPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IDescriptorHeapManager.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChain.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SubSystem.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-IRenderSystemContext.cppm" />
