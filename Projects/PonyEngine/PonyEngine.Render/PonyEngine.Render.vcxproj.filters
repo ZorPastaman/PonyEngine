@@ -166,10 +166,10 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FormatUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Back.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackPrivate.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackManagerPrivate.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackParams.cppm">

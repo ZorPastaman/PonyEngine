@@ -12,23 +12,23 @@ module;
 #include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IBackPrivate;
+export module PonyEngine.Render.Direct3D12.Detail:IBackManagerPrivate;
 
 import PonyMath.Utility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 back.
-	class IBackPrivate
+	/// @brief Direct3D12 back manager.
+	class IBackManagerPrivate
 	{
-		INTERFACE_BODY(IBackPrivate)
+		INTERFACE_BODY(IBackManagerPrivate)
 
-		/// @brief Gets the back view format.
-		/// @return Back view format.
+		/// @brief Gets the back format.
+		/// @return Back format.
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT Format() const noexcept = 0;
-		/// @brief Gets the back view srgb format.
-		/// @return Srgb back view format.
+		/// @brief Gets the back srgb format.
+		/// @return Srgb back format.
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT FormatSrgb() const noexcept = 0;
 
@@ -41,9 +41,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept = 0;
 
-		/// @brief Gets the current back view handle.
-		/// @return Back view handle.
+		/// @brief Gets the current back handle.
+		/// @return Back handle.
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackViewHandle() const noexcept = 0;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackHandle() const noexcept = 0;
 	};
 }

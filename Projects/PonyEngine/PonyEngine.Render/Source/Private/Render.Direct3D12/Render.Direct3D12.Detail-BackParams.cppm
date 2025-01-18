@@ -21,6 +21,5 @@ export namespace PonyEngine::Render::Direct3D12
 	struct BackParams final
 	{
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
-		DXGI_FORMAT backViewFormat; ///< Back view format.
 	};
 }

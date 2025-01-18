@@ -26,7 +26,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
-import :Back;
+import :BackManager;
 import :BackParams;
 import :CopyPipeline;
 import :CpuWaiter;
@@ -144,9 +144,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IBackPrivate& BackPrivate() noexcept override;
+		virtual IBackManagerPrivate& BackPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IBackPrivate& BackPrivate() const noexcept override;
+		virtual const IBackManagerPrivate& BackPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IRenderTargetPrivate& RenderTargetPrivate() noexcept override;
@@ -205,7 +205,7 @@ export namespace PonyEngine::Render::Direct3D12
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
-		std::unique_ptr<Back> back; ///< Back.
+		std::unique_ptr<BackManager> back; ///< Back.
 		std::unique_ptr<class RenderTarget> renderTarget; ///< Render target.
 		std::unique_ptr<DepthStencil> depthStencil; ///< Depth stencil.
 		std::unique_ptr<class RenderView> renderView; ///< Render view.
@@ -374,7 +374,7 @@ namespace PonyEngine::Render::Direct3D12
 	void SubSystem::CreateRenderSystem(const BackParams& backParams, const RenderTargetParams& renderTargetParams, const RenderViewParams& renderViewParams)
 	{
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back.");
-		back = std::make_unique<Back>(*static_cast<ISubSystemContext*>(this), backParams);
+		back = std::make_unique<BackManager>(*static_cast<ISubSystemContext*>(this), backParams);
 		back->Name("Back");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back created.");
 
@@ -466,12 +466,12 @@ namespace PonyEngine::Render::Direct3D12
 		return *device.Get();
 	}
 
-	IBackPrivate& SubSystem::BackPrivate() noexcept
+	IBackManagerPrivate& SubSystem::BackPrivate() noexcept
 	{
 		return *back;
 	}
 
-	const IBackPrivate& SubSystem::BackPrivate() const noexcept
+	const IBackManagerPrivate& SubSystem::BackPrivate() const noexcept
 	{
 		return *back;
 	}

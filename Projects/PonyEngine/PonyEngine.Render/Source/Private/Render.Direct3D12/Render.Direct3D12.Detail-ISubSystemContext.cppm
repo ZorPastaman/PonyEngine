@@ -16,7 +16,7 @@ export module PonyEngine.Render.Direct3D12.Detail:ISubSystemContext;
 
 import PonyDebug.Log;
 
-import :IBackPrivate;
+import :IBackManagerPrivate;
 import :ICopyPipeline;
 import :IDepthStencilPrivate;
 import :IDescriptorHeapManager;
@@ -56,11 +56,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the back.
 		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual IBackPrivate& BackPrivate() noexcept = 0;
+		virtual IBackManagerPrivate& BackPrivate() noexcept = 0;
 		/// @brief Gets the back.
 		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual const IBackPrivate& BackPrivate() const noexcept = 0;
+		virtual const IBackManagerPrivate& BackPrivate() const noexcept = 0;
 
 		/// @brief Gets the render target.
 		/// @return Render target.

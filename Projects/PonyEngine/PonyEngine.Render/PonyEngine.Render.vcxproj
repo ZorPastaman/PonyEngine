@@ -38,7 +38,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Back.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DepthStencil.cppm" />
@@ -58,7 +58,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FormatUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CpuWaiter.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackPrivate.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ICopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IDepthStencilPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IGraphicsPipeline.cppm" />
