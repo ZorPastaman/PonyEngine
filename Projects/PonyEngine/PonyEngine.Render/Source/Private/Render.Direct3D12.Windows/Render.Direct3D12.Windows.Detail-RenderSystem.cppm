@@ -141,10 +141,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
-		auto backParams = Direct3D12::BackParams
-		{
-			.backViewFormat = swapChain.Format(),
-		};
+		auto backParams = Direct3D12::BackParams{};
 		backParams.backBuffers.reserve(bufferCount);
 		for (UINT i = 0u; i < bufferCount; ++i)
 		{

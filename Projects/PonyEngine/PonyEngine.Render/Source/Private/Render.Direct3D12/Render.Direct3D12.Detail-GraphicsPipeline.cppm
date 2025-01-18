@@ -315,7 +315,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
 		IDepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
-		IBackPrivate& back = d3d12System->BackPrivate();
+		IBackManagerPrivate& back = d3d12System->BackPrivate();
 
 		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
 		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
@@ -344,7 +344,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			PopulateRenderToOutputBarriers(mainRenderTargetBuffer, backBuffer, depthStencilBuffer);
 		}
-		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackViewHandle());
+		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackHandle());
 		PopulateOutputToEndBarriers(renderTargetBuffer, backBuffer);
 		CloseLists();
 	}
