@@ -40,6 +40,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Buffer.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DepthStencil.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeap.cppm" />
@@ -47,10 +48,13 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeapVisibility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-GpuWaiter.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IResourceManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MaterialManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ObjectUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderViewParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourcePlacement.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SrgbOutputQuad.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SubSystemParams.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderTargetParams.cppm" />
@@ -69,6 +73,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRootSignatureManagerPrivate.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderTargetPrivate.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Texture.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IDescriptorHeapManager.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChain.cppm" />

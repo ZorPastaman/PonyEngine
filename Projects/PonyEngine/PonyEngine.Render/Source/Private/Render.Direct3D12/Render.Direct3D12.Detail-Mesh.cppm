@@ -25,6 +25,7 @@ import <unordered_map>;
 import <utility>;
 import <vector>;
 
+import :Buffer;
 import :DescriptorHeap;
 import :ObjectUtility;
 
@@ -35,7 +36,7 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, UINT>>& data, const std::shared_ptr<DescriptorHeap>& heap, std::span<const UINT, 3> threadGroupCounts);
+		Mesh(const std::unordered_map<std::string, std::pair<std::vector<std::shared_ptr<Buffer>>, UINT>>& data, const std::shared_ptr<DescriptorHeap>& heap, std::span<const UINT, 3> threadGroupCounts);
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh&) = delete;
 		[[nodiscard("Pure constructor")]]
@@ -50,9 +51,9 @@ export namespace PonyEngine::Render::Direct3D12
 		std::optional<std::size_t> FindBufferCount(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		ID3D12Resource2* FindBuffer(std::string_view dataType, std::size_t index) noexcept;
+		Buffer* FindBuffer(std::string_view dataType, std::size_t index) noexcept;
 		[[nodiscard("Pure function")]]
-		const ID3D12Resource2* FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
+		const Buffer* FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::optional<UINT> FindHandleIndex(std::string_view dataType) const noexcept;
@@ -60,9 +61,9 @@ export namespace PonyEngine::Render::Direct3D12
 		std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> FindHandle(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		ID3D12DescriptorHeap& Heap() noexcept;
+		DescriptorHeap& Heap() noexcept;
 		[[nodiscard("Pure function")]]
-		const ID3D12DescriptorHeap& Heap() const noexcept;
+		const DescriptorHeap& Heap() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::span<UINT, 3> ThreadGroupCounts() noexcept;
@@ -81,7 +82,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::optional<std::size_t> FindDataIndex(std::string_view dataType) const noexcept;
 
 		std::vector<std::string> dataTypes; ///< Data types.
-		std::vector<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>> meshBuffers; ///< Mesh buffers.
+		std::vector<std::vector<std::shared_ptr<Buffer>>> meshBuffers; ///< Mesh buffers.
 		std::vector<UINT> meshHandleIndices; ///< Mesh handle indices.
 		std::shared_ptr<DescriptorHeap> meshHeap; ///< Mesh descriptor heap.
 
@@ -91,7 +92,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Mesh::Mesh(const std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, UINT>>& data, const std::shared_ptr<DescriptorHeap>& heap, std::span<const UINT, 3> threadGroupCounts) :
+	Mesh::Mesh(const std::unordered_map<std::string, std::pair<std::vector<std::shared_ptr<Buffer>>, UINT>>& data, const std::shared_ptr<DescriptorHeap>& heap, std::span<const UINT, 3> threadGroupCounts) :
 		meshHeap(heap)
 	{
 		for (const auto& [dataType, dataPair] : data)
@@ -119,21 +120,21 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	ID3D12Resource2* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
+	Buffer* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
 	{
 		if (const std::optional<std::size_t> dataIndex = FindDataIndex(dataType))
 		{
-			return meshBuffers[dataIndex.value()][index].Get();
+			return meshBuffers[dataIndex.value()][index].get();
 		}
 
 		return nullptr;
 	}
 
-	const ID3D12Resource2* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
+	const Buffer* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
 	{
 		if (const std::optional<std::size_t> dataIndex = FindDataIndex(dataType))
 		{
-			return meshBuffers[dataIndex.value()][index].Get();
+			return meshBuffers[dataIndex.value()][index].get();
 		}
 
 		return nullptr;
@@ -159,14 +160,14 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	ID3D12DescriptorHeap& Mesh::Heap() noexcept
+	DescriptorHeap& Mesh::Heap() noexcept
 	{
-		return meshHeap->Heap();
+		return *meshHeap;
 	}
 
-	const ID3D12DescriptorHeap& Mesh::Heap() const noexcept
+	const DescriptorHeap& Mesh::Heap() const noexcept
 	{
-		return meshHeap->Heap();
+		return *meshHeap;
 	}
 
 	std::span<UINT, 3> Mesh::ThreadGroupCounts() noexcept
@@ -193,7 +194,7 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				componentName.resize(std::min(componentName.capacity(), std::formatted_size(bufferFormat, name, i, j)));
 				std::format_to_n(componentName.begin(), componentName.size(), bufferFormat, name, i, j);
-				SetName(*meshBuffers[i][j].Get(), componentName);
+				SetName(meshBuffers[i][j]->Resource(), componentName);
 			}
 		}
 

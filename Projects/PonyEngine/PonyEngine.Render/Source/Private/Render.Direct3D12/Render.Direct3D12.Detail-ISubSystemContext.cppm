@@ -26,6 +26,7 @@ import :IMeshManagerPrivate;
 import :IRenderObjectManagerPrivate;
 import :IRenderTargetPrivate;
 import :IRenderViewPrivate;
+import :IResourceManager;
 import :IRootSignatureManagerPrivate;
 
 export namespace PonyEngine::Render::Direct3D12
@@ -115,6 +116,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Material manager.
 		[[nodiscard("Pure function")]]
 		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IResourceManager& ResourceManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IResourceManager& ResourceManager() const noexcept = 0;
 
 		/// @brief Gets the descriptor heap manager.
 		/// @return Descriptor heap manager.

@@ -49,6 +49,12 @@ export namespace PonyEngine::Render::Direct3D12
 		DescriptorHeapManager& operator =(DescriptorHeapManager&& other) noexcept = default;
 
 	private:
+		/// @brief Gets heap flags by visibility.
+		/// @param visibility Visibility.
+		/// @return Heap flags.
+		[[nodiscard("Pure function")]]
+		static D3D12_DESCRIPTOR_HEAP_FLAGS GetHeapFlags(DescriptorHeapVisibility visibility) noexcept;
+
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 	};
 }
@@ -66,7 +72,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.Type = heapType,
 			.NumDescriptors = descriptorCount,
-			.Flags = ToHeapFlags(visibility),
+			.Flags = GetHeapFlags(visibility),
 			.NodeMask = 0u
 		};
 		ID3D12Device10& device = d3d12System->Device();
@@ -77,5 +83,19 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		return std::make_shared<DescriptorHeap>(*heap.Get(), device.GetDescriptorHandleIncrementSize(heapType));
+	}
+
+	D3D12_DESCRIPTOR_HEAP_FLAGS DescriptorHeapManager::GetHeapFlags(const DescriptorHeapVisibility visibility) noexcept
+	{
+		switch (visibility)
+		{
+		case DescriptorHeapVisibility::CPU:
+			return D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		case DescriptorHeapVisibility::GPU:
+			return D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
+		default: [[unlikely]]
+			assert(false && "The visibility is incorrect.");
+			return D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
+		}
 	}
 }

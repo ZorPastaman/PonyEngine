@@ -7,14 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeapVisibility;
+export module PonyEngine.Render.Direct3D12.Detail:ResourcePlacement;
 
 import <cstdint>;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Descriptor heap visibility.
-	enum class DescriptorHeapVisibility : std::uint8_t
+	enum class ResourcePlacement : std::uint8_t
 	{
 		CPU,
 		GPU
