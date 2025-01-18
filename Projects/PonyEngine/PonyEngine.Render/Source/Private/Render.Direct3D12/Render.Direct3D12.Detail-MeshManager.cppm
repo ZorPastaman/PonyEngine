@@ -186,28 +186,15 @@ namespace PonyEngine::Render::Direct3D12
 
 	Mesh MeshManager::CreateMesh(const Render::Mesh& mesh) const
 	{
-		ID3D12Device10& device = d3d12System->Device();
-		const auto heapDesc = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = DescHeapType,
-			.NumDescriptors = static_cast<UINT>(mesh.BufferCount()),
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
-		if (const HRESULT result = device.CreateDescriptorHeap(&heapDesc, IID_PPV_ARGS(heap.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create mesh descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
-		const UINT handleIncrement = device.GetDescriptorHandleIncrementSize(DescHeapType);
+		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(mesh.BufferCount()), DescriptorHeapVisibility::CPU);
 
+		ID3D12Device10& device = d3d12System->Device();
 		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
-		std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, D3D12_CPU_DESCRIPTOR_HANDLE>> data;
+		std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, UINT>> data;
+		UINT handleIndex = 0u;
 		for (const std::string& dataType : mesh.DataTypes())
 		{
-			const D3D12_CPU_DESCRIPTOR_HANDLE cpuStartHandle = cpuHandle;
-
+			const UINT startHandleIndex = handleIndex;
 			const std::span<const PonyBase::Container::Buffer> bufferTable = mesh.FindBufferTable(dataType);
 			auto buffers = std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>();
 			buffers.reserve(bufferTable.size());
@@ -219,15 +206,15 @@ namespace PonyEngine::Render::Direct3D12
 				copyPipeline.AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer.Get());
 				buffers.push_back(gpuBuffer);
 
-				CreateSrv(device, cpuHandle, *gpuBuffer.Get(), sourceBuffer);
+				CreateSrv(device, heap->CpuHandle(handleIndex), *gpuBuffer.Get(), sourceBuffer);
 
-				cpuHandle.ptr += handleIncrement;
+				++handleIndex;
 			}
 
-			data[dataType] = std::pair(buffers, cpuStartHandle);
+			data[dataType] = std::pair(buffers, startHandleIndex);
 		}
 
-		return Mesh(data, *heap.Get(), mesh.ThreadGroupCounts());
+		return Mesh(data, heap, mesh.ThreadGroupCounts());
 	}
 
 	D3D12_RESOURCE_DESC1 MeshManager::CreateBufferDesc(const UINT64 bufferSize) noexcept

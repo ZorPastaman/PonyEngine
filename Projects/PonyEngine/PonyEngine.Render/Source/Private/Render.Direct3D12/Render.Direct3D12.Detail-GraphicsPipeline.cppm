@@ -26,6 +26,7 @@ import <stdexcept>;
 import <string>;
 import <string_view>;
 import <type_traits>;
+import <unordered_map>;
 import <vector>;
 
 import PonyBase.Utility.COM;
@@ -178,14 +179,14 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<Transform> renderObjectTransforms; ///< Render object transforms.
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadTransformBuffers; ///< Upload transform buffers.
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuTransformBuffers; ///< Gpu transform buffers.
-		std::unique_ptr<DescriptorHeap> transformHeap; ///< Transform heap.
+		std::shared_ptr<DescriptorHeap> transformHeap; ///< Transform heap.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
 		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
 
-		std::vector<ID3D12DescriptorHeap*> premergedHeaps; ///< Pre-merged heaps.
-		std::unique_ptr<DescriptorHeapMerged> mergedHeap; ///< Merged descriptor heap.
+		std::shared_ptr<DescriptorHeap> renderObjectHeap; ///< Merged descriptor heap.
+		std::unordered_map<ID3D12DescriptorHeap*, UINT> originalHeapOffsets; ///< Original heap to merged heap offset map.
 
 		std::unique_ptr<SrgbOutputQuad> outputQuad; ///< Srgb output quad.
 	};
@@ -513,7 +514,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->FindBufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER
@@ -579,39 +580,44 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (!transformHeap || transformHeap->Heap().GetDesc().NumDescriptors < gpuTransformBuffers.size())
 		{
-			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), DescriptorHeapVisibility::CPU);
 		}
 
 		ID3D12Device10& device = d3d12System->Device();
 		for (std::size_t i = 0; i < gpuTransformBuffers.size(); ++i)
 		{
-			constexpr auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+			const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 			{
-				.Format = DXGI_FORMAT_UNKNOWN,
-				.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-				.Buffer = D3D12_BUFFER_SRV
-				{
-					.FirstElement = 0ULL,
-					.NumElements = 1u,
-					.StructureByteStride = sizeof(Transform),
-					.Flags = D3D12_BUFFER_SRV_FLAG_NONE
-				}
+				.BufferLocation = gpuTransformBuffers[i]->GetGPUVirtualAddress(),
+				.SizeInBytes = sizeof(Transform)
 			};
-			device.CreateShaderResourceView(gpuTransformBuffers[i].Get(), &srvDesc, transformHeap->CpuHandle(i));
+			device.CreateConstantBufferView(&cbvDesc, transformHeap->CpuHandle(i));
 		}
 	}
 
 	void GraphicsPipeline::MergeHeaps()
 	{
-		premergedHeaps.clear();
-		premergedHeaps.push_back(&transformHeap->Heap());
+		UINT descriptorCount = transformHeap->HandleCount();
 		for (Mesh* const mesh : meshes)
 		{
-			premergedHeaps.push_back(&mesh->Heap());
+			descriptorCount += mesh->Heap().GetDesc().NumDescriptors;
+		}
+		if (!renderObjectHeap || renderObjectHeap->HandleCount() < descriptorCount)
+		{
+			renderObjectHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, DescriptorHeapVisibility::GPU);
 		}
 
-		mergedHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeapMerged(premergedHeaps, D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE);
+		originalHeapOffsets.clear();
+		descriptorCount = 0u;
+		originalHeapOffsets[&transformHeap->Heap()] = descriptorCount;
+		descriptorCount = transformHeap->HandleCount();
+		d3d12System->Device().CopyDescriptorsSimple(descriptorCount, renderObjectHeap->CpuHandle(0u), transformHeap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		for (Mesh* const mesh : meshes)
+		{
+			originalHeapOffsets[&mesh->Heap()] = descriptorCount;
+			d3d12System->Device().CopyDescriptorsSimple(mesh->Heap().GetDesc().NumDescriptors, renderObjectHeap->CpuHandle(descriptorCount), mesh->Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			descriptorCount += mesh->Heap().GetDesc().NumDescriptors;
+		}
 	}
 
 	void GraphicsPipeline::PrepareRenderObjectIndices()
@@ -664,7 +670,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateRenderObjects()
 	{
-		ID3D12DescriptorHeap* const heap = &mergedHeap->Heap().Heap();
+		ID3D12DescriptorHeap* const heap = &renderObjectHeap->Heap();
 		commandList->SetDescriptorHeaps(1u, &heap);
 
 		const RootSignature* prevRootSignature = nullptr;
@@ -692,18 +698,14 @@ namespace PonyEngine::Render::Direct3D12
 				{
 					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType))
 					{
-						const D3D12_CPU_DESCRIPTOR_HANDLE originalHandle = mesh->FindHandle(dataType).value();
-						const UINT handleIndex = (originalHandle.ptr - mesh->Heap().GetCPUDescriptorHandleForHeapStart().ptr) / d3d12System->Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV); // TODO: Change to indexing. 
-						commandList->SetGraphicsRootDescriptorTable(slot.value(), mergedHeap->GpuHandle(mesh->Heap(), handleIndex));
+						commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&mesh->Heap()] + mesh->FindHandleIndex(dataType).value()));
 					}
 				}
 			}
 
 			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(PonyTransform))
 			{
-				const D3D12_CPU_DESCRIPTOR_HANDLE originalHandle = transformHeap->CpuHandle(index);
-				const UINT handleIndex = (originalHandle.ptr - transformHeap->Heap().GetCPUDescriptorHandleForHeapStart().ptr) / d3d12System->Device().GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-				commandList->SetGraphicsRootDescriptorTable(slot.value(), mergedHeap->GpuHandle(transformHeap->Heap(), handleIndex));
+				commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + static_cast<UINT>(index)));
 			}
 
 			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
@@ -786,7 +788,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->FindBufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER
@@ -870,7 +872,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			for (const std::string& dataType : mesh->DataTypes())
 			{
-				const std::size_t bufferCount = mesh->BufferCount(dataType).value();
+				const std::size_t bufferCount = mesh->FindBufferCount(dataType).value();
 				for (std::size_t i = 0; i < bufferCount; ++i)
 				{
 					const auto bufferBarrier = D3D12_BUFFER_BARRIER

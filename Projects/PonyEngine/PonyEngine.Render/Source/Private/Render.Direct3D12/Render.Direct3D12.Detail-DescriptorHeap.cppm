@@ -121,11 +121,11 @@ namespace PonyEngine::Render::Direct3D12
 
 	UINT DescriptorHeap::Index(const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle) const noexcept
 	{
-		return (cpuHandle.ptr - heap->GetCPUDescriptorHandleForHeapStart().ptr) / handleIncrement;
+		return static_cast<UINT>((cpuHandle.ptr - heap->GetCPUDescriptorHandleForHeapStart().ptr) / handleIncrement);
 	}
 
 	UINT DescriptorHeap::Index(const D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle) const noexcept
 	{
-		return (gpuHandle.ptr - heap->GetGPUDescriptorHandleForHeapStart().ptr) / handleIncrement;
+		return static_cast<UINT>((gpuHandle.ptr - heap->GetGPUDescriptorHandleForHeapStart().ptr) / handleIncrement);
 	}
 }
