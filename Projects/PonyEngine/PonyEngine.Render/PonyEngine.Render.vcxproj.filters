@@ -202,6 +202,21 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeapVisibility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Buffer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Texture.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IResourceManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourcePlacement.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

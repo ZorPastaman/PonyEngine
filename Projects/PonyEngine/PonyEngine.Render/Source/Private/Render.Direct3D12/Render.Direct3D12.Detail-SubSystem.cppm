@@ -54,6 +54,7 @@ import :RenderTarget;
 import :RenderTargetParams;
 import :RenderView;
 import :RenderViewParams;
+import :ResourceManager;
 import :RootSignatureManager;
 import :SubSystemParams;
 
@@ -179,6 +180,11 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IResourceManager& ResourceManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IResourceManager& ResourceManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
@@ -213,6 +219,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::unique_ptr<MeshManager> meshManager; ///< Mesh manager.
 		std::unique_ptr<RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<MaterialManager> materialManager; ///< Material manager.
+		std::unique_ptr<class ResourceManager> resourceManager;
 		std::unique_ptr<class DescriptorHeapManager> heapManager;
 		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager; ///< Render object manager.
 
@@ -248,6 +255,8 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		SetName(*device.Get(), "RenderDevice");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device acquired.");
+
+		resourceManager = std::make_unique<class ResourceManager>(*static_cast<ISubSystemContext*>(this));
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create descriptor heap manager.");
 		heapManager = std::make_unique<class DescriptorHeapManager>(*static_cast<ISubSystemContext*>(this));
@@ -524,6 +533,16 @@ namespace PonyEngine::Render::Direct3D12
 	const IMaterialManagerPrivate& SubSystem::MaterialManagerPrivate() const noexcept
 	{
 		return *materialManager;
+	}
+
+	IResourceManager& SubSystem::ResourceManager() noexcept
+	{
+		return *resourceManager;
+	}
+
+	const IResourceManager& SubSystem::ResourceManager() const noexcept
+	{
+		return *resourceManager;
 	}
 
 	IDescriptorHeapManager& SubSystem::DescriptorHeapManager() noexcept

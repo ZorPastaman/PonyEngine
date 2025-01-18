@@ -68,12 +68,6 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		[[nodiscard("Pure function")]]
 		Mesh CreateMesh(const Render::Mesh& mesh) const;
-		[[nodiscard("Pure function")]]
-		static D3D12_RESOURCE_DESC1 CreateBufferDesc(UINT64 bufferSize) noexcept;
-		[[nodiscard("Pure function")]]
-		static Microsoft::WRL::ComPtr<ID3D12Resource2> CreateUploadBuffer(ID3D12Device10& device, const D3D12_RESOURCE_DESC1& bufferDesc, const PonyBase::Container::Buffer& sourceBuffer);
-		[[nodiscard("Pure function")]]
-		static Microsoft::WRL::ComPtr<ID3D12Resource2> CreateGpuBuffer(ID3D12Device10& device, const D3D12_RESOURCE_DESC1& bufferDesc);
 		static void CreateSrv(ID3D12Device10& device, const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, ID3D12Resource2& gpuBuffer, const PonyBase::Container::Buffer& sourceBuffer);
 
 		struct SourceState final
@@ -89,25 +83,6 @@ export namespace PonyEngine::Render::Direct3D12
 		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) const;
 
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
-		/// @brief Upload heap properties.
-		static constexpr auto UploadHeapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = D3D12_HEAP_TYPE_UPLOAD,
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
-		/// @brief Gpu heap properties.
-		static constexpr auto GpuHeapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = D3D12_HEAP_TYPE_DEFAULT,
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
-
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
@@ -190,23 +165,23 @@ namespace PonyEngine::Render::Direct3D12
 
 		ID3D12Device10& device = d3d12System->Device();
 		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
-		std::unordered_map<std::string, std::pair<std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>, UINT>> data;
+		std::unordered_map<std::string, std::pair<std::vector<std::shared_ptr<Buffer>>, UINT>> data;
 		UINT handleIndex = 0u;
 		for (const std::string& dataType : mesh.DataTypes())
 		{
 			const UINT startHandleIndex = handleIndex;
 			const std::span<const PonyBase::Container::Buffer> bufferTable = mesh.FindBufferTable(dataType);
-			auto buffers = std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>>();
+			auto buffers = std::vector<std::shared_ptr<Buffer>>();
 			buffers.reserve(bufferTable.size());
 			for (const PonyBase::Container::Buffer& sourceBuffer : bufferTable)
 			{
-				const D3D12_RESOURCE_DESC1 bufferDesc = CreateBufferDesc(static_cast<UINT64>(sourceBuffer.Size()));
-				Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer = CreateUploadBuffer(device, bufferDesc, sourceBuffer);
-				Microsoft::WRL::ComPtr<ID3D12Resource2> gpuBuffer = CreateGpuBuffer(device, bufferDesc);
-				copyPipeline.AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer.Get());
+				const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::CPU);
+				uploadBuffer->SetData(sourceBuffer);
+				const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::GPU);
+				copyPipeline.AddBufferCopyTask(uploadBuffer->Resource(), gpuBuffer->Resource());
 				buffers.push_back(gpuBuffer);
 
-				CreateSrv(device, heap->CpuHandle(handleIndex), *gpuBuffer.Get(), sourceBuffer);
+				CreateSrv(device, heap->CpuHandle(handleIndex), gpuBuffer->Resource(), sourceBuffer);
 
 				++handleIndex;
 			}
@@ -215,55 +190,6 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		return Mesh(data, heap, mesh.ThreadGroupCounts());
-	}
-
-	D3D12_RESOURCE_DESC1 MeshManager::CreateBufferDesc(const UINT64 bufferSize) noexcept
-	{
-		return D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = bufferSize,
-			.Height = 1u,
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-			.Flags = D3D12_RESOURCE_FLAG_NONE,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12Resource2> MeshManager::CreateUploadBuffer(ID3D12Device10& device, const D3D12_RESOURCE_DESC1& bufferDesc, const PonyBase::Container::Buffer& sourceBuffer)
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer;
-		if (const HRESULT result = device.CreateCommittedResource3(&UploadHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		void* data;
-		if (const HRESULT result = uploadBuffer->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		std::memcpy(data, sourceBuffer.Data(), sourceBuffer.Size());
-		uploadBuffer->Unmap(0, nullptr);
-
-		return uploadBuffer;
-	}
-
-	Microsoft::WRL::ComPtr<ID3D12Resource2> MeshManager::CreateGpuBuffer(ID3D12Device10& device, const D3D12_RESOURCE_DESC1& bufferDesc)
-	{
-		Microsoft::WRL::ComPtr<ID3D12Resource2> gpuBuffer;
-		if (const HRESULT result = device.CreateCommittedResource3(&GpuHeapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu mesh buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		return gpuBuffer;
 	}
 
 	void MeshManager::CreateSrv(ID3D12Device10& device, const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, ID3D12Resource2& gpuBuffer, const PonyBase::Container::Buffer& sourceBuffer)
@@ -312,10 +238,10 @@ namespace PonyEngine::Render::Direct3D12
 				{
 					const PonyBase::Container::Buffer* const sourceBuffer = source.FindBuffer(dataType, bufferIndex);
 
-					const D3D12_RESOURCE_DESC1 bufferDesc = CreateBufferDesc(static_cast<UINT64>(sourceBuffer->Size()));
-					Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer = CreateUploadBuffer(d3d12System->Device(), bufferDesc, *sourceBuffer);
-					ID3D12Resource2* const gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
-					d3d12System->CopyPipeline().AddBufferCopyTask(*uploadBuffer.Get(), *gpuBuffer);
+					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer->Size(), ResourcePlacement::CPU);
+					uploadBuffer->SetData(*sourceBuffer);
+					Buffer* const gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
+					d3d12System->CopyPipeline().AddBufferCopyTask(uploadBuffer->Resource(), gpuBuffer->Resource());
 
 					bufferVersions[bufferIndex] = source.BufferVersion(dataType, bufferIndex).value();
 				}

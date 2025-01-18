@@ -523,7 +523,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 						.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 						.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-						.pResource = mesh->FindBuffer(dataType, i),
+						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -600,7 +600,7 @@ namespace PonyEngine::Render::Direct3D12
 		UINT descriptorCount = transformHeap->HandleCount();
 		for (Mesh* const mesh : meshes)
 		{
-			descriptorCount += mesh->Heap().GetDesc().NumDescriptors;
+			descriptorCount += mesh->Heap().Heap().GetDesc().NumDescriptors;
 		}
 		if (!renderObjectHeap || renderObjectHeap->HandleCount() < descriptorCount)
 		{
@@ -614,9 +614,9 @@ namespace PonyEngine::Render::Direct3D12
 		d3d12System->Device().CopyDescriptorsSimple(descriptorCount, renderObjectHeap->CpuHandle(0u), transformHeap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		for (Mesh* const mesh : meshes)
 		{
-			originalHeapOffsets[&mesh->Heap()] = descriptorCount;
-			d3d12System->Device().CopyDescriptorsSimple(mesh->Heap().GetDesc().NumDescriptors, renderObjectHeap->CpuHandle(descriptorCount), mesh->Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			descriptorCount += mesh->Heap().GetDesc().NumDescriptors;
+			originalHeapOffsets[&mesh->Heap().Heap()] = descriptorCount;
+			d3d12System->Device().CopyDescriptorsSimple(mesh->Heap().Heap().GetDesc().NumDescriptors, renderObjectHeap->CpuHandle(descriptorCount), mesh->Heap().Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			descriptorCount += mesh->Heap().Heap().GetDesc().NumDescriptors;
 		}
 	}
 
@@ -698,7 +698,7 @@ namespace PonyEngine::Render::Direct3D12
 				{
 					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType))
 					{
-						commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&mesh->Heap()] + mesh->FindHandleIndex(dataType).value()));
+						commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->FindHandleIndex(dataType).value()));
 					}
 				}
 			}
@@ -797,7 +797,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = mesh->FindBuffer(dataType, i),
+						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -881,7 +881,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = mesh->FindBuffer(dataType, i),
+						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
