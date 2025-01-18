@@ -88,7 +88,7 @@ export namespace PonyEngine::Render::Direct3D12
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
-		std::unique_ptr<DescriptorHeap> backViewHeap; ///< Back view descriptor heap.
+		std::shared_ptr<DescriptorHeap> backViewHeap; ///< Back view descriptor heap.
 	};
 }
 
@@ -100,14 +100,12 @@ namespace PonyEngine::Render::Direct3D12
 		currentBackBufferIndex{0u},
 		d3d12System{&d3d12System}
 	{
-		constexpr D3D12_DESCRIPTOR_HEAP_TYPE descHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
-
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
 		backBuffers = params.backBuffers;
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffers set.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back view descriptor heap.");
-		backViewHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		backViewHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), DescriptorHeapVisibility::CPU);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view descriptor heap created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back view handles.");
@@ -127,9 +125,9 @@ namespace PonyEngine::Render::Direct3D12
 
 	Back::~Back() noexcept
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy back view descriptor heap.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back view descriptor heap.");
 		backViewHeap.reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view descriptor heap destroyed.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back view descriptor heap released.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back buffers.");
 		backBuffers.clear();

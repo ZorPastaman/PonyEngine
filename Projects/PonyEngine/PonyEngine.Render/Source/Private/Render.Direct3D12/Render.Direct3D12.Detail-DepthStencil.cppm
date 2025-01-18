@@ -74,7 +74,7 @@ export namespace PonyEngine::Render::Direct3D12
 		ISubSystemContext* d3d12System; ///< Render system context.
 
 		Microsoft::WRL::ComPtr<ID3D12Resource2> depthStencilBuffer; ///< Depth stencil buffer.
-		std::unique_ptr<DescriptorHeap> dsvHeap; ///< Depth stencil view heap.
+		std::shared_ptr<DescriptorHeap> dsvHeap; ///< Depth stencil view heap.
 	};
 }
 
@@ -123,7 +123,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil buffer acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create dsv descriptor heap.");
-		dsvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1u, D3D12_DESCRIPTOR_HEAP_FLAG_NONE);
+		dsvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1u, DescriptorHeapVisibility::CPU);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Dsv descriptor heap created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create depth stencil handle.");

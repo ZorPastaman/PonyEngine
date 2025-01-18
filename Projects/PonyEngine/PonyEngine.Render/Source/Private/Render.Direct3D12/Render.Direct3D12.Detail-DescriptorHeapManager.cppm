@@ -16,6 +16,7 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeapManager;
 
 import <cstddef>;
+import <memory>;
 import <type_traits>;
 
 import PonyBase.Utility;
@@ -41,10 +42,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		~DescriptorHeapManager() noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const override;
-		[[nodiscard("Pure function")]]
-		virtual std::unique_ptr<DescriptorHeapMerged> CreateDescriptorHeapMerged(std::span<ID3D12DescriptorHeap*> heaps, D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const override;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, DescriptorHeapVisibility visibility) override;
 
 		DescriptorHeapManager& operator =(const DescriptorHeapManager& other) noexcept = default;
 		DescriptorHeapManager& operator =(DescriptorHeapManager&& other) noexcept = default;
@@ -61,59 +60,22 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::unique_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const UINT descriptorCount, const D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const
+	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const UINT descriptorCount, const DescriptorHeapVisibility visibility)
 	{
-		ID3D12Device10& device = d3d12System->Device();
 		const auto heapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = heapType,
 			.NumDescriptors = descriptorCount,
-			.Flags = heapFlags,
+			.Flags = ToHeapFlags(visibility),
 			.NodeMask = 0u
 		};
+		ID3D12Device10& device = d3d12System->Device();
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
 		if (const HRESULT result = device.CreateDescriptorHeap(&heapDescriptor, IID_PPV_ARGS(heap.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_unique<DescriptorHeap>(*heap.Get(), device.GetDescriptorHandleIncrementSize(heapType));
-	}
-
-	std::unique_ptr<DescriptorHeapMerged> DescriptorHeapManager::CreateDescriptorHeapMerged(const std::span<ID3D12DescriptorHeap*> heaps, const D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const
-	{
-		if (heaps.size() == 0)
-		{
-			throw std::invalid_argument("Heaps span is empty.");
-		}
-
-#if _DEBUG
-		for (std::size_t i = 1; i < heaps.size(); ++i)
-		{
-			assert(heaps[0]->GetDesc().Type == heaps[i]->GetDesc().Type && "The heaps must have the same type.");
-		}
-#endif
-
-		UINT totalDescriptorCount = 0u;
-		std::unordered_map<ID3D12DescriptorHeap*, UINT> originalToCopyMap;
-		for (ID3D12DescriptorHeap* const heap : heaps)
-		{
-			originalToCopyMap[heap] = totalDescriptorCount;
-			totalDescriptorCount += heap->GetDesc().NumDescriptors;
-		}
-		const D3D12_DESCRIPTOR_HEAP_TYPE heapType = heaps[0]->GetDesc().Type;
-		auto mergedHeap = std::make_unique<DescriptorHeapMerged>(CreateDescriptorHeap(heapType, totalDescriptorCount, heapFlags), originalToCopyMap);
-
-		ID3D12Device10& device = d3d12System->Device();
-		const UINT handleIncrement = device.GetDescriptorHandleIncrementSize(heapType);
-		D3D12_CPU_DESCRIPTOR_HANDLE dest = mergedHeap->Heap().CpuHandle(0u);
-		for (ID3D12DescriptorHeap* const heap : heaps)
-		{
-			const UINT currentDescriptorCount = heap->GetDesc().NumDescriptors;
-			device.CopyDescriptorsSimple(currentDescriptorCount, dest, heap->GetCPUDescriptorHandleForHeapStart(), heapType);
-			dest.ptr += handleIncrement * currentDescriptorCount;
-		}
-
-		return mergedHeap;
+		return std::make_shared<DescriptorHeap>(*heap.Get(), device.GetDescriptorHandleIncrementSize(heapType));
 	}
 }

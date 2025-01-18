@@ -15,10 +15,9 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:IDescriptorHeapManager;
 
 import <memory>;
-import <span>;
 
 import :DescriptorHeap;
-import :DescriptorHeapMerged;
+import :DescriptorHeapVisibility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -30,15 +29,9 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Creates a descriptor heap.
 		/// @param heapType Heap type.
 		/// @param descriptorCount Descriptor count.
-		/// @param heapFlags Heap flags.
+		/// @param visibility Descriptor heap visibility.
 		/// @return Descriptor heap.
-		[[nodiscard("Pure function")]]
-		virtual std::unique_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const = 0;
-		/// @brief Creates a merged descriptor heap.
-		/// @param heaps Heaps to merge.
-		/// @param heapFlags Heap flags.
-		/// @return Descriptor heap.
-		[[nodiscard("Pure function")]]
-		virtual std::unique_ptr<DescriptorHeapMerged> CreateDescriptorHeapMerged(std::span<ID3D12DescriptorHeap*> heaps, D3D12_DESCRIPTOR_HEAP_FLAGS heapFlags) const = 0;
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, DescriptorHeapVisibility visibility) = 0;
 	};
 }
