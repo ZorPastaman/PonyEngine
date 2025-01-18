@@ -17,23 +17,20 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:BackManager;
 
+import <algorithm>;
 import <cmath>;
 import <cstddef>;
 import <format>;
 import <memory>;
-import <stdexcept>;
 import <string>;
 import <string_view>;
-import <type_traits>;
 import <vector>;
-
-import PonyBase.Utility;
 
 import PonyDebug.Log;
 
 import :BackParams;
-import :FormatUtility;
 import :DescriptorHeap;
+import :FormatUtility;
 import :IBackManagerPrivate;
 import :ISubSystemContext;
 import :ObjectUtility;
