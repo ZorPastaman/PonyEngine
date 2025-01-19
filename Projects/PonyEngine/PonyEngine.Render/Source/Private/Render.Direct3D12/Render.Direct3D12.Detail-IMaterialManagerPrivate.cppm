@@ -22,9 +22,9 @@ import :Shader;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 material manager.
-	class IMaterialManagerPrivate
+	class IMaterialManager
 	{
-		INTERFACE_BODY(IMaterialManagerPrivate)
+		INTERFACE_BODY(IMaterialManager)
 
 		/// @brief Creates a material.
 		/// @param rootSignature Root signature.

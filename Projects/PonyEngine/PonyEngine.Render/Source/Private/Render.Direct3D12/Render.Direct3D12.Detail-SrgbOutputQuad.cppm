@@ -147,7 +147,7 @@ namespace PonyEngine::Render::Direct3D12
 			},
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
-				.RTFormats = { this->d3d12System->BackPrivate().FormatSrgb() },
+				.RTFormats = { this->d3d12System->BackManager().FormatSrgb() },
 				.NumRenderTargets = 1u
 			},
 			.sampleDescription = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}

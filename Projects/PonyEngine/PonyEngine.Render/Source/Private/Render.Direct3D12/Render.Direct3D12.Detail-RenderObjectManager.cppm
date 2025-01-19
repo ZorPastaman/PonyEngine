@@ -27,7 +27,6 @@ import PonyDebug.Log;
 import PonyEngine.Render.Direct3D12;
 
 import :IGraphicsPipeline;
-import :IRenderObjectManagerPrivate;
 import :ISubSystemContext;
 import :Material;
 import :RenderObject;
@@ -36,21 +35,21 @@ import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 render object manager.
-	class Direct3D12RenderObjectManager final : public IRenderObjectManagerPrivate
+	/// @brief Render object manager.
+	class RenderObjectManager final : public IRenderObjectManager
 	{
 	public:
-		/// @brief Creates a @p Direct3D12RenderObjectManager.
+		/// @brief Creates a @p RenderObjectManager.
 		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
-		explicit Direct3D12RenderObjectManager(ISubSystemContext& d3d12System) noexcept;
-		Direct3D12RenderObjectManager(const Direct3D12RenderObjectManager&) = delete;
-		Direct3D12RenderObjectManager(Direct3D12RenderObjectManager&&) = delete;
+		explicit RenderObjectManager(ISubSystemContext& d3d12System) noexcept;
+		RenderObjectManager(const RenderObjectManager&) = delete;
+		RenderObjectManager(RenderObjectManager&&) = delete;
 
-		~Direct3D12RenderObjectManager() noexcept = default;
+		~RenderObjectManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Render::IRenderObject> CreateObject(const RenderObjectParams& params) override;
+		virtual std::shared_ptr<IRenderObject> CreateObject(const RenderObjectParams& params) override;
 
 		/// @brief Adds render tasks to a graphics pipeline.
 		void AddRenderTasks();
@@ -58,8 +57,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Cleans out of dead render objects.
 		void Clean() noexcept;
 
-		Direct3D12RenderObjectManager& operator =(const Direct3D12RenderObjectManager&) = delete;
-		Direct3D12RenderObjectManager& operator =(Direct3D12RenderObjectManager&&) = delete;
+		RenderObjectManager& operator =(const RenderObjectManager&) = delete;
+		RenderObjectManager& operator =(RenderObjectManager&&) = delete;
 		
 
 	private:
@@ -74,7 +73,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Direct3D12RenderObjectManager::Direct3D12RenderObjectManager(ISubSystemContext& d3d12System) noexcept :
+	RenderObjectManager::RenderObjectManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
 		// TODO: Add ShaderManager. But seems that there's no need of exactly ShaderManager for d3d12. I just need a ShaderResource in a ResourceSystem.
@@ -87,7 +86,7 @@ namespace PonyEngine::Render::Direct3D12
 			{ "Positions", 2u },
 			{ "Colors", 3u }
 		};
-		const auto rootSignature = this->d3d12System->RootSignatureManagerPrivate().CreateRootSignature(Shader("RootSig"), dataSlots);
+		const auto rootSignature = this->d3d12System->RootSignatureManager().CreateRootSignature(Shader("RootSig"), dataSlots);
 		rootSignature->Name("DefaultRootSignature");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load mesh shader.");
@@ -97,36 +96,35 @@ namespace PonyEngine::Render::Direct3D12
 		const auto pixelShader = Shader("PixelShader");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pixel shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create material.");
-		defaultMaterial = this->d3d12System->MaterialManagerPrivate().CreateMaterial(rootSignature, meshShader, pixelShader);
+		defaultMaterial = this->d3d12System->MaterialManager().CreateMaterial(rootSignature, meshShader, pixelShader);
 		defaultMaterial->Name("DefaultMaterial");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
-	std::shared_ptr<Render::IRenderObject> Direct3D12RenderObjectManager::CreateObject(const RenderObjectParams& params)
+	std::shared_ptr<Render::IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
-		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManagerPrivate().CreateMesh(params.mesh);
+		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManager().CreateMesh(params.mesh);
 		renderMesh->Name("Mesh");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
-		auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
+		const auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
 		renderObjects.push_back(renderObject);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 
 		return renderObject;
 	}
 
-	void Direct3D12RenderObjectManager::AddRenderTasks()
+	void RenderObjectManager::AddRenderTasks()
 	{
-		IGraphicsPipeline& graphicsPipeline = d3d12System->GraphicsPipeline();
 		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
 		{
-			graphicsPipeline.AddRenderTask(renderObject);
+			d3d12System->GraphicsPipeline().AddRenderTask(renderObject);
 		}
 	}
 
-	void Direct3D12RenderObjectManager::Clean() noexcept
+	void RenderObjectManager::Clean() noexcept
 	{
 		for (std::size_t i = renderObjects.size(); i-- > 0; )
 		{

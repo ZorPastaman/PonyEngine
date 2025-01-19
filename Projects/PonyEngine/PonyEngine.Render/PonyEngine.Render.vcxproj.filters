@@ -136,9 +136,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IMeshManagerPrivate.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderObjectManagerPrivate.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderTargetParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

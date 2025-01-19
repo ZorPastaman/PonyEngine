@@ -40,7 +40,6 @@ import :IDescriptorHeapManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
-import :IRenderObjectManagerPrivate;
 import :IRenderTargetPrivate;
 import :IRenderViewPrivate;
 import :IRenderSystemContext;
@@ -100,12 +99,12 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @note It's created in @p CreateRenderSystem().
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		IRenderObjectManager* RenderObjectManager() noexcept;
+		IRenderObjectManager* RenderObjectManagerD3D12() noexcept;
 		/// @brief Gets the render object manager.
 		/// @note It's created in @p CreateRenderSystem().
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		const IRenderObjectManager* RenderObjectManager() const noexcept;
+		const IRenderObjectManager* RenderObjectManagerD3D12() const noexcept;
 
 		/// @brief Gets the graphics command queue.
 		/// @return Graphics command queue.
@@ -145,9 +144,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IBackManager& BackPrivate() noexcept override;
+		virtual IBackManager& BackManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IBackManager& BackPrivate() const noexcept override;
+		virtual const IBackManager& BackManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IRenderTargetPrivate& RenderTargetPrivate() noexcept override;
@@ -165,19 +164,19 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IRenderViewPrivate& RenderViewPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IMeshManager& MeshManagerPrivate() noexcept override;
+		virtual IMeshManager& MeshManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IMeshManager& MeshManagerPrivate() const noexcept override;
+		virtual const IMeshManager& MeshManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRootSignatureManagerPrivate& RootSignatureManagerPrivate() noexcept override;
+		virtual IRootSignatureManager& RootSignatureManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRootSignatureManagerPrivate& RootSignatureManagerPrivate() const noexcept override;
+		virtual const IRootSignatureManager& RootSignatureManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IMaterialManagerPrivate& MaterialManagerPrivate() noexcept override;
+		virtual IMaterialManager& MaterialManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept override;
+		virtual const IMaterialManager& MaterialManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IResourceManager& ResourceManager() noexcept override;
@@ -190,9 +189,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManagerPrivate& RenderObjectManagerPrivate() noexcept override;
+		virtual IRenderObjectManager& RenderObjectManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept override;
+		virtual const IRenderObjectManager& RenderObjectManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual ICopyPipeline& CopyPipeline() noexcept override;
@@ -211,17 +210,17 @@ export namespace PonyEngine::Render::Direct3D12
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
-		std::unique_ptr<BackManager> back; ///< Back.
+		std::unique_ptr<class BackManager> back; ///< Back.
 		std::unique_ptr<class RenderTarget> renderTarget; ///< Render target.
 		std::unique_ptr<DepthStencil> depthStencil; ///< Depth stencil.
 		std::unique_ptr<class RenderView> renderView; ///< Render view.
 
-		std::unique_ptr<MeshManager> meshManager; ///< Mesh manager.
-		std::unique_ptr<RootSignatureManager> rootSignatureManager; ///< Root signature manager.
-		std::unique_ptr<MaterialManager> materialManager; ///< Material manager.
 		std::unique_ptr<class ResourceManager> resourceManager;
 		std::unique_ptr<class DescriptorHeapManager> heapManager;
-		std::unique_ptr<Direct3D12RenderObjectManager> renderObjectManager; ///< Render object manager.
+		std::unique_ptr<class MeshManager> meshManager; ///< Mesh manager.
+		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
+		std::unique_ptr<class MaterialManager> materialManager; ///< Material manager.
+		std::unique_ptr<class RenderObjectManager> renderObjectManager; ///< Render object manager.
 
 		std::unique_ptr<class CopyPipeline> copyPipeline; ///< Copy pipeline.
 		std::unique_ptr<class GraphicsPipeline> graphicsPipeline; ///< Graphics pipeline.
@@ -360,12 +359,12 @@ namespace PonyEngine::Render::Direct3D12
 		return renderView.get();
 	}
 
-	IRenderObjectManager* SubSystem::RenderObjectManager() noexcept
+	IRenderObjectManager* SubSystem::RenderObjectManagerD3D12() noexcept
 	{
 		return renderObjectManager.get();
 	}
 
-	const IRenderObjectManager* SubSystem::RenderObjectManager() const noexcept
+	const IRenderObjectManager* SubSystem::RenderObjectManagerD3D12() const noexcept
 	{
 		return renderObjectManager.get();
 	}
@@ -383,7 +382,7 @@ namespace PonyEngine::Render::Direct3D12
 	void SubSystem::CreateRenderSystem(const BackParams& backParams, const RenderTargetParams& renderTargetParams, const RenderViewParams& renderViewParams)
 	{
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back.");
-		back = std::make_unique<BackManager>(*static_cast<ISubSystemContext*>(this), backParams);
+		back = std::make_unique<class BackManager>(*static_cast<ISubSystemContext*>(this), backParams);
 		back->Name("Back");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back created.");
 
@@ -402,19 +401,19 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create mesh manager.");
-		meshManager = std::make_unique<MeshManager>(*static_cast<ISubSystemContext*>(this));
+		meshManager = std::make_unique<class MeshManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Mesh manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create root signature manager.");
-		rootSignatureManager = std::make_unique<RootSignatureManager>(*static_cast<ISubSystemContext*>(this));
+		rootSignatureManager = std::make_unique<class RootSignatureManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Root signature manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create material manager.");
-		materialManager = std::make_unique<MaterialManager>(*static_cast<ISubSystemContext*>(this));
+		materialManager = std::make_unique<class MaterialManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render object manager.");
-		renderObjectManager = std::make_unique<Direct3D12RenderObjectManager>(*static_cast<ISubSystemContext*>(this));
+		renderObjectManager = std::make_unique<class RenderObjectManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output quad.");
@@ -475,12 +474,12 @@ namespace PonyEngine::Render::Direct3D12
 		return *device.Get();
 	}
 
-	IBackManager& SubSystem::BackPrivate() noexcept
+	IBackManager& SubSystem::BackManager() noexcept
 	{
 		return *back;
 	}
 
-	const IBackManager& SubSystem::BackPrivate() const noexcept
+	const IBackManager& SubSystem::BackManager() const noexcept
 	{
 		return *back;
 	}
@@ -505,32 +504,32 @@ namespace PonyEngine::Render::Direct3D12
 		return *depthStencil;
 	}
 
-	IMeshManager& SubSystem::MeshManagerPrivate() noexcept
+	IMeshManager& SubSystem::MeshManager() noexcept
 	{
 		return *meshManager;
 	}
 
-	const IMeshManager& SubSystem::MeshManagerPrivate() const noexcept
+	const IMeshManager& SubSystem::MeshManager() const noexcept
 	{
 		return *meshManager;
 	}
 
-	IRootSignatureManagerPrivate& SubSystem::RootSignatureManagerPrivate() noexcept
+	IRootSignatureManager& SubSystem::RootSignatureManager() noexcept
 	{
 		return *rootSignatureManager;
 	}
 
-	const IRootSignatureManagerPrivate& SubSystem::RootSignatureManagerPrivate() const noexcept
+	const IRootSignatureManager& SubSystem::RootSignatureManager() const noexcept
 	{
 		return *rootSignatureManager;
 	}
 
-	IMaterialManagerPrivate& SubSystem::MaterialManagerPrivate() noexcept
+	IMaterialManager& SubSystem::MaterialManager() noexcept
 	{
 		return *materialManager;
 	}
 
-	const IMaterialManagerPrivate& SubSystem::MaterialManagerPrivate() const noexcept
+	const IMaterialManager& SubSystem::MaterialManager() const noexcept
 	{
 		return *materialManager;
 	}
@@ -565,12 +564,12 @@ namespace PonyEngine::Render::Direct3D12
 		return *renderView;
 	}
 
-	IRenderObjectManagerPrivate& SubSystem::RenderObjectManagerPrivate() noexcept
+	IRenderObjectManager& SubSystem::RenderObjectManager() noexcept
 	{
 		return *renderObjectManager;
 	}
 
-	const IRenderObjectManagerPrivate& SubSystem::RenderObjectManagerPrivate() const noexcept
+	const IRenderObjectManager& SubSystem::RenderObjectManager() const noexcept
 	{
 		return *renderObjectManager;
 	}

@@ -34,7 +34,7 @@ import :RootSignature;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 root signature manager.
-	class RootSignatureManager final : public IRootSignatureManagerPrivate
+	class RootSignatureManager final : public IRootSignatureManager
 	{
 	public:
 		/// @brief Creates a @p RootSignatureManager.

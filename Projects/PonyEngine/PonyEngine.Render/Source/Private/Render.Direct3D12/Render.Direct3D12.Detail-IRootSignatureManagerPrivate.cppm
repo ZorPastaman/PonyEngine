@@ -22,9 +22,9 @@ import :Shader;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 root signature manager.
-	class IRootSignatureManagerPrivate
+	class IRootSignatureManager
 	{
-		INTERFACE_BODY(IRootSignatureManagerPrivate)
+		INTERFACE_BODY(IRootSignatureManager)
 
 		/// @brief Creates a root signature.
 		/// @param rootSignatureShader Root signature shader.
