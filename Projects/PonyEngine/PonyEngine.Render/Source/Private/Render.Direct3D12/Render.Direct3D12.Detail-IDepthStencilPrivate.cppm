@@ -29,11 +29,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the depth stencil buffer.
 		/// @return Depth stencil buffer.
 		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& DepthStencilBuffer() noexcept = 0;
+		virtual ID3D12Resource2& DepthStencilTexture() noexcept = 0;
 		/// @brief Gets the depth stencil buffer.
 		/// @return Depth stencil buffer.
 		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& DepthStencilBuffer() const noexcept = 0;
+		virtual const ID3D12Resource2& DepthStencilTexture() const noexcept = 0;
 		/// @brief Gets the depth stencil view handle.
 		/// @return Depth stencil view handle.
 		[[nodiscard("Pure function")]]

@@ -113,7 +113,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void UpdateMeshes();
 		/// @brief Populates begin to render barriers in an msaa context.
 		/// @param renderTargetBuffer Render target buffer.
-		/// @param depthStencilBuffer Depth stencil buffer.
+		/// @param depthStencilTexture Depth stencil buffer.
 		void PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer);
 		/// @brief Populates a render target.
 		/// @param resolution Render resolution.
@@ -144,13 +144,13 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Populates render to output barriers.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param backBuffer Back buffer.
-		/// @param depthStencilBuffer Depth stencil buffer.
+		/// @param depthStencilTexture Depth stencil buffer.
 		void PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer);
 
 		/// @brief Populates render to resolve barriers.
 		/// @param resolveSourceBuffer Resolve source buffer.
 		/// @param resolveDestinationBuffer Resolve destination buffer.
-		/// @param depthStencilBuffer Depth stencil buffer.
+		/// @param depthStencilTexture Depth stencil buffer.
 		void PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer);
 		/// @brief Populates resolve.
 		/// @param resolveSourceBuffer Resolve source buffer.
@@ -319,7 +319,7 @@ namespace PonyEngine::Render::Direct3D12
 
 		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
 		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
-		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilBuffer();
+		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilTexture();
 		ID3D12Resource2& backBuffer = back.CurrentBackBuffer();
 
 		ID3D12Resource2& mainRenderTargetBuffer = msaaRenderTargetBuffer ? *msaaRenderTargetBuffer : renderTargetBuffer;
@@ -516,7 +516,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (!transformHeap || transformHeap->Heap().GetDesc().NumDescriptors < gpuTransformBuffers.size())
 		{
-			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), DescriptorHeapVisibility::CPU);
+			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), false);
 		}
 
 		ID3D12Device10& device = d3d12System->Device();
@@ -540,7 +540,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		if (!renderObjectHeap || renderObjectHeap->HandleCount() < descriptorCount)
 		{
-			renderObjectHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, DescriptorHeapVisibility::GPU);
+			renderObjectHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
 		}
 
 		originalHeapOffsets.clear();

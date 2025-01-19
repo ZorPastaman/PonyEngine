@@ -161,7 +161,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	Mesh MeshManager::CreateMesh(const Render::Mesh& mesh) const
 	{
-		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(mesh.BufferCount()), DescriptorHeapVisibility::CPU);
+		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(mesh.BufferCount()), false);
 
 		ID3D12Device10& device = d3d12System->Device();
 		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();

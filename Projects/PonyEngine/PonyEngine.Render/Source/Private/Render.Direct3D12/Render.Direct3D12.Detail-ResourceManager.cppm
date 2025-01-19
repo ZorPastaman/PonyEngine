@@ -38,12 +38,28 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Buffer> CreateBuffer(UINT64 size, ResourcePlacement placement) override;
 
+		[[nodiscard("Redendant call")]]
+		virtual std::shared_ptr<Texture> CreateTexture1D(UINT64 width, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, ResourcePlacement placement) override;
+		[[nodiscard("Redendant call")]]
+		virtual std::shared_ptr<Texture> CreateTexture2D(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, ResourcePlacement placement) override;
+		[[nodiscard("Redendant call")]]
+		virtual std::shared_ptr<Texture> CreateTexture3D(UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, ResourcePlacement placement) override;
+		[[nodiscard("Redendant call")]]
+		virtual std::shared_ptr<Texture> CreateRenderTarget(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, std::span<const FLOAT, 4> clearColor) override;
+		[[nodiscard("Redendant call")]]
+		virtual std::shared_ptr<Texture> CreateDepthStencil(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, D3D12_DEPTH_STENCIL_VALUE depthStencilValue) override;
+
 		ResourceManager& operator =(const ResourceManager&) = delete;
 		ResourceManager& operator =(ResourceManager&&) = delete;
 
 	private:
 		[[nodiscard("Pure function")]]
+		static D3D12_HEAP_PROPERTIES GetHeapProperties(ResourcePlacement placement) noexcept;
+		[[nodiscard("Pure function")]]
 		static D3D12_HEAP_TYPE GetHeapType(ResourcePlacement placement) noexcept;
+
+		[[nodiscard("Redendant call")]]
+		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, ResourcePlacement placement);
 
 		ISubSystemContext* d3d12System;
 	};
@@ -58,14 +74,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::shared_ptr<Buffer> ResourceManager::CreateBuffer(const UINT64 size, const ResourcePlacement placement)
 	{
-		const auto heapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = GetHeapType(placement),
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
+		const auto heapProperties = GetHeapProperties(placement);
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
@@ -91,6 +100,99 @@ namespace PonyEngine::Render::Direct3D12
 		return std::make_shared<Buffer>(*resource.Get());
 	}
 
+	std::shared_ptr<Texture> ResourceManager::CreateTexture1D(const UINT64 width, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const ResourcePlacement placement)
+	{
+		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, 1u, 1u, format, sampleDesc, placement);
+	}
+
+	std::shared_ptr<Texture> ResourceManager::CreateTexture2D(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const ResourcePlacement placement)
+	{
+		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, 1u, format, sampleDesc, placement);
+	}
+
+	std::shared_ptr<Texture> ResourceManager::CreateTexture3D(const UINT64 width, const UINT height, const UINT16 depth, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const ResourcePlacement placement)
+	{
+		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, depth, format, sampleDesc, placement);
+	}
+
+	std::shared_ptr<Texture> ResourceManager::CreateRenderTarget(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const std::span<const FLOAT, 4> clearColor)
+	{
+		const auto heapProperties = GetHeapProperties(ResourcePlacement::GPU);
+		const auto resourceDesc = D3D12_RESOURCE_DESC1
+		{
+			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Width = width,
+			.Height = height,
+			.DepthOrArraySize = 1u,
+			.MipLevels = 1u,
+			.Format = format,
+			.SampleDesc = sampleDesc,
+			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+			.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
+			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+		};
+		const auto clearValue = D3D12_CLEAR_VALUE
+		{
+			.Format = format,
+			.Color = { clearColor[0], clearColor[1], clearColor[2], clearColor[3] }
+		};
+
+		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
+		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_PRESENT,
+			&clearValue, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create render target resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return std::make_shared<Texture>(*resource.Get());
+	}
+
+	std::shared_ptr<Texture> ResourceManager::CreateDepthStencil(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const D3D12_DEPTH_STENCIL_VALUE depthStencilValue)
+	{
+		const auto heapProperties = GetHeapProperties(ResourcePlacement::GPU);
+		const auto resourceDesc = D3D12_RESOURCE_DESC1
+		{
+			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
+			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Width = width,
+			.Height = height,
+			.DepthOrArraySize = 1u,
+			.MipLevels = 1u,
+			.Format = format,
+			.SampleDesc = sampleDesc,
+			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+			.Flags = D3D12_RESOURCE_FLAG_ALLOW_DEPTH_STENCIL,
+			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+		};
+		const auto clearValue = D3D12_CLEAR_VALUE
+		{
+			.Format = format,
+			.DepthStencil = depthStencilValue
+		};
+
+		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
+		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+			&clearValue, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create depth stencil resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return std::make_shared<Texture>(*resource.Get());
+	}
+
+	D3D12_HEAP_PROPERTIES ResourceManager::GetHeapProperties(const ResourcePlacement placement) noexcept
+	{
+		return D3D12_HEAP_PROPERTIES
+		{
+			.Type = GetHeapType(placement),
+			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
+			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
+			.CreationNodeMask = 0u,
+			.VisibleNodeMask = 0u
+		};
+	}
+
 	D3D12_HEAP_TYPE ResourceManager::GetHeapType(const ResourcePlacement placement) noexcept
 	{
 		switch (placement)
@@ -103,5 +205,34 @@ namespace PonyEngine::Render::Direct3D12
 			assert(false && "The resource placement is incorrect.");
 			return D3D12_HEAP_TYPE_UPLOAD;
 		}
+	}
+
+	std::shared_ptr<Texture> ResourceManager::CreateTexture(const D3D12_RESOURCE_DIMENSION dimension, const UINT64 width, const UINT height, const UINT16 depth, 
+		const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const ResourcePlacement placement)
+	{
+		const auto heapProperties = GetHeapProperties(placement);
+		const auto resourceDesc = D3D12_RESOURCE_DESC1
+		{
+			.Dimension = dimension,
+			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Width = width,
+			.Height = height,
+			.DepthOrArraySize = depth,
+			.MipLevels = 1u,
+			.Format = format,
+			.SampleDesc = sampleDesc,
+			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
+			.Flags = D3D12_RESOURCE_FLAG_NONE,
+			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
+		};
+
+		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
+		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_COMMON,
+			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create texture resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return std::make_shared<Texture>(*resource.Get());
 	}
 }
