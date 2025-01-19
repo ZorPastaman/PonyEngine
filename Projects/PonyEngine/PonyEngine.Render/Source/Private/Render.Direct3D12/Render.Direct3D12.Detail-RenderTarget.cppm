@@ -105,15 +105,12 @@ export namespace PonyEngine::Render::Direct3D12
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		Microsoft::WRL::ComPtr<ID3D12Resource2> renderTargetBuffer; ///< Render target buffer.
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> rtvHeap; ///< Rtv descriptor heap.
-		D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle; ///< Rtv handle.
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> srvHeap; ///< Srv descriptor heap.
-		D3D12_GPU_DESCRIPTOR_HANDLE srvHandle; ///< Srv handle.
+		std::shared_ptr<Texture> renderTargetBuffer; ///< Render target buffer.
+		std::shared_ptr<DescriptorHeap> rtvHeap; ///< Rtv descriptor heap.
+		std::shared_ptr<DescriptorHeap> srvHeap; ///< Srv descriptor heap.
 
-		Microsoft::WRL::ComPtr<ID3D12Resource2> msaaRenderTargetBuffer; ///< Msaa render target buffer.
-		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> msaaRtvHeap; ///< Msaa rtv descriptor heap.
-		D3D12_CPU_DESCRIPTOR_HANDLE msaaRtvHandle; ///< Msaa rtv handle.
+		std::shared_ptr<Texture> msaaRenderTargetBuffer; ///< Msaa render target buffer.
+		std::shared_ptr<DescriptorHeap> msaaRtvHeap; ///< Msaa rtv descriptor heap.
 	};
 }
 
@@ -132,77 +129,25 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire render target buffer.");
-		constexpr auto heapProperties = D3D12_HEAP_PROPERTIES
-		{
-			.Type = D3D12_HEAP_TYPE_DEFAULT,
-			.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-			.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-			.CreationNodeMask = 0u,
-			.VisibleNodeMask = 0u
-		};
-		const auto bufferDesc = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = resolution.Width(),
-			.Height = resolution.Height(),
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = rtvFormat,
-			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
-			.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-		auto clearValue = D3D12_CLEAR_VALUE
-		{
-			.Format = rtvFormat,
-		};
-		std::memcpy(clearValue.Color, clearColor.Span().data(), clearColor.ComponentCount * sizeof(FLOAT));
-		ID3D12Device10& device = this->d3d12System->Device();
-		if (const HRESULT result = device.CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &bufferDesc, D3D12_BARRIER_LAYOUT_COMMON, &clearValue, 
-			nullptr, 0u, nullptr, IID_PPV_ARGS(renderTargetBuffer.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire render target buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
+		renderTargetBuffer = this->d3d12System->ResourceManager().CreateRenderTarget(resolution.Width(), resolution.Height(), rtvFormat, DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}, clearColor.Span());
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render target buffer acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire rtv descriptor heap.");
-		constexpr auto rtvDescriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV,
-			.NumDescriptors = 1u,
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(rtvHeap.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
+		rtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1u, false);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Rtv descriptor heap acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create rtv handle.");
 		const auto rtvDesc = D3D12_RENDER_TARGET_VIEW_DESC
 		{
 			.Format = rtvFormat,
-			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D
+			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
+			.Texture2D = D3D12_TEX2D_RTV{}
 		};
-		rtvHandle = rtvHeap->GetCPUDescriptorHandleForHeapStart();
-		device.CreateRenderTargetView(renderTargetBuffer.Get(), &rtvDesc, rtvHandle);
+		this->d3d12System->Device().CreateRenderTargetView(&renderTargetBuffer->Data(), &rtvDesc, rtvHeap->CpuHandle(0u));
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Rtv handle created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire srv descriptor heap.");
-		constexpr auto srvDescriptorHeapDesc = D3D12_DESCRIPTOR_HEAP_DESC
-		{
-			.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV,
-			.NumDescriptors = 1u,
-			.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE,
-			.NodeMask = 0u
-		};
-		if (const HRESULT result = device.CreateDescriptorHeap(&srvDescriptorHeapDesc, IID_PPV_ARGS(srvHeap.GetAddressOf())); FAILED(result))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire srv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
+		srvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1u, true);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srv descriptor heap acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srv handle.");
@@ -213,9 +158,7 @@ namespace PonyEngine::Render::Direct3D12
 			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 			.Texture2D = D3D12_TEX2D_SRV{.MostDetailedMip = 0u, .MipLevels = 1u, .PlaneSlice = 0u, .ResourceMinLODClamp = 0.f}
 		};
-		D3D12_CPU_DESCRIPTOR_HANDLE srvCpuHandle = srvHeap->GetCPUDescriptorHandleForHeapStart();
-		device.CreateShaderResourceView(renderTargetBuffer.Get(), &srvDesc, srvCpuHandle);
-		srvHandle = srvHeap->GetGPUDescriptorHandleForHeapStart();
+		this->d3d12System->Device().CreateShaderResourceView(&renderTargetBuffer->Data(), &srvDesc, srvHeap->CpuHandle(0u));
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srv handle created.");
 
 		if (params.msaaParams.sampleCount <= 1u)
@@ -228,7 +171,7 @@ namespace PonyEngine::Render::Direct3D12
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Get sample description. Count: '{}'; Quality: '{}'; Format: '{}'.", params.msaaParams.sampleCount, params.msaaParams.sampleQuality, static_cast<int>(rtvFormat));
 		auto msaaLevels = D3D12_FEATURE_DATA_MULTISAMPLE_QUALITY_LEVELS{.Format = rtvFormat, .SampleCount = static_cast<UINT>(params.msaaParams.sampleCount)};
-		if (const HRESULT result = device.CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &msaaLevels, sizeof(msaaLevels)); FAILED(result))
+		if (const HRESULT result = this->d3d12System->Device().CheckFeatureSupport(D3D12_FEATURE_MULTISAMPLE_QUALITY_LEVELS, &msaaLevels, sizeof(msaaLevels)); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get msaa levels with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
@@ -236,32 +179,11 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Sample description gotten. Count: '{}'; Quality: '{}'.", rtvSampleDesc.Count, rtvSampleDesc.Quality);
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire msaa render target buffer.");
-		const auto msaaBufferDesc = D3D12_RESOURCE_DESC1
-		{
-			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-			.Width = resolution.Width(),
-			.Height = resolution.Height(),
-			.DepthOrArraySize = 1u,
-			.MipLevels = 1u,
-			.Format = rtvFormat,
-			.SampleDesc = rtvSampleDesc,
-			.Layout = D3D12_TEXTURE_LAYOUT_UNKNOWN,
-			.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET,
-			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-		};
-		if (const HRESULT result = device.CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &msaaBufferDesc, D3D12_BARRIER_LAYOUT_COMMON, &clearValue,
-			nullptr, 0u, nullptr, IID_PPV_ARGS(msaaRenderTargetBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire msaa render target buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
+		msaaRenderTargetBuffer = this->d3d12System->ResourceManager().CreateRenderTarget(resolution.Width(), resolution.Height(), rtvFormat, rtvSampleDesc, clearColor.Span());
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Msaa render target buffer acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire msaa rtv descriptor heap.");
-		if (const HRESULT result = device.CreateDescriptorHeap(&rtvDescriptorHeapDesc, IID_PPV_ARGS(msaaRtvHeap.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire msaa rtv descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
+		msaaRtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1u, false);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Msaa rtv descriptor heap acquired.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create msaa rtv handle.");
@@ -270,27 +192,26 @@ namespace PonyEngine::Render::Direct3D12
 			.Format = rtvFormat,
 			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2DMS
 		};
-		msaaRtvHandle = msaaRtvHeap->GetCPUDescriptorHandleForHeapStart();
-		device.CreateRenderTargetView(msaaRenderTargetBuffer.Get(), &msaaRtvDesc, msaaRtvHandle);
+		this->d3d12System->Device().CreateRenderTargetView(&msaaRenderTargetBuffer->Data(), &msaaRtvDesc, msaaRtvHeap->CpuHandle(0u));
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Msaa rtv handle created.");
 	}
 
 	RenderTarget::~RenderTarget() noexcept
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release msaa rtv descriptor heap.");
-		msaaRtvHeap.Reset();
+		msaaRtvHeap.reset();
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Msaa rtv descriptor heap released.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release msaa render target buffer.");
-		msaaRenderTargetBuffer.Reset();
+		msaaRenderTargetBuffer.reset();
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Msaa render target buffer released.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release rtv descriptor heap.");
-		rtvHeap.Reset();
+		rtvHeap.reset();
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Rtv descriptor heap released.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release render target buffer.");
-		renderTargetBuffer.Reset();
+		renderTargetBuffer.reset();
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render target buffer released.");
 	}
 
@@ -336,28 +257,28 @@ namespace PonyEngine::Render::Direct3D12
 		componentName.reserve(name.size() + msaaHeapName.size());
 
 		componentName.append(name).append(bufferName);
-		SetName(*renderTargetBuffer.Get(), componentName);
+		SetName(renderTargetBuffer->Data(), componentName);
 
 		componentName.erase();
 		componentName.append(name).append(heapName);
-		SetName(*rtvHeap.Get(), componentName);
+		SetName(rtvHeap->Heap(), componentName);
 
 		componentName.erase();
 		componentName.append(name).append(srvHeapName);
-		SetName(*srvHeap.Get(), componentName);
+		SetName(srvHeap->Heap(), componentName);
 
 		if (msaaRenderTargetBuffer)
 		{
 			componentName.erase();
 			componentName.append(name).append(msaaBufferName);
-			SetName(*msaaRenderTargetBuffer.Get(), componentName);
+			SetName(msaaRenderTargetBuffer->Data(), componentName);
 		}
 
 		if (msaaRtvHeap)
 		{
 			componentName.erase();
 			componentName.append(name).append(msaaHeapName);
-			SetName(*msaaRtvHeap.Get(), componentName);
+			SetName(msaaRtvHeap->Heap(), componentName);
 		}
 	}
 
@@ -373,46 +294,46 @@ namespace PonyEngine::Render::Direct3D12
 
 	ID3D12Resource2& RenderTarget::RenderTargetBuffer() noexcept
 	{
-		return *renderTargetBuffer.Get();
+		return renderTargetBuffer->Data();
 	}
 
 	const ID3D12Resource2& RenderTarget::RenderTargetBuffer() const noexcept
 	{
-		return *renderTargetBuffer.Get();
+		return renderTargetBuffer->Data();
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE RenderTarget::RtvHandle() const noexcept
 	{
-		return rtvHandle;
+		return rtvHeap->CpuHandle(0u);
 	}
 
 	ID3D12DescriptorHeap& RenderTarget::SrvHeap() noexcept
 	{
-		return *srvHeap.Get();
+		return srvHeap->Heap();
 	}
 
 	const ID3D12DescriptorHeap& RenderTarget::SrvHeap() const noexcept
 	{
-		return *srvHeap.Get();
+		return srvHeap->Heap();
 	}
 
 	D3D12_GPU_DESCRIPTOR_HANDLE RenderTarget::SrvHandle() const noexcept
 	{
-		return srvHandle;
+		return srvHeap->GpuHandle(0u);
 	}
 
 	ID3D12Resource2* RenderTarget::RenderTargetBufferMsaa() noexcept
 	{
-		return msaaRenderTargetBuffer.Get();
+		return msaaRenderTargetBuffer ? &msaaRenderTargetBuffer->Data() : nullptr;
 	}
 
 	const ID3D12Resource2* RenderTarget::RenderTargetBufferMsaa() const noexcept
 	{
-		return msaaRenderTargetBuffer.Get();
+		return msaaRenderTargetBuffer ? &msaaRenderTargetBuffer->Data() : nullptr;
 	}
 
 	D3D12_CPU_DESCRIPTOR_HANDLE RenderTarget::RtvHandleMsaa() const noexcept
 	{
-		return msaaRtvHandle;
+		return msaaRtvHeap->CpuHandle(0u);
 	}
 }

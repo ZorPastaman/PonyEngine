@@ -17,7 +17,6 @@ export module PonyEngine.Render.Direct3D12.Detail:IDescriptorHeapManager;
 import <memory>;
 
 import :DescriptorHeap;
-import :DescriptorHeapVisibility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -29,9 +28,9 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Creates a descriptor heap.
 		/// @param heapType Heap type.
 		/// @param descriptorCount Descriptor count.
-		/// @param visibility Descriptor heap visibility.
+		/// @param shaderVisible Is the descriptor shader visible?
 		/// @return Descriptor heap.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, DescriptorHeapVisibility visibility) = 0;
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, bool shaderVisible) = 0;
 	};
 }

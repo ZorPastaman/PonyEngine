@@ -43,18 +43,12 @@ export namespace PonyEngine::Render::Direct3D12
 		~DescriptorHeapManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, DescriptorHeapVisibility visibility) override;
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, bool shaderVisible) override;
 
 		DescriptorHeapManager& operator =(const DescriptorHeapManager& other) noexcept = default;
 		DescriptorHeapManager& operator =(DescriptorHeapManager&& other) noexcept = default;
 
 	private:
-		/// @brief Gets heap flags by visibility.
-		/// @param visibility Visibility.
-		/// @return Heap flags.
-		[[nodiscard("Pure function")]]
-		static D3D12_DESCRIPTOR_HEAP_FLAGS GetHeapFlags(DescriptorHeapVisibility visibility) noexcept;
-
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 	};
 }
@@ -66,13 +60,13 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const UINT descriptorCount, const DescriptorHeapVisibility visibility)
+	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const UINT descriptorCount, const bool shaderVisible)
 	{
 		const auto heapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
 		{
 			.Type = heapType,
 			.NumDescriptors = descriptorCount,
-			.Flags = GetHeapFlags(visibility),
+			.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
 		ID3D12Device10& device = d3d12System->Device();
@@ -83,19 +77,5 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		return std::make_shared<DescriptorHeap>(*heap.Get(), device.GetDescriptorHandleIncrementSize(heapType));
-	}
-
-	D3D12_DESCRIPTOR_HEAP_FLAGS DescriptorHeapManager::GetHeapFlags(const DescriptorHeapVisibility visibility) noexcept
-	{
-		switch (visibility)
-		{
-		case DescriptorHeapVisibility::CPU:
-			return D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		case DescriptorHeapVisibility::GPU:
-			return D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
-		default: [[unlikely]]
-			assert(false && "The visibility is incorrect.");
-			return D3D12_DESCRIPTOR_HEAP_FLAG_NONE;
-		}
 	}
 }

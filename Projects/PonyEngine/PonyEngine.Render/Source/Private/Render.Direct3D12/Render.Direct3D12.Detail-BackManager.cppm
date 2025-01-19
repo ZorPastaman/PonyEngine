@@ -112,7 +112,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer srgb format gotten. Format: {}.", static_cast<int>(srgbBackFormat));
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back descriptor heap.");
-		backHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), DescriptorHeapVisibility::CPU);
+		backHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), false);
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back descriptor heap created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back handles.");
