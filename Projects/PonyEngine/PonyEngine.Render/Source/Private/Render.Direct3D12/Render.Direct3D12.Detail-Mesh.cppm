@@ -51,9 +51,9 @@ export namespace PonyEngine::Render::Direct3D12
 		std::optional<std::size_t> FindBufferCount(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		Buffer* FindBuffer(std::string_view dataType, std::size_t index) noexcept;
+		std::shared_ptr<Buffer> FindBuffer(std::string_view dataType, std::size_t index) noexcept;
 		[[nodiscard("Pure function")]]
-		const Buffer* FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
+		std::shared_ptr<const Buffer> FindBuffer(std::string_view dataType, std::size_t index) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::optional<UINT> FindHandleIndex(std::string_view dataType) const noexcept;
@@ -120,21 +120,21 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	Buffer* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
+	std::shared_ptr<Buffer> Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
 	{
 		if (const std::optional<std::size_t> dataIndex = FindDataIndex(dataType))
 		{
-			return meshBuffers[dataIndex.value()][index].get();
+			return meshBuffers[dataIndex.value()][index];
 		}
 
 		return nullptr;
 	}
 
-	const Buffer* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
+	std::shared_ptr<const Buffer> Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
 	{
 		if (const std::optional<std::size_t> dataIndex = FindDataIndex(dataType))
 		{
-			return meshBuffers[dataIndex.value()][index].get();
+			return meshBuffers[dataIndex.value()][index];
 		}
 
 		return nullptr;
@@ -194,7 +194,7 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				componentName.resize(std::min(componentName.capacity(), std::formatted_size(bufferFormat, name, i, j)));
 				std::format_to_n(componentName.begin(), componentName.size(), bufferFormat, name, i, j);
-				SetName(meshBuffers[i][j]->Resource(), componentName);
+				SetName(meshBuffers[i][j]->Data(), componentName);
 			}
 		}
 
