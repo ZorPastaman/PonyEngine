@@ -23,7 +23,6 @@ import :IDescriptorHeapManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
-import :IRenderObjectManagerPrivate;
 import :IRenderTargetPrivate;
 import :IRenderViewPrivate;
 import :IResourceManager;
@@ -54,14 +53,14 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Device10& Device() const noexcept = 0;
 
-		/// @brief Gets the back.
-		/// @return Back.
+		/// @brief Gets the back manager.
+		/// @return Back manager.
 		[[nodiscard("Pure function")]]
-		virtual IBackManager& BackPrivate() noexcept = 0;
-		/// @brief Gets the back.
-		/// @return Back.
+		virtual IBackManager& BackManager() noexcept = 0;
+		/// @brief Gets the back manager.
+		/// @return Back manager.
 		[[nodiscard("Pure function")]]
-		virtual const IBackManager& BackPrivate() const noexcept = 0;
+		virtual const IBackManager& BackManager() const noexcept = 0;
 
 		/// @brief Gets the render target.
 		/// @return Render target.
@@ -93,29 +92,29 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
 		[[nodiscard("Pure function")]]
-		virtual IMeshManager& MeshManagerPrivate() noexcept = 0;
+		virtual IMeshManager& MeshManager() noexcept = 0;
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
 		[[nodiscard("Pure function")]]
-		virtual const IMeshManager& MeshManagerPrivate() const noexcept = 0;
+		virtual const IMeshManager& MeshManager() const noexcept = 0;
 
 		/// @brief Gets the root signature manager.
 		/// @return Root signature manager.
 		[[nodiscard("Pure function")]]
-		virtual IRootSignatureManagerPrivate& RootSignatureManagerPrivate() noexcept = 0;
+		virtual IRootSignatureManager& RootSignatureManager() noexcept = 0;
 		/// @brief Gets the root signature manager.
 		/// @return Root signature manager.
 		[[nodiscard("Pure function")]]
-		virtual const IRootSignatureManagerPrivate& RootSignatureManagerPrivate() const noexcept = 0;
+		virtual const IRootSignatureManager& RootSignatureManager() const noexcept = 0;
 
 		/// @brief Gets the material manager.
 		/// @return Material manager.
 		[[nodiscard("Pure function")]]
-		virtual IMaterialManagerPrivate& MaterialManagerPrivate() noexcept = 0;
+		virtual IMaterialManager& MaterialManager() noexcept = 0;
 		/// @brief Gets the material manager.
 		/// @return Material manager.
 		[[nodiscard("Pure function")]]
-		virtual const IMaterialManagerPrivate& MaterialManagerPrivate() const noexcept = 0;
+		virtual const IMaterialManager& MaterialManager() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual IResourceManager& ResourceManager() noexcept = 0;
@@ -134,11 +133,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the render object manager.
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManagerPrivate& RenderObjectManagerPrivate() noexcept = 0;
+		virtual IRenderObjectManager& RenderObjectManager() noexcept = 0;
 		/// @brief Gets the render object manager.
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManagerPrivate& RenderObjectManagerPrivate() const noexcept = 0;
+		virtual const IRenderObjectManager& RenderObjectManager() const noexcept = 0;
 
 		/// @brief Gets the copy pipeline.
 		/// @return Copy pipeline.

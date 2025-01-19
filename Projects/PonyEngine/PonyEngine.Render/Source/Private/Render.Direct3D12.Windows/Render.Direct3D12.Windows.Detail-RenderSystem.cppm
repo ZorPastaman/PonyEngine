@@ -223,12 +223,12 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 	IRenderObjectManager& RenderSystem::RenderObjectManager() noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManager();
+		return *direct3D12SubSystem->RenderObjectManagerD3D12();
 	}
 
 	const IRenderObjectManager& RenderSystem::RenderObjectManager() const noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManager();
+		return *direct3D12SubSystem->RenderObjectManagerD3D12();
 	}
 
 	PonyDebug::Log::ILogger& RenderSystem::Logger() noexcept

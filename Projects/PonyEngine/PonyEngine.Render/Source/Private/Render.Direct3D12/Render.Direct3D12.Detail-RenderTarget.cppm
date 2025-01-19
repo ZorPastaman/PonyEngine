@@ -117,7 +117,7 @@ export namespace PonyEngine::Render::Direct3D12
 namespace PonyEngine::Render::Direct3D12
 {
 	RenderTarget::RenderTarget(ISubSystemContext& d3d12System, const RenderTargetParams& params) :
-		rtvFormat{d3d12System.BackPrivate().Format()},
+		rtvFormat{d3d12System.BackManager().Format()},
 		resolution(params.resolution),
 		clearColor(params.clearColor),
 		d3d12System{&d3d12System}

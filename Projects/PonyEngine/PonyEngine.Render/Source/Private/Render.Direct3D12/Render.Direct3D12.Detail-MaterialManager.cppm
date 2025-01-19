@@ -38,7 +38,7 @@ import :Shader;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 material manager.
-	class MaterialManager final : public IMaterialManagerPrivate
+	class MaterialManager final : public IMaterialManager
 	{
 	public:
 		/// @brief Creates a @p MaterialManager.
