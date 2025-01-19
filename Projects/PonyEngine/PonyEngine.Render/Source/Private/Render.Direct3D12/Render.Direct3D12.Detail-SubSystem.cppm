@@ -145,9 +145,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IBackManagerPrivate& BackPrivate() noexcept override;
+		virtual IBackManager& BackPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IBackManagerPrivate& BackPrivate() const noexcept override;
+		virtual const IBackManager& BackPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IRenderTargetPrivate& RenderTargetPrivate() noexcept override;
@@ -165,9 +165,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IRenderViewPrivate& RenderViewPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IMeshManagerPrivate& MeshManagerPrivate() noexcept override;
+		virtual IMeshManager& MeshManagerPrivate() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IMeshManagerPrivate& MeshManagerPrivate() const noexcept override;
+		virtual const IMeshManager& MeshManagerPrivate() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IRootSignatureManagerPrivate& RootSignatureManagerPrivate() noexcept override;
@@ -475,12 +475,12 @@ namespace PonyEngine::Render::Direct3D12
 		return *device.Get();
 	}
 
-	IBackManagerPrivate& SubSystem::BackPrivate() noexcept
+	IBackManager& SubSystem::BackPrivate() noexcept
 	{
 		return *back;
 	}
 
-	const IBackManagerPrivate& SubSystem::BackPrivate() const noexcept
+	const IBackManager& SubSystem::BackPrivate() const noexcept
 	{
 		return *back;
 	}
@@ -505,12 +505,12 @@ namespace PonyEngine::Render::Direct3D12
 		return *depthStencil;
 	}
 
-	IMeshManagerPrivate& SubSystem::MeshManagerPrivate() noexcept
+	IMeshManager& SubSystem::MeshManagerPrivate() noexcept
 	{
 		return *meshManager;
 	}
 
-	const IMeshManagerPrivate& SubSystem::MeshManagerPrivate() const noexcept
+	const IMeshManager& SubSystem::MeshManagerPrivate() const noexcept
 	{
 		return *meshManager;
 	}

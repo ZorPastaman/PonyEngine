@@ -16,7 +16,7 @@ export module PonyEngine.Render.Direct3D12.Detail:ISubSystemContext;
 
 import PonyDebug.Log;
 
-import :IBackManagerPrivate;
+import :IBackManager;
 import :ICopyPipeline;
 import :IDepthStencilPrivate;
 import :IDescriptorHeapManager;
@@ -57,11 +57,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the back.
 		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual IBackManagerPrivate& BackPrivate() noexcept = 0;
+		virtual IBackManager& BackPrivate() noexcept = 0;
 		/// @brief Gets the back.
 		/// @return Back.
 		[[nodiscard("Pure function")]]
-		virtual const IBackManagerPrivate& BackPrivate() const noexcept = 0;
+		virtual const IBackManager& BackPrivate() const noexcept = 0;
 
 		/// @brief Gets the render target.
 		/// @return Render target.
@@ -93,11 +93,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
 		[[nodiscard("Pure function")]]
-		virtual IMeshManagerPrivate& MeshManagerPrivate() noexcept = 0;
+		virtual IMeshManager& MeshManagerPrivate() noexcept = 0;
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
 		[[nodiscard("Pure function")]]
-		virtual const IMeshManagerPrivate& MeshManagerPrivate() const noexcept = 0;
+		virtual const IMeshManager& MeshManagerPrivate() const noexcept = 0;
 
 		/// @brief Gets the root signature manager.
 		/// @return Root signature manager.

@@ -46,6 +46,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 	private:
 		void CheckParams(const void* data, std::size_t size, std::size_t offset) const;
+
 		[[nodiscard("Redundant call")]]
 		void* Map() const;
 		void Unmap() const;
@@ -57,6 +58,7 @@ namespace PonyEngine::Render::Direct3D12
 	Buffer::Buffer(ID3D12Resource2& resource) noexcept :
 		Resource(resource)
 	{
+		assert(resource.GetDesc1().Dimension == D3D12_RESOURCE_DIMENSION_BUFFER && "The resource has a wrong dimension.");
 	}
 
 	void Buffer::GetData(void* const data, const std::size_t size, const std::size_t offset) const noexcept

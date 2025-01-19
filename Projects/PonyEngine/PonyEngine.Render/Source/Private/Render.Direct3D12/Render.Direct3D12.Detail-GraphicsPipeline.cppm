@@ -315,7 +315,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
 		IDepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
-		IBackManagerPrivate& back = d3d12System->BackPrivate();
+		IBackManager& back = d3d12System->BackPrivate();
 
 		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
 		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
@@ -459,7 +459,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 						.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 						.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
+						.pResource = &mesh->FindBuffer(dataType, i)->get()->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -733,7 +733,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
+						.pResource = &mesh->FindBuffer(dataType, i)->get()->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -817,7 +817,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
+						.pResource = &mesh->FindBuffer(dataType, i)->get()->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};

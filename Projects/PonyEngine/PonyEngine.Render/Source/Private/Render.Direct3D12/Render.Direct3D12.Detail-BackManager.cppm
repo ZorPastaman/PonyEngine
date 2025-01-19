@@ -31,14 +31,14 @@ import PonyDebug.Log;
 import :BackParams;
 import :DescriptorHeap;
 import :FormatUtility;
-import :IBackManagerPrivate;
+import :IBackManager;
 import :ISubSystemContext;
 import :ObjectUtility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 back manager.
-	class BackManager final : public IBackManagerPrivate
+	class BackManager final : public IBackManager
 	{
 	public:
 		/// @brief Creates a @p BackManager.
@@ -105,11 +105,8 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Get back buffer format.");
 		backFormat = backBuffers[0]->GetDesc1().Format;
 		assert(std::ranges::find_if(backBuffers, [&](const Microsoft::WRL::ComPtr<ID3D12Resource2>& buffer) { return buffer->GetDesc1().Format != backFormat; }) == backBuffers.cend() && "The back buffers must have the same format.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer format gotten. Format: {}.", static_cast<int>(backFormat));
-
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Get back buffer srgb format.");
 		srgbBackFormat = GetSrgbFormat(backFormat);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer srgb format gotten. Format: {}.", static_cast<int>(srgbBackFormat));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer format gotten. Format: {}; Srgb format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back descriptor heap.");
 		backHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), false);
@@ -172,7 +169,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void BackManager::CurrentBackBufferIndex(const UINT index) noexcept
 	{
-		assert(index < backBuffers.size() && "The new back buffer index is incorrect.");
+		assert(index < backBuffers.size() && "The new back buffer index is out of bounds.");
 		currentBackBufferIndex = index;
 	}
 
