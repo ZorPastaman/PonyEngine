@@ -21,64 +21,47 @@ import <stdexcept>;
 import PonyBase.Container;
 import PonyBase.Utility;
 
+import :Resource;
+
 export namespace PonyEngine::Render::Direct3D12
 {
-	class Buffer final
+	class Buffer final : public Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
 		explicit Buffer(ID3D12Resource2& resource) noexcept;
-		[[nodiscard("Pure constructor")]]
-		Buffer(const Buffer& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		Buffer(Buffer&& other) noexcept = default;
+		Buffer(const Buffer&) = delete;
+		Buffer(Buffer&&) = delete;
 
-		~Buffer() noexcept = default;
+		virtual ~Buffer() noexcept override = default;
 
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2& Resource() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& Resource() const noexcept;
-
-		void GetData(void* data, std::size_t offset, std::size_t size) const noexcept;
+		void GetData(void* data, std::size_t size, std::size_t offset = 0) const noexcept;
 		void GetData(PonyBase::Container::Buffer& buffer, std::size_t offset = 0) const noexcept;
 
-		void SetData(const void* data, std::size_t offset, std::size_t size) noexcept;
+		void SetData(const void* data, std::size_t size, std::size_t offset = 0) noexcept;
 		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0) noexcept;
 
-		Buffer& operator =(const Buffer& other) noexcept = default;
-		Buffer& operator =(Buffer&& other) noexcept = default;
+		Buffer& operator =(const Buffer&) = delete;
+		Buffer& operator =(Buffer&&) = delete;
 
 	private:
-		void CheckParams(const void* data, std::size_t offset, std::size_t size) const;
+		void CheckParams(const void* data, std::size_t size, std::size_t offset) const;
 		[[nodiscard("Redundant call")]]
 		void* Map() const;
 		void Unmap() const;
-
-		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	Buffer::Buffer(ID3D12Resource2& resource) noexcept :
-		resource(&resource)
+		Resource(resource)
 	{
 	}
 
-	ID3D12Resource2& Buffer::Resource() noexcept
+	void Buffer::GetData(void* const data, const std::size_t size, const std::size_t offset) const noexcept
 	{
-		return *resource.Get();
-	}
-
-	const ID3D12Resource2& Buffer::Resource() const noexcept
-	{
-		return *resource.Get();
-	}
-
-	void Buffer::GetData(void* const data, const std::size_t offset, const std::size_t size) const noexcept
-	{
-		CheckParams(data, offset, size);
+		CheckParams(data, size, offset);
 
 		const void* const resourceData = Map();
 		std::memcpy(data, static_cast<const std::byte*>(resourceData) + offset, size);
@@ -87,12 +70,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void Buffer::GetData(PonyBase::Container::Buffer& buffer, const std::size_t offset) const noexcept
 	{
-		GetData(buffer.Data(), offset, buffer.Size());
+		GetData(buffer.Data(), buffer.Size(), offset);
 	}
 
-	void Buffer::SetData(const void* const data, const std::size_t offset, const std::size_t size) noexcept
+	void Buffer::SetData(const void* const data, const std::size_t size, const std::size_t offset) noexcept
 	{
-		CheckParams(data, offset, size);
+		CheckParams(data, size, offset);
 
 		void* const resourceData = Map();
 		std::memcpy(static_cast<std::byte*>(resourceData) + offset, data, size);
@@ -101,10 +84,10 @@ namespace PonyEngine::Render::Direct3D12
 
 	void Buffer::SetData(const PonyBase::Container::Buffer& buffer, const std::size_t offset) noexcept
 	{
-		SetData(buffer.Data(), offset, buffer.Size());
+		SetData(buffer.Data(), buffer.Size(), offset);
 	}
 
-	void Buffer::CheckParams(const void* const data, const std::size_t offset, const std::size_t size) const
+	void Buffer::CheckParams(const void* const data, const std::size_t size, const std::size_t offset) const
 	{
 		assert(data && "The data is nullptr.");
 		if (offset + size > resource->GetDesc1().Width)

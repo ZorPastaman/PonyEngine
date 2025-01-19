@@ -217,6 +217,9 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Resource.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\PixelShader.hlsl">

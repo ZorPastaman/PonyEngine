@@ -178,10 +178,10 @@ namespace PonyEngine::Render::Direct3D12
 				const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::CPU);
 				uploadBuffer->SetData(sourceBuffer);
 				const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::GPU);
-				copyPipeline.AddBufferCopyTask(uploadBuffer->Resource(), gpuBuffer->Resource());
+				copyPipeline.AddCopyTask(uploadBuffer, gpuBuffer);
 				buffers.push_back(gpuBuffer);
 
-				CreateSrv(device, heap->CpuHandle(handleIndex), gpuBuffer->Resource(), sourceBuffer);
+				CreateSrv(device, heap->CpuHandle(handleIndex), gpuBuffer->Data(), sourceBuffer);
 
 				++handleIndex;
 			}
@@ -240,8 +240,8 @@ namespace PonyEngine::Render::Direct3D12
 
 					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer->Size(), ResourcePlacement::CPU);
 					uploadBuffer->SetData(*sourceBuffer);
-					Buffer* const gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
-					d3d12System->CopyPipeline().AddBufferCopyTask(uploadBuffer->Resource(), gpuBuffer->Resource());
+					const std::shared_ptr<Buffer> gpuBuffer = mesh.FindBuffer(dataType, bufferIndex);
+					d3d12System->CopyPipeline().AddCopyTask(uploadBuffer, gpuBuffer);
 
 					bufferVersions[bufferIndex] = source.BufferVersion(dataType, bufferIndex).value();
 				}

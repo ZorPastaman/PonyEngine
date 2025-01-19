@@ -13,49 +13,29 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Texture;
 
+import :Resource;
+
 export namespace PonyEngine::Render::Direct3D12
 {
-	class Texture final
+	class Texture final : public Resource
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
 		explicit Texture(ID3D12Resource2& resource) noexcept;
-		[[nodiscard("Pure constructor")]]
-		Texture(const Texture& other) noexcept = default;
-		[[nodiscard("Pure constructor")]]
-		Texture(Texture&& other) noexcept = default;
+		Texture(const Texture&) = delete;
+		Texture(Texture&&) = delete;
 
-		~Texture() noexcept = default;
+		virtual ~Texture() noexcept override = default;
 
-		[[nodiscard("Pure function")]]
-		ID3D12Resource2& Resource() noexcept;
-		[[nodiscard("Pure function")]]
-		const ID3D12Resource2& Resource() const noexcept;
-
-		Texture& operator =(const Texture& other) noexcept = default;
-		Texture& operator =(Texture&& other) noexcept = default;
-
-	private:
-		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
+		Texture& operator =(const Texture&) = delete;
+		Texture& operator =(Texture&&) = delete;
 	};
-
-
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	Texture::Texture(ID3D12Resource2& resource) noexcept :
-		resource(&resource)
+		Resource(resource)
 	{
-	}
-
-	ID3D12Resource2& Texture::Resource() noexcept
-	{
-		return *resource.Get();
-	}
-
-	const ID3D12Resource2& Texture::Resource() const noexcept
-	{
-		return *resource.Get();
 	}
 }

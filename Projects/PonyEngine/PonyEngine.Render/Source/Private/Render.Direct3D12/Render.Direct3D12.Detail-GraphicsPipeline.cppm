@@ -177,8 +177,8 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<std::size_t> renderObjectIndices; ///< Render object indirection indices.
 		std::vector<std::shared_ptr<RenderObject>> renderObjects; ///< Render objects.
 		std::vector<Transform> renderObjectTransforms; ///< Render object transforms.
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> uploadTransformBuffers; ///< Upload transform buffers.
-		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> gpuTransformBuffers; ///< Gpu transform buffers.
+		std::vector<std::shared_ptr<Buffer>> uploadTransformBuffers; ///< Upload transform buffers.
+		std::vector<std::shared_ptr<Buffer>> gpuTransformBuffers; ///< Gpu transform buffers.
 		std::shared_ptr<DescriptorHeap> transformHeap; ///< Transform heap.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
@@ -376,91 +376,27 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::UpdateGpuTransforms()
 	{
-		ID3D12Device10& device = d3d12System->Device();
-
 		for (std::size_t i = uploadTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
 		{
-			constexpr auto uploadHeapProperties = D3D12_HEAP_PROPERTIES
-			{
-				.Type = D3D12_HEAP_TYPE_UPLOAD,
-				.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-				.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-				.CreationNodeMask = 0u,
-				.VisibleNodeMask = 0u
-			};
-			constexpr auto uploadBufferDesc = D3D12_RESOURCE_DESC1 // TODO: Make a manager or utility function for this.
-			{
-				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-				.Width = static_cast<UINT64>(sizeof(Transform)),
-				.Height = 1u,
-				.DepthOrArraySize = 1u,
-				.MipLevels = 1u,
-				.Format = DXGI_FORMAT_UNKNOWN,
-				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-				.Flags = D3D12_RESOURCE_FLAG_NONE,
-				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-			};
-
-			Microsoft::WRL::ComPtr<ID3D12Resource2> uploadBuffer;
-			if (const HRESULT result = device.CreateCommittedResource3(&uploadHeapProperties, D3D12_HEAP_FLAG_NONE, &uploadBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(uploadBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create upload transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
+			const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), ResourcePlacement::CPU);
 			uploadTransformBuffers.push_back(uploadBuffer);
 		}
 
 		for (std::size_t i = gpuTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
 		{
-			constexpr auto gpuHeapProperties = D3D12_HEAP_PROPERTIES
-			{
-				.Type = D3D12_HEAP_TYPE_DEFAULT,
-				.CPUPageProperty = D3D12_CPU_PAGE_PROPERTY_UNKNOWN,
-				.MemoryPoolPreference = D3D12_MEMORY_POOL_UNKNOWN,
-				.CreationNodeMask = 0u,
-				.VisibleNodeMask = 0u
-			};
-			constexpr auto gpuBufferDesc = D3D12_RESOURCE_DESC1 // TODO: Make a manager or utility function for this.
-			{
-				.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-				.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
-				.Width = static_cast<UINT64>(sizeof(Transform)),
-				.Height = 1u,
-				.DepthOrArraySize = 1u,
-				.MipLevels = 1u,
-				.Format = DXGI_FORMAT_UNKNOWN,
-				.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
-				.Layout = D3D12_TEXTURE_LAYOUT_ROW_MAJOR,
-				.Flags = D3D12_RESOURCE_FLAG_NONE,
-				.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
-			};
-
-			Microsoft::WRL::ComPtr<ID3D12Resource2> gpuBuffer;
-			if (const HRESULT result = device.CreateCommittedResource3(&gpuHeapProperties, D3D12_HEAP_FLAG_NONE, &gpuBufferDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
-				nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(gpuBuffer.GetAddressOf())); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create gpu transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
+			const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), ResourcePlacement::GPU);
 			gpuTransformBuffers.push_back(gpuBuffer);
 		}
 
 		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
 		{
-			void* data;
-			if (const HRESULT result = uploadTransformBuffers[i]->Map(0, nullptr, &data); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map transform buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			std::memcpy(data, renderObjectTransforms[i].Data(), sizeof(Transform));
-			uploadTransformBuffers[i]->Unmap(0, nullptr);
+			uploadTransformBuffers[i]->SetData(renderObjectTransforms[i].Data(), sizeof(Transform));
 		}
 
 		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
 		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
 		{
-			copyPipeline.AddBufferCopyTask(*uploadTransformBuffers[i].Get(), *gpuTransformBuffers[i].Get());
+			copyPipeline.AddCopyTask(uploadTransformBuffers[i], gpuTransformBuffers[i]);
 		}
 	}
 
@@ -496,7 +432,7 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
 		{
 			const auto bufferBarrier = D3D12_BUFFER_BARRIER
 			{
@@ -504,7 +440,7 @@ namespace PonyEngine::Render::Direct3D12
 				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-				.pResource = transform.Get(),
+				.pResource = &transform->Data(),
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
@@ -523,7 +459,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
 						.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 						.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
+						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -588,7 +524,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 			{
-				.BufferLocation = gpuTransformBuffers[i]->GetGPUVirtualAddress(),
+				.BufferLocation = gpuTransformBuffers[i]->Data().GetGPUVirtualAddress(),
 				.SizeInBytes = sizeof(Transform)
 			};
 			device.CreateConstantBufferView(&cbvDesc, transformHeap->CpuHandle(i));
@@ -770,7 +706,7 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
 		{
 			const auto bufferBarrier = D3D12_BUFFER_BARRIER
 			{
@@ -778,7 +714,7 @@ namespace PonyEngine::Render::Direct3D12
 				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = transform.Get(),
+				.pResource = &transform->Data(),
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
@@ -797,7 +733,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
+						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};
@@ -854,7 +790,7 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer)
 	{
 		bufferBarriers.clear();
-		for (const Microsoft::WRL::ComPtr<ID3D12Resource2>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
 		{
 			const auto bufferBarrier = D3D12_BUFFER_BARRIER
 			{
@@ -862,7 +798,7 @@ namespace PonyEngine::Render::Direct3D12
 				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = transform.Get(),
+				.pResource = &transform->Data(),
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
@@ -881,7 +817,7 @@ namespace PonyEngine::Render::Direct3D12
 						.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 						.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 						.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-						.pResource = &mesh->FindBuffer(dataType, i)->Resource(),
+						.pResource = &mesh->FindBuffer(dataType, i)->Data(),
 						.Offset = 0UL,
 						.Size = UINT64_MAX
 					};

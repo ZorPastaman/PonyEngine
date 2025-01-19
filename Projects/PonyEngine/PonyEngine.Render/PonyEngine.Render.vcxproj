@@ -53,6 +53,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ObjectUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderViewParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Resource.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourcePlacement.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SrgbOutputQuad.cppm" />
