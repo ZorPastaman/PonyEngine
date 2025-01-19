@@ -22,14 +22,14 @@ import :Mesh;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 mesh manager.
-	class IMeshManagerPrivate
+	class IMeshManager
 	{
-		INTERFACE_BODY(IMeshManagerPrivate)
+		INTERFACE_BODY(IMeshManager)
 
 		/// @brief Creates a render mesh.
-		/// @param mesh Mesh.
+		/// @param mesh Source mesh.
 		/// @return Render mesh.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Mesh> CreateDirect3D12Mesh(const std::shared_ptr<const Render::Mesh>& mesh) = 0;
+		virtual std::shared_ptr<Mesh> CreateMesh(const std::shared_ptr<const Render::Mesh>& mesh) = 0;
 	};
 }

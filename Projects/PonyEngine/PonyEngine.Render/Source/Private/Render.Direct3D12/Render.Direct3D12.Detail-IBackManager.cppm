@@ -12,16 +12,16 @@ module;
 #include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IBackManagerPrivate;
+export module PonyEngine.Render.Direct3D12.Detail:IBackManager;
 
 import PonyMath.Utility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 back manager.
-	class IBackManagerPrivate
+	class IBackManager
 	{
-		INTERFACE_BODY(IBackManagerPrivate)
+		INTERFACE_BODY(IBackManager)
 
 		/// @brief Gets the back format.
 		/// @return Back format.
