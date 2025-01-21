@@ -36,12 +36,9 @@ import PonyMath.Core;
 import PonyMath.Utility;
 
 import :DescriptorHeap;
-import :DescriptorHeapManager;
-import :IDepthStencilPrivate;
 import :IDescriptorHeapManager;
+import :IFrameManager;
 import :IGraphicsPipeline;
-import :IRenderTargetPrivate;
-import :IRenderViewPrivate;
 import :ISubSystemContext;
 import :Material;
 import :Mesh;
@@ -76,17 +73,15 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
-		virtual void AddRenderTask(const std::shared_ptr<RenderObject>& renderObject) override;
+		void CreateFrame();
 
-		/// @brief Creates an srgb output quad.
-		/// @remark Must be called after other d3d12 system components are created but before a first render.
-		void CreateSrgbOutputQuad();
+		virtual void AddCamera(const std::shared_ptr<Camera>& camera) override;
+		virtual void AddRenderObject(const std::shared_ptr<RenderObject>& renderObject) override;
 
 		/// @brief Sets the name to the graphics pipeline components.
 		/// @param name Name.
 		void Name(std::string_view name);
 
-		/// @brief Prepares data before populating commands.
 		void Prepare();
 		/// @brief Populates commands. All the system components must be ready.
 		void PopulateCommands();
@@ -99,69 +94,67 @@ export namespace PonyEngine::Render::Direct3D12
 		GraphicsPipeline& operator =(GraphicsPipeline&&) = delete;
 
 	private:
-		/// @brief Updates transforms.
+		std::size_t TransformIndex(std::size_t cameraIndex, std::size_t renderObjectIndex);
+
+		void CreateTransforms();
 		void UpdateTransforms();
-		/// @brief Updates transforms.
-		void UpdateGpuTransforms();
 
 		/// @brief Resets command lists.
 		void ResetLists();
 		/// @brief Closes command lists.
 		void CloseLists();
 
-		/// @brief Updates render object meshes cache.
-		void UpdateMeshes();
+		void UpdateMeshSet();
 		/// @brief Populates begin to render barriers in an msaa context.
-		/// @param renderTargetBuffer Render target buffer.
-		/// @param depthStencilTexture Depth stencil buffer.
-		void PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer);
+		void PopulateBeginToRenderBarriers();
 		/// @brief Populates a render target.
 		/// @param resolution Render resolution.
 		/// @param clearColor Clear color.
 		/// @param rtvHandle Rtv handle.
 		/// @param dsvHandle Dsv handle.
-		void PopulateRenderTarget(const PonyMath::Utility::Resolution<UINT>& resolution, const PonyMath::Color::RGBA<FLOAT>& clearColor, D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle);
-		/// @brief Creates transform heaps.
-		void CreateTransformHeaps();
+		void PopulateRenderTarget();
+		void PopulateCamera(std::size_t cameraIndex);
 		/// @brief Merges heaps.
+		void UpdateTransformHeap();
 		void MergeHeaps();
-		/// @brief Prepares render object indirection indices.
-		void PrepareRenderObjectIndices();
+		void UpdateCameraIndices();
+		void UpdateRenderObjectIndices();
+		void SortCameras();
 		/// @brief Sorts render objects.
-		void SortRenderObjects();
+		void SortRenderObjects(std::size_t cameraIndex);
 		/// @brief Populates render objects.
-		void PopulateRenderObjects();
+		void PopulateRenderObjects(std::size_t cameraIndex);
 		/// @brief Populate output.
 		/// @param renderTargetHeap Render target heap.
 		/// @param renderTargetHandle Render target handle.
 		/// @param backViewHandle Back view handle.
-		void PopulateOutput(ID3D12DescriptorHeap& renderTargetHeap, D3D12_GPU_DESCRIPTOR_HANDLE renderTargetHandle, D3D12_CPU_DESCRIPTOR_HANDLE backViewHandle);
+		void PopulateOutput();
 		/// @brief Populates output to end barriers.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param backBuffer 
-		void PopulateOutputToEndBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer);
+		void PopulateOutputToEndBarriers();
 
 		/// @brief Populates render to output barriers.
 		/// @param renderTargetBuffer Render target buffer.
 		/// @param backBuffer Back buffer.
 		/// @param depthStencilTexture Depth stencil buffer.
-		void PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer);
+		void PopulateRenderToOutputBarriers();
 
 		/// @brief Populates render to resolve barriers.
 		/// @param resolveSourceBuffer Resolve source buffer.
 		/// @param resolveDestinationBuffer Resolve destination buffer.
 		/// @param depthStencilTexture Depth stencil buffer.
-		void PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer);
+		void PopulateRenderToResolveBarriers();
 		/// @brief Populates resolve.
 		/// @param resolveSourceBuffer Resolve source buffer.
 		/// @param resolveDestinationBuffer Resolve destination buffer.
 		/// @param format Resource format.
-		void PopulateResolve(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, DXGI_FORMAT format);
+		void PopulateResolve();
 		/// @brief Populates resolve to output barriers.
 		/// @param resolveSourceBuffer Resolve source buffer.
 		/// @param resolveDestinationBuffer Resolve destination buffer.
 		/// @param backBuffer Back buffer.
-		void PopulateResolveToOutputBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& backBuffer);
+		void PopulateResolveToOutputBarriers();
 
 		/// @brief Populates barrier groups.
 		void PopulateBarrierGroups();
@@ -174,20 +167,25 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Graphics command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Graphics command list.
 
-		std::vector<std::size_t> renderObjectIndices; ///< Render object indirection indices.
+		std::vector<std::size_t> cameraIndices;
+		std::vector<std::shared_ptr<Camera>> cameras;
+
+		std::vector<std::size_t> renderObjectIndices;
 		std::vector<std::shared_ptr<RenderObject>> renderObjects; ///< Render objects.
-		std::vector<Transform> renderObjectTransforms; ///< Render object transforms.
-		std::vector<std::shared_ptr<Buffer>> uploadTransformBuffers; ///< Upload transform buffers.
-		std::vector<std::shared_ptr<Buffer>> gpuTransformBuffers; ///< Gpu transform buffers.
-		std::shared_ptr<DescriptorHeap> transformHeap; ///< Transform heap.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
+
+		std::vector<Transform> transforms;
+		std::vector<std::shared_ptr<Buffer>> uploadTransforms;
+		std::vector<std::shared_ptr<Buffer>> gpuTransforms;
+		std::shared_ptr<DescriptorHeap> transformHeap;
 
 		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
 		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
 
-		std::shared_ptr<DescriptorHeap> renderObjectHeap; ///< Merged descriptor heap.
-		std::unordered_map<ID3D12DescriptorHeap*, UINT> originalHeapOffsets; ///< Original heap to merged heap offset map.
+		std::shared_ptr<DescriptorHeap> dataHeap; ///< Data descriptor heap.
+		std::unordered_map<const ID3D12DescriptorHeap*, UINT> originalHeapOffsets; ///< Original heap to merged heap offset map.
 
+		std::shared_ptr<Frame> frame;
 		std::unique_ptr<SrgbOutputQuad> outputQuad; ///< Srgb output quad.
 	};
 }
@@ -238,18 +236,6 @@ namespace PonyEngine::Render::Direct3D12
 		outputQuad.reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srgb output quad destroyed.");
 
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy transform descriptor heap.");
-		transformHeap.reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform descriptor heap destroyed.");
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release transform gpu buffers.");
-		gpuTransformBuffers.clear();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform gpu buffers released.");
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release transform upload buffers.");
-		uploadTransformBuffers.clear();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Transform upload buffers released.");
-
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release direct command list.");
 		commandList.Reset();
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Direct command list released.");
@@ -273,15 +259,22 @@ namespace PonyEngine::Render::Direct3D12
 		return *commandQueue.Get();
 	}
 
-	void GraphicsPipeline::AddRenderTask(const std::shared_ptr<RenderObject>& renderObject)
+	void GraphicsPipeline::CreateFrame()
 	{
-		renderObjects.push_back(renderObject);
+		frame = this->d3d12System->FrameManager().CreateFrame();
+
+		outputQuad = std::make_unique<SrgbOutputQuad>(*this->d3d12System);
+		outputQuad->Name("OutputQuad");
 	}
 
-	void GraphicsPipeline::CreateSrgbOutputQuad()
+	void GraphicsPipeline::AddCamera(const std::shared_ptr<Camera>& camera)
 	{
-		outputQuad = std::make_unique<SrgbOutputQuad>(*d3d12System);
-		outputQuad->Name("OutputQuad");
+		cameras.push_back(camera);
+	}
+
+	void GraphicsPipeline::AddRenderObject(const std::shared_ptr<RenderObject>& renderObject)
+	{
+		renderObjects.push_back(renderObject);
 	}
 
 	void GraphicsPipeline::Name(const std::string_view name)
@@ -307,45 +300,40 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::Prepare()
 	{
+		CreateTransforms();
 		UpdateTransforms();
-		UpdateGpuTransforms();
 	}
 
 	void GraphicsPipeline::PopulateCommands()
 	{
-		IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
-		IDepthStencilPrivate& depthStencil = d3d12System->DepthStencilPrivate();
-		IBackManager& back = d3d12System->BackManager();
-
-		ID3D12Resource2& renderTargetBuffer = renderTarget.RenderTargetBuffer();
-		ID3D12Resource2* const msaaRenderTargetBuffer = renderTarget.RenderTargetBufferMsaa();
-		ID3D12Resource2& depthStencilBuffer = depthStencil.DepthStencilTexture();
-		ID3D12Resource2& backBuffer = back.CurrentBackBuffer();
-
-		ID3D12Resource2& mainRenderTargetBuffer = msaaRenderTargetBuffer ? *msaaRenderTargetBuffer : renderTargetBuffer;
-		const D3D12_CPU_DESCRIPTOR_HANDLE mainRenderTargetHandle = msaaRenderTargetBuffer ? renderTarget.RtvHandleMsaa() : renderTarget.RtvHandle();
+		UpdateMeshSet();
+		UpdateTransformHeap();
+		MergeHeaps();
+		UpdateCameraIndices();
+		UpdateRenderObjectIndices();
 
 		ResetLists();
-		UpdateMeshes();
-		PopulateBeginToRenderBarriers(mainRenderTargetBuffer, depthStencilBuffer);
-		PopulateRenderTarget(renderTarget.ResolutionD3D12(), renderTarget.ClearColorD3D12(), mainRenderTargetHandle, depthStencil.DsvHandle());
-		CreateTransformHeaps();
-		MergeHeaps();
-		PrepareRenderObjectIndices();
-		SortRenderObjects();
-		PopulateRenderObjects();
-		if (msaaRenderTargetBuffer)
+		PopulateBeginToRenderBarriers();
+		PopulateRenderTarget();
+		SortCameras();
+		for (const std::size_t cameraIndex : cameraIndices)
 		{
-			PopulateRenderToResolveBarriers(mainRenderTargetBuffer, renderTargetBuffer, depthStencilBuffer);
-			PopulateResolve(mainRenderTargetBuffer, renderTargetBuffer, renderTarget.Format());
-			PopulateResolveToOutputBarriers(mainRenderTargetBuffer, renderTargetBuffer, backBuffer);
+			PopulateCamera(cameraIndex);
+			SortRenderObjects(cameraIndex);
+			PopulateRenderObjects(cameraIndex);
+		}
+		if (frame->ResolveTarget())
+		{
+			PopulateRenderToResolveBarriers();
+			PopulateResolve();
+			PopulateResolveToOutputBarriers();
 		}
 		else
 		{
-			PopulateRenderToOutputBarriers(mainRenderTargetBuffer, backBuffer, depthStencilBuffer);
+			PopulateRenderToOutputBarriers();
 		}
-		PopulateOutput(renderTarget.SrvHeap(), renderTarget.SrvHandle(), back.CurrentBackHandle());
-		PopulateOutputToEndBarriers(renderTargetBuffer, backBuffer);
+		PopulateOutput();
+		PopulateOutputToEndBarriers();
 		CloseLists();
 	}
 
@@ -357,46 +345,55 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::Clear() noexcept
 	{
+		cameras.clear();
 		renderObjects.clear();
+	}
+
+	std::size_t GraphicsPipeline::TransformIndex(const std::size_t cameraIndex, const std::size_t renderObjectIndex)
+	{
+		return cameraIndex * renderObjects.size() + renderObjectIndex;
+	}
+
+	void GraphicsPipeline::CreateTransforms()
+	{
+		const std::size_t transformCount = cameras.size() * renderObjects.size();
+		transforms.resize(transformCount);
+
+		if (uploadTransforms.size() > transformCount)
+		{
+			uploadTransforms.erase(uploadTransforms.cbegin() + transformCount, uploadTransforms.cend());
+			gpuTransforms.erase(gpuTransforms.cbegin() + transformCount, gpuTransforms.cend());
+		}
+
+		for (std::size_t i = uploadTransforms.size(); i < transformCount; ++i)
+		{
+			uploadTransforms.push_back(d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), HeapType::Upload));
+			gpuTransforms.push_back(d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), HeapType::Default));
+		}
 	}
 
 	void GraphicsPipeline::UpdateTransforms()
 	{
-		renderObjectTransforms.clear();
-
-		const IRenderViewPrivate& renderView = d3d12System->RenderViewPrivate();
-		const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix = renderView.ViewMatrixD3D12();
-		const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix = renderView.ProjectionMatrixD3D12();
-
-		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
+		for (std::size_t cameraIndex = 0; cameraIndex < cameras.size(); ++cameraIndex)
 		{
-			renderObjectTransforms.push_back(Transform(renderObject->ModelMatrixD3D12(), viewMatrix, projectionMatrix));
-		}
-	}
+			for (std::size_t renderObjectIndex = 0; renderObjectIndex < renderObjects.size(); ++renderObjectIndex)
+			{
+				const Camera& camera = *cameras[cameraIndex];
+				const RenderObject& renderObject = *renderObjects[renderObjectIndex];
+				const std::size_t transformIndex = TransformIndex(cameraIndex, renderObjectIndex);
 
-	void GraphicsPipeline::UpdateGpuTransforms()
-	{
-		for (std::size_t i = uploadTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
-		{
-			const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), ResourcePlacement::CPU);
-			uploadTransformBuffers.push_back(uploadBuffer);
+				transforms[transformIndex] = Transform(renderObject.ModelMatrixD3D12(), camera.ViewMatrixD3D12(), camera.ProjectionMatrixD3D12());
+			}
 		}
 
-		for (std::size_t i = gpuTransformBuffers.size(); i < renderObjectTransforms.size(); ++i)
+		for (std::size_t i = 0; i < transforms.size(); ++i)
 		{
-			const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), ResourcePlacement::GPU);
-			gpuTransformBuffers.push_back(gpuBuffer);
+			uploadTransforms[i]->SetData(transforms[i].Data(), sizeof(Transform));
 		}
 
-		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
+		for (std::size_t i = 0; i < uploadTransforms.size(); ++i)
 		{
-			uploadTransformBuffers[i]->SetData(renderObjectTransforms[i].Data(), sizeof(Transform));
-		}
-
-		ICopyPipeline& copyPipeline = d3d12System->CopyPipeline();
-		for (std::size_t i = 0; i < renderObjectTransforms.size(); ++i)
-		{
-			copyPipeline.AddCopyTask(uploadTransformBuffers[i], gpuTransformBuffers[i]);
+			d3d12System->CopyPipeline().AddCopyTask(uploadTransforms[i], gpuTransforms[i]);
 		}
 	}
 
@@ -420,7 +417,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void GraphicsPipeline::UpdateMeshes()
+	void GraphicsPipeline::UpdateMeshSet()
 	{
 		meshes.clear();
 		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
@@ -429,12 +426,12 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void GraphicsPipeline::PopulateBeginToRenderBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& depthStencilBuffer)
+	void GraphicsPipeline::PopulateBeginToRenderBarriers()
 	{
 		bufferBarriers.clear();
-		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransforms)
 		{
-			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			const auto transformBarrier = D3D12_BUFFER_BARRIER
 			{
 				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
 				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
@@ -444,7 +441,7 @@ namespace PonyEngine::Render::Direct3D12
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
-			bufferBarriers.push_back(bufferBarrier);
+			bufferBarriers.push_back(transformBarrier);
 		}
 		for (Mesh* const mesh : meshes)
 		{
@@ -469,7 +466,6 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		textureBarriers.clear();
-		textureBarriers.reserve(2);
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
@@ -478,7 +474,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = &renderTargetBuffer,
+			.pResource = &frame->RenderTarget().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -491,7 +487,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
-			.pResource = &depthStencilBuffer,
+			.pResource = &frame->DepthStencil().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -500,79 +496,127 @@ namespace PonyEngine::Render::Direct3D12
 		PopulateBarrierGroups();
 	}
 
-	void GraphicsPipeline::PopulateRenderTarget(const PonyMath::Utility::Resolution<UINT>& resolution, const PonyMath::Color::RGBA<FLOAT>& clearColor, const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle, const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle)
+	void GraphicsPipeline::PopulateRenderTarget()
 	{
-		const auto viewport = D3D12_VIEWPORT{.TopLeftX = 0.f, .TopLeftY = 0.f, .Width = static_cast<FLOAT>(resolution.Width()), .Height = static_cast<FLOAT>(resolution.Height()), .MinDepth = D3D12_MIN_DEPTH, .MaxDepth = D3D12_MAX_DEPTH};
-		commandList->RSSetViewports(1u, &viewport);
-		const auto rect = D3D12_RECT{.left = 0L, .top = 0L, .right = static_cast<LONG>(resolution.Width()), .bottom = static_cast<LONG>(resolution.Height())};
-		commandList->RSSetScissorRects(1u, &rect);
-
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frame->RenderTargetHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = frame->DepthStencilHandle();
 		commandList->OMSetRenderTargets(1u, &rtvHandle, false, &dsvHandle);
-		commandList->ClearRenderTargetView(rtvHandle, clearColor.Span().data(), 0u, nullptr);
-		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 0u, nullptr);
 	}
 
-	void GraphicsPipeline::CreateTransformHeaps()
+	void GraphicsPipeline::PopulateCamera(const std::size_t cameraIndex)
 	{
-		if (!transformHeap || transformHeap->Heap().GetDesc().NumDescriptors < gpuTransformBuffers.size())
+		const Camera& camera = *cameras[cameraIndex];
+		const PonyMath::Shape::Rect<FLOAT> viewportRect = camera.ViewportRectD3D12();
+		const PonyMath::Utility::Resolution<UINT>& resolution = d3d12System->FrameManager().Resolution();
+
+		const auto viewport = D3D12_VIEWPORT
 		{
-			transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, gpuTransformBuffers.size(), false);
+			.TopLeftX = viewportRect.MinX() * resolution.Width(),
+			.TopLeftY = viewportRect.MinY() * resolution.Height(),
+			.Width = viewportRect.Width() * resolution.Width(),
+			.Height = viewportRect.Height() * resolution.Height(),
+			.MinDepth = D3D12_MIN_DEPTH,
+			.MaxDepth = D3D12_MAX_DEPTH
+		};
+		commandList->RSSetViewports(1u, &viewport);
+
+		const auto rect = D3D12_RECT
+		{
+			.left = static_cast<LONG>(viewport.TopLeftX),
+			.top = static_cast<LONG>(viewport.TopLeftY),
+			.right = static_cast<LONG>(viewport.TopLeftX + viewport.Width),
+			.bottom = static_cast<LONG>(viewport.TopLeftY + viewport.Height)
+		};
+		commandList->RSSetScissorRects(1u, &rect);
+
+		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frame->RenderTargetHandle();
+		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = frame->DepthStencilHandle();
+		commandList->ClearRenderTargetView(rtvHandle, camera.ClearColorD3D12().Span().data(), 1u, &rect);
+		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 1u, &rect);
+	}
+
+	void GraphicsPipeline::UpdateTransformHeap()
+	{
+		if (transformHeap && transformHeap->Heap().GetDesc().NumDescriptors == gpuTransforms.size())
+		{
+			return;
 		}
 
-		ID3D12Device10& device = d3d12System->Device();
-		for (std::size_t i = 0; i < gpuTransformBuffers.size(); ++i)
+		transformHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<UINT>(gpuTransforms.size()), false);
+
+		for (std::size_t i = 0; i < gpuTransforms.size(); ++i)
 		{
 			const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 			{
-				.BufferLocation = gpuTransformBuffers[i]->Data().GetGPUVirtualAddress(),
+				.BufferLocation = gpuTransforms[i]->Data().GetGPUVirtualAddress(),
 				.SizeInBytes = sizeof(Transform)
 			};
-			device.CreateConstantBufferView(&cbvDesc, transformHeap->CpuHandle(i));
+			d3d12System->Device().CreateConstantBufferView(&cbvDesc, transformHeap->CpuHandle(static_cast<UINT>(i)));
 		}
 	}
 
 	void GraphicsPipeline::MergeHeaps()
 	{
-		UINT descriptorCount = transformHeap->HandleCount();
+		UINT descriptorCount = transformHeap->Heap().GetDesc().NumDescriptors;
 		for (Mesh* const mesh : meshes)
 		{
 			descriptorCount += mesh->Heap().Heap().GetDesc().NumDescriptors;
 		}
-		if (!renderObjectHeap || renderObjectHeap->HandleCount() < descriptorCount)
+		if (!dataHeap || dataHeap->HandleCount() != descriptorCount)
 		{
-			renderObjectHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
+			dataHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
 		}
 
 		originalHeapOffsets.clear();
 		descriptorCount = 0u;
 		originalHeapOffsets[&transformHeap->Heap()] = descriptorCount;
-		descriptorCount = transformHeap->HandleCount();
-		d3d12System->Device().CopyDescriptorsSimple(descriptorCount, renderObjectHeap->CpuHandle(0u), transformHeap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		d3d12System->Device().CopyDescriptorsSimple(transformHeap->Heap().GetDesc().NumDescriptors, dataHeap->CpuHandle(descriptorCount), transformHeap->Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		descriptorCount += transformHeap->Heap().GetDesc().NumDescriptors;
+
 		for (Mesh* const mesh : meshes)
 		{
 			originalHeapOffsets[&mesh->Heap().Heap()] = descriptorCount;
-			d3d12System->Device().CopyDescriptorsSimple(mesh->Heap().Heap().GetDesc().NumDescriptors, renderObjectHeap->CpuHandle(descriptorCount), mesh->Heap().Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			d3d12System->Device().CopyDescriptorsSimple(mesh->Heap().Heap().GetDesc().NumDescriptors, dataHeap->CpuHandle(descriptorCount), mesh->Heap().Heap().GetCPUDescriptorHandleForHeapStart(), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			descriptorCount += mesh->Heap().Heap().GetDesc().NumDescriptors;
 		}
 	}
 
-	void GraphicsPipeline::PrepareRenderObjectIndices()
+	void GraphicsPipeline::UpdateCameraIndices()
 	{
-		renderObjectIndices.clear();
-		for (std::size_t i = 0; i < renderObjects.size(); ++i)
+		cameraIndices.resize(cameras.size());
+
+		for (std::size_t i = 0; i < cameraIndices.size(); ++i)
 		{
-			renderObjectIndices.push_back(i);
+			cameraIndices[i] = i;
 		}
 	}
 
-	void GraphicsPipeline::SortRenderObjects()
+	void GraphicsPipeline::UpdateRenderObjectIndices()
+	{
+		renderObjectIndices.resize(renderObjects.size());
+
+		for (std::size_t i = 0; i < renderObjectIndices.size(); ++i)
+		{
+			renderObjectIndices[i] = i;
+		}
+	}
+
+	void GraphicsPipeline::SortCameras()
+	{
+		std::ranges::sort(cameraIndices, [&](const std::size_t& leftIndex, const std::size_t& rightIndex)
+		{
+			return cameras[leftIndex]->SortingOrder() < cameras[rightIndex]->SortingOrder();
+		});
+	}
+
+	void GraphicsPipeline::SortRenderObjects(const std::size_t cameraIndex)
 	{
 		std::ranges::sort(renderObjectIndices, [&](const std::size_t& leftIndex, const std::size_t& rightIndex)
 		{
-			const RenderObject* const leftRenderObject = renderObjects[leftIndex].get();
-			const RenderObject* const rightRenderObject = renderObjects[rightIndex].get();
-			const Material* const leftMaterial = &leftRenderObject->Material();
-			const Material* const rightMaterial = &rightRenderObject->Material();
+			const RenderObject* const left = renderObjects[leftIndex].get();
+			const RenderObject* const right = renderObjects[rightIndex].get();
+			const Material* const leftMaterial = &left->Material();
+			const Material* const rightMaterial = &right->Material();
 			const bool isLeftTransparent = leftMaterial->IsTransparent();
 			const bool isRightTransparent = rightMaterial->IsTransparent();
 
@@ -581,9 +625,12 @@ namespace PonyEngine::Render::Direct3D12
 				return isLeftTransparent < isRightTransparent;
 			}
 
+			const Transform& leftTransform = transforms[TransformIndex(cameraIndex, leftIndex)];
+			const Transform& rightTransform = transforms[TransformIndex(cameraIndex, rightIndex)];
+
 			if (isLeftTransparent)
 			{
-				return PonyMath::Core::ExtractTranslation(renderObjectTransforms[leftIndex].MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(renderObjectTransforms[rightIndex].MvpMatrix()).Z();
+				return PonyMath::Core::ExtractTranslation(leftTransform.MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(rightTransform.MvpMatrix()).Z();
 			}
 
 			if (const RootSignature* const leftRootSignature = &leftMaterial->RootSignature(), * const rightRootSignature = &rightMaterial->RootSignature(); leftRootSignature != rightRootSignature)
@@ -595,26 +642,26 @@ namespace PonyEngine::Render::Direct3D12
 				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
 			}
 
-			if (const Mesh* const leftMesh = &leftRenderObject->Mesh(), * const rightMesh = &rightRenderObject->Mesh(); leftMesh != rightMesh)
+			if (const Mesh* const leftMesh = &left->Mesh(), * const rightMesh = &right->Mesh(); leftMesh != rightMesh)
 			{
 				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(renderObjectTransforms[leftIndex].MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(renderObjectTransforms[rightIndex].MvpMatrix()).Z();
+			return PonyMath::Core::ExtractTranslation(leftTransform.MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(rightTransform.MvpMatrix()).Z();
 		});
 	}
 
-	void GraphicsPipeline::PopulateRenderObjects()
+	void GraphicsPipeline::PopulateRenderObjects(const std::size_t cameraIndex)
 	{
-		ID3D12DescriptorHeap* const heap = &renderObjectHeap->Heap();
+		ID3D12DescriptorHeap* const heap = &dataHeap->Heap();
 		commandList->SetDescriptorHeaps(1u, &heap);
 
 		const RootSignature* prevRootSignature = nullptr;
 		const Material* prevMaterial = nullptr;
 		const Mesh* prevMesh = nullptr;
-		for (const std::size_t index : renderObjectIndices)
+		for (const std::size_t renderObjectIndex : renderObjectIndices)
 		{
-			RenderObject* const renderObject = renderObjects[index].get();
+			RenderObject* const renderObject = renderObjects[renderObjectIndex].get();
 
 			Material* const material = &renderObject->Material();
 			RootSignature* const rootSignature = &material->RootSignature();
@@ -634,14 +681,14 @@ namespace PonyEngine::Render::Direct3D12
 				{
 					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType))
 					{
-						commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->FindHandleIndex(dataType).value()));
+						commandList->SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->FindHandleIndex(dataType).value()));
 					}
 				}
 			}
 
-			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(PonyTransform))
+			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(PonyTransformDataType))
 			{
-				commandList->SetGraphicsRootDescriptorTable(slot.value(), renderObjectHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + static_cast<UINT>(index)));
+				commandList->SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + TransformIndex(cameraIndex, renderObjectIndex)));
 			}
 
 			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
@@ -653,26 +700,26 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void GraphicsPipeline::PopulateOutput(ID3D12DescriptorHeap& renderTargetHeap, const D3D12_GPU_DESCRIPTOR_HANDLE renderTargetHandle, const D3D12_CPU_DESCRIPTOR_HANDLE backViewHandle)
+	void GraphicsPipeline::PopulateOutput()
 	{
+		const D3D12_CPU_DESCRIPTOR_HANDLE backViewHandle = d3d12System->BackManager().CurrentBackHandle();
 		commandList->OMSetRenderTargets(1u, &backViewHandle, false, nullptr);
 
 		commandList->SetGraphicsRootSignature(&outputQuad->RootSignature());
 		commandList->SetPipelineState(&outputQuad->PipelineState());
 
-		ID3D12DescriptorHeap* const heap = &renderTargetHeap;
+		ID3D12DescriptorHeap* const heap = &frame->RenderTargetShaderHeap().Heap();
 		commandList->SetDescriptorHeaps(1u, &heap);
-		commandList->SetGraphicsRootDescriptorTable(outputQuad->RenderTargetSlot, renderTargetHandle);
+		commandList->SetGraphicsRootDescriptorTable(outputQuad->RenderTargetSlot, frame->RenderTargetShaderHandle());
 
 		commandList->DispatchMesh(outputQuad->ThreadGroupXCount, outputQuad->ThreadGroupYCount, outputQuad->ThreadGroupZCount);
 	}
 
-	void GraphicsPipeline::PopulateOutputToEndBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer)
+	void GraphicsPipeline::PopulateOutputToEndBarriers()
 	{
 		bufferBarriers.clear();
 
 		textureBarriers.clear();
-		textureBarriers.reserve(2);
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
@@ -681,7 +728,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
-			.pResource = &renderTargetBuffer,
+			.pResource = frame->ResolveTarget() ? &frame->ResolveTarget()->Data() : &frame->RenderTarget().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -694,7 +741,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
-			.pResource = &backBuffer,
+			.pResource = &d3d12System->BackManager().CurrentBackBuffer(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -703,12 +750,12 @@ namespace PonyEngine::Render::Direct3D12
 		PopulateBarrierGroups();
 	}
 
-	void GraphicsPipeline::PopulateRenderToOutputBarriers(ID3D12Resource2& renderTargetBuffer, ID3D12Resource2& backBuffer, ID3D12Resource2& depthStencilBuffer)
+	void GraphicsPipeline::PopulateRenderToOutputBarriers()
 	{
 		bufferBarriers.clear();
-		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransforms)
 		{
-			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			const auto transformBarrier = D3D12_BUFFER_BARRIER
 			{
 				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
 				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
@@ -718,7 +765,7 @@ namespace PonyEngine::Render::Direct3D12
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
-			bufferBarriers.push_back(bufferBarrier);
+			bufferBarriers.push_back(transformBarrier);
 		}
 		for (Mesh* const mesh : meshes)
 		{
@@ -743,7 +790,6 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		textureBarriers.clear();
-		textureBarriers.reserve(3);
 		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
@@ -752,7 +798,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
-			.pResource = &renderTargetBuffer,
+			.pResource = &frame->RenderTarget().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -765,7 +811,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = &backBuffer,
+			.pResource = &d3d12System->BackManager().CurrentBackBuffer(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -778,7 +824,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
-			.pResource = &depthStencilBuffer,
+			.pResource = &frame->DepthStencil().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -787,12 +833,12 @@ namespace PonyEngine::Render::Direct3D12
 		PopulateBarrierGroups();
 	}
 
-	void GraphicsPipeline::PopulateRenderToResolveBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& depthStencilBuffer)
+	void GraphicsPipeline::PopulateRenderToResolveBarriers()
 	{
 		bufferBarriers.clear();
-		for (const std::shared_ptr<Buffer>& transform : gpuTransformBuffers)
+		for (const std::shared_ptr<Buffer>& transform : gpuTransforms)
 		{
-			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			const auto transformBarrier = D3D12_BUFFER_BARRIER
 			{
 				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
 				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
@@ -802,7 +848,7 @@ namespace PonyEngine::Render::Direct3D12
 				.Offset = 0UL,
 				.Size = UINT64_MAX
 			};
-			bufferBarriers.push_back(bufferBarrier);
+			bufferBarriers.push_back(transformBarrier);
 		}
 		for (Mesh* const mesh : meshes)
 		{
@@ -827,7 +873,6 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		textureBarriers.clear();
-		textureBarriers.reserve(3);
 		const auto resolveSourceBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
@@ -836,7 +881,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_RESOLVE_SOURCE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE,
-			.pResource = &resolveSourceBuffer,
+			.pResource = &frame->RenderTarget().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -849,7 +894,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_RESOLVE_DEST,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RESOLVE_DEST,
-			.pResource = &resolveDestinationBuffer,
+			.pResource = &frame->ResolveTarget()->Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -862,7 +907,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
-			.pResource = &depthStencilBuffer,
+			.pResource = &frame->DepthStencil().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -871,17 +916,16 @@ namespace PonyEngine::Render::Direct3D12
 		PopulateBarrierGroups();
 	}
 
-	void GraphicsPipeline::PopulateResolve(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, const DXGI_FORMAT format)
+	void GraphicsPipeline::PopulateResolve()
 	{
-		commandList->ResolveSubresource(&resolveDestinationBuffer, 0u, &resolveSourceBuffer, 0u, format);
+		commandList->ResolveSubresource(&frame->ResolveTarget()->Data(), 0u, &frame->RenderTarget().Data(), 0u, frame->ResolveTarget()->Data().GetDesc1().Format);
 	}
 
-	void GraphicsPipeline::PopulateResolveToOutputBarriers(ID3D12Resource2& resolveSourceBuffer, ID3D12Resource2& resolveDestinationBuffer, ID3D12Resource2& backBuffer)
+	void GraphicsPipeline::PopulateResolveToOutputBarriers()
 	{
 		bufferBarriers.clear();
 
 		textureBarriers.clear();
-		textureBarriers.reserve(3);
 		const auto resolveSourceBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RESOLVE,
@@ -890,7 +934,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RESOLVE_SOURCE,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
-			.pResource = &resolveSourceBuffer,
+			.pResource = &frame->RenderTarget().Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -903,7 +947,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_RESOLVE_DEST,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
-			.pResource = &resolveDestinationBuffer,
+			.pResource = &frame->ResolveTarget()->Data(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
@@ -916,7 +960,7 @@ namespace PonyEngine::Render::Direct3D12
 			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
 			.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
 			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = &backBuffer,
+			.pResource = &d3d12System->BackManager().CurrentBackBuffer(),
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};

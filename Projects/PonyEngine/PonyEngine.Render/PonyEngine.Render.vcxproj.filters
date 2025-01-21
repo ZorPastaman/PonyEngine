@@ -64,9 +64,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Material.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderTarget.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -74,9 +71,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MeshManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderView.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm">
@@ -88,9 +82,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MaterialManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DepthStencil.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RootSignature.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -98,12 +89,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IDepthStencilPrivate.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderTargetPrivate.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm">
@@ -142,12 +127,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SubSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderViewPrivate.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderViewParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CopyPipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -184,9 +163,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeap.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -205,13 +181,31 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IResourceManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourcePlacement.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-HeapType.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Resource.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Camera.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CameraManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Frame.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IFrameManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FrameManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

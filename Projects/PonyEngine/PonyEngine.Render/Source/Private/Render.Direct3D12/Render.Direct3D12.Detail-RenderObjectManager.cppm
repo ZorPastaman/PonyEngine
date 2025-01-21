@@ -51,8 +51,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IRenderObject> CreateObject(const RenderObjectParams& params) override;
 
-		/// @brief Adds render tasks to a graphics pipeline.
-		void AddRenderTasks();
+		void Tick();
 
 		/// @brief Cleans out of dead render objects.
 		void Clean() noexcept;
@@ -81,7 +80,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const std::unordered_map<std::string, UINT> dataSlots =
 		{
-			{ std::string(PonyTransform), 0u },
+			{ std::string(PonyTransformDataType), 0u },
 			{ "Meshlets", 1u },
 			{ "Positions", 2u },
 			{ "Colors", 3u }
@@ -109,6 +108,7 @@ namespace PonyEngine::Render::Direct3D12
 		renderMesh->Name("Mesh");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
+
 		const auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
 		renderObjects.push_back(renderObject);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
@@ -116,11 +116,11 @@ namespace PonyEngine::Render::Direct3D12
 		return renderObject;
 	}
 
-	void RenderObjectManager::AddRenderTasks()
+	void RenderObjectManager::Tick()
 	{
 		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
 		{
-			d3d12System->GraphicsPipeline().AddRenderTask(renderObject);
+			d3d12System->GraphicsPipeline().AddRenderObject(renderObject);
 		}
 	}
 

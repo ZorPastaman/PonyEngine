@@ -11,15 +11,14 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12:IRenderView;
+export module PonyEngine.Render.Direct3D12:ICameraManager;
 
 import PonyEngine.Render;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 render view.
-	class IRenderView : public Render::IRenderView
+	class ICameraManager : public Render::ICameraManager
 	{
-		INTERFACE_BODY(IRenderView)
+		INTERFACE_BODY(ICameraManager)
 	};
 }

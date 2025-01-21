@@ -35,7 +35,7 @@ struct Vertex
 	float4 color : COLOR;
 };
 
-ConstantBuffer<PonyTransform> Transform: register(b0);
+PonyTransform Transform : register(b0);
 
 StructuredBuffer<Meshlet> Meshlets : register(t0);
 StructuredBuffer<uint> VertexIndices : register(t1);

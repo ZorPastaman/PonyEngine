@@ -61,12 +61,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-IRenderTarget.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-IRenderView.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-IRenderObject.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -80,18 +74,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderTarget.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderView.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-RenderViewParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-RenderTargetParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-SwapChainParams.cppm">
@@ -116,6 +98,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ICamera.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-ICameraManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

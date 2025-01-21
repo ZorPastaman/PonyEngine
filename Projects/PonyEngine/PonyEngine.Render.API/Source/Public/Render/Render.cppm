@@ -9,12 +9,13 @@
 
 export module PonyEngine.Render;
 
+export import :CameraParams;
 export import :EngineDataTypes;
+export import :ICamera;
+export import :ICameraManager;
 export import :IRenderObject;
 export import :IRenderObjectManager;
 export import :IRenderSystem;
-export import :IRenderTarget;
-export import :IRenderView;
 export import :Mesh;
 export import :Meshlet;
 export import :MeshParams;
@@ -24,5 +25,3 @@ export import :RenderObjectParams;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
-export import :RenderTargetParams;
-export import :RenderViewParams;

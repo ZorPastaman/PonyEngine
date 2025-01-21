@@ -11,28 +11,32 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12:IRenderSystem;
+export module PonyEngine.Render.Direct3D12.Detail:IFrameManager;
 
-import PonyEngine.Render;
+import <memory>;
 
-import :ICameraManager;
-import :IRenderObjectManager;
+import PonyMath.Utility;
+
+import :Frame;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 render system.
-	class IRenderSystem : public Render::IRenderSystem
+	class IFrameManager
 	{
-		INTERFACE_BODY(IRenderSystem)
+		INTERFACE_BODY(IFrameManager)
 
 		[[nodiscard("Pure function")]]
-		virtual ICameraManager& CameraManager() noexcept override = 0;
+		virtual DXGI_FORMAT RtvFormat() const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const ICameraManager& CameraManager() const noexcept override = 0;
+		virtual DXGI_FORMAT DsvFormat() const noexcept = 0;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() noexcept override = 0;
+		virtual const PonyMath::Utility::Resolution<UINT>& Resolution() const noexcept = 0;
+
 		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManager& RenderObjectManager() const noexcept override = 0;
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
+
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<class Frame> CreateFrame() = 0;
 	};
 }

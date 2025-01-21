@@ -247,6 +247,7 @@ export namespace PonyMath::Shape
 		NON_CONSTRUCTIBLE_BODY(Predefined)
 
 		static constexpr auto Zero = Rect(T{0}, T{0}, T{0}, T{0}); ///< Rect(0, 0, 0, 0).
+		static constexpr auto NormalizedFull = Rect(T{0}, T{0}, T{1}, T{1}); ///< Rect(0, 0, 1, 1).
 	};
 }
 

@@ -7,20 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Render.Direct3D12.Detail:HeapType;
 
-#include "PonyBase/Core/Direct3D12/Framework.h"
-
-export module PonyEngine.Render.Direct3D12.Detail:RenderViewParams;
-
-import PonyMath.Core;
+import <cstdint>;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 render view parameters.
-	struct RenderViewParams final
+	enum class HeapType : std::uint8_t
 	{
-		PonyMath::Core::Matrix4x4<FLOAT> viewMatrix; ///< View matrix.
-		PonyMath::Core::Matrix4x4<FLOAT> projectionMatrix; ///< Projection matrix.
+		Default,
+		Upload,
+		Readback
 	};
 }

@@ -26,6 +26,8 @@ import <vector>;
 
 import PonyBase.Utility;
 
+import PonyMath.Utility;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
@@ -57,13 +59,10 @@ export namespace PonyEngine::Render::Direct3D12::Windows
 		virtual void Tick() override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderTarget& RenderTarget() noexcept override;
+		virtual ICameraManager& CameraManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderTarget& RenderTarget() const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual IRenderView& RenderView() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IRenderView& RenderView() const noexcept override;
+		virtual const ICameraManager& CameraManager() const noexcept override;
+
 		[[nodiscard("Pure function")]]
 		virtual IRenderObjectManager& RenderObjectManager() noexcept override;
 		[[nodiscard("Pure function")]]
@@ -103,9 +102,9 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		{
 			windowHandle = windowSystem->WindowHandle();
 
-			if (renderParams.renderTargetParams.resolution.has_value())
+			if (renderParams.resolution.has_value())
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.renderTargetParams.resolution.value());
+				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.resolution.value());
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
@@ -122,7 +121,6 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D12 sub-system.");
 		const auto direct3D12SystemParams = Direct3D12::SubSystemParams
 		{
-			.featureLevel = D3D_FEATURE_LEVEL_12_2,
 			.commandQueuePriority = renderParams.commandQueuePriority,
 			.renderTimeout = renderParams.renderTimeout,
 		};
@@ -155,18 +153,12 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
-		const auto renderTargetParams = Direct3D12::RenderTargetParams
+		const auto frameParams = Direct3D12::FrameParams
 		{
 			.resolution = renderResolution,
-			.clearColor = renderParams.renderTargetParams.clearColor,
-			.msaaParams = renderParams.renderTargetParams.msaaParams
+			.msaaParams = renderParams.msaaParams
 		};
-		const auto renderViewParams = Direct3D12::RenderViewParams
-		{
-			.viewMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.viewMatrix),
-			.projectionMatrix = static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(renderParams.renderViewParams.projectionMatrix)
-		};
-		direct3D12SubSystem->CreateRenderSystem(backParams, renderTargetParams, renderViewParams);
+		direct3D12SubSystem->CreateRenderSystem(backParams, frameParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
 	}
 
@@ -201,34 +193,24 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		direct3D12SubSystem->EndFrame();
 	}
 
-	IRenderTarget& RenderSystem::RenderTarget() noexcept
+	ICameraManager& RenderSystem::CameraManager() noexcept
 	{
-		return *direct3D12SubSystem->RenderTarget();
+		return *direct3D12SubSystem->CameraManager();
 	}
 
-	const IRenderTarget& RenderSystem::RenderTarget() const noexcept
+	const ICameraManager& RenderSystem::CameraManager() const noexcept
 	{
-		return *direct3D12SubSystem->RenderTarget();
-	}
-
-	IRenderView& RenderSystem::RenderView() noexcept
-	{
-		return *direct3D12SubSystem->RenderView();
-	}
-
-	const IRenderView& RenderSystem::RenderView() const noexcept
-	{
-		return *direct3D12SubSystem->RenderView();
+		return *direct3D12SubSystem->CameraManager();
 	}
 
 	IRenderObjectManager& RenderSystem::RenderObjectManager() noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManagerD3D12();
+		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
 	const IRenderObjectManager& RenderSystem::RenderObjectManager() const noexcept
 	{
-		return *direct3D12SubSystem->RenderObjectManagerD3D12();
+		return *direct3D12SubSystem->RenderObjectManager();
 	}
 
 	PonyDebug::Log::ILogger& RenderSystem::Logger() noexcept

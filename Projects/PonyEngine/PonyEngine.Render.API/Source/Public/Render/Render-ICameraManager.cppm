@@ -11,15 +11,20 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12:IRenderTarget;
+export module PonyEngine.Render:ICameraManager;
 
-import PonyEngine.Render;
+import <memory>;
 
-export namespace PonyEngine::Render::Direct3D12
+import :CameraParams;
+import :ICamera;
+
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render target.
-	class IRenderTarget : public Render::IRenderTarget
+	class ICameraManager
 	{
-		INTERFACE_BODY(IRenderTarget)
+		INTERFACE_BODY(ICameraManager)
+
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<ICamera> CreateCamera(const CameraParams& cameraParams) = 0;
 	};
 }
