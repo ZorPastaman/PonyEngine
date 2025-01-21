@@ -9,15 +9,18 @@
 
 export module PonyEngine.Render:RenderSystemParams;
 
-import :RenderTargetParams;
-import :RenderViewParams;
+import <optional>;
+
+import PonyMath.Utility;
+
+import :MSAAParams;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Render system parameters.
 	struct RenderSystemParams
 	{
-		RenderTargetParams renderTargetParams; ///< Render target parameters.
-		RenderViewParams renderViewParams; ///< Render view parameters.
+		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution;
+		MSAAParams msaaParams;
 	};
 }

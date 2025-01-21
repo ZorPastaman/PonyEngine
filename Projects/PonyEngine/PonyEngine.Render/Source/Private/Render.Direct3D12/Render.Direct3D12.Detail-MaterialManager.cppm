@@ -25,10 +25,8 @@ import <vector>;
 
 import PonyDebug.Log;
 
-import :IDepthStencilPrivate;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
-import :IRenderTargetPrivate;
 import :ISubSystemContext;
 import :Material;
 import :PipelineStateUtility;
@@ -93,7 +91,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
 
-		const IRenderTargetPrivate& renderTarget = d3d12System->RenderTargetPrivate();
+		const IFrameManager& frameManager = d3d12System->FrameManager();
 		auto pss = PipelineStateStream
 		{
 			.rootSignature = &rootSignature->ControlledRootSignature(),
@@ -161,11 +159,11 @@ namespace PonyEngine::Render::Direct3D12
 			},
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
-				.RTFormats = { renderTarget.Format() },
+				.RTFormats = { frameManager.RtvFormat() },
 				.NumRenderTargets = 1u
 			},
-			.depthStencilFormat = d3d12System->DepthStencilPrivate().DsvFormat(),
-			.sampleDescription = renderTarget.SampleDesc()
+			.depthStencilFormat = frameManager.DsvFormat(),
+			.sampleDescription = frameManager.SampleDesc()
 		};
 		const auto pssDesc = D3D12_PIPELINE_STATE_STREAM_DESC
 		{

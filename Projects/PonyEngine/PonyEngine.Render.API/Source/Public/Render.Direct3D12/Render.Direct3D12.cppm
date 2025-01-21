@@ -11,10 +11,9 @@ export module PonyEngine.Render.Direct3D12;
 
 export import PonyEngine.Render;
 
+export import :ICameraManager;
 export import :IRenderObjectManager;
 export import :IRenderSystem;
-export import :IRenderTarget;
-export import :IRenderView;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
 export import :SwapChainParams;

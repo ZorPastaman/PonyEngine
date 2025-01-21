@@ -20,11 +20,11 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 render target parameters.
-	struct RenderTargetParams final
+	/// @brief Frame parameters.
+	struct FrameParams final
 	{
 		PonyMath::Utility::Resolution<UINT> resolution; ///< Render target resolution.
-		PonyMath::Color::RGBA<FLOAT> clearColor; ///< Clear color.
+		PonyMath::Color::RGBA<FLOAT> clearColor = PonyMath::Color::RGBA<FLOAT>::Predefined::Black; ///< Clear color.
 		MSAAParams msaaParams; ///< MSAA parameters.
 	};
 }

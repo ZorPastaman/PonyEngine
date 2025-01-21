@@ -34,6 +34,7 @@ namespace Shape
 		TEST_METHOD(PredefinedTest)
 		{
 			Assert::IsTrue(PonyMath::Shape::Rect<float>(0.f, 0.f, 0.f, 0.f) == PonyMath::Shape::Rect<float>::Predefined::Zero);
+			Assert::IsTrue(PonyMath::Shape::Rect<float>(0.f, 0.f, 1.f, 1.f) == PonyMath::Shape::Rect<float>::Predefined::NormalizedFull);
 		}
 
 		TEST_METHOD(ConstructorTest)

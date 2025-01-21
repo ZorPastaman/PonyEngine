@@ -13,5 +13,5 @@ import <string_view>;
 
 export namespace PonyEngine::Render
 {
-	constexpr std::string_view PonyTransform = "Pony_Transform";
+	constexpr std::string_view PonyTransformDataType = "Pony_Transform";
 }

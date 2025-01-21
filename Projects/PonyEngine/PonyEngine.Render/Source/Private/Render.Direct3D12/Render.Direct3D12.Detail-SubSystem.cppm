@@ -28,20 +28,19 @@ import PonyEngine.Render.Direct3D12;
 
 import :BackManager;
 import :BackParams;
+import :CameraManager;
 import :CopyPipeline;
 import :CpuWaiter;
-import :DepthStencil;
 import :DescriptorHeapManager;
+import :FrameManager;
 import :GpuWaiter;
 import :GraphicsPipeline;
 import :ICopyPipeline;
-import :IDepthStencilPrivate;
 import :IDescriptorHeapManager;
+import :IFrameManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
-import :IRenderTargetPrivate;
-import :IRenderViewPrivate;
 import :IRenderSystemContext;
 import :IRootSignatureManagerPrivate;
 import :ISubSystemContext;
@@ -49,10 +48,7 @@ import :MaterialManager;
 import :MeshManager;
 import :ObjectUtility;
 import :RenderObjectManager;
-import :RenderTarget;
 import :RenderTargetParams;
-import :RenderView;
-import :RenderViewParams;
 import :ResourceManager;
 import :RootSignatureManager;
 import :SubSystemParams;
@@ -65,46 +61,27 @@ export namespace PonyEngine::Render::Direct3D12
 	public:
 		/// @brief Creates a @p System.
 		/// @param renderSystem Render system context.
-		/// @param params Direct3D12 system parameters.
 		[[nodiscard("Pure constructor")]]
-		SubSystem(IRenderSystemContext& renderSystem, const SubSystemParams& params);
+		SubSystem(IRenderSystemContext& renderSystem, const SubSystemParams& subSystemParams);
 		SubSystem(const SubSystem&) = delete;
 		SubSystem(SubSystem&&) = delete;
 
 		~SubSystem() noexcept;
 
-		/// @brief Gets the render target.
-		/// @note It's created in @p CreateRenderSystem().
-		/// @return Render target.
 		[[nodiscard("Pure function")]]
-		IRenderTarget* RenderTarget() noexcept;
-		/// @brief Gets the render target.
-		/// @note It's created in @p CreateRenderSystem().
-		/// @return Render target.
+		ICameraManager* CameraManager() noexcept;
 		[[nodiscard("Pure function")]]
-		const IRenderTarget* RenderTarget() const noexcept;
-
-		/// @brief Gets the render view.
-		/// @note It's created in @p CreateRenderSystem().
-		/// @return Render view.
-		[[nodiscard("Pure function")]]
-		IRenderView* RenderView() noexcept;
-		/// @brief Gets the render view.
-		/// @note It's created in @p CreateRenderSystem().
-		/// @return Render view.
-		[[nodiscard("Pure function")]]
-		const IRenderView* RenderView() const noexcept;
-
+		const ICameraManager* CameraManager() const noexcept;
 		/// @brief Gets the render object manager.
 		/// @note It's created in @p CreateRenderSystem().
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		IRenderObjectManager* RenderObjectManagerD3D12() noexcept;
+		IRenderObjectManager* RenderObjectManager() noexcept;
 		/// @brief Gets the render object manager.
 		/// @note It's created in @p CreateRenderSystem().
 		/// @return Render object manager.
 		[[nodiscard("Pure function")]]
-		const IRenderObjectManager* RenderObjectManagerD3D12() const noexcept;
+		const IRenderObjectManager* RenderObjectManager() const noexcept;
 
 		/// @brief Gets the graphics command queue.
 		/// @return Graphics command queue.
@@ -117,9 +94,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		/// @brief Creates a render system.
 		/// @param backParams Back parameters.
-		/// @param renderTargetParams Render target parameters.
-		/// @param renderViewParams Render view parameters.
-		void CreateRenderSystem(const BackParams& backParams, const RenderTargetParams& renderTargetParams, const RenderViewParams& renderViewParams);
+		/// @param frameParams Render target parameters.
+		void CreateRenderSystem(const BackParams& backParams, const FrameParams& frameParams);
 
 		/// @brief Begins a new frame.
 		void BeginFrame();
@@ -149,19 +125,9 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IBackManager& BackManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderTargetPrivate& RenderTargetPrivate() noexcept override;
+		virtual IFrameManager& FrameManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderTargetPrivate& RenderTargetPrivate() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual IDepthStencilPrivate& DepthStencilPrivate() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IDepthStencilPrivate& DepthStencilPrivate() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual IRenderViewPrivate& RenderViewPrivate() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IRenderViewPrivate& RenderViewPrivate() const noexcept override;
+		virtual const IFrameManager& FrameManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual IMeshManager& MeshManager() noexcept override;
@@ -189,11 +155,6 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManager& RenderObjectManager() const noexcept override;
-
-		[[nodiscard("Pure function")]]
 		virtual ICopyPipeline& CopyPipeline() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const ICopyPipeline& CopyPipeline() const noexcept override;
@@ -211,15 +172,15 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
 		std::unique_ptr<class BackManager> back; ///< Back.
-		std::unique_ptr<class RenderTarget> renderTarget; ///< Render target.
-		std::unique_ptr<DepthStencil> depthStencil; ///< Depth stencil.
-		std::unique_ptr<class RenderView> renderView; ///< Render view.
+		std::unique_ptr<class FrameManager> frameManager; ///< Frame manager.
 
 		std::unique_ptr<class ResourceManager> resourceManager;
 		std::unique_ptr<class DescriptorHeapManager> heapManager;
 		std::unique_ptr<class MeshManager> meshManager; ///< Mesh manager.
 		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<class MaterialManager> materialManager; ///< Material manager.
+
+		std::unique_ptr<class CameraManager> cameraManager;
 		std::unique_ptr<class RenderObjectManager> renderObjectManager; ///< Render object manager.
 
 		std::unique_ptr<class CopyPipeline> copyPipeline; ///< Copy pipeline.
@@ -232,7 +193,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	SubSystem::SubSystem(IRenderSystemContext& renderSystem, const SubSystemParams& params) :
+	SubSystem::SubSystem(IRenderSystemContext& renderSystem, const SubSystemParams& subSystemParams) :
 		renderSystem{&renderSystem}
 	{
 #ifdef _DEBUG
@@ -247,27 +208,21 @@ namespace PonyEngine::Render::Direct3D12
 		debug->EnableDebugLayer();
 #endif
 
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire device. Feature level: '0x{:X}.'", static_cast<unsigned int>(params.featureLevel));
-		if (const HRESULT result = D3D12CreateDevice(nullptr, params.featureLevel, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire device.'");
+		if (const HRESULT result = D3D12CreateDevice(nullptr, D3D_FEATURE_LEVEL_12_2, IID_PPV_ARGS(device.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire device with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		SetName(*device.Get(), "RenderDevice");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Device acquired.");
 
-		resourceManager = std::make_unique<class ResourceManager>(*static_cast<ISubSystemContext*>(this));
-
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create descriptor heap manager.");
-		heapManager = std::make_unique<class DescriptorHeapManager>(*static_cast<ISubSystemContext*>(this));
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap manager created.");
-
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create copy pipeline.");
-		copyPipeline = std::make_unique<class CopyPipeline>(*static_cast<ISubSystemContext*>(this), params.commandQueuePriority);
+		copyPipeline = std::make_unique<class CopyPipeline>(*static_cast<ISubSystemContext*>(this), subSystemParams.commandQueuePriority);
 		copyPipeline->Name("CopyPipeline");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline created.");
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline.");
-		graphicsPipeline = std::make_unique<class GraphicsPipeline>(*static_cast<ISubSystemContext*>(this), params.commandQueuePriority);
+		graphicsPipeline = std::make_unique<class GraphicsPipeline>(*static_cast<ISubSystemContext*>(this), subSystemParams.commandQueuePriority);
 		graphicsPipeline->Name("GraphicsPipeline");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline created.'");
 
@@ -276,8 +231,8 @@ namespace PonyEngine::Render::Direct3D12
 		copyWaiter->Name("CopyToGraphicsWaiter");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter created.");
 
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline waiter. Wait timeout: {}.", params.renderTimeout);
-		graphicsWaiter = std::make_unique<CpuWaiter>(*static_cast<ISubSystemContext*>(this), graphicsPipeline->CommandQueue(), params.renderTimeout);
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create graphics pipeline waiter. Wait timeout: {}.", subSystemParams.renderTimeout);
+		graphicsWaiter = std::make_unique<CpuWaiter>(*static_cast<ISubSystemContext*>(this), graphicsPipeline->CommandQueue(), subSystemParams.renderTimeout);
 		graphicsWaiter->Name("GraphicsEndWaiter");
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline waiter created.");
 	}
@@ -316,13 +271,9 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Mesh manager destroyed.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy render view.");
-		renderView.reset();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target view.");
-
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy render target.");
-		renderTarget.reset();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target destroyed.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy frame manager.");
+		frameManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Frame manager destroyed.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy back.");
 		back.reset();
@@ -339,32 +290,22 @@ namespace PonyEngine::Render::Direct3D12
 #endif
 	}
 
-	IRenderTarget* SubSystem::RenderTarget() noexcept
+	ICameraManager* SubSystem::CameraManager() noexcept
 	{
-		return renderTarget.get();
+		return cameraManager.get();
 	}
 
-	const IRenderTarget* SubSystem::RenderTarget() const noexcept
+	const ICameraManager* SubSystem::CameraManager() const noexcept
 	{
-		return renderTarget.get();
+		return cameraManager.get();
 	}
 
-	IRenderView* SubSystem::RenderView() noexcept
-	{
-		return renderView.get();
-	}
-
-	const IRenderView* SubSystem::RenderView() const noexcept
-	{
-		return renderView.get();
-	}
-
-	IRenderObjectManager* SubSystem::RenderObjectManagerD3D12() noexcept
+	IRenderObjectManager* SubSystem::RenderObjectManager() noexcept
 	{
 		return renderObjectManager.get();
 	}
 
-	const IRenderObjectManager* SubSystem::RenderObjectManagerD3D12() const noexcept
+	const IRenderObjectManager* SubSystem::RenderObjectManager() const noexcept
 	{
 		return renderObjectManager.get();
 	}
@@ -379,26 +320,22 @@ namespace PonyEngine::Render::Direct3D12
 		return graphicsPipeline->CommandQueue();
 	}
 
-	void SubSystem::CreateRenderSystem(const BackParams& backParams, const RenderTargetParams& renderTargetParams, const RenderViewParams& renderViewParams)
+	void SubSystem::CreateRenderSystem(const BackParams& backParams, const FrameParams& frameParams)
 	{
+		resourceManager = std::make_unique<class ResourceManager>(*static_cast<ISubSystemContext*>(this));
+
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create descriptor heap manager.");
+		heapManager = std::make_unique<class DescriptorHeapManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap manager created.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back.");
 		back = std::make_unique<class BackManager>(*static_cast<ISubSystemContext*>(this), backParams);
 		back->Name("Back");
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back created.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render target.");
-		renderTarget = std::make_unique<class RenderTarget>(*static_cast<ISubSystemContext*>(this), renderTargetParams);
-		renderTarget->Name("RenderTarget");
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render target created.");
-
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render view.");
-		renderView = std::make_unique<class RenderView>(renderViewParams);
-		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render view created.");
-
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create depth stencil.");
-		depthStencil = std::make_unique<DepthStencil>(*static_cast<ISubSystemContext*>(this));
-		depthStencil->Name("DepthStencil");
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil created.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create frame manager.");
+		frameManager = std::make_unique<class FrameManager>(*static_cast<ISubSystemContext*>(this), frameParams);
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Frame manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create mesh manager.");
 		meshManager = std::make_unique<class MeshManager>(*static_cast<ISubSystemContext*>(this));
@@ -412,13 +349,13 @@ namespace PonyEngine::Render::Direct3D12
 		materialManager = std::make_unique<class MaterialManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager created.");
 
+		cameraManager = std::make_unique<class CameraManager>(*static_cast<ISubSystemContext*>(this));
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render object manager.");
 		renderObjectManager = std::make_unique<class RenderObjectManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output quad.");
-		graphicsPipeline->CreateSrgbOutputQuad();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Srgb output quad created.");
+		graphicsPipeline->CreateFrame();
 	}
 
 	void SubSystem::BeginFrame()
@@ -427,13 +364,14 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager->Clean();
 		materialManager->Clean();
 		rootSignatureManager->Clean();
-
-		meshManager->Tick();
+		cameraManager->Clean();
 	}
 
 	void SubSystem::Render(const UINT backBufferIndex)
 	{
-		renderObjectManager->AddRenderTasks();
+		cameraManager->Tick();
+		meshManager->Tick();
+		renderObjectManager->Tick();
 		graphicsPipeline->Prepare();
 
 		copyPipeline->PopulateCommands();
@@ -484,24 +422,14 @@ namespace PonyEngine::Render::Direct3D12
 		return *back;
 	}
 
-	IRenderTargetPrivate& SubSystem::RenderTargetPrivate() noexcept
+	IFrameManager& SubSystem::FrameManager() noexcept
 	{
-		return *renderTarget;
+		return *frameManager;
 	}
 
-	const IRenderTargetPrivate& SubSystem::RenderTargetPrivate() const noexcept
+	const IFrameManager& SubSystem::FrameManager() const noexcept
 	{
-		return *renderTarget;
-	}
-
-	IDepthStencilPrivate& SubSystem::DepthStencilPrivate() noexcept
-	{
-		return *depthStencil;
-	}
-
-	const IDepthStencilPrivate& SubSystem::DepthStencilPrivate() const noexcept
-	{
-		return *depthStencil;
+		return *frameManager;
 	}
 
 	IMeshManager& SubSystem::MeshManager() noexcept
@@ -552,26 +480,6 @@ namespace PonyEngine::Render::Direct3D12
 	const IDescriptorHeapManager& SubSystem::DescriptorHeapManager() const noexcept
 	{
 		return *heapManager;
-	}
-
-	IRenderViewPrivate& SubSystem::RenderViewPrivate() noexcept
-	{
-		return *renderView;
-	}
-
-	const IRenderViewPrivate& SubSystem::RenderViewPrivate() const noexcept
-	{
-		return *renderView;
-	}
-
-	IRenderObjectManager& SubSystem::RenderObjectManager() noexcept
-	{
-		return *renderObjectManager;
-	}
-
-	const IRenderObjectManager& SubSystem::RenderObjectManager() const noexcept
-	{
-		return *renderObjectManager;
 	}
 
 	ICopyPipeline& SubSystem::CopyPipeline() noexcept

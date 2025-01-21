@@ -72,6 +72,7 @@ export namespace Game
 		std::shared_ptr<PonyEngine::Render::IRenderObject> bigBoxHandle;
 
 		PonyMath::Space::Transform3D cameraTransform;
+		std::shared_ptr<PonyEngine::Render::ICamera> camera;
 	};
 }
 
@@ -110,8 +111,6 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Info, "Inputs registered.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Set render view params.");
-		renderSystem->RenderView().ViewMatrix(cameraTransform.TrsMatrix().Inverse());
-		renderSystem->RenderView().ProjectionMatrix(PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, renderSystem->RenderTarget().Resolution().Aspect<float>(), 0.2f, 1000.f));
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
@@ -164,6 +163,8 @@ namespace Game
 		boxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One * 5.f)});
 		bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f))});
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render objects created.");
+
+		camera = renderSystem->CameraManager().CreateCamera(PonyEngine::Render::CameraParams{});
 	}
 
 	void GameSystem::End()
@@ -190,6 +191,6 @@ namespace Game
 			cameraTransform.Translate(cameraTransform.Rotation() * (moveDirection * (10.f * timeSystem->VirtualDeltaTime())));
 		}
 
-		renderSystem->RenderView().ViewMatrix(cameraTransform.TrsMatrix().Inverse());
+		camera->ViewMatrix(cameraTransform.TrsMatrix().Inverse());
 	}
 }

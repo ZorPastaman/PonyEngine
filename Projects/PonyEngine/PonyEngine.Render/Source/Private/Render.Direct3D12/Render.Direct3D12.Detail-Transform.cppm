@@ -1,11 +1,11 @@
 /***************************************************
- * MIT License                                     *
- *                                                 *
- * Copyright (c) 2023-present Vladimir Popov       *
- *                                                 *
- * Email: zor1994@gmail.com                        *
- * Repo: https://github.com/ZorPastaman/PonyEngine *
- ***************************************************/
+* MIT License                                     *
+*                                                 *
+* Copyright (c) 2023-present Vladimir Popov       *
+*                                                 *
+* Email: zor1994@gmail.com                        *
+* Repo: https://github.com/ZorPastaman/PonyEngine *
+***************************************************/
 
 module;
 
@@ -69,7 +69,10 @@ export namespace PonyEngine::Render::Direct3D12
 namespace PonyEngine::Render::Direct3D12
 {
 	Transform::Transform() noexcept :
-		Transform(PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity, PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity, PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity)
+		modelMatrix(PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity),
+		viewMatrix(PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity),
+		projectionMatrix(PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity),
+		mvpMatrix(PonyMath::Core::Matrix4x4<FLOAT>::Predefined::Identity)
 	{
 	}
 

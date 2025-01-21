@@ -8,13 +8,13 @@
  ***************************************************/
 
 // CPU:
-// 0: Pony Transform
+// 0: Transform
 // 1: Meshlets, Vertex indices and Triangles
 // 2: Positions
 // 3: Colors
 
 // GPU:
-// b0: Pony Transform
+// b0: Transform
 // t0: Meshlets
 // t1: Vertex indices
 // t2: Triangles

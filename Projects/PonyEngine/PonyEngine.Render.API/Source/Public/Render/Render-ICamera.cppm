@@ -11,31 +11,32 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render:IRenderTarget;
-
-import <cstdint>;
+export module PonyEngine.Render:ICamera;
 
 import PonyMath.Color;
-import PonyMath.Utility;
+import PonyMath.Core;
+import PonyMath.Shape;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render target.
-	class IRenderTarget
+	class ICamera
 	{
-		INTERFACE_BODY(IRenderTarget)
+		INTERFACE_BODY(ICamera)
 
-		/// @brief Gets the render target resolution.
-		/// @return Render target resolution.
 		[[nodiscard("Pure function")]]
-		virtual PonyMath::Utility::Resolution<std::uint32_t> Resolution() const noexcept = 0;
+		virtual PonyMath::Core::Matrix4x4<float> ViewMatrix() const noexcept = 0;
+		virtual void ViewMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
 
-		/// @brief Gets the clear color.
-		/// @return Clear color.
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Core::Matrix4x4<float> ProjectionMatrix() const noexcept = 0;
+		virtual void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
+
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> ClearColor() const noexcept = 0;
-		/// @brief Sets the clear color.
-		/// @param color Clear color.
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual PonyMath::Shape::Rect<float> ViewportRect() const noexcept = 0;
+		virtual void ViewportRect(const PonyMath::Shape::Rect<float>& rect) noexcept = 0;
 	};
 }

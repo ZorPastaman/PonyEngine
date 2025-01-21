@@ -18,13 +18,11 @@ import PonyDebug.Log;
 
 import :IBackManager;
 import :ICopyPipeline;
-import :IDepthStencilPrivate;
 import :IDescriptorHeapManager;
+import :IFrameManager;
 import :IGraphicsPipeline;
 import :IMaterialManagerPrivate;
 import :IMeshManagerPrivate;
-import :IRenderTargetPrivate;
-import :IRenderViewPrivate;
 import :IResourceManager;
 import :IRootSignatureManagerPrivate;
 
@@ -62,32 +60,10 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const IBackManager& BackManager() const noexcept = 0;
 
-		/// @brief Gets the render target.
-		/// @return Render target.
 		[[nodiscard("Pure function")]]
-		virtual IRenderTargetPrivate& RenderTargetPrivate() noexcept = 0;
-		/// @brief Gets the render target.
-		/// @return Render target.
+		virtual IFrameManager& FrameManager() noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual const IRenderTargetPrivate& RenderTargetPrivate() const noexcept = 0;
-
-		/// @brief Gets the depth stencil.
-		/// @return Depth stencil.
-		[[nodiscard("Pure function")]]
-		virtual IDepthStencilPrivate& DepthStencilPrivate() noexcept = 0;
-		/// @brief Gets the depth stencil.
-		/// @return Depth stencil.
-		[[nodiscard("Pure function")]]
-		virtual const IDepthStencilPrivate& DepthStencilPrivate() const noexcept = 0;
-
-		/// @brief Gets the render view.
-		/// @return Render view.
-		[[nodiscard("Pure function")]]
-		virtual IRenderViewPrivate& RenderViewPrivate() noexcept = 0;
-		/// @brief Gets the render view.
-		/// @return Render view.
-		[[nodiscard("Pure function")]]
-		virtual const IRenderViewPrivate& RenderViewPrivate() const noexcept = 0;
+		virtual const IFrameManager& FrameManager() const noexcept = 0;
 
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
@@ -129,15 +105,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Descriptor heap manager.
 		[[nodiscard("Pure function")]]
 		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept = 0;
-
-		/// @brief Gets the render object manager.
-		/// @return Render object manager.
-		[[nodiscard("Pure function")]]
-		virtual IRenderObjectManager& RenderObjectManager() noexcept = 0;
-		/// @brief Gets the render object manager.
-		/// @return Render object manager.
-		[[nodiscard("Pure function")]]
-		virtual const IRenderObjectManager& RenderObjectManager() const noexcept = 0;
 
 		/// @brief Gets the copy pipeline.
 		/// @return Copy pipeline.

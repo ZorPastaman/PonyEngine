@@ -174,9 +174,9 @@ namespace PonyEngine::Render::Direct3D12
 
 			for (const PonyBase::Container::Buffer& sourceBuffer : bufferTable)
 			{
-				const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::CPU);
+				const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Upload);
 				uploadBuffer->SetData(sourceBuffer);
-				const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), ResourcePlacement::GPU);
+				const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Default);
 				d3d12System->CopyPipeline().AddCopyTask(uploadBuffer, gpuBuffer);
 				buffers.push_back(gpuBuffer);
 
@@ -235,7 +235,7 @@ namespace PonyEngine::Render::Direct3D12
 				{
 					const PonyBase::Container::Buffer* const sourceBuffer = source.FindBuffer(dataType, bufferIndex);
 
-					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer->Size(), ResourcePlacement::CPU);
+					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer->Size(), HeapType::Upload);
 					uploadBuffer->SetData(*sourceBuffer);
 					const std::shared_ptr<Buffer>& gpuBuffer = *mesh.FindBuffer(dataType, bufferIndex);
 					d3d12System->CopyPipeline().AddCopyTask(uploadBuffer, gpuBuffer);

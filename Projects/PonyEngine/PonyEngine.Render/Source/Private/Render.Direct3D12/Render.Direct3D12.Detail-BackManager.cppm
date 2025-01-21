@@ -169,7 +169,6 @@ namespace PonyEngine::Render::Direct3D12
 
 	void BackManager::CurrentBackBufferIndex(const UINT index) noexcept
 	{
-		assert(index < backBuffers.size() && "The new back buffer index is out of bounds.");
 		currentBackBufferIndex = index;
 	}
 
