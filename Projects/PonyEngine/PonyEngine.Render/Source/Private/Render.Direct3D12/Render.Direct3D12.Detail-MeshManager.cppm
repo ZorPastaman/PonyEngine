@@ -59,6 +59,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		void Tick();
 
+		void Clear() noexcept;
+
 		/// @brief Cleans out of dead meshes.
 		void Clean() noexcept;
 
@@ -73,22 +75,23 @@ export namespace PonyEngine::Render::Direct3D12
 		};
 
 		[[nodiscard("Pure function")]]
-		Mesh CreateMesh(const Render::Mesh& mesh) const;
-		void CreateSrv(D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, ID3D12Resource2& gpuBuffer, UINT count, UINT stride) const;
+		Mesh CreateMesh(const Render::Mesh& mesh);
 
 		[[nodiscard("Pure function")]]
 		static SourceState CreateSourceData(const Render::Mesh& mesh);
 
-		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) const;
-		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) const;
+		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
 
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Mesh>> meshes; ///< Meshes.
-		std::vector<std::shared_ptr<const Render::Mesh>> sources;
+		std::vector<std::shared_ptr<const Render::Mesh>> sources; // TODO: Try to use weak_ptr
 		std::vector<SourceState> sourceStates;
+
+		std::vector<std::shared_ptr<Buffer>> uploadBuffers;
 	};
 }
 
@@ -144,6 +147,11 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	void MeshManager::Clear() noexcept
+	{
+		uploadBuffers.clear();
+	}
+
 	void MeshManager::Clean() noexcept
 	{
 		for (std::size_t i = meshes.size(); i-- > 0; )
@@ -159,52 +167,45 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	Mesh MeshManager::CreateMesh(const Render::Mesh& mesh) const
+	Mesh MeshManager::CreateMesh(const Render::Mesh& mesh)
 	{
+		std::vector<std::string> dataTypes;
+		std::vector<std::size_t> bufferOffsets;
+		std::vector<std::shared_ptr<Buffer>> buffers;
 		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(mesh.BufferCount()), false);
 
-		std::unordered_map<std::string, std::vector<std::shared_ptr<Buffer>>> data;
-		data.reserve(mesh.DataTypes().size());
-		UINT handleIndex = 0u;
 		for (const std::string& dataType : mesh.DataTypes())
 		{
-			const std::span<const PonyBase::Container::Buffer> bufferTable = mesh.FindBufferTable(dataType);
-			auto buffers = std::vector<std::shared_ptr<Buffer>>();
-			buffers.reserve(bufferTable.size());
+			dataTypes.push_back(dataType);
+			bufferOffsets.push_back(buffers.size());
 
-			for (const PonyBase::Container::Buffer& sourceBuffer : bufferTable)
+			for (const PonyBase::Container::Buffer& sourceBuffer : mesh.FindBufferTable(dataType))
 			{
 				const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Upload);
 				uploadBuffer->SetData(sourceBuffer);
+				uploadBuffers.push_back(uploadBuffer);
 				const std::shared_ptr<Buffer> gpuBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Default);
-				d3d12System->CopyPipeline().AddCopyTask(uploadBuffer, gpuBuffer);
 				buffers.push_back(gpuBuffer);
+				d3d12System->CopyPipeline().AddCopyTask(*uploadBuffer, *gpuBuffer); // TODO: Do it in tick
 
-				CreateSrv(heap->CpuHandle(handleIndex++), gpuBuffer->Data(), static_cast<UINT>(sourceBuffer.Count()), static_cast<UINT>(sourceBuffer.Stride()));
+				const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
+				{
+					.Format = DXGI_FORMAT_UNKNOWN,
+					.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
+					.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+					.Buffer = D3D12_BUFFER_SRV
+					{
+						.FirstElement = 0UL,
+						.NumElements = static_cast<UINT>(sourceBuffer.Count()),
+						.StructureByteStride = static_cast<UINT>(sourceBuffer.Stride()),
+						.Flags = D3D12_BUFFER_SRV_FLAG_NONE
+					}
+				};
+				d3d12System->Device().CreateShaderResourceView(&gpuBuffer->Data(), &srvDesc, heap->CpuHandle(static_cast<UINT>(buffers.size()) - 1u));
 			}
-
-			data[dataType] = buffers;
 		}
 
-		return Mesh(data, heap, mesh.ThreadGroupCounts());
-	}
-
-	void MeshManager::CreateSrv(const D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle, ID3D12Resource2& gpuBuffer, const UINT count, const UINT stride) const
-	{
-		const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
-		{
-			.Format = DXGI_FORMAT_UNKNOWN,
-			.ViewDimension = D3D12_SRV_DIMENSION_BUFFER,
-			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
-			.Buffer = D3D12_BUFFER_SRV
-			{
-				.FirstElement = 0UL,
-				.NumElements = count,
-				.StructureByteStride = stride,
-				.Flags = D3D12_BUFFER_SRV_FLAG_NONE
-			}
-		};
-		d3d12System->Device().CreateShaderResourceView(&gpuBuffer, &srvDesc, cpuHandle);
+		return Mesh(dataTypes, bufferOffsets, buffers, heap, mesh.ThreadGroupCounts());
 	}
 
 	MeshManager::SourceState MeshManager::CreateSourceData(const Render::Mesh& mesh)
@@ -219,13 +220,13 @@ namespace PonyEngine::Render::Direct3D12
 		return sourceData;
 	}
 
-	void MeshManager::UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) const
+	void MeshManager::UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
 	{
 		mesh = CreateMesh(source);
 		sourceState = CreateSourceData(source);
 	}
 
-	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) const
+	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
 	{
 		for (auto& [dataType, bufferVersions] : sourceState.bufferVersions)
 		{
@@ -237,8 +238,9 @@ namespace PonyEngine::Render::Direct3D12
 
 					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer->Size(), HeapType::Upload);
 					uploadBuffer->SetData(*sourceBuffer);
-					const std::shared_ptr<Buffer>& gpuBuffer = *mesh.FindBuffer(dataType, bufferIndex);
-					d3d12System->CopyPipeline().AddCopyTask(uploadBuffer, gpuBuffer);
+					uploadBuffers.push_back(uploadBuffer);
+					const std::shared_ptr<Buffer>& gpuBuffer = mesh.BufferShared(mesh.FindDataIndex(dataType).value(), bufferIndex);
+					d3d12System->CopyPipeline().AddCopyTask(*uploadBuffer, *gpuBuffer);
 
 					bufferVersions[bufferIndex] = bufferVersion;
 				}

@@ -20,6 +20,6 @@ export namespace PonyEngine::Render
 	/// @brief Render system factory.
 	class RenderSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(RenderSystemFactory)
+		SIMPLE_BASE_BODY(RenderSystemFactory)
 	};
 }

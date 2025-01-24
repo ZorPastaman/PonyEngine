@@ -364,6 +364,9 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager->Clean();
 		materialManager->Clean();
 		rootSignatureManager->Clean();
+		frameManager->Clean();
+		heapManager->Clean();
+		resourceManager->Clean();
 		cameraManager->Clean();
 	}
 
@@ -388,8 +391,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		graphicsWaiter->Wait();
 
-		copyPipeline->Clear();
 		graphicsPipeline->Clear();
+		copyPipeline->Clear();
+		meshManager->Clear();
 	}
 
 	PonyDebug::Log::ILogger& SubSystem::Logger() noexcept

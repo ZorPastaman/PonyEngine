@@ -13,6 +13,10 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Resource;
 
+import <string_view>;
+
+import :ObjectUtility;
+
 export namespace PonyEngine::Render::Direct3D12
 {
 	class Resource
@@ -29,6 +33,8 @@ export namespace PonyEngine::Render::Direct3D12
 		ID3D12Resource2& Data() noexcept;
 		[[nodiscard("Pure function")]]
 		const ID3D12Resource2& Data() const noexcept;
+
+		void Name(std::string_view name);
 
 		Resource& operator =(const Resource&) = delete;
 		Resource& operator =(Resource&&) = delete;
@@ -53,5 +59,10 @@ namespace PonyEngine::Render::Direct3D12
 	const ID3D12Resource2& Resource::Data() const noexcept
 	{
 		return *resource.Get();
+	}
+
+	void Resource::Name(const std::string_view name)
+	{
+		SetName(*resource.Get(), name);
 	}
 }

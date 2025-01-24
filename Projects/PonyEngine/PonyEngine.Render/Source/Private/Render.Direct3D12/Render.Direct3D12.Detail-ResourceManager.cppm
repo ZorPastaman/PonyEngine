@@ -16,6 +16,7 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:ResourceManager;
 
 import <memory>;
+import <vector>;
 
 import :IResourceManager;
 import :ISubSystemContext;
@@ -49,6 +50,8 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Texture> CreateDepthStencil(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, D3D12_DEPTH_STENCIL_VALUE depthStencilValue) override;
 
+		void Clean() noexcept;
+
 		ResourceManager& operator =(const ResourceManager&) = delete;
 		ResourceManager& operator =(ResourceManager&&) = delete;
 
@@ -62,6 +65,8 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType placement);
 
 		ISubSystemContext* d3d12System;
+
+		std::vector<std::shared_ptr<Resource>> resources;
 	};
 }
 
@@ -97,22 +102,34 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create buffer resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<Buffer>(*resource.Get());
+		const auto buffer = std::make_shared<Buffer>(*resource.Get());
+		resources.push_back(buffer);
+
+		return buffer;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture1D(const UINT64 width, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, 1u, 1u, format, sampleDesc, heapType);
+		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, 1u, 1u, format, sampleDesc, heapType);
+		resources.push_back(texture);
+
+		return texture;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture2D(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, 1u, format, sampleDesc, heapType);
+		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, 1u, format, sampleDesc, heapType);
+		resources.push_back(texture);
+
+		return texture;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture3D(const UINT64 width, const UINT height, const UINT16 depth, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		return CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, depth, format, sampleDesc, heapType);
+		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, depth, format, sampleDesc, heapType);
+		resources.push_back(texture);
+
+		return texture;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateRenderTarget(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<FLOAT>& clearColor)
@@ -145,7 +162,10 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create render target resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<Texture>(*resource.Get());
+		const auto renderTarget = std::make_shared<Texture>(*resource.Get());
+		resources.push_back(renderTarget);
+
+		return renderTarget;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateDepthStencil(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const D3D12_DEPTH_STENCIL_VALUE depthStencilValue)
@@ -178,7 +198,21 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create depth stencil resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<Texture>(*resource.Get());
+		const auto depthStencil = std::make_shared<Texture>(*resource.Get());
+		resources.push_back(depthStencil);
+
+		return depthStencil;
+	}
+
+	void ResourceManager::Clean() noexcept
+	{
+		for (std::size_t i = resources.size(); i-- > 0; )
+		{
+			if (resources[i].use_count() <= 1L)
+			{
+				resources.erase(resources.cbegin() + i);
+			}
+		}
 	}
 
 	D3D12_HEAP_PROPERTIES ResourceManager::GetHeapProperties(const HeapType heapType) noexcept

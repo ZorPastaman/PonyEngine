@@ -24,7 +24,7 @@ export namespace PonyEngine::Core
 	/// @brief Engine.
 	class Engine
 	{
-		BASE_BODY(Engine)
+		SIMPLE_BASE_BODY(Engine)
 
 	public:
 		/// @brief Gets the current frame count.

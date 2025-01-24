@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render:ICamera;
 
+import <cstdint>;
+
 import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
@@ -38,5 +40,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Shape::Rect<float> ViewportRect() const noexcept = 0;
 		virtual void ViewportRect(const PonyMath::Shape::Rect<float>& rect) noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::int32_t SortingOrder() const noexcept = 0;
+		virtual void SortingOrder(std::int32_t order) noexcept = 0;
 	};
 }

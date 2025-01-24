@@ -33,13 +33,14 @@ import :Buffer;
 import :ICopyPipeline;
 import :ISubSystemContext;
 import :ObjectUtility;
+import :Pipeline;
 import :Resource;
 import :Texture;
 
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 copy pipeline.
-	class CopyPipeline final : public ICopyPipeline
+	class CopyPipeline final : public Pipeline, public ICopyPipeline
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -47,23 +48,10 @@ export namespace PonyEngine::Render::Direct3D12
 		CopyPipeline(const CopyPipeline&) = delete;
 		CopyPipeline(CopyPipeline&&) = delete;
 
-		~CopyPipeline() noexcept;
+		virtual ~CopyPipeline() noexcept override = default;
 
-		virtual void AddCopyTask(const std::shared_ptr<Buffer>& source, const std::shared_ptr<Buffer>& destination) override;
-		virtual void AddCopyTask(const std::shared_ptr<Texture>& source, const std::shared_ptr<Texture>& destination) override;
-
-		/// @brief Gets the main command queue.
-		/// @return Command queue.
-		[[nodiscard("Pure function")]]
-		ID3D12CommandQueue& CommandQueue() noexcept;
-		/// @brief Gets the main command queue.
-		/// @return Command queue.
-		[[nodiscard("Pure function")]]
-		const ID3D12CommandQueue& CommandQueue() const noexcept;
-
-		/// @brief Sets name to its components.
-		/// @param name Name.
-		void Name(std::string_view name);
+		virtual void AddCopyTask(Buffer& source, Buffer& destination) override;
+		virtual void AddCopyTask(Texture& source, Texture& destination) override;
 
 		/// @brief Populates commands.
 		void PopulateCommands();
@@ -85,21 +73,18 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Copy task.
 		struct CopyTask final
 		{
-			std::shared_ptr<Resource> source; ///< Copy source.
-			std::shared_ptr<Resource> destination; ///< Copy destination.
+			Resource* source; ///< Copy source.
+			Resource* destination; ///< Copy destination.
 			ResourceType resourceType;
 		};
 
-		/// @brief Resets command lists.
-		void ResetLists();
 		/// @brief Populates begin to copy barriers.
-		void PopulateBeginToCopyBarriers();
+		void PushBeginToCopyBarriers();
+		/// @brief Populates copy to end barriers.
+		void PushCopyToEndBarriers();
+
 		/// @brief Populates copies.
 		void PopulateCopies();
-		/// @brief Populates copy to end barriers.
-		void PopulateCopyToEndBarriers();
-		/// @brief Closes command lists.
-		void CloseLists();
 
 		void AddBufferBeforeBarriers(const CopyTask& copyTask);
 		void AddBufferAfterBarriers(const CopyTask& copyTask);
@@ -107,147 +92,56 @@ export namespace PonyEngine::Render::Direct3D12
 		void AddTextureBeforeBarriers(const CopyTask& copyTask);
 		void AddTextureAfterBarriers(const CopyTask& copyTask);
 
-		/// @brief Populates barrier groups.
-		void PopulateBarrierGroups();
-
-		GUID guid; ///< Copy pipeline guid.
-
-		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
-
-		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue; ///< Copy command queue.
-		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Copy command allocator.
-		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Copy command list.
-
 		std::vector<CopyTask> copyTasks; ///< Copy tasks.
-
-		std::vector<D3D12_BUFFER_BARRIER> bufferBarriers; ///< Buffer barriers cache.
-		std::vector<D3D12_TEXTURE_BARRIER> textureBarriers; ///< Buffer barriers cache.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	CopyPipeline::CopyPipeline(ISubSystemContext& d3d12System, const INT commandQueuePriority) :
-		guid{PonyBase::Utility::COM::AcquireGuid()},
-		d3d12System{&d3d12System}
+		Pipeline(d3d12System, commandQueuePriority, D3D12_COMMAND_LIST_TYPE_COPY)
 	{
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline guid: '{}'.", PonyBase::Utility::COM::ToString(guid));
-
-		constexpr D3D12_COMMAND_LIST_TYPE commandListType = D3D12_COMMAND_LIST_TYPE_COPY;
-
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command queue. Priority: '{}'.", commandQueuePriority);
-		const auto commandQueueDescription = D3D12_COMMAND_QUEUE_DESC
-		{
-			.Type = commandListType,
-			.Priority = commandQueuePriority,
-			.Flags = D3D12_COMMAND_QUEUE_FLAG_NONE,
-			.NodeMask = 0u
-		};
-		ID3D12Device10& device = this->d3d12System->Device();
-		if (const HRESULT result = device.CreateCommandQueue1(&commandQueueDescription, guid, IID_PPV_ARGS(commandQueue.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command queue with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command queue acquired.");
-
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command allocator.");
-		if (const HRESULT result = device.CreateCommandAllocator(commandListType, IID_PPV_ARGS(commandAllocator.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command allocator acquired.");
-
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire copy command list.");
-		if (const HRESULT result = device.CreateCommandList1(0, commandListType, D3D12_COMMAND_LIST_FLAG_NONE, IID_PPV_ARGS(commandList.GetAddressOf())); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire copy command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command list acquired.");
 	}
 
-	CopyPipeline::~CopyPipeline() noexcept
-	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command list.");
-		commandList.Reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command list released.");
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command allocator.");
-		commandAllocator.Reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command allocator released.");
-
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release copy command queue.");
-		commandQueue.Reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Copy command queue released.");
-	}
-
-	void CopyPipeline::AddCopyTask(const std::shared_ptr<Buffer>& source, const std::shared_ptr<Buffer>& destination)
+	void CopyPipeline::AddCopyTask(Buffer& source, Buffer& destination)
 	{
 		const auto copyTask = CopyTask
 		{
-			.source = source,
-			.destination = destination,
+			.source = &source,
+			.destination = &destination,
 			.resourceType = ResourceType::Buffer
 		};
 		copyTasks.push_back(copyTask);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Debug, "Buffer copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Debug, "Buffer copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
-	void CopyPipeline::AddCopyTask(const std::shared_ptr<Texture>& source, const std::shared_ptr<Texture>& destination)
+	void CopyPipeline::AddCopyTask(Texture& source, Texture& destination)
 	{
 		const auto copyTask = CopyTask
 		{
-			.source = source,
-			.destination = destination,
+			.source = &source,
+			.destination = &destination,
 			.resourceType = ResourceType::Texture
 		};
 		copyTasks.push_back(copyTask);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Debug, "Texture copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
-	}
-
-	ID3D12CommandQueue& CopyPipeline::CommandQueue() noexcept
-	{
-		return *commandQueue.Get();
-	}
-
-	const ID3D12CommandQueue& CopyPipeline::CommandQueue() const noexcept
-	{
-		return *commandQueue.Get();
-	}
-
-	void CopyPipeline::Name(const std::string_view name)
-	{
-		constexpr std::string_view commandQueueName = " - CommandQueue";
-		constexpr std::string_view commandAllocatorName = " - CommandAllocator";
-		constexpr std::string_view commandListName = " - CommandList";
-
-		auto componentName = std::string();
-		componentName.reserve(name.size() + commandAllocatorName.size());
-
-		componentName.append(name).append(commandQueueName);
-		SetName(*commandQueue.Get(), componentName);
-
-		componentName.clear();
-		componentName.append(name).append(commandAllocatorName);
-		SetName(*commandAllocator.Get(), componentName);
-
-		componentName.clear();
-		componentName.append(name).append(commandListName);
-		SetName(*commandList.Get(), componentName);
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Debug, "Texture copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	void CopyPipeline::PopulateCommands()
 	{
 		ResetLists();
-		PopulateBeginToCopyBarriers();
+		PushBeginToCopyBarriers();
+		PopulateBarriers();
 		PopulateCopies();
-		PopulateCopyToEndBarriers();
+		PushCopyToEndBarriers();
+		PopulateBarriers();
 		CloseLists();
 	}
 
 	void CopyPipeline::Execute()
 	{
-		const auto commandLists = std::array<ID3D12CommandList*, 1> { commandList.Get() };
-		commandQueue->ExecuteCommandLists(static_cast<UINT>(commandLists.size()), commandLists.data());
+		ID3D12CommandList* const copyList = &CommandList();
+		CommandQueue().ExecuteCommandLists(1u, &copyList);
 	}
 
 	void CopyPipeline::Clear() noexcept
@@ -255,22 +149,8 @@ namespace PonyEngine::Render::Direct3D12
 		copyTasks.clear();
 	}
 
-	void CopyPipeline::ResetLists()
+	void CopyPipeline::PushBeginToCopyBarriers()
 	{
-		if (const HRESULT result = commandAllocator->Reset(); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command allocator with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-		if (const HRESULT result = commandList->Reset(commandAllocator.Get(), nullptr); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to reset command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-	}
-
-	void CopyPipeline::PopulateBeginToCopyBarriers()
-	{
-		bufferBarriers.clear();
-		textureBarriers.clear();
 		for (const CopyTask& copyTask : copyTasks)
 		{
 			switch (copyTask.resourceType)
@@ -285,22 +165,18 @@ namespace PonyEngine::Render::Direct3D12
 				assert(false && "Unexpected resource type.");
 			}
 		}
-
-		PopulateBarrierGroups();
 	}
 
 	void CopyPipeline::PopulateCopies()
 	{
 		for (const CopyTask& copyTask : copyTasks)
 		{
-			commandList->CopyResource(&copyTask.destination->Data(), &copyTask.source->Data());
+			CommandList().CopyResource(&copyTask.destination->Data(), &copyTask.source->Data());
 		}
 	}
 
-	void CopyPipeline::PopulateCopyToEndBarriers()
+	void CopyPipeline::PushCopyToEndBarriers()
 	{
-		bufferBarriers.clear();
-		textureBarriers.clear();
 		for (const CopyTask& copyTask : copyTasks)
 		{
 			switch (copyTask.resourceType)
@@ -314,16 +190,6 @@ namespace PonyEngine::Render::Direct3D12
 			default: [[unlikely]]
 				assert(false && "Unexpected resource type.");
 			}
-		}
-
-		PopulateBarrierGroups();
-	}
-
-	void CopyPipeline::CloseLists()
-	{
-		if (const HRESULT result = commandList->Close(); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to close command list with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 	}
 
@@ -349,8 +215,8 @@ namespace PonyEngine::Render::Direct3D12
 			.Offset = 0UL,
 			.Size = UINT64_MAX
 		};
-		bufferBarriers.push_back(sourceBarrier);
-		bufferBarriers.push_back(destinationBarrier);
+		AddBarrier(sourceBarrier);
+		AddBarrier(destinationBarrier);
 	}
 
 	void CopyPipeline::AddBufferAfterBarriers(const CopyTask& copyTask)
@@ -375,8 +241,8 @@ namespace PonyEngine::Render::Direct3D12
 			.Offset = 0UL,
 			.Size = UINT64_MAX
 		};
-		bufferBarriers.push_back(sourceBarrier);
-		bufferBarriers.push_back(destinationBarrier);
+		AddBarrier(sourceBarrier);
+		AddBarrier(destinationBarrier);
 	}
 
 	void CopyPipeline::AddTextureBeforeBarriers(const CopyTask& copyTask)
@@ -405,8 +271,8 @@ namespace PonyEngine::Render::Direct3D12
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		textureBarriers.push_back(sourceBarrier);
-		textureBarriers.push_back(destinationBarrier);
+		AddBarrier(sourceBarrier);
+		AddBarrier(destinationBarrier);
 	}
 
 	void CopyPipeline::AddTextureAfterBarriers(const CopyTask& copyTask)
@@ -435,36 +301,7 @@ namespace PonyEngine::Render::Direct3D12
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		textureBarriers.push_back(sourceBarrier);
-		textureBarriers.push_back(destinationBarrier);
-	}
-
-	void CopyPipeline::PopulateBarrierGroups()
-	{
-		auto barrierGroups = std::array<D3D12_BARRIER_GROUP, 2>();
-		UINT32 count = 0u;
-		if (bufferBarriers.size() > 0)
-		{
-			barrierGroups[count++] = D3D12_BARRIER_GROUP
-			{
-				.Type = D3D12_BARRIER_TYPE_BUFFER,
-				.NumBarriers = static_cast<UINT32>(bufferBarriers.size()),
-				.pBufferBarriers = bufferBarriers.data()
-			};
-		}
-		if (textureBarriers.size() > 0)
-		{
-			barrierGroups[count++] = D3D12_BARRIER_GROUP
-			{
-				.Type = D3D12_BARRIER_TYPE_TEXTURE,
-				.NumBarriers = static_cast<UINT32>(textureBarriers.size()),
-				.pTextureBarriers = textureBarriers.data()
-			};
-		}
-
-		if (count > 0u)
-		{
-			commandList->Barrier(count, barrierGroups.data());
-		}
+		AddBarrier(sourceBarrier);
+		AddBarrier(destinationBarrier);
 	}
 }

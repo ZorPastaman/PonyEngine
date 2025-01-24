@@ -22,7 +22,7 @@ export namespace PonyEngine::Core
 	/// @brief Tickable system.
 	class TickableSystem : public System
 	{
-		BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(TickableSystem)
+		BASE_BODY(TickableSystem)
 
 	public:
 		/// @brief Ticks the system.

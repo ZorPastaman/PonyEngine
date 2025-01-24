@@ -41,9 +41,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept = 0;
 
-		/// @brief Gets the current back handle.
-		/// @return Back handle.
+		/// @brief Gets the current back rtv handle.
+		/// @return Back rtv handle.
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackHandle() const noexcept = 0;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept = 0;
 	};
 }

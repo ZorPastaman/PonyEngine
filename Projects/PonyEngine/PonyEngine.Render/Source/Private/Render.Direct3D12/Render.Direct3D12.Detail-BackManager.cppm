@@ -18,7 +18,6 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:BackManager;
 
 import <algorithm>;
-import <cmath>;
 import <cstddef>;
 import <format>;
 import <memory>;
@@ -62,7 +61,7 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentBackHandle() const noexcept override;
+		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept override;
 
 		/// @brief Gets the current back buffer index.
 		/// @return Current back buffer index.
@@ -87,7 +86,7 @@ export namespace PonyEngine::Render::Direct3D12
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<Microsoft::WRL::ComPtr<ID3D12Resource2>> backBuffers; ///< Back buffers.
-		std::shared_ptr<DescriptorHeap> backHeap; ///< Back descriptor heap.
+		std::shared_ptr<DescriptorHeap> rtvHeap; ///< Rtv descriptor heap.
 	};
 }
 
@@ -100,16 +99,18 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
 		backBuffers = params.backBuffers;
 		assert(!backBuffers.empty() && "The back buffers array can't be empty");
+		assert(std::ranges::find(backBuffers, nullptr) == backBuffers.cend() && "The back buffers have a nullptr element.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffers set.");
 
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Get back buffer format.");
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Get back buffer formats.");
 		backFormat = backBuffers[0]->GetDesc1().Format;
 		assert(std::ranges::find_if(backBuffers, [&](const Microsoft::WRL::ComPtr<ID3D12Resource2>& buffer) { return buffer->GetDesc1().Format != backFormat; }) == backBuffers.cend() && "The back buffers must have the same format.");
 		srgbBackFormat = GetSrgbFormat(backFormat);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer format gotten. Format: {}; Srgb format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer formats gotten. Format: {}; Srgb format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back descriptor heap.");
-		backHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), false);
+		rtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), false);
+		assert(rtvHeap && "The back rtv heap is nullptr.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back descriptor heap created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back handles.");
@@ -121,16 +122,16 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		for (UINT i = 0u; i < backBuffers.size(); ++i)
 		{
-			this->d3d12System->Device().CreateRenderTargetView(backBuffers[i].Get(), &rtvDesc, backHeap->CpuHandle(i));
+			this->d3d12System->Device().CreateRenderTargetView(backBuffers[i].Get(), &rtvDesc, rtvHeap->CpuHandle(i));
 		}
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back handles created.");
 	}
 
 	BackManager::~BackManager() noexcept
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back descriptor heap.");
-		backHeap.reset();
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back descriptor heap released.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back rtv heap.");
+		rtvHeap.reset();
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back rtv heap released.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Release back buffers.");
 		backBuffers.clear();
@@ -157,9 +158,9 @@ namespace PonyEngine::Render::Direct3D12
 		return *backBuffers[currentBackBufferIndex].Get();
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE BackManager::CurrentBackHandle() const noexcept
+	D3D12_CPU_DESCRIPTOR_HANDLE BackManager::CurrentRtvHandle() const noexcept
 	{
-		return backHeap->CpuHandle(currentBackBufferIndex);
+		return rtvHeap->CpuHandle(currentBackBufferIndex);
 	}
 
 	UINT BackManager::CurrentBackBufferIndex() const noexcept
@@ -174,21 +175,17 @@ namespace PonyEngine::Render::Direct3D12
 
 	void BackManager::Name(const std::string_view name)
 	{
-		constexpr std::string_view bufferFormat = "{} - Buffer{}";
-		constexpr std::string_view heapName = " - Heap";
+		constexpr std::string_view bufferFormat = "{}-{}";
 
-		auto componentName = std::string();
-		componentName.reserve(name.size() + bufferFormat.size());
-
+		auto bufferName = std::string();
+		bufferName.reserve(name.size() + bufferFormat.size());
 		for (std::size_t i = 0; i < backBuffers.size(); ++i)
 		{
-			componentName.resize(std::min(componentName.capacity(), std::formatted_size(bufferFormat, name, i)));
-			std::format_to_n(componentName.begin(), componentName.size(), bufferFormat, name, i);
-			SetName(*backBuffers[i].Get(), componentName);
+			bufferName.resize(std::formatted_size(bufferFormat, name, i));
+			std::format_to_n(bufferName.begin(), bufferName.size(), bufferFormat, name, i);
+			SetName(*backBuffers[i].Get(), bufferName);
 		}
 
-		componentName.erase();
-		componentName.append(name).append(heapName);
-		SetName(backHeap->Heap(), componentName);
+		rtvHeap->Name(name);
 	}
 }

@@ -48,9 +48,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<FLOAT>& MvpMatrix() const noexcept;
 
-		[[nodiscard("Pure function")]]
-		const FLOAT* Data() const noexcept;
-
 		void Set(const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrixToSet, const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrixToSet, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrixToSet) noexcept;
 
 		Transform& operator =(const Transform& other) noexcept = default;
@@ -120,11 +117,6 @@ namespace PonyEngine::Render::Direct3D12
 	const PonyMath::Core::Matrix4x4<FLOAT>& Transform::MvpMatrix() const noexcept
 	{
 		return mvpMatrix;
-	}
-
-	const FLOAT* Transform::Data() const noexcept
-	{
-		return modelMatrix.Span().data();
 	}
 
 	void Transform::Set(const PonyMath::Core::Matrix4x4<FLOAT>& modelMatrixToSet, const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrixToSet, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrixToSet) noexcept
