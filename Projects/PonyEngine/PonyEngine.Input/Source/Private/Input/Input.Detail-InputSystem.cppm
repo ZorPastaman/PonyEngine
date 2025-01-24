@@ -314,7 +314,7 @@ namespace PonyEngine::Input
 		{
 			for (std::size_t i = receivers.size(); i-- > 0; )
 			{
-				if (receivers[i].use_count() <= 1)
+				if (receivers[i].use_count() <= 1L)
 				{
 					PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Destroy input receiver at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(receivers[i].get()));
 					receivers.erase(receivers.cbegin() + i);

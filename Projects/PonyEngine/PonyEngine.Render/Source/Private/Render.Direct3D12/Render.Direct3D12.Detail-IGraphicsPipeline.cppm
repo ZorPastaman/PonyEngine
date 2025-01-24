@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:IGraphicsPipeline;
 
-import <memory>;
-
 import :Camera;
 import :RenderObject;
 
@@ -25,10 +23,10 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 		INTERFACE_BODY(IGraphicsPipeline)
 
-		virtual void AddCamera(const std::shared_ptr<Camera>& camera) = 0;
+		virtual void AddCamera(Camera& camera) = 0;
 
 		/// @brief Adds a render object.
 		/// @param renderObject Render object to render.
-		virtual void AddRenderObject(const std::shared_ptr<RenderObject>& renderObject) = 0;
+		virtual void AddRenderObject(RenderObject& renderObject) = 0;
 	};
 }

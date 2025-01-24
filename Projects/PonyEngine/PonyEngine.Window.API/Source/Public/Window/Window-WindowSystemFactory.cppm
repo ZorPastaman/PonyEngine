@@ -20,6 +20,6 @@ export namespace PonyEngine::Window
 	/// @brief Window system factory.
 	class WindowSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(WindowSystemFactory)
+		SIMPLE_BASE_BODY(WindowSystemFactory)
 	};
 }

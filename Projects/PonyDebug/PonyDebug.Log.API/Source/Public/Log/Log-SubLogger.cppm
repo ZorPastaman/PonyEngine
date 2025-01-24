@@ -20,6 +20,6 @@ export namespace PonyDebug::Log
 	/// @brief Sub-logger.
 	class SubLogger : public ISubLogger
 	{
-		BASE_BODY(SubLogger)
+		SIMPLE_BASE_BODY(SubLogger)
 	};
 }

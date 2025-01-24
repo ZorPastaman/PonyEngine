@@ -20,6 +20,6 @@ export namespace PonyEngine::Screen
 	/// @brief Screen system factory.
 	class ScreenSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(ScreenSystemFactory)
+		SIMPLE_BASE_BODY(ScreenSystemFactory)
 	};
 }

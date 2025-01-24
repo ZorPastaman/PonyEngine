@@ -20,6 +20,6 @@ export namespace Game
 	/// @brief Game system factory.
 	class GameSystemFactory : public PonyEngine::Core::ISystemFactory
 	{
-		BASE_BODY(GameSystemFactory)
+		SIMPLE_BASE_BODY(GameSystemFactory)
 	};
 }

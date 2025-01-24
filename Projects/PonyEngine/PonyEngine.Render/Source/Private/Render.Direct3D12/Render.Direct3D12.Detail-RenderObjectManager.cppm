@@ -80,7 +80,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const std::unordered_map<std::string, UINT> dataSlots =
 		{
-			{ std::string(PonyTransformDataType), 0u },
+			{ std::string(EngineDataTypes::PonyTransform), 0u },
 			{ "Meshlets", 1u },
 			{ "Positions", 2u },
 			{ "Colors", 3u }
@@ -120,7 +120,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
 		{
-			d3d12System->GraphicsPipeline().AddRenderObject(renderObject);
+			d3d12System->GraphicsPipeline().AddRenderObject(*renderObject);
 		}
 	}
 

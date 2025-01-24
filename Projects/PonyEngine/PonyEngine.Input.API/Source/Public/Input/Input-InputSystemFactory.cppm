@@ -20,6 +20,6 @@ export namespace PonyEngine::Input
 	/// @brief Input system factory.
 	class InputSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(InputSystemFactory)
+		SIMPLE_BASE_BODY(InputSystemFactory)
 	};
 }

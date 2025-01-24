@@ -20,6 +20,6 @@ export namespace PonyEngine::Time
 	/// @brief Time system factory.
 	class TimeSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(TimeSystemFactory)
+		SIMPLE_BASE_BODY(TimeSystemFactory)
 	};
 }

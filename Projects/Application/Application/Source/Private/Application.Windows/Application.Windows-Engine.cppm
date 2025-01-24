@@ -237,7 +237,6 @@ namespace Application::Windows
 		try
 		{
 			auto inputParams = PonyEngine::Input::InputSystemParams{};
-
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input device factories.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows keyboard device factory.");
 			PonyEngine::Input::Windows::KeyboardDeviceFactoryData keyboardDeviceFactory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(*application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});

@@ -22,7 +22,7 @@ export namespace PonyEngine::Input
 	/// @brief Input device.
 	class Device : public IDevice
 	{
-		BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(Device)
+		BASE_BODY(Device)
 
 	public:
 		/// @brief Begins an input capture. It's called before a first tick.

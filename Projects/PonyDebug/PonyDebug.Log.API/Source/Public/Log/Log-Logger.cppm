@@ -21,7 +21,7 @@ export namespace PonyDebug::Log
 	/// @brief Logger.
 	class Logger : public ILogger
 	{
-		BASE_BODY(Logger)
+		SIMPLE_BASE_BODY(Logger)
 
 	public:
 		/// @brief Adds the @p subLogger to the list of sub-loggers.

@@ -44,12 +44,12 @@ export namespace PonyEngine::Render::Direct3D12
 
 		~CpuWaiter() noexcept;
 
+		/// @brief Waits for the command queue fence.
+		void Wait();
+
 		/// @brief Sets the name to the cpu waiter components.
 		/// @param name Name.
 		void Name(std::string_view name);
-
-		/// @brief Waits for the command queue fence.
-		void Wait();
 
 		CpuWaiter& operator =(const CpuWaiter&) = delete;
 		CpuWaiter& operator =(CpuWaiter&&) = delete;
@@ -93,14 +93,14 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Fence destroyed.");
 	}
 
-	void CpuWaiter::Name(const std::string_view name)
-	{
-		fence->Name(name);
-	}
-
 	void CpuWaiter::Wait()
 	{
 		fence->Signal();
 		fence->Wait(waitEvent, waitTimeout);
+	}
+
+	void CpuWaiter::Name(const std::string_view name)
+	{
+		fence->Name(name);
 	}
 }

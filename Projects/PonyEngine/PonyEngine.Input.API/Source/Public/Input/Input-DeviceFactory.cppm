@@ -20,6 +20,6 @@ export namespace PonyEngine::Input
 	/// @brief Input device factory.
 	class DeviceFactory : public IDeviceFactory
 	{
-		BASE_BODY(DeviceFactory)
+		SIMPLE_BASE_BODY(DeviceFactory)
 	};
 }

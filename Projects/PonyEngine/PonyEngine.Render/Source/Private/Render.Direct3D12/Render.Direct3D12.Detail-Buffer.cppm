@@ -35,11 +35,11 @@ export namespace PonyEngine::Render::Direct3D12
 
 		virtual ~Buffer() noexcept override = default;
 
-		void GetData(void* data, std::size_t size, std::size_t offset = 0) const noexcept;
-		void GetData(PonyBase::Container::Buffer& buffer, std::size_t offset = 0) const noexcept;
+		void GetData(void* data, std::size_t size, std::size_t offset = 0) const;
+		void GetData(PonyBase::Container::Buffer& buffer, std::size_t offset = 0) const;
 
-		void SetData(const void* data, std::size_t size, std::size_t offset = 0) noexcept;
-		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0) noexcept;
+		void SetData(const void* data, std::size_t size, std::size_t offset = 0);
+		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0);
 
 		Buffer& operator =(const Buffer&) = delete;
 		Buffer& operator =(Buffer&&) = delete;
@@ -61,7 +61,7 @@ namespace PonyEngine::Render::Direct3D12
 		assert(resource.GetDesc1().Dimension == D3D12_RESOURCE_DIMENSION_BUFFER && "The resource has a wrong dimension.");
 	}
 
-	void Buffer::GetData(void* const data, const std::size_t size, const std::size_t offset) const noexcept
+	void Buffer::GetData(void* const data, const std::size_t size, const std::size_t offset) const
 	{
 		CheckParams(data, size, offset);
 
@@ -70,12 +70,12 @@ namespace PonyEngine::Render::Direct3D12
 		Unmap();
 	}
 
-	void Buffer::GetData(PonyBase::Container::Buffer& buffer, const std::size_t offset) const noexcept
+	void Buffer::GetData(PonyBase::Container::Buffer& buffer, const std::size_t offset) const
 	{
 		GetData(buffer.Data(), buffer.Size(), offset);
 	}
 
-	void Buffer::SetData(const void* const data, const std::size_t size, const std::size_t offset) noexcept
+	void Buffer::SetData(const void* const data, const std::size_t size, const std::size_t offset)
 	{
 		CheckParams(data, size, offset);
 
@@ -84,14 +84,18 @@ namespace PonyEngine::Render::Direct3D12
 		Unmap();
 	}
 
-	void Buffer::SetData(const PonyBase::Container::Buffer& buffer, const std::size_t offset) noexcept
+	void Buffer::SetData(const PonyBase::Container::Buffer& buffer, const std::size_t offset)
 	{
 		SetData(buffer.Data(), buffer.Size(), offset);
 	}
 
 	void Buffer::CheckParams(const void* const data, const std::size_t size, const std::size_t offset) const
 	{
-		assert(data && "The data is nullptr.");
+		if (!data)
+		{
+			throw std::invalid_argument("Data is nullptr.");
+		}
+
 		if (offset + size > resource->GetDesc1().Width)
 		{
 			throw std::out_of_range("Out of bounds.");

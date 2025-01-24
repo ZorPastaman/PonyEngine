@@ -13,6 +13,11 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeap;
 
+import <string>;
+import <string_view>;
+
+import :ObjectUtility;
+
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Descriptor heap.
@@ -44,7 +49,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Descriptor handle increment.
 		[[nodiscard("Pure function")]]
 		UINT HandleIncrement() const noexcept;
-
 		/// @brief Gets the descriptor handle count.
 		/// @return Descriptor handle count.
 		[[nodiscard("Pure function")]]
@@ -71,6 +75,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Index.
 		[[nodiscard("Pure function")]]
 		UINT Index(D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle) const noexcept;
+
+		void Name(std::string_view name);
 
 		DescriptorHeap& operator =(const DescriptorHeap& other) noexcept = default;
 		DescriptorHeap& operator =(DescriptorHeap&& other) noexcept = default;
@@ -127,5 +133,10 @@ namespace PonyEngine::Render::Direct3D12
 	UINT DescriptorHeap::Index(const D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle) const noexcept
 	{
 		return static_cast<UINT>((gpuHandle.ptr - heap->GetGPUDescriptorHandleForHeapStart().ptr) / handleIncrement);
+	}
+
+	void DescriptorHeap::Name(const std::string_view name)
+	{
+		SetName(*heap.Get(), name);
 	}
 }

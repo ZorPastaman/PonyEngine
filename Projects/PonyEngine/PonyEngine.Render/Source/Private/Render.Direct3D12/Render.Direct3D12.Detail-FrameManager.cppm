@@ -9,14 +9,21 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/Direct3D12/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:FrameManager;
 
 import <memory>;
 import <stdexcept>;
+import <vector>;
 
 import PonyBase.Utility;
+
+import PonyDebug.Log;
 
 import PonyEngine.Render.Direct3D12;
 
@@ -45,10 +52,13 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Utility::Resolution<UINT>& Resolution() const noexcept override;
 
-		[[nodiscard("Pure function")]] virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<class Frame> CreateFrame() override;
+		virtual std::shared_ptr<Frame> CreateFrame() override;
+
+		void Clean() noexcept;
 
 		FrameManager& operator =(const FrameManager&) = delete;
 		FrameManager& operator =(FrameManager&&) = delete;
@@ -62,6 +72,8 @@ export namespace PonyEngine::Render::Direct3D12
 		DXGI_SAMPLE_DESC sampleDesc;
 
 		ISubSystemContext* d3d12System;
+
+		std::vector<std::shared_ptr<Frame>> frames;
 	};
 }
 
@@ -114,16 +126,27 @@ namespace PonyEngine::Render::Direct3D12
 		return sampleDesc;
 	}
 
-	std::shared_ptr<class Frame> FrameManager::CreateFrame()
+	std::shared_ptr<Frame> FrameManager::CreateFrame()
 	{
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create textures.");
 		const auto renderTarget = d3d12System->ResourceManager().CreateRenderTarget(resolution.Width(), resolution.Height(), rtvFormat, sampleDesc, clearColor);
+		assert(renderTarget && "The render target is nullptr.");
 		const auto resolveTarget = sampleDesc.Count > 1u ? d3d12System->ResourceManager().CreateRenderTarget(resolution.Width(), resolution.Height(), rtvFormat, DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u}, clearColor) : nullptr;
+		assert(sampleDesc.Count <= 1u || resolveTarget && "The resolve target is nullptr.");
 		const auto depthStencil = d3d12System->ResourceManager().CreateDepthStencil(resolution.Width(), resolution.Height(), DepthStencilFormat, sampleDesc, D3D12_DEPTH_STENCIL_VALUE{.Depth = D3D12_MAX_DEPTH, .Stencil = 0u});
+		assert(depthStencil && "The depth stencil is nullptr.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Textures created.");
 
-		const auto renderTargetHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1u, false);
-		const auto renderTargetShaderHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1u, true);
-		const auto depthStencilHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1u, false);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create heaps.");
+		const auto rtvHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, 1u, false);
+		assert(rtvHeap && "The rtv heap is nullptr.");
+		const auto srvHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, 1u, true);
+		assert(srvHeap && "The srv heap is nullptr.");
+		const auto dsvHeap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_DSV, 1u, false);
+		assert(dsvHeap && "The dsv heap is nullptr.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Heaps created.");
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create views.");
 		const auto rtvDesc = resolveTarget
 			? D3D12_RENDER_TARGET_VIEW_DESC
 			{
@@ -137,8 +160,7 @@ namespace PonyEngine::Render::Direct3D12
 				.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
 				.Texture2D = D3D12_TEX2D_RTV{}
 			};
-		d3d12System->Device().CreateRenderTargetView(&renderTarget->Data(), &rtvDesc, renderTargetHeap->CpuHandle(0u));
-
+		d3d12System->Device().CreateRenderTargetView(&renderTarget->Data(), &rtvDesc, rtvHeap->CpuHandle(0u));
 		const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
 		{
 			.Format = rtvFormat,
@@ -146,16 +168,34 @@ namespace PonyEngine::Render::Direct3D12
 			.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 			.Texture2D = D3D12_TEX2D_SRV{.MostDetailedMip = 0u, .MipLevels = 1u, .PlaneSlice = 0u, .ResourceMinLODClamp = 0.f}
 		};
-		d3d12System->Device().CreateShaderResourceView(resolveTarget ? &resolveTarget->Data() : &renderTarget->Data(), &srvDesc, renderTargetShaderHeap->CpuHandle(0u));
-
+		d3d12System->Device().CreateShaderResourceView(resolveTarget ? &resolveTarget->Data() : &renderTarget->Data(), &srvDesc, srvHeap->CpuHandle(0u));
 		const auto dsvDesc = D3D12_DEPTH_STENCIL_VIEW_DESC
 		{
 			.Format = DepthStencilFormat,
 			.ViewDimension = sampleDesc.Count > 1u ? D3D12_DSV_DIMENSION_TEXTURE2DMS : D3D12_DSV_DIMENSION_TEXTURE2D,
 			.Flags = D3D12_DSV_FLAG_NONE
 		};
-		this->d3d12System->Device().CreateDepthStencilView(&depthStencil->Data(), &dsvDesc, depthStencilHeap->CpuHandle(0u));
+		this->d3d12System->Device().CreateDepthStencilView(&depthStencil->Data(), &dsvDesc, dsvHeap->CpuHandle(0u));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Views created.");
 
-		return std::make_shared<Frame>(renderTarget, resolveTarget, depthStencil, renderTargetHeap, renderTargetShaderHeap, depthStencilHeap);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create frame.");
+		const auto frame = std::make_shared<Frame>(renderTarget, resolveTarget, depthStencil, rtvHeap, srvHeap, dsvHeap);
+		frames.push_back(frame);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Frame created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(frame.get()));
+
+		return frame;
+	}
+
+	void FrameManager::Clean() noexcept
+	{
+		for (std::size_t i = frames.size(); i-- > 0; )
+		{
+			if (frames[i].use_count() <= 1L)
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy frame at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(frames[i].get()));
+				frames.erase(frames.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Frame destroyed.");
+			}
+		}
 	}
 }

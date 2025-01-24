@@ -25,7 +25,7 @@ export namespace PonyEngine::Render::Direct3D12
 	public:
 		[[nodiscard("Pure constructor")]]
 		Frame(const std::shared_ptr<Texture>& renderTarget, const std::shared_ptr<Texture>& resolveTarget, const std::shared_ptr<Texture>& depthStencil,
-			const std::shared_ptr<DescriptorHeap>& renderTargetHeap, const std::shared_ptr<DescriptorHeap>& renderTargetShaderHeap, const std::shared_ptr<DescriptorHeap>& depthStencilHeap) noexcept;
+			const std::shared_ptr<DescriptorHeap>& rtvHeap, const std::shared_ptr<DescriptorHeap>& srvHeap, const std::shared_ptr<DescriptorHeap>& dsvHeap) noexcept;
 		Frame(const Frame&) = delete;
 		Frame(Frame&&) = delete;
 
@@ -42,22 +42,29 @@ export namespace PonyEngine::Render::Direct3D12
 		const Texture* ResolveTarget() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		Texture& FinalTarget() noexcept;
+		[[nodiscard("Pure function")]]
+		const Texture& FinalTarget() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		Texture& DepthStencil() noexcept;
 		[[nodiscard("Pure function")]]
 		const Texture& DepthStencil() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		DescriptorHeap& RenderTargetShaderHeap() noexcept;
+		DescriptorHeap& SrvHeap() noexcept;
 		[[nodiscard("Pure function")]]
-		const DescriptorHeap& RenderTargetShaderHeap() const noexcept;
+		const DescriptorHeap& SrvHeap() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE RenderTargetHandle() const noexcept;
+		D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept;
 		[[nodiscard("Pure function")]]
-		D3D12_GPU_DESCRIPTOR_HANDLE RenderTargetShaderHandle() const noexcept;
+		D3D12_GPU_DESCRIPTOR_HANDLE SrvHandle() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE DepthStencilHandle() const noexcept;
+		D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept;
+
+		void Name(std::string_view name);
 
 		Frame& operator =(const Frame&) = delete;
 		Frame& operator =(Frame&&) = delete;
@@ -67,22 +74,22 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<Texture> resolveTarget;
 		std::shared_ptr<Texture> depthStencil;
 
-		std::shared_ptr<DescriptorHeap> renderTargetHeap;
-		std::shared_ptr<DescriptorHeap> renderTargetShaderHeap;
-		std::shared_ptr<DescriptorHeap> depthStencilHeap;
+		std::shared_ptr<DescriptorHeap> rtvHeap;
+		std::shared_ptr<DescriptorHeap> srvHeap;
+		std::shared_ptr<DescriptorHeap> dsvHeap;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Frame::Frame(const std::shared_ptr<Texture>& renderTarget, const std::shared_ptr<Texture>& resolveTarget, const std::shared_ptr<Texture>& depthStencil, const std::shared_ptr<DescriptorHeap>& renderTargetHeap,
-		const std::shared_ptr<DescriptorHeap>& renderTargetShaderHeap, const std::shared_ptr<DescriptorHeap>& depthStencilHeap) noexcept :
+	Frame::Frame(const std::shared_ptr<Texture>& renderTarget, const std::shared_ptr<Texture>& resolveTarget, const std::shared_ptr<Texture>& depthStencil, const std::shared_ptr<DescriptorHeap>& rtvHeap,
+		const std::shared_ptr<DescriptorHeap>& srvHeap, const std::shared_ptr<DescriptorHeap>& dsvHeap) noexcept :
 		renderTarget(renderTarget),
 		resolveTarget(resolveTarget),
 		depthStencil(depthStencil),
-		renderTargetHeap(renderTargetHeap),
-		renderTargetShaderHeap(renderTargetShaderHeap),
-		depthStencilHeap(depthStencilHeap)
+		rtvHeap(rtvHeap),
+		srvHeap(srvHeap),
+		dsvHeap(dsvHeap)
 	{
 	}
 
@@ -106,6 +113,16 @@ namespace PonyEngine::Render::Direct3D12
 		return resolveTarget.get();
 	}
 
+	Texture& Frame::FinalTarget() noexcept
+	{
+		return resolveTarget ? *resolveTarget : *renderTarget;
+	}
+
+	const Texture& Frame::FinalTarget() const noexcept
+	{
+		return resolveTarget ? *resolveTarget : *renderTarget;
+	}
+
 	Texture& Frame::DepthStencil() noexcept
 	{
 		return *depthStencil;
@@ -116,28 +133,59 @@ namespace PonyEngine::Render::Direct3D12
 		return *depthStencil;
 	}
 
-	DescriptorHeap& Frame::RenderTargetShaderHeap() noexcept
+	DescriptorHeap& Frame::SrvHeap() noexcept
 	{
-		return *renderTargetShaderHeap;
+		return *srvHeap;
 	}
 
-	const DescriptorHeap& Frame::RenderTargetShaderHeap() const noexcept
+	const DescriptorHeap& Frame::SrvHeap() const noexcept
 	{
-		return *renderTargetShaderHeap;
+		return *srvHeap;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Frame::RenderTargetHandle() const noexcept
+	D3D12_CPU_DESCRIPTOR_HANDLE Frame::RtvHandle() const noexcept
 	{
-		return renderTargetHeap->CpuHandle(0u);
+		return rtvHeap->CpuHandle(0u);
 	}
 
-	D3D12_GPU_DESCRIPTOR_HANDLE Frame::RenderTargetShaderHandle() const noexcept
+	D3D12_GPU_DESCRIPTOR_HANDLE Frame::SrvHandle() const noexcept
 	{
-		return renderTargetShaderHeap->GpuHandle(0u);
+		return srvHeap->GpuHandle(0u);
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Frame::DepthStencilHandle() const noexcept
+	D3D12_CPU_DESCRIPTOR_HANDLE Frame::DsvHandle() const noexcept
 	{
-		return depthStencilHeap->CpuHandle(0u);
+		return dsvHeap->CpuHandle(0u);
+	}
+
+	void Frame::Name(const std::string_view name)
+	{
+		constexpr std::string_view rtvName = "-RTV";
+		constexpr std::string_view resolveName = "-Resolve";
+		constexpr std::string_view srvName = "-SRV";
+		constexpr std::string_view dsvName = "-DSV";
+
+		auto componentName = std::string();
+		componentName.reserve(name.size() + resolveName.size());
+
+		componentName.append(name).append(rtvName);
+		renderTarget->Name(componentName);
+		rtvHeap->Name(componentName);
+
+		componentName.erase();
+		componentName.append(name).append(srvName);
+		srvHeap->Name(componentName);
+
+		componentName.erase();
+		componentName.append(name).append(dsvName);
+		depthStencil->Name(componentName);
+		dsvHeap->Name(componentName);
+
+		if (resolveTarget)
+		{
+			componentName.erase();
+			componentName.append(name).append(resolveName);
+			resolveTarget->Name(componentName);
+		}
 	}
 }

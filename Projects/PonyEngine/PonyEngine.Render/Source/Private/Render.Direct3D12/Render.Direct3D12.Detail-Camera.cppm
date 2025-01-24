@@ -29,9 +29,6 @@ export namespace PonyEngine::Render::Direct3D12
 	class Camera final : public ICamera
 	{
 	public:
-		static constexpr UINT ViewMatrixIndex = 0u;
-		static constexpr UINT ProjectionMatrixIndex = 1u;
-
 		[[nodiscard("Pure constructor")]]
 		Camera(const PonyMath::Core::Matrix4x4<FLOAT>& viewMatrix, const PonyMath::Core::Matrix4x4<FLOAT>& projectionMatrix, 
 			const PonyMath::Color::RGBA<FLOAT>& clearColor, const PonyMath::Shape::Rect<FLOAT>& viewportRect,
@@ -60,6 +57,10 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void ViewportRect(const PonyMath::Shape::Rect<float>& rect) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual std::int32_t SortingOrder() const noexcept override;
+		virtual void SortingOrder(std::int32_t order) noexcept override;
+
+		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<FLOAT>& ViewMatrixD3D12() const noexcept;
 		void ViewMatrixD3D12(const PonyMath::Core::Matrix4x4<FLOAT>& matrix) noexcept;
 
@@ -74,11 +75,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const PonyMath::Shape::Rect<FLOAT>& ViewportRectD3D12() const noexcept;
 		void ViewportRectD3D12(const PonyMath::Shape::Rect<FLOAT>& rect) noexcept;
-
-		[[nodiscard("Pure function")]]
-		std::int32_t& SortingOrder() noexcept;
-		[[nodiscard("Pure function")]]
-		const std::int32_t& SortingOrder() const noexcept;
 
 		Camera& operator =(const Camera& other) noexcept = default;
 		Camera& operator =(Camera&& other) noexcept = default;
@@ -148,6 +144,16 @@ namespace PonyEngine::Render::Direct3D12
 		ViewportRectD3D12(static_cast<PonyMath::Shape::Rect<FLOAT>>(rect));
 	}
 
+	std::int32_t Camera::SortingOrder() const noexcept
+	{
+		return sortingOrder;
+	}
+
+	void Camera::SortingOrder(const std::int32_t order) noexcept
+	{
+		sortingOrder = order;
+	}
+
 	const PonyMath::Core::Matrix4x4<FLOAT>& Camera::ViewMatrixD3D12() const noexcept
 	{
 		return viewMatrix;
@@ -188,13 +194,4 @@ namespace PonyEngine::Render::Direct3D12
 		viewportRect = rect;
 	}
 
-	std::int32_t& Camera::SortingOrder() noexcept
-	{
-		return sortingOrder;
-	}
-
-	const std::int32_t& Camera::SortingOrder() const noexcept
-	{
-		return sortingOrder;
-	}
 }

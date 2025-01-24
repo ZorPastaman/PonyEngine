@@ -20,6 +20,6 @@ export namespace PonyEngine::Time
 	/// @brief Frame rate system factory.
 	class FrameRateSystemFactory : public Core::ISystemFactory
 	{
-		BASE_BODY(FrameRateSystemFactory)
+		SIMPLE_BASE_BODY(FrameRateSystemFactory)
 	};
 }

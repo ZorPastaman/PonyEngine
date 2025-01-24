@@ -13,11 +13,14 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeapManager;
 
 import <cstddef>;
 import <memory>;
 import <type_traits>;
+import <vector>;
 
 import PonyBase.Utility;
 
@@ -45,11 +48,15 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, bool shaderVisible) override;
 
+		void Clean() noexcept;
+
 		DescriptorHeapManager& operator =(const DescriptorHeapManager& other) noexcept = default;
 		DescriptorHeapManager& operator =(DescriptorHeapManager&& other) noexcept = default;
 
 	private:
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
+
+		std::vector<std::shared_ptr<DescriptorHeap>> descriptorHeaps;
 	};
 }
 
@@ -69,13 +76,29 @@ namespace PonyEngine::Render::Direct3D12
 			.Flags = shaderVisible ? D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE : D3D12_DESCRIPTOR_HEAP_FLAG_NONE,
 			.NodeMask = 0u
 		};
-		ID3D12Device10& device = d3d12System->Device();
 		Microsoft::WRL::ComPtr<ID3D12DescriptorHeap> heap;
-		if (const HRESULT result = device.CreateDescriptorHeap(&heapDescriptor, IID_PPV_ARGS(heap.GetAddressOf())); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = d3d12System->Device().CreateDescriptorHeap(&heapDescriptor, IID_PPV_ARGS(heap.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire descriptor heap with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		return std::make_shared<DescriptorHeap>(*heap.Get(), device.GetDescriptorHandleIncrementSize(heapType));
+		const auto descriptorHeap = std::make_shared<DescriptorHeap>(*heap.Get(), d3d12System->Device().GetDescriptorHandleIncrementSize(heapType));
+		descriptorHeaps.push_back(descriptorHeap);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(descriptorHeap.get()));
+
+		return descriptorHeap;
+	}
+
+	void DescriptorHeapManager::Clean() noexcept
+	{
+		for (std::size_t i = descriptorHeaps.size(); i-- > 0; )
+		{
+			if (descriptorHeaps[i].use_count() <= 1L)
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy descriptor heap at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(descriptorHeaps[i].get()));
+				descriptorHeaps.erase(descriptorHeaps.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap destroyed.");
+			}
+		}
 	}
 }

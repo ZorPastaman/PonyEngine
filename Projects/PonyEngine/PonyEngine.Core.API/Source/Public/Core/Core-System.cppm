@@ -21,7 +21,7 @@ export namespace PonyEngine::Core
 	/// @brief System.
 	class System
 	{
-		BASE_BODY_WITHOUT_DEFAULT_CONSTRUCTOR(System)
+		BASE_BODY(System)
 
 	public:
 		/// @brief Begins the system.

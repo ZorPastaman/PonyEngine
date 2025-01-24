@@ -19,7 +19,7 @@ export namespace PonyEngine::Window::Windows
 	/// @brief Windows class.
 	class Class
 	{
-		BASE_BODY(Class)
+		SIMPLE_BASE_BODY(Class)
 
 	public:
 		/// @brief Gets a module handle.

@@ -18,6 +18,6 @@ export namespace PonyEngine::Render::Direct3D12
 	/// @brief Direct3D12 render target parameters.
 	struct SwapChainParams final
 	{
-		UINT bufferCount = 2u; ///< Buffer count.
+		UINT bufferCount = 3u; ///< Buffer count.
 	};
 }

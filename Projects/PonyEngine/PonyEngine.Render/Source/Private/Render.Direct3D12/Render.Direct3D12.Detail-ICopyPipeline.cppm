@@ -13,8 +13,6 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:ICopyPipeline;
 
-import <memory>;
-
 import :Buffer;
 import :Texture;
 
@@ -29,11 +27,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param source Copy source.
 		/// @param destination Copy destination.
 		/// @note The buffers must be the same size.
-		virtual void AddCopyTask(const std::shared_ptr<Buffer>& source, const std::shared_ptr<Buffer>& destination) = 0;
+		virtual void AddCopyTask(Buffer& source, Buffer& destination) = 0;
 		/// @brief Adds a texture copy task.
 		/// @param source Copy source.
 		/// @param destination Copy destination.
 		/// @note The textures must be compatible for copying.
-		virtual void AddCopyTask(const std::shared_ptr<Texture>& source, const std::shared_ptr<Texture>& destination) = 0;
+		virtual void AddCopyTask(Texture& source, Texture& destination) = 0;
 	};
 }

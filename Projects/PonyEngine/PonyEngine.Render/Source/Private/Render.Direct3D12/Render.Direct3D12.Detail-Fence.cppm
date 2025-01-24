@@ -45,28 +45,6 @@ export namespace PonyEngine::Render::Direct3D12
 
 		~Fence() noexcept;
 
-		/// @brief Gets the fence.
-		/// @return Fence.
-		[[nodiscard("Pure function")]]
-		ID3D12Fence1& ControlledFence() noexcept;
-		/// @brief Gets the fence.
-		/// @return Fence.
-		[[nodiscard("Pure function")]]
-		const ID3D12Fence1& ControlledFence() const noexcept;
-
-		/// @brief Gets the current fence value.
-		/// @return Current fence value.
-		[[nodiscard("Pure function")]]
-		UINT64 CurrentValue() const noexcept;
-		/// @brief Gets the completed fence value.
-		/// @return Completed fence value.
-		[[nodiscard("Pure function")]]
-		UINT64 CompletedValue() const noexcept;
-
-		/// @brief Sets the name to the fence components.
-		/// @param name Name.
-		void Name(std::string_view name);
-
 		/// @brief Increases the current fence value and signals the fence.
 		void Signal();
 		/// @brief Sets the wait event and waits for it.
@@ -76,6 +54,10 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Sets the waiting command queue to wait for the fence.
 		/// @param waitingCommandQueue Waiting command queue.
 		void Wait(ID3D12CommandQueue& waitingCommandQueue) const;
+
+		/// @brief Sets the name to the fence components.
+		/// @param name Name.
+		void Name(std::string_view name);
 
 		Fence& operator =(const Fence&) = delete;
 		Fence& operator =(Fence&& other) noexcept = default;
@@ -116,36 +98,6 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Command queue released.");
 	}
 
-	ID3D12Fence1& Fence::ControlledFence() noexcept
-	{
-		return *fence.Get();
-	}
-
-	const ID3D12Fence1& Fence::ControlledFence() const noexcept
-	{
-		return *fence.Get();
-	}
-
-	UINT64 Fence::CurrentValue() const noexcept
-	{
-		return currentValue;
-	}
-
-	UINT64 Fence::CompletedValue() const noexcept
-	{
-		return fence->GetCompletedValue();
-	}
-
-	void Fence::Name(const std::string_view name)
-	{
-		constexpr std::string_view fenceName = " - Fence";
-
-		auto componentName = std::string();
-		componentName.reserve(name.size() + fenceName.size());
-		componentName.append(name).append(fenceName);
-		SetName(*fence.Get(), componentName);
-	}
-
 	void Fence::Signal()
 	{
 		++currentValue;
@@ -180,5 +132,10 @@ namespace PonyEngine::Render::Direct3D12
 				throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set gpu wait with '0x{:X}' result. Fence value: '{}'.", static_cast<std::make_unsigned_t<HRESULT>>(result), currentValue));
 			}
 		}
+	}
+
+	void Fence::Name(const std::string_view name)
+	{
+		SetName(*fence.Get(), name);
 	}
 }
