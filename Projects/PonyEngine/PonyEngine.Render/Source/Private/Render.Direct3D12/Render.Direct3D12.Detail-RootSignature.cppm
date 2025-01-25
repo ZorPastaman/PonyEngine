@@ -48,6 +48,8 @@ export namespace PonyEngine::Render::Direct3D12
 		const ID3D12RootSignature& ControlledRootSignature() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		const std::unordered_map<std::string, UINT>& DataSlots() const noexcept;
+		[[nodiscard("Pure function")]]
 		std::optional<UINT> FindDataSlot(std::string_view dataType) const noexcept;
 
 		/// @brief Sets the name to the root signature components.
@@ -79,6 +81,11 @@ namespace PonyEngine::Render::Direct3D12
 	const ID3D12RootSignature& RootSignature::ControlledRootSignature() const noexcept
 	{
 		return *rootSignature.Get();
+	}
+
+	const std::unordered_map<std::string, UINT>& RootSignature::DataSlots() const noexcept
+	{
+		return dataSlots;
 	}
 
 	std::optional<UINT> RootSignature::FindDataSlot(const std::string_view dataType) const noexcept

@@ -673,9 +673,10 @@ namespace PonyEngine::Render::Direct3D12
 		for (const std::size_t renderObjectIndex : renderObjectIndices)
 		{
 			RenderObject* const renderObject = renderObjects[renderObjectIndex];
-
 			Material* const material = &renderObject->Material();
 			RootSignature* const rootSignature = &material->RootSignature();
+			Mesh* const mesh = &renderObject->Mesh();
+
 			if (rootSignature != prevRootSignature)
 			{
 				CommandList().SetGraphicsRootSignature(&rootSignature->ControlledRootSignature());
@@ -685,14 +686,13 @@ namespace PonyEngine::Render::Direct3D12
 				CommandList().SetPipelineState(&material->PipelineState());
 			}
 
-			Mesh* const mesh = &renderObject->Mesh();
 			if (mesh != prevMesh || rootSignature != prevRootSignature)
 			{
-				for (const std::string& dataType : mesh->DataTypes())
+				for (const auto& [dataType, dataSlot] : rootSignature->DataSlots())
 				{
-					if (const std::optional<UINT> slot = rootSignature->FindDataSlot(dataType)) // TODO: Make it root signature major.
+					if (const std::optional<UINT> meshDataIndex = mesh->FindDataIndex(dataType))
 					{
-						CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->BufferOffset(mesh->FindDataIndex(dataType).value())));
+						CommandList().SetGraphicsRootDescriptorTable(dataSlot, dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->BufferOffset(meshDataIndex.value())));
 					}
 				}
 			}

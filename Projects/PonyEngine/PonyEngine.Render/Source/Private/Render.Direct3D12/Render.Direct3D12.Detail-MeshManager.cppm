@@ -170,14 +170,14 @@ namespace PonyEngine::Render::Direct3D12
 	Mesh MeshManager::CreateMesh(const Render::Mesh& mesh)
 	{
 		std::vector<std::string> dataTypes;
-		std::vector<std::size_t> bufferOffsets;
+		std::vector<UINT> bufferOffsets; // TODO: Check if all the buffer counts are UINT or std::uint32_t - including render mesh and usual mesh.
 		std::vector<std::shared_ptr<Buffer>> buffers;
 		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(mesh.BufferCount()), false);
 
 		for (const std::string& dataType : mesh.DataTypes())
 		{
 			dataTypes.push_back(dataType);
-			bufferOffsets.push_back(buffers.size());
+			bufferOffsets.push_back(static_cast<UINT>(buffers.size()));
 
 			for (const PonyBase::Container::Buffer& sourceBuffer : mesh.FindBufferTable(dataType))
 			{
