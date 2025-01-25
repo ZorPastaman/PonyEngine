@@ -702,8 +702,11 @@ namespace PonyEngine::Render::Direct3D12
 				CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + TransformIndex(cameraIndex, renderObjectIndex)));
 			}
 
-			const std::span<const UINT, 3> threadGroupCounts = mesh->ThreadGroupCounts();
-			CommandList().DispatchMesh(threadGroupCounts[0], threadGroupCounts[1], threadGroupCounts[2]); // TODO: Support amplification shader with custom thread group counts
+			const std::span<const UINT, 3> meshGroupCounts = mesh->ThreadGroupCounts();
+			const std::span<const UINT, 3> materialGroupCounts = material->ThreadGroupCounts();
+			CommandList().DispatchMesh(PonyMath::Core::CeilDivision(meshGroupCounts[0], materialGroupCounts[0]), 
+				PonyMath::Core::CeilDivision(meshGroupCounts[1], materialGroupCounts[1]), 
+				PonyMath::Core::CeilDivision(meshGroupCounts[2], materialGroupCounts[2]));
 
 			prevRootSignature = rootSignature;
 			prevMaterial = material;

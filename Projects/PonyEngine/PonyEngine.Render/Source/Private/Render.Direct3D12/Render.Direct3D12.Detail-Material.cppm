@@ -13,8 +13,10 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Material;
 
+import <array>;
 import <memory>;
 import <optional>;
+import <span>;
 import <string>;
 import <string_view>;
 
@@ -62,6 +64,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		bool IsTransparent() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::span<const UINT, 3> ThreadGroupCounts() const noexcept;
+
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
 		void Name(std::string_view name);
@@ -73,6 +78,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
+		std::array<UINT, 3> threadGroupCounts = {1u, 1u, 1u};
 		bool isTransparent = false; // TODO: Support material params.
 	};
 }
@@ -108,6 +114,11 @@ namespace PonyEngine::Render::Direct3D12
 	bool Material::IsTransparent() const noexcept
 	{
 		return isTransparent;
+	}
+
+	std::span<const UINT, 3> Material::ThreadGroupCounts() const noexcept
+	{
+		return threadGroupCounts;
 	}
 
 	void Material::Name(const std::string_view name)

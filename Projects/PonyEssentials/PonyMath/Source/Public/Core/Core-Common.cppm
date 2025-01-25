@@ -74,6 +74,9 @@ export namespace PonyMath::Core
 	/// @return Rounded integral.
 	template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
+
+	template<std::integral T> [[nodiscard("Pure function")]]
+	constexpr T CeilDivision(T numerator, T denominator) noexcept; // TODO: Add docs and tests
 }
 
 namespace PonyMath::Core
@@ -100,5 +103,11 @@ namespace PonyMath::Core
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
 		return static_cast<To>(from + From{0.5} - (from < From{0}));
+	}
+
+	template<std::integral T>
+	constexpr T CeilDivision(const T numerator, const T denominator) noexcept
+	{
+		return (numerator + denominator - T{1}) / denominator;
 	}
 }
