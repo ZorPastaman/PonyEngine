@@ -48,7 +48,7 @@ import :MaterialManager;
 import :MeshManager;
 import :ObjectUtility;
 import :RenderObjectManager;
-import :RenderTargetParams;
+import :FrameParams;
 import :ResourceManager;
 import :RootSignatureManager;
 import :SubSystemParams;
