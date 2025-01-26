@@ -9,28 +9,29 @@
 
 module;
 
-#include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IRootSignatureManagerPrivate;
+export module PonyEngine.Render.Direct3D12.Detail:IMaterialManager;
 
 import <memory>;
 
+import :Material;
 import :RootSignature;
 import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 root signature manager.
-	class IRootSignatureManager
+	/// @brief Direct3D12 material manager.
+	class IMaterialManager
 	{
-		INTERFACE_BODY(IRootSignatureManager)
+		INTERFACE_BODY(IMaterialManager)
 
-		/// @brief Creates a root signature.
-		/// @param rootSignatureShader Root signature shader.
-		/// @param dataSlots Data slots.
-		/// @return Root signature.
+		/// @brief Creates a material.
+		/// @param rootSignature Root signature.
+		/// @param meshShader Mesh shader.
+		/// @param pixelShader Pixel shader.
+		/// @return Material.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<RootSignature> CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots) = 0;
+		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const Shader& meshShader, const Shader& pixelShader) = 0;
 	};
 }

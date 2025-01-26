@@ -35,7 +35,7 @@ import PonyDebug.Log;
 
 import :ICopyPipeline;
 import :IGraphicsPipeline;
-import :IMeshManagerPrivate;
+import :IMeshManager;
 import :ISubSystemContext;
 import :Mesh;
 

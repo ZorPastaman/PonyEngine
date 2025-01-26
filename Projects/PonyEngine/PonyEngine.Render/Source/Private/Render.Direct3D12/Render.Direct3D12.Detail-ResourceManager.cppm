@@ -45,6 +45,7 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual std::shared_ptr<Texture> CreateTexture2D(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Texture> CreateTexture3D(UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
+
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Texture> CreateRenderTarget(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<FLOAT>& clearColor) override;
 		[[nodiscard("Redendant call")]]

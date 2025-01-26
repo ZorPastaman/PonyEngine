@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IMeshManagerPrivate;
+export module PonyEngine.Render.Direct3D12.Detail:IMeshManager;
 
 import <memory>;
 
