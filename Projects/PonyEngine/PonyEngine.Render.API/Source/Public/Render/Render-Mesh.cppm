@@ -32,6 +32,8 @@ export namespace PonyEngine::Render
 	class Mesh final
 	{
 	public:
+		static constexpr std::uint64_t InitialVersion = 1ULL;
+
 		class BufferTableAccess;
 
 		class BufferAccess final
@@ -110,14 +112,14 @@ export namespace PonyEngine::Render
 			~BufferTableAccess() noexcept = default;
 
 			[[nodiscard("Pure function")]]
-			BufferAccess Buffer(std::size_t index) noexcept;
+			BufferAccess Buffer(std::uint32_t index) noexcept;
 			[[nodiscard("Pure function")]]
-			const PonyBase::Container::Buffer& Buffer(std::size_t index) const noexcept;
+			const PonyBase::Container::Buffer& Buffer(std::uint32_t index) const noexcept;
 
 			template<typename T> [[nodiscard("Pure function")]]
-			BufferViewAccess<T> BufferView(std::size_t index);
+			BufferViewAccess<T> BufferView(std::uint32_t index);
 			template<typename T> [[nodiscard("Pure function")]]
-			PonyBase::Container::BufferView<const T> BufferView(std::size_t index) const;
+			PonyBase::Container::BufferView<const T> BufferView(std::uint32_t index) const;
 
 			BufferTableAccess& operator =(const BufferTableAccess& other) noexcept = default;
 			BufferTableAccess& operator =(BufferTableAccess&& other) noexcept = default;
@@ -149,36 +151,67 @@ export namespace PonyEngine::Render
 		void DestroyBufferTable(std::string_view dataType) noexcept;
 
 		[[nodiscard("Pure function")]]
+		std::optional<std::uint32_t> DataIndex(std::string_view dataType) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::string_view DataType(std::uint32_t dataIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::uint32_t DataTypeCount() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		std::span<const std::string> DataTypes() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<std::size_t> BufferCount(std::string_view dataType) const noexcept;
+		std::uint32_t BufferCount(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::size_t BufferCount() const noexcept;
+		std::optional<std::uint32_t> BufferCount(std::string_view dataType) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::uint32_t BufferCount() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<BufferAccess> FindBuffer(std::string_view dataType, std::size_t index = 0) noexcept;
+		BufferAccess Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Container::Buffer* FindBuffer(std::string_view dataType, std::size_t index = 0) const noexcept;
+		const PonyBase::Container::Buffer& Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
 		[[nodiscard("Pure function")]]
-		const PonyBase::Container::Buffer* FindBufferConst(std::string_view dataType, std::size_t index = 0) const noexcept;
+		const PonyBase::Container::Buffer& BufferConst(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::optional<BufferAccess> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) noexcept;
+		[[nodiscard("Pure function")]]
+		const PonyBase::Container::Buffer* Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
+		[[nodiscard("Pure function")]]
+		const PonyBase::Container::Buffer* BufferConst(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
 
 		template<typename T> [[nodiscard("Pure function")]]
-		std::optional<BufferViewAccess<T>> FindBuffer(std::string_view dataType, std::size_t index = 0) noexcept;
+		BufferViewAccess<T> Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) noexcept;
 		template<typename T> [[nodiscard("Pure function")]]
-		std::optional<PonyBase::Container::BufferView<const T>> FindBuffer(std::string_view dataType, std::size_t index = 0) const noexcept;
+		PonyBase::Container::BufferView<const T> Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
 		template<typename T> [[nodiscard("Pure function")]]
-		std::optional<PonyBase::Container::BufferView<const T>> FindBufferConst(std::string_view dataType, std::size_t index = 0) noexcept;
+		PonyBase::Container::BufferView<const T> BufferConst(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		template<typename T> [[nodiscard("Pure function")]]
+		std::optional<BufferViewAccess<T>> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) noexcept;
+		template<typename T> [[nodiscard("Pure function")]]
+		std::optional<PonyBase::Container::BufferView<const T>> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
+		template<typename T> [[nodiscard("Pure function")]]
+		std::optional<PonyBase::Container::BufferView<const T>> BufferConst(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<BufferTableAccess> FindBufferTable(std::string_view dataType) noexcept;
+		BufferTableAccess BufferTable(std::uint32_t dataIndex) noexcept;
 		[[nodiscard("Pure function")]]
-		std::span<const PonyBase::Container::Buffer> FindBufferTable(std::string_view dataType) const noexcept;
+		std::span<const PonyBase::Container::Buffer> BufferTable(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::span<const PonyBase::Container::Buffer> FindBufferTableConst(std::string_view dataType) const noexcept;
+		std::span<const PonyBase::Container::Buffer> BufferTableConst(std::uint32_t dataIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::optional<BufferTableAccess> BufferTable(std::string_view dataType) noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const PonyBase::Container::Buffer> BufferTable(std::string_view dataType) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const PonyBase::Container::Buffer> BufferTableConst(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<std::uint64_t> BufferVersion(std::string_view dataType, std::size_t index = 0) const noexcept;
+		std::uint64_t BufferVersion(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::uint64_t> BufferVersions(std::uint32_t dataIndex) const noexcept;
+		[[nodiscard("Pure function")]]
+		std::optional<std::uint64_t> BufferVersion(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
 		[[nodiscard("Pure function")]]
 		std::span<const std::uint64_t> BufferVersions(std::string_view dataType) const noexcept;
 		[[nodiscard("Pure function")]]
@@ -194,7 +227,7 @@ export namespace PonyEngine::Render
 
 	private:
 		[[nodiscard("Pure function")]]
-		std::optional<std::size_t> IndexOf(std::string_view dataType) const noexcept;
+		std::size_t BufferCountInternal() const noexcept;
 
 		std::vector<std::string> dataTypes;
 		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
@@ -278,51 +311,65 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Mesh::BufferAccess Mesh::BufferTableAccess::Buffer(const std::size_t index) noexcept
+	Mesh::BufferAccess Mesh::BufferTableAccess::Buffer(const std::uint32_t index) noexcept
 	{
 		return BufferAccess(buffers[index], versions[index]);
 	}
 
-	const PonyBase::Container::Buffer& Mesh::BufferTableAccess::Buffer(const std::size_t index) const noexcept
+	const PonyBase::Container::Buffer& Mesh::BufferTableAccess::Buffer(const std::uint32_t index) const noexcept
 	{
 		return buffers[index];
 	}
 
 	template<typename T>
-	Mesh::BufferViewAccess<T> Mesh::BufferTableAccess::BufferView(const std::size_t index)
+	Mesh::BufferViewAccess<T> Mesh::BufferTableAccess::BufferView(const std::uint32_t index)
 	{
 		return BufferViewAccess<T>(PonyBase::Container::BufferView<T>(&buffers[index]), versions[index]);
 	}
 
 	template<typename T>
-	PonyBase::Container::BufferView<const T> Mesh::BufferTableAccess::BufferView(const std::size_t index) const
+	PonyBase::Container::BufferView<const T> Mesh::BufferTableAccess::BufferView(const std::uint32_t index) const
 	{
 		return PonyBase::Container::BufferView<const T>(&buffers[index]);
 	}
 
 	Mesh::Mesh(const MeshParams& params) :
-		meshVersion{0UL},
+		meshVersion{InitialVersion},
 		threadGroupCounts(params.threadGroupCounts)
 	{
+		if (params.bufferTables.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer table count exceeds std::uint32_t max value.");
+		}
+
 		dataTypes.reserve(params.bufferTables.size());
 		bufferTables.reserve(params.bufferTables.size());
 		bufferVersions.reserve(params.bufferTables.size());
 
 		for (const auto& [dataType, bufferTable] : params.bufferTables)
 		{
-			if (bufferTable.size() == 0)
+			if (bufferTable.size() == 0) [[unlikely]]
 			{
 				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data table of '{}' is empty.", dataType));
+			}
+			if (bufferTable.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Buffer table size exceeds std::uint32_t max value.");
 			}
 
 			dataTypes.push_back(std::string(dataType));
 			bufferTables.push_back(bufferTable);
-			bufferVersions.push_back(std::vector<std::uint64_t>(bufferTable.size(), 0UL));
+			bufferVersions.push_back(std::vector<std::uint64_t>(bufferTable.size(), InitialVersion));
+		}
+
+		if (BufferCountInternal() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
 		}
 	}
 
 	Mesh::Mesh(const std::span<const std::uint32_t, 3> threadGroupCounts) noexcept :
-		meshVersion{0UL}
+		meshVersion{InitialVersion}
 	{
 		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
@@ -331,12 +378,12 @@ namespace PonyEngine::Render
 		dataTypes(other.dataTypes),
 		bufferTables(other.bufferTables),
 		bufferVersions(other.bufferVersions),
-		meshVersion{0UL},
+		meshVersion{InitialVersion},
 		threadGroupCounts(other.threadGroupCounts)
 	{
 		for (std::vector<std::uint64_t>& versions : bufferVersions)
 		{
-			std::ranges::fill(versions, 0UL);
+			std::ranges::fill(versions, InitialVersion);
 		}
 	}
 
@@ -344,20 +391,24 @@ namespace PonyEngine::Render
 		dataTypes(std::move(other.dataTypes)),
 		bufferTables(std::move(other.bufferTables)),
 		bufferVersions(std::move(other.bufferVersions)),
-		meshVersion{0UL},
+		meshVersion{InitialVersion},
 		threadGroupCounts(std::move(other.threadGroupCounts))
 	{
 		for (std::vector<std::uint64_t>& versions : bufferVersions)
 		{
-			std::ranges::fill(versions, 0UL);
+			std::ranges::fill(versions, InitialVersion);
 		}
 	}
 
 	Mesh::BufferTableAccess Mesh::CreateBufferTable(const std::string_view dataType, const std::span<const PonyBase::Container::BufferParams> bufferParams)
 	{
-		if (bufferParams.size() == 0)
+		if (bufferParams.size() == 0) [[unlikely]]
 		{
 			throw std::invalid_argument("Buffer params is empty.");
+		}
+		if (bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
 		}
 
 		auto buffers = std::vector<PonyBase::Container::Buffer>();
@@ -366,18 +417,27 @@ namespace PonyEngine::Render
 		{
 			buffers.push_back(PonyBase::Container::Buffer(bufferParam));
 		}
-		auto versions = std::vector<std::uint64_t>(buffers.size(), 0UL);
+		auto versions = std::vector<std::uint64_t>(buffers.size(), InitialVersion);
 
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
-			++meshVersion;
-			bufferTables[tableIndex.value()] = std::move(buffers);
-			bufferVersions[tableIndex.value()] = std::move(versions);
+			if (BufferCountInternal() - BufferCount(dataIndex.value()) + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+			{
+				throw std::invalid_argument("Buffer count will exceed std::uint32_t max value.");
+			}
 
-			return BufferTableAccess(bufferTables[tableIndex.value()], bufferVersions[tableIndex.value()]);
+			++meshVersion;
+			bufferTables[dataIndex.value()] = std::move(buffers);
+			bufferVersions[dataIndex.value()] = std::move(versions);
+
+			return BufferTableAccess(bufferTables[dataIndex.value()], bufferVersions[dataIndex.value()]);
 		}
 
 		const std::size_t newSize = dataTypes.size() + 1;
+		if (BufferCountInternal() + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer count will exceed std::uint32_t max value.");
+		}
 		dataTypes.reserve(newSize);
 		bufferTables.reserve(newSize);
 		bufferVersions.reserve(newSize);
@@ -392,7 +452,7 @@ namespace PonyEngine::Render
 
 	void Mesh::DestroyBufferTable(const std::string_view dataType) noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		if (const std::optional<std::size_t> tableIndex = DataIndex(dataType))
 		{
 			++meshVersion;
 			dataTypes.erase(dataTypes.begin() + tableIndex.value());
@@ -401,65 +461,126 @@ namespace PonyEngine::Render
 		}
 	}
 
+	std::optional<std::uint32_t> Mesh::DataIndex(const std::string_view dataType) const noexcept
+	{
+		for (std::uint32_t i = 0; i < dataTypes.size(); ++i)
+		{
+			if (dataTypes[i] == dataType)
+			{
+				return i;
+			}
+		}
+
+		return std::nullopt;
+	}
+
+	std::string_view Mesh::DataType(const std::uint32_t dataIndex) const noexcept
+	{
+		return dataTypes[dataIndex];
+	}
+
+	std::uint32_t Mesh::DataTypeCount() const noexcept
+	{
+		return static_cast<std::uint32_t>(dataTypes.size());
+	}
+
 	std::span<const std::string> Mesh::DataTypes() const noexcept
 	{
 		return dataTypes;
 	}
 
-	std::optional<std::size_t> Mesh::BufferCount(const std::string_view dataType) const noexcept
+	std::uint32_t Mesh::BufferCount(const std::uint32_t dataIndex) const noexcept
 	{
-		if (const std::optional<std::size_t> index = IndexOf(dataType))
+		return static_cast<std::uint32_t>(bufferTables[dataIndex].size());
+	}
+
+	std::optional<std::uint32_t> Mesh::BufferCount(const std::string_view dataType) const noexcept
+	{
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
-			return bufferTables[index.value()].size();
+			return BufferCount(dataIndex.value());
 		}
 
 		return std::nullopt;
 	}
 
-	std::size_t Mesh::BufferCount() const noexcept
+	std::uint32_t Mesh::BufferCount() const noexcept
 	{
-		std::size_t count = 0;
-		for (const std::string& dataType : dataTypes)
+		std::uint32_t count = 0u;
+		for (std::uint32_t i = 0u; i < dataTypes.size(); ++i)
 		{
-			count += BufferCount(dataType).value();
+			count += BufferCount(i);
 		}
 
 		return count;
 	}
 
-	std::optional<Mesh::BufferAccess> Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
+	Mesh::BufferAccess Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType) && index < bufferTables[tableIndex.value()].size())
+		return BufferAccess(bufferTables[dataIndex][bufferIndex], bufferVersions[dataIndex][bufferIndex]);
+	}
+
+	const PonyBase::Container::Buffer& Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
+	{
+		return bufferTables[dataIndex][bufferIndex];
+	}
+
+	const PonyBase::Container::Buffer& Mesh::BufferConst(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
+	{
+		return Buffer(dataIndex, bufferIndex);
+	}
+
+	std::optional<Mesh::BufferAccess> Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) noexcept
+	{
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType) && bufferIndex < BufferCount(dataIndex.value()))
 		{
-			return BufferAccess(bufferTables[tableIndex.value()][index], bufferVersions[tableIndex.value()][index]);
+			return Buffer(dataIndex.value(), bufferIndex);
 		}
 
 		return std::nullopt;
 	}
 
-	const PonyBase::Container::Buffer* Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
+	const PonyBase::Container::Buffer* Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType) && index < bufferTables[tableIndex.value()].size())
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType) && bufferIndex < BufferCount(dataIndex.value()))
 		{
-			return &bufferTables[tableIndex.value()][index];
+			return &Buffer(dataIndex.value(), bufferIndex);
 		}
 
 		return nullptr;
 	}
 
-	const PonyBase::Container::Buffer* Mesh::FindBufferConst(const std::string_view dataType, const std::size_t index) const noexcept
+	const PonyBase::Container::Buffer* Mesh::BufferConst(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		return FindBuffer(dataType, index);
+		return Buffer(dataType, bufferIndex);
 	}
 
 	template<typename T>
-	std::optional<Mesh::BufferViewAccess<T>> Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) noexcept
+	Mesh::BufferViewAccess<T> Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		return BufferViewAccess<T>(PonyBase::Container::BufferView<T>(bufferTables[dataIndex], &bufferVersions[dataIndex][bufferIndex]));
+	}
+
+	template<typename T>
+	PonyBase::Container::BufferView<const T> Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
+	{
+		return PonyBase::Container::BufferView<const T>(bufferTables[dataIndex][bufferIndex]);
+	}
+
+	template<typename T>
+	PonyBase::Container::BufferView<const T> Mesh::BufferConst(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
+	{
+		return Buffer<T>(dataIndex, bufferIndex);
+	}
+
+	template<typename T>
+	std::optional<Mesh::BufferViewAccess<T>> Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) noexcept
+	{
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
 		{
-			if (std::vector<PonyBase::Container::Buffer>& table = bufferTables[tableIndex.value()]; index < table.size() && table[index].Stride() == sizeof(T))
+			if (const std::vector<PonyBase::Container::Buffer>& table = bufferTables[dataIndex.value()]; bufferIndex < table.size() && table[bufferIndex].Stride() == sizeof(T))
 			{
-				return BufferViewAccess<T>(PonyBase::Container::BufferView<T>(table[index]), &bufferVersions[tableIndex.value()][index]);
+				return Buffer(dataIndex.value(), bufferIndex);
 			}
 		}
 
@@ -467,13 +588,13 @@ namespace PonyEngine::Render
 	}
 
 	template<typename T>
-	std::optional<PonyBase::Container::BufferView<const T>> Mesh::FindBuffer(const std::string_view dataType, const std::size_t index) const noexcept
+	std::optional<PonyBase::Container::BufferView<const T>> Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		if (const std::optional<std::size_t> dataIndex = DataIndex(dataType))
 		{
-			if (const std::vector<PonyBase::Container::Buffer>& table = bufferTables[tableIndex.value()]; index < table.size() && table[index].Stride() == sizeof(T))
+			if (const std::vector<PonyBase::Container::Buffer>& table = bufferTables[dataIndex.value()]; bufferIndex < table.size() && table[bufferIndex].Stride() == sizeof(T))
 			{
-				return PonyBase::Container::BufferView<const T>(table[index]);
+				return Buffer(dataIndex.value(), bufferIndex);
 			}
 		}
 
@@ -481,41 +602,66 @@ namespace PonyEngine::Render
 	}
 
 	template<typename T>
-	std::optional<PonyBase::Container::BufferView<const T>> Mesh::FindBufferConst(const std::string_view dataType, const std::size_t index) noexcept
+	std::optional<PonyBase::Container::BufferView<const T>> Mesh::BufferConst(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		return FindBuffer<T>(dataType, index);
+		return Buffer<T>(dataType, bufferIndex);
 	}
 
-	std::optional<Mesh::BufferTableAccess> Mesh::FindBufferTable(const std::string_view dataType) noexcept
+	Mesh::BufferTableAccess Mesh::BufferTable(const std::uint32_t dataIndex) noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		return BufferTableAccess(bufferTables[dataIndex], bufferVersions[dataIndex]);
+	}
+
+	std::span<const PonyBase::Container::Buffer> Mesh::BufferTable(const std::uint32_t dataIndex) const noexcept
+	{
+		return bufferTables[dataIndex];
+	}
+
+	std::span<const PonyBase::Container::Buffer> Mesh::BufferTableConst(const std::uint32_t dataIndex) const noexcept
+	{
+		return bufferTables[dataIndex];
+	}
+
+	std::optional<Mesh::BufferTableAccess> Mesh::BufferTable(const std::string_view dataType) noexcept
+	{
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
-			return BufferTableAccess(bufferTables[tableIndex.value()], bufferVersions[tableIndex.value()]);
+			return BufferTable(dataIndex.value());
 		}
 
 		return std::nullopt;
 	}
 
-	std::span<const PonyBase::Container::Buffer> Mesh::FindBufferTable(const std::string_view dataType) const noexcept
+	std::span<const PonyBase::Container::Buffer> Mesh::BufferTable(const std::string_view dataType) const noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
-			return bufferTables[tableIndex.value()];
+			return BufferTable(dataIndex.value());
 		}
 
 		return std::span<const PonyBase::Container::Buffer>();
 	}
 
-	std::span<const PonyBase::Container::Buffer> Mesh::FindBufferTableConst(const std::string_view dataType) const noexcept
+	std::span<const PonyBase::Container::Buffer> Mesh::BufferTableConst(const std::string_view dataType) const noexcept
 	{
-		return FindBufferTable(dataType);
+		return BufferTable(dataType);
 	}
 
-	std::optional<std::uint64_t> Mesh::BufferVersion(const std::string_view dataType, const std::size_t index) const noexcept
+	std::uint64_t Mesh::BufferVersion(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType); tableIndex && index < bufferVersions[tableIndex.value()].size())
+		return bufferVersions[dataIndex][bufferIndex];
+	}
+
+	std::span<const std::uint64_t> Mesh::BufferVersions(const std::uint32_t dataIndex) const noexcept
+	{
+		return bufferVersions[dataIndex];
+	}
+
+	std::optional<std::uint64_t> Mesh::BufferVersion(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
+	{
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < bufferVersions[dataIndex.value()].size())
 		{
-			return bufferVersions[tableIndex.value()][index];
+			return BufferVersion(dataIndex.value(), bufferIndex);
 		}
 
 		return std::nullopt;
@@ -523,7 +669,7 @@ namespace PonyEngine::Render
 
 	std::span<const std::uint64_t> Mesh::BufferVersions(const std::string_view dataType) const noexcept
 	{
-		if (const std::optional<std::size_t> tableIndex = IndexOf(dataType))
+		if (const std::optional<std::uint32_t> tableIndex = DataIndex(dataType))
 		{
 			return bufferVersions[tableIndex.value()];
 		}
@@ -553,7 +699,7 @@ namespace PonyEngine::Render
 		std::vector<std::vector<std::uint64_t>> newBufferVersions = other.bufferVersions;
 		for (std::vector<std::uint64_t> versions : newBufferVersions)
 		{
-			std::ranges::fill(versions, 0UL);
+			std::ranges::fill(versions, InitialVersion);
 		}
 
 		++meshVersion;
@@ -573,23 +719,21 @@ namespace PonyEngine::Render
 		bufferVersions = std::move(other.bufferVersions);
 		for (std::vector<std::uint64_t> versions : bufferVersions)
 		{
-			std::ranges::fill(versions, 0UL);
+			std::ranges::fill(versions, InitialVersion);
 		}
 		threadGroupCounts = std::move(other.threadGroupCounts);
 
 		return *this;
 	}
 
-	std::optional<std::size_t> Mesh::IndexOf(const std::string_view dataType) const noexcept
+	std::size_t Mesh::BufferCountInternal() const noexcept
 	{
-		for (std::size_t i = 0; i < dataTypes.size(); ++i)
+		std::size_t count = 0u;
+		for (std::uint32_t i = 0; i < dataTypes.size(); ++i)
 		{
-			if (dataTypes[i] == dataType)
-			{
-				return i;
-			}
+			count += BufferCount(i);
 		}
 
-		return std::nullopt;
+		return count;
 	}
 }

@@ -123,10 +123,6 @@ namespace PonyEngine::Render::Direct3D12
 
 	void Material::Name(const std::string_view name)
 	{
-		constexpr std::string_view pipelineStateName = " - PipelineState";
-		auto componentName = std::string();
-		componentName.reserve(name.size() + pipelineStateName.size());
-		componentName.append(name).append(pipelineStateName);
-		SetName(*pipelineState.Get(), componentName);
+		SetName(*pipelineState.Get(), name);
 	}
 }

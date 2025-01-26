@@ -331,7 +331,7 @@ namespace PonyEngine::Render::Direct3D12
 		UINT descriptorCount = transformHeap->HandleCount();
 		for (Mesh* const mesh : meshes)
 		{
-			descriptorCount += mesh->Heap().HandleCount();
+			descriptorCount += mesh->Heap()->HandleCount();
 		}
 
 		if (!dataHeap || dataHeap->HandleCount() != descriptorCount)
@@ -349,9 +349,9 @@ namespace PonyEngine::Render::Direct3D12
 
 		for (Mesh* const mesh : meshes)
 		{
-			originalHeapOffsets[&mesh->Heap().Heap()] = descriptorCount;
-			D3D12System().Device().CopyDescriptorsSimple(mesh->Heap().HandleCount(), dataHeap->CpuHandle(descriptorCount), mesh->Heap().CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
-			descriptorCount += mesh->Heap().HandleCount();
+			originalHeapOffsets[&mesh->Heap()->Heap()] = descriptorCount;
+			D3D12System().Device().CopyDescriptorsSimple(mesh->Heap()->HandleCount(), dataHeap->CpuHandle(descriptorCount), mesh->Heap()->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			descriptorCount += mesh->Heap()->HandleCount();
 		}
 	}
 
@@ -690,9 +690,9 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				for (const auto& [dataType, dataSlot] : rootSignature->DataSlots())
 				{
-					if (const std::optional<UINT> meshDataIndex = mesh->FindDataIndex(dataType))
+					if (const std::optional<UINT> meshDataIndex = mesh->DataIndex(dataType))
 					{
-						CommandList().SetGraphicsRootDescriptorTable(dataSlot, dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap().Heap()] + mesh->BufferOffset(meshDataIndex.value())));
+						CommandList().SetGraphicsRootDescriptorTable(dataSlot, dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap()->Heap()] + mesh->BufferOffset(meshDataIndex.value())));
 					}
 				}
 			}

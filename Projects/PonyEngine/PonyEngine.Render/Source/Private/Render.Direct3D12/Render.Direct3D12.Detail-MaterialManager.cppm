@@ -91,7 +91,6 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
 
-		const IFrameManager& frameManager = d3d12System->FrameManager();
 		auto pss = PipelineStateStream
 		{
 			.rootSignature = &rootSignature->ControlledRootSignature(),
@@ -159,11 +158,11 @@ namespace PonyEngine::Render::Direct3D12
 			},
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
-				.RTFormats = { frameManager.RtvFormat() },
+				.RTFormats = { d3d12System->FrameManager().RtvFormat() },
 				.NumRenderTargets = 1u
 			},
-			.depthStencilFormat = frameManager.DsvFormat(),
-			.sampleDescription = frameManager.SampleDesc()
+			.depthStencilFormat = d3d12System->FrameManager().DsvFormat(),
+			.sampleDescription = d3d12System->FrameManager().SampleDesc()
 		};
 		const auto pssDesc = D3D12_PIPELINE_STATE_STREAM_DESC
 		{
