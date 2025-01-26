@@ -121,7 +121,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IMeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderTargetParams.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FrameParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SubSystemParams.cppm">

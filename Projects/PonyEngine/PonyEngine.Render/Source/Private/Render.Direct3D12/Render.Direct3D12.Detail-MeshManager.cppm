@@ -73,6 +73,8 @@ export namespace PonyEngine::Render::Direct3D12
 		{
 			std::vector<std::vector<std::uint64_t>> bufferVersions;
 			std::uint64_t meshVersion;
+			std::uint32_t threadGroupCountsVersion;
+			std::uint64_t nameVersion;
 		};
 
 		void UpdateMeshes();
@@ -80,6 +82,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
 		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+		void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+		void UpdateName(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
 
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 
@@ -118,7 +122,7 @@ namespace PonyEngine::Render::Direct3D12
 		sourceStates.reserve(sourceStates.size() + 1);
 		meshes.push_back(renderMesh);
 		sources.push_back(mesh);
-		sourceStates.push_back(SourceState{.meshVersion = 0ULL});
+		sourceStates.push_back(SourceState{});
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 
 		return renderMesh;
@@ -161,7 +165,8 @@ namespace PonyEngine::Render::Direct3D12
 
 			UpdateMesh(*mesh, *source, sourceState);
 			UpdateBuffers(*mesh, *source, sourceState);
-			std::ranges::copy(source->ThreadGroupCounts(), mesh->ThreadGroupCounts().begin());
+			UpdateThreadGroupCounts(*mesh, *source, sourceState);
+			UpdateName(*mesh, *source, sourceState);
 		}
 	}
 
@@ -243,5 +248,27 @@ namespace PonyEngine::Render::Direct3D12
 				}
 			}
 		}
+	}
+
+	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	{
+		if (sourceState.threadGroupCountsVersion == source.ThreadGroupCountsVersion())
+		{
+			return;
+		}
+
+		std::ranges::copy(source.ThreadGroupCounts(), mesh.ThreadGroupCounts().begin());
+		sourceState.threadGroupCountsVersion = source.ThreadGroupCountsVersion();
+	}
+
+	void MeshManager::UpdateName(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	{
+		if (sourceState.nameVersion == source.NameVersion())
+		{
+			return;
+		}
+
+		mesh.Name(source.Name());
+		sourceState.nameVersion = source.NameVersion();
 	}
 }

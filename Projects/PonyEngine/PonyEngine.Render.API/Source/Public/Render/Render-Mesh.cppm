@@ -32,7 +32,7 @@ export namespace PonyEngine::Render
 	class Mesh final
 	{
 	public:
-		static constexpr std::uint64_t InitialVersion = 1ULL;
+		static constexpr std::uint32_t InitialVersion = 1u;
 
 		class BufferTableAccess;
 
@@ -135,7 +135,7 @@ export namespace PonyEngine::Render
 		};
 
 		[[nodiscard("Pure constructor")]]
-		Mesh() noexcept = default;
+		Mesh() noexcept;
 		[[nodiscard("Pure constructor")]]
 		explicit Mesh(const MeshParams& params);
 		[[nodiscard("Pure constructor")]]
@@ -218,9 +218,16 @@ export namespace PonyEngine::Render
 		std::uint64_t MeshVersion() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
-		[[nodiscard("Pure function")]]
 		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
+		void ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet);
+		[[nodiscard("Pure function")]]
+		std::uint32_t ThreadGroupCountsVersion() const noexcept;
+
+		[[nodiscard("Pure function")]]
+		std::string_view Name() const noexcept;
+		void Name(std::string_view nameToSet);
+		[[nodiscard("Pure function")]]
+		std::uint64_t NameVersion() const noexcept;
 
 		Mesh& operator =(const Mesh& other);
 		Mesh& operator =(Mesh&& other) noexcept;
@@ -235,6 +242,10 @@ export namespace PonyEngine::Render
 		std::uint64_t meshVersion;
 
 		std::array<std::uint32_t, 3> threadGroupCounts;
+		std::uint32_t threadGroupCountVersion;
+
+		std::string name;
+		std::uint64_t nameVersion;
 	};
 }
 
@@ -333,13 +344,29 @@ namespace PonyEngine::Render
 		return PonyBase::Container::BufferView<const T>(&buffers[index]);
 	}
 
+	Mesh::Mesh() noexcept :
+		meshVersion{InitialVersion},
+		threadGroupCounts{ 1u, 1u, 1u },
+		threadGroupCountVersion{InitialVersion},
+		nameVersion{InitialVersion}
+	{
+	}
+
 	Mesh::Mesh(const MeshParams& params) :
 		meshVersion{InitialVersion},
-		threadGroupCounts(params.threadGroupCounts)
+		threadGroupCounts(params.threadGroupCounts),
+		threadGroupCountVersion{InitialVersion},
+		name(params.name),
+		nameVersion{InitialVersion}
 	{
 		if (params.bufferTables.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Buffer table count exceeds std::uint32_t max value.");
+		}
+
+		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.cend()) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count is zero.");
 		}
 
 		dataTypes.reserve(params.bufferTables.size());
@@ -369,8 +396,15 @@ namespace PonyEngine::Render
 	}
 
 	Mesh::Mesh(const std::span<const std::uint32_t, 3> threadGroupCounts) noexcept :
-		meshVersion{InitialVersion}
+		meshVersion{InitialVersion},
+		threadGroupCountVersion{InitialVersion},
+		nameVersion{InitialVersion}
 	{
+		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.end()) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count is zero.");
+		}
+
 		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
@@ -379,7 +413,9 @@ namespace PonyEngine::Render
 		bufferTables(other.bufferTables),
 		bufferVersions(other.bufferVersions),
 		meshVersion{InitialVersion},
-		threadGroupCounts(other.threadGroupCounts)
+		threadGroupCounts(other.threadGroupCounts),
+		threadGroupCountVersion{InitialVersion},
+		nameVersion{InitialVersion}
 	{
 		for (std::vector<std::uint64_t>& versions : bufferVersions)
 		{
@@ -392,7 +428,9 @@ namespace PonyEngine::Render
 		bufferTables(std::move(other.bufferTables)),
 		bufferVersions(std::move(other.bufferVersions)),
 		meshVersion{InitialVersion},
-		threadGroupCounts(std::move(other.threadGroupCounts))
+		threadGroupCounts(std::move(other.threadGroupCounts)),
+		threadGroupCountVersion{InitialVersion},
+		nameVersion{InitialVersion}
 	{
 		for (std::vector<std::uint64_t>& versions : bufferVersions)
 		{
@@ -682,14 +720,41 @@ namespace PonyEngine::Render
 		return meshVersion;
 	}
 
-	std::span<std::uint32_t, 3> Mesh::ThreadGroupCounts() noexcept
+	std::span<const std::uint32_t, 3> Mesh::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	std::span<const std::uint32_t, 3> Mesh::ThreadGroupCounts() const noexcept
+	void Mesh::ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet)
 	{
-		return threadGroupCounts;
+		if (std::ranges::find(threadGroupCountsToSet, 0u) != threadGroupCountsToSet.end()) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count is zero.");
+		}
+
+		std::ranges::copy(threadGroupCountsToSet, threadGroupCounts.begin());
+		++threadGroupCountVersion;
+	}
+
+	std::uint32_t Mesh::ThreadGroupCountsVersion() const noexcept
+	{
+		return threadGroupCountVersion;
+	}
+
+	std::string_view Mesh::Name() const noexcept
+	{
+		return name;
+	}
+
+	void Mesh::Name(const std::string_view nameToSet)
+	{
+		name = nameToSet;
+		++nameVersion;
+	}
+
+	std::uint64_t Mesh::NameVersion() const noexcept
+	{
+		return nameVersion;
 	}
 
 	Mesh& Mesh::operator =(const Mesh& other)
@@ -706,7 +771,12 @@ namespace PonyEngine::Render
 		dataTypes = std::move(newDataTypes);
 		bufferTables = std::move(newBufferTables);
 		bufferVersions = std::move(newBufferVersions);
+
 		threadGroupCounts = other.threadGroupCounts;
+		++threadGroupCountVersion;
+
+		name = other.name;
+		++nameVersion;
 
 		return *this;
 	}
@@ -721,7 +791,12 @@ namespace PonyEngine::Render
 		{
 			std::ranges::fill(versions, InitialVersion);
 		}
+
 		threadGroupCounts = std::move(other.threadGroupCounts);
+		++threadGroupCountVersion;
+
+		name = std::move(other.name);
+		++nameVersion;
 
 		return *this;
 	}

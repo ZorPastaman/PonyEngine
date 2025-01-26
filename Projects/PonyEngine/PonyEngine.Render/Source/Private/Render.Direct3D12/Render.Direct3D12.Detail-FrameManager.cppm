@@ -30,7 +30,7 @@ import PonyEngine.Render.Direct3D12;
 import :Frame;
 import :IFrameManager;
 import :ISubSystemContext;
-import :RenderTargetParams;
+import :FrameParams;
 
 export namespace PonyEngine::Render::Direct3D12
 {

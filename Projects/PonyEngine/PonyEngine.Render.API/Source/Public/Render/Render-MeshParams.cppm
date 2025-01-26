@@ -23,5 +23,6 @@ export namespace PonyEngine::Render
 	{
 		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
 		std::array<std::uint32_t, 3> threadGroupCounts;
+		std::string name;
 	};
 }

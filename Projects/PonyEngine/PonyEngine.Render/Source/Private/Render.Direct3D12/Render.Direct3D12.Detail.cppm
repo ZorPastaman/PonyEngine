@@ -13,6 +13,6 @@ export import PonyEngine.Render.Detail;
 
 export import :BackParams;
 export import :IRenderSystemContext;
-export import :RenderTargetParams;
+export import :FrameParams;
 export import :SubSystem;
 export import :SubSystemParams;
