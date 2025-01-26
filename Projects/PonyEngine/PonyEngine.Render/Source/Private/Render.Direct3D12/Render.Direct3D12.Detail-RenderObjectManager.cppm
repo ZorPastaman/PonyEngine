@@ -105,7 +105,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManager().CreateMesh(params.mesh);
-		renderMesh->Name("Mesh");
+		//renderMesh->Name("Mesh"); // TODO: Name usual mesh and copy it into the render mesh.
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
 
