@@ -25,8 +25,8 @@ import <vector>;
 
 import PonyDebug.Log;
 
-import :IMaterialManagerPrivate;
-import :IMeshManagerPrivate;
+import :IMaterialManager;
+import :IMeshManager;
 import :ISubSystemContext;
 import :Material;
 import :PipelineStateUtility;

@@ -21,10 +21,10 @@ import :ICopyPipeline;
 import :IDescriptorHeapManager;
 import :IFrameManager;
 import :IGraphicsPipeline;
-import :IMaterialManagerPrivate;
-import :IMeshManagerPrivate;
+import :IMaterialManager;
+import :IMeshManager;
 import :IResourceManager;
-import :IRootSignatureManagerPrivate;
+import :IRootSignatureManager;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -65,6 +65,20 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const IFrameManager& FrameManager() const noexcept = 0;
 
+		[[nodiscard("Pure function")]]
+		virtual IResourceManager& ResourceManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IResourceManager& ResourceManager() const noexcept = 0;
+
+		/// @brief Gets the descriptor heap manager.
+		/// @return Descriptor heap manager.
+		[[nodiscard("Pure function")]]
+		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept = 0;
+		/// @brief Gets the descriptor heap manager.
+		/// @return Descriptor heap manager.
+		[[nodiscard("Pure function")]]
+		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept = 0;
+
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
 		[[nodiscard("Pure function")]]
@@ -91,20 +105,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Material manager.
 		[[nodiscard("Pure function")]]
 		virtual const IMaterialManager& MaterialManager() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual IResourceManager& ResourceManager() noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const IResourceManager& ResourceManager() const noexcept = 0;
-
-		/// @brief Gets the descriptor heap manager.
-		/// @return Descriptor heap manager.
-		[[nodiscard("Pure function")]]
-		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept = 0;
-		/// @brief Gets the descriptor heap manager.
-		/// @return Descriptor heap manager.
-		[[nodiscard("Pure function")]]
-		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept = 0;
 
 		/// @brief Gets the copy pipeline.
 		/// @return Copy pipeline.

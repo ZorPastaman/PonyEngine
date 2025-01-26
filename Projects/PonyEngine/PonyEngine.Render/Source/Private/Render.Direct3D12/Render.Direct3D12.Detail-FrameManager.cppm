@@ -51,7 +51,6 @@ export namespace PonyEngine::Render::Direct3D12
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Utility::Resolution<UINT>& Resolution() const noexcept override;
-
 		[[nodiscard("Pure function")]]
 		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
 

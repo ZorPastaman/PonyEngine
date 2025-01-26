@@ -26,7 +26,7 @@ import PonyBase.Utility;
 
 import PonyDebug.Log;
 
-import :IRootSignatureManagerPrivate;
+import :IRootSignatureManager;
 import :ISubSystemContext;
 import :Shader;
 import :RootSignature;
