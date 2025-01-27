@@ -25,6 +25,7 @@ import :IMaterialManager;
 import :IMeshManager;
 import :IResourceManager;
 import :IRootSignatureManager;
+import :IShaderManager;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -51,20 +52,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Device10& Device() const noexcept = 0;
 
-		/// @brief Gets the back manager.
-		/// @return Back manager.
-		[[nodiscard("Pure function")]]
-		virtual IBackManager& BackManager() noexcept = 0;
-		/// @brief Gets the back manager.
-		/// @return Back manager.
-		[[nodiscard("Pure function")]]
-		virtual const IBackManager& BackManager() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual IFrameManager& FrameManager() noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual const IFrameManager& FrameManager() const noexcept = 0;
-
 		[[nodiscard("Pure function")]]
 		virtual IResourceManager& ResourceManager() noexcept = 0;
 		[[nodiscard("Pure function")]]
@@ -78,6 +65,20 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Descriptor heap manager.
 		[[nodiscard("Pure function")]]
 		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept = 0;
+
+		/// @brief Gets the back manager.
+		/// @return Back manager.
+		[[nodiscard("Pure function")]]
+		virtual IBackManager& BackManager() noexcept = 0;
+		/// @brief Gets the back manager.
+		/// @return Back manager.
+		[[nodiscard("Pure function")]]
+		virtual const IBackManager& BackManager() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IFrameManager& FrameManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IFrameManager& FrameManager() const noexcept = 0;
 
 		/// @brief Gets the mesh manager.
 		/// @return Mesh manager.
@@ -96,6 +97,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Root signature manager.
 		[[nodiscard("Pure function")]]
 		virtual const IRootSignatureManager& RootSignatureManager() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual IShaderManager& ShaderManager() noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const IShaderManager& ShaderManager() const noexcept = 0;
 
 		/// @brief Gets the material manager.
 		/// @return Material manager.

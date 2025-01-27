@@ -179,6 +179,8 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 	void RenderSystem::End() noexcept
 	{
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");
+		direct3D12SubSystem->EndFrame(); // Ensures that the render is finished before releasing resources. It may be required in case of an exception.
 	}
 
 	void RenderSystem::Tick()

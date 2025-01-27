@@ -105,22 +105,22 @@ namespace PonyEngine::Render::Direct3D12
 		d3d12System{&d3d12System}
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output root signature.");
-		const auto rootSignatureShader = Shader("OutputRootSig");
+		const auto rootSignatureShader = this->d3d12System->ShaderManager().CreateShader("OutputRootSig");
 		ID3D12Device10& device = this->d3d12System->Device();
-		if (const HRESULT result = device.CreateRootSignature(0u, rootSignatureShader.Data(), rootSignatureShader.Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
+		if (const HRESULT result = device.CreateRootSignature(0u, rootSignatureShader->Data(), rootSignatureShader->Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire srgb output root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srgb output root signature created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output pipeline state.");
-		const auto meshShader = Shader("OutputMeshShader");
-		const auto pixelShader = Shader("OutputPixelShader");
+		const auto meshShader = this->d3d12System->ShaderManager().CreateShader("OutputMeshShader");
+		const auto pixelShader = this->d3d12System->ShaderManager().CreateShader("OutputPixelShader");
 		auto pss = QuadPipelineStateStream
 		{
 			.rootSignature = rootSignature.Get(),
-			.meshShader = meshShader.ByteCode(),
-			.pixelShader = pixelShader.ByteCode(),
+			.meshShader = meshShader->ByteCode(),
+			.pixelShader = pixelShader->ByteCode(),
 			.blend = D3D12_BLEND_DESC
 			{
 				.AlphaToCoverageEnable = false,
@@ -197,17 +197,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void SrgbOutputQuad::Name(const std::string_view name)
 	{
-		constexpr std::string_view rootSignatureName = " - RootSignature";
-		constexpr std::string_view pipelineStateName = " - PipelineState";
-
-		auto componentName = std::string();
-		componentName.reserve(name.size() + rootSignatureName.size());
-
-		componentName.append(name).append(rootSignatureName);
-		SetName(*rootSignature.Get(), componentName);
-
-		componentName.erase();
-		componentName.append(name).append(pipelineStateName);
-		SetName(*pipelineState.Get(), componentName);
+		SetName(*rootSignature.Get(), name);
+		SetName(*pipelineState.Get(), name);
 	}
 }

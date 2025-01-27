@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -51,6 +53,7 @@ import :RenderObjectManager;
 import :FrameParams;
 import :ResourceManager;
 import :RootSignatureManager;
+import :ShaderManager;
 import :SubSystemParams;
 
 export namespace PonyEngine::Render::Direct3D12
@@ -120,6 +123,16 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const ID3D12Device10& Device() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IResourceManager& ResourceManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IResourceManager& ResourceManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual IBackManager& BackManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IBackManager& BackManager() const noexcept override;
@@ -135,6 +148,11 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IMeshManager& MeshManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IShaderManager& ShaderManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IShaderManager& ShaderManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual IRootSignatureManager& RootSignatureManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IRootSignatureManager& RootSignatureManager() const noexcept override;
@@ -143,16 +161,6 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual IMaterialManager& MaterialManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IMaterialManager& MaterialManager() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual IResourceManager& ResourceManager() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IResourceManager& ResourceManager() const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual IDescriptorHeapManager& DescriptorHeapManager() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IDescriptorHeapManager& DescriptorHeapManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual ICopyPipeline& CopyPipeline() noexcept override;
@@ -171,12 +179,14 @@ export namespace PonyEngine::Render::Direct3D12
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
+		std::unique_ptr<class ResourceManager> resourceManager;
+		std::unique_ptr<class DescriptorHeapManager> heapManager;
+
 		std::unique_ptr<class BackManager> back; ///< Back.
 		std::unique_ptr<class FrameManager> frameManager; ///< Frame manager.
 
-		std::unique_ptr<class ResourceManager> resourceManager;
-		std::unique_ptr<class DescriptorHeapManager> heapManager;
 		std::unique_ptr<class MeshManager> meshManager; ///< Mesh manager.
+		std::unique_ptr<class ShaderManager> shaderManager;
 		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<class MaterialManager> materialManager; ///< Material manager.
 
@@ -259,6 +269,10 @@ namespace PonyEngine::Render::Direct3D12
 		renderObjectManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager destroyed.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy camera manager.");
+		cameraManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Camera manager destroyed");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy material manager.");
 		materialManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager destroyed.");
@@ -278,6 +292,14 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy back.");
 		back.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back destroyed.");
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy descriptor heap manager.");
+		heapManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap manager destroyed");
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy resource manager.");
+		resourceManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Resource manager destroyed");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Release device.");
 		device.Reset();
@@ -322,16 +344,20 @@ namespace PonyEngine::Render::Direct3D12
 
 	void SubSystem::CreateRenderSystem(const BackParams& backParams, const FrameParams& frameParams)
 	{
+		assert(!resourceManager && "The CreateRenderSystem() is called twice.");
+
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create resource manager.");
 		resourceManager = std::make_unique<class ResourceManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Resource manager created.");
 
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create descriptor heap manager.");
 		heapManager = std::make_unique<class DescriptorHeapManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(this->renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap manager created.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create back manager.");
 		back = std::make_unique<class BackManager>(*static_cast<ISubSystemContext*>(this), backParams);
 		back->Name("Back");
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back created.");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create frame manager.");
 		frameManager = std::make_unique<class FrameManager>(*static_cast<ISubSystemContext*>(this), frameParams);
@@ -341,6 +367,10 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager = std::make_unique<class MeshManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Mesh manager created.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create shader manager.");
+		shaderManager = std::make_unique<class ShaderManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Shader manager created.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create root signature manager.");
 		rootSignatureManager = std::make_unique<class RootSignatureManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Root signature manager created.");
@@ -349,31 +379,36 @@ namespace PonyEngine::Render::Direct3D12
 		materialManager = std::make_unique<class MaterialManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager created.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create camera manager.");
 		cameraManager = std::make_unique<class CameraManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Camera manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create render object manager.");
 		renderObjectManager = std::make_unique<class RenderObjectManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create main frame.");
 		graphicsPipeline->CreateFrame();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Main frame created.");
 	}
 
 	void SubSystem::BeginFrame()
 	{
 		renderObjectManager->Clean();
-		meshManager->Clean();
+		cameraManager->Clean();
 		materialManager->Clean();
 		rootSignatureManager->Clean();
+		shaderManager->Clean();
+		meshManager->Clean();
 		frameManager->Clean();
 		heapManager->Clean();
 		resourceManager->Clean();
-		cameraManager->Clean();
 	}
 
 	void SubSystem::Render(const UINT backBufferIndex)
 	{
-		cameraManager->Tick();
 		meshManager->Tick();
+		cameraManager->Tick();
 		renderObjectManager->Tick();
 		graphicsPipeline->Prepare();
 
@@ -416,6 +451,26 @@ namespace PonyEngine::Render::Direct3D12
 		return *device.Get();
 	}
 
+	IResourceManager& SubSystem::ResourceManager() noexcept
+	{
+		return *resourceManager;
+	}
+
+	const IResourceManager& SubSystem::ResourceManager() const noexcept
+	{
+		return *resourceManager;
+	}
+
+	IDescriptorHeapManager& SubSystem::DescriptorHeapManager() noexcept
+	{
+		return *heapManager;
+	}
+
+	const IDescriptorHeapManager& SubSystem::DescriptorHeapManager() const noexcept
+	{
+		return *heapManager;
+	}
+
 	IBackManager& SubSystem::BackManager() noexcept
 	{
 		return *back;
@@ -446,6 +501,16 @@ namespace PonyEngine::Render::Direct3D12
 		return *meshManager;
 	}
 
+	IShaderManager& SubSystem::ShaderManager() noexcept
+	{
+		return *shaderManager;
+	}
+
+	const IShaderManager& SubSystem::ShaderManager() const noexcept
+	{
+		return *shaderManager;
+	}
+
 	IRootSignatureManager& SubSystem::RootSignatureManager() noexcept
 	{
 		return *rootSignatureManager;
@@ -464,26 +529,6 @@ namespace PonyEngine::Render::Direct3D12
 	const IMaterialManager& SubSystem::MaterialManager() const noexcept
 	{
 		return *materialManager;
-	}
-
-	IResourceManager& SubSystem::ResourceManager() noexcept
-	{
-		return *resourceManager;
-	}
-
-	const IResourceManager& SubSystem::ResourceManager() const noexcept
-	{
-		return *resourceManager;
-	}
-
-	IDescriptorHeapManager& SubSystem::DescriptorHeapManager() noexcept
-	{
-		return *heapManager;
-	}
-
-	const IDescriptorHeapManager& SubSystem::DescriptorHeapManager() const noexcept
-	{
-		return *heapManager;
 	}
 
 	ICopyPipeline& SubSystem::CopyPipeline() noexcept

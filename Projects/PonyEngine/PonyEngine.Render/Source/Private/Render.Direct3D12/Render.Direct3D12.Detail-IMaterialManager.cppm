@@ -32,6 +32,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param pixelShader Pixel shader.
 		/// @return Material.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const Shader& meshShader, const Shader& pixelShader) = 0;
+		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, 
+			const std::shared_ptr<const Shader>& pixelShader) = 0;
 	};
 }

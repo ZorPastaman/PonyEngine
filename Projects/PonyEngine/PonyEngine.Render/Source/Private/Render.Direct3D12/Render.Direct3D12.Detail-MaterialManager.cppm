@@ -49,7 +49,8 @@ export namespace PonyEngine::Render::Direct3D12
 		~MaterialManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const Shader& meshShader, const Shader& pixelShader) override;
+		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, 
+			const std::shared_ptr<const Shader>& pixelShader) override;
 
 		/// @brief Cleans out of dead materials.
 		void Clean() noexcept;
@@ -61,6 +62,7 @@ export namespace PonyEngine::Render::Direct3D12
 		struct PipelineStateStream final
 		{
 			PipelineStateStreamRootSignature rootSignature;
+			PipelineStateStreamAmplificationShader amplificationShader;
 			PipelineStateStreamMeshShader meshShader;
 			PipelineStateStreamPixelShader pixelShader;
 			PipelineStateStreamBlend blend;
@@ -72,11 +74,17 @@ export namespace PonyEngine::Render::Direct3D12
 			PipelineStateStreamSampleDescription sampleDescription;
 		};
 
+		struct SourceData final
+		{
+			std::shared_ptr<const Shader> amplificationShader;
+			std::shared_ptr<const Shader> meshShader;
+			std::shared_ptr<const Shader> pixelShader;
+		};
+
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Material>> materials; ///< Materials.
-
-		std::vector<D3D12_INPUT_ELEMENT_DESC> inputLayout; ///< Input layout cache.
+		std::vector<SourceData> sources;
 	};
 }
 
@@ -87,15 +95,26 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const Shader& meshShader, const Shader& pixelShader)
+	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, 
+		const std::shared_ptr<const Shader>& pixelShader)
 	{
-		// TODO: Later it must use Resource system types. This function always creates a new material. But the function that accepts MaterialResource should try to find a material created from that resource.
+		for (std::size_t i = 0; i < sources.size(); ++i)
+		{
+			if (sources[i].amplificationShader == amplificationShader && sources[i].meshShader == meshShader && sources[i].pixelShader == pixelShader && &materials[i]->RootSignature() == rootSignature.get())
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material reused at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
 
+				return materials[i];
+			}
+		}
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire graphics pipeline state.");
 		auto pss = PipelineStateStream
 		{
-			.rootSignature = &rootSignature->ControlledRootSignature(),
-			.meshShader = meshShader.ByteCode(),
-			.pixelShader = pixelShader.ByteCode(),
+			.rootSignature = &rootSignature->RootSig(),
+			.amplificationShader = amplificationShader ? amplificationShader->ByteCode() : D3D12_SHADER_BYTECODE{},
+			.meshShader = meshShader->ByteCode(),
+			.pixelShader = pixelShader->ByteCode(),
 			.blend = D3D12_BLEND_DESC
 			{
 				.AlphaToCoverageEnable = false,
@@ -174,9 +193,12 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline state created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.Get()));
-
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline state acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.Get()));
 		const auto material = std::make_shared<Material>(rootSignature, *pipelineState.Get());
+
+		materials.reserve(materials.size() + 1);
+		sources.reserve(sources.size() + 1);
+		sources.push_back(SourceData{.amplificationShader = amplificationShader, .meshShader = meshShader, .pixelShader = pixelShader});
 		materials.push_back(material);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
 

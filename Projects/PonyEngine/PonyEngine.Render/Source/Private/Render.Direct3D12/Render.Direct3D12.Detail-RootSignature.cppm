@@ -41,16 +41,16 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the root signature.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		ID3D12RootSignature& ControlledRootSignature() noexcept;
+		ID3D12RootSignature& RootSig() noexcept;
 		/// @brief Gets the root signature.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		const ID3D12RootSignature& ControlledRootSignature() const noexcept;
+		const ID3D12RootSignature& RootSig() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		const std::unordered_map<std::string, UINT>& DataSlots() const noexcept;
 		[[nodiscard("Pure function")]]
-		std::optional<UINT> FindDataSlot(std::string_view dataType) const noexcept;
+		std::optional<UINT> DataSlot(std::string_view dataType) const noexcept;
 
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
@@ -73,12 +73,12 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	ID3D12RootSignature& RootSignature::ControlledRootSignature() noexcept
+	ID3D12RootSignature& RootSignature::RootSig() noexcept
 	{
 		return *rootSignature.Get();
 	}
 
-	const ID3D12RootSignature& RootSignature::ControlledRootSignature() const noexcept
+	const ID3D12RootSignature& RootSignature::RootSig() const noexcept
 	{
 		return *rootSignature.Get();
 	}
@@ -88,7 +88,7 @@ namespace PonyEngine::Render::Direct3D12
 		return dataSlots;
 	}
 
-	std::optional<UINT> RootSignature::FindDataSlot(const std::string_view dataType) const noexcept
+	std::optional<UINT> RootSignature::DataSlot(const std::string_view dataType) const noexcept
 	{
 		for (const auto& [type, slot] : dataSlots)
 		{
@@ -103,10 +103,6 @@ namespace PonyEngine::Render::Direct3D12
 
 	void RootSignature::Name(const std::string_view name)
 	{
-		constexpr std::string_view rootSignatureName = " - RootSignature";
-		auto componentName = std::string();
-		componentName.reserve(name.size() + rootSignatureName.size());
-		componentName.append(name).append(rootSignatureName);
-		SetName(*rootSignature.Get(), componentName);
+		SetName(*rootSignature.Get(), name);
 	}
 }
