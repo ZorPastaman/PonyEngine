@@ -21,6 +21,7 @@ import <string>;
 import <string_view>;
 import <vector>;
 
+import PonyBase.Container;
 import PonyBase.Utility;
 
 export namespace PonyEngine::Render::Direct3D12
@@ -29,10 +30,8 @@ export namespace PonyEngine::Render::Direct3D12
 	class Shader final
 	{
 	public:
-		/// @brief Creates a @p Shader.
-		/// @param shaderName Shader name.
 		[[nodiscard("Pure constructor")]]
-		explicit Shader(std::string_view shaderName);
+		explicit Shader(const PonyBase::Container::Buffer& data);
 		[[nodiscard("Pure constructor")]]
 		Shader(const Shader& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -43,7 +42,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the shader byte code.
 		/// @return Shader byte code.
 		[[nodiscard("Pure function")]]
-		const char* Data() const noexcept;
+		const std::byte* Data() const noexcept;
 		/// @brief Gets the shader byte code size.
 		/// @return Shader byte code size in bytes.
 		[[nodiscard("Pure function")]]
@@ -55,42 +54,29 @@ export namespace PonyEngine::Render::Direct3D12
 		Shader& operator =(Shader&& other) noexcept = default;
 
 	private:
-		std::vector<char> data; ///< Shader byte code.
+		PonyBase::Container::Buffer data; ///< Shader byte code.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Shader::Shader(const std::string_view shaderName)
+	Shader::Shader(const PonyBase::Container::Buffer& data) :
+		data(data)
 	{
-		const std::string path = std::format("{}.cso", shaderName);
-		auto stream = std::ifstream(path, std::ios::binary | std::ios::ate);
-		if (!stream.is_open())
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to open Direct3D 12 shader file at '{}'.", path));
-		}
-		const std::size_t size = stream.tellg();
-		stream.seekg(std::ios::beg);
-
-		data = std::vector<char>(size);
-		if (!stream.read(data.data(), size))
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read Direct3D 12 shader file at '{}'.", path));
-		}
 	}
 
-	const char* Shader::Data() const noexcept
+	const std::byte* Shader::Data() const noexcept
 	{
-		return data.data();
+		return data.Data();
 	}
 
 	std::size_t Shader::Size() const noexcept
 	{
-		return data.size();
+		return data.Size();
 	}
 
 	D3D12_SHADER_BYTECODE Shader::ByteCode() const noexcept
 	{
-		return D3D12_SHADER_BYTECODE{.pShaderBytecode = Data(), .BytecodeLength = Size()};
+		return D3D12_SHADER_BYTECODE{.pShaderBytecode = Data(), .BytecodeLength = static_cast<SIZE_T>(Size())};
 	}
 }

@@ -13,6 +13,8 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
+#include "PonyDebug/Log/Log.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:ResourceManager;
 
 import <memory>;
@@ -95,16 +97,15 @@ namespace PonyEngine::Render::Direct3D12
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
-
 		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_UNDEFINED,
 			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create buffer resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
 		const auto buffer = std::make_shared<Buffer>(*resource.Get());
 		resources.push_back(buffer);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(buffer.get()));
 
 		return buffer;
 	}
@@ -113,22 +114,25 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, 1u, 1u, format, sampleDesc, heapType);
 		resources.push_back(texture);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Texture created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(texture.get()));
 
 		return texture;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture2D(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, 1u, format, sampleDesc, heapType);
+		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE2D, width, height, 1u, format, sampleDesc, heapType);
 		resources.push_back(texture);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Texture created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(texture.get()));
 
 		return texture;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture3D(const UINT64 width, const UINT height, const UINT16 depth, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, height, depth, format, sampleDesc, heapType);
+		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE3D, width, height, depth, format, sampleDesc, heapType);
 		resources.push_back(texture);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Texture created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(texture.get()));
 
 		return texture;
 	}
@@ -154,17 +158,16 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.Format = format
 		};
-		std::memcpy(clearValue.Color, clearColor.Span().data(), sizeof(PonyMath::Color::RGBA<FLOAT>));
-
+		std::ranges::copy(clearColor.Span(), clearValue.Color);
 		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_PRESENT,
 			&clearValue, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create render target resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
 		const auto renderTarget = std::make_shared<Texture>(*resource.Get());
 		resources.push_back(renderTarget);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render target created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderTarget.get()));
 
 		return renderTarget;
 	}
@@ -191,16 +194,15 @@ namespace PonyEngine::Render::Direct3D12
 			.Format = format,
 			.DepthStencil = depthStencilValue
 		};
-
 		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
 			&clearValue, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create depth stencil resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-
 		const auto depthStencil = std::make_shared<Texture>(*resource.Get());
 		resources.push_back(depthStencil);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(depthStencil.get()));
 
 		return depthStencil;
 	}
@@ -211,7 +213,9 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			if (resources[i].use_count() <= 1L)
 			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy resource at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(resources[i].get()));
 				resources.erase(resources.cbegin() + i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Resource destroyed.");
 			}
 		}
 	}
@@ -262,7 +266,6 @@ namespace PonyEngine::Render::Direct3D12
 			.Flags = D3D12_RESOURCE_FLAG_NONE,
 			.SamplerFeedbackMipRegion = D3D12_MIP_REGION{}
 		};
-
 		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 		if (const HRESULT result = d3d12System->Device().CreateCommittedResource3(&heapProperties, D3D12_HEAP_FLAG_NONE, &resourceDesc, D3D12_BARRIER_LAYOUT_COMMON,
 			nullptr, nullptr, 0, nullptr, IID_PPV_ARGS(resource.GetAddressOf())); FAILED(result)) [[unlikely]]

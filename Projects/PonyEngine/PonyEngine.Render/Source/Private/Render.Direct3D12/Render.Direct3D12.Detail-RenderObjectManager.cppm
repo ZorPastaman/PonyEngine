@@ -75,7 +75,6 @@ namespace PonyEngine::Render::Direct3D12
 	RenderObjectManager::RenderObjectManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
-		// TODO: Add ShaderManager. But seems that there's no need of exactly ShaderManager for d3d12. I just need a ShaderResource in a ResourceSystem.
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create default material.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const std::unordered_map<std::string, UINT> dataSlots =
@@ -85,17 +84,18 @@ namespace PonyEngine::Render::Direct3D12
 			{ "Positions", 2u },
 			{ "Colors", 3u }
 		};
-		const auto rootSignature = this->d3d12System->RootSignatureManager().CreateRootSignature(Shader("RootSig"), dataSlots);
-		rootSignature->Name("DefaultRootSignature");
+		const std::shared_ptr<Shader> rootSigShader = this->d3d12System->ShaderManager().CreateShader("RootSig");
+		const auto rootSignature = this->d3d12System->RootSignatureManager().CreateRootSignature(rootSigShader, dataSlots);
+		rootSignature->Name("RootSig");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load mesh shader.");
-		const auto meshShader = Shader("MeshShader");
+		const auto meshShader = this->d3d12System->ShaderManager().CreateShader("MeshShader");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load pixel shader.");
-		const auto pixelShader = Shader("PixelShader");
+		const auto pixelShader = this->d3d12System->ShaderManager().CreateShader("PixelShader");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pixel shader loaded.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create material.");
-		defaultMaterial = this->d3d12System->MaterialManager().CreateMaterial(rootSignature, meshShader, pixelShader);
+		defaultMaterial = this->d3d12System->MaterialManager().CreateMaterial(rootSignature, nullptr, meshShader, pixelShader);
 		defaultMaterial->Name("DefaultMaterial");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");

@@ -48,7 +48,7 @@ export namespace PonyEngine::Render::Direct3D12
 		~RootSignatureManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<RootSignature> CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots) override;
+		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots) override;
 
 		/// @brief Cleans out of dead root signatures.
 		void Clean() noexcept;
@@ -57,9 +57,16 @@ export namespace PonyEngine::Render::Direct3D12
 		RootSignatureManager& operator =(RootSignatureManager&& other) noexcept = default;
 
 	private:
+		struct SourceData final
+		{
+			std::shared_ptr<const Shader> shader;
+			std::unordered_map<std::string, UINT> dataSlots;
+		};
+
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
+		std::vector<SourceData> sources;
 	};
 }
 
@@ -70,21 +77,32 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const Shader& rootSignatureShader, const std::unordered_map<std::string, UINT>& meshDataSlots)
+	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots)
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create root signature.");
-		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature;
-		if (const HRESULT result = d3d12System->Device().CreateRootSignature(0, rootSignatureShader.Data(), rootSignatureShader.Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result)) [[unlikely]]
+		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire root signature with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			if (sources[i].shader == rootSignatureShader && sources[i].dataSlots == dataSlots)
+			{
+				return rootSignatures[i];
+			}
 		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created.");
 
-		const auto d3d12RootSignature = std::make_shared<RootSignature>(*rootSignature.Get(), meshDataSlots);
-		rootSignatures.push_back(d3d12RootSignature);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(d3d12RootSignature.get()));
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create root sig.");
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSig;
+		if (const HRESULT result = d3d12System->Device().CreateRootSignature(0, rootSignatureShader->Data(), rootSignatureShader->Size(), IID_PPV_ARGS(rootSig.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire root sig with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root sig created.");
+		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get(), dataSlots);
 
-		return d3d12RootSignature;
+		rootSignatures.reserve(rootSignatures.size() + 1);
+		sources.reserve(sources.size() + 1);
+		sources.push_back(SourceData{.shader = rootSignatureShader, .dataSlots = dataSlots});
+		rootSignatures.push_back(rootSignature);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
+
+		return rootSignature;
 	}
 
 	void RootSignatureManager::Clean() noexcept

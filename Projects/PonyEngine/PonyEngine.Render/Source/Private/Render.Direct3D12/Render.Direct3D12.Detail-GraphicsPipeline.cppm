@@ -679,7 +679,7 @@ namespace PonyEngine::Render::Direct3D12
 
 			if (rootSignature != prevRootSignature)
 			{
-				CommandList().SetGraphicsRootSignature(&rootSignature->ControlledRootSignature());
+				CommandList().SetGraphicsRootSignature(&rootSignature->RootSig());
 			}
 			if (material != prevMaterial)
 			{
@@ -697,7 +697,7 @@ namespace PonyEngine::Render::Direct3D12
 				}
 			}
 
-			if (const std::optional<UINT> slot = rootSignature->FindDataSlot(EngineDataTypes::PonyTransform))
+			if (const std::optional<UINT> slot = rootSignature->DataSlot(EngineDataTypes::PonyTransform))
 			{
 				CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + TransformIndex(cameraIndex, renderObjectIndex)));
 			}
