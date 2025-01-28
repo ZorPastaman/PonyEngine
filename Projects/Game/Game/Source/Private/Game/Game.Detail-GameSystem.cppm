@@ -123,14 +123,14 @@ namespace Game
 		{
 			0u, 1u, 2u, 3u, 7u, 4u, 5u, 6u, 7u, 3u, 2u, 1u, 5u, 4u
 		});
-		const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::PackedPrimitive>(std::array<PonyEngine::Render::PackedPrimitive, 6>
+		const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::Primitive>(std::array<PonyEngine::Render::Primitive, 6>
 		{
-			PonyEngine::Render::PackedPrimitive(0u, 1u, 2u),
-			PonyEngine::Render::PackedPrimitive(0u, 2u, 3u),
-			PonyEngine::Render::PackedPrimitive(4u, 5u, 0u),
-			PonyEngine::Render::PackedPrimitive(4u, 0u, 3u),
-			PonyEngine::Render::PackedPrimitive(5u, 6u, 1u),
-			PonyEngine::Render::PackedPrimitive(5u, 1u, 0u)
+			PonyEngine::Render::Primitive(0u, 1u, 2u),
+			PonyEngine::Render::Primitive(0u, 2u, 3u),
+			PonyEngine::Render::Primitive(4u, 5u, 0u),
+			PonyEngine::Render::Primitive(4u, 0u, 3u),
+			PonyEngine::Render::Primitive(5u, 6u, 1u),
+			PonyEngine::Render::Primitive(5u, 1u, 0u)
 		});
 		const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
 		{

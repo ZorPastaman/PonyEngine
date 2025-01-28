@@ -81,6 +81,9 @@ export namespace PonyEngine::Render::Direct3D12
 			std::shared_ptr<const Shader> pixelShader;
 		};
 
+		void Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, const std::shared_ptr<const Shader>& pixelShader);
+		void Remove(std::size_t index) noexcept;
+
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Material>> materials; ///< Materials.
@@ -194,12 +197,9 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline state acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.Get()));
-		const auto material = std::make_shared<Material>(rootSignature, *pipelineState.Get());
 
-		materials.reserve(materials.size() + 1);
-		sources.reserve(sources.size() + 1);
-		sources.push_back(SourceData{.amplificationShader = amplificationShader, .meshShader = meshShader, .pixelShader = pixelShader});
-		materials.push_back(material);
+		const auto material = std::make_shared<Material>(rootSignature, *pipelineState.Get());
+		Add(material, amplificationShader, meshShader, pixelShader);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
 
 		return material;
@@ -212,9 +212,31 @@ namespace PonyEngine::Render::Direct3D12
 			if (materials[i].use_count() <= 1L)
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
-				materials.erase(materials.cbegin() + i);
+				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
 			}
 		}
+	}
+
+	void MaterialManager::Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, const std::shared_ptr<const Shader>& pixelShader)
+	{
+		const std::size_t currentSize = materials.size();
+
+		try
+		{
+			materials.push_back(material);
+			sources.push_back(SourceData{.amplificationShader = amplificationShader, .meshShader = meshShader, .pixelShader = pixelShader});
+		}
+		catch (...)
+		{
+			materials.resize(currentSize);
+			sources.resize(currentSize);
+		}
+	}
+
+	void MaterialManager::Remove(const std::size_t index) noexcept
+	{
+		materials.erase(materials.cbegin() + index);
+		sources.erase(sources.cbegin() + index);
 	}
 }

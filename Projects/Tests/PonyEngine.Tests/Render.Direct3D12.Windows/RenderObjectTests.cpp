@@ -43,9 +43,9 @@ namespace Render
 			{
 				0u, 1u, 2u
 			});
-			const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::PackedPrimitive>(std::array<PonyEngine::Render::PackedPrimitive, 1>
+			const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::Primitive>(std::array<PonyEngine::Render::Primitive, 1>
 			{
-				PonyEngine::Render::PackedPrimitive(0u, 1u, 2u)
+				PonyEngine::Render::Primitive(0u, 1u, 2u)
 			});
 			const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
 			{

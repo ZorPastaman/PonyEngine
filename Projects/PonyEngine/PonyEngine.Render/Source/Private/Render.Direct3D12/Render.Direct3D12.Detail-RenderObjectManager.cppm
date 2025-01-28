@@ -79,7 +79,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
 		const std::unordered_map<std::string, UINT> dataSlots =
 		{
-			{ std::string(EngineDataTypes::PonyTransform), 0u },
+			{ std::string(EngineDataTypes::Transform), 0u },
 			{ "Meshlets", 1u },
 			{ "Positions", 2u },
 			{ "Colors", 3u }
@@ -106,7 +106,6 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManager().CreateMesh(params.mesh);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render object.");
 
 		const auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
 		renderObjects.push_back(renderObject);

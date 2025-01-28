@@ -7,11 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:EngineDataTypes;
-
-import <string_view>;
-
-export namespace PonyEngine::Render::EngineDataTypes
+struct Meshlet
 {
-	constexpr std::string_view Transform = "Pony_Transform";
+	uint vertexOffset;
+	uint primitiveOffset;
+	uint packedCounts;
+};
+
+void UnpackMeshletCounts(in Meshlet meshlet, out uint vertexCount, out uint primitiveCount)
+{
+	vertexCount = meshlet.packedCounts & 0xFF;
+	primitiveCount = meshlet.packedCounts >> 8 & 0xFF;
 }

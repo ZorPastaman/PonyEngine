@@ -41,6 +41,9 @@ export namespace PonyEngine::Render::Direct3D12
 		ShaderManager& operator =(ShaderManager&&) = delete;
 
 	private:
+		void Add(const std::shared_ptr<Shader>& shader, std::string_view shaderName);
+		void Remove(std::size_t index) noexcept;
+
 		ISubSystemContext* d3d12System;
 
 		std::vector<std::shared_ptr<Shader>> shaders;
@@ -79,12 +82,9 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read shader file at '{}'.", path));
 		}
-		const auto shader = std::make_shared<Shader>(data);
 
-		shaders.reserve(shaders.size() + 1);
-		shaderNames.reserve(shaderNames.size() + 1);
-		shaderNames.push_back(std::string(shaderName));
-		shaders.push_back(shader);
+		const auto shader = std::make_shared<Shader>(data);
+		Add(shader, shaderName);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Shader created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(shader.get()));
 
 		return shader;
@@ -94,13 +94,36 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = shaders.size(); i-- > 0; )
 		{
-			if (shaders[i].use_count() < 1L)
+			if (shaders[i].use_count() <= 1L)
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy shader at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(shaders[i].get()));
-				shaders.erase(shaders.cbegin() + i);
-				shaderNames.erase(shaderNames.cbegin() + i);
+				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Shader destroyed.");
 			}
 		}
+	}
+
+	void ShaderManager::Add(const std::shared_ptr<Shader>& shader, const std::string_view shaderName)
+	{
+		const std::size_t currentSize = shaders.size();
+
+		try
+		{
+			shaders.push_back(shader);
+			shaderNames.push_back(std::string(shaderName));
+		}
+		catch (...)
+		{
+			shaders.resize(currentSize);
+			shaderNames.resize(currentSize);
+
+			throw;
+		}
+	}
+
+	void ShaderManager::Remove(const std::size_t index) noexcept
+	{
+		shaders.erase(shaders.cbegin() + index);
+		shaderNames.erase(shaderNames.cbegin() + index);
 	}
 }

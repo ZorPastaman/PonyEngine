@@ -103,6 +103,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create buffer resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
 		const auto buffer = std::make_shared<Buffer>(*resource.Get());
 		resources.push_back(buffer);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Buffer created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(buffer.get()));
@@ -165,6 +166,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create render target resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
 		const auto renderTarget = std::make_shared<Texture>(*resource.Get());
 		resources.push_back(renderTarget);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render target created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderTarget.get()));
@@ -200,6 +202,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create depth stencil resource with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
+
 		const auto depthStencil = std::make_shared<Texture>(*resource.Get());
 		resources.push_back(depthStencil);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Depth stencil created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(depthStencil.get()));

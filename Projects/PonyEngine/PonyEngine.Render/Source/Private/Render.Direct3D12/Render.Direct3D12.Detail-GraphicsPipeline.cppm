@@ -236,18 +236,11 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::SyncTransformCount(std::vector<std::shared_ptr<Buffer>>& transformBuffers, const HeapType heapType, const std::size_t transformCount) const
 	{
-		if (transformBuffers.size() > transformCount)
+		for (std::size_t i = transformBuffers.size(); i < transformCount; ++i)
 		{
-			transformBuffers.erase(transformBuffers.cbegin() + transformCount, transformBuffers.cend());
-		}
-		else
-		{
-			for (std::size_t i = transformBuffers.size(); i < transformCount; ++i)
-			{
-				const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), heapType);
-				transform->Name("Transform");
-				transformBuffers.push_back(transform);
-			}
+			const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), heapType);
+			transform->Name("Transform");
+			transformBuffers.push_back(transform);
 		}
 	}
 
@@ -262,13 +255,9 @@ namespace PonyEngine::Render::Direct3D12
 			}
 		}
 
-		for (std::size_t i = 0; i < uploadTransforms.size(); ++i)
+		for (std::size_t i = 0; i < transforms.size(); ++i)
 		{
 			uploadTransforms[i]->SetData(&transforms[i], sizeof(Transform));
-		}
-
-		for (std::size_t i = 0; i < uploadTransforms.size(); ++i)
-		{
 			D3D12System().CopyPipeline().AddCopyTask(*uploadTransforms[i], *gpuTransforms[i]);
 		}
 	}
@@ -697,7 +686,7 @@ namespace PonyEngine::Render::Direct3D12
 				}
 			}
 
-			if (const std::optional<UINT> slot = rootSignature->DataSlot(EngineDataTypes::PonyTransform))
+			if (const std::optional<UINT> slot = rootSignature->DataSlot(EngineDataTypes::Transform))
 			{
 				CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + TransformIndex(cameraIndex, renderObjectIndex)));
 			}
