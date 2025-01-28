@@ -13,6 +13,7 @@ import <algorithm>;
 import <array>;
 import <cstddef>;
 import <cstdint>;
+import <ranges>;
 import <optional>;
 import <span>;
 import <stdexcept>;
@@ -233,9 +234,6 @@ export namespace PonyEngine::Render
 		Mesh& operator =(Mesh&& other) noexcept;
 
 	private:
-		[[nodiscard("Pure function")]]
-		std::size_t BufferCountInternal() const noexcept;
-
 		std::vector<std::string> dataTypes;
 		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
 		std::vector<std::vector<std::uint64_t>> bufferVersions;
@@ -359,9 +357,18 @@ namespace PonyEngine::Render
 		name(params.name),
 		nameVersion{InitialVersion}
 	{
-		if (params.bufferTables.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		std::size_t bufferCount = 0;
+		for (const auto& [dataType, bufferTable] : params.bufferTables)
 		{
-			throw std::invalid_argument("Buffer table count exceeds std::uint32_t max value.");
+			if (bufferTable.size() == 0) [[unlikely]]
+			{
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data table of '{}' is empty.", dataType));
+			}
+			bufferCount += bufferTable.size();
+		}
+		if (bufferCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
 		}
 
 		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.cend()) [[unlikely]]
@@ -375,23 +382,9 @@ namespace PonyEngine::Render
 
 		for (const auto& [dataType, bufferTable] : params.bufferTables)
 		{
-			if (bufferTable.size() == 0) [[unlikely]]
-			{
-				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data table of '{}' is empty.", dataType));
-			}
-			if (bufferTable.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
-			{
-				throw std::invalid_argument("Buffer table size exceeds std::uint32_t max value.");
-			}
-
 			dataTypes.push_back(std::string(dataType));
 			bufferTables.push_back(bufferTable);
 			bufferVersions.push_back(std::vector<std::uint64_t>(bufferTable.size(), InitialVersion));
-		}
-
-		if (BufferCountInternal() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
-		{
-			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
 		}
 	}
 
@@ -459,7 +452,7 @@ namespace PonyEngine::Render
 
 		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
-			if (BufferCountInternal() - BufferCount(dataIndex.value()) + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+			if (BufferCount() - BufferCount(dataIndex.value()) + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 			{
 				throw std::invalid_argument("Buffer count will exceed std::uint32_t max value.");
 			}
@@ -471,19 +464,28 @@ namespace PonyEngine::Render
 			return BufferTableAccess(bufferTables[dataIndex.value()], bufferVersions[dataIndex.value()]);
 		}
 
-		const std::size_t newSize = dataTypes.size() + 1;
-		if (BufferCountInternal() + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		if (BufferCount() + bufferParams.size() > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Buffer count will exceed std::uint32_t max value.");
 		}
-		dataTypes.reserve(newSize);
-		bufferTables.reserve(newSize);
-		bufferVersions.reserve(newSize);
+
+		const std::size_t currentSize = dataTypes.size();
+		try
+		{
+			dataTypes.push_back(std::string(dataType));
+			bufferTables.push_back(std::move(buffers));
+			bufferVersions.push_back(std::move(versions));
+		}
+		catch (...)
+		{
+			dataTypes.resize(currentSize);
+			bufferTables.resize(currentSize);
+			bufferVersions.resize(currentSize);
+
+			throw;
+		}
 
 		++meshVersion;
-		dataTypes.push_back(std::string(dataType));
-		bufferTables.push_back(std::move(buffers));
-		bufferVersions.push_back(std::move(versions));
 
 		return BufferTableAccess(bufferTables.back(), bufferVersions.back());
 	}
@@ -799,16 +801,5 @@ namespace PonyEngine::Render
 		++nameVersion;
 
 		return *this;
-	}
-
-	std::size_t Mesh::BufferCountInternal() const noexcept
-	{
-		std::size_t count = 0u;
-		for (std::uint32_t i = 0; i < dataTypes.size(); ++i)
-		{
-			count += BufferCount(i);
-		}
-
-		return count;
 	}
 }

@@ -219,23 +219,29 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\PixelShader.hlsl">
+    <FxCompile Include="Shaders\Source\PixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\RootSig.hlsl">
+    <FxCompile Include="Shaders\Source\RootSig.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\MeshShader.hlsl">
+    <FxCompile Include="Shaders\Source\MeshShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputRootSig.hlsl">
+    <FxCompile Include="Shaders\Source\OutputRootSig.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputMeshShader.hlsl">
+    <FxCompile Include="Shaders\Source\OutputMeshShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\OutputPixelShader.hlsl">
+    <FxCompile Include="Shaders\Source\OutputPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Include\Public\PonyEngine\Shader\Meshlet.hlsli" />
+    <None Include="Shaders\Include\Public\PonyEngine\Shader\Transform.hlsli" />
+    <None Include="Shaders\Include\Public\PonyEngine\Shader\Types.hlsli" />
+    <None Include="Shaders\Include\Public\PonyEngine\Shader\Primitive.hlsli" />
   </ItemGroup>
 </Project>

@@ -63,6 +63,9 @@ export namespace PonyEngine::Render::Direct3D12
 			std::unordered_map<std::string, UINT> dataSlots;
 		};
 
+		void Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots);
+		void Remove(std::size_t index) noexcept;
+
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
@@ -94,12 +97,9 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire root sig with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root sig created.");
-		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get(), dataSlots);
 
-		rootSignatures.reserve(rootSignatures.size() + 1);
-		sources.reserve(sources.size() + 1);
-		sources.push_back(SourceData{.shader = rootSignatureShader, .dataSlots = dataSlots});
-		rootSignatures.push_back(rootSignature);
+		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get(), dataSlots);
+		Add(rootSignature, rootSignatureShader, dataSlots);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
 
 		return rootSignature;
@@ -112,9 +112,33 @@ namespace PonyEngine::Render::Direct3D12
 			if (rootSignatures[i].use_count() <= 1L)
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignatures[i].get()));
-				rootSignatures.erase(rootSignatures.cbegin() + i);
+				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature destroyed.");
 			}
 		}
+	}
+
+	void RootSignatureManager::Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots)
+	{
+		const std::size_t currentSize = rootSignatures.size();
+
+		try
+		{
+			rootSignatures.push_back(rootSignature);
+			sources.push_back(SourceData{.shader = rootSignatureShader, .dataSlots = dataSlots});
+		}
+		catch (...)
+		{
+			rootSignatures.resize(currentSize);
+			sources.resize(currentSize);
+
+			throw;
+		}
+	}
+
+	void RootSignatureManager::Remove(const std::size_t index) noexcept
+	{
+		rootSignatures.erase(rootSignatures.cbegin() + index);
+		sources.erase(sources.cbegin() + index);
 	}
 }

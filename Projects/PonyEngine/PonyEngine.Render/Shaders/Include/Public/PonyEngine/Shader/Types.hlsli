@@ -7,11 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:EngineDataTypes;
-
-import <string_view>;
-
-export namespace PonyEngine::Render::EngineDataTypes
-{
-	constexpr std::string_view Transform = "Pony_Transform";
-}
+#include "Meshlet.hlsli"
+#include "Primitive.hlsli"
+#include "Transform.hlsli"

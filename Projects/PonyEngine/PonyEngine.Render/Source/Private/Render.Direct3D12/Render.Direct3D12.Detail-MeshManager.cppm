@@ -77,13 +77,22 @@ export namespace PonyEngine::Render::Direct3D12
 			std::uint64_t nameVersion;
 		};
 
+		struct CopyTask final
+		{
+			std::shared_ptr<Buffer> uploadBuffer;
+			Buffer* gpuBuffer;
+		};
+
 		void UpdateMeshes();
 		void CopyBuffers();
 
 		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
 		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
-		void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+		void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) noexcept;
 		void UpdateName(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+
+		void Add(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<const Render::Mesh>& source);
+		void Remove(std::size_t index) noexcept;
 
 		static constexpr D3D12_DESCRIPTOR_HEAP_TYPE DescHeapType = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV; ///< Descriptor heap type.
 
@@ -93,8 +102,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<std::shared_ptr<const Render::Mesh>> sources;
 		std::vector<SourceState> sourceStates;
 
-		std::vector<std::shared_ptr<Buffer>> uploadBuffers;
-		std::vector<Buffer*> gpuBuffers;
+		std::vector<CopyTask> copyTasks;
 	};
 }
 
@@ -117,12 +125,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		const auto renderMesh = std::make_shared<Mesh>();
-		meshes.reserve(meshes.size() + 1);
-		sources.reserve(sources.size() + 1);
-		sourceStates.reserve(sourceStates.size() + 1);
-		meshes.push_back(renderMesh);
-		sources.push_back(mesh);
-		sourceStates.push_back(SourceState{});
+		Add(renderMesh, mesh);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderMesh.get()));
 
 		return renderMesh;
@@ -136,8 +139,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MeshManager::Clear() noexcept
 	{
-		uploadBuffers.clear();
-		gpuBuffers.clear();
+		copyTasks.clear();
 	}
 
 	void MeshManager::Clean() noexcept
@@ -147,9 +149,7 @@ namespace PonyEngine::Render::Direct3D12
 			if (meshes[i].use_count() <= 1L)
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(meshes[i].get()));
-				meshes.erase(meshes.cbegin() + i);
-				sources.erase(sources.cbegin() + i);
-				sourceStates.erase(sourceStates.begin() + i);
+				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh destroyed.");
 			}
 		}
@@ -172,9 +172,9 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MeshManager::CopyBuffers()
 	{
-		for (std::size_t i = 0; i < uploadBuffers.size(); ++i)
+		for (const CopyTask& copyTask : copyTasks)
 		{
-			d3d12System->CopyPipeline().AddCopyTask(*uploadBuffers[i], *gpuBuffers[i]);
+			d3d12System->CopyPipeline().AddCopyTask(*copyTask.uploadBuffer, *copyTask.gpuBuffer);
 		}
 	}
 
@@ -233,16 +233,11 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				if (const std::uint64_t bufferVersion = source.BufferVersion(dataIndex, bufferIndex); bufferVersions[bufferIndex] != bufferVersion)
 				{
-					uploadBuffers.reserve(uploadBuffers.size() + 1);
-					gpuBuffers.reserve(gpuBuffers.size() + 1);
-
 					const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
 					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sourceBuffer.Size()), HeapType::Upload);
 					uploadBuffer->SetData(sourceBuffer);
-					uploadBuffers.push_back(uploadBuffer);
-
 					Buffer& gpuBuffer = mesh.Buffer(dataIndex, bufferIndex);
-					gpuBuffers.push_back(&gpuBuffer);
+					copyTasks.push_back(CopyTask{.uploadBuffer = uploadBuffer, .gpuBuffer = &gpuBuffer});
 
 					bufferVersions[bufferIndex] = bufferVersion;
 				}
@@ -250,7 +245,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) noexcept
 	{
 		if (sourceState.threadGroupCountsVersion == source.ThreadGroupCountsVersion())
 		{
@@ -270,5 +265,32 @@ namespace PonyEngine::Render::Direct3D12
 
 		mesh.Name(source.Name());
 		sourceState.nameVersion = source.NameVersion();
+	}
+
+	void MeshManager::Add(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<const Render::Mesh>& source)
+	{
+		const std::size_t currentSize = meshes.size();
+
+		try
+		{
+			meshes.push_back(mesh);
+			sources.push_back(source);
+			sourceStates.push_back(SourceState{});
+		}
+		catch (...)
+		{
+			meshes.resize(currentSize);
+			sources.resize(currentSize);
+			sourceStates.resize(currentSize);
+
+			throw;
+		}
+	}
+
+	void MeshManager::Remove(const std::size_t index) noexcept
+	{
+		meshes.erase(meshes.cbegin() + index);
+		sources.erase(sources.cbegin() + index);
+		sourceStates.erase(sourceStates.cbegin() + index);
 	}
 }

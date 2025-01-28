@@ -9,7 +9,7 @@
 
 // CPU:
 // 0: Transform
-// 1: Meshlets, Vertex indices and Triangles
+// 1: Meshlets, Vertex indices and Primitives
 // 2: Positions
 // 3: Colors
 
@@ -17,7 +17,7 @@
 // b0: Transform
 // t0: Meshlets
 // t1: Vertex indices
-// t2: Triangles
+// t2: Primitives
 // t3: Positions
 // t4: Colors
 

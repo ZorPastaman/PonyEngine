@@ -7,11 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:EngineDataTypes;
-
-import <string_view>;
-
-export namespace PonyEngine::Render::EngineDataTypes
+struct Transform
 {
-	constexpr std::string_view Transform = "Pony_Transform";
-}
+	float4x4 modelMatrix;
+	float4x4 viewMatrix;
+	float4x4 projectionMatrix;
+	float4x4 mvpMatrix;
+};
