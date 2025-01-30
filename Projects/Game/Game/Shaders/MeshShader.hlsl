@@ -7,7 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Shader/Types.hlsli"
+#include "PonyShader/Mesh/Meshlet.hlsli"
+#include "PonyShader/Mesh/Primitive.hlsli"
+#include "PonyShader/Space/Transform.hlsli"
 
 #define TRIANGLE_MULTIPLIER 2
 #define VERTEX_COUNT 64

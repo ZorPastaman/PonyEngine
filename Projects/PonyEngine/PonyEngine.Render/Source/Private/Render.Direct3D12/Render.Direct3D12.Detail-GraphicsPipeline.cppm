@@ -36,6 +36,8 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Utility;
 
+import PonyShader.Space;
+
 import :DescriptorHeap;
 import :IDescriptorHeapManager;
 import :IFrameManager;
@@ -48,7 +50,6 @@ import :Pipeline;
 import :RootSignature;
 import :RenderObject;
 import :SrgbOutputQuad;
-import :Transform;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -129,7 +130,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<RenderObject*> renderObjects; ///< Render objects.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
-		std::vector<Transform> transforms;
+		std::vector<PonyShader::Space::Transform> transforms;
 		std::vector<std::shared_ptr<Buffer>> uploadTransforms;
 		std::vector<std::shared_ptr<Buffer>> gpuTransforms;
 		std::shared_ptr<DescriptorHeap> transformHeap;
@@ -238,7 +239,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = transformBuffers.size(); i < transformCount; ++i)
 		{
-			const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(Transform)), heapType);
+			const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(PonyShader::Space::Transform)), heapType);
 			transform->Name("Transform");
 			transformBuffers.push_back(transform);
 		}
@@ -251,13 +252,13 @@ namespace PonyEngine::Render::Direct3D12
 			for (std::size_t renderObjectIndex = 0; renderObjectIndex < renderObjects.size(); ++renderObjectIndex)
 			{
 				const std::size_t transformIndex = TransformIndex(cameraIndex, renderObjectIndex);
-				transforms[transformIndex] = Transform(renderObjects[renderObjectIndex]->ModelMatrixD3D12(), cameras[cameraIndex]->ViewMatrixD3D12(), cameras[cameraIndex]->ProjectionMatrixD3D12());
+				transforms[transformIndex] = PonyShader::Space::Transform(renderObjects[renderObjectIndex]->ModelMatrixD3D12(), cameras[cameraIndex]->ViewMatrixD3D12(), cameras[cameraIndex]->ProjectionMatrixD3D12());
 			}
 		}
 
 		for (std::size_t i = 0; i < transforms.size(); ++i)
 		{
-			uploadTransforms[i]->SetData(&transforms[i], sizeof(Transform));
+			uploadTransforms[i]->SetData(&transforms[i], sizeof(PonyShader::Space::Transform));
 			D3D12System().CopyPipeline().AddCopyTask(*uploadTransforms[i], *gpuTransforms[i]);
 		}
 	}
@@ -309,7 +310,7 @@ namespace PonyEngine::Render::Direct3D12
 			const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 			{
 				.BufferLocation = gpuTransforms[i]->Data().GetGPUVirtualAddress(),
-				.SizeInBytes = sizeof(Transform)
+				.SizeInBytes = sizeof(PonyShader::Space::Transform)
 			};
 			D3D12System().Device().CreateConstantBufferView(&cbvDesc, transformHeap->CpuHandle(i));
 		}
@@ -625,8 +626,8 @@ namespace PonyEngine::Render::Direct3D12
 				return leftMaterial->IsTransparent() < rightMaterial->IsTransparent();
 			}
 
-			const Transform& leftTransform = transforms[TransformIndex(cameraIndex, leftIndex)];
-			const Transform& rightTransform = transforms[TransformIndex(cameraIndex, rightIndex)];
+			const PonyShader::Space::Transform& leftTransform = transforms[TransformIndex(cameraIndex, leftIndex)];
+			const PonyShader::Space::Transform& rightTransform = transforms[TransformIndex(cameraIndex, rightIndex)];
 
 			if (leftMaterial->IsTransparent())
 			{

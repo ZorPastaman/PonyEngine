@@ -205,9 +205,6 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FrameManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Transform.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Pipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -219,29 +216,14 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\Source\PixelShader.hlsl">
+    <FxCompile Include="Shaders\OutputRootSig.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Source\RootSig.hlsl">
+    <FxCompile Include="Shaders\OutputMeshShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Source\MeshShader.hlsl">
+    <FxCompile Include="Shaders\OutputPixelShader.hlsl">
       <Filter>Shaders</Filter>
     </FxCompile>
-    <FxCompile Include="Shaders\Source\OutputRootSig.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Source\OutputMeshShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-    <FxCompile Include="Shaders\Source\OutputPixelShader.hlsl">
-      <Filter>Shaders</Filter>
-    </FxCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <None Include="Shaders\Include\Public\PonyEngine\Shader\Meshlet.hlsli" />
-    <None Include="Shaders\Include\Public\PonyEngine\Shader\Transform.hlsli" />
-    <None Include="Shaders\Include\Public\PonyEngine\Shader\Types.hlsli" />
-    <None Include="Shaders\Include\Public\PonyEngine\Shader\Primitive.hlsli" />
   </ItemGroup>
 </Project>

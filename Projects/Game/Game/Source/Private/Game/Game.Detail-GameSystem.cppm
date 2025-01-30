@@ -26,6 +26,9 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Space;
 
+import PonyShader.Mesh;
+import PonyShader.Space;
+
 import PonyDebug.Log;
 
 import PonyEngine.Core;
@@ -132,23 +135,23 @@ namespace Game
 		};
 		const auto material = std::make_shared<PonyEngine::Render::Material>(materialParams);
 
-		const auto meshlets = PonyBase::Container::Buffer::Create<PonyEngine::Render::Meshlet>(std::array<PonyEngine::Render::Meshlet, 2>
+		const auto meshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 2>
 		{
-			PonyEngine::Render::Meshlet(0u, 0u, 7u, 6u),
-			PonyEngine::Render::Meshlet(7u, 0u, 7u, 6u)
+			PonyShader::Mesh::Meshlet(0u, 0u, 7u, 6u),
+			PonyShader::Mesh::Meshlet(7u, 0u, 7u, 6u)
 		});
 		const auto vertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 14>
 		{
 			0u, 1u, 2u, 3u, 7u, 4u, 5u, 6u, 7u, 3u, 2u, 1u, 5u, 4u
 		});
-		const auto triangles = PonyBase::Container::Buffer::Create<PonyEngine::Render::Primitive>(std::array<PonyEngine::Render::Primitive, 6>
+		const auto triangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
 		{
-			PonyEngine::Render::Primitive(0u, 1u, 2u),
-			PonyEngine::Render::Primitive(0u, 2u, 3u),
-			PonyEngine::Render::Primitive(4u, 5u, 0u),
-			PonyEngine::Render::Primitive(4u, 0u, 3u),
-			PonyEngine::Render::Primitive(5u, 6u, 1u),
-			PonyEngine::Render::Primitive(5u, 1u, 0u)
+			PonyShader::Mesh::Primitive(0u, 1u, 2u),
+			PonyShader::Mesh::Primitive(0u, 2u, 3u),
+			PonyShader::Mesh::Primitive(4u, 5u, 0u),
+			PonyShader::Mesh::Primitive(4u, 0u, 3u),
+			PonyShader::Mesh::Primitive(5u, 6u, 1u),
+			PonyShader::Mesh::Primitive(5u, 1u, 0u)
 		});
 		const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
 		{
