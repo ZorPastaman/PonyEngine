@@ -22,11 +22,11 @@ struct Vertex
 	float4 color : COLOR;
 };
 
-Transform Transform : register(b0);
+Pony_Transform Transform : register(b0);
 
-StructuredBuffer<Meshlet> Meshlets : register(t0);
+StructuredBuffer<Pony_Meshlet> Meshlets : register(t0);
 StructuredBuffer<uint> VertexIndices : register(t1);
-StructuredBuffer<Primitive> Primitives : register(t2);
+StructuredBuffer<Pony_Primitive> Primitives : register(t2);
 StructuredBuffer<float3> Positions : register(t3);
 StructuredBuffer<float4> Colors : register(t4);
 
@@ -51,9 +51,9 @@ void main(in uint groupId : SV_GROUPID,
 	out vertices Vertex outVertices[VERTEX_COUNT],
 	out indices uint3 outTriangles[TRIANGLE_COUNT])
 {
-	Meshlet meshlet = Meshlets[groupId];
-	uint vertexCount;
-	uint primitiveCount;
+	Pony_Meshlet meshlet = Meshlets[groupId];
+	uint vertexCount = 0;
+	uint primitiveCount = 0;
 	UnpackMeshletCounts(meshlet, vertexCount, primitiveCount);
 	SetMeshOutputCounts(vertexCount, primitiveCount);
 

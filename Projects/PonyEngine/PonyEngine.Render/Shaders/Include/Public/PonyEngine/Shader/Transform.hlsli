@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct Transform
+struct Pony_Transform
 {
 	float4x4 modelMatrix;
 	float4x4 viewMatrix;

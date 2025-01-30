@@ -30,7 +30,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param rootSignature Root signature.
 		/// @param dataSlots Data slots.
 		[[nodiscard("Pure constructor")]]
-		RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& dataSlots);
+		explicit RootSignature(ID3D12RootSignature& rootSignature);
 		[[nodiscard("Pure constructor")]]
 		RootSignature(const RootSignature& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -48,9 +48,10 @@ export namespace PonyEngine::Render::Direct3D12
 		const ID3D12RootSignature& RootSig() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		const std::unordered_map<std::string, UINT>& DataSlots() const noexcept;
-		[[nodiscard("Pure function")]]
 		std::optional<UINT> DataSlot(std::string_view dataType) const noexcept;
+		[[nodiscard("Pure function")]]
+		const std::unordered_map<std::string, UINT>& DataSlots() const noexcept;
+		void DataSlots(const std::unordered_map<std::string, UINT>& dataSlotsToSet);
 
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
@@ -67,9 +68,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	RootSignature::RootSignature(ID3D12RootSignature& rootSignature, const std::unordered_map<std::string, UINT>& dataSlots) :
-		rootSignature(&rootSignature),
-		dataSlots(dataSlots)
+	RootSignature::RootSignature(ID3D12RootSignature& rootSignature) :
+		rootSignature(&rootSignature)
 	{
 	}
 
@@ -83,11 +83,6 @@ namespace PonyEngine::Render::Direct3D12
 		return *rootSignature.Get();
 	}
 
-	const std::unordered_map<std::string, UINT>& RootSignature::DataSlots() const noexcept
-	{
-		return dataSlots;
-	}
-
 	std::optional<UINT> RootSignature::DataSlot(const std::string_view dataType) const noexcept
 	{
 		for (const auto& [type, slot] : dataSlots)
@@ -99,6 +94,16 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		return std::nullopt;
+	}
+
+	const std::unordered_map<std::string, UINT>& RootSignature::DataSlots() const noexcept
+	{
+		return dataSlots;
+	}
+
+	void RootSignature::DataSlots(const std::unordered_map<std::string, UINT>& dataSlotsToSet)
+	{
+		dataSlots = dataSlotsToSet;
 	}
 
 	void RootSignature::Name(const std::string_view name)

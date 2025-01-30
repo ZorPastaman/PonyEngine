@@ -28,9 +28,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		/// @brief Creates a root signature.
 		/// @param rootSignatureShader Root signature shader.
-		/// @param dataSlots Data slots.
 		/// @return Root signature.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots) = 0;
+		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader) = 0;
 	};
 }

@@ -64,9 +64,6 @@ export namespace PonyEngine::Render::Direct3D12
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<RenderObject>> renderObjects; ///< Render objects.
-
-		// TODO: There should not be a default material. The user must create their own materials.
-		std::shared_ptr<Material> defaultMaterial; ///< Default material.
 	};
 }
 
@@ -75,39 +72,19 @@ namespace PonyEngine::Render::Direct3D12
 	RenderObjectManager::RenderObjectManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create default material.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load root signature shader.");
-		const std::unordered_map<std::string, UINT> dataSlots =
-		{
-			{ std::string(EngineDataTypes::Transform), 0u },
-			{ "Meshlets", 1u },
-			{ "Positions", 2u },
-			{ "Colors", 3u }
-		};
-		const std::shared_ptr<Shader> rootSigShader = this->d3d12System->ShaderManager().CreateShader("RootSig");
-		const auto rootSignature = this->d3d12System->RootSignatureManager().CreateRootSignature(rootSigShader, dataSlots);
-		rootSignature->Name("RootSig");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load mesh shader.");
-		const auto meshShader = this->d3d12System->ShaderManager().CreateShader("MeshShader");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Load pixel shader.");
-		const auto pixelShader = this->d3d12System->ShaderManager().CreateShader("PixelShader");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pixel shader loaded.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create material.");
-		defaultMaterial = this->d3d12System->MaterialManager().CreateMaterial(rootSignature, nullptr, meshShader, pixelShader);
-		defaultMaterial->Name("DefaultMaterial");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created.");
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Default material created.");
 	}
 
 	std::shared_ptr<Render::IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render material.");
+		const std::shared_ptr<Material> renderMaterial = d3d12System->MaterialManager().CreateMaterial(params.material);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render material created");
+
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Mesh> renderMesh = d3d12System->MeshManager().CreateMesh(params.mesh);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 
-		const auto renderObject = std::make_shared<RenderObject>(defaultMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
+		const auto renderObject = std::make_shared<RenderObject>(renderMaterial, renderMesh, static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(params.modelMatrix));
 		renderObjects.push_back(renderObject);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 

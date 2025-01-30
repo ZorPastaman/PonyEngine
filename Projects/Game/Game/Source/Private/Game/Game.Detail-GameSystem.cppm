@@ -114,6 +114,24 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
+		auto materialParams = PonyEngine::Render::MaterialParams
+		{
+			.rootSignatureShader = "RootSig",
+			.amplificationShader = "",
+			.meshShader = "MeshShader",
+			.pixelShader = "PixelShader",
+			.dataSlots =
+			{
+				{ std::string(PonyEngine::Render::EngineDataTypes::Transform), 0u },
+				{ "Meshlets", 1u },
+				{ "Positions", 2u },
+				{ "Colors", 3u }
+			},
+			.threadGroupCounts = { 1u, 1u, 1u },
+			.name = "Material"
+		};
+		const auto material = std::make_shared<PonyEngine::Render::Material>(materialParams);
+
 		const auto meshlets = PonyBase::Container::Buffer::Create<PonyEngine::Render::Meshlet>(std::array<PonyEngine::Render::Meshlet, 2>
 		{
 			PonyEngine::Render::Meshlet(0u, 0u, 7u, 6u),
@@ -161,8 +179,8 @@ namespace Game
 		meshParams.threadGroupCounts = { 2u, 1u, 1u };
 		meshParams.name = "Box";
 		const auto mesh = std::make_shared<PonyEngine::Render::Mesh>(meshParams);
-		boxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One * 5.f)});
-		bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f))});
+		boxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.material = material, .mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One * 5.f)});
+		bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.material = material, .mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f))});
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render objects created.");
 
 		camera = renderSystem->CameraManager().CreateCamera(PonyEngine::Render::CameraParams{});

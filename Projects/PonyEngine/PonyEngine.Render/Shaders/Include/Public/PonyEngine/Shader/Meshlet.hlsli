@@ -7,14 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct Meshlet
+struct Pony_Meshlet
 {
 	uint vertexOffset;
 	uint primitiveOffset;
 	uint packedCounts;
 };
 
-void UnpackMeshletCounts(in Meshlet meshlet, out uint vertexCount, out uint primitiveCount)
+void UnpackMeshletCounts(in Pony_Meshlet meshlet, out uint vertexCount, out uint primitiveCount)
 {
 	vertexCount = meshlet.packedCounts & 0xFF;
 	primitiveCount = meshlet.packedCounts >> 8 & 0xFF;

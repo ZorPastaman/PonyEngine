@@ -44,6 +44,10 @@
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICamera.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IMaterialObserver.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IMeshObserver.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Material.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-MaterialParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />
