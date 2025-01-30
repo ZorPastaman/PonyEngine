@@ -7,14 +7,14 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:Primitive;
+export module PonyShader.Mesh:Primitive;
 
 import <array>;
 import <cstddef>;
 import <cstdint>;
 import <span>;
 
-export namespace PonyEngine::Render
+export namespace PonyShader::Mesh
 {
 	class Primitive final
 	{
@@ -75,7 +75,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyShader::Mesh
 {
 	Primitive::Primitive(const std::uint8_t i0, const std::uint8_t i1, const std::uint8_t i2, const std::uint8_t i3) noexcept :
 		indices{ i0, i1, i2, i3 }

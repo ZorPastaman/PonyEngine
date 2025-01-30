@@ -11,48 +11,27 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="resource.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ResourceCompile Include="PonyMath.rc" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="Source\Public\Color\Color.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Common.cppm" />
-    <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Matrix2x2.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Matrix3x3.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Matrix4x4.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Quaternion.cppm" />
-    <ClCompile Include="Source\Public\Color\Color-RGB.cppm" />
-    <ClCompile Include="Source\Public\Color\Color-RGBA.cppm" />
-    <ClCompile Include="Source\Public\Color\Color-RGBAInt.cppm" />
-    <ClCompile Include="Source\Public\Color\Color-RGBInt.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Transformations2D.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Transformations3D.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Vector2.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Vector3.cppm" />
-    <ClCompile Include="Source\Public\Core\Core-Vector4.cppm" />
-    <ClCompile Include="Source\Public\Shape\Shape-Inside2D.cppm" />
-    <ClCompile Include="Source\Public\Shape\Shape-Intersecting2D.cppm" />
-    <ClCompile Include="Source\Public\Shape\Shape-Rect.cppm" />
-    <ClCompile Include="Source\Public\Shape\Shape.cppm" />
-    <ClCompile Include="Source\Public\Space\Space.cppm" />
-    <ClCompile Include="Source\Public\Space\Space-Transform2D.cppm" />
-    <ClCompile Include="Source\Public\Space\Space-Transform3D.cppm" />
-    <ClCompile Include="Source\Public\Utility\Utility-Resolution.cppm" />
-    <ClCompile Include="Source\Public\Utility\Utility.cppm" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">
-      <Project>{8a7ec39a-b21b-49fe-bf96-0b9b0ced7323}</Project>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
+      <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\PonyShader\Mesh\Meshlet.hlsli" />
+    <None Include="Shaders\PonyShader\Mesh\Primitive.hlsli" />
+    <None Include="Shaders\PonyShader\Space\Transform.hlsli" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Source\Public\Mesh\Mesh-Meshlet.cppm" />
+    <ClCompile Include="Source\Public\Mesh\Mesh.cppm" />
+    <ClCompile Include="Source\Public\Mesh\Mesh-Primitive.cppm" />
+    <ClCompile Include="Source\Public\Space\Space-Transform.cppm" />
+    <ClCompile Include="Source\Public\Space\Space.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>
-    <ProjectGuid>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</ProjectGuid>
-    <RootNamespace>PonyMath</RootNamespace>
+    <ProjectGuid>{cc5ca766-f2cf-45b2-9d00-ece87aa8bbc4}</ProjectGuid>
+    <RootNamespace>PonyShader</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
@@ -84,11 +63,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Color;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Shape;$(ProjectDir)\Source\Public\Space;$(ProjectDir)\Source\Public\Utility;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Mesh;$(ProjectDir)\Source\Public\Space;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Color;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Geometry;$(ProjectDir)\Source\Public\Shape;$(ProjectDir)\Source\Public\Space;$(ProjectDir)\Source\Public\Utility;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Mesh;$(ProjectDir)\Source\Public\Space;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

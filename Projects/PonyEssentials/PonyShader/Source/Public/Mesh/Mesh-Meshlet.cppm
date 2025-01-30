@@ -7,12 +7,12 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:Meshlet;
+export module PonyShader.Mesh:Meshlet;
 
 import <array>;
 import <cstdint>;
 
-export namespace PonyEngine::Render
+export namespace PonyShader::Mesh
 {
 	class Meshlet final
 	{
@@ -63,7 +63,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyShader::Mesh
 {
 	Meshlet::Meshlet(const std::uint32_t vertexOffset, const std::uint32_t primitiveOffset, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept :
 		vertexOffset{vertexOffset},
