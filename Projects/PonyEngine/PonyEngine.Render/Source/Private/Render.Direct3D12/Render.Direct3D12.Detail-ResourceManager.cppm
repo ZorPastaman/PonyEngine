@@ -86,7 +86,7 @@ namespace PonyEngine::Render::Direct3D12
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Alignment = 0ULL,
 			.Width = size,
 			.Height = 1u,
 			.DepthOrArraySize = 1u,
@@ -144,7 +144,7 @@ namespace PonyEngine::Render::Direct3D12
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Alignment = 0ULL,
 			.Width = width,
 			.Height = height,
 			.DepthOrArraySize = 1u,
@@ -180,7 +180,7 @@ namespace PonyEngine::Render::Direct3D12
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Alignment = 0ULL,
 			.Width = width,
 			.Height = height,
 			.DepthOrArraySize = 1u,
@@ -258,7 +258,7 @@ namespace PonyEngine::Render::Direct3D12
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = dimension,
-			.Alignment = D3D12_DEFAULT_RESOURCE_PLACEMENT_ALIGNMENT,
+			.Alignment = 0ULL,
 			.Width = width,
 			.Height = height,
 			.DepthOrArraySize = depth,

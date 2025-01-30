@@ -48,7 +48,7 @@ export namespace PonyEngine::Render::Direct3D12
 		~RootSignatureManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots) override;
+		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader) override;
 
 		/// @brief Cleans out of dead root signatures.
 		void Clean() noexcept;
@@ -57,19 +57,13 @@ export namespace PonyEngine::Render::Direct3D12
 		RootSignatureManager& operator =(RootSignatureManager&& other) noexcept = default;
 
 	private:
-		struct SourceData final
-		{
-			std::shared_ptr<const Shader> shader;
-			std::unordered_map<std::string, UINT> dataSlots;
-		};
-
-		void Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots);
+		void Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
-		std::vector<SourceData> sources;
+		std::vector<std::shared_ptr<const Shader>> sources;
 	};
 }
 
@@ -80,11 +74,11 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots)
+	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader)
 	{
 		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
-			if (sources[i].shader == rootSignatureShader && sources[i].dataSlots == dataSlots)
+			if (sources[i] == rootSignatureShader)
 			{
 				return rootSignatures[i];
 			}
@@ -98,8 +92,8 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root sig created.");
 
-		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get(), dataSlots);
-		Add(rootSignature, rootSignatureShader, dataSlots);
+		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get());
+		Add(rootSignature, rootSignatureShader);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
 
 		return rootSignature;
@@ -118,14 +112,14 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void RootSignatureManager::Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader, const std::unordered_map<std::string, UINT>& dataSlots)
+	void RootSignatureManager::Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader)
 	{
 		const std::size_t currentSize = rootSignatures.size();
 
 		try
 		{
 			rootSignatures.push_back(rootSignature);
-			sources.push_back(SourceData{.shader = rootSignatureShader, .dataSlots = dataSlots});
+			sources.push_back(rootSignatureShader);
 		}
 		catch (...)
 		{

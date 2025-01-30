@@ -21,6 +21,7 @@ import <cstdint>;
 import <cstring>;
 import <memory>;
 import <optional>;
+import <set>;
 import <span>;
 import <stdexcept>;
 import <type_traits>;
@@ -69,12 +70,40 @@ export namespace PonyEngine::Render::Direct3D12
 		MeshManager& operator =(MeshManager&&) = delete;
 
 	private:
-		struct SourceState final
+		class MeshObserver final : public IMeshObserver
 		{
-			std::vector<std::vector<std::uint64_t>> bufferVersions;
-			std::uint64_t meshVersion;
-			std::uint32_t threadGroupCountsVersion;
-			std::uint64_t nameVersion;
+		public:
+			[[nodiscard("Pure constructor")]]
+			MeshObserver() noexcept;
+			MeshObserver(const MeshObserver&) = delete;
+			MeshObserver(MeshObserver&&) = delete;
+
+			~MeshObserver() noexcept = default;
+
+			virtual void OnMeshChanged() noexcept override;
+			virtual void OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept override;
+			virtual void OnThreadGroupCountsChanged() noexcept override;
+			virtual void OnNameChanged() noexcept override;
+
+			[[nodiscard("Pure function")]]
+			bool MeshChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			const std::set<std::pair<std::uint32_t, std::uint32_t>>& ChangedBuffers() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool ThreadGroupCountsChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool NameChanged() const noexcept;
+
+			void Reset() noexcept;
+
+			MeshObserver& operator =(const MeshObserver&) = delete;
+			MeshObserver& operator =(MeshObserver&&) = delete;
+
+		private:
+			std::set<std::pair<std::uint32_t, std::uint32_t>> changedBuffers;
+			bool meshChanged;
+			bool threadGroupCountsChanged;
+			bool nameChanged;
 		};
 
 		struct CopyTask final
@@ -86,10 +115,11 @@ export namespace PonyEngine::Render::Direct3D12
 		void UpdateMeshes();
 		void CopyBuffers();
 
-		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
-		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
-		void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) noexcept;
-		void UpdateName(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState);
+		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) const;
+		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer);
+		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source, std::uint32_t dataIndex, std::uint32_t bufferIndex);
+		static void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept;
+		static void UpdateName(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer);
 
 		void Add(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<const Render::Mesh>& source);
 		void Remove(std::size_t index) noexcept;
@@ -100,7 +130,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 		std::vector<std::shared_ptr<Mesh>> meshes; ///< Meshes.
 		std::vector<std::shared_ptr<const Render::Mesh>> sources;
-		std::vector<SourceState> sourceStates;
+		std::vector<std::unique_ptr<MeshObserver>> observers;
 
 		std::vector<CopyTask> copyTasks;
 	};
@@ -108,6 +138,65 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
+	MeshManager::MeshObserver::MeshObserver() noexcept :
+		meshChanged{true},
+		threadGroupCountsChanged{true},
+		nameChanged{true}
+	{
+	}
+
+	void MeshManager::MeshObserver::OnMeshChanged() noexcept
+	{
+		changedBuffers.clear();
+		meshChanged = true;
+	}
+
+	void MeshManager::MeshObserver::OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept
+	{
+		if (!meshChanged)
+		{
+			changedBuffers.insert(std::pair(dataIndex, bufferIndex));
+		}
+	}
+
+	void MeshManager::MeshObserver::OnThreadGroupCountsChanged() noexcept
+	{
+		threadGroupCountsChanged = true;
+	}
+
+	void MeshManager::MeshObserver::OnNameChanged() noexcept
+	{
+		nameChanged = true;
+	}
+
+	bool MeshManager::MeshObserver::MeshChanged() const noexcept
+	{
+		return nameChanged;
+	}
+
+	const std::set<std::pair<std::uint32_t, std::uint32_t>>& MeshManager::MeshObserver::ChangedBuffers() const noexcept
+	{
+		return changedBuffers;
+	}
+
+	bool MeshManager::MeshObserver::ThreadGroupCountsChanged() const noexcept
+	{
+		return threadGroupCountsChanged;
+	}
+
+	bool MeshManager::MeshObserver::NameChanged() const noexcept
+	{
+		return nameChanged;
+	}
+
+	void MeshManager::MeshObserver::Reset() noexcept
+	{
+		changedBuffers.clear();
+		meshChanged = false;
+		threadGroupCountsChanged = false;
+		nameChanged = false;
+	}
+
 	MeshManager::MeshManager(ISubSystemContext& d3d12System) :
 		d3d12System{&d3d12System}
 	{
@@ -159,14 +248,16 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = 0; i < meshes.size(); ++i)
 		{
-			const std::shared_ptr<Mesh>& mesh = meshes[i];
-			const std::shared_ptr<const Render::Mesh>& source = sources[i];
-			SourceState& sourceState = sourceStates[i];
+			Mesh& mesh = *meshes[i];
+			const Render::Mesh& source = *sources[i];
+			MeshObserver& observer = *observers[i];
 
-			UpdateMesh(*mesh, *source, sourceState);
-			UpdateBuffers(*mesh, *source, sourceState);
-			UpdateThreadGroupCounts(*mesh, *source, sourceState);
-			UpdateName(*mesh, *source, sourceState);
+			UpdateMesh(mesh, source, observer);
+			UpdateBuffers(mesh, source, observer);
+			UpdateThreadGroupCounts(mesh, source, observer);
+			UpdateName(mesh, source, observer);
+
+			observer.Reset();
 		}
 	}
 
@@ -178,9 +269,9 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MeshManager::UpdateMesh(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	void MeshManager::UpdateMesh(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) const
 	{
-		if (sourceState.meshVersion == source.MeshVersion())
+		if (!observer.MeshChanged()) [[likely]]
 		{
 			return;
 		}
@@ -220,51 +311,55 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		mesh = Mesh(dataTypes, bufferOffsets, buffers, heap);
-		sourceState.meshVersion = source.MeshVersion();
-		sourceState.bufferVersions = std::move(bufferVersions);
 	}
 
-	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer)
 	{
-		for (std::uint32_t dataIndex = 0u; dataIndex < sourceState.bufferVersions.size(); ++dataIndex)
+		if (observer.MeshChanged()) [[unlikely]]
 		{
-			std::vector<std::uint64_t>& bufferVersions = sourceState.bufferVersions[dataIndex];
-			for (std::uint32_t bufferIndex = 0u; bufferIndex < bufferVersions.size(); ++bufferIndex)
+			for (std::size_t dataIndex = 0; dataIndex < source.DataTypeCount(); ++dataIndex)
 			{
-				if (const std::uint64_t bufferVersion = source.BufferVersion(dataIndex, bufferIndex); bufferVersions[bufferIndex] != bufferVersion)
+				for (std::size_t bufferIndex = 0; bufferIndex < source.BufferCount(dataIndex); ++bufferIndex)
 				{
-					const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
-					const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sourceBuffer.Size()), HeapType::Upload);
-					uploadBuffer->SetData(sourceBuffer);
-					Buffer& gpuBuffer = mesh.Buffer(dataIndex, bufferIndex);
-					copyTasks.push_back(CopyTask{.uploadBuffer = uploadBuffer, .gpuBuffer = &gpuBuffer});
-
-					bufferVersions[bufferIndex] = bufferVersion;
+					UpdateBuffer(mesh, source, dataIndex, bufferIndex);
 				}
+			}
+		}
+		else [[likely]]
+		{
+			for (const auto [dataIndex, bufferIndex] : observer.ChangedBuffers())
+			{
+				UpdateBuffer(mesh, source, dataIndex, bufferIndex);
 			}
 		}
 	}
 
-	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState) noexcept
+	void MeshManager::UpdateBuffer(Mesh& mesh, const Render::Mesh& source, const std::uint32_t dataIndex, const std::uint32_t bufferIndex)
 	{
-		if (sourceState.threadGroupCountsVersion == source.ThreadGroupCountsVersion())
-		{
-			return;
-		}
+		const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
 
-		std::ranges::copy(source.ThreadGroupCounts(), mesh.ThreadGroupCounts().begin());
-		sourceState.threadGroupCountsVersion = source.ThreadGroupCountsVersion();
+		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sourceBuffer.Size()), HeapType::Upload);
+		uploadBuffer->SetData(sourceBuffer);
+
+		Buffer& gpuBuffer = mesh.Buffer(dataIndex, bufferIndex);
+
+		copyTasks.push_back(CopyTask{.uploadBuffer = uploadBuffer, .gpuBuffer = &gpuBuffer});
 	}
 
-	void MeshManager::UpdateName(Mesh& mesh, const Render::Mesh& source, SourceState& sourceState)
+	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept
 	{
-		if (sourceState.nameVersion == source.NameVersion())
+		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
 		{
-			return;
+			std::ranges::copy(source.ThreadGroupCounts(), mesh.ThreadGroupCounts().begin());
 		}
+	}
 
-		mesh.Name(source.Name());
-		sourceState.nameVersion = source.NameVersion();
+	void MeshManager::UpdateName(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer)
+	{
+		if (observer.NameChanged()) [[unlikely]]
+		{
+			mesh.Name(source.Name());
+		}
 	}
 
 	void MeshManager::Add(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<const Render::Mesh>& source)
@@ -275,13 +370,14 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			meshes.push_back(mesh);
 			sources.push_back(source);
-			sourceStates.push_back(SourceState{});
+			observers.push_back(std::make_unique<MeshObserver>());
+			source->AddObserver(*observers.back());
 		}
 		catch (...)
 		{
 			meshes.resize(currentSize);
 			sources.resize(currentSize);
-			sourceStates.resize(currentSize);
+			observers.resize(currentSize);
 
 			throw;
 		}
@@ -289,8 +385,10 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MeshManager::Remove(const std::size_t index) noexcept
 	{
+		sources[index]->RemoveObserver(*observers[index]);
+
 		meshes.erase(meshes.cbegin() + index);
 		sources.erase(sources.cbegin() + index);
-		sourceStates.erase(sourceStates.cbegin() + index);
+		observers.erase(observers.cbegin() + index);
 	}
 }

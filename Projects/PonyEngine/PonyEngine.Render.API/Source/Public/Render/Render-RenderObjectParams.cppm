@@ -13,12 +13,14 @@ import <memory>;
 
 import PonyMath.Core;
 
+import :Material;
 import :Mesh;
 
 export namespace PonyEngine::Render
 {
 	struct RenderObjectParams final
 	{
+		std::shared_ptr<const Material> material;
 		std::shared_ptr<const Mesh> mesh;
 		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity;
 	};

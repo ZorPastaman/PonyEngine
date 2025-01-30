@@ -633,9 +633,9 @@ namespace PonyEngine::Render::Direct3D12
 				return PonyMath::Core::ExtractTranslation(leftTransform.MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(rightTransform.MvpMatrix()).Z();
 			}
 
-			if (&leftMaterial->RootSignature() != &rightMaterial->RootSignature())
+			if (leftMaterial->RootSignature() != rightMaterial->RootSignature())
 			{
-				return reinterpret_cast<std::uintptr_t>(&leftMaterial->RootSignature()) < reinterpret_cast<std::uintptr_t>(&rightMaterial->RootSignature());
+				return reinterpret_cast<std::uintptr_t>(leftMaterial->RootSignature()) < reinterpret_cast<std::uintptr_t>(rightMaterial->RootSignature());
 			}
 			if (leftMaterial != rightMaterial)
 			{
@@ -663,7 +663,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			RenderObject* const renderObject = renderObjects[renderObjectIndex];
 			Material* const material = &renderObject->Material();
-			RootSignature* const rootSignature = &material->RootSignature();
+			RootSignature* const rootSignature = material->RootSignature();
 			Mesh* const mesh = &renderObject->Mesh();
 
 			if (rootSignature != prevRootSignature)
@@ -672,7 +672,7 @@ namespace PonyEngine::Render::Direct3D12
 			}
 			if (material != prevMaterial)
 			{
-				CommandList().SetPipelineState(&material->PipelineState());
+				CommandList().SetPipelineState(material->PipelineState());
 			}
 
 			if (mesh != prevMesh || rootSignature != prevRootSignature)

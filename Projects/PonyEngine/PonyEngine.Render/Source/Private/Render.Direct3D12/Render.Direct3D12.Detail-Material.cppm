@@ -22,6 +22,7 @@ import <string_view>;
 
 import :ObjectUtility;
 import :RootSignature;
+import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -29,11 +30,13 @@ export namespace PonyEngine::Render::Direct3D12
 	class Material final
 	{
 	public:
+		[[nodiscard("Pure constructor")]]
+		Material() noexcept;
 		/// @brief Creates a @p Material.
 		/// @param rootSignature Root signature. Mustn't be nullptr.
 		/// @param pipelineState Pipeline state.
 		[[nodiscard("Pure constructor")]]
-		Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState) noexcept;
+		Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, bool isTransparent) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Material(const Material& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -44,20 +47,20 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the root signature.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		class RootSignature& RootSignature() noexcept;
+		class RootSignature* RootSignature() noexcept;
 		/// @brief Gets the root signature.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		const class RootSignature& RootSignature() const noexcept;
+		const class RootSignature* RootSignature() const noexcept;
 
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		ID3D12PipelineState& PipelineState() noexcept;
+		ID3D12PipelineState* PipelineState() noexcept;
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		const ID3D12PipelineState& PipelineState() const noexcept;
+		const ID3D12PipelineState* PipelineState() const noexcept;
 
 		/// @brief Gets if the material is transparent.
 		/// @return @a True if the material is transparent; @a false otherwise.
@@ -66,6 +69,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 		[[nodiscard("Pure function")]]
 		std::span<const UINT, 3> ThreadGroupCounts() const noexcept;
+		void ThreadGroupCounts(std::span<const UINT, 3> threadGroupCountsToSet) noexcept;
 
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
@@ -78,37 +82,45 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
-		std::array<UINT, 3> threadGroupCounts = {1u, 1u, 1u};
-		bool isTransparent = false; // TODO: Support material params.
+		std::array<UINT, 3> threadGroupCounts;
+		bool isTransparent;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Material::Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState) noexcept :
+	Material::Material() noexcept :
+		threadGroupCounts{ 1u, 1u, 1u },
+		isTransparent{true}
+	{
+	}
+
+	Material::Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
 		rootSignature(rootSignature),
-		pipelineState(&pipelineState)
+		pipelineState(&pipelineState),
+		isTransparent{isTransparent}
 	{
+		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
-	class RootSignature& Material::RootSignature() noexcept
+	class RootSignature* Material::RootSignature() noexcept
 	{
-		return *rootSignature;
+		return rootSignature.get();
 	}
 
-	const class RootSignature& Material::RootSignature() const noexcept
+	const class RootSignature* Material::RootSignature() const noexcept
 	{
-		return *rootSignature;
+		return rootSignature.get();
 	}
 
-	ID3D12PipelineState& Material::PipelineState() noexcept
+	ID3D12PipelineState* Material::PipelineState() noexcept
 	{
-		return *pipelineState.Get();
+		return pipelineState.Get();
 	}
 
-	const ID3D12PipelineState& Material::PipelineState() const noexcept
+	const ID3D12PipelineState* Material::PipelineState() const noexcept
 	{
-		return *pipelineState.Get();
+		return pipelineState.Get();
 	}
 
 	bool Material::IsTransparent() const noexcept
@@ -119,6 +131,11 @@ namespace PonyEngine::Render::Direct3D12
 	std::span<const UINT, 3> Material::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
+	}
+
+	void Material::ThreadGroupCounts(std::span<const UINT, 3> threadGroupCountsToSet) noexcept
+	{
+		std::ranges::copy(threadGroupCountsToSet, threadGroupCounts.begin());
 	}
 
 	void Material::Name(const std::string_view name)

@@ -49,8 +49,9 @@ export namespace PonyEngine::Render::Direct3D12
 		~MaterialManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, 
-			const std::shared_ptr<const Shader>& pixelShader) override;
+		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<const Render::Material>& material) override;
+
+		void Tick();
 
 		/// @brief Cleans out of dead materials.
 		void Clean() noexcept;
@@ -59,6 +60,54 @@ export namespace PonyEngine::Render::Direct3D12
 		MaterialManager& operator =(MaterialManager&&) = delete;
 
 	private:
+		class MaterialObserver final : public IMaterialObserver
+		{
+		public:
+			[[nodiscard("Pure constructor")]]
+			MaterialObserver() noexcept;
+			MaterialObserver(const MaterialObserver&) = delete;
+			MaterialObserver(MaterialObserver&&) = delete;
+
+			~MaterialObserver() noexcept = default;
+
+			virtual void OnRootSignatureChanged() noexcept override;
+			virtual void OnAmplificationShaderChanged() noexcept override;
+			virtual void OnMeshShaderChanged() noexcept override;
+			virtual void OnPixelShaderChanged() noexcept override;
+			virtual void OnDataSlotsChanged() noexcept override;
+			virtual void OnThreadGroupCountsChanged() noexcept override;
+			virtual void OnNameChanged() noexcept override;
+
+			[[nodiscard("Pure function")]]
+			bool RootSignatureChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool AmplificationShaderChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool MeshShaderChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool PixelShaderChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool DataSlotsChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool ThreadGroupCountsChanged() const noexcept;
+			[[nodiscard("Pure function")]]
+			bool NameChanged() const noexcept;
+
+			void Reset() noexcept;
+
+			MaterialObserver& operator =(const MaterialObserver&) = delete;
+			MaterialObserver& operator =(MaterialObserver&&) = delete;
+
+		private:
+			bool rootSignatureChanged;
+			bool amplificationShaderChanged;
+			bool meshShaderChanged;
+			bool pixelShaderChanged;
+			bool dataSlotsChanged;
+			bool threadGroupCountsChanged;
+			bool nameChanged;
+		};
+
 		struct PipelineStateStream final
 		{
 			PipelineStateStreamRootSignature rootSignature;
@@ -74,36 +123,135 @@ export namespace PonyEngine::Render::Direct3D12
 			PipelineStateStreamSampleDescription sampleDescription;
 		};
 
-		struct SourceData final
+		struct ShaderData final
 		{
 			std::shared_ptr<const Shader> amplificationShader;
 			std::shared_ptr<const Shader> meshShader;
 			std::shared_ptr<const Shader> pixelShader;
 		};
 
-		void Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, const std::shared_ptr<const Shader>& pixelShader);
+		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
+		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
+		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
+		static void UpdateThreadGroupCounts(Material& material, const Render::Material& source, const MaterialObserver& observer);
+		static void UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer);
+
+		void Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Render::Material>& source);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Material>> materials; ///< Materials.
-		std::vector<SourceData> sources;
+		std::vector<std::shared_ptr<const Render::Material>> sources;
+		std::vector<ShaderData> shaders;
+		std::vector<std::unique_ptr<MaterialObserver>> materialObservers;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
+	MaterialManager::MaterialObserver::MaterialObserver() noexcept :
+		rootSignatureChanged{true},
+		amplificationShaderChanged{true},
+		meshShaderChanged{true},
+		pixelShaderChanged{true},
+		dataSlotsChanged{true},
+		threadGroupCountsChanged{true},
+		nameChanged{true}
+	{
+	}
+
+	void MaterialManager::MaterialObserver::OnRootSignatureChanged() noexcept
+	{
+		rootSignatureChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnAmplificationShaderChanged() noexcept
+	{
+		amplificationShaderChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnMeshShaderChanged() noexcept
+	{
+		meshShaderChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnPixelShaderChanged() noexcept
+	{
+		pixelShaderChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnDataSlotsChanged() noexcept
+	{
+		dataSlotsChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnThreadGroupCountsChanged() noexcept
+	{
+		threadGroupCountsChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnNameChanged() noexcept
+	{
+		nameChanged = true;
+	}
+
+	bool MaterialManager::MaterialObserver::RootSignatureChanged() const noexcept
+	{
+		return rootSignatureChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::AmplificationShaderChanged() const noexcept
+	{
+		return amplificationShaderChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::MeshShaderChanged() const noexcept
+	{
+		return meshShaderChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::PixelShaderChanged() const noexcept
+	{
+		return pixelShaderChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::DataSlotsChanged() const noexcept
+	{
+		return dataSlotsChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::ThreadGroupCountsChanged() const noexcept
+	{
+		return threadGroupCountsChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::NameChanged() const noexcept
+	{
+		return nameChanged;
+	}
+
+	void MaterialManager::MaterialObserver::Reset() noexcept
+	{
+		rootSignatureChanged = false;
+		amplificationShaderChanged = false;
+		meshShaderChanged = false;
+		pixelShaderChanged = false;
+		dataSlotsChanged = false;
+		threadGroupCountsChanged = false;
+		nameChanged = false;
+	}
+
 	MaterialManager::MaterialManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
 	}
 
-	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, 
-		const std::shared_ptr<const Shader>& pixelShader)
+	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<const Render::Material>& material)
 	{
 		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
-			if (sources[i].amplificationShader == amplificationShader && sources[i].meshShader == meshShader && sources[i].pixelShader == pixelShader && &materials[i]->RootSignature() == rootSignature.get())
+			if (sources[i] == material)
 			{
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material reused at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
 
@@ -111,19 +259,86 @@ namespace PonyEngine::Render::Direct3D12
 			}
 		}
 
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Acquire graphics pipeline state.");
+		const auto renderMaterial = std::make_shared<Material>();
+		Add(renderMaterial, material);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
+
+		return renderMaterial;
+	}
+
+	void MaterialManager::Tick()
+	{
+		for (std::size_t i = 0; i < materials.size(); ++i)
+		{
+			Material& material = *materials[i];
+			const Render::Material& source = *sources[i];
+			ShaderData& shaderData = shaders[i];
+			MaterialObserver& observer = *materialObservers[i];
+
+			UpdateShaders(source, shaderData, observer);
+			UpdateMaterial(material, source, shaderData, observer);
+			UpdateDataSlots(material, source, observer);
+			UpdateThreadGroupCounts(material, source, observer);
+			UpdateName(material, source, observer);
+
+			observer.Reset();
+		}
+	}
+
+	void MaterialManager::Clean() noexcept
+	{
+		for (std::size_t i = materials.size(); i-- > 0; )
+		{
+			if (materials[i].use_count() <= 1L)
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
+				Remove(i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
+			}
+		}
+	}
+
+	void MaterialManager::UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const
+	{
+		if (observer.AmplificationShaderChanged()) [[unlikely]]
+		{
+			shaderData.amplificationShader = source.AmplificationShader().empty() ? nullptr : d3d12System->ShaderManager().CreateShader(source.AmplificationShader());
+		}
+
+		if (observer.MeshShaderChanged()) [[unlikely]]
+		{
+			shaderData.meshShader = d3d12System->ShaderManager().CreateShader(source.MeshShader());
+		}
+
+		if (observer.PixelShaderChanged()) [[unlikely]]
+		{
+			shaderData.pixelShader = d3d12System->ShaderManager().CreateShader(source.PixelShader());
+		}
+	}
+
+	void MaterialManager::UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const
+	{
+		if (!observer.RootSignatureChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
+		{
+			return;
+		}
+
+		const std::shared_ptr<Shader> rootSignatureShader = d3d12System->ShaderManager().CreateShader(source.RootSignatureShader());
+		const std::shared_ptr<RootSignature> rootSignature = d3d12System->RootSignatureManager().CreateRootSignature(rootSignatureShader);
+		rootSignature->Name(source.RootSignatureShader());
+
 		auto pss = PipelineStateStream
 		{
 			.rootSignature = &rootSignature->RootSig(),
-			.amplificationShader = amplificationShader ? amplificationShader->ByteCode() : D3D12_SHADER_BYTECODE{},
-			.meshShader = meshShader->ByteCode(),
-			.pixelShader = pixelShader->ByteCode(),
+			.amplificationShader = shaderData.amplificationShader ? shaderData.amplificationShader->ByteCode() : D3D12_SHADER_BYTECODE{},
+			.meshShader = shaderData.meshShader->ByteCode(),
+			.pixelShader = shaderData.pixelShader->ByteCode(),
 			.blend = D3D12_BLEND_DESC
 			{
 				.AlphaToCoverageEnable = false,
 				.IndependentBlendEnable = false,
 				.RenderTarget =
-				{
+			{
 					D3D12_RENDER_TARGET_BLEND_DESC
 					{
 						.BlendEnable = false,
@@ -196,47 +411,62 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline state acquired at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.Get()));
 
-		const auto material = std::make_shared<Material>(rootSignature, *pipelineState.Get());
-		Add(material, amplificationShader, meshShader, pixelShader);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
-
-		return material;
+		material = Material(rootSignature, *pipelineState.Get(), false);
 	}
 
-	void MaterialManager::Clean() noexcept
+	void MaterialManager::UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer)
 	{
-		for (std::size_t i = materials.size(); i-- > 0; )
+		if (observer.DataSlotsChanged() || observer.RootSignatureChanged()) [[unlikely]]
 		{
-			if (materials[i].use_count() <= 1L)
-			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
-				Remove(i);
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
-			}
+			material.RootSignature()->DataSlots(static_cast<std::unordered_map<std::string, UINT>>(source.DataSlots()));
 		}
 	}
 
-	void MaterialManager::Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Shader>& amplificationShader, const std::shared_ptr<const Shader>& meshShader, const std::shared_ptr<const Shader>& pixelShader)
+	void MaterialManager::UpdateThreadGroupCounts(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	{
+		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
+		{
+			material.ThreadGroupCounts(source.ThreadGroupCounts());
+		}
+	}
+
+	void MaterialManager::UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	{
+		if (observer.NameChanged()) [[unlikely]]
+		{
+			material.Name(source.Name());
+		}
+	}
+
+	void MaterialManager::Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Render::Material>& source)
 	{
 		const std::size_t currentSize = materials.size();
 
 		try
 		{
 			materials.push_back(material);
-			sources.push_back(SourceData{.amplificationShader = amplificationShader, .meshShader = meshShader, .pixelShader = pixelShader});
+			sources.push_back(source);
+			shaders.push_back(ShaderData{});
+			materialObservers.push_back(std::make_unique<MaterialObserver>());
+			source->AddObserver(*materialObservers.back());
 		}
 		catch (...)
 		{
 			materials.resize(currentSize);
 			sources.resize(currentSize);
+			shaders.resize(currentSize);
+			materialObservers.resize(currentSize);
 		}
 	}
 
 	void MaterialManager::Remove(const std::size_t index) noexcept
 	{
+		sources[index]->RemoveObserver(*materialObservers[index]);
+
 		materials.erase(materials.cbegin() + index);
 		sources.erase(sources.cbegin() + index);
+		shaders.erase(shaders.cbegin() + index);
+		materialObservers.erase(materialObservers.cbegin() + index);
 	}
 }

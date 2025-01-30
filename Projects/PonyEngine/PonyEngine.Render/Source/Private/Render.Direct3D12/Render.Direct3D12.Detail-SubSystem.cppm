@@ -408,6 +408,7 @@ namespace PonyEngine::Render::Direct3D12
 	void SubSystem::Render(const UINT backBufferIndex)
 	{
 		meshManager->Tick();
+		materialManager->Tick();
 		cameraManager->Tick();
 		renderObjectManager->Tick();
 		graphicsPipeline->Prepare();
