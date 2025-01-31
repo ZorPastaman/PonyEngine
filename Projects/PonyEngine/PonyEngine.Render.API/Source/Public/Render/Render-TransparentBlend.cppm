@@ -7,25 +7,21 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:MaterialParams;
+export module PonyEngine.Render:TransparentBlend;
 
-import <array>;
-import <string>;
-import <unordered_map>;
-
-import :Blend;
+import :BlendFactor;
+import :BlendOperation;
 
 export namespace PonyEngine::Render
 {
-	struct MaterialParams final
+	struct TransparentBlend final
 	{
-		std::string rootSignatureShader;
-		std::string amplificationShader;
-		std::string meshShader;
-		std::string pixelShader;
-		Blend blend;
-		std::unordered_map<std::string, std::uint32_t> dataSlots;
-		std::array<std::uint32_t, 3> threadGroupCounts;
-		std::string name;
+		BlendFactor sourceBlend;
+		BlendFactor destinationBlend;
+		BlendOperation blendOperation;
+
+		BlendFactor sourceBlendAlpha;
+		BlendFactor destinationBlendAlpha;
+		BlendOperation blendOperationAlpha;
 	};
 }

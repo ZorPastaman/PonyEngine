@@ -9,6 +9,9 @@
 
 export module PonyEngine.Render;
 
+export import :Blend;
+export import :BlendFactor;
+export import :BlendOperation;
 export import :CameraParams;
 export import :EngineDataTypes;
 export import :ICamera;
@@ -18,12 +21,16 @@ export import :IMeshObserver;
 export import :IRenderObject;
 export import :IRenderObjectManager;
 export import :IRenderSystem;
+export import :LogicBlend;
+export import :LogicOperation;
 export import :Material;
 export import :MaterialParams;
 export import :Mesh;
 export import :MeshParams;
 export import :MSAAParams;
+export import :OpaqueBlend;
 export import :RenderObjectParams;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
+export import :TransparentBlend;
