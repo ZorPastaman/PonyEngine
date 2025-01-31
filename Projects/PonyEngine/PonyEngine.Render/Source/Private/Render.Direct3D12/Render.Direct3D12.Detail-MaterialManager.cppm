@@ -137,6 +137,12 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static D3D12_BLEND_DESC CreateBlendDesc(const Blend& blend) noexcept;
 		[[nodiscard("Pure function")]]
+		static D3D12_RENDER_TARGET_BLEND_DESC CreateOpaqueBlendDesc(const OpaqueBlend& blend) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_RENDER_TARGET_BLEND_DESC CreateTransparentBlendDesc(const TransparentBlend& blend) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_RENDER_TARGET_BLEND_DESC CreateLogicBlendDesc(const LogicBlend& blend) noexcept;
+		[[nodiscard("Pure function")]]
 		static D3D12_BLEND GetBlendFactor(BlendFactor blendFactor) noexcept;
 		[[nodiscard("Pure function")]]
 		static D3D12_BLEND_OP GetBlendOperation(BlendOperation blendOperation) noexcept;
@@ -323,33 +329,13 @@ namespace PonyEngine::Render::Direct3D12
 		switch (blend.renderTargetBlend.index())
 		{
 		case 0:
-			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
-			{
-				.BlendEnable = false,
-				.LogicOpEnable = false
-			};
+			blendDesc.RenderTarget[0] = CreateOpaqueBlendDesc(std::get<0>(blend.renderTargetBlend));
 			break;
 		case 1:
-			const TransparentBlend transparentBlend = std::get<1>(blend.renderTargetBlend);
-			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
-			{
-				.BlendEnable = true,
-				.LogicOpEnable = false,
-				.SrcBlend = GetBlendFactor(transparentBlend.sourceBlend),
-				.DestBlend = GetBlendFactor(transparentBlend.destinationBlend),
-				.BlendOp = GetBlendOperation(transparentBlend.blendOperation),
-				.SrcBlendAlpha = GetBlendFactor(transparentBlend.sourceBlendAlpha),
-				.DestBlendAlpha = GetBlendFactor(transparentBlend.destinationBlendAlpha),
-				.BlendOpAlpha = GetBlendOperation(transparentBlend.blendOperationAlpha)
-			};
+			blendDesc.RenderTarget[0] = CreateTransparentBlendDesc(std::get<1>(blend.renderTargetBlend));
 			break;
 		case 2:
-			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
-			{
-				.BlendEnable = false,
-				.LogicOpEnable = true,
-				.LogicOp = GetLogicOperation(std::get<2>(blend.renderTargetBlend).operation)
-			};
+			blendDesc.RenderTarget[0] = CreateLogicBlendDesc(std::get<2>(blend.renderTargetBlend));
 			break;
 		default: [[unlikely]]
 			assert(false && "Unsupported render target blend type.");
@@ -361,6 +347,40 @@ namespace PonyEngine::Render::Direct3D12
 		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
 
 		return blendDesc;
+	}
+
+	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateOpaqueBlendDesc(const OpaqueBlend&) noexcept
+	{
+		return D3D12_RENDER_TARGET_BLEND_DESC
+		{
+			.BlendEnable = false,
+			.LogicOpEnable = false
+		};
+	}
+
+	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateTransparentBlendDesc(const TransparentBlend& blend) noexcept
+	{
+		return D3D12_RENDER_TARGET_BLEND_DESC
+		{
+			.BlendEnable = true,
+			.LogicOpEnable = false,
+			.SrcBlend = GetBlendFactor(blend.sourceBlend),
+			.DestBlend = GetBlendFactor(blend.destinationBlend),
+			.BlendOp = GetBlendOperation(blend.blendOperation),
+			.SrcBlendAlpha = GetBlendFactor(blend.sourceBlendAlpha),
+			.DestBlendAlpha = GetBlendFactor(blend.destinationBlendAlpha),
+			.BlendOpAlpha = GetBlendOperation(blend.blendOperationAlpha)
+		};
+	}
+
+	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateLogicBlendDesc(const LogicBlend& blend) noexcept
+	{
+		return D3D12_RENDER_TARGET_BLEND_DESC
+		{
+			.BlendEnable = false,
+			.LogicOpEnable = true,
+			.LogicOp = GetLogicOperation(blend.operation)
+		};
 	}
 
 	D3D12_BLEND MaterialManager::GetBlendFactor(const BlendFactor blendFactor) noexcept

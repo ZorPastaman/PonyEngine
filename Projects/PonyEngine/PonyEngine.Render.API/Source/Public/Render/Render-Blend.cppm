@@ -19,7 +19,7 @@ export namespace PonyEngine::Render
 {
 	struct Blend final
 	{
-		std::variant<OpaqueBlend, TransparentBlend, LogicBlend> renderTargetBlend;
-		bool alphaToCoverage;
+		std::variant<OpaqueBlend, TransparentBlend, LogicBlend> renderTargetBlend = OpaqueBlend{};
+		bool alphaToCoverage = false;
 	};
 }

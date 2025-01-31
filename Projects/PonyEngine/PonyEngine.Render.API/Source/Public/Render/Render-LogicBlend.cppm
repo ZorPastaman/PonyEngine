@@ -15,6 +15,6 @@ export namespace PonyEngine::Render
 {
 	struct LogicBlend final
 	{
-		LogicOperation operation;
+		LogicOperation operation = LogicOperation::Noop;
 	};
 }

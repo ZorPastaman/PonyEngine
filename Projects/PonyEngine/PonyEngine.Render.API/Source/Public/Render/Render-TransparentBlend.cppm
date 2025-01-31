@@ -16,12 +16,12 @@ export namespace PonyEngine::Render
 {
 	struct TransparentBlend final
 	{
-		BlendFactor sourceBlend;
-		BlendFactor destinationBlend;
-		BlendOperation blendOperation;
+		BlendFactor sourceBlend = BlendFactor::One;
+		BlendFactor destinationBlend = BlendFactor::Zero;
+		BlendOperation blendOperation = BlendOperation::Add;
 
-		BlendFactor sourceBlendAlpha;
-		BlendFactor destinationBlendAlpha;
-		BlendOperation blendOperationAlpha;
+		BlendFactor sourceBlendAlpha = BlendFactor::One;
+		BlendFactor destinationBlendAlpha = BlendFactor::Zero;
+		BlendOperation blendOperationAlpha = BlendOperation::Add;
 	};
 }
