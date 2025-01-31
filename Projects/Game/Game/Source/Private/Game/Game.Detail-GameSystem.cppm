@@ -124,7 +124,7 @@ namespace Game
 			.amplificationShader = "",
 			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
 			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
-			.blend = PonyEngine::Render::OpaqueBlend{},
+			.blend = PonyEngine::Render::Blend{},
 			.dataSlots =
 			{
 				{ std::string(PonyEngine::Render::EngineDataTypes::Transform), 0u },
