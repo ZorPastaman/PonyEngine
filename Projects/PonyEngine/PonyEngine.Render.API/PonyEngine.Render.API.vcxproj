@@ -40,17 +40,23 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Blend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-BlendFactor.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICamera.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMaterialObserver.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMeshObserver.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-LogicBlend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-LogicOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Material.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MaterialParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderSystemFactoryParams.cppm" />
@@ -58,6 +64,7 @@
     <ClCompile Include="Source\Public\Render\Render-IRenderObject.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IRenderSystem.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TransparentBlend.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

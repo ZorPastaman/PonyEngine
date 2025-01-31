@@ -9,6 +9,8 @@
 
 module;
 
+#include "cassert"
+
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -21,6 +23,7 @@ import <memory>;
 import <optional>;
 import <stdexcept>;
 import <type_traits>;
+import <variant>;
 import <vector>;
 
 import PonyDebug.Log;
@@ -74,12 +77,13 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnAmplificationShaderChanged() noexcept override;
 			virtual void OnMeshShaderChanged() noexcept override;
 			virtual void OnPixelShaderChanged() noexcept override;
+			virtual void OnBlendChanged() noexcept override;
 			virtual void OnDataSlotsChanged() noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
 			[[nodiscard("Pure function")]]
-			bool RootSignatureChanged() const noexcept;
+			bool MaterialChanged() const noexcept;
 			[[nodiscard("Pure function")]]
 			bool AmplificationShaderChanged() const noexcept;
 			[[nodiscard("Pure function")]]
@@ -99,7 +103,7 @@ export namespace PonyEngine::Render::Direct3D12
 			MaterialObserver& operator =(MaterialObserver&&) = delete;
 
 		private:
-			bool rootSignatureChanged;
+			bool materialChanged;
 			bool amplificationShaderChanged;
 			bool meshShaderChanged;
 			bool pixelShaderChanged;
@@ -130,6 +134,15 @@ export namespace PonyEngine::Render::Direct3D12
 			std::shared_ptr<const Shader> pixelShader;
 		};
 
+		[[nodiscard("Pure function")]]
+		static D3D12_BLEND_DESC CreateBlendDesc(const Blend& blend) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_BLEND GetBlendFactor(BlendFactor blendFactor) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_BLEND_OP GetBlendOperation(BlendOperation blendOperation) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_LOGIC_OP GetLogicOperation(LogicOperation logicOperation) noexcept;
+
 		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
 		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
 		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
@@ -151,7 +164,7 @@ export namespace PonyEngine::Render::Direct3D12
 namespace PonyEngine::Render::Direct3D12
 {
 	MaterialManager::MaterialObserver::MaterialObserver() noexcept :
-		rootSignatureChanged{true},
+		materialChanged{true},
 		amplificationShaderChanged{true},
 		meshShaderChanged{true},
 		pixelShaderChanged{true},
@@ -163,7 +176,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MaterialManager::MaterialObserver::OnRootSignatureChanged() noexcept
 	{
-		rootSignatureChanged = true;
+		materialChanged = true;
 	}
 
 	void MaterialManager::MaterialObserver::OnAmplificationShaderChanged() noexcept
@@ -181,6 +194,11 @@ namespace PonyEngine::Render::Direct3D12
 		pixelShaderChanged = true;
 	}
 
+	void MaterialManager::MaterialObserver::OnBlendChanged() noexcept
+	{
+		materialChanged = true;
+	}
+
 	void MaterialManager::MaterialObserver::OnDataSlotsChanged() noexcept
 	{
 		dataSlotsChanged = true;
@@ -196,9 +214,9 @@ namespace PonyEngine::Render::Direct3D12
 		nameChanged = true;
 	}
 
-	bool MaterialManager::MaterialObserver::RootSignatureChanged() const noexcept
+	bool MaterialManager::MaterialObserver::MaterialChanged() const noexcept
 	{
-		return rootSignatureChanged;
+		return materialChanged;
 	}
 
 	bool MaterialManager::MaterialObserver::AmplificationShaderChanged() const noexcept
@@ -233,7 +251,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MaterialManager::MaterialObserver::Reset() noexcept
 	{
-		rootSignatureChanged = false;
+		materialChanged = false;
 		amplificationShaderChanged = false;
 		meshShaderChanged = false;
 		pixelShaderChanged = false;
@@ -298,6 +316,147 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	D3D12_BLEND_DESC MaterialManager::CreateBlendDesc(const Blend& blend) noexcept
+	{
+		D3D12_BLEND_DESC blendDesc;
+
+		switch (blend.renderTargetBlend.index())
+		{
+		case 0:
+			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
+			{
+				.BlendEnable = false,
+				.LogicOpEnable = false
+			};
+			break;
+		case 1:
+			const TransparentBlend transparentBlend = std::get<1>(blend.renderTargetBlend);
+			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
+			{
+				.BlendEnable = true,
+				.LogicOpEnable = false,
+				.SrcBlend = GetBlendFactor(transparentBlend.sourceBlend),
+				.DestBlend = GetBlendFactor(transparentBlend.destinationBlend),
+				.BlendOp = GetBlendOperation(transparentBlend.blendOperation),
+				.SrcBlendAlpha = GetBlendFactor(transparentBlend.sourceBlendAlpha),
+				.DestBlendAlpha = GetBlendFactor(transparentBlend.destinationBlendAlpha),
+				.BlendOpAlpha = GetBlendOperation(transparentBlend.blendOperationAlpha)
+			};
+			break;
+		case 2:
+			blendDesc.RenderTarget[0] = D3D12_RENDER_TARGET_BLEND_DESC
+			{
+				.BlendEnable = false,
+				.LogicOpEnable = true,
+				.LogicOp = GetLogicOperation(std::get<2>(blend.renderTargetBlend).operation)
+			};
+			break;
+		default: [[unlikely]]
+			assert(false && "Unsupported render target blend type.");
+			break;
+		}
+
+		blendDesc.AlphaToCoverageEnable = blend.alphaToCoverage;
+		blendDesc.IndependentBlendEnable = false;
+		blendDesc.RenderTarget[0].RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL;
+
+		return blendDesc;
+	}
+
+	D3D12_BLEND MaterialManager::GetBlendFactor(const BlendFactor blendFactor) noexcept
+	{
+		switch (blendFactor)
+		{
+		case BlendFactor::Zero:
+			return D3D12_BLEND_ZERO;
+		case BlendFactor::One:
+			return D3D12_BLEND_ONE;
+		case BlendFactor::ColorSource:
+			return D3D12_BLEND_SRC_COLOR;
+		case BlendFactor::ColorSourceInverse:
+			return D3D12_BLEND_INV_SRC_COLOR;
+		case BlendFactor::AlphaSource:
+			return D3D12_BLEND_SRC_ALPHA;
+		case BlendFactor::AlphaSourceInverse:
+			return D3D12_BLEND_INV_SRC_ALPHA;
+		case BlendFactor::AlphaSourceSaturate:
+			return D3D12_BLEND_SRC_ALPHA_SAT;
+		case BlendFactor::ColorDestination:
+			return D3D12_BLEND_DEST_COLOR;
+		case BlendFactor::ColorDestinationInverse:
+			return D3D12_BLEND_INV_DEST_COLOR;
+		case BlendFactor::AlphaDestination:
+			return D3D12_BLEND_DEST_ALPHA;
+		case BlendFactor::AlphaDestinationInverse:
+			return D3D12_BLEND_INV_DEST_ALPHA;
+		default: [[unlikely]]
+			assert(false && "Unsupported blend factor.");
+			return D3D12_BLEND_ZERO;
+		}
+	}
+
+	D3D12_BLEND_OP MaterialManager::GetBlendOperation(const BlendOperation blendOperation) noexcept
+	{
+		switch (blendOperation)
+		{
+		case BlendOperation::Add:
+			return D3D12_BLEND_OP_ADD;
+		case BlendOperation::Subtract:
+			return D3D12_BLEND_OP_SUBTRACT;
+		case BlendOperation::SubtractReverse:
+			return D3D12_BLEND_OP_REV_SUBTRACT;
+		case BlendOperation::Min:
+			return D3D12_BLEND_OP_MIN;
+		case BlendOperation::Max:
+			return D3D12_BLEND_OP_MAX;
+		default: [[unlikely]]
+			assert(false && "Unsupported blend operation");
+			return D3D12_BLEND_OP_ADD;
+		}
+	}
+
+	D3D12_LOGIC_OP MaterialManager::GetLogicOperation(const LogicOperation logicOperation) noexcept
+	{
+		switch (logicOperation)
+		{
+		case LogicOperation::Noop:
+			return D3D12_LOGIC_OP_NOOP;
+		case LogicOperation::Clear:
+			return D3D12_LOGIC_OP_CLEAR;
+		case LogicOperation::Set:
+			return D3D12_LOGIC_OP_SET;
+		case LogicOperation::Copy:
+			return D3D12_LOGIC_OP_COPY;
+		case LogicOperation::CopyInverted:
+			return D3D12_LOGIC_OP_COPY_INVERTED;
+		case LogicOperation::Invert:
+			return D3D12_LOGIC_OP_INVERT;
+		case LogicOperation::And:
+			return D3D12_LOGIC_OP_AND;
+		case LogicOperation::AndReverse:
+			return D3D12_LOGIC_OP_AND_REVERSE;
+		case LogicOperation::AndInverted:
+			return D3D12_LOGIC_OP_AND_INVERTED;
+		case LogicOperation::Nand:
+			return D3D12_LOGIC_OP_NAND;
+		case LogicOperation::Or:
+			return D3D12_LOGIC_OP_OR;
+		case LogicOperation::OrReverse:
+			return D3D12_LOGIC_OP_OR_REVERSE;
+		case LogicOperation::OrInverted:
+			return D3D12_LOGIC_OP_INVERT;
+		case LogicOperation::Nor:
+			return D3D12_LOGIC_OP_NOR;
+		case LogicOperation::Xor:
+			return D3D12_LOGIC_OP_NOR;
+		case LogicOperation::Equal:
+			return D3D12_LOGIC_OP_EQUIV;
+		default: [[unlikely]]
+			assert(false && "Unsupported logic operation.");
+			return D3D12_LOGIC_OP_NOOP;
+		}
+	}
+
 	void MaterialManager::UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const
 	{
 		if (observer.AmplificationShaderChanged()) [[unlikely]]
@@ -318,7 +477,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MaterialManager::UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const
 	{
-		if (!observer.RootSignatureChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
+		if (!observer.MaterialChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
 		{
 			return;
 		}
@@ -333,27 +492,7 @@ namespace PonyEngine::Render::Direct3D12
 			.amplificationShader = shaderData.amplificationShader ? shaderData.amplificationShader->ByteCode() : D3D12_SHADER_BYTECODE{},
 			.meshShader = shaderData.meshShader->ByteCode(),
 			.pixelShader = shaderData.pixelShader->ByteCode(),
-			.blend = D3D12_BLEND_DESC
-			{
-				.AlphaToCoverageEnable = false,
-				.IndependentBlendEnable = false,
-				.RenderTarget =
-			{
-					D3D12_RENDER_TARGET_BLEND_DESC
-					{
-						.BlendEnable = false,
-						.LogicOpEnable = false,
-						.SrcBlend = D3D12_BLEND_ONE,
-						.DestBlend = D3D12_BLEND_ZERO,
-						.BlendOp = D3D12_BLEND_OP_ADD,
-						.SrcBlendAlpha = D3D12_BLEND_ONE,
-						.DestBlendAlpha = D3D12_BLEND_ZERO,
-						.BlendOpAlpha = D3D12_BLEND_OP_ADD,
-						.LogicOp = D3D12_LOGIC_OP_NOOP,
-						.RenderTargetWriteMask = D3D12_COLOR_WRITE_ENABLE_ALL
-					}
-				}
-			},
+			.blend = CreateBlendDesc(source.Blend()),
 			.sampleMask = UINT_MAX,
 			.rasterizer = D3D12_RASTERIZER_DESC
 			{
@@ -412,12 +551,13 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
-		material = Material(rootSignature, *pipelineState.Get(), false);
+		const bool isTransparent = pss.blend.Data().RenderTarget[0].BlendEnable || pss.blend.Data().RenderTarget[0].LogicOpEnable;
+		material = Material(rootSignature, *pipelineState.Get(), isTransparent);
 	}
 
 	void MaterialManager::UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer)
 	{
-		if (observer.DataSlotsChanged() || observer.RootSignatureChanged()) [[unlikely]]
+		if (observer.DataSlotsChanged() || observer.MaterialChanged()) [[unlikely]]
 		{
 			material.RootSignature()->DataSlots(source.DataSlots());
 		}
