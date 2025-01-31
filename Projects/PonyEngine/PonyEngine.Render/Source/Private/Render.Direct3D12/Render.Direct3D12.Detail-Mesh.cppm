@@ -37,10 +37,10 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure constructor")]]
 		Mesh() noexcept;
 		[[nodiscard("Pure constructor")]]
-		Mesh(std::span<const std::string> dataTypes, std::span<const UINT> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap);
+		Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap);
 		[[nodiscard("Pure constructor")]]
-		Mesh(std::span<const std::string> dataTypes, std::span<const UINT> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap, 
-			std::span<const UINT, 3> threadGroupCounts);
+		Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap, 
+			std::span<const std::uint32_t, 3> threadGroupCounts);
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -49,44 +49,44 @@ export namespace PonyEngine::Render::Direct3D12
 		~Mesh() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		std::optional<UINT> DataIndex(std::string_view dataType) const noexcept;
+		std::optional<std::uint32_t> DataIndex(std::string_view dataType) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::string_view DataType(UINT index) const noexcept;
+		std::string_view DataType(std::uint32_t index) const noexcept;
 		[[nodiscard("Pure function")]]
-		UINT DataCount() const noexcept;
+		std::uint32_t DataCount() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::span<const std::string> DataTypes() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		UINT BufferOffset(UINT dataIndex) const;
+		std::uint32_t BufferOffset(std::uint32_t dataIndex) const;
 		[[nodiscard("Pure function")]]
-		std::optional<UINT> BufferOffset(std::string_view dataType) const;
+		std::optional<std::uint32_t> BufferOffset(std::string_view dataType) const;
 
 		[[nodiscard("Pure function")]]
-		class Buffer& Buffer(UINT index) noexcept;
+		class Buffer& Buffer(std::uint32_t index) noexcept;
 		[[nodiscard("Pure function")]]
-		const class Buffer& Buffer(UINT index) const noexcept;
+		const class Buffer& Buffer(std::uint32_t index) const noexcept;
 		[[nodiscard("Pure function")]]
-		UINT BufferCount() const noexcept;
+		std::uint32_t BufferCount() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		class Buffer& Buffer(UINT dataIndex, UINT bufferIndex) noexcept;
+		class Buffer& Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept;
 		[[nodiscard("Pure function")]]
-		const class Buffer& Buffer(UINT dataIndex, UINT bufferIndex) const noexcept;
+		const class Buffer& Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		UINT BufferCount(UINT dataIndex) const noexcept;
+		std::uint32_t BufferCount(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		class Buffer* Buffer(std::string_view dataType, UINT bufferIndex) noexcept;
+		class Buffer* Buffer(std::string_view dataType, std::uint32_t bufferIndex) noexcept;
 		[[nodiscard("Pure function")]]
-		const class Buffer* Buffer(std::string_view dataType, UINT bufferIndex) const noexcept;
+		const class Buffer* Buffer(std::string_view dataType, std::uint32_t bufferIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::optional<UINT> BufferCount(std::string_view dataType) const noexcept;
+		std::optional<std::uint32_t> BufferCount(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle(UINT dataIndex) const noexcept;
+		D3D12_CPU_DESCRIPTOR_HANDLE CpuHandle(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle(UINT dataIndex) const noexcept;
+		D3D12_GPU_DESCRIPTOR_HANDLE GpuHandle(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
 		std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> CpuHandle(std::string_view dataType) const noexcept;
 		[[nodiscard("Pure function")]]
@@ -98,9 +98,9 @@ export namespace PonyEngine::Render::Direct3D12
 		const DescriptorHeap* Heap() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<UINT, 3> ThreadGroupCounts() noexcept;
+		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
 		[[nodiscard("Pure function")]]
-		std::span<const UINT, 3> ThreadGroupCounts() const noexcept;
+		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
 
 		/// @brief Sets the name to the mesh components.
 		/// @param name Name.
@@ -111,11 +111,11 @@ export namespace PonyEngine::Render::Direct3D12
 
 	private:
 		std::vector<std::string> dataTypes; ///< Data types.
-		std::vector<UINT> bufferOffsets;
+		std::vector<std::uint32_t> bufferOffsets;
 		std::vector<std::shared_ptr<class Buffer>> buffers; ///< Buffers.
 		std::shared_ptr<DescriptorHeap> heap; ///< Descriptor heap.
 
-		std::array<UINT, 3> threadGroupCounts; ///< Thread group counts.
+		std::array<std::uint32_t, 3> threadGroupCounts; ///< Thread group counts.
 	};
 }
 
@@ -126,7 +126,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	Mesh::Mesh(std::span<const std::string> dataTypes, std::span<const UINT> bufferOffsets, std::span<const std::shared_ptr<class Direct3D12::Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap) :
+	Mesh::Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Direct3D12::Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap) :
 		dataTypes(dataTypes.begin(), dataTypes.end()),
 		bufferOffsets(bufferOffsets.begin(), bufferOffsets.end()),
 		buffers(buffers.begin(), buffers.end()),
@@ -135,8 +135,8 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	Mesh::Mesh(const std::span<const std::string> dataTypes, const std::span<const UINT> bufferOffsets, const std::span<const std::shared_ptr<class Buffer>> buffers, 
-		const std::shared_ptr<DescriptorHeap>& heap, std::span<const UINT, 3> threadGroupCounts) :
+	Mesh::Mesh(const std::span<const std::string> dataTypes, const std::span<const std::uint32_t> bufferOffsets, const std::span<const std::shared_ptr<class Buffer>> buffers,
+		const std::shared_ptr<DescriptorHeap>& heap, std::span<const std::uint32_t, 3> threadGroupCounts) :
 		dataTypes(dataTypes.begin(), dataTypes.end()),
 		bufferOffsets(bufferOffsets.begin(), bufferOffsets.end()),
 		buffers(buffers.begin(), buffers.end()),
@@ -145,9 +145,9 @@ namespace PonyEngine::Render::Direct3D12
 		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
-	std::optional<UINT> Mesh::DataIndex(const std::string_view dataType) const noexcept
+	std::optional<std::uint32_t> Mesh::DataIndex(const std::string_view dataType) const noexcept
 	{
-		for (UINT i = 0; i < dataTypes.size(); ++i)
+		for (std::uint32_t i = 0u; i < dataTypes.size(); ++i)
 		{
 			if (dataTypes[i] == dataType)
 			{
@@ -158,14 +158,14 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	std::string_view Mesh::DataType(const UINT index) const noexcept
+	std::string_view Mesh::DataType(const std::uint32_t index) const noexcept
 	{
 		return dataTypes[index];
 	}
 
-	UINT Mesh::DataCount() const noexcept
+	std::uint32_t Mesh::DataCount() const noexcept
 	{
-		return dataTypes.size();
+		return static_cast<std::uint32_t>(dataTypes.size());
 	}
 
 	std::span<const std::string> Mesh::DataTypes() const noexcept
@@ -173,14 +173,14 @@ namespace PonyEngine::Render::Direct3D12
 		return dataTypes;
 	}
 
-	UINT Mesh::BufferOffset(const UINT dataIndex) const
+	std::uint32_t Mesh::BufferOffset(const std::uint32_t dataIndex) const
 	{
 		return bufferOffsets[dataIndex];
 	}
 
-	std::optional<UINT> Mesh::BufferOffset(const std::string_view dataType) const
+	std::optional<std::uint32_t> Mesh::BufferOffset(const std::string_view dataType) const
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			return BufferOffset(dataIndex.value());
 		}
@@ -188,41 +188,41 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	class Buffer& Mesh::Buffer(const UINT index) noexcept
+	class Buffer& Mesh::Buffer(const std::uint32_t index) noexcept
 	{
 		return *buffers[index];
 	}
 
-	const class Buffer& Mesh::Buffer(const UINT index) const noexcept
+	const class Buffer& Mesh::Buffer(const std::uint32_t index) const noexcept
 	{
 		return *buffers[index];
 	}
 
-	UINT Mesh::BufferCount() const noexcept
+	std::uint32_t Mesh::BufferCount() const noexcept
 	{
-		return buffers.size();
+		return static_cast<std::uint32_t>(buffers.size());
 	}
 
-	class Buffer& Mesh::Buffer(const UINT dataIndex, const UINT bufferIndex) noexcept
+	class Buffer& Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) noexcept
 	{
 		return *buffers[bufferOffsets[dataIndex] + bufferIndex];
 	}
 
-	const class Buffer& Mesh::Buffer(const UINT dataIndex, const UINT bufferIndex) const noexcept
+	const class Buffer& Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
 	{
 		return *buffers[bufferOffsets[dataIndex] + bufferIndex];
 	}
 
-	UINT Mesh::BufferCount(const UINT dataIndex) const noexcept
+	std::uint32_t Mesh::BufferCount(const std::uint32_t dataIndex) const noexcept
 	{
-		const UINT nextOffset = dataIndex < bufferOffsets.size() - 1 ? bufferOffsets[dataIndex + 1]  : buffers.size();
+		const std::uint32_t nextOffset = static_cast<std::uint32_t>(dataIndex < bufferOffsets.size() - 1 ? bufferOffsets[dataIndex + 1]  : buffers.size());
 
 		return nextOffset - bufferOffsets[dataIndex];
 	}
 
-	class Buffer* Mesh::Buffer(const std::string_view dataType, const UINT bufferIndex) noexcept
+	class Buffer* Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) noexcept
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
 		{
 			return &Buffer(dataIndex.value(), bufferIndex);
 		}
@@ -230,9 +230,9 @@ namespace PonyEngine::Render::Direct3D12
 		return nullptr;
 	}
 
-	const class Buffer* Mesh::Buffer(const std::string_view dataType, const UINT bufferIndex) const noexcept
+	const class Buffer* Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
 		{
 			return &Buffer(dataIndex.value(), bufferIndex);
 		}
@@ -240,9 +240,9 @@ namespace PonyEngine::Render::Direct3D12
 		return nullptr;
 	}
 
-	std::optional<UINT> Mesh::BufferCount(const std::string_view dataType) const noexcept
+	std::optional<std::uint32_t> Mesh::BufferCount(const std::string_view dataType) const noexcept
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			return BufferCount(dataIndex.value());
 		}
@@ -250,19 +250,19 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE Mesh::CpuHandle(const UINT dataIndex) const noexcept
+	D3D12_CPU_DESCRIPTOR_HANDLE Mesh::CpuHandle(const std::uint32_t dataIndex) const noexcept
 	{
 		return heap->CpuHandle(bufferOffsets[dataIndex]);
 	}
 
-	D3D12_GPU_DESCRIPTOR_HANDLE Mesh::GpuHandle(const UINT dataIndex) const noexcept
+	D3D12_GPU_DESCRIPTOR_HANDLE Mesh::GpuHandle(const std::uint32_t dataIndex) const noexcept
 	{
 		return heap->GpuHandle(bufferOffsets[dataIndex]);
 	}
 
 	std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> Mesh::CpuHandle(const std::string_view dataType) const noexcept
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			return CpuHandle(dataIndex.value());
 		}
@@ -272,7 +272,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> Mesh::GpuHandle(const std::string_view dataType) const noexcept
 	{
-		if (const std::optional<UINT> dataIndex = DataIndex(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			return GpuHandle(dataIndex.value());
 		}
@@ -290,12 +290,12 @@ namespace PonyEngine::Render::Direct3D12
 		return heap.get();
 	}
 
-	std::span<UINT, 3> Mesh::ThreadGroupCounts() noexcept
+	std::span<std::uint32_t, 3> Mesh::ThreadGroupCounts() noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	std::span<const UINT, 3> Mesh::ThreadGroupCounts() const noexcept
+	std::span<const std::uint32_t, 3> Mesh::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
@@ -312,10 +312,10 @@ namespace PonyEngine::Render::Direct3D12
 
 		auto componentName = std::string();
 		componentName.reserve(name.size() + longestDataType);
-		for (UINT dataTypeIndex = 0; dataTypeIndex < dataTypes.size(); ++dataTypeIndex)
+		for (std::uint32_t dataTypeIndex = 0; dataTypeIndex < dataTypes.size(); ++dataTypeIndex)
 		{
-			UINT bufferIndex = bufferOffsets[dataTypeIndex];
-			const UINT bufferCount = BufferCount(dataTypeIndex) + bufferIndex;
+			std::uint32_t bufferIndex = bufferOffsets[dataTypeIndex];
+			const std::uint32_t bufferCount = BufferCount(dataTypeIndex) + bufferIndex;
 
 			for (; bufferIndex < bufferCount; ++bufferIndex)
 			{

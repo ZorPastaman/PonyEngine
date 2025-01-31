@@ -50,7 +50,7 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual DXGI_FORMAT DsvFormat() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const PonyMath::Utility::Resolution<UINT>& Resolution() const noexcept override;
+		virtual const PonyMath::Utility::Resolution<std::uint32_t>& Resolution() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept override;
 
@@ -66,8 +66,8 @@ export namespace PonyEngine::Render::Direct3D12
 		static constexpr DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
 
 		DXGI_FORMAT rtvFormat;
-		PonyMath::Utility::Resolution<UINT> resolution;
-		PonyMath::Color::RGBA<FLOAT> clearColor;
+		PonyMath::Utility::Resolution<std::uint32_t> resolution;
+		PonyMath::Color::RGBA<float> clearColor;
 		DXGI_SAMPLE_DESC sampleDesc;
 
 		ISubSystemContext* d3d12System;
@@ -115,7 +115,7 @@ namespace PonyEngine::Render::Direct3D12
 		return DepthStencilFormat;
 	}
 
-	const PonyMath::Utility::Resolution<UINT>& FrameManager::Resolution() const noexcept
+	const PonyMath::Utility::Resolution<std::uint32_t>& FrameManager::Resolution() const noexcept
 	{
 		return resolution;
 	}

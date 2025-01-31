@@ -68,8 +68,9 @@ export namespace PonyEngine::Render::Direct3D12
 		bool IsTransparent() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<const UINT, 3> ThreadGroupCounts() const noexcept;
-		void ThreadGroupCounts(std::span<const UINT, 3> threadGroupCountsToSet) noexcept;
+		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
+		[[nodiscard("Pure function")]]
+		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
 
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
@@ -82,7 +83,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
-		std::array<UINT, 3> threadGroupCounts;
+		std::array<std::uint32_t, 3> threadGroupCounts;
 		bool isTransparent;
 	};
 }
@@ -128,14 +129,14 @@ namespace PonyEngine::Render::Direct3D12
 		return isTransparent;
 	}
 
-	std::span<const UINT, 3> Material::ThreadGroupCounts() const noexcept
+	std::span<std::uint32_t, 3> Material::ThreadGroupCounts() noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	void Material::ThreadGroupCounts(std::span<const UINT, 3> threadGroupCountsToSet) noexcept
+	std::span<const std::uint32_t, 3> Material::ThreadGroupCounts() const noexcept
 	{
-		std::ranges::copy(threadGroupCountsToSet, threadGroupCounts.begin());
+		return threadGroupCounts;
 	}
 
 	void Material::Name(const std::string_view name)

@@ -50,8 +50,8 @@ export namespace PonyEngine::Render::DXGI
 		virtual DXGI_FORMAT Format() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual UINT GetCurrentBackBufferIndex() const noexcept override;
-		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept override;
+		virtual std::uint32_t GetCurrentBackBufferIndex() const noexcept override;
+		virtual HRESULT GetBackBuffer(std::uint32_t bufferIndex, ID3D12Resource2** buffer) const noexcept override;
 
 		/// @brief Sets the fullscreen state.
 		/// @param fullscreen Is fullscreen?
@@ -118,14 +118,14 @@ namespace PonyEngine::Render::DXGI
 		return BackViewFormat;
 	}
 
-	UINT SwapChain::GetCurrentBackBufferIndex() const noexcept
+	std::uint32_t SwapChain::GetCurrentBackBufferIndex() const noexcept
 	{
-		return swapChain->GetCurrentBackBufferIndex();
+		return static_cast<std::uint32_t>(swapChain->GetCurrentBackBufferIndex());
 	}
 
-	HRESULT SwapChain::GetBackBuffer(const UINT bufferIndex, ID3D12Resource2** const buffer) const noexcept
+	HRESULT SwapChain::GetBackBuffer(const std::uint32_t bufferIndex, ID3D12Resource2** const buffer) const noexcept
 	{
-		return swapChain->GetBuffer(bufferIndex, IID_PPV_ARGS(buffer));
+		return swapChain->GetBuffer(static_cast<UINT>(bufferIndex), IID_PPV_ARGS(buffer));
 	}
 
 	void SwapChain::SetFullscreenState(const bool fullscreen)

@@ -46,7 +46,7 @@ export namespace PonyEngine::Render::Direct3D12
 		~DescriptorHeapManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, bool shaderVisible) override;
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, std::uint32_t descriptorCount, bool shaderVisible) override;
 
 		void Clean() noexcept;
 
@@ -67,7 +67,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const UINT descriptorCount, const bool shaderVisible)
+	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const std::uint32_t descriptorCount, const bool shaderVisible)
 	{
 		const auto heapDescriptor = D3D12_DESCRIPTOR_HEAP_DESC
 		{

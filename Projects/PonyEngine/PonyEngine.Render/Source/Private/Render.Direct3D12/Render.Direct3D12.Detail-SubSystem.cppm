@@ -104,7 +104,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void BeginFrame();
 		/// @brief Renders to the back buffer at the @p bufferIndex.
 		/// @param backBufferIndex Current back buffer index.
-		void Render(UINT backBufferIndex);
+		void Render(std::uint32_t backBufferIndex);
 		/// @brief Ends a current frame.
 		void EndFrame();
 
@@ -405,7 +405,7 @@ namespace PonyEngine::Render::Direct3D12
 		resourceManager->Clean();
 	}
 
-	void SubSystem::Render(const UINT backBufferIndex)
+	void SubSystem::Render(const std::uint32_t backBufferIndex)
 	{
 		meshManager->Tick();
 		materialManager->Tick();

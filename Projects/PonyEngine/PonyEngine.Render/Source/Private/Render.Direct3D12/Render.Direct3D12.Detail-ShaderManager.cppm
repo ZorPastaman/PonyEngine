@@ -33,7 +33,7 @@ export namespace PonyEngine::Render::Direct3D12
 		~ShaderManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Shader> CreateShader(std::string_view shaderName) override;
+		virtual std::shared_ptr<Shader> CreateShader(std::string_view shaderPath) override;
 
 		void Clean() noexcept;
 
@@ -41,13 +41,13 @@ export namespace PonyEngine::Render::Direct3D12
 		ShaderManager& operator =(ShaderManager&&) = delete;
 
 	private:
-		void Add(const std::shared_ptr<Shader>& shader, std::string_view shaderName);
+		void Add(const std::shared_ptr<Shader>& shader, std::string_view shaderPath);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System;
 
 		std::vector<std::shared_ptr<Shader>> shaders;
-		std::vector<std::string> shaderNames;
+		std::vector<std::string> shaderPaths;
 	};
 }
 
@@ -58,17 +58,17 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<Shader> ShaderManager::CreateShader(const std::string_view shaderName)
+	std::shared_ptr<Shader> ShaderManager::CreateShader(const std::string_view shaderPath)
 	{
-		for (std::size_t i = 0; i < shaderNames.size(); ++i)
+		for (std::size_t i = 0; i < shaderPaths.size(); ++i)
 		{
-			if (shaderNames[i] == shaderName)
+			if (shaderPaths[i] == shaderPath)
 			{
 				return shaders[i];
 			}
 		}
 
-		const std::string path = std::format("{}.cso", shaderName);
+		const std::string path = std::format("{}.cso", shaderPath);
 		auto stream = std::ifstream(path, std::ios::binary | std::ios::ate);
 		if (!stream.is_open())
 		{
@@ -84,7 +84,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		const auto shader = std::make_shared<Shader>(data);
-		Add(shader, shaderName);
+		Add(shader, shaderPath);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Shader created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(shader.get()));
 
 		return shader;
@@ -103,19 +103,19 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void ShaderManager::Add(const std::shared_ptr<Shader>& shader, const std::string_view shaderName)
+	void ShaderManager::Add(const std::shared_ptr<Shader>& shader, const std::string_view shaderPath)
 	{
 		const std::size_t currentSize = shaders.size();
 
 		try
 		{
 			shaders.push_back(shader);
-			shaderNames.push_back(std::string(shaderName));
+			shaderPaths.push_back(std::string(shaderPath));
 		}
 		catch (...)
 		{
 			shaders.resize(currentSize);
-			shaderNames.resize(currentSize);
+			shaderPaths.resize(currentSize);
 
 			throw;
 		}
@@ -124,6 +124,6 @@ namespace PonyEngine::Render::Direct3D12
 	void ShaderManager::Remove(const std::size_t index) noexcept
 	{
 		shaders.erase(shaders.cbegin() + index);
-		shaderNames.erase(shaderNames.cbegin() + index);
+		shaderPaths.erase(shaderPaths.cbegin() + index);
 	}
 }

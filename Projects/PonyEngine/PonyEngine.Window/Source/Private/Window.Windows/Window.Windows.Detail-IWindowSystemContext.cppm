@@ -55,14 +55,6 @@ export namespace PonyEngine::Window::Windows
 		/// @return Window client rect.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Shape::Rect<std::int32_t> WindowClientRect() const = 0;
-		/// @brief Gets window rect.
-		/// @return Window rect.
-		[[nodiscard("Pure function")]]
-		virtual RECT WindowRectWindows() const = 0;
-		/// @brief Gets window client rect.
-		/// @return Window client rect.
-		[[nodiscard("Pure function")]]
-		virtual RECT WindowClientRectWindows() const = 0;
 
 		/// @brief Gets the window handle.
 		/// @return Window handle.
