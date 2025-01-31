@@ -85,12 +85,12 @@ export namespace PonyEngine::Render::Direct3D12
 
 	private:
 		[[nodiscard("Pure function")]]
-		std::size_t TransformIndex(std::size_t cameraIndex, std::size_t renderObjectIndex) const noexcept;
+		std::uint32_t TransformIndex(std::uint32_t cameraIndex, std::uint32_t renderObjectIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::size_t TransformCount() const noexcept;
+		std::uint32_t TransformCount() const noexcept;
 
 		void SyncTransformCount();
-		void SyncTransformCount(std::vector<std::shared_ptr<Buffer>>& transformBuffers, HeapType heapType, std::size_t transformCount) const;
+		void SyncTransformCount(std::vector<std::shared_ptr<Buffer>>& transformBuffers, HeapType heapType, std::uint32_t transformCount) const;
 		void UpdateTransforms();
 
 		void UpdateData();
@@ -111,11 +111,11 @@ export namespace PonyEngine::Render::Direct3D12
 		void PopulateRender();
 		void PopulateRenderTarget();
 		void SortCameras();
-		void PopulateCamera(std::size_t cameraIndex);
+		void PopulateCamera(std::uint32_t cameraIndex);
 		/// @brief Sorts render objects.
-		void SortRenderObjects(std::size_t cameraIndex);
+		void SortRenderObjects(std::uint32_t cameraIndex);
 		/// @brief Populates render objects.
-		void PopulateRenderObjects(std::size_t cameraIndex);
+		void PopulateRenderObjects(std::uint32_t cameraIndex);
 
 		void PopulateResolve();
 
@@ -123,10 +123,10 @@ export namespace PonyEngine::Render::Direct3D12
 		void PushOutputEndBarriers();
 		void PopulateOutput();
 
-		std::vector<std::size_t> cameraIndices;
+		std::vector<std::uint32_t> cameraIndices;
 		std::vector<Camera*> cameras;
 
-		std::vector<std::size_t> renderObjectIndices;
+		std::vector<std::uint32_t> renderObjectIndices;
 		std::vector<RenderObject*> renderObjects; ///< Render objects.
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
@@ -136,7 +136,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<DescriptorHeap> transformHeap;
 
 		std::shared_ptr<DescriptorHeap> dataHeap; ///< Data descriptor heap.
-		std::unordered_map<const ID3D12DescriptorHeap*, UINT> originalHeapOffsets; ///< Original heap to merged heap offset map.
+		std::unordered_map<const ID3D12DescriptorHeap*, std::uint32_t> originalHeapOffsets; ///< Original heap to merged heap offset map.
 
 		std::shared_ptr<Frame> frame;
 		std::unique_ptr<SrgbOutputQuad> outputQuad; ///< Srgb output quad.
@@ -217,29 +217,29 @@ namespace PonyEngine::Render::Direct3D12
 		renderObjects.clear();
 	}
 
-	std::size_t GraphicsPipeline::TransformIndex(const std::size_t cameraIndex, const std::size_t renderObjectIndex) const noexcept
+	std::uint32_t GraphicsPipeline::TransformIndex(const std::uint32_t cameraIndex, const std::uint32_t renderObjectIndex) const noexcept
 	{
-		return cameraIndex * renderObjects.size() + renderObjectIndex;
+		return static_cast<std::uint32_t>(cameraIndex * renderObjects.size() + renderObjectIndex);
 	}
 
-	std::size_t GraphicsPipeline::TransformCount() const noexcept
+	std::uint32_t GraphicsPipeline::TransformCount() const noexcept
 	{
-		return cameras.size() * renderObjects.size();
+		return static_cast<std::uint32_t>(cameras.size() * renderObjects.size());
 	}
 
 	void GraphicsPipeline::SyncTransformCount()
 	{
-		const std::size_t transformCount = TransformCount();
+		const std::uint32_t transformCount = TransformCount();
 		transforms.resize(transformCount);
 		SyncTransformCount(uploadTransforms, HeapType::Upload, transformCount);
 		SyncTransformCount(gpuTransforms, HeapType::Default, transformCount);
 	}
 
-	void GraphicsPipeline::SyncTransformCount(std::vector<std::shared_ptr<Buffer>>& transformBuffers, const HeapType heapType, const std::size_t transformCount) const
+	void GraphicsPipeline::SyncTransformCount(std::vector<std::shared_ptr<Buffer>>& transformBuffers, const HeapType heapType, const std::uint32_t transformCount) const
 	{
 		for (std::size_t i = transformBuffers.size(); i < transformCount; ++i)
 		{
-			const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<UINT64>(sizeof(PonyShader::Space::Transform)), heapType);
+			const std::shared_ptr<Buffer> transform = D3D12System().ResourceManager().CreateBuffer(static_cast<std::uint64_t>(sizeof(PonyShader::Space::Transform)), heapType);
 			transform->Name("Transform");
 			transformBuffers.push_back(transform);
 		}
@@ -247,12 +247,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::UpdateTransforms()
 	{
-		for (std::size_t cameraIndex = 0; cameraIndex < cameras.size(); ++cameraIndex)
+		for (std::uint32_t cameraIndex = 0u; cameraIndex < cameras.size(); ++cameraIndex)
 		{
-			for (std::size_t renderObjectIndex = 0; renderObjectIndex < renderObjects.size(); ++renderObjectIndex)
+			for (std::uint32_t renderObjectIndex = 0u; renderObjectIndex < renderObjects.size(); ++renderObjectIndex)
 			{
-				const std::size_t transformIndex = TransformIndex(cameraIndex, renderObjectIndex);
-				transforms[transformIndex] = PonyShader::Space::Transform(renderObjects[renderObjectIndex]->ModelMatrixD3D12(), cameras[cameraIndex]->ViewMatrixD3D12(), cameras[cameraIndex]->ProjectionMatrixD3D12());
+				const std::uint32_t transformIndex = TransformIndex(cameraIndex, renderObjectIndex);
+				transforms[transformIndex] = PonyShader::Space::Transform(renderObjects[renderObjectIndex]->ModelMatrix(), cameras[cameraIndex]->ViewMatrix(), cameras[cameraIndex]->ProjectionMatrix());
 			}
 		}
 
@@ -277,13 +277,13 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::UpdateCameraIndices()
 	{
 		cameraIndices.resize(cameras.size());
-		std::iota(cameraIndices.begin(), cameraIndices.end(), std::size_t{0});
+		std::iota(cameraIndices.begin(), cameraIndices.end(), std::uint32_t{0u});
 	}
 
 	void GraphicsPipeline::UpdateRenderObjectIndices()
 	{
 		renderObjectIndices.resize(renderObjects.size());
-		std::iota(renderObjectIndices.begin(), renderObjectIndices.end(), std::size_t{0});
+		std::iota(renderObjectIndices.begin(), renderObjectIndices.end(), std::uint32_t{0u});
 	}
 
 	void GraphicsPipeline::UpdateMeshes()
@@ -302,10 +302,10 @@ namespace PonyEngine::Render::Direct3D12
 			return;
 		}
 
-		transformHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<UINT>(gpuTransforms.size()), false);
+		transformHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<std::uint32_t>(gpuTransforms.size()), false);
 		transformHeap->Name("Transform");
 
-		for (UINT i = 0; i < gpuTransforms.size(); ++i)
+		for (std::uint32_t i = 0u; i < gpuTransforms.size(); ++i)
 		{
 			const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 			{
@@ -318,7 +318,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::MergeHeaps()
 	{
-		UINT descriptorCount = transformHeap->HandleCount();
+		std::uint32_t descriptorCount = transformHeap->HandleCount();
 		for (Mesh* const mesh : meshes)
 		{
 			descriptorCount += mesh->Heap()->HandleCount();
@@ -474,7 +474,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		for (Mesh* const mesh : meshes)
 		{
-			for (std::size_t i = 0; i < mesh->BufferCount(); ++i)
+			for (std::uint32_t i = 0u; i < mesh->BufferCount(); ++i)
 			{
 				const auto bufferBarrier = D3D12_BUFFER_BARRIER
 				{
@@ -523,7 +523,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 		for (Mesh* const mesh : meshes)
 		{
-			for (std::size_t i = 0; i < mesh->BufferCount(); ++i)
+			for (std::uint32_t i = 0u; i < mesh->BufferCount(); ++i)
 			{
 				const auto bufferBarrier = D3D12_BUFFER_BARRIER
 				{
@@ -558,7 +558,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		PopulateRenderTarget();
 		SortCameras();
-		for (const std::size_t cameraIndex : cameraIndices)
+		for (const std::uint32_t cameraIndex : cameraIndices)
 		{
 			PopulateCamera(cameraIndex);
 			SortRenderObjects(cameraIndex);
@@ -575,16 +575,16 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::SortCameras()
 	{
-		std::ranges::sort(cameraIndices, [&](const std::size_t& leftIndex, const std::size_t& rightIndex)
+		std::ranges::sort(cameraIndices, [&](const std::uint32_t leftIndex, const std::uint32_t rightIndex)
 		{
 			return cameras[leftIndex]->SortingOrder() < cameras[rightIndex]->SortingOrder();
 		});
 	}
 
-	void GraphicsPipeline::PopulateCamera(const std::size_t cameraIndex)
+	void GraphicsPipeline::PopulateCamera(const std::uint32_t cameraIndex)
 	{
-		const PonyMath::Shape::Rect<FLOAT>& viewportRect = cameras[cameraIndex]->ViewportRectD3D12();
-		const PonyMath::Utility::Resolution<UINT>& resolution = D3D12System().FrameManager().Resolution();
+		const PonyMath::Shape::Rect<float>& viewportRect = cameras[cameraIndex]->ViewportRect();
+		const PonyMath::Utility::Resolution<std::uint32_t>& resolution = D3D12System().FrameManager().Resolution();
 
 		const auto viewport = D3D12_VIEWPORT
 		{
@@ -608,13 +608,13 @@ namespace PonyEngine::Render::Direct3D12
 
 		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frame->RtvHandle();
 		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = frame->DsvHandle();
-		CommandList().ClearRenderTargetView(rtvHandle, cameras[cameraIndex]->ClearColorD3D12().Span().data(), 1u, &rect);
+		CommandList().ClearRenderTargetView(rtvHandle, cameras[cameraIndex]->ClearColor().Span().data(), 1u, &rect);
 		CommandList().ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 1u, &rect);
 	}
 
-	void GraphicsPipeline::SortRenderObjects(const std::size_t cameraIndex)
+	void GraphicsPipeline::SortRenderObjects(const uint32_t cameraIndex)
 	{
-		std::ranges::sort(renderObjectIndices, [&](const std::size_t& leftIndex, const std::size_t& rightIndex)
+		std::ranges::sort(renderObjectIndices, [&](const std::uint32_t leftIndex, const uint32_t rightIndex)
 		{
 			const RenderObject* const leftRenderObject = renderObjects[leftIndex];
 			const RenderObject* const rightRenderObject = renderObjects[rightIndex];
@@ -652,7 +652,7 @@ namespace PonyEngine::Render::Direct3D12
 		});
 	}
 
-	void GraphicsPipeline::PopulateRenderObjects(const std::size_t cameraIndex)
+	void GraphicsPipeline::PopulateRenderObjects(const uint32_t cameraIndex)
 	{
 		ID3D12DescriptorHeap* const heap = &dataHeap->Heap();
 		CommandList().SetDescriptorHeaps(1u, &heap);
@@ -660,7 +660,7 @@ namespace PonyEngine::Render::Direct3D12
 		const RootSignature* prevRootSignature = nullptr;
 		const Material* prevMaterial = nullptr;
 		const Mesh* prevMesh = nullptr;
-		for (const std::size_t renderObjectIndex : renderObjectIndices)
+		for (const uint32_t renderObjectIndex : renderObjectIndices)
 		{
 			RenderObject* const renderObject = renderObjects[renderObjectIndex];
 			Material* const material = &renderObject->Material();
@@ -680,20 +680,20 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				for (const auto& [dataType, dataSlot] : rootSignature->DataSlots())
 				{
-					if (const std::optional<UINT> meshDataIndex = mesh->DataIndex(dataType))
+					if (const std::optional<std::uint32_t> meshDataIndex = mesh->DataIndex(dataType))
 					{
 						CommandList().SetGraphicsRootDescriptorTable(dataSlot, dataHeap->GpuHandle(originalHeapOffsets[&mesh->Heap()->Heap()] + mesh->BufferOffset(meshDataIndex.value())));
 					}
 				}
 			}
 
-			if (const std::optional<UINT> slot = rootSignature->DataSlot(EngineDataTypes::Transform))
+			if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(EngineDataTypes::Transform))
 			{
 				CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(originalHeapOffsets[&transformHeap->Heap()] + TransformIndex(cameraIndex, renderObjectIndex)));
 			}
 
-			const std::span<const UINT, 3> meshGroupCounts = mesh->ThreadGroupCounts();
-			const std::span<const UINT, 3> materialGroupCounts = material->ThreadGroupCounts();
+			const std::span<const std::uint32_t, 3> meshGroupCounts = mesh->ThreadGroupCounts();
+			const std::span<const std::uint32_t, 3> materialGroupCounts = material->ThreadGroupCounts();
 			CommandList().DispatchMesh(PonyMath::Core::CeilDivision(meshGroupCounts[0], materialGroupCounts[0]), 
 				PonyMath::Core::CeilDivision(meshGroupCounts[1], materialGroupCounts[1]), 
 				PonyMath::Core::CeilDivision(meshGroupCounts[2], materialGroupCounts[2]));

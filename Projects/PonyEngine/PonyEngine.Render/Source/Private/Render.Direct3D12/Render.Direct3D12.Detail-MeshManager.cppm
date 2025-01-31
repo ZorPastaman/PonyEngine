@@ -277,15 +277,15 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		std::vector<std::string> dataTypes;
-		std::vector<UINT> bufferOffsets;
+		std::vector<std::uint32_t> bufferOffsets;
 		std::vector<std::vector<std::uint64_t>> bufferVersions;
 		std::vector<std::shared_ptr<Buffer>> buffers;
-		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, static_cast<UINT>(source.BufferCount()), false);
+		const std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(DescHeapType, source.BufferCount(), false);
 
 		for (std::uint32_t i = 0; i < source.DataTypeCount(); ++i)
 		{
 			dataTypes.push_back(std::string(source.DataType(i)));
-			bufferOffsets.push_back(static_cast<UINT>(buffers.size()));
+			bufferOffsets.push_back(static_cast<std::uint32_t>(buffers.size()));
 			bufferVersions.push_back(std::vector<std::uint64_t>(source.BufferCount(i)));
 
 			for (const PonyBase::Container::Buffer& sourceBuffer : source.BufferTable(i))
@@ -306,7 +306,7 @@ namespace PonyEngine::Render::Direct3D12
 						.Flags = D3D12_BUFFER_SRV_FLAG_NONE
 					}
 				};
-				d3d12System->Device().CreateShaderResourceView(&gpuBuffer->Data(), &srvDesc, heap->CpuHandle(static_cast<UINT>(buffers.size()) - 1u));
+				d3d12System->Device().CreateShaderResourceView(&gpuBuffer->Data(), &srvDesc, heap->CpuHandle(static_cast<std::uint32_t>(buffers.size()) - 1u));
 			}
 		}
 
@@ -317,9 +317,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (observer.MeshChanged()) [[unlikely]]
 		{
-			for (std::size_t dataIndex = 0; dataIndex < source.DataTypeCount(); ++dataIndex)
+			for (std::uint32_t dataIndex = 0; dataIndex < source.DataTypeCount(); ++dataIndex)
 			{
-				for (std::size_t bufferIndex = 0; bufferIndex < source.BufferCount(dataIndex); ++bufferIndex)
+				for (std::uint32_t bufferIndex = 0; bufferIndex < source.BufferCount(dataIndex); ++bufferIndex)
 				{
 					UpdateBuffer(mesh, source, dataIndex, bufferIndex);
 				}
@@ -338,7 +338,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
 
-		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<UINT64>(sourceBuffer.Size()), HeapType::Upload);
+		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(static_cast<std::uint64_t>(sourceBuffer.Size()), HeapType::Upload);
 		uploadBuffer->SetData(sourceBuffer);
 
 		Buffer& gpuBuffer = mesh.Buffer(dataIndex, bufferIndex);

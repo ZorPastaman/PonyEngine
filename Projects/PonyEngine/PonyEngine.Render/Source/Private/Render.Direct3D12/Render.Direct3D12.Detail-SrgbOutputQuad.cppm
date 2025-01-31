@@ -39,10 +39,10 @@ export namespace PonyEngine::Render::Direct3D12
 	class SrgbOutputQuad final
 	{
 	public:
-		static constexpr UINT RenderTargetSlot = 0u; ///< Render target texture slot.
-		static constexpr UINT ThreadGroupXCount = 1u; ///< Thread group x count.
-		static constexpr UINT ThreadGroupYCount = 1u; ///< Thread group y count.
-		static constexpr UINT ThreadGroupZCount = 1u; ///< Thread group z count.
+		static constexpr std::uint32_t RenderTargetSlot = 0u; ///< Render target texture slot.
+		static constexpr std::uint32_t ThreadGroupXCount = 1u; ///< Thread group x count.
+		static constexpr std::uint32_t ThreadGroupYCount = 1u; ///< Thread group y count.
+		static constexpr std::uint32_t ThreadGroupZCount = 1u; ///< Thread group z count.
 
 		/// @brief Creates a @p SrgbOutputQuad.
 		/// @param d3d12System Direct3D12 system context.
@@ -105,7 +105,7 @@ namespace PonyEngine::Render::Direct3D12
 		d3d12System{&d3d12System}
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output root signature.");
-		const auto rootSignatureShader = this->d3d12System->ShaderManager().CreateShader("OutputRootSig");
+		const auto rootSignatureShader = this->d3d12System->ShaderManager().CreateShader(std::format("{}{}", PONY_SHADERS_DIR, "OutputRootSig"));
 		ID3D12Device10& device = this->d3d12System->Device();
 		if (const HRESULT result = device.CreateRootSignature(0u, rootSignatureShader->Data(), rootSignatureShader->Size(), IID_PPV_ARGS(rootSignature.GetAddressOf())); FAILED(result))
 		{
@@ -114,8 +114,8 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Srgb output root signature created.");
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create srgb output pipeline state.");
-		const auto meshShader = this->d3d12System->ShaderManager().CreateShader("OutputMeshShader");
-		const auto pixelShader = this->d3d12System->ShaderManager().CreateShader("OutputPixelShader");
+		const auto meshShader = this->d3d12System->ShaderManager().CreateShader(std::format("{}{}", PONY_SHADERS_DIR, "OutputMeshShader"));
+		const auto pixelShader = this->d3d12System->ShaderManager().CreateShader(std::format("{}{}", PONY_SHADERS_DIR, "OutputPixelShader"));
 		auto pss = QuadPipelineStateStream
 		{
 			.rootSignature = rootSignature.Get(),

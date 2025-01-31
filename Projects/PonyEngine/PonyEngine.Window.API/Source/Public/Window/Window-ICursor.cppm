@@ -47,7 +47,7 @@ export namespace PonyEngine::Window
 		/// @brief Gets the cursor clipping rect.
 		/// @return Cursor clipping rect. It's a normalized rect. If it's nullopt, the cursor isn't clipped.
 		[[nodiscard("Pure function")]]
-		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept = 0;
+		virtual const std::optional<PonyMath::Shape::Rect<float>>& ClippingRect() const noexcept = 0;
 		/// @brief Sets the cursor clipping rect.
 		/// @param clippingRect Cursor clipping rect to set. It must be a normalized rect. If it's nullopt, the cursor isn't clipped.
 		virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) = 0;

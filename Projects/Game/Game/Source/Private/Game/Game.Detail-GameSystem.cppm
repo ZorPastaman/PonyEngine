@@ -15,6 +15,7 @@ export module Game.Detail:GameSystem;
 
 import <array>;
 import <cstdint>;
+import <format>;
 import <functional>;
 import <memory>;
 import <span>;
@@ -119,10 +120,10 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
 		auto materialParams = PonyEngine::Render::MaterialParams
 		{
-			.rootSignatureShader = "RootSig",
+			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
 			.amplificationShader = "",
-			.meshShader = "MeshShader",
-			.pixelShader = "PixelShader",
+			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
+			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
 			.dataSlots =
 			{
 				{ std::string(PonyEngine::Render::EngineDataTypes::Transform), 0u },

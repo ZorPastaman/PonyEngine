@@ -39,19 +39,19 @@ export namespace PonyEngine::Render::Direct3D12
 		~ResourceManager() noexcept = default;
 
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Buffer> CreateBuffer(UINT64 size, HeapType heapType) override;
+		virtual std::shared_ptr<Buffer> CreateBuffer(std::uint64_t size, HeapType heapType) override;
 
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Texture> CreateTexture1D(UINT64 width, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
+		virtual std::shared_ptr<Texture> CreateTexture1D(std::uint64_t width, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Texture> CreateTexture2D(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
+		virtual std::shared_ptr<Texture> CreateTexture2D(std::uint64_t width, std::uint32_t height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Texture> CreateTexture3D(UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
+		virtual std::shared_ptr<Texture> CreateTexture3D(std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) override;
 
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Texture> CreateRenderTarget(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<FLOAT>& clearColor) override;
+		virtual std::shared_ptr<Texture> CreateRenderTarget(std::uint64_t width, std::uint32_t height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<float>& clearColor) override;
 		[[nodiscard("Redendant call")]]
-		virtual std::shared_ptr<Texture> CreateDepthStencil(UINT64 width, UINT height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, D3D12_DEPTH_STENCIL_VALUE depthStencilValue) override;
+		virtual std::shared_ptr<Texture> CreateDepthStencil(std::uint64_t width, std::uint32_t height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, D3D12_DEPTH_STENCIL_VALUE depthStencilValue) override;
 
 		void Clean() noexcept;
 
@@ -65,7 +65,7 @@ export namespace PonyEngine::Render::Direct3D12
 		static D3D12_HEAP_TYPE GetHeapType(HeapType heapType) noexcept;
 
 		[[nodiscard("Redendant call")]]
-		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, UINT64 width, UINT height, UINT16 depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType placement);
+		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType placement);
 
 		ISubSystemContext* d3d12System;
 
@@ -80,14 +80,14 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<Buffer> ResourceManager::CreateBuffer(const UINT64 size, const HeapType heapType)
+	std::shared_ptr<Buffer> ResourceManager::CreateBuffer(const std::uint64_t size, const HeapType heapType)
 	{
 		const auto heapProperties = GetHeapProperties(heapType);
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_BUFFER,
 			.Alignment = 0ULL,
-			.Width = size,
+			.Width = static_cast<UINT64>(size),
 			.Height = 1u,
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
@@ -111,7 +111,7 @@ namespace PonyEngine::Render::Direct3D12
 		return buffer;
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateTexture1D(const UINT64 width, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
+	std::shared_ptr<Texture> ResourceManager::CreateTexture1D(const std::uint64_t width, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
 		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE1D, width, 1u, 1u, format, sampleDesc, heapType);
 		resources.push_back(texture);
@@ -120,7 +120,7 @@ namespace PonyEngine::Render::Direct3D12
 		return texture;
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateTexture2D(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
+	std::shared_ptr<Texture> ResourceManager::CreateTexture2D(const std::uint64_t width, const std::uint32_t height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
 		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE2D, width, height, 1u, format, sampleDesc, heapType);
 		resources.push_back(texture);
@@ -129,7 +129,7 @@ namespace PonyEngine::Render::Direct3D12
 		return texture;
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateTexture3D(const UINT64 width, const UINT height, const UINT16 depth, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
+	std::shared_ptr<Texture> ResourceManager::CreateTexture3D(const std::uint64_t width, const std::uint32_t height, const std::uint16_t depth, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
 		const auto texture = CreateTexture(D3D12_RESOURCE_DIMENSION_TEXTURE3D, width, height, depth, format, sampleDesc, heapType);
 		resources.push_back(texture);
@@ -138,7 +138,7 @@ namespace PonyEngine::Render::Direct3D12
 		return texture;
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateRenderTarget(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<FLOAT>& clearColor)
+	std::shared_ptr<Texture> ResourceManager::CreateRenderTarget(const std::uint64_t width, const std::uint32_t height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const PonyMath::Color::RGBA<float>& clearColor)
 	{
 		const auto heapProperties = GetHeapProperties(HeapType::Default);
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
@@ -174,15 +174,15 @@ namespace PonyEngine::Render::Direct3D12
 		return renderTarget;
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateDepthStencil(const UINT64 width, const UINT height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const D3D12_DEPTH_STENCIL_VALUE depthStencilValue)
+	std::shared_ptr<Texture> ResourceManager::CreateDepthStencil(const std::uint64_t width, const std::uint32_t height, const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const D3D12_DEPTH_STENCIL_VALUE depthStencilValue)
 	{
 		const auto heapProperties = GetHeapProperties(HeapType::Default);
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D,
 			.Alignment = 0ULL,
-			.Width = width,
-			.Height = height,
+			.Width = static_cast<UINT64>(width),
+			.Height = static_cast<UINT>(height),
 			.DepthOrArraySize = 1u,
 			.MipLevels = 1u,
 			.Format = format,
@@ -251,7 +251,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	std::shared_ptr<Texture> ResourceManager::CreateTexture(const D3D12_RESOURCE_DIMENSION dimension, const UINT64 width, const UINT height, const UINT16 depth, 
+	std::shared_ptr<Texture> ResourceManager::CreateTexture(const D3D12_RESOURCE_DIMENSION dimension, const std::uint64_t width, const std::uint32_t height, const std::uint16_t depth, 
 		const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType placement)
 	{
 		const auto heapProperties = GetHeapProperties(placement);
@@ -259,9 +259,9 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.Dimension = dimension,
 			.Alignment = 0ULL,
-			.Width = width,
-			.Height = height,
-			.DepthOrArraySize = depth,
+			.Width = static_cast<UINT64>(width),
+			.Height = static_cast<UINT>(height),
+			.DepthOrArraySize = static_cast<UINT16>(depth),
 			.MipLevels = 1u,
 			.Format = format,
 			.SampleDesc = sampleDesc,

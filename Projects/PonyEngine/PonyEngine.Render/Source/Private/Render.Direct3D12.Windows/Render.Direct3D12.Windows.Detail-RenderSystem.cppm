@@ -96,7 +96,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		dxgiSubSystem = std::make_unique<DXGI::SubSystem>(*static_cast<DXGI::IRenderSystemContext*>(this));
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
-		PonyMath::Utility::Resolution<UINT> renderResolution;
+		PonyMath::Utility::Resolution<std::uint32_t> renderResolution;
 		HWND windowHandle;
 		if (const auto windowSystem = Engine().SystemManager().FindSystem<Window::Windows::IWindowSystem>()) [[likely]]
 		{
@@ -104,12 +104,12 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 			if (renderParams.resolution.has_value())
 			{
-				renderResolution = static_cast<PonyMath::Utility::Resolution<UINT>>(renderParams.resolution.value());
+				renderResolution = renderParams.resolution.value();
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 			else
 			{
-				renderResolution = PonyMath::Utility::Resolution<UINT>(static_cast<PonyMath::Core::Vector2<UINT>>(windowSystem->WindowClientRect().Size()));
+				renderResolution = PonyMath::Utility::Resolution<std::uint32_t>(static_cast<PonyMath::Core::Vector2<std::uint32_t>>(windowSystem->WindowClientRect().Size()));
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution: '{}'.", renderResolution.ToString());
 			}
 		}
@@ -128,7 +128,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
-		const UINT bufferCount = renderParams.swapChainParams.bufferCount;
+		const std::uint32_t bufferCount = renderParams.swapChainParams.bufferCount;
 		const auto swapChainParams = DXGI::SwapChainParams
 		{
 			.hWnd = windowHandle,
@@ -141,7 +141,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
 		auto backParams = Direct3D12::BackParams{};
 		backParams.backBuffers.reserve(bufferCount);
-		for (UINT i = 0u; i < bufferCount; ++i)
+		for (std::uint32_t i = 0u; i < bufferCount; ++i)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffer;
 			if (const HRESULT result = swapChain.GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]
@@ -188,7 +188,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
 		direct3D12SubSystem->BeginFrame();
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Render.");
-		direct3D12SubSystem->Render(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex());
+		direct3D12SubSystem->Render(static_cast<std::uint32_t>(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex()));
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Present.");
 		dxgiSubSystem->Present();
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");

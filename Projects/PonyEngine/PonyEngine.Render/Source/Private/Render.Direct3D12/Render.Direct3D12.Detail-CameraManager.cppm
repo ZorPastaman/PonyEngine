@@ -65,8 +65,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::shared_ptr<ICamera> CameraManager::CreateCamera(const CameraParams& cameraParams)
 	{
-		const auto camera = std::make_shared<Camera>(static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(cameraParams.viewMatrix), static_cast<PonyMath::Core::Matrix4x4<FLOAT>>(cameraParams.projectionMatrix), 
-			static_cast<PonyMath::Color::RGBA<FLOAT>>(cameraParams.clearColor), static_cast<PonyMath::Shape::Rect<FLOAT>>(cameraParams.viewportRect), cameraParams.sortingOrder);
+		const auto camera = std::make_shared<Camera>(cameraParams);
 		cameras.push_back(camera);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Camera created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(camera.get()));
 

@@ -31,6 +31,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param shaderVisible Is the descriptor shader visible?
 		/// @return Descriptor heap.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, UINT descriptorCount, bool shaderVisible) = 0;
+		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, std::uint32_t descriptorCount, bool shaderVisible) = 0;
 	};
 }

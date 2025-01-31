@@ -66,10 +66,10 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the current back buffer index.
 		/// @return Current back buffer index.
 		[[nodiscard("Pure function")]]
-		UINT CurrentBackBufferIndex() const noexcept;
+		std::uint32_t CurrentBackBufferIndex() const noexcept;
 		/// @brief Sets the current back buffer index.
 		/// @param index Current back buffer index to set.
-		void CurrentBackBufferIndex(UINT index) noexcept;
+		void CurrentBackBufferIndex(std::uint32_t index) noexcept;
 
 		/// @brief Sets the name to the back components.
 		/// @param name Name to set.
@@ -81,7 +81,7 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		DXGI_FORMAT backFormat; ///< Back format.
 		DXGI_FORMAT srgbBackFormat; ///< Srgb back format.
-		UINT currentBackBufferIndex; ///< Current back buffer index.
+		std::uint32_t currentBackBufferIndex; ///< Current back buffer index.
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
@@ -109,7 +109,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer formats gotten. Format: {}; Srgb format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back descriptor heap.");
-		rtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<UINT>(backBuffers.size()), false);
+		rtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<std::uint32_t>(backBuffers.size()), false);
 		assert(rtvHeap && "The back rtv heap is nullptr.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back descriptor heap created.");
 
@@ -120,7 +120,7 @@ namespace PonyEngine::Render::Direct3D12
 			.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D,
 			.Texture2D = D3D12_TEX2D_RTV{}
 		};
-		for (UINT i = 0u; i < backBuffers.size(); ++i)
+		for (std::uint32_t i = 0u; i < backBuffers.size(); ++i)
 		{
 			this->d3d12System->Device().CreateRenderTargetView(backBuffers[i].Get(), &rtvDesc, rtvHeap->CpuHandle(i));
 		}
@@ -163,12 +163,12 @@ namespace PonyEngine::Render::Direct3D12
 		return rtvHeap->CpuHandle(currentBackBufferIndex);
 	}
 
-	UINT BackManager::CurrentBackBufferIndex() const noexcept
+	std::uint32_t BackManager::CurrentBackBufferIndex() const noexcept
 	{
 		return currentBackBufferIndex;
 	}
 
-	void BackManager::CurrentBackBufferIndex(const UINT index) noexcept
+	void BackManager::CurrentBackBufferIndex(const std::uint32_t index) noexcept
 	{
 		currentBackBufferIndex = index;
 	}

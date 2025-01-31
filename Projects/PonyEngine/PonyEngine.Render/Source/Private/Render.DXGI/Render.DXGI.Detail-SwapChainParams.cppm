@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render.DXGI.Detail:SwapChainParams;
 
+import <cstdint>;
+
 import PonyMath.Utility;
 
 export namespace PonyEngine::Render::DXGI
@@ -21,7 +23,7 @@ export namespace PonyEngine::Render::DXGI
 	struct SwapChainParams final
 	{
 		HWND hWnd; ///< Window handle. Must be an alive window.
-		PonyMath::Utility::Resolution<UINT> resolution; ///< Swap chain resolution.
-		UINT bufferCount; ///< Back buffer count.
+		PonyMath::Utility::Resolution<std::uint32_t> resolution; ///< Swap chain resolution.
+		std::uint32_t bufferCount; ///< Back buffer count.
 	};
 }

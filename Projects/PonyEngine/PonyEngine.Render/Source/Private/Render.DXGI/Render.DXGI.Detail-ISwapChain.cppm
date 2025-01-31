@@ -14,6 +14,8 @@ module;
 
 export module PonyEngine.Render.DXGI.Detail:ISwapChain;
 
+import <cstdint>;
+
 export namespace PonyEngine::Render::DXGI
 {
 	/// @brief DXGI swap chain.
@@ -29,11 +31,11 @@ export namespace PonyEngine::Render::DXGI
 		/// @brief Gets a current back buffer index.
 		/// @return Current back buffer index.
 		[[nodiscard("Pure function")]]
-		virtual UINT GetCurrentBackBufferIndex() const noexcept = 0;
+		virtual std::uint32_t GetCurrentBackBufferIndex() const noexcept = 0;
 		/// @brief Gets a back buffer.
 		/// @param bufferIndex Back buffer index.
 		/// @param buffer Buffer pointer.
 		/// @return Result of the call.
-		virtual HRESULT GetBackBuffer(UINT bufferIndex, ID3D12Resource2** buffer) const noexcept = 0;
+		virtual HRESULT GetBackBuffer(std::uint32_t bufferIndex, ID3D12Resource2** buffer) const noexcept = 0;
 	};
 }

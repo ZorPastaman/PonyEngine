@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:FrameParams;
 
+import <cstdint>;
+
 import PonyMath.Color;
 import PonyMath.Utility;
 
@@ -23,8 +25,8 @@ export namespace PonyEngine::Render::Direct3D12
 	/// @brief Frame parameters.
 	struct FrameParams final
 	{
-		PonyMath::Utility::Resolution<UINT> resolution; ///< Render target resolution.
-		PonyMath::Color::RGBA<FLOAT> clearColor = PonyMath::Color::RGBA<FLOAT>::Predefined::Black; ///< Clear color.
+		PonyMath::Utility::Resolution<std::uint32_t> resolution; ///< Render target resolution.
+		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
 		MSAAParams msaaParams; ///< MSAA parameters.
 	};
 }

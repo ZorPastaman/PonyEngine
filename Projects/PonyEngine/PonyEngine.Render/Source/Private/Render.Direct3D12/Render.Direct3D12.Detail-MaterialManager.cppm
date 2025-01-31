@@ -419,7 +419,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (observer.DataSlotsChanged() || observer.RootSignatureChanged()) [[unlikely]]
 		{
-			material.RootSignature()->DataSlots(static_cast<std::unordered_map<std::string, UINT>>(source.DataSlots()));
+			material.RootSignature()->DataSlots(source.DataSlots());
 		}
 	}
 
@@ -427,7 +427,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
 		{
-			material.ThreadGroupCounts(source.ThreadGroupCounts());
+			std::ranges::copy(source.ThreadGroupCounts(), material.ThreadGroupCounts().begin());
 		}
 	}
 

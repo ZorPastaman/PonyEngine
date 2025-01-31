@@ -144,7 +144,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		explicit Mesh(const MeshParams& params);
 		[[nodiscard("Pure constructor")]]
-		explicit Mesh(std::span<const std::uint32_t, 3> threadGroupCounts) noexcept;
+		explicit Mesh(std::span<const std::uint32_t, 3> threadGroupCounts);
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other);
 		[[nodiscard("Pure constructor")]]
@@ -380,7 +380,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	Mesh::Mesh(const std::span<const std::uint32_t, 3> threadGroupCounts) noexcept
+	Mesh::Mesh(const std::span<const std::uint32_t, 3> threadGroupCounts)
 	{
 		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.end()) [[unlikely]]
 		{
@@ -598,7 +598,7 @@ namespace PonyEngine::Render
 	template<typename T>
 	std::optional<PonyBase::Container::BufferView<const T>> Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) const noexcept
 	{
-		if (const std::optional<std::size_t> dataIndex = DataIndex(dataType))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			if (const std::vector<PonyBase::Container::Buffer>& table = bufferTables[dataIndex.value()]; bufferIndex < table.size() && table[bufferIndex].Stride() == sizeof(T))
 			{

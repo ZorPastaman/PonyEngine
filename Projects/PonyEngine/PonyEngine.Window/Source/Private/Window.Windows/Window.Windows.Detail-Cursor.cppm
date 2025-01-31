@@ -60,7 +60,7 @@ export namespace PonyEngine::Window::Windows
 		virtual void IsVisible(bool isVisible) override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept override;
+		virtual const std::optional<PonyMath::Shape::Rect<float>>& ClippingRect() const noexcept override;
 		virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>& clippingRect) override;
 
 		Cursor& operator =(const Cursor&) = delete;
@@ -165,7 +165,7 @@ namespace PonyEngine::Window::Windows
 		}
 	}
 
-	std::optional<PonyMath::Shape::Rect<float>> Cursor::ClippingRect() const noexcept
+	const std::optional<PonyMath::Shape::Rect<float>>& Cursor::ClippingRect() const noexcept
 	{
 		return clipping;
 	}

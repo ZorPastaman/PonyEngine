@@ -97,11 +97,6 @@ export namespace PonyEngine::Window::Windows
 		virtual const IRawInputManager& RawInputManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual RECT WindowRectWindows() const override;
-		[[nodiscard("Pure function")]]
-		virtual RECT WindowClientRectWindows() const override;
-
-		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
 
 		WindowSystem& operator =(const WindowSystem&) = delete;
@@ -295,12 +290,36 @@ namespace PonyEngine::Window::Windows
 
 	PonyMath::Shape::Rect<std::int32_t> WindowSystem::WindowRect() const
 	{
-		return ConvertToRect(WindowRectWindows());
+		RECT rect;
+		if (!::GetWindowRect(hWnd, &rect)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		return ConvertToRect(rect);
 	}
 
 	PonyMath::Shape::Rect<std::int32_t> WindowSystem::WindowClientRect() const
 	{
-		return ConvertToRect(WindowClientRectWindows());
+		RECT rect;
+		if (!GetClientRect(hWnd, &rect)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		auto leftTop = POINT{.x = rect.left, .y = rect.top};
+		auto rightBottom = POINT{.x = rect.right, .y = rect.bottom};
+		if (!::ClientToScreen(hWnd, &leftTop) || !::ClientToScreen(hWnd, &rightBottom)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
+		}
+
+		rect.left = leftTop.x;
+		rect.top = leftTop.y;
+		rect.right = rightBottom.x;
+		rect.bottom = rightBottom.y;
+
+		return ConvertToRect(rect);
 	}
 
 	PonyMath::Core::Vector2<std::int32_t> WindowSystem::ClientToScreen(const PonyMath::Core::Vector2<std::int32_t>& clientPoint) const
@@ -343,40 +362,6 @@ namespace PonyEngine::Window::Windows
 	const IRawInputManager& WindowSystem::RawInputManager() const noexcept
 	{
 		return *rawInputManager;
-	}
-
-	RECT WindowSystem::WindowRectWindows() const
-	{
-		RECT rect;
-		if (!::GetWindowRect(hWnd, &rect)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get window rect. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		return rect;
-	}
-
-	RECT WindowSystem::WindowClientRectWindows() const
-	{
-		RECT rect;
-		if (!GetClientRect(hWnd, &rect)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get client rect. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		auto leftTop = POINT{ .x = rect.left, .y = rect.top };
-		auto rightBottom = POINT{ .x = rect.right, .y = rect.bottom };
-		if (!::ClientToScreen(hWnd, &leftTop) || !::ClientToScreen(hWnd, &rightBottom)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to get screen point. Error code: '0x{:X}'.", GetLastError()));
-		}
-
-		rect.left = leftTop.x;
-		rect.top = leftTop.y;
-		rect.right = rightBottom.x;
-		rect.bottom = rightBottom.y;
-
-		return rect;
 	}
 
 	HWND WindowSystem::WindowHandle() const noexcept

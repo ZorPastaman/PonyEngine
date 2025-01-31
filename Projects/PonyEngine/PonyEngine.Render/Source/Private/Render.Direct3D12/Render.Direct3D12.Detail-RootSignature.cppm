@@ -28,7 +28,6 @@ export namespace PonyEngine::Render::Direct3D12
 	public:
 		/// @brief Creates a @p RootSignature.
 		/// @param rootSignature Root signature.
-		/// @param dataSlots Data slots.
 		[[nodiscard("Pure constructor")]]
 		explicit RootSignature(ID3D12RootSignature& rootSignature);
 		[[nodiscard("Pure constructor")]]
@@ -48,10 +47,10 @@ export namespace PonyEngine::Render::Direct3D12
 		const ID3D12RootSignature& RootSig() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::optional<UINT> DataSlot(std::string_view dataType) const noexcept;
+		std::optional<std::uint32_t> DataSlot(std::string_view dataType) const noexcept;
 		[[nodiscard("Pure function")]]
-		const std::unordered_map<std::string, UINT>& DataSlots() const noexcept;
-		void DataSlots(const std::unordered_map<std::string, UINT>& dataSlotsToSet);
+		const std::unordered_map<std::string, std::uint32_t>& DataSlots() const noexcept;
+		void DataSlots(const std::unordered_map<std::string, std::uint32_t>& dataSlotsToSet);
 
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
@@ -62,7 +61,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 	private:
 		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSignature; ///< Root signature.
-		std::unordered_map<std::string, UINT> dataSlots; ///< Data slots.
+		std::unordered_map<std::string, std::uint32_t> dataSlots; ///< Data slots.
 	};
 }
 
@@ -83,7 +82,7 @@ namespace PonyEngine::Render::Direct3D12
 		return *rootSignature.Get();
 	}
 
-	std::optional<UINT> RootSignature::DataSlot(const std::string_view dataType) const noexcept
+	std::optional<std::uint32_t> RootSignature::DataSlot(const std::string_view dataType) const noexcept
 	{
 		for (const auto& [type, slot] : dataSlots)
 		{
@@ -96,12 +95,12 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	const std::unordered_map<std::string, UINT>& RootSignature::DataSlots() const noexcept
+	const std::unordered_map<std::string, std::uint32_t>& RootSignature::DataSlots() const noexcept
 	{
 		return dataSlots;
 	}
 
-	void RootSignature::DataSlots(const std::unordered_map<std::string, UINT>& dataSlotsToSet)
+	void RootSignature::DataSlots(const std::unordered_map<std::string, std::uint32_t>& dataSlotsToSet)
 	{
 		dataSlots = dataSlotsToSet;
 	}
