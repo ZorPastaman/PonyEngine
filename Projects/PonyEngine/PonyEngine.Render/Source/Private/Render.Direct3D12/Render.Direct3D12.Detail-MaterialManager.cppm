@@ -78,6 +78,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnMeshShaderChanged() noexcept override;
 			virtual void OnPixelShaderChanged() noexcept override;
 			virtual void OnBlendChanged() noexcept override;
+			virtual void OnRasterizerChanged() noexcept override;
 			virtual void OnDataSlotsChanged() noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
@@ -149,6 +150,13 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static D3D12_LOGIC_OP GetLogicOperation(LogicOperation logicOperation) noexcept;
 
+		[[nodiscard("Pure function")]]
+		static D3D12_RASTERIZER_DESC CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_FILL_MODE GetFillMode(FillMode fillMode) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_CULL_MODE GetCullMode(CullMode cullMode) noexcept;
+
 		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
 		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
 		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
@@ -201,6 +209,11 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	void MaterialManager::MaterialObserver::OnBlendChanged() noexcept
+	{
+		materialChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnRasterizerChanged() noexcept
 	{
 		materialChanged = true;
 	}
@@ -474,6 +487,54 @@ namespace PonyEngine::Render::Direct3D12
 		default: [[unlikely]]
 			assert(false && "Unsupported logic operation.");
 			return D3D12_LOGIC_OP_NOOP;
+		}
+	}
+
+	D3D12_RASTERIZER_DESC MaterialManager::CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept
+	{
+		return D3D12_RASTERIZER_DESC
+		{
+			.FillMode = GetFillMode(rasterizer.fillMode),
+			.CullMode = GetCullMode(rasterizer.cullMode),
+			.FrontCounterClockwise = true,
+			.DepthBias = static_cast<INT>(rasterizer.depthBias),
+			.DepthBiasClamp = static_cast<FLOAT>(rasterizer.depthBiasClamp),
+			.SlopeScaledDepthBias = static_cast<FLOAT>(rasterizer.slopeScaledDepthBias),
+			.DepthClipEnable = rasterizer.depthClip,
+			.MultisampleEnable = true,
+			.AntialiasedLineEnable = false,
+			.ForcedSampleCount = 0u,
+			.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
+		};
+	}
+
+	D3D12_FILL_MODE MaterialManager::GetFillMode(const FillMode fillMode) noexcept
+	{
+		switch (fillMode)
+		{
+		case FillMode::Solid:
+			return D3D12_FILL_MODE_SOLID;
+		case FillMode::Wireframe:
+			return D3D12_FILL_MODE_WIREFRAME;
+		default: [[unlikely]]
+			assert(false && "Unsupported fill mode.");
+			return D3D12_FILL_MODE_SOLID;
+		}
+	}
+
+	D3D12_CULL_MODE MaterialManager::GetCullMode(const CullMode cullMode) noexcept
+	{
+		switch (cullMode)
+		{
+		case CullMode::None:
+			return D3D12_CULL_MODE_NONE;
+		case CullMode::Front:
+			return D3D12_CULL_MODE_FRONT;
+		case CullMode::Back:
+			return D3D12_CULL_MODE_BACK;
+		default: [[unlikely]]
+			assert(false && "Unsupported cull mode");
+			return D3D12_CULL_MODE_NONE;
 		}
 	}
 

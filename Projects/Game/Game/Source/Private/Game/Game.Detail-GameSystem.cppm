@@ -125,6 +125,7 @@ namespace Game
 			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
 			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
 			.blend = PonyEngine::Render::Blend{},
+			.rasterizer = PonyEngine::Render::Rasterizer{},
 			.dataSlots =
 			{
 				{ std::string(PonyEngine::Render::EngineDataTypes::Transform), 0u },

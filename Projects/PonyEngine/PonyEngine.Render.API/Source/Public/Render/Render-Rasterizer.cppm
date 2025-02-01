@@ -7,31 +7,20 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:MaterialParams;
+export module PonyEngine.Render:Rasterizer;
 
-import <array>;
-import <string>;
-import <unordered_map>;
-
-import :Blend;
-import :Rasterizer;
+import :CullMode;
+import :FillMode;
 
 export namespace PonyEngine::Render
 {
-	struct MaterialParams final
+	struct Rasterizer final
 	{
-		std::string rootSignatureShader;
-		std::string amplificationShader;
-		std::string meshShader;
-		std::string pixelShader;
-
-		Blend blend;
-		Rasterizer rasterizer;
-
-		std::unordered_map<std::string, std::uint32_t> dataSlots;
-
-		std::array<std::uint32_t, 3> threadGroupCounts;
-
-		std::string name;
+		FillMode fillMode = FillMode::Solid;
+		CullMode cullMode = CullMode::Back;
+		std::int32_t depthBias = 0;
+		float depthBiasClamp = 0.f;
+		float slopeScaledDepthBias = 0.f;
+		bool depthClip = true;
 	};
 }
