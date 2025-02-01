@@ -44,7 +44,9 @@
     <ClCompile Include="Source\Public\Render\Render-BlendFactor.cppm" />
     <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-CullMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-FillMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICamera.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMaterialObserver.cppm" />
@@ -57,6 +59,7 @@
     <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />
     <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Rasterizer.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderSystemFactory.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderSystemFactoryParams.cppm" />

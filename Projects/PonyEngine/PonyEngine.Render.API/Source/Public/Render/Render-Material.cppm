@@ -59,6 +59,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		const struct Blend& Blend() const noexcept;
 		void Blend(const struct Blend& blendToSet) noexcept;
+		[[nodiscard("Pure function")]]
+		const struct Rasterizer& Rasterizer() const noexcept;
+		void Rasterizer(const struct Rasterizer& rasterizerToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> DataSlot(std::string_view dataType) const noexcept;
@@ -88,17 +91,26 @@ export namespace PonyEngine::Render
 		void OnAmplificationShaderChanged() const noexcept;
 		void OnMeshShaderChanged() const noexcept;
 		void OnPixelShaderChanged() const noexcept;
+
 		void OnBlendChanged() const noexcept;
+		void OnRasterizerChanged() const noexcept;
+
 		void OnDataSlotsChanged() const noexcept;
+
 		void OnThreadGroupCountsChanged() const noexcept;
+
 		void OnNameChanged() const noexcept;
 
 		std::string rootSignatureShader;
 		std::string amplificationShader;
 		std::string meshShader;
 		std::string pixelShader;
+
 		struct Blend blend;
+		struct Rasterizer rasterizer;
+
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
+
 		std::array<std::uint32_t, 3> threadGroupCounts;
 
 		std::string name;
@@ -120,6 +132,7 @@ namespace PonyEngine::Render
 		meshShader(params.meshShader),
 		pixelShader(params.pixelShader),
 		blend(params.blend),
+		rasterizer(params.rasterizer),
 		dataSlots(params.dataSlots),
 		threadGroupCounts(params.threadGroupCounts),
 		name(params.name)
@@ -136,6 +149,7 @@ namespace PonyEngine::Render
 		meshShader(other.meshShader),
 		pixelShader(other.pixelShader),
 		blend(other.blend),
+		rasterizer(other.rasterizer),
 		dataSlots(other.dataSlots),
 		threadGroupCounts(other.threadGroupCounts),
 		name(other.name)
@@ -148,6 +162,7 @@ namespace PonyEngine::Render
 		meshShader(std::move(other.meshShader)),
 		pixelShader(std::move(other.pixelShader)),
 		blend(std::move(other.blend)),
+		rasterizer(std::move(other.rasterizer)),
 		dataSlots(std::move(other.dataSlots)),
 		threadGroupCounts(std::move(other.threadGroupCounts)),
 		name(std::move(other.name))
@@ -267,10 +282,21 @@ namespace PonyEngine::Render
 		return blend;
 	}
 
-	void Material::Blend(const struct Render::Blend& blendToSet) noexcept
+	void Material::Blend(const struct Blend& blendToSet) noexcept
 	{
 		blend = blendToSet;
 		OnBlendChanged();
+	}
+
+	const struct Rasterizer& Material::Rasterizer() const noexcept
+	{
+		return rasterizer;
+	}
+
+	void Material::Rasterizer(const struct Rasterizer& rasterizerToSet) noexcept
+	{
+		rasterizer = rasterizerToSet;
+		OnRasterizerChanged();
 	}
 
 	std::optional<std::uint32_t> Material::DataSlot(const std::string_view dataType) const noexcept
@@ -409,6 +435,14 @@ namespace PonyEngine::Render
 		}
 	}
 
+	void Material::OnRasterizerChanged() const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnRasterizerChanged();
+		}
+	}
+
 	void Material::OnDataSlotsChanged() const noexcept
 	{
 		for (IMaterialObserver* const observer : materialObservers)
@@ -440,6 +474,7 @@ namespace PonyEngine::Render
 		MeshShader(other.meshShader);
 		PixelShader(other.pixelShader);
 		Blend(other.blend);
+		Rasterizer(other.rasterizer);
 		DataSlots(other.dataSlots);
 
 		ThreadGroupCounts(other.threadGroupCounts);
@@ -455,6 +490,7 @@ namespace PonyEngine::Render
 		MeshShader(std::move(other.meshShader));
 		PixelShader(std::move(other.pixelShader));
 		Blend(other.blend);
+		Rasterizer(other.rasterizer);
 		DataSlots(std::move(other.dataSlots));
 
 		ThreadGroupCounts(other.threadGroupCounts);
