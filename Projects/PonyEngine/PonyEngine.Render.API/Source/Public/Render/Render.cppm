@@ -36,4 +36,7 @@ export import :RenderObjectParams;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
+export import :ThreadGroupCounts;
+export import :ThreadGroupCountsMode;
+export import :ThreadGroupCountsUtility;
 export import :TransparentBlend;

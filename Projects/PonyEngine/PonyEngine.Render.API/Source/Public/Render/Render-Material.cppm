@@ -29,7 +29,7 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Material() noexcept;
+		Material() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		explicit Material(const MaterialParams& params);
 		[[nodiscard("Pure constructor")]]
@@ -72,8 +72,8 @@ export namespace PonyEngine::Render
 		void DataSlots(std::unordered_map<std::string, std::uint32_t>&& data);
 
 		[[nodiscard("Pure function")]]
-		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
-		void ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet) noexcept;
+		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
+		void ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
@@ -111,7 +111,7 @@ export namespace PonyEngine::Render
 
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
-		std::array<std::uint32_t, 3> threadGroupCounts;
+		struct ThreadGroupCounts threadGroupCounts;
 
 		std::string name;
 
@@ -121,11 +121,6 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	Material::Material() noexcept :
-		threadGroupCounts{ 1u, 1u, 1u }
-	{
-	}
-
 	Material::Material(const MaterialParams& params) :
 		rootSignatureShader(params.rootSignatureShader),
 		amplificationShader(params.amplificationShader),
@@ -137,10 +132,6 @@ namespace PonyEngine::Render
 		threadGroupCounts(params.threadGroupCounts),
 		name(params.name)
 	{
-		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.cend())
-		{
-			throw std::invalid_argument("Thread group count is zero.");
-		}
 	}
 
 	Material::Material(const Material& other) :
@@ -349,19 +340,14 @@ namespace PonyEngine::Render
 		OnDataSlotsChanged();
 	}
 
-	std::span<const std::uint32_t, 3> Material::ThreadGroupCounts() const noexcept
+	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	void Material::ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet) noexcept
+	void Material::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept
 	{
-		if (std::memcmp(threadGroupCounts.data(), threadGroupCountsToSet.data(), sizeof(threadGroupCounts)) == 0)
-		{
-			return;
-		}
-
-		std::ranges::copy(threadGroupCountsToSet, threadGroupCounts.begin());
+		threadGroupCounts = threadGroupCountsToSet;
 		OnThreadGroupCountsChanged();
 	}
 

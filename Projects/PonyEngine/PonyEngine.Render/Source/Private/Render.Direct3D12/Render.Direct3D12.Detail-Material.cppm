@@ -20,6 +20,8 @@ import <span>;
 import <string>;
 import <string_view>;
 
+import PonyEngine.Render;
+
 import :ObjectUtility;
 import :RootSignature;
 import :Shader;
@@ -68,9 +70,9 @@ export namespace PonyEngine::Render::Direct3D12
 		bool IsTransparent() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
+		struct ThreadGroupCounts& ThreadGroupCounts() noexcept;
 		[[nodiscard("Pure function")]]
-		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
+		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
@@ -83,7 +85,8 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
-		std::array<std::uint32_t, 3> threadGroupCounts;
+		struct ThreadGroupCounts threadGroupCounts;
+
 		bool isTransparent;
 	};
 }
@@ -91,7 +94,6 @@ export namespace PonyEngine::Render::Direct3D12
 namespace PonyEngine::Render::Direct3D12
 {
 	Material::Material() noexcept :
-		threadGroupCounts{ 1u, 1u, 1u },
 		isTransparent{true}
 	{
 	}
@@ -101,7 +103,6 @@ namespace PonyEngine::Render::Direct3D12
 		pipelineState(&pipelineState),
 		isTransparent{isTransparent}
 	{
-		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
 	class RootSignature* Material::RootSignature() noexcept
@@ -129,12 +130,12 @@ namespace PonyEngine::Render::Direct3D12
 		return isTransparent;
 	}
 
-	std::span<std::uint32_t, 3> Material::ThreadGroupCounts() noexcept
+	struct ThreadGroupCounts& Material::ThreadGroupCounts() noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	std::span<const std::uint32_t, 3> Material::ThreadGroupCounts() const noexcept
+	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}

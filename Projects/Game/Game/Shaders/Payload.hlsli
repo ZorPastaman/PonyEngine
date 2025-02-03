@@ -7,12 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:EngineDataTypes;
-
-import <string_view>;
-
-export namespace PonyEngine::Render::EngineDataTypes
+struct Payload
 {
-	constexpr std::string_view Context = "Pony_Context";
-	constexpr std::string_view Transform = "Pony_Transform";
-}
+	bool isFlipped;
+};

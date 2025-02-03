@@ -7,12 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:EngineDataTypes;
+#include "ThreadGroupCounts.hlsli"
 
-import <string_view>;
-
-export namespace PonyEngine::Render::EngineDataTypes
+struct Pony_Context
 {
-	constexpr std::string_view Context = "Pony_Context";
-	constexpr std::string_view Transform = "Pony_Transform";
-}
+	Pony_ThreadGroupCounts dispatchThreadGroupCounts;
+	Pony_ThreadGroupCounts materialThreadGroupCounts;
+	Pony_ThreadGroupCounts meshThreadGroupCounts;
+};

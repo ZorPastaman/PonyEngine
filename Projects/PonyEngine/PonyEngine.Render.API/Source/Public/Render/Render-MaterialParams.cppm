@@ -15,6 +15,7 @@ import <unordered_map>;
 
 import :Blend;
 import :Rasterizer;
+import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
 {
@@ -30,7 +31,7 @@ export namespace PonyEngine::Render
 
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
-		std::array<std::uint32_t, 3> threadGroupCounts;
+		ThreadGroupCounts threadGroupCounts;
 
 		std::string name;
 	};
