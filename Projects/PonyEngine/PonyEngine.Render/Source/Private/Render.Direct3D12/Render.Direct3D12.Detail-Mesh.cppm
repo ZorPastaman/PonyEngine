@@ -24,6 +24,8 @@ import <string_view>;
 import <utility>;
 import <vector>;
 
+import PonyShader.Core;
+
 import :Buffer;
 import :DescriptorHeap;
 import :ObjectUtility;
@@ -35,7 +37,7 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Mesh() noexcept;
+		Mesh() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap);
 		[[nodiscard("Pure constructor")]]
@@ -98,9 +100,9 @@ export namespace PonyEngine::Render::Direct3D12
 		const DescriptorHeap* Heap() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<std::uint32_t, 3> ThreadGroupCounts() noexcept;
+		PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() noexcept;
 		[[nodiscard("Pure function")]]
-		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
+		const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
 		/// @brief Sets the name to the mesh components.
 		/// @param name Name.
@@ -115,17 +117,12 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<std::shared_ptr<class Buffer>> buffers; ///< Buffers.
 		std::shared_ptr<DescriptorHeap> heap; ///< Descriptor heap.
 
-		std::array<std::uint32_t, 3> threadGroupCounts; ///< Thread group counts.
+		PonyShader::Core::ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Mesh::Mesh() noexcept :
-		threadGroupCounts{ 1u, 1u, 1u }
-	{
-	}
-
 	Mesh::Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Direct3D12::Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap) :
 		dataTypes(dataTypes.begin(), dataTypes.end()),
 		bufferOffsets(bufferOffsets.begin(), bufferOffsets.end()),
@@ -140,9 +137,9 @@ namespace PonyEngine::Render::Direct3D12
 		dataTypes(dataTypes.begin(), dataTypes.end()),
 		bufferOffsets(bufferOffsets.begin(), bufferOffsets.end()),
 		buffers(buffers.begin(), buffers.end()),
-		heap(heap)
+		heap(heap),
+		threadGroupCounts(threadGroupCounts)
 	{
-		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
 	std::optional<std::uint32_t> Mesh::DataIndex(const std::string_view dataType) const noexcept
@@ -290,12 +287,12 @@ namespace PonyEngine::Render::Direct3D12
 		return heap.get();
 	}
 
-	std::span<std::uint32_t, 3> Mesh::ThreadGroupCounts() noexcept
+	PonyShader::Core::ThreadGroupCounts& Mesh::ThreadGroupCounts() noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	std::span<const std::uint32_t, 3> Mesh::ThreadGroupCounts() const noexcept
+	const PonyShader::Core::ThreadGroupCounts& Mesh::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}

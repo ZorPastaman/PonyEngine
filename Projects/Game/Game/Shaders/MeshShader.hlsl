@@ -11,6 +11,8 @@
 #include "PonyShader/Mesh/Primitive.hlsli"
 #include "PonyShader/Space/Transform.hlsli"
 
+#include "Payload.hlsli"
+
 #define TRIANGLE_MULTIPLIER 2
 #define VERTEX_COUNT 64
 #define TRIANGLE_COUNT VERTEX_COUNT * TRIANGLE_MULTIPLIER
@@ -24,7 +26,7 @@ struct Vertex
 	float4 color : COLOR;
 };
 
-Pony_Transform Transform : register(b0);
+ConstantBuffer<Pony_Transform> Transform : register(b1);
 
 StructuredBuffer<Pony_Meshlet> Meshlets : register(t0);
 StructuredBuffer<uint> VertexIndices : register(t1);
@@ -41,14 +43,17 @@ Vertex CreateVertex(in uint index)
 	return vertex;
 }
 
-uint3 CreateTriangle(in uint index)
+uint3 CreateTriangle(in uint index, in bool isFlipped)
 {
-	return UnpackTriangle(Primitives[index]);
+	uint3 primitive = UnpackTriangle(Primitives[index]);
+
+	return uint3(primitive[0], primitive[1 + isFlipped], primitive[2 - isFlipped]);
 }
 
 [outputtopology("triangle")]
 [numthreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
-void main(in uint groupId : SV_GROUPID,
+void main(in payload Payload payload,
+	in uint groupId : SV_GROUPID,
 	in uint groupThreadId : SV_GROUPTHREADID,
 	out vertices Vertex outVertices[VERTEX_COUNT],
 	out indices uint3 outTriangles[TRIANGLE_COUNT])
@@ -72,7 +77,7 @@ void main(in uint groupId : SV_GROUPID,
 		if (groupThreadSubId < primitiveCount)
 		{
 			uint primitiveIndex = meshlet.primitiveOffset + groupThreadSubId;
-			outTriangles[groupThreadSubId] = CreateTriangle(primitiveIndex);
+			outTriangles[groupThreadSubId] = CreateTriangle(primitiveIndex, payload.isFlipped);
 		}
 	}
 }

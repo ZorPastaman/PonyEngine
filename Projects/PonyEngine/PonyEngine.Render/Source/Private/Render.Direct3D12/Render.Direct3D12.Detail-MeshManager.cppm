@@ -350,7 +350,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
 		{
-			std::ranges::copy(source.ThreadGroupCounts(), mesh.ThreadGroupCounts().begin());
+			mesh.ThreadGroupCounts() = source.ThreadGroupCounts();
 		}
 	}
 

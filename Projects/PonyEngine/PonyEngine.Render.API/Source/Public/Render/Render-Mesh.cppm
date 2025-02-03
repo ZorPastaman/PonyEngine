@@ -26,6 +26,8 @@ import <vector>;
 import PonyBase.Container;
 import PonyBase.Utility;
 
+import PonyShader.Core;
+
 import :IMeshObserver;
 import :MeshParams;
 
@@ -140,11 +142,11 @@ export namespace PonyEngine::Render
 		};
 
 		[[nodiscard("Pure constructor")]]
-		Mesh() noexcept;
+		Mesh() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		explicit Mesh(const MeshParams& params);
 		[[nodiscard("Pure constructor")]]
-		explicit Mesh(std::span<const std::uint32_t, 3> threadGroupCounts);
+		explicit Mesh(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other);
 		[[nodiscard("Pure constructor")]]
@@ -212,8 +214,8 @@ export namespace PonyEngine::Render
 		std::span<const PonyBase::Container::Buffer> BufferTableConst(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::span<const std::uint32_t, 3> ThreadGroupCounts() const noexcept;
-		void ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet);
+		const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept;
+		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet);
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
@@ -234,7 +236,8 @@ export namespace PonyEngine::Render
 
 		std::vector<std::string> dataTypes;
 		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
-		std::array<std::uint32_t, 3> threadGroupCounts;
+
+		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
 
 		std::string name;
 
@@ -342,11 +345,6 @@ namespace PonyEngine::Render
 		return PonyBase::Container::BufferView<const T>(&buffers[index]);
 	}
 
-	Mesh::Mesh() noexcept :
-		threadGroupCounts{ 1u, 1u, 1u }
-	{
-	}
-
 	Mesh::Mesh(const MeshParams& params) :
 		threadGroupCounts(params.threadGroupCounts),
 		name(params.name)
@@ -365,11 +363,6 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
 		}
 
-		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.cend()) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count is zero.");
-		}
-
 		dataTypes.reserve(params.bufferTables.size());
 		bufferTables.reserve(params.bufferTables.size());
 
@@ -380,14 +373,9 @@ namespace PonyEngine::Render
 		}
 	}
 
-	Mesh::Mesh(const std::span<const std::uint32_t, 3> threadGroupCounts)
+	Mesh::Mesh(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts) noexcept :
+		threadGroupCounts(threadGroupCounts)
 	{
-		if (std::ranges::find(threadGroupCounts, 0u) != threadGroupCounts.end()) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count is zero.");
-		}
-
-		std::ranges::copy(threadGroupCounts, this->threadGroupCounts.begin());
 	}
 
 	Mesh::Mesh(const Mesh& other) :
@@ -655,24 +643,14 @@ namespace PonyEngine::Render
 		return BufferTable(dataType);
 	}
 
-	std::span<const std::uint32_t, 3> Mesh::ThreadGroupCounts() const noexcept
+	const PonyShader::Core::ThreadGroupCounts& Mesh::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	void Mesh::ThreadGroupCounts(std::span<const std::uint32_t, 3> threadGroupCountsToSet)
+	void Mesh::ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet)
 	{
-		if (std::memcmp(threadGroupCounts.data(), threadGroupCountsToSet.data(), sizeof(threadGroupCounts)) == 0)
-		{
-			return;
-		}
-
-		if (std::ranges::find(threadGroupCountsToSet, 0u) != threadGroupCountsToSet.end()) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count is zero.");
-		}
-
-		std::ranges::copy(threadGroupCountsToSet, threadGroupCounts.begin());
+		threadGroupCounts = threadGroupCountsToSet;
 		OnThreadGroupCountsChanged();
 	}
 

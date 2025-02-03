@@ -7,24 +7,16 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:MeshParams;
+export module PonyShader.Core:Context;
 
-import <array>;
-import <cstdint>;
-import <string>;
-import <unordered_map>;
-import <vector>;
+import :ThreadGroupCounts;
 
-import PonyBase.Container;
-
-import PonyShader.Core;
-
-export namespace PonyEngine::Render
+export namespace PonyShader::Core
 {
-	struct MeshParams final
+	struct Context final
 	{
-		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
-		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
-		std::string name;
+		ThreadGroupCounts dispatchThreadGroupCounts;
+		ThreadGroupCounts materialThreadGroupCounts;
+		ThreadGroupCounts meshThreadGroupCounts;
 	};
 }

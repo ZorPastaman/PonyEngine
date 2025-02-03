@@ -32,5 +32,9 @@
     <FxCompile Include="Shaders\MeshShader.hlsl" />
     <FxCompile Include="Shaders\PixelShader.hlsl" />
     <FxCompile Include="Shaders\RootSig.hlsl" />
+    <FxCompile Include="Shaders\AmplificationShader.hlsl" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Shaders\Payload.hlsli" />
   </ItemGroup>
 </Project>
