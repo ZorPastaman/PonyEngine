@@ -112,7 +112,6 @@ namespace PonyEngine::Render::Direct3D12
 			.resourceType = ResourceType::Buffer
 		};
 		copyTasks.push_back(copyTask);
-		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Debug, "Buffer copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	void CopyPipeline::AddCopyTask(Texture& source, Texture& destination)
@@ -124,7 +123,6 @@ namespace PonyEngine::Render::Direct3D12
 			.resourceType = ResourceType::Texture
 		};
 		copyTasks.push_back(copyTask);
-		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Debug, "Texture copy task added. Source: '0x{:X}'; Destination: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	void CopyPipeline::PopulateCommands()
