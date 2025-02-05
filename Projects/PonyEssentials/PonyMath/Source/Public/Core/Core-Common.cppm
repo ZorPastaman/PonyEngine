@@ -77,6 +77,8 @@ export namespace PonyMath::Core
 
 	template<std::integral T> [[nodiscard("Pure function")]]
 	constexpr T CeilDivision(T numerator, T denominator) noexcept; // TODO: Add docs and tests
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr T Align(T value, T alignment) noexcept;
 }
 
 namespace PonyMath::Core
@@ -109,5 +111,13 @@ namespace PonyMath::Core
 	constexpr T CeilDivision(const T numerator, const T denominator) noexcept
 	{
 		return (numerator + denominator - T{1}) / denominator;
+	}
+
+	template<std::unsigned_integral T>
+	constexpr T Align(const T value, const T alignment) noexcept
+	{
+		const T alignmentValue = alignment - T{1};
+
+		return value + alignmentValue & ~alignmentValue;
 	}
 }
