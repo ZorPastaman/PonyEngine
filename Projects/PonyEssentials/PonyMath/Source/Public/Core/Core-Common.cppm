@@ -19,6 +19,8 @@ export namespace PonyMath::Core
 	/// @brief The concept is satisfied if @p T is an arithmetic type.
 	template<typename T>
 	concept Arithmetic = std::is_arithmetic_v<T>;
+	template<typename T>
+	concept Signed = std::is_signed_v<T>;
 
 	/// @brief The expression is @a true if @a sizeof(T) is greater than @a sizeof(U); @a false otherwise.
 	/// @tparam T Left type.
@@ -58,13 +60,15 @@ export namespace PonyMath::Core
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive or zero; @a -1 if the @p value is negative.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Signed T> [[nodiscard("Pure function")]]
 	constexpr T Sign(T value) noexcept;
+	template<Signed T> [[nodiscard("Pure function")]]
+	constexpr T Sign(bool value) noexcept; // TODO: Add docs and tests
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
-	template<Arithmetic T> [[nodiscard("Pure function")]]
+	template<Signed T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
 
 	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
@@ -89,13 +93,19 @@ namespace PonyMath::Core
 		return std::abs(left - right) < tolerance;
 	}
 
-	template<Arithmetic T>
-	constexpr T Sign(T value) noexcept
+	template<Signed T>
+	constexpr T Sign(const T value) noexcept
 	{
 		return value < T{0} ? T{-1} : T{1};
 	}
 
-	template<Arithmetic T>
+	template<Signed T>
+	constexpr T Sign(const bool value) noexcept
+	{
+		return value ? T{1} : T{-1};
+	}
+
+	template<Signed T>
 	constexpr T Signum(const T value) noexcept
 	{
 		return static_cast<T>(T{0} < value) - (value < T{0});
