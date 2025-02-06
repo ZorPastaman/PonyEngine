@@ -322,7 +322,10 @@ namespace PonyEngine::Render::Direct3D12
 
 	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject)
 	{
-		return false;
+		const auto frustum = PonyMath::Shape::Frustum<float>(camera.ProjectionMatrix() * camera.ViewMatrix());
+		const PonyMath::Core::Vector3<float> position = PonyMath::Core::ExtractTranslation(renderObject.ModelMatrix());
+
+		return !frustum.Contains(position);
 	}
 
 	void GraphicsPipeline::AddData(const Camera& camera, RenderObject& renderObject)
@@ -480,8 +483,11 @@ namespace PonyEngine::Render::Direct3D12
 		const std::uint32_t descriptorCount = static_cast<std::uint32_t>(data.data.size());
 
 		originalHeapOffsets[&data.heap->Heap()] = destOffset;
-		D3D12System().Device().CopyDescriptorsSimple(descriptorCount, dataHeap->CpuHandle(destOffset), 
-			data.heap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		if (descriptorCount > 0u) // TODO: Check other lines for zero count guard.
+		{
+			D3D12System().Device().CopyDescriptorsSimple(descriptorCount, dataHeap->CpuHandle(destOffset), 
+				data.heap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+		}
 
 		return descriptorCount;
 	}

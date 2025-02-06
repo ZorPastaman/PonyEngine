@@ -29,6 +29,6 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept
 	{
-		return large.MinX() <= small.MinX() && large.MinY() <= small.MinY() && large.MaxX() >= small.MaxX() && large.MaxY() >= small.MaxY();
+		return large.MinX() < small.MinX() && large.MinY() < small.MinY() && large.MaxX() > small.MaxX() && large.MaxY() > small.MaxY();
 	}
 }
