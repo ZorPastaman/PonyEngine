@@ -200,9 +200,10 @@ export namespace PonyMath::Core
 		/// @param span Span. The order is x, y, z, w.
 		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
-		/// @brief Multiplies @a this by the @p scale component-wise.
-		/// @param scale Vector to multiply by.
-		constexpr void Scale(const Vector4& scale) noexcept;
+		/// @brief Multiplies @a this by the @p multiplier component-wise.
+		/// @param multiplier Multiplier.
+		constexpr void Multiply(const Vector4& multiplier) noexcept;
+		constexpr void Divide(const Vector4& divisor) noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z, w)'.
 		/// @return State string.
@@ -303,7 +304,9 @@ export namespace PonyMath::Core
 	/// @param right Multiplier.
 	/// @return Product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept;
+	constexpr Vector4<T> Multiply(const Vector4<T>& left, const Vector4<T>& right) noexcept;
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector4<T> Divide(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
 	/// @tparam T Component type.
@@ -644,11 +647,20 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr void Vector4<T>::Scale(const Vector4& scale) noexcept
+	constexpr void Vector4<T>::Multiply(const Vector4& multiplier) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			(*this)[i] *= scale[i];
+			(*this)[i] *= multiplier[i];
+		}
+	}
+
+	template<Arithmetic T>
+	constexpr void Vector4<T>::Divide(const Vector4& divisor) noexcept
+	{
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			(*this)[i] /= divisor[i];
 		}
 	}
 
@@ -691,15 +703,27 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T> Scale(const Vector4<T>& left, const Vector4<T>& right) noexcept
+	constexpr Vector4<T> Multiply(const Vector4<T>& left, const Vector4<T>& right) noexcept
 	{
-		Vector4<T> scaled;
+		Vector4<T> product;
 		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
 		{
-			scaled[i] = left[i] * right[i];
+			product[i] = left[i] * right[i];
 		}
 
-		return scaled;
+		return product;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector4<T> Divide(const Vector4<T>& left, const Vector4<T>& right) noexcept
+	{
+		Vector4<T> quotient;
+		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
+		{
+			quotient[i] = left[i] / right[i];
+		}
+
+		return quotient;
 	}
 
 	template<Arithmetic T>

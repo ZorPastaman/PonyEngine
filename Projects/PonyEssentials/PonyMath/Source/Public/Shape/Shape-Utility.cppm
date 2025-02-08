@@ -7,28 +7,39 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyMath.Shape:Inside2D;
+export module PonyMath.Shape:Utility;
+
+import <span>;
 
 import PonyMath.Core;
 
-import :Rect;
+import :Box;
 
 export namespace PonyMath::Shape
 {
-	/// @brief Checks if the @p small is fully inside the @p large.
-	/// @tparam T Value type.
-	/// @param small Small rect.
-	/// @param large Large rect.
-	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept;
+	constexpr Box<T> CreateBoundingBox(std::span<const Core::Vector3<T>> positions) noexcept;
 }
 
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept
+	constexpr Box<T> CreateBoundingBox(const std::span<const Core::Vector3<T>> positions) noexcept
 	{
-		return large.MinX() <= small.MinX() && large.MinY() <= small.MinY() && large.MaxX() >= small.MaxX() && large.MaxY() >= small.MaxY();
+		if (positions.size() == 0)
+		{
+			return Box<T>::Predefined::Zero;
+		}
+
+		auto min = positions[0];
+		auto max = positions[0];
+
+		for (std::size_t i = 1; i < positions.size(); ++i)
+		{
+			min = Core::Min(min, positions[i]);
+			max = Core::Max(max, positions[i]);
+		}
+
+		return Box<T>(min, max - min);
 	}
 }

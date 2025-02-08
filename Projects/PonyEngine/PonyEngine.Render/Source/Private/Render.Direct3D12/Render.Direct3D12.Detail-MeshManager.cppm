@@ -83,6 +83,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnMeshChanged() noexcept override;
 			virtual void OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
+			virtual void OnBoundingBoxChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
 			[[nodiscard("Pure function")]]
@@ -103,6 +104,7 @@ export namespace PonyEngine::Render::Direct3D12
 			std::set<std::pair<std::uint32_t, std::uint32_t>> changedBuffers;
 			bool meshChanged;
 			bool threadGroupCountsChanged;
+			bool boundingBoxChanged;
 			bool nameChanged;
 		};
 
@@ -164,6 +166,11 @@ namespace PonyEngine::Render::Direct3D12
 		threadGroupCountsChanged = true;
 	}
 
+	void MeshManager::MeshObserver::OnBoundingBoxChanged() noexcept
+	{
+		boundingBoxChanged = true;
+	}
+
 	void MeshManager::MeshObserver::OnNameChanged() noexcept
 	{
 		nameChanged = true;
@@ -194,6 +201,7 @@ namespace PonyEngine::Render::Direct3D12
 		changedBuffers.clear();
 		meshChanged = false;
 		threadGroupCountsChanged = false;
+		boundingBoxChanged = false;
 		nameChanged = false;
 	}
 

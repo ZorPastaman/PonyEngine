@@ -327,9 +327,10 @@ export namespace PonyMath::Core
 		/// @param span Span. The matrix is column-major.
 		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
 
-		/// @brief Multiplies @a this by the @p scale component-wise.
-		/// @param scale Matrix to multiply by.
-		constexpr void Scale(const Matrix3x3& scale) noexcept;
+		/// @brief Multiplies @a this by the @p multiplier component-wise.
+		/// @param multiplier Multiplier.
+		constexpr void Multiply(const Matrix3x3& multiplier) noexcept;
+		constexpr void Divide(const Matrix3x3& divisor) noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
 		/// @remark The format is '(m00, m01, m02)(m10, m11, m12)(m20, m21, m22)'.
@@ -402,7 +403,9 @@ export namespace PonyMath::Core
 	/// @param right Multiplier.
 	/// @return Product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Matrix3x3<T> Scale(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept;
+	constexpr Matrix3x3<T> Multiply(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept;
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Matrix3x3<T> Divide(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept;
 
 	/// @brief Checks if the two matrices are almost equal with the tolerance value.
 	/// @tparam T Component type.
@@ -895,11 +898,20 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::Scale(const Matrix3x3& scale) noexcept
+	constexpr void Matrix3x3<T>::Multiply(const Matrix3x3& multiplier) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			Component(i) *= scale.Component(i);
+			Component(i) *= multiplier.Component(i);
+		}
+	}
+
+	template<Arithmetic T>
+	constexpr void Matrix3x3<T>::Divide(const Matrix3x3& divisor) noexcept
+	{
+		for (std::size_t i = 0; i < ComponentCount; ++i)
+		{
+			Component(i) /= divisor.Component(i);
 		}
 	}
 
@@ -910,15 +922,27 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr Matrix3x3<T> Scale(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
+	constexpr Matrix3x3<T> Multiply(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
 	{
-		Matrix3x3<T> scaled;
+		Matrix3x3<T> product;
 		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
 		{
-			scaled.Component(i) = left.Component(i) * right.Component(i);
+			product.Component(i) = left.Component(i) * right.Component(i);
 		}
 
-		return scaled;
+		return product;
+	}
+
+	template<Arithmetic T>
+	constexpr Matrix3x3<T> Divide(const Matrix3x3<T>& left, const Matrix3x3<T>& right) noexcept
+	{
+		Matrix3x3<T> quotient;
+		for (std::size_t i = 0; i < Matrix3x3<T>::ComponentCount; ++i)
+		{
+			quotient.Component(i) = left.Component(i) / right.Component(i);
+		}
+
+		return quotient;
 	}
 
 	template<std::floating_point T>

@@ -125,6 +125,12 @@ export namespace PonyMath::Shape
 
 		constexpr void Set(std::span<const Plane<T>, 6> planesToSet) noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::string ToString() const;
+
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Frustum<U>() const noexcept;
+
 		[[nodiscard("Pure operator")]]
 		constexpr Plane<T>& operator [](std::size_t index) noexcept;
 		[[nodiscard("Pure operator")]]
@@ -142,6 +148,9 @@ export namespace PonyMath::Shape
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Frustum<T>& left, const Frustum<T>& right, T tolerance = T{0.00001}) noexcept;
+
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Frustum<T>& frustum);
 }
 
 namespace PonyMath::Shape
@@ -416,6 +425,12 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	std::string Frustum<T>::ToString() const
+	{
+		return std::format("Left: {}; Right: {}; Bottom: {}; Top: {}; Near: {}; Far: {}.", Left(), Right(), Bottom(), Top(), Near(), Far());
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Frustum<T>& left, const Frustum<T>& right, const T tolerance) noexcept
 	{
 		for (std::size_t i = 0; i < Frustum<T>::PlaneCount; ++i)
@@ -456,6 +471,14 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Frustum<T>::operator Frustum<U>() const noexcept
+	{
+		return Frustum<U>(static_cast<Plane<U>>(Left()), static_cast<Plane<U>>(Right()), static_cast<Plane<U>>(Bottom()),
+			static_cast<Plane<U>>(Top()), static_cast<Plane<U>>(Near()), static_cast<Plane<U>>(Far()));
+	}
+
+	template<std::floating_point T>
 	constexpr Plane<T>& Frustum<T>::operator [](const std::size_t index) noexcept
 	{
 		return planes[index];
@@ -465,5 +488,11 @@ namespace PonyMath::Shape
 	constexpr const Plane<T>& Frustum<T>::operator [](const std::size_t index) const noexcept
 	{
 		return planes[index];
+	}
+
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Frustum<T>& frustum)
+	{
+		return stream << frustum.ToString();
 	}
 }
