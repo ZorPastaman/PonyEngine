@@ -24,6 +24,7 @@ export namespace PonyEngine::Render
 		virtual void OnMeshChanged() noexcept = 0;
 		virtual void OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept = 0;
 		virtual void OnThreadGroupCountsChanged() noexcept = 0;
+		virtual void OnBoundingBoxChanged() noexcept = 0;
 		virtual void OnNameChanged() noexcept = 0;
 	};
 }

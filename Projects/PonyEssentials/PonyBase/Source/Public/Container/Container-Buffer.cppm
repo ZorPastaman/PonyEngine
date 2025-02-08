@@ -190,7 +190,7 @@ namespace PonyBase::Container
 	{
 		assert(sizeof(T) == stride && "Incorrect type.");
 
-		return std::span<T>(reinterpret_cast<const T*>(data.get()), count);
+		return std::span<const T>(reinterpret_cast<const T*>(data.get()), count);
 	}
 
 	void Buffer::CopyFrom(const Buffer& source)

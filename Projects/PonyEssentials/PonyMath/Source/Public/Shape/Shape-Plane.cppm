@@ -11,6 +11,8 @@ export module PonyMath.Shape:Plane;
 
 import <cmath>;
 import <concepts>;
+import <format>;
+import <string>;
 
 import PonyMath.Core;
 
@@ -65,6 +67,12 @@ export namespace PonyMath::Shape
 
 		constexpr void Set(const Core::Vector3<T>& normalToSet, T distanceToSet = T{0}) noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::string ToString() const;
+
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator Plane<U>() const noexcept;
+
 		constexpr Plane& operator =(const Plane& other) noexcept = default;
 		constexpr Plane& operator =(Plane&& other) noexcept = default;
 
@@ -78,6 +86,9 @@ export namespace PonyMath::Shape
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const Plane<T>& left, const Plane<T>& right, T tolerance = T{0.00001}) noexcept;
+
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Plane<T>& plane);
 }
 
 namespace PonyMath::Shape
@@ -186,8 +197,27 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	std::string Plane<T>::ToString() const
+	{
+		return std::format("Normal: {}, Distance: {}", normal.ToString(), distance);
+	}
+
+	template<std::floating_point T>
+	template<std::floating_point U>
+	constexpr Plane<T>::operator Plane<U>() const noexcept
+	{
+		return Plane<U>(static_cast<Core::Vector3<U>>(normal), static_cast<U>(distance));
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Plane<T>& left, const Plane<T>& right, const T tolerance) noexcept
 	{
 		return Core::AreAlmostEqual(left.Normal(), right.Normal(), tolerance) && Core::AreAlmostEqual(left.Distance(), right.Distance(), tolerance);
+	}
+
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Plane<T>& plane)
+	{
+		return stream << plane.ToString();
 	}
 }

@@ -435,59 +435,31 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr bool Rect<T>::Contains(const Core::Vector2<T>& point) const noexcept
 	{
-		const Core::Vector2<T> max = Max();
-
-		return point.X() >= position.X() && point.Y() >= position.Y() && point.X() <= max.X() && point.Y() <= max.Y();
+		return point.X() >= MinX() && point.Y() >= MinY() && point.X() <= MaxX() && point.Y() <= MaxY();
 	}
 
 	template<Core::Arithmetic T>
 	constexpr Core::Vector2<T> Rect<T>::Normalize(const Core::Vector2<T>& point) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		Core::Vector2<T> normalized;
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			normalized[i] = (point[i] - position[i]) / size[i];
-		}
-
-		return normalized;
+		return Core::Divide(point - position, size);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr Core::Vector2<T> Rect<T>::Unnormalize(const Core::Vector2<T>& point) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		Core::Vector2<T> unnormalized;
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			unnormalized[i] = point[i] * size[i] + position[i];
-		}
-
-		return unnormalized;
+		return Core::Multiply(point, size) + position;
 	}
 
 	template<Core::Arithmetic T>
 	constexpr Rect<T> Rect<T>::Normalize(const Rect& rect) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		Rect normalized;
-		normalized.position = Normalize(rect.position);
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			normalized.size[i] = rect.size[i] / size[i];
-		}
-
-		return normalized;
+		return Rect(Normalize(rect.position), Core::Divide(rect.size, size));
 	}
 
 	template<Core::Arithmetic T>
 	constexpr Rect<T> Rect<T>::Unnormalize(const Rect& rect) const noexcept requires (std::is_floating_point_v<T>)
 	{
-		Rect unnormalized;
-		unnormalized.position = Unnormalize(rect.position);
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			unnormalized.size[i] = rect.size[i] * size[i];
-		}
-
-		return unnormalized;
+		return Rect(Unnormalize(rect.position), Core::Multiply(rect.size, size));
 	}
 
 	template<Core::Arithmetic T>
@@ -507,16 +479,13 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr void Rect<T>::ResolveNegativeSize() noexcept
 	{
-		if (size.X() < T{0})
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
 		{
-			position.X() += size.X();
-			size.X() = -size.X();
-		}
-
-		if (size.Y() < T{0})
-		{
-			position.Y() += size.Y();
-			size.Y() = -size.Y();
+			if (size[i] < T{0})
+			{
+				position[i] += size[i];
+				size[i] = -size[i];
+			}
 		}
 	}
 
@@ -524,20 +493,13 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic U>
 	constexpr Rect<T>::operator Rect<U>() const noexcept
 	{
-		Rect<U> rect;
-		for (std::size_t i = 0; i < Core::Vector2<U>::ComponentCount; ++i)
-		{
-			rect.Position()[i] = static_cast<U>(position[i]);
-			rect.Size()[i] = static_cast<U>(size[i]);
-		}
-
-		return rect;
+		return Rect<U>(static_cast<Core::Vector2<U>>(position), static_cast<Core::Vector2<U>>(size));
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Rect<T>& left, const Rect<T>& right, const T tolerance) noexcept
 	{
-		return AreAlmostEqual(left.Position(), right.Position(), tolerance) && AreAlmostEqual(left.Size(), right.Size(), tolerance);
+		return Core::AreAlmostEqual(left.Position(), right.Position(), tolerance) && Core::AreAlmostEqual(left.Size(), right.Size(), tolerance);
 	}
 
 	template<Core::Arithmetic T>

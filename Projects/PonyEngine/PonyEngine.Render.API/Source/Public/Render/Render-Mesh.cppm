@@ -26,6 +26,8 @@ import <vector>;
 import PonyBase.Container;
 import PonyBase.Utility;
 
+import PonyMath.Shape;
+
 import PonyShader.Core;
 
 import :IMeshObserver;
@@ -218,6 +220,10 @@ export namespace PonyEngine::Render
 		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet);
 
 		[[nodiscard("Pure function")]]
+		const std::optional<PonyMath::Shape::Box<float>>& BoundingBox() const noexcept;
+		void BoundingBox(const std::optional<PonyMath::Shape::Box<float>>& boundingBox) noexcept;
+
+		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
 		void Name(std::string_view nameToSet);
 		void Name(std::string&& nameToSet);
@@ -232,12 +238,14 @@ export namespace PonyEngine::Render
 		void OnMeshChanged() const noexcept;
 		void OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) const noexcept;
 		void OnThreadGroupCountsChanged() const noexcept;
+		void OnBoundingBoxChanged() const noexcept;
 		void OnNameChanged() const noexcept;
 
 		std::vector<std::string> dataTypes;
 		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
 
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
+		std::optional<PonyMath::Shape::Box<float>> boundingBox;
 
 		std::string name;
 
@@ -347,6 +355,7 @@ namespace PonyEngine::Render
 
 	Mesh::Mesh(const MeshParams& params) :
 		threadGroupCounts(params.threadGroupCounts),
+		boundingBox(params.boundingBox),
 		name(params.name)
 	{
 		std::size_t bufferCount = 0;
@@ -654,6 +663,17 @@ namespace PonyEngine::Render
 		OnThreadGroupCountsChanged();
 	}
 
+	const std::optional<PonyMath::Shape::Box<float>>& Mesh::BoundingBox() const noexcept
+	{
+		return boundingBox;
+	}
+
+	void Mesh::BoundingBox(const std::optional<PonyMath::Shape::Box<float>>& boundingBox) noexcept
+	{
+		this->boundingBox = boundingBox;
+		OnBoundingBoxChanged();
+	}
+
 	std::string_view Mesh::Name() const noexcept
 	{
 		return name;
@@ -715,6 +735,14 @@ namespace PonyEngine::Render
 		for (IMeshObserver* const observer : meshObservers)
 		{
 			observer->OnThreadGroupCountsChanged();
+		}
+	}
+
+	void Mesh::OnBoundingBoxChanged() const noexcept
+	{
+		for (IMeshObserver* const observer : meshObservers)
+		{
+			observer->OnBoundingBoxChanged();
 		}
 	}
 

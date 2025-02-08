@@ -25,6 +25,7 @@ import PonyBase.Container;
 
 import PonyMath.Color;
 import PonyMath.Core;
+import PonyMath.Shape;
 import PonyMath.Space;
 
 import PonyShader.Core;
@@ -184,11 +185,12 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Gray,
 			PonyMath::Color::RGBA<float>::Predefined::White
 		});
-		auto meshParams = PonyEngine::Render::MeshParams();
+		auto meshParams = PonyEngine::Render::MeshParams{};
 		meshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ meshlets, vertexIndices, triangles };
 		meshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ positions };
 		meshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ colors };
 		meshParams.threadGroupCounts = { 2u, 1u, 1u };
+		meshParams.boundingBox = PonyMath::Shape::CreateBoundingBox(positions.Span<PonyMath::Core::Vector3<float>>());
 		meshParams.name = "Box";
 		const auto mesh = std::make_shared<PonyEngine::Render::Mesh>(meshParams);
 		boxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.material = material, .mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, -PonyMath::Core::Vector3<float>::Predefined::One * 5.f)});
