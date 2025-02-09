@@ -172,9 +172,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr Core::Vector3<T> Plane<T>::Project(const Core::Vector3<T>& point) const noexcept
 	{
-		const T multiplier = Core::Dot(point, normal) + distance;
-
-		return point - normal * multiplier;
+		return point - normal * Distance(point);
 	}
 
 	template<std::floating_point T>
@@ -186,7 +184,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool Plane<T>::Side(const Core::Vector3<T>& point) const noexcept
 	{
-		return Core::Dot(point, normal) + distance >= T{0};
+		return Distance(point) >= T{0};
 	}
 
 	template<std::floating_point T>

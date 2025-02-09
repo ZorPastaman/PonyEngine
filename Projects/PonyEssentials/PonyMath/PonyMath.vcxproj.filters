@@ -112,5 +112,11 @@
     <ClCompile Include="Source\Public\Shape\Shape-Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Line2D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Line3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
