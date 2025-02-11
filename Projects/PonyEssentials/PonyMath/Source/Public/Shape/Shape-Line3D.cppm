@@ -15,6 +15,9 @@ import <string>;
 
 import PonyMath.Core;
 
+import :Ray3D;
+import :Segment3D;
+
 export namespace PonyMath::Shape
 {
 	template<std::floating_point T>
@@ -25,6 +28,10 @@ export namespace PonyMath::Shape
 		constexpr Line3D() noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Line3D(const Core::Vector3<T>& point, const Core::Vector3<T>& direction) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Line3D(const Ray3D<T>& ray) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Line3D(const Segment3D<T>& segment) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Line3D(const Line3D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -51,9 +58,6 @@ export namespace PonyMath::Shape
 		constexpr T Distance(const Core::Vector3<T>& point) const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Project(const Core::Vector3<T>& point) const noexcept;
-
-		[[nodiscard("Pure function")]]
-		constexpr bool Contains(const Core::Vector3<T>& point, T tolerance = T{0.00001}) const noexcept;
 
 		constexpr void Set(const Core::Vector3<T>& point, const Core::Vector3<T>& direction) noexcept;
 
@@ -96,6 +100,19 @@ namespace PonyMath::Shape
 		direction(direction)
 	{
 
+	}
+
+	template<std::floating_point T>
+	constexpr Line3D<T>::Line3D(const Ray3D<T>& ray) noexcept :
+		point(ray.Origin()),
+		direction(ray.Direction())
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr Line3D<T>::Line3D(const Segment3D<T>& segment) noexcept :
+		Line3D(Ray3D<T>(segment))
+	{
 	}
 
 	template<std::floating_point T>
@@ -147,12 +164,6 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool Line3D<T>::Contains(const Core::Vector3<T>& point, const T tolerance) const noexcept
-	{
-		return AreAlmostEqual(Distance(point), T{0}, tolerance);
-	}
-
-	template<std::floating_point T>
 	constexpr void Line3D<T>::Set(const Core::Vector3<T>& point, const Core::Vector3<T>& direction) noexcept
 	{
 		this->point = point;
@@ -181,7 +192,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Line3D<T>& left, const Line3D<T>& right, const T tolerance) noexcept
 	{
-		return Core::AreAlmostEqual(Core::Angle(left.Direction(), right.Direction(), tolerance)) && Core::AreAlmostEqual(left.Distance(right.Point()), T{0}, tolerance);
+		return Core::AreAlmostEqual(Core::Angle(left.Direction(), right.Direction()), T{0}, tolerance) && Core::AreAlmostEqual((right.Point() - left.Project(right.Point())).MagnitudeSquared(), T{0}, tolerance * tolerance);
 	}
 
 	template<std::floating_point T>

@@ -250,6 +250,8 @@ export namespace PonyMath::Core
 	/// @return Dot product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr T CrossZ(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a distance between two points.
 	/// @tparam T Component type.
 	/// @param left Left vector.
@@ -659,6 +661,12 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
+	constexpr T CrossZ(const Vector2<T>& left, const Vector2<T>& right) noexcept
+	{
+		return left.X() * right.Y() - left.Y() * right.X();
+	}
+
+	template<Arithmetic T>
 	typename Vector2<T>::ComputationalType Distance(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		return std::sqrt(static_cast<typename Vector2<T>::ComputationalType>(DistanceSquared(left, right)));
@@ -682,7 +690,7 @@ namespace PonyMath::Core
 	T AngleSigned(const Vector2<T>& left, const Vector2<T>& right) noexcept
 	{
 		const T angle = Angle(left, right);
-		const T zCross = left.X() * right.Y() - left.Y() * right.X();
+		const T zCross = CrossZ(left, right);
 
 		return std::copysign(angle, zCross);
 	}
@@ -776,7 +784,7 @@ namespace PonyMath::Core
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Vector2<T>& left, const Vector2<T>& right, const T tolerance) noexcept
 	{
-		return (left - right).MagnitudeSquared() < tolerance * tolerance;
+		return (left - right).MagnitudeSquared() <= tolerance * tolerance;
 	}
 
 	template<Arithmetic T>

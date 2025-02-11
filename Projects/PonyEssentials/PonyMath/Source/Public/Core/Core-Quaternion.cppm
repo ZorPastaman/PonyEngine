@@ -535,7 +535,7 @@ namespace PonyMath::Core
 		}
 		else
 		{
-			return (left - right).MagnitudeSquared() < tolerance * tolerance;
+			return (left - right).MagnitudeSquared() <= tolerance * tolerance;
 		}
 	}
 

@@ -40,7 +40,11 @@
     <ClCompile Include="Source\Public\Shape\Shape-Line2D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Line3D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Plane.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Ray2D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Ray3D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Rect.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Segment2D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Segment3D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Utility.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape.cppm" />
     <ClCompile Include="Source\Public\Space\Space.cppm" />

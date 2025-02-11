@@ -90,7 +90,7 @@ namespace PonyMath::Core
 	template<std::floating_point T>
 	bool AreAlmostEqual(const T left, const T right, const T tolerance) noexcept
 	{
-		return std::abs(left - right) < tolerance;
+		return std::abs(left - right) <= tolerance;
 	}
 
 	template<Signed T>

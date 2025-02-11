@@ -61,8 +61,6 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector3<T> Project(const Core::Vector3<T>& point) const noexcept;
 
 		[[nodiscard("Pure function")]]
-		constexpr bool Contains(const Core::Vector3<T>& point, T tolerance = T{0.00001}) const noexcept;
-		[[nodiscard("Pure function")]]
 		constexpr bool Side(const Core::Vector3<T>& point) const noexcept;
 
 		constexpr void Set(const Core::Vector3<T>& normalToSet, T distanceToSet = T{0}) noexcept;
@@ -173,12 +171,6 @@ namespace PonyMath::Shape
 	constexpr Core::Vector3<T> Plane<T>::Project(const Core::Vector3<T>& point) const noexcept
 	{
 		return point - normal * Distance(point);
-	}
-
-	template<std::floating_point T>
-	constexpr bool Plane<T>::Contains(const Core::Vector3<T>& point, const T tolerance) const noexcept
-	{
-		return Core::AreAlmostEqual(Distance(point), T{0}, tolerance);
 	}
 
 	template<std::floating_point T>
