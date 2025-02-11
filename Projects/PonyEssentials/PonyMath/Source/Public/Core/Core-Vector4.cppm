@@ -771,7 +771,7 @@ namespace PonyMath::Core
 	template<std::floating_point T>
 	constexpr bool AreAlmostEqual(const Vector4<T>& left, const Vector4<T>& right, const T tolerance) noexcept
 	{
-		return (left - right).MagnitudeSquared() < tolerance * tolerance;
+		return (left - right).MagnitudeSquared() <= tolerance * tolerance;
 	}
 
 	template<Arithmetic T>

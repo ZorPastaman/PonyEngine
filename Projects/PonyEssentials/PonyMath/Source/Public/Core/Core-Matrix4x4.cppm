@@ -1128,7 +1128,7 @@ namespace PonyMath::Core
 	{
 		const Matrix4x4<T> diff = left - right;
 
-		return Dot(diff, diff) < tolerance * tolerance;
+		return Dot(diff, diff) <= tolerance * tolerance;
 	}
 
 	template<Arithmetic T>

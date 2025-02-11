@@ -144,6 +144,15 @@ export namespace PonyMath::Shape
 		/// @param center Center to set.
 		constexpr void Center(const Core::Vector2<T>& center) noexcept;
 
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> LeftTop() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> RightTop() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> RightBottom() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> LeftBottom() const noexcept;
+
 		/// @brief Computes a perimeter.
 		/// @return Perimeter.
 		[[nodiscard("Pure function")]]
@@ -418,6 +427,30 @@ namespace PonyMath::Shape
 	constexpr void Rect<T>::Center(const Core::Vector2<T>& center) noexcept
 	{
 		position = center - (Center() - position);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::LeftTop() const noexcept
+	{
+		return Core::Vector2<T>(MinX(), MaxY());
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::RightTop() const noexcept
+	{
+		return Max();
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::RightBottom() const noexcept
+	{
+		return Core::Vector2<T>(MaxX(), MinY());
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::LeftBottom() const noexcept
+	{
+		return Min();
 	}
 
 	template<Core::Arithmetic T>

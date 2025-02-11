@@ -628,7 +628,7 @@ namespace PonyMath::Color
 	template<std::floating_point T>
 	constexpr bool RGBA<T>::IsAlmostTransparent(const T tolerance) const noexcept
 	{
-		return A() < tolerance;
+		return A() <= tolerance;
 	}
 
 	template<std::floating_point T>

@@ -15,5 +15,8 @@ export import :Inside2D;
 export import :Intersecting2D;
 export import :Line2D;
 export import :Plane;
+export import :Ray2D;
+export import :Ray3D;
 export import :Rect;
+export import :Segment2D;
 export import :Utility;

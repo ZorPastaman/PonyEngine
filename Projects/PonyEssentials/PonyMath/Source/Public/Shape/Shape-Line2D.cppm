@@ -16,6 +16,9 @@ import <string>;
 
 import PonyMath.Core;
 
+import :Ray2D;
+import :Segment2D;
+
 export namespace PonyMath::Shape
 {
 	template<std::floating_point T>
@@ -28,6 +31,10 @@ export namespace PonyMath::Shape
 		explicit constexpr Line2D(const Core::Vector2<T>& normal, T distance = T{0}) noexcept;
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr Line2D(const Core::Vector2<T>& normal, const Core::Vector2<T>& point) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Line2D(const Ray2D<T>& ray) noexcept;
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Line2D(const Segment2D<T>& segment) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Line2D(const Line2D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -59,8 +66,6 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Project(const Core::Vector2<T>& point) const noexcept;
 
-		[[nodiscard("Pure function")]]
-		constexpr bool Contains(const Core::Vector2<T>& point, T tolerance = T{0.00001}) const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr bool Side(const Core::Vector2<T>& point) const noexcept;
 
@@ -110,6 +115,19 @@ namespace PonyMath::Shape
 	constexpr Line2D<T>::Line2D(const Core::Vector2<T>& normal, const Core::Vector2<T>& point) noexcept :
 		normal(normal),
 		distance{-Core::Dot(normal, point)}
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr Line2D<T>::Line2D(const Ray2D<T>& ray) noexcept :
+		normal(Core::Vector2<T>(-ray.Direction().Y(), ray.Direction().X())),
+		distance(-Core::Dot(normal, ray.Origin()))
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr Line2D<T>::Line2D(const Segment2D<T>& segment) noexcept :
+		Line2D(Ray2D<T>(segment))
 	{
 	}
 
@@ -177,12 +195,6 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool Line2D<T>::Contains(const Core::Vector2<T>& point, const T tolerance) const noexcept
-	{
-		return Core::AreAlmostEqual(Distance(point), T{0}, tolerance);
-	}
-
-	template<std::floating_point T>
 	constexpr bool Line2D<T>::Side(const Core::Vector2<T>& point) const noexcept
 	{
 		return Distance(point) >= T{0};
@@ -192,6 +204,7 @@ namespace PonyMath::Shape
 	constexpr void Line2D<T>::Set(const Core::Vector2<T>& normal, const T distance) noexcept
 	{
 		this->normal = normal;
+		this->distance = distance;
 		this->distance = distance;
 	}
 
