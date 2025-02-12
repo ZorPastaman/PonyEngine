@@ -85,6 +85,9 @@ export namespace PonyMath::Shape
 		/// @return Minimal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Min() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr T Min(std::size_t index) const noexcept;
+		constexpr void Min(std::size_t index, T min) noexcept;
 		/// @brief Sets the minimal x point keeping the max point.
 		/// @param minX Minimal x point to set.
 		constexpr void MinX(T minX) noexcept;
@@ -94,6 +97,9 @@ export namespace PonyMath::Shape
 		/// @brief Sets the minimal point keeping the max point.
 		/// @param min Minimal point to set.
 		constexpr void Min(const Core::Vector2<T>& min) noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr T Max(std::size_t index) const noexcept;
+		constexpr void Max(std::size_t index, T max) noexcept;
 
 		/// @brief Gets the maximal x point.
 		/// @return Maximal x.
@@ -340,6 +346,19 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
+	constexpr T Rect<T>::Min(const std::size_t index) const noexcept
+	{
+		return position[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void Rect<T>::Min(const std::size_t index, const T min) noexcept
+	{
+		size[index] = Max(index) - min;
+		position[index] = min;
+	}
+
+	template<Core::Arithmetic T>
 	constexpr T Rect<T>::MaxX() const noexcept
 	{
 		return position.X() + size.X();
@@ -373,6 +392,18 @@ namespace PonyMath::Shape
 	constexpr void Rect<T>::Max(const Core::Vector2<T>& max) noexcept
 	{
 		size = max - position;
+	}
+
+	template<Core::Arithmetic T>
+	constexpr T Rect<T>::Max(const std::size_t index) const noexcept
+	{
+		return position[index] + size[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void Rect<T>::Max(const std::size_t index, const T max) noexcept
+	{
+		size[index] = max - position[index];
 	}
 
 	template<Core::Arithmetic T>

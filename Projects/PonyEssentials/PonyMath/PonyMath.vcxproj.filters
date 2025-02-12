@@ -130,5 +130,11 @@
     <ClCompile Include="Source\Public\Shape\Shape-Segment3D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Inside3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Intersecting3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

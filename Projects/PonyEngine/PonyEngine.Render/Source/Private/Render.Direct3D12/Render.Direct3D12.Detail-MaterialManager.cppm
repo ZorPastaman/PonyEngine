@@ -496,7 +496,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.FillMode = GetFillMode(rasterizer.fillMode),
 			.CullMode = GetCullMode(rasterizer.cullMode),
-			.FrontCounterClockwise = true,
+			.FrontCounterClockwise = true, // TODO: Change to false
 			.DepthBias = static_cast<INT>(rasterizer.depthBias),
 			.DepthBiasClamp = static_cast<FLOAT>(rasterizer.depthBiasClamp),
 			.SlopeScaledDepthBias = static_cast<FLOAT>(rasterizer.slopeScaledDepthBias),

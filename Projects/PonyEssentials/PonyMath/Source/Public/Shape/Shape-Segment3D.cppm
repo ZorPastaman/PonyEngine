@@ -48,6 +48,9 @@ export namespace PonyMath::Shape
 		constexpr T LengthSquared() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> Vector() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
 		constexpr void Set(const Core::Vector3<T>& point0, const Core::Vector3<T>& point1) noexcept;
@@ -112,13 +115,19 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	T Segment3D<T>::Length() const noexcept
 	{
-		return (point1 - point0).Magnitude();
+		return Vector().Magnitude();
 	}
 
 	template<std::floating_point T>
 	constexpr T Segment3D<T>::LengthSquared() const noexcept
 	{
-		return (point1 - point0).MagnitudeSquared();
+		return Vector().MagnitudeSquared();
+	}
+
+	template<std::floating_point T>
+	constexpr Core::Vector3<T> Segment3D<T>::Vector() const noexcept
+	{
+		return point1 - point0;
 	}
 
 	template<std::floating_point T>
