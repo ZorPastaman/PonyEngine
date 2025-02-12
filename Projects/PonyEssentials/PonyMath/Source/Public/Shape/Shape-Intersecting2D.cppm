@@ -9,6 +9,8 @@
 
 export module PonyMath.Shape:Intersecting2D;
 
+import <span>;
+
 import PonyMath.Core;
 
 import :Line2D;
@@ -63,6 +65,9 @@ export namespace PonyMath::Shape
 namespace PonyMath::Shape
 {
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Line2D<T>& line, std::span<const Core::Vector2<T>> corners) noexcept;
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept;
 
 	template<std::floating_point T>
@@ -74,42 +79,38 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Ray2D<T>& ray) noexcept
 	{
-		const T sign = Core::Sign<T>(line.Side(ray.Origin()));
+		const std::int8_t side = line.Side(ray.Origin());
+		const T dot = Core::Dot(line.Normal(), ray.Direction());
 
-		return Core::Dot(line.Normal(), ray.Direction()) * sign < T{0};
+		return side < std::int8_t{0} && dot > T{0} || side > std::int8_t{0} && dot < T{0};
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Segment2D<T>& segment) noexcept
 	{
-		return line.Side(segment.Point0()) != line.Side(segment.Point1());
+		const std::int8_t side = line.Side(segment.Point0());
+
+		return side != std::int8_t{0} && side != line.Side(segment.Point1());
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Rect<T>& rect) noexcept
 	{
-		const bool side = line.Side(rect.LeftTop());
+		const std::array<Core::Vector2<T>, 4> corners = { rect.LeftTop(), rect.RightTop(), rect.RightBottom(), rect.LeftBottom() };
 
-		return line.Side(rect.RightTop()) != side ||
-			line.Side(rect.RightBottom()) != side ||
-			line.Side(rect.LeftBottom()) != side;
+		return AreIntersecting(line, corners);
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Ray2D<T>& left, const Ray2D<T>& right) noexcept
 	{
-		const T zCross = Core::CrossZ(right, left);
-		if (std::abs(zCross) < T{0.0001}) [[unlikely]]
-		{
-			return false;
-		}
+		const Core::Vector2<T> leftToRight = right.Origin() - left.Origin();
 
-		const Core::Vector2<T> delta = right - left;
-		const T u = Core::CrossZ(right, delta);
-		const T v = Core::CrossZ(left, delta);
-		const bool sign = std::signbit(zCross);
+		const T u = Core::CrossZ(right.Direction(), leftToRight);
+		const T v = Core::CrossZ(left.Direction(), leftToRight);
+		const T det = Core::CrossZ(right.Direction(), left.Direction());
 
-		return u != T{0} && v != T{0} && sign == std::signbit(u) && sign == std::signbit(v);
+		return u > T{0} && v > T{0} && det > T{0} || u < T{0} && v < T{0} && det < T{0};
 	}
 
 	template<std::floating_point T>
@@ -121,37 +122,27 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Segment2D<T>& segment) noexcept
 	{
+		const Core::Vector2<T> segmentToRay = ray.Origin() - segment.Point0();
 		const Core::Vector2<T> inlineVector = segment.Vector();
 		const auto perpendicular = Core::Vector2<T>(-ray.Direction().Y(), ray.Direction().X());
 
-		const T dot = Core::Dot(inlineVector, perpendicular);
-		const T dotAbs = std::abs(dot);
-		if (dotAbs < T{0.0001}) [[unlikely]]
-		{
-			return false;
-		}
-
-		const Core::Vector2<T> segmentToRay = ray.Origin() - segment.Point0();
 		const T u = Core::CrossZ(inlineVector, segmentToRay);
 		const T v = Core::Dot(segmentToRay, perpendicular);
-		const bool sign = std::signbit(dot);
+		const T dot = Core::Dot(inlineVector, perpendicular);
 
-		return u != T{0} && v != T{0} && sign == std::signbit(u) && sign == std::signbit(v) && std::abs(v) < dotAbs;
+		return u > T{0} && v > T{0} && v < dot || u < T{0} && v < T{0} && v > dot;
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Rect<T>& rect) noexcept
 	{
-		return AreIntersecting(ray.Origin(), ray.Direction(), rect, T{0}, std::numeric_limits<T>::infinity);
+		return AreIntersecting(ray.Origin(), ray.Direction(), rect, T{0}, std::numeric_limits<T>::infinity());
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Segment2D<T>& left, const Segment2D<T>& right) noexcept
 	{
-		const auto leftLine = Line2D<T>(left);
-		const auto rightLine = Line2D<T>(right);
-
-		return leftLine.Side(right.Point0()) != leftLine.Side(right.Point1()) && rightLine.Side(left.Point0()) != rightLine.Side(right.Point1());
+		return AreIntersecting(Line2D<T>(left), right) && AreIntersecting(Line2D<T>(right), left);
 	}
 
 	template<std::floating_point T>
@@ -164,7 +155,7 @@ namespace PonyMath::Shape
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Ray2D<T>& ray) noexcept
 	{
 		return AreIntersecting(ray, segment);
-	}
+	}                                                              
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Rect<T>& rect) noexcept
@@ -200,16 +191,31 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Line2D<T>& line, std::span<const Core::Vector2<T>> corners) noexcept
+	{
+		for (std::size_t positives = 0, negatives = 0; const Core::Vector2<T> corner : corners)
+		{
+			const std::int8_t side = line.Side(corner);
+			positives += side > std::int8_t{0};
+			negatives += side < std::int8_t{0};
+
+			if (positives > 0 && negatives > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept
 	{
-		const Core::Vector2<T> rectMin = rect.Min();
-		const Core::Vector2<T> rectMax = rect.Max();
-		const auto directionInv = Core::Vector2<T>(T{1} / direction().X(), T{1} / direction().Y());
-
 		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
 		{
-			const T t0 = (rectMin[i] - origin()[i]) * directionInv[i];
-			const T t1 = (rectMax[i] - origin()[i]) * directionInv[i];
+			const T multiplier = T{1} / direction[i];
+			const T t0 = (rect.Min(i) - origin[i]) * multiplier;
+			const T t1 = (rect.Max(i) - origin[i]) * multiplier;
 
 			tMin = std::max(tMin, std::min(std::min(t0, t1), tMax));
 			tMax = std::min(tMax, std::max(std::max(t0, t1), tMin));

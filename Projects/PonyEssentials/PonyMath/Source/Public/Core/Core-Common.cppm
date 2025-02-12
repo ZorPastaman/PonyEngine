@@ -70,6 +70,8 @@ export namespace PonyMath::Core
 	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
 	template<Signed T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
+	template<Signed T, Signed U> [[nodiscard("Pure function")]]
+	constexpr U Signum(T value) noexcept;
 
 	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
 	/// @tparam From Input type.
@@ -109,6 +111,12 @@ namespace PonyMath::Core
 	constexpr T Signum(const T value) noexcept
 	{
 		return static_cast<T>(T{0} < value) - (value < T{0});
+	}
+
+	template<Signed T, Signed U>
+	constexpr U Signum(const T value) noexcept
+	{
+		return static_cast<U>(T{0} < value) - (value < T{0});
 	}
 
 	template<std::floating_point From, std::integral To>

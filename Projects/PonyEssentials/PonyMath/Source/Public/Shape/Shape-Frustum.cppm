@@ -11,6 +11,7 @@ export module PonyMath.Shape:Frustum;
 
 import <array>;
 import <concepts>;
+import <cstddef>;
 import <span>;
 
 import PonyMath.Core;
@@ -36,11 +37,11 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure constructor")]]
 		constexpr Frustum() noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		constexpr Frustum(const Plane<T>& left, const Plane<T>& right, const Plane<T>& bottom, const Plane<T>& top, const Plane<T>& near, const Plane<T>& far) noexcept;
+		constexpr Frustum(const class Plane<T>& left, const class Plane<T>& right, const class Plane<T>& bottom, const class Plane<T>& top, const class Plane<T>& near, const class Plane<T>& far) noexcept;
 		[[nodiscard("Pure constructor")]]
 		explicit Frustum(const Core::Matrix4x4<T>& vp) noexcept;
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr Frustum(std::span<const Plane<T>, 6> planes) noexcept;
+		explicit constexpr Frustum(std::span<const class Plane<T>, 6> planes) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Frustum(const Frustum& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -49,29 +50,33 @@ export namespace PonyMath::Shape
 		constexpr ~Frustum() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Left() noexcept;
+		constexpr class Plane<T>& Left() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Left() const noexcept;
+		constexpr const class Plane<T>& Left() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Right() noexcept;
+		constexpr class Plane<T>& Right() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Right() const noexcept;
+		constexpr const class Plane<T>& Right() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Bottom() noexcept;
+		constexpr class Plane<T>& Bottom() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Bottom() const noexcept;
+		constexpr const class Plane<T>& Bottom() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Top() noexcept;
+		constexpr class Plane<T>& Top() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Top() const noexcept;
+		constexpr const class Plane<T>& Top() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Near() noexcept;
+		constexpr class Plane<T>& Near() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Near() const noexcept;
+		constexpr const class Plane<T>& Near() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Plane<T>& Far() noexcept;
+		constexpr class Plane<T>& Far() noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const Plane<T>& Far() const noexcept;
+		constexpr const class Plane<T>& Far() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr class Plane<T>& Plane(std::size_t index) noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr const class Plane<T>& Plane(std::size_t index) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftTopNear() const noexcept;
@@ -89,8 +94,6 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector3<T> RightBottomFar() const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftBottomFar() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr std::array<Core::Vector3<T>, 8> Corners() const noexcept;
 
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Center() const noexcept;
@@ -123,18 +126,13 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
 
-		constexpr void Set(std::span<const Plane<T>, 6> planesToSet) noexcept;
+		constexpr void Set(std::span<const class Plane<T>, 6> planesToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Frustum<U>() const noexcept;
-
-		[[nodiscard("Pure operator")]]
-		constexpr Plane<T>& operator [](std::size_t index) noexcept;
-		[[nodiscard("Pure operator")]]
-		constexpr const Plane<T>& operator [](std::size_t index) const noexcept;
 
 		constexpr Frustum& operator =(const Frustum& other) noexcept = default;
 		constexpr Frustum& operator =(Frustum&& other) noexcept = default;
@@ -143,7 +141,7 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const Frustum& other) const noexcept = default;
 
 	private:
-		std::array<Plane<T>, 6> planes;
+		std::array<class Plane<T>, 6> planes;
 	};
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -162,7 +160,7 @@ namespace PonyMath::Shape
 	constexpr Core::Vector3<T> Corner(const Plane<T>& plane0, const Plane<T>& plane1, const Plane<T>& plane2) noexcept;
 
 	template<std::floating_point T>
-	constexpr Frustum<T>::Frustum(const Plane<T>& left, const Plane<T>& right, const Plane<T>& bottom, const Plane<T>& top, const Plane<T>& near, const Plane<T>& far) noexcept :
+	constexpr Frustum<T>::Frustum(const class Plane<T>& left, const class Plane<T>& right, const class Plane<T>& bottom, const class Plane<T>& top, const class Plane<T>& near, const class Plane<T>& far) noexcept :
 		planes{ left, right, bottom, top, near, far }
 	{
 	}
@@ -177,81 +175,93 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr Frustum<T>::Frustum(const std::span<const Plane<T>, 6> planes) noexcept
+	constexpr Frustum<T>::Frustum(const std::span<const class Plane<T>, 6> planes) noexcept
 	{
 		Set(planes);
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Left() noexcept
+	constexpr class Plane<T>& Frustum<T>::Left() noexcept
 	{
 		return planes[0];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Left() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Left() const noexcept
 	{
 		return planes[0];
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Right() noexcept
+	constexpr class Plane<T>& Frustum<T>::Right() noexcept
 	{
 		return planes[1];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Right() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Right() const noexcept
 	{
 		return planes[1];
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Bottom() noexcept
+	constexpr class Plane<T>& Frustum<T>::Bottom() noexcept
 	{
 		return planes[2];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Bottom() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Bottom() const noexcept
 	{
 		return planes[2];
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Top() noexcept
+	constexpr class Plane<T>& Frustum<T>::Top() noexcept
 	{
 		return planes[3];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Top() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Top() const noexcept
 	{
 		return planes[3];
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Near() noexcept
+	constexpr class Plane<T>& Frustum<T>::Near() noexcept
 	{
 		return planes[4];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Near() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Near() const noexcept
 	{
 		return planes[4];
 	}
 
 	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::Far() noexcept
+	constexpr class Plane<T>& Frustum<T>::Far() noexcept
 	{
 		return planes[5];
 	}
 
 	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::Far() const noexcept
+	constexpr const class Plane<T>& Frustum<T>::Far() const noexcept
 	{
 		return planes[5];
+	}
+
+	template<std::floating_point T>
+	constexpr class Plane<T>& Frustum<T>::Plane(const std::size_t index) noexcept
+	{
+		return planes[index];
+	}
+
+	template<std::floating_point T>
+	constexpr const class Plane<T>& Frustum<T>::Plane(const std::size_t index) const noexcept
+	{
+		return planes[index];
 	}
 
 	template<std::floating_point T>
@@ -300,22 +310,6 @@ namespace PonyMath::Shape
 	constexpr Core::Vector3<T> Frustum<T>::LeftBottomFar() const noexcept
 	{
 		return Corner(Left(), Bottom(), Far());
-	}
-
-	template<std::floating_point T>
-	constexpr std::array<Core::Vector3<T>, 8> Frustum<T>::Corners() const noexcept
-	{
-		return std::array<Core::Vector3<T>, 8>
-		{
-			LeftTopNear(),
-			RightTopNear(),
-			RightBottomNear(),
-			LeftBottomNear(),
-			LeftTopFar(),
-			RightTopFar(),
-			RightBottomFar(),
-			LeftBottomFar(),
-		};
 	}
 
 	template<std::floating_point T>
@@ -393,7 +387,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool Frustum<T>::IsFinite() const noexcept
 	{
-		for (const Plane<T>& plane : planes)
+		for (const class Plane<T>& plane : planes)
 		{
 			if (!plane.IsFinite())
 			{
@@ -407,7 +401,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool Frustum<T>::Contains(const Core::Vector3<T>& point) const noexcept
 	{
-		for (const Plane<T>& plane : planes)
+		for (const class Plane<T>& plane : planes)
 		{
 			if (!plane.Side(point))
 			{
@@ -419,7 +413,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr void Frustum<T>::Set(const std::span<const Plane<T>, 6> planesToSet) noexcept
+	constexpr void Frustum<T>::Set(const std::span<const class Plane<T>, 6> planesToSet) noexcept
 	{
 		std::ranges::copy(planesToSet, planes.begin());
 	}
@@ -435,7 +429,7 @@ namespace PonyMath::Shape
 	{
 		for (std::size_t i = 0; i < Frustum<T>::PlaneCount; ++i)
 		{
-			if (!AreAlmostEqual(left[i], right[i], tolerance))
+			if (!AreAlmostEqual(left.Plane(i), right.Plane(i), tolerance))
 			{
 				return false;
 			}
@@ -474,20 +468,8 @@ namespace PonyMath::Shape
 	template<std::floating_point U>
 	constexpr Frustum<T>::operator Frustum<U>() const noexcept
 	{
-		return Frustum<U>(static_cast<Plane<U>>(Left()), static_cast<Plane<U>>(Right()), static_cast<Plane<U>>(Bottom()),
-			static_cast<Plane<U>>(Top()), static_cast<Plane<U>>(Near()), static_cast<Plane<U>>(Far()));
-	}
-
-	template<std::floating_point T>
-	constexpr Plane<T>& Frustum<T>::operator [](const std::size_t index) noexcept
-	{
-		return planes[index];
-	}
-
-	template<std::floating_point T>
-	constexpr const Plane<T>& Frustum<T>::operator [](const std::size_t index) const noexcept
-	{
-		return planes[index];
+		return Frustum<U>(static_cast<class Plane<U>>(Left()), static_cast<class Plane<U>>(Right()), static_cast<class Plane<U>>(Bottom()),
+			static_cast<class Plane<U>>(Top()), static_cast<class Plane<U>>(Near()), static_cast<class Plane<U>>(Far()));
 	}
 
 	template<std::floating_point T>
