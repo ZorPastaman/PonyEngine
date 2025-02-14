@@ -34,15 +34,35 @@ export namespace PonyMath::Shape
 
 namespace PonyMath::Shape
 {
+	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const Rect<T>& large) noexcept;
+
 	template<std::floating_point T>
 	constexpr bool IsInside(const Segment2D<T>& small, const Rect<T>& large) noexcept
 	{
-		return large.Contains(small.Point0()) && large.Contains(small.Point1());
+		const Core::Vector2<T> min = Core::Min(small.Point0(), small.Point1());
+		const Core::Vector2<T> max = Core::Max(small.Point0(), small.Point1());
+
+		return IsInside(min, max, large);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept
 	{
-		return large.MinX() <= small.MinX() && large.MinY() <= small.MinY() && large.MaxX() >= small.MaxX() && large.MaxY() >= small.MaxY();
+		return IsInside(small.Min(), small.Max(), large);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const Rect<T>& large) noexcept
+	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			if (min[i] < large.Min(i) || max[i] > large.Max(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

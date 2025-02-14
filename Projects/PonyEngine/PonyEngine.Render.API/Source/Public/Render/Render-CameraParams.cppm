@@ -15,12 +15,14 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
+import :CameraProjection;
+
 export namespace PonyEngine::Render
 {
 	struct CameraParams final
 	{
 		PonyMath::Core::Matrix4x4<float> viewMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< View matrix.
-		PonyMath::Core::Matrix4x4<float> projectionMatrix = PonyMath::Core::PerspectiveMatrix(60.f * PonyMath::Core::DegToRad<float>, 16.f / 9.f, 0.2f, 1000.f); ///< Projection matrix.
+		CameraProjection projection;
 
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black;
 

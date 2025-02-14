@@ -10,6 +10,7 @@
 export module PonyMath.Shape:Inside3D;
 
 import <concepts>;
+import <span>;
 
 import PonyMath.Core;
 
@@ -27,16 +28,29 @@ export namespace PonyMath::Shape
 
 namespace PonyMath::Shape
 {
+	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const Box<T>& large) noexcept;
+
 	template<std::floating_point T>
 	constexpr bool IsInside(const Segment3D<T>& small, const Box<T>& large) noexcept
 	{
-		return large.Contains(small.Point0()) && large.Contains(small.Point1());
+		const Core::Vector3<T> min = Core::Min(small.Point0(), small.Point1());
+		const Core::Vector3<T> max = Core::Max(small.Point0(), small.Point1());
+
+		return IsInside(min, max, large);
 	}
 
 	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Box<T>& small, const Box<T>& large) noexcept
+	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const Box<T>& large) noexcept
 	{
-		return large.MinX() <= small.MinX() && large.MinY() <= small.MinY() && large.MinZ() <= small.MinZ() && 
-			large.MaxX() >= small.MaxX() && large.MaxY() >= small.MaxY() && large.MaxZ() >= small.MaxZ();
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			if (min[i] < large.Min(i) || max[i] > large.Max(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

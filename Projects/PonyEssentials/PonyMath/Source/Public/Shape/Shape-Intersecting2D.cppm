@@ -65,9 +65,6 @@ export namespace PonyMath::Shape
 namespace PonyMath::Shape
 {
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Line2D<T>& line, std::span<const Core::Vector2<T>> corners) noexcept;
-
-	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept;
 
 	template<std::floating_point T>
@@ -96,9 +93,19 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Rect<T>& rect) noexcept
 	{
-		const std::array<Core::Vector2<T>, 4> corners = { rect.LeftTop(), rect.RightTop(), rect.RightBottom(), rect.LeftBottom() };
+		for (std::size_t i = 0, positives = 0, negatives = 0; i < Rect<T>::CornerCount; ++i)
+		{
+			const std::int8_t side = line.Side(rect.Corner(i));
+			positives += side > std::int8_t{0};
+			negatives += side < std::int8_t{0};
 
-		return AreIntersecting(line, corners);
+			if (positives > std::int8_t{0} && negatives > std::int8_t{0})
+			{
+				return true;
+			}
+		}
+
+		return false;
 	}
 
 	template<std::floating_point T>
@@ -169,7 +176,15 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr bool AreIntersecting(const Rect<T>& left, const Rect<T>& right) noexcept
 	{
-		return !(left.MinX() >= right.MaxX() || left.MaxX() <= right.MinX() || left.MinY() >= right.MaxY() || left.MaxY() <= right.MinY());
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			if (left.Min(i) >= right.Max(i) || left.Max(i) <= right.Min(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 
 	template<std::floating_point T>
@@ -191,34 +206,18 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Line2D<T>& line, std::span<const Core::Vector2<T>> corners) noexcept
-	{
-		for (std::size_t positives = 0, negatives = 0; const Core::Vector2<T> corner : corners)
-		{
-			const std::int8_t side = line.Side(corner);
-			positives += side > std::int8_t{0};
-			negatives += side < std::int8_t{0};
-
-			if (positives > 0 && negatives > 0)
-			{
-				return true;
-			}
-		}
-
-		return false;
-	}
-
-	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
 		{
+			const T min = rect.Min(i) - origin[i];
+			const T max = rect.Max(i) - origin[i];
 			const T multiplier = T{1} / direction[i];
-			const T t0 = (rect.Min(i) - origin[i]) * multiplier;
-			const T t1 = (rect.Max(i) - origin[i]) * multiplier;
+			const Core::Vector2<T> t = Core::Vector2<T>(min, max) * multiplier;
+			const auto& [t0, t1] = t.MinMax();
 
-			tMin = std::max(tMin, std::min(std::min(t0, t1), tMax));
-			tMax = std::min(tMax, std::max(std::max(t0, t1), tMin));
+			tMin = std::max(t0, tMin);
+			tMax = std::min(t1, tMax);
 		}
 
 		return tMin < tMax;

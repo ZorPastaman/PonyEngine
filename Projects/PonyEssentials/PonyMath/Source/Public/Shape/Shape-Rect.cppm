@@ -33,6 +33,12 @@ export namespace PonyMath::Shape
 
 		struct Predefined; ///< Predefined rects.
 
+		static constexpr std::size_t LeftBottomIndex = 0;
+		static constexpr std::size_t RightBottomIndex = 1;
+		static constexpr std::size_t LeftTopIndex = 2;
+		static constexpr std::size_t RightTopIndex = 3;
+		static constexpr std::size_t CornerCount = 4;
+
 		/// @brief Creates a zero rect.
 		[[nodiscard("Pure constructor")]]
 		constexpr Rect() noexcept = default;
@@ -87,7 +93,6 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector2<T> Min() const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr T Min(std::size_t index) const noexcept;
-		constexpr void Min(std::size_t index, T min) noexcept;
 		/// @brief Sets the minimal x point keeping the max point.
 		/// @param minX Minimal x point to set.
 		constexpr void MinX(T minX) noexcept;
@@ -97,9 +102,7 @@ export namespace PonyMath::Shape
 		/// @brief Sets the minimal point keeping the max point.
 		/// @param min Minimal point to set.
 		constexpr void Min(const Core::Vector2<T>& min) noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr T Max(std::size_t index) const noexcept;
-		constexpr void Max(std::size_t index, T max) noexcept;
+		constexpr void Min(std::size_t index, T min) noexcept;
 
 		/// @brief Gets the maximal x point.
 		/// @return Maximal x.
@@ -113,6 +116,8 @@ export namespace PonyMath::Shape
 		/// @return Maximal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Max() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr T Max(std::size_t index) const noexcept;
 		/// @brief Sets the maximal x point keeping the min point.
 		/// @param maxX Maximal x point to set.
 		constexpr void MaxX(T maxX) noexcept;
@@ -122,6 +127,7 @@ export namespace PonyMath::Shape
 		/// @brief Sets the maximal point keeping the min point.
 		/// @param max Maximal point to set.
 		constexpr void Max(const Core::Vector2<T>& max) noexcept;
+		constexpr void Max(std::size_t index, T max) noexcept;
 
 		/// @brief Gets the width.
 		/// @return Width.
@@ -151,13 +157,17 @@ export namespace PonyMath::Shape
 		constexpr void Center(const Core::Vector2<T>& center) noexcept;
 
 		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> LeftBottom() const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> RightBottom() const noexcept;
+		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> LeftTop() const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> RightTop() const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Core::Vector2<T> RightBottom() const noexcept;
+		constexpr Core::Vector2<T> Corner(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr Core::Vector2<T> LeftBottom() const noexcept;
+		constexpr std::array<Core::Vector2<T>, 4> Corners() const noexcept;
 
 		/// @brief Computes a perimeter.
 		/// @return Perimeter.
@@ -325,6 +335,12 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
+	constexpr T Rect<T>::Min(const std::size_t index) const noexcept
+	{
+		return position[index];
+	}
+
+	template<Core::Arithmetic T>
 	constexpr void Rect<T>::MinX(const T minX) noexcept
 	{
 		size.X() = MaxX() - minX;
@@ -343,12 +359,6 @@ namespace PonyMath::Shape
 	{
 		size = Max() - min;
 		position = min;
-	}
-
-	template<Core::Arithmetic T>
-	constexpr T Rect<T>::Min(const std::size_t index) const noexcept
-	{
-		return position[index];
 	}
 
 	template<Core::Arithmetic T>
@@ -377,6 +387,12 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
+	constexpr T Rect<T>::Max(const std::size_t index) const noexcept
+	{
+		return position[index] + size[index];
+	}
+
+	template<Core::Arithmetic T>
 	constexpr void Rect<T>::MaxX(const T maxX) noexcept
 	{
 		size.X() = maxX - position.X();
@@ -392,12 +408,6 @@ namespace PonyMath::Shape
 	constexpr void Rect<T>::Max(const Core::Vector2<T>& max) noexcept
 	{
 		size = max - position;
-	}
-
-	template<Core::Arithmetic T>
-	constexpr T Rect<T>::Max(const std::size_t index) const noexcept
-	{
-		return position[index] + size[index];
 	}
 
 	template<Core::Arithmetic T>
@@ -461,6 +471,18 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::LeftBottom() const noexcept
+	{
+		return Min();
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::RightBottom() const noexcept
+	{
+		return Core::Vector2<T>(MaxX(), MinY());
+	}
+
+	template<Core::Arithmetic T>
 	constexpr Core::Vector2<T> Rect<T>::LeftTop() const noexcept
 	{
 		return Core::Vector2<T>(MinX(), MaxY());
@@ -473,15 +495,25 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector2<T> Rect<T>::RightBottom() const noexcept
+	constexpr Core::Vector2<T> Rect<T>::Corner(const std::size_t index) const noexcept
 	{
-		return Core::Vector2<T>(MaxX(), MinY());
+		Core::Vector2<T> corner;
+		corner.X() = index & 1 ? MaxX() : MinX();
+		corner.Y() = index & 2 ? MaxY() : MinY();
+
+		return corner;
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector2<T> Rect<T>::LeftBottom() const noexcept
+	constexpr std::array<Core::Vector2<T>, 4> Rect<T>::Corners() const noexcept
 	{
-		return Min();
+		return std::array<Core::Vector2<T>, 4>
+		{
+			LeftBottom(),
+			RightBottom(),
+			LeftTop(),
+			RightTop()
+		};
 	}
 
 	template<Core::Arithmetic T>
