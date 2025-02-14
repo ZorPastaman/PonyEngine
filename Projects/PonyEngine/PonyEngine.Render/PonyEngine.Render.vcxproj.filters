@@ -214,6 +214,15 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ShaderManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-CameraFrustum.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-FrustumCuller.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">

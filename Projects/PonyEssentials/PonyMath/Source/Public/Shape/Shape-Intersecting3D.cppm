@@ -9,10 +9,11 @@
 
 export module PonyMath.Shape:Intersecting3D;
 
+import <span>;
+
 import PonyMath.Core;
 
 import :Box;
-import :Frustum;
 import :Line3D;
 import :Plane;
 import :Ray3D;
@@ -24,11 +25,34 @@ export namespace PonyMath::Shape
 	constexpr bool AreIntersecting(const Line3D<T>& line, const Plane<T>& plane) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Line3D<T>& line, const Box<T>& box) noexcept;
-	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Line3D<T>& line, const Frustum<T>& frustum) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& plane, const Frustum<T>& frustum) noexcept;
+	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Box<T>& box) noexcept;
+
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Segment3D<T>& segment, const Plane<T>& plane) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Segment3D<T>& segment, const Box<T>& box) noexcept;
+
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Line3D<T>& line) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Box<T>& box) noexcept;
+
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Box<T>& box, const Line3D<T>& line) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Box<T>& box, const Ray3D<T>& ray) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Box<T>& box, const Plane<T>& plane) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Box<T>& left, const Box<T>& right) noexcept;
 }
 
 namespace PonyMath::Shape
@@ -49,46 +73,65 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Line3D<T>& line, const Frustum<T>& frustum) noexcept
+	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane) noexcept
 	{
-		for (std::size_t i = 0; i < Frustum<T>::PlaneCount - 1; ++i) // No need to check far plane, its normal is the same as the near plane's
-		{
-			const Core::Vector3<T> normal = Core::Cross(line.Direction(), frustum.Plane(i).Normal()).Normalized();
-			const auto plane = Plane<T>(normal, line.Point());
+		const std::int8_t side = plane.Side(ray.Origin());
+		const T dot = Core::Dot(plane.Normal(), ray.Direction());
 
-			if (!AreIntersecting(plane, frustum))
-			{
-				return false;
-			}
-		}
-
-		const std::array<Core::Vector3<T>, 8> corners =
-		{
-			frustum.LeftBottomNear(),
-			frustum.RightBottomNear(),
-			frustum.LeftTopNear(),
-			frustum.RightTopNear(),
-			frustum.LeftBottomFar(),
-			frustum.RightBottomFar(),
-			frustum.LeftTopFar(),
-			frustum.RightTopFar()
-		};
-		const std::array<Core::Vector3<T>, 6> edges = 
-		{
-			
-		};
-
-		return true;
+		return side < std::int8_t{0} && dot > T{0} || side > std::int8_t{0} && dot < T{0};
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& plane, const Frustum<T>& frustum) noexcept
+	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Box<T>& box) noexcept
 	{
-		const bool side = plane.Side(frustum.Corner(0));
+		return AreIntersecting(ray.Origin(), ray.Direction(), box, T{0}, std::numeric_limits<T>::infinity());
+	}
 
-		for (std::size_t i = 1; i < Frustum<T>::CornerCount; ++i)
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Segment3D<T>& segment, const Plane<T>& plane) noexcept
+	{
+		const std::int8_t side = plane.Side(segment.Point0());
+
+		return side != std::int8_t{0} && side != plane.Side(segment.Point1());
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Segment3D<T>& segment, const Box<T>& box) noexcept
+	{
+		const Core::Vector3<T> segmentVector = segment.Vector();
+		const T length = segmentVector.Magnitude();
+
+		return AreIntersecting(segment.Point0(), segmentVector * (T{1} / length), box, T{0}, length);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Line3D<T>& line) noexcept
+	{
+		return AreIntersecting(line, plane);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray) noexcept
+	{
+		return AreIntersecting(ray, plane);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept
+	{
+		return std::abs(Core::Dot(left.Normal(), right.Normal())) < T{1};
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Plane<T>& plane, const Box<T>& box) noexcept
+	{
+		for (std::size_t i = 0, positives = 0, negatives = 0; i < Box<T>::CornerCount; ++i)
 		{
-			if (plane.Side(frustum.Corner(i)) != side)
+			const std::int8_t side = plane.Side(box.Corner(i));
+			positives += side > std::int8_t{0};
+			negatives += side < std::int8_t{0};
+
+			if (positives > std::int8_t{0} && negatives > std::int8_t{0})
 			{
 				return true;
 			}
@@ -98,16 +141,50 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Box<T>& box, const Line3D<T>& line) noexcept
+	{
+		return AreIntersecting(line, box);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Box<T>& box, const Ray3D<T>& ray) noexcept
+	{
+		return AreIntersecting(ray, box);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Box<T>& box, const Plane<T>& plane) noexcept
+	{
+		return AreIntersecting(plane, box);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Box<T>& left, const Box<T>& right) noexcept
+	{
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			if (left.Min(i) >= right.Max(i) || left.Max(i) <= right.Min(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector3<T>& origin, const Core::Vector3<T>& direction, const Box<T>& box, T tMin, T tMax) noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
 		{
+			const T min = box.Min(i) - origin[i];
+			const T max = box.Max(i) - origin[i];
 			const T multiplier = T{1} / direction[i];
-			const T t0 = (box.Min(i) - origin[i]) * multiplier;
-			const T t1 = (box.Max(i) - origin[i]) * multiplier;
+			const Core::Vector2<T> t = Core::Vector2<T>(min, max) * multiplier;
+			const auto& [t0, t1] = t.MinMax();
 
-			tMin = std::max(tMin, std::min(std::min(t0, t1), tMax));
-			tMax = std::min(tMax, std::max(std::max(t0, t1), tMin));
+			tMin = std::max(t0, tMin);
+			tMax = std::min(t1, tMax);
 		}
 
 		return tMin < tMax;

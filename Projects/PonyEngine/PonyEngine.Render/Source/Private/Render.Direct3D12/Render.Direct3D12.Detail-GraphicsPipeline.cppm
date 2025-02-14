@@ -111,7 +111,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void SyncCameraTaskCount();
 		void UpdateCameraTasks();
 		[[nodiscard("Pure function")]]
-		bool Cull(const Camera& camera, const RenderObject& renderObject);
+		bool Cull(const ICuller& culler, const RenderObject& renderObject);
 		void AddData(const Camera& camera, RenderObject& renderObject);
 		void AddMesh(RenderObject& renderObject);
 		void AddContext(const RenderObject& renderObject);
@@ -301,6 +301,7 @@ namespace PonyEngine::Render::Direct3D12
 		for (std::uint32_t cameraIndex = 0u, dataIndex = 0u; cameraIndex < static_cast<std::uint32_t>(cameras.size()); ++cameraIndex)
 		{
 			const Camera& camera = *cameras[cameraIndex];
+			const ICuller& culler = camera.Culler();
 			CameraTask& cameraTask = cameraTasks[cameraIndex];
 			cameraTask.renderObjectTasks.clear();
 
@@ -308,7 +309,7 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				RenderObject& renderObject = *renderObjects[renderObjectIndex];
 
-				if (Cull(camera, renderObject))
+				if (Cull(culler, renderObject))
 				{
 					continue;
 				}
@@ -320,12 +321,9 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject)
+	bool GraphicsPipeline::Cull(const ICuller& culler, const RenderObject& renderObject)
 	{
-		const auto frustum = PonyMath::Shape::Frustum<float>(camera.ProjectionMatrix() * camera.ViewMatrix());
-		const PonyMath::Core::Vector3<float> position = PonyMath::Core::ExtractTranslation(renderObject.ModelMatrix());
-
-		return !frustum.Contains(position);
+		return !culler.IsVisible(PonyMath::Core::TransformPoint(renderObject.ModelMatrix(), PonyMath::Core::Vector3<float>::Predefined::Zero));
 	}
 
 	void GraphicsPipeline::AddData(const Camera& camera, RenderObject& renderObject)

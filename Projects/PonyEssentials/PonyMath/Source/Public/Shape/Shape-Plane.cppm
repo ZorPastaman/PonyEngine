@@ -49,6 +49,9 @@ export namespace PonyMath::Shape
 		constexpr const T& Distance() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> Point() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		constexpr Plane Flipped() const noexcept;
 		constexpr void Flip() noexcept;
 
@@ -141,6 +144,12 @@ namespace PonyMath::Shape
 	constexpr const T& Plane<T>::Distance() const noexcept
 	{
 		return distance;
+	}
+
+	template<std::floating_point T>
+	constexpr Core::Vector3<T> Plane<T>::Point() const noexcept
+	{
+		return normal * -distance;
 	}
 
 	template<std::floating_point T>

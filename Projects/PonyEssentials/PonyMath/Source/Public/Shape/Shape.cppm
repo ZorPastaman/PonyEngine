@@ -10,7 +10,6 @@
 export module PonyMath.Shape;
 
 export import :Box;
-export import :Frustum;
 export import :Inside2D;
 export import :Inside3D;
 export import :Intersecting2D;

@@ -14,10 +14,14 @@ module;
 export module PonyEngine.Render:ICamera;
 
 import <cstdint>;
+import <variant>;
 
 import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
+
+import :CameraProjection;
+import :ICuller;
 
 export namespace PonyEngine::Render
 {
@@ -28,10 +32,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ViewMatrix() const noexcept = 0;
 		virtual void ViewMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
-
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ProjectionMatrix() const noexcept = 0;
-		virtual void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ViewProjectionMatrix() const noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual const CameraProjection& Projection() const noexcept = 0;
+		virtual void Projection(const CameraProjection& projection) noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Color::RGBA<float>& ClearColor() const noexcept = 0;
@@ -44,5 +52,8 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t SortingOrder() const noexcept = 0;
 		virtual void SortingOrder(std::int32_t order) noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual const ICuller& Culler() const noexcept = 0;
 	};
 }

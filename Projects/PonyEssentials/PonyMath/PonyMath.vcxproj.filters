@@ -103,9 +103,6 @@
     <ClCompile Include="Source\Public\Shape\Shape-Plane.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Shape-Frustum.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Shape\Shape-Box.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

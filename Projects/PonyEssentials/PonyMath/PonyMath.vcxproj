@@ -34,7 +34,6 @@
     <ClCompile Include="Source\Public\Core\Core-Vector3.cppm" />
     <ClCompile Include="Source\Public\Core\Core-Vector4.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Box.cppm" />
-    <ClCompile Include="Source\Public\Shape\Shape-Frustum.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Inside2D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Inside3D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Intersecting2D.cppm" />
