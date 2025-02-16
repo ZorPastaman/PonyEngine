@@ -133,5 +133,8 @@
     <ClCompile Include="Source\Public\Shape\Shape-Intersecting3D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-AABR.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -131,7 +131,7 @@ namespace PonyMath::Shape
 			positives += side > std::int8_t{0};
 			negatives += side < std::int8_t{0};
 
-			if (positives > std::int8_t{0} && negatives > std::int8_t{0})
+			if (positives > 0 && negatives > 0)
 			{
 				return true;
 			}
