@@ -186,7 +186,7 @@ export namespace PonyMath::Core
 		/// @param x X-component.
 		/// @param y Y-component.
 		/// @param z Z-component.
-		constexpr void Set(T x, T y, T z) noexcept;
+		constexpr void Set(T x, T y, T z) noexcept; // TODO: Remove sets. Maybe some other functions, too
 		/// @brief Assigns arguments from the @p span.
 		/// @param span Span. The order is x, y, z.
 		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;

@@ -9,10 +9,12 @@
 
 export module PonyMath.Shape:Intersecting2D;
 
+import <algorithm>;
 import <span>;
 
 import PonyMath.Core;
 
+import :AABR;
 import :Line2D;
 import :Ray2D;
 import :Rect;
@@ -27,6 +29,10 @@ export namespace PonyMath::Shape
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Segment2D<T>& segment) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Line2D<T>& line, const AABR<T>& aabr) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Line2D<T>& line, const AABR<T>& aabr, T angle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Rect<T>& rect) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -35,6 +41,10 @@ export namespace PonyMath::Shape
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Line2D<T>& line) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Segment2D<T>& segment) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Ray2D<T>& ray, const AABR<T>& aabr) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Ray2D<T>& ray, const AABR<T>& aabr, T angle) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Rect<T>& rect) noexcept;
 
@@ -45,7 +55,28 @@ export namespace PonyMath::Shape
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Ray2D<T>& ray) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Segment2D<T>& segment, const AABR<T>& aabr) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const Segment2D<T>& segment, const AABR<T>& aabr, T angle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Rect<T>& rect) noexcept;
+
+	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& left, const AABR<T>& right) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& left, T leftAngle, const AABR<T>& right, T rightAngle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Line2D<T>& line) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, T angle, const Line2D<T>& line) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Ray2D<T>& ray) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, T angle, const Ray2D<T>& ray) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Segment2D<T>& segment) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool AreIntersecting(const AABR<T>& aabr, T angle, const Segment2D<T>& segment) noexcept;
 
 	/// @brief Checks if two rects are intersecting.
 	/// @tparam T Value type.
@@ -65,7 +96,12 @@ export namespace PonyMath::Shape
 namespace PonyMath::Shape
 {
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const AABR<T>& aabr, T tMin, T tMax) noexcept;
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept;
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, std::span<const Core::Vector2<T>> edges, std::span<const Core::Vector2<T>> corners) noexcept;
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& left, const Line2D<T>& right) noexcept
@@ -91,6 +127,44 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Line2D<T>& line, const AABR<T>& aabr) noexcept
+	{
+		for (std::size_t i = 0, positives = 0, negatives = 0; i < Rect<T>::CornerCount; ++i)
+		{
+			const std::int8_t side = line.Side(aabr.Corner(i));
+			positives += side > std::int8_t{0};
+			negatives += side < std::int8_t{0};
+
+			if (positives > 0 && negatives > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Line2D<T>& line, const AABR<T>& aabr, const T angle) noexcept
+	{
+		const std::array<Core::Vector2<T>, 4> corners = aabr.Corners(angle);
+
+		for (std::size_t positives = 0, negatives = 0; const Core::Vector2<T>& corner : corners)
+		{
+			const std::int8_t side = line.Side(corner);
+			positives += side > std::int8_t{0};
+			negatives += side < std::int8_t{0};
+
+			if (positives > 0 && negatives > 0)
+			{
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line2D<T>& line, const Rect<T>& rect) noexcept
 	{
 		for (std::size_t i = 0, positives = 0, negatives = 0; i < Rect<T>::CornerCount; ++i)
@@ -99,7 +173,7 @@ namespace PonyMath::Shape
 			positives += side > std::int8_t{0};
 			negatives += side < std::int8_t{0};
 
-			if (positives > std::int8_t{0} && negatives > std::int8_t{0})
+			if (positives > 0 && negatives > 0)
 			{
 				return true;
 			}
@@ -141,6 +215,23 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Ray2D<T>& ray, const AABR<T>& aabr) noexcept
+	{
+		return AreIntersecting(ray.Origin(), ray.Direction(), aabr, T{0}, std::numeric_limits<T>::infinity());
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Ray2D<T>& ray, const AABR<T>& aabr, const T angle) noexcept
+	{
+		const Core::Matrix2x2<T> inverseRotation = Core::RotationMatrix(-angle);
+		const Core::Vector2<T> origin = inverseRotation * (ray.Origin() - aabr.Center());
+		const Core::Vector2<T> direction = inverseRotation * ray.Direction();
+		const AABR<T> simpleAabr = AABR(Core::Vector2<T>::Predefined::Zero, aabr.Extents());
+
+		return AreIntersecting(origin, direction, simpleAabr, T{0}, std::numeric_limits<T>::infinity());
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Ray2D<T>& ray, const Rect<T>& rect) noexcept
 	{
 		return AreIntersecting(ray.Origin(), ray.Direction(), rect, T{0}, std::numeric_limits<T>::infinity());
@@ -162,7 +253,28 @@ namespace PonyMath::Shape
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Ray2D<T>& ray) noexcept
 	{
 		return AreIntersecting(ray, segment);
-	}                                                              
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Segment2D<T>& segment, const AABR<T>& aabr) noexcept
+	{
+		const Core::Vector2<T> segmentVector = segment.Vector();
+		const T length = segmentVector.Magnitude();
+
+		return AreIntersecting(segment.Point0(), segmentVector * (T{1} / length), aabr, T{0}, length);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Segment2D<T>& segment, const AABR<T>& aabr, const T angle) noexcept
+	{
+		const Core::Matrix2x2<T> inverseRotation = Core::RotationMatrix(-angle);
+		const Core::Vector2<T> origin = inverseRotation * (segment.Point0() - aabr.Center());
+		const Core::Vector2<T> direction = inverseRotation * segment.Vector();
+		const T length = direction.Magnitude();
+		const AABR<T> simpleAabr = AABR(Core::Vector2<T>::Predefined::Zero, aabr.Extents());
+
+		return AreIntersecting(origin, direction * (T{1} / length), simpleAabr, T{0}, length);
+	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Segment2D<T>& segment, const Rect<T>& rect) noexcept
@@ -171,6 +283,75 @@ namespace PonyMath::Shape
 		const T length = segmentVector.Magnitude();
 
 		return AreIntersecting(segment.Point0(), segmentVector * (T{1} / length), rect, T{0}, length);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr bool AreIntersecting(const AABR<T>& left, const AABR<T>& right) noexcept
+	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			if (left.Min(i) >= right.Max(i) || left.Max(i) <= right.Min(i))
+			{
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& left, const T leftAngle, const AABR<T>& right, const T rightAngle) noexcept
+	{
+		const std::array<Core::Vector2<T>, 4> leftCorners = left.Corners(leftAngle);
+		const std::array<Core::Vector2<T>, 4> rightCorners = right.Corners(rightAngle);
+		const std::array<Core::Vector2<T>, 2> leftMainEdges =
+		{
+			leftCorners[1] - leftCorners[0],
+			leftCorners[2] - leftCorners[0]
+		};
+		const std::array<Core::Vector2<T>, 2> rightMainEdges =
+		{
+			rightCorners[1] - rightCorners[0],
+			rightCorners[2] - rightCorners[0]
+		};
+
+		return AreIntersecting(leftCorners[0], leftMainEdges, rightCorners) && AreIntersecting(rightCorners[0], rightMainEdges, leftCorners);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Line2D<T>& line) noexcept
+	{
+		return AreIntersecting(line, aabr);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const T angle, const Line2D<T>& line) noexcept
+	{
+		return AreIntersecting(line, aabr, angle);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Ray2D<T>& ray) noexcept
+	{
+		return AreIntersecting(ray, aabr);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const T angle, const Ray2D<T>& ray) noexcept
+	{
+		return AreIntersecting(ray, aabr, angle);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const Segment2D<T>& segment) noexcept
+	{
+		return AreIntersecting(segment, aabr);
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const AABR<T>& aabr, const T angle, const Segment2D<T>& segment) noexcept
+	{
+		return AreIntersecting(segment, aabr, angle);
 	}
 
 	template<Core::Arithmetic T>
@@ -206,6 +387,24 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const AABR<T>& aabr, T tMin, T tMax) noexcept
+	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			const T min = aabr.Min(i) - origin[i];
+			const T max = aabr.Max(i) - origin[i];
+			const T multiplier = T{1} / direction[i];
+			const Core::Vector2<T> t = Core::Vector2<T>(min, max) * multiplier;
+			const auto& [t0, t1] = t.MinMax();
+
+			tMin = std::max(t0, tMin);
+			tMax = std::min(t1, tMax);
+		}
+
+		return tMin < tMax;
+	}
+
+	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction, const Rect<T>& rect, T tMin, T tMax) noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
@@ -221,5 +420,30 @@ namespace PonyMath::Shape
 		}
 
 		return tMin < tMax;
+	}
+
+	template<std::floating_point T>
+	constexpr bool AreIntersecting(const Core::Vector2<T>& origin, std::span<const Core::Vector2<T>> edges, std::span<const Core::Vector2<T>> corners) noexcept
+	{
+		for (const Core::Vector2<T>& edge : edges)
+		{
+			const T edgeLength = edge.Magnitude();
+			const Core::Vector2<T> edgeNormal = edge * (T{1} / edgeLength);
+
+			std::array<T, 4> projections;
+			for (std::size_t i = 0; i < 4; ++i)
+			{
+				projections[i] = Core::Dot(edgeNormal, corners[i] - origin);
+			}
+
+			const auto [min, max] = std::ranges::minmax_element(projections);
+
+			if (min > edgeLength || max < T{0})
+			{
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

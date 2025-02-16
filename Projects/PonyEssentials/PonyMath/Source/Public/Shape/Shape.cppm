@@ -9,6 +9,7 @@
 
 export module PonyMath.Shape;
 
+export import :AABR;
 export import :Box;
 export import :Inside2D;
 export import :Inside3D;
