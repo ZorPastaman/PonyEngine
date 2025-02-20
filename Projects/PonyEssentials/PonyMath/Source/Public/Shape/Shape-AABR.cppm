@@ -32,6 +32,8 @@ export namespace PonyMath::Shape
 
 		struct Predefined; ///< Predefined AABRs.
 
+		static constexpr std::array<Core::Vector2<T>, 2> Axes = { Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up };
+
 		static constexpr std::size_t LeftBottomIndex = 0;
 		static constexpr std::size_t RightBottomIndex = 1;
 		static constexpr std::size_t LeftTopIndex = 2;
@@ -123,10 +125,6 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector2<T> Corner(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr std::array<Core::Vector2<T>, 4> Corners() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector2<T> Corner(std::size_t index, T angle) const noexcept requires (std::is_floating_point_v<T>);
-		[[nodiscard("Pure function")]]
-		constexpr std::array<Core::Vector2<T>, 4> Corners(T angle) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Computes a perimeter.
 		/// @return Perimeter.
@@ -195,7 +193,7 @@ export namespace PonyMath::Shape
 	{
 		NON_CONSTRUCTIBLE_BODY(Predefined)
 
-		static constexpr auto Zero = Rect(T{0}, T{0}, T{0}, T{0}); ///< AABR(0, 0, 0, 0).
+		static constexpr auto Zero = AABR(T{0}, T{0}, T{0}, T{0}); ///< AABR(0, 0, 0, 0).
 	};
 }
 
@@ -395,28 +393,6 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector2<T> AABR<T>::Corner(const std::size_t index, const T angle) const noexcept requires (std::is_floating_point_v<T>)
-	{
-		return Core::Rotate(Corner(index) - Center(), angle) + Center();
-	}
-
-	template<Core::Arithmetic T>
-	constexpr std::array<Core::Vector2<T>, 4> AABR<T>::Corners(const T angle) const noexcept requires (std::is_floating_point_v<T>)
-	{
-		const Core::Matrix2x2<T> rotation = Core::RotationMatrix(angle);
-		const Core::Vector2<T> extentsX = rotation * Core::Vector2<T>(ExtentX(), T{0});
-		const Core::Vector2<T> extentsY = rotation * Core::Vector2<T>(T{0}, ExtentY());
-
-		return std::array<Core::Vector2<T>, 4>
-		{
-			Center() - extentsX - extentsY,
-			Center() + extentsX - extentsY,
-			Center() - extentsX + extentsY,
-			Center() + extentsX + extentsY,
-		};
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABR<T>::Perimeter() const noexcept
 	{
 		return (ExtentX() + ExtentY()) * T{4};
@@ -451,9 +427,9 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr void AABR<T>::ResolveNegativeExtents() noexcept
 	{
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		for (T& extent : extents)
 		{
-			extents[i] = std::abs(extents[i]);
+			extent = std::abs(extent);
 		}
 	}
 

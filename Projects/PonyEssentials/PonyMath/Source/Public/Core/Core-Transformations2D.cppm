@@ -32,6 +32,8 @@ export namespace PonyMath::Core
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix2x2<T> RotationMatrix(T angle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Matrix2x2<T> RotationMatrix(const Vector2<T>& axisX, const Vector2<T>& axisY) noexcept;
 
 	/// @brief Creates a 2D rotation-scaling matrix from the angle and scaling.
 	/// @param angle Rotation angle in radians.
@@ -178,6 +180,12 @@ namespace PonyMath::Core
 		const T angleCos = std::cos(angle);
 
 		return Matrix2x2<T>(angleCos, angleSin, -angleSin, angleCos);
+	}
+
+	template<std::floating_point T>
+	Matrix2x2<T> RotationMatrix(const Vector2<T>& axisX, const Vector2<T>& axisY) noexcept
+	{
+		return Matrix2x2<T>(axisX.X(), axisY.X(), axisX.Y(), axisY.Y());
 	}
 
 	template<std::floating_point T>

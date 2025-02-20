@@ -222,9 +222,10 @@ namespace PonyMath::Space
 
 	void Transform2D::LookAt(const Core::Vector2<float>& point) noexcept
 	{
-		if (const Core::Vector2<float> direction = (point - position).Normalized(); direction.IsFinite())
+		const Core::Vector2<float> direction = point - position;
+		if (const float magnitude = direction.Magnitude(); magnitude > 0.0001f)
 		{
-			LookIn(direction);
+			LookIn(direction * (1.f / magnitude));
 		}
 	}
 

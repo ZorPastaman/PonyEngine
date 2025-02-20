@@ -15,8 +15,6 @@ import <string>;
 
 import PonyMath.Core;
 
-import :Segment2D;
-
 export namespace PonyMath::Shape
 {
 	template<std::floating_point T>
@@ -27,8 +25,6 @@ export namespace PonyMath::Shape
 		constexpr Ray2D() noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray2D(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction) noexcept;
-		[[nodiscard("Pure constructor")]]
-		explicit constexpr Ray2D(const Segment2D<T>& segment) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray2D(const Ray2D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -103,13 +99,6 @@ namespace PonyMath::Shape
 	constexpr Ray2D<T>::Ray2D(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction) noexcept :
 		origin(origin),
 		direction(direction)
-	{
-	}
-
-	template<std::floating_point T>
-	constexpr Ray2D<T>::Ray2D(const Segment2D<T>& segment) noexcept :
-		origin(segment.Point0()),
-		direction((segment.Point1() - segment.Point0()).Normalized())
 	{
 	}
 

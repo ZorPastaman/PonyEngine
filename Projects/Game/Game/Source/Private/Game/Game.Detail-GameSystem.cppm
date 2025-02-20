@@ -206,22 +206,13 @@ namespace Game
 
 	void GameSystem::Tick()
 	{
-		const auto mouse = cameraTransform.Rotation() * PonyMath::Core::Vector3<float>(inputSystem->State("MouseX"), inputSystem->State("MouseY"), 0.f);
-		auto rotationAxis = PonyMath::Core::Cross(cameraTransform.Forward(), mouse);
-		const auto rotation = rotationAxis.Magnitude();
-		rotationAxis *= 1.f / rotation;
-		if (rotationAxis.IsFinite())
-		{
-			cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(rotationAxis, rotation));
-		}
-
-		cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(cameraTransform.Forward(), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime())));
+		const auto rotation = PonyMath::Core::Vector3<float>(inputSystem->State("MouseY"), inputSystem->State("MouseX"), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime()));
+		cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(rotation));
 
 		auto moveDirection = PonyMath::Core::Vector3<float>(inputSystem->State("Right"), inputSystem->State("Up"), inputSystem->State("Forward"));
-		moveDirection.Normalize();
-		if (moveDirection.IsFinite())
+		if (!moveDirection.IsAlmostZero())
 		{
-			cameraTransform.Translate(cameraTransform.Rotation() * (moveDirection * (10.f * timeSystem->VirtualDeltaTime())));
+			cameraTransform.Translate(cameraTransform.Rotation() * (moveDirection.Normalized() * (10.f * timeSystem->VirtualDeltaTime())));
 		}
 
 		camera->ViewMatrix(cameraTransform.TrsMatrix().Inverse());

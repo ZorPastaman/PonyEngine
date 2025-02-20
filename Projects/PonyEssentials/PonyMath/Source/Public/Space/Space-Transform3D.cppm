@@ -242,9 +242,10 @@ namespace PonyMath::Space
 
 	void Transform3D::LookAt(const Core::Vector3<float>& point, const Core::Vector3<float>& up) noexcept
 	{
-		if (const Core::Vector3<float> direction = (point - position).Normalized(); direction.IsFinite())
+		const Core::Vector3<float> direction = point - position;
+		if (const float magnitude = direction.Magnitude(); magnitude > 0.0001f)
 		{
-			LookIn(direction, up);
+			LookIn(direction * (1.f / magnitude), up);
 		}
 	}
 

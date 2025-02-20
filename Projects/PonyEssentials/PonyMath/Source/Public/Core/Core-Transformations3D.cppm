@@ -77,6 +77,8 @@ export namespace PonyMath::Core
 	/// @return Rotation matrix.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	Matrix3x3<T> RotationMatrix(const Vector3<T>& axis, T angle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Matrix3x3<T> RotationMatrix(const Vector3<T>& axisX, const Vector3<T>& axisY, const Vector3<T>& axisZ) noexcept;
 
 	/// @brief Creates a 3D rotation matrix representing a rotation from the @p fromDirection to the @p toDirection.
 	/// @tparam T Value type.
@@ -641,6 +643,12 @@ namespace PonyMath::Core
 		rotationMatrix.M22() = mzz + cos;
 
 		return rotationMatrix;
+	}
+
+	template<std::floating_point T>
+	Matrix3x3<T> RotationMatrix(const Vector3<T>& axisX, const Vector3<T>& axisY, const Vector3<T>& axisZ) noexcept
+	{
+		return Matrix3x3<T>(axisX.X(), axisY.X(), axisZ.X(), axisX().Y(), axisY.Y(), axisZ.Y(), axisX.Z(), axisY.Z(), axisZ.Z());
 	}
 
 	template<std::floating_point T>
