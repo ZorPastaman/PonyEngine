@@ -136,7 +136,7 @@ export namespace PonyEngine::Input
 		NumpadEnter,
 
 		// Mouse
-		// Axis
+		// Axes
 		MouseXPosition,
 		MouseYPosition,
 		MouseXDelta,
@@ -284,7 +284,7 @@ namespace PonyEngine::Input
 		"Numpad Enter",
 
 		// Mouse
-		// Axis
+		// Axes
 		"Mouse X Position",
 		"Mouse Y Position",
 		"Mouse X Delta",

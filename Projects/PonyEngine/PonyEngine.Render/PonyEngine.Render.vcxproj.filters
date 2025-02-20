@@ -223,6 +223,9 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-CameraBox.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">

@@ -25,6 +25,10 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept = 0;
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::Box<float>& box) const noexcept = 0;
+		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds) const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Quaternion<float>& rotation) const noexcept = 0;
+		[[nodiscard("Pure function")]]
+		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept = 0;
 	};
 }

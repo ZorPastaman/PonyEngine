@@ -14,120 +14,60 @@ import <concepts>;
 import PonyMath.Core;
 
 import :AABR;
-import :Line2D;
-import :Ray2D;
-import :Rect;
-import :Segment2D;
+import :OBR;
 
 export namespace PonyMath::Shape
 {
-	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const Rect<T>& large) noexcept;
-	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const AABR<T>& large) noexcept;
-	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const AABR<T>& large, T angle) noexcept;
-
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept;
-	template<std::floating_point T>
-	constexpr bool IsInside(const AABR<T>& small, T smallAngle, const AABR<T>& large, T largeAngle) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept;
 
-	/// @brief Checks if the @p small is fully inside the @p large.
-	/// @tparam T Value type.
-	/// @param small Small rect.
-	/// @param large Large rect.
-	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept;
 }
 
 namespace PonyMath::Shape
 {
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const AABR<T>& large) noexcept;
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const Rect<T>& large) noexcept;
-
 	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const Rect<T>& large) noexcept
-	{
-		const Core::Vector2<T> min = Core::Min(small.Point0(), small.Point1());
-		const Core::Vector2<T> max = Core::Max(small.Point0(), small.Point1());
-
-		return IsInside(min, max, large);
-	}
-
-	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const AABR<T>& large) noexcept
-	{
-		const Core::Vector2<T> min = Core::Min(small.Point0(), small.Point1());
-		const Core::Vector2<T> max = Core::Max(small.Point0(), small.Point1());
-
-		return IsInside(min, max, large);
-	}
-
-	template<std::floating_point T>
-	constexpr bool IsInside(const Segment2D<T>& small, const AABR<T>& large, const T angle) noexcept
-	{
-		const Core::Matrix2x2<T> inverseRotation = Core::RotationMatrix(-angle);
-		const Core::Vector2<T> point0 = inverseRotation * (small.Point0() - large.Center());
-		const Core::Vector2<T> point1 = inverseRotation * (small.Point1() - large.Center());
-		const AABR<T> aarb = AABR<T>(Core::Vector2<T>::Predefined::Zero, large.Extents());
-
-		return IsInside(Segment2D<T>(point0, point1), aarb);
-	}
+	constexpr bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept;
 
 	template<Core::Arithmetic T>
 	constexpr bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept
 	{
-		return IsInside(small.Min(), small.Max(), large);
+		return large.Contains(small.Min()) && large.Contains(small.Max());
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(const AABR<T>& small, const T smallAngle, const AABR<T>& large, const T largeAngle) noexcept
+	constexpr bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept
 	{
-		const std::array<Core::Vector2<T>, 4> smallCorners = small.Corners(smallAngle);
-		const AABR<T> simpleLarge = AABR<T>(Core::Vector2<T>::Predefined::Zero, large.Extents());
-		const Core::Matrix2x2<T> inverseLargeRotation = Core::RotationMatrix(-largeAngle);
-
-		for (const Core::Vector2<T>& smallCorner : smallCorners)
-		{
-			if (!simpleLarge.Contains(inverseLargeRotation * (smallCorner - large.Center())))
-			{
-				return false;
-			}
-		}
-
-		return true;
+		return IsInside(small.Corners(), large);
 	}
 
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Rect<T>& small, const Rect<T>& large) noexcept
+	template<std::floating_point T>
+	constexpr bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept
 	{
-		return IsInside(small.Min(), small.Max(), large);
+		return IsInside(small.Corners(), large);
 	}
 
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const AABR<T>& large) noexcept
+	template<std::floating_point T>
+	constexpr bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept
 	{
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			if (min[i] < large.Min(i) || max[i] > large.Max(i))
-			{
-				return false;
-			}
-		}
+		const std::array<Core::Vector2<T>, 4> corners = small.Corners();
+		const Core::Vector2<T> min = Core::Min(corners[0], Core::Min(corners[1], Core::Min(corners[2], corners[3])));
+		const Core::Vector2<T> max = Core::Max(corners[0], Core::Max(corners[1], Core::Max(corners[2], corners[3])));
 
-		return true;
+		return large.Contains(min) && large.Contains(max);
 	}
 
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Core::Vector2<T>& min, const Core::Vector2<T>& max, const Rect<T>& large) noexcept
+	template<std::floating_point T>
+	constexpr bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept
 	{
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		for (const Core::Vector2<T>& corner : corners)
 		{
-			if (min[i] < large.Min(i) || max[i] > large.Max(i))
+			if (!large.Contains(corner))
 			{
 				return false;
 			}

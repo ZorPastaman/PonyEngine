@@ -175,6 +175,7 @@ export namespace PonyEngine::Render::Direct3D12
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 #ifdef _DEBUG
+		// TODO: Use report live objects.
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
