@@ -16,6 +16,7 @@ export import :Inside2D;
 export import :Inside3D;
 export import :Intersecting2D;
 export import :Line;
+export import :OBB;
 export import :OBR;
 export import :Plane;
 export import :Ray2D;

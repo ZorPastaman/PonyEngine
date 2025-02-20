@@ -64,7 +64,7 @@ namespace PonyMath::Shape
 	constexpr bool AreIntersecting(const Line<T>& line, std::span<const Core::Vector2<T>> corners) noexcept;
 
 	template<std::floating_point T, std::size_t CornerCount> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Core::Vector2<T>& center, const Core::Vector2<T>& extents, std::span<const Core::Vector2<T>, 2> axes, std::span<const Core::Vector2<T>, CornerCount> corners);
+	constexpr bool CheckSat(const Core::Vector2<T>& center, const Core::Vector2<T>& extents, std::span<const Core::Vector2<T>, 2> axes, std::span<const Core::Vector2<T>, CornerCount> corners);
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Ray2D<T>& left, const Ray2D<T>& right, const T leftMaxDistance, const T rightMaxDistance) noexcept
@@ -186,15 +186,15 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const AABR<T>& aabr, const OBR<T>& obr) noexcept
 	{
-		return AreIntersecting(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
-			AreIntersecting(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
+		return CheckSat(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
+			CheckSat(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
 	}
 
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const OBR<T>& left, const OBR<T>& right) noexcept
 	{
-		return AreIntersecting(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
-			AreIntersecting(right.Center(), right.Extents(), right.Axes(), left.Corners());
+		return CheckSat(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
+			CheckSat(right.Center(), right.Extents(), right.Axes(), left.Corners());
 	}
 
 	template<std::floating_point T>
@@ -218,9 +218,9 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr bool AreIntersecting(const Line<T>& line, std::span<const Core::Vector2<T>> corners) noexcept
 	{
-		for (std::size_t i = 0, positives = 0, negatives = 0; i < Rect<T>::CornerCount; ++i)
+		for (std::size_t positives = 0, negatives = 0; const Core::Vector2<T>& corner : corners)
 		{
-			const std::int8_t side = line.Side(corners[i]);
+			const std::int8_t side = line.Side(corner);
 			positives += side > std::int8_t{0};
 			negatives += side < std::int8_t{0};
 
@@ -234,7 +234,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T, std::size_t CornerCount>
-	constexpr bool AreIntersecting(const Core::Vector2<T>& center, const Core::Vector2<T>& extents, const std::span<const Core::Vector2<T>, 2> axes, const std::span<const Core::Vector2<T>, CornerCount> corners)
+	constexpr bool CheckSat(const Core::Vector2<T>& center, const Core::Vector2<T>& extents, const std::span<const Core::Vector2<T>, 2> axes, const std::span<const Core::Vector2<T>, CornerCount> corners)
 	{
 		for (std::size_t axisIndex = 0; axisIndex < 2; ++axisIndex)
 		{

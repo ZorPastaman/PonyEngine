@@ -28,7 +28,7 @@ export namespace PonyEngine::Render
 	{
 		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
-		std::optional<PonyMath::Shape::Box<float>> boundingBox = std::nullopt;
+		std::optional<PonyMath::Shape::AABB<float>> boundingBox = std::nullopt;
 		std::string name;
 	};
 }

@@ -220,8 +220,8 @@ export namespace PonyEngine::Render
 		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet);
 
 		[[nodiscard("Pure function")]]
-		const std::optional<PonyMath::Shape::Box<float>>& BoundingBox() const noexcept;
-		void BoundingBox(const std::optional<PonyMath::Shape::Box<float>>& boundingBox) noexcept;
+		const std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() const noexcept;
+		void BoundingBox(const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
@@ -245,7 +245,7 @@ export namespace PonyEngine::Render
 		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
 
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
-		std::optional<PonyMath::Shape::Box<float>> boundingBox;
+		std::optional<PonyMath::Shape::AABB<float>> boundingBox;
 
 		std::string name;
 
@@ -663,12 +663,12 @@ namespace PonyEngine::Render
 		OnThreadGroupCountsChanged();
 	}
 
-	const std::optional<PonyMath::Shape::Box<float>>& Mesh::BoundingBox() const noexcept
+	const std::optional<PonyMath::Shape::AABB<float>>& Mesh::BoundingBox() const noexcept
 	{
 		return boundingBox;
 	}
 
-	void Mesh::BoundingBox(const std::optional<PonyMath::Shape::Box<float>>& boundingBox) noexcept
+	void Mesh::BoundingBox(const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept
 	{
 		this->boundingBox = boundingBox;
 		OnBoundingBoxChanged();

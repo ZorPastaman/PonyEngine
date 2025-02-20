@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include "PonyBase/Utility/ObjectBody.h"
-
 export module PonyMath.Shape:OBR;
 
 import <array>;
@@ -31,7 +27,7 @@ export namespace PonyMath::Shape
 	public:
 		using ValueType = T; ///< Value type.
 
-		struct Predefined; ///< Predefined OBRs.
+		static constexpr std::size_t AxesCount = 2;
 
 		static constexpr std::size_t LeftBottomIndex = 0;
 		static constexpr std::size_t RightBottomIndex = 1;
@@ -47,6 +43,12 @@ export namespace PonyMath::Shape
 		constexpr OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept;
+		[[nodiscard("Pure constructor")]]
+		constexpr OBR(const OBR& obr, T angle) noexcept;
+		[[nodiscard("Pure constructor")]]
+		constexpr OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept;
+		[[nodiscard("Pure constructor")]]
+		constexpr OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR(const OBR& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -135,14 +137,6 @@ export namespace PonyMath::Shape
 
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const OBR<T>& obr);
-
-	template<std::floating_point T>
-	struct OBR<T>::Predefined final
-	{
-		NON_CONSTRUCTIBLE_BODY(Predefined)
-
-		static constexpr auto Zero = OBR(Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Zero);
-	};
 }
 
 namespace PonyMath::Shape
@@ -162,8 +156,8 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept :
 		center(rs * aabr.Center()),
-		extents(aabr.ExtentX(), aabr.ExtentY()),
-		axes{ rs * Core::Vector2<T>::Predefined::Right, rs * Core::Vector2<T>::Predefined::Up }
+		extents(aabr.Extents()),
+		axes{ rs * AABR<T>::Axes[0], rs * AABR<T>::Axes[1] }
 	{
 		ResolveExtentsAxes();
 	}
@@ -171,8 +165,32 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept :
 		center(Core::TransformPoint(trs, aabr.Center())),
-		extents(aabr.ExtentX(), aabr.ExtentY()),
-		axes{ Core::TransformDirection(trs, Core::Vector2<T>::Predefined::Right), Core::TransformDirection(trs, Core::Vector2<T>::Predefined::Up) }
+		extents(aabr.Extents()),
+		axes{ Core::TransformDirection(trs, AABR<T>::Axes[0]), Core::TransformDirection(trs, AABR<T>::Axes[1]) }
+	{
+		ResolveExtentsAxes();
+	}
+
+	template<std::floating_point T>
+	constexpr OBR<T>::OBR(const OBR& obr, const T angle) noexcept :
+		OBR(obr, Core::RotationMatrix(angle))
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr OBR<T>::OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept :
+		center(rs * obr.Center()),
+		extents(obr.Extents()),
+		axes{ rs * obr.AxisX(), rs * obr.AxisY() }
+	{
+		ResolveExtentsAxes();
+	}
+
+	template<std::floating_point T>
+	constexpr OBR<T>::OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept :
+		center(Core::TransformPoint(trs, obr.Center())),
+		extents(obr.Extents()),
+		axes{ Core::TransformDirection(trs, obr.AxisX()), Core::TransformDirection(trs, obr.AxisY()) }
 	{
 		ResolveExtentsAxes();
 	}
@@ -275,7 +293,7 @@ namespace PonyMath::Shape
 			center - extentX - extentY,
 			center + extentX - extentY,
 			center - extentX + extentY,
-			center + extentX + extentY,
+			center + extentX + extentY
 		};
 	}
 
@@ -319,10 +337,15 @@ namespace PonyMath::Shape
 	constexpr bool OBR<T>::Contains(const Core::Vector2<T>& point) const noexcept
 	{
 		const Core::Vector2<T> delta = point - Center();
-		const T dotX = Core::Dot(delta, AxisX());
-		const T dotY = Core::Dot(delta, AxisY());
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			if (const T dot = Core::Dot(delta, Axis(i)); std::abs(dot) > Extent(i))
+			{
+				return false;
+			}
+		}
 
-		return std::abs(dotX) <= ExtentX() && std::abs(dotY) <= ExtentY();
+		return true;
 	}
 
 	template<std::floating_point T>
@@ -363,6 +386,8 @@ namespace PonyMath::Shape
 			extents[1] = T{0};
 			axes[0] = Core::Vector2<T>::Predefined::Right;
 			axes[1] = Core::Vector2<T>::Predefined::Up;
+			break;
+		default:
 			break;
 		}
 	}

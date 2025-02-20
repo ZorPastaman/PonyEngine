@@ -30,7 +30,7 @@ export namespace PonyMath::Shape
 	public:
 		using ValueType = T; ///< Value type.
 
-		struct Predefined; ///< Predefined AABBs.
+		static constexpr std::array<Core::Vector3<T>, 3> Axes = { Core::Vector3<T>::Predefined::Right, Core::Vector3<T>::Predefined::Up, Core::Vector3<T>::Predefined::Forward };
 
 		static constexpr std::size_t LeftBottomNearIndex = 0;
 		static constexpr std::size_t RightBottomNearIndex = 1;
@@ -41,6 +41,8 @@ export namespace PonyMath::Shape
 		static constexpr std::size_t LeftTopFarIndex = 6;
 		static constexpr std::size_t RightTopFarIndex = 7;
 		static constexpr std::size_t CornerCount = 8;
+
+		struct Predefined; ///< Predefined AABBs.
 
 		[[nodiscard("Pure constructor")]]
 		constexpr AABB() noexcept = default;
@@ -61,27 +63,22 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector3<T>& Center() noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Center() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector3<T>& Extents() noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr const Core::Vector3<T>& Extents() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		constexpr T& ExtentX() noexcept;
+		constexpr T ExtentX() const noexcept;
+		constexpr void ExtentX(T extent) noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const T& ExtentX() const noexcept;
+		constexpr T ExtentY() const noexcept;
+		constexpr void ExtentY(T extent) noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr T& ExtentY() noexcept;
+		constexpr T ExtentZ() const noexcept;
+		constexpr void ExtentZ(T extent) noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr const T& ExtentY() const noexcept;
+		constexpr T Extent(std::size_t index) const noexcept;
+		constexpr void Extent(std::size_t index, T extent) noexcept;
 		[[nodiscard("Pure function")]]
-		constexpr T& ExtentZ() noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr const T& ExtentZ() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr T& Extent(std::size_t index) noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr const T& Extent(std::size_t index) const noexcept;
+		constexpr const Core::Vector3<T>& Extents() const noexcept;
+		constexpr void Extents(const Core::Vector3<T>& extents) noexcept;
 
 		[[nodiscard("Pure function")]]
 		constexpr T Width() const noexcept;
@@ -145,10 +142,6 @@ export namespace PonyMath::Shape
 		constexpr Core::Vector3<T> Corner(std::size_t index) const noexcept;
 		[[nodiscard("Pure function")]]
 		constexpr std::array<Core::Vector3<T>, 8> Corners() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector3<T> Corner(std::size_t index, const Core::Quaternion<T>& rotation) const noexcept requires (std::is_floating_point_v<T>);
-		[[nodiscard("Pure function")]]
-		constexpr std::array<Core::Vector3<T>, 8> Corners(const Core::Quaternion<T>& rotation) const noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Computes an area.
 		/// @return Area.
@@ -167,8 +160,6 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
-
-		constexpr void ResolveNegativeExtents() noexcept;
 
 		/// @brief Creates a string representing the rect.
 		/// @return String representing the rect.
@@ -224,21 +215,21 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr AABB<T>::AABB(const T x, const T y, const T z, const T halfWidth, const T halfHeight, const T halfDepth) noexcept :
 		center(x, y, z),
-		extents(halfWidth, halfHeight, halfDepth)
+		extents(std::abs(halfWidth), std::abs(halfHeight), std::abs(halfDepth))
 	{
 	}
 
 	template<Core::Arithmetic T>
 	constexpr AABB<T>::AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept :
 		center(center),
-		extents(extents)
+		extents(Core::Abs(extents))
 	{
 	}
 
 	template<Core::Arithmetic T>
 	constexpr AABB<T>::AABB(const Box<T>& box) noexcept :
 		center(box.Center()),
-		extents(box.Width() / T{2}, box.Height() / T{2}, box.Depth() / T{2})
+		extents(std::abs(box.Width() / T{2}), std::abs(box.Height() / T{2}), std::abs(box.Depth() / T{2}))
 	{
 	}
 
@@ -255,9 +246,51 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector3<T>& AABB<T>::Extents() noexcept
+	constexpr T AABB<T>::ExtentX() const noexcept
 	{
-		return extents;
+		return extents[0];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void AABB<T>::ExtentX(const T extent) noexcept
+	{
+		extents[0] = std::abs(extent);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr T AABB<T>::ExtentY() const noexcept
+	{
+		return extents[1];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void AABB<T>::ExtentY(const T extent) noexcept
+	{
+		extents[1] = std::abs(extent);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr T AABB<T>::ExtentZ() const noexcept
+	{
+		return extents[2];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void AABB<T>::ExtentZ(const T extent) noexcept
+	{
+		extents[2] = std::abs(extent);
+	}
+
+	template<Core::Arithmetic T>
+	constexpr T AABB<T>::Extent(const std::size_t index) const noexcept
+	{
+		return extents[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr void AABB<T>::Extent(const std::size_t index, const T extent) noexcept
+	{
+		extents[index] = std::abs(extent);
 	}
 
 	template<Core::Arithmetic T>
@@ -267,51 +300,9 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr T& AABB<T>::ExtentX() noexcept
+	constexpr void AABB<T>::Extents(const Core::Vector3<T>& extents) noexcept
 	{
-		return extents[0];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr const T& AABB<T>::ExtentX() const noexcept
-	{
-		return extents[0];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr T& AABB<T>::ExtentY() noexcept
-	{
-		return extents[1];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr const T& AABB<T>::ExtentY() const noexcept
-	{
-		return extents[1];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr T& AABB<T>::ExtentZ() noexcept
-	{
-		return extents[2];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr const T& AABB<T>::ExtentZ() const noexcept
-	{
-		return extents[2];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr T& AABB<T>::Extent(const std::size_t index) noexcept
-	{
-		return extents[index];
-	}
-
-	template<Core::Arithmetic T>
-	constexpr const T& AABB<T>::Extent(const std::size_t index) const noexcept
-	{
-		return extents[index];
+		this->extents = Core::Abs(extents);
 	}
 
 	template<Core::Arithmetic T>
@@ -474,32 +465,6 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector3<T> AABB<T>::Corner(const std::size_t index, const Core::Quaternion<T>& rotation) const noexcept requires (std::is_floating_point_v<T>)
-	{
-		return rotation * (Corner(index) - Center()) + Center();
-	}
-
-	template<Core::Arithmetic T>
-	constexpr std::array<Core::Vector3<T>, 8> AABB<T>::Corners(const Core::Quaternion<T>& rotation) const noexcept requires (std::is_floating_point_v<T>)
-	{
-		const Core::Vector3<T> extentsX = rotation * Core::Vector3<T>(ExtentX(), T{0}, T{0});
-		const Core::Vector3<T> extentsY = rotation * Core::Vector3<T>(T{0}, ExtentY(), T{0});
-		const Core::Vector3<T> extentsZ = rotation * Core::Vector3<T>(T{0}, T{0}, ExtentZ());
-
-		return std::array<Core::Vector3<T>, 8>
-		{
-			Center() - extentsX - extentsY - extentsZ,
-			Center() + extentsX - extentsY - extentsZ,
-			Center() - extentsX + extentsY - extentsZ,
-			Center() + extentsX + extentsY - extentsZ,
-			Center() - extentsX - extentsY + extentsZ,
-			Center() + extentsX - extentsY + extentsZ,
-			Center() - extentsX + extentsY + extentsZ,
-			Center() + extentsX + extentsY + extentsZ
-		};
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Area() const noexcept
 	{
 		return (ExtentX() * ExtentY() + ExtentY() * ExtentZ() + ExtentX() * ExtentZ()) * T{8};
@@ -529,15 +494,6 @@ namespace PonyMath::Shape
 		}
 
 		return true;
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void AABB<T>::ResolveNegativeExtents() noexcept
-	{
-		for (T& extent : extents)
-		{
-			extent = std::abs(extent);
-		}
 	}
 
 	template<Core::Arithmetic T>
