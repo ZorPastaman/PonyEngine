@@ -31,13 +31,13 @@ export namespace PonyMath::Shape
 	public:
 		using ValueType = T; ///< Value type.
 
-		struct Predefined; ///< Predefined rects.
-
 		static constexpr std::size_t LeftBottomIndex = 0;
 		static constexpr std::size_t RightBottomIndex = 1;
 		static constexpr std::size_t LeftTopIndex = 2;
 		static constexpr std::size_t RightTopIndex = 3;
 		static constexpr std::size_t CornerCount = 4;
+
+		struct Predefined; ///< Predefined rects.
 
 		/// @brief Creates a zero rect.
 		[[nodiscard("Pure constructor")]]

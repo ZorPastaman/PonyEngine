@@ -15,76 +15,65 @@ import <span>;
 import PonyMath.Core;
 
 import :AABB;
-import :Box;
+import :OBB;
 
 export namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr bool IsInside(const AABB<T>& small, const AABB<T>& large) noexcept;
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const AABB<T>& small, const Core::Quaternion<T>& smallRotation, const AABB<T>& large, const Core::Quaternion<T>& largeRotation) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const AABB<T>& small, const OBB<T>& large) noexcept;
 
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Box<T>& small, const Box<T>& large) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const OBB<T>& small, const OBB<T>& large) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr bool IsInside(const OBB<T>& small, const AABB<T>& large) noexcept;
 }
 
 namespace PonyMath::Shape
 {
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const AABB<T>& large) noexcept;
-	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const Box<T>& large) noexcept;
+	template<std::floating_point T>
+	constexpr bool IsInside(std::span<const Core::Vector3<T>> corners, const OBB<T>& large) noexcept;
 
 	template<Core::Arithmetic T>
 	constexpr bool IsInside(const AABB<T>& small, const AABB<T>& large) noexcept
 	{
-		return IsInside(small.Min(), small.Max(), large);
+		return large.Contains(small.Min()) && large.Contains(small.Max());
 	}
 
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const AABB<T>& small, const Core::Quaternion<T>& smallRotation, const AABB<T>& large, const Core::Quaternion<T>& largeRotation) noexcept
+	template<std::floating_point T>
+	constexpr bool IsInside(const AABB<T>& small, const OBB<T>& large) noexcept
 	{
-		const std::array<Core::Vector3<T>, 8> smallCorners = small.Corners(smallRotation);
-		const AABB<T> simpleLarge = AABB<T>(Core::Vector3<T>::Predefined::Zero, large.Extents());
-		const Core::Quaternion<T> largeConjugate = largeRotation.Conjugate();
+		return IsInside(small.Corners(), large);
+	}
 
-		for (const Core::Vector3<T>& smallCorner : smallCorners)
+	template<std::floating_point T>
+	constexpr bool IsInside(const OBB<T>& small, const OBB<T>& large) noexcept
+	{
+		return IsInside(small.Corners(), large);
+	}
+
+	template<std::floating_point T>
+	constexpr bool IsInside(const OBB<T>& small, const AABB<T>& large) noexcept
+	{
+		std::array<Core::Vector3<T>, 8> corners = small.Corners();
+		Core::Vector3<T> min = Core::Min(corners[0], corners[1]);
+		Core::Vector3<T> max = Core::Max(corners[0], corners[1]);
+		for (std::size_t i = 2; i < corners.size(); ++i)
 		{
-			if (!simpleLarge.Contains(largeConjugate * (smallCorner - large.Center())))
-			{
-				return false;
-			}
+			min = Core::Min(min, corners[i]);
+			max = Core::Max(max, corners[i]);
 		}
 
-		return true;
+		return large.Contains(min) && large.Contains(max);
 	}
 
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Box<T>& small, const Box<T>& large) noexcept
+	template<std::floating_point T>
+	constexpr bool IsInside(const std::span<const Core::Vector3<T>> corners, const OBB<T>& large) noexcept
 	{
-		return IsInside(small.Min(), small.Max(), large);
-	}
-
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const AABB<T>& large) noexcept
-	{
-		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		for (const Core::Vector3<T>& corner : corners)
 		{
-			if (min[i] < large.Min(i) || max[i] > large.Max(i))
-			{
-				return false;
-			}
-		}
-
-		return true;
-	}
-
-	template<Core::Arithmetic T>
-	constexpr bool IsInside(const Core::Vector3<T>& min, const Core::Vector3<T>& max, const Box<T>& large) noexcept
-	{
-		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
-		{
-			if (min[i] < large.Min(i) || max[i] > large.Max(i))
+			if (!large.Contains(corner))
 			{
 				return false;
 			}

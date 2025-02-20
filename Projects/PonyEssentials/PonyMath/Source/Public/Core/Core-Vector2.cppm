@@ -316,6 +316,9 @@ export namespace PonyMath::Core
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Divide(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
+	template<Arithmetic T> [[nodiscard("Pure function")]]
+	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept;
+
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
 	/// @tparam T Component type.
 	/// @param left Left vector.
@@ -737,6 +740,18 @@ namespace PonyMath::Core
 		}
 
 		return quotient;
+	}
+
+	template<Arithmetic T>
+	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept
+	{
+		Vector2<T> answer;
+		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
+		{
+			answer[i] = std::abs(vector[i]);
+		}
+
+		return answer;
 	}
 
 	template<Arithmetic T>

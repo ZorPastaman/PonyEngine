@@ -24,6 +24,8 @@ import <string_view>;
 import <utility>;
 import <vector>;
 
+import PonyMath.Shape;
+
 import PonyShader.Core;
 
 import :Buffer;
@@ -118,6 +120,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<DescriptorHeap> heap; ///< Descriptor heap.
 
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
+		std::optional<PonyMath::Shape::AABB<float>> boundingBox;
 	};
 }
 

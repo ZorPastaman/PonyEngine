@@ -56,14 +56,19 @@ namespace PonyMath::Shape
 	constexpr bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept
 	{
 		const std::array<Core::Vector2<T>, 4> corners = small.Corners();
-		const Core::Vector2<T> min = Core::Min(corners[0], Core::Min(corners[1], Core::Min(corners[2], corners[3])));
-		const Core::Vector2<T> max = Core::Max(corners[0], Core::Max(corners[1], Core::Max(corners[2], corners[3])));
+		Core::Vector2<T> min = Core::Min(corners[0], corners[1]);
+		Core::Vector2<T> max = Core::Max(corners[0], corners[1]);
+		for (std::size_t i = 2; i < corners.size(); ++i)
+		{
+			min = Core::Min(min, corners[i]);
+			max = Core::Max(max, corners[i]);
+		}
 
 		return large.Contains(min) && large.Contains(max);
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept
+	constexpr bool IsInside(const std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept
 	{
 		for (const Core::Vector2<T>& corner : corners)
 		{

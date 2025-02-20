@@ -42,23 +42,23 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds) const noexcept override;
+		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Quaternion<float>& rotation) const noexcept override;
+		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept override;
+
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override; // TODO: Require in docs model and view matrices to be trs.
+		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
 
 		BoxCuller& operator =(const BoxCuller& other) noexcept = default;
 		BoxCuller& operator =(BoxCuller&& other) noexcept = default;
 
 	private:
 		[[nodiscard("Pure function")]]
-		static std::pair<PonyMath::Core::Vector3<float>, std::array<PonyMath::Core::Vector3<float>, 8>> GetTransformedData(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Matrix4x4<float>& mvMatrix);
-		[[nodiscard("Pure function")]]
-		static void TransformPoints(PonyMath::Core::Vector3<float>& center, std::span<PonyMath::Core::Vector3<float>, 8> corners, const PonyMath::Core::Matrix4x4<float>& mvMatrix) noexcept;
-
-		[[nodiscard("Pure function")]]
-		bool IsVisible(const PonyMath::Core::Vector3<float>& center, std::span<const PonyMath::Core::Vector3<float>, 8> corners) const noexcept;
+		bool CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept;
 
 		CameraBox cameraBox;
 		PonyMath::Core::Matrix4x4<float> viewMatrix;
@@ -101,124 +101,87 @@ namespace PonyEngine::Render
 		return cameraBox.Box().Contains(PonyMath::Core::TransformPoint(viewMatrix, point));
 	}
 
-	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& modelBounds) const noexcept
+	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept
 	{
-		PonyMath::Core::Vector3<float> center = modelBounds.Center();
-		std::array<PonyMath::Core::Vector3<float>, 8> corners = modelBounds.Corners();
-		TransformPoints(center, corners, viewMatrix);
-
-		return IsVisible(center, corners);
+		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix));
 	}
 
-	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Quaternion<float>& rotation) const noexcept
+	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
-		PonyMath::Core::Vector3<float> center = modelBounds.Center();
-		std::array<PonyMath::Core::Vector3<float>, 8> corners = modelBounds.Corners(rotation);
-		TransformPoints(center, corners, viewMatrix);
-
-		return IsVisible(center, corners);
+		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix));
 	}
 
-	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
+	bool BoxCuller::IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
 	{
-		PonyMath::Core::Vector3<float> center = modelBounds.Center();
-		std::array<PonyMath::Core::Vector3<float>, 8> corners = modelBounds.Corners();
-		TransformPoints(center, corners, viewMatrix * modelMatrix);
-
-		return IsVisible(center, corners);
+		return cameraBox.Box().Contains(PonyMath::Core::TransformPoint(viewMatrix * modelMatrix, point));
 	}
 
-	std::pair<PonyMath::Core::Vector3<float>, std::array<PonyMath::Core::Vector3<float>, 8>> BoxCuller::GetTransformedData(const PonyMath::Shape::AABB<float>& modelBounds, const PonyMath::Core::Matrix4x4<float>& mvMatrix)
+	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
 	{
-		std::pair<PonyMath::Core::Vector3<float>, std::array<PonyMath::Core::Vector3<float>, 8>> data;
-
-		data.first = PonyMath::Core::TransformPoint(mvMatrix, modelBounds.Center());
-
-		const PonyMath::Core::Vector3<float> extentsX = PonyMath::Core::TransformDirection(mvMatrix, PonyMath::Core::Vector3<float>())
+		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix * modelMatrix));
 	}
 
-	void BoxCuller::TransformPoints(PonyMath::Core::Vector3<float>& center, const std::span<PonyMath::Core::Vector3<float>, 8> corners, const PonyMath::Core::Matrix4x4<float>& mvMatrix) noexcept
+	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
 	{
-		center = PonyMath::Core::TransformPoint(mvMatrix, center);
+		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix * modelMatrix));
+	}
 
-		for (PonyMath::Core::Vector3<float>& corner : corners)
+	bool BoxCuller::CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept
+	{
+		const std::array<PonyMath::Core::Vector3<float>, 8> objectCorners = obb.Corners();
+		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)
 		{
-			corner = PonyMath::Core::TransformPoint(mvMatrix, corner);
-		}
-	}
-
-	bool BoxCuller::IsVisible(const PonyMath::Core::Vector3<float>& center, const std::span<const PonyMath::Core::Vector3<float>, 8> corners) const noexcept
-	{
-		for (std::size_t axisIndex = 0; axisIndex < CameraBox::BoxAxes.size(); ++axisIndex)
-		{
-			const PonyMath::Core::Vector3<float>& normal = CameraBox::BoxAxes[axisIndex];
+			const PonyMath::Core::Vector3<float>& axis = PonyMath::Shape::AABB<float>::Axes[axisIndex];
 			const float extent = cameraBox.Box().Extent(axisIndex);
 
-			std::array<float, 8> modelProjections;
-			for (std::size_t cornerIndex = 0; cornerIndex < modelProjections.size(); ++cornerIndex)
+			std::array<float, 8> projections;
+			for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
 			{
-				modelProjections[cornerIndex] = PonyMath::Core::Dot(normal, corners[cornerIndex] - cameraBox.Box().Center());
+				projections[cornerIndex] = PonyMath::Core::Dot(axis, objectCorners[cornerIndex] - cameraBox.Box().Center());
 			}
 
-			const auto [min, max] = std::ranges::minmax_element(modelProjections);
+			const auto [min, max] = std::ranges::minmax_element(projections);
 			if (*min > extent || *max < -extent)
 			{
 				return false;
 			}
 		}
 
-		const std::array<PonyMath::Core::Vector3<float>, 3> modelEdges =
+		for (std::size_t axisIndex = 0; axisIndex < objectCorners.size(); ++axisIndex)
 		{
-			corners[1] - corners[0],
-			corners[2] - corners[0],
-			corners[4] - corners[0]
-		};
-		for (const PonyMath::Core::Vector3<float>& modelEdge : modelEdges)
-		{
-			const float edgeLength = modelEdge.Magnitude();
-			if (edgeLength < 0.0001f)
-			{
-				continue;
-			}
-			const float halfEdgeLength = edgeLength * 0.5f;
-			const PonyMath::Core::Vector3<float> normal = modelEdge * (1.f / edgeLength);
+			const PonyMath::Core::Vector3<float>& axis = obb.Axis(axisIndex);
+			const float extent = obb.Extent(axisIndex);
 
-			std::array<float, 8> cameraProjections;
+			std::array<float, 8> projections;
 			for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
 			{
-				cameraProjections[cornerIndex] = PonyMath::Core::Dot(normal, cameraBox.Corner(cornerIndex) - center);
+				projections[cornerIndex] = PonyMath::Core::Dot(axis, cameraBox.Corner(cornerIndex) - obb.Center());
 			}
 
-			const auto [min, max] = std::ranges::minmax_element(cameraProjections);
-			if (*min > halfEdgeLength || *max < -halfEdgeLength)
+			const auto [min, max] = std::ranges::minmax_element(projections);
+			if (*min > extent || *max < -extent)
 			{
 				return false;
 			}
 		}
 
-		for (const PonyMath::Core::Vector3<float>& cameraEdge : cameraBox.Edges())
+		for (const PonyMath::Core::Vector3<float>& cameraAxis : PonyMath::Shape::AABB<float>::Axes)
 		{
-			for (const PonyMath::Core::Vector3<float>& modelEdge : modelEdges)
+			for (const PonyMath::Core::Vector3<float>& objectAxis : obb.Axes())
 			{
-				PonyMath::Core::Vector3<float> normal = PonyMath::Core::Cross(cameraEdge, modelEdge);
-				const float normalMagnitude = normal.Magnitude();
-				if (normalMagnitude < 0.0001f)
-				{
-					continue;
-				}
-				normal *= 1.f / normalMagnitude;
+				const PonyMath::Core::Vector3<float> axis = PonyMath::Core::Cross(cameraAxis, objectAxis);
 
 				std::array<float, 8> cameraProjections;
-				std::array<float, 8> modelProjections;
-				for (std::size_t i = 0; i < 8; ++i)
+				std::array<float, 8> objectProjections;
+				for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
 				{
-					cameraProjections[i] = PonyMath::Core::Dot(normal, cameraBox.Corner(i));
-					modelProjections[i] = PonyMath::Core::Dot(normal, corners[i]);
+					cameraProjections[cornerIndex] = PonyMath::Core::Dot(axis, cameraBox.Corner(cornerIndex));
+					objectProjections[cornerIndex] = PonyMath::Core::Dot(axis, objectCorners[cornerIndex]);
 				}
 
 				const auto [cameraMin, cameraMax] = std::ranges::minmax_element(cameraProjections);
-				const auto [modelMin, modelMax] = std::ranges::minmax_element(modelProjections);
-				if (*cameraMin > *modelMax || *cameraMax < *modelMin)
+				const auto [objectMin, objectMax] = std::ranges::minmax_element(objectProjections);
+				if (*cameraMin > *objectMax || *cameraMax < *objectMin)
 				{
 					return false;
 				}

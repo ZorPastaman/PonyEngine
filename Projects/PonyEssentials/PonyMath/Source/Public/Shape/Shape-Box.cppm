@@ -25,8 +25,6 @@ export namespace PonyMath::Shape
 	public:
 		using ValueType = T;
 
-		struct Predefined;
-
 		static constexpr std::size_t LeftBottomNearIndex = 0;
 		static constexpr std::size_t RightBottomNearIndex = 1;
 		static constexpr std::size_t LeftTopNearIndex = 2;
@@ -36,6 +34,8 @@ export namespace PonyMath::Shape
 		static constexpr std::size_t LeftTopFarIndex = 2;
 		static constexpr std::size_t RightTopFarIndex = 3;
 		static constexpr std::size_t CornerCount = 8;
+
+		struct Predefined;
 
 		[[nodiscard("Pure constructor")]]
 		constexpr Box() noexcept = default;
