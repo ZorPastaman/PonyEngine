@@ -206,7 +206,7 @@ export namespace PonyMath::Shape
 	{
 		NON_CONSTRUCTIBLE_BODY(Predefined)
 
-		static constexpr auto Zero = AABB(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< AABB(0, 0, 0, 0, 0, 0).
+		static inline const auto Zero = AABB(T{0}, T{0}, T{0}, T{0}, T{0}, T{0}); ///< AABB(0, 0, 0, 0, 0, 0).
 	};
 }
 

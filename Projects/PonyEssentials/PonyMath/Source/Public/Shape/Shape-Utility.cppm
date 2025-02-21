@@ -70,7 +70,7 @@ namespace PonyMath::Shape
 
 		AABB<T> answer;
 		answer.Center() = (min + max) / T{2};
-		answer.Extents(Core::Vector2<T>(max.X() - answer.Center().X(), max.Y() - answer.Center().Y(), max.Z() - answer.Center().Z()));
+		answer.Extents(Core::Vector3<T>(max.X() - answer.Center().X(), max.Y() - answer.Center().Y(), max.Z() - answer.Center().Z()));
 
 		return answer;
 	}

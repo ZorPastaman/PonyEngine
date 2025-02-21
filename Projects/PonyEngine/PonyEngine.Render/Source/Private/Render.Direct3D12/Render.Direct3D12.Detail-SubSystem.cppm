@@ -175,7 +175,6 @@ export namespace PonyEngine::Render::Direct3D12
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 #ifdef _DEBUG
-		// TODO: Use report live objects.
 		Microsoft::WRL::ComPtr<ID3D12Debug6> debug; ///< Debug interface.
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
@@ -254,17 +253,17 @@ namespace PonyEngine::Render::Direct3D12
 		graphicsWaiter.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline waiter destroyed.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline waiter.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline waiter.");
 		copyWaiter.reset();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter destroyed.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline waiter destroyed.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy graphics pipeline.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy graphics pipeline.");
 		graphicsPipeline.reset();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline destroyed.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Graphics pipeline destroyed.");
 
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy copy pipeline.");
 		copyPipeline.reset();
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline destroyed.'");
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Copy pipeline destroyed.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy render object manager.");
 		renderObjectManager.reset();

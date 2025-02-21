@@ -57,11 +57,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the mesh.
 		/// @return Mesh.
 		[[nodiscard("Pure function")]]
-		class Mesh& Mesh() noexcept;
+		class Mesh* Mesh() noexcept;
 		/// @brief Gets the mesh.
 		/// @return Mesh.
 		[[nodiscard("Pure function")]]
-		const class Mesh& Mesh() const noexcept;
+		const class Mesh* Mesh() const noexcept;
 
 		RenderObject& operator =(const RenderObject& other) noexcept = default;
 		RenderObject& operator =(RenderObject&& other) noexcept = default;
@@ -102,13 +102,13 @@ namespace PonyEngine::Render::Direct3D12
 		return *material;
 	}
 
-	Mesh& RenderObject::Mesh() noexcept
+	Mesh* RenderObject::Mesh() noexcept
 	{
-		return *mesh;
+		return mesh.get();
 	}
 
-	const Mesh& RenderObject::Mesh() const noexcept
+	const Mesh* RenderObject::Mesh() const noexcept
 	{
-		return *mesh;
+		return mesh.get();
 	}
 }

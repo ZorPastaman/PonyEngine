@@ -23,7 +23,7 @@ export namespace PonyShader::Core
 		static constexpr std::uint32_t ThreadGroupCountProductMax = 4194304u;
 
 		[[nodiscard("Pure constructor")]]
-		ThreadGroupCounts() noexcept;
+		ThreadGroupCounts() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		ThreadGroupCounts(std::uint32_t x, std::uint32_t y, std::uint32_t z);
 		[[nodiscard("Pure constructor")]]
@@ -53,6 +53,9 @@ export namespace PonyShader::Core
 		ThreadGroupCounts& operator =(const ThreadGroupCounts& other) noexcept = default;
 		ThreadGroupCounts& operator =(ThreadGroupCounts&& other) noexcept = default;
 
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const ThreadGroupCounts& other) const noexcept;
+
 	private:
 		std::array<std::uint32_t, 3> counts;
 		std::uint32_t padding = 0u;
@@ -61,11 +64,6 @@ export namespace PonyShader::Core
 
 namespace PonyShader::Core
 {
-	ThreadGroupCounts::ThreadGroupCounts() noexcept :
-		counts{ 1u, 1u, 1u }
-	{
-	}
-
 	ThreadGroupCounts::ThreadGroupCounts(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z)
 	{
 		Set(x, y, z);
@@ -157,5 +155,10 @@ namespace PonyShader::Core
 	void ThreadGroupCounts::Set(const std::span<const std::uint32_t, 3> span)
 	{
 		Set(span[0], span[1], span[2]);
+	}
+
+	bool ThreadGroupCounts::operator ==(const ThreadGroupCounts& other) const noexcept
+	{
+		return counts == other.counts;
 	}
 }

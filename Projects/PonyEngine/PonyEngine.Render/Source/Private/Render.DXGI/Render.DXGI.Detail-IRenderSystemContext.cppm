@@ -9,7 +9,6 @@
 
 module;
 
-#include "PonyBase/Core/DXGI/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
 export module PonyEngine.Render.DXGI.Detail:IRenderSystemContext;
@@ -22,14 +21,5 @@ export namespace PonyEngine::Render::DXGI
 	class IRenderSystemContext : public Render::IRenderSystemContext
 	{
 		INTERFACE_BODY(IRenderSystemContext)
-
-		/// @brief Gets the graphics device.
-		/// @return Graphics device.
-		[[nodiscard("Pure function")]]
-		virtual IUnknown* Device() noexcept = 0;
-		/// @brief Gets the graphics device.
-		/// @return Graphics device.
-		[[nodiscard("Pure function")]]
-		virtual const IUnknown* Device() const noexcept = 0;
 	};
 }

@@ -23,11 +23,11 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		FrustumCuller() noexcept;
+		FrustumCuller() noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		FrustumCuller(const CameraFrustum& frustum, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept;
+		explicit FrustumCuller(const CameraFrustum& frustum) noexcept;
 		[[nodiscard("Pure constructor")]]
-		FrustumCuller(const PerspectiveParams& perspective, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept;
+		explicit FrustumCuller(const PerspectiveParams& perspective) noexcept;
 		[[nodiscard("Pure constructor")]]
 		FrustumCuller(const FrustumCuller& other) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -38,16 +38,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept override;
-		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
 
 		FrustumCuller& operator =(const FrustumCuller& other) noexcept = default;
 		FrustumCuller& operator =(FrustumCuller&& other) noexcept = default;
@@ -57,69 +48,39 @@ export namespace PonyEngine::Render
 		bool CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept;
 
 		CameraFrustum frustum;
-		PonyMath::Core::Matrix4x4<float> viewMatrix;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	FrustumCuller::FrustumCuller() noexcept :
-		viewMatrix(PonyMath::Core::Matrix4x4<float>::Predefined::Identity)
+	FrustumCuller::FrustumCuller(const CameraFrustum& frustum) noexcept :
+		frustum(frustum)
 	{
 	}
 
-	FrustumCuller::FrustumCuller(const CameraFrustum& frustum, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept :
-		frustum(frustum),
-		viewMatrix(viewMatrix)
-	{
-	}
-
-	FrustumCuller::FrustumCuller(const PerspectiveParams& perspective, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept :
-		frustum(perspective),
-		viewMatrix(viewMatrix)
+	FrustumCuller::FrustumCuller(const PerspectiveParams& perspective) noexcept :
+		frustum(perspective)
 	{
 	}
 
 	FrustumCuller::FrustumCuller(const FrustumCuller& other) noexcept :
-		frustum(other.frustum),
-		viewMatrix(other.viewMatrix)
+		frustum(other.frustum)
 	{
 	}
 
 	FrustumCuller::FrustumCuller(FrustumCuller&& other) noexcept :
-		frustum(std::move(other.frustum)),
-		viewMatrix(std::move(other.viewMatrix))
+		frustum(std::move(other.frustum))
 	{
 	}
 
 	bool FrustumCuller::IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept
 	{
-		return frustum.Contains(PonyMath::Core::TransformPoint(viewMatrix, point));
-	}
-
-	bool FrustumCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix));
+		return frustum.Contains(point);
 	}
 
 	bool FrustumCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix));
-	}
-
-	bool FrustumCuller::IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return frustum.Contains(PonyMath::Core::TransformPoint(viewMatrix * modelMatrix, point));
-	}
-
-	bool FrustumCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix * modelMatrix));
-	}
-
-	bool FrustumCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix * modelMatrix));
+		return CheckVisibility(obb);
 	}
 
 	bool FrustumCuller::CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept
@@ -129,7 +90,7 @@ namespace PonyEngine::Render
 		for (std::size_t axisIndex = 0; axisIndex < CameraFrustum::DifferentNormalPlaneCount; ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = frustum.Plane(axisIndex).Normal();
-			const std::pair<float, float>& extents = frustum.Extent(axisIndex);
+			const auto& [minExtent, maxExtent] = frustum.Extent(axisIndex);
 
 			std::array<float, PonyMath::Shape::OBB<float>::CornerCount> projections;
 			for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::OBB<float>::CornerCount; ++cornerIndex)
@@ -138,7 +99,7 @@ namespace PonyEngine::Render
 			}
 
 			const auto [min, max] = std::ranges::minmax_element(projections);
-			if (*min > extents.second || *max < extents.first)
+			if (*min > maxExtent || *max < minExtent)
 			{
 				return false;
 			}

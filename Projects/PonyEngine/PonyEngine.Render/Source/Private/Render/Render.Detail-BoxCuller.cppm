@@ -27,11 +27,11 @@ export namespace PonyEngine::Render
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		BoxCuller() noexcept;
+		BoxCuller() noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept;
+		explicit BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox) noexcept;
 		[[nodiscard("Pure constructor")]]
-		BoxCuller(const OrthographicParams& orthographic, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept;
+		explicit BoxCuller(const OrthographicParams& orthographic) noexcept;
 		[[nodiscard("Pure constructor")]]
 		BoxCuller(const BoxCuller& other) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -42,16 +42,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept override;
-		[[nodiscard("Pure function")]]
 		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual bool IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept override;
 
 		BoxCuller& operator =(const BoxCuller& other) noexcept = default;
 		BoxCuller& operator =(BoxCuller&& other) noexcept = default;
@@ -61,69 +52,39 @@ export namespace PonyEngine::Render
 		bool CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept;
 
 		CameraBox cameraBox;
-		PonyMath::Core::Matrix4x4<float> viewMatrix;
 	};
 }
 
 namespace PonyEngine::Render
 {
-	BoxCuller::BoxCuller() noexcept :
-		viewMatrix(PonyMath::Core::Matrix4x4<float>::Predefined::Identity)
+	BoxCuller::BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox) noexcept :
+		cameraBox(cameraBox)
 	{
 	}
 
-	BoxCuller::BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept :
-		cameraBox(cameraBox),
-		viewMatrix(viewMatrix)
-	{
-	}
-
-	BoxCuller::BoxCuller(const OrthographicParams& orthographic, const PonyMath::Core::Matrix4x4<float>& viewMatrix) noexcept :
-		cameraBox(orthographic),
-		viewMatrix(viewMatrix)
+	BoxCuller::BoxCuller(const OrthographicParams& orthographic) noexcept :
+		cameraBox(orthographic)
 	{
 	}
 
 	BoxCuller::BoxCuller(const BoxCuller& other) noexcept :
-		cameraBox(other.cameraBox),
-		viewMatrix(other.viewMatrix)
+		cameraBox(other.cameraBox)
 	{
 	}
 
 	BoxCuller::BoxCuller(BoxCuller&& other) noexcept :
-		cameraBox(std::move(other.cameraBox)),
-		viewMatrix(std::move(other.viewMatrix))
+		cameraBox(std::move(other.cameraBox))
 	{
 	}
 
 	bool BoxCuller::IsVisible(const PonyMath::Core::Vector3<float>& point) const noexcept
 	{
-		return cameraBox.Box().Contains(PonyMath::Core::TransformPoint(viewMatrix, point));
-	}
-
-	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix));
+		return cameraBox.Box().Contains(point);
 	}
 
 	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix));
-	}
-
-	bool BoxCuller::IsVisible(const PonyMath::Core::Vector3<float>& point, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return cameraBox.Box().Contains(PonyMath::Core::TransformPoint(viewMatrix * modelMatrix, point));
-	}
-
-	bool BoxCuller::IsVisible(const PonyMath::Shape::AABB<float>& aabb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(aabb, viewMatrix * modelMatrix));
-	}
-
-	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb, const PonyMath::Core::Matrix4x4<float>& modelMatrix) const noexcept
-	{
-		return CheckVisibility(PonyMath::Shape::OBB<float>(obb, viewMatrix * modelMatrix));
+		return CheckVisibility(obb);
 	}
 
 	bool BoxCuller::CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept

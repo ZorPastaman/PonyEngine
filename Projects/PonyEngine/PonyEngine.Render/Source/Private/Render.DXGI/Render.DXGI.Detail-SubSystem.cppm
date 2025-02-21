@@ -77,11 +77,6 @@ export namespace PonyEngine::Render::DXGI
 		[[nodiscard("Pure function")]]
 		virtual const IDXGIFactory7& Factory() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual IUnknown& Device() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IUnknown& Device() const noexcept override;
-
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 #ifdef _DEBUG
@@ -199,19 +194,5 @@ namespace PonyEngine::Render::DXGI
 	const IDXGIFactory7& SubSystem::Factory() const noexcept
 	{
 		return *factory.Get();
-	}
-
-	IUnknown& SubSystem::Device() noexcept
-	{
-		IUnknown* const device = renderSystem->Device();
-		assert(device && "The render system device is nullptr.");
-		return *device;
-	}
-
-	const IUnknown& SubSystem::Device() const noexcept
-	{
-		const IUnknown* const device = renderSystem->Device();
-		assert(device && "The render system device is nullptr.");
-		return *device;
 	}
 }

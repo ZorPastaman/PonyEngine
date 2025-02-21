@@ -77,11 +77,6 @@ export namespace PonyEngine::Render::Direct3D12::Windows
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
-		[[nodiscard("Pure function")]]
-		virtual IUnknown* Device() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const IUnknown* Device() const noexcept override;
-
 		std::unique_ptr<DXGI::SubSystem> dxgiSubSystem; ///< DXGI sub-system.
 		std::unique_ptr<Direct3D12::SubSystem> direct3D12SubSystem; ///< Direct3D12 sub-system.
 	};
@@ -131,6 +126,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		const std::uint32_t bufferCount = renderParams.swapChainParams.bufferCount;
 		const auto swapChainParams = DXGI::SwapChainParams
 		{
+			.device = &direct3D12SubSystem->GraphicsCommandQueue(),
 			.hWnd = windowHandle,
 			.resolution = renderResolution,
 			.bufferCount = bufferCount
@@ -223,15 +219,5 @@ namespace PonyEngine::Render::Direct3D12::Windows
 	const PonyDebug::Log::ILogger& RenderSystem::Logger() const noexcept
 	{
 		return Engine().Logger();
-	}
-
-	IUnknown* RenderSystem::Device() noexcept
-	{
-		return &direct3D12SubSystem->GraphicsCommandQueue();
-	}
-
-	const IUnknown* RenderSystem::Device() const noexcept
-	{
-		return &direct3D12SubSystem->GraphicsCommandQueue();
 	}
 }

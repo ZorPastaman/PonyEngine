@@ -659,6 +659,11 @@ namespace PonyEngine::Render
 
 	void Mesh::ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet)
 	{
+		if (threadGroupCounts == threadGroupCountsToSet)
+		{
+			return;;
+		}
+
 		threadGroupCounts = threadGroupCountsToSet;
 		OnThreadGroupCountsChanged();
 	}
@@ -670,6 +675,11 @@ namespace PonyEngine::Render
 
 	void Mesh::BoundingBox(const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept
 	{
+		if (this->boundingBox == boundingBox)
+		{
+			return;
+		}
+
 		this->boundingBox = boundingBox;
 		OnBoundingBoxChanged();
 	}

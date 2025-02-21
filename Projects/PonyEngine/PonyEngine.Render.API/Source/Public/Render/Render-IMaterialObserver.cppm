@@ -30,6 +30,7 @@ export namespace PonyEngine::Render
 		virtual void OnDataSlotsChanged() noexcept = 0;
 
 		virtual void OnThreadGroupCountsChanged() noexcept = 0;
+		virtual void OnCameraCullingChanged() noexcept = 0;
 
 		virtual void OnNameChanged() noexcept = 0;
 	};

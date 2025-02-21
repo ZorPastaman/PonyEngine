@@ -40,14 +40,5 @@ export namespace PonyEngine::Render::DXGI
 		/// @return Factory.
 		[[nodiscard("Pure function")]]
 		virtual const IDXGIFactory7& Factory() const noexcept = 0;
-
-		/// @brief Gets the graphics device.
-		/// @return Graphics device.
-		[[nodiscard("Pure function")]]
-		virtual IUnknown& Device() noexcept = 0;
-		/// @brief Gets the graphics device.
-		/// @return Graphics device.
-		[[nodiscard("Pure function")]]
-		virtual const IUnknown& Device() const noexcept = 0;
 	};
 }
