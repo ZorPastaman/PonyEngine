@@ -46,6 +46,8 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure constructor")]]
 		constexpr OBB() noexcept;
 		[[nodiscard("Pure constructor")]]
+		explicit constexpr OBB(const AABB<T>& aabb) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr OBB(const AABB<T>& aabb, const Core::Quaternion<T>& quaternion) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OBB(const AABB<T>& aabb, const Core::Matrix3x3<T>& rs) noexcept;
@@ -160,6 +162,14 @@ namespace PonyMath::Shape
 {
 	template<std::floating_point T>
 	constexpr OBB<T>::OBB() noexcept :
+		axes{ Core::Vector3<T>::Predefined::Right, Core::Vector3<T>::Predefined::Up, Core::Vector3<T>::Predefined::Forward }
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr OBB<T>::OBB(const AABB<T>& aabb) noexcept :
+		center(aabb.Center()),
+		extents(aabb.Extents()),
 		axes{ Core::Vector3<T>::Predefined::Right, Core::Vector3<T>::Predefined::Up, Core::Vector3<T>::Predefined::Forward }
 	{
 	}
@@ -339,9 +349,9 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	std::array<Core::Vector3<T>, 8> OBB<T>::Corners() const noexcept
 	{
-		const Core::Vector2<T> extentX = AxisX() * ExtentX();
-		const Core::Vector2<T> extentY = AxisY() * ExtentY();
-		const Core::Vector2<T> extentZ = AxisZ() * ExtentZ();
+		const Core::Vector3<T> extentX = AxisX() * ExtentX();
+		const Core::Vector3<T> extentY = AxisY() * ExtentY();
+		const Core::Vector3<T> extentZ = AxisZ() * ExtentZ();
 
 		return std::array<Core::Vector3<T>, 8>
 		{
@@ -432,7 +442,7 @@ namespace PonyMath::Shape
 			}
 			else
 			{
-				incorrectFlags |= 1 << i;
+				incorrectFlags |= std::size_t{1} << i;
 			}
 		}
 

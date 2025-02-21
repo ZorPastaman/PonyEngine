@@ -111,7 +111,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void SyncCameraTaskCount();
 		void UpdateCameraTasks();
 		[[nodiscard("Pure function")]]
-		bool Cull(const ICuller& culler, const RenderObject& renderObject);
+		bool Cull(const Camera& camera, const RenderObject& renderObject);
 		void AddData(const Camera& camera, RenderObject& renderObject);
 		void AddMesh(RenderObject& renderObject);
 		void AddContext(const RenderObject& renderObject);
@@ -301,7 +301,6 @@ namespace PonyEngine::Render::Direct3D12
 		for (std::uint32_t cameraIndex = 0u, dataIndex = 0u; cameraIndex < static_cast<std::uint32_t>(cameras.size()); ++cameraIndex)
 		{
 			const Camera& camera = *cameras[cameraIndex];
-			const ICuller& culler = camera.Culler();
 			CameraTask& cameraTask = cameraTasks[cameraIndex];
 			cameraTask.renderObjectTasks.clear();
 
@@ -309,7 +308,7 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				RenderObject& renderObject = *renderObjects[renderObjectIndex];
 
-				if (Cull(culler, renderObject))
+				if (Cull(camera, renderObject))
 				{
 					continue;
 				}
@@ -321,9 +320,24 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	bool GraphicsPipeline::Cull(const ICuller& culler, const RenderObject& renderObject)
+	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject)
 	{
-		return !culler.IsVisible(PonyMath::Core::TransformPoint(renderObject.ModelMatrix(), PonyMath::Core::Vector3<float>::Predefined::Zero));
+		if (!renderObject.Material().CameraCulling())
+		{
+			return false;
+		}
+		const Mesh* const mesh = renderObject.Mesh();
+		if (!mesh)
+		{
+			return false;
+		}
+		const std::optional<PonyMath::Shape::AABB<float>>& boundingBox = mesh->BoundingBox();
+		if (!boundingBox)
+		{
+			return false;
+		}
+
+		return !camera.Culler().IsVisible(PonyMath::Shape::OBB<float>(boundingBox.value(), camera.ViewMatrix() * renderObject.ModelMatrix()));
 	}
 
 	void GraphicsPipeline::AddData(const Camera& camera, RenderObject& renderObject)
@@ -335,13 +349,18 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::AddMesh(RenderObject& renderObject)
 	{
-		meshes.insert(&renderObject.Mesh());
+		if (Mesh* const mesh = renderObject.Mesh())
+		{
+			meshes.insert(mesh);
+		}
 	}
 
 	void GraphicsPipeline::AddContext(const RenderObject& renderObject)
 	{
+		const Mesh* mesh = renderObject.Mesh();
+
 		const ThreadGroupCounts& materialGroups = renderObject.Material().ThreadGroupCounts();
-		const PonyShader::Core::ThreadGroupCounts& meshGroups = renderObject.Mesh().ThreadGroupCounts();
+		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
 		const auto context = PonyShader::Core::Context
 		{
 			.dispatchThreadGroupCounts = CreateDispatchThreadGroupCounts(materialGroups, meshGroups),
@@ -466,8 +485,11 @@ namespace PonyEngine::Render::Direct3D12
 			const std::uint32_t destIndex = destOffset + descriptorCount;
 
 			originalHeapOffsets[&heap->Heap()] = destIndex;
-			D3D12System().Device().CopyDescriptorsSimple(handleCount, dataHeap->CpuHandle(destIndex), 
-				mesh->Heap()->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			if (handleCount > 0u)
+			{
+				D3D12System().Device().CopyDescriptorsSimple(handleCount, dataHeap->CpuHandle(destIndex), 
+					mesh->Heap()->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			}
 
 			descriptorCount += handleCount;
 		}
@@ -481,7 +503,7 @@ namespace PonyEngine::Render::Direct3D12
 		const std::uint32_t descriptorCount = static_cast<std::uint32_t>(data.data.size());
 
 		originalHeapOffsets[&data.heap->Heap()] = destOffset;
-		if (descriptorCount > 0u) // TODO: Check other lines for zero count guard.
+		if (descriptorCount > 0u)
 		{
 			D3D12System().Device().CopyDescriptorsSimple(descriptorCount, dataHeap->CpuHandle(destOffset), 
 				data.heap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
@@ -777,7 +799,7 @@ namespace PonyEngine::Render::Direct3D12
 
 		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frame->RtvHandle();
 		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = frame->DsvHandle();
-		CommandList().ClearRenderTargetView(rtvHandle, camera.ClearColor().Span().data(), 1u, &rect);
+		CommandList().ClearRenderTargetView(rtvHandle, camera.ClearColor().Span().data(), 1u, &rect); // TODO: Add clear flags
 		CommandList().ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 1u, &rect);
 	}
 
@@ -795,12 +817,21 @@ namespace PonyEngine::Render::Direct3D12
 				return leftMaterial->IsTransparent() < rightMaterial->IsTransparent();
 			}
 
+			const Mesh* const leftMesh = leftRenderObject->Mesh();
+			const Mesh* const rightMesh = rightRenderObject->Mesh();
+			const PonyMath::Core::Vector3<float>& leftCentralPoint = leftMesh && leftMesh->BoundingBox()
+				? leftMesh->BoundingBox().value().Center()
+				: PonyMath::Core::Vector3<float>::Predefined::Zero;
+			const PonyMath::Core::Vector3<float>& rightCentralPoint = rightMesh && rightMesh->BoundingBox()
+				? rightMesh->BoundingBox().value().Center()
+				: PonyMath::Core::Vector3<float>::Predefined::Zero;
+
 			const PonyShader::Space::Transform& leftTransform = transforms.data[left.dataIndex];
 			const PonyShader::Space::Transform& rightTransform = transforms.data[right.dataIndex];
 
 			if (leftMaterial->IsTransparent())
 			{
-				return PonyMath::Core::ExtractTranslation(leftTransform.MvpMatrix()).Z() > PonyMath::Core::ExtractTranslation(rightTransform.MvpMatrix()).Z();
+				return PonyMath::Core::TransformPoint(leftTransform.MvpMatrix(), leftCentralPoint).Z() > PonyMath::Core::TransformPoint(rightTransform.MvpMatrix(), rightCentralPoint).Z();
 			}
 
 			if (leftMaterial->RootSignature() != rightMaterial->RootSignature())
@@ -812,12 +843,12 @@ namespace PonyEngine::Render::Direct3D12
 				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
 			}
 
-			if (&leftRenderObject->Mesh() != &rightRenderObject->Mesh())
+			if (leftMesh != rightMesh)
 			{
-				return reinterpret_cast<std::uintptr_t>(&leftRenderObject->Mesh()) < reinterpret_cast<std::uintptr_t>(&rightRenderObject->Mesh());
+				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
 			}
 
-			return PonyMath::Core::ExtractTranslation(leftTransform.MvpMatrix()).Z() < PonyMath::Core::ExtractTranslation(rightTransform.MvpMatrix()).Z();
+			return PonyMath::Core::TransformPoint(leftTransform.MvpMatrix(), leftCentralPoint).Z() < PonyMath::Core::TransformPoint(rightTransform.MvpMatrix(), rightCentralPoint).Z();
 		});
 	}
 
@@ -834,7 +865,7 @@ namespace PonyEngine::Render::Direct3D12
 			RenderObject* const renderObject = renderObjects[renderObjectTask.renderObjectIndex];
 			Material* const material = &renderObject->Material();
 			RootSignature* const rootSignature = material->RootSignature();
-			const Mesh* const mesh = &renderObject->Mesh();
+			const Mesh* const mesh = renderObject->Mesh();
 
 			PopulateMaterial(prevRootSignature, prevMaterial, rootSignature, material);
 			PopulateMesh(prevRootSignature, prevMesh, rootSignature, mesh);
@@ -863,7 +894,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateMesh(const RootSignature* const prevRootSignature, const Mesh* const prevMesh, const RootSignature* const rootSignature, const Mesh* const mesh)
 	{
-		if (mesh != prevMesh || rootSignature != prevRootSignature)
+		if (mesh && (mesh != prevMesh || rootSignature != prevRootSignature))
 		{
 			for (const auto& [dataType, dataSlot] : rootSignature->DataSlots())
 			{

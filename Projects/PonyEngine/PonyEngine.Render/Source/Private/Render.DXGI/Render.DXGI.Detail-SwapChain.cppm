@@ -77,9 +77,8 @@ namespace PonyEngine::Render::DXGI
 	SwapChain::SwapChain(ISubSystemContext& dxgiSystem, const SwapChainParams& swapChainParams) :
 		dxgiSystem{&dxgiSystem}
 	{
-		IUnknown* const device = &this->dxgiSystem->Device();
 		PONY_LOG(this->dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Acquire swap chain for '0x{:X}' device and '0x{:X}' window. Resolution: '{}'; Buffer count : {}.",
-			reinterpret_cast<std::uintptr_t>(device), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), swapChainParams.bufferCount);
+			reinterpret_cast<std::uintptr_t>(swapChainParams.device.Get()), reinterpret_cast<std::uintptr_t>(swapChainParams.hWnd), swapChainParams.resolution.ToString(), swapChainParams.bufferCount);
 		const auto swapChainDescription = DXGI_SWAP_CHAIN_DESC1
 		{
 			.Width = swapChainParams.resolution.Width(),
@@ -95,7 +94,7 @@ namespace PonyEngine::Render::DXGI
 			.Flags = DXGI_SWAP_CHAIN_FLAG_ALLOW_TEARING
 		};
 		Microsoft::WRL::ComPtr<IDXGISwapChain1> acquiredSwapChain;
-		if (const HRESULT result = this->dxgiSystem->Factory().CreateSwapChainForHwnd(device, swapChainParams.hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
+		if (const HRESULT result = this->dxgiSystem->Factory().CreateSwapChainForHwnd(swapChainParams.device.Get(), swapChainParams.hWnd, &swapChainDescription, nullptr, nullptr, acquiredSwapChain.GetAddressOf()); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}

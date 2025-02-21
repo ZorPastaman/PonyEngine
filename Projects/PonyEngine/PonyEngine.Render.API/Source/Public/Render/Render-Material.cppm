@@ -76,6 +76,10 @@ export namespace PonyEngine::Render
 		void ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
+		bool CameraCulling() const noexcept;
+		void CameraCulling(bool culling) noexcept;
+
+		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
 		void Name(std::string_view nameToSet);
 		void Name(std::string&& nameToSet);
@@ -98,6 +102,7 @@ export namespace PonyEngine::Render
 		void OnDataSlotsChanged() const noexcept;
 
 		void OnThreadGroupCountsChanged() const noexcept;
+		void OnCameraCullingChanged() const noexcept;
 
 		void OnNameChanged() const noexcept;
 
@@ -112,6 +117,7 @@ export namespace PonyEngine::Render
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
 		struct ThreadGroupCounts threadGroupCounts;
+		bool cameraCulling;
 
 		std::string name;
 
@@ -130,6 +136,7 @@ namespace PonyEngine::Render
 		rasterizer(params.rasterizer),
 		dataSlots(params.dataSlots),
 		threadGroupCounts(params.threadGroupCounts),
+		cameraCulling(params.cameraCulling),
 		name(params.name)
 	{
 	}
@@ -143,6 +150,7 @@ namespace PonyEngine::Render
 		rasterizer(other.rasterizer),
 		dataSlots(other.dataSlots),
 		threadGroupCounts(other.threadGroupCounts),
+		cameraCulling(other.cameraCulling),
 		name(other.name)
 	{
 	}
@@ -156,6 +164,7 @@ namespace PonyEngine::Render
 		rasterizer(std::move(other.rasterizer)),
 		dataSlots(std::move(other.dataSlots)),
 		threadGroupCounts(std::move(other.threadGroupCounts)),
+		cameraCulling(std::move(other.cameraCulling)),
 		name(std::move(other.name))
 	{
 	}
@@ -347,8 +356,29 @@ namespace PonyEngine::Render
 
 	void Material::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept
 	{
+		if (threadGroupCounts == threadGroupCountsToSet)
+		{
+			return;
+		}
+
 		threadGroupCounts = threadGroupCountsToSet;
 		OnThreadGroupCountsChanged();
+	}
+
+	bool Material::CameraCulling() const noexcept
+	{
+		return cameraCulling;
+	}
+
+	void Material::CameraCulling(const bool culling) noexcept
+	{
+		if (cameraCulling == culling)
+		{
+			return;
+		}
+
+		cameraCulling = culling;
+		OnCameraCullingChanged();
 	}
 
 	std::string_view Material::Name() const noexcept
@@ -358,12 +388,22 @@ namespace PonyEngine::Render
 
 	void Material::Name(const std::string_view nameToSet)
 	{
+		if (name == nameToSet)
+		{
+			return;
+		}
+
 		name = nameToSet;
 		OnNameChanged();
 	}
 
 	void Material::Name(std::string&& nameToSet)
 	{
+		if (name == nameToSet)
+		{
+			return;
+		}
+
 		name = std::move(nameToSet);
 		OnNameChanged();
 	}
@@ -445,6 +485,14 @@ namespace PonyEngine::Render
 		}
 	}
 
+	void Material::OnCameraCullingChanged() const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnCameraCullingChanged();
+		}
+	}
+
 	void Material::OnNameChanged() const noexcept
 	{
 		for (IMaterialObserver* const observer : materialObservers)
@@ -464,6 +512,8 @@ namespace PonyEngine::Render
 		DataSlots(other.dataSlots);
 
 		ThreadGroupCounts(other.threadGroupCounts);
+		CameraCulling(other.cameraCulling);
+
 		Name(other.name);
 
 		return *this;
@@ -480,6 +530,8 @@ namespace PonyEngine::Render
 		DataSlots(std::move(other.dataSlots));
 
 		ThreadGroupCounts(other.threadGroupCounts);
+		CameraCulling(other.cameraCulling);
+
 		Name(std::move(other.name));
 
 		return *this;

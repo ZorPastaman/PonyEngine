@@ -138,7 +138,7 @@ namespace Game
 			},
 			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
 			{
-				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(),
+				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(1u, 1u, 1u),
 				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMaterial
 			},
 			.name = "Box"
@@ -156,12 +156,12 @@ namespace Game
 		});
 		const auto triangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
 		{
-			PonyShader::Mesh::Primitive(0u, 1u, 2u),
-			PonyShader::Mesh::Primitive(0u, 2u, 3u),
-			PonyShader::Mesh::Primitive(4u, 5u, 0u),
-			PonyShader::Mesh::Primitive(4u, 0u, 3u),
-			PonyShader::Mesh::Primitive(5u, 6u, 1u),
-			PonyShader::Mesh::Primitive(5u, 1u, 0u)
+			PonyShader::Mesh::Primitive(0u, 2u, 1u),
+			PonyShader::Mesh::Primitive(0u, 3u, 2u),
+			PonyShader::Mesh::Primitive(4u, 0u, 5u),
+			PonyShader::Mesh::Primitive(4u, 3u, 0u),
+			PonyShader::Mesh::Primitive(5u, 1u, 6u),
+			PonyShader::Mesh::Primitive(5u, 0u, 1u)
 		});
 		const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
 		{
@@ -206,8 +206,9 @@ namespace Game
 
 	void GameSystem::Tick()
 	{
-		const auto rotation = PonyMath::Core::Vector3<float>(inputSystem->State("MouseY"), inputSystem->State("MouseX"), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime()));
-		cameraTransform.Rotate(PonyMath::Core::RotationQuaternion(rotation));
+		const auto rotation = PonyMath::Core::RotationQuaternion(cameraTransform.Forward(), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime())) *
+			PonyMath::Core::RotationQuaternion(cameraTransform.Right(), inputSystem->State("MouseY")) * PonyMath::Core::RotationQuaternion(cameraTransform.Up(), inputSystem->State("MouseX"));
+		cameraTransform.Rotate(rotation);
 
 		auto moveDirection = PonyMath::Core::Vector3<float>(inputSystem->State("Right"), inputSystem->State("Up"), inputSystem->State("Forward"));
 		if (!moveDirection.IsAlmostZero())

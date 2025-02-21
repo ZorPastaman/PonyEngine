@@ -74,6 +74,11 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		bool& CameraCulling() noexcept;
+		[[nodiscard("Pure function")]]
+		const bool& CameraCulling() const noexcept;
+
 		/// @brief Sets the name to the material components.
 		/// @param name Name.
 		void Name(std::string_view name);
@@ -86,6 +91,7 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
 		struct ThreadGroupCounts threadGroupCounts;
+		bool cameraCulling;
 
 		bool isTransparent;
 	};
@@ -94,6 +100,8 @@ export namespace PonyEngine::Render::Direct3D12
 namespace PonyEngine::Render::Direct3D12
 {
 	Material::Material() noexcept :
+		threadGroupCounts(),
+		cameraCulling{true},
 		isTransparent{true}
 	{
 	}
@@ -101,6 +109,8 @@ namespace PonyEngine::Render::Direct3D12
 	Material::Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
+		threadGroupCounts(),
+		cameraCulling{true},
 		isTransparent{isTransparent}
 	{
 	}
@@ -138,6 +148,16 @@ namespace PonyEngine::Render::Direct3D12
 	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
+	}
+
+	bool& Material::CameraCulling() noexcept
+	{
+		return cameraCulling;
+	}
+
+	const bool& Material::CameraCulling() const noexcept
+	{
+		return cameraCulling;
 	}
 
 	void Material::Name(const std::string_view name)

@@ -91,7 +91,7 @@ export namespace PonyEngine::Render::Direct3D12
 			[[nodiscard("Pure function")]]
 			const std::set<std::pair<std::uint32_t, std::uint32_t>>& ChangedBuffers() const noexcept;
 			[[nodiscard("Pure function")]]
-			bool ThreadGroupCountsChanged() const noexcept;
+			bool AdditionalDataChanged() const noexcept;
 			[[nodiscard("Pure function")]]
 			bool NameChanged() const noexcept;
 
@@ -103,8 +103,7 @@ export namespace PonyEngine::Render::Direct3D12
 		private:
 			std::set<std::pair<std::uint32_t, std::uint32_t>> changedBuffers;
 			bool meshChanged;
-			bool threadGroupCountsChanged;
-			bool boundingBoxChanged;
+			bool additionalDataChanged;
 			bool nameChanged;
 		};
 
@@ -120,7 +119,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void UpdateMesh(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) const;
 		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer);
 		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source, std::uint32_t dataIndex, std::uint32_t bufferIndex);
-		static void UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept;
+		static void UpdateAdditionalData(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept;
 		static void UpdateName(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer);
 
 		void Add(const std::shared_ptr<Mesh>& mesh, const std::shared_ptr<const Render::Mesh>& source);
@@ -142,7 +141,7 @@ namespace PonyEngine::Render::Direct3D12
 {
 	MeshManager::MeshObserver::MeshObserver() noexcept :
 		meshChanged{true},
-		threadGroupCountsChanged{true},
+		additionalDataChanged{true},
 		nameChanged{true}
 	{
 	}
@@ -163,12 +162,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MeshManager::MeshObserver::OnThreadGroupCountsChanged() noexcept
 	{
-		threadGroupCountsChanged = true;
+		additionalDataChanged = true;
 	}
 
 	void MeshManager::MeshObserver::OnBoundingBoxChanged() noexcept
 	{
-		boundingBoxChanged = true;
+		additionalDataChanged = true;
 	}
 
 	void MeshManager::MeshObserver::OnNameChanged() noexcept
@@ -186,9 +185,9 @@ namespace PonyEngine::Render::Direct3D12
 		return changedBuffers;
 	}
 
-	bool MeshManager::MeshObserver::ThreadGroupCountsChanged() const noexcept
+	bool MeshManager::MeshObserver::AdditionalDataChanged() const noexcept
 	{
-		return threadGroupCountsChanged;
+		return additionalDataChanged;
 	}
 
 	bool MeshManager::MeshObserver::NameChanged() const noexcept
@@ -200,8 +199,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		changedBuffers.clear();
 		meshChanged = false;
-		threadGroupCountsChanged = false;
-		boundingBoxChanged = false;
+		additionalDataChanged = false;
 		nameChanged = false;
 	}
 
@@ -262,7 +260,7 @@ namespace PonyEngine::Render::Direct3D12
 
 			UpdateMesh(mesh, source, observer);
 			UpdateBuffers(mesh, source, observer);
-			UpdateThreadGroupCounts(mesh, source, observer);
+			UpdateAdditionalData(mesh, source, observer);
 			UpdateName(mesh, source, observer);
 
 			observer.Reset();
@@ -354,11 +352,12 @@ namespace PonyEngine::Render::Direct3D12
 		copyTasks.push_back(CopyTask{.uploadBuffer = uploadBuffer, .gpuBuffer = &gpuBuffer});
 	}
 
-	void MeshManager::UpdateThreadGroupCounts(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept
+	void MeshManager::UpdateAdditionalData(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) noexcept
 	{
-		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
+		if (observer.AdditionalDataChanged()) [[unlikely]]
 		{
 			mesh.ThreadGroupCounts() = source.ThreadGroupCounts();
+			mesh.BoundingBox() = source.BoundingBox();
 		}
 	}
 

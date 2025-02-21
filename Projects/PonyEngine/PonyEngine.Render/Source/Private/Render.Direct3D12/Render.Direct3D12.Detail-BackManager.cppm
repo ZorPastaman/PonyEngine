@@ -37,7 +37,7 @@ import :ObjectUtility;
 export namespace PonyEngine::Render::Direct3D12
 {
 	/// @brief Direct3D12 back manager.
-	class BackManager final : public IBackManager // TODO: Move some code to dxgi so that all d3d12 objects may be created before dxgi. In render, pass a pointer to the current back buffer.
+	class BackManager final : public IBackManager
 	{
 	public:
 		/// @brief Creates a @p BackManager.

@@ -44,7 +44,7 @@ export namespace PonyEngine::Render::Direct3D12
 		Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap);
 		[[nodiscard("Pure constructor")]]
 		Mesh(std::span<const std::string> dataTypes, std::span<const std::uint32_t> bufferOffsets, std::span<const std::shared_ptr<class Buffer>> buffers, const std::shared_ptr<DescriptorHeap>& heap, 
-			std::span<const std::uint32_t, 3> threadGroupCounts);
+			std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox);
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -106,6 +106,11 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() noexcept;
+		[[nodiscard("Pure function")]]
+		const std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() const noexcept;
+
 		/// @brief Sets the name to the mesh components.
 		/// @param name Name.
 		void Name(std::string_view name);
@@ -136,12 +141,13 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	Mesh::Mesh(const std::span<const std::string> dataTypes, const std::span<const std::uint32_t> bufferOffsets, const std::span<const std::shared_ptr<class Buffer>> buffers,
-		const std::shared_ptr<DescriptorHeap>& heap, std::span<const std::uint32_t, 3> threadGroupCounts) :
+		const std::shared_ptr<DescriptorHeap>& heap, const std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) :
 		dataTypes(dataTypes.begin(), dataTypes.end()),
 		bufferOffsets(bufferOffsets.begin(), bufferOffsets.end()),
 		buffers(buffers.begin(), buffers.end()),
 		heap(heap),
-		threadGroupCounts(threadGroupCounts)
+		threadGroupCounts(threadGroupCounts),
+		boundingBox(boundingBox)
 	{
 	}
 
@@ -298,6 +304,16 @@ namespace PonyEngine::Render::Direct3D12
 	const PonyShader::Core::ThreadGroupCounts& Mesh::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
+	}
+
+	std::optional<PonyMath::Shape::AABB<float>>& Mesh::BoundingBox() noexcept
+	{
+		return boundingBox;
+	}
+
+	const std::optional<PonyMath::Shape::AABB<float>>& Mesh::BoundingBox() const noexcept
+	{
+		return boundingBox;
 	}
 
 	void Mesh::Name(const std::string_view name)

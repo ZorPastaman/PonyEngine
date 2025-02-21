@@ -81,6 +81,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnRasterizerChanged() noexcept override;
 			virtual void OnDataSlotsChanged() noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
+			virtual void OnCameraCullingChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
 			[[nodiscard("Pure function")]]
@@ -94,7 +95,7 @@ export namespace PonyEngine::Render::Direct3D12
 			[[nodiscard("Pure function")]]
 			bool DataSlotsChanged() const noexcept;
 			[[nodiscard("Pure function")]]
-			bool ThreadGroupCountsChanged() const noexcept;
+			bool AdditionalDataChanged() const noexcept;
 			[[nodiscard("Pure function")]]
 			bool NameChanged() const noexcept;
 
@@ -109,7 +110,7 @@ export namespace PonyEngine::Render::Direct3D12
 			bool meshShaderChanged;
 			bool pixelShaderChanged;
 			bool dataSlotsChanged;
-			bool threadGroupCountsChanged;
+			bool additionalDataChanged;
 			bool nameChanged;
 		};
 
@@ -160,7 +161,7 @@ export namespace PonyEngine::Render::Direct3D12
 		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
 		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
 		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
-		static void UpdateThreadGroupCounts(Material& material, const Render::Material& source, const MaterialObserver& observer);
+		static void UpdateAdditionalData(Material& material, const Render::Material& source, const MaterialObserver& observer);
 		static void UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer);
 
 		void Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Render::Material>& source);
@@ -183,7 +184,7 @@ namespace PonyEngine::Render::Direct3D12
 		meshShaderChanged{true},
 		pixelShaderChanged{true},
 		dataSlotsChanged{true},
-		threadGroupCountsChanged{true},
+		additionalDataChanged{true},
 		nameChanged{true}
 	{
 	}
@@ -225,7 +226,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MaterialManager::MaterialObserver::OnThreadGroupCountsChanged() noexcept
 	{
-		threadGroupCountsChanged = true;
+		additionalDataChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnCameraCullingChanged() noexcept
+	{
+		additionalDataChanged = true;
 	}
 
 	void MaterialManager::MaterialObserver::OnNameChanged() noexcept
@@ -258,9 +264,9 @@ namespace PonyEngine::Render::Direct3D12
 		return dataSlotsChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::ThreadGroupCountsChanged() const noexcept
+	bool MaterialManager::MaterialObserver::AdditionalDataChanged() const noexcept
 	{
-		return threadGroupCountsChanged;
+		return additionalDataChanged;
 	}
 
 	bool MaterialManager::MaterialObserver::NameChanged() const noexcept
@@ -275,7 +281,7 @@ namespace PonyEngine::Render::Direct3D12
 		meshShaderChanged = false;
 		pixelShaderChanged = false;
 		dataSlotsChanged = false;
-		threadGroupCountsChanged = false;
+		additionalDataChanged = false;
 		nameChanged = false;
 	}
 
@@ -286,6 +292,11 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<const Render::Material>& material)
 	{
+		if (!material)
+		{
+			throw std::invalid_argument("Material is nullptr.");
+		}
+
 		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
 			if (sources[i] == material)
@@ -315,7 +326,7 @@ namespace PonyEngine::Render::Direct3D12
 			UpdateShaders(source, shaderData, observer);
 			UpdateMaterial(material, source, shaderData, observer);
 			UpdateDataSlots(material, source, observer);
-			UpdateThreadGroupCounts(material, source, observer);
+			UpdateAdditionalData(material, source, observer);
 			UpdateName(material, source, observer);
 
 			observer.Reset();
@@ -496,7 +507,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			.FillMode = GetFillMode(rasterizer.fillMode),
 			.CullMode = GetCullMode(rasterizer.cullMode),
-			.FrontCounterClockwise = true, // TODO: Change to false
+			.FrontCounterClockwise = false,
 			.DepthBias = static_cast<INT>(rasterizer.depthBias),
 			.DepthBiasClamp = static_cast<FLOAT>(rasterizer.depthBiasClamp),
 			.SlopeScaledDepthBias = static_cast<FLOAT>(rasterizer.slopeScaledDepthBias),
@@ -575,20 +586,7 @@ namespace PonyEngine::Render::Direct3D12
 			.pixelShader = shaderData.pixelShader->ByteCode(),
 			.blend = CreateBlendDesc(source.Blend()),
 			.sampleMask = UINT_MAX,
-			.rasterizer = D3D12_RASTERIZER_DESC
-			{
-				.FillMode = D3D12_FILL_MODE_SOLID,
-				.CullMode = D3D12_CULL_MODE_BACK,
-				.FrontCounterClockwise = true,
-				.DepthBias = D3D12_DEFAULT_DEPTH_BIAS,
-				.DepthBiasClamp = D3D12_DEFAULT_DEPTH_BIAS_CLAMP,
-				.SlopeScaledDepthBias = D3D12_DEFAULT_SLOPE_SCALED_DEPTH_BIAS,
-				.DepthClipEnable = true,
-				.MultisampleEnable = true,
-				.AntialiasedLineEnable = false,
-				.ForcedSampleCount = 0u,
-				.ConservativeRaster = D3D12_CONSERVATIVE_RASTERIZATION_MODE_OFF
-			},
+			.rasterizer = CreateRasterizerDesc(source.Rasterizer()),
 			.depthStencil = D3D12_DEPTH_STENCIL_DESC1
 			{
 				.DepthEnable = true,
@@ -644,11 +642,12 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MaterialManager::UpdateThreadGroupCounts(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	void MaterialManager::UpdateAdditionalData(Material& material, const Render::Material& source, const MaterialObserver& observer)
 	{
-		if (observer.ThreadGroupCountsChanged()) [[unlikely]]
+		if (observer.AdditionalDataChanged()) [[unlikely]]
 		{
 			material.ThreadGroupCounts() = source.ThreadGroupCounts();
+			material.CameraCulling() = source.CameraCulling();
 		}
 	}
 

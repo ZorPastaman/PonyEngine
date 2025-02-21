@@ -38,6 +38,8 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR() noexcept;
 		[[nodiscard("Pure constructor")]]
+		explicit constexpr OBR(const AABR<T>& aabr) noexcept;
+		[[nodiscard("Pure constructor")]]
 		constexpr OBR(const AABR<T>& aabr, T angle) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept;
@@ -143,6 +145,14 @@ namespace PonyMath::Shape
 {
 	template<std::floating_point T>
 	constexpr OBR<T>::OBR() noexcept :
+		axes{ Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up }
+	{
+	}
+
+	template<std::floating_point T>
+	constexpr OBR<T>::OBR(const AABR<T>& aabr) noexcept :
+		center(aabr.Center()),
+		extents(aabr.Extents()),
 		axes{ Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up }
 	{
 	}
@@ -367,7 +377,7 @@ namespace PonyMath::Shape
 			}
 			else
 			{
-				incorrectFlags |= 1 << i;
+				incorrectFlags |= std::size_t{1} << i;
 			}
 		}
 
