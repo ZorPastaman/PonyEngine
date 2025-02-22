@@ -13,6 +13,7 @@ export import :Blend;
 export import :BlendFactor;
 export import :BlendOperation;
 export import :CameraParams;
+export import :Clear;
 export import :Common;
 export import :CullMode;
 export import :EngineDataTypes;

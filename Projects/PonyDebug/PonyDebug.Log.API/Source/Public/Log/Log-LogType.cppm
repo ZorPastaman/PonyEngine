@@ -15,6 +15,7 @@ import <cstddef>;
 import <cstdint>;
 import <ostream>;
 import <string_view>;
+import <type_traits>;
 
 export namespace PonyDebug::Log
 {

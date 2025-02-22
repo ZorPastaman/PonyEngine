@@ -172,5 +172,8 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Clear.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

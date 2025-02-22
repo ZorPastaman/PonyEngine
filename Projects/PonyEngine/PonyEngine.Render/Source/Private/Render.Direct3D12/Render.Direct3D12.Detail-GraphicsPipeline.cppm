@@ -797,10 +797,18 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		CommandList().RSSetScissorRects(1u, &rect);
 
-		const D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = frame->RtvHandle();
-		const D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = frame->DsvHandle();
-		CommandList().ClearRenderTargetView(rtvHandle, camera.ClearColor().Span().data(), 1u, &rect); // TODO: Add clear flags
-		CommandList().ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH | D3D12_CLEAR_FLAG_STENCIL, D3D12_MAX_DEPTH, 0u, 1u, &rect);
+		if ((camera.ClearFlags() & Clear::Color) != Clear::None)
+		{
+			CommandList().ClearRenderTargetView(frame->RtvHandle(), camera.ClearColor().Span().data(), 1u, &rect);
+		}
+
+		if (const D3D12_CLEAR_FLAGS dsvClearFlags =
+			((camera.ClearFlags() & Clear::Depth) != Clear::None ? D3D12_CLEAR_FLAG_DEPTH : static_cast<D3D12_CLEAR_FLAGS>(0)) |
+			((camera.ClearFlags() & Clear::Stencil) != Clear::None ? D3D12_CLEAR_FLAG_STENCIL : static_cast<D3D12_CLEAR_FLAGS>(0));
+			dsvClearFlags != static_cast<D3D12_CLEAR_FLAGS>(0))
+		{
+			CommandList().ClearDepthStencilView(frame->DsvHandle(), dsvClearFlags, D3D12_MAX_DEPTH, 0u, 1u, &rect);
+		}
 	}
 
 	void GraphicsPipeline::SortRenderObjects(const std::uint32_t cameraIndex)
@@ -844,6 +852,11 @@ namespace PonyEngine::Render::Direct3D12
 				? leftDistance > rightDistance
 				: leftDistance < rightDistance;
 		});
+
+		if (tasks.size() < 3)
+		{
+			return;
+		}
 
 		// Group opaque objects with the same root signature together.
 		for (std::size_t baseIndex = 0; baseIndex < tasks.size() - 2; ++baseIndex)
