@@ -44,9 +44,6 @@ export namespace PonyEngine::Render
 		FrustumCuller& operator =(FrustumCuller&& other) noexcept = default;
 
 	private:
-		[[nodiscard("Pure function")]]
-		bool CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept;
-
 		CameraFrustum frustum;
 	};
 }
@@ -79,11 +76,6 @@ namespace PonyEngine::Render
 	}
 
 	bool FrustumCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
-	{
-		return CheckVisibility(obb);
-	}
-
-	bool FrustumCuller::CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
 		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::OBB<float>::CornerCount> boxCorners = obb.Corners();
 

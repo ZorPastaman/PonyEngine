@@ -76,6 +76,10 @@ export namespace PonyEngine::Render
 		void ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept;
 
 		[[nodiscard("Pure function")]]
+		std::int32_t RenderQueue() const noexcept;
+		void RenderQueue(std::int32_t renderQueue) noexcept;
+
+		[[nodiscard("Pure function")]]
 		bool CameraCulling() const noexcept;
 		void CameraCulling(bool culling) noexcept;
 
@@ -102,6 +106,7 @@ export namespace PonyEngine::Render
 		void OnDataSlotsChanged() const noexcept;
 
 		void OnThreadGroupCountsChanged() const noexcept;
+		void OnRenderQueueChanged() const noexcept;
 		void OnCameraCullingChanged() const noexcept;
 
 		void OnNameChanged() const noexcept;
@@ -117,6 +122,7 @@ export namespace PonyEngine::Render
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
 		struct ThreadGroupCounts threadGroupCounts;
+		std::int32_t renderQueue;
 		bool cameraCulling;
 
 		std::string name;
@@ -136,7 +142,8 @@ namespace PonyEngine::Render
 		rasterizer(params.rasterizer),
 		dataSlots(params.dataSlots),
 		threadGroupCounts(params.threadGroupCounts),
-		cameraCulling(params.cameraCulling),
+		renderQueue{params.renderQueue},
+		cameraCulling{params.cameraCulling},
 		name(params.name)
 	{
 	}
@@ -150,7 +157,8 @@ namespace PonyEngine::Render
 		rasterizer(other.rasterizer),
 		dataSlots(other.dataSlots),
 		threadGroupCounts(other.threadGroupCounts),
-		cameraCulling(other.cameraCulling),
+		renderQueue{other.renderQueue},
+		cameraCulling{other.cameraCulling},
 		name(other.name)
 	{
 	}
@@ -164,7 +172,8 @@ namespace PonyEngine::Render
 		rasterizer(std::move(other.rasterizer)),
 		dataSlots(std::move(other.dataSlots)),
 		threadGroupCounts(std::move(other.threadGroupCounts)),
-		cameraCulling(std::move(other.cameraCulling)),
+		renderQueue{std::move(other.renderQueue)},
+		cameraCulling{std::move(other.cameraCulling)},
 		name(std::move(other.name))
 	{
 	}
@@ -365,6 +374,22 @@ namespace PonyEngine::Render
 		OnThreadGroupCountsChanged();
 	}
 
+	std::int32_t Material::RenderQueue() const noexcept
+	{
+		return renderQueue;
+	}
+
+	void Material::RenderQueue(const std::int32_t renderQueue) noexcept
+	{
+		if (this->renderQueue == renderQueue)
+		{
+			return;
+		}
+
+		this->renderQueue = renderQueue;
+		OnRenderQueueChanged();
+	}
+
 	bool Material::CameraCulling() const noexcept
 	{
 		return cameraCulling;
@@ -485,6 +510,14 @@ namespace PonyEngine::Render
 		}
 	}
 
+	void Material::OnRenderQueueChanged() const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnRenderQueueChanged();
+		}
+	}
+
 	void Material::OnCameraCullingChanged() const noexcept
 	{
 		for (IMaterialObserver* const observer : materialObservers)
@@ -512,6 +545,7 @@ namespace PonyEngine::Render
 		DataSlots(other.dataSlots);
 
 		ThreadGroupCounts(other.threadGroupCounts);
+		RenderQueue(other.renderQueue);
 		CameraCulling(other.cameraCulling);
 
 		Name(other.name);
@@ -530,6 +564,7 @@ namespace PonyEngine::Render
 		DataSlots(std::move(other.dataSlots));
 
 		ThreadGroupCounts(other.threadGroupCounts);
+		RenderQueue(other.renderQueue);
 		CameraCulling(other.cameraCulling);
 
 		Name(std::move(other.name));

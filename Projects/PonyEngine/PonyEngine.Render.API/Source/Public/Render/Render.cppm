@@ -37,6 +37,7 @@ export import :OrthographicParams;
 export import :PerspectiveParams;
 export import :Rasterizer;
 export import :RenderObjectParams;
+export import :RenderQueue;
 export import :RenderSystemFactory;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;

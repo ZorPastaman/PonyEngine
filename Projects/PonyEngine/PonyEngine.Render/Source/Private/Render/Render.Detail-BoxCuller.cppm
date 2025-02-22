@@ -48,9 +48,6 @@ export namespace PonyEngine::Render
 		BoxCuller& operator =(BoxCuller&& other) noexcept = default;
 
 	private:
-		[[nodiscard("Pure function")]]
-		bool CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept;
-
 		CameraBox cameraBox;
 	};
 }
@@ -83,11 +80,6 @@ namespace PonyEngine::Render
 	}
 
 	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
-	{
-		return CheckVisibility(obb);
-	}
-
-	bool BoxCuller::CheckVisibility(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
 		const std::array<PonyMath::Core::Vector3<float>, 8> objectCorners = obb.Corners();
 		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)

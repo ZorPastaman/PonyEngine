@@ -75,6 +75,11 @@ export namespace PonyEngine::Render::Direct3D12
 		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
 		[[nodiscard("Pure function")]]
+		std::int32_t& RenderQueue() noexcept;
+		[[nodiscard("Pure function")]]
+		const std::int32_t& RenderQueue() const noexcept;
+
+		[[nodiscard("Pure function")]]
 		bool& CameraCulling() noexcept;
 		[[nodiscard("Pure function")]]
 		const bool& CameraCulling() const noexcept;
@@ -91,6 +96,7 @@ export namespace PonyEngine::Render::Direct3D12
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
 
 		struct ThreadGroupCounts threadGroupCounts;
+		std::int32_t renderQueue;
 		bool cameraCulling;
 
 		bool isTransparent;
@@ -101,6 +107,7 @@ namespace PonyEngine::Render::Direct3D12
 {
 	Material::Material() noexcept :
 		threadGroupCounts(),
+		renderQueue{0},
 		cameraCulling{true},
 		isTransparent{true}
 	{
@@ -110,6 +117,7 @@ namespace PonyEngine::Render::Direct3D12
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
 		threadGroupCounts(),
+		renderQueue{0},
 		cameraCulling{true},
 		isTransparent{isTransparent}
 	{
@@ -148,6 +156,16 @@ namespace PonyEngine::Render::Direct3D12
 	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
+	}
+
+	std::int32_t& Material::RenderQueue() noexcept
+	{
+		return renderQueue;
+	}
+
+	const std::int32_t& Material::RenderQueue() const noexcept
+	{
+		return renderQueue;
 	}
 
 	bool& Material::CameraCulling() noexcept
