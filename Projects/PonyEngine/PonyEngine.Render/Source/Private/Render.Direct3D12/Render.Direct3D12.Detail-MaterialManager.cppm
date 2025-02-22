@@ -615,7 +615,7 @@ namespace PonyEngine::Render::Direct3D12
 					.StencilPassOp = D3D12_STENCIL_OP_KEEP,
 					.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
 				},
-				.DepthBoundsTestEnable = true
+				.DepthBoundsTestEnable = false
 			},
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{

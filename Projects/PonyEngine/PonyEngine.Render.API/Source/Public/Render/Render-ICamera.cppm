@@ -20,7 +20,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
-import :CameraProjection;
+import :Common;
 import :ICuller;
 
 export namespace PonyEngine::Render

@@ -163,13 +163,13 @@
     <ClCompile Include="Source\Public\Render\Render-OrthographicParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-CameraProjection.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

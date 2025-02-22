@@ -7,19 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:CameraProjection;
+export module PonyEngine.Render:Common;
 
 import <variant>;
-
-import PonyMath.Core;
 
 import :OrthographicParams;
 import :PerspectiveParams;
 
 export namespace PonyEngine::Render
 {
-	struct CameraProjection final // TODO: Replace with using
-	{
-		std::variant<PerspectiveParams, OrthographicParams> projection = PerspectiveParams{.fov = 60.f * PonyMath::Core::DegToRad<float>, .aspect = 16.f / 9.f, .nearPlane = 0.2f, .farPlane = 1000.f}; ///< Projection.
-	};
+	using CameraProjection = std::variant<PerspectiveParams, OrthographicParams>;
 }
