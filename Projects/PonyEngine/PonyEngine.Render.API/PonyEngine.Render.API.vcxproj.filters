@@ -169,5 +169,8 @@
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

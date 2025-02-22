@@ -52,6 +52,7 @@
     <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CullMode.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />

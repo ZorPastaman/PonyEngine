@@ -7,9 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyBase.Utility;
+export module PonyEngine.Render:RenderQueue;
 
-export import :Container;
-export import :ObjectInterfaces;
-export import :SafeFormat;
-export import :StringConvert;
+import <cstdint>;
+
+export namespace PonyEngine::Render
+{
+	enum class RenderQueue : std::int32_t
+	{
+		Opaque = 0 * 100000,
+		Skybox = 1 * 100000,
+		Transparent = 2 * 100000,
+		Overlay = 5 * 100000
+	};
+}

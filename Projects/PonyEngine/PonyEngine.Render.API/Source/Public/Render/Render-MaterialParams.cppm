@@ -32,6 +32,7 @@ export namespace PonyEngine::Render
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
 		ThreadGroupCounts threadGroupCounts;
+		std::int32_t renderQueue = 0;
 		bool cameraCulling = true;
 
 		std::string name;

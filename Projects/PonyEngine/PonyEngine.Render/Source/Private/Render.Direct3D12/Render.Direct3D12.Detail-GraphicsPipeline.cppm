@@ -805,12 +805,20 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::SortRenderObjects(const std::uint32_t cameraIndex)
 	{
-		std::ranges::sort(cameraTasks[cameraIndex].renderObjectTasks, [&](const RenderObjectTask& left, const RenderObjectTask& right)
+		std::vector<RenderObjectTask>& tasks = cameraTasks[cameraIndex].renderObjectTasks;
+
+		// Basic sorting - by render queue, by transparency, by distance (opaque - front to back, transparent - back to front)
+		std::ranges::sort(tasks, [&](const RenderObjectTask& left, const RenderObjectTask& right)
 		{
 			const RenderObject* const leftRenderObject = renderObjects[left.renderObjectIndex];
 			const RenderObject* const rightRenderObject = renderObjects[right.renderObjectIndex];
 			const Material* const leftMaterial = &leftRenderObject->Material();
 			const Material* const rightMaterial = &rightRenderObject->Material();
+
+			if (leftMaterial->RenderQueue() != rightMaterial->RenderQueue())
+			{
+				return leftMaterial->RenderQueue() < rightMaterial->RenderQueue();
+			}
 
 			if (leftMaterial->IsTransparent() != rightMaterial->IsTransparent())
 			{
@@ -826,30 +834,106 @@ namespace PonyEngine::Render::Direct3D12
 				? rightMesh->BoundingBox().value().Center()
 				: PonyMath::Core::Vector3<float>::Predefined::Zero;
 
-			const PonyShader::Space::Transform& leftTransform = transforms.data[left.dataIndex];
-			const PonyShader::Space::Transform& rightTransform = transforms.data[right.dataIndex];
+			const PonyMath::Core::Matrix4x4<float>& leftMvp = transforms.data[left.dataIndex].MvpMatrix();
+			const PonyMath::Core::Matrix4x4<float>& rightMvp = transforms.data[right.dataIndex].MvpMatrix();
 
-			if (leftMaterial->IsTransparent())
-			{
-				return PonyMath::Core::TransformPoint(leftTransform.MvpMatrix(), leftCentralPoint).Z() > PonyMath::Core::TransformPoint(rightTransform.MvpMatrix(), rightCentralPoint).Z();
-			}
+			const float leftDistance = PonyMath::Core::TransformPoint(leftMvp, leftCentralPoint).Z();
+			const float rightDistance = PonyMath::Core::TransformPoint(rightMvp, rightCentralPoint).Z();
 
-			if (leftMaterial->RootSignature() != rightMaterial->RootSignature())
-			{
-				return reinterpret_cast<std::uintptr_t>(leftMaterial->RootSignature()) < reinterpret_cast<std::uintptr_t>(rightMaterial->RootSignature());
-			}
-			if (leftMaterial != rightMaterial)
-			{
-				return reinterpret_cast<std::uintptr_t>(leftMaterial) < reinterpret_cast<std::uintptr_t>(rightMaterial);
-			}
-
-			if (leftMesh != rightMesh)
-			{
-				return reinterpret_cast<std::uintptr_t>(leftMesh) < reinterpret_cast<std::uintptr_t>(rightMesh);
-			}
-
-			return PonyMath::Core::TransformPoint(leftTransform.MvpMatrix(), leftCentralPoint).Z() < PonyMath::Core::TransformPoint(rightTransform.MvpMatrix(), rightCentralPoint).Z();
+			return leftMaterial->IsTransparent()
+				? leftDistance > rightDistance
+				: leftDistance < rightDistance;
 		});
+
+		// Group opaque objects with the same root signature together.
+		for (std::size_t baseIndex = 0; baseIndex < tasks.size() - 2; ++baseIndex)
+		{
+			const RenderObjectTask& baseTask = tasks[baseIndex];
+			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
+			const Material& baseMaterial = baseRenderObject->Material();
+			if (baseMaterial.IsTransparent())
+			{
+				continue;
+			}
+			const RootSignature* const baseRootSignature = baseMaterial.RootSignature();
+
+			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
+			{
+				const RenderObjectTask& targetTask = tasks[targetIndex];
+				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
+				const Material& targetMaterial = targetRenderObject->Material();
+				if (targetMaterial.IsTransparent() || targetMaterial.RenderQueue() != baseMaterial.RenderQueue())
+				{
+					break;
+				}
+
+				if (targetMaterial.RootSignature() == baseRootSignature)
+				{
+					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
+					break;
+				}
+			}
+		}
+
+		// Group opaque objects with the same material together.
+		for (std::size_t baseIndex = 0; baseIndex < tasks.size() - 2; ++baseIndex)
+		{
+			const RenderObjectTask& baseTask = tasks[baseIndex];
+			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
+			const Material& baseMaterial = baseRenderObject->Material();
+			if (baseMaterial.IsTransparent())
+			{
+				continue;
+			}
+			const RootSignature* const baseRootSignature = baseMaterial.RootSignature();
+
+			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
+			{
+				const RenderObjectTask& targetTask = tasks[targetIndex];
+				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
+				const Material& targetMaterial = targetRenderObject->Material();
+				if (targetMaterial.IsTransparent() || targetMaterial.RenderQueue() != baseMaterial.RenderQueue() || targetMaterial.RootSignature() != baseRootSignature)
+				{
+					break;
+				}
+
+				if (&targetMaterial == &baseMaterial)
+				{
+					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
+					break;
+				}
+			}
+		}
+
+		// Group opaque objects with the same mesh together.
+		for (std::size_t baseIndex = 0; baseIndex < tasks.size() - 2; ++baseIndex)
+		{
+			const RenderObjectTask& baseTask = tasks[baseIndex];
+			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
+			const Material& baseMaterial = baseRenderObject->Material();
+			if (baseMaterial.IsTransparent())
+			{
+				continue;
+			}
+			const Mesh* const baseMesh = baseRenderObject->Mesh();
+
+			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
+			{
+				const RenderObjectTask& targetTask = tasks[targetIndex];
+				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
+				const Material& targetMaterial = targetRenderObject->Material();
+				if (targetMaterial.IsTransparent() || targetMaterial.RenderQueue() != baseMaterial.RenderQueue() || &targetMaterial != &baseMaterial)
+				{
+					break;
+				}
+
+				if (targetRenderObject->Mesh() == baseMesh)
+				{
+					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
+					break;
+				}
+			}
+		}
 	}
 
 	void GraphicsPipeline::PopulateRenderObjects(const std::uint32_t cameraIndex)

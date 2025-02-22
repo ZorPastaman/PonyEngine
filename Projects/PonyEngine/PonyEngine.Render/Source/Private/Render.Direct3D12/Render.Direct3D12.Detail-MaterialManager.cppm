@@ -81,6 +81,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnRasterizerChanged() noexcept override;
 			virtual void OnDataSlotsChanged() noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
+			virtual void OnRenderQueueChanged() noexcept override;
 			virtual void OnCameraCullingChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
@@ -225,6 +226,11 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	void MaterialManager::MaterialObserver::OnThreadGroupCountsChanged() noexcept
+	{
+		additionalDataChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnRenderQueueChanged() noexcept
 	{
 		additionalDataChanged = true;
 	}
@@ -647,6 +653,7 @@ namespace PonyEngine::Render::Direct3D12
 		if (observer.AdditionalDataChanged()) [[unlikely]]
 		{
 			material.ThreadGroupCounts() = source.ThreadGroupCounts();
+			material.RenderQueue() = source.RenderQueue();
 			material.CameraCulling() = source.CameraCulling();
 		}
 	}
