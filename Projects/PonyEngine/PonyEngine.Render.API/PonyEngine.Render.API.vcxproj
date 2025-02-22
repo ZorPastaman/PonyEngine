@@ -43,7 +43,7 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-CameraProjection.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-OrthographicParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-PerspectiveParams.cppm" />

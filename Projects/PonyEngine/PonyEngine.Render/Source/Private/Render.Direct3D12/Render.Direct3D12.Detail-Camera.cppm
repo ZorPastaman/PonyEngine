@@ -182,13 +182,13 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (!culler)
 		{
-			switch (projection.projection.index())
+			switch (projection.index())
 			{
 			case 0:
-				culler = FrustumCuller(std::get<0>(projection.projection));
+				culler = FrustumCuller(std::get<0>(projection));
 				break;
 			case 1:
-				culler = BoxCuller(std::get<1>(projection.projection));
+				culler = BoxCuller(std::get<1>(projection));
 			default: [[unlikely]]
 				assert(false && "Unsupported projection type.");
 				culler = BoxCuller(PonyMath::Shape::AABB<float>::Predefined::Zero);
@@ -206,12 +206,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	PonyMath::Core::Matrix4x4<float> Camera::ComputeProjectionMatrix() const noexcept
 	{
-		switch (projection.projection.index())
+		switch (projection.index())
 		{
 		case 0:
-			return ComputePerspectiveMatrix(std::get<0>(projection.projection));
+			return ComputePerspectiveMatrix(std::get<0>(projection));
 		case 1:
-			return ComputeOrthographicMatrix(std::get<1>(projection.projection));
+			return ComputeOrthographicMatrix(std::get<1>(projection));
 		default: [[unlikely]]
 			assert(false && "Unsupported projection type.");
 			return PonyMath::Core::Matrix4x4<float>::Predefined::Identity;
