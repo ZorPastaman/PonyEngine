@@ -15,6 +15,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
+import :Clear;
 import :Common;
 
 export namespace PonyEngine::Render
@@ -25,6 +26,7 @@ export namespace PonyEngine::Render
 		CameraProjection projection = PerspectiveParams{ .fov = 60.f * PonyMath::Core::DegToRad<float>, .aspect = 16.f / 9.f, .nearPlane = 0.2f, .farPlane = 1000.f };
 
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black;
+		Clear clearFlags = Clear::All;
 
 		PonyMath::Shape::Rect<float> viewportRect = PonyMath::Shape::Rect<float>::Predefined::NormalizedFull;
 

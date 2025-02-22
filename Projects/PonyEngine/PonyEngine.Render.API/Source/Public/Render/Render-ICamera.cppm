@@ -20,6 +20,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
+import :Clear;
 import :Common;
 import :ICuller;
 
@@ -44,6 +45,10 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Color::RGBA<float>& ClearColor() const noexcept = 0;
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual Clear ClearFlags() const noexcept = 0;
+		virtual void ClearFlags(Clear clear) noexcept = 0;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept = 0;

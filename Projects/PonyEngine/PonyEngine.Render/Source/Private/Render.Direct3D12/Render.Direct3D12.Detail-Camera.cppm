@@ -58,6 +58,10 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual Clear ClearFlags() const noexcept override;
+		virtual void ClearFlags(Clear clear) noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept override;
 		virtual void ViewportRect(const PonyMath::Shape::Rect<float>& rect) noexcept override;
 
@@ -86,6 +90,7 @@ export namespace PonyEngine::Render::Direct3D12
 		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler;
 
 		PonyMath::Color::RGBA<float> clearColor;
+		Clear clearFlags;
 
 		PonyMath::Shape::Rect<float> viewportRect;
 
@@ -99,8 +104,9 @@ namespace PonyEngine::Render::Direct3D12
 		viewMatrix(cameraParams.viewMatrix),
 		projection(cameraParams.projection),
 		clearColor(cameraParams.clearColor),
+		clearFlags{cameraParams.clearFlags},
 		viewportRect(cameraParams.viewportRect),
-		sortingOrder(cameraParams.sortingOrder)
+		sortingOrder{cameraParams.sortingOrder}
 	{
 	}
 
@@ -156,6 +162,16 @@ namespace PonyEngine::Render::Direct3D12
 	void Camera::ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept
 	{
 		clearColor = color;
+	}
+
+	Clear Camera::ClearFlags() const noexcept
+	{
+		return clearFlags;
+	}
+
+	void Camera::ClearFlags(const Clear clear) noexcept
+	{
+		clearFlags = clear;
 	}
 
 	const PonyMath::Shape::Rect<float>& Camera::ViewportRect() const noexcept
