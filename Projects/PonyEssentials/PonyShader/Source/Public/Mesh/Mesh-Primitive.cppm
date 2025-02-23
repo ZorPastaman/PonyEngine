@@ -53,10 +53,6 @@ export namespace PonyShader::Mesh
 		[[nodiscard("Pure function")]]
 		const std::uint8_t* Data() const noexcept;
 
-		void Set(std::uint8_t i0, std::uint8_t i1 = 0u, std::uint8_t i2 = 0u, std::uint8_t i3 = 0u) noexcept;
-		template<std::size_t N>
-		void Set(std::span<const std::uint8_t, N> indicesToSet) noexcept requires (N > 0 && N <= 4);
-
 		[[nodiscard("Pure operator")]]
 		std::uint8_t& operator [](std::size_t index) noexcept;
 		[[nodiscard("Pure operator")]]
@@ -64,8 +60,6 @@ export namespace PonyShader::Mesh
 
 		Primitive& operator =(const Primitive& other) noexcept = default;
 		Primitive& operator =(Primitive&& other) noexcept = default;
-		template<std::size_t N>
-		Primitive& operator =(std::span<const std::uint8_t, N> otherIndices) noexcept requires (N > 0 && N <= 4);
 
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const Primitive& other) const noexcept;
@@ -85,7 +79,7 @@ namespace PonyShader::Mesh
 	template<std::size_t N>
 	Primitive::Primitive(const std::span<const std::uint8_t, N> indices) noexcept requires (N > 0 && N <= 4)
 	{
-		Set(indices);
+		std::ranges::copy(indices, this->indices.data());
 	}
 
 	std::uint8_t& Primitive::I0() noexcept
@@ -138,20 +132,6 @@ namespace PonyShader::Mesh
 		return indices.data();
 	}
 
-	void Primitive::Set(const std::uint8_t i0, const std::uint8_t i1, const std::uint8_t i2, const std::uint8_t i3) noexcept
-	{
-		indices[0] = i0;
-		indices[1] = i1;
-		indices[2] = i2;
-		indices[3] = i3;
-	}
-
-	template<std::size_t N>
-	void Primitive::Set(const std::span<const std::uint8_t, N> indicesToSet) noexcept requires (N > 0 && N <= 4)
-	{
-		std::ranges::copy(indicesToSet, indices.begin());
-	}
-
 	std::uint8_t& Primitive::operator [](const std::size_t index) noexcept
 	{
 		return indices[index];
@@ -160,14 +140,6 @@ namespace PonyShader::Mesh
 	const std::uint8_t& Primitive::operator [](const std::size_t index) const noexcept
 	{
 		return indices[index];
-	}
-
-	template<std::size_t N>
-	Primitive& Primitive::operator =(const std::span<const std::uint8_t, N> otherIndices) noexcept requires (N > 0 && N <= 4)
-	{
-		Set(otherIndices);
-
-		return *this;
 	}
 
 	bool Primitive::operator ==(const Primitive& other) const noexcept

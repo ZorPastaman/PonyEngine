@@ -48,8 +48,6 @@ export namespace PonyShader::Mesh
 		[[nodiscard("Pure function")]]
 		const std::uint8_t& PrimitiveCount() const noexcept;
 
-		void Set(std::uint32_t vertexOffsetToSet, std::uint32_t primitiveOffsetToSet, std::uint8_t vertexCount, std::uint8_t primitiveCount) noexcept;
-
 		Meshlet& operator =(const Meshlet& other) noexcept = default;
 		Meshlet& operator =(Meshlet&& other) noexcept = default;
 
@@ -110,13 +108,5 @@ namespace PonyShader::Mesh
 	const std::uint8_t& Meshlet::PrimitiveCount() const noexcept
 	{
 		return packedCounts[1];
-	}
-
-	void Meshlet::Set(const std::uint32_t vertexOffsetToSet, const std::uint32_t primitiveOffsetToSet, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept
-	{
-		vertexOffset = vertexOffsetToSet;
-		primitiveOffset = primitiveOffsetToSet;
-		packedCounts[0] = vertexCount;
-		packedCounts[1] = primitiveCount;
 	}
 }

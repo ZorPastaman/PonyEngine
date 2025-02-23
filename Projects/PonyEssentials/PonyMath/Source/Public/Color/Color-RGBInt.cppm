@@ -137,15 +137,6 @@ export namespace PonyMath::Color
 		[[nodiscard("Pure function")]]
 		constexpr bool IsWhite() const noexcept;
 
-		/// @brief Sets arguments to components.
-		/// @param red Red.
-		/// @param green Green.
-		/// @param blue Blue.
-		constexpr void Set(T red, T green, T blue) noexcept;
-		/// @brief Sets components from the array.
-		/// @param span Span. The order is r, g, b.
-		constexpr void Set(std::span<const T, 3> span) noexcept;
-
 		/// @brief Creates a string representing a state of the color.
 		/// @return String representing a state of the color.
 		[[nodiscard("Pure function")]]
@@ -352,18 +343,6 @@ namespace PonyMath::Color
 	constexpr bool RGBInt<T>::IsWhite() const noexcept
 	{
 		return *this == Predefined::White;
-	}
-
-	template<std::unsigned_integral T>
-	constexpr void RGBInt<T>::Set(const T red, const T green, const T blue) noexcept
-	{
-		components.Set(red, green, blue);
-	}
-
-	template<std::unsigned_integral T>
-	constexpr void RGBInt<T>::Set(const std::span<const T, 3> span) noexcept
-	{
-		components.Set(span);
 	}
 
 	template<std::unsigned_integral T>

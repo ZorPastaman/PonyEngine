@@ -372,34 +372,6 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Assigns arguments to the matrix components.
-		/// @param m00 Component 00.
-		/// @param m10 Component 10.
-		/// @param m20 Component 20.
-		/// @param m30 Component 30.
-		/// @param m01 Component 01.
-		/// @param m11 Component 11.
-		/// @param m21 Component 21.
-		/// @param m31 Component 31.
-		/// @param m02 Component 02.
-		/// @param m12 Component 12.
-		/// @param m22 Component 22.
-		/// @param m32 Component 32.
-		/// @param m03 Component 03.
-		/// @param m13 Component 13.
-		/// @param m23 Component 23.
-		/// @param m33 Component 33.
-		constexpr void Set(T m00, T m10, T m20, T m30, T m01, T m11, T m21, T m31, T m02, T m12, T m22, T m32, T m03, T m13, T m23, T m33) noexcept;
-		/// @brief Assigns columns to the matrix.
-		/// @param column0 Column 0 to assign.
-		/// @param column1 Column 1 to assign.
-		/// @param column2 Column 2 to assign.
-		/// @param column3 Column 3 to assign.
-		constexpr void Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
-		/// @brief Assigns matrix components from the @p span.
-		/// @param span Span. The matrix is column-major.
-		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
-
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Matrix4x4& multiplier) noexcept;
@@ -654,13 +626,16 @@ namespace PonyMath::Core
 	template<Arithmetic T>
 	constexpr Matrix4x4<T>::Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept
 	{
-		Set(column0, column1, column2, column3);
+		Column(0, column0);
+		Column(1, column1);
+		Column(2, column2);
+		Column(3, column3);
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix4x4<T>::Matrix4x4(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(span);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -1036,43 +1011,6 @@ namespace PonyMath::Core
 		}
 
 		return true;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::Set(const T m00, const T m10, const T m20, const T m30, const T m01, const T m11, const T m21, const T m31,
-		const T m02, const T m12, const T m22, const T m32, const T m03, const T m13, const T m23, const T m33) noexcept
-	{
-		M00() = m00;
-		M10() = m10;
-		M20() = m20;
-		M30() = m30;
-		M01() = m01;
-		M11() = m11;
-		M21() = m21;
-		M31() = m31;
-		M02() = m02;
-		M12() = m12;
-		M22() = m22;
-		M32() = m32;
-		M03() = m03;
-		M13() = m13;
-		M23() = m23;
-		M33() = m33;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::Set(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept
-	{
-		Column(0, column0);
-		Column(1, column1);
-		Column(2, column2);
-		Column(3, column3);
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix4x4<T>::Set(const std::span<const T, ComponentCount> span) noexcept
-	{
-		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>

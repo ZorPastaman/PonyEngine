@@ -66,8 +66,6 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr std::int8_t Side(const Core::Vector2<T>& point) const noexcept;
 
-		constexpr void Set(const Core::Vector2<T>& normal, T distance = T{0}) noexcept;
-
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
@@ -189,14 +187,6 @@ namespace PonyMath::Shape
 	constexpr std::int8_t Line<T>::Side(const Core::Vector2<T>& point) const noexcept
 	{
 		return Core::Signum<T, std::int8_t>(Distance(point));
-	}
-
-	template<std::floating_point T>
-	constexpr void Line<T>::Set(const Core::Vector2<T>& normal, const T distance) noexcept
-	{
-		this->normal = normal;
-		this->distance = distance;
-		this->distance = distance;
 	}
 
 	template<std::floating_point T>

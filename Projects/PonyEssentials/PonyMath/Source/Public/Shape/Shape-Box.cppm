@@ -208,9 +208,7 @@ export namespace PonyMath::Shape
 		/// @return Unnormalized box.
 		[[nodiscard("Pure function")]]
 		constexpr Box Unnormalize(const Box& box) const noexcept requires (std::is_floating_point_v<T>);
-
-		constexpr void Set(T x, T y, T z, T width, T height, T depth) noexcept;
-		constexpr void Set(const Core::Vector3<T>& positionToSet, const Core::Vector3<T>& sizeToSet) noexcept; // TODO: Change ToSet to usual names and use this->
+		// TODO: Change ToSet to usual names and use this->
 
 		constexpr void ResolveNegativeSize() noexcept;
 
@@ -607,20 +605,6 @@ namespace PonyMath::Shape
 	constexpr Box<T> Box<T>::Unnormalize(const Box& box) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return Box(Unnormalize(box.position), Core::Multiply(box.size, size));
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void Box<T>::Set(const T x, const T y, const T z, const T width, const T height, const T depth) noexcept
-	{
-		position.Set(x, y, z);
-		size.Set(width, height, depth);
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void Box<T>::Set(const Core::Vector3<T>& positionToSet, const Core::Vector3<T>& sizeToSet) noexcept
-	{
-		position.Set(positionToSet);
-		size.Set(sizeToSet);
 	}
 
 	template<Core::Arithmetic T>
