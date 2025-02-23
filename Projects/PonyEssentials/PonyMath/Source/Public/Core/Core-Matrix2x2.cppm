@@ -260,20 +260,6 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Assigns arguments to the matrix components.
-		/// @param m00 Component 00.
-		/// @param m10 Component 10.
-		/// @param m01 Component 01.
-		/// @param m11 Component 11.
-		constexpr void Set(T m00, T m10, T m01, T m11) noexcept;
-		/// @brief Assigns columns to the matrix.
-		/// @param column0 Column 0 to assign.
-		/// @param column1 Column 1 to assign.
-		constexpr void Set(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
-		/// @brief Assigns matrix components from the @p span.
-		/// @param span Span. The matrix is column-major.
-		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
-
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Matrix2x2& multiplier) noexcept;
@@ -526,13 +512,14 @@ namespace PonyMath::Core
 	template<Arithmetic T>
 	constexpr Matrix2x2<T>::Matrix2x2(const Vector2<T>& column0, const Vector2<T>& column1) noexcept
 	{
-		Set(column0, column1);
+		Column(0, column0);
+		Column(1, column1);
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix2x2<T>::Matrix2x2(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(span);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -739,28 +726,6 @@ namespace PonyMath::Core
 		}
 
 		return true;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::Set(const T m00, const T m10, const T m01, const T m11) noexcept
-	{
-		M00() = m00;
-		M10() = m10;
-		M01() = m01;
-		M11() = m11;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::Set(const Vector2<T>& column0, const Vector2<T>& column1) noexcept
-	{
-		Column(0, column0);
-		Column(1, column1);
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix2x2<T>::Set(const std::span<const T, ComponentCount> span) noexcept
-	{
-		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>

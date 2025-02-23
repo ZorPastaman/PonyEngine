@@ -214,17 +214,6 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr Rect Unnormalize(const Rect& rect) const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Sets the rect.
-		/// @param x X position.
-		/// @param y Y position.
-		/// @param width Width.
-		/// @param height Height.
-		constexpr void Set(T x, T y, T width, T height) noexcept;
-		/// @brief Sets the rect.
-		/// @param positionToSet Position.
-		/// @param sizeToSet Size.
-		constexpr void Set(const Core::Vector2<T>& positionToSet, const Core::Vector2<T>& sizeToSet) noexcept;
-
 		/// @brief Adjusts position and size so that the rect keeps its shape but its size becomes positive.
 		constexpr void ResolveNegativeSize() noexcept;
 
@@ -556,20 +545,6 @@ namespace PonyMath::Shape
 	constexpr Rect<T> Rect<T>::Unnormalize(const Rect& rect) const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return Rect(Unnormalize(rect.position), Core::Multiply(rect.size, size));
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void Rect<T>::Set(const T x, const T y, const T width, const T height) noexcept
-	{
-		position.Set(x, y);
-		size.Set(width, height);
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void Rect<T>::Set(const Core::Vector2<T>& positionToSet, const Core::Vector2<T>& sizeToSet) noexcept
-	{
-		position = positionToSet;
-		size = sizeToSet;
 	}
 
 	template<Core::Arithmetic T>

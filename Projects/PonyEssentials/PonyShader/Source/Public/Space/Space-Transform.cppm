@@ -46,8 +46,6 @@ export namespace PonyShader::Space
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<float>& MvpMatrix() const noexcept;
 
-		void Set(const PonyMath::Core::Matrix4x4<float>& modelMatrixToSet, const PonyMath::Core::Matrix4x4<float>& viewMatrixToSet, const PonyMath::Core::Matrix4x4<float>& projectionMatrixToSet) noexcept;
-
 		Transform& operator =(const Transform& other) noexcept = default;
 		Transform& operator =(Transform&& other) noexcept = default;
 
@@ -115,14 +113,6 @@ namespace PonyShader::Space
 	const PonyMath::Core::Matrix4x4<float>& Transform::MvpMatrix() const noexcept
 	{
 		return mvpMatrix;
-	}
-
-	void Transform::Set(const PonyMath::Core::Matrix4x4<float>& modelMatrixToSet, const PonyMath::Core::Matrix4x4<float>& viewMatrixToSet, const PonyMath::Core::Matrix4x4<float>& projectionMatrixToSet) noexcept
-	{
-		modelMatrix = modelMatrixToSet;
-		viewMatrix = viewMatrixToSet;
-		projectionMatrix = projectionMatrixToSet;
-		UpdateMvp();
 	}
 
 	void Transform::UpdateMvp() noexcept

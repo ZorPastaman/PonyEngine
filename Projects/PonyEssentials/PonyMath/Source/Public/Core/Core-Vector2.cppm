@@ -172,14 +172,6 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Assigns arguments to the vector components.
-		/// @param x X-component.
-		/// @param y Y-component.
-		constexpr void Set(T x, T y) noexcept;
-		/// @brief Assigns arguments from the @p span.
-		/// @param span Span. The order is x, y.
-		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
-
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Vector2& multiplier) noexcept;
@@ -461,7 +453,7 @@ namespace PonyMath::Core
 	template<Arithmetic T>
 	constexpr Vector2<T>::Vector2(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(span);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -618,19 +610,6 @@ namespace PonyMath::Core
 	bool Vector2<T>::IsFinite() const noexcept requires (std::is_floating_point_v<T>)
 	{
 		return std::isfinite(X()) && std::isfinite(Y());
-	}
-
-	template<Arithmetic T>
-	constexpr void Vector2<T>::Set(const T x, const T y) noexcept
-	{
-		X() = x;
-		Y() = y;
-	}
-
-	template<Arithmetic T>
-	constexpr void Vector2<T>::Set(const std::span<const T, ComponentCount> span) noexcept
-	{
-		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>

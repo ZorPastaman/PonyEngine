@@ -173,15 +173,6 @@ export namespace PonyMath::Color
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
-		/// @brief Sets arguments to the components.
-		/// @param red Red.
-		/// @param green Green.
-		/// @param blue Blue.
-		constexpr void Set(T red, T green, T blue) noexcept;
-		/// @brief Sets the @p span to the components.
-		/// @param span Span. The order is r, g, b.
-		constexpr void Set(std::span<const T, 3> span) noexcept;
-
 		/// @brief Creates a string representing a state of the color.
 		/// @return String representing a state of the color.
 		[[nodiscard("Pure function")]]
@@ -572,18 +563,6 @@ namespace PonyMath::Color
 	bool RGB<T>::IsFinite() const noexcept
 	{
 		return components.IsFinite();
-	}
-
-	template<std::floating_point T>
-	constexpr void RGB<T>::Set(const T red, const T green, const T blue) noexcept
-	{
-		components.Set(red, green, blue);
-	}
-
-	template<std::floating_point T>
-	constexpr void RGB<T>::Set(const std::span<const T, 3> span) noexcept
-	{
-		components.Set(span);
 	}
 
 	template<std::floating_point T>

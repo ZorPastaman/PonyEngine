@@ -164,16 +164,6 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
-		/// @brief Assigns arguments to the quaternion components.
-		/// @param x X-component.
-		/// @param y Y-component.
-		/// @param z Z-component.
-		/// @param w W-component.
-		constexpr void Set(T x, T y, T z, T w) noexcept;
-		/// @brief Assigns @p span to the quaternion components.
-		/// @param span Span. The order is x, y, z, w.
-		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
-
 		/// @brief Creates a string representing a state of the quaternion. The format is '(x, y, z, w)'.
 		/// @return State string.
 		[[nodiscard("Pure function")]]
@@ -335,7 +325,7 @@ namespace PonyMath::Core
 	template<std::floating_point T>
 	constexpr Quaternion<T>::Quaternion(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(span);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<std::floating_point T>
@@ -469,21 +459,6 @@ namespace PonyMath::Core
 	bool Quaternion<T>::IsFinite() const noexcept
 	{
 		return std::isfinite(X()) && std::isfinite(Y()) && std::isfinite(Z()) && std::isfinite(W());
-	}
-
-	template<std::floating_point T>
-	constexpr void Quaternion<T>::Set(const T x, const T y, const T z, const T w) noexcept
-	{
-		X() = x;
-		Y() = y;
-		Z() = z;
-		W() = w;
-	}
-
-	template<std::floating_point T>
-	constexpr void Quaternion<T>::Set(const std::span<const T, ComponentCount> span) noexcept
-	{
-		std::ranges::copy(span, components.data());
 	}
 
 	template<std::floating_point T>

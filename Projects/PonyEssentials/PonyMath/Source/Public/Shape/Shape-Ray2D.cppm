@@ -60,8 +60,6 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> UnnormalizeVector(T value) const noexcept;
 
-		constexpr void Set(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction) noexcept;
-
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
@@ -172,13 +170,6 @@ namespace PonyMath::Shape
 	constexpr Core::Vector2<T> Ray2D<T>::UnnormalizeVector(const T value) const noexcept
 	{
 		return direction * value;
-	}
-
-	template<std::floating_point T>
-	constexpr void Ray2D<T>::Set(const Core::Vector2<T>& origin, const Core::Vector2<T>& direction) noexcept
-	{
-		this->origin = origin;
-		this->direction = direction;
 	}
 
 	template<std::floating_point T>

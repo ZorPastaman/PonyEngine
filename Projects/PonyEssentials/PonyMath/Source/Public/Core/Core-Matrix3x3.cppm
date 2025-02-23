@@ -307,26 +307,6 @@ export namespace PonyMath::Core
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Assigns arguments to the matrix components.
-		/// @param m00 Component 00.
-		/// @param m10 Component 10.
-		/// @param m20 Component 20.
-		/// @param m01 Component 01.
-		/// @param m11 Component 11.
-		/// @param m21 Component 21.
-		/// @param m02 Component 02.
-		/// @param m12 Component 12.
-		/// @param m22 Component 22.
-		constexpr void Set(T m00, T m10, T m20, T m01, T m11, T m21, T m02, T m12, T m22) noexcept;
-		/// @brief Assigns columns to the matrix.
-		/// @param column0 Column 0 to assign.
-		/// @param column1 Column 1 to assign.
-		/// @param column2 Column 2 to assign.
-		constexpr void Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept;
-		/// @brief Assigns matrix components from the @p span.
-		/// @param span Span. The matrix is column-major.
-		constexpr void Set(std::span<const T, ComponentCount> span) noexcept;
-
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Matrix3x3& multiplier) noexcept;
@@ -579,13 +559,15 @@ namespace PonyMath::Core
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>::Matrix3x3(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept
 	{
-		Set(column0, column1, column2);
+		Column(0, column0);
+		Column(1, column1);
+		Column(2, column2);
 	}
 
 	template<Arithmetic T>
 	constexpr Matrix3x3<T>::Matrix3x3(const std::span<const T, ComponentCount> span) noexcept
 	{
-		Set(span);
+		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>
@@ -867,34 +849,6 @@ namespace PonyMath::Core
 		}
 
 		return true;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::Set(const T m00, const T m10, const T m20, const T m01, const T m11, const T m21, const T m02, const T m12, const T m22) noexcept
-	{
-		M00() = m00;
-		M10() = m10;
-		M20() = m20;
-		M01() = m01;
-		M11() = m11;
-		M21() = m21;
-		M02() = m02;
-		M12() = m12;
-		M22() = m22;
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::Set(const Vector3<T>& column0, const Vector3<T>& column1, const Vector3<T>& column2) noexcept
-	{
-		Column(0, column0);
-		Column(1, column1);
-		Column(2, column2);
-	}
-
-	template<Arithmetic T>
-	constexpr void Matrix3x3<T>::Set(const std::span<const T, ComponentCount> span) noexcept
-	{
-		std::ranges::copy(span, components.data());
 	}
 
 	template<Arithmetic T>

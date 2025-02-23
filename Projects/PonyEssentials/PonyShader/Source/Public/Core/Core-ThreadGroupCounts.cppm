@@ -47,9 +47,6 @@ export namespace PonyShader::Core
 		[[nodiscard("Pure function")]]
 		std::span<const std::uint32_t, 3> Span() const noexcept;
 
-		void Set(std::uint32_t x, std::uint32_t y, std::uint32_t z);
-		void Set(std::span<const std::uint32_t, 3> span);
-
 		ThreadGroupCounts& operator =(const ThreadGroupCounts& other) noexcept = default;
 		ThreadGroupCounts& operator =(ThreadGroupCounts&& other) noexcept = default;
 
@@ -64,14 +61,31 @@ export namespace PonyShader::Core
 
 namespace PonyShader::Core
 {
-	ThreadGroupCounts::ThreadGroupCounts(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z)
+	ThreadGroupCounts::ThreadGroupCounts(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z) :
+		counts{ x, y, z }
 	{
-		Set(x, y, z);
+		if (x >= ThreadGroupCountMax || y >= ThreadGroupCountMax || z >= ThreadGroupCountMax) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count must be less than 65536.");
+		}
+		if (x * y * z > ThreadGroupCountProductMax) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count product exceeds 4194304.");
+		}
 	}
 
 	ThreadGroupCounts::ThreadGroupCounts(const std::span<const std::uint32_t, 3> span)
 	{
-		Set(span);
+		std::ranges::copy(span, counts.data());
+
+		if (counts[0] >= ThreadGroupCountMax || counts[1] >= ThreadGroupCountMax || counts[2] >= ThreadGroupCountMax) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count must be less than 65536.");
+		}
+		if (counts[0] * counts[1] * counts[2] > ThreadGroupCountProductMax) [[unlikely]]
+		{
+			throw std::invalid_argument("Thread group count product exceeds 4194304.");
+		}
 	}
 
 	std::uint32_t ThreadGroupCounts::ThreadGroupCountX() const noexcept
@@ -134,27 +148,6 @@ namespace PonyShader::Core
 	std::span<const std::uint32_t, 3> ThreadGroupCounts::Span() const noexcept
 	{
 		return counts;
-	}
-
-	void ThreadGroupCounts::Set(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z)
-	{
-		if (x >= ThreadGroupCountMax || y >= ThreadGroupCountMax || z >= ThreadGroupCountMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count must be less than 65536.");
-		}
-		if (x * y * z > ThreadGroupCountProductMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count product exceeds 4194304.");
-		}
-
-		counts[0] = x;
-		counts[1] = y;
-		counts[2] = z;
-	}
-
-	void ThreadGroupCounts::Set(const std::span<const std::uint32_t, 3> span)
-	{
-		Set(span[0], span[1], span[2]);
 	}
 
 	bool ThreadGroupCounts::operator ==(const ThreadGroupCounts& other) const noexcept

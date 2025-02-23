@@ -15,13 +15,13 @@ import <vector>;
 export namespace PonyBase::Utility
 {
 	template<typename T>
-	void Move(std::vector<T>& vector, std::size_t from, std::size_t to) noexcept;
+	void Move(std::vector<T>& vector, std::size_t from, std::size_t to);
 }
 
 namespace PonyBase::Utility
 {
 	template<typename T>
-	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to) noexcept
+	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to)
 	{
 		if (from == to)
 		{
