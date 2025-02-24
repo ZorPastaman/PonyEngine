@@ -33,15 +33,15 @@ export namespace PonyShader::Space
 
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<float>& ModelMatrix() const noexcept;
-		void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& modelMatrixToSet) noexcept;
+		void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept;
 
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<float>& ViewMatrix() const noexcept;
-		void ViewMatrix(const PonyMath::Core::Matrix4x4<float>& viewMatrixToSet) noexcept;
+		void ViewMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept;
 
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<float>& ProjectionMatrix() const noexcept;
-		void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& projectionMatrixToSet) noexcept;
+		void ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept;
 
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Matrix4x4<float>& MvpMatrix() const noexcept;
@@ -82,9 +82,9 @@ namespace PonyShader::Space
 		return modelMatrix;
 	}
 
-	void Transform::ModelMatrix(const PonyMath::Core::Matrix4x4<float>& modelMatrixToSet) noexcept
+	void Transform::ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
-		modelMatrix = modelMatrixToSet;
+		modelMatrix = matrix;
 		UpdateMvp();
 	}
 
@@ -93,9 +93,9 @@ namespace PonyShader::Space
 		return viewMatrix;
 	}
 
-	void Transform::ViewMatrix(const PonyMath::Core::Matrix4x4<float>& viewMatrixToSet) noexcept
+	void Transform::ViewMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
-		viewMatrix = viewMatrixToSet;
+		viewMatrix = matrix;
 		UpdateMvp();
 	}
 
@@ -104,9 +104,9 @@ namespace PonyShader::Space
 		return projectionMatrix;
 	}
 
-	void Transform::ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& projectionMatrixToSet) noexcept
+	void Transform::ProjectionMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
-		projectionMatrix = projectionMatrixToSet;
+		projectionMatrix = matrix;
 		UpdateMvp();
 	}
 

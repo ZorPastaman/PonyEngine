@@ -21,5 +21,8 @@ export namespace PonyEngine::Render
 	{
 		std::variant<OpaqueBlend, TransparentBlend, LogicBlend> renderTargetBlend = OpaqueBlend{};
 		bool alphaToCoverage = false;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Blend& other) const noexcept = default;
 	};
 }

@@ -22,5 +22,8 @@ export namespace PonyEngine::Render
 		float depthBiasClamp = 0.f;
 		float slopeScaledDepthBias = 0.f;
 		bool depthClip = true;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Rasterizer& other) const noexcept = default;
 	};
 }

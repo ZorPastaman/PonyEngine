@@ -47,7 +47,7 @@ export namespace PonyEngine::Render::Direct3D12
 		PipelineStateStream& operator =(const PipelineStateStream& other) noexcept = default;
 		PipelineStateStream& operator =(PipelineStateStream&& other) noexcept = default;
 
-		PipelineStateStream& operator =(const DataType& dataToSet) noexcept;
+		PipelineStateStream& operator =(const DataType& data) noexcept;
 
 	private:
 		D3D12_PIPELINE_STATE_SUBOBJECT_TYPE streamType = Type; ///< Sub-object type.
@@ -102,9 +102,9 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	template<D3D12_PIPELINE_STATE_SUBOBJECT_TYPE Type, typename DataType>
-	PipelineStateStream<Type, DataType>& PipelineStateStream<Type, DataType>::operator =(const DataType& dataToSet) noexcept
+	PipelineStateStream<Type, DataType>& PipelineStateStream<Type, DataType>::operator =(const DataType& data) noexcept
 	{
-		data = dataToSet;
+		this->data = data;
 
 		return *this;
 	}

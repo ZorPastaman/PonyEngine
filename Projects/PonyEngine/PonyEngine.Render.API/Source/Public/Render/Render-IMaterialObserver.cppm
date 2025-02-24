@@ -26,6 +26,7 @@ export namespace PonyEngine::Render
 
 		virtual void OnBlendChanged() noexcept = 0;
 		virtual void OnRasterizerChanged() noexcept = 0;
+		virtual void OnDepthStencilChanged() noexcept = 0;
 
 		virtual void OnDataSlotsChanged() noexcept = 0;
 

@@ -20,6 +20,7 @@ import <unordered_map>;
 import <vector>;
 
 import :Blend;
+import :DepthStencil;
 import :IMaterialObserver;
 import :MaterialParams;
 
@@ -58,10 +59,13 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		const struct Blend& Blend() const noexcept;
-		void Blend(const struct Blend& blendToSet) noexcept;
+		void Blend(const struct Blend& blend) noexcept;
 		[[nodiscard("Pure function")]]
 		const struct Rasterizer& Rasterizer() const noexcept;
-		void Rasterizer(const struct Rasterizer& rasterizerToSet) noexcept;
+		void Rasterizer(const struct Rasterizer& rasterizer) noexcept;
+		[[nodiscard("Pure function")]]
+		const struct DepthStencil& DepthStencil() const noexcept;
+		void DepthStencil(const struct DepthStencil& depthStencil) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> DataSlot(std::string_view dataType) const noexcept;
@@ -73,7 +77,7 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
-		void ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept;
+		void ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCounts) noexcept;
 
 		[[nodiscard("Pure function")]]
 		std::int32_t RenderQueue() const noexcept;
@@ -85,8 +89,8 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
-		void Name(std::string_view nameToSet);
-		void Name(std::string&& nameToSet);
+		void Name(std::string_view name);
+		void Name(std::string&& name);
 
 		void AddObserver(IMaterialObserver& observer) const;
 		void RemoveObserver(IMaterialObserver& observer) const noexcept;
@@ -102,6 +106,7 @@ export namespace PonyEngine::Render
 
 		void OnBlendChanged() const noexcept;
 		void OnRasterizerChanged() const noexcept;
+		void OnDepthStencilChanged() const noexcept;
 
 		void OnDataSlotsChanged() const noexcept;
 
@@ -118,6 +123,7 @@ export namespace PonyEngine::Render
 
 		struct Blend blend;
 		struct Rasterizer rasterizer;
+		struct DepthStencil depthStencil;
 
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
@@ -140,6 +146,7 @@ namespace PonyEngine::Render
 		pixelShader(params.pixelShader),
 		blend(params.blend),
 		rasterizer(params.rasterizer),
+		depthStencil(params.depthStencil),
 		dataSlots(params.dataSlots),
 		threadGroupCounts(params.threadGroupCounts),
 		renderQueue{params.renderQueue},
@@ -155,6 +162,7 @@ namespace PonyEngine::Render
 		pixelShader(other.pixelShader),
 		blend(other.blend),
 		rasterizer(other.rasterizer),
+		depthStencil(other.depthStencil),
 		dataSlots(other.dataSlots),
 		threadGroupCounts(other.threadGroupCounts),
 		renderQueue{other.renderQueue},
@@ -170,6 +178,7 @@ namespace PonyEngine::Render
 		pixelShader(std::move(other.pixelShader)),
 		blend(std::move(other.blend)),
 		rasterizer(std::move(other.rasterizer)),
+		depthStencil(std::move(other.depthStencil)),
 		dataSlots(std::move(other.dataSlots)),
 		threadGroupCounts(std::move(other.threadGroupCounts)),
 		renderQueue{std::move(other.renderQueue)},
@@ -291,9 +300,14 @@ namespace PonyEngine::Render
 		return blend;
 	}
 
-	void Material::Blend(const struct Blend& blendToSet) noexcept
+	void Material::Blend(const struct Blend& blend) noexcept
 	{
-		blend = blendToSet;
+		if (this->blend == blend)
+		{
+			return;
+		}
+
+		this->blend = blend;
 		OnBlendChanged();
 	}
 
@@ -302,10 +316,31 @@ namespace PonyEngine::Render
 		return rasterizer;
 	}
 
-	void Material::Rasterizer(const struct Rasterizer& rasterizerToSet) noexcept
+	void Material::Rasterizer(const struct Rasterizer& rasterizer) noexcept
 	{
-		rasterizer = rasterizerToSet;
+		if (this->rasterizer == rasterizer)
+		{
+			return;
+		}
+
+		this->rasterizer = rasterizer;
 		OnRasterizerChanged();
+	}
+
+	const struct DepthStencil& Material::DepthStencil() const noexcept
+	{
+		return depthStencil;
+	}
+
+	void Material::DepthStencil(const struct DepthStencil& depthStencil) noexcept
+	{
+		if (this->depthStencil == depthStencil)
+		{
+			return;
+		}
+
+		this->depthStencil = depthStencil;
+		OnDepthStencilChanged();
 	}
 
 	std::optional<std::uint32_t> Material::DataSlot(const std::string_view dataType) const noexcept
@@ -348,12 +383,22 @@ namespace PonyEngine::Render
 
 	void Material::DataSlots(const std::unordered_map<std::string, std::uint32_t>& data)
 	{
+		if (dataSlots == data)
+		{
+			return;
+		}
+
 		dataSlots = data;
 		OnDataSlotsChanged();
 	}
 
 	void Material::DataSlots(std::unordered_map<std::string, std::uint32_t>&& data)
 	{
+		if (dataSlots == data)
+		{
+			return;
+		}
+
 		dataSlots = std::move(data);
 		OnDataSlotsChanged();
 	}
@@ -363,14 +408,14 @@ namespace PonyEngine::Render
 		return threadGroupCounts;
 	}
 
-	void Material::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCountsToSet) noexcept
+	void Material::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCounts) noexcept
 	{
-		if (threadGroupCounts == threadGroupCountsToSet)
+		if (this->threadGroupCounts == threadGroupCounts)
 		{
 			return;
 		}
 
-		threadGroupCounts = threadGroupCountsToSet;
+		this->threadGroupCounts = threadGroupCounts;
 		OnThreadGroupCountsChanged();
 	}
 
@@ -411,25 +456,25 @@ namespace PonyEngine::Render
 		return name;
 	}
 
-	void Material::Name(const std::string_view nameToSet)
+	void Material::Name(const std::string_view name)
 	{
-		if (name == nameToSet)
+		if (this->name == name)
 		{
 			return;
 		}
 
-		name = nameToSet;
+		this->name = name;
 		OnNameChanged();
 	}
 
-	void Material::Name(std::string&& nameToSet)
+	void Material::Name(std::string&& name)
 	{
-		if (name == nameToSet)
+		if (this->name == name)
 		{
 			return;
 		}
 
-		name = std::move(nameToSet);
+		this->name = std::move(name);
 		OnNameChanged();
 	}
 
@@ -494,6 +539,14 @@ namespace PonyEngine::Render
 		}
 	}
 
+	void Material::OnDepthStencilChanged() const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnDepthStencilChanged();
+		}
+	}
+
 	void Material::OnDataSlotsChanged() const noexcept
 	{
 		for (IMaterialObserver* const observer : materialObservers)
@@ -542,6 +595,7 @@ namespace PonyEngine::Render
 		PixelShader(other.pixelShader);
 		Blend(other.blend);
 		Rasterizer(other.rasterizer);
+		DepthStencil(other.depthStencil);
 		DataSlots(other.dataSlots);
 
 		ThreadGroupCounts(other.threadGroupCounts);
@@ -561,6 +615,7 @@ namespace PonyEngine::Render
 		PixelShader(std::move(other.pixelShader));
 		Blend(other.blend);
 		Rasterizer(other.rasterizer);
+		DepthStencil(other.depthStencil);
 		DataSlots(std::move(other.dataSlots));
 
 		ThreadGroupCounts(other.threadGroupCounts);

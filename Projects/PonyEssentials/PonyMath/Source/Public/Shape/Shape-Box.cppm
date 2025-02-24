@@ -208,7 +208,6 @@ export namespace PonyMath::Shape
 		/// @return Unnormalized box.
 		[[nodiscard("Pure function")]]
 		constexpr Box Unnormalize(const Box& box) const noexcept requires (std::is_floating_point_v<T>);
-		// TODO: Change ToSet to usual names and use this->
 
 		constexpr void ResolveNegativeSize() noexcept;
 

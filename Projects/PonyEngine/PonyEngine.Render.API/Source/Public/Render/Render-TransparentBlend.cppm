@@ -23,5 +23,8 @@ export namespace PonyEngine::Render
 		BlendFactor sourceBlendAlpha = BlendFactor::One;
 		BlendFactor destinationBlendAlpha = BlendFactor::Zero;
 		BlendOperation blendOperationAlpha = BlendOperation::Add;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const TransparentBlend& other) const noexcept = default;
 	};
 }

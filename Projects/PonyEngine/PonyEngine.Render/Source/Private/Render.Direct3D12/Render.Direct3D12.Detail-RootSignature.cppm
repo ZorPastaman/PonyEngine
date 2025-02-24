@@ -49,8 +49,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> DataSlot(std::string_view dataType) const noexcept;
 		[[nodiscard("Pure function")]]
+		std::unordered_map<std::string, std::uint32_t>& DataSlots() noexcept;
+		[[nodiscard("Pure function")]]
 		const std::unordered_map<std::string, std::uint32_t>& DataSlots() const noexcept;
-		void DataSlots(const std::unordered_map<std::string, std::uint32_t>& dataSlotsToSet);
 
 		/// @brief Sets the name to the root signature components.
 		/// @param name Name.
@@ -95,14 +96,14 @@ namespace PonyEngine::Render::Direct3D12
 		return std::nullopt;
 	}
 
-	const std::unordered_map<std::string, std::uint32_t>& RootSignature::DataSlots() const noexcept
+	std::unordered_map<std::string, std::uint32_t>& RootSignature::DataSlots() noexcept
 	{
 		return dataSlots;
 	}
 
-	void RootSignature::DataSlots(const std::unordered_map<std::string, std::uint32_t>& dataSlotsToSet)
+	const std::unordered_map<std::string, std::uint32_t>& RootSignature::DataSlots() const noexcept
 	{
-		dataSlots = dataSlotsToSet;
+		return dataSlots;
 	}
 
 	void RootSignature::Name(const std::string_view name)
