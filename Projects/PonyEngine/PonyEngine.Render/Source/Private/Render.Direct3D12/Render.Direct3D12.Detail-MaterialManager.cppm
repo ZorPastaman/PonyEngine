@@ -79,6 +79,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnPixelShaderChanged() noexcept override;
 			virtual void OnBlendChanged() noexcept override;
 			virtual void OnRasterizerChanged() noexcept override;
+			virtual void OnDepthStencilChanged() noexcept override;
 			virtual void OnDataSlotsChanged() noexcept override;
 			virtual void OnThreadGroupCountsChanged() noexcept override;
 			virtual void OnRenderQueueChanged() noexcept override;
@@ -159,6 +160,15 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static D3D12_CULL_MODE GetCullMode(CullMode cullMode) noexcept;
 
+		[[nodiscard("Pure function")]]
+		static D3D12_DEPTH_STENCIL_DESC1 CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_COMPARISON_FUNC GetComparison(ComparisonFunction comparison) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_DEPTH_STENCILOP_DESC GetDepthStencilOpDesc(const StencilFace& face) noexcept;
+		[[nodiscard("Pure function")]]
+		static D3D12_STENCIL_OP GetStencilOp(StencilOperation stencilOperation) noexcept;
+
 		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
 		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
 		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
@@ -216,6 +226,11 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	void MaterialManager::MaterialObserver::OnRasterizerChanged() noexcept
+	{
+		materialChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnDepthStencilChanged() noexcept
 	{
 		materialChanged = true;
 	}
@@ -555,6 +570,85 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	D3D12_DEPTH_STENCIL_DESC1 MaterialManager::CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept
+	{
+		return D3D12_DEPTH_STENCIL_DESC1
+		{
+			.DepthEnable = depthStencil.depth,
+			.DepthWriteMask = depthStencil.depthWrite ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO,
+			.DepthFunc = GetComparison(depthStencil.depthFunc),
+			.StencilEnable = depthStencil.stencil,
+			.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK,
+			.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK,
+			.FrontFace = GetDepthStencilOpDesc(depthStencil.stencilFront),
+			.BackFace = GetDepthStencilOpDesc(depthStencil.stencilBack),
+			.DepthBoundsTestEnable = false
+		};
+	}
+
+	D3D12_COMPARISON_FUNC MaterialManager::GetComparison(const ComparisonFunction comparison) noexcept
+	{
+		switch (comparison)
+		{
+		case ComparisonFunction::Never:
+			return D3D12_COMPARISON_FUNC_NEVER;
+		case ComparisonFunction::Always:
+			return D3D12_COMPARISON_FUNC_ALWAYS;
+		case ComparisonFunction::Equal:
+			return D3D12_COMPARISON_FUNC_EQUAL;
+		case ComparisonFunction::NotEqual:
+			return D3D12_COMPARISON_FUNC_NOT_EQUAL;
+		case ComparisonFunction::Less:
+			return D3D12_COMPARISON_FUNC_LESS;
+		case ComparisonFunction::LessOrEqual:
+			return D3D12_COMPARISON_FUNC_LESS_EQUAL;
+		case ComparisonFunction::Greater:
+			return D3D12_COMPARISON_FUNC_GREATER;
+		case ComparisonFunction::GreaterOrEqual:
+			return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
+		default: [[unlikely]]
+			assert(false && "Unsupported comparison function.");
+			return D3D12_COMPARISON_FUNC_NEVER;
+		}
+	}
+
+	D3D12_DEPTH_STENCILOP_DESC MaterialManager::GetDepthStencilOpDesc(const StencilFace& face) noexcept
+	{
+		return D3D12_DEPTH_STENCILOP_DESC
+		{
+			.StencilFailOp = GetStencilOp(face.failOperation),
+			.StencilDepthFailOp = GetStencilOp(face.depthFailOperation),
+			.StencilPassOp = GetStencilOp(face.passOperation),
+			.StencilFunc = GetComparison(face.comparison)
+		};
+	}
+
+	D3D12_STENCIL_OP MaterialManager::GetStencilOp(const StencilOperation stencilOperation) noexcept
+	{
+		switch (stencilOperation)
+		{
+		case StencilOperation::Keep:
+			return D3D12_STENCIL_OP_KEEP;
+		case StencilOperation::Zero:
+			return D3D12_STENCIL_OP_ZERO;
+		case StencilOperation::Replace:
+			return D3D12_STENCIL_OP_REPLACE;
+		case StencilOperation::Invert:
+			return D3D12_STENCIL_OP_INVERT;
+		case StencilOperation::Increment:
+			return D3D12_STENCIL_OP_INCR;
+		case StencilOperation::Decrement:
+			return D3D12_STENCIL_OP_DECR;
+		case StencilOperation::IncrementSaturated:
+			return D3D12_STENCIL_OP_INCR_SAT;
+		case StencilOperation::DecrementSaturated:
+			return D3D12_STENCIL_OP_DECR_SAT;
+		default: [[unlikely]]
+			assert(false && "Unsupported stencil operation.");
+			return D3D12_STENCIL_OP_KEEP;
+		}
+	}
+
 	void MaterialManager::UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const
 	{
 		if (observer.AmplificationShaderChanged()) [[unlikely]]
@@ -593,30 +687,7 @@ namespace PonyEngine::Render::Direct3D12
 			.blend = CreateBlendDesc(source.Blend()),
 			.sampleMask = UINT_MAX,
 			.rasterizer = CreateRasterizerDesc(source.Rasterizer()),
-			.depthStencil = D3D12_DEPTH_STENCIL_DESC1
-			{
-				.DepthEnable = true,
-				.DepthWriteMask = D3D12_DEPTH_WRITE_MASK_ALL,
-				.DepthFunc = D3D12_COMPARISON_FUNC_LESS,
-				.StencilEnable = true,
-				.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK,
-				.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK,
-				.FrontFace = D3D12_DEPTH_STENCILOP_DESC
-				{
-					.StencilFailOp = D3D12_STENCIL_OP_KEEP,
-					.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP,
-					.StencilPassOp = D3D12_STENCIL_OP_KEEP,
-					.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
-				},
-				.BackFace = D3D12_DEPTH_STENCILOP_DESC
-				{
-					.StencilFailOp = D3D12_STENCIL_OP_KEEP,
-					.StencilDepthFailOp = D3D12_STENCIL_OP_KEEP,
-					.StencilPassOp = D3D12_STENCIL_OP_KEEP,
-					.StencilFunc = D3D12_COMPARISON_FUNC_ALWAYS
-				},
-				.DepthBoundsTestEnable = false
-			},
+			.depthStencil = CreateDepthStencilDesc(source.DepthStencil()),
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
 				.RTFormats = { d3d12System->FrameManager().RtvFormat() },
@@ -644,7 +715,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		if (observer.DataSlotsChanged() || observer.MaterialChanged()) [[unlikely]]
 		{
-			material.RootSignature()->DataSlots(source.DataSlots());
+			material.RootSignature()->DataSlots() = source.DataSlots();
 		}
 	}
 

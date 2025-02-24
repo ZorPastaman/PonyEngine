@@ -16,5 +16,8 @@ export namespace PonyEngine::Render
 	struct LogicBlend final
 	{
 		LogicOperation operation = LogicOperation::Noop;
+
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const LogicBlend& other) const noexcept = default;
 	};
 }

@@ -14,6 +14,7 @@ import <string>;
 import <unordered_map>;
 
 import :Blend;
+import :DepthStencil;
 import :Rasterizer;
 import :ThreadGroupCounts;
 
@@ -28,6 +29,7 @@ export namespace PonyEngine::Render
 
 		Blend blend;
 		Rasterizer rasterizer;
+		DepthStencil depthStencil;
 
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 

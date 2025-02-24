@@ -45,6 +45,8 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Clear.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-OrthographicParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-PerspectiveParams.cppm" />
@@ -54,6 +56,8 @@
     <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CullMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-StencilFace.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm" />

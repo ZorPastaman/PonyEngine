@@ -132,7 +132,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::uint32_t MeshDescriptorCount() const;
 		std::uint32_t CopyMeshDescriptors(std::uint32_t destOffset);
 		template<typename T>
-		std::uint32_t CopyDataDescriptors(RenderObjectData<T>& data, std::uint32_t destOffset);
+		std::uint32_t CopyDataDescriptors(const RenderObjectData<T>& data, std::uint32_t destOffset);
 
 		void PushBeginToRenderBarriers();
 		void PushRenderToResolveBarriers();
@@ -498,7 +498,7 @@ namespace PonyEngine::Render::Direct3D12
 	}
 
 	template<typename T>
-	std::uint32_t GraphicsPipeline::CopyDataDescriptors(RenderObjectData<T>& data, std::uint32_t destOffset)
+	std::uint32_t GraphicsPipeline::CopyDataDescriptors(const RenderObjectData<T>& data, const std::uint32_t destOffset)
 	{
 		const std::uint32_t descriptorCount = static_cast<std::uint32_t>(data.data.size());
 

@@ -13,5 +13,7 @@ export namespace PonyEngine::Render
 {
 	struct OpaqueBlend final
 	{
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const OpaqueBlend& other) const noexcept = default;
 	};
 }

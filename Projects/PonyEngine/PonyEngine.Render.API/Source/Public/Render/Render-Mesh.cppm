@@ -217,7 +217,7 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept;
-		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet);
+		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts);
 
 		[[nodiscard("Pure function")]]
 		const std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() const noexcept;
@@ -225,8 +225,8 @@ export namespace PonyEngine::Render
 
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
-		void Name(std::string_view nameToSet);
-		void Name(std::string&& nameToSet);
+		void Name(std::string_view name);
+		void Name(std::string&& name);
 
 		void AddObserver(IMeshObserver& observer) const;
 		void RemoveObserver(IMeshObserver& observer) const noexcept;
@@ -657,14 +657,14 @@ namespace PonyEngine::Render
 		return threadGroupCounts;
 	}
 
-	void Mesh::ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCountsToSet)
+	void Mesh::ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts)
 	{
-		if (threadGroupCounts == threadGroupCountsToSet)
+		if (this->threadGroupCounts == threadGroupCounts)
 		{
-			return;;
+			return;
 		}
 
-		threadGroupCounts = threadGroupCountsToSet;
+		this->threadGroupCounts = threadGroupCounts;
 		OnThreadGroupCountsChanged();
 	}
 
@@ -689,25 +689,25 @@ namespace PonyEngine::Render
 		return name;
 	}
 
-	void Mesh::Name(const std::string_view nameToSet)
+	void Mesh::Name(const std::string_view name)
 	{
-		if (name == nameToSet)
+		if (this->name == name)
 		{
 			return;
 		}
 
-		name = nameToSet;
+		this->name = name;
 		OnNameChanged();
 	}
 
-	void Mesh::Name(std::string&& nameToSet)
+	void Mesh::Name(std::string&& name)
 	{
-		if (name == nameToSet)
+		if (this->name == name)
 		{
 			return;
 		}
 
-		name = std::move(nameToSet);
+		this->name = std::move(name);
 		OnNameChanged();
 	}
 

@@ -113,13 +113,13 @@ namespace PonyEngine::Window::Windows
 			return;
 		}
 
-		const std::string titleToSet = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
+		const std::string windowTitle = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
 
-		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(titleToSet).c_str())) [[unlikely]]
+		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(windowTitle).c_str())) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to '{}'.", titleToSet);
+		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to '{}'.", windowTitle);
 	}
 }
