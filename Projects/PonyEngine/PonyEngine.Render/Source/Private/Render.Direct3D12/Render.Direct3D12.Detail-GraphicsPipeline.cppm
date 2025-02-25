@@ -113,9 +113,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		bool Cull(const Camera& camera, const RenderObject& renderObject);
 		void AddData(const Camera& camera, RenderObject& renderObject);
-		void AddMesh(RenderObject& renderObject);
-		void AddContext(const RenderObject& renderObject);
-		void AddTransform(const Camera& camera, const RenderObject& renderObject);
 		void SyncDataCounts();
 		template<typename T>
 		void SyncDataCounts(RenderObjectData<T>& data, std::string_view name);
@@ -342,37 +339,27 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::AddData(const Camera& camera, RenderObject& renderObject)
 	{
-		AddMesh(renderObject);
-		AddContext(renderObject);
-		AddTransform(camera, renderObject);
-	}
+		const auto transform = PonyShader::Space::Transform(renderObject.ModelMatrix(), camera.ViewMatrix(), camera.ProjectionMatrix());
+		Mesh* const mesh = renderObject.Mesh();
 
-	void GraphicsPipeline::AddMesh(RenderObject& renderObject)
-	{
-		if (Mesh* const mesh = renderObject.Mesh())
+		if (mesh)
 		{
 			meshes.insert(mesh);
 		}
-	}
-
-	void GraphicsPipeline::AddContext(const RenderObject& renderObject)
-	{
-		const Mesh* mesh = renderObject.Mesh();
 
 		const ThreadGroupCounts& materialGroups = renderObject.Material().ThreadGroupCounts();
 		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
-		const auto context = PonyShader::Core::Context // TODO: Add more data to the context. Seems it may have a render queue and transparency.
+		const auto context = PonyShader::Core::Context
 		{
 			.dispatchThreadGroupCounts = CreateDispatchThreadGroupCounts(materialGroups, meshGroups),
 			.materialThreadGroupCounts = materialGroups.threadGroupCounts,
-			.meshThreadGroupCounts = meshGroups
+			.meshThreadGroupCounts = meshGroups,
+			.renderQueue = renderObject.Material().RenderQueue(),
+			.isTransparent = renderObject.Material().IsTransparent(),
+			.isFlipped = transform.MvpMatrix().Determinant() < 0.f
 		};
 		contexts.data.push_back(context);
-	}
 
-	void GraphicsPipeline::AddTransform(const Camera& camera, const RenderObject& renderObject)
-	{
-		const auto transform = PonyShader::Space::Transform(renderObject.ModelMatrix(), camera.ViewMatrix(), camera.ProjectionMatrix());
 		transforms.data.push_back(transform);
 	}
 

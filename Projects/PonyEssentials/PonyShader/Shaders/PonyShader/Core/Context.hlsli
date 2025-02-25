@@ -14,4 +14,7 @@ struct Pony_Context
 	Pony_ThreadGroupCounts dispatchThreadGroupCounts;
 	Pony_ThreadGroupCounts materialThreadGroupCounts;
 	Pony_ThreadGroupCounts meshThreadGroupCounts;
+	int renderQueue;
+	bool isTransparent;
+	bool isFlipped;
 };
