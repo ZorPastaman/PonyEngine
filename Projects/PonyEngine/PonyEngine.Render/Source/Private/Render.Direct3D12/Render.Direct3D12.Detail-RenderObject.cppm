@@ -14,6 +14,8 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:RenderObject;
 
 import <memory>;
+import <string>;
+import <string_view>;
 
 import PonyEngine.Render.Direct3D12;
 
@@ -63,6 +65,10 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const class Mesh* Mesh() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept override;
+		virtual void Name(std::string_view name) override;
+
 		RenderObject& operator =(const RenderObject& other) noexcept = default;
 		RenderObject& operator =(RenderObject&& other) noexcept = default;
 
@@ -70,6 +76,8 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<class Material> material; ///< Material.
 		std::shared_ptr<class Mesh> mesh; ///< Mesh.
 		PonyMath::Core::Matrix4x4<float> modelMatrix; ///< Model matrix.
+
+		std::string name;
 	};
 }
 
@@ -110,5 +118,15 @@ namespace PonyEngine::Render::Direct3D12
 	const Mesh* RenderObject::Mesh() const noexcept
 	{
 		return mesh.get();
+	}
+
+	std::string_view RenderObject::Name() const noexcept
+	{
+		return name;
+	}
+
+	void RenderObject::Name(const std::string_view name)
+	{
+		this->name = name;
 	}
 }

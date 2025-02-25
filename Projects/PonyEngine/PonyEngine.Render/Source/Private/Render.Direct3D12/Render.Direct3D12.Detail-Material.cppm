@@ -94,32 +94,31 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
+		bool isTransparent;
 
 		struct ThreadGroupCounts threadGroupCounts;
 		std::int32_t renderQueue;
 		bool cameraCulling;
-
-		bool isTransparent;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	Material::Material() noexcept :
+		isTransparent{true},
 		threadGroupCounts(),
 		renderQueue{0},
-		cameraCulling{true},
-		isTransparent{true}
+		cameraCulling{true}
 	{
 	}
 
 	Material::Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
+		isTransparent{isTransparent},
 		threadGroupCounts(),
 		renderQueue{0},
-		cameraCulling{true},
-		isTransparent{isTransparent}
+		cameraCulling{true}
 	{
 	}
 

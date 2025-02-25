@@ -20,7 +20,7 @@ export namespace PonyEngine::Render
 		bool depthWrite = true;
 		ComparisonFunction depthFunc = ComparisonFunction::Less;
 
-		bool stencil = true;
+		bool stencil = false;
 		StencilFace stencilFront;
 		StencilFace stencilBack;
 
