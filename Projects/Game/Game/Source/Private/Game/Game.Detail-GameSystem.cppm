@@ -135,7 +135,6 @@ namespace Game
 		const auto opaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
-			.amplificationShader = std::format("{}{}", GAME_SHADERS_DIR, "AmplificationShader"),
 			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
 			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
 			.blend = PonyEngine::Render::OpaqueBlend{},
@@ -151,8 +150,7 @@ namespace Game
 			},
 			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
 			{
-				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(1u, 1u, 1u),
-				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMaterial
+				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMesh
 			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Opaque),
 			.name = "Opaque"
@@ -160,7 +158,6 @@ namespace Game
 		const auto transparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
-			.amplificationShader = std::format("{}{}", GAME_SHADERS_DIR, "AmplificationShader"),
 			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
 			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
 			.blend = PonyEngine::Render::TransparentBlend
@@ -187,8 +184,7 @@ namespace Game
 			},
 			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
 			{
-				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(1u, 1u, 1u),
-				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMaterial
+				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMesh
 			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Transparent),
 			.name = "Transparent"
@@ -360,14 +356,14 @@ namespace Game
 		});
 		const auto rightNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
 		{
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
-			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f)
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f)
 		});
 		auto floorMeshParams = PonyEngine::Render::MeshParams{};
 		floorMeshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ boxMeshlets, boxVertexIndices, boxTriangles };
@@ -433,7 +429,7 @@ namespace Game
 		{
 			.material = opaqueMaterial,
 			.mesh = centralColumnMesh,
-			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 2.5f, 0.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 5.f, 1.f)),
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 2.5f, 0.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(-1.f, 5.f, 1.f)),
 			.name = "CentralColumn"
 		});
 		leftNearColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams

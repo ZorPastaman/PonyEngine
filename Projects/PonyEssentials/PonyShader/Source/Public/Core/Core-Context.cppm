@@ -9,6 +9,8 @@
 
 export module PonyShader.Core:Context;
 
+import <cstdint>;
+
 import :ThreadGroupCounts;
 
 export namespace PonyShader::Core
@@ -18,5 +20,8 @@ export namespace PonyShader::Core
 		ThreadGroupCounts dispatchThreadGroupCounts;
 		ThreadGroupCounts materialThreadGroupCounts;
 		ThreadGroupCounts meshThreadGroupCounts;
-	};
+		std::int32_t renderQueue;
+		std::uint32_t isTransparent;
+		std::uint32_t isFlipped;
+	};;
 }
