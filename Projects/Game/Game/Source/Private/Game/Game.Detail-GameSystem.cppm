@@ -74,8 +74,19 @@ export namespace Game
 		std::shared_ptr<PonyEngine::Input::InputReceiver> resetHandle;
 		std::shared_ptr<PonyEngine::Input::InputReceiver> exitHandle;
 
-		std::shared_ptr<PonyEngine::Render::IRenderObject> boxHandle;
-		std::shared_ptr<PonyEngine::Render::IRenderObject> bigBoxHandle;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> floor;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> centralColumn;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> leftNearColumn;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> leftFarColumn;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> rightFarColumn;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> rightNearColumn;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> pyramid;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> leftNearGlass;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> leftFarGlass;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> rightFarGlass;
+		std::shared_ptr<PonyEngine::Render::IRenderObject> rightNearGlass;
+
+		PonyMath::Space::Transform3D pyramidTransform;
 
 		PonyMath::Space::Transform3D cameraTransform;
 		std::shared_ptr<PonyEngine::Render::ICamera> camera;
@@ -89,7 +100,8 @@ namespace Game
 		inputSystem{nullptr},
 		renderSystem{nullptr},
 		timeSystem{nullptr},
-		cameraTransform(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One)
+		pyramidTransform(PonyMath::Core::Vector3<float>(0.f, 9.f, 0.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One),
+		cameraTransform(PonyMath::Core::Vector3<float>(0.f, 5.f, -25.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>::Predefined::One)
 	{
 	}
 
@@ -120,14 +132,15 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
-		auto materialParams = PonyEngine::Render::MaterialParams
+		const auto opaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
 			.amplificationShader = std::format("{}{}", GAME_SHADERS_DIR, "AmplificationShader"),
 			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
 			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
-			.blend = PonyEngine::Render::Blend{},
+			.blend = PonyEngine::Render::OpaqueBlend{},
 			.rasterizer = PonyEngine::Render::Rasterizer{},
+			.depthStencil = PonyEngine::Render::DepthStencil{},
 			.dataSlots =
 			{
 				{ std::string(PonyEngine::Render::EngineDataTypes::Context), 0u },
@@ -141,63 +154,360 @@ namespace Game
 				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(1u, 1u, 1u),
 				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMaterial
 			},
-			.name = "Box"
+			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Opaque),
+			.name = "Opaque"
 		};
-		const auto material = std::make_shared<PonyEngine::Render::Material>(materialParams);
+		const auto transparentMaterialParams = PonyEngine::Render::MaterialParams
+		{
+			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
+			.amplificationShader = std::format("{}{}", GAME_SHADERS_DIR, "AmplificationShader"),
+			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
+			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
+			.blend = PonyEngine::Render::TransparentBlend
+			{
+				.sourceBlend = PonyEngine::Render::BlendFactor::AlphaSource,
+				.destinationBlend = PonyEngine::Render::BlendFactor::AlphaSourceInverse,
+				.blendOperation = PonyEngine::Render::BlendOperation::Add,
+				.sourceBlendAlpha = PonyEngine::Render::BlendFactor::One,
+				.destinationBlendAlpha = PonyEngine::Render::BlendFactor::AlphaSourceInverse,
+				.blendOperationAlpha = PonyEngine::Render::BlendOperation::Add
+			},
+			.rasterizer = PonyEngine::Render::Rasterizer{},
+			.depthStencil = PonyEngine::Render::DepthStencil
+			{
+				.depthWrite = false
+			},
+			.dataSlots =
+			{
+				{ std::string(PonyEngine::Render::EngineDataTypes::Context), 0u },
+				{ std::string(PonyEngine::Render::EngineDataTypes::Transform), 1u },
+				{ "Meshlets", 2u },
+				{ "Positions", 3u },
+				{ "Colors", 4u }
+			},
+			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
+			{
+				.threadGroupCounts = PonyShader::Core::ThreadGroupCounts(1u, 1u, 1u),
+				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMaterial
+			},
+			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Transparent),
+			.name = "Transparent"
+		};
+		const auto opaqueMaterial = std::make_shared<PonyEngine::Render::Material>(opaqueMaterialParams);
+		const auto transparentMaterial = std::make_shared<PonyEngine::Render::Material>(transparentMaterialParams);
 
-		const auto meshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 2>
+		const auto boxMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 2>
 		{
 			PonyShader::Mesh::Meshlet(0u, 0u, 7u, 6u),
 			PonyShader::Mesh::Meshlet(7u, 0u, 7u, 6u)
 		});
-		const auto vertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 14>
+		const auto pyramidMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 1>
 		{
-			0u, 1u, 2u, 3u, 7u, 4u, 5u, 6u, 7u, 3u, 2u, 1u, 5u, 4u
+			PonyShader::Mesh::Meshlet(0u, 0u, 5u, 6u)
 		});
-		const auto triangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
+		const auto boxVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 14>
 		{
-			PonyShader::Mesh::Primitive(0u, 2u, 1u),
-			PonyShader::Mesh::Primitive(0u, 3u, 2u),
-			PonyShader::Mesh::Primitive(4u, 0u, 5u),
-			PonyShader::Mesh::Primitive(4u, 3u, 0u),
-			PonyShader::Mesh::Primitive(5u, 1u, 6u),
-			PonyShader::Mesh::Primitive(5u, 0u, 1u)
+			0u, 1u, 2u, 3u, 4u, 5u, 7u, 6u, 5u, 4u, 7u, 2u, 1u, 3u
 		});
-		const auto positions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
+		const auto pyramidVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 5>
+		{
+			0u, 1u, 2u, 3u, 4u
+		});
+		const auto boxTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
+		{
+			PonyShader::Mesh::Primitive(0u, 1u, 2u),
+			PonyShader::Mesh::Primitive(0u, 2u, 3u),
+			PonyShader::Mesh::Primitive(0u, 4u, 5u),
+			PonyShader::Mesh::Primitive(0u, 5u, 1u),
+			PonyShader::Mesh::Primitive(0u, 6u, 4u),
+			PonyShader::Mesh::Primitive(0u, 3u, 6u)
+		});
+		const auto pyramidTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
+		{
+			PonyShader::Mesh::Primitive(0u, 1u, 2u),
+			PonyShader::Mesh::Primitive(0u, 2u, 3u),
+			PonyShader::Mesh::Primitive(0u, 3u, 4u),
+			PonyShader::Mesh::Primitive(0u, 4u, 1u),
+			PonyShader::Mesh::Primitive(1u, 3u, 2u),
+			PonyShader::Mesh::Primitive(1u, 4u, 3u)
+		});
+		const auto boxPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
 		{
 			PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f),
-			PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f),
-			PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f),
 			PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
+			PonyMath::Core::Vector3<float>(1.f, 1.f, 1.f),
+			PonyMath::Core::Vector3<float>(1.f, 1.f, -1.f),
 			PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f),
-			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f),
+			PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f),
 			PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f),
-			PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f)
+			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f)
 		});
-		const auto colors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto pyramidPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 5>
 		{
-			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Core::Vector3<float>(0.f, 1.f, 0.f),
+			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f),
+			PonyMath::Core::Vector3<float>(-1.f, -1.f, -1.f),
+			PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f),
+			PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f),
+		});
+		const auto floorColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8> // TODO: Change to a data number
+		{
 			PonyMath::Color::RGBA<float>::Predefined::Green,
-			PonyMath::Color::RGBA<float>::Predefined::Blue,
-			PonyMath::Color::RGBA<float>::Predefined::Yellow,
-			PonyMath::Color::RGBA<float>::Predefined::Magenta,
-			PonyMath::Color::RGBA<float>::Predefined::Cyan,
-			PonyMath::Color::RGBA<float>::Predefined::Gray,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green,
+			PonyMath::Color::RGBA<float>::Predefined::Green
+		});
+		const auto centralColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
+			PonyMath::Color::RGBA<float>::Predefined::White,
 			PonyMath::Color::RGBA<float>::Predefined::White
 		});
-		auto meshParams = PonyEngine::Render::MeshParams{};
-		meshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ meshlets, vertexIndices, triangles };
-		meshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ positions };
-		meshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ colors };
-		meshParams.threadGroupCounts = { 2u, 1u, 1u };
-		meshParams.boundingBox = PonyMath::Shape::CreateBoundingBox(positions.Span<PonyMath::Core::Vector3<float>>());
-		meshParams.name = "Box";
-		const auto mesh = std::make_shared<PonyEngine::Render::Mesh>(meshParams);
-		boxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.material = material, .mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 20.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, -PonyMath::Core::Vector3<float>::Predefined::One * 5.f)});
-		bigBoxHandle = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams{.material = material, .mesh = mesh, .modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 0.f, 50.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(20.f, 20.f, 5.f))});
+		const auto leftNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow,
+			PonyMath::Color::RGBA<float>::Predefined::Yellow
+		});
+		const auto leftFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan,
+			PonyMath::Color::RGBA<float>::Predefined::Cyan
+		});
+		const auto rightFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue,
+			PonyMath::Color::RGBA<float>::Predefined::Blue
+		});
+		const auto rightNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta,
+			PonyMath::Color::RGBA<float>::Predefined::Magenta
+		});
+		const auto pyramidColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 5>
+		{
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+			PonyMath::Color::RGBA<float>::Predefined::Red,
+		});
+		const auto leftNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
+			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f)
+			
+		});
+		const auto leftFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
+			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f)
+		});
+		const auto rightFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
+			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f)
+		});
+		const auto rightNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		{
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f),
+			PonyMath::Color::RGBA<float>(1.f, 1.f, 1.f, 0.15f)
+		});
+		auto floorMeshParams = PonyEngine::Render::MeshParams{};
+		floorMeshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ boxMeshlets, boxVertexIndices, boxTriangles };
+		floorMeshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ boxPositions };
+		floorMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ floorColors };
+		floorMeshParams.threadGroupCounts = { 2u, 1u, 1u };
+		floorMeshParams.boundingBox = PonyMath::Shape::CreateBoundingBox(boxPositions.Span<PonyMath::Core::Vector3<float>>());
+		floorMeshParams.name = "Floor";
+		auto centralColumnMeshParams = floorMeshParams;
+		centralColumnMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ centralColumnColors };
+		centralColumnMeshParams.name = "CentralColumn";
+		auto leftNearColumnMeshParams = floorMeshParams;
+		leftNearColumnMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ leftNearColumnColors };
+		leftNearColumnMeshParams.name = "LeftNearColumn";
+		auto leftFarColumnMeshParams = floorMeshParams;
+		leftFarColumnMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ leftFarColumnColors };
+		leftFarColumnMeshParams.name = "LeftFarColumn";
+		auto rightFarColumnMeshParams = floorMeshParams;
+		rightFarColumnMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ rightFarColumnColors };
+		rightFarColumnMeshParams.name = "RightFarColumn";
+		auto rightNearColumnMeshParams = floorMeshParams;
+		rightNearColumnMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ rightNearColumnColors };
+		rightNearColumnMeshParams.name = "RightNearColumn";
+		auto pyramidMeshParams = PonyEngine::Render::MeshParams{};
+		pyramidMeshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ pyramidMeshlets, pyramidVertexIndices, pyramidTriangles };
+		pyramidMeshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ pyramidPositions };
+		pyramidMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ pyramidColors };
+		pyramidMeshParams.threadGroupCounts = { 1u, 1u, 1u };
+		pyramidMeshParams.boundingBox = PonyMath::Shape::CreateBoundingBox(pyramidPositions.Span<PonyMath::Core::Vector3<float>>());
+		pyramidMeshParams.name = "Pyramid";
+		auto leftNearGlassMeshParams = floorMeshParams;
+		leftNearGlassMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ leftNearGlassColors };
+		leftNearGlassMeshParams.name = "LeftNearGlass";
+		auto leftFarGlassMeshParams = floorMeshParams;
+		leftFarGlassMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ leftFarGlassColors };
+		leftFarGlassMeshParams.name = "LeftFarGlass";
+		auto rightFarGlassMeshParams = floorMeshParams;
+		rightFarGlassMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ rightFarGlassColors };
+		rightFarGlassMeshParams.name = "RightFarGlass";
+		auto rightNearGlassMeshParams = floorMeshParams;
+		rightNearGlassMeshParams.bufferTables["Colors"] = std::vector<PonyBase::Container::Buffer>{ rightNearGlassColors };
+		rightNearGlassMeshParams.name = "RightNearGlass";
+		const auto floorMesh = std::make_shared<PonyEngine::Render::Mesh>(floorMeshParams);
+		const auto centralColumnMesh = std::make_shared<PonyEngine::Render::Mesh>(centralColumnMeshParams);
+		const auto leftNearColumnMesh = std::make_shared<PonyEngine::Render::Mesh>(leftNearColumnMeshParams);
+		const auto leftFarColumnMesh = std::make_shared<PonyEngine::Render::Mesh>(leftFarColumnMeshParams);
+		const auto rightFarColumnMesh = std::make_shared<PonyEngine::Render::Mesh>(rightFarColumnMeshParams);
+		const auto rightNearColumnMesh = std::make_shared<PonyEngine::Render::Mesh>(rightNearColumnMeshParams);
+		const auto pyramidMesh = std::make_shared<PonyEngine::Render::Mesh>(pyramidMeshParams);
+		const auto leftNearGlassMesh = std::make_shared<PonyEngine::Render::Mesh>(leftNearGlassMeshParams);
+		const auto leftFarGlassMesh = std::make_shared<PonyEngine::Render::Mesh>(leftFarGlassMeshParams);
+		const auto rightFarGlassMesh = std::make_shared<PonyEngine::Render::Mesh>(rightFarGlassMeshParams);
+		const auto rightNearGlassMesh = std::make_shared<PonyEngine::Render::Mesh>(rightNearGlassMeshParams);
+
+		floor = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = floorMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(10.f, 0.1f, 10.f)),
+			.name = "Floor"
+		});
+		centralColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = centralColumnMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 2.5f, 0.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 5.f, 1.f)),
+			.name = "CentralColumn"
+		});
+		leftNearColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = leftNearColumnMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-8.f, 6.f, -8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
+			.name = "LeftNearColumn"
+		});
+		leftFarColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = leftFarColumnMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-8.f, 6.f, 8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
+			.name = "LeftFarColumn"
+		});
+		rightFarColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = rightFarColumnMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(8.f, 6.f, 8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
+			.name = "RightFarColumn"
+		});
+		rightNearColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = rightNearColumnMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(8.f, 6.f, -8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
+			.name = "RightNearColumn"
+		});
+		pyramid = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = opaqueMaterial,
+			.mesh = pyramidMesh,
+			.modelMatrix = pyramidTransform.TrsMatrix(),
+			.name = "Pyramid"
+		});
+		leftNearGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = transparentMaterial,
+			.mesh = leftNearGlassMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-5.f, 4.f, -5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 45.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
+			.name = "LeftNearGlass"
+		});
+		leftFarGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = transparentMaterial,
+			.mesh = leftFarGlassMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-5.f, 4.f, 5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 135.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
+			.name = "LeftFarGlass"
+		});
+		rightFarGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = transparentMaterial,
+			.mesh = rightFarGlassMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(5.f, 4.f, 5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 225.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
+			.name = "RightFarGlass"
+		});
+		rightNearGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
+		{
+			.material = transparentMaterial,
+			.mesh = rightNearGlassMesh,
+			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(5.f, 4.f, -5.f), PonyMath::Core::Vector3<float>::Predefined::Up, -45.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
+			.name = "RightNearGlass"
+		});
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render objects created.");
 
-		camera = renderSystem->CameraManager().CreateCamera(PonyEngine::Render::CameraParams{});
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create camera.");
+
+		camera = renderSystem->CameraManager().CreateCamera(PonyEngine::Render::CameraParams
+		{
+			.viewMatrix = cameraTransform.TrsMatrix()
+		});
+		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Camera created.");
 	}
 
 	void GameSystem::End()
@@ -206,6 +516,9 @@ namespace Game
 
 	void GameSystem::Tick()
 	{
+		pyramidTransform.Rotate(PonyMath::Core::RotationQuaternion(pyramidTransform.Up(), 1.f * timeSystem->VirtualDeltaTime()));
+		pyramid->ModelMatrix(pyramidTransform.TrsMatrix());
+
 		const auto rotation = PonyMath::Core::RotationQuaternion(cameraTransform.Forward(), inputSystem->State("Rotate") * (0.5f * timeSystem->VirtualDeltaTime())) *
 			PonyMath::Core::RotationQuaternion(cameraTransform.Right(), inputSystem->State("MouseY")) * PonyMath::Core::RotationQuaternion(cameraTransform.Up(), inputSystem->State("MouseX"));
 		cameraTransform.Rotate(rotation);

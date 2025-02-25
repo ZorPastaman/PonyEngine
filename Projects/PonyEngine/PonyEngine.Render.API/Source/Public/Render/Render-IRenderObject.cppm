@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Render:IRenderObject;
 
+import <string_view>;
+
 import PonyMath.Core;
 
 export namespace PonyEngine::Render
@@ -29,5 +31,9 @@ export namespace PonyEngine::Render
 		/// @brief Sets the translation-rotation-scaling matrix of the object.
 		/// @param matrix Translation-rotation-scaling matrix.
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
+
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		virtual void Name(std::string_view name) = 0;
 	};
 }

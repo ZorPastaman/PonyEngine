@@ -10,6 +10,7 @@
 export module PonyEngine.Render:RenderObjectParams;
 
 import <memory>;
+import <string>;
 
 import PonyMath.Core;
 
@@ -23,5 +24,7 @@ export namespace PonyEngine::Render
 		std::shared_ptr<const Material> material;
 		std::shared_ptr<const Mesh> mesh;
 		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity;
+
+		std::string name = "";
 	};
 }

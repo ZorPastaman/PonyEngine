@@ -361,7 +361,7 @@ namespace PonyEngine::Render::Direct3D12
 
 		const ThreadGroupCounts& materialGroups = renderObject.Material().ThreadGroupCounts();
 		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
-		const auto context = PonyShader::Core::Context
+		const auto context = PonyShader::Core::Context // TODO: Add more data to the context. Seems it may have a render queue and transparency.
 		{
 			.dispatchThreadGroupCounts = CreateDispatchThreadGroupCounts(materialGroups, meshGroups),
 			.materialThreadGroupCounts = materialGroups.threadGroupCounts,
