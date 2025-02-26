@@ -10,5 +10,5 @@
 export module PonyBase.Container;
 
 export import :Buffer;
-export import :BufferView;
 export import :BufferParams;
+export import :BufferView;

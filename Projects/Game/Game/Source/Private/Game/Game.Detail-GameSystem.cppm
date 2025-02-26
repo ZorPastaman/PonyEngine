@@ -148,10 +148,6 @@ namespace Game
 				{ "Positions", 3u },
 				{ "Colors", 4u }
 			},
-			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
-			{
-				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMesh
-			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Opaque),
 			.name = "Opaque"
 		};
@@ -181,10 +177,6 @@ namespace Game
 				{ "Meshlets", 2u },
 				{ "Positions", 3u },
 				{ "Colors", 4u }
-			},
-			.threadGroupCounts = PonyEngine::Render::ThreadGroupCounts
-			{
-				.mode = PonyEngine::Render::ThreadGroupCountsMode::SetMesh
 			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Transparent),
 			.name = "Transparent"

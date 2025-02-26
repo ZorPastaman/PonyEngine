@@ -563,7 +563,7 @@ namespace PonyEngine::Render
 	template<typename T>
 	Mesh::BufferViewAccess<T> Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) noexcept
 	{
-		return BufferViewAccess<T>(PonyBase::Container::BufferView<T>(bufferTables[dataIndex], *this, dataIndex, bufferIndex));
+		return BufferViewAccess<T>(PonyBase::Container::BufferView<T>(bufferTables[dataIndex]), *this, dataIndex, bufferIndex);
 	}
 
 	template<typename T>

@@ -16,20 +16,27 @@ export module PonyBase.Container:BufferView;
 import <cstddef>;
 import <cstdint>;
 import <span>;
-import <stdexcept>;
+import <type_traits>;
 
 import :Buffer;
 
 export namespace PonyBase::Container
 {
+	/// @brief Buffer wrapper that allows to work with it as an array of a specific type.
+	/// @tparam T Data type.
 	template<typename T>
 	class BufferView final
 	{
 	public:
+		using BufferType = std::conditional_t<std::is_const_v<T>, const Buffer, Buffer>; ///< Buffer type.
+
+		/// @brief Creates an empty buffer view that doesn't point to any buffer.
 		[[nodiscard("Pure constructor")]]
 		BufferView() noexcept = default;
+		/// @brief Creates a buffer view for the @p buffer.
+		/// @param buffer Target buffer.
 		[[nodiscard("Pure constructor")]]
-		explicit BufferView(class Buffer* buffer);
+		explicit BufferView(BufferType& buffer);
 		[[nodiscard("Pure constructor")]]
 		BufferView(const BufferView& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -37,34 +44,61 @@ export namespace PonyBase::Container
 
 		~BufferView() noexcept = default;
 
+		/// @brief Gets the element size.
+		/// @return Element size.
 		[[nodiscard("Pure function")]]
 		static std::uint32_t Stride() noexcept;
+		/// @brief Gets the element count.
+		/// @return Element count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t Count() const noexcept;
+		/// @brief Gets the buffer size.
+		/// @return Buffer size.
 		[[nodiscard("Pure function")]]
-		std::uint32_t Size() const noexcept;
+		std::size_t Size() const noexcept;
+		/// @brief Gets the buffer data.
+		/// @return Buffer data.
 		[[nodiscard("Pure function")]]
-		T* Data();
+		T* Data() noexcept;
+		/// @brief Gets the buffer data.
+		/// @return Buffer data.
 		[[nodiscard("Pure function")]]
-		const T* Data() const;
+		const T* Data() const noexcept;
+		/// @brief Gets the buffer.
+		/// @return Buffer.
 		[[nodiscard("Pure function")]]
-		class Buffer* Buffer() noexcept;
+		BufferType* Buffer() noexcept;
+		/// @brief Gets the buffer.
+		/// @return Buffer.
 		[[nodiscard("Pure function")]]
-		const class Buffer* Buffer() const noexcept;
+		const BufferType* Buffer() const noexcept;
 
+		/// @brief Is the view empty?
+		/// @return @a True if it's empty; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsEmpty() const noexcept;
 
+		/// @brief Gets the span.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
 		std::span<T> Span() noexcept;
+		/// @brief Gets the span.
+		/// @return Span.
 		[[nodiscard("Pure function")]]
 		std::span<const T> Span() const noexcept;
 
+		/// @brief @a True if the buffer isn't nullptr; @a false otherwise.
 		[[nodiscard("Pure operator")]]
 		explicit operator bool() const noexcept;
 
+		/// @brief Gets the object by the @p index.
+		/// @param index Object index.
+		/// @return Object.
 		[[nodiscard("Pure operator")]]
 		T& operator [](std::size_t index) noexcept;
+		/// @brief Gets the object by the @p index.
+		/// @param index Object index.
+		/// @return Object.
 		[[nodiscard("Pure operator")]]
 		const T& operator [](std::size_t index) const noexcept;
 
@@ -72,17 +106,17 @@ export namespace PonyBase::Container
 		BufferView& operator =(BufferView&& other) noexcept = default;
 
 	private:
-		class Buffer* buffer;
+		BufferType* buffer; ///< Buffer.
 	};
 }
 
 namespace PonyBase::Container
 {
 	template<typename T>
-	BufferView<T>::BufferView(class Buffer* const buffer) :
-		buffer{buffer}
+	BufferView<T>::BufferView(BufferType& buffer) :
+		buffer{&buffer}
 	{
-		if (this->buffer && this->buffer->Stride() != Stride()) [[unlikely]]
+		if (this->buffer->Stride() != Stride()) [[unlikely]]
 		{
 			throw std::invalid_argument("Buffer view is incompatible with buffer.");
 		}
@@ -101,31 +135,31 @@ namespace PonyBase::Container
 	}
 
 	template<typename T>
-	std::uint32_t BufferView<T>::Size() const noexcept
+	std::size_t BufferView<T>::Size() const noexcept
 	{
-		return Stride() * Count();
+		return static_cast<std::size_t>(Stride()) * Count();
 	}
 
 	template<typename T>
-	T* BufferView<T>::Data()
+	T* BufferView<T>::Data() noexcept
 	{
-		return buffer ? buffer->Data() : nullptr;
+		return buffer ? reinterpret_cast<T*>(buffer->Data()) : nullptr;
 	}
 
 	template<typename T>
-	const T* BufferView<T>::Data() const
+	const T* BufferView<T>::Data() const noexcept
 	{
-		return buffer ? buffer->Data() : nullptr;
+		return buffer ? reinterpret_cast<const T*>(buffer->Data()) : nullptr;
 	}
 
 	template<typename T>
-	class Buffer* BufferView<T>::Buffer() noexcept
+	typename BufferView<T>::BufferType* BufferView<T>::Buffer() noexcept
 	{
 		return buffer;
 	}
 
 	template<typename T>
-	const class Buffer* BufferView<T>::Buffer() const noexcept
+	const typename BufferView<T>::BufferType* BufferView<T>::Buffer() const noexcept
 	{
 		return buffer;
 	}
@@ -139,13 +173,13 @@ namespace PonyBase::Container
 	template<typename T>
 	std::span<T> BufferView<T>::Span() noexcept
 	{
-		return buffer ? buffer->Span<T>() : std::span<T>();
+		return buffer ? buffer->template Span<T>() : std::span<T>();
 	}
 
 	template<typename T>
 	std::span<const T> BufferView<T>::Span() const noexcept
 	{
-		return buffer ? buffer->Span<T>() : std::span<T>();
+		return buffer ? buffer->template Span<T>() : std::span<T>();
 	}
 
 	template<typename T>
@@ -159,7 +193,7 @@ namespace PonyBase::Container
 	{
 		assert(buffer && "The buffer is nullptr.");
 
-		return buffer->Get<T>(index);
+		return buffer->template Get<T>(index);
 	}
 
 	template<typename T>
@@ -167,6 +201,6 @@ namespace PonyBase::Container
 	{
 		assert(buffer && "The buffer is nullptr.");
 
-		return buffer->Get<T>(index);
+		return buffer->template Get<T>(index);
 	}
 }

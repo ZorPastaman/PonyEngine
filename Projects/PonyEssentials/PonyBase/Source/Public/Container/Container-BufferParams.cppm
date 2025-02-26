@@ -13,9 +13,10 @@ import <cstdint>;
 
 export namespace PonyBase::Container
 {
+	/// @brief Buffer parameters.
 	struct BufferParams final
 	{
-		std::uint32_t stride = 0u;
-		std::uint32_t count = 0u;
+		std::uint32_t stride = 0u; ///< Element size.
+		std::uint32_t count = 0u; ///< Element count.
 	};
 }

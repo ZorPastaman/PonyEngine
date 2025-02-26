@@ -18,7 +18,7 @@ export namespace PonyEngine::Render
 	struct ThreadGroupCounts final
 	{
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
-		ThreadGroupCountsMode mode = ThreadGroupCountsMode::DivideMeshByMaterial;
+		ThreadGroupCountsMode mode = ThreadGroupCountsMode::SetMesh;
 
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const ThreadGroupCounts& other) const noexcept = default;
