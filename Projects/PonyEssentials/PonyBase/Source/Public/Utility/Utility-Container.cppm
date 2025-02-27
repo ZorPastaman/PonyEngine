@@ -10,26 +10,28 @@
 export module PonyBase.Utility:Container;
 
 import <cstddef>;
+import <type_traits>;
+import <utility>;
 import <vector>;
 
 export namespace PonyBase::Utility
 {
 	template<typename T>
-	void Move(std::vector<T>& vector, std::size_t from, std::size_t to);
+	void Move(std::vector<T>& vector, std::size_t from, std::size_t to) noexcept(std::is_nothrow_move_constructible_v<T>);
 }
 
 namespace PonyBase::Utility
 {
 	template<typename T>
-	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to)
+	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to) noexcept(std::is_nothrow_move_constructible_v<T>)
 	{
 		if (from == to)
 		{
 			return;
 		}
 
-		const T value = vector[from];
+		const T value = std::move(vector[from]);
 		vector.erase(vector.begin() + from);
-		vector.insert(vector.begin() + to - (to > from), value);
+		vector.insert(vector.begin() + to, std::move(value));
 	}
 }

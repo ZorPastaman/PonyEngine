@@ -17,7 +17,7 @@ import PonyBase.Utility.COM;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
-namespace Utility
+namespace Utility::COM
 {
 	TEST_CLASS(GuidUtilityTests)
 	{

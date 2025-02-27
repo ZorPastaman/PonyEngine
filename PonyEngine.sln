@@ -9,6 +9,8 @@ Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyBase", "Projects\PonyEs
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyMath", "Projects\PonyEssentials\PonyMath\PonyMath.vcxproj", "{95A38DE9-14C2-4BD5-B8B6-C1C6992D729A}"
 EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyShader", "Projects\PonyEssentials\PonyShader\PonyShader.vcxproj", "{CC5CA766-F2CF-45B2-9D00-ECE87AA8BBC4}"
+EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyDebug.Log.API", "Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj", "{8B6B1B01-CBC6-414D-B455-0BB7ABEDAE4C}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyDebug.Log", "Projects\PonyDebug\PonyDebug.Log\PonyDebug.Log.vcxproj", "{260938CA-8A73-40F8-AB77-D1A2295E8FD9}"
@@ -60,8 +62,6 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Game", "Game", "{B548428F-A26F-4FD5-9587-45D3CB54C39D}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{43F91669-3F87-4CB1-BA38-E3D973C07263}"
-EndProject
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "PonyShader", "Projects\PonyEssentials\PonyShader\PonyShader.vcxproj", "{CC5CA766-F2CF-45B2-9D00-ECE87AA8BBC4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
