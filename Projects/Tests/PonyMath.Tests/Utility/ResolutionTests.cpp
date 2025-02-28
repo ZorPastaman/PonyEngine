@@ -192,11 +192,13 @@ namespace Utility
 		static constexpr PonyMath::Utility::Resolution<std::uint32_t> GetConstexpr()
 		{
 			auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(1024u, 768u);
+			const auto copyResolution = resolution;
 			auto movedResolution = std::move(resolution);
 
 			[[maybe_unused]] auto width = movedResolution.Width();
 			[[maybe_unused]] auto height = movedResolution.Height();
 			[[maybe_unused]] auto span = movedResolution.Span();
+			[[maybe_unused]] auto spanC = copyResolution.Span();
 			[[maybe_unused]] auto vector = movedResolution.Vector();
 
 			auto copiedResolution = PonyMath::Utility::Resolution<std::uint32_t>();
@@ -217,7 +219,6 @@ namespace Utility
 
 			[[maybe_unused]] constexpr auto width = resolution.Width();
 			[[maybe_unused]] constexpr auto height = resolution.Height();
-			[[maybe_unused]] constexpr auto span = resolution.Span();
 			[[maybe_unused]] constexpr auto vector = resolution.Vector();
 
 			[[maybe_unused]] constexpr auto aspect = resolution.Aspect<float>();

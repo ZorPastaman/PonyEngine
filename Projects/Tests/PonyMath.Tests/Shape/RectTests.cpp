@@ -302,22 +302,6 @@ namespace Shape
 			Assert::AreEqual(15., static_cast<double>(rectN.MaxY()), 0.001);
 		}
 
-		TEST_METHOD(SetTest)
-		{
-			auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
-			rect.Set(1.f, -3.f, 5.f, 8.f);
-			Assert::AreEqual(1.f, rect.Position().X());
-			Assert::AreEqual(-3.f, rect.Position().Y());
-			Assert::AreEqual(5.f, rect.Size().X());
-			Assert::AreEqual(8.f, rect.Size().Y());
-
-			rect.Set(PonyMath::Core::Vector2<float>(-2.f, 4.f), PonyMath::Core::Vector2<float>(4.f, 7.f));
-			Assert::AreEqual(-2.f, rect.Position().X());
-			Assert::AreEqual(4.f, rect.Position().Y());
-			Assert::AreEqual(4.f, rect.Size().X());
-			Assert::AreEqual(7.f, rect.Size().Y());
-		}
-
 		TEST_METHOD(ResolveNegativeTest)
 		{
 			auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
@@ -456,9 +440,6 @@ namespace Shape
 			movedRect.Height<true>(6.f);
 
 			movedRect.Center(PonyMath::Core::Vector2<float>(4.f, 7.f));
-
-			movedRect.Set(2.f, 1.f, 7.f, 8.f);
-			movedRect.Set(PonyMath::Core::Vector2<float>(2.f, 6.f), PonyMath::Core::Vector2<float>(-4.f, 5.f));
 
 			movedRect.ResolveNegativeSize();
 

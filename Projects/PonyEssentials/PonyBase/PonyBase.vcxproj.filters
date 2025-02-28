@@ -55,7 +55,7 @@
     <ClCompile Include="Source\Public\Utility.COM\Utility.COM.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-Guid.cppm">
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-GUID.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Utility\Utility-ObjectInterfaces.cppm">

@@ -263,6 +263,8 @@ export namespace PonyMath::Core
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Matrix2x2& multiplier) noexcept;
+		/// @brief Divides @a this by the @p divisor component-wise.
+		/// @param divisor Divisor.
 		constexpr void Divide(const Matrix2x2& divisor) noexcept;
 
 		/// @brief Creates a string representing a state of the matrix.
@@ -320,11 +322,8 @@ export namespace PonyMath::Core
 		/// @return @a This.
 		constexpr Matrix2x2& operator /=(ComputationalType divisor) noexcept requires (std::is_integral_v<T>);
 
-		/// @brief Checks if the two matrices are equal.
-		/// @param other Other matrix.
-		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const Matrix2x2& other) const noexcept;
+		constexpr bool operator ==(const Matrix2x2& other) const noexcept = default;
 
 	private:
 		std::array<T, ComponentCount> components; ///< Component array in order m00, m10, m01, m11.
@@ -337,6 +336,11 @@ export namespace PonyMath::Core
 	/// @return Product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Matrix2x2<T> Multiply(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept;
+	/// @brief Divides the @p left matrix by the @p right matrix component-wise.
+	/// @tparam T Component type.
+	/// @param left Dividend.
+	/// @param right Divisor.
+	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Matrix2x2<T> Divide(const Matrix2x2<T>& left, const Matrix2x2<T>& right) noexcept;
 
@@ -885,12 +889,6 @@ namespace PonyMath::Core
 		}
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	constexpr bool Matrix2x2<T>::operator ==(const Matrix2x2& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<Arithmetic T>

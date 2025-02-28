@@ -267,11 +267,8 @@ export namespace PonyMath::Color
 		/// @return @a This.
 		constexpr RGBA& operator /=(T divisor) noexcept;
 
-		/// @brief Check if all the components in the two colors are equal.
-		/// @param other Color to compare with.
-		/// @return @a True if they're equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const RGBA& other) const noexcept;
+		constexpr bool operator ==(const RGBA& other) const noexcept = default;
 
 	private:
 		Core::Vector4<T> components; ///< Component array in order red, green, blue, alpha.
@@ -772,12 +769,6 @@ namespace PonyMath::Color
 		components /= divisor;
 
 		return *this;
-	}
-
-	template<std::floating_point T>
-	constexpr bool RGBA<T>::operator ==(const RGBA& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<std::floating_point T>

@@ -11,4 +11,4 @@ export module PonyBase.Utility.COM;
 
 export import PonyBase.Utility;
 
-export import :Guid;
+export import :GUID;

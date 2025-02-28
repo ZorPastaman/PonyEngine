@@ -186,7 +186,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr std::int8_t Line<T>::Side(const Core::Vector2<T>& point) const noexcept
 	{
-		return Core::Signum<T, std::int8_t>(Distance(point));
+		return Core::Signum<std::int8_t>(Distance(point));
 	}
 
 	template<std::floating_point T>

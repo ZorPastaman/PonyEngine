@@ -193,6 +193,8 @@ export namespace PonyMath::Core
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Vector4& multiplier) noexcept;
+		/// @brief Divides @a this by the @p divisor component-wise.
+		/// @param divisor Divisor.
 		constexpr void Divide(const Vector4& divisor) noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y, z, w)'.
@@ -239,11 +241,8 @@ export namespace PonyMath::Core
 		/// @return @a This.
 		constexpr Vector4& operator /=(ComputationalType divisor) noexcept;
 
-		/// @brief Checks if all the components of vectors are equal.
-		/// @param other Vector to compare.
-		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const Vector4& other) const noexcept;
+		constexpr bool operator ==(const Vector4& other) const noexcept = default;
 
 	private:
 		std::array<T, ComponentCount> components; ///< Component array in order x, y, z, w.
@@ -295,11 +294,20 @@ export namespace PonyMath::Core
 	/// @return Product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector4<T> Multiply(const Vector4<T>& left, const Vector4<T>& right) noexcept;
+	/// @brief Divides the @p left vector by the @p right vector component-wise.
+	/// @tparam T Component type.
+	/// @param left Dividend.
+	/// @param right Divisor.
+	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector4<T> Divide(const Vector4<T>& left, const Vector4<T>& right) noexcept;
 
+	/// @brief Computes absolute values of the @p vector components.
+	/// @tparam T Component type.
+	/// @param vector Source.
+	/// @return Absolute vector.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector4<T> Abs(const Vector4<T>& vector) noexcept;
+	Vector4<T> Abs(const Vector4<T>& vector) noexcept;
 
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
 	/// @tparam T Component type.
@@ -705,7 +713,7 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr Vector4<T> Abs(const Vector4<T>& vector) noexcept
+	Vector4<T> Abs(const Vector4<T>& vector) noexcept
 	{
 		Vector4<T> answer;
 		for (std::size_t i = 0; i < Vector4<T>::ComponentCount; ++i)
@@ -842,12 +850,6 @@ namespace PonyMath::Core
 		}
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	constexpr bool Vector4<T>::operator ==(const Vector4& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<Arithmetic T>

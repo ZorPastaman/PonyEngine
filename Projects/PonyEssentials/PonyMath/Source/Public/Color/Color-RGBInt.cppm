@@ -160,11 +160,8 @@ export namespace PonyMath::Color
 		constexpr RGBInt& operator =(const RGBInt& other) noexcept = default;
 		constexpr RGBInt& operator =(RGBInt&& other) noexcept = default;
 
-		/// @brief Checks if the two colors are equal.
-		/// @param other Color to compare with.
-		/// @return @a True if they're equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const RGBInt& other) const noexcept;
+		constexpr bool operator ==(const RGBInt& other) const noexcept = default;
 
 	private:
 		Core::Vector3<T> components; ///< Component array. The order is r, g, b.
@@ -385,12 +382,6 @@ namespace PonyMath::Color
 	constexpr const T& RGBInt<T>::operator [](const std::size_t index) const noexcept
 	{
 		return components[index];
-	}
-
-	template<std::unsigned_integral T>
-	constexpr bool RGBInt<T>::operator ==(const RGBInt& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<std::unsigned_integral T>
