@@ -197,11 +197,8 @@ export namespace PonyMath::Core
 		/// @return @a This.
 		constexpr Quaternion& operator *=(const Quaternion& other) noexcept;
 
-		/// @brief Checks if the two quaternions are equal.
-		/// @param other Other quaternion.
-		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const Quaternion& other) const noexcept;
+		constexpr bool operator ==(const Quaternion& other) const noexcept = default;
 
 	private:
 		std::array<T, ComponentCount> components; ///< Component array in order x, y, z, w.
@@ -555,12 +552,6 @@ namespace PonyMath::Core
 	constexpr Quaternion<T>& Quaternion<T>::operator *=(const Quaternion& other) noexcept
 	{
 		return *this = *this * other;
-	}
-
-	template<std::floating_point T>
-	constexpr bool Quaternion<T>::operator ==(const Quaternion& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<std::floating_point T>

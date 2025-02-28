@@ -31,7 +31,7 @@
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\Core-ExitCodes.cppm" />
     <ClCompile Include="Source\Public\Utility.COM\Utility.COM.cppm" />
-    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-Guid.cppm" />
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-GUID.cppm" />
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Cursor.cppm" />
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Module.cppm" />
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm" />

@@ -1490,159 +1490,7 @@ namespace Core
 			}
 		}
 
-		TEST_METHOD(SetShortTest)
-		{
-			constexpr std::int16_t m00 = 1;
-			constexpr std::int16_t m10 = 3;
-			constexpr std::int16_t m20 = 2;
-			constexpr std::int16_t m01 = 4;
-			constexpr std::int16_t m11 = 6;
-			constexpr std::int16_t m21 = 5;
-			constexpr std::int16_t m02 = 8;
-			constexpr std::int16_t m12 = -4;
-			constexpr std::int16_t m22 = -3;
-			auto matrix = PonyMath::Core::Matrix3x3<std::int16_t>();
-			matrix.Set(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(SetFloatTest)
-		{
-			constexpr float m00 = 1;
-			constexpr float m10 = 3;
-			constexpr float m20 = 2;
-			constexpr float m01 = 4;
-			constexpr float m11 = 6;
-			constexpr float m21 = 5;
-			constexpr float m02 = 8;
-			constexpr float m12 = -4;
-			constexpr float m22 = -3;
-			auto matrix = PonyMath::Core::Matrix3x3<float>();
-			matrix.Set(m00, m10, m20, m01, m11, m21, m02, m12, m22);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(SetColumnsShortTest)
-		{
-			constexpr std::int16_t m00 = 1;
-			constexpr std::int16_t m10 = 3;
-			constexpr std::int16_t m20 = 2;
-			constexpr std::int16_t m01 = 4;
-			constexpr std::int16_t m11 = 6;
-			constexpr std::int16_t m21 = 5;
-			constexpr std::int16_t m02 = 8;
-			constexpr std::int16_t m12 = -4;
-			constexpr std::int16_t m22 = -3;
-			constexpr auto column0 = PonyMath::Core::Vector3<std::int16_t>(m00, m10, m20);
-			constexpr auto column1 = PonyMath::Core::Vector3<std::int16_t>(m01, m11, m21);
-			constexpr auto column2 = PonyMath::Core::Vector3<std::int16_t>(m02, m12, m22);
-			auto matrix = PonyMath::Core::Matrix3x3<std::int16_t>();
-			matrix.Set(column0, column1, column2);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(SetColumsFloatTest)
-		{
-			constexpr float m00 = 1;
-			constexpr float m10 = 3;
-			constexpr float m20 = 2;
-			constexpr float m01 = 4;
-			constexpr float m11 = 6;
-			constexpr float m21 = 5;
-			constexpr float m02 = 8;
-			constexpr float m12 = -4;
-			constexpr float m22 = -3;
-			constexpr auto column0 = PonyMath::Core::Vector3<float>(m00, m10, m20);
-			constexpr auto column1 = PonyMath::Core::Vector3<float>(m01, m11, m21);
-			constexpr auto column2 = PonyMath::Core::Vector3<float>(m02, m12, m22);
-			auto matrix = PonyMath::Core::Matrix3x3<float>();
-			matrix.Set(column0, column1, column2);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(SetSpanShortTest)
-		{
-			constexpr std::int16_t m00 = 1;
-			constexpr std::int16_t m10 = 3;
-			constexpr std::int16_t m20 = 2;
-			constexpr std::int16_t m01 = 4;
-			constexpr std::int16_t m11 = 6;
-			constexpr std::int16_t m21 = 5;
-			constexpr std::int16_t m02 = 8;
-			constexpr std::int16_t m12 = -4;
-			constexpr std::int16_t m22 = -3;
-			constexpr std::array<std::int16_t, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
-			auto matrix = PonyMath::Core::Matrix3x3<std::int16_t>();
-			matrix.Set(array);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(SetSpanFloatTest)
-		{
-			constexpr float m00 = 1;
-			constexpr float m10 = 3;
-			constexpr float m20 = 2;
-			constexpr float m01 = 4;
-			constexpr float m11 = 6;
-			constexpr float m21 = 5;
-			constexpr float m02 = 8;
-			constexpr float m12 = -4;
-			constexpr float m22 = -3;
-			constexpr std::array<float, 9> array{ m00, m10, m20, m01, m11, m21, m02, m12, m22 };
-			auto matrix = PonyMath::Core::Matrix3x3<float>();
-			matrix.Set(array);
-			Assert::AreEqual(m00, matrix.M00());
-			Assert::AreEqual(m10, matrix.M10());
-			Assert::AreEqual(m20, matrix.M20());
-			Assert::AreEqual(m01, matrix.M01());
-			Assert::AreEqual(m11, matrix.M11());
-			Assert::AreEqual(m21, matrix.M21());
-			Assert::AreEqual(m02, matrix.M02());
-			Assert::AreEqual(m12, matrix.M12());
-			Assert::AreEqual(m22, matrix.M22());
-		}
-
-		TEST_METHOD(ScaleThisShortTest)
+		TEST_METHOD(MultiplyThisShortTest)
 		{
 			constexpr std::int16_t m00 = 1;
 			constexpr std::int16_t m10 = 3;
@@ -1664,7 +1512,7 @@ namespace Core
 			constexpr std::int16_t m22S = -7;
 			auto matrix = PonyMath::Core::Matrix3x3<std::int16_t>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
 			constexpr auto scale = PonyMath::Core::Matrix3x3<std::int16_t>(m00S, m10S, m20S, m01S, m11S, m21S, m02S, m12S, m22S);
-			matrix.Scale(scale);
+			matrix.Multiply(scale);
 			Assert::AreEqual(static_cast<std::int16_t>(m00 * m00S), matrix.M00());
 			Assert::AreEqual(static_cast<std::int16_t>(m10 * m10S), matrix.M10());
 			Assert::AreEqual(static_cast<std::int16_t>(m20 * m20S), matrix.M20());
@@ -1676,7 +1524,7 @@ namespace Core
 			Assert::AreEqual(static_cast<std::int16_t>(m22 * m22S), matrix.M22());
 		}
 
-		TEST_METHOD(ScaleThisFloatTest)
+		TEST_METHOD(MultiplyThisFloatTest)
 		{
 			constexpr float m00 = 1;
 			constexpr float m10 = 3;
@@ -1698,7 +1546,7 @@ namespace Core
 			constexpr float m22S = -7;
 			auto matrix = PonyMath::Core::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
 			constexpr auto scale = PonyMath::Core::Matrix3x3<float>(m00S, m10S, m20S, m01S, m11S, m21S, m02S, m12S, m22S);
-			matrix.Scale(scale);
+			matrix.Multiply(scale);
 			Assert::AreEqual(m00 * m00S, matrix.M00());
 			Assert::AreEqual(m10 * m10S, matrix.M10());
 			Assert::AreEqual(m20 * m20S, matrix.M20());
@@ -1708,6 +1556,74 @@ namespace Core
 			Assert::AreEqual(m02 * m02S, matrix.M02());
 			Assert::AreEqual(m12 * m12S, matrix.M12());
 			Assert::AreEqual(m22 * m22S, matrix.M22());
+		}
+
+		TEST_METHOD(DivideThisShortTest)
+		{
+			constexpr std::int16_t m00 = 1;
+			constexpr std::int16_t m10 = 3;
+			constexpr std::int16_t m20 = 2;
+			constexpr std::int16_t m01 = 4;
+			constexpr std::int16_t m11 = 6;
+			constexpr std::int16_t m21 = 5;
+			constexpr std::int16_t m02 = 8;
+			constexpr std::int16_t m12 = -4;
+			constexpr std::int16_t m22 = -3;
+			constexpr std::int16_t m00S = 3;
+			constexpr std::int16_t m10S = -2;
+			constexpr std::int16_t m20S = 5;
+			constexpr std::int16_t m01S = 4;
+			constexpr std::int16_t m11S = -1;
+			constexpr std::int16_t m21S = 7;
+			constexpr std::int16_t m02S = -5;
+			constexpr std::int16_t m12S = 6;
+			constexpr std::int16_t m22S = -7;
+			auto matrix = PonyMath::Core::Matrix3x3<std::int16_t>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
+			constexpr auto scale = PonyMath::Core::Matrix3x3<std::int16_t>(m00S, m10S, m20S, m01S, m11S, m21S, m02S, m12S, m22S);
+			matrix.Divide(scale);
+			Assert::AreEqual(static_cast<std::int16_t>(m00 / m00S), matrix.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10 / m10S), matrix.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20 / m20S), matrix.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m01 / m01S), matrix.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11 / m11S), matrix.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21 / m21S), matrix.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m02 / m02S), matrix.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12 / m12S), matrix.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22 / m22S), matrix.M22());
+		}
+
+		TEST_METHOD(DivideThisFloatTest)
+		{
+			constexpr float m00 = 1;
+			constexpr float m10 = 3;
+			constexpr float m20 = 2;
+			constexpr float m01 = 4;
+			constexpr float m11 = 6;
+			constexpr float m21 = 5;
+			constexpr float m02 = 8;
+			constexpr float m12 = -4;
+			constexpr float m22 = -3;
+			constexpr float m00S = 3;
+			constexpr float m10S = -2;
+			constexpr float m20S = 5;
+			constexpr float m01S = 4;
+			constexpr float m11S = -1;
+			constexpr float m21S = 7;
+			constexpr float m02S = -5;
+			constexpr float m12S = 6;
+			constexpr float m22S = -7;
+			auto matrix = PonyMath::Core::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
+			constexpr auto scale = PonyMath::Core::Matrix3x3<float>(m00S, m10S, m20S, m01S, m11S, m21S, m02S, m12S, m22S);
+			matrix.Divide(scale);
+			Assert::AreEqual(m00 / m00S, matrix.M00());
+			Assert::AreEqual(m10 / m10S, matrix.M10());
+			Assert::AreEqual(m20 / m20S, matrix.M20());
+			Assert::AreEqual(m01 / m01S, matrix.M01());
+			Assert::AreEqual(m11 / m11S, matrix.M11());
+			Assert::AreEqual(m21 / m21S, matrix.M21());
+			Assert::AreEqual(m02 / m02S, matrix.M02());
+			Assert::AreEqual(m12 / m12S, matrix.M12());
+			Assert::AreEqual(m22 / m22S, matrix.M22());
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -2258,7 +2174,7 @@ namespace Core
 			Assert::IsTrue(PonyMath::Core::Matrix3x3<std::int16_t>::Predefined::Zero == PonyMath::Core::Matrix3x3<std::int16_t>(0, 0, 0, 0, 0, 0, 0, 0, 0));
 		}
 
-		TEST_METHOD(ScaleShortTest)
+		TEST_METHOD(MultiplyShortTest)
 		{
 			constexpr std::int16_t m00R = 1;
 			constexpr std::int16_t m10R = 3;
@@ -2280,7 +2196,7 @@ namespace Core
 			constexpr std::int16_t m12L = 6;
 			constexpr std::int16_t m22L = -7;
 			constexpr auto matrixL = PonyMath::Core::Matrix3x3<std::int16_t>(m00L, m10L, m20L, m01L, m11L, m21L, m02L, m12L, m22L);
-			PonyMath::Core::Matrix3x3<std::int16_t> scaled = PonyMath::Core::Scale(matrixL, matrixR);
+			PonyMath::Core::Matrix3x3<std::int16_t> scaled = PonyMath::Core::Multiply(matrixL, matrixR);
 			Assert::AreEqual(static_cast<std::int16_t>(m00L * m00R), scaled.M00());
 			Assert::AreEqual(static_cast<std::int16_t>(m10L * m10R), scaled.M10());
 			Assert::AreEqual(static_cast<std::int16_t>(m20L * m20R), scaled.M20());
@@ -2292,7 +2208,7 @@ namespace Core
 			Assert::AreEqual(static_cast<std::int16_t>(m22L * m22R), scaled.M22());
 		}
 
-		TEST_METHOD(ScaleFloatTest)
+		TEST_METHOD(MultiplyFloatTest)
 		{
 			constexpr float m00R = 1;
 			constexpr float m10R = 3;
@@ -2314,7 +2230,7 @@ namespace Core
 			constexpr float m12L = 6;
 			constexpr float m22L = -7;
 			constexpr auto matrixL = PonyMath::Core::Matrix3x3<float>(m00L, m10L, m20L, m01L, m11L, m21L, m02L, m12L, m22L);
-			PonyMath::Core::Matrix3x3<float> scaled = PonyMath::Core::Scale(matrixL, matrixR);
+			PonyMath::Core::Matrix3x3<float> scaled = PonyMath::Core::Multiply(matrixL, matrixR);
 			Assert::AreEqual(m00L * m00R, scaled.M00());
 			Assert::AreEqual(m10L * m10R, scaled.M10());
 			Assert::AreEqual(m20L * m20R, scaled.M20());
@@ -2324,6 +2240,74 @@ namespace Core
 			Assert::AreEqual(m02L * m02R, scaled.M02());
 			Assert::AreEqual(m12L * m12R, scaled.M12());
 			Assert::AreEqual(m22L * m22R, scaled.M22());
+		}
+
+		TEST_METHOD(DivideMatrixShortTest)
+		{
+			constexpr std::int16_t m00R = 1;
+			constexpr std::int16_t m10R = 3;
+			constexpr std::int16_t m20R = 2;
+			constexpr std::int16_t m01R = 4;
+			constexpr std::int16_t m11R = 6;
+			constexpr std::int16_t m21R = 5;
+			constexpr std::int16_t m02R = 8;
+			constexpr std::int16_t m12R = -4;
+			constexpr std::int16_t m22R = -3;
+			constexpr auto matrixR = PonyMath::Core::Matrix3x3<std::int16_t>(m00R, m10R, m20R, m01R, m11R, m21R, m02R, m12R, m22R);
+			constexpr std::int16_t m00L = 3;
+			constexpr std::int16_t m10L = -2;
+			constexpr std::int16_t m20L = 5;
+			constexpr std::int16_t m01L = 4;
+			constexpr std::int16_t m11L = -1;
+			constexpr std::int16_t m21L = 7;
+			constexpr std::int16_t m02L = -5;
+			constexpr std::int16_t m12L = 6;
+			constexpr std::int16_t m22L = -7;
+			constexpr auto matrixL = PonyMath::Core::Matrix3x3<std::int16_t>(m00L, m10L, m20L, m01L, m11L, m21L, m02L, m12L, m22L);
+			PonyMath::Core::Matrix3x3<std::int16_t> scaled = PonyMath::Core::Divide(matrixL, matrixR);
+			Assert::AreEqual(static_cast<std::int16_t>(m00L / m00R), scaled.M00());
+			Assert::AreEqual(static_cast<std::int16_t>(m10L / m10R), scaled.M10());
+			Assert::AreEqual(static_cast<std::int16_t>(m20L / m20R), scaled.M20());
+			Assert::AreEqual(static_cast<std::int16_t>(m01L / m01R), scaled.M01());
+			Assert::AreEqual(static_cast<std::int16_t>(m11L / m11R), scaled.M11());
+			Assert::AreEqual(static_cast<std::int16_t>(m21L / m21R), scaled.M21());
+			Assert::AreEqual(static_cast<std::int16_t>(m02L / m02R), scaled.M02());
+			Assert::AreEqual(static_cast<std::int16_t>(m12L / m12R), scaled.M12());
+			Assert::AreEqual(static_cast<std::int16_t>(m22L / m22R), scaled.M22());
+		}
+
+		TEST_METHOD(DivideMatrixFloatTest)
+		{
+			constexpr float m00R = 1;
+			constexpr float m10R = 3;
+			constexpr float m20R = 2;
+			constexpr float m01R = 4;
+			constexpr float m11R = 6;
+			constexpr float m21R = 5;
+			constexpr float m02R = 8;
+			constexpr float m12R = -4;
+			constexpr float m22R = -3;
+			constexpr auto matrixR = PonyMath::Core::Matrix3x3<float>(m00R, m10R, m20R, m01R, m11R, m21R, m02R, m12R, m22R);
+			constexpr float m00L = 3;
+			constexpr float m10L = -2;
+			constexpr float m20L = 5;
+			constexpr float m01L = 4;
+			constexpr float m11L = -1;
+			constexpr float m21L = 7;
+			constexpr float m02L = -5;
+			constexpr float m12L = 6;
+			constexpr float m22L = -7;
+			constexpr auto matrixL = PonyMath::Core::Matrix3x3<float>(m00L, m10L, m20L, m01L, m11L, m21L, m02L, m12L, m22L);
+			PonyMath::Core::Matrix3x3<float> scaled = PonyMath::Core::Divide(matrixL, matrixR);
+			Assert::AreEqual(m00L / m00R, scaled.M00());
+			Assert::AreEqual(m10L / m10R, scaled.M10());
+			Assert::AreEqual(m20L / m20R, scaled.M20());
+			Assert::AreEqual(m01L / m01R, scaled.M01());
+			Assert::AreEqual(m11L / m11R, scaled.M11());
+			Assert::AreEqual(m21L / m21R, scaled.M21());
+			Assert::AreEqual(m02L / m02R, scaled.M02());
+			Assert::AreEqual(m12L / m12R, scaled.M12());
+			Assert::AreEqual(m22L / m22R, scaled.M22());
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)
@@ -2799,11 +2783,8 @@ namespace Core
 			movedMatrix.Diagonal(PonyMath::Core::Vector3<std::int32_t>(3, 6, 9));
 			movedMatrix.CounterDiagonal(PonyMath::Core::Vector3<std::int32_t>(3, 6, 9));
 
-			movedMatrix.Set(4, 6, 1, 0, 8, -4, -2, -1, 7);
-			movedMatrix.Set(PonyMath::Core::Vector3<std::int32_t>(4, 6, 1), PonyMath::Core::Vector3<std::int32_t>(9, 4, 1), PonyMath::Core::Vector3<std::int32_t>(9, 4, 1));
-			movedMatrix.Set(std::array<std::int32_t, 9>{4, 5, 6, 6, 1, 6, -4, -6, -7});
-
-			movedMatrix.Scale(constMatrix);
+			movedMatrix.Multiply(constMatrix);
+			movedMatrix.Divide(constMatrix);
 
 			movedMatrix[1][1] = 5;
 			movedMatrix[1] = PonyMath::Core::Vector3<std::int32_t>(9, 4, 8);
@@ -2873,7 +2854,8 @@ namespace Core
 			[[maybe_unused]] constexpr bool equal = matrix == defaultMatrix;
 			[[maybe_unused]] constexpr bool notEqual = matrix != defaultMatrix;
 
-			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<std::int32_t> scaled = PonyMath::Core::Scale(matrix, columnMatrix);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<std::int32_t> scaled = PonyMath::Core::Multiply(matrix, columnMatrix);
+			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<std::int32_t> scaledD = PonyMath::Core::Divide(matrix, columnMatrix);
 			[[maybe_unused]] constexpr bool areAlmostEqual = PonyMath::Core::AreAlmostEqual(PonyMath::Core::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0), PonyMath::Core::Matrix3x3<float>(0, 2, 3, 4, -1, -8, 1, 5, 0));
 
 			[[maybe_unused]] constexpr PonyMath::Core::Matrix3x3<std::int32_t> sum = matrix + columnMatrix;

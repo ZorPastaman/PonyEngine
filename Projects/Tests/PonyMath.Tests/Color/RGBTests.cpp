@@ -290,24 +290,6 @@ namespace Core
 			Assert::IsFalse(color.IsFinite());
 		}
 
-		TEST_METHOD(SetTest)
-		{
-			constexpr float r = 0.49f;
-			constexpr float g = 0.69f;
-			constexpr float b = 0.211f;
-			auto color = PonyMath::Color::RGB<float>();
-			color.Set(r, g, b);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-			auto array = std::array<float, 3> { r, g, b };
-			color = PonyMath::Color::RGB<float>();
-			color.Set(array);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-		}
-
 		TEST_METHOD(ToStringTest)
 		{
 			constexpr float r = 0.49f;
@@ -753,9 +735,6 @@ namespace Core
 			copiedColor.Min() /= 3.f;
 			copiedColor.Max() *= 2.f;
 			[[maybe_unused]] const auto minMax = movedColor.MinMax();
-
-			movedColor.Set(0.1f, 0.69f, 0.228f);
-			movedColor.Set(copiedColor.Span());
 
 			movedColor[0] *= 1.5f;
 			auto anotherColor = PonyMath::Color::RGB<float>();

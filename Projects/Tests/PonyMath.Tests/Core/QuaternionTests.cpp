@@ -295,34 +295,6 @@ namespace Core
 			Assert::IsFalse(quaternion.IsFinite());
 		}
 
-		TEST_METHOD(SetTest)
-		{
-			constexpr float x = 4;
-			constexpr float y = -1;
-			constexpr float z = 1;
-			constexpr float w = 2;
-			auto quaternion = PonyMath::Core::Quaternion<float>();
-			quaternion.Set(x, y, z, w);
-			Assert::AreEqual(x, quaternion.X());
-			Assert::AreEqual(y, quaternion.Y());
-			Assert::AreEqual(z, quaternion.Z());
-			Assert::AreEqual(w, quaternion.W());
-		}
-
-		TEST_METHOD(SetSpanTest)
-		{
-			constexpr float x = 4;
-			constexpr float y = -1;
-			constexpr float z = 1;
-			constexpr float w = 2;
-			auto quaternion = PonyMath::Core::Quaternion<float>();
-			quaternion.Set(std::array<float, 4>{x, y, z, w});
-			Assert::AreEqual(x, quaternion.X());
-			Assert::AreEqual(y, quaternion.Y());
-			Assert::AreEqual(z, quaternion.Z());
-			Assert::AreEqual(w, quaternion.W());
-		}
-
 		TEST_METHOD(ToStringTest)
 		{
 			constexpr float x = 4;
@@ -738,9 +710,6 @@ namespace Core
 			quaternion.Span()[2] -= 6.f;
 
 			[[maybe_unused]] const auto quaternionC = PonyMath::Core::Quaternion<float>(0, 4, 5, 1);
-
-			quaternion.Set(1.f, 6.f, 7.f, -1.f);
-			quaternion.Set(quaternion.Span());
 
 			quaternion[0] *= 5.f;
 

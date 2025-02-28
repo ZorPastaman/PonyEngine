@@ -60,9 +60,9 @@ namespace PonyEngine::Render
 	PonyShader::Core::ThreadGroupCounts CreateDividedThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& materialCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts) noexcept
 	{
 		return PonyShader::Core::ThreadGroupCounts(
-			materialCounts.ThreadGroupCountX() > 0u ? PonyMath::Core::CeilDivision(meshCounts.ThreadGroupCountX(), materialCounts.ThreadGroupCountX()) : 0u,
-			materialCounts.ThreadGroupCountY() > 0u ? PonyMath::Core::CeilDivision(meshCounts.ThreadGroupCountY(), materialCounts.ThreadGroupCountY()) : 0u,
-			materialCounts.ThreadGroupCountZ() > 0u ? PonyMath::Core::CeilDivision(meshCounts.ThreadGroupCountZ(), materialCounts.ThreadGroupCountZ()) : 0u
+			materialCounts.ThreadGroupCountX() > 0u ? PonyMath::Core::DivideCeil(meshCounts.ThreadGroupCountX(), materialCounts.ThreadGroupCountX()) : 0u,
+			materialCounts.ThreadGroupCountY() > 0u ? PonyMath::Core::DivideCeil(meshCounts.ThreadGroupCountY(), materialCounts.ThreadGroupCountY()) : 0u,
+			materialCounts.ThreadGroupCountZ() > 0u ? PonyMath::Core::DivideCeil(meshCounts.ThreadGroupCountZ(), materialCounts.ThreadGroupCountZ()) : 0u
 		);
 	}
 }

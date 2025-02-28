@@ -24,34 +24,50 @@ import :Box;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Axis-aligned bounding box implementation.
+	/// @tparam T Component type.
 	template<Core::Arithmetic T>
 	class AABB final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
 
+		/// @brief AABB axes.
 		static constexpr std::array<Core::Vector3<T>, 3> Axes = { Core::Vector3<T>::Predefined::Right, Core::Vector3<T>::Predefined::Up, Core::Vector3<T>::Predefined::Forward };
 
-		static constexpr std::size_t LeftBottomNearIndex = 0;
-		static constexpr std::size_t RightBottomNearIndex = 1;
-		static constexpr std::size_t LeftTopNearIndex = 2;
-		static constexpr std::size_t RightTopNearIndex = 3;
-		static constexpr std::size_t LeftBottomFarIndex = 4;
-		static constexpr std::size_t RightBottomFarIndex = 5;
-		static constexpr std::size_t LeftTopFarIndex = 6;
-		static constexpr std::size_t RightTopFarIndex = 7;
-		static constexpr std::size_t CornerCount = 8;
+		static constexpr std::size_t LeftBottomNearIndex = 0; ///< (MinX, MinY, MinZ) corner index.
+		static constexpr std::size_t RightBottomNearIndex = 1; ///< (MaxX, MinY, MinZ) corner index.
+		static constexpr std::size_t LeftTopNearIndex = 2; ///< (MinX, MaxY, MinZ) corner index.
+		static constexpr std::size_t RightTopNearIndex = 3; ///< (MaxX, MaxY, MinZ) corner index.
+		static constexpr std::size_t LeftBottomFarIndex = 4; ///< (MinX, MinY, MaxZ) corner index.
+		static constexpr std::size_t RightBottomFarIndex = 5; ///< (MaxX, MinY, MaxZ) corner index.
+		static constexpr std::size_t LeftTopFarIndex = 6; ///< (MinX, MaxY, MaxZ) corner index.
+		static constexpr std::size_t RightTopFarIndex = 7; ///< (MaxX, MaxY, MaxZ) corner index.
+		static constexpr std::size_t CornerCount = 8; ///< Corner count.
 
 		struct Predefined; ///< Predefined AABBs.
 
+		/// @brief Creates an empty AABB.
 		[[nodiscard("Pure constructor")]]
 		constexpr AABB() noexcept = default;
+		/// @brief Creates an AABB.
+		/// @param x Center x component.
+		/// @param y Center y component.
+		/// @param z Center z component.
+		/// @param halfWidth Half width.
+		/// @param halfHeight Half height.
+		/// @param halfDepth Half depth.
 		[[nodiscard("Pure constructor")]]
-		constexpr AABB(T x, T y, T z, T halfWidth, T halfHeight, T halfDepth) noexcept;
+		AABB(T x, T y, T z, T halfWidth, T halfHeight, T halfDepth) noexcept;
+		/// @brief Creates an AABB.
+		/// @param center Center.
+		/// @param extents Extents. Half-sizes in every dimension.
 		[[nodiscard("Pure constructor")]]
-		constexpr AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept;
+		AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept;
+		/// @brief Converts the @p box to an AABB.
+		/// @param box Box.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr AABB(const Box<T>& box) noexcept;
+		explicit AABB(const Box<T>& box) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr AABB(const AABB& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -59,117 +75,186 @@ export namespace PonyMath::Shape
 
 		constexpr ~AABB() noexcept = default;
 
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T>& Center() noexcept;
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Center() const noexcept;
 
+		/// @brief Gets the x extent.
+		/// @return X extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentX() const noexcept;
+		/// @brief Sets the x extent.
+		/// @param extent X extent to set.
 		constexpr void ExtentX(T extent) noexcept;
+		/// @brief Gets the y extent.
+		/// @return Y extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentY() const noexcept;
+		/// @brief Sets the y extent.
+		/// @param extent Y extent to set.
 		constexpr void ExtentY(T extent) noexcept;
+		/// @brief Gets the z extent.
+		/// @return Z extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentZ() const noexcept;
+		/// @brief Sets the z extent.
+		/// @param extent Z extent to set.
 		constexpr void ExtentZ(T extent) noexcept;
+		/// @brief Gets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
+		/// @return Extent.
 		[[nodiscard("Pure function")]]
 		constexpr T Extent(std::size_t index) const noexcept;
+		/// @brief Sets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
+		/// @param extent Extent to set.
 		constexpr void Extent(std::size_t index, T extent) noexcept;
+		/// @brief Gets the extents.
+		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Extents() const noexcept;
+		/// @brief Sets the extents.
+		/// @param extents Extents to set.
 		constexpr void Extents(const Core::Vector3<T>& extents) noexcept;
 
+		/// @brief Gets the width.
+		/// @return Width.
 		[[nodiscard("Pure function")]]
 		constexpr T Width() const noexcept;
+		/// @brief Gets the height.
+		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr T Height() const noexcept;
+		/// @brief Gets the depth.
+		/// @return Depth.
 		[[nodiscard("Pure function")]]
 		constexpr T Depth() const noexcept;
+		/// @brief Gets the size by the @p index.
+		/// @param index Size index. 0 -> width, 1 -> height, 2 -> depth.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		constexpr T Size(std::size_t index) const noexcept;
 
-		/// @brief Gets the minimal x point.
+		/// @brief Gets the minimal x.
 		/// @return Minimal x.
 		[[nodiscard("Pure function")]]
 		constexpr T MinX() const noexcept;
-		/// @brief Gets the minimal y point.
+		/// @brief Gets the minimal y.
 		/// @return Minimal y.
 		[[nodiscard("Pure function")]]
 		constexpr T MinY() const noexcept;
+		/// @brief Gets the minimal z.
+		/// @return Minimal z.
 		[[nodiscard("Pure function")]]
 		constexpr T MinZ() const noexcept;
 		/// @brief Gets the minimal point.
 		/// @return Minimal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Min() const noexcept;
+		/// @brief Gets the minimal component by the @p index.
+		/// @param index Component index. 0 -> x, 1 -> y, 2 -> z.
+		/// @return Minimal component.
 		[[nodiscard("Pure function")]]
 		constexpr T Min(std::size_t index) const noexcept;
-		/// @brief Gets the maximal x point.
+		/// @brief Gets the maximal x.
 		/// @return Maximal x.
 		[[nodiscard("Pure function")]]
 		constexpr T MaxX() const noexcept;
-		/// @brief Gets the maximal x point.
-		/// @return Maximal x.
+		/// @brief Gets the maximal y.
+		/// @return Maximal y.
 		[[nodiscard("Pure function")]]
 		constexpr T MaxY() const noexcept;
+		/// @brief Gets the maximal z.
+		/// @return Maximal z.
 		[[nodiscard("Pure function")]]
 		constexpr T MaxZ() const noexcept;
 		/// @brief Gets the maximal point.
 		/// @return Maximal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Max() const noexcept;
+		/// @brief Gets the maximal component by the @p index.
+		/// @param index Component index. 0 -> x, 1 -> y, 2 -> z.
+		/// @return Maximal component.
 		[[nodiscard("Pure function")]]
 		constexpr T Max(std::size_t index) const noexcept;
 
+		/// @brief Gets the (MinX, MinY, MinZ) point.
+		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftBottomNear() const noexcept;
+		/// @brief Gets the (MaxX, MinY, MinZ) point.
+		/// @return Right bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightBottomNear() const noexcept;
+		/// @brief Gets the (MinX, MaxY, MinZ) point.
+		/// @return Left top near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftTopNear() const noexcept;
+		/// @brief Gets the (MaxX, MaxY, MinZ) point.
+		/// @return Right top near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightTopNear() const noexcept;
+		/// @brief Gets the (MinX, MinY, MaxZ) point.
+		/// @return Left bottom far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftBottomFar() const noexcept;
+		/// @brief Gets the (MaxX, MinY, MaxZ) point.
+		/// @return Right bottom far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightBottomFar() const noexcept;
+		/// @brief Gets the (MinX, MaxY, MaxZ) point.
+		/// @return Left top far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftTopFar() const noexcept;
+		/// @brief Gets the (MaxX, MaxY, MaxZ) point.
+		/// @return Right top far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightTopFar() const noexcept;
+		/// @brief Gets the corner by the @p index.
+		/// @param index Corner index.
+		/// @return Corner.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Corner(std::size_t index) const noexcept;
+		/// @brief Gets the corners.
+		/// @return Corners.
 		[[nodiscard("Pure function")]]
 		constexpr std::array<Core::Vector3<T>, 8> Corners() const noexcept;
 
-		/// @brief Computes an area.
+		/// @brief Calculates an area.
 		/// @return Area.
 		[[nodiscard("Pure function")]]
 		constexpr T Area() const noexcept;
+		/// @brief Calculates a volume.
+		/// @return Volume.
 		[[nodiscard("Pure function")]]
 		constexpr T Volume() const noexcept;
 
-		/// @brief Checks if all the rect data is finite.
+		/// @brief Checks if all the AABB data is finite.
 		/// @return @a True if they are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Checks if the rect contains the point.
+		/// @brief Checks if the AABB contains the point.
 		/// @param point Point to check.
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
 
-		/// @brief Creates a string representing the rect.
-		/// @return String representing the rect.
+		/// @brief Creates a string representing the AABB.
+		/// @return String representing the AABB.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
-		/// @brief Converts the rect to a rect of another type.
+		/// @brief Converts the AABB to an AABB of another type.
 		/// @tparam U Target type.
 		template<Core::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator AABB<U>() const noexcept;
+		/// @brief Converts the AABB to a box.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator Box<T>() const noexcept;
 
@@ -180,14 +265,14 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const AABB& other) const noexcept = default;
 
 	private:
-		Core::Vector3<T> center;
-		Core::Vector3<T> extents;
+		Core::Vector3<T> center; ///< Center.
+		Core::Vector3<T> extents; ///< Extents.
 	};
 
 	/// @brief Checks if the two AABBs are almost equal with the tolerance value.
 	/// @tparam T Value type.
-	/// @param left Left rect.
-	/// @param right Right rect.
+	/// @param left Left AABB.
+	/// @param right Right AABB.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -213,23 +298,23 @@ export namespace PonyMath::Shape
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	constexpr AABB<T>::AABB(const T x, const T y, const T z, const T halfWidth, const T halfHeight, const T halfDepth) noexcept :
+	AABB<T>::AABB(const T x, const T y, const T z, const T halfWidth, const T halfHeight, const T halfDepth) noexcept :
 		center(x, y, z),
 		extents(std::abs(halfWidth), std::abs(halfHeight), std::abs(halfDepth))
 	{
 	}
 
 	template<Core::Arithmetic T>
-	constexpr AABB<T>::AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept :
+	AABB<T>::AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept :
 		center(center),
 		extents(Core::Abs(extents))
 	{
 	}
 
 	template<Core::Arithmetic T>
-	constexpr AABB<T>::AABB(const Box<T>& box) noexcept :
+	AABB<T>::AABB(const Box<T>& box) noexcept :
 		center(box.Center()),
-		extents(std::abs(box.Width() / T{2}), std::abs(box.Height() / T{2}), std::abs(box.Depth() / T{2}))
+		extents(Core::Abs(box.Size() / T{2}))
 	{
 	}
 
@@ -248,37 +333,37 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::ExtentX() const noexcept
 	{
-		return extents[0];
+		return Extent(0);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr void AABB<T>::ExtentX(const T extent) noexcept
 	{
-		extents[0] = std::abs(extent);
+		Extent(0, extent);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::ExtentY() const noexcept
 	{
-		return extents[1];
+		return Extent(1);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr void AABB<T>::ExtentY(const T extent) noexcept
 	{
-		extents[1] = std::abs(extent);
+		Extent(1, extent);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::ExtentZ() const noexcept
 	{
-		return extents[2];
+		return Extent(2);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr void AABB<T>::ExtentZ(const T extent) noexcept
 	{
-		extents[2] = std::abs(extent);
+		Extent(2, extent);
 	}
 
 	template<Core::Arithmetic T>
@@ -308,19 +393,19 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Width() const noexcept
 	{
-		return ExtentX() * T{2};
+		return Size(0);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Height() const noexcept
 	{
-		return ExtentY() * T{2};
+		return Size(1);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Depth() const noexcept
 	{
-		return ExtentZ() * T{2};
+		return Size(2);
 	}
 
 	template<Core::Arithmetic T>
@@ -440,7 +525,7 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr Core::Vector3<T> AABB<T>::Corner(const std::size_t index) const noexcept
 	{
-		Core::Vector2<T> corner;
+		Core::Vector3<T> corner;
 		corner.X() = index & 1 ? MaxX() : MinX();
 		corner.Y() = index & 2 ? MaxY() : MinY();
 		corner.Z() = index & 4 ? MaxZ() : MinZ();
@@ -467,7 +552,7 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Area() const noexcept
 	{
-		return (ExtentX() * ExtentY() + ExtentY() * ExtentZ() + ExtentX() * ExtentZ()) * T{8};
+		return (ExtentX() * ExtentY() + ExtentX() * ExtentZ() + ExtentY() * ExtentZ()) * T{8};
 	}
 
 	template<Core::Arithmetic T>

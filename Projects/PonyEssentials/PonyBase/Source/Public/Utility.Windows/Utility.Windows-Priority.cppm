@@ -30,7 +30,7 @@ namespace PonyBase::Utility::Windows
 	{
 		if (!SetPriorityClass(GetCurrentProcess(), priority))
 		{
-			throw std::runtime_error(SafeFormat("Failed to set current process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
+			throw std::runtime_error(SafeFormat("Failed to set process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
 		}
 	}
 }

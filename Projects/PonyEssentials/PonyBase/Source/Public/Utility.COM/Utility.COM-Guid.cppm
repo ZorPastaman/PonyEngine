@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/COM/Framework.h"
 
-export module PonyBase.Utility.COM:Guid;
+export module PonyBase.Utility.COM:GUID;
 
 import <stdexcept>;
 import <string>;

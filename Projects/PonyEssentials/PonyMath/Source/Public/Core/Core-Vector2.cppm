@@ -175,7 +175,9 @@ export namespace PonyMath::Core
 		/// @brief Multiplies @a this by the @p multiplier component-wise.
 		/// @param multiplier Multiplier.
 		constexpr void Multiply(const Vector2& multiplier) noexcept;
-		constexpr void Divide(const Vector2& divide) noexcept;
+		/// @brief Divides @a this by the @p divisor component-wise.
+		/// @param divisor Divisor.
+		constexpr void Divide(const Vector2& divisor) noexcept;
 
 		/// @brief Creates a string representing a state of the vector. The format is '(x, y)'.
 		/// @return State string.
@@ -225,11 +227,8 @@ export namespace PonyMath::Core
 		/// @return @a This.
 		constexpr Vector2& operator /=(ComputationalType divisor) noexcept requires (std::is_integral_v<T>);
 
-		/// @brief Checks if the two vectors are equal.
-		/// @param other Other vector.
-		/// @return @a True if they are equal; @a false otherwise.
 		[[nodiscard("Pure operator")]]
-		constexpr bool operator ==(const Vector2& other) const noexcept;
+		constexpr bool operator ==(const Vector2& other) const noexcept = default;
 
 	private:
 		std::array<T, ComponentCount> components; ///< Component array in order x, y.
@@ -242,6 +241,11 @@ export namespace PonyMath::Core
 	/// @return Dot product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T Dot(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	/// @brief Computes a cross vector and returns its z component.
+	/// @tparam T Component type.
+	/// @param left Left vector.
+	/// @param right Right vector.
+	/// @return Cross product z component.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr T CrossZ(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 	/// @brief Computes a distance between two points.
@@ -305,11 +309,20 @@ export namespace PonyMath::Core
 	/// @return Product.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Multiply(const Vector2<T>& left, const Vector2<T>& right) noexcept;
+	/// @brief Divides the @p left vector by the @p right vector component-wise.
+	/// @tparam T Component type.
+	/// @param left Dividend.
+	/// @param right Divisor.
+	/// @return Quotient.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector2<T> Divide(const Vector2<T>& left, const Vector2<T>& right) noexcept;
 
-	template<Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept;
+	/// @brief Computes absolute values of the @p vector components.
+	/// @tparam T Component type.
+	/// @param vector Source.
+	/// @return Absolute vector.
+	template<Signed T> [[nodiscard("Pure function")]]
+	Vector2<T> Abs(const Vector2<T>& vector) noexcept;
 
 	/// @brief Creates a vector consisting of minimal elements of the two vectors.
 	/// @tparam T Component type.
@@ -622,11 +635,11 @@ namespace PonyMath::Core
 	}
 
 	template<Arithmetic T>
-	constexpr void Vector2<T>::Divide(const Vector2& divide) noexcept
+	constexpr void Vector2<T>::Divide(const Vector2& divisor) noexcept
 	{
 		for (std::size_t i = 0; i < ComponentCount; ++i)
 		{
-			(*this)[i] /= divide[i];
+			(*this)[i] /= divisor[i];
 		}
 	}
 
@@ -721,8 +734,8 @@ namespace PonyMath::Core
 		return quotient;
 	}
 
-	template<Arithmetic T>
-	constexpr Vector2<T> Abs(const Vector2<T>& vector) noexcept
+	template<Signed T>
+	Vector2<T> Abs(const Vector2<T>& vector) noexcept
 	{
 		Vector2<T> answer;
 		for (std::size_t i = 0; i < Vector2<T>::ComponentCount; ++i)
@@ -870,12 +883,6 @@ namespace PonyMath::Core
 		}
 
 		return *this;
-	}
-
-	template<Arithmetic T>
-	constexpr bool Vector2<T>::operator ==(const Vector2& other) const noexcept
-	{
-		return components == other.components;
 	}
 
 	template<Arithmetic T>

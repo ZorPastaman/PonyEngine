@@ -19,6 +19,7 @@ export namespace PonyMath::Core
 	/// @brief The concept is satisfied if @p T is an arithmetic type.
 	template<typename T>
 	concept Arithmetic = std::is_arithmetic_v<T>;
+	/// @brief The concept is satisfied if @p T is a signed type.
 	template<typename T>
 	concept Signed = std::is_signed_v<T>;
 
@@ -62,15 +63,24 @@ export namespace PonyMath::Core
 	/// @return @a 1 if the @p value is positive or zero; @a -1 if the @p value is negative.
 	template<Signed T> [[nodiscard("Pure function")]]
 	constexpr T Sign(T value) noexcept;
+	/// @brief Sign function that transforms a @p bool to a value.
+	/// @tparam T Output type.
+	/// @param value Input.
+	/// @return @a 1 if the @p value is @a true; @a -1 if the @p value is @a false.
 	template<Signed T> [[nodiscard("Pure function")]]
-	constexpr T Sign(bool value) noexcept; // TODO: Add docs and tests
+	constexpr T Sign(bool value) noexcept;
 	/// @brief Signum function.
 	/// @tparam T Value type.
 	/// @param value Input.
 	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
 	template<Signed T> [[nodiscard("Pure function")]]
 	constexpr T Signum(T value) noexcept;
-	template<Signed T, Signed U> [[nodiscard("Pure function")]]
+	/// @brief Signum function that returns output as a value of another type.
+	/// @tparam U Output type.
+	/// @tparam T Input type.
+	/// @param value Input.
+	/// @return @a 1 if the @p value is positive, @a -1 if the @p value is negative and 0 if the @p value is 0.
+	template<Signed U, Signed T> [[nodiscard("Pure function")]]
 	constexpr U Signum(T value) noexcept;
 
 	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
@@ -81,8 +91,18 @@ export namespace PonyMath::Core
 	template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
 
-	template<std::integral T> [[nodiscard("Pure function")]]
-	constexpr T CeilDivision(T numerator, T denominator) noexcept; // TODO: Add docs and tests
+	/// @brief Divides the @p numerator by the @p denominator and ceils the result.
+	/// @tparam T Value type.
+	/// @param numerator Numerator.
+	/// @param denominator Denominator. Must be greater than @a 0.
+	/// @return Divided and ceiled value.
+	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
+	constexpr T DivideCeil(T numerator, T denominator) noexcept;
+	/// @brief Computes an aligned value.
+	/// @tparam T Value type.
+	/// @param value Input value.
+	/// @param alignment Alignment. Must be a power of 2.
+	/// @return Aligned value.
 	template<std::unsigned_integral T> [[nodiscard("Pure function")]]
 	constexpr T Align(T value, T alignment) noexcept;
 }
@@ -113,7 +133,7 @@ namespace PonyMath::Core
 		return static_cast<T>(T{0} < value) - (value < T{0});
 	}
 
-	template<Signed T, Signed U>
+	template<Signed U, Signed T>
 	constexpr U Signum(const T value) noexcept
 	{
 		return static_cast<U>(T{0} < value) - (value < T{0});
@@ -125,8 +145,8 @@ namespace PonyMath::Core
 		return static_cast<To>(from + From{0.5} - (from < From{0}));
 	}
 
-	template<std::integral T>
-	constexpr T CeilDivision(const T numerator, const T denominator) noexcept
+	template<std::unsigned_integral T>
+	constexpr T DivideCeil(const T numerator, const T denominator) noexcept
 	{
 		return (numerator + denominator - T{1}) / denominator;
 	}
