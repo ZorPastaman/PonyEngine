@@ -11,7 +11,9 @@
 
 #include <cstdint>
 #include <format>
+#include <utility>
 
+import PonyMath.Core;
 import PonyMath.Shape;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
@@ -571,7 +573,7 @@ namespace Shape
 			Assert::IsTrue(aabb.Contains(aabb.Max()));
 			Assert::IsTrue(aabb.Contains(aabb.Center() + PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) / 2));
 
-			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(100.f, y, z)));
+			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(100, y, z)));
 			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(x, -100, z)));
 			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(x, y, 178)));
 			Assert::IsFalse(aabb.Contains(aabb.Max() + PonyMath::Core::Vector3<std::int16_t>::Predefined::One));
@@ -606,7 +608,12 @@ namespace Shape
 			constexpr float halfHeight = 14;
 			constexpr float halfDepth = -2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
-			Assert::AreEqual(std::format("Center: {}, Extents: {}", aabb.Center().ToString(), aabb.Extents().ToString()), aabb.ToString());
+			const std::string expected = std::format("Center: {}, Extents: {}", aabb.Center().ToString(), aabb.Extents().ToString());
+			Assert::AreEqual(expected, aabb.ToString());
+
+			std::ostringstream ss;
+			ss << aabb;
+			Assert::AreEqual(expected, ss.str());
 		}
 
 		TEST_METHOD(ConvertTest)
@@ -627,7 +634,7 @@ namespace Shape
 			Assert::AreEqual(static_cast<std::int16_t>(-halfDepth), aabbInt.ExtentZ());
 		}
 
-		TEST_METHOD(ConvertToBox)
+		TEST_METHOD(ConvertToBoxTest)
 		{
 			constexpr float x = 7;
 			constexpr float y = -8;
@@ -639,6 +646,142 @@ namespace Shape
 			const auto box = static_cast<PonyMath::Shape::Box<float>>(aabb);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(aabb.Min(), box.Position()));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Vector3<float>(-halfWidth, halfHeight, -halfDepth) * 2.f, box.Size()));
+		}
+
+		TEST_METHOD(EqualityTest)
+		{
+			constexpr float x = 7;
+			constexpr float y = -8;
+			constexpr float z = -12;
+			constexpr float halfWidth = -4;
+			constexpr float halfHeight = 14;
+			constexpr float halfDepth = -2;
+			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
+			auto another = aabb;
+			Assert::IsTrue(aabb == another);
+
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				const float was = another.Center()[i];
+				another.Center()[i] = std::nextafter(was, 0.f);
+				Assert::IsFalse(aabb == another);
+				another.Center()[i] += 1.f;
+				Assert::IsFalse(aabb == another);
+				another.Center()[i] = was;
+			}
+
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				const float was = another.Extent(i);
+				another.Extent(i, std::nextafter(was, 0.f));
+				Assert::IsFalse(aabb == another);
+				another.Extent(i, was + 1.f);
+				Assert::IsFalse(aabb == another);
+				another.Extent(i, was);
+			}
+		}
+
+		TEST_METHOD(AreAlmostEqualTest)
+		{
+			constexpr float x = 7;
+			constexpr float y = -8;
+			constexpr float z = -12;
+			constexpr float halfWidth = -4;
+			constexpr float halfHeight = 14;
+			constexpr float halfDepth = -2;
+			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
+			auto another = aabb;
+			Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another));
+
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				const float was = another.Center()[i];
+				another.Center()[i] = std::nextafter(was, 0.f);
+				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another));
+				another.Center()[i] += 1.f;
+				Assert::IsFalse(PonyMath::Shape::AreAlmostEqual(aabb, another));
+				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another, 5.f));
+				another.Center()[i] = was;
+			}
+
+			for (std::size_t i = 0; i < 3; ++i)
+			{
+				const float was = another.Extent(i);
+				another.Extent(i, std::nextafter(was, 0.f));
+				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another));
+				another.Extent(i, was + 1.f);
+				Assert::IsFalse(PonyMath::Shape::AreAlmostEqual(aabb, another));
+				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another, 5.f));
+				another.Extent(i, was);
+			}
+		}
+
+		static constexpr PonyMath::Shape::AABB<float> AABBConstexpr()
+		{
+			auto defaultAABB = PonyMath::Shape::AABB<float>();
+			auto movedAABB = std::move(defaultAABB);
+
+			movedAABB.Center() = PonyMath::Core::Vector3<float>(2.f, 5.f, -8.f);
+
+			auto copied = PonyMath::Shape::AABB<float>();
+			copied = defaultAABB;
+
+			auto moved = PonyMath::Shape::AABB<float>();
+			moved = std::move(movedAABB);
+
+			return moved;
+		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			[[maybe_unused]] constexpr auto defaultAABB = PonyMath::Shape::AABB<float>();
+			[[maybe_unused]] constexpr auto copied = defaultAABB;
+			[[maybe_unused]] constexpr auto moved = AABBConstexpr();
+
+			[[maybe_unused]] constexpr auto center = moved.Center();
+
+			[[maybe_unused]] constexpr auto extentX = moved.ExtentX();
+			[[maybe_unused]] constexpr auto extentY = moved.ExtentY();
+			[[maybe_unused]] constexpr auto extentZ = moved.ExtentZ();
+			[[maybe_unused]] constexpr auto extent = moved.Extent(1);
+			[[maybe_unused]] constexpr auto extents = moved.Extents();
+
+			[[maybe_unused]] constexpr auto width = moved.Width();
+			[[maybe_unused]] constexpr auto height = moved.Height();
+			[[maybe_unused]] constexpr auto depth = moved.Depth();
+			[[maybe_unused]] constexpr auto size = moved.Size(0);
+
+			[[maybe_unused]] constexpr auto minX = moved.MinX();
+			[[maybe_unused]] constexpr auto minY = moved.MinY();
+			[[maybe_unused]] constexpr auto minZ = moved.MinZ();
+			[[maybe_unused]] constexpr auto minI = moved.Min(2);
+			[[maybe_unused]] constexpr auto min = moved.Min();
+			[[maybe_unused]] constexpr auto maxX = moved.MaxX();
+			[[maybe_unused]] constexpr auto maxY = moved.MaxY();
+			[[maybe_unused]] constexpr auto maxZ = moved.MaxZ();
+			[[maybe_unused]] constexpr auto maxI = moved.Max(2);
+			[[maybe_unused]] constexpr auto max = moved.Max();
+
+			[[maybe_unused]] constexpr auto leftBottomNear = moved.LeftBottomNear();
+			[[maybe_unused]] constexpr auto rightBottomNear = moved.RightBottomNear();
+			[[maybe_unused]] constexpr auto leftTopNear = moved.LeftTopNear();
+			[[maybe_unused]] constexpr auto rightTopNear = moved.RightTopNear();
+			[[maybe_unused]] constexpr auto leftBottomFar = moved.LeftBottomFar();
+			[[maybe_unused]] constexpr auto rightBottomFar = moved.RightBottomFar();
+			[[maybe_unused]] constexpr auto leftTopFar = moved.LeftTopFar();
+			[[maybe_unused]] constexpr auto rightTopFar = moved.RightTopFar();
+			[[maybe_unused]] constexpr auto corner = moved.Corner(5);
+			[[maybe_unused]] constexpr auto corners = moved.Corners();
+
+			[[maybe_unused]] constexpr auto area = moved.Area();
+			[[maybe_unused]] constexpr auto volume = moved.Volume();
+
+			[[maybe_unused]] constexpr auto box = static_cast<PonyMath::Shape::Box<float>>(moved);
+
+			[[maybe_unused]] constexpr bool equal = moved == defaultAABB;
+			[[maybe_unused]] constexpr bool notEqual = moved != defaultAABB;
+
+			[[maybe_unused]] constexpr bool areAlmostEqual = PonyMath::Shape::AreAlmostEqual(moved, defaultAABB);
 		}
 	};
 }

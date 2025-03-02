@@ -14,9 +14,12 @@ module;
 export module PonyMath.Shape:AABB;
 
 import <array>;
+import <cmath>;
 import <cstddef>;
 import <format>;
+import <ostream>;
 import <string>;
+import <type_traits>;
 
 import PonyMath.Core;
 
@@ -90,21 +93,21 @@ export namespace PonyMath::Shape
 		constexpr T ExtentX() const noexcept;
 		/// @brief Sets the x extent.
 		/// @param extent X extent to set.
-		constexpr void ExtentX(T extent) noexcept;
+		void ExtentX(T extent) noexcept;
 		/// @brief Gets the y extent.
 		/// @return Y extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentY() const noexcept;
 		/// @brief Sets the y extent.
 		/// @param extent Y extent to set.
-		constexpr void ExtentY(T extent) noexcept;
+		void ExtentY(T extent) noexcept;
 		/// @brief Gets the z extent.
 		/// @return Z extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentZ() const noexcept;
 		/// @brief Sets the z extent.
 		/// @param extent Z extent to set.
-		constexpr void ExtentZ(T extent) noexcept;
+		void ExtentZ(T extent) noexcept;
 		/// @brief Gets an extent by the @p index.
 		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
 		/// @return Extent.
@@ -113,14 +116,14 @@ export namespace PonyMath::Shape
 		/// @brief Sets an extent by the @p index.
 		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
 		/// @param extent Extent to set.
-		constexpr void Extent(std::size_t index, T extent) noexcept;
+		void Extent(std::size_t index, T extent) noexcept;
 		/// @brief Gets the extents.
 		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Extents() const noexcept;
 		/// @brief Sets the extents.
 		/// @param extents Extents to set.
-		constexpr void Extents(const Core::Vector3<T>& extents) noexcept;
+		void Extents(const Core::Vector3<T>& extents) noexcept;
 
 		/// @brief Gets the width.
 		/// @return Width.
@@ -152,15 +155,15 @@ export namespace PonyMath::Shape
 		/// @return Minimal z.
 		[[nodiscard("Pure function")]]
 		constexpr T MinZ() const noexcept;
-		/// @brief Gets the minimal point.
-		/// @return Minimal point.
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector3<T> Min() const noexcept;
 		/// @brief Gets the minimal component by the @p index.
 		/// @param index Component index. 0 -> x, 1 -> y, 2 -> z.
 		/// @return Minimal component.
 		[[nodiscard("Pure function")]]
 		constexpr T Min(std::size_t index) const noexcept;
+		/// @brief Gets the minimal point.
+		/// @return Minimal point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> Min() const noexcept;
 		/// @brief Gets the maximal x.
 		/// @return Maximal x.
 		[[nodiscard("Pure function")]]
@@ -173,15 +176,15 @@ export namespace PonyMath::Shape
 		/// @return Maximal z.
 		[[nodiscard("Pure function")]]
 		constexpr T MaxZ() const noexcept;
-		/// @brief Gets the maximal point.
-		/// @return Maximal point.
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector3<T> Max() const noexcept;
 		/// @brief Gets the maximal component by the @p index.
 		/// @param index Component index. 0 -> x, 1 -> y, 2 -> z.
 		/// @return Maximal component.
 		[[nodiscard("Pure function")]]
 		constexpr T Max(std::size_t index) const noexcept;
+		/// @brief Gets the maximal point.
+		/// @return Maximal point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> Max() const noexcept;
 
 		/// @brief Gets the (MinX, MinY, MinZ) point.
 		/// @return Left bottom near point.
@@ -243,7 +246,7 @@ export namespace PonyMath::Shape
 		/// @param point Point to check.
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
+		bool Contains(const Core::Vector3<T>& point) const noexcept;
 
 		/// @brief Creates a string representing the AABB.
 		/// @return String representing the AABB.
@@ -253,7 +256,7 @@ export namespace PonyMath::Shape
 		/// @brief Converts the AABB to an AABB of another type.
 		/// @tparam U Target type.
 		template<Core::Arithmetic U> [[nodiscard("Pure operator")]]
-		explicit constexpr operator AABB<U>() const noexcept;
+		explicit operator AABB<U>() const noexcept;
 		/// @brief Converts the AABB to a box.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator Box<T>() const noexcept;
@@ -337,7 +340,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABB<T>::ExtentX(const T extent) noexcept
+	void AABB<T>::ExtentX(const T extent) noexcept
 	{
 		Extent(0, extent);
 	}
@@ -349,7 +352,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABB<T>::ExtentY(const T extent) noexcept
+	void AABB<T>::ExtentY(const T extent) noexcept
 	{
 		Extent(1, extent);
 	}
@@ -361,7 +364,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABB<T>::ExtentZ(const T extent) noexcept
+	void AABB<T>::ExtentZ(const T extent) noexcept
 	{
 		Extent(2, extent);
 	}
@@ -373,7 +376,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABB<T>::Extent(const std::size_t index, const T extent) noexcept
+	void AABB<T>::Extent(const std::size_t index, const T extent) noexcept
 	{
 		extents[index] = std::abs(extent);
 	}
@@ -385,7 +388,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABB<T>::Extents(const Core::Vector3<T>& extents) noexcept
+	void AABB<T>::Extents(const Core::Vector3<T>& extents) noexcept
 	{
 		this->extents = Core::Abs(extents);
 	}
@@ -433,15 +436,15 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector3<T> AABB<T>::Min() const noexcept
-	{
-		return Core::Vector3<T>(MinX(), MinY(), MinZ());
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Min(const std::size_t index) const noexcept
 	{
 		return center[index] - extents[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector3<T> AABB<T>::Min() const noexcept
+	{
+		return Core::Vector3<T>(MinX(), MinY(), MinZ());
 	}
 
 	template<Core::Arithmetic T>
@@ -463,15 +466,15 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector3<T> AABB<T>::Max() const noexcept
-	{
-		return Core::Vector3<T>(MaxX(), MaxY(), MaxZ());
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABB<T>::Max(const std::size_t index) const noexcept
 	{
 		return center[index] + extents[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector3<T> AABB<T>::Max() const noexcept
+	{
+		return Core::Vector3<T>(MaxX(), MaxY(), MaxZ());
 	}
 
 	template<Core::Arithmetic T>
@@ -568,7 +571,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr bool AABB<T>::Contains(const Core::Vector3<T>& point) const noexcept
+	bool AABB<T>::Contains(const Core::Vector3<T>& point) const noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
 		{
@@ -589,7 +592,7 @@ namespace PonyMath::Shape
 
 	template<Core::Arithmetic T>
 	template<Core::Arithmetic U>
-	constexpr AABB<T>::operator AABB<U>() const noexcept
+	AABB<T>::operator AABB<U>() const noexcept
 	{
 		return AABB<U>(static_cast<Core::Vector3<U>>(center), static_cast<Core::Vector3<U>>(extents));
 	}

@@ -14,9 +14,12 @@ module;
 export module PonyMath.Shape:AABR;
 
 import <array>;
+import <cmath>;
 import <cstddef>;
 import <format>;
+import <ostream>;
 import <string>;
+import <type_traits>;
 
 import PonyMath.Core;
 
@@ -24,30 +27,44 @@ import :Rect;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Axis-aligned bounding rect implementation.
+	/// @tparam T Component type.
 	template<Core::Arithmetic T>
 	class AABR final
 	{
 	public:
 		using ValueType = T; ///< Value type.
 
+		/// @brief AABR axes.
 		static constexpr std::array<Core::Vector2<T>, 2> Axes = { Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up };
 
-		static constexpr std::size_t LeftBottomIndex = 0;
-		static constexpr std::size_t RightBottomIndex = 1;
-		static constexpr std::size_t LeftTopIndex = 2;
-		static constexpr std::size_t RightTopIndex = 3;
-		static constexpr std::size_t CornerCount = 4;
+		static constexpr std::size_t LeftBottomIndex = 0; ///< (MinX, MinY) corner index.
+		static constexpr std::size_t RightBottomIndex = 1; ///< (MaxX, MinY) corner index.
+		static constexpr std::size_t LeftTopIndex = 2; ///< (MinX, MaxY) corner index.
+		static constexpr std::size_t RightTopIndex = 3; ///< (MaxX, MaxY) corner index.
+		static constexpr std::size_t CornerCount = 4; ///< Corner count.
 
 		struct Predefined; ///< Predefined AABRs.
 
+		/// @brief Creates an empty AABR.
 		[[nodiscard("Pure constructor")]]
 		constexpr AABR() noexcept = default;
+		/// @brief Creates an AABR.
+		/// @param x Center x component.
+		/// @param y Center y component.
+		/// @param halfWidth Half width.
+		/// @param halfHeight Half height.
 		[[nodiscard("Pure constructor")]]
-		constexpr AABR(T x, T y, T halfWidth, T halfHeight) noexcept;
+		AABR(T x, T y, T halfWidth, T halfHeight) noexcept;
+		/// @brief Creates an AABR.
+		/// @param center Center.
+		/// @param extents Extents. Half-sizes in every dimension.
 		[[nodiscard("Pure constructor")]]
-		constexpr AABR(const Core::Vector2<T>& center, const Core::Vector2<T>& extents) noexcept;
+		AABR(const Core::Vector2<T>& center, const Core::Vector2<T>& extents) noexcept;
+		/// @brief Converts the @p rect to an AABR.
+		/// @param rect Rect to convert.
 		[[nodiscard("Pure constructor")]]
-		explicit constexpr AABR(const Rect<T>& rect) noexcept;
+		explicit AABR(const Rect<T>& rect) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr AABR(const AABR& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -55,28 +72,57 @@ export namespace PonyMath::Shape
 
 		constexpr ~AABR() noexcept = default;
 
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T>& Center() noexcept;
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Center() const noexcept;
 
+		/// @brief Gets the x extent.
+		/// @return X extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentX() const noexcept;
+		/// @brief Sets the x extent.
+		/// @param extent X extent to set.
 		constexpr void ExtentX(T extent) noexcept;
+		/// @brief Gets the y extent.
+		/// @return Y extent.
 		[[nodiscard("Pure function")]]
 		constexpr T ExtentY() const noexcept;
+		/// @brief Sets the y extent.
+		/// @param extent Y extent to set.
 		constexpr void ExtentY(T extent) noexcept;
+		/// @brief Gets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y.
+		/// @return Extent.
 		[[nodiscard("Pure function")]]
 		constexpr T Extent(std::size_t index) const noexcept;
+		/// @brief Sets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y.
+		/// @param extent Extent to set.
 		constexpr void Extent(std::size_t index, T extent) noexcept;
+		/// @brief Gets the extents.
+		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Extents() const noexcept;
+		/// @brief Sets the extents.
+		/// @param extents Extents to set.
 		constexpr void Extents(const Core::Vector2<T>& extents) noexcept;
 
+		/// @brief Gets the width.
+		/// @return Width.
 		[[nodiscard("Pure function")]]
 		constexpr T Width() const noexcept;
+		/// @brief Gets the height.
+		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr T Height() const noexcept;
+		/// @brief Gets the size by the @p index.
+		/// @param index Size index. 0 -> width, 1 -> height.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		constexpr T Size(std::size_t index) const noexcept;
 
@@ -88,12 +134,15 @@ export namespace PonyMath::Shape
 		/// @return Minimal y.
 		[[nodiscard("Pure function")]]
 		constexpr T MinY() const noexcept;
+		/// @brief Gets the minimal component by the @p index.
+		/// @param index Component index. 0 -> x, 1 -> y.
+		/// @return Minimal component.
+		[[nodiscard("Pure function")]]
+		constexpr T Min(std::size_t index) const noexcept;
 		/// @brief Gets the minimal point.
 		/// @return Minimal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Min() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr T Min(std::size_t index) const noexcept;
 		/// @brief Gets the maximal x point.
 		/// @return Maximal x.
 		[[nodiscard("Pure function")]]
@@ -102,57 +151,72 @@ export namespace PonyMath::Shape
 		/// @return Maximal x.
 		[[nodiscard("Pure function")]]
 		constexpr T MaxY() const noexcept;
+		/// @brief Gets the maximal component by the @p index.
+		/// @param index Component index. 0 -> x, 1 -> y.
+		/// @return Maximal component.
+		[[nodiscard("Pure function")]]
+		constexpr T Max(std::size_t index) const noexcept;
 		/// @brief Gets the maximal point.
 		/// @return Maximal point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Max() const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr T Max(std::size_t index) const noexcept;
 
+		/// @brief Gets the (MinX, MinY) point.
+		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> LeftBottom() const noexcept;
+		/// @brief Gets the (MaxX, MinY) point.
+		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> RightBottom() const noexcept;
+		/// @brief Gets the (MinX, MaxY) point.
+		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> LeftTop() const noexcept;
+		/// @brief Gets the (MaxX, MaxY) point.
+		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> RightTop() const noexcept;
+		/// @brief Gets the corner by the @p index.
+		/// @param index Corner index.
+		/// @return Corner.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Corner(std::size_t index) const noexcept;
+		/// @brief Gets the corners.
+		/// @return Corners.
 		[[nodiscard("Pure function")]]
 		constexpr std::array<Core::Vector2<T>, 4> Corners() const noexcept;
 
-		/// @brief Computes a perimeter.
+		/// @brief Calculates a perimeter.
 		/// @return Perimeter.
 		[[nodiscard("Pure function")]]
 		constexpr T Perimeter() const noexcept;
-		/// @brief Computes an area.
+		/// @brief Calculates an area.
 		/// @return Area.
 		[[nodiscard("Pure function")]]
 		constexpr T Area() const noexcept;
 
-		/// @brief Checks if all the rect data is finite.
+		/// @brief Checks if all the AABR data is finite.
 		/// @return @a True if they are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Checks if the rect contains the point.
+		/// @brief Checks if the AABR contains the point.
 		/// @param point Point to check.
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector2<T>& point) const noexcept;
 
-		constexpr void ResolveNegativeExtents() noexcept;
-
-		/// @brief Creates a string representing the rect.
-		/// @return String representing the rect.
+		/// @brief Creates a string representing the AABR.
+		/// @return String representing the AABR.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
-		/// @brief Converts the rect to a rect of another type.
+		/// @brief Converts the AABR to an AABR of another type.
 		/// @tparam U Target type.
 		template<Core::Arithmetic U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator AABR<U>() const noexcept;
+		/// @brief Converts the AABR to a rect.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator Rect<T>() const noexcept;
 
@@ -163,8 +227,8 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const AABR& other) const noexcept = default;
 
 	private:
-		Core::Vector2<T> center;
-		Core::Vector2<T> extents;
+		Core::Vector2<T> center; ///< Center
+		Core::Vector2<T> extents; ///< Extents
 	};
 
 	/// @brief Checks if the two AABRs are almost equal with the tolerance value.
@@ -189,30 +253,30 @@ export namespace PonyMath::Shape
 	{
 		NON_CONSTRUCTIBLE_BODY(Predefined)
 
-		static constexpr auto Zero = AABR(T{0}, T{0}, T{0}, T{0}); ///< AABR(0, 0, 0, 0).
+		static inline const auto Zero = AABR(T{0}, T{0}, T{0}, T{0}); ///< AABR(0, 0, 0, 0).
 	};
 }
 
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	constexpr AABR<T>::AABR(const T x, const T y, const T halfWidth, const T halfHeight) noexcept :
+	AABR<T>::AABR(const T x, const T y, const T halfWidth, const T halfHeight) noexcept :
 		center(x, y),
-		extents(halfWidth, halfHeight)
+		extents(std::abs(halfWidth), std::abs(halfHeight))
 	{
 	}
 
 	template<Core::Arithmetic T>
-	constexpr AABR<T>::AABR(const Core::Vector2<T>& center, const Core::Vector2<T>& extents) noexcept :
+	AABR<T>::AABR(const Core::Vector2<T>& center, const Core::Vector2<T>& extents) noexcept :
 		center(center),
-		extents(extents)
+		extents(Core::Abs(extents))
 	{
 	}
 
 	template<Core::Arithmetic T>
-	constexpr AABR<T>::AABR(const Rect<T>& rect) noexcept :
+	AABR<T>::AABR(const Rect<T>& rect) noexcept :
 		center(rect.Center()),
-		extents(rect.Width() / T{2}, rect.Height() / T{2})
+		extents(Core::Abs(rect.Size() / T{2}))
 	{
 	}
 
@@ -231,25 +295,25 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr T AABR<T>::ExtentX() const noexcept
 	{
-		return extents[0];
+		return Extent(0);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr void AABR<T>::ExtentX(const T extent) noexcept
 	{
-		extents[0] = std::abs(extent);
+		Extent(0, extent);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABR<T>::ExtentY() const noexcept
 	{
-		return extents[1];
+		return Extent(1);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr void AABR<T>::ExtentY(const T extent) noexcept
 	{
-		extents[1] = std::abs(extent);
+		Extent(1, extent);
 	}
 
 	template<Core::Arithmetic T>
@@ -279,13 +343,13 @@ namespace PonyMath::Shape
 	template<Core::Arithmetic T>
 	constexpr T AABR<T>::Width() const noexcept
 	{
-		return ExtentX() * T{2};
+		return Size(0);
 	}
 
 	template<Core::Arithmetic T>
 	constexpr T AABR<T>::Height() const noexcept
 	{
-		return ExtentY() * T{2};
+		return Size(1);
 	}
 
 	template<Core::Arithmetic T>
@@ -307,15 +371,15 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector2<T> AABR<T>::Min() const noexcept
-	{
-		return Core::Vector2<T>(MinX(), MinY());
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABR<T>::Min(const std::size_t index) const noexcept
 	{
 		return center[index] - extents[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> AABR<T>::Min() const noexcept
+	{
+		return Core::Vector2<T>(MinX(), MinY());
 	}
 
 	template<Core::Arithmetic T>
@@ -331,15 +395,15 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr Core::Vector2<T> AABR<T>::Max() const noexcept
-	{
-		return Core::Vector2<T>(MaxX(), MaxY());
-	}
-
-	template<Core::Arithmetic T>
 	constexpr T AABR<T>::Max(const std::size_t index) const noexcept
 	{
 		return center[index] + extents[index];
+	}
+
+	template<Core::Arithmetic T>
+	constexpr Core::Vector2<T> AABR<T>::Max() const noexcept
+	{
+		return Core::Vector2<T>(MaxX(), MaxY());
 	}
 
 	template<Core::Arithmetic T>
@@ -418,15 +482,6 @@ namespace PonyMath::Shape
 		}
 
 		return true;
-	}
-
-	template<Core::Arithmetic T>
-	constexpr void AABR<T>::ResolveNegativeExtents() noexcept
-	{
-		for (T& extent : extents)
-		{
-			extent = std::abs(extent);
-		}
 	}
 
 	template<Core::Arithmetic T>
