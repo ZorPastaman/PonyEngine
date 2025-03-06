@@ -16,6 +16,11 @@ import <vector>;
 
 export namespace PonyBase::Utility
 {
+	/// @brief Moves an element from one index to another.
+	/// @tparam T Value type.
+	/// @param vector Vector.
+	/// @param from From index.
+	/// @param to To index. It's a target index after an erasure of an element at the index from.
 	template<typename T>
 	void Move(std::vector<T>& vector, std::size_t from, std::size_t to) noexcept(std::is_nothrow_move_constructible_v<T>);
 }
@@ -30,7 +35,7 @@ namespace PonyBase::Utility
 			return;
 		}
 
-		const T value = std::move(vector[from]);
+		T value = std::move(vector[from]);
 		vector.erase(vector.begin() + from);
 		vector.insert(vector.begin() + to, std::move(value));
 	}

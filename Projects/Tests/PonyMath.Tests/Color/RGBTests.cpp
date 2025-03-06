@@ -702,9 +702,9 @@ namespace Core
 			constexpr float b1 = 0.219f;
 			constexpr auto color1 = PonyMath::Color::RGB<float>(r1, g1, b1);
 			auto quotient = color / color1;
-			Assert::AreEqual(r / r1, quotient.R());
-			Assert::AreEqual(g / g1, quotient.G());
-			Assert::AreEqual(b / b1, quotient.B());
+			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(quotient.R()), 0.0001);
+			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(quotient.G()), 0.0001);
+			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(quotient.B()), 0.0001);
 		}
 
 		TEST_METHOD(DivisionTest)

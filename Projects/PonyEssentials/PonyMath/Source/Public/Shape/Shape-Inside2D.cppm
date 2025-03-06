@@ -9,7 +9,10 @@
 
 export module PonyMath.Shape:Inside2D;
 
+import <array>;
+import <cstddef>;
 import <concepts>;
+import <span>;
 
 import PonyMath.Core;
 
@@ -18,42 +21,71 @@ import :OBR;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Checks if the @p small is fully inside the @p large.
+	/// @tparam T Component type.
+	/// @param small Small object.
+	/// @param large Large object.
+	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept;
+	bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept;
+	/// @brief Checks if the @p small is fully inside the @p large.
+	/// @tparam T Component type.
+	/// @param small Small object.
+	/// @param large Large object.
+	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept;
+	bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept;
 
+	/// @brief Checks if the @p small is fully inside the @p large.
+	/// @tparam T Component type.
+	/// @param small Small object.
+	/// @param large Large object.
+	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept;
+	bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept;
+	/// @brief Checks if the @p small is fully inside the @p large.
+	/// @tparam T Component type.
+	/// @param small Small object.
+	/// @param large Large object.
+	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept;
+	bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept;
 }
 
 namespace PonyMath::Shape
 {
+	/// @brief Checks if all the @p corners are inside the @p large.
+	/// @tparam T Component type.
+	/// @param corners Corners.
+	/// @param large Large object.
+	/// @return @a True if all the @p corners are inside the @p large; @a false otherwise.
 	template<std::floating_point T>
-	constexpr bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept;
+	bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept;
 
 	template<Core::Arithmetic T>
-	constexpr bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept
+	bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept
 	{
 		return large.Contains(small.Min()) && large.Contains(small.Max());
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept
+	bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept
 	{
-		return IsInside(small.Corners(), large);
+		const std::array<Core::Vector2<T>, 4> corners = small.Corners();
+
+		return IsInside(std::span<const Core::Vector2<T>>(corners.data(), corners.size()), large);
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept
+	bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept
 	{
-		return IsInside(small.Corners(), large);
+		const std::array<Core::Vector2<T>, 4> corners = small.Corners();
+
+		return IsInside(std::span<const Core::Vector2<T>>(corners.data(), corners.size()), large);
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept
+	bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept
 	{
 		const std::array<Core::Vector2<T>, 4> corners = small.Corners();
 		Core::Vector2<T> min = Core::Min(corners[0], corners[1]);
@@ -68,7 +100,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool IsInside(const std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept
+	bool IsInside(const std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept
 	{
 		for (const Core::Vector2<T>& corner : corners)
 		{

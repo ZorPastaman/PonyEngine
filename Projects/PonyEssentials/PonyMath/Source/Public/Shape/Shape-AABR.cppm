@@ -15,6 +15,7 @@ export module PonyMath.Shape:AABR;
 
 import <array>;
 import <cmath>;
+import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
@@ -46,7 +47,7 @@ export namespace PonyMath::Shape
 
 		struct Predefined; ///< Predefined AABRs.
 
-		/// @brief Creates an empty AABR.
+		/// @brief Creates a zero AABR.
 		[[nodiscard("Pure constructor")]]
 		constexpr AABR() noexcept = default;
 		/// @brief Creates an AABR.

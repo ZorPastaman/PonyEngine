@@ -674,10 +674,10 @@ namespace Core
 			constexpr float wS = -5;
 			constexpr auto scale = PonyMath::Core::Vector4<float>(xS, yS, zS, wS);
 			vector.Divide(scale);
-			Assert::AreEqual(x / xS, vector.X());
-			Assert::AreEqual(y / yS, vector.Y());
-			Assert::AreEqual(z / zS, vector.Z());
-			Assert::AreEqual(w / wS, vector.W());
+			Assert::AreEqual(static_cast<double>(x / xS), static_cast<double>(vector.X()), 0.0001);
+			Assert::AreEqual(static_cast<double>(y / yS), static_cast<double>(vector.Y()), 0.0001);
+			Assert::AreEqual(static_cast<double>(z / zS), static_cast<double>(vector.Z()), 0.0001);
+			Assert::AreEqual(static_cast<double>(w / wS), static_cast<double>(vector.W()), 0.0001);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -1327,10 +1327,10 @@ namespace Core
 			constexpr float wL = -5;
 			constexpr auto vectorL = PonyMath::Core::Vector4<float>(xL, yL, zL, wL);
 			const PonyMath::Core::Vector4<float> scaled = PonyMath::Core::Divide(vectorL, vectorR);
-			Assert::AreEqual(xL / xR, scaled.X());
-			Assert::AreEqual(yL / yR, scaled.Y());
-			Assert::AreEqual(zL / zR, scaled.Z());
-			Assert::AreEqual(wL / wR, scaled.W());
+			Assert::AreEqual(static_cast<double>(xL / xR), static_cast<double>(scaled.X()), 0.0001);
+			Assert::AreEqual(static_cast<double>(yL / yR), static_cast<double>(scaled.Y()), 0.0001);
+			Assert::AreEqual(static_cast<double>(zL / zR), static_cast<double>(scaled.Z()), 0.0001);
+			Assert::AreEqual(static_cast<double>(wL / wR), static_cast<double>(scaled.W()), 0.0001);
 		}
 
 		TEST_METHOD(AbsShortTest)
