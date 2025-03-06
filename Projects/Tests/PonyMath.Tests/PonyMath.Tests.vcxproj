@@ -27,8 +27,10 @@
     <ClCompile Include="Core\Vector4Tests.cpp" />
     <ClCompile Include="Shape\AABBTests.cpp" />
     <ClCompile Include="Shape\AABRTests.cpp" />
-    <ClCompile Include="Shape\InsideTests.cpp" />
+    <ClCompile Include="Shape\BoxTests.cpp" />
+    <ClCompile Include="Shape\Inside3DTests.cpp" />
     <ClCompile Include="Shape\IntersectingTests.cpp" />
+    <ClCompile Include="Shape\Inside2DTests.cpp" />
     <ClCompile Include="Shape\RectTests.cpp" />
     <ClCompile Include="Space\Transform2DTests.cpp" />
     <ClCompile Include="Space\Transform3DTests.cpp" />

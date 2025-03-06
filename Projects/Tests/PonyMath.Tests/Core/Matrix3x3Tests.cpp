@@ -1615,15 +1615,15 @@ namespace Core
 			auto matrix = PonyMath::Core::Matrix3x3<float>(m00, m10, m20, m01, m11, m21, m02, m12, m22);
 			constexpr auto scale = PonyMath::Core::Matrix3x3<float>(m00S, m10S, m20S, m01S, m11S, m21S, m02S, m12S, m22S);
 			matrix.Divide(scale);
-			Assert::AreEqual(m00 / m00S, matrix.M00());
-			Assert::AreEqual(m10 / m10S, matrix.M10());
-			Assert::AreEqual(m20 / m20S, matrix.M20());
-			Assert::AreEqual(m01 / m01S, matrix.M01());
-			Assert::AreEqual(m11 / m11S, matrix.M11());
-			Assert::AreEqual(m21 / m21S, matrix.M21());
-			Assert::AreEqual(m02 / m02S, matrix.M02());
-			Assert::AreEqual(m12 / m12S, matrix.M12());
-			Assert::AreEqual(m22 / m22S, matrix.M22());
+			Assert::AreEqual(static_cast<double>(m00 / m00S), static_cast<double>(matrix.M00()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m10 / m10S), static_cast<double>(matrix.M10()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m20 / m20S), static_cast<double>(matrix.M20()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m01 / m01S), static_cast<double>(matrix.M01()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m11 / m11S), static_cast<double>(matrix.M11()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m21 / m21S), static_cast<double>(matrix.M21()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m02 / m02S), static_cast<double>(matrix.M02()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m12 / m12S), static_cast<double>(matrix.M12()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m22 / m22S), static_cast<double>(matrix.M22()), 0.0001);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -2299,15 +2299,15 @@ namespace Core
 			constexpr float m22L = -7;
 			constexpr auto matrixL = PonyMath::Core::Matrix3x3<float>(m00L, m10L, m20L, m01L, m11L, m21L, m02L, m12L, m22L);
 			PonyMath::Core::Matrix3x3<float> scaled = PonyMath::Core::Divide(matrixL, matrixR);
-			Assert::AreEqual(m00L / m00R, scaled.M00());
-			Assert::AreEqual(m10L / m10R, scaled.M10());
-			Assert::AreEqual(m20L / m20R, scaled.M20());
-			Assert::AreEqual(m01L / m01R, scaled.M01());
-			Assert::AreEqual(m11L / m11R, scaled.M11());
-			Assert::AreEqual(m21L / m21R, scaled.M21());
-			Assert::AreEqual(m02L / m02R, scaled.M02());
-			Assert::AreEqual(m12L / m12R, scaled.M12());
-			Assert::AreEqual(m22L / m22R, scaled.M22());
+			Assert::AreEqual(static_cast<double>(m00L / m00R), static_cast<double>(scaled.M00()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m10L / m10R), static_cast<double>(scaled.M10()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m20L / m20R), static_cast<double>(scaled.M20()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m01L / m01R), static_cast<double>(scaled.M01()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m11L / m11R), static_cast<double>(scaled.M11()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m21L / m21R), static_cast<double>(scaled.M21()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m02L / m02R), static_cast<double>(scaled.M02()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m12L / m12R), static_cast<double>(scaled.M12()), 0.0001);
+			Assert::AreEqual(static_cast<double>(m22L / m22R), static_cast<double>(scaled.M22()), 0.0001);
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)

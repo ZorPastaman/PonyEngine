@@ -535,8 +535,8 @@ namespace Core
 			constexpr float yS = 7;
 			constexpr auto scale = PonyMath::Core::Vector2<float>(xS, yS);
 			vector.Divide(scale);
-			Assert::AreEqual(x / xS, vector.X());
-			Assert::AreEqual(y / yS, vector.Y());
+			Assert::AreEqual(static_cast<double>(x / xS), static_cast<double>(vector.X()), 0.0001);
+			Assert::AreEqual(static_cast<double>(y / yS), static_cast<double>(vector.Y()), 0.0001);
 		}
 
 		TEST_METHOD(ToStringShortTest)

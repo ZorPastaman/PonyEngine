@@ -15,6 +15,7 @@ export module PonyMath.Shape:AABB;
 
 import <array>;
 import <cmath>;
+import <concepts>;
 import <cstddef>;
 import <format>;
 import <ostream>;
@@ -50,7 +51,7 @@ export namespace PonyMath::Shape
 
 		struct Predefined; ///< Predefined AABBs.
 
-		/// @brief Creates an empty AABB.
+		/// @brief Creates a zero AABB.
 		[[nodiscard("Pure constructor")]]
 		constexpr AABB() noexcept = default;
 		/// @brief Creates an AABB.
