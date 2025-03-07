@@ -22,53 +22,53 @@ import :Ray3D;
 export namespace PonyMath::Shape
 {
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const AABB<T>& aabb, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const Ray3D<T>& ray, const AABB<T>& aabb, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const OBB<T>& obb, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const Ray3D<T>& ray, const OBB<T>& obb, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept;
+	bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& plane, const AABB<T>& aabb) noexcept;
+	bool AreIntersecting(const Plane<T>& plane, const AABB<T>& aabb) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& plane, const OBB<T>& obb) noexcept;
+	bool AreIntersecting(const Plane<T>& plane, const OBB<T>& obb) noexcept;
 
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const AABB<T>& left, const AABB<T>& right) noexcept;
+	bool AreIntersecting(const AABB<T>& left, const AABB<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const AABB<T>& aabb, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept;
+	bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const OBB<T>& obb) noexcept;
+	bool AreIntersecting(const AABB<T>& aabb, const OBB<T>& obb) noexcept;
 
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const OBB<T>& left, const OBB<T>& right) noexcept;
+	bool AreIntersecting(const OBB<T>& left, const OBB<T>& right) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const OBB<T>& obb, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	bool AreIntersecting(const OBB<T>& obb, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept;
+	bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept;
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const OBB<T>& obb, const AABB<T>& aabb) noexcept;
+	bool AreIntersecting(const OBB<T>& obb, const AABB<T>& aabb) noexcept;
 }
 
 namespace PonyMath::Shape
 {
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreIntersecting(const Plane<T>& plane, std::span<const Core::Vector3<T>> corners) noexcept;
+	bool AreIntersecting(const Plane<T>& plane, std::span<const Core::Vector3<T>> corners) noexcept;
 
 	template<std::floating_point T, std::size_t CornerCount> [[nodiscard("Pure function")]]
-	constexpr bool CheckSat(const Core::Vector3<T>& center, const Core::Vector3<T>& extents, std::span<const Core::Vector3<T>, 3> axes, std::span<const Core::Vector3<T>, CornerCount> corners);
+	bool CheckSat(const Core::Vector3<T>& center, const Core::Vector3<T>& extents, std::span<const Core::Vector3<T>, 3> axes, std::span<const Core::Vector3<T>, CornerCount> corners);
 	template<std::floating_point T, std::size_t LeftCornerCount, std::size_t RightCornerCount> [[nodiscard("Pure function")]]
-	constexpr bool CheckSat(std::span<const Core::Vector3<T>> leftAxes, std::span<const Core::Vector3<T>> rightAxes, 
+	bool CheckSat(std::span<const Core::Vector3<T>> leftAxes, std::span<const Core::Vector3<T>> rightAxes, 
 		std::span<const Core::Vector3<T>, LeftCornerCount> leftCorners, std::span<const Core::Vector3<T>, RightCornerCount> rightCorners);
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane, const T maxDistance) noexcept
+	bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane, const T maxDistance) noexcept
 	{
 		const T distance = plane.Distance(ray.Origin());
 		const T dot = Core::Dot(plane.Normal(), ray.Direction());
@@ -78,7 +78,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const AABB<T>& aabb, const T maxDistance) noexcept
+	bool AreIntersecting(const Ray3D<T>& ray, const AABB<T>& aabb, const T maxDistance) noexcept
 	{
 		T tMin = T{0};
 		T tMax = maxDistance;
@@ -110,7 +110,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Ray3D<T>& ray, const OBB<T>& obb, const T maxDistance) noexcept
+	bool AreIntersecting(const Ray3D<T>& ray, const OBB<T>& obb, const T maxDistance) noexcept
 	{
 		const Core::Matrix3x3<T> inverseRotation = Core::RotationMatrix(obb.AxisX(), obb.AxisY(), obb.AxisZ()).Inverse();
 		const Core::Vector3<T> origin = inverseRotation * (ray.Origin() - obb.Center());
@@ -121,31 +121,31 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept
+	bool AreIntersecting(const Plane<T>& left, const Plane<T>& right) noexcept
 	{
 		return std::abs(Core::Dot(left.Normal(), right.Normal())) < T{1};
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray, const T maxDistance) noexcept
+	bool AreIntersecting(const Plane<T>& plane, const Ray3D<T>& ray, const T maxDistance) noexcept
 	{
 		return AreIntersecting(ray, plane, maxDistance);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& plane, const AABB<T>& aabb) noexcept
+	bool AreIntersecting(const Plane<T>& plane, const AABB<T>& aabb) noexcept
 	{
 		return AreIntersecting(plane, aabb.Corners());
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& plane, const OBB<T>& obb) noexcept
+	bool AreIntersecting(const Plane<T>& plane, const OBB<T>& obb) noexcept
 	{
 		return AreIntersecting(plane, obb.Corners());
 	}
 
 	template<Core::Arithmetic T>
-	constexpr bool AreIntersecting(const AABB<T>& left, const AABB<T>& right) noexcept
+	bool AreIntersecting(const AABB<T>& left, const AABB<T>& right) noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
 		{
@@ -159,19 +159,19 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const Ray3D<T>& ray, const T maxDistance) noexcept
+	bool AreIntersecting(const AABB<T>& aabb, const Ray3D<T>& ray, const T maxDistance) noexcept
 	{
 		return AreIntersecting(ray, aabb, maxDistance);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept
+	bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept
 	{
 		return AreIntersecting(plane, aabb);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const AABB<T>& aabb, const OBB<T>& obb) noexcept
+	bool AreIntersecting(const AABB<T>& aabb, const OBB<T>& obb) noexcept
 	{
 		const std::array<Core::Vector3<T>, 8> aabbCorners = aabb.Corners();
 		const std::array<Core::Vector3<T>, 8> obbCorners = obb.Corners();
@@ -182,7 +182,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const OBB<T>& left, const OBB<T>& right) noexcept
+	bool AreIntersecting(const OBB<T>& left, const OBB<T>& right) noexcept
 	{
 		const std::array<Core::Vector3<T>, 8> leftCorners = left.Corners();
 		const std::array<Core::Vector3<T>, 8> rightCorners = right.Corners();
@@ -193,25 +193,25 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const OBB<T>& obb, const Ray3D<T>& ray, const T maxDistance) noexcept
+	bool AreIntersecting(const OBB<T>& obb, const Ray3D<T>& ray, const T maxDistance) noexcept
 	{
 		return AreIntersecting(ray, obb, maxDistance);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept
+	bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept
 	{
 		return AreIntersecting(plane, obb);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const OBB<T>& obb, const AABB<T>& aabb) noexcept
+	bool AreIntersecting(const OBB<T>& obb, const AABB<T>& aabb) noexcept
 	{
 		return AreIntersecting(aabb, obb);
 	}
 
 	template<std::floating_point T>
-	constexpr bool AreIntersecting(const Plane<T>& plane, const std::span<const Core::Vector3<T>> corners) noexcept
+	bool AreIntersecting(const Plane<T>& plane, const std::span<const Core::Vector3<T>> corners) noexcept
 	{
 		for (std::size_t positives = 0, negatives = 0; const Core::Vector3<T>& corner : corners)
 		{
@@ -229,7 +229,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T, std::size_t CornerCount>
-	constexpr bool CheckSat(const Core::Vector3<T>& center, const Core::Vector3<T>& extents, const std::span<const Core::Vector3<T>, 3> axes, const std::span<const Core::Vector3<T>, CornerCount> corners)
+	bool CheckSat(const Core::Vector3<T>& center, const Core::Vector3<T>& extents, const std::span<const Core::Vector3<T>, 3> axes, const std::span<const Core::Vector3<T>, CornerCount> corners)
 	{
 		for (std::size_t axisIndex = 0; axisIndex < 3; ++axisIndex)
 		{
@@ -253,7 +253,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T, std::size_t LeftCornerCount, std::size_t RightCornerCount>
-	constexpr bool CheckSat(const std::span<const Core::Vector3<T>> leftAxes, const std::span<const Core::Vector3<T>> rightAxes, 
+	bool CheckSat(const std::span<const Core::Vector3<T>> leftAxes, const std::span<const Core::Vector3<T>> rightAxes, 
 		const std::span<const Core::Vector3<T>, LeftCornerCount> leftCorners, const std::span<const Core::Vector3<T>, RightCornerCount> rightCorners)
 	{
 		for (const Core::Vector3<T>& leftAxis : leftAxes)

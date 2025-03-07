@@ -66,9 +66,6 @@
     <ClCompile Include="Utility\ResolutionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shape\IntersectingTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Shape\RectTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -85,6 +82,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Shape\Inside3DTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape\Intersecting2DTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

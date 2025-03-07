@@ -976,7 +976,7 @@ namespace PonyMath::Core
 	template<Arithmetic T>
 	constexpr Matrix4x4<T> Matrix4x4<T>::Inverse() const noexcept requires (std::is_floating_point_v<T>)
 	{
-		return Adjugate() * (ComputationalType{1} / Determinant());
+		return Adjugate() * (T{1} / Determinant());
 	}
 
 	template<Arithmetic T>

@@ -36,7 +36,7 @@ namespace Shape
 		TEST_METHOD(AabrObrTest)
 		{
 			const auto largeBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 20.f, 20.f);
-			const auto large = PonyMath::Shape::OBR<float>(largeBox, 30.f);
+			const auto large = PonyMath::Shape::OBR<float>(largeBox, 30.f * PonyMath::Core::DegToRad<float>);
 
 			auto small = PonyMath::Shape::AABR<float>(1.f, -1.f, 3.f, 4.f);
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
@@ -51,30 +51,30 @@ namespace Shape
 		TEST_METHOD(ObrObrTest)
 		{
 			const auto largeBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 20.f, 20.f);
-			const auto large = PonyMath::Shape::OBR<float>(largeBox, 30.f);
+			const auto large = PonyMath::Shape::OBR<float>(largeBox, 30.f * PonyMath::Core::DegToRad<float>);
 
 			auto smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 3.f, 4.f);
-			auto small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			auto small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 30.f, 40.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(-50.f, 50.f, 5.f, 5.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 3.f, 4.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 45.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 45.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 17.f, 17.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 17.f, 17.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 60.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 60.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 		}
 
@@ -83,15 +83,15 @@ namespace Shape
 			const auto large = PonyMath::Shape::AABR<float>(10.f, 10.f, 20.f, 20.f);
 
 			auto smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 3.f, 4.f);
-			auto small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			auto small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(1.f, -1.f, 30.f, 40.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(-50.f, 50.f, 5.f, 5.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 30.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 30.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(10.f, 10.f, 17.f, 17.f);
@@ -99,7 +99,7 @@ namespace Shape
 			Assert::IsTrue(PonyMath::Shape::IsInside(small, large));
 
 			smallBox = PonyMath::Shape::AABR<float>(10.f, -10.f, 17.f, 17.f);
-			small = PonyMath::Shape::OBR<float>(smallBox, 45.f);
+			small = PonyMath::Shape::OBR<float>(smallBox, 45.f * PonyMath::Core::DegToRad<float>);
 			Assert::IsFalse(PonyMath::Shape::IsInside(small, large));
 		}
 	};
