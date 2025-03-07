@@ -98,7 +98,7 @@ export namespace PonyMath::Core
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector2 Normalized() const noexcept requires (std::is_floating_point_v<T>);
+		Vector2 Normalized() const noexcept requires (std::is_floating_point_v<T>); // TODO: Add safe normalized with a default vector that is returned if this vector is zero.
 		/// @brief Normalizes the vector.
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires (std::is_floating_point_v<T>);
