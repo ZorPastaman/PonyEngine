@@ -256,13 +256,17 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& line, const AABR<T>& aabr) noexcept
 	{
-		return AreIntersecting(line, aabr.Corners());
+		const std::array<Core::Vector2<T>, 4> corners = aabr.Corners();
+
+		return AreIntersecting(line, std::span<const Core::Vector2<T>>(corners.data(), corners.size()));
 	}
 
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& line, const OBR<T>& obr) noexcept
 	{
-		return AreIntersecting(line, obr.Corners());
+		const std::array<Core::Vector2<T>, 4> corners = obr.Corners();
+
+		return AreIntersecting(line, std::span<const Core::Vector2<T>>(corners.data(), corners.size()));
 	}
 
 	template<Core::Arithmetic T>
