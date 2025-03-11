@@ -23,30 +23,30 @@ export namespace PonyMath::Shape
 {
 	/// @brief Checks if the @p small is fully inside the @p large.
 	/// @tparam T Component type.
-	/// @param small Small object.
-	/// @param large Large object.
+	/// @param small Small shape.
+	/// @param large Large shape.
 	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
 	bool IsInside(const AABR<T>& small, const AABR<T>& large) noexcept;
 	/// @brief Checks if the @p small is fully inside the @p large.
 	/// @tparam T Component type.
-	/// @param small Small object.
-	/// @param large Large object.
+	/// @param small Small shape.
+	/// @param large Large shape.
 	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool IsInside(const AABR<T>& small, const OBR<T>& large) noexcept;
 
 	/// @brief Checks if the @p small is fully inside the @p large.
 	/// @tparam T Component type.
-	/// @param small Small object.
-	/// @param large Large object.
+	/// @param small Small shape.
+	/// @param large Large shape.
 	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool IsInside(const OBR<T>& small, const OBR<T>& large) noexcept;
 	/// @brief Checks if the @p small is fully inside the @p large.
 	/// @tparam T Component type.
-	/// @param small Small object.
-	/// @param large Large object.
+	/// @param small Small shape.
+	/// @param large Large shape.
 	/// @return @a True if the @p small is fully inside the @p large; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool IsInside(const OBR<T>& small, const AABR<T>& large) noexcept;
@@ -57,7 +57,7 @@ namespace PonyMath::Shape
 	/// @brief Checks if all the @p corners are inside the @p large.
 	/// @tparam T Component type.
 	/// @param corners Corners.
-	/// @param large Large object.
+	/// @param large Large shape.
 	/// @return @a True if all the @p corners are inside the @p large; @a false otherwise.
 	template<std::floating_point T>
 	bool IsInside(std::span<const Core::Vector2<T>> corners, const OBR<T>& large) noexcept;

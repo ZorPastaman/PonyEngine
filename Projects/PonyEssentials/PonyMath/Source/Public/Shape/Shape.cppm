@@ -15,6 +15,7 @@ export import :Box;
 export import :Inside2D;
 export import :Inside3D;
 export import :Intersecting2D;
+export import :Intersecting3D;
 export import :Line;
 export import :OBB;
 export import :OBR;

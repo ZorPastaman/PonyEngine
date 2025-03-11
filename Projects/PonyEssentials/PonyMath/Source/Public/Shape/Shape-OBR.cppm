@@ -117,7 +117,7 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
-		template<Core::Arithmetic U> [[nodiscard("Pure operator")]]
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator OBR<U>() const noexcept;
 
 		constexpr OBR& operator =(const OBR& other) noexcept = default;
@@ -403,7 +403,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	template<Core::Arithmetic U>
+	template<std::floating_point U>
 	constexpr OBR<T>::operator OBR<U>() const noexcept
 	{
 		OBR<U> answer;
