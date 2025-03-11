@@ -102,6 +102,10 @@ export namespace PonyMath::Core
 		/// @param column1 Column 1.
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix2x2(const Vector2<T>& column0, const Vector2<T>& column1) noexcept;
+		/// @brief Creates a matrix and assigns its components from column vector span.
+		/// @param columns Columns.
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Matrix2x2(std::span<const Vector2<T>, 2> columns) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p span.
 		/// @param span Span. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
@@ -518,6 +522,15 @@ namespace PonyMath::Core
 	{
 		Column(0, column0);
 		Column(1, column1);
+	}
+
+	template <Arithmetic T>
+	constexpr Matrix2x2<T>::Matrix2x2(const std::span<const Vector2<T>, 2> columns) noexcept
+	{
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			Column(i, columns[i]);
+		}
 	}
 
 	template<Arithmetic T>

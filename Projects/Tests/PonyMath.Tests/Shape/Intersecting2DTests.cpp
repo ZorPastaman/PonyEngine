@@ -529,5 +529,203 @@ namespace Shape
 			line = PonyMath::Shape::Line<float>(lineNormal, linePoint);
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(line, obr));
 		}
+
+		TEST_METHOD(AabrAabrTest)
+		{
+			constexpr auto aabr0Center = PonyMath::Core::Vector2<float>(3.f, 4.f);
+			constexpr auto aabr0Extents = PonyMath::Core::Vector2<float>(4.f, 5.f);
+			const auto aabr0 = PonyMath::Shape::AABR<float>(aabr0Center, aabr0Extents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr0, aabr0));
+
+			auto aabr1Center = PonyMath::Core::Vector2<float>(1.f, 3.f);
+			auto aabr1Extents = PonyMath::Core::Vector2<float>(1.f, 2.f);
+			auto aabr1 = PonyMath::Shape::AABR<float>(aabr1Center, aabr1Extents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr0, aabr1));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr1, aabr0));
+
+			aabr1Center = PonyMath::Core::Vector2<float>(5.f, 3.f);
+			aabr1Extents = PonyMath::Core::Vector2<float>(10.f, 2.f);
+			aabr1 = PonyMath::Shape::AABR<float>(aabr1Center, aabr1Extents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr0, aabr1));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr1, aabr0));
+
+			aabr1Center = PonyMath::Core::Vector2<float>(10.f, 3.f);
+			aabr1Extents = PonyMath::Core::Vector2<float>(2.f, 2.f);
+			aabr1 = PonyMath::Shape::AABR<float>(aabr1Center, aabr1Extents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr0, aabr1));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr1, aabr0));
+
+			aabr1Center = PonyMath::Core::Vector2<float>(2.f, 12.f);
+			aabr1Extents = PonyMath::Core::Vector2<float>(2.f, 2.f);
+			aabr1 = PonyMath::Shape::AABR<float>(aabr1Center, aabr1Extents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr0, aabr1));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr1, aabr0));
+		}
+
+		TEST_METHOD(AabrRayTest)
+		{
+			auto aabrCenter = PonyMath::Core::Vector2<float>(-0.5f, 1.f);
+			auto aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			auto aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			constexpr auto rayOrigin = PonyMath::Core::Vector2<float>(5.f, 7.f);
+			const auto rayDirection = PonyMath::Core::Vector2<float>(-0.4f, -0.7f).Normalized();
+			const auto ray = PonyMath::Shape::Ray2D<float>(rayOrigin, rayDirection);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray, 1.f));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr, ray, 100.f));
+
+			aabrExtents = PonyMath::Core::Vector2<float>(0.1f, 0.1f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray, 100.f));
+
+			aabrCenter = PonyMath::Core::Vector2<float>(0.f, 100.f);
+			aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, ray, 100.f));
+		}
+
+		TEST_METHOD(AabrLineTest)
+		{
+			auto aabrCenter = PonyMath::Core::Vector2<float>(-0.5f, 1.f);
+			auto aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			auto aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			const auto lineNormal = PonyMath::Core::Vector2<float>(1.f, 1.5f).Normalized();
+			const auto line = PonyMath::Shape::Line<float>(lineNormal, -4.f);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr, line));
+
+			aabrExtents = PonyMath::Core::Vector2<float>(0.1f, 0.1f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, line));
+
+			aabrCenter = PonyMath::Core::Vector2<float>(0.f, 100.f);
+			aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, line));
+		}
+
+		TEST_METHOD(AabrObrTest)
+		{
+			auto aabrCenter = PonyMath::Core::Vector2<float>(-0.5f, 1.f);
+			auto aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			auto aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			constexpr auto obrCenter = PonyMath::Core::Vector2<float>(1.f, 2.f);
+			constexpr auto obrExtents = PonyMath::Core::Vector2<float>(3.f, 3.f);
+			const auto obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 105.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabr, obr));
+
+			aabrCenter = PonyMath::Core::Vector2<float>(3.6f, 1.f);
+			aabrExtents = PonyMath::Core::Vector2<float>(1.f, 0.5f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabr, obr));
+		}
+
+		TEST_METHOD(ObrObrTest)
+		{
+			constexpr auto obr0Center = PonyMath::Core::Vector2<float>(5.f, 1.f);
+			auto obr0Extents = PonyMath::Core::Vector2<float>(2.f, 1.5f);
+			auto obr0 = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obr0Center, obr0Extents), 0.f);
+			constexpr auto obr1Center = PonyMath::Core::Vector2<float>(-3.f, 0.f);
+			constexpr auto obr1Extents = PonyMath::Core::Vector2<float>(1.f, 1.f);
+			const auto obr1 = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obr1Center, obr1Extents), 0.f);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr0, obr1));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr1, obr0));
+
+			obr0 = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obr0Center, obr0Extents), 170.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr0, obr1));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr1, obr0));
+
+			obr0Extents = PonyMath::Core::Vector2<float>(0.5f, 0.5f);
+			obr0 = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obr0Center, obr0Extents), 170.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr0, obr1));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr1, obr0));
+		}
+
+		TEST_METHOD(ObrRayTest)
+		{
+			auto aabrCenter = PonyMath::Core::Vector2<float>(-0.5f, 1.f);
+			auto aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			auto aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			auto obr = PonyMath::Shape::OBR<float>(aabr, 15.f * PonyMath::Core::DegToRad<float>);
+			constexpr auto rayOrigin = PonyMath::Core::Vector2<float>(5.f, 7.f);
+			const auto rayDirection = PonyMath::Core::Vector2<float>(-0.4f, -0.7f).Normalized();
+			const auto ray = PonyMath::Shape::Ray2D<float>(rayOrigin, rayDirection);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 1.f));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr, ray, 100.f));
+
+			aabrExtents = PonyMath::Core::Vector2<float>(0.1f, 0.1f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			obr = PonyMath::Shape::OBR<float>(aabr, 15.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 100.f));
+
+			aabrCenter = PonyMath::Core::Vector2<float>(0.f, 100.f);
+			aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			obr = PonyMath::Shape::OBR<float>(aabr, 15.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 100.f));
+
+			aabrCenter = PonyMath::Core::Vector2<float>(-1.f, 1.f);
+			aabrExtents = PonyMath::Core::Vector2<float>(2.f, 1.f);
+			aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			obr = PonyMath::Shape::OBR<float>(aabr, 45.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, ray, 100.f));
+		}
+
+		TEST_METHOD(ObrLineTest)
+		{
+			auto obrCenter = PonyMath::Core::Vector2<float>(6.f, 4.f);
+			auto obrExtents = PonyMath::Core::Vector2<float>(4.f, 3.f);
+			auto obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 5.f * PonyMath::Core::DegToRad<float>);
+			auto lineNormal = PonyMath::Core::Vector2<float>(1.f, -1.f).Normalized();
+			auto line = PonyMath::Shape::Line<float>(lineNormal, 0.f);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr, line));
+
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 105.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, line));
+
+			obrCenter = PonyMath::Core::Vector2<float>(-6.f, 4.f);
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 5.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, line));
+
+			obrCenter = PonyMath::Core::Vector2<float>(6.f, 4.f);
+			obrExtents = PonyMath::Core::Vector2<float>(0.3f, 0.2f);
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 5.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, line));
+		}
+
+		TEST_METHOD(ObrAabrTest)
+		{
+			auto obrCenter = PonyMath::Core::Vector2<float>(4.f, 2.f);
+			auto obrExtents = PonyMath::Core::Vector2<float>(3.f, 3.f);
+			auto obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 105.f * PonyMath::Core::DegToRad<float>);
+			auto aabrCenter = PonyMath::Core::Vector2<float>(-5.f, 1.f);
+			auto aabrExtents = PonyMath::Core::Vector2<float>(4.f, 6.f);
+			auto aabr = PonyMath::Shape::AABR<float>(aabrCenter, aabrExtents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obr, aabr));
+
+			obrCenter = PonyMath::Core::Vector2<float>(4.f, -20.f);
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 105.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, aabr));
+
+			obrCenter = PonyMath::Core::Vector2<float>(4.f, 2.f);
+			obrExtents = PonyMath::Core::Vector2<float>(0.3f, 0.1f);
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 50.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, aabr));
+
+			obrCenter = PonyMath::Core::Vector2<float>(4.f, 2.f);
+			obrExtents = PonyMath::Core::Vector2<float>(3.f, 3.f);
+			obr = PonyMath::Shape::OBR<float>(PonyMath::Shape::AABR<float>(obrCenter, obrExtents), 5.f * PonyMath::Core::DegToRad<float>);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obr, aabr));
+		}
 	};
 }

@@ -27,7 +27,7 @@ import :Ray2D;
 
 export namespace PonyMath::Shape
 {
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param left Left ray.
 	/// @param right Right ray.
@@ -36,7 +36,7 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray2D<T>& left, const Ray2D<T>& right, T leftMaxDistance = std::numeric_limits<T>::infinity(), T rightMaxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param ray Ray.
 	/// @param line Line.
@@ -44,7 +44,7 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray2D<T>& ray, const Line<T>& line, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param ray Ray.
 	/// @param aabr Axis-aligned bounding rect.
@@ -52,7 +52,7 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray2D<T>& ray, const AABR<T>& aabr, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param ray Ray.
 	/// @param obr Oriented bounding rect.
@@ -61,14 +61,14 @@ export namespace PonyMath::Shape
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray2D<T>& ray, const OBR<T>& obr, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param left Left line.
 	/// @param right Right line.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Line<T>& left, const Line<T>& right) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param line Line.
 	/// @param ray Ray.
@@ -76,14 +76,14 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Line<T>& line, const Ray2D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param line Line.
 	/// @param aabr Axis-aligned bounding rect.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Line<T>& line, const AABR<T>& aabr) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param line Line.
 	/// @param obr Oriented bounding rect.
@@ -91,14 +91,14 @@ export namespace PonyMath::Shape
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Line<T>& line, const OBR<T>& obr) noexcept;
 
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param left Left axis-aligned bounding rect.
 	/// @param right Right axis-aligned bounding rect.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABR<T>& left, const AABR<T>& right) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param aabr Axis-aligned bounding rect.
 	/// @param ray Ray.
@@ -106,14 +106,14 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABR<T>& aabr, const Ray2D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param aabr Axis-aligned bounding rect.
 	/// @param line Line.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABR<T>& aabr, const Line<T>& line) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param aabr Axis-aligned bounding rect.
 	/// @param obr Oriented bounding rect.
@@ -121,14 +121,14 @@ export namespace PonyMath::Shape
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABR<T>& aabr, const OBR<T>& obr) noexcept;
 
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param left Left oriented bounding rect.
 	/// @param right Right oriented bounding rect.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const OBR<T>& left, const OBR<T>& right) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param obr Oriented bounding rect.
 	/// @param ray Ray.
@@ -136,14 +136,14 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const OBR<T>& obr, const Ray2D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param obr Oriented bounding rect.
 	/// @param line Line.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const OBR<T>& obr, const Line<T>& line) noexcept;
-	/// @brief Checks if two objects are intersecting.
+	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param obr Oriented bounding rect.
 	/// @param aabr Axis-aligned bounding rect.
@@ -163,6 +163,7 @@ namespace PonyMath::Shape
 	bool AreIntersecting(const Line<T>& line, std::span<const Core::Vector2<T>> corners) noexcept;
 
 	/// @brief Checks if a rect intersects a convex shape described with the @p corners using separating axis theorem.
+	/// @note It's one step of the theorem. The calling function must call other steps.
 	/// @tparam T Component type.
 	/// @tparam CornerCount Corner count.
 	/// @param center Rect center.
@@ -232,7 +233,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const Ray2D<T>& ray, const OBR<T>& obr, const T maxDistance) noexcept
 	{
-		const Core::Matrix2x2<T> inverseRotation = Core::Matrix2x2<T>(obr.AxisX(), obr.AxisY()).Inverse();
+		const Core::Matrix2x2<T> inverseRotation = Core::Matrix2x2<T>(obr.Axes()).Transpose();
 		const Core::Vector2<T> origin = inverseRotation * (ray.Origin() - obr.Center());
 		const Core::Vector2<T> direction = inverseRotation * ray.Direction();
 		const auto rotatedRay = Ray2D<T>(origin, direction);
@@ -298,15 +299,15 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const AABR<T>& aabr, const OBR<T>& obr) noexcept
 	{
-		return CheckSat(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
-			CheckSat(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
+		return CheckSat<T, 4>(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
+			CheckSat<T, 4>(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
 	}
 
 	template<std::floating_point T>
 	bool AreIntersecting(const OBR<T>& left, const OBR<T>& right) noexcept
 	{
-		return CheckSat(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
-			CheckSat(right.Center(), right.Extents(), right.Axes(), left.Corners());
+		return CheckSat<T, 4>(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
+			CheckSat<T, 4>(right.Center(), right.Extents(), right.Axes(), left.Corners());
 	}
 
 	template<std::floating_point T>

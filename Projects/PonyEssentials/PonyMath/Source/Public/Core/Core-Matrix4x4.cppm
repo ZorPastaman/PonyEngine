@@ -118,6 +118,10 @@ export namespace PonyMath::Core
 		/// @param column3 Column 3.
 		[[nodiscard("Pure constructor")]]
 		constexpr Matrix4x4(const Vector4<T>& column0, const Vector4<T>& column1, const Vector4<T>& column2, const Vector4<T>& column3) noexcept;
+		/// @brief Creates a matrix and assigns its components from column vector span.
+		/// @param columns Columns.
+		[[nodiscard("Pure constructor")]]
+		explicit constexpr Matrix4x4(std::span<const Vector4<T>, 4> columns) noexcept;
 		/// @brief Creates a matrix and assigns its components from the @p span.
 		/// @param span Span. The matrix is column-major.
 		[[nodiscard("Pure constructor")]]
@@ -634,6 +638,15 @@ namespace PonyMath::Core
 		Column(1, column1);
 		Column(2, column2);
 		Column(3, column3);
+	}
+
+	template <Arithmetic T>
+	constexpr Matrix4x4<T>::Matrix4x4(std::span<const Vector4<T>, 4> columns) noexcept
+	{
+		for (std::size_t i = 0; i < Dimension; ++i)
+		{
+			Column(i, columns[i]);
+		}
 	}
 
 	template<Arithmetic T>

@@ -704,6 +704,90 @@ namespace Core
 			Assert::AreEqual(m33, matrix.M33());
 		}
 
+		TEST_METHOD(ConstructorColumnSpanShortTest)
+		{
+			constexpr std::int16_t m00 = 10;
+			constexpr std::int16_t m10 = -15;
+			constexpr std::int16_t m20 = 3;
+			constexpr std::int16_t m30 = 22;
+			constexpr std::int16_t m01 = 5;
+			constexpr std::int16_t m11 = -20;
+			constexpr std::int16_t m21 = 33;
+			constexpr std::int16_t m31 = 11;
+			constexpr std::int16_t m02 = 6;
+			constexpr std::int16_t m12 = 7;
+			constexpr std::int16_t m22 = 19;
+			constexpr std::int16_t m32 = -22;
+			constexpr std::int16_t m03 = -12;
+			constexpr std::int16_t m13 = 31;
+			constexpr std::int16_t m23 = -1;
+			constexpr std::int16_t m33 = 2;
+			constexpr auto column0 = PonyMath::Core::Vector4<std::int16_t>(m00, m10, m20, m30);
+			constexpr auto column1 = PonyMath::Core::Vector4<std::int16_t>(m01, m11, m21, m31);
+			constexpr auto column2 = PonyMath::Core::Vector4<std::int16_t>(m02, m12, m22, m32);
+			constexpr auto column3 = PonyMath::Core::Vector4<std::int16_t>(m03, m13, m23, m33);
+			constexpr auto columns = std::array{ column0, column1, column2, column3 };
+			const auto matrix = PonyMath::Core::Matrix4x4<std::int16_t>(columns);
+			Assert::AreEqual(m00, matrix.M00());
+			Assert::AreEqual(m10, matrix.M10());
+			Assert::AreEqual(m20, matrix.M20());
+			Assert::AreEqual(m30, matrix.M30());
+			Assert::AreEqual(m01, matrix.M01());
+			Assert::AreEqual(m11, matrix.M11());
+			Assert::AreEqual(m21, matrix.M21());
+			Assert::AreEqual(m31, matrix.M31());
+			Assert::AreEqual(m02, matrix.M02());
+			Assert::AreEqual(m12, matrix.M12());
+			Assert::AreEqual(m22, matrix.M22());
+			Assert::AreEqual(m32, matrix.M32());
+			Assert::AreEqual(m03, matrix.M03());
+			Assert::AreEqual(m13, matrix.M13());
+			Assert::AreEqual(m23, matrix.M23());
+			Assert::AreEqual(m33, matrix.M33());
+		}
+
+		TEST_METHOD(ConstructorColumnSpanFloatTest)
+		{
+			constexpr float m00 = 10;
+			constexpr float m10 = -15;
+			constexpr float m20 = 3;
+			constexpr float m30 = 22;
+			constexpr float m01 = 5;
+			constexpr float m11 = -20;
+			constexpr float m21 = 33;
+			constexpr float m31 = 11;
+			constexpr float m02 = 6;
+			constexpr float m12 = 7;
+			constexpr float m22 = 19;
+			constexpr float m32 = -22;
+			constexpr float m03 = -12;
+			constexpr float m13 = 31;
+			constexpr float m23 = -1;
+			constexpr float m33 = 2;
+			constexpr auto column0 = PonyMath::Core::Vector4<float>(m00, m10, m20, m30);
+			constexpr auto column1 = PonyMath::Core::Vector4<float>(m01, m11, m21, m31);
+			constexpr auto column2 = PonyMath::Core::Vector4<float>(m02, m12, m22, m32);
+			constexpr auto column3 = PonyMath::Core::Vector4<float>(m03, m13, m23, m33);
+			constexpr auto columns = std::array{ column0, column1, column2, column3 };
+			const auto matrix = PonyMath::Core::Matrix4x4<float>(columns);
+			Assert::AreEqual(m00, matrix.M00());
+			Assert::AreEqual(m10, matrix.M10());
+			Assert::AreEqual(m20, matrix.M20());
+			Assert::AreEqual(m30, matrix.M30());
+			Assert::AreEqual(m01, matrix.M01());
+			Assert::AreEqual(m11, matrix.M11());
+			Assert::AreEqual(m21, matrix.M21());
+			Assert::AreEqual(m31, matrix.M31());
+			Assert::AreEqual(m02, matrix.M02());
+			Assert::AreEqual(m12, matrix.M12());
+			Assert::AreEqual(m22, matrix.M22());
+			Assert::AreEqual(m32, matrix.M32());
+			Assert::AreEqual(m03, matrix.M03());
+			Assert::AreEqual(m13, matrix.M13());
+			Assert::AreEqual(m23, matrix.M23());
+			Assert::AreEqual(m33, matrix.M33());
+		}
+
 		TEST_METHOD(ConstructorSpanShortTest)
 		{
 			constexpr std::int16_t m00 = 10;
@@ -4269,6 +4353,7 @@ namespace Core
 			[[maybe_unused]] constexpr auto defaultMatrix = PonyMath::Core::Matrix4x4<std::int32_t>();
 			[[maybe_unused]] constexpr auto matrix = PonyMath::Core::Matrix4x4<std::int32_t>(4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8);
 			[[maybe_unused]] constexpr auto columnMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5));
+			[[maybe_unused]] constexpr auto columnSpanMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(std::array{ PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5), PonyMath::Core::Vector4<std::int32_t>(3, 6, 9, 5) });
 			[[maybe_unused]] constexpr auto arrayMatrix = PonyMath::Core::Matrix4x4<std::int32_t>(std::array<std::int32_t, 16>{4, 3, 9, 1, -8, -5, -4, 6, 7, 1, 5, -3, 6, 1, 6, 8});
 			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> copiedMatrix = matrix;
 			[[maybe_unused]] constexpr PonyMath::Core::Matrix4x4<std::int32_t> movedMatrix = MatrixConstexpr();
