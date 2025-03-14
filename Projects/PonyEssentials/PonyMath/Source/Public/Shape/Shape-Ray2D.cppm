@@ -45,7 +45,7 @@ export namespace PonyMath::Shape
 		constexpr const Core::Vector2<T>& Direction() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		constexpr Ray2D Flipped() const noexcept;
+		constexpr Ray2D Flipped() const noexcept; // TODO: Add project function
 		constexpr void Flip() noexcept;
 
 		[[nodiscard("Pure function")]]

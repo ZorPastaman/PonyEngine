@@ -641,7 +641,7 @@ namespace PonyMath::Core
 	}
 
 	template <Arithmetic T>
-	constexpr Matrix4x4<T>::Matrix4x4(std::span<const Vector4<T>, 4> columns) noexcept
+	constexpr Matrix4x4<T>::Matrix4x4(const std::span<const Vector4<T>, 4> columns) noexcept
 	{
 		for (std::size_t i = 0; i < Dimension; ++i)
 		{

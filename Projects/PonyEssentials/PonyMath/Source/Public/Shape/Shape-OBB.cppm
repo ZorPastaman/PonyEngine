@@ -48,7 +48,7 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr OBB(const AABB<T>& aabb) noexcept;
 		[[nodiscard("Pure constructor")]]
-		constexpr OBB(const AABB<T>& aabb, const Core::Quaternion<T>& quaternion) noexcept;
+		constexpr OBB(const AABB<T>& aabb, const Core::Quaternion<T>& quaternion) noexcept; // TODO: Add a bool to keep center
 		[[nodiscard("Pure constructor")]]
 		constexpr OBB(const AABB<T>& aabb, const Core::Matrix3x3<T>& rs) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -136,6 +136,9 @@ export namespace PonyMath::Shape
 
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
+
+		template<std::floating_point U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator OBB<U>() const noexcept;
 
 		constexpr OBB& operator =(const OBB& other) noexcept = default;
 		constexpr OBB& operator =(OBB&& other) noexcept = default;
@@ -489,6 +492,20 @@ namespace PonyMath::Shape
 		default:
 			break;
 		}
+	}
+
+	template <std::floating_point T>
+	template <std::floating_point U>
+	constexpr OBB<T>::operator OBB<U>() const noexcept
+	{
+		OBB<U> answer;
+		answer.center = static_cast<Core::Vector3<U>>(center);
+		answer.extents = static_cast<Core::Vector3<U>>(extents);
+		answer.axes[0] = static_cast<Core::Vector3<U>>(axes[0]);
+		answer.axes[1] = static_cast<Core::Vector3<U>>(axes[1]);
+		answer.axes[2] = static_cast<Core::Vector3<U>>(axes[2]);
+
+		return answer;
 	}
 
 	template<std::floating_point T>
