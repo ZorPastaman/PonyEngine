@@ -573,7 +573,7 @@ namespace PonyMath::Core
 	}
 
 	template <Arithmetic T>
-	constexpr Matrix3x3<T>::Matrix3x3(std::span<const Vector3<T>, 3> columns) noexcept
+	constexpr Matrix3x3<T>::Matrix3x3(const std::span<const Vector3<T>, 3> columns) noexcept
 	{
 		for (std::size_t i = 0; i < Dimension; ++i)
 		{

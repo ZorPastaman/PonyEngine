@@ -245,7 +245,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& left, const Line<T>& right) noexcept
 	{
-		return std::abs(Core::Dot(left.Normal(), right.Normal())) < T{1};
+		return std::abs(Core::Dot(left.Normal(), right.Normal())) < T{0.9999};
 	}
 
 	template<std::floating_point T>
@@ -257,7 +257,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& line, const AABR<T>& aabr) noexcept
 	{
-		const std::array<Core::Vector2<T>, 4> corners = aabr.Corners();
+		const std::array<Core::Vector2<T>, AABR<T>::CornerCount> corners = aabr.Corners();
 
 		return AreIntersecting(line, std::span<const Core::Vector2<T>>(corners.data(), corners.size()));
 	}
@@ -265,7 +265,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& line, const OBR<T>& obr) noexcept
 	{
-		const std::array<Core::Vector2<T>, 4> corners = obr.Corners();
+		const std::array<Core::Vector2<T>, OBR<T>::CornerCount> corners = obr.Corners();
 
 		return AreIntersecting(line, std::span<const Core::Vector2<T>>(corners.data(), corners.size()));
 	}
@@ -299,15 +299,15 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	bool AreIntersecting(const AABR<T>& aabr, const OBR<T>& obr) noexcept
 	{
-		return CheckSat<T, 4>(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
-			CheckSat<T, 4>(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
+		return CheckSat<T, OBR<T>::CornerCount>(aabr.Center(), aabr.Extents(), AABR<T>::Axes, obr.Corners()) &&
+			CheckSat<T, AABR<T>::CornerCount>(obr.Center(), obr.Extents(), obr.Axes(), aabr.Corners());
 	}
 
 	template<std::floating_point T>
 	bool AreIntersecting(const OBR<T>& left, const OBR<T>& right) noexcept
 	{
-		return CheckSat<T, 4>(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
-			CheckSat<T, 4>(right.Center(), right.Extents(), right.Axes(), left.Corners());
+		return CheckSat<T, OBR<T>::CornerCount>(left.Center(), left.Extents(), left.Axes(), right.Corners()) &&
+			CheckSat<T, OBR<T>::CornerCount>(right.Center(), right.Extents(), right.Axes(), left.Corners());
 	}
 
 	template<std::floating_point T>
@@ -349,7 +349,7 @@ namespace PonyMath::Shape
 	template<std::floating_point T, std::size_t CornerCount>
 	bool CheckSat(const Core::Vector2<T>& center, const Core::Vector2<T>& extents, const std::span<const Core::Vector2<T>, 2> axes, const std::span<const Core::Vector2<T>, CornerCount> corners)
 	{
-		for (std::size_t axisIndex = 0; axisIndex < 2; ++axisIndex)
+		for (std::size_t axisIndex = 0; axisIndex < Core::Vector2<T>::ComponentCount; ++axisIndex)
 		{
 			const Core::Vector2<T>& normal = axes[axisIndex];
 			const T extent = extents[axisIndex];
