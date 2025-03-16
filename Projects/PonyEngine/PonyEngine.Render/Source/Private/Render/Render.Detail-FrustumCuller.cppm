@@ -119,17 +119,17 @@ namespace PonyEngine::Render
 		{
 			for (const PonyMath::Core::Vector3<float>& boxAxis : obb.Axes())
 			{
-				const PonyMath::Core::Vector3<float> normal = PonyMath::Core::Cross(frustumEdge, boxAxis);
+				const PonyMath::Core::Vector3<float> axis = PonyMath::Core::Cross(frustumEdge, boxAxis);
 
 				std::array<float, CameraFrustum::CornerCount> frustumProjections;
 				for (std::size_t cornerIndex = 0; cornerIndex < CameraFrustum::CornerCount; ++cornerIndex)
 				{
-					frustumProjections[cornerIndex] = PonyMath::Core::Dot(normal, frustum.Corner(cornerIndex));
+					frustumProjections[cornerIndex] = PonyMath::Core::Dot(axis, frustum.Corner(cornerIndex));
 				}
 				std::array<float, PonyMath::Shape::OBB<float>::CornerCount> boxProjections;
 				for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::OBB<float>::CornerCount; ++cornerIndex)
 				{
-					boxProjections[cornerIndex] = PonyMath::Core::Dot(normal, boxCorners[cornerIndex]);
+					boxProjections[cornerIndex] = PonyMath::Core::Dot(axis, boxCorners[cornerIndex]);
 				}
 
 				const auto [frustumMin, frustumMax] = std::ranges::minmax_element(frustumProjections);
