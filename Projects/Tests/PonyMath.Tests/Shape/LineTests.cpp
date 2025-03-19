@@ -22,32 +22,51 @@ namespace Shape
 {
 	TEST_CLASS(LineTests)
 	{
-		TEST_METHOD(TypeTest)
+		TEST_METHOD(TypesTest)
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Line<float>::ValueType>);
 		}
 
-		TEST_METHOD(ConstructorTest)
+		TEST_METHOD(DefaultConstructorTest)
 		{
 			const auto defaultLine = PonyMath::Shape::Line<float>();
 			Assert::IsTrue(PonyMath::Core::Vector2<float>::Predefined::Up == defaultLine.Normal());
 			Assert::AreEqual(0.f, defaultLine.Distance());
+		}
 
+		TEST_METHOD(ConstructorTest)
+		{
 			const auto normal = PonyMath::Core::Vector2<float>(3.f, -2.f).Normalized();
 			constexpr float distance = 4.f;
 			const auto line = PonyMath::Shape::Line<float>(normal, distance);
 			Assert::IsTrue(normal == line.Normal());
 			Assert::AreEqual(distance, line.Distance());
+		}
 
+		TEST_METHOD(ConstructorPointTest)
+		{
+			const auto normal = PonyMath::Core::Vector2<float>(3.f, -2.f).Normalized();
 			const auto point = PonyMath::Core::Vector2<float>(-4.f, 3.f);
-			const auto pointedLine = PonyMath::Shape::Line<float>(normal, point);
-			Assert::IsTrue(normal == pointedLine.Normal());
-			Assert::AreEqual(0., static_cast<double>(pointedLine.Distance(point)), 0.0001);
+			const auto line = PonyMath::Shape::Line<float>(normal, point);
+			Assert::IsTrue(normal == line.Normal());
+			Assert::AreEqual(0., static_cast<double>(line.Distance(point)), 0.0001);
+		}
 
-			auto copied = line;
+		TEST_METHOD(CopyConstructorTest)
+		{
+			const auto normal = PonyMath::Core::Vector2<float>(3.f, -2.f).Normalized();
+			constexpr float distance = 4.f;
+			const auto line = PonyMath::Shape::Line<float>(normal, distance);
+			const auto copied = line;
 			Assert::IsTrue(line == copied);
+		}
 
-			const auto moved = std::move(copied);
+		TEST_METHOD(MoveConstructorTest)
+		{
+			const auto normal = PonyMath::Core::Vector2<float>(3.f, -2.f).Normalized();
+			constexpr float distance = 4.f;
+			auto line = PonyMath::Shape::Line<float>(normal, distance);
+			const auto moved = std::move(line);
 			Assert::IsTrue(line == moved);
 		}
 
@@ -257,6 +276,51 @@ namespace Shape
 			line.Distance() -= 1.f;
 			Assert::IsFalse(PonyMath::Shape::AreAlmostEqual(line, other));
 			Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(line, other, 5.f));
+		}
+
+		static constexpr PonyMath::Shape::Line<float> LineConstexpr()
+		{
+			auto line = PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Right, 2.f);
+			auto moved = std::move(line);
+
+			const auto normal = moved.Normal();
+			moved.Normal() = PonyMath::Core::Vector2<float>::Predefined::Up;
+			const float distance = moved.Distance();
+			moved.Distance() = 5.f;
+
+			moved.Flip();
+
+			auto copied = PonyMath::Shape::Line<float>(normal, distance);
+			copied = moved;
+			moved = std::move(copied);
+
+			return moved;
+		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			[[maybe_unused]] constexpr auto defaultLine = PonyMath::Shape::Line<float>();
+			[[maybe_unused]] constexpr auto line = PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Right, 2.f);
+			[[maybe_unused]] constexpr auto pointLine = PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Up, PonyMath::Core::Vector2<float>(4.f, -2.f));
+			[[maybe_unused]] constexpr auto copiedLine = line;
+			[[maybe_unused]] constexpr auto moved = LineConstexpr();
+
+			[[maybe_unused]] constexpr auto normal = line.Normal();
+			[[maybe_unused]] constexpr float distance = line.Distance();
+
+			[[maybe_unused]] constexpr auto flipped = line.Flipped();
+
+			[[maybe_unused]] constexpr auto distanceToPoint = line.Distance(PonyMath::Core::Vector2<float>::Predefined::Zero);
+			[[maybe_unused]] constexpr auto projected = line.Project(PonyMath::Core::Vector2<float>::Predefined::One);
+
+			[[maybe_unused]] constexpr auto side = line.Side(PonyMath::Core::Vector2<float>::Predefined::One);
+
+			[[maybe_unused]] constexpr auto converted = static_cast<PonyMath::Shape::Line<double>>(line);
+
+			[[maybe_unused]] constexpr bool equal = line == pointLine;
+			[[maybe_unused]] constexpr bool notEqual = line != pointLine;
+
+			[[maybe_unused]] constexpr bool areAlmostEqual = PonyMath::Shape::AreAlmostEqual(line, pointLine);
 		}
 	};
 }

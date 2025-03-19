@@ -202,7 +202,7 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept requires (std::is_floating_point_v<T>);
 
-		/// @brief Checks if the AABR contains the point.
+		/// @brief Checks if the AABR contains the @p point.
 		/// @param point Point to check.
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
@@ -233,7 +233,7 @@ export namespace PonyMath::Shape
 	};
 
 	/// @brief Checks if the two AABRs are almost equal with the tolerance value.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param left Left rect.
 	/// @param right Right rect.
 	/// @param tolerance Tolerance value. Must be positive.
@@ -242,7 +242,7 @@ export namespace PonyMath::Shape
 	constexpr bool AreAlmostEqual(const AABR<T>& left, const AABR<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Puts aabr.ToString() into the @p stream.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param stream Target stream.
 	/// @param aabr Source AABR.
 	/// @return @p stream.
