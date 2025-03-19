@@ -20,7 +20,7 @@ import PonyMath.Core;
 export namespace PonyMath::Utility
 {
 	/// @brief Resolution.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	template<std::unsigned_integral T>
 	class Resolution final
 	{
@@ -110,7 +110,7 @@ export namespace PonyMath::Utility
 	};
 
 	/// @brief Puts @p resolution.ToString() into the @p stream.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param stream Stream.
 	/// @param resolution Resolution.
 	/// @return @p stream.

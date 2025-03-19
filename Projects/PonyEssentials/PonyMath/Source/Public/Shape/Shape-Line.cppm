@@ -11,12 +11,12 @@ export module PonyMath.Shape:Line;
 
 import <cmath>;
 import <concepts>;
+import <cstdint>;
 import <format>;
+import <ostream>;
 import <string>;
 
 import PonyMath.Core;
-
-import :Ray2D;
 
 export namespace PonyMath::Shape
 {
@@ -52,7 +52,7 @@ export namespace PonyMath::Shape
 		/// @param point1 Point 1.
 		/// @return Creates line.
 		[[nodiscard("Pure function")]]
-		static constexpr Line Create(const Core::Vector2<T>& point0, const Core::Vector2<T>& point1) noexcept;
+		static Line Create(const Core::Vector2<T>& point0, const Core::Vector2<T>& point1) noexcept;
 
 		constexpr ~Line() noexcept = default;
 
@@ -133,7 +133,7 @@ export namespace PonyMath::Shape
 	constexpr bool AreAlmostEqual(const Line<T>& left, const Line<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Puts line.ToString() into the @p stream.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param stream Target stream.
 	/// @param line Source line.
 	/// @return @p stream.
@@ -165,7 +165,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	constexpr Line<T> Line<T>::Create(const Core::Vector2<T>& point0, const Core::Vector2<T>& point1) noexcept
+	Line<T> Line<T>::Create(const Core::Vector2<T>& point0, const Core::Vector2<T>& point1) noexcept
 	{
 		const Core::Vector2<T> inlineVector = point1 - point0;
 		const Core::Vector2<T> normal = Core::Vector2<T>(-inlineVector.Y(), inlineVector.X()).Normalized();

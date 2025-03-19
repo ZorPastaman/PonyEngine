@@ -24,7 +24,7 @@ import PonyMath.Core;
 export namespace PonyMath::Shape
 {
 	/// @brief Rectangle implementation.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	template<Core::Arithmetic T>
 	class Rect final
 	{
@@ -239,7 +239,7 @@ export namespace PonyMath::Shape
 	};
 
 	/// @brief Checks if the two rects are almost equal with the tolerance value.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param left Left rect.
 	/// @param right Right rect.
 	/// @param tolerance Tolerance value. Must be positive.
@@ -248,7 +248,7 @@ export namespace PonyMath::Shape
 	constexpr bool AreAlmostEqual(const Rect<T>& left, const Rect<T>& right, T tolerance = T{0.00001}) noexcept;
 
 	/// @brief Puts rect.ToString() into the @p stream.
-	/// @tparam T Value type.
+	/// @tparam T Component type.
 	/// @param stream Target stream.
 	/// @param rect Source rect.
 	/// @return @p stream.
