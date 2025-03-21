@@ -93,7 +93,10 @@
     <ClCompile Include="Shape\LineTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Shape\OBBTest.cpp">
+    <ClCompile Include="Shape\OBBTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Shape\OBRTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

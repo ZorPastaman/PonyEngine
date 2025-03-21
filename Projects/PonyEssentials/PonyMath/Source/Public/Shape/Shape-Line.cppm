@@ -120,7 +120,7 @@ export namespace PonyMath::Shape
 
 	private:
 		Core::Vector2<T> normal; ///< Normal.
-		T distance; ///< Distance between the line and the origin. If it's positive, the normal look at the origin; otherwise it look away from it.
+		T distance; ///< Distance between the line and the origin. If it's positive, the normal looks at the origin; otherwise it looks away from it.
 	};
 
 	/// @brief Checks if the two lines are almost equal with the tolerance value.

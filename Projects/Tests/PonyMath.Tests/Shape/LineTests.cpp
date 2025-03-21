@@ -25,6 +25,7 @@ namespace Shape
 		TEST_METHOD(TypesTest)
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Line<float>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::Line<double>::ValueType>);
 		}
 
 		TEST_METHOD(DefaultConstructorTest)

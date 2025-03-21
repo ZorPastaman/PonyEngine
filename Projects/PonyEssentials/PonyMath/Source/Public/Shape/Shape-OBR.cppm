@@ -11,7 +11,10 @@ export module PonyMath.Shape:OBR;
 
 import <array>;
 import <concepts>;
+import <cmath>;
+import <cstddef>;
 import <format>;
+import <ostream>;
 import <span>;
 import <string>;
 
@@ -21,36 +24,59 @@ import :AABR;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Oriented bounding rect implementation.
+	/// @tparam T Component type.
 	template<std::floating_point T>
 	class OBR final
 	{
 	public:
 		using ValueType = T; ///< Value type.
 
-		static constexpr std::size_t AxesCount = 2;
+		static constexpr std::size_t AxesCount = 2; ///< Axes count.
 
-		static constexpr std::size_t LeftBottomIndex = 0;
-		static constexpr std::size_t RightBottomIndex = 1;
-		static constexpr std::size_t LeftTopIndex = 2;
-		static constexpr std::size_t RightTopIndex = 3;
-		static constexpr std::size_t CornerCount = 4;
+		static constexpr std::size_t LeftBottomIndex = 0; ///< Left bottom corner index.
+		static constexpr std::size_t RightBottomIndex = 1; ///< Right bottom corner index.
+		static constexpr std::size_t LeftTopIndex = 2; ///< Left top corner index.
+		static constexpr std::size_t RightTopIndex = 3; ///< Right top corner index.
+		static constexpr std::size_t CornerCount = 4; ///< Corner count.
 
+		/// @brief Creates a zero OBR.
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR() noexcept;
+		/// @brief Creates an OBR that covers the same space as the @p aabr.
+		/// @param aabr Axis-aligned bounding rect.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr OBR(const AABR<T>& aabr) noexcept;
+		/// @brief Creates an OBR that is the @p aabr rotated with the @p angle.
+		/// @param aabr Axis-aligned bounding rect.
+		/// @param angle Rotation angle in radians.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const AABR<T>& aabr, T angle) noexcept;
+		OBR(const AABR<T>& aabr, T angle) noexcept;
+		/// @brief Creates an OBR that is the @p aabr transformed with the @p rs matrix.
+		/// @param aabr Axis-aligned bounding rect.
+		/// @param rs Rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept;
+		OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept;
+		/// @brief Creates an OBR that is the @p aabr transformed with the @p trs matrix.
+		/// @param aabr Axis-aligned bounding rect.
+		/// @param trs Translation-rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept;
+		OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept;
+		/// @brief Creates an OBR that is the @p obr rotated with the @p angle.
+		/// @param obr Oriented bounding rect.
+		/// @param angle Rotation angle in radians.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const OBR& obr, T angle) noexcept;
+		OBR(const OBR& obr, T angle) noexcept;
+		/// @brief Creates an OBR that is the @p obr transformed with the @p rs matrix.
+		/// @param obr Oriented bounding rect.
+		/// @param rs Rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept;
+		OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept;
+		/// @brief Creates an OBR that is the @p obr transformed with the @p trs matrix.
+		/// @param obr Oriented bounding rect.
+		/// @param trs Translation-rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
-		constexpr OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept;
+		OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept;
 		[[nodiscard("Pure constructor")]]
 		constexpr OBR(const OBR& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,65 +84,112 @@ export namespace PonyMath::Shape
 
 		constexpr ~OBR() noexcept = default;
 
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Center() const noexcept;
+		/// @brief Gets the x-extent.
+		/// @return X-extent.
 		[[nodiscard("Pure function")]]
 		constexpr const T& ExtentX() const noexcept;
+		/// @brief Gets the y-extent.
+		/// @return Y-extent.
 		[[nodiscard("Pure function")]]
 		constexpr const T& ExtentY() const noexcept;
+		/// @brief Gets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y.
+		/// @return Extent.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Extent(std::size_t index) const noexcept;
+		/// @brief Gets the extents.
+		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Extents() const noexcept;
+		/// @brief Gets the x-axis.
+		/// @return X-axis.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& AxisX() const noexcept;
+		/// @brief Gets the y-axis.
+		/// @return Y-axis.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& AxisY() const noexcept;
+		/// @brief Gets an axis by the @p index.
+		/// @param index Axis index. 0 -> x, 1 -> y.
+		/// @return Axis.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Axis(std::size_t index) const noexcept;
+		/// @brief Gets the axes.
+		/// @return Axes.
 		[[nodiscard("Pure function")]]
 		constexpr std::span<const Core::Vector2<T>, 2> Axes() const noexcept;
 
-		[[nodiscard("Pure function")]]
-		Core::Vector2<T> LeftBottom() const noexcept;
-		[[nodiscard("Pure function")]]
-		Core::Vector2<T> RightBottom() const noexcept;
-		[[nodiscard("Pure function")]]
-		Core::Vector2<T> LeftTop() const noexcept;
-		[[nodiscard("Pure function")]]
-		Core::Vector2<T> RightTop() const noexcept;
-		[[nodiscard("Pure function")]]
-		Core::Vector2<T> Corner(std::size_t index) const noexcept;
-		[[nodiscard("Pure function")]]
-		std::array<Core::Vector2<T>, 4> Corners() const noexcept;
-
+		/// @brief Calculates a width.
+		/// @return Width.
 		[[nodiscard("Pure function")]]
 		constexpr T Width() const noexcept;
+		/// @brief Calculates a height.
+		/// @return Height.
 		[[nodiscard("Pure function")]]
 		constexpr T Height() const noexcept;
+		/// @brief Calculates a size by the @p index.
+		/// @param index Size index. 0 -> x, y -> 1.
+		/// @return Size.
 		[[nodiscard("Pure function")]]
 		constexpr T Size(std::size_t index) const noexcept;
 
-		/// @brief Computes a perimeter.
+		/// @brief Calculates a left bottom point.
+		/// @return Left bottom point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> LeftBottom() const noexcept;
+		/// @brief Calculates a right bottom point.
+		/// @return Left bottom point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> RightBottom() const noexcept;
+		/// @brief Calculates a left top point.
+		/// @return Left bottom point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> LeftTop() const noexcept;
+		/// @brief Calculates a right top point.
+		/// @return Left bottom point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> RightTop() const noexcept;
+		/// @brief Calculates a corner by the @p index.
+		/// @param index Corner index.
+		/// @return Corner.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> Corner(std::size_t index) const noexcept;
+		/// @brief Calculates corners.
+		/// @return Corners.
+		[[nodiscard("Pure function")]]
+		constexpr std::array<Core::Vector2<T>, 4> Corners() const noexcept;
+
+		/// @brief Calculates a perimeter.
 		/// @return Perimeter.
 		[[nodiscard("Pure function")]]
 		constexpr T Perimeter() const noexcept;
-		/// @brief Computes an area.
+		/// @brief Calculates an area.
 		/// @return Area.
 		[[nodiscard("Pure function")]]
 		constexpr T Area() const noexcept;
 
-		/// @brief Checks if all the rect data is finite.
+		/// @brief Checks if all the OBR data is finite.
 		/// @return @a True if they are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
+		/// @brief Checks if the OBR contains the @p point.
+		/// @param point Point to check.
+		/// @return @a True if the OBR contains the @p point; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector2<T>& point) const noexcept;
 
+		/// @brief Creates a string representing the OBR.
+		/// @return String representing the OBR.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts the OBR to an OBR of another type.
+		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator OBR<U>() const noexcept;
 
@@ -127,16 +200,31 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const OBR& other) const noexcept = default;
 
 	private:
+		/// @brief Makes every axis unit and multiplies extents by their magnitudes. It also solves zero-length axes.
 		void ResolveExtentsAxes() noexcept;
 
-		Core::Vector2<T> center;
-		Core::Vector2<T> extents;
-		std::array<Core::Vector2<T>, 2> axes;
+		Core::Vector2<T> center; ///< Center.
+		Core::Vector2<T> extents; ///< Extents.
+		std::array<Core::Vector2<T>, 2> axes; ///< Axes in order x, y.
+
+		template<std::floating_point U>
+		friend class OBR;
 	};
 
+	/// @brief Checks if the two OBRs are almost equal with the tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left OBR.
+	/// @param right Right OBR.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr bool AreAlmostEqual(const OBR<T>& left, const OBR<T>& right, T tolerance = T{0.00001}) noexcept;
 
+	/// @brief Puts obr.ToString() into the @p stream.
+	/// @tparam T Component type.
+	/// @param stream Target stream.
+	/// @param obr Source OBR.
+	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const OBR<T>& obr);
 }
@@ -145,7 +233,9 @@ namespace PonyMath::Shape
 {
 	template<std::floating_point T>
 	constexpr OBR<T>::OBR() noexcept :
-		axes{ Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up }
+		center(),
+		extents(),
+		axes(AABR<T>::Axes)
 	{
 	}
 
@@ -153,55 +243,71 @@ namespace PonyMath::Shape
 	constexpr OBR<T>::OBR(const AABR<T>& aabr) noexcept :
 		center(aabr.Center()),
 		extents(aabr.Extents()),
-		axes{ Core::Vector2<T>::Predefined::Right, Core::Vector2<T>::Predefined::Up }
+		axes(AABR<T>::Axes)
 	{
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const AABR<T>& aabr, const T angle) noexcept :
+	OBR<T>::OBR(const AABR<T>& aabr, const T angle) noexcept :
 		OBR(aabr, Core::RotationMatrix(angle))
 	{
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept :
+	OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix2x2<T>& rs) noexcept :
 		center(rs * aabr.Center()),
-		extents(aabr.Extents()),
-		axes{ rs * AABR<T>::Axes[0], rs * AABR<T>::Axes[1] }
+		extents(aabr.Extents())
 	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			axes[i] = rs.Column(i);
+		}
+
 		ResolveExtentsAxes();
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept :
+	OBR<T>::OBR(const AABR<T>& aabr, const Core::Matrix3x3<T>& trs) noexcept :
 		center(Core::TransformPoint(trs, aabr.Center())),
-		extents(aabr.Extents()),
-		axes{ Core::TransformDirection(trs, AABR<T>::Axes[0]), Core::TransformDirection(trs, AABR<T>::Axes[1]) }
+		extents(aabr.Extents())
 	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			axes[i] = PonyMath::Core::Vector2<T>(trs.Span(i).template subspan<0, 2>());
+		}
+
 		ResolveExtentsAxes();
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const OBR& obr, const T angle) noexcept :
+	OBR<T>::OBR(const OBR& obr, const T angle) noexcept :
 		OBR(obr, Core::RotationMatrix(angle))
 	{
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept :
+	OBR<T>::OBR(const OBR& obr, const Core::Matrix2x2<T>& rs) noexcept :
 		center(rs * obr.Center()),
-		extents(obr.Extents()),
-		axes{ rs * obr.AxisX(), rs * obr.AxisY() }
+		extents(obr.Extents())
 	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			axes[i] = rs * obr.Axis(i);
+		}
+
 		ResolveExtentsAxes();
 	}
 
 	template<std::floating_point T>
-	constexpr OBR<T>::OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept :
+	OBR<T>::OBR(const OBR& obr, const Core::Matrix3x3<T>& trs) noexcept :
 		center(Core::TransformPoint(trs, obr.Center())),
-		extents(obr.Extents()),
-		axes{ Core::TransformDirection(trs, obr.AxisX()), Core::TransformDirection(trs, obr.AxisY()) }
+		extents(obr.Extents())
 	{
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			axes[i] = Core::TransformDirection(trs, obr.Axis(i));
+		}
+
 		ResolveExtentsAxes();
 	}
 
@@ -260,31 +366,49 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	Core::Vector2<T> OBR<T>::LeftBottom() const noexcept
+	constexpr T OBR<T>::Width() const noexcept
+	{
+		return Size(0);
+	}
+
+	template<std::floating_point T>
+	constexpr T OBR<T>::Height() const noexcept
+	{
+		return Size(1);
+	}
+
+	template<std::floating_point T>
+	constexpr T OBR<T>::Size(const std::size_t index) const noexcept
+	{
+		return Extent(index) * T{2};
+	}
+
+	template<std::floating_point T>
+	constexpr Core::Vector2<T> OBR<T>::LeftBottom() const noexcept
 	{
 		return Center() - AxisX() * ExtentX() - AxisY() * ExtentY();
 	}
 
 	template<std::floating_point T>
-	Core::Vector2<T> OBR<T>::RightBottom() const noexcept
+	constexpr Core::Vector2<T> OBR<T>::RightBottom() const noexcept
 	{
 		return Center() + AxisX() * ExtentX() - AxisY() * ExtentY();
 	}
 
 	template<std::floating_point T>
-	Core::Vector2<T> OBR<T>::LeftTop() const noexcept
+	constexpr Core::Vector2<T> OBR<T>::LeftTop() const noexcept
 	{
 		return Center() - AxisX() * ExtentX() + AxisY() * ExtentY();
 	}
 
 	template<std::floating_point T>
-	Core::Vector2<T> OBR<T>::RightTop() const noexcept
+	constexpr Core::Vector2<T> OBR<T>::RightTop() const noexcept
 	{
 		return Center() + AxisX() * ExtentX() + AxisY() * ExtentY();
 	}
 
 	template<std::floating_point T>
-	Core::Vector2<T> OBR<T>::Corner(const std::size_t index) const noexcept
+	constexpr Core::Vector2<T> OBR<T>::Corner(const std::size_t index) const noexcept
 	{
 		const T extentX = index & 1 ? ExtentX() : -ExtentX();
 		const T extentY = index & 2 ? ExtentY() : -ExtentY();
@@ -293,7 +417,7 @@ namespace PonyMath::Shape
 	}
 
 	template<std::floating_point T>
-	std::array<Core::Vector2<T>, 4> OBR<T>::Corners() const noexcept
+	constexpr std::array<Core::Vector2<T>, 4> OBR<T>::Corners() const noexcept
 	{
 		const Core::Vector2<T> extentX = AxisX() * ExtentX();
 		const Core::Vector2<T> extentY = AxisY() * ExtentY();
@@ -305,24 +429,6 @@ namespace PonyMath::Shape
 			center - extentX + extentY,
 			center + extentX + extentY
 		};
-	}
-
-	template<std::floating_point T>
-	constexpr T OBR<T>::Width() const noexcept
-	{
-		return ExtentX() * T{2};
-	}
-
-	template<std::floating_point T>
-	constexpr T OBR<T>::Height() const noexcept
-	{
-		return ExtentY() * T{2};
-	}
-
-	template<std::floating_point T>
-	constexpr T OBR<T>::Size(const std::size_t index) const noexcept
-	{
-		return Extent(index) * T{2};
 	}
 
 	template<std::floating_point T>
@@ -370,12 +476,12 @@ namespace PonyMath::Shape
 		std::size_t incorrectFlags = 0;
 		for (std::size_t i = 0; i < axes.size(); ++i)
 		{
-			if (const T multiplier = axes[i].Magnitude(); multiplier > T{0.0001})
+			if (const T multiplier = axes[i].Magnitude(); multiplier > T{0.0001}) [[likely]]
 			{
 				extents[i] *= multiplier;
 				axes[i] *= T{1} / multiplier;
 			}
-			else
+			else [[unlikely]]
 			{
 				incorrectFlags |= std::size_t{1} << i;
 			}
@@ -397,7 +503,7 @@ namespace PonyMath::Shape
 			axes[0] = Core::Vector2<T>::Predefined::Right;
 			axes[1] = Core::Vector2<T>::Predefined::Up;
 			break;
-		default:
+		default: [[likely]]
 			break;
 		}
 	}
@@ -409,8 +515,10 @@ namespace PonyMath::Shape
 		OBR<U> answer;
 		answer.center = static_cast<Core::Vector2<U>>(center);
 		answer.extents = static_cast<Core::Vector2<U>>(extents);
-		answer.axes[0] = static_cast<Core::Vector2<U>>(axes[0]);
-		answer.axes[1] = static_cast<Core::Vector2<U>>(axes[1]);
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			answer.axes[i] = static_cast<Core::Vector2<U>>(axes[i]);
+		}
 
 		return answer;
 	}
