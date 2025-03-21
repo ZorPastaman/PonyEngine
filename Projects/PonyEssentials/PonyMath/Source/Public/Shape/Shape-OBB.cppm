@@ -51,32 +51,32 @@ export namespace PonyMath::Shape
 		/// @param aabb Axis-aligned bounding box.
 		[[nodiscard("Pure constructor")]]
 		explicit constexpr OBB(const AABB<T>& aabb) noexcept;
-		/// @brief Creates an OBB that is the @p aabb rotated with @p the quaternion.
+		/// @brief Creates an OBB that is the @p aabb rotated with the @p quaternion.
 		/// @param aabb Axis-aligned bounding box.
 		/// @param quaternion Rotation around origin.
 		[[nodiscard("Pure constructor")]]
 		OBB(const AABB<T>& aabb, const Core::Quaternion<T>& quaternion) noexcept;
-		/// @brief Creates an OBB that is the @p aabb transformed with @p the rs matrix.
+		/// @brief Creates an OBB that is the @p aabb transformed with the @p rs matrix.
 		/// @param aabb Axis-aligned bounding box.
 		/// @param rs Rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
 		OBB(const AABB<T>& aabb, const Core::Matrix3x3<T>& rs) noexcept;
-		/// @brief Creates an OBB that is the @p aabb transformed with @p the trs matrix.
+		/// @brief Creates an OBB that is the @p aabb transformed with the @p trs matrix.
 		/// @param aabb Axis-aligned bounding box.
 		/// @param trs Translation-rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
 		OBB(const AABB<T>& aabb, const Core::Matrix4x4<T>& trs) noexcept;
-		/// @brief Creates an OBB that is the @p OBB rotated with @p the quaternion.
+		/// @brief Creates an OBB that is the @p obb rotated with the @p quaternion.
 		/// @param obb Oriented bounding box.
 		/// @param quaternion Rotation around origin.
 		[[nodiscard("Pure constructor")]]
 		OBB(const OBB& obb, const Core::Quaternion<T>& quaternion) noexcept;
-		/// @brief Creates an OBB that is the @p OBB transformed with @p the rs matrix.
+		/// @brief Creates an OBB that is the @p obb transformed with the @p rs matrix.
 		/// @param obb Oriented bounding box.
 		/// @param rs Rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
 		OBB(const OBB& obb, const Core::Matrix3x3<T>& rs) noexcept;
-		/// @brief Creates an OBB that is the @p OBB transformed with @p the trs matrix.
+		/// @brief Creates an OBB that is the @p obb transformed with the @p trs matrix.
 		/// @param obb Oriented bounding box.
 		/// @param trs Translation-rotation-scaling matrix.
 		[[nodiscard("Pure constructor")]]
@@ -153,44 +153,44 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr T Size(std::size_t index) const noexcept;
 
-		/// @brief Gets the (MinX, MinY, MinZ) point.
+		/// @brief Calculates a left bottom near point.
 		/// @return Left bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftBottomNear() const noexcept;
-		/// @brief Gets the (MaxX, MinY, MinZ) point.
+		/// @brief Calculates a right bottom near point.
 		/// @return Right bottom near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightBottomNear() const noexcept;
-		/// @brief Gets the (MinX, MaxY, MinZ) point.
+		/// @brief Calculates a left top near point.
 		/// @return Left top near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftTopNear() const noexcept;
-		/// @brief Gets the (MaxX, MaxY, MinZ) point.
+		/// @brief Calculates a right near point.
 		/// @return Right top near point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightTopNear() const noexcept;
-		/// @brief Gets the (MinX, MinY, MaxZ) point.
+		/// @brief Calculates a left bottom far point.
 		/// @return Left bottom far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftBottomFar() const noexcept;
-		/// @brief Gets the (MaxX, MinY, MaxZ) point.
+		/// @brief Calculates a right bottom far point.
 		/// @return Right bottom far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightBottomFar() const noexcept;
-		/// @brief Gets the (MinX, MaxY, MaxZ) point.
+		/// @brief Calculates a left top far point.
 		/// @return Left top far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> LeftTopFar() const noexcept;
-		/// @brief Gets the (MaxX, MaxY, MaxZ) point.
+		/// @brief Calculates a right top far point.
 		/// @return Right top far point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> RightTopFar() const noexcept;
-		/// @brief Gets the corner by the @p index.
+		/// @brief Calculates a corner by the @p index.
 		/// @param index Corner index.
 		/// @return Corner.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Corner(std::size_t index) const noexcept;
-		/// @brief Gets the corners.
+		/// @brief Calculates corners.
 		/// @return Corners.
 		[[nodiscard("Pure function")]]
 		constexpr std::array<Core::Vector3<T>, 8> Corners() const noexcept;
@@ -645,7 +645,7 @@ namespace PonyMath::Shape
 	template <std::floating_point T>
 	Core::Vector3<T> RandomPerpendicular(const Core::Vector3<T>& vector) noexcept
 	{
-		const Core::Vector3<T>& right = std::abs(vector.X()) > T{0.0001} ? Core::Vector3<T>::Predefined::Up : Core::Vector3<T>::Predefined::Right;
+		const Core::Vector3<T>& right = std::abs(vector.X()) > T{0.5} ? Core::Vector3<T>::Predefined::Up : Core::Vector3<T>::Predefined::Right;
 
 		return Core::Cross(vector, right);
 	}

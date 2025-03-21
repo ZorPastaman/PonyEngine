@@ -33,7 +33,8 @@
     <ClCompile Include="Shape\Inside2DTests.cpp" />
     <ClCompile Include="Shape\Intersecting3DTests.cpp" />
     <ClCompile Include="Shape\LineTests.cpp" />
-    <ClCompile Include="Shape\OBBTest.cpp" />
+    <ClCompile Include="Shape\OBBTests.cpp" />
+    <ClCompile Include="Shape\OBRTests.cpp" />
     <ClCompile Include="Shape\RectTests.cpp" />
     <ClCompile Include="Space\Transform2DTests.cpp" />
     <ClCompile Include="Space\Transform3DTests.cpp" />

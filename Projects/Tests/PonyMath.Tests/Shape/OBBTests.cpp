@@ -20,11 +20,12 @@ using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
 namespace Shape
 {
-	TEST_CLASS(OBBTest)
+	TEST_CLASS(OBBTests)
 	{
 		TEST_METHOD(TypesTest)
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::OBB<float>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::OBB<double>::ValueType>);
 		}
 
 		TEST_METHOD(StaticDataTest)
@@ -165,7 +166,7 @@ namespace Shape
 		TEST_METHOD(ResolveExtentsAxesTest)
 		{
 			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
-			auto rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
+			const auto rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
 			auto scaling = PonyMath::Core::Vector3<float>(-2.f, 1.2f, 2.2f);
 			auto rs = PonyMath::Core::RsMatrix(rotation, scaling);
 			auto obb = PonyMath::Shape::OBB<float>(aabb, rs);
@@ -206,7 +207,7 @@ namespace Shape
 			rs = PonyMath::Core::RsMatrix(rotation, scaling);
 			obb = PonyMath::Shape::OBB<float>(aabb, rs);
 			axisZ = (rs * PonyMath::Shape::AABB<float>::Axes[2]).Normalized();
-			axisX = PonyMath::Core::Cross(axisZ, PonyMath::Core::Vector3<float>::Predefined::Up).Normalized();
+			axisX = PonyMath::Core::Cross(axisZ, PonyMath::Core::Vector3<float>::Predefined::Right).Normalized();
 			axisY = PonyMath::Core::Cross(axisZ, axisX);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(rs * aabb.Center(), obb.Center()));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Abs(PonyMath::Core::Multiply(aabb.Extents(), scaling)), obb.Extents()));
@@ -242,7 +243,7 @@ namespace Shape
 			rs = PonyMath::Core::RsMatrix(rotation, scaling);
 			obb = PonyMath::Shape::OBB<float>(aabb, rs);
 			axisX = (rs * PonyMath::Shape::AABB<float>::Axes[0]).Normalized();
-			axisY = PonyMath::Core::Cross(axisX, PonyMath::Core::Vector3<float>::Predefined::Up).Normalized();
+			axisY = PonyMath::Core::Cross(axisX, PonyMath::Core::Vector3<float>::Predefined::Right).Normalized();
 			axisZ = PonyMath::Core::Cross(axisX, axisY);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(rs * aabb.Center(), obb.Center()));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Abs(PonyMath::Core::Multiply(aabb.Extents(), scaling)), obb.Extents()));
@@ -261,44 +262,44 @@ namespace Shape
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisX, obb.AxisX()));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisY, obb.AxisY()));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisZ, obb.AxisZ()));
+		}
 
-			rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, 0.f, 0.f));
-			scaling = PonyMath::Core::Vector3<float>(0.f, 0.f, 2.2f);
-			rs = PonyMath::Core::RsMatrix(rotation, scaling);
-			obb = PonyMath::Shape::OBB<float>(aabb, rs);
-			axisX = PonyMath::Shape::AABB<float>::Axes[1];
-			axisY = -PonyMath::Shape::AABB<float>::Axes[0];
-			axisZ = PonyMath::Shape::AABB<float>::Axes[2];
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(rs * aabb.Center(), obb.Center()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Abs(PonyMath::Core::Multiply(aabb.Extents(), scaling)), obb.Extents()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisX, obb.AxisX()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisY, obb.AxisY()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisZ, obb.AxisZ()));
+		TEST_METHOD(CenterTest)
+		{
+			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
+			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
+			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * aabb.Center(), obb.Center()));
+		}
 
-			scaling = PonyMath::Core::Vector3<float>(0.f, 1.2f, 0.f);
-			rs = PonyMath::Core::RsMatrix(rotation, scaling);
-			obb = PonyMath::Shape::OBB<float>(aabb, rs);
-			axisX = -PonyMath::Shape::AABB<float>::Axes[2];
-			axisY = PonyMath::Shape::AABB<float>::Axes[1];
-			axisZ = PonyMath::Shape::AABB<float>::Axes[0];
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(rs * aabb.Center(), obb.Center()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Abs(PonyMath::Core::Multiply(aabb.Extents(), scaling)), obb.Extents()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisX, obb.AxisX()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisY, obb.AxisY()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisZ, obb.AxisZ()));
+		TEST_METHOD(ExtentsTest)
+		{
+			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
+			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
+			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
+			Assert::AreEqual(aabb.ExtentX(), obb.ExtentX());
+			Assert::AreEqual(aabb.ExtentY(), obb.ExtentY());
+			Assert::AreEqual(aabb.ExtentZ(), obb.ExtentZ());
+			Assert::AreEqual(aabb.ExtentX(), obb.Extent(0));
+			Assert::AreEqual(aabb.ExtentY(), obb.Extent(1));
+			Assert::AreEqual(aabb.ExtentZ(), obb.Extent(2));
+			Assert::IsTrue(aabb.Extents() == obb.Extents());
+		}
 
-			rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.f, 0.f, 90.f) * PonyMath::Core::DegToRad<float>);
-			scaling = PonyMath::Core::Vector3<float>(-2.f, 0.f, 0.f);
-			rs = PonyMath::Core::RsMatrix(rotation, scaling);
-			obb = PonyMath::Shape::OBB<float>(aabb, rs);
-			axisX = -PonyMath::Shape::AABB<float>::Axes[1];
-			axisY = PonyMath::Shape::AABB<float>::Axes[2];
-			axisZ = -PonyMath::Shape::AABB<float>::Axes[0];
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(rs* aabb.Center(), obb.Center()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Abs(PonyMath::Core::Multiply(aabb.Extents(), scaling)), obb.Extents()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisX, obb.AxisX()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisY, obb.AxisY()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(axisZ, obb.AxisZ()));
+		TEST_METHOD(AxesTest)
+		{
+			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
+			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
+			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[0], obb.AxisX()));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[1], obb.AxisY()));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[2], obb.AxisZ()));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[0], obb.Axis(0)));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[1], obb.Axis(1)));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[2], obb.Axis(2)));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[0], obb.Axes()[0]));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[1], obb.Axes()[1]));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(quaternion * PonyMath::Shape::AABB<float>::Axes[2], obb.Axes()[2]));
 		}
 
 		TEST_METHOD(SizeTest)
