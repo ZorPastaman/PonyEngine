@@ -95,7 +95,6 @@ export namespace PonyMath::Shape
 		/// @return Projected point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector2<T> Project(const Core::Vector2<T>& point) const noexcept;
-
 		/// @brief Calculates a side of the @p point.
 		/// @param point Point.
 		/// @return 1 if the point lies in the direction of the normal; -1 if the point lies in the opposite direction; 0 is the point lies on the line.
