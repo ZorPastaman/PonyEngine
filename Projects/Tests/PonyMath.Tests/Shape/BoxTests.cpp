@@ -44,8 +44,12 @@ namespace Shape
 			Assert::AreEqual(std::size_t{6}, PonyMath::Shape::Box<float>::LeftTopFarIndex);
 			Assert::AreEqual(std::size_t{7}, PonyMath::Shape::Box<float>::RightTopFarIndex);
 			Assert::AreEqual(std::size_t{8}, PonyMath::Shape::Box<float>::CornerCount);
+		}
 
+		TEST_METHOD(PredefinedTest)
+		{
 			Assert::IsTrue(PonyMath::Shape::Box<float>(0.f, 0.f, 0.f, 0.f, 0.f, 0.f) == PonyMath::Shape::Box<float>::Predefined::Zero);
+			Assert::IsTrue(PonyMath::Shape::Box<float>(0.f, 0.f, 0.f, 1.f, 1.f, 1.f) == PonyMath::Shape::Box<float>::Predefined::NormalizedFull);
 		}
 
 		TEST_METHOD(ConstructorDefaultShortTest)

@@ -31,6 +31,15 @@ namespace Shape
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Rect<float>::ValueType>);
 		}
 
+		TEST_METHOD(StaticDataTest)
+		{
+			Assert::AreEqual(std::size_t{0}, PonyMath::Shape::Rect<float>::LeftBottomIndex);
+			Assert::AreEqual(std::size_t{1}, PonyMath::Shape::Rect<float>::RightBottomIndex);
+			Assert::AreEqual(std::size_t{2}, PonyMath::Shape::Rect<float>::LeftTopIndex);
+			Assert::AreEqual(std::size_t{3}, PonyMath::Shape::Rect<float>::RightTopIndex);
+			Assert::AreEqual(std::size_t{4}, PonyMath::Shape::Rect<float>::CornerCount);
+		}
+
 		TEST_METHOD(PredefinedTest)
 		{
 			Assert::IsTrue(PonyMath::Shape::Rect<float>(0.f, 0.f, 0.f, 0.f) == PonyMath::Shape::Rect<float>::Predefined::Zero);
@@ -184,6 +193,23 @@ namespace Shape
 			rect.Center(PonyMath::Core::Vector2<float>(-1.f, -2.f));
 			Assert::AreEqual(-2, static_cast<double>(rect.MinX()), 0.001);
 			Assert::AreEqual(-5.5, static_cast<double>(rect.MinY()), 0.001);
+		}
+
+		TEST_METHOD(CornerTest)
+		{
+			const auto rect = PonyMath::Shape::Rect<std::int32_t>(4, 1, 2, 7);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.LeftBottom());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.RightBottom());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.LeftTop());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.RightTop());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.Corner(0));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.Corner(1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.Corner(2));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.Corner(3));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.Corners()[0]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.Corners()[1]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.Corners()[2]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.Corners()[3]);
 		}
 
 		TEST_METHOD(PerimeterTest)
@@ -472,6 +498,13 @@ namespace Shape
 			[[maybe_unused]] constexpr auto height = rect.Height();
 
 			[[maybe_unused]] constexpr auto center = rect.Center();
+
+			[[maybe_unused]] constexpr auto leftBottom = rect.LeftBottom();
+			[[maybe_unused]] constexpr auto rightBottom = rect.RightBottom();
+			[[maybe_unused]] constexpr auto leftTop = rect.LeftTop();
+			[[maybe_unused]] constexpr auto rightTop = rect.RightTop();
+			[[maybe_unused]] constexpr auto corner = rect.Corner(0);
+			[[maybe_unused]] constexpr auto corners = rect.Corners();
 
 			[[maybe_unused]] constexpr auto perimeter = rect.Perimeter();
 			[[maybe_unused]] constexpr auto area = rect.Area();
