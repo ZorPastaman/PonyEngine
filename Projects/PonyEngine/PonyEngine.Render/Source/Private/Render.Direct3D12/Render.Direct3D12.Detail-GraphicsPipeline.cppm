@@ -319,7 +319,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject)
 	{
-		if (!renderObject.Material().CameraCulling()) // TODO: Add Volume culling
+		if (!renderObject.Material().CameraCulling())
 		{
 			return false;
 		}
