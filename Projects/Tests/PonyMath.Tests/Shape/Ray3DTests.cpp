@@ -300,5 +300,45 @@ namespace Shape
 				copied.Direction()[i] = was;
 			}
 		}
+
+		static constexpr PonyMath::Shape::Ray3D<float> RayConstexpr()
+		{
+			auto ray = PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>(2.f, 3.f, -1.f), PonyMath::Core::Vector3<float>::Predefined::Right);
+			auto moved = std::move(ray);
+
+			moved.Origin() = PonyMath::Core::Vector3<float>(2.f, 2.f, -1.f);
+			moved.Direction() = PonyMath::Core::Vector3<float>::Predefined::Up;
+
+			moved.Flip();
+
+			auto copied = PonyMath::Shape::Ray3D<float>();
+			copied = moved;
+			moved = std::move(copied);
+
+			return moved;
+		}
+
+		TEST_METHOD(ConstexprCompilationTest)
+		{
+			[[maybe_unused]] constexpr auto defaultRay = PonyMath::Shape::Ray3D<float>();
+			[[maybe_unused]] constexpr auto ray = PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>(2.f, 3.f, 2.f), PonyMath::Core::Vector3<float>::Predefined::Right);
+			[[maybe_unused]] constexpr auto copied = ray;
+			[[maybe_unused]] constexpr auto moved = RayConstexpr();
+
+			[[maybe_unused]] constexpr auto origin = ray.Origin();
+			[[maybe_unused]] constexpr auto direction = ray.Direction();
+
+			[[maybe_unused]] constexpr auto flipped = ray.Flipped();
+
+			[[maybe_unused]] constexpr auto projected = ray.Project(PonyMath::Core::Vector3<float>(2.f, 3.f, 4.f));
+			[[maybe_unused]] constexpr auto normalized = ray.Normalize(PonyMath::Core::Vector3<float>(2.f, 3.f, -1.f));
+			[[maybe_unused]] constexpr auto unnormalized = ray.Unnormalize(1.f);
+
+			[[maybe_unused]] constexpr auto converted = static_cast<PonyMath::Shape::Ray3D<double>>(ray);
+
+			[[maybe_unused]] constexpr bool equal = ray == copied;
+			[[maybe_unused]] constexpr bool notEqual = ray != copied;
+			[[maybe_unused]] constexpr bool areAlmostEqual = PonyMath::Shape::AreAlmostEqual(ray, copied);
+		}
 	};
 }
