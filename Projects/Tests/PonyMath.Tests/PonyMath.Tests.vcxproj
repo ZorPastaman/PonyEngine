@@ -36,6 +36,8 @@
     <ClCompile Include="Shape\OBBTests.cpp" />
     <ClCompile Include="Shape\OBRTests.cpp" />
     <ClCompile Include="Shape\PlaneTests.cpp" />
+    <ClCompile Include="Shape\Ray2DTests.cpp" />
+    <ClCompile Include="Shape\Ray3DTests.cpp" />
     <ClCompile Include="Shape\RectTests.cpp" />
     <ClCompile Include="Space\Transform2DTests.cpp" />
     <ClCompile Include="Space\Transform3DTests.cpp" />

@@ -9,20 +9,29 @@
 
 export module PonyMath.Shape:Ray3D;
 
+import <algorithm>;
 import <concepts>;
 import <format>;
+import <limits>;
+import <ostream>;
 import <string>;
 
 import PonyMath.Core;
 
 export namespace PonyMath::Shape
 {
+	/// @brief 3D ray implementation.
+	/// @tparam T Component type.
 	template<std::floating_point T>
 	class Ray3D final
 	{
 	public:
+		/// @brief Creates a default ray. The ray origin is the world origin, the ray direction is a right unit vector.
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray3D() noexcept;
+		/// @brief Creates a ray.
+		/// @param origin Ray origin.
+		/// @param direction Ray direction. Must be unit.
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray3D(const Core::Vector3<T>& origin, const Core::Vector3<T>& direction) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -30,39 +39,68 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray3D(Ray3D&& other) noexcept = default;
 
+		/// @brief Creates a ray that starts at the @p origin and passes the @p target.
+		/// @param origin Ray origin.
+		/// @param target Target point.
+		/// @return Created ray.
 		[[nodiscard("Pure function")]]
 		static constexpr Ray3D Create(const Core::Vector3<T>& origin, const Core::Vector3<T>& target) noexcept;
 
 		constexpr ~Ray3D() noexcept = default;
 
+		/// @brief Gets the ray origin.
+		/// @return Origin.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T>& Origin() noexcept;
+		/// @brief Gets the ray origin.
+		/// @return Origin.
 		[[nodiscard("Pure constructor")]]
 		constexpr const Core::Vector3<T>& Origin() const noexcept;
+		/// @brief Gets the ray direction.
+		/// @return Direction. Must be unit.
 		[[nodiscard("Pure constructor")]]
 		constexpr Core::Vector3<T>& Direction() noexcept;
+		/// @brief Gets the ray direction.
+		/// @return Direction.
 		[[nodiscard("Pure constructor")]]
 		constexpr const Core::Vector3<T>& Direction() const noexcept;
 
+		/// @brief Creates a ray with the same origin but an opposite direction.
+		/// @return Flipped ray.
 		[[nodiscard("Pure function")]]
-		constexpr Ray3D Flipped() const noexcept; // TODO: Add project function
+		constexpr Ray3D Flipped() const noexcept;
+		/// @brief Sets an opposite direction.
 		constexpr void Flip() noexcept;
 
+		/// @brief Checks if all the components are finite.
+		/// @return @a True if they are all finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
+		/// @brief Projects the @p point onto the ray.
+		/// @param point Point to project.
+		/// @param maxDistance Ray max distance.
+		/// @return Projected point.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> Project(const Core::Vector3<T>& point, T maxDistance = std::numeric_limits<T>::infinity()) const noexcept;
+		/// @brief Normalizes the @p point.
+		/// @param point Point to normalize.
+		/// @return Normalized point.
 		[[nodiscard("Pure function")]]
 		constexpr T Normalize(const Core::Vector3<T>& point) const noexcept;
+		/// @brief Unnormalizes a point by its normalized @p value.
+		/// @param value Normalized value.
+		/// @return Unnormalized point.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> Unnormalize(T value) const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr T NormalizeVector(const Core::Vector3<T>& vector) const noexcept;
-		[[nodiscard("Pure function")]]
-		constexpr Core::Vector3<T> UnnormalizeVector(T value) const noexcept;
 
+		/// @brief Creates a string representing the ray.
+		/// @return String representing the ray.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts the ray to a ray of another type.
+		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Ray3D<U>() const noexcept;
 
@@ -73,13 +111,24 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const Ray3D& other) const noexcept = default;
 
 	private:
-		Core::Vector3<T> origin;
-		Core::Vector3<T> direction;
+		Core::Vector3<T> origin; ///< Origin.
+		Core::Vector3<T> direction; ///< Direction.
 	};
 
+	/// @brief Checks if the two rays are almost equal with the tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left ray.
+	/// @param right Right ray.
+	/// @param tolerance Tolerance. Must be positive.
+	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	constexpr bool AreAlmostEqual(const Ray3D<T>& left, const Ray3D<T>& right, T tolerance = T{ 0.00001 }) noexcept;
+	constexpr bool AreAlmostEqual(const Ray3D<T>& left, const Ray3D<T>& right, T tolerance = T{0.00001}) noexcept;
 
+	/// @brief Puts ray.ToString() into the @p stream.
+	/// @tparam T Component type.
+	/// @param stream Target stream.
+	/// @param ray Source ray.
+	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Ray3D<T>& ray);
 }
@@ -139,13 +188,21 @@ namespace PonyMath::Shape
 	template<std::floating_point T>
 	constexpr void Ray3D<T>::Flip() noexcept
 	{
-		*this = Flipped();
+		direction = -direction;
 	}
 
 	template<std::floating_point T>
 	bool Ray3D<T>::IsFinite() const noexcept
 	{
 		return origin.IsFinite() && direction.IsFinite();
+	}
+
+	template <std::floating_point T>
+	constexpr Core::Vector3<T> Ray3D<T>::Project(const Core::Vector3<T>& point, const T maxDistance) const noexcept
+	{
+		const T normalized = std::clamp(Normalize(point), T{0}, maxDistance);
+
+		return Unnormalize(normalized);
 	}
 
 	template<std::floating_point T>
@@ -158,18 +215,6 @@ namespace PonyMath::Shape
 	constexpr Core::Vector3<T> Ray3D<T>::Unnormalize(const T value) const noexcept
 	{
 		return origin + direction * value;
-	}
-
-	template<std::floating_point T>
-	constexpr T Ray3D<T>::NormalizeVector(const Core::Vector3<T>& vector) const noexcept
-	{
-		return Core::Dot(direction, vector);
-	}
-
-	template<std::floating_point T>
-	constexpr Core::Vector3<T> Ray3D<T>::UnnormalizeVector(const T value) const noexcept
-	{
-		return direction * value;
 	}
 
 	template<std::floating_point T>
