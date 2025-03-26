@@ -104,14 +104,14 @@ export namespace PonyMath::Shape
 		/// @brief Sets an extent by the @p index.
 		/// @param index Extent index. 0 -> x, 1 -> y.
 		/// @param extent Extent to set.
-		constexpr void Extent(std::size_t index, T extent) noexcept;
+		void Extent(std::size_t index, T extent) noexcept;
 		/// @brief Gets the extents.
 		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector2<T>& Extents() const noexcept;
 		/// @brief Sets the extents.
 		/// @param extents Extents to set.
-		constexpr void Extents(const Core::Vector2<T>& extents) noexcept;
+		void Extents(const Core::Vector2<T>& extents) noexcept;
 
 		/// @brief Gets the width.
 		/// @return Width.
@@ -206,7 +206,7 @@ export namespace PonyMath::Shape
 		/// @param point Point to check.
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		constexpr bool Contains(const Core::Vector2<T>& point) const noexcept;
+		bool Contains(const Core::Vector2<T>& point) const noexcept;
 
 		/// @brief Creates a string representing the AABR.
 		/// @return String representing the AABR.
@@ -324,7 +324,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABR<T>::Extent(const std::size_t index, const T extent) noexcept
+	void AABR<T>::Extent(const std::size_t index, const T extent) noexcept
 	{
 		extents[index] = std::abs(extent);
 	}
@@ -336,7 +336,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr void AABR<T>::Extents(const Core::Vector2<T>& extents) noexcept
+	void AABR<T>::Extents(const Core::Vector2<T>& extents) noexcept
 	{
 		this->extents = Core::Abs(extents);
 	}
@@ -472,7 +472,7 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	constexpr bool AABR<T>::Contains(const Core::Vector2<T>& point) const noexcept
+	bool AABR<T>::Contains(const Core::Vector2<T>& point) const noexcept
 	{
 		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
 		{

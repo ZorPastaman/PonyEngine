@@ -13,6 +13,7 @@ module;
 
 export module PonyMath.Shape:Rect;
 
+import <array>;
 import <cstddef>;
 import <format>;
 import <ostream>;
