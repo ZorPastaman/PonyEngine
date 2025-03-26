@@ -9,6 +9,8 @@
 
 export module PonyMath.Shape:Utility;
 
+import <algorithm>;
+import <cstddef>;
 import <span>;
 
 import PonyMath.Core;
@@ -18,26 +20,32 @@ import :AABR;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Creates an axis-aligned bounding rect that overlaps all the @p positions.
+	/// @tparam T Component type.
+	/// @param positions Position.
+	/// @return Axis-aligned bounding rect.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr AABR<T> CreateBoundingRect(std::span<const Core::Vector2<T>> positions) noexcept;
-
+	AABR<T> CreateBoundingRect(std::span<const Core::Vector2<T>> positions) noexcept;
+	/// @brief Creates an axis-aligned bounding box that overlaps all the @p positions.
+	/// @tparam T Component type.
+	/// @param positions Position.
+	/// @return Axis-aligned bounding box.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	constexpr AABB<T> CreateBoundingBox(std::span<const Core::Vector3<T>> positions) noexcept;
+	AABB<T> CreateBoundingBox(std::span<const Core::Vector3<T>> positions) noexcept;
 }
 
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	constexpr AABR<T> CreateBoundingRect(std::span<const Core::Vector2<T>> positions) noexcept
+	AABR<T> CreateBoundingRect(const std::span<const Core::Vector2<T>> positions) noexcept
 	{
-		if (positions.size() == 0)
+		if (positions.size() == 0) [[unlikely]]
 		{
 			return AABR<T>::Predefined::Zero;
 		}
 
 		auto min = positions[0];
 		auto max = positions[0];
-
 		for (std::size_t i = 1; i < positions.size(); ++i)
 		{
 			min = Core::Min(min, positions[i]);
@@ -46,22 +54,25 @@ namespace PonyMath::Shape
 
 		AABR<T> answer;
 		answer.Center() = (min + max) / T{2};
-		answer.Extents(Core::Vector2<T>(max.X() - answer.Center().X(), max.Y() - answer.Center().Y()));
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			const T extent = std::max(max[i] - answer.Center()[i], answer.Center()[i] - min[i]);
+			answer.Extent(i, extent);
+		}
 
 		return answer;
 	}
 
 	template<Core::Arithmetic T>
-	constexpr AABB<T> CreateBoundingBox(const std::span<const Core::Vector3<T>> positions) noexcept
+	AABB<T> CreateBoundingBox(const std::span<const Core::Vector3<T>> positions) noexcept
 	{
-		if (positions.size() == 0)
+		if (positions.size() == 0) [[unlikely]]
 		{
 			return AABB<T>::Predefined::Zero;
 		}
 
 		auto min = positions[0];
 		auto max = positions[0];
-
 		for (std::size_t i = 1; i < positions.size(); ++i)
 		{
 			min = Core::Min(min, positions[i]);
@@ -70,7 +81,11 @@ namespace PonyMath::Shape
 
 		AABB<T> answer;
 		answer.Center() = (min + max) / T{2};
-		answer.Extents(Core::Vector3<T>(max.X() - answer.Center().X(), max.Y() - answer.Center().Y(), max.Z() - answer.Center().Z()));
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			const T extent = std::max(max[i] - answer.Center()[i], answer.Center()[i] - min[i]);
+			answer.Extent(i, extent);
+		}
 
 		return answer;
 	}
