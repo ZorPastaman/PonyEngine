@@ -216,7 +216,6 @@ export namespace PonyMath::Shape
 		Core::Vector2<T> extents; ///< Extents.
 		std::array<Core::Vector2<T>, 2> axes; ///< Axes in order x, y.
 
-		template<std::floating_point U>
 		friend class OBR;
 	};
 

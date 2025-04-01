@@ -419,7 +419,7 @@ namespace Shape
 
 		TEST_METHOD(ContainsTest)
 		{
-			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
+			constexpr auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
 			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
 			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 			Assert::IsTrue(obb.Contains(obb.Center()));
@@ -427,6 +427,19 @@ namespace Shape
 			Assert::IsTrue(obb.Contains(obb.Center() - obb.AxisX() * obb.ExtentX() * 0.75f + obb.AxisY() * obb.ExtentY() * 0.5f - obb.AxisZ() * obb.ExtentZ() * 0.2f));
 			Assert::IsFalse(obb.Contains(obb.Center() + obb.AxisX() * obb.ExtentX() * 1.75f - obb.AxisY() * obb.ExtentY() * 0.5f + obb.AxisZ() * obb.ExtentZ() * 0.2f));
 			Assert::IsFalse(obb.Contains(obb.Center() + obb.AxisX() * obb.ExtentX() * 0.75f - obb.AxisY() * obb.ExtentY() * 1.05f - obb.AxisZ() * obb.ExtentZ() * 1.2f));
+		}
+
+		TEST_METHOD(ClosestPointTest)
+		{
+			constexpr auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
+			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
+			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(obb.Center(), obb.ClosestPoint(obb.Center())));
+			auto expected = obb.Center() + PonyMath::Core::Vector3<float>(-0.5f, 1.f, 0.5f);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, obb.ClosestPoint(expected)));
+			auto test = PonyMath::Core::Vector3<float>(13.f, 15.f, -7.f);
+			expected = PonyMath::Core::Vector3<float>(10.704f, -4.126f, -2.322f);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, obb.ClosestPoint(test), 0.001f));
 		}
 
 		TEST_METHOD(ToStringTest)

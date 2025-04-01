@@ -731,7 +731,7 @@ namespace Shape
 			auto obb = PonyMath::Shape::OBB<float>(PonyMath::Shape::AABB<float>(obbCenter, obbExtents), PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(15.f, 175.f, -80.f) * PonyMath::Core::DegToRad<float>));
 			constexpr auto aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -4.f);
 			constexpr auto aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
-			const auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			constexpr auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obb, aabb));
 
 			obbExtents = PonyMath::Core::Vector3<float>(0.6f, 0.2f, 0.3f);

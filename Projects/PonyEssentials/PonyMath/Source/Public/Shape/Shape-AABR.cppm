@@ -498,13 +498,7 @@ namespace PonyMath::Shape
 	template <Core::Arithmetic T>
 	constexpr Core::Vector2<T> AABR<T>::ClosestPoint(const Core::Vector2<T>& point) const noexcept
 	{
-		Core::Vector2<T> answer;
-		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
-		{
-			answer[i] = std::clamp(point[i], Min(i), Max(i));
-		}
-
-		return answer;
+		return Core::Clamp(point, Min(), Max());
 	}
 
 	template<Core::Arithmetic T>

@@ -17,6 +17,7 @@ import <cmath>;
 import <concepts>;
 import <format>;
 import <numbers>;
+import <ostream>;
 import <string>;
 
 import PonyMath.Core;
