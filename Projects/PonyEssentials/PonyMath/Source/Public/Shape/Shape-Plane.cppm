@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:Plane;
 
 import <cmath>;
@@ -26,7 +30,9 @@ export namespace PonyMath::Shape
 	class Plane final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
+
+		struct Predefined; ///< Predefined planes.
 
 		/// @brief Creates a plane passes the origin and which normal looks forward.
 		[[nodiscard("Pure constructor")]]
@@ -137,6 +143,19 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Plane<T>& plane);
+
+	template<std::floating_point T>
+	struct Plane<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static constexpr auto Forward = Plane(Core::Vector3<T>::Predefined::Forward, T{0}); ///< Plane(Forward, 0).
+		static constexpr auto Back = Plane(Core::Vector3<T>::Predefined::Back, T{0}); ///< Plane(Back, 0).
+		static constexpr auto Up = Plane(Core::Vector3<T>::Predefined::Up, T{0}); ///< Plane(Up, 0).
+		static constexpr auto Down = Plane(Core::Vector3<T>::Predefined::Down, T{0}); ///< Plane(Down, 0).
+		static constexpr auto Right = Plane(Core::Vector3<T>::Predefined::Right, T{0}); ///< Plane(Right, 0).
+		static constexpr auto Left = Plane(Core::Vector3<T>::Predefined::Left, T{0}); ///< Plane(Left, 0).
+	};
 }
 
 namespace PonyMath::Shape

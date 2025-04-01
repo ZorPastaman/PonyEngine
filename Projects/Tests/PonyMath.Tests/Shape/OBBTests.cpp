@@ -48,6 +48,11 @@ namespace Shape
 			Assert::AreEqual(std::size_t{8}, PonyMath::Shape::OBB<float>::CornerCount);
 		}
 
+		TEST_METHOD(PredefinedTest)
+		{
+			Assert::IsTrue(PonyMath::Shape::OBB<float>(PonyMath::Shape::AABB<float>::Predefined::Zero) == PonyMath::Shape::OBB<float>::Predefined::Zero);
+		}
+
 		TEST_METHOD(DefaultContructorTest)
 		{
 			const auto defaultObb = PonyMath::Shape::OBB<float>();
@@ -491,13 +496,13 @@ namespace Shape
 			for (std::size_t i = 0; i < 3; ++i)
 			{
 				const float was = obb.Extents()[i];
-				aabb.Extent(i, std::nextafter(was, 0.f));
+				aabb.Extent(i) = std::nextafter(was, 0.f);
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 				Assert::IsFalse(obb == copied);
-				aabb.Extent(i, was + 1.f);
+				aabb.Extent(i) = was + 1.f;
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 				Assert::IsFalse(obb == copied);
-				aabb.Extent(i, was);
+				aabb.Extent(i) = was;
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 			}
 
@@ -550,14 +555,14 @@ namespace Shape
 			for (std::size_t i = 0; i < 3; ++i)
 			{
 				const float was = obb.Extents()[i];
-				aabb.Extent(i, std::nextafter(was, 0.f));
+				aabb.Extent(i) = std::nextafter(was, 0.f);
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(obb, copied));
-				aabb.Extent(i, was + 1.f);
+				aabb.Extent(i) = was + 1.f;
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 				Assert::IsFalse(PonyMath::Shape::AreAlmostEqual(obb, copied));
 				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(obb, copied, 5.f));
-				aabb.Extent(i, was);
+				aabb.Extent(i) = was;
 				obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
 			}
 

@@ -27,6 +27,22 @@ namespace Shape
 {
 	TEST_CLASS(Ray3DTests)
 	{
+		TEST_METHOD(TypesTest)
+		{
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Ray3D<float>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::Ray3D<double>::ValueType>);
+		}
+
+		TEST_METHOD(PredefinedTest)
+		{
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Forward) == PonyMath::Shape::Ray3D<float>::Predefined::Forward);
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Back) == PonyMath::Shape::Ray3D<float>::Predefined::Back);
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Up) == PonyMath::Shape::Ray3D<float>::Predefined::Up);
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Down) == PonyMath::Shape::Ray3D<float>::Predefined::Down);
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Right) == PonyMath::Shape::Ray3D<float>::Predefined::Right);
+			Assert::IsTrue(PonyMath::Shape::Ray3D<float>(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Vector3<float>::Predefined::Left) == PonyMath::Shape::Ray3D<float>::Predefined::Left);
+		}
+
 		TEST_METHOD(DefaultConstructorTest)
 		{
 			const auto ray = PonyMath::Shape::Ray3D<float>();

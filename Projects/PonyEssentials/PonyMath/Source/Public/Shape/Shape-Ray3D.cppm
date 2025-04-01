@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:Ray3D;
 
 import <algorithm>;
@@ -26,6 +30,10 @@ export namespace PonyMath::Shape
 	class Ray3D final
 	{
 	public:
+		using ValueType = T; ///< Component type.
+
+		struct Predefined; ///< Predefined rays.
+
 		/// @brief Creates a default ray. The ray origin is the world origin, the ray direction is a right unit vector.
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray3D() noexcept;
@@ -131,6 +139,19 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Ray3D<T>& ray);
+
+	template<std::floating_point T>
+	struct Ray3D<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static constexpr auto Forward = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Forward); ///< Ray3D(Zero, Forward).
+		static constexpr auto Back = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Back); ///< Ray3D(Zero, Back).
+		static constexpr auto Up = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Up); ///< Ray3D(Zero, Up).
+		static constexpr auto Down = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Down); ///< Ray3D(Zero, Down).
+		static constexpr auto Right = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Right); ///< Ray3D(Zero, Right).
+		static constexpr auto Left = Ray3D(Core::Vector3<T>::Predefined::Zero, Core::Vector3<T>::Predefined::Left); ///< Ray3D(Zero, Left).
+	};
 }
 
 namespace PonyMath::Shape

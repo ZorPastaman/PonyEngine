@@ -33,6 +33,14 @@ namespace Shape
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::Line<double>::ValueType>);
 		}
 
+		TEST_METHOD(PredefinedTest)
+		{
+			Assert::IsTrue(PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Up, 0.f) == PonyMath::Shape::Line<float>::Predefined::Up);
+			Assert::IsTrue(PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Down, 0.f) == PonyMath::Shape::Line<float>::Predefined::Down);
+			Assert::IsTrue(PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Right, 0.f) == PonyMath::Shape::Line<float>::Predefined::Right);
+			Assert::IsTrue(PonyMath::Shape::Line<float>(PonyMath::Core::Vector2<float>::Predefined::Left, 0.f) == PonyMath::Shape::Line<float>::Predefined::Left);
+		}
+
 		TEST_METHOD(DefaultConstructorTest)
 		{
 			const auto defaultLine = PonyMath::Shape::Line<float>();

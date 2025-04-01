@@ -27,10 +27,20 @@ namespace Shape
 {
 	TEST_CLASS(PlaneTests)
 	{
-		TEST_METHOD(TypeTests)
+		TEST_METHOD(TypesTest)
 		{
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Plane<float>::ValueType>);
 			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::Plane<double>::ValueType>);
+		}
+
+		TEST_METHOD(PredefinedTest)
+		{
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Forward, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Forward);
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Back, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Back);
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Up, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Up);
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Down, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Down);
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Right, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Right);
+			Assert::IsTrue(PonyMath::Shape::Plane<float>(PonyMath::Core::Vector3<float>::Predefined::Left, 0.f) == PonyMath::Shape::Plane<float>::Predefined::Left);
 		}
 
 		TEST_METHOD(DefaultConstructorTest)

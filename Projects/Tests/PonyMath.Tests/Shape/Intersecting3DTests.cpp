@@ -58,18 +58,36 @@ namespace Shape
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, plane));
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane, 1.f));
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, plane, 100.f));
+		}
 
-			rayOrigin = plane.Project(rayOrigin);
-			ray = PonyMath::Shape::Ray3D<float>(rayOrigin, rayDirection);
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane));
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane, 1.f));
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane, 100.f));
+		TEST_METHOD(RaySphereTest)
+		{
+			auto rayOrigin = PonyMath::Core::Vector3<float>(-5.f, 2.f, -5.f);
+			auto rayDirection = PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f).Normalized();
+			auto ray = PonyMath::Shape::Ray3D<float>(rayOrigin, rayDirection);
+			constexpr auto center = PonyMath::Core::Vector3<float>(1.f, -2.f, 3.f);
+			constexpr float radius = 4.f;
+			constexpr auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, sphere));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 1.f));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, sphere, 100.f));
 
-			rayOrigin -= rayDirection * 0.00001f;
+			rayDirection = -rayDirection;
 			ray = PonyMath::Shape::Ray3D<float>(rayOrigin, rayDirection);
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane));
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane, 1.f));
-			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, plane, 100.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 100.f));
+
+			rayOrigin = PonyMath::Core::Vector3<float>(-5.f, 2.f, -50.f);
+			rayDirection = -rayDirection;
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 100.f));
+
+			rayOrigin = PonyMath::Core::Vector3<float>(-5.f, 2.f, 50.f);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, sphere, 100.f));
 		}
 
 		TEST_METHOD(RayAabbTest)
@@ -79,7 +97,7 @@ namespace Shape
 			auto ray = PonyMath::Shape::Ray3D<float>(rayOrigin, rayDirection);
 			constexpr auto aabbCenter = PonyMath::Core::Vector3<float>(1.f, -2.f, 3.f);
 			constexpr auto aabbExtents = PonyMath::Core::Vector3<float>(4.f, 2.f, 4.f);
-			const auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			constexpr auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, aabb));
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, aabb, 1.f));
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, aabb, 100.f));
@@ -142,7 +160,7 @@ namespace Shape
 			Assert::IsTrue(PonyMath::Shape::AreIntersecting(ray, aabb, 100.f));
 
 			rayOrigin = aabbCenter;
-			rayOrigin.Z() += aabbExtents.Z() * 1.00001f;
+			rayOrigin.Z() += aabbExtents.Z();
 			ray = PonyMath::Shape::Ray3D<float>(rayOrigin, rayDirection);
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, aabb));
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(ray, aabb, 1.f));
@@ -275,6 +293,22 @@ namespace Shape
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(plane, ray, 100.f));
 		}
 
+		TEST_METHOD(PlaneSphereTest)
+		{
+			const auto planeNormal = PonyMath::Core::Vector3<float>(-1.f, -2.f, 1.f).Normalized();
+			auto plane = PonyMath::Shape::Plane<float>(planeNormal, 3.f);
+			constexpr auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 0.f);
+			constexpr float radius = 5.f;
+			constexpr auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(plane, sphere));
+
+			plane = PonyMath::Shape::Plane<float>(planeNormal, 30.f);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(plane, sphere));
+
+			plane = PonyMath::Shape::Plane<float>(planeNormal, -30.f);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(plane, sphere));
+		}
+
 		TEST_METHOD(PlaneAabbTest)
 		{
 			const auto planeNormal = PonyMath::Core::Vector3<float>(-1.f, -2.f, 1.f).Normalized();
@@ -305,6 +339,131 @@ namespace Shape
 
 			plane = PonyMath::Shape::Plane<float>(planeNormal, -30.f);
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(plane, obb));
+		}
+
+		TEST_METHOD(SphereSphereTest)
+		{
+			auto center = PonyMath::Core::Vector3<float>(2.f, 5.f, -7.f);
+			float radius = 5.f;
+			auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, sphere));
+
+			constexpr auto center1 = PonyMath::Core::Vector3<float>(4.f, 2.f, -4.f);
+			constexpr float radius1 = 4.f;
+			constexpr auto sphere1 = PonyMath::Shape::Sphere<float>(center1, radius1);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, sphere1));
+
+			center = PonyMath::Core::Vector3<float>(-5.f, 5.f, -7.f);
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, sphere1));
+
+			center = PonyMath::Core::Vector3<float>(-1.f, 5.f, -7.f);
+			radius = 1.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, sphere1));
+		}
+
+		TEST_METHOD(SphereRayTest)
+		{
+			auto center = PonyMath::Core::Vector3<float>(2.f, 5.f, -7.f);
+			float radius = 5.f;
+			auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			constexpr auto origin = PonyMath::Core::Vector3<float>(-1.f, -2.f, -20.f);
+			const auto direction = PonyMath::Core::Vector3<float>(20.f, 60.f, 130.f).Normalized();
+			const auto ray = PonyMath::Shape::Ray3D<float>(origin, direction);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray, 1.f));
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, ray, 100.f));
+
+			radius = 1.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray, 100.f));
+
+			center = PonyMath::Core::Vector3<float>(2.f, 50.f, -7.f);
+			radius = 5.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray, 1.f));
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, ray, 100.f));
+		}
+
+		TEST_METHOD(SpherePlaneTest)
+		{
+			auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 0.f);
+			float radius = 5.f;
+			auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			const auto planeNormal = PonyMath::Core::Vector3<float>(-1.f, -2.f, 1.f).Normalized();
+			const auto plane = PonyMath::Shape::Plane<float>(planeNormal, 3.f);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, plane));
+
+			radius = 1.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, plane));
+
+			center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 100.f);
+			radius = 5.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, plane));
+		}
+
+		TEST_METHOD(SphereAabbTest)
+		{
+			auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 3.f);
+			float radius = 5.f;
+			auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			const auto aabbCenter = center;
+			constexpr auto aabbExtents = PonyMath::Core::Vector3<float>(3.f, 2.f, 1.f);
+			const auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, aabb));
+
+			center = PonyMath::Core::Vector3<float>(-1.f, 0.f, 2.f);
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, aabb));
+
+			center = PonyMath::Core::Vector3<float>(2.f, 3.f, 1.3f);
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, aabb));
+
+			radius = 1.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, aabb));
+
+			center = PonyMath::Core::Vector3<float>(20.f, 3.f, 1.3f);
+			radius = 5.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, aabb));
+		}
+
+		TEST_METHOD(SphereObbTest)
+		{
+			auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 3.f);
+			float radius = 5.f;
+			auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			const auto aabbCenter = center;
+			constexpr auto aabbExtents = PonyMath::Core::Vector3<float>(3.f, 2.f, 1.f);
+			const auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			const auto rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.001f, 0.002f, -0.001f));
+			const auto obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, obb));
+
+			center = PonyMath::Core::Vector3<float>(-1.f, 0.f, 2.f);
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, obb));
+
+			center = PonyMath::Core::Vector3<float>(2.f, 3.f, 1.3f);
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(sphere, obb));
+
+			radius = 1.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, obb));
+
+			center = PonyMath::Core::Vector3<float>(20.f, 3.f, 1.3f);
+			radius = 5.f;
+			sphere = PonyMath::Shape::Sphere<float>(center, radius);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(sphere, obb));
 		}
 
 		TEST_METHOD(AabbAabbTest)
@@ -374,6 +533,34 @@ namespace Shape
 			aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
 			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabb, plane));
+		}
+
+		TEST_METHOD(AabbSphereTest)
+		{
+			auto aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -4.f);
+			auto aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
+			auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			const auto sphereCenter = aabbCenter;
+			constexpr float radius = 3.f;
+			const auto sphere = PonyMath::Shape::Sphere<float>(sphereCenter, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(3.f, 2.f, -2.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(0.f, 9.f, -8.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(aabb, sphere));
+
+			aabbExtents = PonyMath::Core::Vector3<float>(0.1f, 0.2f, 0.1f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -40.f);
+			aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(aabb, sphere));
 		}
 
 		TEST_METHOD(AabbObbTest)
@@ -494,6 +681,47 @@ namespace Shape
 			obbCenter = PonyMath::Core::Vector3<float>(6.7f, 2.f, 13.55f);
 			obb = PonyMath::Shape::OBB<float>(PonyMath::Shape::AABB<float>(obbCenter, obbExtents), PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(110.f, 65.f, -80.f) * PonyMath::Core::DegToRad<float>));
 			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obb, plane));
+		}
+
+		TEST_METHOD(ObbSphereTest)
+		{
+			auto aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -4.f);
+			auto aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
+			auto aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			auto rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.1f, -0.1f, 0.15f));
+			auto obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			const auto sphereCenter = aabbCenter;
+			constexpr float radius = 3.f;
+			const auto sphere = PonyMath::Shape::Sphere<float>(sphereCenter, radius);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(3.f, 2.f, -2.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(0.f, 9.f, -8.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsTrue(PonyMath::Shape::AreIntersecting(obb, sphere));
+
+			aabbExtents = PonyMath::Core::Vector3<float>(0.1f, 0.2f, 0.1f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -40.f);
+			aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obb, sphere));
+
+			aabbCenter = PonyMath::Core::Vector3<float>(4.f, 3.f, -4.f);
+			aabbExtents = PonyMath::Core::Vector3<float>(6.f, 5.f, 3.f);
+			aabb = PonyMath::Shape::AABB<float>(aabbCenter, aabbExtents);
+			rotation = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(0.1f, -3.f, 2.9f));
+			obb = PonyMath::Shape::OBB<float>(aabb, rotation);
+			Assert::IsFalse(PonyMath::Shape::AreIntersecting(obb, sphere));
 		}
 
 		TEST_METHOD(ObbAabbTest)

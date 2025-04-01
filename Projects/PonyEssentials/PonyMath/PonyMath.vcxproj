@@ -33,6 +33,7 @@
     <ClCompile Include="Source\Public\Core\Core-Vector2.cppm" />
     <ClCompile Include="Source\Public\Core\Core-Vector3.cppm" />
     <ClCompile Include="Source\Public\Core\Core-Vector4.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Circle.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-AABB.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-AABR.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Box.cppm" />
@@ -47,6 +48,7 @@
     <ClCompile Include="Source\Public\Shape\Shape-Ray2D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Ray3D.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Rect.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Sphere.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape-Utility.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape.cppm" />
     <ClCompile Include="Source\Public\Space\Space.cppm" />

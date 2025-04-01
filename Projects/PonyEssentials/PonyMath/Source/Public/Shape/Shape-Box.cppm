@@ -13,6 +13,7 @@ module;
 
 export module PonyMath.Shape:Box;
 
+import <algorithm>;
 import <array>;
 import <concepts>;
 import <cstddef>;
@@ -271,6 +272,11 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
+		/// @brief Calculates the closest point on the box.
+		/// @param point Point.
+		/// @return The closest point. If the @p point lies inside the box, the @p point is returned.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> ClosestPoint(const Core::Vector3<T>& point) const noexcept;
 
 		/// @brief Normalizes the point inside the box.
 		/// @details Min point is [0, 0, 0]; Max point is [1, 1, 1].
@@ -677,6 +683,18 @@ namespace PonyMath::Shape
 	{
 		return point.X() >= MinX() && point.Y() >= MinY() && point.Z() >= MinZ() &&
 			point.X() <= MaxX() && point.Y() <= MaxY() && point.Z() <= MaxZ();
+	}
+
+	template <Core::Arithmetic T>
+	constexpr Core::Vector3<T> Box<T>::ClosestPoint(const Core::Vector3<T>& point) const noexcept
+	{
+		Core::Vector3<T> answer;
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			answer[i] = std::clamp(point[i], Min(i), Max(i));
+		}
+
+		return answer;
 	}
 
 	template<Core::Arithmetic T>

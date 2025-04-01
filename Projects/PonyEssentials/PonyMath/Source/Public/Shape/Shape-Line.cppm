@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:Line;
 
 import <cmath>;
@@ -27,6 +31,8 @@ export namespace PonyMath::Shape
 	{
 	public:
 		using ValueType = T; ///< Component type.
+
+		struct Predefined; ///< Predefined lines.
 
 		/// @brief Create a horizontal line that passes through the origin.
 		[[nodiscard("Pure constructor")]]
@@ -138,6 +144,17 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Line<T>& line);
+
+	template<std::floating_point T>
+	struct Line<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static constexpr auto Up = Line(Core::Vector2<T>::Predefined::Up, T{0}); ///< Line(Up, 0).
+		static constexpr auto Down = Line(Core::Vector2<T>::Predefined::Down, T{0}); ///< Line(Down, 0).
+		static constexpr auto Right = Line(Core::Vector2<T>::Predefined::Right, T{0}); ///< Line(Right, 0).
+		static constexpr auto Left = Line(Core::Vector2<T>::Predefined::Left, T{0}); ///< Line(Left, 0).
+	};
 }
 
 namespace PonyMath::Shape

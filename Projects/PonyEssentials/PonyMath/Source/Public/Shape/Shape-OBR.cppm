@@ -7,8 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:OBR;
 
+import <algorithm>;
 import <array>;
 import <concepts>;
 import <cmath>;
@@ -30,7 +35,7 @@ export namespace PonyMath::Shape
 	class OBR final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
 
 		static constexpr std::size_t AxesCount = 2; ///< Axes count.
 
@@ -39,6 +44,8 @@ export namespace PonyMath::Shape
 		static constexpr std::size_t LeftTopIndex = 2; ///< Left top corner index.
 		static constexpr std::size_t RightTopIndex = 3; ///< Right top corner index.
 		static constexpr std::size_t CornerCount = 4; ///< Corner count.
+
+		struct Predefined; ///< Predefined OBRs.
 
 		/// @brief Creates a zero OBR.
 		[[nodiscard("Pure constructor")]]
@@ -182,6 +189,8 @@ export namespace PonyMath::Shape
 		/// @return @a True if the OBR contains the @p point; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector2<T>& point) const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> ClosestPoint(const Core::Vector2<T>& point) const noexcept;
 
 		/// @brief Creates a string representing the OBR.
 		/// @return String representing the OBR.
@@ -227,6 +236,14 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const OBR<T>& obr);
+
+	template<std::floating_point T>
+	struct OBR<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static inline const auto Zero = OBR(AABR<float>::Predefined::Zero); ///< Zero OBR.
+	};
 }
 
 namespace PonyMath::Shape
@@ -462,6 +479,21 @@ namespace PonyMath::Shape
 		}
 
 		return true;
+	}
+
+	template <std::floating_point T>
+	constexpr Core::Vector2<T> OBR<T>::ClosestPoint(const Core::Vector2<T>& point) const noexcept
+	{
+		const Core::Vector2<T> delta = point - center;
+
+		Core::Vector2<T> answer = center;
+		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
+		{
+			const T dot = Core::Dot(delta, axes[i]);
+			answer += axes[i] * std::clamp(dot, -extents[i], extents[i]);
+		}
+
+		return answer;
 	}
 
 	template<std::floating_point T>

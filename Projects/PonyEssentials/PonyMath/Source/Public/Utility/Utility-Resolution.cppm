@@ -25,7 +25,7 @@ export namespace PonyMath::Utility
 	class Resolution final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
 
 		/// @brief Creates a resolution 0x0.
 		[[nodiscard("Pure constructor")]]

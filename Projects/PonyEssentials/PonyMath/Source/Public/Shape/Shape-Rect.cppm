@@ -30,7 +30,7 @@ export namespace PonyMath::Shape
 	class Rect final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
 
 		static constexpr std::size_t LeftBottomIndex = 0; ///< (MinX, MinY) corner index.
 		static constexpr std::size_t RightBottomIndex = 1; ///< (MaxX, MinY) corner index.
@@ -250,7 +250,7 @@ export namespace PonyMath::Shape
 		constexpr Rect& operator =(const Rect& other) noexcept = default;
 		constexpr Rect& operator =(Rect&& other) noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const Rect& other) const noexcept = default;
 
 	private:

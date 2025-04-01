@@ -72,11 +72,11 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(x, y, z) == aabb.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 		}
 
 		TEST_METHOD(ConstructorDataFloatTest)
@@ -85,11 +85,11 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(x, y, z) == aabb.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 		}
 
 		TEST_METHOD(ConstructorVectorShortTest)
@@ -98,13 +98,13 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			constexpr auto center = PonyMath::Core::Vector3<std::int16_t>(x, y, z);
 			constexpr auto extents = PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth);
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(center, extents);
 			Assert::IsTrue(center == aabb.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 		}
 
 		TEST_METHOD(ConstructorVectorFloatTest)
@@ -113,13 +113,13 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			constexpr auto center = PonyMath::Core::Vector3<float>(x, y, z);
 			constexpr auto extents = PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth);
 			const auto aabb = PonyMath::Shape::AABB<float>(center, extents);
 			Assert::IsTrue(center == aabb.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 		}
 
 		TEST_METHOD(ConstructorBoxShortTest)
@@ -156,12 +156,12 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto copy = aabb;
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(x, y, z) == copy.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, -halfHeight, -halfDepth) == copy.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) == copy.Extents());
 		}
 
 		TEST_METHOD(ConstructorCopyFloatTest)
@@ -170,12 +170,12 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto copy = aabb;
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(x, y, z) == copy.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, -halfHeight, -halfDepth) == copy.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) == copy.Extents());
 		}
 
 		TEST_METHOD(ConstructorMoveShortTest)
@@ -184,12 +184,12 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto copy = std::move(aabb);
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(x, y, z) == copy.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, -halfHeight, -halfDepth) == copy.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) == copy.Extents());
 		}
 
 		TEST_METHOD(ConstructorMoveFloatTest)
@@ -198,12 +198,12 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto copy = std::move(aabb);
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(x, y, z) == copy.Center());
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, -halfHeight, -halfDepth) == copy.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) == copy.Extents());
 		}
 
 		TEST_METHOD(CenterShortTest)
@@ -212,8 +212,8 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(x, y, z) == aabb.Center());
 		}
@@ -224,8 +224,8 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(x, y, z) == aabb.Center());
 		}
@@ -236,24 +236,24 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(halfWidth, aabb.ExtentX());
-			Assert::AreEqual(std::int16_t{-halfHeight}, aabb.ExtentY());
-			Assert::AreEqual(std::int16_t{-halfDepth}, aabb.ExtentZ());
+			Assert::AreEqual(halfHeight, aabb.ExtentY());
+			Assert::AreEqual(halfDepth, aabb.ExtentZ());
 			Assert::AreEqual(halfWidth, aabb.Extent(0));
-			Assert::AreEqual(std::int16_t{-halfHeight}, aabb.Extent(1));
-			Assert::AreEqual(std::int16_t{-halfDepth}, aabb.Extent(2));
+			Assert::AreEqual(halfHeight, aabb.Extent(1));
+			Assert::AreEqual(halfDepth, aabb.Extent(2));
 
-			aabb.ExtentX(-3);
-			aabb.ExtentY(6);
-			aabb.ExtentZ(8);
+			aabb.ExtentX() = 3;
+			aabb.ExtentY() = 6;
+			aabb.ExtentZ() = 8;
 			Assert::AreEqual(std::int16_t{3}, aabb.ExtentX());
 			Assert::AreEqual(std::int16_t{6}, aabb.ExtentY());
 			Assert::AreEqual(std::int16_t{8}, aabb.ExtentZ());
 
-			aabb.Extent(2, -6);
+			aabb.Extent(2) = 6;
 			Assert::AreEqual(std::int16_t{6}, aabb.Extent(2));
 		}
 
@@ -263,24 +263,24 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(halfWidth, aabb.ExtentX());
-			Assert::AreEqual(-halfHeight, aabb.ExtentY());
-			Assert::AreEqual(-halfDepth, aabb.ExtentZ());
+			Assert::AreEqual(halfHeight, aabb.ExtentY());
+			Assert::AreEqual(halfDepth, aabb.ExtentZ());
 			Assert::AreEqual(halfWidth, aabb.Extent(0));
-			Assert::AreEqual(-halfHeight, aabb.Extent(1));
-			Assert::AreEqual(-halfDepth, aabb.Extent(2));
+			Assert::AreEqual(halfHeight, aabb.Extent(1));
+			Assert::AreEqual(halfDepth, aabb.Extent(2));
 
-			aabb.ExtentX(-3);
-			aabb.ExtentY(6);
-			aabb.ExtentZ(8);
+			aabb.ExtentX() = 3;
+			aabb.ExtentY() = 6;
+			aabb.ExtentZ() = 8;
 			Assert::AreEqual(3.f, aabb.ExtentX());
 			Assert::AreEqual(6.f, aabb.ExtentY());
 			Assert::AreEqual(8.f, aabb.ExtentZ());
 
-			aabb.Extent(2, -6);
+			aabb.Extent(2) = 6;
 			Assert::AreEqual(6.f, aabb.Extent(2));
 		}
 
@@ -290,14 +290,14 @@ namespace Shape
 			constexpr std::int16_t y = 5;
 			constexpr std::int16_t z = 10;
 			constexpr std::int16_t halfWidth = 24;
-			constexpr std::int16_t halfHeight = -12;
-			constexpr std::int16_t halfDepth = -22;
+			constexpr std::int16_t halfHeight = 12;
+			constexpr std::int16_t halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
-			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 
-			constexpr auto extents = PonyMath::Core::Vector3<std::int16_t>(-5, -8, 9);
-			aabb.Extents(extents);
-			Assert::IsTrue(PonyMath::Core::Abs(extents) == aabb.Extents());
+			constexpr auto extents = PonyMath::Core::Vector3<std::int16_t>(5, 8, 9);
+			aabb.Extents() = extents;
+			Assert::IsTrue(extents == aabb.Extents());
 		}
 
 		TEST_METHOD(ExtentsFloatTest)
@@ -306,14 +306,14 @@ namespace Shape
 			constexpr float y = 5;
 			constexpr float z = 10;
 			constexpr float halfWidth = 24;
-			constexpr float halfHeight = -12;
-			constexpr float halfDepth = -22;
+			constexpr float halfHeight = 12;
+			constexpr float halfDepth = 22;
 			auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, -halfHeight, -halfDepth) == aabb.Extents());
+			Assert::IsTrue(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) == aabb.Extents());
 
-			constexpr auto extents = PonyMath::Core::Vector3<float>(-5, -8, 9);
-			aabb.Extents(extents);
-			Assert::IsTrue(PonyMath::Core::Abs(extents) == aabb.Extents());
+			constexpr auto extents = PonyMath::Core::Vector3<float>(5, 8, 9);
+			aabb.Extents() = extents;
+			Assert::IsTrue(extents == aabb.Extents());
 		}
 
 		TEST_METHOD(SizeShortTest)
@@ -321,9 +321,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(std::int16_t{8}, aabb.Width());
 			Assert::AreEqual(std::int16_t{28}, aabb.Height());
@@ -338,9 +338,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(8.f, aabb.Width());
 			Assert::AreEqual(28.f, aabb.Height());
@@ -355,9 +355,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(std::int16_t{3}, aabb.MinX());
 			Assert::AreEqual(std::int16_t{-22}, aabb.MinY());
@@ -373,9 +373,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(3.f, aabb.MinX());
 			Assert::AreEqual(-22.f, aabb.MinY());
@@ -391,9 +391,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(std::int16_t{11}, aabb.MaxX());
 			Assert::AreEqual(std::int16_t{6}, aabb.MaxY());
@@ -409,9 +409,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(11.f, aabb.MaxX());
 			Assert::AreEqual(6.f, aabb.MaxY());
@@ -427,9 +427,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(3, -22, -14) == aabb.LeftBottomNear());
 			Assert::IsTrue(PonyMath::Core::Vector3<std::int16_t>(11, -22, -14) == aabb.RightBottomNear());
@@ -460,9 +460,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(3, -22, -14) == aabb.LeftBottomNear());
 			Assert::IsTrue(PonyMath::Core::Vector3<float>(11, -22, -14) == aabb.RightBottomNear());
@@ -493,9 +493,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(std::int16_t{736}, aabb.Area());
 		}
@@ -505,9 +505,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(736.f, aabb.Area());
 		}
@@ -517,9 +517,9 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(std::int16_t{896}, aabb.Volume());
 		}
@@ -529,9 +529,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::AreEqual(896.f, aabb.Volume());
 		}
@@ -558,9 +558,9 @@ namespace Shape
 			for (std::size_t i = 0; i < 3; ++i)
 			{
 				const float was = aabb.Extent(i);
-				aabb.Extent(i, std::numeric_limits<float>::quiet_NaN());
+				aabb.Extent(i) = std::numeric_limits<float>::quiet_NaN();
 				Assert::IsFalse(aabb.IsFinite());
-				aabb.Extent(i, was);
+				aabb.Extent(i) = was;
 			}
 		}
 
@@ -569,14 +569,14 @@ namespace Shape
 			constexpr std::int16_t x = 7;
 			constexpr std::int16_t y = -8;
 			constexpr std::int16_t z = -12;
-			constexpr std::int16_t halfWidth = -4;
+			constexpr std::int16_t halfWidth = 4;
 			constexpr std::int16_t halfHeight = 14;
-			constexpr std::int16_t halfDepth = -2;
+			constexpr std::int16_t halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(aabb.Contains(aabb.Center()));
 			Assert::IsTrue(aabb.Contains(aabb.Min()));
 			Assert::IsTrue(aabb.Contains(aabb.Max()));
-			Assert::IsTrue(aabb.Contains(aabb.Center() + PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, halfDepth) / 2));
+			Assert::IsTrue(aabb.Contains(aabb.Center() + PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, -halfDepth) / 2));
 
 			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(100, y, z)));
 			Assert::IsFalse(aabb.Contains(PonyMath::Core::Vector3<std::int16_t>(x, -100, z)));
@@ -589,9 +589,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			Assert::IsTrue(aabb.Contains(aabb.Center()));
 			Assert::IsTrue(aabb.Contains(aabb.Min()));
@@ -604,14 +604,78 @@ namespace Shape
 			Assert::IsFalse(aabb.Contains(aabb.Max() + PonyMath::Core::Vector3<float>::Predefined::One));
 		}
 
+		TEST_METHOD(ClosestPointShortTest)
+		{
+			constexpr std::int16_t x = 7;
+			constexpr std::int16_t y = -8;
+			constexpr std::int16_t z = -12;
+			constexpr std::int16_t halfWidth = 4;
+			constexpr std::int16_t halfHeight = 14;
+			constexpr std::int16_t halfDepth = 2;
+			const auto aabb = PonyMath::Shape::AABB<std::int16_t>(x, y, z, halfWidth, halfHeight, halfDepth);
+			Assert::IsTrue(aabb.Center() == aabb.ClosestPoint(aabb.Center()));
+			Assert::IsTrue(aabb.Min() == aabb.ClosestPoint(aabb.Min()));
+			Assert::IsTrue(aabb.Max() == aabb.ClosestPoint(aabb.Max()));
+			auto vector = aabb.Center() + PonyMath::Core::Vector3<std::int16_t>(halfWidth, halfHeight, -halfDepth) / 2;
+			Assert::IsTrue(vector == aabb.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(100, y, z);
+			auto expected = PonyMath::Core::Vector3<std::int16_t>(aabb.MaxX(), y, z);
+			Assert::IsTrue(expected == aabb.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(x, -100, z);
+			expected = PonyMath::Core::Vector3<std::int16_t>(x, aabb.MinY(), z);
+			Assert::IsTrue(expected == aabb.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(x, y, 178);
+			expected = PonyMath::Core::Vector3<std::int16_t>(x, y, aabb.MaxZ());
+			Assert::IsTrue(expected == aabb.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(-100, 100, 178);
+			expected = PonyMath::Core::Vector3<std::int16_t>(aabb.MinX(), aabb.MaxY(), aabb.MaxZ());
+			Assert::IsTrue(expected == aabb.ClosestPoint(vector));
+		}
+
+		TEST_METHOD(ClosestPointFloatTest)
+		{
+			constexpr float x = 7;
+			constexpr float y = -8;
+			constexpr float z = -12;
+			constexpr float halfWidth = 4;
+			constexpr float halfHeight = 14;
+			constexpr float halfDepth = 2;
+			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(aabb.Center(), aabb.ClosestPoint(aabb.Center())));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(aabb.Min(), aabb.ClosestPoint(aabb.Min())));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(aabb.Max(), aabb.ClosestPoint(aabb.Max())));
+			auto vector = aabb.Center() + PonyMath::Core::Vector3<float>(halfWidth, halfHeight, -halfDepth) / 2.f;
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(vector, aabb.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(100, y, z);
+			auto expected = PonyMath::Core::Vector3<float>(aabb.MaxX(), y, z);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, aabb.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(x, -100, z);
+			expected = PonyMath::Core::Vector3<float>(x, aabb.MinY(), z);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, aabb.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(x, y, 178);
+			expected = PonyMath::Core::Vector3<float>(x, y, aabb.MaxZ());
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, aabb.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(-100, 100, 178);
+			expected = PonyMath::Core::Vector3<float>(aabb.MinX(), aabb.MaxY(), aabb.MaxZ());
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, aabb.ClosestPoint(vector)));
+		}
+
 		TEST_METHOD(ToStringTest)
 		{
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const std::string expected = std::format("Center: {}, Extents: {}", aabb.Center().ToString(), aabb.Extents().ToString());
 			Assert::AreEqual(expected, aabb.ToString());
@@ -626,17 +690,17 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto aabbInt = static_cast<PonyMath::Shape::AABB<std::int16_t>>(aabb);
 			Assert::AreEqual(static_cast<std::int16_t>(x), aabbInt.Center().X());
 			Assert::AreEqual(static_cast<std::int16_t>(y), aabbInt.Center().Y());
 			Assert::AreEqual(static_cast<std::int16_t>(z), aabbInt.Center().Z());
-			Assert::AreEqual(static_cast<std::int16_t>(-halfWidth), aabbInt.ExtentX());
+			Assert::AreEqual(static_cast<std::int16_t>(halfWidth), aabbInt.ExtentX());
 			Assert::AreEqual(static_cast<std::int16_t>(halfHeight), aabbInt.ExtentY());
-			Assert::AreEqual(static_cast<std::int16_t>(-halfDepth), aabbInt.ExtentZ());
+			Assert::AreEqual(static_cast<std::int16_t>(halfDepth), aabbInt.ExtentZ());
 		}
 
 		TEST_METHOD(ConvertToBoxTest)
@@ -644,13 +708,13 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			const auto box = static_cast<PonyMath::Shape::Box<float>>(aabb);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(aabb.Min(), box.Position()));
-			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Vector3<float>(-halfWidth, halfHeight, -halfDepth) * 2.f, box.Size()));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Vector3<float>(halfWidth, halfHeight, halfDepth) * 2.f, box.Size()));
 		}
 
 		TEST_METHOD(EqualityTest)
@@ -658,9 +722,9 @@ namespace Shape
 			constexpr float x = 7;
 			constexpr float y = -8;
 			constexpr float z = -12;
-			constexpr float halfWidth = -4;
+			constexpr float halfWidth = 4;
 			constexpr float halfHeight = 14;
-			constexpr float halfDepth = -2;
+			constexpr float halfDepth = 2;
 			const auto aabb = PonyMath::Shape::AABB<float>(x, y, z, halfWidth, halfHeight, halfDepth);
 			auto another = aabb;
 			Assert::IsTrue(aabb == another);
@@ -678,11 +742,11 @@ namespace Shape
 			for (std::size_t i = 0; i < 3; ++i)
 			{
 				const float was = another.Extent(i);
-				another.Extent(i, std::nextafter(was, 0.f));
+				another.Extent(i) = std::nextafter(was, 0.f);
 				Assert::IsFalse(aabb == another);
-				another.Extent(i, was + 1.f);
+				another.Extent(i) = was + 1.f;
 				Assert::IsFalse(aabb == another);
-				another.Extent(i, was);
+				another.Extent(i) = was;
 			}
 		}
 
@@ -712,12 +776,12 @@ namespace Shape
 			for (std::size_t i = 0; i < 3; ++i)
 			{
 				const float was = another.Extent(i);
-				another.Extent(i, std::nextafter(was, 0.f));
+				another.Extent(i) = std::nextafter(was, 0.f);
 				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another));
-				another.Extent(i, was + 1.f);
+				another.Extent(i) = was + 1.f;
 				Assert::IsFalse(PonyMath::Shape::AreAlmostEqual(aabb, another));
 				Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(aabb, another, 5.f));
-				another.Extent(i, was);
+				another.Extent(i) = was;
 			}
 		}
 
@@ -727,6 +791,11 @@ namespace Shape
 			auto movedAABB = std::move(defaultAABB);
 
 			movedAABB.Center() = PonyMath::Core::Vector3<float>(2.f, 5.f, -8.f);
+			movedAABB.ExtentX() = 2.f;
+			movedAABB.ExtentY() = 4.f;
+			movedAABB.ExtentZ() = 3.f;
+			movedAABB.Extent(1) = 3.f;
+			movedAABB.Extents() = PonyMath::Core::Vector3<float>(2.f, 5.f, 8.f);
 
 			auto copied = PonyMath::Shape::AABB<float>();
 			copied = defaultAABB;
@@ -741,6 +810,8 @@ namespace Shape
 		{
 			[[maybe_unused]] constexpr auto defaultAABB = PonyMath::Shape::AABB<float>();
 			[[maybe_unused]] constexpr auto copied = defaultAABB;
+			[[maybe_unused]] constexpr auto aabb = PonyMath::Shape::AABB<float>(-2.f, 3.f, 4.f, 4.f, 5.f, 2.f);
+			[[maybe_unused]] constexpr auto aabbV = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(-2.f, 3.f, 4.f), PonyMath::Core::Vector3<float>(4.f, 5.f, 2.f));
 			[[maybe_unused]] constexpr auto moved = AABBConstexpr();
 
 			[[maybe_unused]] constexpr auto center = moved.Center();
@@ -780,6 +851,8 @@ namespace Shape
 
 			[[maybe_unused]] constexpr auto area = moved.Area();
 			[[maybe_unused]] constexpr auto volume = moved.Volume();
+
+			[[maybe_unused]] constexpr auto closest = moved.ClosestPoint(PonyMath::Core::Vector3<float>(1.f, 2.f, 3.f));
 
 			[[maybe_unused]] constexpr auto box = static_cast<PonyMath::Shape::Box<float>>(moved);
 
