@@ -1342,21 +1342,29 @@ namespace Core
 		{
 			constexpr float x = 0.8;
 			constexpr float y = 0.2;
-			constexpr float z = 0.1;
-			constexpr auto vector = PonyMath::Core::Vector3<float>(x, y, z);
+			constexpr auto vector = PonyMath::Core::Vector2<float>(x, y);
 			constexpr float x1 = 0.9;
 			constexpr float y1 = 0.6;
-			constexpr float z1 = 0.1;
-			constexpr auto vector1 = PonyMath::Core::Vector3<float>(x1, y1, z1);
+			constexpr auto vector1 = PonyMath::Core::Vector2<float>(x1, y1);
 			constexpr float x2 = 0.85;
 			constexpr float y2 = 0.8;
-			constexpr float z2 = 0.5;
-			constexpr auto vector2 = PonyMath::Core::Vector3<float>(x2, y2, z2);
+			constexpr auto vector2 = PonyMath::Core::Vector2<float>(x2, y2);
 
 			auto clamped = PonyMath::Core::Clamp(vector2, vector, vector1);
 			Assert::AreEqual(x2, clamped.X());
 			Assert::AreEqual(y1, clamped.Y());
-			Assert::AreEqual(z, clamped.Z());
+		}
+
+		TEST_METHOD(ClampMagnitudeTest)
+		{
+			constexpr float x = 0.8;
+			constexpr float y = 0.2;
+			constexpr auto vector = PonyMath::Core::Vector2<float>(x, y);
+			auto clamped = PonyMath::Core::ClampMagnitude(vector, 40.f);
+			Assert::IsTrue(vector == clamped);
+
+			clamped = PonyMath::Core::ClampMagnitude(vector, 0.5f);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(vector.Normalized() * 0.5f, clamped));
 		}
 
 		TEST_METHOD(LerpShortTest)

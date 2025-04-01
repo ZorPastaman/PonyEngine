@@ -27,6 +27,20 @@ namespace Shape
 {
 	TEST_CLASS(Ray2DTests)
 	{
+		TEST_METHOD(TypesTest)
+		{
+			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Ray2D<float>::ValueType>);
+			Assert::IsTrue(std::is_same_v<double, PonyMath::Shape::Ray2D<double>::ValueType>);
+		}
+
+		TEST_METHOD(PredefinedTest)
+		{
+			Assert::IsTrue(PonyMath::Shape::Ray2D<float>(PonyMath::Core::Vector2<float>::Predefined::Zero, PonyMath::Core::Vector2<float>::Predefined::Up) == PonyMath::Shape::Ray2D<float>::Predefined::Up);
+			Assert::IsTrue(PonyMath::Shape::Ray2D<float>(PonyMath::Core::Vector2<float>::Predefined::Zero, PonyMath::Core::Vector2<float>::Predefined::Down) == PonyMath::Shape::Ray2D<float>::Predefined::Down);
+			Assert::IsTrue(PonyMath::Shape::Ray2D<float>(PonyMath::Core::Vector2<float>::Predefined::Zero, PonyMath::Core::Vector2<float>::Predefined::Right) == PonyMath::Shape::Ray2D<float>::Predefined::Right);
+			Assert::IsTrue(PonyMath::Shape::Ray2D<float>(PonyMath::Core::Vector2<float>::Predefined::Zero, PonyMath::Core::Vector2<float>::Predefined::Left) == PonyMath::Shape::Ray2D<float>::Predefined::Left);
+		}
+
 		TEST_METHOD(DefaultConstructorTest)
 		{
 			const auto ray = PonyMath::Shape::Ray2D<float>();

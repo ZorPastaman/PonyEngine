@@ -698,6 +698,70 @@ namespace Shape
 			Assert::IsFalse(box.Contains(box.Max() + PonyMath::Core::Vector3<float>::Predefined::One));
 		}
 
+		TEST_METHOD(ClosestPointShortTest)
+		{
+			constexpr std::int16_t x = 7;
+			constexpr std::int16_t y = -8;
+			constexpr std::int16_t z = -12;
+			constexpr std::int16_t width = 4;
+			constexpr std::int16_t height = 14;
+			constexpr std::int16_t depth = 2;
+			constexpr auto box = PonyMath::Shape::Box<std::int16_t>(x, y, z, width, height, depth);
+			Assert::IsTrue(box.Center() == box.ClosestPoint(box.Center()));
+			Assert::IsTrue(box.Min() == box.ClosestPoint(box.Min()));
+			Assert::IsTrue(box.Max() == box.ClosestPoint(box.Max()));
+			auto vector = box.Center() + PonyMath::Core::Vector3<std::int16_t>(width, height, -depth) / 2;
+			Assert::IsTrue(vector == box.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(100, y, z);
+			auto expected = PonyMath::Core::Vector3<std::int16_t>(box.MaxX(), y, z);
+			Assert::IsTrue(expected == box.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(x, -100, z);
+			expected = PonyMath::Core::Vector3<std::int16_t>(x, box.MinY(), z);
+			Assert::IsTrue(expected == box.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(x, y, 178);
+			expected = PonyMath::Core::Vector3<std::int16_t>(x, y, box.MaxZ());
+			Assert::IsTrue(expected == box.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector3<std::int16_t>(-100, 100, 178);
+			expected = PonyMath::Core::Vector3<std::int16_t>(box.MinX(), box.MaxY(), box.MaxZ());
+			Assert::IsTrue(expected == box.ClosestPoint(vector));
+		}
+
+		TEST_METHOD(ClosestPointFloatTest)
+		{
+			constexpr float x = 7;
+			constexpr float y = -8;
+			constexpr float z = -12;
+			constexpr float width = 4;
+			constexpr float height = 14;
+			constexpr float depth = 2;
+			constexpr auto box = PonyMath::Shape::Box<float>(x, y, z, width, height, depth);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(box.Center(), box.ClosestPoint(box.Center())));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(box.Min(), box.ClosestPoint(box.Min())));
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(box.Max(), box.ClosestPoint(box.Max())));
+			auto vector = box.Center() + PonyMath::Core::Vector3<float>(width, height, -depth) / 2.f;
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(vector, box.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(100, y, z);
+			auto expected = PonyMath::Core::Vector3<float>(box.MaxX(), y, z);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, box.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(x, -100, z);
+			expected = PonyMath::Core::Vector3<float>(x, box.MinY(), z);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, box.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(x, y, 178);
+			expected = PonyMath::Core::Vector3<float>(x, y, box.MaxZ());
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, box.ClosestPoint(vector)));
+
+			vector = PonyMath::Core::Vector3<float>(-100, 100, 178);
+			expected = PonyMath::Core::Vector3<float>(box.MinX(), box.MaxY(), box.MaxZ());
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(expected, box.ClosestPoint(vector)));
+		}
+
 		TEST_METHOD(NormalizeVectorTest)
 		{
 			constexpr float x = 7;
@@ -983,6 +1047,7 @@ namespace Shape
 			[[maybe_unused]] constexpr float volume = box.Volume();
 
 			[[maybe_unused]] constexpr bool contains = box.Contains(PonyMath::Core::Vector3<float>(-3.f, 2.f, 5.f));
+			[[maybe_unused]] constexpr auto closest = moved.ClosestPoint(PonyMath::Core::Vector3<float>(1.f, 2.f, 3.f));
 
 			[[maybe_unused]] constexpr auto normalizedV = box.Normalize(PonyMath::Core::Vector3<float>(-3.f, 2.f, 5.f));
 			[[maybe_unused]] constexpr auto unnormalizedV = box.Unnormalize(normalizedV);

@@ -13,6 +13,7 @@ module;
 
 export module PonyMath.Shape:AABB;
 
+import <algorithm>;
 import <array>;
 import <cmath>;
 import <concepts>;
@@ -58,16 +59,16 @@ export namespace PonyMath::Shape
 		/// @param x Center x component.
 		/// @param y Center y component.
 		/// @param z Center z component.
-		/// @param halfWidth Half width.
-		/// @param halfHeight Half height.
-		/// @param halfDepth Half depth.
+		/// @param halfWidth Half width. Must be positive.
+		/// @param halfHeight Half height. Must be positive.
+		/// @param halfDepth Half depth. Must be positive.
 		[[nodiscard("Pure constructor")]]
-		AABB(T x, T y, T z, T halfWidth, T halfHeight, T halfDepth) noexcept;
+		constexpr AABB(T x, T y, T z, T halfWidth, T halfHeight, T halfDepth) noexcept;
 		/// @brief Creates an AABB.
 		/// @param center Center.
-		/// @param extents Extents. Half-sizes in every dimension.
+		/// @param extents Extents. Half-sizes in every dimension. All the components must be positive.
 		[[nodiscard("Pure constructor")]]
-		AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept;
+		constexpr AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept;
 		/// @brief Converts the @p box to an AABB.
 		/// @param box Box.
 		[[nodiscard("Pure constructor")]]
@@ -89,42 +90,47 @@ export namespace PonyMath::Shape
 		constexpr const Core::Vector3<T>& Center() const noexcept;
 
 		/// @brief Gets the x extent.
+		/// @return X extent. Must be positive.
+		[[nodiscard("Pure function")]]
+		constexpr T& ExtentX() noexcept;
+		/// @brief Gets the x extent.
 		/// @return X extent.
 		[[nodiscard("Pure function")]]
-		constexpr T ExtentX() const noexcept;
-		/// @brief Sets the x extent.
-		/// @param extent X extent to set.
-		void ExtentX(T extent) noexcept;
+		constexpr const T& ExtentX() const noexcept;
+		/// @brief Gets the y extent.
+		/// @return Y extent. Must be positive.
+		[[nodiscard("Pure function")]]
+		constexpr T& ExtentY() noexcept;
 		/// @brief Gets the y extent.
 		/// @return Y extent.
 		[[nodiscard("Pure function")]]
-		constexpr T ExtentY() const noexcept;
-		/// @brief Sets the y extent.
-		/// @param extent Y extent to set.
-		void ExtentY(T extent) noexcept;
+		constexpr const T& ExtentY() const noexcept;
+		/// @brief Gets the z extent.
+		/// @return Z extent. Must be positive.
+		[[nodiscard("Pure function")]]
+		constexpr T& ExtentZ() noexcept;
 		/// @brief Gets the z extent.
 		/// @return Z extent.
 		[[nodiscard("Pure function")]]
-		constexpr T ExtentZ() const noexcept;
-		/// @brief Sets the z extent.
-		/// @param extent Z extent to set.
-		void ExtentZ(T extent) noexcept;
+		constexpr const T& ExtentZ() const noexcept;
+		/// @brief Gets an extent by the @p index.
+		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
+		/// @return Extent. Must be positive.
+		[[nodiscard("Pure function")]]
+		constexpr T& Extent(std::size_t index) noexcept;
 		/// @brief Gets an extent by the @p index.
 		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
 		/// @return Extent.
 		[[nodiscard("Pure function")]]
-		constexpr T Extent(std::size_t index) const noexcept;
-		/// @brief Sets an extent by the @p index.
-		/// @param index Extent index. 0 -> x, 1 -> y, 2 -> z.
-		/// @param extent Extent to set.
-		void Extent(std::size_t index, T extent) noexcept;
+		constexpr const T& Extent(std::size_t index) const noexcept;
+		/// @brief Gets the extents.
+		/// @return Extents. All the components must be positive.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T>& Extents() noexcept;
 		/// @brief Gets the extents.
 		/// @return Extents.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Extents() const noexcept;
-		/// @brief Sets the extents.
-		/// @param extents Extents to set.
-		void Extents(const Core::Vector3<T>& extents) noexcept;
 
 		/// @brief Gets the width.
 		/// @return Width.
@@ -248,6 +254,11 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Contains(const Core::Vector3<T>& point) const noexcept;
+		/// @brief Calculates the closest point on the box.
+		/// @param point Point.
+		/// @return The closest point. If the @p point lies inside the box, the @p point is returned.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> ClosestPoint(const Core::Vector3<T>& point) const noexcept;
 
 		/// @brief Creates a string representing the AABB.
 		/// @return String representing the AABB.
@@ -265,7 +276,7 @@ export namespace PonyMath::Shape
 		constexpr AABB& operator =(const AABB& other) noexcept = default;
 		constexpr AABB& operator =(AABB&& other) noexcept = default;
 
-		[[nodiscard("Pure function")]]
+		[[nodiscard("Pure operator")]]
 		constexpr bool operator ==(const AABB& other) const noexcept = default;
 
 	private:
@@ -302,16 +313,16 @@ export namespace PonyMath::Shape
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	AABB<T>::AABB(const T x, const T y, const T z, const T halfWidth, const T halfHeight, const T halfDepth) noexcept :
+	constexpr AABB<T>::AABB(const T x, const T y, const T z, const T halfWidth, const T halfHeight, const T halfDepth) noexcept :
 		center(x, y, z),
-		extents(std::abs(halfWidth), std::abs(halfHeight), std::abs(halfDepth))
+		extents(halfWidth, halfHeight, halfDepth)
 	{
 	}
 
 	template<Core::Arithmetic T>
-	AABB<T>::AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept :
+	constexpr AABB<T>::AABB(const Core::Vector3<T>& center, const Core::Vector3<T>& extents) noexcept :
 		center(center),
-		extents(Core::Abs(extents))
+		extents(extents)
 	{
 	}
 
@@ -334,64 +345,64 @@ namespace PonyMath::Shape
 		return center;
 	}
 
-	template<Core::Arithmetic T>
-	constexpr T AABB<T>::ExtentX() const noexcept
+	template <Core::Arithmetic T>
+	constexpr T& AABB<T>::ExtentX() noexcept
 	{
-		return Extent(0);
+		return extents[0];
 	}
 
-	template<Core::Arithmetic T>
-	void AABB<T>::ExtentX(const T extent) noexcept
+	template <Core::Arithmetic T>
+	constexpr const T& AABB<T>::ExtentX() const noexcept
 	{
-		Extent(0, extent);
+		return extents[0];
 	}
 
-	template<Core::Arithmetic T>
-	constexpr T AABB<T>::ExtentY() const noexcept
+	template <Core::Arithmetic T>
+	constexpr T& AABB<T>::ExtentY() noexcept
 	{
-		return Extent(1);
+		return extents[1];
 	}
 
-	template<Core::Arithmetic T>
-	void AABB<T>::ExtentY(const T extent) noexcept
+	template <Core::Arithmetic T>
+	constexpr const T& AABB<T>::ExtentY() const noexcept
 	{
-		Extent(1, extent);
+		return extents[1];
 	}
 
-	template<Core::Arithmetic T>
-	constexpr T AABB<T>::ExtentZ() const noexcept
+	template <Core::Arithmetic T>
+	constexpr T& AABB<T>::ExtentZ() noexcept
 	{
-		return Extent(2);
+		return extents[2];
 	}
 
-	template<Core::Arithmetic T>
-	void AABB<T>::ExtentZ(const T extent) noexcept
+	template <Core::Arithmetic T>
+	constexpr const T& AABB<T>::ExtentZ() const noexcept
 	{
-		Extent(2, extent);
+		return extents[2];
 	}
 
-	template<Core::Arithmetic T>
-	constexpr T AABB<T>::Extent(const std::size_t index) const noexcept
+	template <Core::Arithmetic T>
+	constexpr T& AABB<T>::Extent(const std::size_t index) noexcept
 	{
 		return extents[index];
 	}
 
-	template<Core::Arithmetic T>
-	void AABB<T>::Extent(const std::size_t index, const T extent) noexcept
+	template <Core::Arithmetic T>
+	constexpr const T& AABB<T>::Extent(const std::size_t index) const noexcept
 	{
-		extents[index] = std::abs(extent);
+		return extents[index];
+	}
+
+	template <Core::Arithmetic T>
+	constexpr Core::Vector3<T>& AABB<T>::Extents() noexcept
+	{
+		return extents;
 	}
 
 	template<Core::Arithmetic T>
 	constexpr const Core::Vector3<T>& AABB<T>::Extents() const noexcept
 	{
 		return extents;
-	}
-
-	template<Core::Arithmetic T>
-	void AABB<T>::Extents(const Core::Vector3<T>& extents) noexcept
-	{
-		this->extents = Core::Abs(extents);
 	}
 
 	template<Core::Arithmetic T>
@@ -583,6 +594,18 @@ namespace PonyMath::Shape
 		}
 
 		return true;
+	}
+
+	template <Core::Arithmetic T>
+	constexpr Core::Vector3<T> AABB<T>::ClosestPoint(const Core::Vector3<T>& point) const noexcept
+	{
+		Core::Vector3<T> answer;
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			answer[i] = std::clamp(point[i], Min(i), Max(i));
+		}
+
+		return answer;
 	}
 
 	template<Core::Arithmetic T>

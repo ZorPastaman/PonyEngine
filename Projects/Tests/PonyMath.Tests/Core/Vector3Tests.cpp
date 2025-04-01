@@ -1553,6 +1553,19 @@ namespace Core
 			Assert::AreEqual(z, clamped.Z());
 		}
 
+		TEST_METHOD(ClampMagnitudeTest)
+		{
+			constexpr float x = 0.8;
+			constexpr float y = 0.2;
+			constexpr float z = 0.1;
+			constexpr auto vector = PonyMath::Core::Vector3<float>(x, y, z);
+			auto clamped = PonyMath::Core::ClampMagnitude(vector, 40.f);
+			Assert::IsTrue(vector == clamped);
+
+			clamped = PonyMath::Core::ClampMagnitude(vector, 0.5f);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(vector.Normalized() * 0.5f, clamped));
+		}
+
 		TEST_METHOD(LerpShortTest)
 		{
 			constexpr std::int16_t xR = 2;

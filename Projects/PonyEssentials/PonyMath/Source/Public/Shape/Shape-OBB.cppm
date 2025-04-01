@@ -7,8 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:OBB;
 
+import <algorithm>;
 import <array>;
 import <concepts>;
 import <cmath>;
@@ -30,7 +35,7 @@ export namespace PonyMath::Shape
 	class OBB final
 	{
 	public:
-		using ValueType = T; ///< Value type.
+		using ValueType = T; ///< Component type.
 
 		static constexpr std::size_t AxesCount = 3; ///< Axes count.
 
@@ -43,6 +48,8 @@ export namespace PonyMath::Shape
 		static constexpr std::size_t LeftTopFarIndex = 6; ///< Left top far corner index.
 		static constexpr std::size_t RightTopFarIndex = 7; ///< Right top far corner index.
 		static constexpr std::size_t CornerCount = 8; ///< Corner count.
+
+		struct Predefined; ///< Predefined OBBs.
 
 		/// @brief Creates a zero OBB.
 		[[nodiscard("Pure constructor")]]
@@ -214,6 +221,8 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Contains(const Core::Vector3<T>& point) const noexcept;
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector3<T> ClosestPoint(const Core::Vector3<T>& point) const noexcept;
 
 		/// @brief Creates a string representing the OBB.
 		/// @return String representing the OBB.
@@ -259,6 +268,14 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const OBB<T>& obb);
+
+	template<std::floating_point T>
+	struct OBB<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static inline const auto Zero = OBB(AABB<float>::Predefined::Zero); ///< Zero OBB.
+	};
 }
 
 namespace PonyMath::Shape
@@ -549,6 +566,21 @@ namespace PonyMath::Shape
 		}
 
 		return true;
+	}
+
+	template <std::floating_point T>
+	constexpr Core::Vector3<T> OBB<T>::ClosestPoint(const Core::Vector3<T>& point) const noexcept
+	{
+		const Core::Vector3<T> delta = point - center;
+
+		Core::Vector3<T> answer = center;
+		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
+		{
+			const T dot = Core::Dot(delta, axes[i]);
+			answer += axes[i] * std::clamp(dot, -extents[i], extents[i]);
+		}
+
+		return answer;
 	}
 
 	template<std::floating_point T>

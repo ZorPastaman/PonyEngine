@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/ObjectBody.h"
+
 export module PonyMath.Shape:Ray2D;
 
 import <algorithm>;
@@ -26,6 +30,10 @@ export namespace PonyMath::Shape
 	class Ray2D final
 	{
 	public:
+		using ValueType = T; ///< Component type.
+
+		struct Predefined; ///< Predefined rays.
+
 		/// @brief Creates a default ray. The ray origin is the world origin, the ray direction is a right unit vector.
 		[[nodiscard("Pure constructor")]]
 		constexpr Ray2D() noexcept;
@@ -131,6 +139,17 @@ export namespace PonyMath::Shape
 	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Ray2D<T>& ray);
+
+	template<std::floating_point T>
+	struct Ray2D<T>::Predefined final
+	{
+		NON_CONSTRUCTIBLE_BODY(Predefined)
+
+		static constexpr auto Up = Ray2D(Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Up); ///< Ray2D(Zero, Up).
+		static constexpr auto Down = Ray2D(Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Down); ///< Ray2D(Zero, Down).
+		static constexpr auto Right = Ray2D(Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Right); ///< Ray2D(Zero, Right).
+		static constexpr auto Left = Ray2D(Core::Vector2<T>::Predefined::Zero, Core::Vector2<T>::Predefined::Left); ///< Ray2D(Zero, Left).
+	};
 }
 
 namespace PonyMath::Shape

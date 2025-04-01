@@ -24,6 +24,7 @@ import :AABB;
 import :OBB;
 import :Plane;
 import :Ray3D;
+import :Sphere;
 
 export namespace PonyMath::Shape
 {
@@ -35,6 +36,14 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray3D<T>& ray, const Plane<T>& plane, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param ray Ray.
+	/// @param sphere Sphere.
+	/// @param maxDistance Ray max distance.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Ray3D<T>& ray, const Sphere<T>& sphere, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param ray Ray.
@@ -70,6 +79,13 @@ export namespace PonyMath::Shape
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param plane Plane.
+	/// @param sphere Sphere.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Plane<T>& plane, const Sphere<T>& sphere) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param plane Plane.
 	/// @param aabb Axis-aligned bounding box.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -81,6 +97,43 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Plane<T>& plane, const OBB<T>& obb) noexcept;
+
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param left Left sphere.
+	/// @param right Right sphere.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Sphere<T>& left, const Sphere<T>& right) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param sphere Sphere.
+	/// @param ray Ray.
+	/// @param maxDistance Ray max distance.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Sphere<T>& sphere, const Ray3D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param sphere Sphere.
+	/// @param plane Plane.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Sphere<T>& sphere, const Plane<T>& plane) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param sphere Sphere.
+	/// @param aabb Axis-aligned bounding box.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Sphere<T>& sphere, const AABB<T>& aabb) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param sphere Sphere.
+	/// @param obb Oriented bounding box.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Sphere<T>& sphere, const OBB<T>& obb) noexcept;
 
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
@@ -104,6 +157,13 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param aabb Axis-aligned bounding box.
+	/// @param sphere Sphere.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const AABB<T>& aabb, const Sphere<T>& sphere) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param aabb Axis-aligned bounding box.
@@ -134,6 +194,13 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param obb Oriented bounding box.
+	/// @param sphere Sphere.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const OBB<T>& obb, const Sphere<T>& sphere) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param obb Oriented bounding box.
@@ -184,8 +251,25 @@ namespace PonyMath::Shape
 		const T distance = plane.Distance(ray.Origin());
 		const T dot = Core::Dot(plane.Normal(), ray.Direction());
 
-		return std::signbit(distance) != std::signbit(dot) && std::abs(distance) > T{0.0001} && std::abs(dot) > T{0.0001} &&
+		return std::signbit(distance) != std::signbit(dot) && std::abs(distance) > T{0} && std::abs(dot) > T{0.0001} &&
 			-distance / dot < maxDistance;
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Ray3D<T>& ray, const Sphere<T>& sphere, const T maxDistance) noexcept
+	{
+		const Core::Vector3<T> centerToRay = ray.Origin() - sphere.Center();
+		const T b = Core::Dot(ray.Direction(), centerToRay);
+		const T c = centerToRay.MagnitudeSquared() - sphere.Radius() * sphere.Radius();
+		const T dis = b * b - c;
+		if (dis < T{0})
+		{
+			return false;
+		}
+
+		const T t = -b - std::sqrt(dis);
+
+		return t > T{0} && t <= maxDistance;
 	}
 
 	template<std::floating_point T>
@@ -217,13 +301,13 @@ namespace PonyMath::Shape
 			tMax = std::min(tMax, t1);
 		}
 
-		return tMin > T{0.0001} && tMin <= tMax;
+		return tMin > T{0} && tMin <= tMax;
 	}
 
 	template<std::floating_point T>
 	bool AreIntersecting(const Ray3D<T>& ray, const OBB<T>& obb, const T maxDistance) noexcept
 	{
-		const Core::Matrix3x3<T> inverseRotation = Core::Matrix3x3<T>(obb.Axes()).Transpose();
+		const auto inverseRotation = Core::Matrix3x3<T>(obb.Axes()).Transpose();
 		const Core::Vector3<T> origin = inverseRotation * (ray.Origin() - obb.Center());
 		const Core::Vector3<T> direction = inverseRotation * ray.Direction();
 		const Ray3D<T> rotatedRay = Ray3D<T>(origin, direction);
@@ -244,6 +328,12 @@ namespace PonyMath::Shape
 		return AreIntersecting(ray, plane, maxDistance);
 	}
 
+	template <std::floating_point T>
+	bool AreIntersecting(const Plane<T>& plane, const Sphere<T>& sphere) noexcept
+	{
+		return sphere.Contains(plane.Project(sphere.Center()));
+	}
+
 	template<std::floating_point T>
 	bool AreIntersecting(const Plane<T>& plane, const AABB<T>& aabb) noexcept
 	{
@@ -258,6 +348,43 @@ namespace PonyMath::Shape
 		const std::array<Core::Vector3<T>, OBB<T>::CornerCount> corners = obb.Corners();
 
 		return AreIntersecting(plane, std::span<const Core::Vector3<float>>(corners.data(), corners.size()));
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Sphere<T>& left, const Sphere<T>& right) noexcept
+	{
+		const T radiusSum = left.Radius() + right.Radius();
+
+		return (left.Center() - right.Center()).MagnitudeSquared() <= radiusSum * radiusSum;
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Sphere<T>& sphere, const Ray3D<T>& ray, const T maxDistance) noexcept
+	{
+		return AreIntersecting(ray, sphere, maxDistance);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Sphere<T>& sphere, const Plane<T>& plane) noexcept
+	{
+		return AreIntersecting(plane, sphere);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Sphere<T>& sphere, const AABB<T>& aabb) noexcept
+	{
+		return sphere.Contains(aabb.ClosestPoint(sphere.Center()));
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Sphere<T>& sphere, const OBB<T>& obb) noexcept
+	{
+		const auto inverseRotation = Core::Matrix3x3<T>(obb.Axes()).Transpose();
+		const Core::Vector3<T> center = inverseRotation * (sphere.Center() - obb.Center());
+		const auto rotatedSphere = Sphere<T>(center, sphere.Radius());
+		const auto aabb = AABB<T>(Core::Vector3<T>::Predefined::Zero, obb.Extents());
+
+		return AreIntersecting(rotatedSphere, aabb);
 	}
 
 	template<Core::Arithmetic T>
@@ -284,6 +411,12 @@ namespace PonyMath::Shape
 	bool AreIntersecting(const AABB<T>& aabb, const Plane<T>& plane) noexcept
 	{
 		return AreIntersecting(plane, aabb);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const AABB<T>& aabb, const Sphere<T>& sphere) noexcept
+	{
+		return AreIntersecting(sphere, aabb);
 	}
 
 	template<std::floating_point T>
@@ -318,6 +451,12 @@ namespace PonyMath::Shape
 	bool AreIntersecting(const OBB<T>& obb, const Plane<T>& plane) noexcept
 	{
 		return AreIntersecting(plane, obb);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const OBB<T>& obb, const Sphere<T>& sphere) noexcept
+	{
+		return AreIntersecting(sphere, obb);
 	}
 
 	template<std::floating_point T>

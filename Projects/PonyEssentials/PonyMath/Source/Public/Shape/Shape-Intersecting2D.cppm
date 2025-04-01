@@ -21,6 +21,7 @@ import <span>;
 import PonyMath.Core;
 
 import :AABR;
+import :Circle;
 import :Line;
 import :OBR;
 import :Ray2D;
@@ -44,6 +45,14 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Ray2D<T>& ray, const Line<T>& line, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param ray Ray.
+	/// @param circle Circle.
+	/// @param maxDistance Ray max distance.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Ray2D<T>& ray, const Circle<T>& circle, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param ray Ray.
@@ -79,6 +88,13 @@ export namespace PonyMath::Shape
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param line Line.
+	/// @param circle Circle.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Line<T>& line, const Circle<T>& circle) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param line Line.
 	/// @param aabr Axis-aligned bounding rect.
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
@@ -90,6 +106,43 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const Line<T>& line, const OBR<T>& obr) noexcept;
+
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param left Left circle.
+	/// @param right Right circle.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Circle<T>& left, const Circle<T>& right) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param circle Circle.
+	/// @param ray Ray.
+	/// @param maxDistance Ray max distance.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Circle<T>& circle, const Ray2D<T>& ray, T maxDistance = std::numeric_limits<T>::infinity()) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param circle Circle.
+	/// @param line Line.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Circle<T>& circle, const Line<T>& line) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param circle Circle.
+	/// @param aabr Axis-aligned bounding rect.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Circle<T>& circle, const AABR<T>& aabr) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param circle Circle.
+	/// @param obr Oriented bounding rect.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const Circle<T>& circle, const OBR<T>& obr) noexcept;
 
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
@@ -113,6 +166,13 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const AABR<T>& aabr, const Line<T>& line) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param aabr Axis-aligned bounding rect.
+	/// @param circle Circle.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const AABR<T>& aabr, const Circle<T>& circle) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param aabr Axis-aligned bounding rect.
@@ -143,6 +203,13 @@ export namespace PonyMath::Shape
 	/// @return @a True if they are intersecting; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	bool AreIntersecting(const OBR<T>& obr, const Line<T>& line) noexcept;
+	/// @brief Checks if two shapes are intersecting.
+	/// @tparam T Component type.
+	/// @param obr Oriented bounding rect.
+	/// @param circle Circle.
+	/// @return @a True if they are intersecting; @a false otherwise.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreIntersecting(const OBR<T>& obr, const Circle<T>& circle) noexcept;
 	/// @brief Checks if two shapes are intersecting.
 	/// @tparam T Component type.
 	/// @param obr Oriented bounding rect.
@@ -184,7 +251,7 @@ namespace PonyMath::Shape
 		const T det = Core::CrossZ(right.Direction(), left.Direction());
 
 		return std::signbit(u) == std::signbit(v) && std::signbit(u) == std::signbit(det) &&
-			std::abs(u) > T{0.0001} && std::abs(v) > T{0.0001} && std::abs(det) > T{0.0001} &&
+			std::abs(u) > T{0} && std::abs(v) > T{0} && std::abs(det) > T{0.0001} &&
 			std::abs(u) < leftMaxDistance && std::abs(v) < rightMaxDistance;
 	}
 
@@ -194,8 +261,25 @@ namespace PonyMath::Shape
 		const T distance = line.Distance(ray.Origin());
 		const T dot = Core::Dot(line.Normal(), ray.Direction());
 
-		return std::signbit(distance) != std::signbit(dot) && std::abs(distance) > T{0.0001} && std::abs(dot) > T{0.0001} &&
+		return std::signbit(distance) != std::signbit(dot) && std::abs(distance) > T{0} && std::abs(dot) > T{0.0001} &&
 			-distance / dot < maxDistance;
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Ray2D<T>& ray, const Circle<T>& circle, const T maxDistance) noexcept
+	{
+		const Core::Vector2<T> centerToRay = ray.Origin() - circle.Center();
+		const T b = Core::Dot(ray.Direction(), centerToRay);
+		const T c = centerToRay.MagnitudeSquared() - circle.Radius() * circle.Radius();
+		const T dis = b * b - c;
+		if (dis < T{0})
+		{
+			return false;
+		}
+
+		const T t = -b - std::sqrt(dis);
+
+		return t > T{0} && t <= maxDistance;
 	}
 
 	template<std::floating_point T>
@@ -227,13 +311,13 @@ namespace PonyMath::Shape
 			tMax = std::min(tMax, t1);
 		}
 
-		return tMin > T{0.0001} && tMin <= tMax;
+		return tMin > T{0} && tMin <= tMax;
 	}
 
 	template<std::floating_point T>
 	bool AreIntersecting(const Ray2D<T>& ray, const OBR<T>& obr, const T maxDistance) noexcept
 	{
-		const Core::Matrix2x2<T> inverseRotation = Core::Matrix2x2<T>(obr.Axes()).Transpose();
+		const auto inverseRotation = Core::Matrix2x2<T>(obr.Axes()).Transpose();
 		const Core::Vector2<T> origin = inverseRotation * (ray.Origin() - obr.Center());
 		const Core::Vector2<T> direction = inverseRotation * ray.Direction();
 		const auto rotatedRay = Ray2D<T>(origin, direction);
@@ -254,6 +338,12 @@ namespace PonyMath::Shape
 		return AreIntersecting(ray, line, maxDistance);
 	}
 
+	template <std::floating_point T>
+	bool AreIntersecting(const Line<T>& line, const Circle<T>& circle) noexcept
+	{
+		return circle.Contains(line.Project(circle.Center()));
+	}
+
 	template<std::floating_point T>
 	bool AreIntersecting(const Line<T>& line, const AABR<T>& aabr) noexcept
 	{
@@ -268,6 +358,43 @@ namespace PonyMath::Shape
 		const std::array<Core::Vector2<T>, OBR<T>::CornerCount> corners = obr.Corners();
 
 		return AreIntersecting(line, std::span<const Core::Vector2<T>>(corners.data(), corners.size()));
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Circle<T>& left, const Circle<T>& right) noexcept
+	{
+		const T radiusSum = left.Radius() + right.Radius();
+
+		return (left.Center() - right.Center()).MagnitudeSquared() <= radiusSum * radiusSum;
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Circle<T>& circle, const Ray2D<T>& ray, const T maxDistance) noexcept
+	{
+		return AreIntersecting(ray, circle, maxDistance);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Circle<T>& circle, const Line<T>& line) noexcept
+	{
+		return AreIntersecting(line, circle);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Circle<T>& circle, const AABR<T>& aabr) noexcept
+	{
+		return circle.Contains(aabr.ClosestPoint(circle.Center()));
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const Circle<T>& circle, const OBR<T>& obr) noexcept
+	{
+		const auto inverseRotation = Core::Matrix2x2<T>(obr.Axes()).Transpose();
+		const Core::Vector2<T> center = inverseRotation * (circle.Center() - obr.Center());
+		const auto rotatedCircle = Circle<T>(center, circle.Radius());
+		const auto aabr = AABR<T>(Core::Vector2<T>::Predefined::Zero, obr.Extents());
+
+		return AreIntersecting(rotatedCircle, aabr);
 	}
 
 	template<Core::Arithmetic T>
@@ -296,6 +423,12 @@ namespace PonyMath::Shape
 		return AreIntersecting(line, aabr);
 	}
 
+	template <std::floating_point T>
+	bool AreIntersecting(const AABR<T>& aabr, const Circle<T>& circle) noexcept
+	{
+		return AreIntersecting(circle, aabr);
+	}
+
 	template<std::floating_point T>
 	bool AreIntersecting(const AABR<T>& aabr, const OBR<T>& obr) noexcept
 	{
@@ -320,6 +453,12 @@ namespace PonyMath::Shape
 	bool AreIntersecting(const OBR<T>& obr, const Line<T>& line) noexcept
 	{
 		return AreIntersecting(line, obr);
+	}
+
+	template <std::floating_point T>
+	bool AreIntersecting(const OBR<T>& obr, const Circle<T>& circle) noexcept
+	{
+		return AreIntersecting(circle, obr);
 	}
 
 	template<std::floating_point T>

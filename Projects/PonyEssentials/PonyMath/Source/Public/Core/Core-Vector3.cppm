@@ -361,6 +361,13 @@ export namespace PonyMath::Core
 	/// @return Clamped vector.
 	template<Arithmetic T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> Clamp(const Vector3<T>& value, const Vector3<T>& min, const Vector3<T>& max) noexcept;
+	/// @brief Clamps the @p vector magnitude.
+	/// @tparam T Component type.
+	/// @param vector Vector.
+	/// @param magnitude Max magnitude.
+	/// @return Clamped vector.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	Vector3<T> ClampMagnitude(const Vector3<T>& vector, T magnitude) noexcept;
 	/// @brief Linear interpolation between the two vectors if the @p time is in range [0, 1].
 	///        Linear extrapolation between the two vectors if the @p time is out of range [0, 1].
 	/// @tparam T Component type.
@@ -823,6 +830,16 @@ namespace PonyMath::Core
 		}
 
 		return clamped;
+	}
+
+	template <std::floating_point T>
+	Vector3<T> ClampMagnitude(const Vector3<T>& vector, const T magnitude) noexcept
+	{
+		const T vectorMagnitudeSqr = vector.MagnitudeSquared();
+
+		return vectorMagnitudeSqr > magnitude * magnitude
+			? vector * (magnitude / std::sqrt(vectorMagnitudeSqr))
+			: vector;
 	}
 
 	template<Arithmetic T>

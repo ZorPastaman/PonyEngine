@@ -136,5 +136,11 @@
     <ClCompile Include="Source\Public\Shape\Shape-OBB.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Circle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Sphere.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

@@ -52,15 +52,15 @@ namespace PonyMath::Shape
 			max = Core::Max(max, positions[i]);
 		}
 
-		AABR<T> answer;
-		answer.Center() = (min + max) / T{2};
+		const Core::Vector2<T> center = (min + max) / T{2};
+		Core::Vector2<T> extents;
 		for (std::size_t i = 0; i < Core::Vector2<T>::ComponentCount; ++i)
 		{
-			const T extent = std::max(max[i] - answer.Center()[i], answer.Center()[i] - min[i]);
-			answer.Extent(i, extent);
+			const T extent = std::max(max[i] - center[i], center[i] - min[i]);
+			extents[i] = std::max(extent, T{0});
 		}
 
-		return answer;
+		return AABR<T>(center, extents);
 	}
 
 	template<Core::Arithmetic T>
@@ -79,14 +79,14 @@ namespace PonyMath::Shape
 			max = Core::Max(max, positions[i]);
 		}
 
-		AABB<T> answer;
-		answer.Center() = (min + max) / T{2};
+		const Core::Vector3<T> center = (min + max) / T{2};
+		Core::Vector3<T> extents;
 		for (std::size_t i = 0; i < Core::Vector3<T>::ComponentCount; ++i)
 		{
-			const T extent = std::max(max[i] - answer.Center()[i], answer.Center()[i] - min[i]);
-			answer.Extent(i, extent);
+			const T extent = std::max(max[i] - center[i], center[i] - min[i]);
+			extents[i] = std::max(extent, T{0});
 		}
 
-		return answer;
+		return AABB<T>(center, extents);
 	}
 }
