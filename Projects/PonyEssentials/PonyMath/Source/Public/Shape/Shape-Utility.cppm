@@ -11,6 +11,7 @@ export module PonyMath.Shape:Utility;
 
 import <algorithm>;
 import <cstddef>;
+import <optional>;
 import <span>;
 
 import PonyMath.Core;
@@ -23,25 +24,25 @@ export namespace PonyMath::Shape
 	/// @brief Creates an axis-aligned bounding rect that overlaps all the @p positions.
 	/// @tparam T Component type.
 	/// @param positions Position.
-	/// @return Axis-aligned bounding rect.
+	/// @return Axis-aligned bounding rect. @a Nullopt if the @p positions count is zero.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	AABR<T> CreateBoundingRect(std::span<const Core::Vector2<T>> positions) noexcept;
+	std::optional<AABR<T>> CreateBoundingRect(std::span<const Core::Vector2<T>> positions) noexcept;
 	/// @brief Creates an axis-aligned bounding box that overlaps all the @p positions.
 	/// @tparam T Component type.
 	/// @param positions Position.
-	/// @return Axis-aligned bounding box.
+	/// @return Axis-aligned bounding box. @a Nullopt if the @p positions count is zero.
 	template<Core::Arithmetic T> [[nodiscard("Pure function")]]
-	AABB<T> CreateBoundingBox(std::span<const Core::Vector3<T>> positions) noexcept;
+	std::optional<AABB<T>> CreateBoundingBox(std::span<const Core::Vector3<T>> positions) noexcept;
 }
 
 namespace PonyMath::Shape
 {
 	template<Core::Arithmetic T>
-	AABR<T> CreateBoundingRect(const std::span<const Core::Vector2<T>> positions) noexcept
+	std::optional<AABR<T>> CreateBoundingRect(const std::span<const Core::Vector2<T>> positions) noexcept
 	{
 		if (positions.size() == 0) [[unlikely]]
 		{
-			return AABR<T>::Predefined::Zero;
+			return std::nullopt;
 		}
 
 		auto min = positions[0];
@@ -64,11 +65,11 @@ namespace PonyMath::Shape
 	}
 
 	template<Core::Arithmetic T>
-	AABB<T> CreateBoundingBox(const std::span<const Core::Vector3<T>> positions) noexcept
+	std::optional<AABB<T>> CreateBoundingBox(const std::span<const Core::Vector3<T>> positions) noexcept
 	{
 		if (positions.size() == 0) [[unlikely]]
 		{
-			return AABB<T>::Predefined::Zero;
+			return std::nullopt;
 		}
 
 		auto min = positions[0];

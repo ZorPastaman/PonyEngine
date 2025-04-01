@@ -208,6 +208,11 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector2<T>& point) const noexcept;
+		/// @brief Calculates the closest point on the rect.
+		/// @param point Point.
+		/// @return The closest point. If the @p point lies inside the rect, the @p point is returned.
+		[[nodiscard("Pure function")]]
+		constexpr Core::Vector2<T> ClosestPoint(const Core::Vector2<T>& point) const noexcept;
 
 		/// @brief Normalizes the point inside the rect.
 		/// @details Min point is [0, 0]; Max point is [1, 1].
@@ -541,6 +546,12 @@ namespace PonyMath::Shape
 	constexpr bool Rect<T>::Contains(const Core::Vector2<T>& point) const noexcept
 	{
 		return point.X() >= MinX() && point.Y() >= MinY() && point.X() <= MaxX() && point.Y() <= MaxY();
+	}
+
+	template <Core::Arithmetic T>
+	constexpr Core::Vector2<T> Rect<T>::ClosestPoint(const Core::Vector2<T>& point) const noexcept
+	{
+		return Core::Clamp(point, Min(), Max());
 	}
 
 	template<Core::Arithmetic T>

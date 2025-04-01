@@ -221,6 +221,9 @@ export namespace PonyMath::Shape
 		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Contains(const Core::Vector3<T>& point) const noexcept;
+		/// @brief Calculates the closest point on the box.
+		/// @param point Point.
+		/// @return The closest point. If the @p point lies inside the box, the @p point is returned.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T> ClosestPoint(const Core::Vector3<T>& point) const noexcept;
 
@@ -248,7 +251,6 @@ export namespace PonyMath::Shape
 		Core::Vector3<T> extents; ///< Extents.
 		std::array<Core::Vector3<T>, 3> axes; ///< Axes in order x, y, z.
 
-		template<std::floating_point U>
 		friend class OBB;
 	};
 

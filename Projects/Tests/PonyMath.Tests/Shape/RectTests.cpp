@@ -249,6 +249,32 @@ namespace Shape
 			Assert::IsFalse(rect.Contains(PonyMath::Core::Vector2<float>(5.f, -7.f)));
 		}
 
+		TEST_METHOD(ClosestPointShortTest)
+		{
+			constexpr std::int16_t x = 7;
+			constexpr std::int16_t y = -8;
+			constexpr std::int16_t width = 4;
+			constexpr std::int16_t height = 14;
+			constexpr auto rect = PonyMath::Shape::Rect<std::int16_t>(x, y, width, height);
+			Assert::IsTrue(rect.Center() == rect.ClosestPoint(rect.Center()));
+			Assert::IsTrue(rect.Min() == rect.ClosestPoint(rect.Min()));
+			Assert::IsTrue(rect.Max() == rect.ClosestPoint(rect.Max()));
+			auto vector = rect.Center() + PonyMath::Core::Vector2<std::int16_t>(width, height) / 2;
+			Assert::IsTrue(vector == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(100, y);
+			auto expected = PonyMath::Core::Vector2<std::int16_t>(rect.MaxX(), y);
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(x, -100);
+			expected = PonyMath::Core::Vector2<std::int16_t>(x, rect.MinY());
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(-100, 100);
+			expected = PonyMath::Core::Vector2<std::int16_t>(rect.MinX(), rect.MaxY());
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
+		}
+
 		TEST_METHOD(NormalizePointTest)
 		{
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
