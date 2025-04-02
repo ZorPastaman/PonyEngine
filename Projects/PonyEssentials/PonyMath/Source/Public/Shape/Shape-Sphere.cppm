@@ -24,18 +24,29 @@ import PonyMath.Core;
 
 export namespace PonyMath::Shape
 {
+	/// @brief Sphere implementation.
+	/// @tparam T Component type.
 	template<std::floating_point T>
 	class Sphere final
 	{
 	public:
-		using ValueType = T;
+		using ValueType = T; ///< Component type.
 
-		struct Predefined;
+		struct Predefined; ///< Predefined spheres.
 
+		/// @brief Creates a zero sphere.
 		[[nodiscard("Pure constructor")]]
 		constexpr Sphere() noexcept = default;
+		/// @brief Creates a sphere.
+		/// @param x Center x component.
+		/// @param y Center y component.
+		/// @param z Center z component.
+		/// @param radius Radius.
 		[[nodiscard("Pure constructor")]]
 		constexpr Sphere(T x, T y, T z, T radius) noexcept;
+		/// @brief Creates a sphere.
+		/// @param center Center.
+		/// @param radius Radius.
 		[[nodiscard("Pure constructor")]]
 		constexpr Sphere(const Core::Vector3<T>& center, T radius) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -45,15 +56,25 @@ export namespace PonyMath::Shape
 
 		constexpr ~Sphere() noexcept = default;
 
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr Core::Vector3<T>& Center() noexcept;
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		constexpr const Core::Vector3<T>& Center() const noexcept;
+		/// @brief Gets the radius.
+		/// @return Radius. Must be positive.
 		[[nodiscard("Pure function")]]
 		constexpr T& Radius() noexcept;
+		/// @brief Gets the radius.
+		/// @return Radius.
 		[[nodiscard("Pure function")]]
 		constexpr const T& Radius() const noexcept;
 
+		/// @brief Calculates a diameter.
+		/// @return Diameter.
 		[[nodiscard("Pure function")]]
 		constexpr T Diameter() const noexcept;
 
@@ -66,17 +87,29 @@ export namespace PonyMath::Shape
 		[[nodiscard("Pure function")]]
 		constexpr T Volume() const noexcept;
 
+		/// @brief Checks if all the box data is finite.
+		/// @return @a True if they are finite; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsFinite() const noexcept;
 
+		/// @brief Checks if the sphere contains the @p point.
+		/// @param point Point to check.
+		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		constexpr bool Contains(const Core::Vector3<T>& point) const noexcept;
+		/// @brief Calculates the closest point on the sphere.
+		/// @param point Point.
+		/// @return The closest point. If the @p point lies inside the sphere, the @p point is returned.
 		[[nodiscard("Pure function")]]
 		Core::Vector3<T> ClosestPoint(const Core::Vector3<T>& point) const noexcept;
 
+		/// @brief Creates a string representing the sphere.
+		/// @return String representing the sphere.
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts the sphere to a sphere of another type.
+		/// @tparam U Target type.
 		template<std::floating_point U> [[nodiscard("Pure operator")]]
 		explicit constexpr operator Sphere<U>() const noexcept;
 
@@ -87,13 +120,24 @@ export namespace PonyMath::Shape
 		constexpr bool operator ==(const Sphere& other) const noexcept = default;
 
 	private:
-		Core::Vector3<T> center;
-		T radius;
+		Core::Vector3<T> center; ///< Center.
+		T radius; ///< Radius.
 	};
 
+	/// @brief Checks if the two spheres are almost equal with the tolerance value.
+	/// @tparam T Component type.
+	/// @param left Left sphere.
+	/// @param right Right sphere.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if they are almost equal; @a false otherwise.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Sphere<T>& left, const Sphere<T>& right, T tolerance = T{ 0.00001 }) noexcept;
+	bool AreAlmostEqual(const Sphere<T>& left, const Sphere<T>& right, T tolerance = T{0.00001}) noexcept;
 
+	/// @brief Puts sphere.ToString() into the @p stream.
+	/// @tparam T Component type.
+	/// @param stream Target stream.
+	/// @param sphere Source sphere.
+	/// @return @p stream.
 	template<std::floating_point T>
 	std::ostream& operator <<(std::ostream& stream, const Sphere<T>& sphere);
 
@@ -102,7 +146,7 @@ export namespace PonyMath::Shape
 	{
 		NON_CONSTRUCTIBLE_BODY(Predefined)
 
-		static constexpr auto Zero = Sphere(Core::Vector3<T>::Predefined::Zero, T{0});
+		static constexpr auto Zero = Sphere(Core::Vector3<T>::Predefined::Zero, T{0}); ///< Sphere(Zero, 0).
 	};
 }
 
