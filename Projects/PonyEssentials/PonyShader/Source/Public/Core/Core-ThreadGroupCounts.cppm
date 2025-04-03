@@ -9,59 +9,102 @@
 
 export module PonyShader.Core:ThreadGroupCounts;
 
+import <algorithm>;
 import <array>;
+import <cstddef>;
 import <cstdint>;
 import <span>;
 import <stdexcept>;
 
 export namespace PonyShader::Core
 {
+	/// @brief Thread group counts wrapper.
 	class ThreadGroupCounts final
 	{
 	public:
-		static constexpr std::uint32_t ThreadGroupCountMax = 65536u;
-		static constexpr std::uint32_t ThreadGroupCountProductMax = 4194304u;
+		static constexpr std::size_t ThreadGroupCountCount = 3; ///< Thread group counts count.
+		static constexpr std::uint32_t ThreadGroupCountMax = 65536u; ///< Every thread group count must be less than this number.
+		static constexpr std::uint32_t ThreadGroupCountProductMax = 4194304u; ///< A product of thread group counts mustn't exceed this number.
 
+		/// @brief Creates zero thread group counts.
 		[[nodiscard("Pure constructor")]]
-		ThreadGroupCounts() noexcept = default;
+		constexpr ThreadGroupCounts() noexcept = default;
+		/// @brief Creates thread group counts.
+		/// @throw std::invalid_argument If any thread group count isn't less than @p ThreadGroupCountMax.
+		/// @throw std::invalid_argument If the product of every thread group count is greater than @p ThreadGroupCountProductMax.
+		/// @param x Thread group count X.
+		/// @param y Thread group count Y.
+		/// @param z Thread group count Z.
 		[[nodiscard("Pure constructor")]]
-		ThreadGroupCounts(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+		constexpr ThreadGroupCounts(std::uint32_t x, std::uint32_t y, std::uint32_t z);
+		/// @brief Creates thread group counts.
+		/// @param span Thread group counts. The order is x, y, z.
 		[[nodiscard("Pure constructor")]]
-		explicit ThreadGroupCounts(std::span<const std::uint32_t, 3> span);
+		explicit constexpr ThreadGroupCounts(std::span<const std::uint32_t, 3> span);
 		[[nodiscard("Pure constructor")]]
-		ThreadGroupCounts(const ThreadGroupCounts& other) noexcept = default;
+		constexpr ThreadGroupCounts(const ThreadGroupCounts& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		ThreadGroupCounts(ThreadGroupCounts&& other) noexcept = default;
+		constexpr ThreadGroupCounts(ThreadGroupCounts&& other) noexcept = default;
 
-		~ThreadGroupCounts() noexcept = default;
+		constexpr ~ThreadGroupCounts() noexcept = default;
 
+		/// @brief Gets the thread group count X.
+		/// @return Thread group count X.
 		[[nodiscard("Pure function")]]
-		std::uint32_t ThreadGroupCountX() const noexcept;
-		void ThreadGroupCountX(std::uint32_t count);
+		constexpr std::uint32_t ThreadGroupCountX() const noexcept;
+		/// @brief Sets the thread group count X.
+		/// @throw std::invalid_argument If the @p count isn't less than @p ThreadGroupCountMax.
+		/// @throw std::invalid_argument If the product of every thread group count is greater than @p ThreadGroupCountProductMax.
+		/// @param count Thread group count X to set.
+		constexpr void ThreadGroupCountX(std::uint32_t count);
+		/// @brief Gets the thread group count Y.
+		/// @return Thread group count Y.
 		[[nodiscard("Pure function")]]
-		std::uint32_t ThreadGroupCountY() const noexcept;
-		void ThreadGroupCountY(std::uint32_t count);
+		constexpr std::uint32_t ThreadGroupCountY() const noexcept;
+		/// @brief Sets the thread group count Y.
+		/// @throw std::invalid_argument If the @p count isn't less than @p ThreadGroupCountMax.
+		/// @throw std::invalid_argument If the product of every thread group count is greater than @p ThreadGroupCountProductMax.
+		/// @param count Thread group count Y to set.
+		constexpr void ThreadGroupCountY(std::uint32_t count);
+		/// @brief Gets the thread group count Z.
+		/// @return Thread group count Z.
 		[[nodiscard("Pure function")]]
-		std::uint32_t ThreadGroupCountZ() const noexcept;
-		void ThreadGroupCountZ(std::uint32_t count);
+		constexpr std::uint32_t ThreadGroupCountZ() const noexcept;
+		/// @brief Sets the thread group count Z.
+		/// @throw std::invalid_argument If the @p count isn't less than @p ThreadGroupCountMax.
+		/// @throw std::invalid_argument If the product of every thread group count is greater than @p ThreadGroupCountProductMax.
+		/// @param count Thread group count Z to set.
+		constexpr void ThreadGroupCountZ(std::uint32_t count);
+		/// @brief Gets the thread group count by the @p index.
+		/// @param index Thread group count index. 0 -> x, 1 -> y, 2 -> z.
+		/// @return Thread group count.
 		[[nodiscard("Pure function")]]
-		std::span<const std::uint32_t, 3> Span() const noexcept;
+		constexpr std::uint32_t ThreadGroupCount(std::size_t index) const noexcept;
+		/// @brief Sets the thread group count by the @p index.
+		/// @throw std::invalid_argument If the @p count isn't less than @p ThreadGroupCountMax.
+		/// @throw std::invalid_argument If the product of every thread group count is greater than @p ThreadGroupCountProductMax.
+		/// @param index Thread group count index. 0 -> x, 1 -> y, 2 -> z.
+		/// @param count Thread group count to set.
+		constexpr void ThreadGroupCount(std::size_t index, std::uint32_t count);
+		/// @brief Gets the thread group counts.
+		/// @return Thread group counts.
+		[[nodiscard("Pure function")]]
+		constexpr std::span<const std::uint32_t, 3> Span() const noexcept;
 
-		ThreadGroupCounts& operator =(const ThreadGroupCounts& other) noexcept = default;
-		ThreadGroupCounts& operator =(ThreadGroupCounts&& other) noexcept = default;
+		constexpr ThreadGroupCounts& operator =(const ThreadGroupCounts& other) noexcept = default;
+		constexpr ThreadGroupCounts& operator =(ThreadGroupCounts&& other) noexcept = default;
 
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const ThreadGroupCounts& other) const noexcept;
+		constexpr bool operator ==(const ThreadGroupCounts& other) const noexcept;
 
 	private:
-		std::array<std::uint32_t, 3> counts;
-		std::uint32_t padding = 0u;
+		std::array<std::uint32_t, 3> counts; ///< Thread group counts.
 	};
 }
 
 namespace PonyShader::Core
 {
-	ThreadGroupCounts::ThreadGroupCounts(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z) :
+	constexpr ThreadGroupCounts::ThreadGroupCounts(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z) :
 		counts{ x, y, z }
 	{
 		if (x >= ThreadGroupCountMax || y >= ThreadGroupCountMax || z >= ThreadGroupCountMax) [[unlikely]]
@@ -74,7 +117,7 @@ namespace PonyShader::Core
 		}
 	}
 
-	ThreadGroupCounts::ThreadGroupCounts(const std::span<const std::uint32_t, 3> span)
+	constexpr ThreadGroupCounts::ThreadGroupCounts(const std::span<const std::uint32_t, 3> span)
 	{
 		std::ranges::copy(span, counts.data());
 
@@ -88,69 +131,64 @@ namespace PonyShader::Core
 		}
 	}
 
-	std::uint32_t ThreadGroupCounts::ThreadGroupCountX() const noexcept
+	constexpr std::uint32_t ThreadGroupCounts::ThreadGroupCountX() const noexcept
 	{
-		return counts[0];
+		return ThreadGroupCount(0);
 	}
 
-	void ThreadGroupCounts::ThreadGroupCountX(const std::uint32_t count)
+	constexpr void ThreadGroupCounts::ThreadGroupCountX(const std::uint32_t count)
 	{
-		if (count >= ThreadGroupCountMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count must be less than 65536.");
-		}
-		if (count * counts[1] * counts[2] > ThreadGroupCountProductMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count product exceeds 4194304.");
-		}
-
-		counts[0] = count;
+		ThreadGroupCount(0, count);
 	}
 
-	std::uint32_t ThreadGroupCounts::ThreadGroupCountY() const noexcept
+	constexpr std::uint32_t ThreadGroupCounts::ThreadGroupCountY() const noexcept
 	{
-		return counts[1];
+		return ThreadGroupCount(1);
 	}
 
-	void ThreadGroupCounts::ThreadGroupCountY(const std::uint32_t count)
+	constexpr void ThreadGroupCounts::ThreadGroupCountY(const std::uint32_t count)
 	{
-		if (count >= ThreadGroupCountMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count must be less than 65536.");
-		}
-		if (counts[0] * count * counts[2] > ThreadGroupCountProductMax) [[unlikely]]
-		{
-			throw std::invalid_argument("Thread group count product exceeds 4194304.");
-		}
-
-		counts[1] = count;
+		ThreadGroupCount(1, count);
 	}
 
-	std::uint32_t ThreadGroupCounts::ThreadGroupCountZ() const noexcept
+	constexpr std::uint32_t ThreadGroupCounts::ThreadGroupCountZ() const noexcept
 	{
-		return counts[2];
+		return ThreadGroupCount(2);
 	}
 
-	void ThreadGroupCounts::ThreadGroupCountZ(const std::uint32_t count)
+	constexpr void ThreadGroupCounts::ThreadGroupCountZ(const std::uint32_t count)
+	{
+		ThreadGroupCount(2, count);
+	}
+
+	constexpr std::uint32_t ThreadGroupCounts::ThreadGroupCount(const std::size_t index) const noexcept
+	{
+		return counts[index];
+	}
+
+	constexpr void ThreadGroupCounts::ThreadGroupCount(const std::size_t index, const std::uint32_t count)
 	{
 		if (count >= ThreadGroupCountMax) [[unlikely]]
 		{
 			throw std::invalid_argument("Thread group count must be less than 65536.");
 		}
-		if (counts[0] * counts[1] * count > ThreadGroupCountProductMax) [[unlikely]]
+
+		std::array<std::uint32_t, 3> newCounts = counts;
+		newCounts[index] = count;
+		if (newCounts[0] * newCounts[1] * newCounts[2] > ThreadGroupCountProductMax) [[unlikely]]
 		{
 			throw std::invalid_argument("Thread group count product exceeds 4194304.");
 		}
 
-		counts[2] = count;
+		counts = newCounts;
 	}
 
-	std::span<const std::uint32_t, 3> ThreadGroupCounts::Span() const noexcept
+	constexpr std::span<const std::uint32_t, 3> ThreadGroupCounts::Span() const noexcept
 	{
 		return counts;
 	}
 
-	bool ThreadGroupCounts::operator ==(const ThreadGroupCounts& other) const noexcept
+	constexpr bool ThreadGroupCounts::operator ==(const ThreadGroupCounts& other) const noexcept
 	{
 		return counts == other.counts;
 	}

@@ -413,7 +413,7 @@ namespace PonyEngine::Render::Direct3D12
 	template<typename T>
 	void GraphicsPipeline::UpdateHeap(RenderObjectData<T>& data, const std::string_view name)
 	{
-		if (data.heap && data.heap->HandleCount() >= data.gpuBuffers.size())
+		if (data.heap && data.heap->HandleCount() == data.gpuBuffers.size())
 		{
 			return;
 		}

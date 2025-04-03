@@ -39,6 +39,9 @@
     <ClCompile Include="Source\Public\Core\Core-Context.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Core\Core-Bool.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <None Include="Shaders\PonyShader\Mesh\Meshlet.hlsli" />

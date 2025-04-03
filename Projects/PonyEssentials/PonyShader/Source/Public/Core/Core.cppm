@@ -9,5 +9,6 @@
 
 export module PonyShader.Core;
 
+export import :Bool;
 export import :Context;
 export import :ThreadGroupCounts;
