@@ -184,24 +184,24 @@ namespace Game
 		const auto opaqueMaterial = std::make_shared<PonyEngine::Render::Material>(opaqueMaterialParams);
 		const auto transparentMaterial = std::make_shared<PonyEngine::Render::Material>(transparentMaterialParams);
 
-		const auto boxMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 2>
+		const auto boxMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array
 		{
 			PonyShader::Mesh::Meshlet(0u, 0u, 7u, 6u),
 			PonyShader::Mesh::Meshlet(7u, 0u, 7u, 6u)
 		});
-		const auto pyramidMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array<PonyShader::Mesh::Meshlet, 1>
+		const auto pyramidMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array
 		{
 			PonyShader::Mesh::Meshlet(0u, 0u, 5u, 6u)
 		});
-		const auto boxVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 14>
+		const auto boxVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array
 		{
 			0u, 1u, 2u, 3u, 4u, 5u, 7u, 6u, 5u, 4u, 7u, 2u, 1u, 3u
 		});
-		const auto pyramidVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array<std::uint32_t, 5>
+		const auto pyramidVertexIndices = PonyBase::Container::Buffer::Create<std::uint32_t>(std::array
 		{
 			0u, 1u, 2u, 3u, 4u
 		});
-		const auto boxTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
+		const auto boxTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array
 		{
 			PonyShader::Mesh::Primitive(0u, 1u, 2u),
 			PonyShader::Mesh::Primitive(0u, 2u, 3u),
@@ -210,7 +210,7 @@ namespace Game
 			PonyShader::Mesh::Primitive(0u, 6u, 4u),
 			PonyShader::Mesh::Primitive(0u, 3u, 6u)
 		});
-		const auto pyramidTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array<PonyShader::Mesh::Primitive, 6>
+		const auto pyramidTriangles = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Primitive>(std::array
 		{
 			PonyShader::Mesh::Primitive(0u, 1u, 2u),
 			PonyShader::Mesh::Primitive(0u, 2u, 3u),
@@ -219,7 +219,7 @@ namespace Game
 			PonyShader::Mesh::Primitive(1u, 3u, 2u),
 			PonyShader::Mesh::Primitive(1u, 4u, 3u)
 		});
-		const auto boxPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 8>
+		const auto boxPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array
 		{
 			PonyMath::Core::Vector3<float>(-1.f, 1.f, -1.f),
 			PonyMath::Core::Vector3<float>(-1.f, 1.f, 1.f),
@@ -230,7 +230,7 @@ namespace Game
 			PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f),
 			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f)
 		});
-		const auto pyramidPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array<PonyMath::Core::Vector3<float>, 5>
+		const auto pyramidPositions = PonyBase::Container::Buffer::Create<PonyMath::Core::Vector3<float>>(std::array
 		{
 			PonyMath::Core::Vector3<float>(0.f, 1.f, 0.f),
 			PonyMath::Core::Vector3<float>(1.f, -1.f, -1.f),
@@ -238,7 +238,7 @@ namespace Game
 			PonyMath::Core::Vector3<float>(-1.f, -1.f, 1.f),
 			PonyMath::Core::Vector3<float>(1.f, -1.f, 1.f),
 		});
-		const auto floorColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8> // TODO: Change to a data number
+		const auto floorColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array // TODO: Change to a data number
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Green,
 			PonyMath::Color::RGBA<float>::Predefined::Green,
@@ -249,7 +249,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Green,
 			PonyMath::Color::RGBA<float>::Predefined::Green
 		});
-		const auto centralColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto centralColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::White,
 			PonyMath::Color::RGBA<float>::Predefined::White,
@@ -260,7 +260,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::White,
 			PonyMath::Color::RGBA<float>::Predefined::White
 		});
-		const auto leftNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto leftNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Yellow,
 			PonyMath::Color::RGBA<float>::Predefined::Yellow,
@@ -271,7 +271,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Yellow,
 			PonyMath::Color::RGBA<float>::Predefined::Yellow
 		});
-		const auto leftFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto leftFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Cyan,
 			PonyMath::Color::RGBA<float>::Predefined::Cyan,
@@ -282,7 +282,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Cyan,
 			PonyMath::Color::RGBA<float>::Predefined::Cyan
 		});
-		const auto rightFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto rightFarColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Blue,
 			PonyMath::Color::RGBA<float>::Predefined::Blue,
@@ -293,7 +293,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Blue,
 			PonyMath::Color::RGBA<float>::Predefined::Blue
 		});
-		const auto rightNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto rightNearColumnColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Magenta,
 			PonyMath::Color::RGBA<float>::Predefined::Magenta,
@@ -304,7 +304,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Magenta,
 			PonyMath::Color::RGBA<float>::Predefined::Magenta
 		});
-		const auto pyramidColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 5>
+		const auto pyramidColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>::Predefined::Red,
 			PonyMath::Color::RGBA<float>::Predefined::Red,
@@ -312,7 +312,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>::Predefined::Red,
 			PonyMath::Color::RGBA<float>::Predefined::Red,
 		});
-		const auto leftNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto leftNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
 			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f),
@@ -324,7 +324,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f)
 			
 		});
-		const auto leftFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto leftFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
 			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
@@ -335,7 +335,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f),
 			PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f)
 		});
-		const auto rightFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto rightFarGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
 			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
@@ -346,7 +346,7 @@ namespace Game
 			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f),
 			PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f)
 		});
-		const auto rightNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array<PonyMath::Color::RGBA<float>, 8>
+		const auto rightNearGlassColors = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array
 		{
 			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
 			PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f),
