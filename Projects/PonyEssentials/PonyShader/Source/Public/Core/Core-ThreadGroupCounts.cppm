@@ -18,7 +18,7 @@ import <stdexcept>;
 
 export namespace PonyShader::Core
 {
-	/// @brief Thread group counts wrapper.
+	/// @brief Thread group counts wrapper. It corresponds to @p Pony_ThreadGroupCounts in PonyShader/Core/ThreadGroupCounts.hlsli on the HLSL side.
 	class ThreadGroupCounts final
 	{
 	public:

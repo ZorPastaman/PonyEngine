@@ -41,8 +41,8 @@ static const uint3 QuadTriangles[] =
 	uint3(0u, 2u, 3u)
 };
 
-[outputtopology("triangle")]
-[numthreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
+[OutputTopology("triangle")]
+[NumThreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
 void main(in uint groupThreadId : SV_GROUPTHREADID, 
 	out vertices Vertex outVertices[VERTEX_COUNT],
 	out indices uint3 outTriangles[TRIANGLE_COUNT])

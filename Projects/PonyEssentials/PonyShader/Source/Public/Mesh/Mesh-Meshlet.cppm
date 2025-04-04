@@ -14,98 +14,121 @@ import <cstdint>;
 
 export namespace PonyShader::Mesh
 {
+	/// @brief Meshlet. It corresponds to @p Pony_Meshlet in PonyShader/Mesh/Meshlet.hlsli on the HLSL side.
 	class Meshlet final
 	{
 	public:
+		/// @brief Creates a zero meshlet.
 		[[nodiscard("Pure constructor")]]
-		Meshlet() noexcept = default;
+		constexpr Meshlet() noexcept = default;
+		/// @brief Creates a meshlet.
+		/// @param vertexOffset Vertex offset.
+		/// @param primitiveOffset Primitive offset.
+		/// @param vertexCount Vertex count.
+		/// @param primitiveCount Primitive count.
 		[[nodiscard("Pure constructor")]]
-		Meshlet(std::uint32_t vertexOffset, std::uint32_t primitiveOffset, std::uint8_t vertexCount, std::uint8_t primitiveCount) noexcept;
+		constexpr Meshlet(std::uint32_t vertexOffset, std::uint32_t primitiveOffset, std::uint8_t vertexCount, std::uint8_t primitiveCount) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Meshlet(const Meshlet& other) noexcept = default;
+		constexpr Meshlet(const Meshlet& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		Meshlet(Meshlet&& other) noexcept = default;
+		constexpr Meshlet(Meshlet&& other) noexcept = default;
 
-		~Meshlet() noexcept = default;
+		constexpr ~Meshlet() noexcept = default;
 
+		/// @brief Gets the vertex offset.
+		/// @return Vertex offset.
 		[[nodiscard("Pure function")]]
-		std::uint32_t& VertexOffset() noexcept;
+		constexpr std::uint32_t& VertexOffset() noexcept;
+		/// @brief Gets the vertex offset.
+		/// @return Vertex offset.
 		[[nodiscard("Pure function")]]
-		const std::uint32_t& VertexOffset() const noexcept;
+		constexpr const std::uint32_t& VertexOffset() const noexcept;
 
+		/// @brief Gets the primitive offset.
+		/// @return Primitive offset.
 		[[nodiscard("Pure function")]]
-		std::uint32_t& PrimitiveOffset() noexcept;
+		constexpr std::uint32_t& PrimitiveOffset() noexcept;
+		/// @brief Gets the primitive offset.
+		/// @return Primitive offset.
 		[[nodiscard("Pure function")]]
-		const std::uint32_t& PrimitiveOffset() const noexcept;
+		constexpr const std::uint32_t& PrimitiveOffset() const noexcept;
 
+		/// @brief Gets the vertex count.
+		/// @return Vertex count.
 		[[nodiscard("Pure function")]]
-		std::uint8_t& VertexCount() noexcept;
+		constexpr std::uint8_t& VertexCount() noexcept;
+		/// @brief Gets the vertex count.
+		/// @return Vertex count.
 		[[nodiscard("Pure function")]]
-		const std::uint8_t& VertexCount() const noexcept;
+		constexpr const std::uint8_t& VertexCount() const noexcept;
 
+		/// @brief Gets the primitive count.
+		/// @return Primitive count.
 		[[nodiscard("Pure function")]]
-		std::uint8_t& PrimitiveCount() noexcept;
+		constexpr std::uint8_t& PrimitiveCount() noexcept;
+		/// @brief Gets the primitive count.
+		/// @return Primitive count.
 		[[nodiscard("Pure function")]]
-		const std::uint8_t& PrimitiveCount() const noexcept;
+		constexpr const std::uint8_t& PrimitiveCount() const noexcept;
 
-		Meshlet& operator =(const Meshlet& other) noexcept = default;
-		Meshlet& operator =(Meshlet&& other) noexcept = default;
+		constexpr Meshlet& operator =(const Meshlet& other) noexcept = default;
+		constexpr Meshlet& operator =(Meshlet&& other) noexcept = default;
 
 		[[nodiscard("Pure operator")]]
-		bool operator ==(const Meshlet& other) const noexcept = default;
+		constexpr bool operator ==(const Meshlet& other) const noexcept = default;
 
 	private:
-		std::uint32_t vertexOffset;
-		std::uint32_t primitiveOffset;
+		std::uint32_t vertexOffset; ///< Vertex offset.
+		std::uint32_t primitiveOffset; ///< Primitive offset.
 		std::array<std::uint8_t, 4> packedCounts; ///< Packed counts: vertex count, primitive count and 2 elements for alignment with shader data.
 	};
 }
 
 namespace PonyShader::Mesh
 {
-	Meshlet::Meshlet(const std::uint32_t vertexOffset, const std::uint32_t primitiveOffset, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept :
+	constexpr Meshlet::Meshlet(const std::uint32_t vertexOffset, const std::uint32_t primitiveOffset, const std::uint8_t vertexCount, const std::uint8_t primitiveCount) noexcept :
 		vertexOffset{vertexOffset},
 		primitiveOffset{primitiveOffset},
 		packedCounts{ vertexCount, primitiveCount, 0u, 0u }
 	{
 	}
 
-	std::uint32_t& Meshlet::VertexOffset() noexcept
+	constexpr std::uint32_t& Meshlet::VertexOffset() noexcept
 	{
 		return vertexOffset;
 	}
 
-	const std::uint32_t& Meshlet::VertexOffset() const noexcept
+	constexpr const std::uint32_t& Meshlet::VertexOffset() const noexcept
 	{
 		return vertexOffset;
 	}
 
-	std::uint32_t& Meshlet::PrimitiveOffset() noexcept
+	constexpr std::uint32_t& Meshlet::PrimitiveOffset() noexcept
 	{
 		return primitiveOffset;
 	}
 
-	const std::uint32_t& Meshlet::PrimitiveOffset() const noexcept
+	constexpr const std::uint32_t& Meshlet::PrimitiveOffset() const noexcept
 	{
 		return primitiveOffset;
 	}
 
-	std::uint8_t& Meshlet::VertexCount() noexcept
+	constexpr std::uint8_t& Meshlet::VertexCount() noexcept
 	{
 		return packedCounts[0];
 	}
 
-	const std::uint8_t& Meshlet::VertexCount() const noexcept
+	constexpr const std::uint8_t& Meshlet::VertexCount() const noexcept
 	{
 		return packedCounts[0];
 	}
 
-	std::uint8_t& Meshlet::PrimitiveCount() noexcept
+	constexpr std::uint8_t& Meshlet::PrimitiveCount() noexcept
 	{
 		return packedCounts[1];
 	}
 
-	const std::uint8_t& Meshlet::PrimitiveCount() const noexcept
+	constexpr const std::uint8_t& Meshlet::PrimitiveCount() const noexcept
 	{
 		return packedCounts[1];
 	}

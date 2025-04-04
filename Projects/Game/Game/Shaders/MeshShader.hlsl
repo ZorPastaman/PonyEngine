@@ -50,8 +50,8 @@ uint3 CreateTriangle(in uint index, in bool isFlipped)
 	return uint3(primitive[0], primitive[1 + isFlipped], primitive[2 - isFlipped]);
 }
 
-[outputtopology("triangle")]
-[numthreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
+[OutputTopology("triangle")]
+[NumThreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
 void main(in uint groupId : SV_GROUPID,
 	in uint groupThreadId : SV_GROUPTHREADID,
 	out vertices Vertex outVertices[VERTEX_COUNT],
