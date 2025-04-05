@@ -20,6 +20,7 @@
     <ClCompile Include="Core\ThreadGroupCountsTests.cpp" />
     <ClCompile Include="Mesh\MeshletTests.cpp" />
     <ClCompile Include="Mesh\PrimitiveTests.cpp" />
+    <ClCompile Include="Space\TransformTests.cpp" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
