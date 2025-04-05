@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "Logger.h"
-
 #include "CppUnitTest.h"
 
-#include <cstdint>
+#include "Logger.h"
+
+#include <type_traits>
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
 
