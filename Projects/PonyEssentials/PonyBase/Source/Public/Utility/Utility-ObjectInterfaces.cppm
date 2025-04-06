@@ -67,6 +67,10 @@ export namespace PonyBase::Utility
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> Span() const noexcept;
 
+		/// @brief Reserves a space for the @p count of elements.
+		/// @param count Count of elements to reserve for.
+		void Reserve(std::size_t count);
+
 		/// @brief Gets an interface by the @p index.
 		/// @param index Interface index.
 		/// @return Interface.
@@ -98,6 +102,7 @@ namespace PonyBase::Utility
 	template<typename Source, typename... Targets>
 	void ObjectInterfaces::AddInterfaces(Source& object) requires (std::derived_from<Source, Targets> && ...)
 	{
+		Reserve(interfaces.size() + sizeof...(Targets));
 		(AddInterface<Targets, Source>(object), ...);
 	}
 
@@ -115,6 +120,11 @@ namespace PonyBase::Utility
 	std::span<const std::pair<std::reference_wrapper<const std::type_info>, void*>> ObjectInterfaces::Span() const noexcept
 	{
 		return interfaces;
+	}
+
+	void ObjectInterfaces::Reserve(const std::size_t count)
+	{
+		interfaces.reserve(count);
 	}
 
 	const std::pair<std::reference_wrapper<const std::type_info>, void*>& ObjectInterfaces::operator [](const std::size_t index) const noexcept

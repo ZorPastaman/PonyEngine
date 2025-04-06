@@ -17,6 +17,7 @@ export module Application.Windows:Logger;
 
 import <array>;
 import <exception>;
+import <filesystem>;
 import <format>;
 import <memory>;
 import <typeinfo>;
@@ -51,9 +52,10 @@ export namespace Application::Windows
 
 	private:
 		/// @brief Creates a logger.
+		/// @param subLoggerCount Expected sub-logger count.
 		/// @return Created logger.
 		[[nodiscard("Pure function")]]
-		static PonyDebug::Log::LoggerData CreateLogger();
+		static PonyDebug::Log::LoggerData CreateLogger(std::size_t subLoggerCount);
 
 		/// @brief Creates a console sub-logger.
 		/// @return Created console sub-logger.
@@ -76,7 +78,7 @@ export namespace Application::Windows
 namespace Application::Windows
 {
 	Logger::Logger() :
-		logger{CreateLogger().logger},
+		logger{CreateLogger(subLoggers.size()).logger},
 		subLoggers
 		{
 			CreateConsoleSubLogger().subLogger,
@@ -134,12 +136,12 @@ namespace Application::Windows
 		return *logger;
 	}
 
-	PonyDebug::Log::LoggerData Logger::CreateLogger()
+	PonyDebug::Log::LoggerData Logger::CreateLogger(const std::size_t subLoggerCount)
 	{
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
-			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{});
+			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{.subLoggerCount = subLoggerCount});
 			assert(logger.logger && "The logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", typeid(*logger.logger).name());
 
@@ -196,7 +198,8 @@ namespace Application::Windows
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create file sub-logger.");
-			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Log.log"};
+			const auto params = PonyDebug::Log::FileSubLoggerParams{.logPath = "Logs/Main.log"};
+			std::filesystem::create_directories(params.logPath.parent_path());
 			PonyDebug::Log::FileSubLoggerData fileSubLogger = PonyDebug::Log::CreateFileSubLogger(params);
 			assert(fileSubLogger.subLogger && "The file sub-logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' file sub-logger created.", typeid(*fileSubLogger.subLogger).name());

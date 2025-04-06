@@ -22,13 +22,13 @@ export namespace PonyBase::Utility
 	/// @param from From index.
 	/// @param to To index. It's a target index after an erasure of an element at the index from.
 	template<typename T>
-	void Move(std::vector<T>& vector, std::size_t from, std::size_t to) noexcept(std::is_nothrow_move_constructible_v<T>);
+	void Move(std::vector<T>& vector, std::size_t from, std::size_t to) noexcept (std::is_nothrow_move_constructible_v<T>);
 }
 
 namespace PonyBase::Utility
 {
 	template<typename T>
-	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to) noexcept(std::is_nothrow_move_constructible_v<T>)
+	void Move(std::vector<T>& vector, const std::size_t from, const std::size_t to) noexcept (std::is_nothrow_move_constructible_v<T>)
 	{
 		if (from == to)
 		{
