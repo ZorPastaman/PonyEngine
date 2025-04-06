@@ -12,7 +12,7 @@
 #include <cstddef>
 #include <exception>
 
-#include "Mocks/SubLogger.h"
+import Mocks;
 
 import PonyDebug.Log.Impl;
 

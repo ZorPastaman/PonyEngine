@@ -16,9 +16,7 @@
 #include <utility>
 #include <variant>
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
-#include "Mocks/Engine.h"
+import Mocks;
 
 import PonyEngine.Screen.Windows.Impl;
 

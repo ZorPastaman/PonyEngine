@@ -7,13 +7,43 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
 #include "CppUnitTest.h"
 
-#include "Logger.h"
+export module Mocks:Logger;
 
-#include <type_traits>
+import <cstddef>;
+import <cstdint>;
+import <exception>;
+import <optional>;
+import <string_view>;
+import <type_traits>;
+
+import PonyDebug.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+export namespace Log
+{
+	class Logger final : public PonyDebug::Log::ILogger
+	{
+	public:
+		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
+		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		std::size_t Version() const noexcept;
+
+		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
+		std::optional<const std::exception*> expectedException = {};
+		std::optional<std::string_view> expectedMessage = {};
+		std::optional<std::optional<std::int64_t>> expectedFrameCount = {};
+
+	private:
+		mutable std::size_t version = 0;
+	};
+}
 
 namespace Log
 {

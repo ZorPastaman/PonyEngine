@@ -19,10 +19,7 @@
 #include <typeinfo>
 #include <variant>
 
-#include "Mocks/Application.h"
-#include "Mocks/Engine.h"
-#include "Mocks/Logger.h"
-#include "Mocks/ScreenSystem.h"
+import Mocks;
 
 import PonyBase.Utility;
 

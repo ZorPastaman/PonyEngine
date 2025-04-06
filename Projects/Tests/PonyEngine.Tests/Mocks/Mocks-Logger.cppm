@@ -7,33 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:Logger;
 
-#include <cstddef>
-#include <cstdint>
-#include <exception>
-#include <optional>
-#include <string_view>
+import <exception>;
 
 import PonyDebug.Log;
 
-namespace Log
+export namespace Mocks
 {
 	class Logger final : public PonyDebug::Log::ILogger
 	{
 	public:
 		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
-		virtual void LogException(const ::std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
-
-		[[nodiscard("Pure function")]]
-		std::size_t Version() const noexcept;
-
-		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
-		std::optional<const std::exception*> expectedException = {};
-		std::optional<std::string_view> expectedMessage = {};
-		std::optional<std::optional<std::int64_t>> expectedFrameCount = {};
-
-	private:
-		mutable std::size_t version = 0;
+		virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
 	};
+}
+
+namespace Mocks
+{
+	void Logger::Log(PonyDebug::Log::LogType, const PonyDebug::Log::LogInput&) const noexcept
+	{
+	}
+
+	void Logger::LogException(const std::exception&, const PonyDebug::Log::LogInput&) const noexcept
+	{
+	}
 }

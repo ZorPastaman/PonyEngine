@@ -15,12 +15,7 @@
 #include <memory>
 #include <typeinfo>
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
-#include "Mocks/System.h"
-#include "Mocks/SystemFactory.h"
-#include "Mocks/TickableSystem.h"
-#include "Mocks/TickableSystemFactory.h"
+import Mocks;
 
 import PonyDebug.Log;
 

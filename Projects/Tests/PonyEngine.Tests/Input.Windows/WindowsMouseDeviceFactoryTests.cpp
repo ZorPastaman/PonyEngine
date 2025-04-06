@@ -9,10 +9,7 @@
 
 #include "CppUnitTest.h"
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
-#include "Mocks/Engine.h"
-#include "Mocks/InputSystem.h"
+import Mocks;
 
 import PonyEngine.Input.Windows.Impl;
 

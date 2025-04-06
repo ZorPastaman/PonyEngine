@@ -15,9 +15,7 @@
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "Mocks/Engine.h"
-#include "Mocks/InputSystem.h"
-#include "Mocks/Logger.h"
+import Mocks;
 
 import PonyEngine.Input.Windows.Impl;
 import PonyEngine.Window.Windows;
@@ -94,6 +92,8 @@ namespace Input
 
 		class Cursor final : public PonyEngine::Window::Windows::ICursor
 		{
+			std::optional<PonyMath::Shape::Rect<float>> rect;
+
 		public:
 			[[nodiscard("Pure function")]]
 			virtual PonyMath::Core::Vector2<std::int32_t> CursorPosition() const override
@@ -114,7 +114,7 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept override { return std::nullopt; }
+			virtual const std::optional<PonyMath::Shape::Rect<float>>& ClippingRect() const noexcept override { return rect; }
 			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>&) override {}
 		};
 

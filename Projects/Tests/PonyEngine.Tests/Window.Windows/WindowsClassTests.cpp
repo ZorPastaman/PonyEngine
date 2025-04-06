@@ -14,8 +14,7 @@
 #include <cstdint>
 #include <memory>
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
+import Mocks;
 
 import PonyEngine.Window.Windows.Impl;
 

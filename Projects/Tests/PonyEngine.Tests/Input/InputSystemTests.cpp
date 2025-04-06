@@ -14,10 +14,7 @@
 #include <variant>
 #include <vector>
 
-#include "Mocks/Application.h"
-#include "Mocks/InputDeviceFactory.h"
-#include "Mocks/Logger.h"
-#include "Mocks/Engine.h"
+import Mocks;
 
 import PonyEngine.Input.Impl;
 

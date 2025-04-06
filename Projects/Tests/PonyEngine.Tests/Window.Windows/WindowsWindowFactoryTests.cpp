@@ -15,9 +15,7 @@
 #include <typeinfo>
 #include <variant>
 
-#include "Mocks/Application.h"
-#include "Mocks/Engine.h"
-#include "Mocks/Logger.h"
+import Mocks;
 
 import PonyDebug.Log;
 

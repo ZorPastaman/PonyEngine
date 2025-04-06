@@ -7,15 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
-
-#include <cstddef>
+module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
+export module Mocks:System;
+
+import <cstddef>;
+
 import PonyEngine.Core;
 
-namespace Mocks
+export namespace Mocks
 {
 	class ISystemInterface
 	{
@@ -51,4 +53,40 @@ namespace Mocks
 		std::size_t beginCount = 0;
 		std::size_t endCount = 0;
 	};
+}
+
+namespace Mocks
+{
+	System::System(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) noexcept :
+		PonyEngine::Core::System(engine, params)
+	{
+	}
+
+	System::~System() noexcept
+	{
+		if (onDestructed)
+		{
+			*onDestructed = true;
+		}
+	}
+
+	void System::Begin()
+	{
+		++beginCount;
+	}
+
+	void System::End()
+	{
+		++endCount;
+	}
+
+	std::size_t System::BeginCount() const noexcept
+	{
+		return beginCount;
+	}
+
+	std::size_t System::EndCount() const noexcept
+	{
+		return endCount;
+	}
 }

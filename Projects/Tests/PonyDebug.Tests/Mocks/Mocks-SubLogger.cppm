@@ -7,13 +7,53 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "SubLogger.h"
+module;
 
 #include "CppUnitTest.h"
 
-#include <cstdint>
+export module Mocks:SubLogger;
+
+import <chrono>;
+import <cstddef>;
+import <cstdint>;
+import <exception>;
+import <optional>;
+import <string_view>;
+
+import PonyDebug.Log;
 
 using namespace Microsoft::VisualStudio::CppUnitTestFramework;
+
+export namespace Log
+{
+	class SubLogger final : public PonyDebug::Log::ISubLogger
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		SubLogger() noexcept = default;
+		SubLogger(const SubLogger&) = delete;
+		SubLogger(SubLogger&&) = delete;
+
+		~SubLogger() noexcept = default;
+
+		virtual void Log(const PonyDebug::Log::LogEntry& logEntry) const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		std::size_t Version() const noexcept;
+
+		SubLogger& operator =(const SubLogger&) = delete;
+		SubLogger& operator =(SubLogger&&) = delete;
+
+		std::optional<std::string_view> expectedMessage = {};
+		std::optional<const std::exception*> expectedException = {};
+		std::optional<std::chrono::time_point<std::chrono::system_clock>> expectedTime = {};
+		std::optional<std::optional<std::int64_t>> expectedFrameCount = {};
+		std::optional<PonyDebug::Log::LogType> expectedLogType = {};
+
+	private:
+		mutable std::size_t version = 0;
+	};
+}
 
 namespace Log
 {
