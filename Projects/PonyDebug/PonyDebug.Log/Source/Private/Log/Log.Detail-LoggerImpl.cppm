@@ -57,8 +57,9 @@ export namespace PonyDebug::Log
 
 namespace PonyDebug::Log
 {
-	LoggerImpl::LoggerImpl(const LoggerParams&) noexcept
+	LoggerImpl::LoggerImpl(const LoggerParams& params) noexcept
 	{
+		subLoggers.reserve(params.subLoggerCount);
 	}
 
 	void LoggerImpl::Log(const LogType logType, const LogInput& logInput) const noexcept
