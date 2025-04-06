@@ -7,7 +7,31 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "InputDevice.h"
+export module Mocks:InputDevice;
+
+import <cstddef>;
+
+import PonyEngine.Input;
+
+export namespace Mocks
+{
+	class InputDevice final : public PonyEngine::Input::Device
+	{
+	public:
+		[[nodiscard("Pure constructor")]]
+		InputDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams) noexcept;
+
+		virtual void Begin() override;
+		virtual void End() override;
+		virtual void Tick() override;
+
+		void AddInput(const PonyEngine::Input::InputEvent& input);
+
+		std::size_t beginCount = 0;
+		std::size_t endCount = 0;
+		std::size_t tickCount = 0;
+	};
+}
 
 namespace Mocks
 {

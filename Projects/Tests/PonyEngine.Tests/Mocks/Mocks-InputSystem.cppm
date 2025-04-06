@@ -7,15 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:InputSystem;
 
-#include <cstddef>
-#include <vector>
+import <cstddef>;
+import <vector>;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
 
-namespace Mocks
+export namespace Mocks
 {
 	class InputSystem final : public PonyEngine::Input::IInputSystemContext
 	{
@@ -36,4 +36,32 @@ namespace Mocks
 
 		PonyEngine::Core::IEngineContext* engine = nullptr;
 	};
+}
+
+namespace Mocks
+{
+	PonyDebug::Log::ILogger& InputSystem::Logger() noexcept
+	{
+		return engine->Logger();
+	}
+
+	const PonyDebug::Log::ILogger& InputSystem::Logger() const noexcept
+	{
+		return engine->Logger();
+	}
+
+	PonyEngine::Core::ISystemManager& InputSystem::SystemManager() noexcept
+	{
+		return engine->SystemManager();
+	}
+
+	const PonyEngine::Core::ISystemManager& InputSystem::SystemManager() const noexcept
+	{
+		return engine->SystemManager();
+	}
+
+	void InputSystem::AddInputEvent(const PonyEngine::Input::IDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent)
+	{
+		events.emplace_back(&inputSource, inputEvent);
+	}
 }

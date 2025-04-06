@@ -16,7 +16,7 @@
 #include <string>
 #include <string_view>
 
-#include "Mocks/Logger.h"
+import Mocks;
 
 import PonyDebug.Log;
 

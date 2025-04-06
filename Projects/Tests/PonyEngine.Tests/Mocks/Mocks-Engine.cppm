@@ -7,18 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:Engine;
 
-#include <cstdint>
-#include <optional>
-#include <typeindex>
-#include <unordered_map>
-
-#include "Application.h"
+import <cstdint>;
+import <optional>;
+import <typeindex>;
+import <unordered_map>;
 
 import PonyEngine.Core;
 
-namespace Mocks
+import :Application;
+
+export namespace Mocks
 {
 	class SystemManager final : public PonyEngine::Core::ISystemManager
 	{
@@ -60,4 +60,62 @@ namespace Mocks
 	private:
 		mutable Mocks::SystemManager systemManager;
 	};
+}
+
+namespace Mocks
+{
+	void* SystemManager::FindSystem(const std::type_info& typeInfo) const noexcept
+	{
+		if (const auto position = types.find(typeInfo); position != types.cend())
+		{
+			return position->second;
+		}
+
+		return nullptr;
+	}
+
+	std::uint64_t Engine::FrameCount() const noexcept
+	{
+		return frameCount;
+	}
+
+	PonyDebug::Log::ILogger& Engine::Logger() noexcept
+	{
+		return application->Logger();
+	}
+
+	const PonyDebug::Log::ILogger& Engine::Logger() const noexcept
+	{
+		return application->Logger();
+	}
+
+	PonyEngine::Core::ISystemManager& Engine::SystemManager() noexcept
+	{
+		return systemManager;
+	}
+
+	const PonyEngine::Core::ISystemManager& Engine::SystemManager() const noexcept
+	{
+		return systemManager;
+	}
+
+	bool Engine::IsRunning() const noexcept
+	{
+		return !exitCode;
+	}
+
+	int Engine::ExitCode() const noexcept
+	{
+		return exitCode.value();
+	}
+
+	void Engine::Stop(const int exitCodeToSet) noexcept
+	{
+		exitCode = exitCodeToSet;
+	}
+
+	void Engine::Tick()
+	{
+		++frameCount;
+	}
 }

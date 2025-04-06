@@ -7,15 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:InputDeviceFactory;
 
-#include <cstddef>
+import <cstddef>;
+import <memory>;
+import <typeinfo>;
+import <utility>;
 
-#include "InputDevice.h"
+import :InputDevice;
 
-import PonyEngine.Input;
-
-namespace Mocks
+export namespace Mocks
 {
 	class InputDeviceFactory final : public PonyEngine::Input::IDeviceFactory
 	{
@@ -29,4 +30,21 @@ namespace Mocks
 		std::size_t version = 0;
 		InputDevice* inputDevice = nullptr;
 	};
+}
+
+namespace Mocks
+{
+	PonyEngine::Input::DeviceData InputDeviceFactory::CreateDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams)
+	{
+		++version;
+		auto device = std::make_unique<InputDevice>(inputSystem, deviceParams);
+		inputDevice = device.get();
+
+		return PonyEngine::Input::DeviceData{.inputDevice = std::move(device)};
+	}
+
+	const type_info& InputDeviceFactory::DeviceType() const noexcept
+	{
+		return typeid(InputDevice);
+	}
 }

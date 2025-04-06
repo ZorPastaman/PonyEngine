@@ -7,18 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks;
 
-#include <exception>
-
-import PonyDebug.Log;
-
-namespace Mocks
-{
-	class Logger final : public PonyDebug::Log::ILogger
-	{
-	public:
-		virtual void Log(PonyDebug::Log::LogType logType, const PonyDebug::Log::LogInput& logInput) const noexcept override;
-		virtual void LogException(const std::exception& exception, const PonyDebug::Log::LogInput& logInput) const noexcept override;
-	};
-}
+export import :Application;
+export import :Engine;
+export import :InputDevice;
+export import :InputDeviceFactory;
+export import :InputSystem;
+export import :Logger;
+export import :ScreenSystem;
+export import :System;
+export import :SystemFactory;
+export import :TickableSystem;
+export import :TickableSystemFactory;

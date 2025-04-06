@@ -7,11 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:Application;
 
 import PonyEngine.Core;
 
-namespace Mocks
+export namespace Mocks
 {
 	class Application final : public PonyEngine::Core::IApplicationContext
 	{
@@ -23,4 +23,17 @@ namespace Mocks
 
 		PonyDebug::Log::ILogger* logger = nullptr;
 	};
+}
+
+namespace Mocks
+{
+	PonyDebug::Log::ILogger& Application::Logger() noexcept
+	{
+		return *logger;
+	}
+
+	const PonyDebug::Log::ILogger& Application::Logger() const noexcept
+	{
+		return *logger;
+	}
 }

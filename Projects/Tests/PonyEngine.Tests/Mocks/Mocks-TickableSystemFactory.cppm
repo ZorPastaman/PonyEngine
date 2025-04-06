@@ -7,12 +7,39 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "TickableSystemFactory.h"
+export module Mocks:TickableSystemFactory;
 
-#include <memory>
-#include <utility>
+import <cstddef>;
+import <memory>;
+import <typeinfo>;
+import <utility>;
 
 import PonyBase.Utility;
+
+import PonyEngine.Core;
+
+import :TickableSystem;
+
+export namespace Mocks
+{
+	class TickableSystemFactory final : public PonyEngine::Core::ISystemFactory
+	{
+	public:
+		[[nodiscard("Pure function")]]
+		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
+		[[nodiscard("Pure function")]]
+		virtual const type_info& SystemType() const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		TickableSystem* GetSystem() const noexcept;
+		[[nodiscard("Pure function")]]
+		std::size_t Version() const noexcept;
+
+	private:
+		TickableSystem* createdSystem = nullptr;
+		std::size_t version = 0;
+	};
+}
 
 namespace Mocks
 {

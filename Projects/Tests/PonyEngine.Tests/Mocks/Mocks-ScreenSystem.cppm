@@ -7,15 +7,15 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module Mocks:ScreenSystem;
 
-#include <cstdint>
+import <cstdint>;
 
 import PonyMath.Utility;
 
 import PonyEngine.Screen;
 
-namespace Mocks
+export namespace Mocks
 {
 	class ScreenSystem final : public PonyEngine::Screen::IScreenSystem
 	{
@@ -23,4 +23,12 @@ namespace Mocks
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Utility::Resolution<std::uint32_t> DisplayResolution() const noexcept override;
 	};
+}
+
+namespace Mocks
+{
+	PonyMath::Utility::Resolution<std::uint32_t> ScreenSystem::DisplayResolution() const noexcept
+	{
+		return PonyMath::Utility::Resolution<std::uint32_t>(1280u, 720u);
+	}
 }

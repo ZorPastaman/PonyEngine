@@ -7,17 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "Application.h"
+export module Mocks;
 
-namespace Mocks
-{
-	PonyDebug::Log::ILogger& Application::Logger() noexcept
-	{
-		return *logger;
-	}
-
-	const PonyDebug::Log::ILogger& Application::Logger() const noexcept
-	{
-		return *logger;
-	}
-}
+export import :Logger;
+export import :SubLogger;
