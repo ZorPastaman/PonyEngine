@@ -19,6 +19,7 @@ import <algorithm>;
 import <cstdint>;
 import <exception>;
 import <memory>;
+import <numeric>;
 import <ranges>;
 import <string>;
 import <typeindex>;
@@ -114,12 +115,17 @@ namespace PonyEngine::Core
 
 	void SystemManager::CreateSystems(const std::span<const SystemFactoryEntry> systemFactories)
 	{
+		systems.reserve(systemFactories.size());
+		tickableSystems.reserve(std::ranges::count_if(systemFactories, [](const SystemFactoryEntry& entry) { return entry.factory->SystemInfo().IsTickable(); }));
+		systemInterfaces.reserve(std::accumulate(systemFactories.begin(), systemFactories.end(), std::size_t{0}, [](const std::size_t value, const SystemFactoryEntry& entry) { return value + entry.factory->SystemInfo().InterfaceCount(); }));
+
 		auto tickableSystemsBuffer = std::vector<std::pair<TickableSystem*, std::int32_t>>();
+		tickableSystemsBuffer.reserve(tickableSystems.capacity());
 
 		for (const auto& [factory, tickOrder] : systemFactories)
 		{
 			assert(factory && "The system factory is nullptr.");
-			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
+			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Create '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemInfo().SystemType().name());
 			SystemData systemData = CreateSystem(factory.get());
 
 			switch (systemData.system.index())
@@ -231,7 +237,7 @@ namespace PonyEngine::Core
 		}
 		catch (const std::exception& e)
 		{
-			PONY_LOG_E(engine->Logger(), e, "On creating '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemType().name());
+			PONY_LOG_E(engine->Logger(), e, "On creating '{}' system with '{}' factory.", typeid(*factory).name(), factory->SystemInfo().SystemType().name());
 
 			throw;
 		}

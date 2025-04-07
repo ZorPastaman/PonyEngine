@@ -52,7 +52,7 @@ namespace Time
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Time::IFrameRateSystem*>(std::get<1>(frameRateSystem.system).get())), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
-		TEST_METHOD(SystemTypeTest)
+		TEST_METHOD(SystemInfoTest)
 		{
 			auto logger = Mocks::Logger();
 			auto application = Mocks::Application();
@@ -60,7 +60,10 @@ namespace Time
 			auto engine = Mocks::Engine();
 			auto factory = PonyEngine::Time::CreateFrameRateSystemFactory(application, PonyEngine::Time::FrameRateSystemFactoryParams(), PonyEngine::Time::FrameRateSystemParams{});
 			auto frameRateSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			Assert::IsTrue(typeid(*std::get<1>(frameRateSystem.system)) == factory.systemFactory->SystemType());
+			const PonyEngine::Core::ISystemInfo& info = factory.systemFactory->SystemInfo();
+			Assert::IsTrue(typeid(*std::get<1>(frameRateSystem.system)) == info.SystemType());
+			Assert::IsTrue(info.IsTickable());
+			Assert::AreEqual(std::size_t{1}, info.InterfaceCount());
 		}
 	};
 }

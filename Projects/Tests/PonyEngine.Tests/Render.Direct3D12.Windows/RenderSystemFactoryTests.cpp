@@ -61,7 +61,7 @@ namespace Render
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Render::Direct3D12::Windows::IRenderSystem*>(renderSystem)), reinterpret_cast<std::uintptr_t>(system.publicInterfaces[2].second));
 		}
 
-		TEST_METHOD(SystemTypeTest)
+		TEST_METHOD(SystemInfoTest)
 		{
 			auto logger = Mocks::Logger();
 			auto screenSystem = Mocks::ScreenSystem();
@@ -78,8 +78,10 @@ namespace Render
 			auto renderFactory = PonyEngine::Render::Direct3D12::Windows::CreateRenderSystemFactory(application, PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryParams{}, PonyEngine::Render::Direct3D12::Windows::RenderSystemParams{});
 			auto system = renderFactory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
 			auto renderSystem = std::get<1>(system.system).get();
-
-			Assert::IsTrue(typeid(*renderSystem) == renderFactory.systemFactory->SystemType());
+			const PonyEngine::Core::ISystemInfo& info = renderFactory.systemFactory->SystemInfo();
+			Assert::IsTrue(typeid(*renderSystem) == info.SystemType());
+			Assert::IsTrue(info.IsTickable());
+			Assert::AreEqual(std::size_t{3}, info.InterfaceCount());
 		}
 	};
 }

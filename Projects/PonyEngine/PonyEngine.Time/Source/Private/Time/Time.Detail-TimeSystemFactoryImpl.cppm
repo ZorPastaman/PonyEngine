@@ -10,8 +10,6 @@
 export module PonyEngine.Time.Detail:TimeSystemFactoryImpl;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -41,13 +39,14 @@ export namespace PonyEngine::Time
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		TimeSystemFactoryImpl& operator =(const TimeSystemFactoryImpl&) = delete;
 		TimeSystemFactoryImpl& operator =(TimeSystemFactoryImpl&&) = delete;
 
 	private:
-		TimeSystemParams timeSystemParams; //< Time system parameters.
+		TimeSystemParams timeSystemParams; ///< Time system parameters.
+		Core::SystemInfo<TimeSystem, ITimeSystem> timeSystemInfo; ///< Time system info.
 
 		Core::IApplicationContext* application; ///< Application context.
 	};
@@ -63,19 +62,11 @@ namespace PonyEngine::Time
 
 	Core::SystemData TimeSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<TimeSystem>(engine, params, timeSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<ITimeSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return timeSystemInfo.CreateSystemData(std::make_unique<TimeSystem>(engine, params, timeSystemParams));
 	}
 
-	const std::type_info& TimeSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& TimeSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(TimeSystem);
+		return timeSystemInfo;
 	}
 }

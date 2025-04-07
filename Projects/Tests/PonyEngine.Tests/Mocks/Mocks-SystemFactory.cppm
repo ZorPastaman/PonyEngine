@@ -11,7 +11,6 @@ export module Mocks:SystemFactory;
 
 import <cstddef>;
 import <memory>;
-import <typeinfo>;
 import <utility>;
 
 import PonyBase.Utility;
@@ -29,7 +28,7 @@ export namespace Mocks
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const type_info& SystemType() const noexcept override;
+		virtual const PonyEngine::Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		System* GetSystem() const noexcept;
@@ -37,6 +36,7 @@ export namespace Mocks
 		std::size_t Version() const noexcept;
 
 	private:
+		PonyEngine::Core::SystemInfo<System, ISystemInterface> systemInfo;
 		System* createdSystem = nullptr;
 		std::size_t version = 0;
 	};
@@ -60,9 +60,9 @@ namespace Mocks
 		};
 	}
 
-	const type_info& SystemFactory::SystemType() const noexcept
+	const PonyEngine::Core::ISystemInfo& SystemFactory::SystemInfo() const noexcept
 	{
-		return typeid(System);
+		return systemInfo;
 	}
 
 	System* SystemFactory::GetSystem() const noexcept

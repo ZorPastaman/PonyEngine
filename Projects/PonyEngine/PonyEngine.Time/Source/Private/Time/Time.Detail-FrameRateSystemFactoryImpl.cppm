@@ -10,8 +10,6 @@
 export module PonyEngine.Time.Detail:FrameRateSystemFactory;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -41,13 +39,14 @@ export namespace PonyEngine::Time
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		FrameRateSystemFactoryImpl& operator =(const FrameRateSystemFactoryImpl&) = delete;
 		FrameRateSystemFactoryImpl& operator =(FrameRateSystemFactoryImpl&&) = delete;
 
 	private:
-		FrameRateSystemParams frameRateSystemParams; //< Frame rate system parameters.
+		FrameRateSystemParams frameRateSystemParams; ///< Frame rate system parameters.
+		Core::SystemInfo<FrameRateSystem, IFrameRateSystem> frameRateSystemInfo; ///< Frame rate system info.
 
 		Core::IApplicationContext* application; ///< Application context.
 	};
@@ -63,19 +62,11 @@ namespace PonyEngine::Time
 
 	Core::SystemData FrameRateSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<FrameRateSystem>(engine, params, frameRateSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IFrameRateSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return frameRateSystemInfo.CreateSystemData(std::make_unique<FrameRateSystem>(engine, params, frameRateSystemParams));
 	}
 
-	const std::type_info& FrameRateSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& FrameRateSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(FrameRateSystem);
+		return frameRateSystemInfo;
 	}
 }

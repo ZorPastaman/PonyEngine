@@ -10,8 +10,6 @@
 export module PonyEngine.Window.Windows.Detail:WindowSystemFactoryImpl;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -41,13 +39,14 @@ export namespace PonyEngine::Window::Windows
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		WindowSystemFactoryImpl& operator =(const WindowSystemFactoryImpl&) = delete;
 		WindowSystemFactoryImpl& operator =(WindowSystemFactoryImpl&&) = delete;
 
 	private:
 		WindowSystemParams windowSystemParams; ///< Window system parameters.
+		Core::SystemInfo<WindowSystem, Window::IWindowSystem, IWindowSystem> windowSystemInfo; ///< Window system info.
 
 		Core::IApplicationContext* application; ///< Application context.
 	};
@@ -63,19 +62,11 @@ namespace PonyEngine::Window::Windows
 
 	Core::SystemData WindowSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<WindowSystem>(engine, params, windowSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<Window::IWindowSystem, IWindowSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return windowSystemInfo.CreateSystemData(std::make_unique<WindowSystem>(engine, params, windowSystemParams));
 	}
 
-	const std::type_info& WindowSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& WindowSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(WindowSystem);
+		return windowSystemInfo;
 	}
 }
