@@ -13,9 +13,8 @@ module;
 
 export module PonyEngine.Core:ISystemFactory;
 
-import <typeinfo>;
-
 import :IEngineContext;
+import :ISystemInfo;
 import :SystemData;
 import :SystemParams;
 
@@ -33,9 +32,9 @@ export namespace PonyEngine::Core
 		[[nodiscard("Redundant call")]]
 		virtual SystemData Create(IEngineContext& engine, const SystemParams& params) = 0;
 
-		/// @brief Gets a system type.
-		/// @return System type.
+		/// @brief Gets a system info.
+		/// @return System info.
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept = 0;
+		virtual const ISystemInfo& SystemInfo() const noexcept = 0;
 	};
 }

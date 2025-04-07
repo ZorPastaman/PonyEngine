@@ -11,7 +11,6 @@ export module Mocks:TickableSystemFactory;
 
 import <cstddef>;
 import <memory>;
-import <typeinfo>;
 import <utility>;
 
 import PonyBase.Utility;
@@ -27,8 +26,9 @@ export namespace Mocks
 	public:
 		[[nodiscard("Pure function")]]
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
+
 		[[nodiscard("Pure function")]]
-		virtual const type_info& SystemType() const noexcept override;
+		virtual const PonyEngine::Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		TickableSystem* GetSystem() const noexcept;
@@ -36,6 +36,7 @@ export namespace Mocks
 		std::size_t Version() const noexcept;
 
 	private:
+		PonyEngine::Core::SystemInfo<TickableSystem, ITickableSystemInterface> systemInfo;
 		TickableSystem* createdSystem = nullptr;
 		std::size_t version = 0;
 	};
@@ -59,9 +60,9 @@ namespace Mocks
 		};
 	}
 
-	const type_info& TickableSystemFactory::SystemType() const noexcept
+	const PonyEngine::Core::ISystemInfo& TickableSystemFactory::SystemInfo() const noexcept
 	{
-		return typeid(TickableSystem);
+		return systemInfo;
 	}
 
 	TickableSystem* TickableSystemFactory::GetSystem() const noexcept

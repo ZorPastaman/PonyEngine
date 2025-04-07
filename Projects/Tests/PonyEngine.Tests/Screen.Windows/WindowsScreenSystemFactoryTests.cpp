@@ -55,7 +55,7 @@ namespace Screen
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Screen::Windows::IScreenSystem*>(screenSystem)), reinterpret_cast<std::uintptr_t>(interfaces[1].second));
 		}
 
-		TEST_METHOD(SystemTypeTest)
+		TEST_METHOD(SystemInfoTest)
 		{
 			auto logger = Mocks::Logger();
 			auto application = Mocks::Application();
@@ -64,7 +64,10 @@ namespace Screen
 			engine.application = &application;
 			const auto factory = PonyEngine::Screen::Windows::CreateScreenFactory(application, PonyEngine::Screen::Windows::ScreenSystemFactoryParams{}, PonyEngine::Screen::Windows::ScreenSystemParams{});
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
-			Assert::IsTrue(typeid(*std::get<0>(system.system)) == factory.systemFactory->SystemType());
+			const PonyEngine::Core::ISystemInfo& info = factory.systemFactory->SystemInfo();
+			Assert::IsTrue(typeid(*std::get<0>(system.system)) == info.SystemType());
+			Assert::IsFalse(info.IsTickable());
+			Assert::AreEqual(std::size_t{2}, info.InterfaceCount());
 		}
 	};
 }

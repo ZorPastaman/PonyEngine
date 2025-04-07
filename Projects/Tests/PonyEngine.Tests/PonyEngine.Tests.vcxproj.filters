@@ -105,5 +105,8 @@
     <ClCompile Include="Mocks\Mocks.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Core\SystemInfoTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

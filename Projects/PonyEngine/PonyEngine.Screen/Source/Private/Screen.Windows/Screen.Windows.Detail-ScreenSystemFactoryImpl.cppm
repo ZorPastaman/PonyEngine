@@ -10,8 +10,6 @@
 export module PonyEngine.Screen.Windows.Detail:ScreenSystemFactoryImpl;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -41,13 +39,14 @@ export namespace PonyEngine::Screen::Windows
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		ScreenSystemFactoryImpl& operator =(const ScreenSystemFactoryImpl&) = delete;
 		ScreenSystemFactoryImpl& operator =(ScreenSystemFactoryImpl&&) = delete;
 
 	private:
 		ScreenSystemParams screenSystemParams; ///< Screen system parameters.
+		Core::SystemInfo<ScreenSystem, Screen::IScreenSystem, IScreenSystem> screenSystemInfo;
 
 		Core::IApplicationContext* application; ///< Application context.
 	};
@@ -63,19 +62,11 @@ namespace PonyEngine::Screen::Windows
 
 	Core::SystemData ScreenSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<ScreenSystem>(engine, params, screenSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<Screen::IScreenSystem, IScreenSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::System>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return screenSystemInfo.CreateSystemData(std::make_unique<ScreenSystem>(engine, params, screenSystemParams));
 	}
 
-	const std::type_info& ScreenSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& ScreenSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(ScreenSystem);
+		return screenSystemInfo;
 	}
 }

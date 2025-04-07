@@ -44,13 +44,14 @@ export namespace Game
 		virtual PonyEngine::Core::SystemData Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const PonyEngine::Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		GameSystemFactoryImpl& operator =(const GameSystemFactoryImpl&) = delete;
 		GameSystemFactoryImpl& operator =(GameSystemFactoryImpl&&) = delete;
 
 	private:
 		GameSystemParams gameSystemParams; ///< Game system parameters.
+		PonyEngine::Core::SystemInfo<GameSystem, IGameSystem> gameSystemInfo; ///< Game system info.
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application context.
 	};
@@ -66,19 +67,11 @@ namespace Game
 
 	PonyEngine::Core::SystemData GameSystemFactoryImpl::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		auto system = std::make_unique<GameSystem>(engine, params, gameSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IGameSystem>(*system);
-
-		return PonyEngine::Core::SystemData
-		{
-			.system = std::unique_ptr<PonyEngine::Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return gameSystemInfo.CreateSystemData(std::make_unique<GameSystem>(engine, params, gameSystemParams));
 	}
 
-	const std::type_info& GameSystemFactoryImpl::SystemType() const noexcept
+	const PonyEngine::Core::ISystemInfo& GameSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(GameSystem);
+		return gameSystemInfo;
 	}
 }

@@ -10,8 +10,6 @@
 export module PonyEngine.Input.Detail:InputSystemFactoryImpl;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -40,13 +38,14 @@ export namespace PonyEngine::Input
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		InputSystemFactoryImpl& operator =(const InputSystemFactoryImpl&) = delete;
 		InputSystemFactoryImpl& operator =(InputSystemFactoryImpl&&) = delete;
 
 	private:
 		InputSystemParams inputSystemParams; ///< Input system parameters.
+		Core::SystemInfo<InputSystem, IInputSystem> inputSystemInfo; ///< Input system info.
 
 		Core::IApplicationContext* application; ///< Application.
 	};
@@ -62,19 +61,11 @@ namespace PonyEngine::Input
 
 	Core::SystemData InputSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<InputSystem>(engine, params, inputSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<IInputSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return inputSystemInfo.CreateSystemData(std::make_unique<InputSystem>(engine, params, inputSystemParams));
 	}
 
-	const std::type_info& InputSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& InputSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(InputSystem);
+		return inputSystemInfo;
 	}
 }

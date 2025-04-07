@@ -10,8 +10,6 @@
 export module PonyEngine.Render.Direct3D12.Windows.Detail:RenderSystemFactory;
 
 import <memory>;
-import <typeinfo>;
-import <utility>;
 
 import PonyBase.Utility;
 
@@ -41,13 +39,14 @@ export namespace PonyEngine::Render::Direct3D12::Windows
 		virtual Core::SystemData Create(Core::IEngineContext& engine, const Core::SystemParams& params) override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::type_info& SystemType() const noexcept override;
+		virtual const Core::ISystemInfo& SystemInfo() const noexcept override;
 
 		RenderSystemFactoryImpl& operator =(const RenderSystemFactoryImpl&) = delete;
 		RenderSystemFactoryImpl& operator =(RenderSystemFactoryImpl&&) = delete;
 
 	private:
 		RenderSystemParams renderSystemParams; ///< Render system parameters
+		Core::SystemInfo<RenderSystem, Render::IRenderSystem, Direct3D12::IRenderSystem, IRenderSystem> renderSystemInfo; ///< Render system info.
 
 		Core::IApplicationContext* application; ///< Application.
 	};
@@ -63,19 +62,11 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 	Core::SystemData RenderSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		auto system = std::make_unique<RenderSystem>(engine, params, renderSystemParams);
-		auto interfaces = PonyBase::Utility::ObjectInterfaces();
-		interfaces.AddInterfacesDeduced<Render::IRenderSystem, Direct3D12::IRenderSystem, IRenderSystem>(*system);
-
-		return Core::SystemData
-		{
-			.system = std::unique_ptr<Core::TickableSystem>(std::move(system)),
-			.publicInterfaces = std::move(interfaces)
-		};
+		return renderSystemInfo.CreateSystemData(std::make_unique<RenderSystem>(engine, params, renderSystemParams));
 	}
 
-	const std::type_info& RenderSystemFactoryImpl::SystemType() const noexcept
+	const Core::ISystemInfo& RenderSystemFactoryImpl::SystemInfo() const noexcept
 	{
-		return typeid(RenderSystem);
+		return renderSystemInfo;
 	}
 }

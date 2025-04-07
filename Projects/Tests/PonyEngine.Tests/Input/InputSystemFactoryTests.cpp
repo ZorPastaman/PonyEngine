@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+#include <typeindex>
 #include <typeinfo>
 #include <variant>
 
@@ -50,7 +51,7 @@ namespace Input
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputSystem*>(system)), reinterpret_cast<std::uintptr_t>(interfaces[0].second));
 		}
 
-		TEST_METHOD(SystemTypeTest)
+		TEST_METHOD(SystemInfoTest)
 		{
 			auto application = Mocks::Application();
 			auto logger = Mocks::Logger();
@@ -59,7 +60,10 @@ namespace Input
 			engine.application = &application;
 			const auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams(), PonyEngine::Input::InputSystemParams{});
 			auto inputSystem = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			Assert::IsTrue(typeid(*std::get<1>(inputSystem.system)) == factory.systemFactory->SystemType());
+			const PonyEngine::Core::ISystemInfo& info = factory.systemFactory->SystemInfo();
+			Assert::IsTrue(typeid(*std::get<1>(inputSystem.system)) == info.SystemType());
+			Assert::IsTrue(info.IsTickable());
+			Assert::AreEqual(std::size_t{1}, info.InterfaceCount());
 		}
 	};
 }
