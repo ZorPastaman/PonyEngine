@@ -117,7 +117,7 @@ namespace PonyEngine::Core
 	{
 		systems.reserve(systemFactories.size());
 		tickableSystems.reserve(std::ranges::count_if(systemFactories, [](const SystemFactoryEntry& entry) { return entry.factory->SystemInfo().IsTickable(); }));
-		systemInterfaces.reserve(std::accumulate(systemFactories.begin(), systemFactories.end(), std::size_t{0}, [](const std::size_t value, const SystemFactoryEntry& entry) { return value + entry.factory->SystemInfo().InterfaceCount(); }));
+		systemInterfaces.reserve(std::reduce(systemFactories.begin(), systemFactories.end(), std::size_t{0}, [](const std::size_t value, const SystemFactoryEntry& entry) { return value + entry.factory->SystemInfo().InterfaceCount(); }));
 
 		auto tickableSystemsBuffer = std::vector<std::pair<TickableSystem*, std::int32_t>>();
 		tickableSystemsBuffer.reserve(tickableSystems.capacity());

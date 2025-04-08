@@ -16,7 +16,7 @@ export module PonyEngine.Input:IInputSystem;
 import <memory>;
 import <string_view>;
 
-import :InputReceiver;
+import :IInputReceiver;
 
 export namespace PonyEngine::Input
 {
@@ -29,7 +29,7 @@ export namespace PonyEngine::Input
 		/// @param id Input ID.
 		/// @return Input receiver.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<InputReceiver> CreateReceiver(std::string_view id) = 0;
+		virtual std::shared_ptr<IInputReceiver> CreateReceiver(std::string_view id) = 0;
 
 		/// @brief Gets the input state - a sum of all inputs with the same ID.
 		/// @param id Input ID.

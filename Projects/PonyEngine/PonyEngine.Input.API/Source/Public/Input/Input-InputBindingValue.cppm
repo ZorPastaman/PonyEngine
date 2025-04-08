@@ -13,7 +13,7 @@ import :InputCode;
 
 export namespace PonyEngine::Input
 {
-	/// @brief Input binding value. It's the second element of a binding table pair.
+	/// @brief Input binding value.
 	struct InputBindingValue final
 	{
 		InputCode inputCode; ///< Input code.

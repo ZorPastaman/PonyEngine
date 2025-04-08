@@ -7,14 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Input:InputReceiver;
+export module PonyEngine.Input.Detail:InputReceiver;
 
 import <functional>;
+import <utility>;
+
+import PonyEngine.Input;
 
 export namespace PonyEngine::Input
 {
 	/// @brief Input receiver. It executes a function when a bound to it event is invoked.
-	class InputReceiver final
+	class InputReceiver final : public IInputReceiver
 	{
 	public:
 		/// @brief Creates an empty @p InputReceiver.
@@ -25,15 +28,11 @@ export namespace PonyEngine::Input
 
 		~InputReceiver() noexcept = default;
 
-		/// @brief Resets the receiver. it sets an empty action.
-		void Reset() noexcept;
-		/// @brief Gets the action.
-		/// @return Action that is called on a receiver event.
+		virtual void Reset() noexcept override;
 		[[nodiscard("Pure function")]]
-		const std::function<void(float)>& Action() const noexcept;
-		/// @brief Sets the action.
-		/// @param action Action that is called on a receiver event.
-		void Action(const std::function<void(float)>& action) noexcept;
+		virtual const std::function<void(float)>& Action() const noexcept override;
+		virtual void Action(const std::function<void(float)>& action) noexcept override;
+		virtual void Action(std::function<void(float)>&& action) noexcept override;
 
 		/// @brief Executes the input event action.
 		/// @param value Input event value.
@@ -74,6 +73,18 @@ namespace PonyEngine::Input
 		}
 
 		func = action;
+	}
+
+	void InputReceiver::Action(std::function<void(float)>&& action) noexcept
+	{
+		if (action == nullptr)
+		{
+			Reset();
+
+			return;
+		}
+
+		func = std::move(action);
 	}
 
 	void InputReceiver::Execute(const float value)

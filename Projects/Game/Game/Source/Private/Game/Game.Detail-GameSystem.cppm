@@ -71,8 +71,8 @@ export namespace Game
 		PonyEngine::Render::IRenderSystem* renderSystem;
 		PonyEngine::Time::ITimeSystem* timeSystem;
 
-		std::shared_ptr<PonyEngine::Input::InputReceiver> resetHandle;
-		std::shared_ptr<PonyEngine::Input::InputReceiver> exitHandle;
+		std::shared_ptr<PonyEngine::Input::IInputReceiver> resetHandle;
+		std::shared_ptr<PonyEngine::Input::IInputReceiver> exitHandle;
 
 		std::shared_ptr<PonyEngine::Render::IRenderObject> floor;
 		std::shared_ptr<PonyEngine::Render::IRenderObject> centralColumn;

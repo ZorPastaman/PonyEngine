@@ -22,7 +22,6 @@ import <exception>;
 import <memory>;
 import <numeric>;
 import <optional>;
-import <queue>;
 import <ranges>;
 import <string>;
 import <string_view>;
@@ -35,6 +34,8 @@ import PonyDebug.Log;
 
 import PonyEngine.Core;
 import PonyEngine.Input;
+
+import :InputReceiver;
 
 export namespace PonyEngine::Input
 {
@@ -59,7 +60,7 @@ export namespace PonyEngine::Input
 		virtual void Tick() override;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<InputReceiver> CreateReceiver(std::string_view id) override;
+		virtual std::shared_ptr<IInputReceiver> CreateReceiver(std::string_view id) override;
 
 		[[nodiscard("Pure function")]]
 		virtual float State(std::string_view id) const noexcept override;
@@ -136,7 +137,7 @@ export namespace PonyEngine::Input
 		std::unordered_map<std::size_t, std::vector<std::size_t>> idToInputMapping; ///< Input ID index to input mapping entries map.
 		std::unordered_map<InputCode, std::vector<std::size_t>> codeToInputMapping; ///< Input code to input mapping entries map.
 
-		std::queue<std::pair<const IDevice*, InputEvent>> inputQueue; ///< Input queue.
+		std::vector<std::pair<const IDevice*, InputEvent>> inputQueue; ///< Input queue.
 		std::unordered_map<std::size_t, std::vector<std::shared_ptr<InputReceiver>>> inputReceivers; ///< Input ID index to input receivers map.
 
 		std::unordered_map<InputCode, std::vector<float>> inputStates; ///< Input states. Input code to input states. Inputs states are synced with corresponding devices via index.
@@ -149,6 +150,87 @@ namespace PonyEngine::Input
 	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams& inputParams) noexcept :
 		TickableSystem(engine, systemParams)
 	{
+		devices.reserve(inputParams.inputDeviceFactories.size());
+		inputIds.reserve(inputParams.inputBindings.size());
+		inputMapping.reserve(std::reduce(inputParams.inputBindings.begin(), inputParams.inputBindings.end(), std::size_t{0}, [](const std::size_t value, const std::pair<std::string, InputBindingInfo>& entry) { return value + entry.second.inputBindingValues.size(); }));
+		idToInputMapping.reserve(inputParams.inputBindings.size());
+		for (std::size_t index = 0; const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			idToInputMapping[index].reserve(binding.inputBindingValues.size());
+			++index;
+		}
+		std::size_t uniqueInputCodeCount = 0;
+		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			{
+				bool uniqueCode = true;
+
+				for (const auto& bindingSecond : std::ranges::views::values(inputParams.inputBindings))
+				{
+					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond.inputBindingValues)
+					{
+						if (&inputCode == &inputCodeSecond)
+						{
+							break;
+						}
+
+						if (inputCode == inputCodeSecond)
+						{
+							uniqueCode = false;
+							break;
+						}
+					}
+				}
+
+				uniqueInputCodeCount += uniqueCode;
+			}
+		}
+		codeToInputMapping.reserve(uniqueInputCodeCount);
+		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			{
+				std::size_t inputCodeCount = 0;
+				for (const auto& bindingSecond : std::ranges::views::values(inputParams.inputBindings))
+				{
+					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond.inputBindingValues)
+					{
+						inputCodeCount += inputCode == inputCodeSecond;
+					}
+				}
+
+				codeToInputMapping[inputCode].reserve(inputCodeCount);
+			}
+		}
+		inputQueue.reserve(inputParams.inputEventsPerFrame);
+		inputReceivers.reserve(std::ranges::count_if(inputParams.inputBindings, [](const std::pair<std::string, InputBindingInfo>& binding) { return binding.second.inputReceiverCount > 0; }));
+		for (std::size_t index = 0; const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			if (binding.inputReceiverCount > 0)
+			{
+				inputReceivers[index].reserve(binding.inputReceiverCount);
+			}
+
+			++index;
+		}
+		inputStates.reserve(uniqueInputCodeCount);
+		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			{
+				inputStates[inputCode].resize(inputParams.inputDeviceFactories.size());
+			}
+		}
+		inputDeltas.reserve(uniqueInputCodeCount);
+		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
+		{
+			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			{
+				inputDeltas[inputCode] = 0.f;
+			}
+		}
+
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create devices.");
 		for (const std::shared_ptr<IDeviceFactory>& deviceFactory : inputParams.inputDeviceFactories)
 		{
@@ -166,12 +248,13 @@ namespace PonyEngine::Input
 		{
 			inputIds.push_back(id);
 			const std::size_t idIndex = inputIds.size() - 1;
-			for (const auto& [inputCode, multiplier] : binding)
+			std::vector<std::size_t>& idToInput = idToInputMapping[idIndex];
+			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
 			{
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Set input binding. ID: '{}'; Input code: '{}'; Multiplier: '{}'.", id, ToString(inputCode), multiplier);
 				inputMapping.push_back(InputMappingEntry{.idIndex = idIndex, .inputCode = inputCode, .multiplier = multiplier});
 				const std::size_t entryIndex = inputMapping.size() - 1;
-				idToInputMapping[idIndex].push_back(entryIndex);
+				idToInput.push_back(entryIndex);
 				codeToInputMapping[inputCode].push_back(entryIndex);
 			}
 		}
@@ -233,7 +316,7 @@ namespace PonyEngine::Input
 		ProcessInput();
 	}
 
-	std::shared_ptr<InputReceiver> InputSystem::CreateReceiver(const std::string_view id)
+	std::shared_ptr<IInputReceiver> InputSystem::CreateReceiver(const std::string_view id)
 	{
 		auto receiver = std::make_shared<InputReceiver>();
 		if (const std::optional<std::size_t> inputIdIndex = InputIdIndex(id)) [[likely]]
@@ -300,7 +383,12 @@ namespace PonyEngine::Input
 
 	void InputSystem::AddInputEvent(const IDevice& inputSource, const InputEvent& inputEvent)
 	{
-		inputQueue.emplace(&inputSource, inputEvent);
+		if (!codeToInputMapping.contains(inputEvent.inputCode))
+		{
+			return; // No mapping. So, it can be safely ignored.
+		}
+
+		inputQueue.emplace_back(&inputSource, inputEvent);
 	}
 
 	void InputSystem::ZeroDeltas() noexcept
@@ -334,25 +422,34 @@ namespace PonyEngine::Input
 
 	void InputSystem::ProcessInput()
 	{
-		while (!inputQueue.empty())
+		try
 		{
-			ProcessInputEvent(inputQueue.front());
-			inputQueue.pop();
+			for (const std::pair<const IDevice*, InputEvent>& inputEntry : inputQueue)
+			{
+				ProcessInputEvent(inputEntry);
+			}
 		}
+		catch (...)
+		{
+			inputQueue.clear();
+
+			throw;
+		}
+
+		inputQueue.clear();
 	}
 
 	void InputSystem::ProcessInputEvent(const std::pair<const IDevice*, InputEvent>& inputEntry)
 	{
 		UpdateStateAndDelta(inputEntry);
 
-		if (const auto& mappingPosition = codeToInputMapping.find(inputEntry.second.inputCode); mappingPosition != codeToInputMapping.cend())
+		const auto& mappingPosition = codeToInputMapping.find(inputEntry.second.inputCode);
+		assert(mappingPosition != codeToInputMapping.cend() && "The input code is incorrect.");
+		for (const std::size_t inputMappingIndex : mappingPosition->second)
 		{
-			for (const std::size_t inputMappingIndex : mappingPosition->second)
-			{
-				const InputMappingEntry& inputMappingEntry = inputMapping[inputMappingIndex];
-				const float value = inputEntry.second.inputValue * inputMappingEntry.multiplier;
-				ExecuteReceivers(inputMappingEntry.idIndex, value);
-			}
+			const InputMappingEntry& inputMappingEntry = inputMapping[inputMappingIndex];
+			const float value = inputEntry.second.inputValue * inputMappingEntry.multiplier;
+			ExecuteReceivers(inputMappingEntry.idIndex, value);
 		}
 	}
 
@@ -377,25 +474,18 @@ namespace PonyEngine::Input
 		const std::optional<std::size_t> deviceIndex = DeviceIndex(inputDevice);
 		assert(deviceIndex && "The input with the wrong input device has been received.");
 
-		std::vector<float>* states;
-		if (const auto statesPosition = inputStates.find(inputCode); statesPosition != inputStates.cend()) [[likely]]
-		{
-			states = &statesPosition->second;
-		}
-		else [[unlikely]]
-		{
-			std::vector<float>& newStates = inputStates[inputCode];
-			newStates.resize(devices.size());
-			std::ranges::fill(newStates, 0.f);
-			states = &newStates;
-		}
+		const auto statesPosition = inputStates.find(inputCode);
+		assert(statesPosition != inputStates.cend() && "Tried to update a state by an invalid input code.");
 
-		(*states)[deviceIndex.value()] = value;
+		statesPosition->second[deviceIndex.value()] = value;
 	}
 
 	void InputSystem::UpdateDelta(const InputCode inputCode, const  float value)
 	{
-		inputDeltas[inputCode] += value;
+		const auto inputDeltaPosition = inputDeltas.find(inputCode);
+		assert(inputDeltaPosition != inputDeltas.cend() && "Tried to update a delta by an invalid input code.");
+
+		inputDeltaPosition->second += value;
 	}
 
 	void InputSystem::ExecuteReceivers(const std::size_t idIndex, const float value) const
