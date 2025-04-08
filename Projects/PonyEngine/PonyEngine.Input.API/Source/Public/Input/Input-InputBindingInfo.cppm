@@ -7,15 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LoggerParams;
+export module PonyEngine.Input:InputBindingInfo;
 
-import <cstddef>;
+import <vector>;
 
-export namespace PonyDebug::Log
+import :InputBindingValue;
+
+export namespace PonyEngine::Input
 {
-	/// @brief Logger parameters.
-	struct LoggerParams final
+	/// @brief Input binding info.
+	struct InputBindingInfo final
 	{
-		std::size_t subLoggerCount = 0; ///< Expected number of sub-logger. It's used to preallocate memory and doesn't limit a count of sub-loggers.
+		std::vector<InputBindingValue> inputBindingValues; ///< Input binding values.
+
+		std::size_t inputReceiverCount = 0; ///< Expected number of input receivers. It's used to preallocate memory and doesn't limit a count of receivers.
 	};
 }
