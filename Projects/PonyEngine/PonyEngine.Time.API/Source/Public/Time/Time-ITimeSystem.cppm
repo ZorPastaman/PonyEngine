@@ -39,15 +39,15 @@ export namespace PonyEngine::Time
 		/// @brief Gets a real frame count elapsed since the engine start.
 		/// @return Real frame count.
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t RealFrameCount() const noexcept = 0;
+		virtual std::uint64_t RealFrameCount() const noexcept = 0;
 		/// @brief Gets a virtual frame count elapsed since the engine start.
 		/// @return Virtual frame count.
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t VirtualFrameCount() const noexcept = 0;
+		virtual std::uint64_t VirtualFrameCount() const noexcept = 0;
 		/// @brief Gets an unscaled virtual frame count elapsed since the engine start.
 		/// @return Unscaled virtual frame count.
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t UnscaledVirtualFrameCount() const noexcept = 0;
+		virtual std::uint64_t UnscaledVirtualFrameCount() const noexcept = 0;
 
 		/// @brief Gets a real time elapsed since a previous tick.
 		/// @return Real delta time in seconds.
@@ -65,15 +65,15 @@ export namespace PonyEngine::Time
 		/// @brief Gets a real frame count elapsed since a previous tick.
 		/// @return Real delta frame.
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t RealDeltaFrame() const noexcept = 0;
+		virtual std::uint32_t RealDeltaFrame() const noexcept = 0;
 		/// @brief Gets a virtual frame count elapsed since a previous tick.
 		/// @return Virtual delta frame.
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t VirtualDeltaFrame() const noexcept = 0;
+		virtual std::uint32_t VirtualDeltaFrame() const noexcept = 0;
 		/// @brief Gets an unscaled virtual frame count elapsed since a previous tick.
 		/// @return Unscaled virtual delta frame.
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t UnscaledVirtualDeltaFrame() const noexcept = 0;
+		virtual std::uint32_t UnscaledVirtualDeltaFrame() const noexcept = 0;
 
 		/// @brief Gets the delta time cap.
 		/// @details It affects a virtual time only. Its delta can't exceed this value.
