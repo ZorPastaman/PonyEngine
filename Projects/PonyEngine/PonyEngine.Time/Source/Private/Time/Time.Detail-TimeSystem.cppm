@@ -54,11 +54,11 @@ export namespace PonyEngine::Time
 		virtual double UnscaledVirtualTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t RealFrameCount() const noexcept override;
+		virtual std::uint64_t RealFrameCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t VirtualFrameCount() const noexcept override;
+		virtual std::uint64_t VirtualFrameCount() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::int64_t UnscaledVirtualFrameCount() const noexcept override;
+		virtual std::uint64_t UnscaledVirtualFrameCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual float RealDeltaTime() const noexcept override;
@@ -68,11 +68,11 @@ export namespace PonyEngine::Time
 		virtual float UnscaledVirtualDeltaTime() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t RealDeltaFrame() const noexcept override;
+		virtual std::uint32_t RealDeltaFrame() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t VirtualDeltaFrame() const noexcept override;
+		virtual std::uint32_t VirtualDeltaFrame() const noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t UnscaledVirtualDeltaFrame() const noexcept override;
+		virtual std::uint32_t UnscaledVirtualDeltaFrame() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual float DeltaTimeCap() const noexcept override;
@@ -109,17 +109,17 @@ export namespace PonyEngine::Time
 		double unscaledVirtualTime; ///< Unscaled virtual time elapsed since the engine start in seconds.
 		double virtualTime; ///< Virtual time elapsed since the engine start in seconds.
 
-		std::int64_t realFrameCount; ///< Real frame count since the engine start.
-		std::int64_t unscaledVirtualFrameCount; ///< Unscaled virtual frame count since the engine start.
-		std::int64_t virtualFrameCount; ///< Virtual frame count since the engine start.
+		std::uint64_t realFrameCount; ///< Real frame count since the engine start.
+		std::uint64_t unscaledVirtualFrameCount; ///< Unscaled virtual frame count since the engine start.
+		std::uint64_t virtualFrameCount; ///< Virtual frame count since the engine start.
 
 		float realDeltaTime; ///< Real delta time.
 		float unscaledVirtualDeltaTime; ///< Unscaled virtual delta time.
 		float virtualDeltaTime; ///< Virtual delta time.
 
-		std::int32_t realDeltaFrame; ///< Real delta frame.
-		std::int32_t unscaledVirtualDeltaFrame; ///< Unscaled virtual delta frame.
-		std::int32_t virtualDeltaFrame; ///< Virtual delta frame.
+		std::uint32_t realDeltaFrame; ///< Real delta frame.
+		std::uint32_t unscaledVirtualDeltaFrame; ///< Unscaled virtual delta frame.
+		std::uint32_t virtualDeltaFrame; ///< Virtual delta frame.
 
 		float realTimeAccumulator; ///< Real time accumulator.
 		float unscaledVirtualTimeAccumulator; ///< Unscaled virtual time accumulator.
@@ -140,15 +140,15 @@ namespace PonyEngine::Time
 		realTime{0.},
 		unscaledVirtualTime{0.},
 		virtualTime{0.},
-		realFrameCount{0LL},
-		unscaledVirtualFrameCount{0LL},
-		virtualFrameCount{0LL},
+		realFrameCount{0ULL},
+		unscaledVirtualFrameCount{0ULL},
+		virtualFrameCount{0ULL},
 		realDeltaTime{0.f},
 		unscaledVirtualDeltaTime{0.f},
 		virtualDeltaTime{0.f},
-		realDeltaFrame{0},
-		unscaledVirtualDeltaFrame{0},
-		virtualDeltaFrame{0},
+		realDeltaFrame{0u},
+		unscaledVirtualDeltaFrame{0u},
+		virtualDeltaFrame{0u},
 		realTimeAccumulator{0.f},
 		unscaledVirtualTimeAccumulator{0.f},
 		virtualTimeAccumulator{0.f}
@@ -180,9 +180,9 @@ namespace PonyEngine::Time
 		unscaledVirtualTimeAccumulator += unscaledVirtualDeltaTime;
 		virtualTimeAccumulator += virtualDeltaTime;
 
-		realDeltaFrame = 0;
-		unscaledVirtualDeltaFrame = 0;
-		virtualDeltaFrame = 0;
+		realDeltaFrame = 0u;
+		unscaledVirtualDeltaFrame = 0u;
+		virtualDeltaFrame = 0u;
 		while (realTimeAccumulator > framePeriod)
 		{
 			++realDeltaFrame;
@@ -219,17 +219,17 @@ namespace PonyEngine::Time
 		return unscaledVirtualTime;
 	}
 
-	std::int64_t TimeSystem::RealFrameCount() const noexcept
+	std::uint64_t TimeSystem::RealFrameCount() const noexcept
 	{
 		return realFrameCount;
 	}
 
-	std::int64_t TimeSystem::VirtualFrameCount() const noexcept
+	std::uint64_t TimeSystem::VirtualFrameCount() const noexcept
 	{
 		return virtualFrameCount;
 	}
 
-	std::int64_t TimeSystem::UnscaledVirtualFrameCount() const noexcept
+	std::uint64_t TimeSystem::UnscaledVirtualFrameCount() const noexcept
 	{
 		return unscaledVirtualFrameCount;
 	}
@@ -249,17 +249,17 @@ namespace PonyEngine::Time
 		return unscaledVirtualDeltaTime;
 	}
 
-	std::int32_t TimeSystem::RealDeltaFrame() const noexcept
+	std::uint32_t TimeSystem::RealDeltaFrame() const noexcept
 	{
 		return realDeltaFrame;
 	}
 
-	std::int32_t TimeSystem::VirtualDeltaFrame() const noexcept
+	std::uint32_t TimeSystem::VirtualDeltaFrame() const noexcept
 	{
 		return virtualDeltaFrame;
 	}
 
-	std::int32_t TimeSystem::UnscaledVirtualDeltaFrame() const noexcept
+	std::uint32_t TimeSystem::UnscaledVirtualDeltaFrame() const noexcept
 	{
 		return unscaledVirtualDeltaFrame;
 	}
