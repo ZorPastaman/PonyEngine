@@ -101,26 +101,26 @@ namespace PonyEngine::Input::Windows
 		switch (uMsg)
 		{
 		case WM_MOUSEMOVE:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseXPosition, .inputValue = static_cast<float>(GET_X_LPARAM(lParam)), .inputType = InputType::State});
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseYPosition, .inputValue = static_cast<float>(GET_Y_LPARAM(lParam)), .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXPosition, .inputValue = static_cast<float>(GET_X_LPARAM(lParam)), .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYPosition, .inputValue = static_cast<float>(GET_Y_LPARAM(lParam)), .inputType = InputType::State});
 			break;
 		case WM_LBUTTONDOWN:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseLeftButton, .inputValue = 1.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseLeftButton, .inputValue = 1.f, .inputType = InputType::State});
 			break;
 		case WM_LBUTTONUP:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseLeftButton, .inputValue = 0.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseLeftButton, .inputValue = 0.f, .inputType = InputType::State});
 			break;
 		case WM_RBUTTONDOWN:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseRightButton, .inputValue = 1.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseRightButton, .inputValue = 1.f, .inputType = InputType::State});
 			break;
 		case WM_RBUTTONUP:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseRightButton, .inputValue = 0.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseRightButton, .inputValue = 0.f, .inputType = InputType::State});
 			break;
 		case WM_MBUTTONDOWN:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseMiddleButton, .inputValue = 1.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseMiddleButton, .inputValue = 1.f, .inputType = InputType::State});
 			break;
 		case WM_MBUTTONUP:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseMiddleButton, .inputValue = 0.f, .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseMiddleButton, .inputValue = 0.f, .inputType = InputType::State});
 			break;
 		case WM_XBUTTONDOWN:
 			ObserveXButton(wParam, true);
@@ -129,7 +129,7 @@ namespace PonyEngine::Input::Windows
 			ObserveXButton(wParam, false);
 			break;
 		case WM_MOUSEWHEEL:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseWheel, .inputValue = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA), .inputType = InputType::Delta});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseWheel, .inputValue = static_cast<float>(GET_WHEEL_DELTA_WPARAM(wParam) / WHEEL_DELTA), .inputType = InputType::Delta});
 			break;
 		default: [[unlikely]]
 			assert(false && "The incorrect message type has been received.");
@@ -139,18 +139,21 @@ namespace PonyEngine::Input::Windows
 
 	void MouseDevice::Observe(const RAWINPUT& input)
 	{
-		assert(input.data.mouse.usFlags == MOUSE_MOVE_RELATIVE && "The incorrect raw input type has been received.");
+		if (input.data.mouse.usFlags != MOUSE_MOVE_RELATIVE)
+		{
+			return;
+		}
 
 		const LONG deltaX = input.data.mouse.lLastX;
 		const LONG deltaY = input.data.mouse.lLastY;
 
 		if (deltaX != 0L)
 		{
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseXDelta, .inputValue = static_cast<float>(deltaX) * sensitivity, .inputType = InputType::Delta});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseXDelta, .inputValue = static_cast<float>(deltaX) * sensitivity, .inputType = InputType::Delta});
 		}
 		if (deltaY != 0L)
 		{
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseYDelta, .inputValue = static_cast<float>(deltaY) * sensitivity, .inputType = InputType::Delta});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseYDelta, .inputValue = static_cast<float>(deltaY) * sensitivity, .inputType = InputType::Delta});
 		}
 	}
 
@@ -159,10 +162,10 @@ namespace PonyEngine::Input::Windows
 		switch (GET_XBUTTON_WPARAM(wParam))
 		{
 		case 1:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseButton4, .inputValue = static_cast<float>(isDown), .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseButton4, .inputValue = static_cast<float>(isDown), .inputType = InputType::State});
 			break;
 		case 2:
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = InputCode::MouseButton5, .inputValue = static_cast<float>(isDown), .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = InputCode::MouseButton5, .inputValue = static_cast<float>(isDown), .inputType = InputType::State});
 			break;
 		default:
 			break;

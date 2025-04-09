@@ -27,6 +27,11 @@ export namespace PonyEngine::Input
 	{
 		INTERFACE_BODY(IInputSystemContext)
 
+		/// @brief Gets the current frame count.
+		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint64_t FrameCount() const noexcept = 0;
+
 		/// @brief Gets the logger.
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
@@ -39,15 +44,15 @@ export namespace PonyEngine::Input
 		/// @brief Gets the system manager.
 		/// @return System manager.
 		[[nodiscard("Pure function")]]
-		virtual Core::ISystemManager& SystemManager() noexcept = 0;
-		/// @brief Gets the system manager.
-		/// @return System manager.
-		[[nodiscard("Pure function")]]
 		virtual const Core::ISystemManager& SystemManager() const noexcept = 0;
 
+		/// @brief Is the engine running now?
+		/// @return @a True if it's running; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		virtual bool IsRunning() const noexcept = 0;
+
 		/// @brief Adds the event to an input queue.
-		/// @param inputSource Input source.
 		/// @param inputEvent Input event.
-		virtual void AddInputEvent(const IDevice& inputSource, const InputEvent& inputEvent) = 0;
+		virtual void AddInputEvent(const InputEvent& inputEvent) = 0;
 	};
 }

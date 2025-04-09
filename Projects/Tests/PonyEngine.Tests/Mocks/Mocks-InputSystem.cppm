@@ -21,18 +21,22 @@ export namespace Mocks
 	{
 	public:
 		[[nodiscard("Pure function")]]
+		virtual std::uint64_t FrameCount() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual PonyEngine::Core::ISystemManager& SystemManager() noexcept override;
-		[[nodiscard("Pure function")]]
 		virtual const PonyEngine::Core::ISystemManager& SystemManager() const noexcept override;
 
-		virtual void AddInputEvent(const PonyEngine::Input::IDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent) override;
+		[[nodiscard("Pure function")]]
+		virtual bool IsRunning() const noexcept override;
 
-		std::vector<std::pair<const PonyEngine::Input::IDevice*, PonyEngine::Input::InputEvent>> events;
+		virtual void AddInputEvent(const PonyEngine::Input::InputEvent& inputEvent) override;
+
+		std::vector<PonyEngine::Input::InputEvent> events;
 
 		PonyEngine::Core::IEngineContext* engine = nullptr;
 	};
@@ -40,6 +44,11 @@ export namespace Mocks
 
 namespace Mocks
 {
+	std::uint64_t InputSystem::FrameCount() const noexcept
+	{
+		return 0ULL;
+	}
+
 	PonyDebug::Log::ILogger& InputSystem::Logger() noexcept
 	{
 		return engine->Logger();
@@ -50,18 +59,18 @@ namespace Mocks
 		return engine->Logger();
 	}
 
-	PonyEngine::Core::ISystemManager& InputSystem::SystemManager() noexcept
-	{
-		return engine->SystemManager();
-	}
-
 	const PonyEngine::Core::ISystemManager& InputSystem::SystemManager() const noexcept
 	{
 		return engine->SystemManager();
 	}
 
-	void InputSystem::AddInputEvent(const PonyEngine::Input::IDevice& inputSource, const PonyEngine::Input::InputEvent& inputEvent)
+	bool InputSystem::IsRunning() const noexcept
 	{
-		events.emplace_back(&inputSource, inputEvent);
+		return true;
+	}
+
+	void InputSystem::AddInputEvent(const PonyEngine::Input::InputEvent& inputEvent)
+	{
+		events.emplace_back(inputEvent);
 	}
 }
