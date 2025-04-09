@@ -40,7 +40,7 @@ import :InputReceiver;
 export namespace PonyEngine::Input
 {
 	/// @brief Input system.
-	class InputSystem final : public Core::TickableSystem, public IInputSystem, private IInputSystemContext
+	class InputSystem final : public Core::TickableSystem, public IInputSystem
 	{
 	public:
 		/// @brief Creates an input system
@@ -77,17 +77,74 @@ export namespace PonyEngine::Input
 			float multiplier; ///< Input multiplier.
 		};
 
-		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+		/// @brief Input system context wrapper.
+		class InputSystemContextWrapper final : public IInputSystemContext
+		{
+		public:
+			/// @brief Creates a wrapper.
+			/// @param inputSystem Input system.
+			/// @param deviceIndex Device index.
+			[[nodiscard("Pure constructor")]]
+			InputSystemContextWrapper(InputSystem* inputSystem, std::size_t deviceIndex) noexcept;
+			[[nodiscard("Pure constructor")]]
+			InputSystemContextWrapper(const InputSystemContextWrapper& other) noexcept = default;
+			[[nodiscard("Pure constructor")]]
+			InputSystemContextWrapper(InputSystemContextWrapper&& other) noexcept = default;
 
-		[[nodiscard("Pure function")]]
-		virtual Core::ISystemManager& SystemManager() noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual const Core::ISystemManager& SystemManager() const noexcept override;
+			~InputSystemContextWrapper() noexcept = default;
 
-		virtual void AddInputEvent(const IDevice& inputSource, const InputEvent& inputEvent) override;
+			[[nodiscard("Pure function")]]
+			virtual std::uint64_t FrameCount() const noexcept override;
+
+			[[nodiscard("Pure function")]]
+			virtual PonyDebug::Log::ILogger& Logger() noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const PonyDebug::Log::ILogger& Logger() const noexcept override;
+
+			[[nodiscard("Pure function")]]
+			virtual const Core::ISystemManager& SystemManager() const noexcept override;
+
+			[[nodiscard("Pure function")]]
+			virtual bool IsRunning() const noexcept override;
+
+			virtual void AddInputEvent(const InputEvent& inputEvent) override;
+
+			InputSystemContextWrapper& operator =(const InputSystemContextWrapper& other) noexcept = default;
+			InputSystemContextWrapper& operator =(InputSystemContextWrapper&& other) noexcept = default;
+
+		private:
+			InputSystem* inputSystem; ///< Input system.
+			std::size_t deviceIndex; ///< Device index.
+		};
+
+		/// @brief Gets the current frame count.
+		/// @return Frame count.
+		[[nodiscard("Pure function")]]
+		std::uint64_t FrameCount() const noexcept;
+
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		PonyDebug::Log::ILogger& Logger() noexcept;
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		const PonyDebug::Log::ILogger& Logger() const noexcept;
+
+		/// @brief Gets the system manager.
+		/// @return System manager.
+		[[nodiscard("Pure function")]]
+		const Core::ISystemManager& SystemManager() const noexcept;
+
+		/// @brief Is the engine running now?
+		/// @return @a True if it's running; @a false otherwise.
+		[[nodiscard("Pure function")]]
+		bool IsRunning() const noexcept;
+
+		/// @brief Adds an input event.
+		/// @param deviceIndex Device index.
+		/// @param inputEvent Input event.
+		void AddInputEvent(std::size_t deviceIndex, const InputEvent& inputEvent);
 
 		/// @brief Zeroes deltas.
 		void ZeroDeltas() noexcept;
@@ -99,20 +156,23 @@ export namespace PonyEngine::Input
 		void ProcessInput();
 
 		/// @brief Processes the @p inputEvent.
-		/// @param inputEntry Input entry to process.
-		void ProcessInputEvent(const std::pair<const IDevice*, InputEvent>& inputEntry);
+		/// @param inputEntry Input entry to process. Device index - input event.
+		void ProcessInputEvent(const std::pair<std::size_t, InputEvent>& inputEntry);
 		/// @brief Updates a state and a delta.
-		/// @param inputEntry Input entry.
-		void UpdateStateAndDelta(const std::pair<const IDevice*, InputEvent>& inputEntry);
+		/// @param inputEntry Input entry. Device index - input event.
+		void UpdateStateAndDelta(const std::pair<std::size_t, InputEvent>& inputEntry);
 		/// @brief Updates a state.
-		/// @param inputDevice Input source.
+		/// @param deviceIndex Input source.
 		/// @param inputCode Input code.
 		/// @param value Input value.
-		void UpdateState(const IDevice& inputDevice, InputCode inputCode, float value);
+		void UpdateState(std::size_t deviceIndex, InputCode inputCode, float value);
 		/// @brief Updates a delta.
 		/// @param inputCode Input code.
 		/// @param value Input value.
 		void UpdateDelta(InputCode inputCode, float value);
+		/// @brief Updates recievers.
+		/// @param inputEntry Input entry. Device index - input event.
+		void UpdateReceivers(const std::pair<std::size_t, InputEvent>& inputEntry);
 		/// @brief Execute bound actions.
 		/// @param idIndex Binding ID index.
 		/// @param value Input value.
@@ -123,13 +183,9 @@ export namespace PonyEngine::Input
 		/// @return Input ID index. If there's no such an ID, it's nullopt.
 		[[nodiscard("Pure function")]]
 		std::optional<std::size_t> InputIdIndex(std::string_view id) const noexcept;
-		/// @brief Gets a device index.
-		/// @param device Device.
-		/// @return Device index. If there's no such a device, it's nullopt.
-		[[nodiscard("Pure function")]]
-		std::optional<std::size_t> DeviceIndex(const IDevice& device) const noexcept;
 
 		std::vector<std::unique_ptr<Device>> devices; ///< Input devices.
+		std::vector<InputSystemContextWrapper> contextWrappers; ///< Context wrappers for devices.
 
 		std::vector<std::string> inputIds; ///< Input ids.
 		std::vector<InputMappingEntry> inputMapping; ///< Input mapping.
@@ -137,7 +193,7 @@ export namespace PonyEngine::Input
 		std::unordered_map<std::size_t, std::vector<std::size_t>> idToInputMapping; ///< Input ID index to input mapping entries map.
 		std::unordered_map<InputCode, std::vector<std::size_t>> codeToInputMapping; ///< Input code to input mapping entries map.
 
-		std::vector<std::pair<const IDevice*, InputEvent>> inputQueue; ///< Input queue.
+		std::vector<std::pair<std::size_t, InputEvent>> inputQueue; ///< Input queue.
 		std::unordered_map<std::size_t, std::vector<std::shared_ptr<InputReceiver>>> inputReceivers; ///< Input ID index to input receivers map.
 
 		std::unordered_map<InputCode, std::vector<float>> inputStates; ///< Input states. Input code to input states. Inputs states are synced with corresponding devices via index.
@@ -147,10 +203,47 @@ export namespace PonyEngine::Input
 
 namespace PonyEngine::Input
 {
+	InputSystem::InputSystemContextWrapper::InputSystemContextWrapper(InputSystem* const inputSystem, const std::size_t deviceIndex) noexcept :
+		inputSystem{inputSystem},
+		deviceIndex{deviceIndex}
+	{
+	}
+
+	std::uint64_t InputSystem::InputSystemContextWrapper::FrameCount() const noexcept
+	{
+		return inputSystem->FrameCount();
+	}
+
+	PonyDebug::Log::ILogger& InputSystem::InputSystemContextWrapper::Logger() noexcept
+	{
+		return inputSystem->Logger();
+	}
+
+	const PonyDebug::Log::ILogger& InputSystem::InputSystemContextWrapper::Logger() const noexcept
+	{
+		return inputSystem->Logger();
+	}
+
+	const Core::ISystemManager& InputSystem::InputSystemContextWrapper::SystemManager() const noexcept
+	{
+		return inputSystem->SystemManager();
+	}
+
+	bool InputSystem::InputSystemContextWrapper::IsRunning() const noexcept
+	{
+		return inputSystem->IsRunning();
+	}
+
+	void InputSystem::InputSystemContextWrapper::AddInputEvent(const InputEvent& inputEvent)
+	{
+		inputSystem->AddInputEvent(deviceIndex, inputEvent);
+	}
+
 	InputSystem::InputSystem(Core::IEngineContext& engine, const Core::SystemParams& systemParams, const InputSystemParams& inputParams) noexcept :
 		TickableSystem(engine, systemParams)
 	{
 		devices.reserve(inputParams.inputDeviceFactories.size());
+		contextWrappers.reserve(inputParams.inputDeviceFactories.size());
 		inputIds.reserve(inputParams.inputBindings.size());
 		inputMapping.reserve(std::reduce(inputParams.inputBindings.begin(), inputParams.inputBindings.end(), std::size_t{0}, [](const std::size_t value, const std::pair<std::string, InputBindingInfo>& entry) { return value + entry.second.inputBindingValues.size(); }));
 		idToInputMapping.reserve(inputParams.inputBindings.size());
@@ -236,7 +329,8 @@ namespace PonyEngine::Input
 		{
 			assert(deviceFactory && "The device factory is nullptr.");
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create '{}' device with '{}' factory.", deviceFactory->DeviceType().name(), typeid(*deviceFactory).name());
-			DeviceData device = deviceFactory->CreateDevice(*static_cast<IInputSystemContext*>(this), DeviceParams{});
+			contextWrappers.push_back(InputSystemContextWrapper(this, devices.size()));
+			DeviceData device = deviceFactory->CreateDevice(contextWrappers.back(), DeviceParams{});
 			assert(device.inputDevice && "The device is nullptr");
 			devices.push_back(std::move(device.inputDevice));
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Device created.");
@@ -361,6 +455,11 @@ namespace PonyEngine::Input
 		return value;
 	}
 
+	std::uint64_t InputSystem::FrameCount() const noexcept
+	{
+		return Engine().FrameCount();
+	}
+
 	PonyDebug::Log::ILogger& InputSystem::Logger() noexcept
 	{
 		return Engine().Logger();
@@ -371,24 +470,24 @@ namespace PonyEngine::Input
 		return Engine().Logger();
 	}
 
-	Core::ISystemManager& InputSystem::SystemManager() noexcept
-	{
-		return Engine().SystemManager();
-	}
-
 	const Core::ISystemManager& InputSystem::SystemManager() const noexcept
 	{
 		return Engine().SystemManager();
 	}
 
-	void InputSystem::AddInputEvent(const IDevice& inputSource, const InputEvent& inputEvent)
+	bool InputSystem::IsRunning() const noexcept
+	{
+		return Engine().IsRunning();
+	}
+
+	void InputSystem::AddInputEvent(const std::size_t deviceIndex, const InputEvent& inputEvent)
 	{
 		if (!codeToInputMapping.contains(inputEvent.inputCode))
 		{
 			return; // No mapping. So, it can be safely ignored.
 		}
 
-		inputQueue.emplace_back(&inputSource, inputEvent);
+		inputQueue.emplace_back(deviceIndex, inputEvent);
 	}
 
 	void InputSystem::ZeroDeltas() noexcept
@@ -424,7 +523,7 @@ namespace PonyEngine::Input
 	{
 		try
 		{
-			for (const std::pair<const IDevice*, InputEvent>& inputEntry : inputQueue)
+			for (const std::pair<std::size_t, InputEvent>& inputEntry : inputQueue)
 			{
 				ProcessInputEvent(inputEntry);
 			}
@@ -439,26 +538,18 @@ namespace PonyEngine::Input
 		inputQueue.clear();
 	}
 
-	void InputSystem::ProcessInputEvent(const std::pair<const IDevice*, InputEvent>& inputEntry)
+	void InputSystem::ProcessInputEvent(const std::pair<std::size_t, InputEvent>& inputEntry)
 	{
 		UpdateStateAndDelta(inputEntry);
-
-		const auto& mappingPosition = codeToInputMapping.find(inputEntry.second.inputCode);
-		assert(mappingPosition != codeToInputMapping.cend() && "The input code is incorrect.");
-		for (const std::size_t inputMappingIndex : mappingPosition->second)
-		{
-			const InputMappingEntry& inputMappingEntry = inputMapping[inputMappingIndex];
-			const float value = inputEntry.second.inputValue * inputMappingEntry.multiplier;
-			ExecuteReceivers(inputMappingEntry.idIndex, value);
-		}
+		UpdateReceivers(inputEntry);
 	}
 
-	void InputSystem::UpdateStateAndDelta(const std::pair<const IDevice*, InputEvent>& inputEntry)
+	void InputSystem::UpdateStateAndDelta(const std::pair<std::size_t, InputEvent>& inputEntry)
 	{
 		switch (inputEntry.second.inputType)
 		{
 		case InputType::State:
-			UpdateState(*inputEntry.first, inputEntry.second.inputCode, inputEntry.second.inputValue);
+			UpdateState(inputEntry.first, inputEntry.second.inputCode, inputEntry.second.inputValue);
 			break;
 		case InputType::Delta:
 			UpdateDelta(inputEntry.second.inputCode, inputEntry.second.inputValue);
@@ -469,15 +560,12 @@ namespace PonyEngine::Input
 		}
 	}
 
-	void InputSystem::UpdateState(const IDevice& inputDevice, const InputCode inputCode, const float value)
+	void InputSystem::UpdateState(const std::size_t deviceIndex, const InputCode inputCode, const float value)
 	{
-		const std::optional<std::size_t> deviceIndex = DeviceIndex(inputDevice);
-		assert(deviceIndex && "The input with the wrong input device has been received.");
-
 		const auto statesPosition = inputStates.find(inputCode);
 		assert(statesPosition != inputStates.cend() && "Tried to update a state by an invalid input code.");
 
-		statesPosition->second[deviceIndex.value()] = value;
+		statesPosition->second[deviceIndex] = value;
 	}
 
 	void InputSystem::UpdateDelta(const InputCode inputCode, const  float value)
@@ -486,6 +574,18 @@ namespace PonyEngine::Input
 		assert(inputDeltaPosition != inputDeltas.cend() && "Tried to update a delta by an invalid input code.");
 
 		inputDeltaPosition->second += value;
+	}
+
+	void InputSystem::UpdateReceivers(const std::pair<std::size_t, InputEvent>& inputEntry)
+	{
+		const auto& mappingPosition = codeToInputMapping.find(inputEntry.second.inputCode);
+		assert(mappingPosition != codeToInputMapping.cend() && "The input code is incorrect.");
+		for (const std::size_t inputMappingIndex : mappingPosition->second)
+		{
+			const InputMappingEntry& inputMappingEntry = inputMapping[inputMappingIndex];
+			const float value = inputEntry.second.inputValue * inputMappingEntry.multiplier;
+			ExecuteReceivers(inputMappingEntry.idIndex, value);
+		}
 	}
 
 	void InputSystem::ExecuteReceivers(const std::size_t idIndex, const float value) const
@@ -504,19 +604,6 @@ namespace PonyEngine::Input
 		for (std::size_t i = 0; i < inputIds.size(); ++i)
 		{
 			if (inputIds[i] == id)
-			{
-				return i;
-			}
-		}
-
-		return std::optional<std::size_t>{};
-	}
-
-	std::optional<std::size_t> InputSystem::DeviceIndex(const IDevice& device) const noexcept
-	{
-		for (std::size_t i = 0; i < devices.size(); ++i)
-		{
-			if (static_cast<IDevice*>(devices[i].get()) == &device)
 			{
 				return i;
 			}

@@ -60,7 +60,7 @@ namespace PonyEngine::Input::Windows
 
 	DeviceData MouseDeviceFactory::CreateDevice(IInputSystemContext& inputSystem, const DeviceParams& deviceParams)
 	{
-		return DeviceData{ .inputDevice = std::make_unique<MouseDevice>(inputSystem, deviceParams, mouseParams) };
+		return DeviceData{.inputDevice = std::make_unique<MouseDevice>(inputSystem, deviceParams, mouseParams)};
 	}
 
 	const std::type_info& MouseDeviceFactory::DeviceType() const noexcept

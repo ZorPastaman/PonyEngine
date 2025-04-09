@@ -26,7 +26,7 @@ import PonyEngine.Input.Windows;
 import PonyEngine.Window.Windows;
 
 export namespace PonyEngine::Input::Windows
-{
+{ 
 	/// @brief Windows keyboard device.
 	class KeyboardDevice final : public Device, private Window::Windows::IMessageObserver
 	{
@@ -216,7 +216,7 @@ namespace PonyEngine::Input::Windows
 		const WORD key = scanCode | extendedPrefix;
 		if (const auto keyCodeMapPosition = KeyCodeMap.find(key); keyCodeMapPosition != KeyCodeMap.cend())
 		{
-			InputSystem().AddInputEvent(*this, InputEvent{.inputCode = keyCodeMapPosition->second, .inputValue = static_cast<float>(inputValue), .inputType = InputType::State});
+			InputSystem().AddInputEvent(InputEvent{.inputCode = keyCodeMapPosition->second, .inputValue = static_cast<float>(inputValue), .inputType = InputType::State});
 		}
 	}
 }
