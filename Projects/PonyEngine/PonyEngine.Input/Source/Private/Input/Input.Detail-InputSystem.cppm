@@ -245,23 +245,23 @@ namespace PonyEngine::Input
 		devices.reserve(inputParams.inputDeviceFactories.size());
 		contextWrappers.reserve(inputParams.inputDeviceFactories.size());
 		inputIds.reserve(inputParams.inputBindings.size());
-		inputMapping.reserve(std::reduce(inputParams.inputBindings.begin(), inputParams.inputBindings.end(), std::size_t{0}, [](const std::size_t value, const std::pair<std::string, InputBindingInfo>& entry) { return value + entry.second.inputBindingValues.size(); }));
+		inputMapping.reserve(std::reduce(inputParams.inputBindings.begin(), inputParams.inputBindings.end(), std::size_t{0}, [](const std::size_t value, const std::pair<std::string, std::vector<InputBindingValue>>& entry) { return value + entry.second.size(); }));
 		idToInputMapping.reserve(inputParams.inputBindings.size());
 		for (std::size_t index = 0; const auto& binding : std::ranges::views::values(inputParams.inputBindings))
 		{
-			idToInputMapping[index].reserve(binding.inputBindingValues.size());
+			idToInputMapping[index].reserve(binding.size());
 			++index;
 		}
 		std::size_t uniqueInputCodeCount = 0;
 		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
 		{
-			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			for (const auto& [inputCode, multiplier] : binding)
 			{
 				bool uniqueCode = true;
 
 				for (const auto& bindingSecond : std::ranges::views::values(inputParams.inputBindings))
 				{
-					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond.inputBindingValues)
+					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond)
 					{
 						if (&inputCode == &inputCodeSecond)
 						{
@@ -282,12 +282,12 @@ namespace PonyEngine::Input
 		codeToInputMapping.reserve(uniqueInputCodeCount);
 		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
 		{
-			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			for (const auto& [inputCode, multiplier] : binding)
 			{
 				std::size_t inputCodeCount = 0;
 				for (const auto& bindingSecond : std::ranges::views::values(inputParams.inputBindings))
 				{
-					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond.inputBindingValues)
+					for (const auto& [inputCodeSecond, multiplierSecond] : bindingSecond)
 					{
 						inputCodeCount += inputCode == inputCodeSecond;
 					}
@@ -296,21 +296,11 @@ namespace PonyEngine::Input
 				codeToInputMapping[inputCode].reserve(inputCodeCount);
 			}
 		}
-		inputQueue.reserve(inputParams.inputEventsPerFrame);
-		inputReceivers.reserve(std::ranges::count_if(inputParams.inputBindings, [](const std::pair<std::string, InputBindingInfo>& binding) { return binding.second.inputReceiverCount > 0; }));
-		for (std::size_t index = 0; const auto& binding : std::ranges::views::values(inputParams.inputBindings))
-		{
-			if (binding.inputReceiverCount > 0)
-			{
-				inputReceivers[index].reserve(binding.inputReceiverCount);
-			}
-
-			++index;
-		}
+		inputQueue.reserve(128);
 		inputStates.reserve(uniqueInputCodeCount);
 		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
 		{
-			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			for (const auto& [inputCode, multiplier] : binding)
 			{
 				inputStates[inputCode].resize(inputParams.inputDeviceFactories.size());
 			}
@@ -318,7 +308,7 @@ namespace PonyEngine::Input
 		inputDeltas.reserve(uniqueInputCodeCount);
 		for (const auto& binding : std::ranges::views::values(inputParams.inputBindings))
 		{
-			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			for (const auto& [inputCode, multiplier] : binding)
 			{
 				inputDeltas[inputCode] = 0.f;
 			}
@@ -343,7 +333,7 @@ namespace PonyEngine::Input
 			inputIds.push_back(id);
 			const std::size_t idIndex = inputIds.size() - 1;
 			std::vector<std::size_t>& idToInput = idToInputMapping[idIndex];
-			for (const auto& [inputCode, multiplier] : binding.inputBindingValues)
+			for (const auto& [inputCode, multiplier] : binding)
 			{
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Set input binding. ID: '{}'; Input code: '{}'; Multiplier: '{}'.", id, ToString(inputCode), multiplier);
 				inputMapping.push_back(InputMappingEntry{.idIndex = idIndex, .inputCode = inputCode, .multiplier = multiplier});

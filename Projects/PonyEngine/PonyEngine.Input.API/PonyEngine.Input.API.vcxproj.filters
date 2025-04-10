@@ -90,9 +90,6 @@
     <ClCompile Include="Source\Public\Input\Input-InputType.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Input\Input-InputBindingInfo.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Input\Input-IInputReceiver.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

@@ -9,13 +9,13 @@
 
 export module PonyEngine.Input:InputSystemParams;
 
-import <cstddef>;
 import <memory>;
+import <string>;
 import <unordered_map>;
 import <vector>;
 
 import :IDeviceFactory;
-import :InputBindingInfo;
+import :InputBindingValue;
 
 export namespace PonyEngine::Input
 {
@@ -23,8 +23,6 @@ export namespace PonyEngine::Input
 	struct InputSystemParams final
 	{
 		std::vector<std::shared_ptr<IDeviceFactory>> inputDeviceFactories; ///< Input device factories.
-		std::unordered_map<std::string, InputBindingInfo> inputBindings; ///< Input bindings.
-
-		std::size_t inputEventsPerFrame = 100; ///< Expected number of input events per frame. It's used to preallocate memory and doesn't limit a count of events.
+		std::unordered_map<std::string, std::vector<InputBindingValue>> inputBindings; ///< Input bindings.
 	};
 }

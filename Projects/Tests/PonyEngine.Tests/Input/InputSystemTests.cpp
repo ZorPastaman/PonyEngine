@@ -34,12 +34,9 @@ namespace Input
 			const auto deviceFactory = std::make_shared<Mocks::InputDeviceFactory>();
 			auto params = PonyEngine::Input::InputSystemParams{};
 			params.inputDeviceFactories.push_back(deviceFactory);
-			params.inputBindings["Mock"] = PonyEngine::Input::InputBindingInfo
+			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{ .inputCode = PonyEngine::Input::InputCode::H }
-				}
+				PonyEngine::Input::InputBindingValue{ .inputCode = PonyEngine::Input::InputCode::H }
 			};
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
@@ -85,12 +82,9 @@ namespace Input
 			const auto deviceFactory = std::make_shared<Mocks::InputDeviceFactory>();
 			auto params = PonyEngine::Input::InputSystemParams{};
 			params.inputDeviceFactories.push_back(deviceFactory);
-			params.inputBindings["Mock"] = PonyEngine::Input::InputBindingInfo
+			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H }
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H }
 			};
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});
