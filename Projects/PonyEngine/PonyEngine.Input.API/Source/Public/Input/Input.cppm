@@ -18,7 +18,6 @@ export import :IDeviceFactory;
 export import :IInputReceiver;
 export import :IInputSystem;
 export import :IInputSystemContext;
-export import :InputBindingInfo;
 export import :InputBindingValue;
 export import :InputCode;
 export import :InputEvent;

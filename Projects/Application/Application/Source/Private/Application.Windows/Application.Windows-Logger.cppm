@@ -141,7 +141,7 @@ namespace Application::Windows
 		try
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Create logger.");
-			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{.subLoggerCount = subLoggerCount});
+			PonyDebug::Log::LoggerData logger = PonyDebug::Log::CreateLogger(PonyDebug::Log::LoggerParams{});
 			assert(logger.logger && "The logger is nullptr.");
 			PONY_CONSOLE(PonyDebug::Log::LogType::Info, "'{}' logger created.", typeid(*logger.logger).name());
 

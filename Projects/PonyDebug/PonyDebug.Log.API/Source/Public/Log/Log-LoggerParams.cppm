@@ -9,13 +9,10 @@
 
 export module PonyDebug.Log:LoggerParams;
 
-import <cstddef>;
-
 export namespace PonyDebug::Log
 {
 	/// @brief Logger parameters.
 	struct LoggerParams final
 	{
-		std::size_t subLoggerCount = 0; ///< Expected number of sub-logger. It's used to preallocate memory and doesn't limit a count of sub-loggers.
 	};
 }

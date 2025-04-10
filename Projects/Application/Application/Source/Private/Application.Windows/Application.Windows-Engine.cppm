@@ -248,67 +248,41 @@ namespace Application::Windows
 			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::DeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
-			inputParams.inputBindings["Forward"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Forward"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::W, .multiplier = 1.f},
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::S, .multiplier = -1.f},
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::W, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::S, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["Right"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Right"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::D, .multiplier = 1.f},
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::A, .multiplier = -1.f},
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::D, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::A, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["Up"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Up"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Space, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::LeftCtrl, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["Rotate"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Rotate"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Q, .multiplier = 1.f},
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::E, .multiplier = -1.f},
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Q, .multiplier = 1.f},
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::E, .multiplier = -1.f},
 			};
-			inputParams.inputBindings["Reset"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Reset"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
-				},
-				.inputReceiverCount = 1
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Enter, .multiplier = 1.f}
 			};
-			inputParams.inputBindings["Exit"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["Exit"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
-				},
-				.inputReceiverCount = 1
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::Escape, .multiplier = 1.f}
 			};
-			inputParams.inputBindings["MouseX"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["MouseX"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseXDelta, .multiplier = 1.f}
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseXDelta, .multiplier = 1.f}
 			};
-			inputParams.inputBindings["MouseY"] = PonyEngine::Input::InputBindingInfo
+			inputParams.inputBindings["MouseY"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				.inputBindingValues = std::vector<PonyEngine::Input::InputBindingValue>
-				{
-					PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = 1.f}
-				}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::MouseYDelta, .multiplier = 1.f}
 			};
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input mapping set up.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create input system factory.");
