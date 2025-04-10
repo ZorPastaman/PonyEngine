@@ -9,20 +9,21 @@
 
 export module PonyEngine.Render:Material;
 
-import <array>;
+import <algorithm>;
 import <cstdint>;
 import <optional>;
-import <span>;
-import <stdexcept>;
 import <string>;
 import <string_view>;
 import <unordered_map>;
+import <utility>;
 import <vector>;
 
 import :Blend;
 import :DepthStencil;
 import :IMaterialObserver;
 import :MaterialParams;
+import :Rasterizer;
+import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
 {
@@ -33,6 +34,8 @@ export namespace PonyEngine::Render
 		Material() noexcept = default;
 		[[nodiscard("Pure constructor")]]
 		explicit Material(const MaterialParams& params);
+		[[nodiscard("Pure constructor")]]
+		explicit Material(MaterialParams&& params);
 		[[nodiscard("Pure constructor")]]
 		Material(const Material& other);
 		[[nodiscard("Pure constructor")]]
@@ -155,6 +158,22 @@ namespace PonyEngine::Render
 	{
 	}
 
+	Material::Material(MaterialParams&& params) :
+		rootSignatureShader(std::move(params.rootSignatureShader)),
+		amplificationShader(std::move(params.amplificationShader)),
+		meshShader(std::move(params.meshShader)),
+		pixelShader(std::move(params.pixelShader)),
+		blend(std::move(params.blend)),
+		rasterizer(std::move(params.rasterizer)),
+		depthStencil(std::move(params.depthStencil)),
+		dataSlots(std::move(params.dataSlots)),
+		threadGroupCounts(std::move(params.threadGroupCounts)),
+		renderQueue{params.renderQueue},
+		cameraCulling{params.cameraCulling},
+		name(std::move(params.name))
+	{
+	}
+
 	Material::Material(const Material& other) :
 		rootSignatureShader(other.rootSignatureShader),
 		amplificationShader(other.amplificationShader),
@@ -181,8 +200,8 @@ namespace PonyEngine::Render
 		depthStencil(std::move(other.depthStencil)),
 		dataSlots(std::move(other.dataSlots)),
 		threadGroupCounts(std::move(other.threadGroupCounts)),
-		renderQueue{std::move(other.renderQueue)},
-		cameraCulling{std::move(other.cameraCulling)},
+		renderQueue{other.renderQueue},
+		cameraCulling{other.cameraCulling},
 		name(std::move(other.name))
 	{
 	}
@@ -613,12 +632,12 @@ namespace PonyEngine::Render
 		AmplificationShader(std::move(other.amplificationShader));
 		MeshShader(std::move(other.meshShader));
 		PixelShader(std::move(other.pixelShader));
-		Blend(other.blend);
-		Rasterizer(other.rasterizer);
-		DepthStencil(other.depthStencil);
+		Blend(std::move(other.blend));
+		Rasterizer(std::move(other.rasterizer));
+		DepthStencil(std::move(other.depthStencil));
 		DataSlots(std::move(other.dataSlots));
 
-		ThreadGroupCounts(other.threadGroupCounts);
+		ThreadGroupCounts(std::move(other.threadGroupCounts));
 		RenderQueue(other.renderQueue);
 		CameraCulling(other.cameraCulling);
 

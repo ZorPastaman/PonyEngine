@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Fill mode.
 	enum class FillMode : std::uint8_t
 	{
 		Solid,

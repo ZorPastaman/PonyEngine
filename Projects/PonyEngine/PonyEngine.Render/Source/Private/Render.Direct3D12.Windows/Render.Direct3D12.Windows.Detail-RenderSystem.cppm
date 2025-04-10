@@ -123,21 +123,20 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
-		const std::uint32_t bufferCount = renderParams.swapChainParams.bufferCount;
 		const auto swapChainParams = DXGI::SwapChainParams
 		{
 			.device = &direct3D12SubSystem->GraphicsCommandQueue(),
 			.hWnd = windowHandle,
 			.resolution = renderResolution,
-			.bufferCount = bufferCount
+			.bufferCount = renderParams.bufferCount
 		};
 		const DXGI::ISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
 		auto backParams = Direct3D12::BackParams{};
-		backParams.backBuffers.reserve(bufferCount);
-		for (std::uint32_t i = 0u; i < bufferCount; ++i)
+		backParams.backBuffers.reserve(renderParams.bufferCount);
+		for (std::uint32_t i = 0u; i < renderParams.bufferCount; ++i)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffer;
 			if (const HRESULT result = swapChain.GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]

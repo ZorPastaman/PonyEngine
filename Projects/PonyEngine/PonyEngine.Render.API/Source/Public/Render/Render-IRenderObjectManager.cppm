@@ -15,8 +15,6 @@ export module PonyEngine.Render:IRenderObjectManager;
 
 import <memory>;
 
-import PonyMath.Core;
-
 import :IRenderObject;
 import :RenderObjectParams;
 

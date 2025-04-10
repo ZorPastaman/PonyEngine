@@ -54,12 +54,8 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void Projection(const CameraProjection& projection) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const PonyMath::Color::RGBA<float>& ClearColor() const noexcept override;
-		virtual void ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept override;
-
-		[[nodiscard("Pure function")]]
-		virtual Clear ClearFlags() const noexcept override;
-		virtual void ClearFlags(Clear clear) noexcept override;
+		virtual const ClearParams& Clear() const noexcept override;
+		virtual void Clear(const ClearParams& clear) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept override;
@@ -89,8 +85,7 @@ export namespace PonyEngine::Render::Direct3D12
 		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionMatrix;
 		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler;
 
-		PonyMath::Color::RGBA<float> clearColor;
-		Clear clearFlags;
+		ClearParams clearParams;
 
 		PonyMath::Shape::Rect<float> viewportRect;
 
@@ -103,8 +98,7 @@ namespace PonyEngine::Render::Direct3D12
 	Camera::Camera(const CameraParams& cameraParams) noexcept :
 		viewMatrix(cameraParams.viewMatrix),
 		projection(cameraParams.projection),
-		clearColor(cameraParams.clearColor),
-		clearFlags{cameraParams.clearFlags},
+		clearParams{cameraParams.clearParams},
 		viewportRect(cameraParams.viewportRect),
 		sortingOrder{cameraParams.sortingOrder}
 	{
@@ -154,24 +148,14 @@ namespace PonyEngine::Render::Direct3D12
 		culler = std::nullopt;
 	}
 
-	const PonyMath::Color::RGBA<float>& Camera::ClearColor() const noexcept
+	const ClearParams& Camera::Clear() const noexcept
 	{
-		return clearColor;
+		return clearParams;
 	}
 
-	void Camera::ClearColor(const PonyMath::Color::RGBA<float>& color) noexcept
+	void Camera::Clear(const ClearParams& clear) noexcept
 	{
-		clearColor = color;
-	}
-
-	Clear Camera::ClearFlags() const noexcept
-	{
-		return clearFlags;
-	}
-
-	void Camera::ClearFlags(const Clear clear) noexcept
-	{
-		clearFlags = clear;
+		clearParams = clear;
 	}
 
 	const PonyMath::Shape::Rect<float>& Camera::ViewportRect() const noexcept

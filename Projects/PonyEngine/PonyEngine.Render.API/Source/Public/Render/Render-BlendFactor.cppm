@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Blend factor.
 	enum class BlendFactor : std::uint8_t
 	{
 		Zero,

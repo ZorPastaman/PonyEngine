@@ -165,7 +165,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static D3D12_COMPARISON_FUNC GetComparison(ComparisonFunction comparison) noexcept;
 		[[nodiscard("Pure function")]]
-		static D3D12_DEPTH_STENCILOP_DESC GetDepthStencilOpDesc(const StencilFace& face) noexcept;
+		static D3D12_DEPTH_STENCILOP_DESC GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept;
 		[[nodiscard("Pure function")]]
 		static D3D12_STENCIL_OP GetStencilOp(StencilOperation stencilOperation) noexcept;
 
@@ -578,10 +578,10 @@ namespace PonyEngine::Render::Direct3D12
 			.DepthWriteMask = depthStencil.depthWrite ? D3D12_DEPTH_WRITE_MASK_ALL : D3D12_DEPTH_WRITE_MASK_ZERO,
 			.DepthFunc = GetComparison(depthStencil.depthFunc),
 			.StencilEnable = depthStencil.stencil,
-			.StencilReadMask = D3D12_DEFAULT_STENCIL_READ_MASK,
-			.StencilWriteMask = D3D12_DEFAULT_STENCIL_WRITE_MASK,
-			.FrontFace = GetDepthStencilOpDesc(depthStencil.stencilFront),
-			.BackFace = GetDepthStencilOpDesc(depthStencil.stencilBack),
+			.StencilReadMask = static_cast<UINT8>(depthStencil.stencilReadMask),
+			.StencilWriteMask = static_cast<UINT8>(depthStencil.stencilWriteMask),
+			.FrontFace = GetDepthStencilOpDesc(depthStencil.frontFace),
+			.BackFace = GetDepthStencilOpDesc(depthStencil.backFace),
 			.DepthBoundsTestEnable = false
 		};
 	}
@@ -612,14 +612,14 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_DEPTH_STENCILOP_DESC MaterialManager::GetDepthStencilOpDesc(const StencilFace& face) noexcept
+	D3D12_DEPTH_STENCILOP_DESC MaterialManager::GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept
 	{
 		return D3D12_DEPTH_STENCILOP_DESC
 		{
-			.StencilFailOp = GetStencilOp(face.failOperation),
-			.StencilDepthFailOp = GetStencilOp(face.depthFailOperation),
-			.StencilPassOp = GetStencilOp(face.passOperation),
-			.StencilFunc = GetComparison(face.comparison)
+			.StencilFailOp = GetStencilOp(operation.failOperation),
+			.StencilDepthFailOp = GetStencilOp(operation.depthFailOperation),
+			.StencilPassOp = GetStencilOp(operation.passOperation),
+			.StencilFunc = GetComparison(operation.stencilComparison)
 		};
 	}
 

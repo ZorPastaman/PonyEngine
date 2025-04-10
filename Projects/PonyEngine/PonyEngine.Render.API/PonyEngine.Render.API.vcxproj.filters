@@ -76,9 +76,6 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-SwapChainParams.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -91,7 +88,7 @@
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-EngineDataTypes.cppm">
+    <ClCompile Include="Source\Public\Render\Render-SlotNames.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-ICamera.cppm">
@@ -172,7 +169,7 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-Clear.cppm">
+    <ClCompile Include="Source\Public\Render\Render-ClearParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm">
@@ -181,7 +178,7 @@
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-StencilFace.cppm">
+    <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm">

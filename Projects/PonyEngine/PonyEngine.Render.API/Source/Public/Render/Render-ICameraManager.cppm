@@ -20,10 +20,14 @@ import :ICamera;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Camera manager.
 	class ICameraManager
 	{
 		INTERFACE_BODY(ICameraManager)
 
+		/// @brief Creates a camera.
+		/// @param cameraParams Camera parameters.
+		/// @return Camera.
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<ICamera> CreateCamera(const CameraParams& cameraParams) = 0;
 	};

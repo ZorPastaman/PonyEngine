@@ -16,5 +16,8 @@ import :PerspectiveParams;
 
 export namespace PonyEngine::Render
 {
-	using CameraProjection = std::variant<PerspectiveParams, OrthographicParams>;
+	constexpr float MinDepth = 0.f; ///< Minimal depth value.
+	constexpr float MaxDepth = 1.f; ///< Maximal depth value.
+
+	using CameraProjection = std::variant<PerspectiveParams, OrthographicParams>; ///< Camera projection parameters.
 }

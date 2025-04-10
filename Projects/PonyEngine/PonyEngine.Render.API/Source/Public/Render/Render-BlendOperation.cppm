@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Blend operation.
 	enum class BlendOperation : std::uint8_t
 	{
 		Add,

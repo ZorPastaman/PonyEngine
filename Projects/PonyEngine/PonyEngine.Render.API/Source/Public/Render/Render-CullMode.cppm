@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Cull mode.
 	enum class CullMode : std::uint8_t
 	{
 		None,
