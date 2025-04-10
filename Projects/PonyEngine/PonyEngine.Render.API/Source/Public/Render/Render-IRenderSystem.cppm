@@ -23,8 +23,12 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IRenderSystem)
 
+		/// @brief Gets the camera manager.
+		/// @return Camera manager.
 		[[nodiscard("Pure function")]]
 		virtual ICameraManager& CameraManager() noexcept = 0;
+		/// @brief Gets the camera manager.
+		/// @return Camera manager.
 		[[nodiscard("Pure function")]]
 		virtual const ICameraManager& CameraManager() const noexcept = 0;
 

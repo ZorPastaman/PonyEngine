@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Logic operation.
 	enum class LogicOperation : std::uint8_t
 	{
 		Noop,

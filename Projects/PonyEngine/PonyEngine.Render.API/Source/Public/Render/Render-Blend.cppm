@@ -17,10 +17,11 @@ import :TransparentBlend;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Blend.
 	struct Blend final
 	{
-		std::variant<OpaqueBlend, TransparentBlend, LogicBlend> renderTargetBlend = OpaqueBlend{};
-		bool alphaToCoverage = false;
+		std::variant<OpaqueBlend, TransparentBlend, LogicBlend> renderTargetBlend = OpaqueBlend{}; ///< Render target blend.
+		bool alphaToCoverage = false; ///< Enable alpha to coverage?
 
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const Blend& other) const noexcept = default;

@@ -21,6 +21,7 @@ export namespace PonyEngine::Render
 	struct RenderSystemParams
 	{
 		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution;
+		std::uint32_t bufferCount = 3u; ///< Buffer count.
 		MSAAParams msaaParams;
 	};
 }

@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Comparison function.
 	enum class ComparisonFunction : std::uint8_t
 	{
 		Never,

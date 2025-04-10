@@ -784,17 +784,17 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		CommandList().RSSetScissorRects(1u, &rect);
 
-		if ((camera.ClearFlags() & Clear::Color) != Clear::None)
+		const ClearParams& clear = camera.Clear();
+		if (clear.color.has_value())
 		{
-			CommandList().ClearRenderTargetView(frame->RtvHandle(), camera.ClearColor().Span().data(), 1u, &rect);
+			CommandList().ClearRenderTargetView(frame->RtvHandle(), clear.color.value().Span().data(), 1u, &rect);
 		}
-
 		if (const D3D12_CLEAR_FLAGS dsvClearFlags =
-			((camera.ClearFlags() & Clear::Depth) != Clear::None ? D3D12_CLEAR_FLAG_DEPTH : static_cast<D3D12_CLEAR_FLAGS>(0)) |
-			((camera.ClearFlags() & Clear::Stencil) != Clear::None ? D3D12_CLEAR_FLAG_STENCIL : static_cast<D3D12_CLEAR_FLAGS>(0));
+			(clear.depth.has_value() ? D3D12_CLEAR_FLAG_DEPTH : static_cast<D3D12_CLEAR_FLAGS>(0)) |
+			(clear.stencil.has_value() ? D3D12_CLEAR_FLAG_STENCIL : static_cast<D3D12_CLEAR_FLAGS>(0));
 			dsvClearFlags != static_cast<D3D12_CLEAR_FLAGS>(0))
 		{
-			CommandList().ClearDepthStencilView(frame->DsvHandle(), dsvClearFlags, D3D12_MAX_DEPTH, 0u, 1u, &rect);
+			CommandList().ClearDepthStencilView(frame->DsvHandle(), dsvClearFlags, clear.depth.value_or(D3D12_MAX_DEPTH), clear.stencil.value_or(std::uint8_t{0u}), 1u, &rect);
 		}
 	}
 
@@ -992,12 +992,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateEngineData(const RootSignature* const rootSignature, const std::uint32_t dataIndex)
 	{
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(EngineDataTypes::Context))
+		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(SlotNames::Context))
 		{
 			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(contexts, dataIndex)));
 		}
 
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(EngineDataTypes::Transform))
+		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(SlotNames::Transform))
 		{
 			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(transforms, dataIndex)));
 		}

@@ -16,4 +16,3 @@ export import :IRenderObjectManager;
 export import :IRenderSystem;
 export import :RenderSystemFactoryParams;
 export import :RenderSystemParams;
-export import :SwapChainParams;

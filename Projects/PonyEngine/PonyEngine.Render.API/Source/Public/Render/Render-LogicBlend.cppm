@@ -13,9 +13,10 @@ import :LogicOperation;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Logic blend.
 	struct LogicBlend final
 	{
-		LogicOperation operation = LogicOperation::Noop;
+		LogicOperation operation = LogicOperation::Noop; ///< Logic blend operation.
 
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const LogicBlend& other) const noexcept = default;

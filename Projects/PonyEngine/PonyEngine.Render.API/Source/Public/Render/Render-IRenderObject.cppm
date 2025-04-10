@@ -32,8 +32,12 @@ export namespace PonyEngine::Render
 		/// @param matrix Translation-rotation-scaling matrix.
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
 
+		/// @brief Gets the name.
+		/// @return Name.
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		virtual void Name(std::string_view name) = 0;
 	};
 }
