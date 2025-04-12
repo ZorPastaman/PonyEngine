@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Stencil operation.
 	enum class StencilOperation : std::uint8_t
 	{
 		Keep,

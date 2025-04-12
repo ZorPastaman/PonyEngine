@@ -19,12 +19,13 @@ import :Mesh;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render object parameters.
 	struct RenderObjectParams final
 	{
-		std::shared_ptr<const Material> material;
-		std::shared_ptr<const Mesh> mesh;
-		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity;
+		std::shared_ptr<const Material> material; ///< Render object material.
+		std::shared_ptr<const Mesh> mesh; ///< Render object mesh.
+		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< Render object model matrix.
 
-		std::string name = "";
+		std::string name; ///< Render object name.
 	};
 }

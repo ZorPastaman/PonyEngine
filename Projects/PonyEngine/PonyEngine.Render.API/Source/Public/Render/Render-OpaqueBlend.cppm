@@ -11,6 +11,7 @@ export module PonyEngine.Render:OpaqueBlend;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Opaque blend.
 	struct OpaqueBlend final
 	{
 		[[nodiscard("Pure operator")]]

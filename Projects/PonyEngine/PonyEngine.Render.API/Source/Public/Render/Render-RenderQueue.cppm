@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render queue default values.
 	enum class RenderQueue : std::int32_t
 	{
 		Opaque = 0 * 100000,

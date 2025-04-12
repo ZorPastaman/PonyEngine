@@ -9,7 +9,7 @@
 
 export module PonyEngine.Render:MaterialParams;
 
-import <array>;
+import <cstdint>;
 import <string>;
 import <unordered_map>;
 
@@ -20,23 +20,28 @@ import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Material parameters.
 	struct MaterialParams final
 	{
-		std::string rootSignatureShader;
-		std::string amplificationShader;
-		std::string meshShader;
-		std::string pixelShader;
+		std::string rootSignatureShader; ///< Root signature shader. Relative path to a shader file without extension.
+		std::string amplificationShader; ///< Amplification shader. Relative path to a shader file without extension.
+		std::string meshShader; ///< Mesh shader. Relative path to a shader file without extension.
+		std::string pixelShader; ///< Pixel shader. Relative path to a shader file without extension.
 
-		Blend blend;
-		Rasterizer rasterizer;
-		DepthStencil depthStencil;
+		Blend blend; ///< Blend parameters.
+		Rasterizer rasterizer; ///< Rasterizer parameters.
+		DepthStencil depthStencil; ///< Depth stencil parameters.
 
+		/// @brief Data slots.
+		/// @details The engine automatically binds mesh data to shader slots if their types match.
+		/// If a type matches one of the special types declared in @p PonyEngine::Render::DataTypes,
+		/// the engine will bind specific data to it automatically.
 		std::unordered_map<std::string, std::uint32_t> dataSlots;
 
-		ThreadGroupCounts threadGroupCounts;
-		std::int32_t renderQueue = 0;
-		bool cameraCulling = true;
+		ThreadGroupCounts threadGroupCounts; ///< Thread group counts parameters.
+		std::int32_t renderQueue = 0; ///< Render queue.
+		bool cameraCulling = true; ///< Is camera culling enabled?
 
-		std::string name;
+		std::string name; ///< Material name.
 	};
 }

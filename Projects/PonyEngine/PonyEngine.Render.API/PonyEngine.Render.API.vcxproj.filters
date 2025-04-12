@@ -88,7 +88,7 @@
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-SlotNames.cppm">
+    <ClCompile Include="Source\Public\Render\Render-DataTypes.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-ICamera.cppm">

@@ -14,15 +14,16 @@ import :BlendOperation;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Transparent blend operation.
 	struct TransparentBlend final
 	{
-		BlendFactor sourceBlend = BlendFactor::One;
-		BlendFactor destinationBlend = BlendFactor::Zero;
-		BlendOperation blendOperation = BlendOperation::Add;
+		BlendFactor sourceBlend = BlendFactor::One; ///< Source color blend factor.
+		BlendFactor destinationBlend = BlendFactor::Zero; ///< Destination color blend factor.
+		BlendOperation blendOperation = BlendOperation::Add; ///< Color blend operation.
 
-		BlendFactor sourceBlendAlpha = BlendFactor::One;
-		BlendFactor destinationBlendAlpha = BlendFactor::Zero;
-		BlendOperation blendOperationAlpha = BlendOperation::Add;
+		BlendFactor sourceBlendAlpha = BlendFactor::One; ///< Source alpha blend factor.
+		BlendFactor destinationBlendAlpha = BlendFactor::Zero; ///< Destination alpha blend factor.
+		BlendOperation blendOperationAlpha = BlendOperation::Add; ///< Alpha blend operation.
 
 		[[nodiscard("Pure operator")]]
 		bool operator ==(const TransparentBlend& other) const noexcept = default;

@@ -73,7 +73,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 			~MaterialObserver() noexcept = default;
 
-			virtual void OnRootSignatureChanged() noexcept override;
+			virtual void OnRootSignatureShaderChanged() noexcept override;
 			virtual void OnAmplificationShaderChanged() noexcept override;
 			virtual void OnMeshShaderChanged() noexcept override;
 			virtual void OnPixelShaderChanged() noexcept override;
@@ -200,7 +200,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	void MaterialManager::MaterialObserver::OnRootSignatureChanged() noexcept
+	void MaterialManager::MaterialObserver::OnRootSignatureShaderChanged() noexcept
 	{
 		materialChanged = true;
 	}

@@ -63,7 +63,7 @@ export namespace PonyEngine::Render::Direct3D12
 		FrameManager& operator =(FrameManager&&) = delete;
 
 	private:
-		static constexpr DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D24_UNORM_S8_UINT;
+		static constexpr DXGI_FORMAT DepthStencilFormat = DXGI_FORMAT_D32_FLOAT_S8X24_UINT;
 
 		DXGI_FORMAT rtvFormat;
 		PonyMath::Utility::Resolution<std::uint32_t> resolution;

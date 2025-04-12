@@ -7,13 +7,16 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Render:Mesh;
 
 import <algorithm>;
-import <array>;
 import <cstddef>;
 import <cstdint>;
-import <ranges>;
+import <limits>;
 import <optional>;
 import <span>;
 import <stdexcept>;
@@ -35,11 +38,14 @@ import :MeshParams;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Render mesh.
+	/// @details It's a map of a data type to an array of buffers.
 	class Mesh final
-	{
+	{ 
 	public:
 		class BufferTableAccess;
 
+		/// @brief Buffer access wrapper.
 		class BufferAccess final
 		{
 		public:
@@ -50,13 +56,31 @@ export namespace PonyEngine::Render
 
 			~BufferAccess() noexcept = default;
 
+			/// @brief Gets the buffer.
+			/// @return Buffer.
 			[[nodiscard("Pure function")]]
 			const PonyBase::Container::Buffer& Buffer() const noexcept;
 
+			/// @brief Sets the value by the index.
+			/// @param index Byte index.
+			/// @param value Value.
 			void Set(std::size_t index, std::byte value) noexcept;
+			/// @brief Sets the data.
+			/// @note offset + data.size() must not exceed the target buffer size.
+			/// @param offset Data destination offset.
+			/// @param data Data to set.
 			void Set(std::size_t offset, std::span<const std::byte> data) noexcept;
+			/// @brief Sets the value by the index.
+			/// @tparam T Value type. Its size must be a stride of the buffer.
+			/// @param index Value index.
+			/// @param value Value.
 			template<typename T>
 			void Set(std::size_t index, const T& value) noexcept;
+			/// @brief Sets the data.
+			/// @note offset + data.size() must not exceed a target buffer size.
+			/// @tparam T Value type.
+			/// @param offset Data destination offset.
+			/// @param data Data to set.
 			template<typename T>
 			void Set(std::size_t offset, std::span<const T> data) noexcept;
 
@@ -64,18 +88,25 @@ export namespace PonyEngine::Render
 			BufferAccess& operator =(BufferAccess&& other) noexcept = default;
 
 		private:
+			/// @brief Creates a buffer access.
+			/// @param buffer Buffer.
+			/// @param mesh Mesh.
+			/// @param dataIndex Data index.
+			/// @param bufferIndex Buffer index.
 			[[nodiscard("Pure constructor")]]
 			BufferAccess(PonyBase::Container::Buffer& buffer, Mesh& mesh, std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept;
 
-			PonyBase::Container::Buffer* buffer;
-			Mesh* mesh;
-			std::uint32_t dataIndex;
-			std::uint32_t bufferIndex;
+			PonyBase::Container::Buffer* buffer; ///< Buffer.
+			Mesh* mesh; ///< Mesh.
+			std::uint32_t dataIndex; ///< Data index.
+			std::uint32_t bufferIndex; ///< Buffer index.
 
 			friend Mesh;
 			friend BufferTableAccess;
 		};
 
+		/// @brief Buffer view access wrapper.
+		/// @tparam T Value type.
 		template<typename T>
 		class BufferViewAccess final
 		{
@@ -87,28 +118,43 @@ export namespace PonyEngine::Render
 
 			~BufferViewAccess() noexcept = default;
 
+			/// @brief Gets the buffer view.
+			/// @return Buffer view.
 			[[nodiscard("Pure function")]]
 			const PonyBase::Container::BufferView<T>& BufferView() const noexcept;
 
+			/// @brief Sets the value by the index.
+			/// @param index Value index.
+			/// @param value Value to set.
 			void Set(std::size_t index, const T& value) noexcept;
+			/// @brief Sets the data.
+			/// @note offset + data.size() must not exceed a target buffer size.
+			/// @param offset Data destination offset.
+			/// @param data Data to set.
 			void Set(std::size_t offset, std::span<const T> data) noexcept;
 
 			BufferViewAccess& operator =(const BufferViewAccess& other) noexcept = default;
 			BufferViewAccess& operator =(BufferViewAccess&& other) noexcept = default;
 
 		private:
+			/// @brief Creates a buffer view access.
+			/// @param bufferView Buffer view.
+			/// @param mesh Mesh.
+			/// @param dataIndex Data index.
+			/// @param bufferIndex Buffer index.
 			[[nodiscard("Pure constructor")]]
 			BufferViewAccess(const PonyBase::Container::BufferView<T>& bufferView, Mesh& mesh, std::uint32_t dataIndex, std::uint32_t bufferIndex) noexcept;
 
-			PonyBase::Container::BufferView<T> bufferView;
-			Mesh* mesh;
-			std::uint32_t dataIndex;
-			std::uint32_t bufferIndex;
+			PonyBase::Container::BufferView<T> bufferView; ///< Buffer view.
+			Mesh* mesh; ///< Mesh.
+			std::uint32_t dataIndex; ///< Data index.
+			std::uint32_t bufferIndex; ///< Buffer index.
 
 			friend Mesh;
 			friend BufferTableAccess;
 		};
 
+		/// @brief Buffer table access wrapper
 		class BufferTableAccess final
 		{
 		public:
@@ -119,13 +165,30 @@ export namespace PonyEngine::Render
 
 			~BufferTableAccess() noexcept = default;
 
+			/// @brief Gets the buffer count.
+			/// @return Buffer count.
+			[[nodiscard("Pure function")]]
+			std::size_t BufferCount() const noexcept;
+
+			/// @brief Gets the buffer access by the index.
+			/// @param index Buffer index.
+			/// @return Buffer access.
 			[[nodiscard("Pure function")]]
 			BufferAccess Buffer(std::uint32_t index) noexcept;
+			/// @brief Gets the buffer by the index.
+			/// @param index Buffer index.
+			/// @return Buffer.
 			[[nodiscard("Pure function")]]
 			const PonyBase::Container::Buffer& Buffer(std::uint32_t index) const noexcept;
 
+			/// @brief Gets the buffer view access by the index.
+			/// @param index Buffer index.
+			/// @return Buffer view access.
 			template<typename T> [[nodiscard("Pure function")]]
 			BufferViewAccess<T> BufferView(std::uint32_t index);
+			/// @brief Gets the buffer view by the index.
+			/// @param index Buffer index.
+			/// @return Buffer view.
 			template<typename T> [[nodiscard("Pure function")]]
 			PonyBase::Container::BufferView<const T> BufferView(std::uint32_t index) const;
 
@@ -133,123 +196,262 @@ export namespace PonyEngine::Render
 			BufferTableAccess& operator =(BufferTableAccess&& other) noexcept = default;
 
 		private:
+			/// @brief Creates a buffer table access.
+			/// @param buffers Buffers.
+			/// @param mesh Mesh.
+			/// @param dataIndex Data index.
 			[[nodiscard("Pure constructor")]]
 			BufferTableAccess(std::span<PonyBase::Container::Buffer> buffers, Mesh& mesh, std::uint32_t dataIndex) noexcept;
 
-			std::span<PonyBase::Container::Buffer> buffers;
-			Mesh* mesh;
-			std::uint32_t dataIndex;
+			std::span<PonyBase::Container::Buffer> buffers; ///< Buffers.
+			Mesh* mesh; ///< Mesh.
+			std::uint32_t dataIndex; ///< Data index.
 
 			friend Mesh;
 		};
 
+		/// @brief Creates an empty mesh with zero thread group counts.
 		[[nodiscard("Pure constructor")]]
 		Mesh() noexcept = default;
+		/// @brief Creates a mesh.
+		/// @param params Mesh parameters
 		[[nodiscard("Pure constructor")]]
 		explicit Mesh(const MeshParams& params);
+		/// @brief Creates a mesh.
+		/// @param params Mesh parameters
+		[[nodiscard("Pure constructor")]]
+		explicit Mesh(MeshParams&& params);
+		/// @brief Creates an empty mesh with defined thread group counts.
+		/// @param threadGroupCounts Thread group counts.
 		[[nodiscard("Pure constructor")]]
 		explicit Mesh(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts) noexcept;
+		/// @brief Copy constructor.
+		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other);
+		/// @brief Move constructor.
+		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
 		Mesh(Mesh&& other) noexcept;
 
 		~Mesh() noexcept = default;
 
+		/// @brief Creates a buffer table inside the mesh or replaces an existing one.
+		/// @note The @p bufferParams mustn't be empty.
+		/// @note The mesh buffer count mustn't exceed std::uint32_t max value.
+		/// @param dataType Data type.
+		/// @param bufferParams Buffer parameters. Each element describes an individual buffer in the table.
+		/// @return Buffer table access to a created table. It may be invalid if the mesh structure is changed.
 		BufferTableAccess CreateBufferTable(std::string_view dataType, std::span<const PonyBase::Container::BufferParams> bufferParams);
+		/// @brief Destroys a buffer table by the data type.
+		/// @param dataType Data type.
 		void DestroyBufferTable(std::string_view dataType) noexcept;
 
+		/// @brief Tries to find a data index by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Data index; std::nullopt if such a data type isn't found.
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> DataIndex(std::string_view dataType) const noexcept;
+		/// @brief Gets a data type by the @p dataIndex.
+		/// @param dataIndex Data index.
+		/// @return Data type.
 		[[nodiscard("Pure function")]]
 		std::string_view DataType(std::uint32_t dataIndex) const noexcept;
+		/// @brief Gets the data type count.
+		/// @return Data type count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t DataTypeCount() const noexcept;
-
+		/// @brief Gets the data types.
+		/// @return Data types.
 		[[nodiscard("Pure function")]]
 		std::span<const std::string> DataTypes() const noexcept;
 
+		/// @brief Gets the buffer count by the @p dataIndex.
+		/// @param dataIndex Data index.
+		/// @return Data count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t BufferCount(std::uint32_t dataIndex) const noexcept;
+		/// @brief Tries to find a buffer count by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Buffer count; std::nullopt if such a data type isn't found.
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> BufferCount(std::string_view dataType) const noexcept;
+		/// @brief Gets the buffer count of all the tables.
+		/// @return Buffer count.
 		[[nodiscard("Pure function")]]
 		std::uint32_t BufferCount() const noexcept;
 
+		/// @brief Gets a buffer access.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer access. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		BufferAccess Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) noexcept;
+		/// @brief Gets the buffer.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		const PonyBase::Container::Buffer& Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Gets the buffer.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		const PonyBase::Container::Buffer& BufferConst(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Tries to find a buffer.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer access; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::optional<BufferAccess> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) noexcept;
+		/// @brief Tries to find a buffer.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer; nullptr if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		const PonyBase::Container::Buffer* Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Tries to find a buffer.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer; nullptr if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		const PonyBase::Container::Buffer* BufferConst(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
 
+		/// @brief Gets a buffer view access.
+		/// @tparam T Value type.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view access. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		BufferViewAccess<T> Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) noexcept;
+		/// @brief Gets a buffer view.
+		/// @tparam T Value type.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		PonyBase::Container::BufferView<const T> Buffer(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Gets a buffer view.
+		/// @tparam T Value type.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		PonyBase::Container::BufferView<const T> BufferConst(std::uint32_t dataIndex, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Tries to find a buffer view access.
+		/// @tparam T Value type.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view access; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::optional<BufferViewAccess<T>> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) noexcept;
+		/// @brief Tries to find a buffer view.
+		/// @tparam T Value type.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::optional<PonyBase::Container::BufferView<const T>> Buffer(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
+		/// @brief Tries to find a buffer view.
+		/// @tparam T Value type.
+		/// @param dataType Data type.
+		/// @param bufferIndex Buffer index.
+		/// @return Buffer view; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::optional<PonyBase::Container::BufferView<const T>> BufferConst(std::string_view dataType, std::uint32_t bufferIndex = 0u) const noexcept;
 
+		/// @brief Gets a buffer table access by the @p dataIndex.
+		/// @param dataIndex Data index.
+		/// @return Buffer table access. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		BufferTableAccess BufferTable(std::uint32_t dataIndex) noexcept;
+		/// @brief Gets buffers by the @p dataIndex.
+		/// @param dataIndex Data index.
+		/// @return Buffers. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyBase::Container::Buffer> BufferTable(std::uint32_t dataIndex) const noexcept;
+		/// @brief Gets buffers by the @p dataIndex.
+		/// @param dataIndex Data index.
+		/// @return Buffers. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyBase::Container::Buffer> BufferTableConst(std::uint32_t dataIndex) const noexcept;
+		/// @brief Tries to find a buffer table access by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Buffer table access; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::optional<BufferTableAccess> BufferTable(std::string_view dataType) noexcept;
+		/// @brief Tries to find a buffer table by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Buffer table; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyBase::Container::Buffer> BufferTable(std::string_view dataType) const noexcept;
+		/// @brief Tries to find a buffer table by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Buffer table; std::nullopt if such a data type isn't found. It may be invalidated if the mesh structure is changed.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyBase::Container::Buffer> BufferTableConst(std::string_view dataType) const noexcept;
 
+		/// @brief Gets the thread group counts.
+		/// @return Thread group counts.
 		[[nodiscard("Pure function")]]
 		const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept;
+		/// @brief Sets the thread group counts.
+		/// @param threadGroupCounts Thread group counts to set.
 		void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& threadGroupCounts);
 
+		/// @brief Gets the bounding box.
+		/// @return Bounding box.
 		[[nodiscard("Pure function")]]
 		const std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() const noexcept;
+		/// @brief Sets the bounding box.
+		/// @param boundingBox Bounding box to set.
 		void BoundingBox(const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept;
 
+		/// @brief Gets the name.
+		/// @return Name.
 		[[nodiscard("Pure function")]]
 		std::string_view Name() const noexcept;
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string&& name);
 
+		/// @brief Adds the observer.
+		/// @param observer Observer to add. It must be unique. It must live longer than the mesh.
 		void AddObserver(IMeshObserver& observer) const;
+		/// @brief Removes the observer.
+		/// @param observer Observer to remove.
 		void RemoveObserver(IMeshObserver& observer) const noexcept;
 
 		Mesh& operator =(const Mesh& other);
 		Mesh& operator =(Mesh&& other) noexcept;
 
 	private:
+		/// @brief Calls @p OnMeshChanged() on each observer.
 		void OnMeshChanged() const noexcept;
+		/// @brief Calls @p OnBufferChanged() on each observer.
+		/// @param dataIndex Data index.
+		/// @param bufferIndex Buffer index.
 		void OnBufferChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) const noexcept;
+		/// @brief Calls @p OnThreadGroupCountsChanged() on each observer.
 		void OnThreadGroupCountsChanged() const noexcept;
+		/// @brief Calls @p OnBoundingBoxChanged() on each observer.
 		void OnBoundingBoxChanged() const noexcept;
+		/// @brief Calls @p OnNameChanged() on each observer.
 		void OnNameChanged() const noexcept;
 
-		std::vector<std::string> dataTypes;
-		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables;
+		std::vector<std::string> dataTypes; ///< Data types.
+		std::vector<std::vector<PonyBase::Container::Buffer>> bufferTables; ///< Buffer tables.
 
-		PonyShader::Core::ThreadGroupCounts threadGroupCounts;
-		std::optional<PonyMath::Shape::AABB<float>> boundingBox;
+		PonyShader::Core::ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
+		std::optional<PonyMath::Shape::AABB<float>> boundingBox; ///< Bounding box.
 
-		std::string name;
+		std::string name; ///< Mesh name.
 
-		mutable std::vector<IMeshObserver*> meshObservers;
+		mutable std::vector<IMeshObserver*> meshObservers; ///< Mesh observers.
 	};
 }
 
@@ -324,11 +526,16 @@ namespace PonyEngine::Render
 		mesh->OnBufferChanged(dataIndex, bufferIndex);
 	}
 
-	Mesh::BufferTableAccess::BufferTableAccess(const std::span<PonyBase::Container::Buffer> buffers, Mesh& mesh, std::uint32_t dataIndex) noexcept :
+	Mesh::BufferTableAccess::BufferTableAccess(const std::span<PonyBase::Container::Buffer> buffers, Mesh& mesh, const std::uint32_t dataIndex) noexcept :
 		buffers(buffers),
 		mesh{&mesh},
 		dataIndex{dataIndex}
 	{
+	}
+
+	std::size_t Mesh::BufferTableAccess::BufferCount() const noexcept
+	{
+		return buffers.size();
 	}
 
 	Mesh::BufferAccess Mesh::BufferTableAccess::Buffer(const std::uint32_t index) noexcept
@@ -377,8 +584,37 @@ namespace PonyEngine::Render
 
 		for (const auto& [dataType, bufferTable] : params.bufferTables)
 		{
-			dataTypes.push_back(std::string(dataType));
+			dataTypes.push_back(dataType);
 			bufferTables.push_back(bufferTable);
+		}
+	}
+
+	Mesh::Mesh(MeshParams&& params) :
+		threadGroupCounts(std::move(params.threadGroupCounts)),
+		boundingBox(std::move(params.boundingBox)),
+		name(std::move(params.name))
+	{
+		std::size_t bufferCount = 0;
+		for (const auto& [dataType, bufferTable] : params.bufferTables)
+		{
+			if (bufferTable.size() == 0) [[unlikely]]
+			{
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data table of '{}' is empty.", dataType));
+			}
+			bufferCount += bufferTable.size();
+		}
+		if (bufferCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer count exceeds std::uint32_t max value.");
+		}
+
+		dataTypes.reserve(params.bufferTables.size());
+		bufferTables.reserve(params.bufferTables.size());
+
+		for (const auto& [dataType, bufferTable] : params.bufferTables)
+		{
+			dataTypes.push_back(std::move(dataType));
+			bufferTables.push_back(std::move(bufferTable));
 		}
 	}
 
@@ -390,14 +626,18 @@ namespace PonyEngine::Render
 	Mesh::Mesh(const Mesh& other) :
 		dataTypes(other.dataTypes),
 		bufferTables(other.bufferTables),
-		threadGroupCounts(other.threadGroupCounts)
+		threadGroupCounts(other.threadGroupCounts),
+		boundingBox(other.boundingBox),
+		name(other.name)
 	{
 	}
 
 	Mesh::Mesh(Mesh&& other) noexcept :
 		dataTypes(std::move(other.dataTypes)),
 		bufferTables(std::move(other.bufferTables)),
-		threadGroupCounts(std::move(other.threadGroupCounts))
+		threadGroupCounts(std::move(other.threadGroupCounts)),
+		boundingBox(std::move(other.boundingBox)),
+		name(std::move(other.name))
 	{
 	}
 
@@ -581,7 +821,7 @@ namespace PonyEngine::Render
 	template<typename T>
 	std::optional<Mesh::BufferViewAccess<T>> Mesh::Buffer(const std::string_view dataType, const std::uint32_t bufferIndex) noexcept
 	{
-		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType); dataIndex && bufferIndex < BufferCount(dataIndex.value()))
+		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
 			if (const std::vector<PonyBase::Container::Buffer>& table = bufferTables[dataIndex.value()]; bufferIndex < table.size() && table[bufferIndex].Stride() == sizeof(T))
 			{
@@ -713,6 +953,7 @@ namespace PonyEngine::Render
 
 	void Mesh::AddObserver(IMeshObserver& observer) const
 	{
+		assert(std::ranges::find(meshObservers, &observer) == meshObservers.cend() && "The mesh observer is already added.");
 		meshObservers.push_back(&observer);
 	}
 
@@ -768,12 +1009,20 @@ namespace PonyEngine::Render
 	{
 		std::vector<std::string> newDataTypes = other.dataTypes;
 		std::vector<std::vector<PonyBase::Container::Buffer>> newBufferTables = other.bufferTables;
+		std::optional<std::string> newName = name == other.name ? std::nullopt : std::optional(other.name);
+
 		dataTypes = std::move(newDataTypes);
 		bufferTables = std::move(newBufferTables);
 		OnMeshChanged();
 
 		ThreadGroupCounts(other.threadGroupCounts);
-		Name(other.name);
+		BoundingBox(other.boundingBox);
+
+		if (newName)
+		{
+			name = std::move(newName.value());
+			OnNameChanged();
+		}
 
 		return *this;
 	}
@@ -785,6 +1034,8 @@ namespace PonyEngine::Render
 		OnMeshChanged();
 
 		ThreadGroupCounts(other.threadGroupCounts);
+		BoundingBox(std::move(other.boundingBox));
+
 		Name(std::move(other.name));
 
 		return *this;
