@@ -9,6 +9,7 @@
 
 export module PonyEngine.Render:RenderSystemParams;
 
+import <cstdint>;
 import <optional>;
 
 import PonyMath.Utility;
@@ -20,8 +21,8 @@ export namespace PonyEngine::Render
 	/// @brief Render system parameters.
 	struct RenderSystemParams
 	{
-		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution;
+		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution; ///< Render resolution. If it's std::nullopt, the resolution of a window is used.
 		std::uint32_t bufferCount = 3u; ///< Buffer count.
-		MSAAParams msaaParams;
+		MSAAParams msaaParams; ///< MSAA parameters.
 	};
 }

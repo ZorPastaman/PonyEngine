@@ -20,8 +20,8 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IMaterialObserver)
 
-		/// @brief Invoked when a root signature is changed.
-		virtual void OnRootSignatureChanged() noexcept = 0;
+		/// @brief Invoked when a root signature shader is changed.
+		virtual void OnRootSignatureShaderChanged() noexcept = 0;
 		/// @brief Invoked when an amplification shader is changed.
 		virtual void OnAmplificationShaderChanged() noexcept = 0;
 		/// @brief Invoked when a mesh shader is changed.

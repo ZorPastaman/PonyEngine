@@ -11,11 +11,12 @@ export module PonyEngine.Render:OrthographicParams;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Orthographic projection parameters.
 	struct OrthographicParams final
 	{
-		float width;
-		float height;
-		float nearPlane;
-		float farPlane;
+		float width; ///< Width.
+		float height; ///< Height.
+		float nearPlane; ///< Near plane distance.
+		float farPlane; ///< Far plane distance.
 	};
 }

@@ -992,12 +992,12 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateEngineData(const RootSignature* const rootSignature, const std::uint32_t dataIndex)
 	{
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(SlotNames::Context))
+		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(DataTypes::Context))
 		{
 			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(contexts, dataIndex)));
 		}
 
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(SlotNames::Transform))
+		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(DataTypes::Transform))
 		{
 			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(transforms, dataIndex)));
 		}
