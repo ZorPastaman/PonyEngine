@@ -17,6 +17,7 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 camera manager.
 	class ICameraManager : public Render::ICameraManager
 	{
 		INTERFACE_BODY(ICameraManager)
