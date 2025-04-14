@@ -7,16 +7,16 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:MSAAParams;
-
-import <cstdint>;
+export module PonyEngine.Render:Orthographic;
 
 export namespace PonyEngine::Render
 {
-	/// @brief MSAA parameters.
-	struct MSAAParams final
+	/// @brief Orthographic projection parameters.
+	struct Orthographic final
 	{
-		std::uint32_t sampleCount = 1; ///< Sample count.
-		float sampleQuality = 1.f; ///< Sample quality. Must be in range [0, 1].
+		float width; ///< Width.
+		float height; ///< Height.
+		float nearPlane; ///< Near plane distance.
+		float farPlane; ///< Far plane distance.
 	};
 }

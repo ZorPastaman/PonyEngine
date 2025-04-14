@@ -16,18 +16,21 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Buffer;
 
 import <cstddef>;
+import <cstring>;
 import <stdexcept>;
 
 import PonyBase.Container;
-import PonyBase.Utility;
 
 import :Resource;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 buffer.
 	class Buffer final : public Resource
 	{
 	public:
+		/// @brief Creates a buffer.
+		/// @param resource Resource. Must have a buffer dimension.
 		[[nodiscard("Pure constructor")]]
 		explicit Buffer(ID3D12Resource2& resource) noexcept;
 		Buffer(const Buffer&) = delete;
@@ -35,21 +38,43 @@ export namespace PonyEngine::Render::Direct3D12
 
 		virtual ~Buffer() noexcept override = default;
 
+		/// @brief Gets the buffer data.
+		/// @note @p size + @p offset mustn't exceed the buffer size.
+		/// @note The buffer must be cpu accessible.
+		/// @param data Output. Mustn't be nullptr.
+		/// @param size Read size.
+		/// @param offset Read offset.
 		void GetData(void* data, std::size_t size, std::size_t offset = 0) const;
+		/// @brief Gets the buffer data.
+		/// @note @p size + @p offset mustn't exceed the buffer size.
+		/// @note The buffer must be cpu accessible.
+		/// @param buffer Output.
+		/// @param offset Read offset.
 		void GetData(PonyBase::Container::Buffer& buffer, std::size_t offset = 0) const;
 
+		/// @brief Sets the buffer data.
+		/// @note @p size + @p offset mustn't exceed the buffer size.
+		/// @note The buffer must be cpu accessible.
+		/// @param data Input. Mustn't be nullptr.
+		/// @param size Write size.
+		/// @param offset Write offset.
 		void SetData(const void* data, std::size_t size, std::size_t offset = 0);
+		/// @brief Sets the buffer data.
+		/// @note @p size + @p offset mustn't exceed the buffer size.
+		/// @note The buffer must be cpu accessible.
+		/// @param buffer Input.
+		/// @param offset Write offset.
 		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0);
 
 		Buffer& operator =(const Buffer&) = delete;
 		Buffer& operator =(Buffer&&) = delete;
 
 	private:
+		/// @brief Checks if the parameters are correct.
+		/// @param data Input/Output.
+		/// @param size Read/Write size.
+		/// @param offset Read/Write offset.
 		void CheckParams(const void* data, std::size_t size, std::size_t offset) const;
-
-		[[nodiscard("Redundant call")]]
-		void* Map() const;
-		void Unmap() const;
 	};
 }
 
@@ -91,30 +116,14 @@ namespace PonyEngine::Render::Direct3D12
 
 	void Buffer::CheckParams(const void* const data, const std::size_t size, const std::size_t offset) const
 	{
-		if (!data)
+		if (!data) [[unlikely]]
 		{
 			throw std::invalid_argument("Data is nullptr.");
 		}
 
-		if (offset + size > resource->GetDesc1().Width)
+		if (offset + size > resource->GetDesc1().Width) [[unlikely]]
 		{
 			throw std::out_of_range("Out of bounds.");
 		}
-	}
-
-	void* Buffer::Map() const
-	{
-		void* resourceData;
-		if (const HRESULT result = resource->Map(0, nullptr, &resourceData); FAILED(result)) [[unlikely]]
-		{
-			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-		}
-
-		return resourceData;
-	}
-
-	void Buffer::Unmap() const
-	{
-		resource->Unmap(0, nullptr);
 	}
 }

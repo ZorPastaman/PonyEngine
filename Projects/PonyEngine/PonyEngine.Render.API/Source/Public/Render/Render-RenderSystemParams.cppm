@@ -14,7 +14,7 @@ import <optional>;
 
 import PonyMath.Utility;
 
-import :MSAAParams;
+import :MSAA;
 
 export namespace PonyEngine::Render
 {
@@ -23,6 +23,6 @@ export namespace PonyEngine::Render
 	{
 		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution; ///< Render resolution. If it's std::nullopt, the resolution of a window is used.
 		std::uint32_t bufferCount = 3u; ///< Buffer count.
-		MSAAParams msaaParams; ///< MSAA parameters.
+		MSAA msaaParams; ///< MSAA parameters.
 	};
 }

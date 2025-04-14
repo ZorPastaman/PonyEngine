@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:ClearParams;
+export module PonyEngine.Render:Clear;
 
 import <cstdint>;
 import <optional>;
@@ -19,7 +19,7 @@ import :Common;
 export namespace PonyEngine::Render
 {
 	/// @brief Clear parameters.
-	struct ClearParams final
+	struct Clear final
 	{
 		std::optional<PonyMath::Color::RGBA<float>> color = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color. std::nullopt means no color clearing.
 		std::optional<float> depth = MaxDepth; ///< Clear depth. std::nullopt means no depth clearing.

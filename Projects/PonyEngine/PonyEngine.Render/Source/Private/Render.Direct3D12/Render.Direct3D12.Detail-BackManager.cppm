@@ -98,7 +98,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Set back buffers.");
 		backBuffers = params.backBuffers;
-		assert(!backBuffers.empty() && "The back buffers array can't be empty");
+		assert(!backBuffers.empty() && "The back buffers array can't be empty.");
 		assert(std::ranges::find(backBuffers, nullptr) == backBuffers.cend() && "The back buffers have a nullptr element.");
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffers set.");
 
@@ -106,7 +106,7 @@ namespace PonyEngine::Render::Direct3D12
 		backFormat = backBuffers[0]->GetDesc1().Format;
 		assert(std::ranges::find_if(backBuffers, [&](const Microsoft::WRL::ComPtr<ID3D12Resource2>& buffer) { return buffer->GetDesc1().Format != backFormat; }) == backBuffers.cend() && "The back buffers must have the same format.");
 		srgbBackFormat = GetSrgbFormat(backFormat);
-		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer formats gotten. Format: {}; Srgb format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
+		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Back buffer formats gotten. Format: {}; SRGB format: {}.", static_cast<int>(backFormat), static_cast<int>(srgbBackFormat));
 
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create back descriptor heap.");
 		rtvHeap = this->d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_RTV, static_cast<std::uint32_t>(backBuffers.size()), false);

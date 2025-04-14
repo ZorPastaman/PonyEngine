@@ -12,11 +12,10 @@ export module PonyEngine.Render.Detail:CameraFrustum;
 import <algorithm>;
 import <array>;
 import <cmath>;
-import <concepts>;
 import <cstddef>;
-import <format>;
+import <cstdint>;
 import <span>;
-import <string>;
+import <utility>;
 
 import PonyMath.Core;
 import PonyMath.Shape;
@@ -25,32 +24,36 @@ import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Camera frustum.
 	class CameraFrustum final
 	{
 	public:
-		static constexpr std::size_t LeftBottomNear = 0;
-		static constexpr std::size_t RightBottomNear = 1;
-		static constexpr std::size_t LeftTopNear = 2;
-		static constexpr std::size_t RightTopNear = 3;
-		static constexpr std::size_t LeftBottomFar = 4;
-		static constexpr std::size_t RightBottomFar = 5;
-		static constexpr std::size_t LeftTopFar = 6;
-		static constexpr std::size_t RightTopFar = 7;
-		static constexpr std::size_t CornerCount = 8;
+		static constexpr std::size_t LeftBottomNear = 0; ///< Left bottom near corner index.
+		static constexpr std::size_t RightBottomNear = 1; ///< Right bottom near corner index.
+		static constexpr std::size_t LeftTopNear = 2; ///< Left top near corner index.
+		static constexpr std::size_t RightTopNear = 3; ///< Right top near corner index.
+		static constexpr std::size_t LeftBottomFar = 4; ///< Left bottom far corner index.
+		static constexpr std::size_t RightBottomFar = 5; ///< Right bottom far corner index.
+		static constexpr std::size_t LeftTopFar = 6; ///< Left top far corner index.
+		static constexpr std::size_t RightTopFar = 7; ///< Right top far corner index.
+		static constexpr std::size_t CornerCount = 8; ///< Corner count.
 
-		static constexpr std::size_t Left = 0;
-		static constexpr std::size_t Right = 1;
-		static constexpr std::size_t Bottom = 2;
-		static constexpr std::size_t Top = 3;
-		static constexpr std::size_t Near = 4;
-		static constexpr std::size_t Far = 5;
-		static constexpr std::size_t PlaneCount = 6;
-		static constexpr std::size_t DifferentNormalPlaneCount = 5;
+		static constexpr std::size_t Left = 0; ///< Left plane index.
+		static constexpr std::size_t Right = 1; ///< Right plane index.
+		static constexpr std::size_t Bottom = 2; ///< Bottom plane index.
+		static constexpr std::size_t Top = 3; ///< Top plane index.
+		static constexpr std::size_t Near = 4; ///< Near plane index.
+		static constexpr std::size_t Far = 5; ///< Far plane index.
+		static constexpr std::size_t PlaneCount = 6; ///< Plane count.
+		static constexpr std::size_t DifferentNormalPlaneCount = 5; ///< How many planes have different normals.
 
+		/// @brief Creates a zero frustum.
 		[[nodiscard("Pure constructor")]]
 		CameraFrustum() noexcept = default;
+		/// @brief Creates a frustum.
+		/// @param perspective Perspective projection parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit CameraFrustum(const PerspectiveParams& perspective) noexcept;
+		explicit CameraFrustum(const Perspective& perspective) noexcept;
 		[[nodiscard("Pure constructor")]]
 		CameraFrustum(const CameraFrustum& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -58,29 +61,54 @@ export namespace PonyEngine::Render
 
 		~CameraFrustum() noexcept = default;
 
+		/// @brief Gets a plane by the @p index.
+		/// @param index Plane index.
+		/// @return Plane.
 		[[nodiscard("Pure function")]]
 		const PonyMath::Shape::Plane<float>& Plane(std::size_t index) const noexcept;
+		/// @brief Gets the planes.
+		/// @return Planes.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyMath::Shape::Plane<float>, 6> Planes() const noexcept;
 
+		/// @brief Gets the center.
+		/// @return Center.
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Vector3<float>& Center() const noexcept;
 
+		/// @brief Gets minimal and maximal extents by the @p index.
+		/// @param index Normal index. Must be in range [0, 4].
+		/// @return Minimal and maximal extents. Those are distances from the center.
 		[[nodiscard("Pure function")]]
 		const std::pair<float, float>& Extent(std::size_t index) const noexcept;
+		/// @brief Gets extents.
+		/// @return Extents. Those are distances from the center.
 		[[nodiscard("Pure function")]]
 		std::span<const std::pair<float, float>, 5> Extents() const noexcept;
 
+		/// @brief Gets a corner by the index.
+		/// @param index Corner index.
+		/// @return Corner.
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Vector3<float>& Corner(std::size_t index) const noexcept;
+		/// @brief Gets the corners.
+		/// @return Corner.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyMath::Core::Vector3<float>, 8> Corners() const noexcept;
 
+		/// @brief Gets an edge normal by the @p index.
+		/// @param index Edge index. Must be in range [0, 5].
+		/// @return Edge normal.
 		[[nodiscard("Pure function")]]
 		const PonyMath::Core::Vector3<float>& Edge(std::size_t index) const noexcept;
+		/// @brief Gets the edge normals.
+		/// @return Edge normals.
 		[[nodiscard("Pure function")]]
 		std::span<const PonyMath::Core::Vector3<float>, 6> Edges() const noexcept;
 
+		/// @brief Checks if the frustum contains the @p point.
+		/// @param point Point to check.
+		/// @return @a True if it contains; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool Contains(const PonyMath::Core::Vector3<float>& point) const noexcept;
 
@@ -88,19 +116,19 @@ export namespace PonyEngine::Render
 		CameraFrustum& operator =(CameraFrustum&& other) noexcept = default;
 
 	private:
-		std::array<PonyMath::Shape::Plane<float>, 6> planes;
+		std::array<PonyMath::Shape::Plane<float>, 6> planes; ///< Frustum planes.
 
-		PonyMath::Core::Vector3<float> center;
-		std::array<std::pair<float, float>, 5> extents;
-		std::array<PonyMath::Core::Vector3<float>, 8> corners;
+		PonyMath::Core::Vector3<float> center; ///< Frustum center.
+		std::array<std::pair<float, float>, 5> extents; ///< Frustum extents.
+		std::array<PonyMath::Core::Vector3<float>, 8> corners; ///< Frustum corners.
 
-		std::array<PonyMath::Core::Vector3<float>, 6> edgeNormals;
+		std::array<PonyMath::Core::Vector3<float>, 6> edgeNormals; ///< Frustum edge normals.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	CameraFrustum::CameraFrustum(const PerspectiveParams& perspective) noexcept
+	CameraFrustum::CameraFrustum(const Perspective& perspective) noexcept
 	{
 		const float tan = std::tan(perspective.fov * 0.5f);
 		const float nearHalfHeight = tan * perspective.nearPlane;
@@ -124,12 +152,11 @@ namespace PonyEngine::Render
 		planes[Near] = PonyMath::Shape::Plane<float>(corners[RightTopNear], corners[LeftTopNear], corners[LeftBottomNear]);
 		planes[Far] = PonyMath::Shape::Plane<float>(corners[LeftTopFar], corners[RightTopFar], corners[RightBottomFar]);
 
-		auto cornerSum = PonyMath::Core::Vector3<float>::Predefined::Zero;
+		center = PonyMath::Core::Vector3<float>::Predefined::Zero;
 		for (const PonyMath::Core::Vector3<float>& corner : corners)
 		{
-			cornerSum += corner;
+			center += corner * (1.f / 8.f);
 		}
-		center = cornerSum * (1.f / 8.f);
 
 		for (std::size_t planeIndex = 0; planeIndex < DifferentNormalPlaneCount; ++planeIndex)
 		{

@@ -478,6 +478,11 @@ namespace PonyEngine::Render
 
 	void Mesh::BufferAccess::Set(const std::size_t offset, std::span<const std::byte> data) noexcept
 	{
+		if (data.size() + offset > buffer->Size()) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+
 		std::ranges::copy(data, buffer->Data() + offset);
 		mesh->OnBufferChanged(dataIndex, bufferIndex);
 	}
@@ -492,6 +497,11 @@ namespace PonyEngine::Render
 	template<typename T>
 	void Mesh::BufferAccess::Set(const std::size_t offset, const std::span<const T> data) noexcept
 	{
+		if ((data.size() + offset) * sizeof(T) > buffer->Size()) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+
 		std::ranges::copy(data, &buffer->Get<T>(offset));
 		mesh->OnBufferChanged(dataIndex, bufferIndex);
 	}
@@ -522,6 +532,11 @@ namespace PonyEngine::Render
 	template<typename T>
 	void Mesh::BufferViewAccess<T>::Set(const std::size_t offset, std::span<const T> data) noexcept
 	{
+		if (data.size() + offset > bufferView.Span().size()) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+
 		std::ranges::copy(data, bufferView.Data() + offset);
 		mesh->OnBufferChanged(dataIndex, bufferIndex);
 	}

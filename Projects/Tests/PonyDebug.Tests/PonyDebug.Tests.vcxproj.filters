@@ -24,9 +24,6 @@
     <ClCompile Include="Log\FileSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\LogConsoleHelperTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\LogEntryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>

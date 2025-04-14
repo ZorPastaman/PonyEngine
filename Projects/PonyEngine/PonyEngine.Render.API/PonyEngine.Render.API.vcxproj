@@ -42,13 +42,13 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-ClearParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Clear.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-OrthographicParams.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-PerspectiveParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Orthographic.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Perspective.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Blend.cppm" />
     <ClCompile Include="Source\Public\Render\Render-BlendFactor.cppm" />
     <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm" />
@@ -57,6 +57,7 @@
     <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DataTypes.cppm" />
@@ -70,7 +71,7 @@
     <ClCompile Include="Source\Public\Render\Render-Material.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MaterialParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />
     <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Rasterizer.cppm" />

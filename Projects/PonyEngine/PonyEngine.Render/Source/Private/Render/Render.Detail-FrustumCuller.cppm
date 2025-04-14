@@ -9,9 +9,13 @@
 
 export module PonyEngine.Render.Detail:FrustumCuller;
 
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <utility>;
 
 import PonyMath.Core;
+import PonyMath.Shape;
 
 import PonyEngine.Render;
 
@@ -19,19 +23,25 @@ import :CameraFrustum;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Camera frustum culler.
 	class FrustumCuller final : public ICuller
 	{
 	public:
+		/// @brief Creates a zero frustum culler.
 		[[nodiscard("Pure constructor")]]
 		FrustumCuller() noexcept = default;
+		/// @brief Creates a frustum culler.
+		/// @param frustum Camera frustum.
 		[[nodiscard("Pure constructor")]]
 		explicit FrustumCuller(const CameraFrustum& frustum) noexcept;
+		/// @brief Creates a frustum culler.
+		/// @param perspective Perspective projection parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit FrustumCuller(const PerspectiveParams& perspective) noexcept;
+		explicit FrustumCuller(const Perspective& perspective) noexcept;
 		[[nodiscard("Pure constructor")]]
-		FrustumCuller(const FrustumCuller& other) noexcept;
+		FrustumCuller(const FrustumCuller& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		FrustumCuller(FrustumCuller&& other) noexcept;
+		FrustumCuller(FrustumCuller&& other) noexcept = default;
 
 		~FrustumCuller() noexcept = default;
 
@@ -44,7 +54,7 @@ export namespace PonyEngine::Render
 		FrustumCuller& operator =(FrustumCuller&& other) noexcept = default;
 
 	private:
-		CameraFrustum frustum;
+		CameraFrustum frustum; ///< Camera frustum.
 	};
 }
 
@@ -55,18 +65,8 @@ namespace PonyEngine::Render
 	{
 	}
 
-	FrustumCuller::FrustumCuller(const PerspectiveParams& perspective) noexcept :
+	FrustumCuller::FrustumCuller(const Perspective& perspective) noexcept :
 		frustum(perspective)
-	{
-	}
-
-	FrustumCuller::FrustumCuller(const FrustumCuller& other) noexcept :
-		frustum(other.frustum)
-	{
-	}
-
-	FrustumCuller::FrustumCuller(FrustumCuller&& other) noexcept :
-		frustum(std::move(other.frustum))
 	{
 	}
 
@@ -77,7 +77,7 @@ namespace PonyEngine::Render
 
 	bool FrustumCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
-		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::OBB<float>::CornerCount> boxCorners = obb.Corners();
+		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::OBB<float>::CornerCount> obbCorners = obb.Corners();
 
 		for (std::size_t axisIndex = 0; axisIndex < CameraFrustum::DifferentNormalPlaneCount; ++axisIndex)
 		{
@@ -87,7 +87,7 @@ namespace PonyEngine::Render
 			std::array<float, PonyMath::Shape::OBB<float>::CornerCount> projections;
 			for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::OBB<float>::CornerCount; ++cornerIndex)
 			{
-				projections[cornerIndex] = PonyMath::Core::Dot(axis, boxCorners[cornerIndex] - frustum.Center());
+				projections[cornerIndex] = PonyMath::Core::Dot(axis, obbCorners[cornerIndex] - frustum.Center());
 			}
 
 			const auto [min, max] = std::ranges::minmax_element(projections);
@@ -126,14 +126,14 @@ namespace PonyEngine::Render
 				{
 					frustumProjections[cornerIndex] = PonyMath::Core::Dot(axis, frustum.Corner(cornerIndex));
 				}
-				std::array<float, PonyMath::Shape::OBB<float>::CornerCount> boxProjections;
+				std::array<float, PonyMath::Shape::OBB<float>::CornerCount> obbProjections;
 				for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::OBB<float>::CornerCount; ++cornerIndex)
 				{
-					boxProjections[cornerIndex] = PonyMath::Core::Dot(axis, boxCorners[cornerIndex]);
+					obbProjections[cornerIndex] = PonyMath::Core::Dot(axis, obbCorners[cornerIndex]);
 				}
 
 				const auto [frustumMin, frustumMax] = std::ranges::minmax_element(frustumProjections);
-				const auto [boxMin, boxMax] = std::ranges::minmax_element(boxProjections);
+				const auto [boxMin, boxMax] = std::ranges::minmax_element(obbProjections);
 				if (*frustumMin > *boxMax || *frustumMax < *boxMin)
 				{
 					return false;

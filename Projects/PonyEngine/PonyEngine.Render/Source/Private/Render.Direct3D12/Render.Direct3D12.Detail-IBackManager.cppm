@@ -27,8 +27,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Back format.
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT Format() const noexcept = 0;
-		/// @brief Gets the back srgb format.
-		/// @return Srgb back format.
+		/// @brief Gets the back SRGB format.
+		/// @return SRGB back format.
 		[[nodiscard("Pure function")]]
 		virtual DXGI_FORMAT FormatSrgb() const noexcept = 0;
 

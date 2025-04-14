@@ -40,6 +40,10 @@ export namespace PonyEngine::Render::Direct3D12
 		Resource& operator =(Resource&&) = delete;
 
 	protected:
+		[[nodiscard("Redundant call")]]
+		void* Map() const;
+		void Unmap() const;
+
 		Microsoft::WRL::ComPtr<ID3D12Resource2> resource;
 	};
 }
@@ -64,5 +68,21 @@ namespace PonyEngine::Render::Direct3D12
 	void Resource::Name(const std::string_view name)
 	{
 		SetName(*resource.Get(), name);
+	}
+
+	void* Resource::Map() const
+	{
+		void* resourceData;
+		if (const HRESULT result = resource->Map(0, nullptr, &resourceData); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to map buffer with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return resourceData;
+	}
+
+	void Resource::Unmap() const
+	{
+		resource->Unmap(0, nullptr);
 	}
 }

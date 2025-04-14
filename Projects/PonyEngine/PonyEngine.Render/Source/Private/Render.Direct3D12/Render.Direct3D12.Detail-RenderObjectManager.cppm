@@ -51,8 +51,6 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IRenderObject> CreateObject(const RenderObjectParams& params) override;
 
-		void Tick();
-
 		/// @brief Cleans out of dead render objects.
 		void Clean() noexcept;
 
@@ -87,26 +85,20 @@ namespace PonyEngine::Render::Direct3D12
 		const auto renderObject = std::make_shared<RenderObject>(renderMaterial, renderMesh, params.modelMatrix);
 		renderObject->Name(params.name);
 		renderObjects.push_back(renderObject);
+		d3d12System->GraphicsPipeline().AddRenderObject(*renderObject);
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
 
 		return renderObject;
-	}
-
-	void RenderObjectManager::Tick()
-	{
-		for (const std::shared_ptr<RenderObject>& renderObject : renderObjects)
-		{
-			d3d12System->GraphicsPipeline().AddRenderObject(*renderObject);
-		}
 	}
 
 	void RenderObjectManager::Clean() noexcept
 	{
 		for (std::size_t i = renderObjects.size(); i-- > 0; )
 		{
-			if (renderObjects[i].use_count() <= 1L)
+			if (const std::shared_ptr<RenderObject>& renderObject = renderObjects[i]; renderObject.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy render object at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObjects[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy render object at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(renderObject.get()));
+				d3d12System->GraphicsPipeline().RemoveRenderObject(*renderObject);
 				renderObjects.erase(renderObjects.cbegin() + i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render object destroyed.");
 			}

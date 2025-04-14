@@ -409,8 +409,6 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		meshManager->Tick();
 		materialManager->Tick();
-		cameraManager->Tick();
-		renderObjectManager->Tick();
 		graphicsPipeline->Prepare();
 
 		copyPipeline->PopulateCommands();

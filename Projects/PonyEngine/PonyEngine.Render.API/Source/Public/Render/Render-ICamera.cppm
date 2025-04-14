@@ -19,7 +19,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
-import :ClearParams;
+import :Clear;
 import :Common;
 import :ICuller;
 
@@ -57,10 +57,10 @@ export namespace PonyEngine::Render
 		/// @brief Gets the clear parameters.
 		/// @return Clear parameters.
 		[[nodiscard("Pure function")]]
-		virtual const ClearParams& Clear() const noexcept = 0;
+		virtual const struct Clear& Clear() const noexcept = 0;
 		/// @brief Sets the clear parameters.
 		/// @param clear Clear parameters to set.
-		virtual void Clear(const ClearParams& clear) noexcept = 0;
+		virtual void Clear(const struct Clear& clear) noexcept = 0;
 
 		/// @brief Gets the normalized viewport rect.
 		/// @return Normalized viewport rect.

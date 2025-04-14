@@ -76,7 +76,7 @@
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-MSAAParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-Mesh.cppm">
@@ -154,10 +154,10 @@
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-PerspectiveParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-Perspective.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-OrthographicParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-Orthographic.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm">
@@ -169,7 +169,7 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-ClearParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-Clear.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm">
@@ -182,6 +182,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

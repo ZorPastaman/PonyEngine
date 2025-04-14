@@ -14,6 +14,7 @@ import :LogicOperation;
 export namespace PonyEngine::Render
 {
 	/// @brief Logic blend.
+	/// @note Logic blend can be used only with integer render targets. So, it can't be used with final output render target.
 	struct LogicBlend final
 	{
 		LogicOperation operation = LogicOperation::Noop; ///< Logic blend operation.
