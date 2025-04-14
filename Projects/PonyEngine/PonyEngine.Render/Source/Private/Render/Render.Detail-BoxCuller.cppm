@@ -11,7 +11,7 @@ export module PonyEngine.Render.Detail:BoxCuller;
 
 import <algorithm>;
 import <array>;
-import <span>;
+import <cstddef>;
 import <utility>;
 
 import PonyMath.Core;
@@ -23,19 +23,25 @@ import :CameraBox;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Box culler.
 	class BoxCuller final : public ICuller
 	{
 	public:
+		/// @brief Creates a zero box culler.
 		[[nodiscard("Pure constructor")]]
 		BoxCuller() noexcept = default;
+		/// @brief Creates a box culler.
+		/// @param cameraBox Camera bounding box.
 		[[nodiscard("Pure constructor")]]
 		explicit BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox) noexcept;
+		/// @brief Creates a box culler.
+		/// @param orthographic Orthographic projection parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit BoxCuller(const OrthographicParams& orthographic) noexcept;
+		explicit BoxCuller(const Orthographic& orthographic) noexcept;
 		[[nodiscard("Pure constructor")]]
-		BoxCuller(const BoxCuller& other) noexcept;
+		BoxCuller(const BoxCuller& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		BoxCuller(BoxCuller&& other) noexcept;
+		BoxCuller(BoxCuller&& other) noexcept = default;
 
 		~BoxCuller() noexcept = default;
 
@@ -48,7 +54,7 @@ export namespace PonyEngine::Render
 		BoxCuller& operator =(BoxCuller&& other) noexcept = default;
 
 	private:
-		CameraBox cameraBox;
+		CameraBox cameraBox; ///< Camera box.
 	};
 }
 
@@ -59,18 +65,8 @@ namespace PonyEngine::Render
 	{
 	}
 
-	BoxCuller::BoxCuller(const OrthographicParams& orthographic) noexcept :
+	BoxCuller::BoxCuller(const Orthographic& orthographic) noexcept :
 		cameraBox(orthographic)
-	{
-	}
-
-	BoxCuller::BoxCuller(const BoxCuller& other) noexcept :
-		cameraBox(other.cameraBox)
-	{
-	}
-
-	BoxCuller::BoxCuller(BoxCuller&& other) noexcept :
-		cameraBox(std::move(other.cameraBox))
 	{
 	}
 
@@ -81,16 +77,17 @@ namespace PonyEngine::Render
 
 	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
-		const std::array<PonyMath::Core::Vector3<float>, 8> objectCorners = obb.Corners();
+		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::AABB<float>::CornerCount> obbCorners = obb.Corners();
+
 		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = PonyMath::Shape::AABB<float>::Axes[axisIndex];
 			const float extent = cameraBox.Box().Extent(axisIndex);
 
-			std::array<float, 8> projections;
-			for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
+			std::array<float, PonyMath::Shape::AABB<float>::CornerCount> projections;
+			for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::AABB<float>::CornerCount; ++cornerIndex)
 			{
-				projections[cornerIndex] = PonyMath::Core::Dot(axis, objectCorners[cornerIndex] - cameraBox.Box().Center());
+				projections[cornerIndex] = PonyMath::Core::Dot(axis, obbCorners[cornerIndex] - cameraBox.Box().Center());
 			}
 
 			const auto [min, max] = std::ranges::minmax_element(projections);
@@ -100,13 +97,13 @@ namespace PonyEngine::Render
 			}
 		}
 
-		for (std::size_t axisIndex = 0; axisIndex < objectCorners.size(); ++axisIndex)
+		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = obb.Axis(axisIndex);
 			const float extent = obb.Extent(axisIndex);
 
-			std::array<float, 8> projections;
-			for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
+			std::array<float, PonyMath::Shape::AABB<float>::CornerCount> projections;
+			for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::AABB<float>::CornerCount; ++cornerIndex)
 			{
 				projections[cornerIndex] = PonyMath::Core::Dot(axis, cameraBox.Corner(cornerIndex) - obb.Center());
 			}
@@ -124,16 +121,16 @@ namespace PonyEngine::Render
 			{
 				const PonyMath::Core::Vector3<float> axis = PonyMath::Core::Cross(cameraAxis, objectAxis);
 
-				std::array<float, 8> cameraProjections;
-				std::array<float, 8> objectProjections;
-				for (std::size_t cornerIndex = 0; cornerIndex < 8; ++cornerIndex)
+				std::array<float, PonyMath::Shape::AABB<float>::CornerCount> cameraProjections;
+				std::array<float, PonyMath::Shape::AABB<float>::CornerCount> obbProjections;
+				for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::AABB<float>::CornerCount; ++cornerIndex)
 				{
 					cameraProjections[cornerIndex] = PonyMath::Core::Dot(axis, cameraBox.Corner(cornerIndex));
-					objectProjections[cornerIndex] = PonyMath::Core::Dot(axis, objectCorners[cornerIndex]);
+					obbProjections[cornerIndex] = PonyMath::Core::Dot(axis, obbCorners[cornerIndex]);
 				}
 
 				const auto [cameraMin, cameraMax] = std::ranges::minmax_element(cameraProjections);
-				const auto [objectMin, objectMax] = std::ranges::minmax_element(objectProjections);
+				const auto [objectMin, objectMax] = std::ranges::minmax_element(obbProjections);
 				if (*cameraMin > *objectMax || *cameraMax < *objectMin)
 				{
 					return false;

@@ -24,9 +24,11 @@ export namespace PonyEngine::Render::Direct3D12
 		INTERFACE_BODY(IGraphicsPipeline)
 
 		virtual void AddCamera(Camera& camera) = 0;
+		virtual void RemoveCamera(Camera& camera) = 0;
 
 		/// @brief Adds a render object.
 		/// @param renderObject Render object to render.
 		virtual void AddRenderObject(RenderObject& renderObject) = 0;
+		virtual void RemoveRenderObject(RenderObject& renderObject) = 0;
 	};
 }

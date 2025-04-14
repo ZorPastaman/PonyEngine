@@ -13,25 +13,25 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:Camera;
 
+import <cstdint>;
 import <optional>;
 import <memory>;
 import <variant>;
 
-import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
+import PonyEngine.Render;
 import PonyEngine.Render.Detail;
-import PonyEngine.Render.Direct3D12;
-
-import :Buffer;
-import :DescriptorHeap;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 camera.
 	class Camera final : public ICamera
 	{
 	public:
+		/// @brief Creates a camera.
+		/// @param cameraParams Camera parameters.
 		[[nodiscard("Pure constructor")]]
 		explicit Camera(const CameraParams& cameraParams) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -54,8 +54,8 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void Projection(const CameraProjection& projection) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const ClearParams& Clear() const noexcept override;
-		virtual void Clear(const ClearParams& clear) noexcept override;
+		virtual const struct Clear& Clear() const noexcept override;
+		virtual void Clear(const struct Clear& clear) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept override;
@@ -72,24 +72,32 @@ export namespace PonyEngine::Render::Direct3D12
 		Camera& operator =(Camera&& other) noexcept = default;
 
 	private:
+		/// @brief Computes a projection matrix by current parameters.
+		/// @return Projection matrix.
 		[[nodiscard("Pure function")]]
 		PonyMath::Core::Matrix4x4<float> ComputeProjectionMatrix() const noexcept;
+		/// @brief Computes a perspective projection matrix.
+		/// @param params Perspective projection parameters.
+		/// @return Perspective projection matrix.
 		[[nodiscard("Pure function")]]
-		static PonyMath::Core::Matrix4x4<float> ComputePerspectiveMatrix(const PerspectiveParams& params) noexcept;
+		static PonyMath::Core::Matrix4x4<float> ComputePerspectiveMatrix(const Perspective& params) noexcept;
+		/// @brief Computes an orthographic projection matrix.
+		/// @param params Orthographic projection parameters.
+		/// @return Orthographic projection matrix.
 		[[nodiscard("Pure function")]]
-		static PonyMath::Core::Matrix4x4<float> ComputeOrthographicMatrix(const OrthographicParams& params) noexcept;
+		static PonyMath::Core::Matrix4x4<float> ComputeOrthographicMatrix(const Orthographic& params) noexcept;
 
-		PonyMath::Core::Matrix4x4<float> viewMatrix;
-		CameraProjection projection;
-		mutable std::optional<PonyMath::Core::Matrix4x4<float>> projectionMatrix;
-		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionMatrix;
-		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler;
+		PonyMath::Core::Matrix4x4<float> viewMatrix; ///< View matrix.
+		CameraProjection projection; ///< Projection parameters.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> projectionMatrix; ///< Projection matrix. It becomes std::nullopt if the projection parameters are changed.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionMatrix; ///< View-projection matrix. It becomes std::nullopt if the projection parameters are changed.
+		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler; ///< Culler. It becomes std::nullopt if the projection parameters are changed.
 
-		ClearParams clearParams;
+		struct Clear clear; ///< Clear parameters.
 
-		PonyMath::Shape::Rect<float> viewportRect;
+		PonyMath::Shape::Rect<float> viewportRect; ///< Normalized viewport rect.
 
-		std::int32_t sortingOrder;
+		std::int32_t sortingOrder; ///< Sorting order.
 	};
 }
 
@@ -98,7 +106,7 @@ namespace PonyEngine::Render::Direct3D12
 	Camera::Camera(const CameraParams& cameraParams) noexcept :
 		viewMatrix(cameraParams.viewMatrix),
 		projection(cameraParams.projection),
-		clearParams{cameraParams.clearParams},
+		clear(cameraParams.clearParams),
 		viewportRect(cameraParams.viewportRect),
 		sortingOrder{cameraParams.sortingOrder}
 	{
@@ -148,14 +156,14 @@ namespace PonyEngine::Render::Direct3D12
 		culler = std::nullopt;
 	}
 
-	const ClearParams& Camera::Clear() const noexcept
+	const struct Clear& Camera::Clear() const noexcept
 	{
-		return clearParams;
+		return clear;
 	}
 
-	void Camera::Clear(const ClearParams& clear) noexcept
+	void Camera::Clear(const struct Clear& clear) noexcept
 	{
-		clearParams = clear;
+		this->clear = clear;
 	}
 
 	const PonyMath::Shape::Rect<float>& Camera::ViewportRect() const noexcept
@@ -189,6 +197,7 @@ namespace PonyEngine::Render::Direct3D12
 				break;
 			case 1:
 				culler = BoxCuller(std::get<1>(projection));
+				break;
 			default: [[unlikely]]
 				assert(false && "Unsupported projection type.");
 				culler = BoxCuller(PonyMath::Shape::AABB<float>::Predefined::Zero);
@@ -196,12 +205,9 @@ namespace PonyEngine::Render::Direct3D12
 			}
 		}
 
-		if (culler->index() == 0)
-		{
-			return std::get<0>(culler.value());
-		}
-
-		return std::get<1>(culler.value());
+		return culler->index() == 0
+			? static_cast<const ICuller&>(std::get<0>(culler.value()))
+			: std::get<1>(culler.value());
 	}
 
 	PonyMath::Core::Matrix4x4<float> Camera::ComputeProjectionMatrix() const noexcept
@@ -218,12 +224,12 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	PonyMath::Core::Matrix4x4<float> Camera::ComputePerspectiveMatrix(const PerspectiveParams& params) noexcept
+	PonyMath::Core::Matrix4x4<float> Camera::ComputePerspectiveMatrix(const Perspective& params) noexcept
 	{
 		return PonyMath::Core::PerspectiveMatrix(params.fov, params.aspect, params.nearPlane, params.farPlane);
 	}
 
-	PonyMath::Core::Matrix4x4<float> Camera::ComputeOrthographicMatrix(const OrthographicParams& params) noexcept
+	PonyMath::Core::Matrix4x4<float> Camera::ComputeOrthographicMatrix(const Orthographic& params) noexcept
 	{
 		return PonyMath::Core::OrthographicMatrix(params.width, params.height, params.nearPlane, params.farPlane);
 	}

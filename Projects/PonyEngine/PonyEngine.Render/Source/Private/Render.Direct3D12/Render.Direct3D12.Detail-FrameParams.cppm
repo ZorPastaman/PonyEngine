@@ -27,6 +27,6 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 		PonyMath::Utility::Resolution<std::uint32_t> resolution; ///< Render target resolution.
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
-		MSAAParams msaaParams; ///< MSAA parameters.
+		MSAA msaaParams; ///< MSAA parameters.
 	};
 }

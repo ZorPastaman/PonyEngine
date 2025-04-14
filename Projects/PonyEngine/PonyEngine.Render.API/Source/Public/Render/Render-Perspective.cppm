@@ -7,14 +7,14 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:PerspectiveParams;
+export module PonyEngine.Render:Perspective;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Perspective projection parameters.
-	struct PerspectiveParams final
+	struct Perspective final
 	{
-		float fov; ///< Field of view in radians.
+		float fov; ///< Vertical field of view in radians.
 		float aspect; ///< Width to height aspect ratio.
 		float nearPlane; ///< Near plane distance.
 		float farPlane; ///< Far plane distance.

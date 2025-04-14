@@ -35,7 +35,7 @@ import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 srgb output quad.
+	/// @brief Direct3D12 SRGB output quad.
 	class SrgbOutputQuad final
 	{
 	public:
@@ -44,7 +44,7 @@ export namespace PonyEngine::Render::Direct3D12
 		static constexpr std::uint32_t ThreadGroupYCount = 1u; ///< Thread group y count.
 		static constexpr std::uint32_t ThreadGroupZCount = 1u; ///< Thread group z count.
 
-		/// @brief Creates a @p SrgbOutputQuad.
+		/// @brief Creates an @p SrgbOutputQuad.
 		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
 		explicit SrgbOutputQuad(ISubSystemContext& d3d12System);

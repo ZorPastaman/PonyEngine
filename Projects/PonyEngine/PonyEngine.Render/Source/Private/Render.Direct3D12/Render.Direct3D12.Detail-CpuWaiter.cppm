@@ -17,9 +17,7 @@ export module PonyEngine.Render.Direct3D12.Detail:CpuWaiter;
 
 import <memory>;
 import <stdexcept>;
-import <string>;
 import <string_view>;
-import <type_traits>;
 
 import PonyBase.Utility;
 

@@ -9,20 +9,13 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:CopyPipeline;
 
-import <array>;
 import <cstdint>;
-import <stdexcept>;
-import <string>;
-import <string_view>;
-import <type_traits>;
 import <vector>;
 
 import PonyBase.Utility.COM;
@@ -32,7 +25,6 @@ import PonyDebug.Log;
 import :Buffer;
 import :ICopyPipeline;
 import :ISubSystemContext;
-import :ObjectUtility;
 import :Pipeline;
 import :Resource;
 import :Texture;
@@ -43,6 +35,9 @@ export namespace PonyEngine::Render::Direct3D12
 	class CopyPipeline final : public Pipeline, public ICopyPipeline
 	{
 	public:
+		/// @brief Creates a copy pipeline.
+		/// @param d3d12System Direct3D12 system context.
+		/// @param commandQueuePriority Command queue priority.
 		[[nodiscard("Pure constructor")]]
 		CopyPipeline(ISubSystemContext& d3d12System, INT commandQueuePriority);
 		CopyPipeline(const CopyPipeline&) = delete;
@@ -64,42 +59,39 @@ export namespace PonyEngine::Render::Direct3D12
 		CopyPipeline& operator =(CopyPipeline&&) = delete;
 
 	private:
-		enum class ResourceType : std::uint8_t
-		{
-			Buffer,
-			Texture
-		};
-
 		/// @brief Copy task.
 		struct CopyTask final
 		{
 			Resource* source; ///< Copy source.
 			Resource* destination; ///< Copy destination.
-			ResourceType resourceType;
 		};
 
-		/// @brief Populates begin to copy barriers.
-		void PushBeginToCopyBarriers();
-		/// @brief Populates copy to end barriers.
-		void PushCopyToEndBarriers();
+		/// @brief Adds buffer barriers that go before copying.
+		void AddBufferBeforeBarriers();
+		/// @brief Adds buffer barriers that go after copying.
+		void AddBufferAfterBarriers();
+
+		/// @brief Adds texture barriers that go before copying.
+		void AddTextureBeforeBarriers();
+		/// @brief Adds texture barriers that go after copying.
+		void AddTextureAfterBarriers();
 
 		/// @brief Populates copies.
-		void PopulateCopies();
+		/// @param copyTasks Copy tasks to populate.
+		void PopulateCopies(const std::vector<CopyTask>& copyTasks);
 
-		void AddBufferBeforeBarriers(const CopyTask& copyTask);
-		void AddBufferAfterBarriers(const CopyTask& copyTask);
+		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		void AddTextureBeforeBarriers(const CopyTask& copyTask);
-		void AddTextureAfterBarriers(const CopyTask& copyTask);
-
-		std::vector<CopyTask> copyTasks; ///< Copy tasks.
+		std::vector<CopyTask> bufferCopyTasks; ///< Buffer copy tasks.
+		std::vector<CopyTask> textureCopyTasks; ///< Texture copy tasks.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	CopyPipeline::CopyPipeline(ISubSystemContext& d3d12System, const INT commandQueuePriority) :
-		Pipeline(d3d12System, commandQueuePriority, D3D12_COMMAND_LIST_TYPE_COPY)
+		Pipeline(d3d12System, commandQueuePriority, D3D12_COMMAND_LIST_TYPE_COPY),
+		d3d12System{&d3d12System}
 	{
 	}
 
@@ -108,10 +100,10 @@ namespace PonyEngine::Render::Direct3D12
 		const auto copyTask = CopyTask
 		{
 			.source = &source,
-			.destination = &destination,
-			.resourceType = ResourceType::Buffer
+			.destination = &destination
 		};
-		copyTasks.push_back(copyTask);
+		bufferCopyTasks.push_back(copyTask);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Buffer copy task added. From: '0x{:X}', To: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	void CopyPipeline::AddCopyTask(Texture& source, Texture& destination)
@@ -119,19 +111,22 @@ namespace PonyEngine::Render::Direct3D12
 		const auto copyTask = CopyTask
 		{
 			.source = &source,
-			.destination = &destination,
-			.resourceType = ResourceType::Texture
+			.destination = &destination
 		};
-		copyTasks.push_back(copyTask);
+		textureCopyTasks.push_back(copyTask);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Verbose, "Texture copy task added. From: '0x{:X}', To: '0x{:X}'.", reinterpret_cast<std::uintptr_t>(&source), reinterpret_cast<std::uintptr_t>(&destination));
 	}
 
 	void CopyPipeline::PopulateCommands()
 	{
 		ResetLists();
-		PushBeginToCopyBarriers();
+		AddBufferBeforeBarriers();
+		AddTextureBeforeBarriers();
 		PopulateBarriers();
-		PopulateCopies();
-		PushCopyToEndBarriers();
+		PopulateCopies(bufferCopyTasks);
+		PopulateCopies(textureCopyTasks);
+		AddBufferAfterBarriers();
+		AddTextureAfterBarriers();
 		PopulateBarriers();
 		CloseLists();
 	}
@@ -144,162 +139,139 @@ namespace PonyEngine::Render::Direct3D12
 
 	void CopyPipeline::Clear() noexcept
 	{
-		copyTasks.clear();
+		bufferCopyTasks.clear();
+		textureCopyTasks.clear();
 	}
 
-	void CopyPipeline::PushBeginToCopyBarriers()
+	void CopyPipeline::AddBufferBeforeBarriers()
 	{
-		for (const CopyTask& copyTask : copyTasks)
+		for (const auto& [source, destination] : bufferCopyTasks)
 		{
-			switch (copyTask.resourceType)
+			const auto sourceBarrier = D3D12_BUFFER_BARRIER
 			{
-			case ResourceType::Buffer:
-				AddBufferBeforeBarriers(copyTask);
-				break;
-			case ResourceType::Texture:
-				AddTextureBeforeBarriers(copyTask);
-				break;
-			default: [[unlikely]]
-				assert(false && "Unexpected resource type.");
-			}
-		}
-	}
-
-	void CopyPipeline::PopulateCopies()
-	{
-		for (const CopyTask& copyTask : copyTasks)
-		{
-			CommandList().CopyResource(&copyTask.destination->Data(), &copyTask.source->Data());
-		}
-	}
-
-	void CopyPipeline::PushCopyToEndBarriers()
-	{
-		for (const CopyTask& copyTask : copyTasks)
-		{
-			switch (copyTask.resourceType)
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.pResource = &source->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			const auto destinationBarrier = D3D12_BUFFER_BARRIER
 			{
-			case ResourceType::Buffer:
-				AddBufferAfterBarriers(copyTask);
-				break;
-			case ResourceType::Texture:
-				AddTextureAfterBarriers(copyTask);
-				break;
-			default: [[unlikely]]
-				assert(false && "Unexpected resource type.");
-			}
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.pResource = &destination->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(sourceBarrier);
+			AddBarrier(destinationBarrier);
 		}
 	}
 
-	void CopyPipeline::AddBufferBeforeBarriers(const CopyTask& copyTask)
+	void CopyPipeline::AddBufferAfterBarriers()
 	{
-		const auto sourceBarrier = D3D12_BUFFER_BARRIER
+		for (const auto& [source, destination] : bufferCopyTasks)
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_COPY,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_COPY_SOURCE,
-			.pResource = &copyTask.source->Data(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		const auto destinationBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_COPY,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST,
-			.pResource = &copyTask.destination->Data(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		AddBarrier(sourceBarrier);
-		AddBarrier(destinationBarrier);
+			const auto sourceBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = &source->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			const auto destinationBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = &destination->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(sourceBarrier);
+			AddBarrier(destinationBarrier);
+		}
 	}
 
-	void CopyPipeline::AddBufferAfterBarriers(const CopyTask& copyTask)
+	void CopyPipeline::AddTextureBeforeBarriers()
 	{
-		const auto sourceBarrier = D3D12_BUFFER_BARRIER
+		for (const auto& [source, destination] : textureCopyTasks)
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_COPY,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_COPY_SOURCE,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.pResource = &copyTask.source->Data(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		const auto destinationBarrier = D3D12_BUFFER_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_COPY,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.pResource = &copyTask.destination->Data(),
-			.Offset = 0UL,
-			.Size = UINT64_MAX
-		};
-		AddBarrier(sourceBarrier);
-		AddBarrier(destinationBarrier);
+			const auto sourceBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
+				.pResource = &source->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			const auto destinationBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_COPY,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_DEST,
+				.pResource = &destination->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(sourceBarrier);
+			AddBarrier(destinationBarrier);
+		}
 	}
 
-	void CopyPipeline::AddTextureBeforeBarriers(const CopyTask& copyTask)
+	void CopyPipeline::AddTextureAfterBarriers()
 	{
-		const auto sourceBarrier = D3D12_TEXTURE_BARRIER
+		for (const auto& [source, destination] : textureCopyTasks)
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_COPY,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_COPY_SOURCE,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
-			.pResource = &copyTask.source->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		const auto destinationBarrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_COPY,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_COPY_DEST,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_COPY_DEST,
-			.pResource = &copyTask.destination->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(sourceBarrier);
-		AddBarrier(destinationBarrier);
+			const auto sourceBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_SOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &source->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			const auto destinationBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_COPY,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_DEST,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &destination->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(sourceBarrier);
+			AddBarrier(destinationBarrier);
+		}
 	}
 
-	void CopyPipeline::AddTextureAfterBarriers(const CopyTask& copyTask)
+	void CopyPipeline::PopulateCopies(const std::vector<CopyTask>& copyTasks)
 	{
-		const auto sourceBarrier = D3D12_TEXTURE_BARRIER
+		for (const auto& [source, destination] : copyTasks)
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_COPY,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_COPY_SOURCE,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_SOURCE,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
-			.pResource = &copyTask.source->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		const auto destinationBarrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_COPY,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_COPY_DEST,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_COPY_DEST,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
-			.pResource = &copyTask.destination->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(sourceBarrier);
-		AddBarrier(destinationBarrier);
+			CommandList().CopyResource(&destination->Data(), &source->Data());
+		}
 	}
 }

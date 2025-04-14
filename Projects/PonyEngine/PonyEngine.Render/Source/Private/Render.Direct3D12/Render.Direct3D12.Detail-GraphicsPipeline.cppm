@@ -69,7 +69,10 @@ export namespace PonyEngine::Render::Direct3D12
 		void CreateFrame();
 
 		virtual void AddCamera(Camera& camera) override;
+		virtual void RemoveCamera(Camera& camera) override;
+
 		virtual void AddRenderObject(RenderObject& renderObject) override;
+		virtual void RemoveRenderObject(RenderObject& renderObject) override;
 
 		void Prepare();
 		/// @brief Populates commands. All the system components must be ready.
@@ -203,9 +206,25 @@ namespace PonyEngine::Render::Direct3D12
 		cameras.push_back(&camera);
 	}
 
+	void GraphicsPipeline::RemoveCamera(Camera& camera)
+	{
+		if (const auto position = std::ranges::find(cameras, &camera); position != cameras.cend()) [[likely]]
+		{
+			cameras.erase(position);
+		}
+	}
+
 	void GraphicsPipeline::AddRenderObject(RenderObject& renderObject)
 	{
 		renderObjects.push_back(&renderObject);
+	}
+
+	void GraphicsPipeline::RemoveRenderObject(RenderObject& renderObject)
+	{
+		if (const auto position = std::ranges::find(renderObjects, &renderObject); position != renderObjects.cend()) [[likely]]
+		{
+			renderObjects.erase(position);
+		}
 	}
 
 	void GraphicsPipeline::Prepare()
@@ -257,9 +276,6 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::Clear() noexcept
 	{
-		cameras.clear();
-		renderObjects.clear();
-
 		meshes.clear();
 
 		contexts.data.clear();
@@ -784,7 +800,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		CommandList().RSSetScissorRects(1u, &rect);
 
-		const ClearParams& clear = camera.Clear();
+		const struct Clear& clear = camera.Clear();
 		if (clear.color.has_value())
 		{
 			CommandList().ClearRenderTargetView(frame->RtvHandle(), clear.color.value().Span().data(), 1u, &rect);

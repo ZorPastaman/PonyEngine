@@ -21,7 +21,7 @@ import <string>;
 import <string_view>;
 
 import :LogFormat;
-import :LogConsoleHelper;
+import :LogHelper;
 import :LogType;
 
 export namespace PonyDebug::Log
