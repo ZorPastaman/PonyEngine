@@ -97,15 +97,16 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		{
 			windowHandle = windowSystem->WindowHandle();
 
-			if (renderParams.resolution.has_value())
-			{
-				renderResolution = renderParams.resolution.value();
-				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
-			}
-			else
+			if (renderParams.swapChainParams.useWindowResolution)
 			{
 				renderResolution = PonyMath::Utility::Resolution<std::uint32_t>(static_cast<PonyMath::Core::Vector2<std::uint32_t>>(windowSystem->WindowClientRect().Size()));
 				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution: '{}'.", renderResolution.ToString());
+				
+			}
+			else
+			{
+				renderResolution = renderParams.mainFrameParams.resolution;
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
 			}
 		}
 		else [[unlikely]]
@@ -128,15 +129,15 @@ namespace PonyEngine::Render::Direct3D12::Windows
 			.device = &direct3D12SubSystem->GraphicsCommandQueue(),
 			.hWnd = windowHandle,
 			.resolution = renderResolution,
-			.bufferCount = renderParams.bufferCount
+			.bufferCount = renderParams.swapChainParams.bufferCount
 		};
 		const DXGI::ISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Get swap chain buffers.");
 		auto backParams = Direct3D12::BackParams{};
-		backParams.backBuffers.reserve(renderParams.bufferCount);
-		for (std::uint32_t i = 0u; i < renderParams.bufferCount; ++i)
+		backParams.backBuffers.reserve(renderParams.swapChainParams.bufferCount);
+		for (std::uint32_t i = 0u; i < renderParams.swapChainParams.bufferCount; ++i)
 		{
 			Microsoft::WRL::ComPtr<ID3D12Resource2> backBuffer;
 			if (const HRESULT result = swapChain.GetBackBuffer(i, backBuffer.GetAddressOf()); FAILED(result)) [[unlikely]]
@@ -148,12 +149,9 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Swap chain buffers gotten.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
-		const auto frameParams = Direct3D12::FrameParams
-		{
-			.resolution = renderResolution,
-			.msaaParams = renderParams.msaaParams
-		};
-		direct3D12SubSystem->CreateRenderSystem(backParams, frameParams);
+		Render::FrameParams mainFrameParams = renderParams.mainFrameParams;
+		mainFrameParams.resolution = renderResolution;
+		direct3D12SubSystem->CreateRenderSystem(backParams, mainFrameParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
 	}
 

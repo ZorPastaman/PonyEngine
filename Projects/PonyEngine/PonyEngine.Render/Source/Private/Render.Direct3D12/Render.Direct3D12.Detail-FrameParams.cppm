@@ -26,7 +26,11 @@ export namespace PonyEngine::Render::Direct3D12
 	struct FrameParams final
 	{
 		PonyMath::Utility::Resolution<std::uint32_t> resolution; ///< Render target resolution.
-		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
-		MSAA msaaParams; ///< MSAA parameters.
+		DXGI_SAMPLE_DESC sampleDesc; ///< Sample description.
+		PonyMath::Color::RGBA<float> clearColor; ///< Clear color.
+		float clearDepth; ///< Clear depth.
+		std::uint8_t clearStencil; ///< Clear stencil.
+		DXGI_FORMAT rtvFormat; ///< Render target view format. If it's Unknown, it means no render target is required.
+		DXGI_FORMAT dsvFormat; ///< Depth stencil view format. If it's Unknown, it means no depth stencil is required.
 	};
 }

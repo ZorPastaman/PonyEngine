@@ -40,6 +40,7 @@ export namespace PonyEngine::Render
 {
 	/// @brief Render mesh.
 	/// @details It's a map of a data type to an array of buffers.
+	/// @remark All the mesh data will be transferred to shader t-buffers.
 	class Mesh final
 	{ 
 	public:
@@ -69,7 +70,7 @@ export namespace PonyEngine::Render
 			/// @note offset + data.size() must not exceed the target buffer size.
 			/// @param offset Data destination offset.
 			/// @param data Data to set.
-			void Set(std::size_t offset, std::span<const std::byte> data) noexcept;
+			void Set(std::size_t offset, std::span<const std::byte> data);
 			/// @brief Sets the value by the index.
 			/// @tparam T Value type. Its size must be a stride of the buffer.
 			/// @param index Value index.
@@ -476,7 +477,7 @@ namespace PonyEngine::Render
 		mesh->OnBufferChanged(dataIndex, bufferIndex);
 	}
 
-	void Mesh::BufferAccess::Set(const std::size_t offset, std::span<const std::byte> data) noexcept
+	void Mesh::BufferAccess::Set(const std::size_t offset, std::span<const std::byte> data)
 	{
 		if (data.size() + offset > buffer->Size()) [[unlikely]]
 		{

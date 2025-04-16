@@ -28,6 +28,8 @@ import <vector>;
 
 import PonyDebug.Log;
 
+import :FrameParams;
+import :IGraphicsPipeline;
 import :IMaterialManager;
 import :IMeshManager;
 import :ISubSystemContext;
@@ -677,6 +679,7 @@ namespace PonyEngine::Render::Direct3D12
 		const std::shared_ptr<Shader> rootSignatureShader = d3d12System->ShaderManager().CreateShader(source.RootSignatureShader());
 		const std::shared_ptr<RootSignature> rootSignature = d3d12System->RootSignatureManager().CreateRootSignature(rootSignatureShader);
 		rootSignature->Name(source.RootSignatureShader());
+		const FrameParams& frameParams = d3d12System->GraphicsPipeline().MainFrameParams();
 
 		auto pss = PipelineStateStream
 		{
@@ -690,11 +693,11 @@ namespace PonyEngine::Render::Direct3D12
 			.depthStencil = CreateDepthStencilDesc(source.DepthStencil()),
 			.renderTargetFormats = D3D12_RT_FORMAT_ARRAY
 			{
-				.RTFormats = { d3d12System->FrameManager().RtvFormat() },
+				.RTFormats = { frameParams.rtvFormat },
 				.NumRenderTargets = 1u
 			},
-			.depthStencilFormat = d3d12System->FrameManager().DsvFormat(),
-			.sampleDescription = d3d12System->FrameManager().SampleDesc()
+			.depthStencilFormat = frameParams.dsvFormat,
+			.sampleDescription = frameParams.sampleDesc
 		};
 		const auto pssDesc = D3D12_PIPELINE_STATE_STREAM_DESC
 		{

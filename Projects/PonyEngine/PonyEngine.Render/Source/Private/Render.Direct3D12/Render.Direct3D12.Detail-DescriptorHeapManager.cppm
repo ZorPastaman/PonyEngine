@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"
@@ -18,7 +16,9 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeapManager;
 
 import <cstddef>;
+import <cstdint>;
 import <memory>;
+import <stdexcept>;
 import <type_traits>;
 import <vector>;
 
@@ -48,6 +48,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<DescriptorHeap> CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE heapType, std::uint32_t descriptorCount, bool shaderVisible) override;
 
+		/// @brief Cleans out of dead descriptor heaps.
 		void Clean() noexcept;
 
 		DescriptorHeapManager& operator =(const DescriptorHeapManager& other) noexcept = default;
@@ -56,7 +57,7 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::vector<std::shared_ptr<DescriptorHeap>> descriptorHeaps;
+		std::vector<std::shared_ptr<DescriptorHeap>> descriptorHeaps; ///< Descriptor heaps.
 	};
 }
 
@@ -93,9 +94,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = descriptorHeaps.size(); i-- > 0; )
 		{
-			if (descriptorHeaps[i].use_count() <= 1L)
+			if (const std::shared_ptr<DescriptorHeap>& descriptorHeap = descriptorHeaps[i]; descriptorHeap.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy descriptor heap at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(descriptorHeaps[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy descriptor heap at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(descriptorHeap.get()));
 				descriptorHeaps.erase(descriptorHeaps.cbegin() + i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Descriptor heap destroyed.");
 			}

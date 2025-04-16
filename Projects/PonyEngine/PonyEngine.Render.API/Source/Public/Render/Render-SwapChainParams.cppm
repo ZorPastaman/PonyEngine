@@ -7,19 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:RenderSystemParams;
+export module PonyEngine.Render:SwapChainParams;
 
-import :FrameParams;
-import :SwapChainParams;
+import <cstdint>;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render system parameters.
-	struct RenderSystemParams
+	/// @brief Swap chain parameters.
+	struct SwapChainParams final
 	{
-		/// @brief Main frame parameters.
-		/// @note Must have a correct rtv format that is compatible with SRGB but not SRGB.
-		FrameParams mainFrameParams;
-		SwapChainParams swapChainParams; ///< Swap chain parameters.
+		std::uint8_t bufferCount = 3u; ///< Back buffer count.
+		bool useWindowResolution = true; ///< If it's true, the resolution from the frame parameters will be ignored and the resolution from the window will be used.
 	};
 }

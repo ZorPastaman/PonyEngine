@@ -21,6 +21,7 @@ import <algorithm>;
 import <cstddef>;
 import <format>;
 import <memory>;
+import <optional>;
 import <string>;
 import <string_view>;
 import <vector>;
@@ -56,12 +57,12 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual DXGI_FORMAT FormatSrgb() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& CurrentBackBuffer() noexcept override;
+		virtual ID3D12Resource2* CurrentBackBuffer() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept override;
+		virtual const ID3D12Resource2* CurrentBackBuffer() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept override;
+		virtual std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> CurrentRtvHandle() const noexcept override;
 
 		/// @brief Gets the current back buffer index.
 		/// @return Current back buffer index.
@@ -148,19 +149,19 @@ namespace PonyEngine::Render::Direct3D12
 		return srgbBackFormat;
 	}
 
-	ID3D12Resource2& BackManager::CurrentBackBuffer() noexcept
+	ID3D12Resource2* BackManager::CurrentBackBuffer() noexcept
 	{
-		return *backBuffers[currentBackBufferIndex].Get();
+		return backBuffers.size() > 0 ? backBuffers[currentBackBufferIndex].Get() : nullptr;
 	}
 
-	const ID3D12Resource2& BackManager::CurrentBackBuffer() const noexcept
+	const ID3D12Resource2* BackManager::CurrentBackBuffer() const noexcept
 	{
-		return *backBuffers[currentBackBufferIndex].Get();
+		return backBuffers.size() > 0 ? backBuffers[currentBackBufferIndex].Get() : nullptr;
 	}
 
-	D3D12_CPU_DESCRIPTOR_HANDLE BackManager::CurrentRtvHandle() const noexcept
+	std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> BackManager::CurrentRtvHandle() const noexcept
 	{
-		return rtvHeap->CpuHandle(currentBackBufferIndex);
+		return backBuffers.size() > 0 ? std::optional(rtvHeap->CpuHandle(currentBackBufferIndex)) : std::nullopt;
 	}
 
 	std::uint32_t BackManager::CurrentBackBufferIndex() const noexcept

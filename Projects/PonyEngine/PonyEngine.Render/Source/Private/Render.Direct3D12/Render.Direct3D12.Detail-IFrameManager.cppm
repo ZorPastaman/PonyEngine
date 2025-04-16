@@ -18,6 +18,7 @@ import <memory>;
 import PonyMath.Utility;
 
 import :Frame;
+import :FrameParams;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -26,16 +27,9 @@ export namespace PonyEngine::Render::Direct3D12
 		INTERFACE_BODY(IFrameManager)
 
 		[[nodiscard("Pure function")]]
-		virtual DXGI_FORMAT RtvFormat() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual DXGI_FORMAT DsvFormat() const noexcept = 0;
-
-		[[nodiscard("Pure function")]]
-		virtual const PonyMath::Utility::Resolution<std::uint32_t>& Resolution() const noexcept = 0;
-		[[nodiscard("Pure function")]]
-		virtual DXGI_SAMPLE_DESC SampleDesc() const noexcept = 0;
+		virtual FrameParams ConvertFrameParams(const Render::FrameParams& frameParams) const = 0;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<class Frame> CreateFrame() = 0;
+		virtual std::shared_ptr<Frame> CreateFrame(const FrameParams& frameParams) = 0;
 	};
 }

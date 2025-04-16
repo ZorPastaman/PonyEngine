@@ -226,6 +226,12 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-CameraBox.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Attachment.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-View.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">

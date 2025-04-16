@@ -19,6 +19,7 @@ export namespace PonyEngine::Render
 {
 	/// @brief Engine special data types.
 	/// @details The engine passes special data to slots if they have these types.
+	/// @remark All the data will be transferred to shader b-buffers.
 	struct DataTypes final
 	{
 		NON_CONSTRUCTIBLE_BODY(DataTypes)

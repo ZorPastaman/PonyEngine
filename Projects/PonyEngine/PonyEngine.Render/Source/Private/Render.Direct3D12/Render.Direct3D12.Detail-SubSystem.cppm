@@ -97,8 +97,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 		/// @brief Creates a render system.
 		/// @param backParams Back parameters.
-		/// @param frameParams Render target parameters.
-		void CreateRenderSystem(const BackParams& backParams, const FrameParams& frameParams);
+		/// @param mainFrameParams Main frame parameters.
+		void CreateRenderSystem(const BackParams& backParams, const Render::FrameParams& mainFrameParams);
 
 		/// @brief Begins a new frame.
 		void BeginFrame();
@@ -342,7 +342,7 @@ namespace PonyEngine::Render::Direct3D12
 		return graphicsPipeline->CommandQueue();
 	}
 
-	void SubSystem::CreateRenderSystem(const BackParams& backParams, const FrameParams& frameParams)
+	void SubSystem::CreateRenderSystem(const BackParams& backParams, const Render::FrameParams& mainFrameParams)
 	{
 		assert(!resourceManager && "The CreateRenderSystem() is called twice.");
 
@@ -360,7 +360,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Back manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create frame manager.");
-		frameManager = std::make_unique<class FrameManager>(*static_cast<ISubSystemContext*>(this), frameParams);
+		frameManager = std::make_unique<class FrameManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Frame manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create mesh manager.");
@@ -388,7 +388,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create main frame.");
-		graphicsPipeline->CreateFrame();
+		graphicsPipeline->CreateFrame(mainFrameParams);
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Main frame created.");
 	}
 
