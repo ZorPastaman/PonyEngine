@@ -9,183 +9,210 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:Frame;
 
+import <algorithm>;
 import <memory>;
+import <optional>;
+import <string>;
+import <string_view>;
+import <unordered_map>;
+import <utility>;
 
+import :Attachment;
 import :DescriptorHeap;
 import :Texture;
+import :View;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Frame buffer.
 	class Frame final
 	{
 	public:
+		/// @brief Creates a frame.
+		/// @note The @p heaps must have all the views that the @p handles have.
+		/// @note The @p heaps must have descriptor heaps that point only to the @p textures.
+		/// @param textures Textures.
+		/// @param heaps Heaps.
+		/// @param handles Handles.
 		[[nodiscard("Pure constructor")]]
-		Frame(const std::shared_ptr<Texture>& renderTarget, const std::shared_ptr<Texture>& resolveTarget, const std::shared_ptr<Texture>& depthStencil,
-			const std::shared_ptr<DescriptorHeap>& rtvHeap, const std::shared_ptr<DescriptorHeap>& srvHeap, const std::shared_ptr<DescriptorHeap>& dsvHeap) noexcept;
-		Frame(const Frame&) = delete;
-		Frame(Frame&&) = delete;
+		Frame(const std::unordered_map<Attachment, std::shared_ptr<Texture>>& textures, 
+			const std::unordered_map<View, std::shared_ptr<DescriptorHeap>>& heaps, const std::unordered_map<View, std::uint32_t>& handles);
+		/// @brief Creates a frame.
+		/// @note The @p heaps must have all the views that the @p handles have.
+		/// @note The @p heaps must have descriptor heaps that point only to the @p textures.
+		/// @param textures Textures.
+		/// @param heaps Heaps.
+		/// @param handles Handles.
+		[[nodiscard("Pure constructor")]]
+		Frame(std::unordered_map<Attachment, std::shared_ptr<Texture>>&& textures,
+			std::unordered_map<View, std::shared_ptr<DescriptorHeap>>&& heaps, std::unordered_map<View, std::uint32_t>&& handles) noexcept;
+		[[nodiscard("Pure constructor")]]
+		Frame(const Frame& other) = default;
+		[[nodiscard("Pure constructor")]]
+		Frame(Frame&& other) noexcept = default;
 
 		~Frame() noexcept = default;
 
+		/// @brief Tries to find a texture by the @p attachment.
+		/// @param attachment Attachment.
+		/// @return Texture; nullptr if such a texture isn't found.
 		[[nodiscard("Pure function")]]
-		Texture& RenderTarget() noexcept;
+		Texture* FindTexture(Attachment attachment) noexcept;
+		/// @brief Tries to find a texture by the @p attachment.
+		/// @param attachment Attachment.
+		/// @return Texture; nullptr if such a texture isn't found.
 		[[nodiscard("Pure function")]]
-		const Texture& RenderTarget() const noexcept;
+		const Texture* FindTexture(Attachment attachment) const noexcept;
 
+		/// @brief Tries to find a heap that has a descriptor for the @p view.
+		/// @param view View.
+		/// @return Descriptor heap; nullptr if such a heap isn't found.
 		[[nodiscard("Pure function")]]
-		Texture* ResolveTarget() noexcept;
+		DescriptorHeap* FindHeap(View view) noexcept;
+		/// @brief Tries to find a heap that has a descriptor for the @p view.
+		/// @param view View.
+		/// @return Descriptor heap; nullptr if such a heap isn't found.
 		[[nodiscard("Pure function")]]
-		const Texture* ResolveTarget() const noexcept;
+		const DescriptorHeap* FindHeap(View view) const noexcept;
 
+		/// @brief Tries to find a cpu handle by the @p view.
+		/// @param view View.
+		/// @return Handle; std::nullopt if such a handle isn't found.
 		[[nodiscard("Pure function")]]
-		Texture& FinalTarget() noexcept;
+		std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> FindCpuHandle(View view) const noexcept;
+		/// @brief Tries to find a gpu handle by the @p view.
+		/// @param view View.
+		/// @return Handle; std::nullopt if such a handle isn't found.
 		[[nodiscard("Pure function")]]
-		const Texture& FinalTarget() const noexcept;
+		std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> FindGpuHandle(View view) const noexcept;
 
-		[[nodiscard("Pure function")]]
-		Texture& DepthStencil() noexcept;
-		[[nodiscard("Pure function")]]
-		const Texture& DepthStencil() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		DescriptorHeap& SrvHeap() noexcept;
-		[[nodiscard("Pure function")]]
-		const DescriptorHeap& SrvHeap() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE RtvHandle() const noexcept;
-		[[nodiscard("Pure function")]]
-		D3D12_GPU_DESCRIPTOR_HANDLE SrvHandle() const noexcept;
-
-		[[nodiscard("Pure function")]]
-		D3D12_CPU_DESCRIPTOR_HANDLE DsvHandle() const noexcept;
-
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
 
-		Frame& operator =(const Frame&) = delete;
-		Frame& operator =(Frame&&) = delete;
+		Frame& operator =(const Frame& other) = default;
+		Frame& operator =(Frame&& other) noexcept = default;
 
 	private:
-		std::shared_ptr<Texture> renderTarget;
-		std::shared_ptr<Texture> resolveTarget;
-		std::shared_ptr<Texture> depthStencil;
-
-		std::shared_ptr<DescriptorHeap> rtvHeap;
-		std::shared_ptr<DescriptorHeap> srvHeap;
-		std::shared_ptr<DescriptorHeap> dsvHeap;
+		std::unordered_map<Attachment, std::shared_ptr<Texture>> textures; ///< Textures.
+		std::unordered_map<View, std::shared_ptr<DescriptorHeap>> heaps; ///< Heaps.
+		std::unordered_map<View, std::uint32_t> handles; ///< Handle indices.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Frame::Frame(const std::shared_ptr<Texture>& renderTarget, const std::shared_ptr<Texture>& resolveTarget, const std::shared_ptr<Texture>& depthStencil, const std::shared_ptr<DescriptorHeap>& rtvHeap,
-		const std::shared_ptr<DescriptorHeap>& srvHeap, const std::shared_ptr<DescriptorHeap>& dsvHeap) noexcept :
-		renderTarget(renderTarget),
-		resolveTarget(resolveTarget),
-		depthStencil(depthStencil),
-		rtvHeap(rtvHeap),
-		srvHeap(srvHeap),
-		dsvHeap(dsvHeap)
+	Frame::Frame(const std::unordered_map<Attachment, std::shared_ptr<Texture>>& textures,
+		const std::unordered_map<View, std::shared_ptr<DescriptorHeap>>& heaps, const std::unordered_map<View, std::uint32_t>& handles) :
+		textures(textures),
+		heaps(heaps),
+		handles(handles)
 	{
+		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return p.second == nullptr; }) == this->textures.cend() && "At least one of the textures is nullptr.");
+		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return p.second == nullptr; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
+		assert(std::ranges::find_if(this->handles, [&](const std::pair<View, std::uint32_t>& p) { return !this->heaps.contains(p.first) || p.second >= this->heaps.find(p.first)->second->HandleCount(); }) == this->handles.cend() && "No heap for a handle is found.");
 	}
 
-	Texture& Frame::RenderTarget() noexcept
+	Frame::Frame(std::unordered_map<Attachment, std::shared_ptr<Texture>>&& textures,
+		std::unordered_map<View, std::shared_ptr<DescriptorHeap>>&& heaps, std::unordered_map<View, std::uint32_t>&& handles) noexcept :
+		textures(std::move(textures)),
+		heaps(std::move(heaps)),
+		handles(std::move(handles))
 	{
-		return *renderTarget;
+		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return p.second == nullptr; }) == this->textures.cend() && "At least one of the textures is nullptr.");
+		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return p.second == nullptr; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
+		assert(std::ranges::find_if(this->handles, [&](const std::pair<View, std::uint32_t>& p) { return !this->heaps.contains(p.first) || p.second >= this->heaps.find(p.first)->second->HandleCount(); }) == this->handles.cend() && "No heap for a handle is found.");
 	}
 
-	const Texture& Frame::RenderTarget() const noexcept
+	Texture* Frame::FindTexture(const Attachment attachment) noexcept
 	{
-		return *renderTarget;
+		if (const auto position = textures.find(attachment); position != textures.cend())
+		{
+			return position->second.get();
+		}
+
+		return nullptr;
 	}
 
-	Texture* Frame::ResolveTarget() noexcept
+	const Texture* Frame::FindTexture(const Attachment attachment) const noexcept
 	{
-		return resolveTarget.get();
+		if (const auto position = textures.find(attachment); position != textures.cend())
+		{
+			return position->second.get();
+		}
+
+		return nullptr;
 	}
 
-	const Texture* Frame::ResolveTarget() const noexcept
+	DescriptorHeap* Frame::FindHeap(const View view) noexcept
 	{
-		return resolveTarget.get();
+		if (const auto position = heaps.find(view); position != heaps.cend())
+		{
+			return position->second.get();
+		}
+
+		return nullptr;
 	}
 
-	Texture& Frame::FinalTarget() noexcept
+	const DescriptorHeap* Frame::FindHeap(const View view) const noexcept
 	{
-		return resolveTarget ? *resolveTarget : *renderTarget;
+		if (const auto position = heaps.find(view); position != heaps.cend())
+		{
+			return position->second.get();
+		}
+
+		return nullptr;
 	}
 
-	const Texture& Frame::FinalTarget() const noexcept
+	std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> Frame::FindCpuHandle(const View view) const noexcept
 	{
-		return resolveTarget ? *resolveTarget : *renderTarget;
+		if (const DescriptorHeap* const heap = FindHeap(view))
+		{
+			if (const auto position = handles.find(view); position != handles.cend())
+			{
+				return heap->CpuHandle(position->second);
+			}
+		}
+
+		return std::nullopt;
 	}
 
-	Texture& Frame::DepthStencil() noexcept
+	std::optional<D3D12_GPU_DESCRIPTOR_HANDLE> Frame::FindGpuHandle(const View view) const noexcept
 	{
-		return *depthStencil;
-	}
+		if (const DescriptorHeap* const heap = FindHeap(view))
+		{
+			if (const auto position = handles.find(view); position != handles.cend())
+			{
+				return heap->GpuHandle(position->second);
+			}
+		}
 
-	const Texture& Frame::DepthStencil() const noexcept
-	{
-		return *depthStencil;
-	}
-
-	DescriptorHeap& Frame::SrvHeap() noexcept
-	{
-		return *srvHeap;
-	}
-
-	const DescriptorHeap& Frame::SrvHeap() const noexcept
-	{
-		return *srvHeap;
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE Frame::RtvHandle() const noexcept
-	{
-		return rtvHeap->CpuHandle(0u);
-	}
-
-	D3D12_GPU_DESCRIPTOR_HANDLE Frame::SrvHandle() const noexcept
-	{
-		return srvHeap->GpuHandle(0u);
-	}
-
-	D3D12_CPU_DESCRIPTOR_HANDLE Frame::DsvHandle() const noexcept
-	{
-		return dsvHeap->CpuHandle(0u);
+		return std::nullopt;
 	}
 
 	void Frame::Name(const std::string_view name)
 	{
-		constexpr std::string_view rtvName = "-RTV";
-		constexpr std::string_view resolveName = "-Resolve";
-		constexpr std::string_view srvName = "-SRV";
-		constexpr std::string_view dsvName = "-DSV";
-
 		auto componentName = std::string();
-		componentName.reserve(name.size() + resolveName.size());
+		componentName.reserve(name.size() + 32);
 
-		componentName.append(name).append(rtvName);
-		renderTarget->Name(componentName);
-		rtvHeap->Name(componentName);
-
-		componentName.erase();
-		componentName.append(name).append(srvName);
-		srvHeap->Name(componentName);
-
-		componentName.erase();
-		componentName.append(name).append(dsvName);
-		depthStencil->Name(componentName);
-		dsvHeap->Name(componentName);
-
-		if (resolveTarget)
+		for (const auto& [attachment, texture] : textures)
 		{
-			componentName.erase();
-			componentName.append(name).append(resolveName);
-			resolveTarget->Name(componentName);
+			componentName.clear();
+			componentName.append(name).append("-").append(ToString(attachment));
+			texture->Name(componentName);
+		}
+
+		for (const auto& [view, heap] : heaps)
+		{
+			componentName.clear();
+			componentName.append(name).append("-").append(ToString(view));
+			heap->Name(componentName);
 		}
 	}
 }

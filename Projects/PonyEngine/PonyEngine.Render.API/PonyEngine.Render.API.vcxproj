@@ -46,6 +46,7 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Orthographic.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Perspective.cppm" />
@@ -57,6 +58,7 @@
     <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-SwapChainParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />

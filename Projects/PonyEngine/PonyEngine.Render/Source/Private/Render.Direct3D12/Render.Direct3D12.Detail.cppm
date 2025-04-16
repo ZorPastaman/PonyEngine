@@ -12,7 +12,8 @@ export module PonyEngine.Render.Direct3D12.Detail;
 export import PonyEngine.Render.Detail;
 
 export import :BackParams;
-export import :IRenderSystemContext;
+export import :FormatUtility;
 export import :FrameParams;
+export import :IRenderSystemContext;
 export import :SubSystem;
 export import :SubSystemParams;

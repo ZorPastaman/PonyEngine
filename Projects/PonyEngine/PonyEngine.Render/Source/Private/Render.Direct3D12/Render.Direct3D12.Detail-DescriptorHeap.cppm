@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeap;
 
-import <string>;
+import <cstdint>;
 import <string_view>;
 
 import :ObjectUtility;
@@ -76,6 +76,8 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		std::uint32_t Index(D3D12_GPU_DESCRIPTOR_HANDLE gpuHandle) const noexcept;
 
+		/// @brief Sets the name.
+		/// @param name Name to set.
 		void Name(std::string_view name);
 
 		DescriptorHeap& operator =(const DescriptorHeap& other) noexcept = default;

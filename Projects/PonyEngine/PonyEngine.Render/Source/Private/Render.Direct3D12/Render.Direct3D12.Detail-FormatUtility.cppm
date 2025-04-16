@@ -28,7 +28,7 @@ export namespace PonyEngine::Render::Direct3D12
 	/// @param format Texture format.
 	/// @return Direct3D12 format.
 	[[nodiscard("Pure function")]]
-	DXGI_FORMAT GetD3D12Format(TextureFormat format) noexcept;
+	DXGI_FORMAT GetDirect3D12Format(TextureFormat format) noexcept;
 
 	/// @brief Gets an SRGB version of the @p sourceFormat.
 	/// @param sourceFormat Source format.
@@ -132,9 +132,9 @@ namespace PonyEngine::Render::Direct3D12
 		std::pair(DXGI_FORMAT_B8G8R8X8_UNORM, DXGI_FORMAT_B8G8R8X8_UNORM_SRGB)
 	};
 
-	DXGI_FORMAT GetD3D12Format(const TextureFormat format) noexcept
+	DXGI_FORMAT GetDirect3D12Format(const TextureFormat format) noexcept
 	{
-		if (const auto position = TextureFormatDxgiFormatMap.find(format); position != TextureFormatDxgiFormatMap.cend())
+		if (const auto position = TextureFormatDxgiFormatMap.find(format); position != TextureFormatDxgiFormatMap.cend()) [[likely]]
 		{
 			return position->second;
 		}

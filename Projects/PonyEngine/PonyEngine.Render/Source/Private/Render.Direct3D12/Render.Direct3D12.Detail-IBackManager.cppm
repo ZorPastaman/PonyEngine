@@ -14,6 +14,8 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:IBackManager;
 
+import <optional>;
+
 import PonyMath.Utility;
 
 export namespace PonyEngine::Render::Direct3D12
@@ -35,15 +37,15 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets a current back buffer.
 		/// @return Current back buffer.
 		[[nodiscard("Pure function")]]
-		virtual ID3D12Resource2& CurrentBackBuffer() noexcept = 0;
+		virtual ID3D12Resource2* CurrentBackBuffer() noexcept = 0;
 		/// @brief Gets a current back buffer.
 		/// @return Current back buffer.
 		[[nodiscard("Pure function")]]
-		virtual const ID3D12Resource2& CurrentBackBuffer() const noexcept = 0;
+		virtual const ID3D12Resource2* CurrentBackBuffer() const noexcept = 0;
 
 		/// @brief Gets the current back rtv handle.
 		/// @return Back rtv handle.
 		[[nodiscard("Pure function")]]
-		virtual D3D12_CPU_DESCRIPTOR_HANDLE CurrentRtvHandle() const noexcept = 0;
+		virtual std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> CurrentRtvHandle() const noexcept = 0;
 	};
 }

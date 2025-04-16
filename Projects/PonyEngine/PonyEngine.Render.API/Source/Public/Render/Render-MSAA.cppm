@@ -16,7 +16,7 @@ export namespace PonyEngine::Render
 	/// @brief Multi sample anti-aliasing parameters.
 	struct MSAA final
 	{
-		std::uint32_t sampleCount = 1; ///< Sample count.
-		float sampleQuality = 1.f; ///< Sample quality. Must be in range [0, 1].
+		std::uint32_t sampleCount; ///< Sample count.
+		float sampleQuality; ///< Sample quality. Must be in range [0, 1].
 	};
 }

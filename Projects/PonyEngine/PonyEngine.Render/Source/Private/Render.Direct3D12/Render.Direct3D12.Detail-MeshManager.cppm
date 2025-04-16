@@ -239,7 +239,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void MeshManager::Clean() noexcept
 	{
-		for (std::size_t i = meshes.size(); i-- > 0; )
+		for (std::size_t i = meshes.size(); i-- > 0; ) // TODO: Use a custom deleter and don't make for loops to find dead objects.
 		{
 			if (meshes[i].use_count() <= 1L)
 			{
