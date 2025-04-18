@@ -144,6 +144,7 @@ namespace PonyEngine::Render::Direct3D12
 	FrameManager::FrameManager(ISubSystemContext& d3d12System) :
 		d3d12System{&d3d12System}
 	{
+		frames.reserve(8);
 	}
 
 	FrameParams FrameManager::ConvertFrameParams(const Render::FrameParams& frameParams) const
@@ -154,8 +155,8 @@ namespace PonyEngine::Render::Direct3D12
 			.clearColor = frameParams.clearColor,
 			.clearDepth = frameParams.clearDepth,
 			.clearStencil = frameParams.clearStencil,
-			.rtvFormat = GetDirect3D12Format(frameParams.rtvFormat),
-			.dsvFormat = GetDirect3D12Format(frameParams.dsvFormat)
+			.rtvFormat = GetD3D12Format(frameParams.rtvFormat),
+			.dsvFormat = GetD3D12Format(frameParams.dsvFormat)
 		};
 
 		if (answer.rtvFormat != DXGI_FORMAT_UNKNOWN)

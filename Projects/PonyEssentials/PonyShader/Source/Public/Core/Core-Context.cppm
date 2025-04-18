@@ -17,7 +17,7 @@ import :ThreadGroupCounts;
 export namespace PonyShader::Core
 {
 	/// @brief Render context. It corresponds to @p Pony_Context in PonyShader/Core/Context.hlsli on the HLSL side.
-	struct Context final
+	struct alignas(256) Context final
 	{
 		alignas(16) ThreadGroupCounts dispatchThreadGroupCounts; ///< How many thread groups are dispatched by a render pipeline.
 		alignas(16) ThreadGroupCounts materialThreadGroupCounts; ///< How many thread groups are required by a material. It takes just the number without considering a mode declared in the material.

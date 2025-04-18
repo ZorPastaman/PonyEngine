@@ -24,6 +24,7 @@ export namespace PonyEngine::Render
 	{
 		NON_CONSTRUCTIBLE_BODY(DataTypes)
 
+		static constexpr std::string_view Data = "Pony_Data"; ///< Engine data type. It's a shortcut to include all the engine data in the order: Context, Transform. Don't use with other types.
 		static constexpr std::string_view Context = "Pony_Context"; ///< Engine context data type. Bound to @p Pony_Context from @p PonyShader/Core/Context.hlsli.
 		static constexpr std::string_view Transform = "Pony_Transform"; ///< Engine transform data type. Bound to @p Pony_Transform from @p PonyShader/Space/Transform.hlsli.
 	};

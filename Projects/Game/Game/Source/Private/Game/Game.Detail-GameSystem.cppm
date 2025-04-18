@@ -142,11 +142,10 @@ namespace Game
 			.depthStencil = PonyEngine::Render::DepthStencil{},
 			.dataSlots =
 			{
-				{ std::string(PonyEngine::Render::DataTypes::Context), 0u },
-				{ std::string(PonyEngine::Render::DataTypes::Transform), 1u },
-				{ "Meshlets", 2u },
-				{ "Positions", 3u },
-				{ "Colors", 4u }
+				{ std::string(PonyEngine::Render::DataTypes::Data), 0u },
+				{ "Meshlets", 1u },
+				{ "Positions", 2u },
+				{ "Colors", 3u }
 			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Opaque),
 			.name = "Opaque"
@@ -172,11 +171,10 @@ namespace Game
 			},
 			.dataSlots =
 			{
-				{ std::string(PonyEngine::Render::DataTypes::Context), 0u },
-				{ std::string(PonyEngine::Render::DataTypes::Transform), 1u },
-				{ "Meshlets", 2u },
-				{ "Positions", 3u },
-				{ "Colors", 4u }
+				{ std::string(PonyEngine::Render::DataTypes::Data), 0u },
+				{ "Meshlets", 1u },
+				{ "Positions", 2u },
+				{ "Colors", 3u }
 			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Transparent),
 			.name = "Transparent"

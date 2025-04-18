@@ -60,6 +60,7 @@ namespace PonyEngine::Render::Direct3D12
 	CameraManager::CameraManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
+		cameras.reserve(8);
 	}
 
 	std::shared_ptr<ICamera> CameraManager::CreateCamera(const CameraParams& cameraParams)

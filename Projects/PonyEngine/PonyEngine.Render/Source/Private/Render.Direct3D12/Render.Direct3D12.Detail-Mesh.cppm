@@ -63,9 +63,9 @@ export namespace PonyEngine::Render::Direct3D12
 		std::span<const std::string> DataTypes() const noexcept;
 
 		[[nodiscard("Pure function")]]
-		std::uint32_t BufferOffset(std::uint32_t dataIndex) const;
+		std::uint32_t BufferOffset(std::uint32_t dataIndex) const noexcept;
 		[[nodiscard("Pure function")]]
-		std::optional<std::uint32_t> BufferOffset(std::string_view dataType) const;
+		std::optional<std::uint32_t> BufferOffset(std::string_view dataType) const noexcept;
 
 		[[nodiscard("Pure function")]]
 		class Buffer& Buffer(std::uint32_t index) noexcept;
@@ -179,12 +179,12 @@ namespace PonyEngine::Render::Direct3D12
 		return dataTypes;
 	}
 
-	std::uint32_t Mesh::BufferOffset(const std::uint32_t dataIndex) const
+	std::uint32_t Mesh::BufferOffset(const std::uint32_t dataIndex) const noexcept
 	{
 		return bufferOffsets[dataIndex];
 	}
 
-	std::optional<std::uint32_t> Mesh::BufferOffset(const std::string_view dataType) const
+	std::optional<std::uint32_t> Mesh::BufferOffset(const std::string_view dataType) const noexcept
 	{
 		if (const std::optional<std::uint32_t> dataIndex = DataIndex(dataType))
 		{
