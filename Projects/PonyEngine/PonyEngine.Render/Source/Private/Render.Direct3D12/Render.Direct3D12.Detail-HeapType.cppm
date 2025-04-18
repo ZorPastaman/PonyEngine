@@ -13,6 +13,7 @@ import <cstdint>;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Heap type.
 	enum class HeapType : std::uint8_t
 	{
 		Default,

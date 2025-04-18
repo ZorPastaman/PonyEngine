@@ -66,6 +66,7 @@ namespace PonyEngine::Render::Direct3D12
 	DescriptorHeapManager::DescriptorHeapManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
+		descriptorHeaps.reserve(128);
 	}
 
 	std::shared_ptr<DescriptorHeap> DescriptorHeapManager::CreateDescriptorHeap(const D3D12_DESCRIPTOR_HEAP_TYPE heapType, const std::uint32_t descriptorCount, const bool shaderVisible)

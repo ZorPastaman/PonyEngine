@@ -35,7 +35,7 @@ import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 SRGB output quad.
+	/// @brief Direct3D12 sRGB output quad.
 	class SrgbOutputQuad final
 	{
 	public:

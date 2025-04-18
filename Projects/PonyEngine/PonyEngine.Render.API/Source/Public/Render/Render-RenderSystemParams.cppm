@@ -18,7 +18,7 @@ export namespace PonyEngine::Render
 	struct RenderSystemParams
 	{
 		/// @brief Main frame parameters.
-		/// @note Must have a correct rtv format that is compatible with SRGB but not SRGB.
+		/// @note Must have a correct rtv format that is compatible with sRGB but not sRGB.
 		FrameParams mainFrameParams;
 		SwapChainParams swapChainParams; ///< Swap chain parameters.
 	};

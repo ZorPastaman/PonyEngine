@@ -43,13 +43,6 @@ Vertex CreateVertex(in uint index)
 	return vertex;
 }
 
-uint3 CreateTriangle(in uint index, in bool isFlipped)
-{
-	uint3 primitive = UnpackTriangle(Primitives[index]);
-
-	return uint3(primitive[0], primitive[1 + isFlipped], primitive[2 - isFlipped]);
-}
-
 [OutputTopology("triangle")]
 [NumThreads(THREAD_COUNT_X, THREAD_COUNT_Y, THREAD_COUNT_Z)]
 void main(in uint groupId : SV_GROUPID,
@@ -76,7 +69,7 @@ void main(in uint groupId : SV_GROUPID,
 		if (groupThreadSubId < primitiveCount)
 		{
 			uint primitiveIndex = meshlet.primitiveOffset + groupThreadSubId;
-			outTriangles[groupThreadSubId] = CreateTriangle(primitiveIndex, Context.isFlipped);
+			outTriangles[groupThreadSubId] = UnpackTriangle(Primitives[primitiveIndex], Context.isFlipped);
 		}
 	}
 }

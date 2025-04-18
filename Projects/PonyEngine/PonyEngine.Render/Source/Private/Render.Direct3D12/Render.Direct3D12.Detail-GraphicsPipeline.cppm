@@ -22,10 +22,8 @@ import <array>;
 import <cstddef>;
 import <cstdint>;
 import <memory>;
-import <numeric>;
 import <optional>;
 import <set>;
-import <stdexcept>;
 import <string>;
 import <string_view>;
 import <type_traits>;
@@ -36,13 +34,22 @@ import PonyBase.Utility.COM;
 
 import PonyMath.Color;
 import PonyMath.Core;
+import PonyMath.Shape;
 import PonyMath.Utility;
 
 import PonyShader.Core;
 import PonyShader.Space;
 
+import PonyEngine.Render.Detail;
+
+import :Attachment;
+import :Buffer;
+import :Camera;
 import :DescriptorHeap;
+import :Frame;
 import :FrameParams;
+import :IBackManager;
+import :ICopyPipeline;
 import :IDescriptorHeapManager;
 import :IFrameManager;
 import :IGraphicsPipeline;
@@ -51,9 +58,11 @@ import :Material;
 import :Mesh;
 import :ObjectUtility;
 import :Pipeline;
-import :RootSignature;
 import :RenderObject;
+import :RootSignature;
 import :SrgbOutputQuad;
+import :Texture;
+import :View;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -74,14 +83,17 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const FrameParams& MainFrameParams() const noexcept override;
 
-		void CreateFrame(const Render::FrameParams& frameParams);
-
 		virtual void AddCamera(Camera& camera) override;
 		virtual void RemoveCamera(Camera& camera) override;
 
 		virtual void AddRenderObject(RenderObject& renderObject) override;
 		virtual void RemoveRenderObject(RenderObject& renderObject) override;
 
+		/// @brief Creates a main frame.
+		/// @param frameParams Frame parameters.
+		void CreateMainFrame(const Render::FrameParams& frameParams);
+
+		/// @brief Prepares data before populating commands.
 		void Prepare();
 		/// @brief Populates commands. All the system components must be ready.
 		void PopulateCommands();
@@ -94,102 +106,185 @@ export namespace PonyEngine::Render::Direct3D12
 		GraphicsPipeline& operator =(GraphicsPipeline&&) = delete;
 
 	private:
-		template<typename T>
+		/// @brief Render object data.
 		struct RenderObjectData
 		{
-			std::vector<T> data;
-			std::vector<std::shared_ptr<Buffer>> uploadBuffers;
-			std::vector<std::shared_ptr<Buffer>> gpuBuffers;
-			std::shared_ptr<DescriptorHeap> heap;
+			static constexpr std::uint32_t DataTypeCount = 2u; ///< Data type count.
+			static constexpr std::uint32_t DataIndex = 0u; ///< Common data index.
+			static constexpr std::uint32_t ContextIndex = 0u; ///< Context data index.
+			static constexpr std::uint32_t TransformIndex = 1u; ///< Transform data index.
+			/// @brief Data sizes for each type.
+			static constexpr std::array<std::uint32_t, DataTypeCount> DataSizes { sizeof(PonyShader::Core::Context), sizeof(PonyShader::Space::Transform) };
+
+			PonyShader::Core::Context context; ///< Context.
+			PonyShader::Space::Transform transform; ///< Transform
 		};
 
+		/// @brief Render object task.
 		struct RenderObjectTask final
 		{
-			std::uint32_t renderObjectIndex;
-			std::uint32_t dataIndex;
+			std::uint32_t renderObjectIndex; ///< Render object index.
+			std::uint32_t dataIndex; ///< Data index.
 		};
 
+		/// @brief Camera task.
 		struct CameraTask final 
 		{
-			std::vector<RenderObjectTask> renderObjectTasks;
+			std::vector<RenderObjectTask> renderObjectTasks; ///< Render object tasks.
 		};
 
-		std::uint32_t MergedHeapMeshIndex(const Mesh& mesh, std::uint32_t dataIndex);
-		template<typename T>
-		std::uint32_t MergedHeapDataIndex(const RenderObjectData<T>& data, std::uint32_t index);
+		/// @brief Gets the data buffer size.
+		/// @return Data buffer size.
+		[[nodiscard("Pure function")]]
+		std::uint64_t DataBufferSize() const noexcept;
+		/// @brief Gets the data descriptor count.
+		/// @return Data descriptor count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t DataDescriptorCount() const noexcept;
+		/// @brief Calculates a required data descriptor count.
+		/// @param dataCount Data count.
+		/// @return Data descriptor count.
+		[[nodiscard("Pure function")]]
+		static std::size_t DataDescriptorCount(std::size_t dataCount) noexcept;
+		/// @brief Gets a sum of mesh descriptors.
+		/// @return Mesh descriptor count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t MeshDescriptorCount() const noexcept;
 
-		void SortCameras();
-		void SyncCameraTaskCount();
+		/// @brief Calculates an index in the merged heap.
+		/// @tparam T Value type.
+		/// @param dataIndex Data index.
+		/// @param elementIndex Element index.
+		/// @return Index the merged heap.
+		std::uint32_t MergedHeapDataIndex(std::uint32_t dataIndex, std::uint32_t elementIndex) noexcept;
+		/// @brief Calculates an index in the merged heap by the original data.
+		/// @param mesh Mesh.
+		/// @param dataIndex Mesh data index.
+		/// @return Index in the merged heap.
+		std::uint32_t MergedHeapMeshIndex(const Mesh& mesh, std::uint32_t dataIndex) noexcept;
+
+		/// @brief Sorts cameras.
+		void SortCameras() noexcept;
+		/// @brief Allocates camera task vectors.
+		void AllocateCameraTasks();
+		/// @brief Updates camera tasks.
 		void UpdateCameraTasks();
+		/// @brief Checks if the object must be culled.
+		/// @param camera Camera.
+		/// @param renderObject Render object.
+		/// @return @a True if it must be culled; @a false otherwise.
 		[[nodiscard("Pure function")]]
-		bool Cull(const Camera& camera, const RenderObject& renderObject);
-		void AddData(const Camera& camera, RenderObject& renderObject);
-		void SyncDataCounts();
-		template<typename T>
-		void SyncDataCounts(RenderObjectData<T>& data, std::string_view name);
-		void SyncDataCounts(std::vector<std::shared_ptr<Buffer>>& buffers, std::uint64_t bufferSize, std::uint32_t bufferCount, HeapType heapType, std::string_view name) const;
-		void UpdateData();
-		template<typename T>
-		void UpdateData(RenderObjectData<T>& data);
+		bool Cull(const Camera& camera, const RenderObject& renderObject) noexcept;
+		/// @brief Adds a render object data.
+		/// @param camera Camera.
+		/// @param renderObject Render object.
+		void AddRenderObjectData(const Camera& camera, RenderObject& renderObject);
+		/// @brief Syncs render object buffers.
+		void SyncRenderObjectData();
+		/// @brief Syncs render object data heap.
+		void SyncRenderObjectDataHeap();
 
-		void UpdateHeaps();
-		template<typename T>
-		void UpdateHeap(RenderObjectData<T>& data, std::string_view name);
+		/// @brief Merges heaps.
 		void MergeHeaps();
-		[[nodiscard("Pure function")]]
-		std::uint32_t MeshDescriptorCount() const;
+		/// @brief Copies data descriptors into the merged heap.
+		/// @param destOffset Destination offset.
+		/// @return How many descriptors were copied.
+		std::uint32_t CopyDataDescriptors(std::uint32_t destOffset);
+		/// @brief Copies mesh descriptors into the merged heap.
+		/// @param destOffset Destination offset.
+		/// @return How many descriptors were copied.
 		std::uint32_t CopyMeshDescriptors(std::uint32_t destOffset);
-		template<typename T>
-		std::uint32_t CopyDataDescriptors(const RenderObjectData<T>& data, std::uint32_t destOffset);
 
-		void PushBeginToRenderBarriers();
-		void PushRenderToResolveBarriers();
-		void PushResolveToOutputBarriers();
-		void PushRenderToOutputBarriers();
-		void PushOutputToEndBarriers();
+		/// @brief Adds begin to render barriers.
+		void AddBeginToRenderBarriers();
+		/// @brief Adds render to resolve barriers.
+		void AddRenderToResolveBarriers();
+		/// @brief Adds resolver to output barriers.
+		void AddResolveToOutputBarriers();
+		/// @brief Adds render to output barriers.
+		void AddRenderToOutputBarriers();
+		/// @brief Adds output to end barriers.
+		void AddOutputToEndBarriers();
 
-		void PushMeshBeginBarriers();
-		void PushMeshEndBarriers();
-		template<typename T>
-		void PushRenderDataBeginBarriers(RenderObjectData<T>& data);
-		template<typename T>
-		void PushRenderDataEndBarriers(RenderObjectData<T>& data);
-		void PushDepthStencilBeginBarriers();
-		void PushDepthStencilEndBarriers();
+		/// @brief Adds depth stencil begin barriers.
+		void AddDepthStencilBeginBarriers();
+		/// @brief Adds depth stencil end barriers.
+		void AddDepthStencilEndBarriers();
+		/// @brief Adds back begin barriers.
+		void AddBackBeginBarriers();
+		/// @brief Adds back end barriers.
+		void AddBackEndBarriers();
 
-		void PushRenderBeginBarriers();
-		void PushRenderEndBarriers();
+		/// @brief Adds render begin barriers.
+		void AddRenderBeginBarriers();
+		/// @brief Adds render end barriers.
+		void AddRenderEndBarriers();
+		/// @brief Adds render data begin barriers.
+		void AddRenderDataBeginBarriers();
+		/// @brief Adds render data end barriers.
+		void AddRenderDataEndBarriers();
+		/// @brief Adds mesh begin barriers.
+		void AddMeshBeginBarriers();
+		/// @brief Adds mesh end barriers.
+		void AddMeshEndBarriers();
+
+		/// @brief Populates main render phase.
 		void PopulateRender();
+		/// @brief Populates a render target.
 		void PopulateRenderTarget();
+		/// @brief Populates a camera.
+		/// @param cameraIndex Camera index.
 		void PopulateCamera(std::uint32_t cameraIndex);
 		/// @brief Sorts render objects.
 		void SortRenderObjects(std::uint32_t cameraIndex);
 		/// @brief Populates render objects.
 		void PopulateRenderObjects(std::uint32_t cameraIndex);
+		/// @brief Populates a material. If the material is the same as a previous one, does nothing.
+		/// @param prevRootSignature Previous root signature.
+		/// @param prevMaterial Previous material.
+		/// @param rootSignature New root signature.
+		/// @param material New material.
 		void PopulateMaterial(const RootSignature* prevRootSignature, const Material* prevMaterial, RootSignature* rootSignature, Material* material);
+		/// @brief Populates a mesh. If the mesh is the same as a previous one, does nothing.
+		/// @param prevRootSignature Previous root signature.
+		/// @param prevMesh Previous mesh.
+		/// @param rootSignature New root signature.
+		/// @param mesh New mesh.
 		void PopulateMesh(const RootSignature* prevRootSignature, const Mesh* prevMesh, const RootSignature* rootSignature, const Mesh* mesh);
+		/// @brief Populates engine data.
+		/// @param rootSignature Root signature.
+		/// @param dataIndex Data index.
 		void PopulateEngineData(const RootSignature* rootSignature, std::uint32_t dataIndex);
+		/// @brief Populates engine data.
+		/// @param rootSignature Root signature.
+		/// @param dataType Engine data type.
+		/// @param dataIndex Data index.
+		/// @param elementIndex Data element index.
+		/// @return @a True if the root signature has a needed slot and the data was actually populated; @a false otherwise.
+		bool PopulateEngineData(const RootSignature* rootSignature, std::string_view dataType, std::uint32_t dataIndex, std::uint32_t elementIndex);
 
+		/// @brief Populates resolve.
 		void PopulateResolve();
-
-		void PushOutputBeginBarriers();
-		void PushOutputEndBarriers();
+		/// @brief Populates sRGB output.
 		void PopulateOutput();
 
-		std::vector<Camera*> cameras;
+		std::vector<Camera*> cameras; ///< Cameras.
 		std::vector<RenderObject*> renderObjects; ///< Render objects.
+
+		std::vector<RenderObjectData> renderObjectData; ///< Render object data.
+		std::shared_ptr<Buffer> renderObjectUploadData; ///< Render object data upload buffer.
+		std::shared_ptr<Buffer> renderObjectGpuData; ///< Render object data gpu buffer.
+		std::shared_ptr<DescriptorHeap> renderObjectDataHeap; ///< Render object data heap.
 
 		std::set<Mesh*> meshes; ///< Render object meshes cache.
 
-		std::vector<CameraTask> cameraTasks;
-		RenderObjectData<PonyShader::Core::Context> contexts;
-		RenderObjectData<PonyShader::Space::Transform> transforms;
+		std::vector<CameraTask> cameraTasks; ///< Camera tasks.
 
-		std::shared_ptr<DescriptorHeap> dataHeap; ///< Data descriptor heap.
+		std::shared_ptr<DescriptorHeap> mergedDataHeap; ///< Merged data descriptor heap.
 		std::unordered_map<const ID3D12DescriptorHeap*, std::uint32_t> originalHeapOffsets; ///< Original heap to merged heap offset map.
 
-		FrameParams frameParams;
-		std::shared_ptr<Frame> frame;
+		FrameParams frameParams; ///< Main frame parameters.
+		std::shared_ptr<Frame> frame; ///< Main frame.
 		std::unique_ptr<SrgbOutputQuad> outputQuad; ///< Srgb output quad.
 	};
 }
@@ -200,21 +295,16 @@ namespace PonyEngine::Render::Direct3D12
 		Pipeline(d3d12System, commandQueuePriority, D3D12_COMMAND_LIST_TYPE_DIRECT),
 		frameParams{}
 	{
+		cameras.reserve(8);
+		renderObjects.reserve(64);
+		renderObjectData.reserve(8 * 64);
+		cameraTasks.reserve(8);
+		originalHeapOffsets.reserve(128);
 	}
 
 	const FrameParams& GraphicsPipeline::MainFrameParams() const noexcept
 	{
 		return frameParams;
-	}
-
-	void GraphicsPipeline::CreateFrame(const Render::FrameParams& frameParams)
-	{
-		this->frameParams = D3D12System().FrameManager().ConvertFrameParams(frameParams);
-		frame = D3D12System().FrameManager().CreateFrame(this->frameParams);
-		frame->Name("MainFrame");
-
-		outputQuad = std::make_unique<SrgbOutputQuad>(D3D12System());
-		outputQuad->Name("OutputQuad");
 	}
 
 	void GraphicsPipeline::AddCamera(Camera& camera)
@@ -253,43 +343,52 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	void GraphicsPipeline::CreateMainFrame(const Render::FrameParams& frameParams)
+	{
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Info, "Create frame.");
+		this->frameParams = D3D12System().FrameManager().ConvertFrameParams(frameParams);
+		frame = D3D12System().FrameManager().CreateFrame(this->frameParams);
+		frame->Name("MainFrame");
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Info, "Frame created.");
+
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Info, "Create output quad.");
+		outputQuad = std::make_unique<SrgbOutputQuad>(D3D12System());
+		outputQuad->Name("OutputQuad");
+		PONY_LOG(D3D12System().Logger(), PonyDebug::Log::LogType::Info, "Output quad created.");
+	}
+
 	void GraphicsPipeline::Prepare()
 	{
 		SortCameras();
-		SyncCameraTaskCount();
+		AllocateCameraTasks();
 		UpdateCameraTasks();
 
-		SyncDataCounts();
-		UpdateData();
+		SyncRenderObjectData();
 	}
 
 	void GraphicsPipeline::PopulateCommands()
 	{
-		UpdateHeaps();
+		SyncRenderObjectDataHeap();
 		MergeHeaps();
 
 		ResetLists();
-		PushBeginToRenderBarriers();
-		PushRenderBeginBarriers();
+		AddBeginToRenderBarriers();
 		PopulateBarriers();
 		PopulateRender();
-		PushRenderEndBarriers();
 		if (frame->FindTexture(Attachment::Resolve))
 		{
-			PushRenderToResolveBarriers();
+			AddRenderToResolveBarriers();
 			PopulateBarriers();
 			PopulateResolve();
-			PushResolveToOutputBarriers();
+			AddResolveToOutputBarriers();
 		}
 		else
 		{
-			PushRenderToOutputBarriers();
+			AddRenderToOutputBarriers();
 		}
-		PushOutputBeginBarriers();
 		PopulateBarriers();
 		PopulateOutput();
-		PushOutputEndBarriers();
-		PushOutputToEndBarriers();
+		AddOutputToEndBarriers();
 		PopulateBarriers();
 		CloseLists();
 	}
@@ -303,23 +402,46 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::Clear() noexcept
 	{
 		meshes.clear();
-
-		contexts.data.clear();
-		transforms.data.clear();
+		renderObjectData.clear();
 	}
 
-	template<typename T>
-	std::uint32_t GraphicsPipeline::MergedHeapDataIndex(const RenderObjectData<T>& data, const std::uint32_t index)
+	std::uint64_t GraphicsPipeline::DataBufferSize() const noexcept
 	{
-		return originalHeapOffsets[&data.heap->Heap()] + index;
+		return static_cast<std::uint64_t>(renderObjectData.size() * sizeof(RenderObjectData));
 	}
 
-	std::uint32_t GraphicsPipeline::MergedHeapMeshIndex(const Mesh& mesh, const std::uint32_t dataIndex)
+	std::uint32_t GraphicsPipeline::DataDescriptorCount() const noexcept
+	{
+		return static_cast<std::uint32_t>(DataDescriptorCount(renderObjectData.size()));
+	}
+
+	std::size_t GraphicsPipeline::DataDescriptorCount(const std::size_t dataCount) noexcept
+	{
+		return dataCount * RenderObjectData::DataTypeCount;
+	}
+
+	std::uint32_t GraphicsPipeline::MeshDescriptorCount() const noexcept
+	{
+		std::uint32_t descriptorCount = 0u;
+		for (Mesh* const mesh : meshes)
+		{
+			descriptorCount += mesh->Heap()->HandleCount();
+		}
+
+		return descriptorCount;
+	}
+
+	std::uint32_t GraphicsPipeline::MergedHeapDataIndex(const std::uint32_t dataIndex, const std::uint32_t elementIndex) noexcept
+	{
+		return originalHeapOffsets[&renderObjectDataHeap->Heap()] + static_cast<std::uint32_t>(DataDescriptorCount(dataIndex)) + elementIndex;
+	}
+
+	std::uint32_t GraphicsPipeline::MergedHeapMeshIndex(const Mesh& mesh, const std::uint32_t dataIndex) noexcept
 	{
 		return originalHeapOffsets[&mesh.Heap()->Heap()] + mesh.BufferOffset(dataIndex);
 	}
 
-	void GraphicsPipeline::SortCameras()
+	void GraphicsPipeline::SortCameras() noexcept
 	{
 		std::ranges::sort(cameras, [](const Camera* const left, const Camera* const right)
 		{
@@ -327,7 +449,7 @@ namespace PonyEngine::Render::Direct3D12
 		});
 	}
 
-	void GraphicsPipeline::SyncCameraTaskCount()
+	void GraphicsPipeline::AllocateCameraTasks()
 	{
 		if (cameraTasks.size() < static_cast<std::uint32_t>(cameras.size()))
 		{
@@ -352,14 +474,14 @@ namespace PonyEngine::Render::Direct3D12
 					continue;
 				}
 
-				AddData(camera, renderObject);
+				AddRenderObjectData(camera, renderObject);
 				cameraTask.renderObjectTasks.push_back(RenderObjectTask{.renderObjectIndex = renderObjectIndex, .dataIndex = dataIndex});
 				++dataIndex;
 			}
 		}
 	}
 
-	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject)
+	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject) noexcept
 	{
 		if (!renderObject.Material().CameraCulling())
 		{
@@ -379,8 +501,13 @@ namespace PonyEngine::Render::Direct3D12
 		return !camera.Culler().IsVisible(PonyMath::Shape::OBB<float>(boundingBox.value(), camera.ViewMatrix() * renderObject.ModelMatrix()));
 	}
 
-	void GraphicsPipeline::AddData(const Camera& camera, RenderObject& renderObject)
+	void GraphicsPipeline::AddRenderObjectData(const Camera& camera, RenderObject& renderObject)
 	{
+		if (DataDescriptorCount(renderObjectData.size() + 1) >= std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		{
+			throw std::runtime_error("Max render object count is exceeded.");
+		}
+
 		Mesh* const mesh = renderObject.Mesh();
 		if (mesh)
 		{
@@ -388,7 +515,6 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		const auto transform = PonyShader::Space::Transform(renderObject.ModelMatrix(), camera.ViewMatrix(), camera.ProjectionMatrix());
-		transforms.data.push_back(transform);
 
 		const ThreadGroupCounts& materialGroups = renderObject.Material().ThreadGroupCounts();
 		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
@@ -401,112 +527,94 @@ namespace PonyEngine::Render::Direct3D12
 			.isTransparent = renderObject.Material().IsTransparent(),
 			.isFlipped = transform.MvpMatrix().Determinant() < 0.f
 		};
-		contexts.data.push_back(context);
-	}
 
-	void GraphicsPipeline::SyncDataCounts()
-	{
-		SyncDataCounts<PonyShader::Core::Context>(contexts, "Context");
-		SyncDataCounts(transforms, "Transform");
-	}
-
-	template<typename T>
-	void GraphicsPipeline::SyncDataCounts(RenderObjectData<T>& data, const std::string_view name)
-	{
-		const std::uint64_t bufferSize = PonyMath::Core::Align(static_cast<std::uint64_t>(sizeof(T)), 256ULL);
-		const std::uint32_t count = static_cast<std::uint32_t>(data.data.size());
-		SyncDataCounts(data.uploadBuffers, bufferSize, count, HeapType::Upload, name);
-		SyncDataCounts(data.gpuBuffers, bufferSize, count, HeapType::Default, name);
-	}
-
-	void GraphicsPipeline::SyncDataCounts(std::vector<std::shared_ptr<Buffer>>& buffers, const std::uint64_t bufferSize, const std::uint32_t bufferCount, const HeapType heapType, const std::string_view name) const
-	{
-		for (std::size_t i = buffers.size(); i < bufferCount; ++i)
+		renderObjectData.push_back(RenderObjectData
 		{
-			const std::shared_ptr<Buffer> buffer = D3D12System().ResourceManager().CreateBuffer(bufferSize, heapType);
-			buffer->Name(name);
-			buffers.push_back(buffer);
+			.context = context,
+			.transform = transform
+		});
+	}
+
+	void GraphicsPipeline::SyncRenderObjectData()
+	{
+		const std::uint64_t bufferSize = std::max(DataBufferSize(), 1ULL);
+
+		if (!renderObjectUploadData || renderObjectUploadData->Data().GetDesc1().Width < bufferSize)
+		{
+			renderObjectUploadData = D3D12System().ResourceManager().CreateBuffer(bufferSize, HeapType::Upload);
+			renderObjectUploadData->Name(DataTypes::Data);
 		}
-	}
-
-	void GraphicsPipeline::UpdateData()
-	{
-		UpdateData(contexts);
-		UpdateData(transforms);
-	}
-
-	template<typename T>
-	void GraphicsPipeline::UpdateData(RenderObjectData<T>& data)
-	{
-		for (std::uint32_t i = 0u; i < static_cast<std::uint32_t>(data.data.size()); ++i)
+		if (!renderObjectGpuData || renderObjectGpuData->Data().GetDesc1().Width < bufferSize)
 		{
-			data.uploadBuffers[i]->SetData(&data.data[i], sizeof(T));
-			D3D12System().CopyPipeline().AddCopyTask(*data.uploadBuffers[i], *data.gpuBuffers[i]);
+			renderObjectGpuData = D3D12System().ResourceManager().CreateBuffer(bufferSize, HeapType::Default);
+			renderObjectGpuData->Name(DataTypes::Data);
 		}
+
+		renderObjectUploadData->SetData(renderObjectData.data(), bufferSize);
+		D3D12System().CopyPipeline().AddCopyTask(*renderObjectUploadData, *renderObjectGpuData);
 	}
 
-	void GraphicsPipeline::UpdateHeaps()
+	void GraphicsPipeline::SyncRenderObjectDataHeap()
 	{
-		UpdateHeap(contexts, "Context");
-		UpdateHeap(transforms, "Transform");
-	}
+		const std::uint32_t descriptorCount = DataDescriptorCount();
 
-	template<typename T>
-	void GraphicsPipeline::UpdateHeap(RenderObjectData<T>& data, const std::string_view name)
-	{
-		if (!data.heap || data.heap->HandleCount() < data.gpuBuffers.size())
+		if (renderObjectDataHeap && renderObjectDataHeap->HandleCount() >= descriptorCount)
 		{
-			data.heap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<std::uint32_t>(data.gpuBuffers.size()), false);
-			data.heap->Name(name);
+			return;
+		}
 
-			for (std::uint32_t i = 0u; i < static_cast<std::uint32_t>(data.gpuBuffers.size()); ++i)
+		renderObjectDataHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, false);
+		renderObjectDataHeap->Name(DataTypes::Data);
+
+		std::uint64_t gpuAddress = renderObjectGpuData->Data().GetGPUVirtualAddress();
+		std::uint32_t heapIndex = 0u;
+		for (std::size_t dataIndex = 0u; dataIndex < renderObjectData.size(); ++dataIndex)
+		{
+			for (std::size_t elementIndex = 0; elementIndex < RenderObjectData::DataTypeCount; ++elementIndex, ++heapIndex)
 			{
+				const std::uint32_t elementSize = RenderObjectData::DataSizes[elementIndex];
+
 				const auto cbvDesc = D3D12_CONSTANT_BUFFER_VIEW_DESC
 				{
-					.BufferLocation = data.gpuBuffers[i]->Data().GetGPUVirtualAddress(),
-					.SizeInBytes = PonyMath::Core::Align(static_cast<std::uint32_t>(sizeof(T)), 256u)
+					.BufferLocation = gpuAddress,
+					.SizeInBytes = elementSize
 				};
-				D3D12System().Device().CreateConstantBufferView(&cbvDesc, data.heap->CpuHandle(i));
-			}
-		}
-		else
-		{
-			for (std::uint32_t i = static_cast<std::uint32_t>(data.gpuBuffers.size()); i < data.heap->HandleCount(); ++i)
-			{
-				D3D12System().Device().CreateConstantBufferView(nullptr, data.heap->CpuHandle(i));
+				D3D12System().Device().CreateConstantBufferView(&cbvDesc, renderObjectDataHeap->CpuHandle(heapIndex));
+
+				gpuAddress += elementSize;
 			}
 		}
 	}
 
 	void GraphicsPipeline::MergeHeaps()
 	{
-		std::uint32_t descriptorCount = MeshDescriptorCount() +
-			static_cast<std::uint32_t>(contexts.data.size()) +
-			static_cast<std::uint32_t>(transforms.data.size());
-		if (!dataHeap || dataHeap->HandleCount() < descriptorCount)
+		std::uint32_t descriptorCount = DataDescriptorCount() + MeshDescriptorCount();
+		if (!mergedDataHeap || mergedDataHeap->HandleCount() < descriptorCount)
 		{
-			dataHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
-			dataHeap->Name("MergedData");
+			mergedDataHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
+			mergedDataHeap->Name("MergedData");
 		}
 
 		originalHeapOffsets.clear();
 
-		descriptorCount = CopyMeshDescriptors(0u);
-		descriptorCount += CopyDataDescriptors(contexts, descriptorCount);
-		descriptorCount += CopyDataDescriptors(transforms, descriptorCount);
+		descriptorCount = CopyDataDescriptors(0u);
+		descriptorCount += CopyMeshDescriptors(descriptorCount);
 
-		for (std::uint32_t i = descriptorCount; i < dataHeap->HandleCount(); ++i)
+		for (std::uint32_t i = descriptorCount; i < mergedDataHeap->HandleCount(); ++i)
 		{
-			D3D12System().Device().CreateConstantBufferView(nullptr, dataHeap->CpuHandle(i));
+			D3D12System().Device().CreateConstantBufferView(nullptr, mergedDataHeap->CpuHandle(i));
 		}
 	}
 
-	std::uint32_t GraphicsPipeline::MeshDescriptorCount() const
+	std::uint32_t GraphicsPipeline::CopyDataDescriptors(const std::uint32_t destOffset)
 	{
-		std::uint32_t descriptorCount = 0u;
-		for (Mesh* const mesh : meshes)
+		const std::uint32_t descriptorCount = DataDescriptorCount();
+
+		originalHeapOffsets[&renderObjectDataHeap->Heap()] = destOffset;
+		if (descriptorCount > 0u)
 		{
-			descriptorCount += mesh->Heap()->HandleCount();
+			D3D12System().Device().CopyDescriptorsSimple(descriptorCount, mergedDataHeap->CpuHandle(destOffset),
+				renderObjectDataHeap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 		}
 
 		return descriptorCount;
@@ -525,7 +633,7 @@ namespace PonyEngine::Render::Direct3D12
 			originalHeapOffsets[&heap->Heap()] = destIndex;
 			if (handleCount > 0u)
 			{
-				D3D12System().Device().CopyDescriptorsSimple(handleCount, dataHeap->CpuHandle(destIndex), 
+				D3D12System().Device().CopyDescriptorsSimple(handleCount, mergedDataHeap->CpuHandle(destIndex), 
 					mesh->Heap()->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
 			}
 
@@ -535,51 +643,35 @@ namespace PonyEngine::Render::Direct3D12
 		return descriptorCount;
 	}
 
-	template<typename T>
-	std::uint32_t GraphicsPipeline::CopyDataDescriptors(const RenderObjectData<T>& data, const std::uint32_t destOffset)
+	void GraphicsPipeline::AddBeginToRenderBarriers()
 	{
-		const std::uint32_t descriptorCount = static_cast<std::uint32_t>(data.data.size());
-
-		originalHeapOffsets[&data.heap->Heap()] = destOffset;
-		if (descriptorCount > 0u)
+		if (Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget))
 		{
-			D3D12System().Device().CopyDescriptorsSimple(descriptorCount, dataHeap->CpuHandle(destOffset), 
-				data.heap->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.pResource = &renderTarget->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(renderTargetBarrier);
 		}
 
-		return descriptorCount;
+		AddDepthStencilBeginBarriers();
+		AddRenderBeginBarriers();
 	}
 
-	void GraphicsPipeline::PushBeginToRenderBarriers()
-	{
-		Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget);
-		if (!renderTarget)
-		{
-			return;;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = &renderTarget->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(barrier);
-	}
-
-	void GraphicsPipeline::PushRenderToResolveBarriers()
+	void GraphicsPipeline::AddRenderToResolveBarriers()
 	{
 		Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget);
 		Texture* const resolve = frame->FindTexture(Attachment::Resolve);
 		assert(renderTarget && resolve && "The graphics pipeline took a resolve path though render target or resolve are nullptr.");
-
-		const auto renderBarrier = D3D12_TEXTURE_BARRIER
+		const auto renderTargetBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
 			.SyncAfter = D3D12_BARRIER_SYNC_RESOLVE,
@@ -603,16 +695,18 @@ namespace PonyEngine::Render::Direct3D12
 			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
 			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
 		};
-		AddBarrier(renderBarrier);
+		AddBarrier(renderTargetBarrier);
 		AddBarrier(resolveBarrier);
+
+		AddDepthStencilEndBarriers();
+		AddRenderEndBarriers();
 	}
 
-	void GraphicsPipeline::PushResolveToOutputBarriers()
+	void GraphicsPipeline::AddResolveToOutputBarriers()
 	{
 		Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget);
 		Texture* const resolve = frame->FindTexture(Attachment::Resolve);
 		assert(renderTarget && resolve && "The graphics pipeline took a resolve path though render target or resolve are nullptr.");
-
 		const auto renderBarrier = D3D12_TEXTURE_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_RESOLVE,
@@ -639,56 +733,179 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		AddBarrier(renderBarrier);
 		AddBarrier(resolveBarrier);
+
+		AddBackBeginBarriers();
 	}
 
-	void GraphicsPipeline::PushRenderToOutputBarriers()
+	void GraphicsPipeline::AddRenderToOutputBarriers()
 	{
-		Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget);
-		if (!renderTarget)
+		if (Texture* const renderTarget = frame->FindTexture(Attachment::RenderTarget))
 		{
-			return;
+			const auto barrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
+				.pResource = &renderTarget->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(barrier);
 		}
 
-		const auto barrier = D3D12_TEXTURE_BARRIER
+		AddDepthStencilEndBarriers();
+		AddBackBeginBarriers();
+		AddRenderEndBarriers();
+	}
+
+	void GraphicsPipeline::AddOutputToEndBarriers()
+	{
+		if (Texture* const resolve = frame->FindTexture(Attachment::Resolve); Texture* const output = resolve ? resolve : frame->FindTexture(Attachment::RenderTarget))
 		{
-			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+			const auto barrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &output->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(barrier);
+		}
+
+		AddBackEndBarriers();
+	}
+
+	void GraphicsPipeline::AddDepthStencilBeginBarriers()
+	{
+		if (Texture* const depthStencil = frame->FindTexture(Attachment::DepthStencil))
+		{
+			const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
+				.pResource = &depthStencil->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(depthStencilBarrier);
+		}
+	}
+
+	void GraphicsPipeline::AddDepthStencilEndBarriers()
+	{
+		if (Texture* const depthStencil = frame->FindTexture(Attachment::DepthStencil))
+		{
+			const auto depthStencilBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
+				.pResource = &depthStencil->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(depthStencilBarrier);
+		}
+	}
+
+	void GraphicsPipeline::AddBackBeginBarriers()
+	{
+		if (ID3D12Resource* const backBuffer = D3D12System().BackManager().CurrentBackBuffer())
+		{
+			const auto barrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.pResource = backBuffer,
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(barrier);
+		}
+	}
+
+	void GraphicsPipeline::AddBackEndBarriers()
+	{
+		if (ID3D12Resource* const backBuffer = D3D12System().BackManager().CurrentBackBuffer())
+		{
+			const auto barrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
+				.pResource = backBuffer,
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(barrier);
+		}
+	}
+
+	void GraphicsPipeline::AddRenderBeginBarriers()
+	{
+		AddRenderDataBeginBarriers();
+		AddMeshBeginBarriers();
+	}
+
+	void GraphicsPipeline::AddRenderEndBarriers()
+	{
+		AddRenderDataEndBarriers();
+		AddMeshEndBarriers();
+	}
+
+	void GraphicsPipeline::AddRenderDataBeginBarriers()
+	{
+		const auto barrier = D3D12_BUFFER_BARRIER
+		{
+			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
 			.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-			.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
+			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
 			.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
-			.pResource = &renderTarget->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			.pResource = &renderObjectGpuData->Data(),
+			.Offset = 0UL,
+			.Size = UINT64_MAX
 		};
 		AddBarrier(barrier);
 	}
 
-	void GraphicsPipeline::PushOutputToEndBarriers()
+	void GraphicsPipeline::AddRenderDataEndBarriers()
 	{
-		Texture* const resolve = frame->FindTexture(Attachment::Resolve);
-		Texture* const output = resolve ? resolve : frame->FindTexture(Attachment::RenderTarget);
-		if (!output)
-		{
-			return;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
+		const auto barrier = D3D12_BUFFER_BARRIER
 		{
 			.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
 			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
 			.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
 			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
-			.pResource = &output->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			.pResource = &renderObjectGpuData->Data(),
+			.Offset = 0UL,
+			.Size = UINT64_MAX
 		};
 		AddBarrier(barrier);
 	}
 
-	void GraphicsPipeline::PushMeshBeginBarriers()
+	void GraphicsPipeline::AddMeshBeginBarriers()
 	{
 		for (Mesh* const mesh : meshes)
 		{
@@ -709,7 +926,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void GraphicsPipeline::PushMeshEndBarriers()
+	void GraphicsPipeline::AddMeshEndBarriers()
 	{
 		for (Mesh* const mesh : meshes)
 		{
@@ -728,106 +945,6 @@ namespace PonyEngine::Render::Direct3D12
 				AddBarrier(bufferBarrier);
 			}
 		}
-	}
-
-	template<typename T>
-	void GraphicsPipeline::PushRenderDataBeginBarriers(RenderObjectData<T>& data)
-	{
-		for (const std::shared_ptr<Buffer>& buffer : data.gpuBuffers)
-		{
-			const auto barrier = D3D12_BUFFER_BARRIER
-			{
-				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-				.pResource = &buffer->Data(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			AddBarrier(barrier);
-		}
-	}
-
-	template<typename T>
-	void GraphicsPipeline::PushRenderDataEndBarriers(RenderObjectData<T>& data)
-	{
-		for (const std::shared_ptr<Buffer>& buffer : data.gpuBuffers)
-		{
-			const auto barrier = D3D12_BUFFER_BARRIER
-			{
-				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-				.pResource = &buffer->Data(),
-				.Offset = 0UL,
-				.Size = UINT64_MAX
-			};
-			AddBarrier(barrier);
-		}
-	}
-
-	void GraphicsPipeline::PushDepthStencilBeginBarriers()
-	{
-		Texture* const depthStencil = frame->FindTexture(Attachment::DepthStencil);
-		if (!depthStencil)
-		{
-			return;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
-			.pResource = &depthStencil->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(barrier);
-	}
-
-	void GraphicsPipeline::PushDepthStencilEndBarriers()
-	{
-		Texture* const depthStencil = frame->FindTexture(Attachment::DepthStencil);
-		if (!depthStencil)
-		{
-			return;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_DEPTH_STENCIL,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_DEPTH_STENCIL_WRITE,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_WRITE,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_DEPTH_STENCIL_READ,
-			.pResource = &depthStencil->Data(),
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(barrier);
-	}
-
-	void GraphicsPipeline::PushRenderBeginBarriers()
-	{
-		PushMeshBeginBarriers();
-		PushRenderDataBeginBarriers(contexts);
-		PushRenderDataBeginBarriers(transforms);
-		PushDepthStencilBeginBarriers();
-	}
-
-	void GraphicsPipeline::PushRenderEndBarriers()
-	{
-		PushMeshEndBarriers();
-		PushRenderDataEndBarriers(contexts);
-		PushRenderDataEndBarriers(transforms);
-		PushDepthStencilEndBarriers();
 	}
 
 	void GraphicsPipeline::PopulateRender()
@@ -937,8 +1054,8 @@ namespace PonyEngine::Render::Direct3D12
 				? rightMesh->BoundingBox().value().Center()
 				: PonyMath::Core::Vector3<float>::Predefined::Zero;
 
-			const PonyMath::Core::Matrix4x4<float>& leftMvp = transforms.data[left.dataIndex].MvpMatrix();
-			const PonyMath::Core::Matrix4x4<float>& rightMvp = transforms.data[right.dataIndex].MvpMatrix();
+			const PonyMath::Core::Matrix4x4<float>& leftMvp = renderObjectData[left.dataIndex].transform.MvpMatrix();
+			const PonyMath::Core::Matrix4x4<float>& rightMvp = renderObjectData[right.dataIndex].transform.MvpMatrix();
 
 			const float leftDistance = PonyMath::Core::TransformPoint(leftMvp, leftCentralPoint).Z();
 			const float rightDistance = PonyMath::Core::TransformPoint(rightMvp, rightCentralPoint).Z();
@@ -1046,7 +1163,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateRenderObjects(const std::uint32_t cameraIndex)
 	{
-		ID3D12DescriptorHeap* const heap = &dataHeap->Heap();
+		ID3D12DescriptorHeap* const heap = &mergedDataHeap->Heap();
 		CommandList().SetDescriptorHeaps(1u, &heap);
 
 		const RootSignature* prevRootSignature = nullptr;
@@ -1063,7 +1180,7 @@ namespace PonyEngine::Render::Direct3D12
 			PopulateMesh(prevRootSignature, prevMesh, rootSignature, mesh);
 			PopulateEngineData(rootSignature, renderObjectTask.dataIndex);
 
-			const auto groupCounts = contexts.data[renderObjectTask.dataIndex].dispatchThreadGroupCounts;
+			const auto groupCounts = renderObjectData[renderObjectTask.dataIndex].context.dispatchThreadGroupCounts;
 			CommandList().DispatchMesh(groupCounts.ThreadGroupCountX(), groupCounts.ThreadGroupCountY(), groupCounts.ThreadGroupCountZ());
 
 			prevRootSignature = rootSignature;
@@ -1092,7 +1209,7 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				if (const std::optional<std::uint32_t> meshDataIndex = mesh->DataIndex(dataType))
 				{
-					CommandList().SetGraphicsRootDescriptorTable(dataSlot, dataHeap->GpuHandle(MergedHeapMeshIndex(*mesh, meshDataIndex.value())));
+					CommandList().SetGraphicsRootDescriptorTable(dataSlot, mergedDataHeap->GpuHandle(MergedHeapMeshIndex(*mesh, meshDataIndex.value())));
 				}
 			}
 		}
@@ -1100,15 +1217,25 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::PopulateEngineData(const RootSignature* const rootSignature, const std::uint32_t dataIndex)
 	{
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(DataTypes::Context))
+		if (PopulateEngineData(rootSignature, DataTypes::Data, dataIndex, RenderObjectData::DataIndex))
 		{
-			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(contexts, dataIndex)));
+			return;
 		}
 
-		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(DataTypes::Transform))
+		PopulateEngineData(rootSignature, DataTypes::Context, dataIndex, RenderObjectData::ContextIndex);
+		PopulateEngineData(rootSignature, DataTypes::Transform, dataIndex, RenderObjectData::TransformIndex);
+	}
+
+	bool GraphicsPipeline::PopulateEngineData(const RootSignature* const rootSignature, const std::string_view dataType, const std::uint32_t dataIndex, const std::uint32_t elementIndex)
+	{
+		if (const std::optional<std::uint32_t> slot = rootSignature->DataSlot(dataType))
 		{
-			CommandList().SetGraphicsRootDescriptorTable(slot.value(), dataHeap->GpuHandle(MergedHeapDataIndex(transforms, dataIndex)));
+			CommandList().SetGraphicsRootDescriptorTable(slot.value(), mergedDataHeap->GpuHandle(MergedHeapDataIndex(dataIndex, elementIndex)));
+
+			return true;
 		}
+
+		return false;
 	}
 
 	void GraphicsPipeline::PopulateResolve()
@@ -1118,52 +1245,6 @@ namespace PonyEngine::Render::Direct3D12
 		assert(renderTarget && resolve && "The graphics pipeline tried to resolve nullptr textures.");
 
 		CommandList().ResolveSubresource(&resolve->Data(), 0u, &renderTarget->Data(), 0u, frameParams.rtvFormat);
-	}
-
-	void GraphicsPipeline::PushOutputBeginBarriers()
-	{
-		ID3D12Resource* const backBuffer = D3D12System().BackManager().CurrentBackBuffer();
-		if (!backBuffer)
-		{
-			return;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-			.SyncAfter = D3D12_BARRIER_SYNC_RENDER_TARGET,
-			.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.AccessAfter = D3D12_BARRIER_ACCESS_RENDER_TARGET,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_PRESENT,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.pResource = backBuffer,
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(barrier);
-	}
-
-	void GraphicsPipeline::PushOutputEndBarriers()
-	{
-		ID3D12Resource* const backBuffer = D3D12System().BackManager().CurrentBackBuffer();
-		if (!backBuffer)
-		{
-			return;
-		}
-
-		const auto barrier = D3D12_TEXTURE_BARRIER
-		{
-			.SyncBefore = D3D12_BARRIER_SYNC_RENDER_TARGET,
-			.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-			.AccessBefore = D3D12_BARRIER_ACCESS_RENDER_TARGET,
-			.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-			.LayoutBefore = D3D12_BARRIER_LAYOUT_RENDER_TARGET,
-			.LayoutAfter = D3D12_BARRIER_LAYOUT_PRESENT,
-			.pResource = backBuffer,
-			.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
-			.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
-		};
-		AddBarrier(barrier);
 	}
 
 	void GraphicsPipeline::PopulateOutput()

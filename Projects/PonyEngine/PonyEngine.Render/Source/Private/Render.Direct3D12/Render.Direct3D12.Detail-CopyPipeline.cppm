@@ -93,6 +93,8 @@ namespace PonyEngine::Render::Direct3D12
 		Pipeline(d3d12System, commandQueuePriority, D3D12_COMMAND_LIST_TYPE_COPY),
 		d3d12System{&d3d12System}
 	{
+		bufferCopyTasks.reserve(64);
+		textureCopyTasks.reserve(64);
 	}
 
 	void CopyPipeline::AddCopyTask(Buffer& source, Buffer& destination)

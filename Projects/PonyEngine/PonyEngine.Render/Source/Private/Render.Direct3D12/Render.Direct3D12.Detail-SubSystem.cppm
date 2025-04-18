@@ -388,7 +388,7 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Render object manager created.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create main frame.");
-		graphicsPipeline->CreateFrame(mainFrameParams);
+		graphicsPipeline->CreateMainFrame(mainFrameParams);
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Main frame created.");
 	}
 
