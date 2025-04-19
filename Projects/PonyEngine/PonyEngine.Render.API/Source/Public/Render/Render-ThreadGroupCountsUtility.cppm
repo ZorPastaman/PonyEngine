@@ -26,18 +26,18 @@ import :ThreadGroupCountsMode;
 export namespace PonyEngine::Render
 {
 	/// @brief Creates thread group counts that must be dispatched by the parameters.
-	/// @param materialCounts Material thread group counts.
+	/// @param pipelineStateCounts Pipeline state thread group counts.
 	/// @param meshCounts Mesh thread group counts.
 	/// @return Thread group counts to dispatch.
 	[[nodiscard("Pure function")]]
-	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const ThreadGroupCounts& materialCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts) noexcept;
+	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const ThreadGroupCounts& pipelineStateCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts) noexcept;
 	/// @brief Creates thread group counts that must be dispatched by the parameters.
-	/// @param materialCounts Material thread group counts.
+	/// @param pipelineStateCounts Pipeline state thread group counts.
 	/// @param meshCounts Mesh thread group counts.
 	/// @param mode Calculation mode.
 	/// @return Thread group counts to dispatch.
 	[[nodiscard("Pure function")]]
-	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& materialCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts, ThreadGroupCountsMode mode) noexcept;
+	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& pipelineStateCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts, ThreadGroupCountsMode mode) noexcept;
 }
 
 namespace PonyEngine::Render
@@ -55,28 +55,28 @@ namespace PonyEngine::Render
 	[[nodiscard("Pure function")]]
 	PonyShader::Core::ThreadGroupCounts CreateDividedThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& numerator, const PonyShader::Core::ThreadGroupCounts& denominator) noexcept;
 
-	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const ThreadGroupCounts& materialCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts) noexcept
+	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const ThreadGroupCounts& pipelineStateCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts) noexcept
 	{
-		return CreateDispatchThreadGroupCounts(materialCounts.threadGroupCounts, meshCounts, materialCounts.mode);
+		return CreateDispatchThreadGroupCounts(pipelineStateCounts.threadGroupCounts, meshCounts, pipelineStateCounts.mode);
 	}
 
-	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& materialCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts, const ThreadGroupCountsMode mode) noexcept
+	PonyShader::Core::ThreadGroupCounts CreateDispatchThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& pipelineStateCounts, const PonyShader::Core::ThreadGroupCounts& meshCounts, const ThreadGroupCountsMode mode) noexcept
 	{
 		switch (mode)
 		{
 		case ThreadGroupCountsMode::SetMesh:
 			return meshCounts;
-		case ThreadGroupCountsMode::SetMaterial:
-			return materialCounts;
+		case ThreadGroupCountsMode::SetPipelineState:
+			return pipelineStateCounts;
 		case ThreadGroupCountsMode::Multiply:
-			return CreateMultipliedThreadGroupCounts(materialCounts, meshCounts);
-		case ThreadGroupCountsMode::DivideMeshByMaterial:
-			return CreateDividedThreadGroupCounts(meshCounts, materialCounts);
-		case ThreadGroupCountsMode::DivideMaterialByMesh:
-			return CreateDividedThreadGroupCounts(materialCounts, meshCounts);
+			return CreateMultipliedThreadGroupCounts(pipelineStateCounts, meshCounts);
+		case ThreadGroupCountsMode::DivideMeshByPipelineState:
+			return CreateDividedThreadGroupCounts(meshCounts, pipelineStateCounts);
+		case ThreadGroupCountsMode::DividePipelineStateByMesh:
+			return CreateDividedThreadGroupCounts(pipelineStateCounts, meshCounts);
 		default: [[unlikely]]
 			assert(false && "Unsupported ThreadGroupCountsMode.");
-			return CreateDividedThreadGroupCounts(meshCounts, materialCounts);
+			return CreateDividedThreadGroupCounts(meshCounts, pipelineStateCounts);
 		}
 	}
 

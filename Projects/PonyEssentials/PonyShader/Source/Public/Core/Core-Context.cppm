@@ -20,7 +20,7 @@ export namespace PonyShader::Core
 	struct alignas(256) Context final
 	{
 		alignas(16) ThreadGroupCounts dispatchThreadGroupCounts; ///< How many thread groups are dispatched by a render pipeline.
-		alignas(16) ThreadGroupCounts materialThreadGroupCounts; ///< How many thread groups are required by a material. It takes just the number without considering a mode declared in the material.
+		alignas(16) ThreadGroupCounts pipelineStateThreadGroupCounts; ///< How many thread groups are required by a pipeline state. It takes just the number without considering a mode declared in the pipeline state.
 		alignas(16) ThreadGroupCounts meshThreadGroupCounts; ///< How many thread groups are required by a mesh.
 		std::int32_t renderQueue; ///< Render queue.
 		Bool isTransparent; ///< @a True if the render object is transparent; @a false otherwise.

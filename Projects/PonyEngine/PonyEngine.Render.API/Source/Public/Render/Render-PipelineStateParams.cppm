@@ -7,7 +7,7 @@
 * Repo: https://github.com/ZorPastaman/PonyEngine *
 ***************************************************/
 
-export module PonyEngine.Render:MaterialParams;
+export module PonyEngine.Render:PipelineStateParams;
 
 import <cstdint>;
 import <string>;
@@ -20,8 +20,8 @@ import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Material parameters.
-	struct MaterialParams final
+	/// @brief Pipeline state parameters.
+	struct PipelineStateParams final
 	{
 		std::string rootSignatureShader; ///< Root signature shader. Relative path to a shader file without extension.
 		std::string amplificationShader; ///< Amplification shader. Relative path to a shader file without extension.
@@ -42,6 +42,6 @@ export namespace PonyEngine::Render
 		std::int32_t renderQueue = 0; ///< Render queue.
 		bool cameraCulling = true; ///< Is camera culling enabled?
 
-		std::string name; ///< Material name.
+		std::string name; ///< Pipeline state name.
 	};
 }

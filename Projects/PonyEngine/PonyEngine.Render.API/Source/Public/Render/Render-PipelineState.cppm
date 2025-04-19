@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Render:Material;
+export module PonyEngine.Render:PipelineState;
 
 import <algorithm>;
 import <cstdint>;
@@ -24,38 +24,38 @@ import <vector>;
 
 import :Blend;
 import :DepthStencil;
-import :IMaterialObserver;
-import :MaterialParams;
+import :IPipelineStateObserver;
+import :PipelineStateParams;
 import :Rasterizer;
 import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render material.
-	class Material final
+	/// @brief Graphics pipeline state.
+	class PipelineState final
 	{
 	public:
-		/// @brief Creates an empty material.
+		/// @brief Creates an empty pipeline state.
 		[[nodiscard("Pure constructor")]]
-		Material() noexcept = default;
-		/// @brief Creates a material.
-		/// @param params Material parameters.
+		PipelineState() noexcept = default;
+		/// @brief Creates a pipeline state.
+		/// @param params Pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit Material(const MaterialParams& params);
-		/// @brief Creates a material.
-		/// @param params Material parameters.
+		explicit PipelineState(const PipelineStateParams& params);
+		/// @brief Creates a pipeline state.
+		/// @param params Pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
-		explicit Material(MaterialParams&& params);
+		explicit PipelineState(PipelineStateParams&& params);
 		/// @brief Copy constructor.
 		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
-		Material(const Material& other);
+		PipelineState(const PipelineState& other);
 		/// @brief Move constructor.
 		/// @param other Move source.
 		[[nodiscard("Pure constructor")]]
-		Material(Material&& other) noexcept;
+		PipelineState(PipelineState&& other) noexcept;
 
-		~Material() noexcept = default;
+		~PipelineState() noexcept = default;
 
 		/// @brief Gets the root signature shader.
 		/// @return Root signature shader. Relative path to a shader file without extension.
@@ -175,15 +175,15 @@ export namespace PonyEngine::Render
 		/// @param name Name to set.
 		void Name(std::string&& name);
 
-		/// @brief Adds a material observer.
-		/// @param observer Material observer to add. It must be unique. It must live longer than the material.
-		void AddObserver(IMaterialObserver& observer) const;
-		/// @brief Removes a material observer.
-		/// @param observer Material observer to remove.
-		void RemoveObserver(IMaterialObserver& observer) const noexcept;
+		/// @brief Adds a pipeline state observer.
+		/// @param observer Pipeline state observer to add. It must be unique. It must live longer than the pipeline state.
+		void AddObserver(IPipelineStateObserver& observer) const;
+		/// @brief Removes a pipeline state observer.
+		/// @param observer Pipeline state observer to remove.
+		void RemoveObserver(IPipelineStateObserver& observer) const noexcept;
 
-		Material& operator =(const Material& other);
-		Material& operator =(Material&& other) noexcept;
+		PipelineState& operator =(const PipelineState& other);
+		PipelineState& operator =(PipelineState&& other) noexcept;
 
 	private:
 		/// @brief Calls @p OnRootSignatureShaderChanged() on each observer.
@@ -232,13 +232,13 @@ export namespace PonyEngine::Render
 
 		std::string name; ///< Name.
 
-		mutable std::vector<IMaterialObserver*> materialObservers; ///< Observers.
+		mutable std::vector<IPipelineStateObserver*> pipelineStateObservers; ///< Observers.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	Material::Material(const MaterialParams& params) :
+	PipelineState::PipelineState(const PipelineStateParams& params) :
 		rootSignatureShader(params.rootSignatureShader),
 		amplificationShader(params.amplificationShader),
 		meshShader(params.meshShader),
@@ -254,7 +254,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Material::Material(MaterialParams&& params) :
+	PipelineState::PipelineState(PipelineStateParams&& params) :
 		rootSignatureShader(std::move(params.rootSignatureShader)),
 		amplificationShader(std::move(params.amplificationShader)),
 		meshShader(std::move(params.meshShader)),
@@ -270,7 +270,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Material::Material(const Material& other) :
+	PipelineState::PipelineState(const PipelineState& other) :
 		rootSignatureShader(other.rootSignatureShader),
 		amplificationShader(other.amplificationShader),
 		meshShader(other.meshShader),
@@ -286,7 +286,7 @@ namespace PonyEngine::Render
 	{
 	}
 
-	Material::Material(Material&& other) noexcept :
+	PipelineState::PipelineState(PipelineState&& other) noexcept :
 		rootSignatureShader(std::move(other.rootSignatureShader)),
 		amplificationShader(std::move(other.amplificationShader)),
 		meshShader(std::move(other.meshShader)),
@@ -302,12 +302,12 @@ namespace PonyEngine::Render
 	{
 	}
 
-	std::string_view Material::RootSignatureShader() const noexcept
+	std::string_view PipelineState::RootSignatureShader() const noexcept
 	{
 		return rootSignatureShader;
 	}
 
-	void Material::RootSignatureShader(const std::string_view shader)
+	void PipelineState::RootSignatureShader(const std::string_view shader)
 	{
 		if (rootSignatureShader == shader)
 		{
@@ -318,7 +318,7 @@ namespace PonyEngine::Render
 		OnRootSignatureShaderChanged();
 	}
 
-	void Material::RootSignatureShader(std::string&& shader)
+	void PipelineState::RootSignatureShader(std::string&& shader)
 	{
 		if (rootSignatureShader == shader)
 		{
@@ -329,12 +329,12 @@ namespace PonyEngine::Render
 		OnRootSignatureShaderChanged();
 	}
 
-	std::string_view Material::AmplificationShader() const noexcept
+	std::string_view PipelineState::AmplificationShader() const noexcept
 	{
 		return amplificationShader;
 	}
 
-	void Material::AmplificationShader(const std::string_view shader)
+	void PipelineState::AmplificationShader(const std::string_view shader)
 	{
 		if (amplificationShader == shader)
 		{
@@ -345,7 +345,7 @@ namespace PonyEngine::Render
 		OnAmplificationShaderChanged();
 	}
 
-	void Material::AmplificationShader(std::string&& shader)
+	void PipelineState::AmplificationShader(std::string&& shader)
 	{
 		if (amplificationShader == shader)
 		{
@@ -356,12 +356,12 @@ namespace PonyEngine::Render
 		OnAmplificationShaderChanged();
 	}
 
-	std::string_view Material::MeshShader() const noexcept
+	std::string_view PipelineState::MeshShader() const noexcept
 	{
 		return meshShader;
 	}
 
-	void Material::MeshShader(const std::string_view shader)
+	void PipelineState::MeshShader(const std::string_view shader)
 	{
 		if (meshShader == shader)
 		{
@@ -372,7 +372,7 @@ namespace PonyEngine::Render
 		OnMeshShaderChanged();
 	}
 
-	void Material::MeshShader(std::string&& shader)
+	void PipelineState::MeshShader(std::string&& shader)
 	{
 		if (meshShader == shader)
 		{
@@ -383,12 +383,12 @@ namespace PonyEngine::Render
 		OnMeshShaderChanged();
 	}
 
-	std::string_view Material::PixelShader() const noexcept
+	std::string_view PipelineState::PixelShader() const noexcept
 	{
 		return pixelShader;
 	}
 
-	void Material::PixelShader(const std::string_view shader)
+	void PipelineState::PixelShader(const std::string_view shader)
 	{
 		if (pixelShader == shader)
 		{
@@ -399,7 +399,7 @@ namespace PonyEngine::Render
 		OnPixelShaderChanged();
 	}
 
-	void Material::PixelShader(std::string&& shader)
+	void PipelineState::PixelShader(std::string&& shader)
 	{
 		if (pixelShader == shader)
 		{
@@ -410,12 +410,12 @@ namespace PonyEngine::Render
 		OnPixelShaderChanged();
 	}
 
-	const struct Blend& Material::Blend() const noexcept
+	const struct Blend& PipelineState::Blend() const noexcept
 	{
 		return blend;
 	}
 
-	void Material::Blend(const struct Blend& blend) noexcept
+	void PipelineState::Blend(const struct Blend& blend) noexcept
 	{
 		if (this->blend == blend)
 		{
@@ -426,12 +426,12 @@ namespace PonyEngine::Render
 		OnBlendChanged();
 	}
 
-	const struct Rasterizer& Material::Rasterizer() const noexcept
+	const struct Rasterizer& PipelineState::Rasterizer() const noexcept
 	{
 		return rasterizer;
 	}
 
-	void Material::Rasterizer(const struct Rasterizer& rasterizer) noexcept
+	void PipelineState::Rasterizer(const struct Rasterizer& rasterizer) noexcept
 	{
 		if (this->rasterizer == rasterizer)
 		{
@@ -442,12 +442,12 @@ namespace PonyEngine::Render
 		OnRasterizerChanged();
 	}
 
-	const struct DepthStencil& Material::DepthStencil() const noexcept
+	const struct DepthStencil& PipelineState::DepthStencil() const noexcept
 	{
 		return depthStencil;
 	}
 
-	void Material::DepthStencil(const struct DepthStencil& depthStencil) noexcept
+	void PipelineState::DepthStencil(const struct DepthStencil& depthStencil) noexcept
 	{
 		if (this->depthStencil == depthStencil)
 		{
@@ -458,7 +458,7 @@ namespace PonyEngine::Render
 		OnDepthStencilChanged();
 	}
 
-	std::optional<std::uint32_t> Material::DataSlot(const std::string_view dataType) const noexcept
+	std::optional<std::uint32_t> PipelineState::DataSlot(const std::string_view dataType) const noexcept
 	{
 		for (const auto& [type, slot] : dataSlots)
 		{
@@ -471,7 +471,7 @@ namespace PonyEngine::Render
 		return std::nullopt;
 	}
 
-	void Material::DataSlot(const std::string_view dataType, const std::uint32_t dataSlot)
+	void PipelineState::DataSlot(const std::string_view dataType, const std::uint32_t dataSlot)
 	{
 		for (const auto& [type, slot] : dataSlots)
 		{
@@ -491,12 +491,12 @@ namespace PonyEngine::Render
 		OnDataSlotsChanged();
 	}
 
-	const std::unordered_map<std::string, std::uint32_t>& Material::DataSlots() const noexcept
+	const std::unordered_map<std::string, std::uint32_t>& PipelineState::DataSlots() const noexcept
 	{
 		return dataSlots;
 	}
 
-	void Material::DataSlots(const std::unordered_map<std::string, std::uint32_t>& data)
+	void PipelineState::DataSlots(const std::unordered_map<std::string, std::uint32_t>& data)
 	{
 		if (dataSlots == data)
 		{
@@ -507,7 +507,7 @@ namespace PonyEngine::Render
 		OnDataSlotsChanged();
 	}
 
-	void Material::DataSlots(std::unordered_map<std::string, std::uint32_t>&& data)
+	void PipelineState::DataSlots(std::unordered_map<std::string, std::uint32_t>&& data)
 	{
 		if (dataSlots == data)
 		{
@@ -518,12 +518,12 @@ namespace PonyEngine::Render
 		OnDataSlotsChanged();
 	}
 
-	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
+	const struct ThreadGroupCounts& PipelineState::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	void Material::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCounts) noexcept
+	void PipelineState::ThreadGroupCounts(const struct ThreadGroupCounts& threadGroupCounts) noexcept
 	{
 		if (this->threadGroupCounts == threadGroupCounts)
 		{
@@ -534,12 +534,12 @@ namespace PonyEngine::Render
 		OnThreadGroupCountsChanged();
 	}
 
-	std::int32_t Material::RenderQueue() const noexcept
+	std::int32_t PipelineState::RenderQueue() const noexcept
 	{
 		return renderQueue;
 	}
 
-	void Material::RenderQueue(const std::int32_t renderQueue) noexcept
+	void PipelineState::RenderQueue(const std::int32_t renderQueue) noexcept
 	{
 		if (this->renderQueue == renderQueue)
 		{
@@ -550,12 +550,12 @@ namespace PonyEngine::Render
 		OnRenderQueueChanged();
 	}
 
-	bool Material::CameraCulling() const noexcept
+	bool PipelineState::CameraCulling() const noexcept
 	{
 		return cameraCulling;
 	}
 
-	void Material::CameraCulling(const bool culling) noexcept
+	void PipelineState::CameraCulling(const bool culling) noexcept
 	{
 		if (cameraCulling == culling)
 		{
@@ -566,12 +566,12 @@ namespace PonyEngine::Render
 		OnCameraCullingChanged();
 	}
 
-	std::string_view Material::Name() const noexcept
+	std::string_view PipelineState::Name() const noexcept
 	{
 		return name;
 	}
 
-	void Material::Name(const std::string_view name)
+	void PipelineState::Name(const std::string_view name)
 	{
 		if (this->name == name)
 		{
@@ -582,7 +582,7 @@ namespace PonyEngine::Render
 		OnNameChanged();
 	}
 
-	void Material::Name(std::string&& name)
+	void PipelineState::Name(std::string&& name)
 	{
 		if (this->name == name)
 		{
@@ -593,117 +593,117 @@ namespace PonyEngine::Render
 		OnNameChanged();
 	}
 
-	void Material::AddObserver(IMaterialObserver& observer) const
+	void PipelineState::AddObserver(IPipelineStateObserver& observer) const
 	{
-		assert(std::ranges::find(materialObservers, &observer) == materialObservers.cend() && "The material observer is already added.");
-		materialObservers.push_back(&observer);
+		assert(std::ranges::find(pipelineStateObservers, &observer) == pipelineStateObservers.cend() && "The pipeline state observer is already added.");
+		pipelineStateObservers.push_back(&observer);
 	}
 
-	void Material::RemoveObserver(IMaterialObserver& observer) const noexcept
+	void PipelineState::RemoveObserver(IPipelineStateObserver& observer) const noexcept
 	{
-		if (const auto position = std::ranges::find(materialObservers, &observer); position != materialObservers.cend()) [[likely]]
+		if (const auto position = std::ranges::find(pipelineStateObservers, &observer); position != pipelineStateObservers.cend()) [[likely]]
 		{
-			materialObservers.erase(position);
+			pipelineStateObservers.erase(position);
 		}
 	}
 
-	void Material::OnRootSignatureShaderChanged() const noexcept
+	void PipelineState::OnRootSignatureShaderChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnRootSignatureShaderChanged();
 		}
 	}
 
-	void Material::OnAmplificationShaderChanged() const noexcept
+	void PipelineState::OnAmplificationShaderChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnAmplificationShaderChanged();
 		}
 	}
 
-	void Material::OnMeshShaderChanged() const noexcept
+	void PipelineState::OnMeshShaderChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnMeshShaderChanged();
 		}
 	}
 
-	void Material::OnPixelShaderChanged() const noexcept
+	void PipelineState::OnPixelShaderChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnPixelShaderChanged();
 		}
 	}
 
-	void Material::OnBlendChanged() const noexcept
+	void PipelineState::OnBlendChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnBlendChanged();
 		}
 	}
 
-	void Material::OnRasterizerChanged() const noexcept
+	void PipelineState::OnRasterizerChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnRasterizerChanged();
 		}
 	}
 
-	void Material::OnDepthStencilChanged() const noexcept
+	void PipelineState::OnDepthStencilChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnDepthStencilChanged();
 		}
 	}
 
-	void Material::OnDataSlotsChanged() const noexcept
+	void PipelineState::OnDataSlotsChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnDataSlotsChanged();
 		}
 	}
 
-	void Material::OnThreadGroupCountsChanged() const noexcept
+	void PipelineState::OnThreadGroupCountsChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnThreadGroupCountsChanged();
 		}
 	}
 
-	void Material::OnRenderQueueChanged() const noexcept
+	void PipelineState::OnRenderQueueChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnRenderQueueChanged();
 		}
 	}
 
-	void Material::OnCameraCullingChanged() const noexcept
+	void PipelineState::OnCameraCullingChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnCameraCullingChanged();
 		}
 	}
 
-	void Material::OnNameChanged() const noexcept
+	void PipelineState::OnNameChanged() const noexcept
 	{
-		for (IMaterialObserver* const observer : materialObservers)
+		for (IPipelineStateObserver* const observer : pipelineStateObservers)
 		{
 			observer->OnNameChanged();
 		}
 	}
 
-	Material& Material::operator =(const Material& other)
+	PipelineState& PipelineState::operator =(const PipelineState& other)
 	{
 		std::optional<std::string> newRootSig = rootSignatureShader == other.rootSignatureShader ? std::nullopt : std::optional(other.rootSignatureShader);
 		std::optional<std::string> newAmplificationShader = amplificationShader == other.amplificationShader ? std::nullopt : std::optional(other.amplificationShader);
@@ -755,7 +755,7 @@ namespace PonyEngine::Render
 		return *this;
 	}
 
-	Material& Material::operator =(Material&& other) noexcept
+	PipelineState& PipelineState::operator =(PipelineState&& other) noexcept
 	{
 		RootSignatureShader(std::move(other.rootSignatureShader));
 		AmplificationShader(std::move(other.amplificationShader));

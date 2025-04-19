@@ -20,7 +20,7 @@ import :DescriptorHeap;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Descriptor heap manager.
+	/// @brief Direct3D12 Descriptor heap manager.
 	class IDescriptorHeapManager
 	{
 		INTERFACE_BODY(IDescriptorHeapManager)

@@ -24,15 +24,23 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 		INTERFACE_BODY(IGraphicsPipeline)
 
+		/// @brief Gets the main frame parameters.
+		/// @return Main frame parameters.
 		[[nodiscard("Pure function")]]
 		virtual const FrameParams& MainFrameParams() const noexcept = 0;
 
+		/// @brief Adds the @p camera.
+		/// @param camera Camera to add.
 		virtual void AddCamera(Camera& camera) = 0;
+		/// @brief Removes the @p camera.
+		/// @param camera Camera to remove.
 		virtual void RemoveCamera(Camera& camera) = 0;
 
-		/// @brief Adds a render object.
-		/// @param renderObject Render object to render.
+		/// @brief Adds the @p renderObject.
+		/// @param renderObject Render object to add.
 		virtual void AddRenderObject(RenderObject& renderObject) = 0;
+		/// @brief Removes the @p renderObject.
+		/// @param renderObject Render object to remove.
 		virtual void RemoveRenderObject(RenderObject& renderObject) = 0;
 	};
 }

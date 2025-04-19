@@ -15,7 +15,7 @@ export namespace PonyShader::Space
 {
 	/// @brief Render transform. It corresponds to @p Pony_Transform in PonyShader/Space/Transform.hlsli on the HLSL side.
 	/// @details It contains model, view and projection matrices. And it always has an actual mvp matrix as well.
-	class Transform final
+	class alignas(256) Transform final
 	{
 	public:
 		/// @brief Creates an identity transform.
