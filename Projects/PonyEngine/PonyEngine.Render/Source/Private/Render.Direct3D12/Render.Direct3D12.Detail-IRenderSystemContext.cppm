@@ -17,6 +17,7 @@ import PonyEngine.Render.Detail;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 render system context.
 	class IRenderSystemContext : public Render::IRenderSystemContext
 	{
 		INTERFACE_BODY(IRenderSystemContext)

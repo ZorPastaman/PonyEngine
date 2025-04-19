@@ -14,7 +14,7 @@ import <string>;
 
 import PonyMath.Core;
 
-import :Material;
+import :PipelineState;
 import :Mesh;
 
 export namespace PonyEngine::Render
@@ -22,7 +22,7 @@ export namespace PonyEngine::Render
 	/// @brief Render object parameters.
 	struct RenderObjectParams final
 	{
-		std::shared_ptr<const Material> material; ///< Render object material.
+		std::shared_ptr<const PipelineState> pipelineState; ///< Render object pipeline state.
 		std::shared_ptr<const Mesh> mesh; ///< Render object mesh.
 		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< Render object model matrix.
 

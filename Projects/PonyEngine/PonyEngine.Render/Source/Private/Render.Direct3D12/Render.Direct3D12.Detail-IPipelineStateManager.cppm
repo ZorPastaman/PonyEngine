@@ -11,29 +11,25 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IMaterialManager;
+export module PonyEngine.Render.Direct3D12.Detail:IPipelineStateManager;
 
 import <memory>;
 
 import PonyEngine.Render;
 
-import :Material;
-import :RootSignature;
-import :Shader;
+import :PipelineState;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 material manager.
-	class IMaterialManager
+	/// @brief Direct3D12 pipeline state manager.
+	class IPipelineStateManager
 	{
-		INTERFACE_BODY(IMaterialManager)
+		INTERFACE_BODY(IPipelineStateManager)
 
-		/// @brief Creates a material.
-		/// @param rootSignature Root signature.
-		/// @param meshShader Mesh shader.
-		/// @param pixelShader Pixel shader.
-		/// @return Material.
+		/// @brief Creates a Direct3D12 pipeline state.
+		/// @param pipelineState Pipeline state.
+		/// @return Direct3D12 pipeline state.
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<const Render::Material>& material) = 0;
+		virtual std::shared_ptr<PipelineState> CreatePipelineState(const std::shared_ptr<const Render::PipelineState>& pipelineState) = 0;
 	};
 }

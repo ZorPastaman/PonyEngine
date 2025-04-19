@@ -57,7 +57,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IResourceManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IShaderManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MaterialManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ObjectUtility.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Pipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateUtility.cppm" />
@@ -75,7 +75,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ICopyPipeline.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IGraphicsPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IMaterialManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IPipelineStateManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IMeshManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm" />
@@ -98,7 +98,7 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail-RenderSystem.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail-RenderSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-GraphicsPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Material.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineState.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Mesh.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MeshManager.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderObjectManager.cppm" />

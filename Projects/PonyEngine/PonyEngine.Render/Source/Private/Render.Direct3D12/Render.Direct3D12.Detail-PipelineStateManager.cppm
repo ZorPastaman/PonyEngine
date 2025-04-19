@@ -15,7 +15,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:MaterialManager;
+export module PonyEngine.Render.Direct3D12.Detail:PipelineStateManager;
 
 import <cstddef>;
 import <cstdint>;
@@ -30,50 +30,50 @@ import PonyDebug.Log;
 
 import :FrameParams;
 import :IGraphicsPipeline;
-import :IMaterialManager;
+import :IPipelineStateManager;
 import :IMeshManager;
 import :ISubSystemContext;
-import :Material;
+import :PipelineState;
 import :PipelineStateUtility;
 import :RootSignature;
 import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 material manager.
-	class MaterialManager final : public IMaterialManager
+	/// @brief Direct3D12 pipeline state manager.
+	class PipelineStateManager final : public IPipelineStateManager
 	{
 	public:
-		/// @brief Creates a @p MaterialManager.
+		/// @brief Creates a @p PipelineStateManager.
 		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
-		explicit MaterialManager(ISubSystemContext& d3d12System) noexcept;
-		MaterialManager(const MaterialManager&) = delete;
-		MaterialManager(MaterialManager&&) = delete;
+		explicit PipelineStateManager(ISubSystemContext& d3d12System) noexcept;
+		PipelineStateManager(const PipelineStateManager&) = delete;
+		PipelineStateManager(PipelineStateManager&&) = delete;
 
-		~MaterialManager() noexcept = default;
+		~PipelineStateManager() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Material> CreateMaterial(const std::shared_ptr<const Render::Material>& material) override;
+		virtual std::shared_ptr<PipelineState> CreatePipelineState(const std::shared_ptr<const Render::PipelineState>& pipelineState) override;
 
 		void Tick();
 
-		/// @brief Cleans out of dead materials.
+		/// @brief Cleans out of dead pipelineState.
 		void Clean() noexcept;
 
-		MaterialManager& operator =(const MaterialManager&) = delete;
-		MaterialManager& operator =(MaterialManager&&) = delete;
+		PipelineStateManager& operator =(const PipelineStateManager&) = delete;
+		PipelineStateManager& operator =(PipelineStateManager&&) = delete;
 
 	private:
-		class MaterialObserver final : public IMaterialObserver
+		class PipelineStateObserver final : public IPipelineStateObserver
 		{
 		public:
 			[[nodiscard("Pure constructor")]]
-			MaterialObserver() noexcept;
-			MaterialObserver(const MaterialObserver&) = delete;
-			MaterialObserver(MaterialObserver&&) = delete;
+			PipelineStateObserver() noexcept;
+			PipelineStateObserver(const PipelineStateObserver&) = delete;
+			PipelineStateObserver(PipelineStateObserver&&) = delete;
 
-			~MaterialObserver() noexcept = default;
+			~PipelineStateObserver() noexcept = default;
 
 			virtual void OnRootSignatureShaderChanged() noexcept override;
 			virtual void OnAmplificationShaderChanged() noexcept override;
@@ -89,7 +89,7 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnNameChanged() noexcept override;
 
 			[[nodiscard("Pure function")]]
-			bool MaterialChanged() const noexcept;
+			bool CoreChanged() const noexcept;
 			[[nodiscard("Pure function")]]
 			bool AmplificationShaderChanged() const noexcept;
 			[[nodiscard("Pure function")]]
@@ -105,11 +105,11 @@ export namespace PonyEngine::Render::Direct3D12
 
 			void Reset() noexcept;
 
-			MaterialObserver& operator =(const MaterialObserver&) = delete;
-			MaterialObserver& operator =(MaterialObserver&&) = delete;
+			PipelineStateObserver& operator =(const PipelineStateObserver&) = delete;
+			PipelineStateObserver& operator =(PipelineStateObserver&&) = delete;
 
 		private:
-			bool materialChanged;
+			bool coreChanged;
 			bool amplificationShaderChanged;
 			bool meshShaderChanged;
 			bool pixelShaderChanged;
@@ -171,28 +171,28 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static D3D12_STENCIL_OP GetStencilOp(StencilOperation stencilOperation) noexcept;
 
-		void UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const;
-		void UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const;
-		static void UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer);
-		static void UpdateAdditionalData(Material& material, const Render::Material& source, const MaterialObserver& observer);
-		static void UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer);
+		void UpdateShaders(const Render::PipelineState& source, ShaderData& shaderData, const PipelineStateObserver& observer) const;
+		void UpdatePipelineState(PipelineState& renderPipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const;
+		static void UpdateDataSlots(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
+		static void UpdateAdditionalData(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
+		static void UpdateName(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
 
-		void Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Render::Material>& source);
+		void Add(const std::shared_ptr<PipelineState>& pipelineState, const std::shared_ptr<const Render::PipelineState>& source);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::vector<std::shared_ptr<Material>> materials; ///< Materials.
-		std::vector<std::shared_ptr<const Render::Material>> sources;
+		std::vector<std::shared_ptr<PipelineState>> pipelineStates; ///< Pipeline states.
+		std::vector<std::shared_ptr<const Render::PipelineState>> sources;
 		std::vector<ShaderData> shaders;
-		std::vector<std::unique_ptr<MaterialObserver>> materialObservers;
+		std::vector<std::unique_ptr<PipelineStateObserver>> pipelineStateObservers;
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
-	MaterialManager::MaterialObserver::MaterialObserver() noexcept :
-		materialChanged{true},
+	PipelineStateManager::PipelineStateObserver::PipelineStateObserver() noexcept :
+		coreChanged{true},
 		amplificationShaderChanged{true},
 		meshShaderChanged{true},
 		pixelShaderChanged{true},
@@ -202,104 +202,104 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	void MaterialManager::MaterialObserver::OnRootSignatureShaderChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnRootSignatureShaderChanged() noexcept
 	{
-		materialChanged = true;
+		coreChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnAmplificationShaderChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnAmplificationShaderChanged() noexcept
 	{
 		amplificationShaderChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnMeshShaderChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnMeshShaderChanged() noexcept
 	{
 		meshShaderChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnPixelShaderChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnPixelShaderChanged() noexcept
 	{
 		pixelShaderChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnBlendChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnBlendChanged() noexcept
 	{
-		materialChanged = true;
+		coreChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnRasterizerChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnRasterizerChanged() noexcept
 	{
-		materialChanged = true;
+		coreChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnDepthStencilChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnDepthStencilChanged() noexcept
 	{
-		materialChanged = true;
+		coreChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnDataSlotsChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnDataSlotsChanged() noexcept
 	{
 		dataSlotsChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnThreadGroupCountsChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnThreadGroupCountsChanged() noexcept
 	{
 		additionalDataChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnRenderQueueChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnRenderQueueChanged() noexcept
 	{
 		additionalDataChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnCameraCullingChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnCameraCullingChanged() noexcept
 	{
 		additionalDataChanged = true;
 	}
 
-	void MaterialManager::MaterialObserver::OnNameChanged() noexcept
+	void PipelineStateManager::PipelineStateObserver::OnNameChanged() noexcept
 	{
 		nameChanged = true;
 	}
 
-	bool MaterialManager::MaterialObserver::MaterialChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::CoreChanged() const noexcept
 	{
-		return materialChanged;
+		return coreChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::AmplificationShaderChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::AmplificationShaderChanged() const noexcept
 	{
 		return amplificationShaderChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::MeshShaderChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::MeshShaderChanged() const noexcept
 	{
 		return meshShaderChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::PixelShaderChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::PixelShaderChanged() const noexcept
 	{
 		return pixelShaderChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::DataSlotsChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::DataSlotsChanged() const noexcept
 	{
 		return dataSlotsChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::AdditionalDataChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::AdditionalDataChanged() const noexcept
 	{
 		return additionalDataChanged;
 	}
 
-	bool MaterialManager::MaterialObserver::NameChanged() const noexcept
+	bool PipelineStateManager::PipelineStateObserver::NameChanged() const noexcept
 	{
 		return nameChanged;
 	}
 
-	void MaterialManager::MaterialObserver::Reset() noexcept
+	void PipelineStateManager::PipelineStateObserver::Reset() noexcept
 	{
-		materialChanged = false;
+		coreChanged = false;
 		amplificationShaderChanged = false;
 		meshShaderChanged = false;
 		pixelShaderChanged = false;
@@ -308,68 +308,68 @@ namespace PonyEngine::Render::Direct3D12
 		nameChanged = false;
 	}
 
-	MaterialManager::MaterialManager(ISubSystemContext& d3d12System) noexcept :
+	PipelineStateManager::PipelineStateManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
 	}
 
-	std::shared_ptr<Material> MaterialManager::CreateMaterial(const std::shared_ptr<const Render::Material>& material)
+	std::shared_ptr<PipelineState> PipelineStateManager::CreatePipelineState(const std::shared_ptr<const Render::PipelineState>& pipelineState)
 	{
-		if (!material)
+		if (!pipelineState)
 		{
-			throw std::invalid_argument("Material is nullptr.");
+			throw std::invalid_argument("Pipeline state is nullptr.");
 		}
 
 		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
-			if (sources[i] == material)
+			if (sources[i] == pipelineState)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material reused at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pipeline state reused at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineStates[i].get()));
 
-				return materials[i];
+				return pipelineStates[i];
 			}
 		}
 
-		const auto renderMaterial = std::make_shared<Material>();
-		Add(renderMaterial, material);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(material.get()));
+		const auto renderPipelineState = std::make_shared<PipelineState>();
+		Add(renderPipelineState, pipelineState);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pipeline state created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineState.get()));
 
-		return renderMaterial;
+		return renderPipelineState;
 	}
 
-	void MaterialManager::Tick()
+	void PipelineStateManager::Tick()
 	{
-		for (std::size_t i = 0; i < materials.size(); ++i)
+		for (std::size_t i = 0; i < pipelineStates.size(); ++i)
 		{
-			Material& material = *materials[i];
-			const Render::Material& source = *sources[i];
+			PipelineState& pipelineState = *pipelineStates[i];
+			const Render::PipelineState& source = *sources[i];
 			ShaderData& shaderData = shaders[i];
-			MaterialObserver& observer = *materialObservers[i];
+			PipelineStateObserver& observer = *pipelineStateObservers[i];
 
 			UpdateShaders(source, shaderData, observer);
-			UpdateMaterial(material, source, shaderData, observer);
-			UpdateDataSlots(material, source, observer);
-			UpdateAdditionalData(material, source, observer);
-			UpdateName(material, source, observer);
+			UpdatePipelineState(pipelineState, source, shaderData, observer);
+			UpdateDataSlots(pipelineState, source, observer);
+			UpdateAdditionalData(pipelineState, source, observer);
+			UpdateName(pipelineState, source, observer);
 
 			observer.Reset();
 		}
 	}
 
-	void MaterialManager::Clean() noexcept
+	void PipelineStateManager::Clean() noexcept
 	{
-		for (std::size_t i = materials.size(); i-- > 0; )
+		for (std::size_t i = pipelineStates.size(); i-- > 0; )
 		{
-			if (materials[i].use_count() <= 1L)
+			if (pipelineStates[i].use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy material at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(materials[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy pipeline state at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(pipelineStates[i].get()));
 				Remove(i);
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Material destroyed.");
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Pipeline state destroyed.");
 			}
 		}
 	}
 
-	D3D12_BLEND_DESC MaterialManager::CreateBlendDesc(const Blend& blend) noexcept
+	D3D12_BLEND_DESC PipelineStateManager::CreateBlendDesc(const Blend& blend) noexcept
 	{
 		D3D12_BLEND_DESC blendDesc;
 
@@ -396,7 +396,7 @@ namespace PonyEngine::Render::Direct3D12
 		return blendDesc;
 	}
 
-	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateOpaqueBlendDesc(const OpaqueBlend&) noexcept
+	D3D12_RENDER_TARGET_BLEND_DESC PipelineStateManager::CreateOpaqueBlendDesc(const OpaqueBlend&) noexcept
 	{
 		return D3D12_RENDER_TARGET_BLEND_DESC
 		{
@@ -405,7 +405,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateTransparentBlendDesc(const TransparentBlend& blend) noexcept
+	D3D12_RENDER_TARGET_BLEND_DESC PipelineStateManager::CreateTransparentBlendDesc(const TransparentBlend& blend) noexcept
 	{
 		return D3D12_RENDER_TARGET_BLEND_DESC
 		{
@@ -420,7 +420,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_RENDER_TARGET_BLEND_DESC MaterialManager::CreateLogicBlendDesc(const LogicBlend& blend) noexcept
+	D3D12_RENDER_TARGET_BLEND_DESC PipelineStateManager::CreateLogicBlendDesc(const LogicBlend& blend) noexcept
 	{
 		return D3D12_RENDER_TARGET_BLEND_DESC
 		{
@@ -430,7 +430,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_BLEND MaterialManager::GetBlendFactor(const BlendFactor blendFactor) noexcept
+	D3D12_BLEND PipelineStateManager::GetBlendFactor(const BlendFactor blendFactor) noexcept
 	{
 		switch (blendFactor)
 		{
@@ -462,7 +462,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_BLEND_OP MaterialManager::GetBlendOperation(const BlendOperation blendOperation) noexcept
+	D3D12_BLEND_OP PipelineStateManager::GetBlendOperation(const BlendOperation blendOperation) noexcept
 	{
 		switch (blendOperation)
 		{
@@ -482,7 +482,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_LOGIC_OP MaterialManager::GetLogicOperation(const LogicOperation logicOperation) noexcept
+	D3D12_LOGIC_OP PipelineStateManager::GetLogicOperation(const LogicOperation logicOperation) noexcept
 	{
 		switch (logicOperation)
 		{
@@ -524,7 +524,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_RASTERIZER_DESC MaterialManager::CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept
+	D3D12_RASTERIZER_DESC PipelineStateManager::CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept
 	{
 		return D3D12_RASTERIZER_DESC
 		{
@@ -542,7 +542,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_FILL_MODE MaterialManager::GetFillMode(const FillMode fillMode) noexcept
+	D3D12_FILL_MODE PipelineStateManager::GetFillMode(const FillMode fillMode) noexcept
 	{
 		switch (fillMode)
 		{
@@ -556,7 +556,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_CULL_MODE MaterialManager::GetCullMode(const CullMode cullMode) noexcept
+	D3D12_CULL_MODE PipelineStateManager::GetCullMode(const CullMode cullMode) noexcept
 	{
 		switch (cullMode)
 		{
@@ -572,7 +572,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_DEPTH_STENCIL_DESC1 MaterialManager::CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept
+	D3D12_DEPTH_STENCIL_DESC1 PipelineStateManager::CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept
 	{
 		return D3D12_DEPTH_STENCIL_DESC1
 		{
@@ -588,7 +588,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_COMPARISON_FUNC MaterialManager::GetComparison(const ComparisonFunction comparison) noexcept
+	D3D12_COMPARISON_FUNC PipelineStateManager::GetComparison(const ComparisonFunction comparison) noexcept
 	{
 		switch (comparison)
 		{
@@ -614,7 +614,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	D3D12_DEPTH_STENCILOP_DESC MaterialManager::GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept
+	D3D12_DEPTH_STENCILOP_DESC PipelineStateManager::GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept
 	{
 		return D3D12_DEPTH_STENCILOP_DESC
 		{
@@ -625,7 +625,7 @@ namespace PonyEngine::Render::Direct3D12
 		};
 	}
 
-	D3D12_STENCIL_OP MaterialManager::GetStencilOp(const StencilOperation stencilOperation) noexcept
+	D3D12_STENCIL_OP PipelineStateManager::GetStencilOp(const StencilOperation stencilOperation) noexcept
 	{
 		switch (stencilOperation)
 		{
@@ -651,7 +651,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MaterialManager::UpdateShaders(const Render::Material& source, ShaderData& shaderData, const MaterialObserver& observer) const
+	void PipelineStateManager::UpdateShaders(const Render::PipelineState& source, ShaderData& shaderData, const PipelineStateObserver& observer) const
 	{
 		if (observer.AmplificationShaderChanged()) [[unlikely]]
 		{
@@ -669,9 +669,9 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MaterialManager::UpdateMaterial(Material& material, const Render::Material& source, const ShaderData& shaderData, const MaterialObserver& observer) const
+	void PipelineStateManager::UpdatePipelineState(PipelineState& renderPipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const
 	{
-		if (!observer.MaterialChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
+		if (!observer.CoreChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
 		{
 			return;
 		}
@@ -711,63 +711,63 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		const bool isTransparent = pss.blend.Data().RenderTarget[0].BlendEnable || pss.blend.Data().RenderTarget[0].LogicOpEnable;
-		material = Material(rootSignature, *pipelineState.Get(), isTransparent);
+		renderPipelineState = PipelineState(rootSignature, *pipelineState.Get(), isTransparent);
 	}
 
-	void MaterialManager::UpdateDataSlots(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	void PipelineStateManager::UpdateDataSlots(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer)
 	{
-		if (observer.DataSlotsChanged() || observer.MaterialChanged()) [[unlikely]]
+		if (observer.DataSlotsChanged() || observer.CoreChanged()) [[unlikely]]
 		{
-			material.RootSignature()->DataSlots() = source.DataSlots();
+			pipelineState.RootSignature()->DataSlots() = source.DataSlots();
 		}
 	}
 
-	void MaterialManager::UpdateAdditionalData(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	void PipelineStateManager::UpdateAdditionalData(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer)
 	{
 		if (observer.AdditionalDataChanged()) [[unlikely]]
 		{
-			material.ThreadGroupCounts() = source.ThreadGroupCounts();
-			material.RenderQueue() = source.RenderQueue();
-			material.CameraCulling() = source.CameraCulling();
+			pipelineState.ThreadGroupCounts() = source.ThreadGroupCounts();
+			pipelineState.RenderQueue() = source.RenderQueue();
+			pipelineState.CameraCulling() = source.CameraCulling();
 		}
 	}
 
-	void MaterialManager::UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	void PipelineStateManager::UpdateName(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer)
 	{
 		if (observer.NameChanged()) [[unlikely]]
 		{
-			material.Name(source.Name());
+			pipelineState.Name(source.Name());
 		}
 	}
 
-	void MaterialManager::Add(const std::shared_ptr<Material>& material, const std::shared_ptr<const Render::Material>& source)
+	void PipelineStateManager::Add(const std::shared_ptr<PipelineState>& pipelineState, const std::shared_ptr<const Render::PipelineState>& source)
 	{
-		const std::size_t currentSize = materials.size();
+		const std::size_t currentSize = pipelineStates.size();
 
 		try
 		{
-			materials.push_back(material);
+			pipelineStates.push_back(pipelineState);
 			sources.push_back(source);
 			shaders.push_back(ShaderData{});
-			materialObservers.push_back(std::make_unique<MaterialObserver>());
-			source->AddObserver(*materialObservers.back());
+			pipelineStateObservers.push_back(std::make_unique<PipelineStateObserver>());
+			source->AddObserver(*pipelineStateObservers.back());
 		}
 		catch (...)
 		{
-			materials.resize(currentSize);
+			pipelineStates.resize(currentSize);
 			sources.resize(currentSize);
 			shaders.resize(currentSize);
-			materialObservers.resize(currentSize);
+			pipelineStateObservers.resize(currentSize);
 		}
 	}
 
-	void MaterialManager::Remove(const std::size_t index) noexcept
+	void PipelineStateManager::Remove(const std::size_t index) noexcept
 	{
-		sources[index]->RemoveObserver(*materialObservers[index]);
+		sources[index]->RemoveObserver(*pipelineStateObservers[index]);
 
-		materials.erase(materials.cbegin() + index);
+		pipelineStates.erase(pipelineStates.cbegin() + index);
 		sources.erase(sources.cbegin() + index);
 		shaders.erase(shaders.cbegin() + index);
-		materialObservers.erase(materialObservers.cbegin() + index);
+		pipelineStateObservers.erase(pipelineStateObservers.cbegin() + index);
 	}
 }

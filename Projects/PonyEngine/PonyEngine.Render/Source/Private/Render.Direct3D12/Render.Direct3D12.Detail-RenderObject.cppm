@@ -21,8 +21,8 @@ import PonyEngine.Render.Direct3D12;
 
 import PonyMath.Core;
 
-import :Material;
 import :Mesh;
+import :PipelineState;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -31,11 +31,11 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 	public:
 		/// @brief Creates a @p RenderObject.
-		/// @param material Material.
+		/// @param pipelineState Pipeline state.
 		/// @param mesh Mesh.
 		/// @param modelMatrix Model matrix.
 		[[nodiscard("Pure constructor")]]
-		RenderObject(const std::shared_ptr<Material>& material, const std::shared_ptr<Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept;
+		RenderObject(const std::shared_ptr<PipelineState>& pipelineState, const std::shared_ptr<Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept;
 		[[nodiscard("Pure constructor")]]
 		RenderObject(const RenderObject& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -47,14 +47,14 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const PonyMath::Core::Matrix4x4<float>& ModelMatrix() const noexcept override;
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
 
-		/// @brief Gets the material.
-		/// @return Material.
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		class Material& Material() noexcept;
-		/// @brief Gets the material.
-		/// @return Material.
+		class PipelineState& PipelineState() noexcept;
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		const class Material& Material() const noexcept;
+		const class PipelineState& PipelineState() const noexcept;
 
 		/// @brief Gets the mesh.
 		/// @return Mesh.
@@ -73,7 +73,7 @@ export namespace PonyEngine::Render::Direct3D12
 		RenderObject& operator =(RenderObject&& other) noexcept = default;
 
 	private:
-		std::shared_ptr<class Material> material; ///< Material.
+		std::shared_ptr<class PipelineState> pipelineState; ///< Pipeline state.
 		std::shared_ptr<class Mesh> mesh; ///< Mesh.
 		PonyMath::Core::Matrix4x4<float> modelMatrix; ///< Model matrix.
 
@@ -83,8 +83,8 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	RenderObject::RenderObject(const std::shared_ptr<class Material>& material, const std::shared_ptr<class Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept :
-		material(material),
+	RenderObject::RenderObject(const std::shared_ptr<class PipelineState>& pipelineState, const std::shared_ptr<class Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept :
+		pipelineState(pipelineState),
 		mesh(mesh),
 		modelMatrix(modelMatrix)
 	{
@@ -100,14 +100,14 @@ namespace PonyEngine::Render::Direct3D12
 		modelMatrix = matrix;
 	}
 
-	Material& RenderObject::Material() noexcept
+	PipelineState& RenderObject::PipelineState() noexcept
 	{
-		return *material;
+		return *pipelineState;
 	}
 
-	const Material& RenderObject::Material() const noexcept
+	const PipelineState& RenderObject::PipelineState() const noexcept
 	{
-		return *material;
+		return *pipelineState;
 	}
 
 	Mesh* RenderObject::Mesh() noexcept

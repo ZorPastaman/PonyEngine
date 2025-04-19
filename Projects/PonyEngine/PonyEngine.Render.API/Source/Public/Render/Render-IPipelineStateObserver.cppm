@@ -11,14 +11,14 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render:IMaterialObserver;
+export module PonyEngine.Render:IPipelineStateObserver;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Material observer.
-	class IMaterialObserver
+	/// @brief Pipeline state observer.
+	class IPipelineStateObserver
 	{
-		INTERFACE_BODY(IMaterialObserver)
+		INTERFACE_BODY(IPipelineStateObserver)
 
 		/// @brief Invoked when a root signature shader is changed.
 		virtual void OnRootSignatureShaderChanged() noexcept = 0;

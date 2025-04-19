@@ -21,8 +21,8 @@ import :ICopyPipeline;
 import :IDescriptorHeapManager;
 import :IFrameManager;
 import :IGraphicsPipeline;
-import :IMaterialManager;
 import :IMeshManager;
+import :IPipelineStateManager;
 import :IResourceManager;
 import :IRootSignatureManager;
 import :IShaderManager;
@@ -52,8 +52,12 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ID3D12Device10& Device() const noexcept = 0;
 
+		/// @brief Gets the resource manager.
+		/// @return Resource manager.
 		[[nodiscard("Pure function")]]
 		virtual IResourceManager& ResourceManager() noexcept = 0;
+		/// @brief Gets the resource manager.
+		/// @return Resource manager.
 		[[nodiscard("Pure function")]]
 		virtual const IResourceManager& ResourceManager() const noexcept = 0;
 
@@ -75,8 +79,12 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const IBackManager& BackManager() const noexcept = 0;
 
+		/// @brief Gets the frame manager.
+		/// @return Frame manager.
 		[[nodiscard("Pure function")]]
 		virtual IFrameManager& FrameManager() noexcept = 0;
+		/// @brief Gets the frame manager.
+		/// @return Frame manager.
 		[[nodiscard("Pure function")]]
 		virtual const IFrameManager& FrameManager() const noexcept = 0;
 
@@ -98,19 +106,23 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const IRootSignatureManager& RootSignatureManager() const noexcept = 0;
 
+		/// @brief Gets the shader manager.
+		/// @return Shader manager.
 		[[nodiscard("Pure function")]]
 		virtual IShaderManager& ShaderManager() noexcept = 0;
+		/// @brief Gets the shader manager.
+		/// @return Shader manager.
 		[[nodiscard("Pure function")]]
 		virtual const IShaderManager& ShaderManager() const noexcept = 0;
 
-		/// @brief Gets the material manager.
-		/// @return Material manager.
+		/// @brief Gets the pipeline state manager.
+		/// @return Pipeline state manager.
 		[[nodiscard("Pure function")]]
-		virtual IMaterialManager& MaterialManager() noexcept = 0;
-		/// @brief Gets the material manager.
-		/// @return Material manager.
+		virtual IPipelineStateManager& PipelineStateManager() noexcept = 0;
+		/// @brief Gets the pipeline state manager.
+		/// @return Pipeline state manager.
 		[[nodiscard("Pure function")]]
-		virtual const IMaterialManager& MaterialManager() const noexcept = 0;
+		virtual const IPipelineStateManager& PipelineStateManager() const noexcept = 0;
 
 		/// @brief Gets the copy pipeline.
 		/// @return Copy pipeline.

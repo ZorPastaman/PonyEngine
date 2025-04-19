@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Material;
+export module PonyEngine.Render.Direct3D12.Detail:PipelineState;
 
 import <array>;
 import <memory>;
@@ -28,23 +28,24 @@ import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
-	/// @brief Direct3D12 material.
-	class Material final
+	/// @brief Direct3D12 pipeline state.
+	class PipelineState final
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
-		Material() noexcept;
-		/// @brief Creates a @p Material.
+		PipelineState() noexcept;
+		/// @brief Creates a @p Pipeline state.
 		/// @param rootSignature Root signature. Mustn't be nullptr.
 		/// @param pipelineState Pipeline state.
+		/// @param isTransparent Is transparent?
 		[[nodiscard("Pure constructor")]]
-		Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, bool isTransparent) noexcept;
+		PipelineState(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, bool isTransparent) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Material(const Material& other) noexcept = default;
+		PipelineState(const PipelineState& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
-		Material(Material&& other) noexcept = default;
+		PipelineState(PipelineState&& other) noexcept = default;
 
-		~Material() noexcept = default;
+		~PipelineState() noexcept = default;
 
 		/// @brief Gets the root signature.
 		/// @return Root signature.
@@ -58,14 +59,14 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		ID3D12PipelineState* PipelineState() noexcept;
+		ID3D12PipelineState* State() noexcept;
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		const ID3D12PipelineState* PipelineState() const noexcept;
+		const ID3D12PipelineState* State() const noexcept;
 
-		/// @brief Gets if the material is transparent.
-		/// @return @a True if the material is transparent; @a false otherwise.
+		/// @brief Gets if the pipeline state is transparent.
+		/// @return @a True if the pipeline state is transparent; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool IsTransparent() const noexcept;
 
@@ -84,12 +85,12 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const bool& CameraCulling() const noexcept;
 
-		/// @brief Sets the name to the material components.
+		/// @brief Sets the name to the pipeline state components.
 		/// @param name Name.
 		void Name(std::string_view name);
 
-		Material& operator =(const Material& other) noexcept = default;
-		Material& operator =(Material&& other) noexcept = default;
+		PipelineState& operator =(const PipelineState& other) noexcept = default;
+		PipelineState& operator =(PipelineState&& other) noexcept = default;
 
 	private:
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
@@ -104,7 +105,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Material::Material() noexcept :
+	PipelineState::PipelineState() noexcept :
 		isTransparent{true},
 		threadGroupCounts(),
 		renderQueue{0},
@@ -112,7 +113,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	Material::Material(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
+	PipelineState::PipelineState(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
 		isTransparent{isTransparent},
@@ -122,62 +123,62 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	class RootSignature* Material::RootSignature() noexcept
+	class RootSignature* PipelineState::RootSignature() noexcept
 	{
 		return rootSignature.get();
 	}
 
-	const class RootSignature* Material::RootSignature() const noexcept
+	const class RootSignature* PipelineState::RootSignature() const noexcept
 	{
 		return rootSignature.get();
 	}
 
-	ID3D12PipelineState* Material::PipelineState() noexcept
+	ID3D12PipelineState* PipelineState::State() noexcept
 	{
 		return pipelineState.Get();
 	}
 
-	const ID3D12PipelineState* Material::PipelineState() const noexcept
+	const ID3D12PipelineState* PipelineState::State() const noexcept
 	{
 		return pipelineState.Get();
 	}
 
-	bool Material::IsTransparent() const noexcept
+	bool PipelineState::IsTransparent() const noexcept
 	{
 		return isTransparent;
 	}
 
-	struct ThreadGroupCounts& Material::ThreadGroupCounts() noexcept
+	struct ThreadGroupCounts& PipelineState::ThreadGroupCounts() noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	const struct ThreadGroupCounts& Material::ThreadGroupCounts() const noexcept
+	const struct ThreadGroupCounts& PipelineState::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
 	}
 
-	std::int32_t& Material::RenderQueue() noexcept
+	std::int32_t& PipelineState::RenderQueue() noexcept
 	{
 		return renderQueue;
 	}
 
-	const std::int32_t& Material::RenderQueue() const noexcept
+	const std::int32_t& PipelineState::RenderQueue() const noexcept
 	{
 		return renderQueue;
 	}
 
-	bool& Material::CameraCulling() noexcept
+	bool& PipelineState::CameraCulling() noexcept
 	{
 		return cameraCulling;
 	}
 
-	const bool& Material::CameraCulling() const noexcept
+	const bool& PipelineState::CameraCulling() const noexcept
 	{
 		return cameraCulling;
 	}
 
-	void Material::Name(const std::string_view name)
+	void PipelineState::Name(const std::string_view name)
 	{
 		SetName(*pipelineState.Get(), name);
 	}
