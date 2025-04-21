@@ -23,11 +23,6 @@ export namespace PonyEngine::Render::DXGI
 	{
 		INTERFACE_BODY(ISwapChain)
 
-		/// @brief Gets a format of the swap chain.
-		/// @return Format.
-		[[nodiscard("Pure function")]]
-		virtual DXGI_FORMAT Format() const noexcept = 0;
-
 		/// @brief Gets a current back buffer index.
 		/// @return Current back buffer index.
 		[[nodiscard("Pure function")]]

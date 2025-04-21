@@ -41,13 +41,9 @@ export namespace PonyEngine::Render::DXGI
 		[[nodiscard("Pure constructor")]]
 		SwapChain(ISubSystemContext& dxgiSystem, const SwapChainParams& swapChainParams);
 		SwapChain(const SwapChain&) = delete;
-		[[nodiscard("Pure constructor")]]
-		SwapChain(SwapChain&& other) noexcept = default;
+		SwapChain(SwapChain&&) = delete;
 
 		~SwapChain() noexcept;
-
-		[[nodiscard("Pure function")]]
-		virtual DXGI_FORMAT Format() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t GetCurrentBackBufferIndex() const noexcept override;
@@ -64,8 +60,6 @@ export namespace PonyEngine::Render::DXGI
 		SwapChain& operator =(SwapChain&& other) noexcept = default;
 
 	private:
-		static constexpr DXGI_FORMAT BackViewFormat = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Back view format
-
 		ISubSystemContext* dxgiSystem; ///< DXGI system context.
 
 		Microsoft::WRL::ComPtr<IDXGISwapChain4> swapChain; ///< Swap chain.
@@ -83,7 +77,7 @@ namespace PonyEngine::Render::DXGI
 		{
 			.Width = swapChainParams.resolution.Width(),
 			.Height = swapChainParams.resolution.Height(),
-			.Format = BackViewFormat,
+			.Format = swapChainParams.format,
 			.Stereo = false,
 			.SampleDesc = DXGI_SAMPLE_DESC{.Count = 1u, .Quality = 0u},
 			.BufferUsage = DXGI_USAGE_BACK_BUFFER | DXGI_USAGE_RENDER_TARGET_OUTPUT,
@@ -110,11 +104,6 @@ namespace PonyEngine::Render::DXGI
 		PONY_LOG(dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Release swap chain.");
 		swapChain.Reset();
 		PONY_LOG(dxgiSystem->Logger(), PonyDebug::Log::LogType::Info, "Swap chain released.");
-	}
-
-	DXGI_FORMAT SwapChain::Format() const noexcept
-	{
-		return BackViewFormat;
 	}
 
 	std::uint32_t SwapChain::GetCurrentBackBufferIndex() const noexcept

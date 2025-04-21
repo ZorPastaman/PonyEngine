@@ -11,12 +11,14 @@ export module PonyEngine.Render:SwapChainParams;
 
 import <cstdint>;
 
+import PonyMath.Utility;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Swap chain parameters.
 	struct SwapChainParams final
 	{
+		PonyMath::Utility::Resolution<std::uint32_t> resolution = PonyMath::Utility::Resolution<std::uint32_t>(1280u, 720u);; ///< Swap chain resolution.
 		std::uint8_t bufferCount = 3u; ///< Back buffer count.
-		bool useWindowResolution = true; ///< If it's true, the resolution from the frame parameters will be ignored and the resolution from the window will be used.
 	};
 }

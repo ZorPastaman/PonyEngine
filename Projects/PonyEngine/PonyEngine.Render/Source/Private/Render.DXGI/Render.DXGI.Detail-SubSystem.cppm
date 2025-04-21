@@ -36,11 +36,12 @@ export namespace PonyEngine::Render::DXGI
 	class SubSystem final : private ISubSystemContext
 	{
 	public:
+		/// @brief Creates a DXGI subsystem.
+		/// @param renderSystem 
 		[[nodiscard("Pure constructor")]]
 		explicit SubSystem(IRenderSystemContext& renderSystem);
 		SubSystem(const SubSystem&) = delete;
-		[[nodiscard("Pure constructor")]]
-		SubSystem(SubSystem&& other) noexcept = default;
+		SubSystem(SubSystem&&) = delete;
 
 		~SubSystem() noexcept;
 
@@ -64,7 +65,7 @@ export namespace PonyEngine::Render::DXGI
 		void Present();
 
 		SubSystem& operator =(const SubSystem&) = delete;
-		SubSystem& operator =(SubSystem&& other) noexcept = default;
+		SubSystem& operator =(SubSystem&&) = delete;
 
 	private:
 		[[nodiscard("Pure function")]]
