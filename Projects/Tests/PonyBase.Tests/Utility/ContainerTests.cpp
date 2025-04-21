@@ -9,6 +9,7 @@
 
 #include "CppUnitTest.h"
 
+import <memory>;
 #include <vector>
 
 import PonyBase.Utility;
@@ -40,6 +41,26 @@ namespace Utility
 			Assert::AreEqual(5, vector[1]);
 			Assert::AreEqual(-2, vector[2]);
 			Assert::AreEqual(6, vector[3]);
+
+			auto vectorP = std::vector<std::shared_ptr<int>> { std::make_shared<int>(-2), std::make_shared<int>(5), std::make_shared<int>(6), std::make_shared<int>(-8) };
+
+			PonyBase::Utility::Move(vectorP, 2, 2);
+			Assert::AreEqual(-2, *vectorP[0]);
+			Assert::AreEqual(5, *vectorP[1]);
+			Assert::AreEqual(6, *vectorP[2]);
+			Assert::AreEqual(-8, *vectorP[3]);
+
+			PonyBase::Utility::Move(vectorP, 3, 1);
+			Assert::AreEqual(-2, *vectorP[0]);
+			Assert::AreEqual(-8, *vectorP[1]);
+			Assert::AreEqual(5, *vectorP[2]);
+			Assert::AreEqual(6, *vectorP[3]);
+
+			PonyBase::Utility::Move(vectorP, 0, 2);
+			Assert::AreEqual(-8, *vectorP[0]);
+			Assert::AreEqual(5, *vectorP[1]);
+			Assert::AreEqual(-2, *vectorP[2]);
+			Assert::AreEqual(6, *vectorP[3]);
 		}
 	};
 }
