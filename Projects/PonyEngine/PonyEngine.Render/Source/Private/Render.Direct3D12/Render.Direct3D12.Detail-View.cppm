@@ -19,6 +19,7 @@ import <string_view>;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief View type.
 	enum class View : std::uint8_t
 	{
 		RenderTarget,
@@ -26,12 +27,16 @@ export namespace PonyEngine::Render::Direct3D12
 		DepthStencil
 	};
 
+	/// @brief Creates a string representing the @p view.
+	/// @param view View type.
+	/// @return String representing the @p view.
 	[[nodiscard("Pure function")]]
 	constexpr std::string_view ToString(View view) noexcept;
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief View names.
 	constexpr std::array<std::string_view, 3> ViewNames
 	{
 		"RenderTarget",

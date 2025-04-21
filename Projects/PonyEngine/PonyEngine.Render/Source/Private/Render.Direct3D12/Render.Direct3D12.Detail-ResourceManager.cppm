@@ -17,18 +17,27 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:ResourceManager;
 
+import <algorithm>;
+import <cstddef>;
+import <cstdint>;
 import <memory>;
+import <stdexcept>;
+import <type_traits>;
+import <unordered_map>;
 import <vector>;
 
+import :HeapType;
 import :IResourceManager;
 import :ISubSystemContext;
-import :HeapType;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 resource manager.
 	class ResourceManager final : public IResourceManager
 	{
 	public:
+		/// @brief Creates a @p ResourceManager.
+		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
 		explicit ResourceManager(ISubSystemContext& d3d12System) noexcept;
 		[[nodiscard("Pure constructor")]]
@@ -53,28 +62,52 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Texture> CreateDepthStencil(std::uint64_t width, std::uint32_t height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, D3D12_DEPTH_STENCIL_VALUE depthStencilValue) override;
 
+		/// @brief Cleans out of dead resources.
 		void Clean() noexcept;
 
 		ResourceManager& operator =(const ResourceManager&) = delete;
 		ResourceManager& operator =(ResourceManager&&) = delete;
 
 	private:
+		/// @brief Gets a Direct3D12 heap properties.
+		/// @param heapType Heap type.
+		/// @return Direct3D12 heap properties.
 		[[nodiscard("Pure function")]]
 		static D3D12_HEAP_PROPERTIES GetHeapProperties(HeapType heapType) noexcept;
+		/// @brief Gets a Direct3D12 heap type.
+		/// @param heapType Heap type.
+		/// @return Direct3D12 heap type.
 		[[nodiscard("Pure function")]]
 		static D3D12_HEAP_TYPE GetHeapType(HeapType heapType) noexcept;
 
+		/// @brief Creates a texture.
+		/// @param dimension Dimension.
+		/// @param width Width.
+		/// @param height Height.
+		/// @param depth Depth.
+		/// @param format Pixel format.
+		/// @param sampleDesc Sample description.
+		/// @param heapType Heap type.
+		/// @return Texture.
 		[[nodiscard("Redendant call")]]
-		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType placement);
+		std::shared_ptr<Texture> CreateTexture(D3D12_RESOURCE_DIMENSION dimension, std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType);
 
-		ISubSystemContext* d3d12System;
+		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::vector<std::shared_ptr<Resource>> resources;
+		std::vector<std::shared_ptr<Resource>> resources; ///< Resources
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Map of a heap type to a Direct3D12 heap type.
+	const std::unordered_map<HeapType, D3D12_HEAP_TYPE> HeapTypes
+	{
+		{ HeapType::Default, D3D12_HEAP_TYPE_DEFAULT },
+		{ HeapType::Upload, D3D12_HEAP_TYPE_UPLOAD },
+		{ HeapType::Readback, D3D12_HEAP_TYPE_READBACK }
+	};
+
 	ResourceManager::ResourceManager(ISubSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
@@ -214,9 +247,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = resources.size(); i-- > 0; )
 		{
-			if (resources[i].use_count() <= 1L)
+			if (const std::shared_ptr<Resource>& resource = resources[i]; resource.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy resource at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(resources[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy resource at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(resource.get()));
 				resources.erase(resources.cbegin() + i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Resource destroyed.");
 			}
@@ -237,24 +270,19 @@ namespace PonyEngine::Render::Direct3D12
 
 	D3D12_HEAP_TYPE ResourceManager::GetHeapType(const HeapType heapType) noexcept
 	{
-		switch (heapType)
+		if (const auto position = HeapTypes.find(heapType); position != HeapTypes.cend()) [[likely]]
 		{
-		case HeapType::Default:
-			return D3D12_HEAP_TYPE_DEFAULT;
-		case HeapType::Upload:
-			return D3D12_HEAP_TYPE_UPLOAD;
-		case HeapType::Readback:
-			return D3D12_HEAP_TYPE_READBACK;
-		default: [[unlikely]]
-			assert(false && "The resource heapType is incorrect.");
-			return D3D12_HEAP_TYPE_UPLOAD;
+			return position->second;
 		}
+
+		assert(false && "The resource heapType is incorrect.");
+		return D3D12_HEAP_TYPE_UPLOAD;
 	}
 
 	std::shared_ptr<Texture> ResourceManager::CreateTexture(const D3D12_RESOURCE_DIMENSION dimension, const std::uint64_t width, const std::uint32_t height, const std::uint16_t depth, 
-		const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType placement)
+		const DXGI_FORMAT format, const DXGI_SAMPLE_DESC sampleDesc, const HeapType heapType)
 	{
-		const auto heapProperties = GetHeapProperties(placement);
+		const auto heapProperties = GetHeapProperties(heapType);
 		const auto resourceDesc = D3D12_RESOURCE_DESC1
 		{
 			.Dimension = dimension,

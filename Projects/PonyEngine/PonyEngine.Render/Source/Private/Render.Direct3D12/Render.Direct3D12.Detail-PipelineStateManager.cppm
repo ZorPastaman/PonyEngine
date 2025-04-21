@@ -23,6 +23,7 @@ import <memory>;
 import <optional>;
 import <stdexcept>;
 import <type_traits>;
+import <unordered_map>;
 import <variant>;
 import <vector>;
 
@@ -56,6 +57,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<PipelineState> CreatePipelineState(const std::shared_ptr<const Render::PipelineState>& pipelineState) override;
 
+		/// @brief Ticks the pipeline state manager.
 		void Tick();
 
 		/// @brief Cleans out of dead pipelineState.
@@ -65,9 +67,11 @@ export namespace PonyEngine::Render::Direct3D12
 		PipelineStateManager& operator =(PipelineStateManager&&) = delete;
 
 	private:
+		/// @brief Pipeline state observer.
 		class PipelineStateObserver final : public IPipelineStateObserver
 		{
 		public:
+			/// @brief Creates a zero pipeline state observer.
 			[[nodiscard("Pure constructor")]]
 			PipelineStateObserver() noexcept;
 			PipelineStateObserver(const PipelineStateObserver&) = delete;
@@ -88,109 +92,274 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnCameraCullingChanged() noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
+			/// @brief Is the core changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool CoreChanged() const noexcept;
+			/// @brief Is the amplification shader changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool AmplificationShaderChanged() const noexcept;
+			/// @brief Is the mesh shader changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool MeshShaderChanged() const noexcept;
+			/// @brief Is the pixel shader changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool PixelShaderChanged() const noexcept;
+			/// @brief Are the data slots changed?
+			/// @return @a True if they're changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool DataSlotsChanged() const noexcept;
+			/// @brief Is the additional data changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool AdditionalDataChanged() const noexcept;
+			/// @brief Is the name changed?
+			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool NameChanged() const noexcept;
 
+			/// @brief Resets all the flags.
 			void Reset() noexcept;
 
 			PipelineStateObserver& operator =(const PipelineStateObserver&) = delete;
 			PipelineStateObserver& operator =(PipelineStateObserver&&) = delete;
 
 		private:
-			bool coreChanged;
-			bool amplificationShaderChanged;
-			bool meshShaderChanged;
-			bool pixelShaderChanged;
-			bool dataSlotsChanged;
-			bool additionalDataChanged;
-			bool nameChanged;
+			bool coreChanged; ///< Is the core changed?
+			bool amplificationShaderChanged; ///< Is the amplification shader changed?
+			bool meshShaderChanged; ///< Is the mesh shader changed?
+			bool pixelShaderChanged; ///< Is the pixel shader changed?
+			bool dataSlotsChanged; ///< Are the data slots changed?
+			bool additionalDataChanged; ///< Is the additional data changed?
+			bool nameChanged; ///< Is the name changed?
 		};
 
+		/// @brief Pipeline state stream.
 		struct PipelineStateStream final
 		{
-			PipelineStateStreamRootSignature rootSignature;
-			PipelineStateStreamAmplificationShader amplificationShader;
-			PipelineStateStreamMeshShader meshShader;
-			PipelineStateStreamPixelShader pixelShader;
-			PipelineStateStreamBlend blend;
-			PipelineStateStreamSampleMask sampleMask;
-			PipelineStateStreamRasterizer rasterizer;
-			PipelineStateStreamDepthStencil1 depthStencil;
-			PipelineStateStreamRenderTargetFormats renderTargetFormats;
-			PipelineStateStreamDepthStencilFormat depthStencilFormat;
-			PipelineStateStreamSampleDescription sampleDescription;
+			PipelineStateStreamRootSignature rootSignature; ///< Root signature.
+			PipelineStateStreamAmplificationShader amplificationShader; ///< Amplification shader.
+			PipelineStateStreamMeshShader meshShader; ///< Mesh shader.
+			PipelineStateStreamPixelShader pixelShader; ///< Pixel shader.
+			PipelineStateStreamBlend blend; ///< Blend.
+			PipelineStateStreamSampleMask sampleMask; ///< Sample mask.
+			PipelineStateStreamRasterizer rasterizer; ///< Rasterizer.
+			PipelineStateStreamDepthStencil1 depthStencil; ///< Depth stencil.
+			PipelineStateStreamRenderTargetFormats renderTargetFormats; ///< Render target formats.
+			PipelineStateStreamDepthStencilFormat depthStencilFormat; ///< Depth stencil format.
+			PipelineStateStreamSampleDescription sampleDescription; ///< Sample description.
 		};
 
+		/// @brief Pipeline shader data.
 		struct ShaderData final
 		{
-			std::shared_ptr<const Shader> amplificationShader;
-			std::shared_ptr<const Shader> meshShader;
-			std::shared_ptr<const Shader> pixelShader;
+			std::shared_ptr<const Shader> amplificationShader; ///< Amplification shader.
+			std::shared_ptr<const Shader> meshShader; ///< Mesh shader.
+			std::shared_ptr<const Shader> pixelShader; ///< Pixel shader.
 		};
 
+		/// @brief Creates a Direct3D12 blend.
+		/// @param blend Blend.
+		/// @return Direct3D12 blend.
 		[[nodiscard("Pure function")]]
 		static D3D12_BLEND_DESC CreateBlendDesc(const Blend& blend) noexcept;
+		/// @brief Creates a Direct3D12 opaque blend.
+		/// @param blend Blend.
+		/// @return Direct3D12 opaque blend.
 		[[nodiscard("Pure function")]]
 		static D3D12_RENDER_TARGET_BLEND_DESC CreateOpaqueBlendDesc(const OpaqueBlend& blend) noexcept;
+		/// @brief Creates a Direct3D12 transparent blend.
+		/// @param blend Blend.
+		/// @return Direct3D12 transparent blend.
 		[[nodiscard("Pure function")]]
 		static D3D12_RENDER_TARGET_BLEND_DESC CreateTransparentBlendDesc(const TransparentBlend& blend) noexcept;
+		/// @brief Creates a Direct3D12 logic blend.
+		/// @param blend Blend.
+		/// @return Direct3D12 logic blend.
 		[[nodiscard("Pure function")]]
 		static D3D12_RENDER_TARGET_BLEND_DESC CreateLogicBlendDesc(const LogicBlend& blend) noexcept;
+		/// @brief Converts the @p blendFactor to a Direct3D12 blend factor.
+		/// @param blendFactor Blend factor.
+		/// @return Direct3D12 blend factor.
 		[[nodiscard("Pure function")]]
 		static D3D12_BLEND GetBlendFactor(BlendFactor blendFactor) noexcept;
+		/// @brief Converts the @p blendOperation to a Direct3D12 blend operation.
+		/// @param blendOperation Blend operation.
+		/// @return Direct3D12 blend operation.
 		[[nodiscard("Pure function")]]
 		static D3D12_BLEND_OP GetBlendOperation(BlendOperation blendOperation) noexcept;
+		/// @brief Converts the @p logicOperation to a Direct3D12 logic operation.
+		/// @param logicOperation Logic operation.
+		/// @return Direct3D12 logic operation.
 		[[nodiscard("Pure function")]]
 		static D3D12_LOGIC_OP GetLogicOperation(LogicOperation logicOperation) noexcept;
 
+		/// @brief Creates a Direct3D12 rasterizer.
+		/// @param rasterizer Rasterizer.
+		/// @return Direct3D12 rasterizer.
 		[[nodiscard("Pure function")]]
 		static D3D12_RASTERIZER_DESC CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept;
+		/// @brief Converts the @p fillMode to a Direct3D12 fill mode.
+		/// @param fillMode Fill mode.
+		/// @return Direct3D12 fill mode.
 		[[nodiscard("Pure function")]]
 		static D3D12_FILL_MODE GetFillMode(FillMode fillMode) noexcept;
+		/// @brief Converts the @p cullMode to a Direct3D12 cull mode.
+		/// @param cullMode Cull mode.
+		/// @return Direct3D12 cull mode.
 		[[nodiscard("Pure function")]]
 		static D3D12_CULL_MODE GetCullMode(CullMode cullMode) noexcept;
 
+		/// @brief Creates a Direct3D12 depth stencil.
+		/// @param depthStencil Depth stencil.
+		/// @return Direct3D12 depth stencil.
 		[[nodiscard("Pure function")]]
 		static D3D12_DEPTH_STENCIL_DESC1 CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept;
+		/// @brief Converts the @p comparison to a Direct3D12 comparison.
+		/// @param comparison Comparison.
+		/// @return Direct3D12 comparison.
 		[[nodiscard("Pure function")]]
 		static D3D12_COMPARISON_FUNC GetComparison(ComparisonFunction comparison) noexcept;
+		/// @brief Converts the @p operation to a Direct3D12 depth stencil operation.
+		/// @param operation Depth stencil operation.
+		/// @return Direct3D12 depth stencil operation.
 		[[nodiscard("Pure function")]]
 		static D3D12_DEPTH_STENCILOP_DESC GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept;
+		/// @brief Converts the @p stencilOperation to a Direct3D12 stencil operation.
+		/// @param stencilOperation Stencil operation.
+		/// @return Direct3D12 stencil operation.
 		[[nodiscard("Pure function")]]
 		static D3D12_STENCIL_OP GetStencilOp(StencilOperation stencilOperation) noexcept;
 
+		/// @brief Updates the shaders.
+		/// @param source Pipeline state source.
+		/// @param shaderData Shader data to update.
+		/// @param observer Pipeline state observer.
 		void UpdateShaders(const Render::PipelineState& source, ShaderData& shaderData, const PipelineStateObserver& observer) const;
-		void UpdatePipelineState(PipelineState& renderPipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const;
+		/// @brief Update the pipeline state.
+		/// @param pipelineState Pipeline state to update.
+		/// @param source Pipeline state source.
+		/// @param shaderData Shader data.
+		/// @param observer Pipeline state observer.
+		void UpdatePipelineState(PipelineState& pipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const;
+        /// @brief Updates the pipeline state data slots.
+		/// @param pipelineState Pipeline state to update.
+		/// @param source Pipeline state source.
+		/// @param observer Pipeline state observer.
 		static void UpdateDataSlots(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
+		/// @brief Updates the pipeline state additional data.
+		/// @param pipelineState Pipeline state to update.
+		/// @param source Pipeline state source.
+		/// @param observer Pipeline state observer.
 		static void UpdateAdditionalData(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
+		/// @brief Updates the pipeline state name.
+		/// @param pipelineState Pipeline state to update.
+		/// @param source Pipeline state source.
+		/// @param observer Pipeline state observer.
 		static void UpdateName(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer);
 
+		/// @brief Adds a pipeline state.
+		/// @param pipelineState Pipeline state.
+		/// @param source Pipeline state source.
 		void Add(const std::shared_ptr<PipelineState>& pipelineState, const std::shared_ptr<const Render::PipelineState>& source);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<PipelineState>> pipelineStates; ///< Pipeline states.
-		std::vector<std::shared_ptr<const Render::PipelineState>> sources;
-		std::vector<ShaderData> shaders;
-		std::vector<std::unique_ptr<PipelineStateObserver>> pipelineStateObservers;
+		std::vector<std::shared_ptr<const Render::PipelineState>> sources; ///< Pipeline state sources.
+		std::vector<ShaderData> shaders; ///< Shader data.
+		std::vector<std::unique_ptr<PipelineStateObserver>> pipelineStateObservers; ///< Pipeline state observers.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Map of a blend factor to a Direct3D12 blend factor.
+	const std::unordered_map<BlendFactor, D3D12_BLEND> BlendFactors
+	{
+		{ BlendFactor::Zero, D3D12_BLEND_ZERO },
+		{ BlendFactor::One, D3D12_BLEND_ONE },
+		{ BlendFactor::ColorSource, D3D12_BLEND_SRC_COLOR},
+		{ BlendFactor::ColorSourceInverse, D3D12_BLEND_INV_SRC_COLOR },
+		{ BlendFactor::AlphaSource, D3D12_BLEND_SRC_ALPHA },
+		{ BlendFactor::AlphaSourceInverse, D3D12_BLEND_INV_SRC_ALPHA },
+		{ BlendFactor::AlphaSourceSaturate, D3D12_BLEND_SRC_ALPHA_SAT },
+		{ BlendFactor::ColorDestination, D3D12_BLEND_DEST_COLOR },
+		{ BlendFactor::ColorDestinationInverse, D3D12_BLEND_INV_DEST_COLOR },
+		{ BlendFactor::AlphaDestination, D3D12_BLEND_DEST_ALPHA },
+		{ BlendFactor::AlphaDestinationInverse, D3D12_BLEND_INV_DEST_ALPHA }
+	};
+	/// @brief Map of a blend operation to a Direct3D12 blend operation.
+	const std::unordered_map<BlendOperation, D3D12_BLEND_OP> BlendOperations
+	{
+		{ BlendOperation::Add, D3D12_BLEND_OP_ADD },
+		{ BlendOperation::Subtract, D3D12_BLEND_OP_SUBTRACT },
+		{ BlendOperation::SubtractReverse, D3D12_BLEND_OP_REV_SUBTRACT },
+		{ BlendOperation::Min, D3D12_BLEND_OP_MIN },
+		{ BlendOperation::Max, D3D12_BLEND_OP_MAX }
+	};
+	/// @brief Map of a logic operation to a Direct3D12 logic operation.
+	const std::unordered_map<LogicOperation, D3D12_LOGIC_OP> LogicOperations
+	{
+		{ LogicOperation::Noop, D3D12_LOGIC_OP_NOOP },
+		{ LogicOperation::Clear, D3D12_LOGIC_OP_CLEAR },
+		{ LogicOperation::Set, D3D12_LOGIC_OP_SET },
+		{ LogicOperation::Copy, D3D12_LOGIC_OP_COPY },
+		{ LogicOperation::CopyInverted, D3D12_LOGIC_OP_COPY_INVERTED },
+		{ LogicOperation::Invert, D3D12_LOGIC_OP_INVERT },
+		{ LogicOperation::And, D3D12_LOGIC_OP_AND },
+		{ LogicOperation::AndReverse, D3D12_LOGIC_OP_AND_REVERSE },
+		{ LogicOperation::AndInverted, D3D12_LOGIC_OP_AND_INVERTED },
+		{ LogicOperation::Nand, D3D12_LOGIC_OP_NAND },
+		{ LogicOperation::Or, D3D12_LOGIC_OP_OR },
+		{ LogicOperation::OrReverse, D3D12_LOGIC_OP_OR_REVERSE },
+		{ LogicOperation::OrInverted, D3D12_LOGIC_OP_INVERT },
+		{ LogicOperation::Nor, D3D12_LOGIC_OP_NOR },
+		{ LogicOperation::Xor, D3D12_LOGIC_OP_NOR },
+		{ LogicOperation::Equal, D3D12_LOGIC_OP_EQUIV }
+	};
+	/// @brief Map of a fill mode to a Direct3D12 fill mode.
+	const std::unordered_map<FillMode, D3D12_FILL_MODE> FillModes
+	{
+		{ FillMode::Solid, D3D12_FILL_MODE_SOLID },
+		{ FillMode::Wireframe, D3D12_FILL_MODE_WIREFRAME }
+	};
+	/// @brief Map of a cull mode to a Direct3D12 cull mode.
+	const std::unordered_map<CullMode, D3D12_CULL_MODE> CullModes
+	{
+		{ CullMode::None, D3D12_CULL_MODE_NONE },
+		{ CullMode::Front, D3D12_CULL_MODE_FRONT },
+		{ CullMode::Back, D3D12_CULL_MODE_BACK }
+	};
+	/// @brief Map of a comparison function to a Direct3D12 comparison function.
+	const std::unordered_map<ComparisonFunction, D3D12_COMPARISON_FUNC> ComparisonFunctions
+	{
+		{ ComparisonFunction::Never, D3D12_COMPARISON_FUNC_NEVER },
+		{ ComparisonFunction::Always, D3D12_COMPARISON_FUNC_ALWAYS },
+		{ ComparisonFunction::Equal, D3D12_COMPARISON_FUNC_EQUAL },
+		{ ComparisonFunction::NotEqual, D3D12_COMPARISON_FUNC_NOT_EQUAL },
+		{ ComparisonFunction::Less, D3D12_COMPARISON_FUNC_LESS },
+		{ ComparisonFunction::LessOrEqual, D3D12_COMPARISON_FUNC_LESS_EQUAL },
+		{ ComparisonFunction::Greater, D3D12_COMPARISON_FUNC_GREATER },
+		{ ComparisonFunction::GreaterOrEqual, D3D12_COMPARISON_FUNC_GREATER_EQUAL }
+	};
+	/// @brief Map of a depth stencil operation to a Direct3D12 depth stencil operation.
+	const std::unordered_map<StencilOperation, D3D12_STENCIL_OP> StencilOperations
+	{
+		{ StencilOperation::Keep, D3D12_STENCIL_OP_KEEP },
+		{ StencilOperation::Zero, D3D12_STENCIL_OP_ZERO },
+		{ StencilOperation::Replace, D3D12_STENCIL_OP_REPLACE },
+		{ StencilOperation::Invert, D3D12_STENCIL_OP_INVERT },
+		{ StencilOperation::Increment, D3D12_STENCIL_OP_INCR },
+		{ StencilOperation::Decrement, D3D12_STENCIL_OP_DECR },
+		{ StencilOperation::IncrementSaturated, D3D12_STENCIL_OP_INCR_SAT },
+		{ StencilOperation::DecrementSaturated, D3D12_STENCIL_OP_DECR_SAT }
+	};
+
 	PipelineStateManager::PipelineStateObserver::PipelineStateObserver() noexcept :
 		coreChanged{true},
 		amplificationShaderChanged{true},
@@ -432,96 +601,35 @@ namespace PonyEngine::Render::Direct3D12
 
 	D3D12_BLEND PipelineStateManager::GetBlendFactor(const BlendFactor blendFactor) noexcept
 	{
-		switch (blendFactor)
+		if (const auto position = BlendFactors.find(blendFactor); position != BlendFactors.cend()) [[likely]]
 		{
-		case BlendFactor::Zero:
-			return D3D12_BLEND_ZERO;
-		case BlendFactor::One:
-			return D3D12_BLEND_ONE;
-		case BlendFactor::ColorSource:
-			return D3D12_BLEND_SRC_COLOR;
-		case BlendFactor::ColorSourceInverse:
-			return D3D12_BLEND_INV_SRC_COLOR;
-		case BlendFactor::AlphaSource:
-			return D3D12_BLEND_SRC_ALPHA;
-		case BlendFactor::AlphaSourceInverse:
-			return D3D12_BLEND_INV_SRC_ALPHA;
-		case BlendFactor::AlphaSourceSaturate:
-			return D3D12_BLEND_SRC_ALPHA_SAT;
-		case BlendFactor::ColorDestination:
-			return D3D12_BLEND_DEST_COLOR;
-		case BlendFactor::ColorDestinationInverse:
-			return D3D12_BLEND_INV_DEST_COLOR;
-		case BlendFactor::AlphaDestination:
-			return D3D12_BLEND_DEST_ALPHA;
-		case BlendFactor::AlphaDestinationInverse:
-			return D3D12_BLEND_INV_DEST_ALPHA;
-		default: [[unlikely]]
-			assert(false && "Unsupported blend factor.");
-			return D3D12_BLEND_ZERO;
+			return position->second;
 		}
+
+		assert(false && "Unsupported blend factor.");
+		return D3D12_BLEND_ZERO;
 	}
 
 	D3D12_BLEND_OP PipelineStateManager::GetBlendOperation(const BlendOperation blendOperation) noexcept
 	{
-		switch (blendOperation)
+		if (const auto position = BlendOperations.find(blendOperation); position != BlendOperations.cend()) [[likely]]
 		{
-		case BlendOperation::Add:
-			return D3D12_BLEND_OP_ADD;
-		case BlendOperation::Subtract:
-			return D3D12_BLEND_OP_SUBTRACT;
-		case BlendOperation::SubtractReverse:
-			return D3D12_BLEND_OP_REV_SUBTRACT;
-		case BlendOperation::Min:
-			return D3D12_BLEND_OP_MIN;
-		case BlendOperation::Max:
-			return D3D12_BLEND_OP_MAX;
-		default: [[unlikely]]
-			assert(false && "Unsupported blend operation");
-			return D3D12_BLEND_OP_ADD;
+			return position->second;
 		}
+
+		assert(false && "Unsupported blend operation");
+		return D3D12_BLEND_OP_ADD;
 	}
 
 	D3D12_LOGIC_OP PipelineStateManager::GetLogicOperation(const LogicOperation logicOperation) noexcept
 	{
-		switch (logicOperation)
+		if (const auto position = LogicOperations.find(logicOperation); position != LogicOperations.cend()) [[likely]]
 		{
-		case LogicOperation::Noop:
-			return D3D12_LOGIC_OP_NOOP;
-		case LogicOperation::Clear:
-			return D3D12_LOGIC_OP_CLEAR;
-		case LogicOperation::Set:
-			return D3D12_LOGIC_OP_SET;
-		case LogicOperation::Copy:
-			return D3D12_LOGIC_OP_COPY;
-		case LogicOperation::CopyInverted:
-			return D3D12_LOGIC_OP_COPY_INVERTED;
-		case LogicOperation::Invert:
-			return D3D12_LOGIC_OP_INVERT;
-		case LogicOperation::And:
-			return D3D12_LOGIC_OP_AND;
-		case LogicOperation::AndReverse:
-			return D3D12_LOGIC_OP_AND_REVERSE;
-		case LogicOperation::AndInverted:
-			return D3D12_LOGIC_OP_AND_INVERTED;
-		case LogicOperation::Nand:
-			return D3D12_LOGIC_OP_NAND;
-		case LogicOperation::Or:
-			return D3D12_LOGIC_OP_OR;
-		case LogicOperation::OrReverse:
-			return D3D12_LOGIC_OP_OR_REVERSE;
-		case LogicOperation::OrInverted:
-			return D3D12_LOGIC_OP_INVERT;
-		case LogicOperation::Nor:
-			return D3D12_LOGIC_OP_NOR;
-		case LogicOperation::Xor:
-			return D3D12_LOGIC_OP_NOR;
-		case LogicOperation::Equal:
-			return D3D12_LOGIC_OP_EQUIV;
-		default: [[unlikely]]
-			assert(false && "Unsupported logic operation.");
-			return D3D12_LOGIC_OP_NOOP;
+			return position->second;
 		}
+
+		assert(false && "Unsupported logic operation.");
+		return D3D12_LOGIC_OP_NOOP;
 	}
 
 	D3D12_RASTERIZER_DESC PipelineStateManager::CreateRasterizerDesc(const Rasterizer& rasterizer) noexcept
@@ -544,32 +652,24 @@ namespace PonyEngine::Render::Direct3D12
 
 	D3D12_FILL_MODE PipelineStateManager::GetFillMode(const FillMode fillMode) noexcept
 	{
-		switch (fillMode)
+		if (const auto position = FillModes.find(fillMode); position != FillModes.cend()) [[likely]]
 		{
-		case FillMode::Solid:
-			return D3D12_FILL_MODE_SOLID;
-		case FillMode::Wireframe:
-			return D3D12_FILL_MODE_WIREFRAME;
-		default: [[unlikely]]
-			assert(false && "Unsupported fill mode.");
-			return D3D12_FILL_MODE_SOLID;
+			return position->second;
 		}
+
+		assert(false && "Unsupported fill mode.");
+		return D3D12_FILL_MODE_SOLID;
 	}
 
 	D3D12_CULL_MODE PipelineStateManager::GetCullMode(const CullMode cullMode) noexcept
 	{
-		switch (cullMode)
+		if (const auto position = CullModes.find(cullMode); position != CullModes.cend()) [[likely]]
 		{
-		case CullMode::None:
-			return D3D12_CULL_MODE_NONE;
-		case CullMode::Front:
-			return D3D12_CULL_MODE_FRONT;
-		case CullMode::Back:
-			return D3D12_CULL_MODE_BACK;
-		default: [[unlikely]]
-			assert(false && "Unsupported cull mode");
-			return D3D12_CULL_MODE_NONE;
-		}
+			return position->second;
+		};
+
+		assert(false && "Unsupported cull mode");
+		return D3D12_CULL_MODE_NONE;
 	}
 
 	D3D12_DEPTH_STENCIL_DESC1 PipelineStateManager::CreateDepthStencilDesc(const DepthStencil& depthStencil) noexcept
@@ -590,28 +690,13 @@ namespace PonyEngine::Render::Direct3D12
 
 	D3D12_COMPARISON_FUNC PipelineStateManager::GetComparison(const ComparisonFunction comparison) noexcept
 	{
-		switch (comparison)
+		if (const auto position = ComparisonFunctions.find(comparison); position != ComparisonFunctions.cend()) [[likely]]
 		{
-		case ComparisonFunction::Never:
-			return D3D12_COMPARISON_FUNC_NEVER;
-		case ComparisonFunction::Always:
-			return D3D12_COMPARISON_FUNC_ALWAYS;
-		case ComparisonFunction::Equal:
-			return D3D12_COMPARISON_FUNC_EQUAL;
-		case ComparisonFunction::NotEqual:
-			return D3D12_COMPARISON_FUNC_NOT_EQUAL;
-		case ComparisonFunction::Less:
-			return D3D12_COMPARISON_FUNC_LESS;
-		case ComparisonFunction::LessOrEqual:
-			return D3D12_COMPARISON_FUNC_LESS_EQUAL;
-		case ComparisonFunction::Greater:
-			return D3D12_COMPARISON_FUNC_GREATER;
-		case ComparisonFunction::GreaterOrEqual:
-			return D3D12_COMPARISON_FUNC_GREATER_EQUAL;
-		default: [[unlikely]]
-			assert(false && "Unsupported comparison function.");
-			return D3D12_COMPARISON_FUNC_NEVER;
+			return position->second;
 		}
+
+		assert(false && "Unsupported comparison function.");
+		return D3D12_COMPARISON_FUNC_NEVER;
 	}
 
 	D3D12_DEPTH_STENCILOP_DESC PipelineStateManager::GetDepthStencilOpDesc(const DepthStencilOperation& operation) noexcept
@@ -627,28 +712,13 @@ namespace PonyEngine::Render::Direct3D12
 
 	D3D12_STENCIL_OP PipelineStateManager::GetStencilOp(const StencilOperation stencilOperation) noexcept
 	{
-		switch (stencilOperation)
+		if (const auto position = StencilOperations.find(stencilOperation); position != StencilOperations.cend())
 		{
-		case StencilOperation::Keep:
-			return D3D12_STENCIL_OP_KEEP;
-		case StencilOperation::Zero:
-			return D3D12_STENCIL_OP_ZERO;
-		case StencilOperation::Replace:
-			return D3D12_STENCIL_OP_REPLACE;
-		case StencilOperation::Invert:
-			return D3D12_STENCIL_OP_INVERT;
-		case StencilOperation::Increment:
-			return D3D12_STENCIL_OP_INCR;
-		case StencilOperation::Decrement:
-			return D3D12_STENCIL_OP_DECR;
-		case StencilOperation::IncrementSaturated:
-			return D3D12_STENCIL_OP_INCR_SAT;
-		case StencilOperation::DecrementSaturated:
-			return D3D12_STENCIL_OP_DECR_SAT;
-		default: [[unlikely]]
-			assert(false && "Unsupported stencil operation.");
-			return D3D12_STENCIL_OP_KEEP;
+			return position->second;
 		}
+
+		assert(false && "Unsupported stencil operation.");
+		return D3D12_STENCIL_OP_KEEP;
 	}
 
 	void PipelineStateManager::UpdateShaders(const Render::PipelineState& source, ShaderData& shaderData, const PipelineStateObserver& observer) const
@@ -669,7 +739,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void PipelineStateManager::UpdatePipelineState(PipelineState& renderPipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const
+	void PipelineStateManager::UpdatePipelineState(PipelineState& pipelineState, const Render::PipelineState& source, const ShaderData& shaderData, const PipelineStateObserver& observer) const
 	{
 		if (!observer.CoreChanged() && !observer.AmplificationShaderChanged() && !observer.MeshShaderChanged() && !observer.PixelShaderChanged()) [[likely]]
 		{
@@ -704,14 +774,14 @@ namespace PonyEngine::Render::Direct3D12
 			.SizeInBytes = sizeof(pss),
 			.pPipelineStateSubobjectStream = &pss
 		};
-		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState;
-		if (const HRESULT result = d3d12System->Device().CreatePipelineState(&pssDesc, IID_PPV_ARGS(pipelineState.GetAddressOf())); FAILED(result)) [[unlikely]]
+		Microsoft::WRL::ComPtr<ID3D12PipelineState> state;
+		if (const HRESULT result = d3d12System->Device().CreatePipelineState(&pssDesc, IID_PPV_ARGS(state.GetAddressOf())); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire graphics pipeline state with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		const bool isTransparent = pss.blend.Data().RenderTarget[0].BlendEnable || pss.blend.Data().RenderTarget[0].LogicOpEnable;
-		renderPipelineState = PipelineState(rootSignature, *pipelineState.Get(), isTransparent);
+		pipelineState = PipelineState(rootSignature, *state.Get(), isTransparent);
 	}
 
 	void PipelineStateManager::UpdateDataSlots(PipelineState& pipelineState, const Render::PipelineState& source, const PipelineStateObserver& observer)
@@ -758,6 +828,8 @@ namespace PonyEngine::Render::Direct3D12
 			sources.resize(currentSize);
 			shaders.resize(currentSize);
 			pipelineStateObservers.resize(currentSize);
+
+			throw;
 		}
 	}
 

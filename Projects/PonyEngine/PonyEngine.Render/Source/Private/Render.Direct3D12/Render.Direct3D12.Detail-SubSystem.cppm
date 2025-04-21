@@ -35,6 +35,7 @@ import :CopyPipeline;
 import :CpuWaiter;
 import :DescriptorHeapManager;
 import :FrameManager;
+import :FrameParams;
 import :GpuWaiter;
 import :GraphicsPipeline;
 import :ICopyPipeline;
@@ -50,7 +51,6 @@ import :PipelineStateManager;
 import :MeshManager;
 import :ObjectUtility;
 import :RenderObjectManager;
-import :FrameParams;
 import :ResourceManager;
 import :RootSignatureManager;
 import :ShaderManager;
@@ -64,6 +64,7 @@ export namespace PonyEngine::Render::Direct3D12
 	public:
 		/// @brief Creates a @p System.
 		/// @param renderSystem Render system context.
+		/// @param subSystemParams Direct3D12 system parameters.
 		[[nodiscard("Pure constructor")]]
 		SubSystem(IRenderSystemContext& renderSystem, const SubSystemParams& subSystemParams);
 		SubSystem(const SubSystem&) = delete;
@@ -71,8 +72,12 @@ export namespace PonyEngine::Render::Direct3D12
 
 		~SubSystem() noexcept;
 
+		/// @brief Gets the camera manager.
+		/// @return Camera manager.
 		[[nodiscard("Pure function")]]
 		ICameraManager* CameraManager() noexcept;
+		/// @brief Gets the camera manager.
+		/// @return Camera manager.
 		[[nodiscard("Pure function")]]
 		const ICameraManager* CameraManager() const noexcept;
 		/// @brief Gets the render object manager.
@@ -179,18 +184,18 @@ export namespace PonyEngine::Render::Direct3D12
 #endif
 		Microsoft::WRL::ComPtr<ID3D12Device10> device; ///< Render device.
 
-		std::unique_ptr<class ResourceManager> resourceManager;
-		std::unique_ptr<class DescriptorHeapManager> heapManager;
+		std::unique_ptr<class ResourceManager> resourceManager; ///< Resource manager.
+		std::unique_ptr<class DescriptorHeapManager> heapManager; ///< Descriptor heap manager.
 
-		std::unique_ptr<class BackManager> back; ///< Back.
+		std::unique_ptr<class BackManager> back; ///< Back manager.
 		std::unique_ptr<class FrameManager> frameManager; ///< Frame manager.
 
 		std::unique_ptr<class MeshManager> meshManager; ///< Mesh manager.
-		std::unique_ptr<class ShaderManager> shaderManager;
+		std::unique_ptr<class ShaderManager> shaderManager; ///< Shader manager.
 		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<class PipelineStateManager> pipelineStateManager; ///< Pipeline state manager.
 
-		std::unique_ptr<class CameraManager> cameraManager;
+		std::unique_ptr<class CameraManager> cameraManager; ///< Camera manager.
 		std::unique_ptr<class RenderObjectManager> renderObjectManager; ///< Render object manager.
 
 		std::unique_ptr<class CopyPipeline> copyPipeline; ///< Copy pipeline.
@@ -407,6 +412,8 @@ namespace PonyEngine::Render::Direct3D12
 
 	void SubSystem::Render(const std::uint32_t backBufferIndex)
 	{
+		back->CurrentBackBufferIndex(backBufferIndex);
+
 		meshManager->Tick();
 		pipelineStateManager->Tick();
 		graphicsPipeline->Prepare();
@@ -414,9 +421,7 @@ namespace PonyEngine::Render::Direct3D12
 		copyPipeline->PopulateCommands();
 		copyPipeline->Execute();
 
-		back->CurrentBackBufferIndex(backBufferIndex);
 		graphicsPipeline->PopulateCommands();
-
 		copyWaiter->Wait();
 		graphicsPipeline->Execute();
 	}

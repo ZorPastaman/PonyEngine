@@ -21,6 +21,7 @@ import :ISubSystemContext;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 pipeline.
 	class Pipeline
 	{
 	public:
@@ -38,20 +39,32 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const ID3D12CommandQueue& CommandQueue() const noexcept;
 
+		/// @brief Sets the name to the components.
+		/// @param name Name.
 		virtual void Name(std::string_view name);
 
 		Pipeline& operator =(const Pipeline&) = delete;
 		Pipeline& operator =(Pipeline&&) = delete;
 
 	protected:
+		/// @brief Creates a pipeline.
+		/// @param d3d12System Direct3D12 system context.
+		/// @param commandQueuePriority Command queue priority.
+		/// @param commandListType Command list type.
 		[[nodiscard("Pure constructor")]]
 		Pipeline(ISubSystemContext& d3d12System, INT commandQueuePriority, D3D12_COMMAND_LIST_TYPE commandListType);
 
+		/// @brief Gets the Direct3D12 system.
+		/// @return Direct3D12 system.
 		[[nodiscard("Pure function")]]
 		ISubSystemContext& D3D12System() const noexcept;
 
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		ID3D12GraphicsCommandList7& CommandList() noexcept;
+		/// @brief Gets the command list.
+		/// @return Command list.
 		[[nodiscard("Pure function")]]
 		const ID3D12GraphicsCommandList7& CommandList() const noexcept;
 
@@ -60,8 +73,13 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Closes command lists.
 		void CloseLists();
 
+		/// @brief Adds the buffer barrier.
+		/// @param barrier Buffer barrier to add.
 		void AddBarrier(const D3D12_BUFFER_BARRIER& barrier);
+		/// @brief Adds the texture barrier.
+		/// @param barrier Texture barrier to add.
 		void AddBarrier(const D3D12_TEXTURE_BARRIER& barrier);
+		/// @brief Populates barriers.
 		void PopulateBarriers();
 
 	private:
@@ -69,6 +87,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
+		// TODO: Add command list per back buffer.
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue; ///< Copy command queue.
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Copy command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Copy command list.

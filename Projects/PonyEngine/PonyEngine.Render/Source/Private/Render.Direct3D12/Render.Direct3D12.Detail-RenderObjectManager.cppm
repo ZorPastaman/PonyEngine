@@ -30,8 +30,6 @@ import :IGraphicsPipeline;
 import :ISubSystemContext;
 import :PipelineState;
 import :RenderObject;
-import :RootSignature;
-import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -72,7 +70,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 	}
 
-	std::shared_ptr<Render::IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
+	std::shared_ptr<IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render pipeline state.");
 		const std::shared_ptr<PipelineState> renderPipelineState = d3d12System->PipelineStateManager().CreatePipelineState(params.pipelineState);

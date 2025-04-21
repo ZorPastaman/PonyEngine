@@ -14,7 +14,6 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:RootSignature;
 
 import <optional>;
-import <string>;
 import <string_view>;
 import <unordered_map>;
 
@@ -46,10 +45,17 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		const ID3D12RootSignature& RootSig() const noexcept;
 
+		/// @brief Tries to find a data slot by the @p dataType.
+		/// @param dataType Data type.
+		/// @return Data slot; std::nullopt it isn't found.
 		[[nodiscard("Pure function")]]
 		std::optional<std::uint32_t> DataSlot(std::string_view dataType) const noexcept;
+		/// @brief Gets the data slots.
+		/// @return Data slots.
 		[[nodiscard("Pure function")]]
 		std::unordered_map<std::string, std::uint32_t>& DataSlots() noexcept;
+		/// @brief Gets the data slots.
+		/// @return Data slots.
 		[[nodiscard("Pure function")]]
 		const std::unordered_map<std::string, std::uint32_t>& DataSlots() const noexcept;
 

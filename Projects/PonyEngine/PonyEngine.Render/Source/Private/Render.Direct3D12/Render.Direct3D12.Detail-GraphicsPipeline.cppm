@@ -23,11 +23,11 @@ import <cstddef>;
 import <cstdint>;
 import <memory>;
 import <optional>;
-import <set>;
 import <string>;
 import <string_view>;
 import <type_traits>;
 import <unordered_map>;
+import <unordered_set>;
 import <vector>;
 
 import PonyBase.Utility.COM;
@@ -276,7 +276,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<Buffer> renderObjectGpuData; ///< Render object data gpu buffer.
 		std::shared_ptr<DescriptorHeap> renderObjectDataHeap; ///< Render object data heap.
 
-		std::set<Mesh*> meshes; ///< Render object meshes cache.
+		std::unordered_set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<CameraTask> cameraTasks; ///< Camera tasks.
 
@@ -438,7 +438,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::uint32_t GraphicsPipeline::MergedHeapMeshIndex(const Mesh& mesh, const std::uint32_t dataIndex) noexcept
 	{
-		return originalHeapOffsets[&mesh.Heap()->Heap()] + mesh.BufferOffset(dataIndex);
+		return originalHeapOffsets[&mesh.Heap()->Heap()] + mesh.HeapIndex(dataIndex);
 	}
 
 	void GraphicsPipeline::SortCameras() noexcept
@@ -909,20 +909,17 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (Mesh* const mesh : meshes)
 		{
-			for (std::uint32_t i = 0u; i < mesh->BufferCount(); ++i)
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
 			{
-				const auto bufferBarrier = D3D12_BUFFER_BARRIER
-				{
-					.SyncBefore = D3D12_BARRIER_SYNC_NONE,
-					.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
-					.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-					.pResource = &mesh->Buffer(i).Data(),
-					.Offset = 0UL,
-					.Size = UINT64_MAX
-				};
-				AddBarrier(bufferBarrier);
-			}
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.pResource = &mesh->Buffer()->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(bufferBarrier);
 		}
 	}
 
@@ -930,20 +927,17 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (Mesh* const mesh : meshes)
 		{
-			for (std::uint32_t i = 0u; i < mesh->BufferCount(); ++i)
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
 			{
-				const auto bufferBarrier = D3D12_BUFFER_BARRIER
-				{
-					.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
-					.SyncAfter = D3D12_BARRIER_SYNC_NONE,
-					.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
-					.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
-					.pResource = &mesh->Buffer(i).Data(),
-					.Offset = 0UL,
-					.Size = UINT64_MAX
-				};
-				AddBarrier(bufferBarrier);
-			}
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = &mesh->Buffer()->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(bufferBarrier);
 		}
 	}
 

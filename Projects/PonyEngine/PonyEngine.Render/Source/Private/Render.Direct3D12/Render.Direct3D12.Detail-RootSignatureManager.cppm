@@ -28,8 +28,8 @@ import PonyDebug.Log;
 
 import :IRootSignatureManager;
 import :ISubSystemContext;
-import :Shader;
 import :RootSignature;
+import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -42,8 +42,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure constructor")]]
 		explicit RootSignatureManager(ISubSystemContext& d3d12System) noexcept;
 		RootSignatureManager(const RootSignatureManager&) = delete;
-		[[nodiscard("Pure constructor")]]
-		RootSignatureManager(RootSignatureManager&& other) noexcept = default;
+		RootSignatureManager(RootSignatureManager&&) = delete;
 
 		~RootSignatureManager() noexcept = default;
 
@@ -54,16 +53,19 @@ export namespace PonyEngine::Render::Direct3D12
 		void Clean() noexcept;
 
 		RootSignatureManager& operator =(const RootSignatureManager&) = delete;
-		RootSignatureManager& operator =(RootSignatureManager&& other) noexcept = default;
+		RootSignatureManager& operator =(RootSignatureManager&&) = delete;
 
 	private:
+		/// @brief Adds a root signature.
+		/// @param rootSignature Root signature.
+		/// @param rootSignatureShader Root signature shader.
 		void Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader);
 		void Remove(std::size_t index) noexcept;
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
-		std::vector<std::shared_ptr<const Shader>> sources;
+		std::vector<std::shared_ptr<const Shader>> sources; ///< Root signature sources.
 	};
 }
 
@@ -76,6 +78,11 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader)
 	{
+		if (!rootSignatureShader) [[unlikely]]
+		{
+			throw std::invalid_argument("Root signature shader is nullptr.");
+		}
+
 		for (std::size_t i = 0; i < sources.size(); ++i)
 		{
 			if (sources[i] == rootSignatureShader)
@@ -103,9 +110,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = rootSignatures.size(); i-- > 0; )
 		{
-			if (rootSignatures[i].use_count() <= 1L)
+			if (const std::shared_ptr<RootSignature>& rootSignature = rootSignatures[i]; rootSignature.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignatures[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
 				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature destroyed.");
 			}
