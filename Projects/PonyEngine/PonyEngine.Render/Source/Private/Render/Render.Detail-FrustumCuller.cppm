@@ -84,8 +84,7 @@ namespace PonyEngine::Render
 		}
 
 		// Check by bounding sphere.
-		const float radiusSqr = PonyMath::Core::Vector3<float>(obb.Extents()).MagnitudeSquared();
-		for (const PonyMath::Shape::Plane<float>& plane : frustum.Planes())
+		for (const float radiusSqr = obb.Extents().MagnitudeSquared(); const PonyMath::Shape::Plane<float>& plane : frustum.Planes())
 		{
 			if (const float distance = plane.Distance(obb.Center()); distance < 0.f && distance * distance > radiusSqr)
 			{
@@ -150,13 +149,10 @@ namespace PonyEngine::Render
 				const PonyMath::Core::Vector3<float> axis = PonyMath::Core::Cross(frustumEdge, boxAxis);
 
 				std::array<float, CameraFrustum::CornerCount> frustumProjections;
-				for (std::size_t cornerIndex = 0; cornerIndex < CameraFrustum::CornerCount; ++cornerIndex)
-				{
-					frustumProjections[cornerIndex] = PonyMath::Core::Dot(axis, frustum.Corner(cornerIndex));
-				}
 				std::array<float, PonyMath::Shape::OBB<float>::CornerCount> obbProjections;
 				for (std::size_t cornerIndex = 0; cornerIndex < PonyMath::Shape::OBB<float>::CornerCount; ++cornerIndex)
 				{
+					frustumProjections[cornerIndex] = PonyMath::Core::Dot(axis, frustum.Corner(cornerIndex));
 					obbProjections[cornerIndex] = PonyMath::Core::Dot(axis, obbCorners[cornerIndex]);
 				}
 

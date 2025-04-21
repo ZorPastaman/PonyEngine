@@ -84,8 +84,7 @@ namespace PonyEngine::Render
 		}
 
 		// Check by bounding sphere.
-		const float radiusSqr = PonyMath::Core::Vector3<float>(obb.Extents()).MagnitudeSquared();
-		if (const PonyMath::Core::Vector3<float> closestPoint = cameraBox.Box().ClosestPoint(obb.Center()); (closestPoint - obb.Center()).MagnitudeSquared() > radiusSqr)
+		if ((cameraBox.Box().ClosestPoint(obb.Center()) - obb.Center()).MagnitudeSquared() > obb.Extents().MagnitudeSquared())
 		{
 			return false;
 		}
