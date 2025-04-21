@@ -26,6 +26,9 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
       <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyShader\PonyShader.vcxproj">
+      <Project>{cc5ca766-f2cf-45b2-9d00-ece87aa8bbc4}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
     </ProjectReference>
@@ -38,81 +41,101 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CopyPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12DepthStencil.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GpuWaiter.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12InputElementParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MaterialParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12PipelineParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderViewParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12SystemParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTargetParams.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignature.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RootSignatureManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Utility.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexDataType.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexFormat.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12CpuWaiter.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12CopyPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12DepthStencilPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12GraphicsPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MaterialManagerPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12MeshManagerPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderObjectManagerPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderSystemContext.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderViewPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RootSignatureManagerPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12SystemContext.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\IDirect3D12RenderTargetPrivate.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChain.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\DXGISystem.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\IDXGIRenderSystemContext.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\IDXGISwapChain.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\IDXGISystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Attachment.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-BackParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Buffer.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Camera.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CameraManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CopyPipeline.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeap.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-DescriptorHeapManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Frame.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FrameManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-GpuWaiter.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IFrameManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IResourceManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IShaderManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ObjectUtility.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Pipeline.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineStateUtility.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Resource.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ResourceManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-HeapType.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ShaderManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SrgbOutputQuad.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SubSystemParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FrameParams.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RootSignature.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RootSignatureManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-FormatUtility.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-CpuWaiter.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IBackManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ICopyPipeline.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IGraphicsPipeline.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IPipelineStateManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IMeshManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IRootSignatureManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-ISubSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Texture.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-IDescriptorHeapManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-View.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChain.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SubSystem.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-IRenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-ISwapChain.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm" />
-    <ClCompile Include="Source\Private\Render.DXGI\DXGISwapChainParams.cppm" />
-    <ClCompile Include="Source\Private\Render\IRenderSystemContext.cppm" />
+    <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChainParams.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-CameraBox.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-CameraFrustum.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-FrustumCuller.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystem.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryImpl.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12GraphicsPipeline.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexArray.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12IndexFormat.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Material.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Mesh.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12MeshManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObjectManager.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderTarget.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Shader.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12VertexArray.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12System.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12Fence.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderView.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail-RenderSystem.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Detail-RenderSystemFactoryImpl.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-GraphicsPipeline.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-PipelineState.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Mesh.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-MeshManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderObjectManager.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Shader.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-SubSystem.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-Fence.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail.cppm" />
-    <ClCompile Include="Source\Private\Render.Direct3D12\Direct3D12RenderObject.cppm" />
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.Detail-RenderObject.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>
-    <FxCompile Include="Shaders\PixelShader.hlsl">
+    <FxCompile Include="Shaders\OutputPixelShader.hlsl">
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
       <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <SetRootSignature Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+      </SetRootSignature>
+      <SetRootSignature Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+      </SetRootSignature>
+    </FxCompile>
+    <FxCompile Include="Shaders\OutputMeshShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mesh</ShaderType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
     </FxCompile>
-    <FxCompile Include="Shaders\RootSignature.hlsli">
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rootsig_1.1</ShaderModel>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ROOT_SIGNATURE</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RootSignature</ShaderType>
-      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ROOT_SIGNATURE</EntryPointName>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RootSignature</ShaderType>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\OutputRootSig.hlsl">
+      <FileType>Document</FileType>
       <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">rootsig_1.1</ShaderModel>
-    </FxCompile>
-    <FxCompile Include="Shaders\VertexShader.hlsl">
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Vertex</ShaderType>
-      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Vertex</ShaderType>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
-      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rootsig_1.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">SRGB_OUTPUT_ROOT_SIG</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">SRGB_OUTPUT_ROOT_SIG</EntryPointName>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RootSignature</ShaderType>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RootSignature</ShaderType>
     </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
@@ -167,6 +190,9 @@
       <Version>0.1</Version>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ObjectFileOutput>$(PonyShadersOutDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -178,6 +204,9 @@
       <Version>0.1</Version>
       <AdditionalDependencies>d3d12.lib;dxgi.lib;dxguid.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
+    <FxCompile>
+      <ObjectFileOutput>$(PonyShadersOutDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

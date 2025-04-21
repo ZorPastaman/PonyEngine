@@ -20,7 +20,7 @@ import <memory>;
 import PonyEngine.Core;
 import PonyEngine.Screen.Windows.Detail;
 
-export namespace PonyEngine::Screen
+export namespace PonyEngine::Screen::Windows
 {
 	/// @brief Creates a screen system for Windows factory.
 	/// @param application Application context.
@@ -28,13 +28,13 @@ export namespace PonyEngine::Screen
 	/// @param systemParams Screen system for Windows parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext& application, const WindowsScreenSystemFactoryParams& factoryParams, const WindowsScreenSystemParams& systemParams);
+	PONY_DLL_EXPORT ScreenSystemFactoryData CreateScreenFactory(Core::IApplicationContext& application, const ScreenSystemFactoryParams& factoryParams, const ScreenSystemParams& systemParams);
 }
 
-namespace PonyEngine::Screen
+namespace PonyEngine::Screen::Windows
 {
-	WindowsScreenSystemFactoryData CreateWindowsScreenFactory(Core::IApplicationContext& application, const WindowsScreenSystemFactoryParams& factoryParams, const WindowsScreenSystemParams& systemParams)
+	ScreenSystemFactoryData CreateScreenFactory(Core::IApplicationContext& application, const ScreenSystemFactoryParams& factoryParams, const ScreenSystemParams& systemParams)
 	{
-		return WindowsScreenSystemFactoryData{.systemFactory = std::make_unique<WindowsScreenSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return ScreenSystemFactoryData{.systemFactory = std::make_unique<ScreenSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

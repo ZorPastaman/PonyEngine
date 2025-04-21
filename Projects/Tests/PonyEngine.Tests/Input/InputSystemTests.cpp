@@ -14,10 +14,7 @@
 #include <variant>
 #include <vector>
 
-#include "Mocks/Application.h"
-#include "Mocks/InputDeviceFactory.h"
-#include "Mocks/Logger.h"
-#include "Mocks/Engine.h"
+import Mocks;
 
 import PonyEngine.Input.Impl;
 
@@ -87,7 +84,7 @@ namespace Input
 			params.inputDeviceFactories.push_back(deviceFactory);
 			params.inputBindings["Mock"] = std::vector<PonyEngine::Input::InputBindingValue>
 			{
-				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H}
+				PonyEngine::Input::InputBindingValue{.inputCode = PonyEngine::Input::InputCode::H }
 			};
 			auto factory = PonyEngine::Input::CreateInputSystemFactory(application, PonyEngine::Input::InputSystemFactoryParams{}, params);
 			auto system = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams{});

@@ -12,9 +12,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Core\Core.Detail.cppm" />
-    <ClCompile Include="Source\Private\Core\EngineImpl.cppm" />
-    <ClCompile Include="Source\Private\Core\EngineLogger.cppm" />
-    <ClCompile Include="Source\Private\Core\SystemManager.cppm" />
+    <ClCompile Include="Source\Private\Core\Core.Detail-EngineImpl.cppm" />
+    <ClCompile Include="Source\Private\Core\Core.Detail-EngineLogger.cppm" />
+    <ClCompile Include="Source\Private\Core\Core.Detail-SystemManager.cppm" />
     <ClCompile Include="Source\Public\Core\Core.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>

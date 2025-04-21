@@ -25,37 +25,37 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystem.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-WindowSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowSystemFactoryImpl.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-WindowSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsClassImpl.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-ClassImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsUtility.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsWindowTitleBar.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-TitleBar.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\IWindowsWindowSystemContext.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-IWindowSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsMessagePump.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-MessagePump.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsRawInputManager.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-RawInputManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\WindowsCursor.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-Cursor.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

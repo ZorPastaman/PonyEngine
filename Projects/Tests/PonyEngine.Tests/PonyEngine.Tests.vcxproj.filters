@@ -39,25 +39,25 @@
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\Application.cpp">
+    <ClCompile Include="Mocks\Mocks-Application.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\Logger.cpp">
+    <ClCompile Include="Mocks\Mocks-Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\System.cpp">
+    <ClCompile Include="Mocks\Mocks-System.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\TickableSystem.cpp">
+    <ClCompile Include="Mocks\Mocks-TickableSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\SystemFactory.cpp">
+    <ClCompile Include="Mocks\Mocks-SystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\TickableSystemFactory.cpp">
+    <ClCompile Include="Mocks\Mocks-TickableSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\Engine.cpp">
+    <ClCompile Include="Mocks\Mocks-Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Screen.Windows\WindowsScreenSystemFactoryTests.cpp">
@@ -69,19 +69,7 @@
     <ClCompile Include="Window.Windows\WindowsClassTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Mocks\ScreenSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Render.Direct3D12.Windows\RenderTargetTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Render.Direct3D12.Windows\RenderViewTests.cpp">
+    <ClCompile Include="Mocks\Mocks-ScreenSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Render.Direct3D12.Windows\RenderSystemFactoryTests.cpp">
@@ -90,16 +78,16 @@
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceFactoryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\InputSystem.cpp">
+    <ClCompile Include="Mocks\Mocks-InputSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Input\InputSystemTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\InputDevice.cpp">
+    <ClCompile Include="Mocks\Mocks-InputDevice.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\InputDeviceFactory.cpp">
+    <ClCompile Include="Mocks\Mocks-InputDeviceFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceTests.cpp">
@@ -114,40 +102,17 @@
     <ClCompile Include="Input.Windows\WindowsMouseDeviceTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Mocks\Application.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\TickableSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\SystemFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\TickableSystemFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\ScreenSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\InputSystem.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\InputDevice.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\InputDeviceFactory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="Mocks\Mocks.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Core\SystemInfoTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeSystemFactoryTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Time\TimeSystemTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

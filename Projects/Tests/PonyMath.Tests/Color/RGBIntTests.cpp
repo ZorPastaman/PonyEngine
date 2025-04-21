@@ -192,24 +192,6 @@ namespace Core
 			Assert::IsTrue(PonyMath::Color::RGBInt<std::uint8_t>::Predefined::White.IsWhite());
 		}
 
-		TEST_METHOD(SetTest)
-		{
-			constexpr std::uint8_t r = 211;
-			constexpr std::uint8_t g = 200;
-			constexpr std::uint8_t b = 1;
-			auto color = PonyMath::Color::RGBInt<std::uint8_t>();
-			color.Set(r, g, b);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-			color = PonyMath::Color::RGBInt<std::uint8_t>();
-			constexpr std::array<std::uint8_t, 3> array = {r, g, b};
-			color.Set(array);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-		}
-
 		TEST_METHOD(ToStringTest)
 		{
 			constexpr std::uint8_t r = 211;
@@ -363,9 +345,6 @@ namespace Core
 			[[maybe_unused]] const std::uint8_t min = movedColor.Min();
 			[[maybe_unused]] const std::uint8_t max = movedColor.Max();
 			[[maybe_unused]] const auto minMax = movedColor.MinMax();
-
-			movedColor.Set(124, 21, 90);
-			movedColor.Set(span);
 
 			[[maybe_unused]] auto component = movedColor[1];
 

@@ -18,31 +18,43 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Public\Color\Color.cppm" />
-    <ClCompile Include="Source\Public\Core\Common.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Common.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\Matrix2x2.cppm" />
-    <ClCompile Include="Source\Public\Core\Matrix3x3.cppm" />
-    <ClCompile Include="Source\Public\Core\Matrix4x4.cppm" />
-    <ClCompile Include="Source\Public\Core\Quaternion.cppm" />
-    <ClCompile Include="Source\Public\Color\RGB.cppm" />
-    <ClCompile Include="Source\Public\Color\RGBA.cppm" />
-    <ClCompile Include="Source\Public\Color\RGBAInt.cppm" />
-    <ClCompile Include="Source\Public\Color\RGBInt.cppm" />
-    <ClCompile Include="Source\Public\Core\Transformations2D.cppm" />
-    <ClCompile Include="Source\Public\Core\Transformations3D.cppm" />
-    <ClCompile Include="Source\Public\Core\Vector2.cppm" />
-    <ClCompile Include="Source\Public\Core\Vector3.cppm" />
-    <ClCompile Include="Source\Public\Core\Vector4.cppm" />
-    <ClCompile Include="Source\Public\Geometry\Geometry.cppm" />
-    <ClCompile Include="Source\Public\Geometry\Mesh.cppm" />
-    <ClCompile Include="Source\Public\Shape\Inside.cppm" />
-    <ClCompile Include="Source\Public\Shape\Intersecting.cppm" />
-    <ClCompile Include="Source\Public\Shape\Rect.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Matrix2x2.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Matrix3x3.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Matrix4x4.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Quaternion.cppm" />
+    <ClCompile Include="Source\Public\Color\Color-RGB.cppm" />
+    <ClCompile Include="Source\Public\Color\Color-RGBA.cppm" />
+    <ClCompile Include="Source\Public\Color\Color-RGBAInt.cppm" />
+    <ClCompile Include="Source\Public\Color\Color-RGBInt.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Transformations2D.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Transformations3D.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Vector2.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Vector3.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Vector4.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Circle.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-AABB.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-AABR.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Box.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Inside2D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Inside3D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Intersecting2D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Intersecting3D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Line.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-OBB.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-OBR.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Plane.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Ray2D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Ray3D.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Rect.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Sphere.cppm" />
+    <ClCompile Include="Source\Public\Shape\Shape-Utility.cppm" />
     <ClCompile Include="Source\Public\Shape\Shape.cppm" />
     <ClCompile Include="Source\Public\Space\Space.cppm" />
-    <ClCompile Include="Source\Public\Space\Transform2D.cppm" />
-    <ClCompile Include="Source\Public\Space\Transform3D.cppm" />
-    <ClCompile Include="Source\Public\Utility\Resolution.cppm" />
+    <ClCompile Include="Source\Public\Space\Space-Transform2D.cppm" />
+    <ClCompile Include="Source\Public\Space\Space-Transform3D.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-Resolution.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -68,7 +80,6 @@
     <ConfigurationType>StaticLibrary</ConfigurationType>
     <UseDebugLibraries>false</UseDebugLibraries>
     <PlatformToolset>v143</PlatformToolset>
-    <WholeProgramOptimization>true</WholeProgramOptimization>
     <CharacterSet>Unicode</CharacterSet>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />

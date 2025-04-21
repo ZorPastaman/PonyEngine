@@ -236,8 +236,8 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.708, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.836, static_cast<double>(gamma.G()), 0.001);
+			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
+			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
 			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
 			Assert::AreEqual(a, gamma.A());
 		}
@@ -250,8 +250,8 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.49, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.69, static_cast<double>(linear.G()), 0.001);
+			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
 			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
 			Assert::AreEqual(a, linear.A());
 		}
@@ -362,27 +362,6 @@ namespace Core
 			color.A() = a;
 			color.A() = nan;
 			Assert::IsFalse(color.IsFinite());
-		}
-
-		TEST_METHOD(SetTest)
-		{
-			constexpr float r = 0.49f;
-			constexpr float g = 0.69f;
-			constexpr float b = 0.211f;
-			constexpr float a = 0.166f;
-			auto color = PonyMath::Color::RGBA<float>();
-			color.Set(r, g, b, a);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-			Assert::AreEqual(a, color.A());
-			auto array = std::array<float, 4> { r, g, b, a };
-			color = PonyMath::Color::RGBA<float>();
-			color.Set(array);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-			Assert::AreEqual(a, color.A());
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -926,9 +905,6 @@ namespace Core
 			copiedColor.Min() /= 3.f;
 			copiedColor.Max() *= 2.f;
 			[[maybe_unused]] const auto minMax = movedColor.MinMax();
-
-			movedColor.Set(0.1f, 0.69f, 0.228f, 0.322f);
-			movedColor.Set(copiedColor.Span());
 
 			movedColor[0] *= 1.5f;
 			auto anotherColor = PonyMath::Color::RGBA<float>();

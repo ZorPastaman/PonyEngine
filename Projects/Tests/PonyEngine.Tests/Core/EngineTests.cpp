@@ -15,12 +15,7 @@
 #include <memory>
 #include <typeinfo>
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
-#include "Mocks/System.h"
-#include "Mocks/SystemFactory.h"
-#include "Mocks/TickableSystem.h"
-#include "Mocks/TickableSystemFactory.h"
+import Mocks;
 
 import PonyDebug.Log;
 
@@ -48,7 +43,7 @@ namespace Core
 			application.logger = &logger;
 			const auto engine = PonyEngine::Core::CreateEngine(application, PonyEngine::Core::EngineParams());
 
-			for (std::int64_t i = 0; i < 10; ++i)
+			for (std::uint64_t i = 0; i < 10; ++i)
 			{
 				Assert::AreEqual(i, engine.engine->FrameCount());
 				engine.engine->Tick();

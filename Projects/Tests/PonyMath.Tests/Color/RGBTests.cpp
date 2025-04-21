@@ -37,7 +37,7 @@ namespace Core
 		TEST_METHOD(StaticDataTest)
 		{
 			Assert::AreEqual(std::size_t{3}, PonyMath::Color::RGB<float>::ComponentCount);
-			Assert::AreEqual(2.2f, PonyMath::Color::RGB<float>::GammaValue);
+			Assert::AreEqual(2.4f, PonyMath::Color::RGB<float>::GammaValue);
 		}
 
 		TEST_METHOD(PredefinedTest)
@@ -199,8 +199,8 @@ namespace Core
 			constexpr float b = 0.002f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.708, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.836, static_cast<double>(gamma.G()), 0.001);
+			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
+			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
 			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
 		}
 
@@ -211,8 +211,8 @@ namespace Core
 			constexpr float b = 0.026f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.49, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.69, static_cast<double>(linear.G()), 0.001);
+			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
+			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
 			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
 		}
 
@@ -288,24 +288,6 @@ namespace Core
 			color.G() = g;
 			color.B() = nan;
 			Assert::IsFalse(color.IsFinite());
-		}
-
-		TEST_METHOD(SetTest)
-		{
-			constexpr float r = 0.49f;
-			constexpr float g = 0.69f;
-			constexpr float b = 0.211f;
-			auto color = PonyMath::Color::RGB<float>();
-			color.Set(r, g, b);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
-			auto array = std::array<float, 3> { r, g, b };
-			color = PonyMath::Color::RGB<float>();
-			color.Set(array);
-			Assert::AreEqual(r, color.R());
-			Assert::AreEqual(g, color.G());
-			Assert::AreEqual(b, color.B());
 		}
 
 		TEST_METHOD(ToStringTest)
@@ -720,9 +702,9 @@ namespace Core
 			constexpr float b1 = 0.219f;
 			constexpr auto color1 = PonyMath::Color::RGB<float>(r1, g1, b1);
 			auto quotient = color / color1;
-			Assert::AreEqual(r / r1, quotient.R());
-			Assert::AreEqual(g / g1, quotient.G());
-			Assert::AreEqual(b / b1, quotient.B());
+			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(quotient.R()), 0.0001);
+			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(quotient.G()), 0.0001);
+			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(quotient.B()), 0.0001);
 		}
 
 		TEST_METHOD(DivisionTest)
@@ -753,9 +735,6 @@ namespace Core
 			copiedColor.Min() /= 3.f;
 			copiedColor.Max() *= 2.f;
 			[[maybe_unused]] const auto minMax = movedColor.MinMax();
-
-			movedColor.Set(0.1f, 0.69f, 0.228f);
-			movedColor.Set(copiedColor.Span());
 
 			movedColor[0] *= 1.5f;
 			auto anotherColor = PonyMath::Color::RGB<float>();

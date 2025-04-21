@@ -15,7 +15,6 @@ export import :FileSubLoggerData;
 export import :FileSubLoggerParams;
 export import :ILogger;
 export import :ISubLogger;
-export import :LogConsoleHelper;
 export import :LogEntry;
 export import :LogFormat;
 export import :Logger;

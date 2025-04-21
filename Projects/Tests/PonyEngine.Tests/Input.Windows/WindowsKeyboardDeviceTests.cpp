@@ -10,14 +10,13 @@
 #include "CppUnitTest.h"
 
 #include <cstddef>
+#include <optional>
 #include <span>
 #include <vector>
 
 #include "PonyBase/Core/Windows/Framework.h"
 
-#include "Mocks/Engine.h"
-#include "Mocks/InputSystem.h"
-#include "Mocks/Logger.h"
+import Mocks;
 
 import PonyEngine.Input.Windows.Impl;
 import PonyEngine.Window.Windows;
@@ -28,7 +27,7 @@ namespace Input
 {
 	TEST_CLASS(WindowsKeyboardDeviceTests)
 	{
-		class WindowsWindowTitleBar final : public PonyEngine::Window::IWindowsWindowTitleBar
+		class WindowsWindowTitleBar final : public PonyEngine::Window::Windows::ITitleBar
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -40,36 +39,38 @@ namespace Input
 			virtual void SecondaryTitle(std::string_view) override {}
 		};
 
-		class MessagePump final : public PonyEngine::Window::IWindowsMessagePump
+		class MessagePump final : public PonyEngine::Window::Windows::IMessagePump
 		{
 		public:
 			std::size_t version = 0;
-			PonyEngine::Window::IWindowsMessageObserver* addedObserver;
+			PonyEngine::Window::Windows::IMessageObserver* addedObserver;
 			std::vector<UINT> observerMessageTypes;
 
-			virtual void AddMessageObserver(PonyEngine::Window::IWindowsMessageObserver& observer, std::span<const UINT> messageTypes) override
+			virtual void AddMessageObserver(PonyEngine::Window::Windows::IMessageObserver& observer, std::span<const UINT> messageTypes) override
 			{
 				++version;
 				addedObserver = &observer;
 				observerMessageTypes.assign(messageTypes.begin(), messageTypes.end());
 			}
 
-			virtual void RemoveMessageObserver(PonyEngine::Window::IWindowsMessageObserver&) noexcept override
+			virtual void RemoveMessageObserver(PonyEngine::Window::Windows::IMessageObserver&) noexcept override
 			{
 				++version;
 				addedObserver = nullptr;
 			}
 		};
 
-		class RawInputManager final : public PonyEngine::Window::IWindowsRawInputManager
+		class RawInputManager final : public PonyEngine::Window::Windows::IRawInputManager
 		{
 		public:
-			virtual void AddRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&, std::span<const DWORD>) override {}
-			virtual void RemoveRawInputObserver(PonyEngine::Window::IWindowsRawInputObserver&) noexcept override {}
+			virtual void AddRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver&, std::span<const DWORD>) override {}
+			virtual void RemoveRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver&) noexcept override {}
 		};
 
-		class Cursor final : public PonyEngine::Window::IWindowsCursor
+		class Cursor final : public PonyEngine::Window::Windows::ICursor
 		{
+			std::optional<PonyMath::Shape::Rect<float>> rect;
+
 		public:
 			[[nodiscard("Pure function")]]
 			virtual PonyMath::Core::Vector2<std::int32_t> CursorPosition() const override { return PonyMath::Core::Vector2<std::int32_t>::Predefined::Zero; }
@@ -80,11 +81,11 @@ namespace Input
 			virtual void IsVisible(bool) override {}
 
 			[[nodiscard("Pure function")]]
-			virtual std::optional<PonyMath::Shape::Rect<float>> ClippingRect() const noexcept override { return std::nullopt; }
+			virtual const std::optional<PonyMath::Shape::Rect<float>>& ClippingRect() const noexcept override { return rect; }
 			virtual void ClippingRect(const std::optional<PonyMath::Shape::Rect<float>>&) override {}
 		};
 
-		class WindowsWindowSystem final : public PonyEngine::Window::IWindowsWindowSystem
+		class WindowsWindowSystem final : public PonyEngine::Window::Windows::IWindowSystem
 		{
 		public:
 			WindowsWindowTitleBar titleBar;
@@ -93,9 +94,9 @@ namespace Input
 			class Cursor cursor;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() noexcept override { return titleBar; }
+			virtual PonyEngine::Window::Windows::ITitleBar& TitleBar() noexcept override { return titleBar; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsWindowTitleBar& TitleBar() const noexcept override { return titleBar; }
+			virtual const PonyEngine::Window::Windows::ITitleBar& TitleBar() const noexcept override { return titleBar; }
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override { return false; }
@@ -114,19 +115,19 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsCursor& Cursor() noexcept override { return cursor; }
+			virtual PonyEngine::Window::Windows::ICursor& Cursor() noexcept override { return cursor; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsCursor& Cursor() const noexcept override { return cursor; }
+			virtual const PonyEngine::Window::Windows::ICursor& Cursor() const noexcept override { return cursor; }
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsMessagePump& MessagePump() noexcept override { return messagePump; }
+			virtual PonyEngine::Window::Windows::IMessagePump& MessagePump() noexcept override { return messagePump; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsMessagePump& MessagePump() const noexcept override { return messagePump; }
+			virtual const PonyEngine::Window::Windows::IMessagePump& MessagePump() const noexcept override { return messagePump; }
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::IWindowsRawInputManager& RawInputManager() noexcept override { return rawInputManager; }
+			virtual PonyEngine::Window::Windows::IRawInputManager& RawInputManager() noexcept override { return rawInputManager; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::IWindowsRawInputManager& RawInputManager() const noexcept override { return rawInputManager; }
+			virtual const PonyEngine::Window::Windows::IRawInputManager& RawInputManager() const noexcept override { return rawInputManager; }
 
 			[[nodiscard("Pure function")]]
 			virtual HWND WindowHandle() const noexcept override { return nullptr; }
@@ -145,11 +146,11 @@ namespace Input
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto window = WindowsWindowSystem();
-			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), static_cast<PonyEngine::Window::IWindowsWindowSystem*>(&window));
+			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), static_cast<PonyEngine::Window::Windows::IWindowSystem*>(&window));
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 
 			device.inputDevice->Begin();
 
@@ -175,40 +176,36 @@ namespace Input
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			auto window = WindowsWindowSystem();
-			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::IWindowsWindowSystem), static_cast<PonyEngine::Window::IWindowsWindowSystem*>(&window));
+			dynamic_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Window::Windows::IWindowSystem), static_cast<PonyEngine::Window::Windows::IWindowSystem*>(&window));
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsKeyboardDeviceFactory(application, PonyEngine::Input::WindowsKeyboardDeviceFactoryParams{}, PonyEngine::Input::WindowsKeyboardDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateKeyboardDeviceFactory(application, PonyEngine::Input::Windows::KeyboardDeviceFactoryParams{}, PonyEngine::Input::Windows::KeyboardDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 
 			device.inputDevice->Begin();
 
 			window.messagePump.addedObserver->Observe(WM_KEYDOWN, 0, LPARAM{3014657});
 			Assert::AreEqual(std::size_t{1}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
-			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(1.f, inputSystem.events.back().inputValue);
 
 			window.messagePump.addedObserver->Observe(WM_KEYDOWN, 0, LPARAM{3014657 | (1 << 30)});
 			Assert::AreEqual(std::size_t{1}, inputSystem.events.size());
 
 			window.messagePump.addedObserver->Observe(WM_KEYUP, 0, LPARAM{2293761 | (1 << 30)});
 			Assert::AreEqual(std::size_t{2}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
-			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(0.f, inputSystem.events.back().inputValue);
 
 			window.messagePump.addedObserver->Observe(WM_SYSKEYUP, 0, LPARAM{3014657 | (1 << 30)});
 			Assert::AreEqual(std::size_t{3}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
-			Assert::AreEqual(0.f, inputSystem.events.back().second.inputValue);
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::C), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(0.f, inputSystem.events.back().inputValue);
 
 			window.messagePump.addedObserver->Observe(WM_SYSKEYDOWN, 0, LPARAM{2293761});
 			Assert::AreEqual(std::size_t{4}, inputSystem.events.size());
-			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(dynamic_cast<PonyEngine::Input::IInputDevice*>(device.inputDevice.get())), reinterpret_cast<std::uintptr_t>(inputSystem.events.back().first));
-			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().second.inputCode));
-			Assert::AreEqual(1.f, inputSystem.events.back().second.inputValue);
+			Assert::AreEqual(static_cast<std::uint32_t>(PonyEngine::Input::InputCode::H), static_cast<std::uint32_t>(inputSystem.events.back().inputCode));
+			Assert::AreEqual(1.f, inputSystem.events.back().inputValue);
 
 			device.inputDevice->End();
 		}

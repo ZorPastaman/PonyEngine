@@ -1,0 +1,271 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyMath.Space:Transform3D;
+
+import <format>;
+import <ostream>;
+import <string>;
+
+import PonyMath.Core;
+
+export namespace PonyMath::Space
+{
+	/// @brief 3D transform implementation.
+	class Transform3D final
+	{
+	public:
+		/// @brief Creates a transform with a zero position, identity rotation and scale of one.
+		[[nodiscard("Pure constructor")]]
+		Transform3D() noexcept;
+		/// @brief Creates a transform with arguments.
+		/// @param position Position.
+		/// @param rotation Rotation. Must be unit.
+		/// @param scale Scale.
+		[[nodiscard("Pure constructor")]]
+		Transform3D(const Core::Vector3<float>& position, const Core::Quaternion<float>& rotation, const Core::Vector3<float>& scale) noexcept;
+		[[nodiscard("Pure constructor")]]
+		Transform3D(const Transform3D& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		Transform3D(Transform3D&& other) noexcept = default;
+
+		~Transform3D() noexcept = default;
+
+		/// @brief Gets the position.
+		/// @return Position.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float>& Position() noexcept;
+		/// @brief Gets the position.
+		/// @return Position.
+		[[nodiscard("Pure function")]]
+		const Core::Vector3<float>& Position() const noexcept;
+
+		/// @brief Gets the rotation.
+		/// @return Rotation.
+		[[nodiscard("Pure function")]]
+		Core::Quaternion<float>& Rotation() noexcept;
+		/// @brief Gets the rotation.
+		/// @return Rotation.
+		[[nodiscard("Pure function")]]
+		const Core::Quaternion<float>& Rotation() const noexcept;
+
+		/// @brief Gets the scale.
+		/// @return Scale.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float>& Scale() noexcept;
+		/// @brief Gets the scale.
+		/// @return Scale.
+		[[nodiscard("Pure function")]]
+		const Core::Vector3<float>& Scale() const noexcept;
+
+		/// @brief Computes a translation-rotation-scaling matrix.
+		/// @return Translation-rotation-scaling matrix.
+		[[nodiscard("Pure function")]]
+		Core::Matrix4x4<float> TrsMatrix() const noexcept;
+
+		/// @brief Gets the transform forward vector.
+		/// @return Forward.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Forward() const noexcept;
+		/// @brief Gets the transform back vector.
+		/// @return Back.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Back() const noexcept;
+		/// @brief Gets the transform up vector.
+		/// @return Up.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Up() const noexcept;
+		/// @brief Gets the transform down vector.
+		/// @return Down.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Down() const noexcept;
+		/// @brief Gets the transform right vector.
+		/// @return Right.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Right() const noexcept;
+		/// @brief Gets the transform left vector.
+		/// @return Left.
+		[[nodiscard("Pure function")]]
+		Core::Vector3<float> Left() const noexcept;
+
+		/// @brief Translates the transform.
+		/// @param translation Translation.
+		void Translate(const Core::Vector3<float>& translation) noexcept;
+		/// @brief Rotates the transform.
+		/// @param rotationToAdd Rotation. Must be unit.
+		void Rotate(const Core::Quaternion<float>& rotationToAdd) noexcept;
+
+		/// @brief Rotates the transform so that it looks in the specific direction.
+		/// @param direction Look direction. Must be unit.
+		/// @param up Up vector. Must be unit.
+		void LookIn(const Core::Vector3<float>& direction, const Core::Vector3<float>& up) noexcept;
+		/// @brief Rotates the transform so that it looks at the specific point.
+		/// @note The function does nothing if the @p point is too close to the current position.
+		/// @param point Look target.
+		/// @param up Up vector. Must be unit.
+		void LookAt(const Core::Vector3<float>& point, const Core::Vector3<float>& up) noexcept;
+
+		/// @brief Creates a string representing the current state of the transform.
+		/// @return String representing the current state of the transform.
+		[[nodiscard("Pure function")]]
+		std::string ToString() const;
+
+		Transform3D& operator =(const Transform3D& other) noexcept = default;
+		Transform3D& operator =(Transform3D&& other) noexcept = default;
+
+		/// @brief Checks if two transforms are the same: they have the same position, rotation and scale.
+		/// @param other Other transform.
+		/// @return @a True if they're the same; @a false otherwise.
+		[[nodiscard("Pure operator")]]
+		bool operator ==(const Transform3D& other) const noexcept;
+
+	private:
+		Core::Vector3<float> position; ///< Position.
+		Core::Quaternion<float> rotation; ///< Rotation.
+		Core::Vector3<float> scale; ///< Scale.
+	};
+
+	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.
+	/// @param left Left transform.
+	/// @param right Right transform.
+	/// @param tolerance Tolerance value. Must be positive.
+	/// @return @a True if they're almost equal; @a false otherwise.
+	[[nodiscard("Pure function")]]
+	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right, float tolerance = 0.00001f) noexcept;
+
+	/// @brief Puts the transform ToString() to the stream.
+	/// @param stream Target.
+	/// @param transform Transform.
+	/// @return @p stream.
+	std::ostream& operator <<(std::ostream& stream, const Transform3D& transform);
+}
+
+namespace PonyMath::Space
+{
+	Transform3D::Transform3D() noexcept :
+		Transform3D(Core::Vector3<float>::Predefined::Zero, Core::Quaternion<float>::Predefined::Identity, Core::Vector3<float>::Predefined::One)
+	{
+	}
+
+	Transform3D::Transform3D(const Core::Vector3<float>& position, const Core::Quaternion<float>& rotation, const Core::Vector3<float>& scale) noexcept :
+		position(position),
+		rotation(rotation),
+		scale(scale)
+	{
+	}
+
+	Core::Vector3<float>& Transform3D::Position() noexcept
+	{
+		return position;
+	}
+
+	const Core::Vector3<float>& Transform3D::Position() const noexcept
+	{
+		return position;
+	}
+
+	Core::Quaternion<float>& Transform3D::Rotation() noexcept
+	{
+		return rotation;
+	}
+
+	const Core::Quaternion<float>& Transform3D::Rotation() const noexcept
+	{
+		return rotation;
+	}
+
+	Core::Vector3<float>& Transform3D::Scale() noexcept
+	{
+		return scale;
+	}
+
+	const Core::Vector3<float>& Transform3D::Scale() const noexcept
+	{
+		return scale;
+	}
+
+	Core::Matrix4x4<float> Transform3D::TrsMatrix() const noexcept
+	{
+		return Core::TrsMatrix(position, rotation, scale);
+	}
+
+	Core::Vector3<float> Transform3D::Forward() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Forward;
+	}
+
+	Core::Vector3<float> Transform3D::Back() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Back;
+	}
+
+	Core::Vector3<float> Transform3D::Up() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Up;
+	}
+
+	Core::Vector3<float> Transform3D::Down() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Down;
+	}
+
+	Core::Vector3<float> Transform3D::Right() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Right;
+	}
+
+	Core::Vector3<float> Transform3D::Left() const noexcept
+	{
+		return rotation * Core::Vector3<float>::Predefined::Left;
+	}
+
+	void Transform3D::Translate(const Core::Vector3<float>& translation) noexcept
+	{
+		position += translation;
+	}
+
+	void Transform3D::Rotate(const Core::Quaternion<float>& rotationToAdd) noexcept
+	{
+		rotation = rotationToAdd * rotation;
+	}
+
+	void Transform3D::LookIn(const Core::Vector3<float>& direction, const Core::Vector3<float>& up) noexcept
+	{
+		rotation = Core::LookInRotationQuaternion(direction, up);
+	}
+
+	void Transform3D::LookAt(const Core::Vector3<float>& point, const Core::Vector3<float>& up) noexcept
+	{
+		const Core::Vector3<float> direction = point - position;
+		if (const float magnitude = direction.Magnitude(); magnitude > 0.0001f)
+		{
+			LookIn(direction * (1.f / magnitude), up);
+		}
+	}
+
+	std::string Transform3D::ToString() const
+	{
+		return std::format("Position: {}, Rotation: {}, Scale: {}", position.ToString(), rotation.ToString(), scale.ToString());
+	}
+
+	bool Transform3D::operator ==(const Transform3D& other) const noexcept
+	{
+		return position == other.position && rotation == other.rotation && scale == other.scale;
+	}
+
+	bool AreAlmostEqual(const Transform3D& left, const Transform3D& right, const float tolerance) noexcept
+	{
+		return Core::AreAlmostEqual(left.Position(), right.Position(), tolerance) && Core::AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && Core::AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
+	}
+
+	std::ostream& operator <<(std::ostream& stream, const Transform3D& transform)
+	{
+		return stream << transform.ToString();
+	}
+}

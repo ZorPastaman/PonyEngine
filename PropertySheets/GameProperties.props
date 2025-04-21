@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ImportGroup Label="PropertySheets" />
+  <PropertyGroup Label="UserMacros">
+    <GameDataDir>GameData\</GameDataDir>
+    <GameDataOutDir>$(OutDir)$(GameDataDir)</GameDataOutDir>
+    <GameShadersDir>$(GameDataDir)Shaders\</GameShadersDir>
+    <GameShadersOutDir>$(OutDir)$(GameShadersDir)</GameShadersOutDir>
+  </PropertyGroup>
+  <ItemGroup>
+    <BuildMacro Include="GameDataDir">
+      <Value>$(GameDataDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameDataOutDir">
+      <Value>$(GameDataOutDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameShadersDir">
+      <Value>$(GameShadersDir)</Value>
+    </BuildMacro>
+    <BuildMacro Include="GameShadersOutDir">
+      <Value>$(GameShadersOutDir)</Value>
+    </BuildMacro>
+  </ItemGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>GAME_DATA_DIR="$(GameDataDir.Replace('\', '/'))";GAME_SHADERS_DIR="$(GameShadersDir.Replace('\', '/'))";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <PreprocessorDefinitions>GAME_DATA_DIR="$(GameDataDir.Replace('\', '/'))";GAME_SHADERS_DIR="$(GameShadersDir.Replace('\', '/'))";%(PreprocessorDefinitions)</PreprocessorDefinitions>
+    </ClCompile>
+  </ItemDefinitionGroup>
+</Project>

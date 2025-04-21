@@ -9,6 +9,20 @@
 
 export module PonyMath.Shape;
 
-export import :Inside;
-export import :Intersecting;
+export import :AABB;
+export import :AABR;
+export import :Box;
+export import :Circle;
+export import :Inside2D;
+export import :Inside3D;
+export import :Intersecting2D;
+export import :Intersecting3D;
+export import :Line;
+export import :OBB;
+export import :OBR;
+export import :Plane;
+export import :Ray2D;
+export import :Ray3D;
 export import :Rect;
+export import :Sphere;
+export import :Utility;

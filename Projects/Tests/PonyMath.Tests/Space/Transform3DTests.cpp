@@ -39,12 +39,6 @@ namespace Space
 			Assert::IsTrue(rotation == transform.Rotation());
 			Assert::IsTrue(scale == transform.Scale());
 
-			constexpr float uniformScale = 1.5f;
-			const auto uniformTransform = PonyMath::Space::Transform3D(position, rotation, uniformScale);
-			Assert::IsTrue(position == uniformTransform.Position());
-			Assert::IsTrue(rotation == uniformTransform.Rotation());
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(uniformScale, uniformScale, uniformScale) == uniformTransform.Scale());
-
 			const PonyMath::Space::Transform3D copiedTransform = transform;
 			Assert::IsTrue(position == copiedTransform.Position());
 			Assert::IsTrue(rotation == copiedTransform.Rotation());
@@ -60,28 +54,33 @@ namespace Space
 		{
 			auto transform = PonyMath::Space::Transform3D();
 			constexpr auto position = PonyMath::Core::Vector3<float>(3.f, -2.f, 1.5f);
-			transform.Position(position);
+			transform.Position() = position;
 			Assert::IsTrue(position == transform.Position());
+
+			const auto transformC = transform;
+			Assert::IsTrue(position == transformC.Position());
 		}
 
 		TEST_METHOD(RotationTest)
 		{
 			auto transform = PonyMath::Space::Transform3D();
 			const auto rotation = PonyMath::Core::Quaternion<float>(1.f, 2.f, -3.f, 4.f).Normalized();
-			transform.Rotation(rotation);
+			transform.Rotation() = rotation;
 			Assert::IsTrue(rotation == transform.Rotation());
+
+			const auto transformC = transform;
+			Assert::IsTrue(rotation == transformC.Rotation());
 		}
 
 		TEST_METHOD(ScaleTest)
 		{
 			auto transform = PonyMath::Space::Transform3D();
 			constexpr auto scale = PonyMath::Core::Vector3<float>(0.5f, 1.2f, 3.f);
-			transform.Scale(scale);
+			transform.Scale() = scale;
 			Assert::IsTrue(scale == transform.Scale());
 
-			constexpr float uniformScale = 3.f;
-			transform.Scale(uniformScale);
-			Assert::IsTrue(PonyMath::Core::Vector3<float>(uniformScale, uniformScale, uniformScale) == transform.Scale());
+			const auto transformC = transform;
+			Assert::IsTrue(scale == transformC.Scale());
 		}
 
 		TEST_METHOD(TrsMatrixTest)
@@ -218,13 +217,13 @@ namespace Space
 			Assert::IsFalse(transform == otherTransform);
 			Assert::IsTrue(transform != otherTransform);
 
-			otherTransform.Position(position);
+			otherTransform.Position() = position;
 			otherTransform.Rotate(PonyMath::Core::Quaternion<float>(1.5f, 0.2f, -1.1f, 2.f).Normalized());
 			Assert::IsFalse(transform == otherTransform);
 			Assert::IsTrue(transform != otherTransform);
 
-			otherTransform.Rotation(rotation);
-			otherTransform.Scale(PonyMath::Core::Vector3<float>::Predefined::One);
+			otherTransform.Rotation() = rotation;
+			otherTransform.Scale() = PonyMath::Core::Vector3<float>::Predefined::One;
 			Assert::IsFalse(transform == otherTransform);
 			Assert::IsTrue(transform != otherTransform);
 		}
@@ -239,15 +238,15 @@ namespace Space
 			auto otherTransform = transform;
 			Assert::IsTrue(PonyMath::Space::AreAlmostEqual(transform, otherTransform));
 
-			otherTransform.Position(PonyMath::Core::Vector3<float>(std::nextafter(position.X(), 0.f), std::nextafter(position.Y(), 0.f), std::nextafter(position.Z(), 0.f)));
+			otherTransform.Position() = PonyMath::Core::Vector3<float>(std::nextafter(position.X(), 0.f), std::nextafter(position.Y(), 0.f), std::nextafter(position.Z(), 0.f));
 			Assert::IsTrue(PonyMath::Space::AreAlmostEqual(transform, otherTransform));
 
-			otherTransform.Position(position);
-			otherTransform.Rotation(PonyMath::Core::Quaternion<float>(std::nextafter(rotation.X(), 0.f), std::nextafter(rotation.Y(), 0.f), std::nextafter(rotation.Z(), 0.f), std::nextafter(rotation.W(), 0.f)));
+			otherTransform.Position() = position;
+			otherTransform.Rotation() = PonyMath::Core::Quaternion<float>(std::nextafter(rotation.X(), 0.f), std::nextafter(rotation.Y(), 0.f), std::nextafter(rotation.Z(), 0.f), std::nextafter(rotation.W(), 0.f));
 			Assert::IsTrue(PonyMath::Space::AreAlmostEqual(transform, otherTransform));
 
-			otherTransform.Rotation(rotation);
-			otherTransform.Scale(PonyMath::Core::Vector3<float>(std::nextafter(scale.X(), 0.f), std::nextafter(scale.Y(), 0.f), std::nextafter(scale.Z(), 0.f)));
+			otherTransform.Rotation() = rotation;
+			otherTransform.Scale() = PonyMath::Core::Vector3<float>(std::nextafter(scale.X(), 0.f), std::nextafter(scale.Y(), 0.f), std::nextafter(scale.Z(), 0.f));
 
 			Assert::IsFalse(PonyMath::Space::AreAlmostEqual(transform, PonyMath::Space::Transform3D()));
 			Assert::IsTrue(PonyMath::Space::AreAlmostEqual(transform, PonyMath::Space::Transform3D(), 1000.f));

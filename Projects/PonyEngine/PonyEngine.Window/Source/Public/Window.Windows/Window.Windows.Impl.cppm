@@ -20,35 +20,35 @@ import <memory>;
 import PonyEngine.Core;
 import PonyEngine.Window.Windows.Detail;
 
-export namespace PonyEngine::Window
+export namespace PonyEngine::Window::Windows
 {
 	/// @brief Creates a Windows class.
-	/// @note The window that uses this class must set a pointer to @p IWindowsMessageHandler in CreateWindow() to correctly use this class.
+	/// @note The window that uses this class must set a pointer to @p IMessageHandler in CreateWindow() to correctly use this class.
 	/// @param application Application context.
 	/// @param params Windows class parameters.
 	/// @return Windows class.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsClassData CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params);
+	PONY_DLL_EXPORT ClassData CreateClass(Core::IApplicationContext& application, const ClassParams& params);
 
 	/// @brief Creates a window system for Windows factory.
-	/// @note The window class must support @p IWindowsMessageHandler that is set in CreateWindow().
+	/// @note The window class must support @p IMessageHandler that is set in CreateWindow().
 	/// @param application Application context.
 	/// @param factoryParams Window system for Windows factory parameters.
 	/// @param systemParams Window system for Windows parameters.
 	/// @return Created factory.
 	[[nodiscard("Pure function")]]
-	PONY_DLL_EXPORT WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& factoryParams, const WindowsWindowSystemParams& systemParams);
+	PONY_DLL_EXPORT WindowSystemFactoryData CreateWindowFactory(Core::IApplicationContext& application, const WindowSystemFactoryParams& factoryParams, const WindowSystemParams& systemParams);
 }
 
-namespace PonyEngine::Window
+namespace PonyEngine::Window::Windows
 {
-	WindowsClassData CreateWindowsClass(Core::IApplicationContext& application, const WindowsClassParams& params)
+	ClassData CreateClass(Core::IApplicationContext& application, const ClassParams& params)
 	{
-		return WindowsClassData{.windowsClass = std::make_unique<WindowsClassImpl>(application, params)};
+		return ClassData{.windowsClass = std::make_unique<ClassImpl>(application, params)};
 	}
 
-	WindowsWindowSystemFactoryData CreateWindowsWindowFactory(Core::IApplicationContext& application, const WindowsWindowSystemFactoryParams& factoryParams, const WindowsWindowSystemParams& systemParams)
+	WindowSystemFactoryData CreateWindowFactory(Core::IApplicationContext& application, const WindowSystemFactoryParams& factoryParams, const WindowSystemParams& systemParams)
 	{
-		return WindowsWindowSystemFactoryData{.systemFactory = std::make_unique<WindowsWindowSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return WindowSystemFactoryData{.systemFactory = std::make_unique<WindowSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

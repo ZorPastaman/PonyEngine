@@ -31,9 +31,19 @@ namespace Shape
 			Assert::IsTrue(std::is_same_v<float, PonyMath::Shape::Rect<float>::ValueType>);
 		}
 
+		TEST_METHOD(StaticDataTest)
+		{
+			Assert::AreEqual(std::size_t{0}, PonyMath::Shape::Rect<float>::LeftBottomIndex);
+			Assert::AreEqual(std::size_t{1}, PonyMath::Shape::Rect<float>::RightBottomIndex);
+			Assert::AreEqual(std::size_t{2}, PonyMath::Shape::Rect<float>::LeftTopIndex);
+			Assert::AreEqual(std::size_t{3}, PonyMath::Shape::Rect<float>::RightTopIndex);
+			Assert::AreEqual(std::size_t{4}, PonyMath::Shape::Rect<float>::CornerCount);
+		}
+
 		TEST_METHOD(PredefinedTest)
 		{
 			Assert::IsTrue(PonyMath::Shape::Rect<float>(0.f, 0.f, 0.f, 0.f) == PonyMath::Shape::Rect<float>::Predefined::Zero);
+			Assert::IsTrue(PonyMath::Shape::Rect<float>(0.f, 0.f, 1.f, 1.f) == PonyMath::Shape::Rect<float>::Predefined::NormalizedFull);
 		}
 
 		TEST_METHOD(ConstructorTest)
@@ -185,6 +195,23 @@ namespace Shape
 			Assert::AreEqual(-5.5, static_cast<double>(rect.MinY()), 0.001);
 		}
 
+		TEST_METHOD(CornerTest)
+		{
+			const auto rect = PonyMath::Shape::Rect<std::int32_t>(4, 1, 2, 7);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.LeftBottom());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.RightBottom());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.LeftTop());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.RightTop());
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.Corner(0));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.Corner(1));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.Corner(2));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.Corner(3));
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 1) == rect.Corners()[0]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 1) == rect.Corners()[1]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(4, 8) == rect.Corners()[2]);
+			Assert::IsTrue(PonyMath::Core::Vector2<std::int32_t>(6, 8) == rect.Corners()[3]);
+		}
+
 		TEST_METHOD(PerimeterTest)
 		{
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
@@ -220,6 +247,32 @@ namespace Shape
 			Assert::IsTrue(rect.Contains(PonyMath::Core::Vector2<float>(5.f, 7.f)));
 			Assert::IsFalse(rect.Contains(PonyMath::Core::Vector2<float>(8.f, 7.f)));
 			Assert::IsFalse(rect.Contains(PonyMath::Core::Vector2<float>(5.f, -7.f)));
+		}
+
+		TEST_METHOD(ClosestPointShortTest)
+		{
+			constexpr std::int16_t x = 7;
+			constexpr std::int16_t y = -8;
+			constexpr std::int16_t width = 4;
+			constexpr std::int16_t height = 14;
+			constexpr auto rect = PonyMath::Shape::Rect<std::int16_t>(x, y, width, height);
+			Assert::IsTrue(rect.Center() == rect.ClosestPoint(rect.Center()));
+			Assert::IsTrue(rect.Min() == rect.ClosestPoint(rect.Min()));
+			Assert::IsTrue(rect.Max() == rect.ClosestPoint(rect.Max()));
+			auto vector = rect.Center() + PonyMath::Core::Vector2<std::int16_t>(width, height) / 2;
+			Assert::IsTrue(vector == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(100, y);
+			auto expected = PonyMath::Core::Vector2<std::int16_t>(rect.MaxX(), y);
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(x, -100);
+			expected = PonyMath::Core::Vector2<std::int16_t>(x, rect.MinY());
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
+
+			vector = PonyMath::Core::Vector2<std::int16_t>(-100, 100);
+			expected = PonyMath::Core::Vector2<std::int16_t>(rect.MinX(), rect.MaxY());
+			Assert::IsTrue(expected == rect.ClosestPoint(vector));
 		}
 
 		TEST_METHOD(NormalizePointTest)
@@ -299,22 +352,6 @@ namespace Shape
 			Assert::AreEqual(-6., static_cast<double>(rectN.MinY()), 0.001);
 			Assert::AreEqual(8., static_cast<double>(rectN.MaxX()), 0.001);
 			Assert::AreEqual(15., static_cast<double>(rectN.MaxY()), 0.001);
-		}
-
-		TEST_METHOD(SetTest)
-		{
-			auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
-			rect.Set(1.f, -3.f, 5.f, 8.f);
-			Assert::AreEqual(1.f, rect.Position().X());
-			Assert::AreEqual(-3.f, rect.Position().Y());
-			Assert::AreEqual(5.f, rect.Size().X());
-			Assert::AreEqual(8.f, rect.Size().Y());
-
-			rect.Set(PonyMath::Core::Vector2<float>(-2.f, 4.f), PonyMath::Core::Vector2<float>(4.f, 7.f));
-			Assert::AreEqual(-2.f, rect.Position().X());
-			Assert::AreEqual(4.f, rect.Position().Y());
-			Assert::AreEqual(4.f, rect.Size().X());
-			Assert::AreEqual(7.f, rect.Size().Y());
 		}
 
 		TEST_METHOD(ResolveNegativeTest)
@@ -456,9 +493,6 @@ namespace Shape
 
 			movedRect.Center(PonyMath::Core::Vector2<float>(4.f, 7.f));
 
-			movedRect.Set(2.f, 1.f, 7.f, 8.f);
-			movedRect.Set(PonyMath::Core::Vector2<float>(2.f, 6.f), PonyMath::Core::Vector2<float>(-4.f, 5.f));
-
 			movedRect.ResolveNegativeSize();
 
 			PonyMath::Shape::Rect<float> copied;
@@ -490,6 +524,13 @@ namespace Shape
 			[[maybe_unused]] constexpr auto height = rect.Height();
 
 			[[maybe_unused]] constexpr auto center = rect.Center();
+
+			[[maybe_unused]] constexpr auto leftBottom = rect.LeftBottom();
+			[[maybe_unused]] constexpr auto rightBottom = rect.RightBottom();
+			[[maybe_unused]] constexpr auto leftTop = rect.LeftTop();
+			[[maybe_unused]] constexpr auto rightTop = rect.RightTop();
+			[[maybe_unused]] constexpr auto corner = rect.Corner(0);
+			[[maybe_unused]] constexpr auto corners = rect.Corners();
 
 			[[maybe_unused]] constexpr auto perimeter = rect.Perimeter();
 			[[maybe_unused]] constexpr auto area = rect.Area();

@@ -15,13 +15,13 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Log\ConsoleSubLogger.cppm">
+    <ClCompile Include="Source\Private\Log\Log.Detail-ConsoleSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Log\FileSubLogger.cppm">
+    <ClCompile Include="Source\Private\Log\Log.Detail-FileSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Log\LoggerImpl.cppm">
+    <ClCompile Include="Source\Private\Log\Log.Detail-LoggerImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Log\Log.Impl.cppm">
@@ -30,7 +30,7 @@
     <ClCompile Include="Source\Public\Log.Windows\Log.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Log.Windows\OutputDebugStringSubLogger.cppm">
+    <ClCompile Include="Source\Private\Log.Windows\Log.Windows.Detail-OutputDebugStringSubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Log\Log.Detail.cppm">
