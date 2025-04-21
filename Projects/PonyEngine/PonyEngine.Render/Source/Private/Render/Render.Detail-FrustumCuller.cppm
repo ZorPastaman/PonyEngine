@@ -77,8 +77,34 @@ namespace PonyEngine::Render
 
 	bool FrustumCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
+		// Check by center.
+		if (frustum.Contains(obb.Center()))
+		{
+			return true;
+		}
+
+		// Check by bounding sphere.
+		const float radiusSqr = PonyMath::Core::Vector3<float>(obb.Extents()).MagnitudeSquared();
+		for (const PonyMath::Shape::Plane<float>& plane : frustum.Planes())
+		{
+			if (const float distance = plane.Distance(obb.Center()); distance < 0.f && distance * distance > radiusSqr)
+			{
+				return false;
+			}
+		}
+
 		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::OBB<float>::CornerCount> obbCorners = obb.Corners();
 
+		// Check by corners.
+		for (const PonyMath::Core::Vector3<float>& corner : obbCorners)
+		{
+			if (frustum.Contains(corner))
+			{
+				return true;
+			}
+		}
+
+		// Check by SAT (first step).
 		for (std::size_t axisIndex = 0; axisIndex < CameraFrustum::DifferentNormalPlaneCount; ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = frustum.Plane(axisIndex).Normal();
@@ -97,6 +123,7 @@ namespace PonyEngine::Render
 			}
 		}
 
+		// Check by SAT (second step).
 		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::OBB<float>::AxesCount; ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = obb.Axis(axisIndex);
@@ -115,6 +142,7 @@ namespace PonyEngine::Render
 			}
 		}
 
+		// Check by SAT (third step).
 		for (const PonyMath::Core::Vector3<float>& frustumEdge : frustum.Edges())
 		{
 			for (const PonyMath::Core::Vector3<float>& boxAxis : obb.Axes())
