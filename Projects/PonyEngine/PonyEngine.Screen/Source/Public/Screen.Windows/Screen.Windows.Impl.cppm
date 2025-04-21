@@ -35,6 +35,6 @@ namespace PonyEngine::Screen::Windows
 {
 	ScreenSystemFactoryData CreateScreenFactory(Core::IApplicationContext& application, const ScreenSystemFactoryParams& factoryParams, const ScreenSystemParams& systemParams)
 	{
-		return ScreenSystemFactoryData{.systemFactory = std::make_unique<ScreenSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return ScreenSystemFactoryData{.systemFactory = std::make_shared<ScreenSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

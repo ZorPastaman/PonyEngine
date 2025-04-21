@@ -18,7 +18,6 @@ export namespace PonyEngine::Render::Direct3D12::Windows
 	/// @brief Direct3D 12 render system for Windows factory data.
 	struct RenderSystemFactoryData final
 	{
-		std::unique_ptr<RenderSystemFactory> systemFactory; ///< Render system factory.
-		// TODO: Here and in other places replace unique_ptr with shared_ptr if an object goes across dll boundaries.
+		std::shared_ptr<RenderSystemFactory> systemFactory; ///< Render system factory.
 	};
 }

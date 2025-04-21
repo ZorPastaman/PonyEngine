@@ -44,11 +44,11 @@ namespace PonyEngine::Input::Windows
 {
 	KeyboardDeviceFactoryData CreateKeyboardDeviceFactory(Core::IApplicationContext& application, const KeyboardDeviceFactoryParams& factoryParams, const KeyboardDeviceParams& deviceParams)
 	{
-		return KeyboardDeviceFactoryData{.inputDeviceFactory = std::make_unique<KeyboardDeviceFactory>(application, factoryParams, deviceParams)};
+		return KeyboardDeviceFactoryData{.inputDeviceFactory = std::make_shared<KeyboardDeviceFactory>(application, factoryParams, deviceParams)};
 	}
 
 	MouseDeviceFactoryData CreateMouseDeviceFactory(Core::IApplicationContext& application, const MouseDeviceFactoryParams& factoryParams, const MouseDeviceParams& deviceParams)
 	{
-		return MouseDeviceFactoryData{.inputDeviceFactory = std::make_unique<MouseDeviceFactory>(application, factoryParams, deviceParams)};
+		return MouseDeviceFactoryData{.inputDeviceFactory = std::make_shared<MouseDeviceFactory>(application, factoryParams, deviceParams)};
 	}
 }

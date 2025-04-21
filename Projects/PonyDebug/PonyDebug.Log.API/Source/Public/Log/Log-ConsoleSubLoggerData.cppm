@@ -18,6 +18,6 @@ export namespace PonyDebug::Log
 	/// @brief Console sub-logger data.
 	struct ConsoleSubLoggerData final
 	{
-		std::unique_ptr<SubLogger> subLogger; ///< Sub-logger.
+		std::shared_ptr<SubLogger> subLogger; ///< Sub-logger.
 	};
 }

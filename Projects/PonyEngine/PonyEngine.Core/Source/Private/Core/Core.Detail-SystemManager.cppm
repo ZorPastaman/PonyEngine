@@ -81,16 +81,16 @@ export namespace PonyEngine::Core
 		SystemData CreateSystem(ISystemFactory* factory) const;
 		/// @brief Adds the @p system as a non-tickable system.
 		/// @param system Non-tickable system.
-		void AddNonTickable(std::unique_ptr<System> system);
+		void AddNonTickable(std::shared_ptr<System>&& system);
 		/// @brief Adds the @p system as a tickable system.
 		/// @param system Tickable system.
 		/// @param tickOrder Tick order.
 		/// @param tickableSystemsBuffer Tickable systems buffer.
-		void AddTickable(std::unique_ptr<TickableSystem> system, std::int32_t tickOrder, std::vector<std::pair<TickableSystem*, std::int32_t>>& tickableSystemsBuffer);
+		void AddTickable(std::shared_ptr<TickableSystem>&& system, std::int32_t tickOrder, std::vector<std::pair<TickableSystem*, std::int32_t>>& tickableSystemsBuffer);
 
 		IEngineContext* engine; ///< Engine.
 
-		std::vector<std::unique_ptr<System>> systems; ///< Systems.
+		std::vector<std::shared_ptr<System>> systems; ///< Systems.
 		std::vector<TickableSystem*> tickableSystems; ///< Tickable systems.
 		std::unordered_map<std::type_index, void*> systemInterfaces; ///< System interfaces.
 	};
@@ -176,7 +176,7 @@ namespace PonyEngine::Core
 
 	void SystemManager::BeginSystems() const
 	{
-		for (const std::unique_ptr<System>& system : systems)
+		for (const std::shared_ptr<System>& system : systems)
 		{
 			PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Info, "Begin '{}' system.", typeid(*system).name());
 			try
@@ -243,19 +243,19 @@ namespace PonyEngine::Core
 		}
 	}
 
-	void SystemManager::AddNonTickable(std::unique_ptr<System> system)
+	void SystemManager::AddNonTickable(std::shared_ptr<System>&& system)
 	{
 		assert(system && "The system is nullptr.");
-		assert(std::ranges::find_if(systems, [&](const std::unique_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
+		assert(std::ranges::find_if(systems, [&](const std::shared_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
 			"The system has already been added.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to non-tickable systems.", typeid(*system).name());
 		systems.push_back(std::move(system));
 	}
 
-	void SystemManager::AddTickable(std::unique_ptr<TickableSystem> system, const std::int32_t tickOrder, std::vector<std::pair<TickableSystem*, std::int32_t>>& tickableSystemsBuffer)
+	void SystemManager::AddTickable(std::shared_ptr<TickableSystem>&& system, const std::int32_t tickOrder, std::vector<std::pair<TickableSystem*, std::int32_t>>& tickableSystemsBuffer)
 	{
 		assert(system && "The system is nullptr.");
-		assert(std::ranges::find_if(systems, [&](const std::unique_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
+		assert(std::ranges::find_if(systems, [&](const std::shared_ptr<System>& addedSystem) { return typeid(*addedSystem) == typeid(*system); }) == systems.cend() &&
 			"The system has already been added.");
 		PONY_LOG(engine->Logger(), PonyDebug::Log::LogType::Debug, "Add '{}' to tickable systems.", typeid(*system).name());
 		tickableSystemsBuffer.emplace_back(system.get(), tickOrder);

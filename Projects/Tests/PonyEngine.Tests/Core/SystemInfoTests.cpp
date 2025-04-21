@@ -45,7 +45,7 @@ namespace Core
 			engine.application = &application;
 
 			const auto info = PonyEngine::Core::SystemInfo<Mocks::System, Mocks::ISystemInterface>();
-			const auto data = info.CreateSystemData(std::make_unique<Mocks::System>(engine, PonyEngine::Core::SystemParams{}));
+			const auto data = info.CreateSystemData(std::make_shared<Mocks::System>(engine, PonyEngine::Core::SystemParams{}));
 			Assert::AreEqual(std::size_t{0}, data.system.index());
 			Assert::IsTrue(typeid(Mocks::System) == typeid(*std::get<0>(data.system)));
 			Assert::AreEqual(std::size_t{1}, data.publicInterfaces.Count());

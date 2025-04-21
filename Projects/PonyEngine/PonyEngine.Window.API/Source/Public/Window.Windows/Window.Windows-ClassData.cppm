@@ -18,6 +18,6 @@ export namespace PonyEngine::Window::Windows
 	/// @brief Windows class data.
 	struct ClassData final
 	{
-		std::unique_ptr<Class> windowsClass; ///< Windows class.
+		std::shared_ptr<Class> windowsClass; ///< Windows class.
 	};
 }

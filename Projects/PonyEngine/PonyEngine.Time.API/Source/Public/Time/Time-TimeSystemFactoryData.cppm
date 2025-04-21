@@ -18,6 +18,6 @@ export namespace PonyEngine::Time
 	/// @brief Time system factory data.
 	struct TimeSystemFactoryData final
 	{
-		std::unique_ptr<TimeSystemFactory> systemFactory; ///< System factory.
+		std::shared_ptr<TimeSystemFactory> systemFactory; ///< System factory.
 	};
 }

@@ -60,7 +60,7 @@ namespace PonyEngine::Input::Windows
 
 	DeviceData KeyboardDeviceFactory::CreateDevice(IInputSystemContext& inputSystem, const DeviceParams& deviceParams)
 	{
-		return DeviceData{.inputDevice = std::make_unique<KeyboardDevice>(inputSystem, deviceParams, keyboardParams)};
+		return DeviceData{.inputDevice = std::make_shared<KeyboardDevice>(inputSystem, deviceParams, keyboardParams)};
 	}
 
 	const std::type_info& KeyboardDeviceFactory::DeviceType() const noexcept

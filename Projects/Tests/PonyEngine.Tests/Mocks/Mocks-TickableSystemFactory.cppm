@@ -46,7 +46,7 @@ namespace Mocks
 {
 	PonyEngine::Core::SystemData TickableSystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		auto system = std::make_unique<TickableSystem>(engine, params);
+		auto system = std::make_shared<TickableSystem>(engine, params);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<ITickableSystemInterface>(*system);
 
@@ -55,7 +55,7 @@ namespace Mocks
 
 		return PonyEngine::Core::SystemData
 		{
-			.system = std::unique_ptr<PonyEngine::Core::TickableSystem>(std::move(system)),
+			.system = std::shared_ptr<PonyEngine::Core::TickableSystem>(system),
 			.publicInterfaces = std::move(interfaces)
 		};
 	}

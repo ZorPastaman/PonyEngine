@@ -42,7 +42,12 @@ export namespace PonyEngine::Core
 		/// @param system System.
 		/// @return System data.
 		[[nodiscard("Pure function")]]
-		SystemData CreateSystemData(std::unique_ptr<System>&& system) const;
+		SystemData CreateSystemData(const std::shared_ptr<System>& system) const;
+		/// @brief Creates a system data.
+		/// @param system System.
+		/// @return System data.
+		[[nodiscard("Pure function")]]
+		SystemData CreateSystemData(std::shared_ptr<System>&& system) const;
 	};
 }
 
@@ -67,18 +72,36 @@ namespace PonyEngine::Core
 	}
 
 	template<typename System, typename... Interfaces> requires (std::derived_from<System, Core::System> && (std::derived_from<System, Interfaces> && ...))
-	SystemData SystemInfo<System, Interfaces...>::CreateSystemData(std::unique_ptr<System>&& system) const
+	SystemData SystemInfo<System, Interfaces...>::CreateSystemData(const std::shared_ptr<System>& system) const
 	{
 		SystemData data;
 		data.publicInterfaces.AddInterfaces<System, Interfaces...>(*system);
 
 		if constexpr (std::is_base_of_v<TickableSystem, System>)
 		{
-			data.system = std::unique_ptr<TickableSystem>(std::move(system));
+			data.system = std::shared_ptr<TickableSystem>(system);
 		}
 		else
 		{
-			data.system = std::unique_ptr<Core::System>(std::move(system));
+			data.system = std::shared_ptr<Core::System>(system);
+		}
+
+		return data;
+	}
+
+	template<typename System, typename... Interfaces> requires (std::derived_from<System, Core::System> && (std::derived_from<System, Interfaces> && ...))
+	SystemData SystemInfo<System, Interfaces...>::CreateSystemData(std::shared_ptr<System>&& system) const
+	{
+		SystemData data;
+		data.publicInterfaces.AddInterfaces<System, Interfaces...>(*system);
+
+		if constexpr (std::is_base_of_v<TickableSystem, System>)
+		{
+			data.system = std::shared_ptr<TickableSystem>(std::move(system));
+		}
+		else
+		{
+			data.system = std::shared_ptr<Core::System>(std::move(system));
 		}
 
 		return data;

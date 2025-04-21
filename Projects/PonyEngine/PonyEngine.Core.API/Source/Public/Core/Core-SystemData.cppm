@@ -22,7 +22,7 @@ export namespace PonyEngine::Core
 	/// @brief System data.
 	struct SystemData final
 	{
-		std::variant<std::unique_ptr<System>, std::unique_ptr<TickableSystem>> system; ///< System.
+		std::variant<std::shared_ptr<System>, std::shared_ptr<TickableSystem>> system; ///< System.
 		PonyBase::Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
 	};
 }

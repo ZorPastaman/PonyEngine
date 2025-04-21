@@ -18,6 +18,6 @@ export namespace PonyEngine::Screen::Windows
 	/// @brief Windows screen system factory data.
 	struct ScreenSystemFactoryData final
 	{
-		std::unique_ptr<ScreenSystemFactory> systemFactory; ///< System factory.
+		std::shared_ptr<ScreenSystemFactory> systemFactory; ///< System factory.
 	};
 }

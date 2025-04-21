@@ -61,7 +61,7 @@ namespace PonyEngine::Input
 
 	Core::SystemData InputSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return inputSystemInfo.CreateSystemData(std::make_unique<InputSystem>(engine, params, inputSystemParams));
+		return inputSystemInfo.CreateSystemData(std::make_shared<InputSystem>(engine, params, inputSystemParams));
 	}
 
 	const Core::ISystemInfo& InputSystemFactoryImpl::SystemInfo() const noexcept

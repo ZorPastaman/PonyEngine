@@ -62,7 +62,7 @@ namespace PonyEngine::Time
 
 	Core::SystemData FrameRateSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return frameRateSystemInfo.CreateSystemData(std::make_unique<FrameRateSystem>(engine, params, frameRateSystemParams));
+		return frameRateSystemInfo.CreateSystemData(std::make_shared<FrameRateSystem>(engine, params, frameRateSystemParams));
 	}
 
 	const Core::ISystemInfo& FrameRateSystemFactoryImpl::SystemInfo() const noexcept

@@ -62,7 +62,7 @@ namespace PonyEngine::Window::Windows
 
 	Core::SystemData WindowSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return windowSystemInfo.CreateSystemData(std::make_unique<WindowSystem>(engine, params, windowSystemParams));
+		return windowSystemInfo.CreateSystemData(std::make_shared<WindowSystem>(engine, params, windowSystemParams));
 	}
 
 	const Core::ISystemInfo& WindowSystemFactoryImpl::SystemInfo() const noexcept

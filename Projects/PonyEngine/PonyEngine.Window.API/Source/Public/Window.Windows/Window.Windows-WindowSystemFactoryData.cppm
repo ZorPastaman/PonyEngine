@@ -18,6 +18,6 @@ export namespace PonyEngine::Window::Windows
 	/// @brief Window system for Windows factory data.
 	struct WindowSystemFactoryData final
 	{
-		std::unique_ptr<WindowSystemFactory> systemFactory; ///< System factory.
+		std::shared_ptr<WindowSystemFactory> systemFactory; ///< System factory.
 	};
 }

@@ -44,11 +44,11 @@ namespace PonyEngine::Window::Windows
 {
 	ClassData CreateClass(Core::IApplicationContext& application, const ClassParams& params)
 	{
-		return ClassData{.windowsClass = std::make_unique<ClassImpl>(application, params)};
+		return ClassData{.windowsClass = std::make_shared<ClassImpl>(application, params)};
 	}
 
 	WindowSystemFactoryData CreateWindowFactory(Core::IApplicationContext& application, const WindowSystemFactoryParams& factoryParams, const WindowSystemParams& systemParams)
 	{
-		return WindowSystemFactoryData{.systemFactory = std::make_unique<WindowSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return WindowSystemFactoryData{.systemFactory = std::make_shared<WindowSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

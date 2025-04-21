@@ -35,6 +35,6 @@ namespace PonyEngine::Render::Direct3D12::Windows
 {
 	RenderSystemFactoryData CreateRenderSystemFactory(Core::IApplicationContext& application, const RenderSystemFactoryParams& factoryParams, const RenderSystemParams& systemParams)
 	{
-		return RenderSystemFactoryData{.systemFactory = std::make_unique<RenderSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return RenderSystemFactoryData{.systemFactory = std::make_shared<RenderSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

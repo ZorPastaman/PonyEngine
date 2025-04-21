@@ -18,6 +18,6 @@ export namespace Game
 	/// @brief Game system factory data.
 	struct GameSystemFactoryData final
 	{
-		std::unique_ptr<GameSystemFactory> systemFactory; ///< Game system factory.
+		std::shared_ptr<GameSystemFactory> systemFactory; ///< Game system factory.
 	};
 }

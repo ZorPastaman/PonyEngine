@@ -18,6 +18,6 @@ export namespace PonyEngine::Input
 	/// @brief Input system factory data.
 	struct InputSystemFactoryData final
 	{
-		std::unique_ptr<InputSystemFactory> systemFactory; ///< Input system factory.
+		std::shared_ptr<InputSystemFactory> systemFactory; ///< Input system factory.
 	};
 }

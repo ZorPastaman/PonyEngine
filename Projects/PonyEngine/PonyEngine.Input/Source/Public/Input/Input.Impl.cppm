@@ -35,6 +35,6 @@ namespace PonyEngine::Input
 {
 	InputSystemFactoryData CreateInputSystemFactory(Core::IApplicationContext& application, const InputSystemFactoryParams& factoryParams, const InputSystemParams& systemParams)
 	{
-		return InputSystemFactoryData{.systemFactory = std::make_unique<InputSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return InputSystemFactoryData{.systemFactory = std::make_shared<InputSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

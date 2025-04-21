@@ -18,6 +18,6 @@ export namespace PonyEngine::Input::Windows
 	/// @brief Windows keyboard device factory data.
 	struct KeyboardDeviceFactoryData final
 	{
-		std::unique_ptr<DeviceFactory> inputDeviceFactory; ///< Windows keyboard device factory.
+		std::shared_ptr<DeviceFactory> inputDeviceFactory; ///< Windows keyboard device factory.
 	};
 }

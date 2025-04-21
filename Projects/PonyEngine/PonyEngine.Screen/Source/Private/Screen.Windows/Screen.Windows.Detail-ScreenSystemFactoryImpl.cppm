@@ -62,7 +62,7 @@ namespace PonyEngine::Screen::Windows
 
 	Core::SystemData ScreenSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return screenSystemInfo.CreateSystemData(std::make_unique<ScreenSystem>(engine, params, screenSystemParams));
+		return screenSystemInfo.CreateSystemData(std::make_shared<ScreenSystem>(engine, params, screenSystemParams));
 	}
 
 	const Core::ISystemInfo& ScreenSystemFactoryImpl::SystemInfo() const noexcept
