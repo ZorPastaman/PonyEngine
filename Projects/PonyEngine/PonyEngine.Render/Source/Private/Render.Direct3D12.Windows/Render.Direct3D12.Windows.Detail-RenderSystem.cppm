@@ -91,29 +91,6 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		dxgiSubSystem = std::make_unique<DXGI::SubSystem>(*static_cast<DXGI::IRenderSystemContext*>(this));
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "DXGI sub-system created.");
 
-		PonyMath::Utility::Resolution<std::uint32_t> renderResolution;
-		HWND windowHandle;
-		if (const auto windowSystem = Engine().SystemManager().FindSystem<Window::Windows::IWindowSystem>()) [[likely]]
-		{
-			windowHandle = windowSystem->WindowHandle();
-
-			if (renderParams.swapChainParams.useWindowResolution)
-			{
-				renderResolution = PonyMath::Utility::Resolution<std::uint32_t>(static_cast<PonyMath::Core::Vector2<std::uint32_t>>(windowSystem->WindowClientRect().Size()));
-				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution: '{}'.", renderResolution.ToString());
-				
-			}
-			else
-			{
-				renderResolution = renderParams.mainFrameParams.resolution;
-				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", renderResolution.ToString());
-			}
-		}
-		else [[unlikely]]
-		{
-			throw std::runtime_error("Failed to find Windows window system.");
-		}
-
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D12 sub-system.");
 		const auto direct3D12SystemParams = Direct3D12::SubSystemParams
 		{
@@ -124,11 +101,33 @@ namespace PonyEngine::Render::Direct3D12::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Direct3D12 sub-system created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create swap chain.");
+		PonyMath::Utility::Resolution<std::uint32_t> swapChainResolution;
+		HWND windowHandle;
+		if (const auto windowSystem = Engine().SystemManager().FindSystem<Window::Windows::IWindowSystem>()) [[likely]]
+		{
+			windowHandle = windowSystem->WindowHandle();
+
+			if (renderParams.useWindowResolutionAsSwapChainResolution)
+			{
+				swapChainResolution = PonyMath::Utility::Resolution<std::uint32_t>(static_cast<PonyMath::Core::Vector2<std::uint32_t>>(windowSystem->WindowClientRect().Size()));
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use window resolution: '{}'.", swapChainResolution.ToString());
+			}
+			else
+			{
+				swapChainResolution = renderParams.swapChainParams.resolution;
+				PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Use custom resolution: '{}'.", swapChainResolution.ToString());
+			}
+		}
+		else [[unlikely]]
+		{
+			throw std::runtime_error("Failed to find Windows window system.");
+		}
 		const auto swapChainParams = DXGI::SwapChainParams
 		{
 			.device = &direct3D12SubSystem->GraphicsCommandQueue(),
 			.hWnd = windowHandle,
-			.resolution = renderResolution,
+			.resolution = swapChainResolution,
+			.format = GetD3D12Format(renderParams.mainFrameParams.rtvFormat),
 			.bufferCount = renderParams.swapChainParams.bufferCount
 		};
 		const DXGI::ISwapChain& swapChain = dxgiSubSystem->CreateSwapChain(swapChainParams);
@@ -150,7 +149,10 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create render system.");
 		Render::FrameParams mainFrameParams = renderParams.mainFrameParams;
-		mainFrameParams.resolution = renderResolution;
+		if (renderParams.useSwapChainResolutionAsRenderResolution)
+		{
+			mainFrameParams.resolution = swapChainResolution;
+		}
 		direct3D12SubSystem->CreateRenderSystem(backParams, mainFrameParams);
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Render system created.");
 	}
@@ -173,7 +175,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 	void RenderSystem::End() noexcept
 	{
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");
-		direct3D12SubSystem->EndFrame(); // Ensures that the render is finished before releasing resources. It may be required in case of an exception.
+		direct3D12SubSystem->EndFrame(); // Ensures that the render is finished before releasing resources.
 	}
 
 	void RenderSystem::Tick()

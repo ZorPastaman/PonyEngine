@@ -25,6 +25,7 @@ export namespace PonyEngine::Render::DXGI
 		Microsoft::WRL::ComPtr<IUnknown> device; ///< Render device.
 		HWND hWnd; ///< Window handle. Must be an alive window.
 		PonyMath::Utility::Resolution<std::uint32_t> resolution; ///< Swap chain resolution.
+		DXGI_FORMAT format = DXGI_FORMAT_R8G8B8A8_UNORM; ///< Swap chain format.
 		std::uint32_t bufferCount; ///< Back buffer count.
 	};
 }

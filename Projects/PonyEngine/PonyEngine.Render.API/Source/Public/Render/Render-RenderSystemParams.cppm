@@ -21,5 +21,7 @@ export namespace PonyEngine::Render
 		/// @note Must have a correct rtv format that is compatible with sRGB but not sRGB.
 		FrameParams mainFrameParams;
 		SwapChainParams swapChainParams; ///< Swap chain parameters.
+		bool useWindowResolutionAsSwapChainResolution = true; ///< If it's true, the swap chain resolution will be the same as the window resolution.
+		bool useSwapChainResolutionAsRenderResolution = true; ///< If it's true, the render resolution will be the same as the swap chain resolution.
 	};
 }
