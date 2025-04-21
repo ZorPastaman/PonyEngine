@@ -77,8 +77,31 @@ namespace PonyEngine::Render
 
 	bool BoxCuller::IsVisible(const PonyMath::Shape::OBB<float>& obb) const noexcept
 	{
+		// Check by center.
+		if (cameraBox.Box().Contains(obb.Center()))
+		{
+			return true;
+		}
+
+		// Check by bounding sphere.
+		const float radiusSqr = PonyMath::Core::Vector3<float>(obb.Extents()).MagnitudeSquared();
+		if (const PonyMath::Core::Vector3<float> closestPoint = cameraBox.Box().ClosestPoint(obb.Center()); (closestPoint - obb.Center()).MagnitudeSquared() > radiusSqr)
+		{
+			return false;
+		}
+
 		const std::array<PonyMath::Core::Vector3<float>, PonyMath::Shape::AABB<float>::CornerCount> obbCorners = obb.Corners();
 
+		// Check by corners.
+		for (const PonyMath::Core::Vector3<float>& corner : obbCorners)
+		{
+			if (cameraBox.Box().Contains(corner))
+			{
+				return true;
+			}
+		}
+
+		// Check by SAT (first step).
 		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = PonyMath::Shape::AABB<float>::Axes[axisIndex];
@@ -97,6 +120,7 @@ namespace PonyEngine::Render
 			}
 		}
 
+		// Check by SAT (second step).
 		for (std::size_t axisIndex = 0; axisIndex < PonyMath::Shape::AABB<float>::Axes.size(); ++axisIndex)
 		{
 			const PonyMath::Core::Vector3<float>& axis = obb.Axis(axisIndex);
@@ -115,6 +139,7 @@ namespace PonyEngine::Render
 			}
 		}
 
+		// Check by SAT (third step).
 		for (const PonyMath::Core::Vector3<float>& cameraAxis : PonyMath::Shape::AABB<float>::Axes)
 		{
 			for (const PonyMath::Core::Vector3<float>& objectAxis : obb.Axes())
