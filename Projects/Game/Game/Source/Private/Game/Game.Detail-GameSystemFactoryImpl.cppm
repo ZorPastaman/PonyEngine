@@ -67,7 +67,7 @@ namespace Game
 
 	PonyEngine::Core::SystemData GameSystemFactoryImpl::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		return gameSystemInfo.CreateSystemData(std::make_unique<GameSystem>(engine, params, gameSystemParams));
+		return gameSystemInfo.CreateSystemData(std::make_shared<GameSystem>(engine, params, gameSystemParams));
 	}
 
 	const PonyEngine::Core::ISystemInfo& GameSystemFactoryImpl::SystemInfo() const noexcept

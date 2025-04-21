@@ -70,8 +70,8 @@ export namespace Application::Windows
 		[[nodiscard("Pure function")]]
 		static PonyDebug::Log::FileSubLoggerData CreateFileSubLogger();
 
-		std::unique_ptr<PonyDebug::Log::Logger> logger; ///< Logger.
-		std::array<std::unique_ptr<PonyDebug::Log::SubLogger>, 3> subLoggers; ///< Sub-loggers.
+		std::shared_ptr<PonyDebug::Log::Logger> logger; ///< Logger.
+		std::array<std::shared_ptr<PonyDebug::Log::SubLogger>, 3> subLoggers; ///< Sub-loggers.
 	};
 }
 
@@ -87,7 +87,7 @@ namespace Application::Windows
 		}
 	{
 		PONY_CONSOLE(PonyDebug::Log::LogType::Info, "Add sub-loggers.");
-		for (std::unique_ptr<PonyDebug::Log::SubLogger>& subLogger : subLoggers)
+		for (std::shared_ptr<PonyDebug::Log::SubLogger>& subLogger : subLoggers)
 		{
 			PONY_CONSOLE(PonyDebug::Log::LogType::Debug, "Add '{}' sub-logger.", typeid(*subLogger).name());
 			logger->AddSubLogger(*subLogger);

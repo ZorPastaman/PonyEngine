@@ -18,6 +18,6 @@ export namespace PonyDebug::Log::Windows
 	/// @brief Output debug string sub-logger data.
 	struct OutputDebugStringSubLoggerData final
 	{
-		std::unique_ptr<SubLogger> subLogger; ///< Sub-logger.
+		std::shared_ptr<SubLogger> subLogger; ///< Sub-logger.
 	};
 }

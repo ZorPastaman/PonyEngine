@@ -102,7 +102,7 @@ export namespace Application::Windows
 
 		PonyEngine::Core::IApplicationContext* application; ///< Application.
 
-		std::unique_ptr<PonyEngine::Core::Engine> engine; ///< Engine.
+		std::shared_ptr<PonyEngine::Core::Engine> engine; ///< Engine.
 	};
 }
 
@@ -214,7 +214,7 @@ namespace Application::Windows
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows window system factory.");
 			const auto windowsClassParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Game"};
 			auto windowsClass = PonyEngine::Window::Windows::CreateClass(*application, windowsClassParams);
-			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = windowsClass.windowsClass};
 			systemParams.cursorParams.visible = false;
 			systemParams.cursorParams.cursorClipping = PonyMath::Shape::Rect<float>(0.5f, 0.5f, 0.f, 0.f);
 			systemParams.windowsWindowStyle.extendedStyle |= WS_EX_APPWINDOW;
@@ -244,8 +244,8 @@ namespace Application::Windows
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Windows mouse device factory.");
 			PonyEngine::Input::Windows::MouseDeviceFactoryData mouseDeviceFactory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(*application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{.sensitivity = 0.001f});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Windows mouse device factory created.", typeid(*mouseDeviceFactory.inputDeviceFactory).name());
-			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::DeviceFactory>(std::move(keyboardDeviceFactory.inputDeviceFactory)));
-			inputParams.inputDeviceFactories.push_back(std::shared_ptr<PonyEngine::Input::DeviceFactory>(std::move(mouseDeviceFactory.inputDeviceFactory)));
+			inputParams.inputDeviceFactories.push_back(keyboardDeviceFactory.inputDeviceFactory);
+			inputParams.inputDeviceFactories.push_back(mouseDeviceFactory.inputDeviceFactory);
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Input device factories created.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Set up input mapping.");
 			inputParams.inputBindings["Forward"] = std::vector<PonyEngine::Input::InputBindingValue>
@@ -347,13 +347,13 @@ namespace Application::Windows
 			auto params = PonyEngine::Core::EngineParams{};
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create system factories.");
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Screen::ScreenSystemFactory>(std::move(CreateScreenSystemFactory().systemFactory))});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Time::FrameRateSystemFactory>(std::move(CreateFrameRateSystemFactory().systemFactory)), .tickOrder = 1});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Time::TimeSystemFactory>(std::move(CreateTimeSystemFactory().systemFactory)), .tickOrder = 2});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Window::WindowSystemFactory>(std::move(CreateWindowSystemFactory().systemFactory)), .tickOrder = 3});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Input::InputSystemFactory>(std::move(CreateInputSystemFactory().systemFactory)), .tickOrder = 4});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<PonyEngine::Render::RenderSystemFactory>(std::move(CreateRenderSystemFactory().systemFactory)), .tickOrder = 6});
-			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = std::shared_ptr<Game::GameSystemFactory>(std::move(CreateGameSystemFactory().systemFactory)), .tickOrder = 5});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateScreenSystemFactory().systemFactory});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateFrameRateSystemFactory().systemFactory, .tickOrder = 1});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateTimeSystemFactory().systemFactory, .tickOrder = 2});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateWindowSystemFactory().systemFactory, .tickOrder = 3});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateInputSystemFactory().systemFactory, .tickOrder = 4});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateRenderSystemFactory().systemFactory, .tickOrder = 6});
+			params.systemFactories.push_back(PonyEngine::Core::SystemFactoryEntry{.factory = CreateGameSystemFactory().systemFactory, .tickOrder = 5});
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "System factories created.");
 
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create engine.");

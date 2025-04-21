@@ -37,7 +37,7 @@ namespace Mocks
 	PonyEngine::Input::DeviceData InputDeviceFactory::CreateDevice(PonyEngine::Input::IInputSystemContext& inputSystem, const PonyEngine::Input::DeviceParams& deviceParams)
 	{
 		++version;
-		auto device = std::make_unique<InputDevice>(inputSystem, deviceParams);
+		auto device = std::make_shared<InputDevice>(inputSystem, deviceParams);
 		inputDevice = device.get();
 
 		return PonyEngine::Input::DeviceData{.inputDevice = std::move(device)};

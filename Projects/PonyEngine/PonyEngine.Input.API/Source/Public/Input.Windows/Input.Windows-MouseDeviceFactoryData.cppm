@@ -18,6 +18,6 @@ export namespace PonyEngine::Input::Windows
 	/// @brief Windows mouse device factory data.
 	struct MouseDeviceFactoryData final
 	{
-		std::unique_ptr<DeviceFactory> inputDeviceFactory; ///< Windows mouse device factory.
+		std::shared_ptr<DeviceFactory> inputDeviceFactory; ///< Windows mouse device factory.
 	};
 }

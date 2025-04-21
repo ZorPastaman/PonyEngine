@@ -46,7 +46,7 @@ namespace Mocks
 {
 	PonyEngine::Core::SystemData SystemFactory::Create(PonyEngine::Core::IEngineContext& engine, const PonyEngine::Core::SystemParams& params)
 	{
-		auto system = std::make_unique<System>(engine, params);
+		auto system = std::make_shared<System>(engine, params);
 		auto interfaces = PonyBase::Utility::ObjectInterfaces();
 		interfaces.AddInterfacesDeduced<ISystemInterface>(*system);
 

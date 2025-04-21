@@ -43,11 +43,11 @@ namespace PonyEngine::Time
 {
 	FrameRateSystemFactoryData CreateFrameRateSystemFactory(Core::IApplicationContext& application, const FrameRateSystemFactoryParams& factoryParams, const FrameRateSystemParams& systemParams)
 	{
-		return FrameRateSystemFactoryData{.systemFactory = std::make_unique<FrameRateSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return FrameRateSystemFactoryData{.systemFactory = std::make_shared<FrameRateSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 
 	TimeSystemFactoryData CreateTimeSystemFactory(Core::IApplicationContext& application, const TimeSystemFactoryParams& factoryParams, const TimeSystemParams& systemParams)
 	{
-		return TimeSystemFactoryData{.systemFactory = std::make_unique<TimeSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return TimeSystemFactoryData{.systemFactory = std::make_shared<TimeSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

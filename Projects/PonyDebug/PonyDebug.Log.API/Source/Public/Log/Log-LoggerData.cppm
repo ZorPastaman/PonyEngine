@@ -18,6 +18,6 @@ export namespace PonyDebug::Log
 	/// @brief Logger data.
 	struct LoggerData final
 	{
-		std::unique_ptr<Logger> logger; ///< Logger.
+		std::shared_ptr<Logger> logger; ///< Logger.
 	};
 }

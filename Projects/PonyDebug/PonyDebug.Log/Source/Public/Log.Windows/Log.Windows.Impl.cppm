@@ -35,6 +35,6 @@ namespace PonyDebug::Log::Windows
 {
 	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params)
 	{
-		return OutputDebugStringSubLoggerData{.subLogger = std::make_unique<OutputDebugStringSubLogger>(params)};
+		return OutputDebugStringSubLoggerData{.subLogger = std::make_shared<OutputDebugStringSubLogger>(params)};
 	}
 }

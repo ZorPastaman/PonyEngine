@@ -43,16 +43,16 @@ namespace PonyDebug::Log
 {
 	LoggerData CreateLogger(const LoggerParams& params)
 	{
-		return LoggerData{.logger = std::make_unique<LoggerImpl>(params)};
+		return LoggerData{.logger = std::make_shared<LoggerImpl>(params)};
 	}
 
 	ConsoleSubLoggerData CreateConsoleSubLogger(const ConsoleSubLoggerParams& params)
 	{
-		return ConsoleSubLoggerData{.subLogger = std::make_unique<ConsoleSubLogger>(params)};
+		return ConsoleSubLoggerData{.subLogger = std::make_shared<ConsoleSubLogger>(params)};
 	}
 
 	FileSubLoggerData CreateFileSubLogger(const FileSubLoggerParams& params)
 	{
-		return FileSubLoggerData{.subLogger = std::make_unique<FileSubLogger>(params)};
+		return FileSubLoggerData{.subLogger = std::make_shared<FileSubLogger>(params)};
 	}
 }

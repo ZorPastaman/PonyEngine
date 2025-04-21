@@ -18,6 +18,6 @@ export namespace PonyEngine::Core
 	/// @brief Engine data.
 	struct EngineData final
 	{
-		std::unique_ptr<Engine> engine; ///< Engine.
+		std::shared_ptr<Engine> engine; ///< Engine.
 	};
 }

@@ -62,7 +62,7 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 	Core::SystemData RenderSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return renderSystemInfo.CreateSystemData(std::make_unique<RenderSystem>(engine, params, renderSystemParams));
+		return renderSystemInfo.CreateSystemData(std::make_shared<RenderSystem>(engine, params, renderSystemParams));
 	}
 
 	const Core::ISystemInfo& RenderSystemFactoryImpl::SystemInfo() const noexcept

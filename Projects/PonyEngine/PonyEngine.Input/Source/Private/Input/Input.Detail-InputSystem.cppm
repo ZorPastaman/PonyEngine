@@ -184,7 +184,7 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		std::optional<std::size_t> InputIdIndex(std::string_view id) const noexcept;
 
-		std::vector<std::unique_ptr<Device>> devices; ///< Input devices.
+		std::vector<std::shared_ptr<Device>> devices; ///< Input devices.
 		std::vector<InputSystemContextWrapper> contextWrappers; ///< Context wrappers for devices.
 
 		std::vector<std::string> inputIds; ///< Input ids.
@@ -322,7 +322,7 @@ namespace PonyEngine::Input
 			contextWrappers.push_back(InputSystemContextWrapper(this, devices.size()));
 			DeviceData device = deviceFactory->CreateDevice(contextWrappers.back(), DeviceParams{});
 			assert(device.inputDevice && "The device is nullptr");
-			devices.push_back(std::move(device.inputDevice));
+			devices.push_back(device.inputDevice);
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Device created.");
 		}
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Devices created.");
@@ -360,7 +360,7 @@ namespace PonyEngine::Input
 	void InputSystem::Begin()
 	{
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Begin devices.");
-		for (const std::unique_ptr<Device>& device : devices)
+		for (const std::shared_ptr<Device>& device : devices)
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Begin '{}' device.", typeid(*device).name());
 			device->Begin();
@@ -503,7 +503,7 @@ namespace PonyEngine::Input
 
 	void InputSystem::TickDevices()
 	{
-		for (const std::unique_ptr<Device>& device : devices)
+		for (const std::shared_ptr<Device>& device : devices)
 		{
 			device->Tick();
 		}

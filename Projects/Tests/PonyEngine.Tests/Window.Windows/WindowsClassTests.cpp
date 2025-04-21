@@ -30,7 +30,7 @@ namespace Window
 			auto application = Mocks::Application();
 			application.logger = &logger;
 			const auto params = PonyEngine::Window::Windows::ClassParams{.name = L"Test", .icon = nullptr, .smallIcon = nullptr, .cursor = nullptr}; // TODO: Add tests for all the fields.
-			std::unique_ptr<PonyEngine::Window::Windows::Class> windowsClass = PonyEngine::Window::Windows::CreateClass(application, params).windowsClass;
+			std::shared_ptr<PonyEngine::Window::Windows::Class> windowsClass = PonyEngine::Window::Windows::CreateClass(application, params).windowsClass;
 
 			WNDCLASSEXW classParams;
 			Assert::IsTrue(GetClassInfoExW(windowsClass->ModuleHandle(), params.name.c_str(), &classParams));

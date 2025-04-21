@@ -18,6 +18,6 @@ export namespace PonyEngine::Time
 	/// @brief Frame rate system factory data.
 	struct FrameRateSystemFactoryData final
 	{
-		std::unique_ptr<FrameRateSystemFactory> systemFactory; ///< System factory.
+		std::shared_ptr<FrameRateSystemFactory> systemFactory; ///< System factory.
 	};
 }

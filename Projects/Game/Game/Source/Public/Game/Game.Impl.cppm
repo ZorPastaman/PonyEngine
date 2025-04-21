@@ -36,6 +36,6 @@ namespace Game
 {
 	GameSystemFactoryData CreateGameSystemFactory(PonyEngine::Core::IApplicationContext& application, const GameSystemFactoryParams& factoryParams, const GameSystemParams& systemParams)
 	{
-		return GameSystemFactoryData{.systemFactory = std::make_unique<GameSystemFactoryImpl>(application, factoryParams, systemParams)};
+		return GameSystemFactoryData{.systemFactory = std::make_shared<GameSystemFactoryImpl>(application, factoryParams, systemParams)};
 	}
 }

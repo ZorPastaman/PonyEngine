@@ -62,7 +62,7 @@ namespace PonyEngine::Time
 
 	Core::SystemData TimeSystemFactoryImpl::Create(Core::IEngineContext& engine, const Core::SystemParams& params)
 	{
-		return timeSystemInfo.CreateSystemData(std::make_unique<TimeSystem>(engine, params, timeSystemParams));
+		return timeSystemInfo.CreateSystemData(std::make_shared<TimeSystem>(engine, params, timeSystemParams));
 	}
 
 	const Core::ISystemInfo& TimeSystemFactoryImpl::SystemInfo() const noexcept

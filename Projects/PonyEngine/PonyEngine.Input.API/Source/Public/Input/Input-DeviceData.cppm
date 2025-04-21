@@ -18,6 +18,6 @@ export namespace PonyEngine::Input
 	/// @brief Input device data.
 	struct DeviceData final
 	{
-		std::unique_ptr<Device> inputDevice; ///< Input device.
+		std::shared_ptr<Device> inputDevice; ///< Input device.
 	};
 }
