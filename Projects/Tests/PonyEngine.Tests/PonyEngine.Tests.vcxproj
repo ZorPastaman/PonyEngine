@@ -72,35 +72,35 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="Core\EngineTests.cpp" />
+    <ClCompile Include="Core\SystemInfoTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsMouseDeviceFactoryTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsMouseDeviceTests.cpp" />
     <ClCompile Include="Input\ActionConversionTests.cpp" />
     <ClCompile Include="Input\InputSystemTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceFactoryTests.cpp" />
     <ClCompile Include="Input.Windows\WindowsKeyboardDeviceTests.cpp" />
-    <ClCompile Include="Mocks\Application.cpp" />
-    <ClCompile Include="Mocks\Engine.cpp" />
-    <ClCompile Include="Mocks\InputDevice.cpp" />
-    <ClCompile Include="Mocks\InputDeviceFactory.cpp" />
-    <ClCompile Include="Mocks\InputSystem.cpp" />
-    <ClCompile Include="Mocks\Logger.cpp" />
-    <ClCompile Include="Mocks\ScreenSystem.cpp" />
-    <ClCompile Include="Mocks\System.cpp" />
-    <ClCompile Include="Mocks\SystemFactory.cpp" />
-    <ClCompile Include="Mocks\TickableSystem.cpp" />
-    <ClCompile Include="Mocks\TickableSystemFactory.cpp" />
+    <ClCompile Include="Mocks\Mocks-Application.cppm" />
+    <ClCompile Include="Mocks\Mocks-Engine.cppm" />
+    <ClCompile Include="Mocks\Mocks-InputDevice.cppm" />
+    <ClCompile Include="Mocks\Mocks-InputDeviceFactory.cppm" />
+    <ClCompile Include="Mocks\Mocks-InputSystem.cppm" />
+    <ClCompile Include="Mocks\Mocks-Logger.cppm" />
+    <ClCompile Include="Mocks\Mocks.cppm" />
+    <ClCompile Include="Mocks\Mocks-ScreenSystem.cppm" />
+    <ClCompile Include="Mocks\Mocks-System.cppm" />
+    <ClCompile Include="Mocks\Mocks-SystemFactory.cppm" />
+    <ClCompile Include="Mocks\Mocks-TickableSystem.cppm" />
+    <ClCompile Include="Mocks\Mocks-TickableSystemFactory.cppm" />
     <ClCompile Include="Input\InputSystemFactoryTests.cpp" />
     <ClCompile Include="Input\InputCodeTests.cpp" />
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectManagerTests.cpp" />
-    <ClCompile Include="Render.Direct3D12.Windows\RenderObjectTests.cpp" />
     <ClCompile Include="Render.Direct3D12.Windows\RenderSystemFactoryTests.cpp" />
-    <ClCompile Include="Render.Direct3D12.Windows\RenderTargetTests.cpp" />
-    <ClCompile Include="Render.Direct3D12.Windows\RenderViewTests.cpp" />
     <ClCompile Include="Screen.Windows\WindowsScreenSystemFactoryTests.cpp" />
     <ClCompile Include="Screen.Windows\WindowsScreenSystemTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemFactoryTests.cpp" />
     <ClCompile Include="Time\FrameRateSystemTests.cpp" />
     <ClCompile Include="Time\FrameTimeFrameRateConversionTests.cpp" />
+    <ClCompile Include="Time\TimeSystemFactoryTests.cpp" />
+    <ClCompile Include="Time\TimeSystemTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsClassTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowFactoryTests.cpp" />
     <ClCompile Include="Window.Windows\WindowsWindowTests.cpp" />
@@ -111,6 +111,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
       <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyShader\PonyShader.vcxproj">
+      <Project>{cc5ca766-f2cf-45b2-9d00-ece87aa8bbc4}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
@@ -154,19 +157,6 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window\PonyEngine.Window.vcxproj">
       <Project>{6f7c3d39-fd6c-447b-9191-a401efdffc08}</Project>
     </ProjectReference>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Mocks\Application.h" />
-    <ClInclude Include="Mocks\Engine.h" />
-    <ClInclude Include="Mocks\InputDevice.h" />
-    <ClInclude Include="Mocks\InputDeviceFactory.h" />
-    <ClInclude Include="Mocks\InputSystem.h" />
-    <ClInclude Include="Mocks\Logger.h" />
-    <ClInclude Include="Mocks\ScreenSystem.h" />
-    <ClInclude Include="Mocks\System.h" />
-    <ClInclude Include="Mocks\SystemFactory.h" />
-    <ClInclude Include="Mocks\TickableSystem.h" />
-    <ClInclude Include="Mocks\TickableSystemFactory.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

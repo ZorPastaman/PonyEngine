@@ -28,31 +28,31 @@
     <ClCompile Include="Source\Public\Screen\Screen.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen\IScreenSystem.cppm">
+    <ClCompile Include="Source\Public\Screen\Screen-IScreenSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemFactoryData.cppm">
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows-ScreenSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows-ScreenSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen\ScreenSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Screen\Screen-ScreenSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen\ScreenSystemParams.cppm">
+    <ClCompile Include="Source\Public\Screen\Screen-ScreenSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\IWindowsScreenSystem.cppm">
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows-IScreenSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen.Windows\WindowsScreenSystemParams.cppm">
+    <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows-ScreenSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Screen\ScreenSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Screen\Screen-ScreenSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

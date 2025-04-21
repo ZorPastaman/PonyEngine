@@ -19,12 +19,9 @@
 #include <typeinfo>
 #include <variant>
 
-#include "Mocks/Application.h"
-#include "Mocks/Engine.h"
-#include "Mocks/Logger.h"
-#include "Mocks/ScreenSystem.h"
+import Mocks;
 
-import PonyBase.StringUtility;
+import PonyBase.Utility;
 
 import PonyMath.Core;
 import PonyMath.Utility;
@@ -42,7 +39,7 @@ namespace Window
 {
 	TEST_CLASS(WindowsWindowTests)
 	{
-		class MessageObserver final : public PonyEngine::Window::IWindowsMessageObserver
+		class MessageObserver final : public PonyEngine::Window::Windows::IMessageObserver
 		{
 		public:
 			std::size_t version;
@@ -68,12 +65,12 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			constexpr std::string_view title = "Test title";
 			windowsWindow->TitleBar().MainTitle(title);
 			wchar_t gotTitle[64];
@@ -99,12 +96,12 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)});
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			windowsWindow->ShowWindow();
 			Assert::IsTrue(IsWindowVisible(windowsWindow->WindowHandle()));
 			Assert::IsTrue(windowsWindow->IsVisible());
@@ -124,14 +121,14 @@ namespace Window
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
 			std::string title = "Test title";
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
 			systemParams.rect.fullscreen = false;
 			systemParams.title = title;
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			Assert::AreEqual(std::string_view(title), windowsWindow->TitleBar().MainTitle());
 		}
 
@@ -144,16 +141,16 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
 			systemParams.rect.fullscreen = false;
 			systemParams.cursorParams.visible = false;
 			const auto clipping = PonyMath::Shape::Rect<float>(0.25f, 0.25f, 0.5f, 0.5f);;
 			systemParams.cursorParams.cursorClipping = clipping;
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			Assert::IsFalse(windowsWindow->Cursor().IsVisible());
 			Assert::IsTrue(clipping == windowsWindow->Cursor().ClippingRect());
 		}
@@ -167,13 +164,13 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			RECT rect;
 			GetClientRect(windowsWindow->WindowHandle(), &rect);
 			Assert::AreEqual(0L, rect.left);
@@ -185,10 +182,10 @@ namespace Window
 			systemParams.rect.fullscreen = false;
 			systemParams.rect.position = PonyMath::Core::Vector2<std::int32_t>(120, 130);
 			systemParams.rect.resolution = PonyMath::Utility::Resolution<std::uint32_t>(1200u, 670u);
-			factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			GetClientRect(windowsWindow->WindowHandle(), &rect);
 			auto leftTop = POINT{.x = rect.left, .y = rect.top};
 			auto rightBottom = POINT{.x = rect.right, .y = rect.bottom};
@@ -214,15 +211,15 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{.name = L"Pony Engine Test"};
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
 			systemParams.rect.fullscreen = false;
 			systemParams.windowsWindowStyle.style = WS_OVERLAPPEDWINDOW;
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 
 			RECT rect;
 			GetWindowRect(windowsWindow->WindowHandle(), &rect);
@@ -259,15 +256,15 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{.name = L"Pony Engine Test"};
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
 			systemParams.rect.fullscreen = false;
 			systemParams.windowsWindowStyle.style = WS_OVERLAPPEDWINDOW;
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 
 			auto rect = PonyMath::Shape::Rect<float>(0.1f, 0.1f, 0.7f, 0.7f);
 			windowsWindow->Cursor().ClippingRect(rect);
@@ -286,13 +283,13 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			const auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			const auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{.windowsClass = std::move(windowsClass.windowsClass)};
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			PostMessageW(windowsWindow->WindowHandle(), WM_DESTROY, 0, 0);
 			std::get<1>(window.system)->Tick();
 			Assert::AreEqual(0, engine.ExitCode());
@@ -308,13 +305,13 @@ namespace Window
 			auto engine = Mocks::Engine();
 			engine.application = &application;
 			static_cast<Mocks::SystemManager*>(&engine.SystemManager())->types.emplace(typeid(PonyEngine::Screen::IScreenSystem), static_cast<PonyEngine::Screen::IScreenSystem*>(&screenSystem));
-			const auto classParams = PonyEngine::Window::WindowsClassParams{ .name = L"Pony Engine Test" };
-			auto windowsClass = PonyEngine::Window::CreateWindowsClass(application, classParams);
-			const auto systemParams = PonyEngine::Window::WindowsWindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
-			auto factory = PonyEngine::Window::CreateWindowsWindowFactory(application, PonyEngine::Window::WindowsWindowSystemFactoryParams{}, systemParams);
+			const auto classParams = PonyEngine::Window::Windows::ClassParams{ .name = L"Pony Engine Test" };
+			auto windowsClass = PonyEngine::Window::Windows::CreateClass(application, classParams);
+			const auto systemParams = PonyEngine::Window::Windows::WindowSystemParams{ .windowsClass = std::move(windowsClass.windowsClass) };
+			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			std::get<1>(window.system)->Begin();
-			auto windowsWindow = dynamic_cast<PonyEngine::Window::IWindowsWindowSystem*>(std::get<1>(window.system).get());
+			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			auto messageObserver = MessageObserver();
 			constexpr auto messages = std::array<UINT, 2>{ WM_KEYDOWN, WM_KEYUP };
 			windowsWindow->MessagePump().AddMessageObserver(messageObserver, messages);

@@ -23,36 +23,70 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
       <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
     </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyShader\PonyShader.vcxproj">
+      <Project>{cc5ca766-f2cf-45b2-9d00-ece87aa8bbc4}</Project>
+    </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Core.API\PonyEngine.Core.API.vcxproj">
       <Project>{00a276d2-91e6-4ef6-9380-be06ad925d61}</Project>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12SwapChainParams.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObject.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObjectManager.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderTarget.cppm" />
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderView.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-ICameraManager.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm" />
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderObject.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderSystem.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderTarget.cppm" />
-    <ClCompile Include="Source\Public\Render\IRenderView.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Clear.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Orthographic.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Perspective.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Blend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-BlendFactor.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-CullMode.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-SwapChainParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-DataTypes.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-FillMode.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ICamera.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IPipelineStateObserver.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IMeshObserver.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-LogicBlend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-LogicOperation.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-PipelineState.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-PipelineStateParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Mesh.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Rasterizer.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IRenderObject.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IRenderObjectManager.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IRenderSystem.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TransparentBlend.cppm" />
     <ClCompile Include="Source\Public\Render\Render.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderTargetParams.cppm" />
-    <ClCompile Include="Source\Public\Render\RenderViewParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsUtility.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>

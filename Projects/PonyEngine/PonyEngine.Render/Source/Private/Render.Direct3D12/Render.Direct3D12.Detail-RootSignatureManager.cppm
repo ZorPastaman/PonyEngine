@@ -1,0 +1,145 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include "PonyBase/Core/Direct3D12/Framework.h"
+
+#include "PonyDebug/Log/Log.h"
+
+export module PonyEngine.Render.Direct3D12.Detail:RootSignatureManager;
+
+import <cstddef>;
+import <cstdint>;
+import <memory>;
+import <stdexcept>;
+import <type_traits>;
+import <vector>;
+
+import PonyBase.Utility;
+
+import PonyDebug.Log;
+
+import :IRootSignatureManager;
+import :ISubSystemContext;
+import :RootSignature;
+import :Shader;
+
+export namespace PonyEngine::Render::Direct3D12
+{
+	/// @brief Direct3D12 root signature manager.
+	class RootSignatureManager final : public IRootSignatureManager
+	{
+	public:
+		/// @brief Creates a @p RootSignatureManager.
+		/// @param d3d12System Direct3D12 system context.
+		[[nodiscard("Pure constructor")]]
+		explicit RootSignatureManager(ISubSystemContext& d3d12System) noexcept;
+		RootSignatureManager(const RootSignatureManager&) = delete;
+		RootSignatureManager(RootSignatureManager&&) = delete;
+
+		~RootSignatureManager() noexcept = default;
+
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<RootSignature> CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader) override;
+
+		/// @brief Cleans out of dead root signatures.
+		void Clean() noexcept;
+
+		RootSignatureManager& operator =(const RootSignatureManager&) = delete;
+		RootSignatureManager& operator =(RootSignatureManager&&) = delete;
+
+	private:
+		/// @brief Adds a root signature.
+		/// @param rootSignature Root signature.
+		/// @param rootSignatureShader Root signature shader.
+		void Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader);
+		void Remove(std::size_t index) noexcept;
+
+		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
+
+		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
+		std::vector<std::shared_ptr<const Shader>> sources; ///< Root signature sources.
+	};
+}
+
+namespace PonyEngine::Render::Direct3D12
+{
+	RootSignatureManager::RootSignatureManager(ISubSystemContext& d3d12System) noexcept :
+		d3d12System{&d3d12System}
+	{
+	}
+
+	std::shared_ptr<RootSignature> RootSignatureManager::CreateRootSignature(const std::shared_ptr<const Shader>& rootSignatureShader)
+	{
+		if (!rootSignatureShader) [[unlikely]]
+		{
+			throw std::invalid_argument("Root signature shader is nullptr.");
+		}
+
+		for (std::size_t i = 0; i < sources.size(); ++i)
+		{
+			if (sources[i] == rootSignatureShader)
+			{
+				return rootSignatures[i];
+			}
+		}
+
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create root sig.");
+		Microsoft::WRL::ComPtr<ID3D12RootSignature> rootSig;
+		if (const HRESULT result = d3d12System->Device().CreateRootSignature(0, rootSignatureShader->Data(), rootSignatureShader->Size(), IID_PPV_ARGS(rootSig.GetAddressOf())); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to acquire root sig with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root sig created.");
+
+		const auto rootSignature = std::make_shared<RootSignature>(*rootSig.Get());
+		Add(rootSignature, rootSignatureShader);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
+
+		return rootSignature;
+	}
+
+	void RootSignatureManager::Clean() noexcept
+	{
+		for (std::size_t i = rootSignatures.size(); i-- > 0; )
+		{
+			if (const std::shared_ptr<RootSignature>& rootSignature = rootSignatures[i]; rootSignature.use_count() <= 1L)
+			{
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy root signature at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rootSignature.get()));
+				Remove(i);
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Root signature destroyed.");
+			}
+		}
+	}
+
+	void RootSignatureManager::Add(const std::shared_ptr<RootSignature>& rootSignature, const std::shared_ptr<const Shader>& rootSignatureShader)
+	{
+		const std::size_t currentSize = rootSignatures.size();
+
+		try
+		{
+			rootSignatures.push_back(rootSignature);
+			sources.push_back(rootSignatureShader);
+		}
+		catch (...)
+		{
+			rootSignatures.resize(currentSize);
+			sources.resize(currentSize);
+
+			throw;
+		}
+	}
+
+	void RootSignatureManager::Remove(const std::size_t index) noexcept
+	{
+		rootSignatures.erase(rootSignatures.cbegin() + index);
+		sources.erase(sources.cbegin() + index);
+	}
+}

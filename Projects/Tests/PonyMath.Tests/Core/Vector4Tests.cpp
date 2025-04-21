@@ -604,79 +604,7 @@ namespace Core
 			Assert::IsFalse(vector.IsFinite());
 		}
 
-		TEST_METHOD(SetShortTest)
-		{
-			constexpr std::int16_t x = 2;
-			constexpr std::int16_t y = -3;
-			constexpr std::int16_t z = 5;
-			constexpr std::int16_t w = -2;
-			auto vector = PonyMath::Core::Vector4<std::int16_t>(x, y, z, w);
-			constexpr std::int16_t xNew = 4;
-			constexpr std::int16_t yNew = 7;
-			constexpr std::int16_t zNew = -1;
-			constexpr std::int16_t wNew = -5;
-			vector.Set(xNew, yNew, zNew, wNew);
-			Assert::AreEqual(xNew, vector.X());
-			Assert::AreEqual(yNew, vector.Y());
-			Assert::AreEqual(zNew, vector.Z());
-			Assert::AreEqual(wNew, vector.W());
-		}
-
-		TEST_METHOD(SetFloatTest)
-		{
-			constexpr float x = 2;
-			constexpr float y = -3;
-			constexpr float z = 5;
-			constexpr float w = -2;
-			auto vector = PonyMath::Core::Vector4<float>(x, y, z, w);
-			constexpr float xNew = 4;
-			constexpr float yNew = 7;
-			constexpr float zNew = -1;
-			constexpr float wNew = -5;
-			vector.Set(xNew, yNew, zNew, wNew);
-			Assert::AreEqual(xNew, vector.X());
-			Assert::AreEqual(yNew, vector.Y());
-			Assert::AreEqual(zNew, vector.Z());
-			Assert::AreEqual(wNew, vector.W());
-		}
-
-		TEST_METHOD(SetSpanShortTest)
-		{
-			constexpr std::int16_t x = 2;
-			constexpr std::int16_t y = -3;
-			constexpr std::int16_t z = 5;
-			constexpr std::int16_t w = -2;
-			auto vector = PonyMath::Core::Vector4<std::int16_t>(x, y, z, w);
-			constexpr std::int16_t xNew = 4;
-			constexpr std::int16_t yNew = 7;
-			constexpr std::int16_t zNew = -1;
-			constexpr std::int16_t wNew = -5;
-			vector.Set(std::array<std::int16_t, 4>{xNew, yNew, zNew, wNew});
-			Assert::AreEqual(xNew, vector.X());
-			Assert::AreEqual(yNew, vector.Y());
-			Assert::AreEqual(zNew, vector.Z());
-			Assert::AreEqual(wNew, vector.W());
-		}
-
-		TEST_METHOD(SetSpanFloatTest)
-		{
-			constexpr float x = 2;
-			constexpr float y = -3;
-			constexpr float z = 5;
-			constexpr float w = -2;
-			auto vector = PonyMath::Core::Vector4<float>(x, y, z, w);
-			constexpr float xNew = 4;
-			constexpr float yNew = 7;
-			constexpr float zNew = -1;
-			constexpr float wNew = -5;
-			vector.Set(std::array<float, 4>{xNew, yNew, zNew, wNew});
-			Assert::AreEqual(xNew, vector.X());
-			Assert::AreEqual(yNew, vector.Y());
-			Assert::AreEqual(zNew, vector.Z());
-			Assert::AreEqual(wNew, vector.W());
-		}
-
-		TEST_METHOD(ScaleThisShortTest)
+		TEST_METHOD(MultiplyThisShortTest)
 		{
 			constexpr std::int16_t x = 2;
 			constexpr std::int16_t y = -3;
@@ -688,14 +616,14 @@ namespace Core
 			constexpr std::int16_t zS = -1;
 			constexpr std::int16_t wS = -5;
 			constexpr auto scale = PonyMath::Core::Vector4<std::int16_t>(xS, yS, zS, wS);
-			vector.Scale(scale);
+			vector.Multiply(scale);
 			Assert::AreEqual(std::int16_t{x * xS}, vector.X());
 			Assert::AreEqual(std::int16_t{y * yS}, vector.Y());
 			Assert::AreEqual(std::int16_t{z * zS}, vector.Z());
 			Assert::AreEqual(std::int16_t{w * wS}, vector.W());
 		}
 
-		TEST_METHOD(ScaleThisFloatTest)
+		TEST_METHOD(MultiplyThisFloatTest)
 		{
 			constexpr float x = 2;
 			constexpr float y = -3;
@@ -707,10 +635,49 @@ namespace Core
 			constexpr float zS = -1;
 			constexpr float wS = -5;
 			constexpr auto scale = PonyMath::Core::Vector4<float>(xS, yS, zS, wS);
-			vector.Scale(scale);
+			vector.Multiply(scale);
 			Assert::AreEqual(x * xS, vector.X());
 			Assert::AreEqual(y * yS, vector.Y());
 			Assert::AreEqual(z * zS, vector.Z());
+			Assert::AreEqual(w * wS, vector.W());
+		}
+
+		TEST_METHOD(DivideThisShortTest)
+		{
+			constexpr std::int16_t x = 2;
+			constexpr std::int16_t y = -3;
+			constexpr std::int16_t z = 5;
+			constexpr std::int16_t w = -2;
+			auto vector = PonyMath::Core::Vector4<std::int16_t>(x, y, z, w);
+			constexpr std::int16_t xS = 4;
+			constexpr std::int16_t yS = 7;
+			constexpr std::int16_t zS = -1;
+			constexpr std::int16_t wS = -5;
+			constexpr auto scale = PonyMath::Core::Vector4<std::int16_t>(xS, yS, zS, wS);
+			vector.Divide(scale);
+			Assert::AreEqual(std::int16_t{ x / xS }, vector.X());
+			Assert::AreEqual(std::int16_t{ y / yS }, vector.Y());
+			Assert::AreEqual(std::int16_t{ z / zS }, vector.Z());
+			Assert::AreEqual(std::int16_t{ w / wS }, vector.W());
+		}
+
+		TEST_METHOD(DivideThisFloatTest)
+		{
+			constexpr float x = 2;
+			constexpr float y = -3;
+			constexpr float z = 5;
+			constexpr float w = -2;
+			auto vector = PonyMath::Core::Vector4<float>(x, y, z, w);
+			constexpr float xS = 4;
+			constexpr float yS = 7;
+			constexpr float zS = -1;
+			constexpr float wS = -5;
+			constexpr auto scale = PonyMath::Core::Vector4<float>(xS, yS, zS, wS);
+			vector.Divide(scale);
+			Assert::AreEqual(static_cast<double>(x / xS), static_cast<double>(vector.X()), 0.0001);
+			Assert::AreEqual(static_cast<double>(y / yS), static_cast<double>(vector.Y()), 0.0001);
+			Assert::AreEqual(static_cast<double>(z / zS), static_cast<double>(vector.Z()), 0.0001);
+			Assert::AreEqual(static_cast<double>(w / wS), static_cast<double>(vector.W()), 0.0001);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -1290,7 +1257,7 @@ namespace Core
 			Assert::AreEqual(5., static_cast<double>(projected.W()), 0.001);
 		}
 
-		TEST_METHOD(ScaleShortTest)
+		TEST_METHOD(MultiplyVectorShortTest)
 		{
 			constexpr std::int16_t xR = 2;
 			constexpr std::int16_t yR = -3;
@@ -1302,14 +1269,14 @@ namespace Core
 			constexpr std::int16_t zL = -2;
 			constexpr std::int16_t wL = -5;
 			constexpr auto vectorL = PonyMath::Core::Vector4<std::int16_t>(xL, yL, zL, wL);
-			const PonyMath::Core::Vector4<std::int16_t> scaled = PonyMath::Core::Scale(vectorL, vectorR);
+			const PonyMath::Core::Vector4<std::int16_t> scaled = PonyMath::Core::Multiply(vectorL, vectorR);
 			Assert::AreEqual(static_cast<std::int16_t>(xL * xR), scaled.X());
 			Assert::AreEqual(static_cast<std::int16_t>(yL * yR), scaled.Y());
 			Assert::AreEqual(static_cast<std::int16_t>(zL * zR), scaled.Z());
 			Assert::AreEqual(static_cast<std::int16_t>(wL * wR), scaled.W());
 		}
 
-		TEST_METHOD(ScaleFloatTest)
+		TEST_METHOD(MultiplyVectorFloatTest)
 		{
 			constexpr float xR = 2;
 			constexpr float yR = -3;
@@ -1321,11 +1288,77 @@ namespace Core
 			constexpr float zL = -2;
 			constexpr float wL = -5;
 			constexpr auto vectorL = PonyMath::Core::Vector4<float>(xL, yL, zL, wL);
-			const PonyMath::Core::Vector4<float> scaled = PonyMath::Core::Scale(vectorL, vectorR);
+			const PonyMath::Core::Vector4<float> scaled = PonyMath::Core::Multiply(vectorL, vectorR);
 			Assert::AreEqual(xL * xR, scaled.X());
 			Assert::AreEqual(yL * yR, scaled.Y());
 			Assert::AreEqual(zL * zR, scaled.Z());
 			Assert::AreEqual(wL * wR, scaled.W());
+		}
+
+		TEST_METHOD(DivideVectorShortTest)
+		{
+			constexpr std::int16_t xR = 2;
+			constexpr std::int16_t yR = -3;
+			constexpr std::int16_t zR = 5;
+			constexpr std::int16_t wR = -2;
+			constexpr auto vectorR = PonyMath::Core::Vector4<std::int16_t>(xR, yR, zR, wR);
+			constexpr std::int16_t xL = 6;
+			constexpr std::int16_t yL = 4;
+			constexpr std::int16_t zL = -2;
+			constexpr std::int16_t wL = -5;
+			constexpr auto vectorL = PonyMath::Core::Vector4<std::int16_t>(xL, yL, zL, wL);
+			const PonyMath::Core::Vector4<std::int16_t> scaled = PonyMath::Core::Divide(vectorL, vectorR);
+			Assert::AreEqual(static_cast<std::int16_t>(xL / xR), scaled.X());
+			Assert::AreEqual(static_cast<std::int16_t>(yL / yR), scaled.Y());
+			Assert::AreEqual(static_cast<std::int16_t>(zL / zR), scaled.Z());
+			Assert::AreEqual(static_cast<std::int16_t>(wL / wR), scaled.W());
+		}
+
+		TEST_METHOD(DivideVectorFloatTest)
+		{
+			constexpr float xR = 2;
+			constexpr float yR = -3;
+			constexpr float zR = 5;
+			constexpr float wR = -2;
+			constexpr auto vectorR = PonyMath::Core::Vector4<float>(xR, yR, zR, wR);
+			constexpr float xL = 6;
+			constexpr float yL = 4;
+			constexpr float zL = -2;
+			constexpr float wL = -5;
+			constexpr auto vectorL = PonyMath::Core::Vector4<float>(xL, yL, zL, wL);
+			const PonyMath::Core::Vector4<float> scaled = PonyMath::Core::Divide(vectorL, vectorR);
+			Assert::AreEqual(static_cast<double>(xL / xR), static_cast<double>(scaled.X()), 0.0001);
+			Assert::AreEqual(static_cast<double>(yL / yR), static_cast<double>(scaled.Y()), 0.0001);
+			Assert::AreEqual(static_cast<double>(zL / zR), static_cast<double>(scaled.Z()), 0.0001);
+			Assert::AreEqual(static_cast<double>(wL / wR), static_cast<double>(scaled.W()), 0.0001);
+		}
+
+		TEST_METHOD(AbsShortTest)
+		{
+			constexpr std::int16_t x = -2;
+			constexpr std::int16_t y = -3;
+			constexpr std::int16_t z = -5;
+			constexpr std::int16_t w = -2;
+			constexpr auto vector = PonyMath::Core::Vector4<std::int16_t>(x, y, z, w);
+			const PonyMath::Core::Vector4<std::int16_t> abs = PonyMath::Core::Abs(vector);
+			Assert::AreEqual(static_cast<std::int16_t>(std::abs(x)), abs.X());
+			Assert::AreEqual(static_cast<std::int16_t>(std::abs(y)), abs.Y());
+			Assert::AreEqual(static_cast<std::int16_t>(std::abs(z)), abs.Z());
+			Assert::AreEqual(static_cast<std::int16_t>(std::abs(w)), abs.W());
+		}
+
+		TEST_METHOD(AbsFloatTest)
+		{
+			constexpr float x = -2;
+			constexpr float y = -3;
+			constexpr float z = -5;
+			constexpr float w = -2;
+			constexpr auto vector = PonyMath::Core::Vector4<float>(x, y, z, w);
+			const PonyMath::Core::Vector4<float> abs = PonyMath::Core::Abs(vector);
+			Assert::AreEqual(std::abs(x), abs.X());
+			Assert::AreEqual(std::abs(y), abs.Y());
+			Assert::AreEqual(std::abs(z), abs.Z());
+			Assert::AreEqual(std::abs(w), abs.W());
 		}
 
 		TEST_METHOD(MinCombinedShortTest)
@@ -1452,6 +1485,20 @@ namespace Core
 			Assert::AreEqual(y1, clamped.Y());
 			Assert::AreEqual(z, clamped.Z());
 			Assert::AreEqual(w, clamped.W());
+		}
+
+		TEST_METHOD(ClampMagnitudeTest)
+		{
+			constexpr float x = 0.8;
+			constexpr float y = 0.2;
+			constexpr float z = 0.1;
+			constexpr float w = 0.2;
+			constexpr auto vector = PonyMath::Core::Vector4<float>(x, y, z, w);
+			auto clamped = PonyMath::Core::ClampMagnitude(vector, 40.f);
+			Assert::IsTrue(vector == clamped);
+
+			clamped = PonyMath::Core::ClampMagnitude(vector, 0.5f);
+			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(vector.Normalized() * 0.5f, clamped));
 		}
 
 		TEST_METHOD(LerpShortTest)
@@ -1771,8 +1818,8 @@ namespace Core
 
 			movedVector.Swap();
 
-			movedVector.Set(5, 2, 9, 6);
-			movedVector.Set(std::array<float, 4>{7, 9, 8, 1});
+			movedVector.Multiply(constVector);
+			movedVector.Divide(constVector);
 
 			movedVector[1] -= 4;
 
@@ -1805,6 +1852,7 @@ namespace Core
 			[[maybe_unused]] constexpr float x = vector.X();
 			[[maybe_unused]] constexpr float y = vector.Y();
 			[[maybe_unused]] constexpr float z = vector.Z();
+			[[maybe_unused]] constexpr float w = vector.W();
 
 			[[maybe_unused]] constexpr auto spanElement = vector.Span()[0];
 
@@ -1832,7 +1880,8 @@ namespace Core
 
 			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> project = PonyMath::Core::Project(vector, PonyMath::Core::Vector4<float>(1, 0, 0, 0));
 
-			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> scale = PonyMath::Core::Scale(vector, arrayVector);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> scale = PonyMath::Core::Multiply(vector, arrayVector);
+			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> scaleD = PonyMath::Core::Divide(vector, arrayVector);
 
 			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> minCombined = PonyMath::Core::Min(defaultVector, arrayVector);
 			[[maybe_unused]] constexpr PonyMath::Core::Vector4<float> maxCombined = PonyMath::Core::Max(defaultVector, arrayVector);

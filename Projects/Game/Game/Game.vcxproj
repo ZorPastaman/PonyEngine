@@ -12,8 +12,8 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Game\Game.Detail.cppm" />
-    <ClCompile Include="Source\Private\Game\GameSystem.cppm" />
-    <ClCompile Include="Source\Private\Game\GameSystemFactoryImpl.cppm" />
+    <ClCompile Include="Source\Private\Game\Game.Detail-GameSystem.cppm" />
+    <ClCompile Include="Source\Private\Game\Game.Detail-GameSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Public\Game\Game.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>
@@ -25,6 +25,9 @@
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyMath\PonyMath.vcxproj">
       <Project>{95a38de9-14c2-4bd5-b8b6-c1c6992d729a}</Project>
+    </ProjectReference>
+    <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyShader\PonyShader.vcxproj">
+      <Project>{cc5ca766-f2cf-45b2-9d00-ece87aa8bbc4}</Project>
     </ProjectReference>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyDebug\PonyDebug.Log.API\PonyDebug.Log.API.vcxproj">
       <Project>{8b6b1b01-cbc6-414d-b455-0bb7abedae4c}</Project>
@@ -47,6 +50,28 @@
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEngine\PonyEngine.Window.API\PonyEngine.Window.API.vcxproj">
       <Project>{0a2cf7d6-506c-405f-afaa-b045ad0fa2a6}</Project>
     </ProjectReference>
+  </ItemGroup>
+  <ItemGroup>
+    <FxCompile Include="Shaders\MeshShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Mesh</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Mesh</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\PixelShader.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">6.6</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Pixel</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">6.6</ShaderModel>
+    </FxCompile>
+    <FxCompile Include="Shaders\RootSig.hlsl">
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">RootSignature</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">rootsig_1.1</ShaderModel>
+      <ShaderType Condition="'$(Configuration)|$(Platform)'=='Release|x64'">RootSignature</ShaderType>
+      <ShaderModel Condition="'$(Configuration)|$(Platform)'=='Release|x64'">rootsig_1.1</ShaderModel>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">ROOT_SIG</EntryPointName>
+      <EntryPointName Condition="'$(Configuration)|$(Platform)'=='Release|x64'">ROOT_SIG</EntryPointName>
+    </FxCompile>
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -75,10 +100,12 @@
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
+    <Import Project="$(SolutionDir)\PropertySheets\GameProperties.props" />
   </ImportGroup>
   <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
     <Import Project="$(SolutionDir)\PropertySheets\PonyEngineProperties.props" />
+    <Import Project="$(SolutionDir)\PropertySheets\GameProperties.props" />
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -99,6 +126,10 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Projects\PonyEssentials\PonyShader\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileOutput>$(GameShadersOutDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -108,6 +139,10 @@
     <Link>
       <SubSystem>Windows</SubSystem>
     </Link>
+    <FxCompile>
+      <AdditionalIncludeDirectories>$(SolutionDir)\Projects\PonyEssentials\PonyShader\Shaders;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <ObjectFileOutput>$(GameShadersOutDir)%(Filename).cso</ObjectFileOutput>
+    </FxCompile>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

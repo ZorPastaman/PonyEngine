@@ -25,19 +25,19 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystem.cppm">
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-ScreenSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Impl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactoryImpl.cppm">
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-ScreenSystemFactoryImpl.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Screen.Windows\Utility.cppm">
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

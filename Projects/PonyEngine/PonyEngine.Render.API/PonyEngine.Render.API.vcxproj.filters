@@ -28,16 +28,16 @@
     <ClCompile Include="Source\Public\Render\Render.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderSystem.cppm">
+    <ClCompile Include="Source\Public\Render\Render-IRenderSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryData.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemFactoryData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\WindowsDirect3D12RenderSystemParams.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12.cppm">
@@ -46,58 +46,151 @@
     <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderSystemFactory.cppm">
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemFactory.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderSystem.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\IWindowsDirect3D12RenderSystem.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12.Windows\Render.Direct3D12.Windows-IRenderSystem.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderSystemParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemParams.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderTarget.cppm">
+    <ClCompile Include="Source\Public\Render\Render-IRenderObject.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderView.cppm">
+    <ClCompile Include="Source\Public\Render\Render-IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderObject.cppm">
+    <ClCompile Include="Source\Public\Render\Render-RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\IRenderObjectManager.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-IRenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12RenderSystemFactoryParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObject.cppm">
+    <ClCompile Include="Source\Public\Render\Render-Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderObjectManager.cppm">
+    <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderTarget.cppm">
+    <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\IDirect3D12RenderView.cppm">
+    <ClCompile Include="Source\Public\Render\Render-DataTypes.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderViewParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-ICamera.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\RenderTargetParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-CameraParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render.Direct3D12\Direct3D12SwapChainParams.cppm">
+    <ClCompile Include="Source\Public\Render\Render-ICameraManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render.Direct3D12\Render.Direct3D12-ICameraManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-PipelineState.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-PipelineStateParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-IMeshObserver.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-IPipelineStateObserver.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-TransparentBlend.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-BlendFactor.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-BlendOperation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-LogicOperation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-LogicBlend.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Blend.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-FillMode.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-CullMode.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Rasterizer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsUtility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Perspective.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Orthographic.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ICuller.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-RenderQueue.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Common.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-Clear.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-SwapChainParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

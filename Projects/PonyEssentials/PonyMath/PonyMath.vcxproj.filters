@@ -25,70 +25,64 @@
     </ResourceCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Core\Common.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Matrix2x2.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Matrix2x2.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Matrix3x3.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Matrix3x3.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Matrix4x4.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Matrix4x4.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Quaternion.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Quaternion.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Color\RGB.cppm">
+    <ClCompile Include="Source\Public\Color\Color-RGB.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Color\RGBA.cppm">
+    <ClCompile Include="Source\Public\Color\Color-RGBA.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Color\RGBAInt.cppm">
+    <ClCompile Include="Source\Public\Color\Color-RGBAInt.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Color\RGBInt.cppm">
+    <ClCompile Include="Source\Public\Color\Color-RGBInt.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Transformations2D.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Transformations2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Transformations3D.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Transformations3D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Vector2.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Vector2.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Vector3.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Vector3.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\Vector4.cppm">
+    <ClCompile Include="Source\Public\Core\Core-Vector4.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Color\Color.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Geometry\Geometry.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Geometry\Mesh.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Space\Space.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Space\Transform2D.cppm">
+    <ClCompile Include="Source\Public\Space\Space-Transform2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Space\Transform3D.cppm">
+    <ClCompile Include="Source\Public\Space\Space-Transform3D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\Resolution.cppm">
+    <ClCompile Include="Source\Public\Utility\Utility-Resolution.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Utility\Utility.cppm">
@@ -97,13 +91,55 @@
     <ClCompile Include="Source\Public\Shape\Shape.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Rect.cppm">
+    <ClCompile Include="Source\Public\Shape\Shape-Rect.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Intersecting.cppm">
+    <ClCompile Include="Source\Public\Shape\Shape-Intersecting2D.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Shape\Inside.cppm">
+    <ClCompile Include="Source\Public\Shape\Shape-Inside2D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Plane.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Box.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Utility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Line.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Ray2D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Ray3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Inside3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Intersecting3D.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-AABR.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-AABB.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-OBR.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-OBB.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Circle.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Shape\Shape-Sphere.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

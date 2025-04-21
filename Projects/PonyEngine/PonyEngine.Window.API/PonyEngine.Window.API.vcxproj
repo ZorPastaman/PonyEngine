@@ -17,30 +17,30 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsCursor.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageObserver.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessagePump.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputManager.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsRawInputObserver.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsMessageHandler.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowTitleBar.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsClass.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsClassData.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsClassParams.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowStyle.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemFactoryData.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\WindowsWindowSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\IWindowsWindowSystem.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ICursor.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessageObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessagePump.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInputManager.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInputObserver.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessageHandler.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ITitleBar.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-Class.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ClassData.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ClassParams.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-WindowStyle.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-WindowSystemFactoryData.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-WindowSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-WindowSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows.cppm" />
-    <ClCompile Include="Source\Public\Window\CursorParams.cppm" />
-    <ClCompile Include="Source\Public\Window\ICursor.cppm" />
-    <ClCompile Include="Source\Public\Window\IWindowTitleBar.cppm" />
-    <ClCompile Include="Source\Public\Window\WindowSystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Window\WindowRect.cppm" />
-    <ClCompile Include="Source\Public\Window\WindowSystemFactoryParams.cppm" />
-    <ClCompile Include="Source\Public\Window\WindowSystemParams.cppm" />
-    <ClCompile Include="Source\Public\Window\IWindowSystem.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-CursorParams.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-ICursor.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-ITitleBar.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-WindowSystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-WindowRect.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-WindowSystemFactoryParams.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-WindowSystemParams.cppm" />
+    <ClCompile Include="Source\Public\Window\Window-IWindowSystem.cppm" />
     <ClCompile Include="Source\Public\Window\Window.cppm" />
   </ItemGroup>
   <ItemGroup>

@@ -17,19 +17,21 @@
     <ResourceCompile Include="PonyEngine.Core.API.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Core\Core-ISystemInfo.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-SystemInfo.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\EngineData.cppm" />
-    <ClCompile Include="Source\Public\Core\EngineParams.cppm" />
-    <ClCompile Include="Source\Public\Core\ISystemFactory.cppm" />
-    <ClCompile Include="Source\Public\Core\SystemData.cppm" />
-    <ClCompile Include="Source\Public\Core\SystemFactoryEntry.cppm" />
-    <ClCompile Include="Source\Public\Core\SystemParams.cppm" />
-    <ClCompile Include="Source\Public\Core\IApplicationContext.cppm" />
-    <ClCompile Include="Source\Public\Core\System.cppm" />
-    <ClCompile Include="Source\Public\Core\TickableSystem.cppm" />
-    <ClCompile Include="Source\Public\Core\IEngineContext.cppm" />
-    <ClCompile Include="Source\Public\Core\ISystemManager.cppm" />
-    <ClCompile Include="Source\Public\Core\Engine.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-EngineData.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-EngineParams.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-ISystemFactory.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-SystemData.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-SystemFactoryEntry.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-SystemParams.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-IApplicationContext.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-System.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-TickableSystem.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-IEngineContext.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-ISystemManager.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-Engine.cppm" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="$(SolutionDir)\Projects\PonyEssentials\PonyBase\PonyBase.vcxproj">

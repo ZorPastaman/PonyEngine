@@ -22,7 +22,7 @@ import <memory>;
 
 import PonyDebug.Log.Windows.Detail;
 
-export namespace PonyDebug::Log
+export namespace PonyDebug::Log::Windows
 {
 	/// @brief Creates an output debug string sub-logger.
 	/// @param params Output debug string sub-logger parameters.
@@ -31,7 +31,7 @@ export namespace PonyDebug::Log
 	PONY_DLL_EXPORT OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params);
 }
 
-namespace PonyDebug::Log
+namespace PonyDebug::Log::Windows
 {
 	OutputDebugStringSubLoggerData CreateOutputDebugStringSubLogger(const OutputDebugStringSubLoggerParams& params)
 	{

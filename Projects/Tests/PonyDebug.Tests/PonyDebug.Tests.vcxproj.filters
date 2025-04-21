@@ -24,9 +24,6 @@
     <ClCompile Include="Log\FileSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Log\LogConsoleHelperTests.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Log\LogEntryTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -45,19 +42,14 @@
     <ClCompile Include="Log\OutputDebugStringSubLoggerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\SubLogger.cpp">
+    <ClCompile Include="Mocks\Mocks-SubLogger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Mocks\Logger.cpp">
+    <ClCompile Include="Mocks\Mocks-Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="Mocks\SubLogger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="Mocks\Logger.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
+    <ClCompile Include="Mocks\Mocks.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>

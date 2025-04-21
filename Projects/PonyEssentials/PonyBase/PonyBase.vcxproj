@@ -24,15 +24,23 @@
     <ResourceCompile Include="PonyBase.rc" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="Source\Public\Container\Container-Buffer.cppm" />
+    <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm" />
+    <ClCompile Include="Source\Public\Container\Container-BufferView.cppm" />
+    <ClCompile Include="Source\Public\Container\Container.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />
-    <ClCompile Include="Source\Public\Core\ExitCodes.cppm" />
-    <ClCompile Include="Source\Public\Utility.COM\COMUtility.cppm" />
-    <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm" />
-    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectInterfaces.cppm" />
-    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectUtility.cppm" />
-    <ClCompile Include="Source\Public\Utility\StringUtility\SafeFormat.cppm" />
-    <ClCompile Include="Source\Public\Utility\StringUtility\StringConvert.cppm" />
-    <ClCompile Include="Source\Public\Utility\StringUtility\StringUtility.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-ExitCodes.cppm" />
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM.cppm" />
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-GUID.cppm" />
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Cursor.cppm" />
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Module.cppm" />
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm" />
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-Container.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-ObjectInterfaces.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-SafeFormat.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-StringConvert.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
@@ -70,11 +78,11 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Memory;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Utility\ObjectUtility;$(ProjectDir)\Source\Public\Utility\StringUtility;$(ProjectDir)\Source\Public\Utility.COM;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Container;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Utility.COM;$(ProjectDir)\Source\Public\Utility.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PublicIncludeDirectories>$(ProjectDir)\Include\Public;$(PublicIncludeDirectories)</PublicIncludeDirectories>
-    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Memory;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Utility\ObjectUtility;$(ProjectDir)\Source\Public\Utility\StringUtility;$(ProjectDir)\Source\Public\Utility.COM;$(PublicModuleDirectories)</PublicModuleDirectories>
+    <PublicModuleDirectories>$(ProjectDir)\Source\Public;$(ProjectDir)\Source\Public\Container;$(ProjectDir)\Source\Public\Core;$(ProjectDir)\Source\Public\Utility;$(ProjectDir)\Source\Public\Utility.COM;$(ProjectDir)\Source\Public\Utility.Windows;$(PublicModuleDirectories)</PublicModuleDirectories>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>

@@ -102,6 +102,18 @@ namespace Core
 			Assert::AreEqual(-1.f, PonyMath::Core::Sign(-0.3f));
 		}
 
+		TEST_METHOD(SignShortFromBoolTest)
+		{
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Sign<std::int16_t>(true));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::Sign<std::int16_t>(false));
+		}
+
+		TEST_METHOD(SignFloatFromBoolTest)
+		{
+			Assert::AreEqual(1.f, PonyMath::Core::Sign<float>(true));
+			Assert::AreEqual(-1.f, PonyMath::Core::Sign<float>(false));
+		}
+
 		TEST_METHOD(SignumShortTest)
 		{
 			Assert::AreEqual(std::int16_t{0}, PonyMath::Core::Signum(std::int16_t{0}));
@@ -116,6 +128,22 @@ namespace Core
 			Assert::AreEqual(-1.f, PonyMath::Core::Signum(-42.f));
 			Assert::AreEqual(1.f, PonyMath::Core::Signum(0.3f));
 			Assert::AreEqual(-1.f, PonyMath::Core::Signum(-0.3f));
+		}
+
+		TEST_METHOD(SignumWithConversionShortTest)
+		{
+			Assert::AreEqual(std::int16_t{ 0 }, PonyMath::Core::Signum<std::int16_t>(0.f));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Signum<std::int16_t>(5.f));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::Signum<std::int16_t>(-42.f));
+			Assert::AreEqual(std::int16_t{1}, PonyMath::Core::Signum<std::int16_t>(0.1f));
+			Assert::AreEqual(std::int16_t{-1}, PonyMath::Core::Signum<std::int16_t>(-0.1f));
+		}
+
+		TEST_METHOD(SignumWithConversionFloatTest)
+		{
+			Assert::AreEqual(0.f, PonyMath::Core::Signum<float>(0));
+			Assert::AreEqual(1.f, PonyMath::Core::Signum<float>(39));
+			Assert::AreEqual(-1.f, PonyMath::Core::Signum<float>(-42));
 		}
 
 		TEST_METHOD(RoundToIntegralShortTest)
@@ -148,13 +176,34 @@ namespace Core
 			Assert::AreEqual(-11LL, PonyMath::Core::RoundToIntegral<double, std::int64_t>(-10.7));
 		}
 
+		TEST_METHOD(DivideCeilTest)
+		{
+			Assert::AreEqual(3u, PonyMath::Core::DivideCeil(12u, 5u));
+			Assert::AreEqual(1u, PonyMath::Core::DivideCeil(1u, 6u));
+			Assert::AreEqual(1u, PonyMath::Core::DivideCeil(7u, 7u));
+			Assert::AreEqual(1u, PonyMath::Core::DivideCeil(7u, 8u));
+			Assert::AreEqual(2u, PonyMath::Core::DivideCeil(9u, 8u));
+			Assert::AreEqual(4u, PonyMath::Core::DivideCeil(100u, 26u));
+		}
+
+		TEST_METHOD(AlignTest)
+		{
+			Assert::AreEqual(8u, PonyMath::Core::Align(5u, 4u));
+			Assert::AreEqual(256u, PonyMath::Core::Align(200u, 64u));
+			Assert::AreEqual(4u, PonyMath::Core::Align(1u, 4u));
+		}
+
 		TEST_METHOD(ConstexprCompilationTest)
 		{
 			[[maybe_unused]] constexpr float degToRad = PonyMath::Core::DegToRad<float>;
 			[[maybe_unused]] constexpr float radToDeg = PonyMath::Core::RadToDeg<float>;
-			[[maybe_unused]] constexpr float sign = PonyMath::Core::Sign<float>(4.f);
-			[[maybe_unused]] constexpr float signum = PonyMath::Core::Signum<float>(3.f);
+			[[maybe_unused]] constexpr float sign = PonyMath::Core::Sign(4.f);
+			[[maybe_unused]] constexpr float signB = PonyMath::Core::Sign<float>(true);
+			[[maybe_unused]] constexpr float signum = PonyMath::Core::Signum(3.f);
+			[[maybe_unused]] constexpr float signumCast = PonyMath::Core::Signum<float>(4);
 			[[maybe_unused]] constexpr std::int32_t round = PonyMath::Core::RoundToIntegral<float, std::int32_t>(3.5f);
+			[[maybe_unused]] constexpr std::uint32_t divCeil = PonyMath::Core::DivideCeil(6u, 2u);
+			[[maybe_unused]] constexpr std::uint32_t align = PonyMath::Core::Align(12u, 32u);
 		}
 	};
 }

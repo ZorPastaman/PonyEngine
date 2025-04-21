@@ -9,5 +9,5 @@
 
 export module PonyEngine.Input.Windows.Detail;
 
-export import :WindowsKeyboardDeviceFactory;
-export import :WindowsMouseDeviceFactory;
+export import :KeyboardDeviceFactory;
+export import :MouseDeviceFactory;

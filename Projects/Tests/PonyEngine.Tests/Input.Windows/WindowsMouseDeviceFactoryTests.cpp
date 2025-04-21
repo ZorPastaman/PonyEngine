@@ -9,10 +9,7 @@
 
 #include "CppUnitTest.h"
 
-#include "Mocks/Application.h"
-#include "Mocks/Logger.h"
-#include "Mocks/Engine.h"
-#include "Mocks/InputSystem.h"
+import Mocks;
 
 import PonyEngine.Input.Windows.Impl;
 
@@ -25,7 +22,7 @@ namespace Input
 		TEST_METHOD(CreateTest)
 		{
 			auto application = Mocks::Application();
-			auto factory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{});
 			Assert::IsNotNull(factory.inputDeviceFactory.get());
 		}
 
@@ -38,8 +35,8 @@ namespace Input
 			engine.application = &application;
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 			Assert::IsNotNull(device.inputDevice.get());
 		}
 
@@ -52,8 +49,8 @@ namespace Input
 			engine.application = &application;
 			auto inputSystem = Mocks::InputSystem();
 			inputSystem.engine = &engine;
-			auto factory = PonyEngine::Input::CreateWindowsMouseDeviceFactory(application, PonyEngine::Input::WindowsMouseDeviceFactoryParams{}, PonyEngine::Input::WindowsMouseDeviceParams{});
-			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::InputDeviceParams{});
+			auto factory = PonyEngine::Input::Windows::CreateMouseDeviceFactory(application, PonyEngine::Input::Windows::MouseDeviceFactoryParams{}, PonyEngine::Input::Windows::MouseDeviceParams{});
+			auto device = factory.inputDeviceFactory->CreateDevice(inputSystem, PonyEngine::Input::DeviceParams{});
 			Assert::IsTrue(typeid(*device.inputDevice) == factory.inputDeviceFactory->DeviceType());
 		}
 	};

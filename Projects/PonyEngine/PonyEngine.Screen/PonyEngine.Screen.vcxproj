@@ -35,9 +35,9 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail.cppm" />
-    <ClCompile Include="Source\Private\Screen.Windows\Utility.cppm" />
-    <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystem.cppm" />
-    <ClCompile Include="Source\Private\Screen.Windows\WindowsScreenSystemFactoryImpl.cppm" />
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-Utility.cppm" />
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-ScreenSystem.cppm" />
+    <ClCompile Include="Source\Private\Screen.Windows\Screen.Windows.Detail-ScreenSystemFactoryImpl.cppm" />
     <ClCompile Include="Source\Public\Screen.Windows\Screen.Windows.Impl.cppm" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

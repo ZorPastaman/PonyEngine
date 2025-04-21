@@ -71,7 +71,10 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="Utility\GuidUtilityTests.cpp" />
+    <ClCompile Include="Container\BufferTests.cpp" />
+    <ClCompile Include="Container\BufferViewTests.cpp" />
+    <ClCompile Include="Utility\ContainerTests.cpp" />
+    <ClCompile Include="Utility.COM\GuidUtilityTests.cpp" />
     <ClCompile Include="Utility\ObjectInterfacesTests.cpp" />
     <ClCompile Include="Utility\StringUtilityTests.cpp" />
   </ItemGroup>

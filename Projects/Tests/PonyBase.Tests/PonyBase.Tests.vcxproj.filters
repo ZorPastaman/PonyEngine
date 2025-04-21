@@ -18,10 +18,19 @@
     <ClCompile Include="Utility\StringUtilityTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Utility\GuidUtilityTests.cpp">
+    <ClCompile Include="Utility.COM\GuidUtilityTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Utility\ObjectInterfacesTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Container\BufferTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Container\BufferViewTests.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Utility\ContainerTests.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

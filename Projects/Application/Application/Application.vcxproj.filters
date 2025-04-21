@@ -21,19 +21,16 @@
     <ClCompile Include="Source\Main.Windows.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsApplication.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Application.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsLogger.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Logger.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsEngine.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-Engine.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsQuitChecker.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Application.Windows\WindowsUtility.cppm">
+    <ClCompile Include="Source\Private\Application.Windows\Application.Windows-QuitChecker.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

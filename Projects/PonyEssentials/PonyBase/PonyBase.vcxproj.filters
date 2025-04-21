@@ -49,28 +49,52 @@
     <ClCompile Include="Source\Public\Core\Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Core\ExitCodes.cppm">
+    <ClCompile Include="Source\Public\Core\Core-ExitCodes.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility.COM\COMUtility.cppm">
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility.COM\GuidUtility.cppm">
+    <ClCompile Include="Source\Public\Utility.COM\Utility.COM-GUID.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectInterfaces.cppm">
+    <ClCompile Include="Source\Public\Utility\Utility-ObjectInterfaces.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\ObjectUtility\ObjectUtility.cppm">
+    <ClCompile Include="Source\Public\Utility\Utility-SafeFormat.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\StringUtility\SafeFormat.cppm">
+    <ClCompile Include="Source\Public\Utility\Utility-StringConvert.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\StringUtility\StringConvert.cppm">
+    <ClCompile Include="Source\Public\Utility\Utility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Utility\StringUtility\StringUtility.cppm">
+    <ClCompile Include="Source\Public\Container\Container.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Container\Container-Buffer.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Container\Container-BufferView.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Module.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Cursor.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Utility\Utility-Container.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
