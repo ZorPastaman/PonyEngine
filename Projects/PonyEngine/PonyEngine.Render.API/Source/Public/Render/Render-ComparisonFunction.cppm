@@ -17,12 +17,12 @@ export namespace PonyEngine::Render
 	enum class ComparisonFunction : std::uint8_t
 	{
 		Never,
-        Always,
-        Equal,
-        NotEqual,
-        Less,
-        LessOrEqual,
-        Greater,
-        GreaterOrEqual
+		Always,
+		Equal,
+		NotEqual,
+		Less,
+		LessOrEqual,
+		Greater,
+		GreaterOrEqual
 	};
 }

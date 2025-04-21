@@ -17,12 +17,12 @@ export namespace PonyEngine::Render
 	enum class StencilOperation : std::uint8_t
 	{
 		Keep,
-        Zero,
-        Replace,
-        Invert,
-        Increment,
-        Decrement,
-        IncrementSaturated,
-        DecrementSaturated
+		Zero,
+		Replace,
+		Invert,
+		Increment,
+		Decrement,
+		IncrementSaturated,
+		DecrementSaturated
 	};
 }
