@@ -13,18 +13,14 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:PipelineState;
 
-import <array>;
+import <cstdint>;
 import <memory>;
-import <optional>;
-import <span>;
-import <string>;
 import <string_view>;
 
 import PonyEngine.Render;
 
 import :ObjectUtility;
 import :RootSignature;
-import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -32,6 +28,7 @@ export namespace PonyEngine::Render::Direct3D12
 	class PipelineState final
 	{
 	public:
+		/// @brief Creates an empty pipeline state.
 		[[nodiscard("Pure constructor")]]
 		PipelineState() noexcept;
 		/// @brief Creates a @p Pipeline state.
@@ -70,18 +67,30 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		bool IsTransparent() const noexcept;
 
+		/// @brief Gets the thread group counts.
+		/// @return Thread group counts.
 		[[nodiscard("Pure function")]]
 		struct ThreadGroupCounts& ThreadGroupCounts() noexcept;
+		/// @brief Gets the thread group counts.
+		/// @return Thread group counts.
 		[[nodiscard("Pure function")]]
 		const struct ThreadGroupCounts& ThreadGroupCounts() const noexcept;
 
+		/// @brief Gets the render queue.
+		/// @return Render queue.
 		[[nodiscard("Pure function")]]
 		std::int32_t& RenderQueue() noexcept;
+		/// @brief Gets the render queue.
+		/// @return Render queue.
 		[[nodiscard("Pure function")]]
 		const std::int32_t& RenderQueue() const noexcept;
 
+		/// @brief Gets if the camera culling is enabled.
+		/// @return @a True if it's enabled; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		bool& CameraCulling() noexcept;
+		/// @brief Gets if the camera culling is enabled.
+		/// @return @a True if it's enabled; @a false otherwise.
 		[[nodiscard("Pure function")]]
 		const bool& CameraCulling() const noexcept;
 
@@ -95,20 +104,21 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		std::shared_ptr<class RootSignature> rootSignature; ///< Root signature.
 		Microsoft::WRL::ComPtr<ID3D12PipelineState> pipelineState; ///< Pipeline state.
-		bool isTransparent;
 
-		struct ThreadGroupCounts threadGroupCounts;
-		std::int32_t renderQueue;
-		bool cameraCulling;
+		struct ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
+		std::int32_t renderQueue; ///< Render queue.
+
+		bool isTransparent; ///< Is the state transparent?
+		bool cameraCulling; ///< Camera culling.
 	};
 }
 
 namespace PonyEngine::Render::Direct3D12
 {
 	PipelineState::PipelineState() noexcept :
-		isTransparent{true},
 		threadGroupCounts(),
 		renderQueue{0},
+		isTransparent{true},
 		cameraCulling{true}
 	{
 	}
@@ -116,9 +126,9 @@ namespace PonyEngine::Render::Direct3D12
 	PipelineState::PipelineState(const std::shared_ptr<class RootSignature>& rootSignature, ID3D12PipelineState& pipelineState, const bool isTransparent) noexcept :
 		rootSignature(rootSignature),
 		pipelineState(&pipelineState),
-		isTransparent{isTransparent},
 		threadGroupCounts(),
 		renderQueue{0},
+		isTransparent{isTransparent},
 		cameraCulling{true}
 	{
 	}

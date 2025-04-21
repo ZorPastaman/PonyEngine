@@ -13,7 +13,12 @@ module;
 
 export module PonyEngine.Render.Direct3D12.Detail:ShaderManager;
 
+import <cstddef>;
+import <cstdint>;
+import <fstream>;
 import <memory>;
+import <string>;
+import <string_view>;
 import <vector>;
 
 import :IShaderManager;
@@ -22,9 +27,12 @@ import :Shader;
 
 export namespace PonyEngine::Render::Direct3D12
 {
+	/// @brief Direct3D12 shader manager.
 	class ShaderManager final : public IShaderManager
 	{
 	public:
+		/// @brief Creates a shader manager.
+		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
 		explicit ShaderManager(ISubSystemContext& d3d12System) noexcept;
 		ShaderManager(const ShaderManager&) = delete;
@@ -35,19 +43,23 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Shader> CreateShader(std::string_view shaderPath) override;
 
+		/// @brief Clean out of dead shaders.
 		void Clean() noexcept;
 
 		ShaderManager& operator =(const ShaderManager&) = delete;
 		ShaderManager& operator =(ShaderManager&&) = delete;
 
 	private:
+		/// @brief Adds a shader.
+		/// @param shader Shader to add.
+		/// @param shaderPath Shader path.
 		void Add(const std::shared_ptr<Shader>& shader, std::string_view shaderPath);
 		void Remove(std::size_t index) noexcept;
 
-		ISubSystemContext* d3d12System;
+		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		std::vector<std::shared_ptr<Shader>> shaders;
-		std::vector<std::string> shaderPaths;
+		std::vector<std::shared_ptr<Shader>> shaders; ///< Shaders.
+		std::vector<std::string> shaderPaths; ///< Shader paths.
 	};
 }
 
@@ -68,6 +80,7 @@ namespace PonyEngine::Render::Direct3D12
 			}
 		}
 
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Read shader file.");
 		const std::string path = std::format("{}.cso", shaderPath);
 		auto stream = std::ifstream(path, std::ios::binary | std::ios::ate);
 		if (!stream.is_open())
@@ -82,6 +95,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read shader file at '{}'.", path));
 		}
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Shader file read.");
 
 		const auto shader = std::make_shared<Shader>(data);
 		Add(shader, shaderPath);
@@ -94,9 +108,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = shaders.size(); i-- > 0; )
 		{
-			if (shaders[i].use_count() <= 1L)
+			if (const std::shared_ptr<Shader>& shader = shaders[i]; shader.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy shader at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(shaders[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy shader at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(shader.get()));
 				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Shader destroyed.");
 			}

@@ -14,15 +14,8 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:Shader;
 
 import <cstddef>;
-import <format>;
-import <fstream>;
-import <stdexcept>;
-import <string>;
-import <string_view>;
-import <vector>;
 
 import PonyBase.Container;
-import PonyBase.Utility;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -30,6 +23,8 @@ export namespace PonyEngine::Render::Direct3D12
 	class Shader final
 	{
 	public:
+		/// @brief Creates a shader.
+		/// @param data Shader data.
 		[[nodiscard("Pure constructor")]]
 		explicit Shader(const PonyBase::Container::Buffer& data);
 		[[nodiscard("Pure constructor")]]
@@ -47,6 +42,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Shader byte code size in bytes.
 		[[nodiscard("Pure function")]]
 		std::size_t Size() const noexcept;
+		/// @brief Gets the shader byte code.
+		/// @return Shader byte code.
 		[[nodiscard("Pure function")]]
 		D3D12_SHADER_BYTECODE ByteCode() const noexcept;
 

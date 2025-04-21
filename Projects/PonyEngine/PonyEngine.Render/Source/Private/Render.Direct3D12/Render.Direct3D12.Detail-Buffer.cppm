@@ -33,8 +33,10 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param resource Resource. Must have a buffer dimension.
 		[[nodiscard("Pure constructor")]]
 		explicit Buffer(ID3D12Resource2& resource) noexcept;
-		Buffer(const Buffer&) = delete;
-		Buffer(Buffer&&) = delete;
+		[[nodiscard("Pure constructor")]]
+		Buffer(const Buffer& other) noexcept = default;
+		[[nodiscard("Pure constructor")]]
+		Buffer(Buffer&& other) noexcept = default;
 
 		virtual ~Buffer() noexcept override = default;
 
@@ -66,8 +68,8 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param offset Write offset.
 		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0);
 
-		Buffer& operator =(const Buffer&) = delete;
-		Buffer& operator =(Buffer&&) = delete;
+		Buffer& operator =(const Buffer& other) noexcept = default;
+		Buffer& operator =(Buffer&& other) noexcept = default;
 
 	private:
 		/// @brief Checks if the parameters are correct.

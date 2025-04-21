@@ -27,7 +27,7 @@ export namespace PonyEngine::Render::Direct3D12
 		INTERFACE_BODY(IPipelineStateManager)
 
 		/// @brief Creates a Direct3D12 pipeline state.
-		/// @param pipelineState Pipeline state.
+		/// @param pipelineState Pipeline state. Mustn't be nullptr.
 		/// @return Direct3D12 pipeline state.
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<PipelineState> CreatePipelineState(const std::shared_ptr<const Render::PipelineState>& pipelineState) = 0;
