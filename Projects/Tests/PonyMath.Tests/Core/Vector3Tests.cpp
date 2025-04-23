@@ -234,7 +234,7 @@ namespace Core
 			constexpr std::int16_t y = -3;
 			constexpr std::int16_t z = 5; 
 			constexpr auto vector = PonyMath::Core::Vector3<std::int16_t>(x, y, z);
-			Assert::AreEqual(6.164, static_cast<double>(vector.Magnitude()), 0.001);
+			Assert::AreEqual(6.164f, vector.Magnitude(), 0.001f);
 
 			Assert::AreEqual(0.f, PonyMath::Core::Vector3<std::int16_t>::Predefined::Zero.Magnitude());
 		}
@@ -245,7 +245,7 @@ namespace Core
 			constexpr float y = -3;
 			constexpr float z = 5;
 			constexpr auto vector = PonyMath::Core::Vector3<float>(x, y, z);
-			Assert::AreEqual(6.164, static_cast<double>(vector.Magnitude()), 0.001);
+			Assert::AreEqual(6.164f, vector.Magnitude(), 0.001f);
 
 			Assert::AreEqual(0.f, PonyMath::Core::Vector3<float>::Predefined::Zero.Magnitude());
 		}
@@ -279,11 +279,33 @@ namespace Core
 			constexpr float z = 5;
 			auto vector = PonyMath::Core::Vector3<float>(x, y, z);
 			const PonyMath::Core::Vector3<float> normalized = vector.Normalized();
-			Assert::AreEqual(0.324, static_cast<double>(normalized.X()), 0.001);
-			Assert::AreEqual(-0.487, static_cast<double>(normalized.Y()), 0.001);
-			Assert::AreEqual(0.811, static_cast<double>(normalized.Z()), 0.001);
+			Assert::AreEqual(0.324f, normalized.X(), 0.001f);
+			Assert::AreEqual(-0.487f, normalized.Y(), 0.001f);
+			Assert::AreEqual(0.811f, normalized.Z(), 0.001f);
 			vector.Normalize();
 			Assert::IsTrue(vector == normalized);
+		}
+
+		TEST_METHOD(NormalizeSafeTest)
+		{
+			auto vector = PonyMath::Core::Vector3<float>(2.f, -3.f, 5.f);
+			constexpr auto fallback = PonyMath::Core::Vector3<float>(1.0f, 0.0f, 1.f);
+			const PonyMath::Core::Vector3<float> normalized = vector.Normalized(fallback);
+			Assert::AreEqual(0.324f, normalized.X(), 0.001f);
+			Assert::AreEqual(-0.487f, normalized.Y(), 0.001f);
+			Assert::AreEqual(0.811f, normalized.Z(), 0.001f);
+
+			vector.Normalize(fallback);
+			Assert::IsTrue(vector == normalized);
+
+			auto zeroVector = PonyMath::Core::Vector3<float>::Predefined::Zero;
+			const PonyMath::Core::Vector3<float> normalizedZero = zeroVector.Normalized(fallback);
+			Assert::AreEqual(fallback.X(), normalizedZero.X());
+			Assert::AreEqual(fallback.Y(), normalizedZero.Y());
+			Assert::AreEqual(fallback.Z(), normalizedZero.Z());
+
+			zeroVector.Normalize(fallback);
+			Assert::IsTrue(zeroVector == normalizedZero);
 		}
 
 		TEST_METHOD(MinShortTest)
@@ -604,9 +626,9 @@ namespace Core
 			constexpr float zS = -1;
 			constexpr auto scale = PonyMath::Core::Vector3<float>(xS, yS, zS);
 			vector.Divide(scale);
-			Assert::AreEqual(static_cast<double>(x / xS), static_cast<double>(vector.X()), 0.0001);
-			Assert::AreEqual(static_cast<double>(y / yS), static_cast<double>(vector.Y()), 0.0001);
-			Assert::AreEqual(static_cast<double>(z / zS), static_cast<double>(vector.Z()), 0.0001);
+			Assert::AreEqual(x / xS, vector.X(), 0.0001f);
+			Assert::AreEqual(y / yS, vector.Y(), 0.0001f);
+			Assert::AreEqual(z / zS, vector.Z(), 0.0001f);
 		}
 
 		TEST_METHOD(ToStringShortTest)
@@ -1080,7 +1102,7 @@ namespace Core
 			constexpr std::int16_t yL = 4;
 			constexpr std::int16_t zL = -3;
 			constexpr auto vectorL = PonyMath::Core::Vector3<std::int16_t>(xL, yL, zL);
-			Assert::AreEqual(11.358, static_cast<double>(PonyMath::Core::Distance(vectorL, vectorR)), 0.001);
+			Assert::AreEqual(11.358f, PonyMath::Core::Distance(vectorL, vectorR), 0.001f);
 			Assert::AreEqual(std::int16_t{129}, PonyMath::Core::DistanceSquared(vectorR, vectorL));
 		}
 
@@ -1094,7 +1116,7 @@ namespace Core
 			constexpr float yL = 4;
 			constexpr float zL = -3;
 			constexpr auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
-			Assert::AreEqual(11.358, static_cast<double>(PonyMath::Core::Distance(vectorL, vectorR)), 0.001);
+			Assert::AreEqual(11.358f, PonyMath::Core::Distance(vectorL, vectorR), 0.001f);
 			Assert::AreEqual(129.f, PonyMath::Core::DistanceSquared(vectorR, vectorL));
 		}
 
@@ -1109,7 +1131,7 @@ namespace Core
 			float zL = -2;
 			auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL).Normalized();
 			float angle = PonyMath::Core::Angle(vectorL, vectorR);
-			Assert::AreEqual(1.789, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(1.789f, angle, 0.001f);
 
 			xR = 2;
 			yR = 3;
@@ -1120,13 +1142,13 @@ namespace Core
 			zL = 2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL).Normalized();
 			angle = PonyMath::Core::Angle(vectorL, vectorR);
-			Assert::AreEqual(0.742, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(0.742f, angle, 0.001f);
 
 			angle = PonyMath::Core::Angle(vectorL, vectorL);
-			Assert::AreEqual(0., static_cast<double>(angle), 0.001);
+			Assert::AreEqual(0.f, angle, 0.001f);
 
 			angle = PonyMath::Core::Angle(vectorL, -vectorL);
-			Assert::AreEqual(std::numbers::pi_v<double>, std::abs(static_cast<double>(angle)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(angle), 0.001f);
 
 			xR = 2;
 			yR = 3;
@@ -1137,7 +1159,7 @@ namespace Core
 			zL = -2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			angle = PonyMath::Core::Angle(vectorL, vectorR);
-			Assert::AreEqual(std::numbers::pi_v<double> / 2., std::abs(static_cast<double>(angle)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2.f, std::abs(angle), 0.001f);
 		}
 
 		TEST_METHOD(AngleSignedTest)
@@ -1151,11 +1173,11 @@ namespace Core
 			float zL = -2;
 			auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL).Normalized();
 			float angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Up);
-			Assert::AreEqual(-1.789, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(-1.789f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorR, vectorL, PonyMath::Core::Vector3<float>::Predefined::Up);
-			Assert::AreEqual(1.789, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(1.789f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Down);
-			Assert::AreEqual(1.789, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(1.789f, angle, 0.001f);
 
 			xR = 2;
 			yR = 3;
@@ -1166,17 +1188,17 @@ namespace Core
 			zL = 2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL).Normalized();
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Right);
-			Assert::AreEqual(0.742, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(0.742f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorR, vectorL, PonyMath::Core::Vector3<float>::Predefined::Right);
-			Assert::AreEqual(-0.742, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(-0.742f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Left);
-			Assert::AreEqual(-0.742, static_cast<double>(angle), 0.001);
+			Assert::AreEqual(-0.742f, angle, 0.001f);
 
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorL, PonyMath::Core::Vector3<float>::Predefined::Forward);
-			Assert::AreEqual(0., static_cast<double>(angle), 0.001);
+			Assert::AreEqual(0.f, angle, 0.001f);
 
 			angle = PonyMath::Core::AngleSigned(vectorL, -vectorL, PonyMath::Core::Vector3<float>::Predefined::Forward);
-			Assert::AreEqual(std::numbers::pi_v<double>, std::abs(static_cast<double>(angle)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float>, std::abs(angle), 0.001f);
 
 			xR = 2;
 			yR = 3;
@@ -1187,11 +1209,11 @@ namespace Core
 			zL = -2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Forward);
-			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(angle), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2.f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorR, vectorL, PonyMath::Core::Vector3<float>::Predefined::Forward);
-			Assert::AreEqual(-std::numbers::pi_v<double> / 2., static_cast<double>(angle), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2.f, angle, 0.001f);
 			angle = PonyMath::Core::AngleSigned(vectorL, vectorR, PonyMath::Core::Vector3<float>::Predefined::Back);
-			Assert::AreEqual(-std::numbers::pi_v<double> / 2., static_cast<double>(angle), 0.001);
+			Assert::AreEqual(-std::numbers::pi_v<float> / 2.f, angle, 0.001f);
 		}
 
 		TEST_METHOD(ProjectTest)
@@ -1205,9 +1227,9 @@ namespace Core
 			float zL = -2;
 			auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			PonyMath::Core::Vector3<float> projected = PonyMath::Core::Project(vectorL, vectorR);
-			Assert::AreEqual(-0.526, static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(0.789, static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(-1.316, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(-0.526f, projected.X(), 0.001f);
+			Assert::AreEqual(0.789f, projected.Y(), 0.001f);
+			Assert::AreEqual(-1.316f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1218,9 +1240,9 @@ namespace Core
 			zL = 2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::Project(vectorL, vectorR);
-			Assert::AreEqual(1.789, static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(-2.684, static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(4.474, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(1.789f, projected.X(), 0.001f);
+			Assert::AreEqual(-2.684f, projected.Y(), 0.001f);
+			Assert::AreEqual(4.474f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1231,9 +1253,9 @@ namespace Core
 			zL = 10;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::Project(vectorL, vectorR);
-			Assert::AreEqual(4., static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(-6., static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(10., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(4.f, projected.X(), 0.001f);
+			Assert::AreEqual(-6.f, projected.Y(), 0.001f);
+			Assert::AreEqual(10.f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1244,9 +1266,9 @@ namespace Core
 			zL = -13;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::Project(vectorL, vectorR);
-			Assert::AreEqual(0., static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(0.f, projected.X(), 0.001f);
+			Assert::AreEqual(0.f, projected.Y(), 0.001f);
+			Assert::AreEqual(0.f, projected.Z(), 0.001f);
 		}
 
 		TEST_METHOD(ProjectOnPlaneTest)
@@ -1260,9 +1282,9 @@ namespace Core
 			float zL = -2;
 			auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			PonyMath::Core::Vector3<float> projected = PonyMath::Core::ProjectOnPlane(vectorL, vectorR);
-			Assert::AreEqual(6.526, static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(3.211, static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(-0.684, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(6.526f, projected.X(), 0.001f);
+			Assert::AreEqual(3.211f, projected.Y(), 0.001f);
+			Assert::AreEqual(-0.684f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1273,9 +1295,9 @@ namespace Core
 			zL = 2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::ProjectOnPlane(vectorL, vectorR);
-			Assert::AreEqual(4.211, static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(-1.316, static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(-2.474, static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(4.211f, projected.X(), 0.001f);
+			Assert::AreEqual(-1.316f, projected.Y(), 0.001f);
+			Assert::AreEqual(-2.474f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1286,9 +1308,9 @@ namespace Core
 			zL = 10;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::ProjectOnPlane(vectorL, vectorR);
-			Assert::AreEqual(0., static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(0.f, projected.X(), 0.001f);
+			Assert::AreEqual(0.f, projected.Y(), 0.001f);
+			Assert::AreEqual(0.f, projected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1299,9 +1321,9 @@ namespace Core
 			zL = -13;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			projected = PonyMath::Core::ProjectOnPlane(vectorL, vectorR);
-			Assert::AreEqual(4., static_cast<double>(projected.X()), 0.001);
-			Assert::AreEqual(-6., static_cast<double>(projected.Y()), 0.001);
-			Assert::AreEqual(-13., static_cast<double>(projected.Z()), 0.001);
+			Assert::AreEqual(4.f, projected.X(), 0.001f);
+			Assert::AreEqual(-6.f, projected.Y(), 0.001f);
+			Assert::AreEqual(-13.f, projected.Z(), 0.001f);
 		}
 
 		TEST_METHOD(ReflectTest)
@@ -1315,9 +1337,9 @@ namespace Core
 			float zL = -2;
 			auto vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			PonyMath::Core::Vector3<float> reflected = PonyMath::Core::Reflect(vectorL, vectorR);
-			Assert::AreEqual(7.053, static_cast<double>(reflected.X()), 0.001);
-			Assert::AreEqual(2.421, static_cast<double>(reflected.Y()), 0.001);
-			Assert::AreEqual(0.632, static_cast<double>(reflected.Z()), 0.001);
+			Assert::AreEqual(7.053f, reflected.X(), 0.001f);
+			Assert::AreEqual(2.421f, reflected.Y(), 0.001f);
+			Assert::AreEqual(0.632f, reflected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1328,9 +1350,9 @@ namespace Core
 			zL = 2;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			reflected = PonyMath::Core::Reflect(vectorL, vectorR);
-			Assert::AreEqual(2.421, static_cast<double>(reflected.X()), 0.001);
-			Assert::AreEqual(1.368, static_cast<double>(reflected.Y()), 0.001);
-			Assert::AreEqual(-6.947, static_cast<double>(reflected.Z()), 0.001);
+			Assert::AreEqual(2.421f, reflected.X(), 0.001f);
+			Assert::AreEqual(1.368f, reflected.Y(), 0.001f);
+			Assert::AreEqual(-6.947f, reflected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1341,9 +1363,9 @@ namespace Core
 			zL = 10;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			reflected = PonyMath::Core::Reflect(vectorL, vectorR);
-			Assert::AreEqual(-4., static_cast<double>(reflected.X()), 0.001);
-			Assert::AreEqual(6., static_cast<double>(reflected.Y()), 0.001);
-			Assert::AreEqual(-10., static_cast<double>(reflected.Z()), 0.001);
+			Assert::AreEqual(-4.f, reflected.X(), 0.001f);
+			Assert::AreEqual(6.f, reflected.Y(), 0.001f);
+			Assert::AreEqual(-10.f, reflected.Z(), 0.001f);
 
 			xR = 2;
 			yR = -3;
@@ -1354,9 +1376,9 @@ namespace Core
 			zL = -13;
 			vectorL = PonyMath::Core::Vector3<float>(xL, yL, zL);
 			reflected = PonyMath::Core::Reflect(vectorL, vectorR);
-			Assert::AreEqual(4., static_cast<double>(reflected.X()), 0.001);
-			Assert::AreEqual(-6., static_cast<double>(reflected.Y()), 0.001);
-			Assert::AreEqual(-13., static_cast<double>(reflected.Z()), 0.001);
+			Assert::AreEqual(4.f, reflected.X(), 0.001f);
+			Assert::AreEqual(-6.f, reflected.Y(), 0.001f);
+			Assert::AreEqual(-13.f, reflected.Z(), 0.001f);
 		}
 
 		TEST_METHOD(MultiplyVectorShortTest)

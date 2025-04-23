@@ -111,7 +111,7 @@ namespace Time
 			Assert::AreEqual(static_cast<std::uint64_t>(timeSystem->VirtualTime() / params.framePeriod), timeSystem->VirtualFrameCount());
 			Assert::AreEqual(static_cast<std::uint64_t>(timeSystem->UnscaledVirtualTime() / params.framePeriod), timeSystem->UnscaledVirtualFrameCount());
 			Assert::IsTrue(20.f < timeSystem->RealDeltaTime());
-			Assert::AreEqual(5., static_cast<double>(timeSystem->VirtualDeltaTime()), 0.000001);
+			Assert::AreEqual(5.f, timeSystem->VirtualDeltaTime(), 0.000001f);
 			Assert::AreEqual(10.f, timeSystem->UnscaledVirtualDeltaTime());
 			Assert::AreEqual(static_cast<std::uint32_t>(timeSystem->RealTime() / params.framePeriod) - realDeltaFrame, timeSystem->RealDeltaFrame());
 			Assert::AreEqual(static_cast<std::uint32_t>(timeSystem->VirtualTime() / params.framePeriod) - virtualDeltaFrame, timeSystem->VirtualDeltaFrame());

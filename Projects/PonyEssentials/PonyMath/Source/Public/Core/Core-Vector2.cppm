@@ -98,10 +98,18 @@ export namespace PonyMath::Core
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		/// @return Normalized vector.
 		[[nodiscard("Pure function")]]
-		Vector2 Normalized() const noexcept requires (std::is_floating_point_v<T>); // TODO: Add safe normalized with a default vector that is returned if this vector is zero.
+		Vector2 Normalized() const noexcept requires (std::is_floating_point_v<T>);
 		/// @brief Normalizes the vector.
 		/// @note If the magnitude of the vector is 0, the result is undefined.
 		void Normalize() noexcept requires (std::is_floating_point_v<T>);
+		/// @brief Computes a vector normalized from this one.
+		/// @param fallback Fallback vector. This vector is returned if the magnitude of the vector is 0.
+		/// @return Normalized vector; the @p fallback if the magnitude of the vector is 0.
+		[[nodiscard("Pure function")]]
+		Vector2 Normalized(const Vector2& fallback) const noexcept requires (std::is_floating_point_v<T>);
+		/// @brief Normalizes the vector.
+		/// @param fallback Fallback vector. This vector is set if the magnitude of the vector is 0.
+		void Normalize(const Vector2& fallback) noexcept requires (std::is_floating_point_v<T>);
 
 		/// @brief Gets a minimum among the components.
 		/// @return Minimum component.
@@ -534,6 +542,18 @@ namespace PonyMath::Core
 	void Vector2<T>::Normalize() noexcept requires (std::is_floating_point_v<T>)
 	{
 		*this = Normalized();
+	}
+
+	template <Arithmetic T>
+	Vector2<T> Vector2<T>::Normalized(const Vector2& fallback) const noexcept requires (std::is_floating_point_v<T>)
+	{
+		return IsAlmostZero() ? fallback : Normalized();
+	}
+
+	template <Arithmetic T>
+	void Vector2<T>::Normalize(const Vector2& fallback) noexcept requires (std::is_floating_point_v<T>)
+	{
+		*this = Normalized(fallback);
 	}
 
 	template<Arithmetic T>

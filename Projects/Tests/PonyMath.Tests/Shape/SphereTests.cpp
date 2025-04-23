@@ -118,7 +118,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 2.f);
 			constexpr float radius = 2.f;
 			constexpr auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
-			Assert::AreEqual(radius * 2., static_cast<double>(sphere.Diameter()), 0.00001);
+			Assert::AreEqual(radius * 2.f, sphere.Diameter(), 0.00001f);
 		}
 		
 		TEST_METHOD(AreaTest)
@@ -126,7 +126,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 2.f);
 			constexpr float radius = 2.f;
 			constexpr auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
-			Assert::AreEqual(4. * std::numbers::pi_v<double> * radius * radius, static_cast<double>(sphere.Area()), 0.0001);
+			Assert::AreEqual(4.f * std::numbers::pi_v<float> * radius * radius, sphere.Area(), 0.0001f);
 		}
 
 		TEST_METHOD(VolumeTest)
@@ -134,7 +134,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector3<float>(-2.f, -1.f, 2.f);
 			constexpr float radius = 2.f;
 			constexpr auto sphere = PonyMath::Shape::Sphere<float>(center, radius);
-			Assert::AreEqual(4. / 3. * std::numbers::pi_v<double> * radius * radius * radius, static_cast<double>(sphere.Volume()), 0.0001);
+			Assert::AreEqual(4.f / 3.f * std::numbers::pi_v<float> * radius * radius * radius, sphere.Volume(), 0.0001f);
 		}
 		
 		TEST_METHOD(IsFiniteTest)

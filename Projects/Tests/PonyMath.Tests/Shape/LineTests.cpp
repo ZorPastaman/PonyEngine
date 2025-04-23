@@ -63,7 +63,7 @@ namespace Shape
 			const auto point = PonyMath::Core::Vector2<float>(-4.f, 3.f);
 			const auto line = PonyMath::Shape::Line<float>(normal, point);
 			Assert::IsTrue(normal == line.Normal());
-			Assert::AreEqual(0., static_cast<double>(line.Distance(point)), 0.0001);
+			Assert::AreEqual(0.f, line.Distance(point), 0.0001f);
 		}
 
 		TEST_METHOD(CopyConstructorTest)
@@ -89,8 +89,8 @@ namespace Shape
 			constexpr auto point0 = PonyMath::Core::Vector2<float>(4.f, 3.f);
 			constexpr auto point1 = PonyMath::Core::Vector2<float>(-5.f, 1.f);
 			const auto line = PonyMath::Shape::Line<float>::Create(point0, point1);
-			Assert::AreEqual(0., static_cast<double>(line.Distance(point0)), 0.0001);
-			Assert::AreEqual(0., static_cast<double>(line.Distance(point1)), 0.0001);
+			Assert::AreEqual(0.f, line.Distance(point0), 0.0001f);
+			Assert::AreEqual(0.f, line.Distance(point1), 0.0001f);
 		}
 
 		TEST_METHOD(NormalTest)
@@ -161,11 +161,11 @@ namespace Shape
 			constexpr float distance = 3.f;
 			const auto line = PonyMath::Shape::Line<float>(normal, distance);
 
-			Assert::AreEqual(3., static_cast<double>(line.Distance(PonyMath::Core::Vector2<float>::Predefined::Zero)), 0.0001);
-			Assert::AreEqual(0., static_cast<double>(line.Distance(-normal * 3.f)), 0.0001);
-			Assert::AreEqual(-3., static_cast<double>(line.Distance(-normal * 6.f)), 0.0001);
-			Assert::AreEqual(5.8, static_cast<double>(line.Distance(PonyMath::Core::Vector2<float>(5.f, 2.f))), 0.0001);
-			Assert::AreEqual(-4.2, static_cast<double>(line.Distance(PonyMath::Core::Vector2<float>(-6.f, 4.f))), 0.0001);
+			Assert::AreEqual(3.f, line.Distance(PonyMath::Core::Vector2<float>::Predefined::Zero), 0.0001f);
+			Assert::AreEqual(0.f, line.Distance(-normal * 3.f), 0.0001f);
+			Assert::AreEqual(-3.f, line.Distance(-normal * 6.f), 0.0001f);
+			Assert::AreEqual(5.8f, line.Distance(PonyMath::Core::Vector2<float>(5.f, 2.f)), 0.0001f);
+			Assert::AreEqual(-4.2f, line.Distance(PonyMath::Core::Vector2<float>(-6.f, 4.f)), 0.0001f);
 		}
 
 		TEST_METHOD(ProjectTest)

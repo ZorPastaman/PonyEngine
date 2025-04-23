@@ -86,9 +86,9 @@ export namespace Game
 		std::shared_ptr<PonyEngine::Render::IRenderObject> rightFarGlass;
 		std::shared_ptr<PonyEngine::Render::IRenderObject> rightNearGlass;
 
-		PonyMath::Space::Transform3D pyramidTransform;
+		PonyMath::Space::Transform3D<float> pyramidTransform;
 
-		PonyMath::Space::Transform3D cameraTransform;
+		PonyMath::Space::Transform3D<float> cameraTransform;
 		std::shared_ptr<PonyEngine::Render::ICamera> camera;
 	};
 }
@@ -510,10 +510,7 @@ namespace Game
 		cameraTransform.Rotate(rotation);
 
 		auto moveDirection = PonyMath::Core::Vector3<float>(inputSystem->State("Right"), inputSystem->State("Up"), inputSystem->State("Forward"));
-		if (!moveDirection.IsAlmostZero())
-		{
-			cameraTransform.Translate(cameraTransform.Rotation() * (moveDirection.Normalized() * (10.f * timeSystem->VirtualDeltaTime())));
-		}
+		cameraTransform.Translate(cameraTransform.Rotation() * (moveDirection.Normalized(PonyMath::Core::Vector3<float>::Predefined::Zero) * (10.f * timeSystem->VirtualDeltaTime())));
 
 		camera->ViewMatrix(cameraTransform.TrsMatrix().Inverse());
 	}

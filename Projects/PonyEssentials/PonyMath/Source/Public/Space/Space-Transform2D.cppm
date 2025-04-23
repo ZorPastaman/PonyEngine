@@ -9,6 +9,7 @@
 
 export module PonyMath.Space:Transform2D;
 
+import <concepts>;
 import <format>;
 import <ostream>;
 import <string>;
@@ -18,6 +19,8 @@ import PonyMath.Core;
 export namespace PonyMath::Space
 {
 	/// @brief 2D transform implementation.
+	/// @tparam T Component type.
+	template<std::floating_point T>
 	class Transform2D final
 	{
 	public:
@@ -29,7 +32,7 @@ export namespace PonyMath::Space
 		/// @param rotation Rotation in radians.
 		/// @param scale Scale.
 		[[nodiscard("Pure constructor")]]
-		Transform2D(const Core::Vector2<float>& position, float rotation, const Core::Vector2<float>& scale) noexcept;
+		Transform2D(const Core::Vector2<T>& position, T rotation, const Core::Vector2<T>& scale) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Transform2D(const Transform2D& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -40,66 +43,66 @@ export namespace PonyMath::Space
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float>& Position() noexcept;
+		Core::Vector2<T>& Position() noexcept;
 		/// @brief Gets the position.
 		/// @return Position.
 		[[nodiscard("Pure function")]]
-		const Core::Vector2<float>& Position() const noexcept;
+		const Core::Vector2<T>& Position() const noexcept;
 
 		/// @brief Gets the rotation.
 		/// @return Rotation in radians.
 		[[nodiscard("Pure function")]]
-		float& Rotation() noexcept;
+		T& Rotation() noexcept;
 		/// @brief Gets the rotation.
 		/// @return Rotation in radians.
 		[[nodiscard("Pure function")]]
-		const float& Rotation() const noexcept;
+		const T& Rotation() const noexcept;
 
 		/// @brief Gets the scale.
 		/// @return Scale.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float>& Scale() noexcept;
+		Core::Vector2<T>& Scale() noexcept;
 		/// @brief Gets the scale.
 		/// @return Scale.
 		[[nodiscard("Pure function")]]
-		const Core::Vector2<float>& Scale() const noexcept;
+		const Core::Vector2<T>& Scale() const noexcept;
 
 		/// @brief Computes a translation-rotation-scaling matrix.
 		/// @return Translation-rotation-scaling matrix.
 		[[nodiscard("Pure function")]]
-		Core::Matrix3x3<float> TrsMatrix() const noexcept;
+		Core::Matrix3x3<T> TrsMatrix() const noexcept;
 
 		/// @brief Gets the transform up vector.
 		/// @return Up.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float> Up() const noexcept;
+		Core::Vector2<T> Up() const noexcept;
 		/// @brief Gets the transform down vector.
 		/// @return Down.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float> Down() const noexcept;
+		Core::Vector2<T> Down() const noexcept;
 		/// @brief Gets the transform right vector.
 		/// @return Right.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float> Right() const noexcept;
+		Core::Vector2<T> Right() const noexcept;
 		/// @brief Gets the transform left vector.
 		/// @return Left.
 		[[nodiscard("Pure function")]]
-		Core::Vector2<float> Left() const noexcept;
+		Core::Vector2<T> Left() const noexcept;
 
 		/// @brief Translates the transform.
 		/// @param translation Translation.
-		void Translate(const Core::Vector2<float>& translation) noexcept;
+		void Translate(const Core::Vector2<T>& translation) noexcept;
 		/// @brief Rotates the transform.
 		/// @param rotationToAdd Rotation in radians.
-		void Rotate(float rotationToAdd) noexcept;
+		void Rotate(T rotationToAdd) noexcept;
 
 		/// @brief Rotates the transform so that it looks in the specific direction.
 		/// @param direction Look direction. Must be unit.
-		void LookIn(const Core::Vector2<float>& direction) noexcept;
+		void LookIn(const Core::Vector2<T>& direction) noexcept;
 		/// @brief Rotates the transform so that it looks at the specific point.
 		/// @note The function does nothing if the @p point is too close to the current position.
 		/// @param point Look target.
-		void LookAt(const Core::Vector2<float>& point) noexcept;
+		void LookAt(const Core::Vector2<T>& point) noexcept;
 
 		/// @brief Creates a string representing the current state of the transform.
 		/// @return String representing the current state of the transform.
@@ -116,135 +119,159 @@ export namespace PonyMath::Space
 		bool operator ==(const Transform2D& other) const noexcept;
 
 	private:
-		Core::Vector2<float> position; ///< Position.
-		float rotation; ///< Rotation.
-		Core::Vector2<float> scale; ///< Scale.
+		Core::Vector2<T> position; ///< Position.
+		T rotation; ///< Rotation.
+		Core::Vector2<T> scale; ///< Scale.
 	};
 
 	/// @brief Checks if positions, rotations and scaled of the two transforms are almost equal.
+	/// @tparam T Component type.
 	/// @param left Left transform.
 	/// @param right Right transform.
 	/// @param tolerance Tolerance value. Must be positive.
 	/// @return @a True if they're almost equal; @a false otherwise.
-	[[nodiscard("Pure function")]]
-	bool AreAlmostEqual(const Transform2D& left, const Transform2D& right, float tolerance = 0.00001f) noexcept;
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	bool AreAlmostEqual(const Transform2D<T>& left, const Transform2D<T>& right, T tolerance = 0.00001f) noexcept;
 
 	/// @brief Puts the transform ToString() to the stream.
+	/// @tparam T Component type.
 	/// @param stream Target.
 	/// @param transform Transform.
 	/// @return @p stream.
-	std::ostream& operator <<(std::ostream& stream, const Transform2D& transform);
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Transform2D<T>& transform);
 }
 
 namespace PonyMath::Space
 {
-	Transform2D::Transform2D() noexcept :
-		Transform2D(Core::Vector2<float>::Predefined::Zero, 0.f, Core::Vector2<float>::Predefined::One)
+	template<std::floating_point T>
+	Transform2D<T>::Transform2D() noexcept :
+		Transform2D(Core::Vector2<T>::Predefined::Zero, 0.f, Core::Vector2<T>::Predefined::One)
 	{
 	}
 
-	Transform2D::Transform2D(const Core::Vector2<float>& position, const float rotation, const Core::Vector2<float>& scale) noexcept :
+	template<std::floating_point T>
+	Transform2D<T>::Transform2D(const Core::Vector2<T>& position, const T rotation, const Core::Vector2<T>& scale) noexcept :
 		position(position),
 		rotation{rotation},
 		scale(scale)
 	{
 	}
 
-	Core::Vector2<float>& Transform2D::Position() noexcept
+	template<std::floating_point T>
+	Core::Vector2<T>& Transform2D<T>::Position() noexcept
 	{
 		return position;
 	}
 
-	const Core::Vector2<float>& Transform2D::Position() const noexcept
+	template<std::floating_point T>
+	const Core::Vector2<T>& Transform2D<T>::Position() const noexcept
 	{
 		return position;
 	}
 
-	float& Transform2D::Rotation() noexcept
+	template<std::floating_point T>
+	T& Transform2D<T>::Rotation() noexcept
 	{
 		return rotation;
 	}
 
-	const float& Transform2D::Rotation() const noexcept
+	template<std::floating_point T>
+	const T& Transform2D<T>::Rotation() const noexcept
 	{
 		return rotation;
 	}
 
-	Core::Vector2<float>& Transform2D::Scale() noexcept
+	template<std::floating_point T>
+	Core::Vector2<T>& Transform2D<T>::Scale() noexcept
 	{
 		return scale;
 	}
 
-	const Core::Vector2<float>& Transform2D::Scale() const noexcept
+	template<std::floating_point T>
+	const Core::Vector2<T>& Transform2D<T>::Scale() const noexcept
 	{
 		return scale;
 	}
 
-	Core::Matrix3x3<float> Transform2D::TrsMatrix() const noexcept
+	template<std::floating_point T>
+	Core::Matrix3x3<T> Transform2D<T>::TrsMatrix() const noexcept
 	{
 		return Core::TrsMatrix(position, rotation, scale);
 	}
 
-	Core::Vector2<float> Transform2D::Up() const noexcept
+	template<std::floating_point T>
+	Core::Vector2<T> Transform2D<T>::Up() const noexcept
 	{
-		return Core::Rotate(Core::Vector2<float>::Predefined::Up, rotation);
+		return Core::Rotate(Core::Vector2<T>::Predefined::Up, rotation);
 	}
 
-	Core::Vector2<float> Transform2D::Down() const noexcept
+	template<std::floating_point T>
+	Core::Vector2<T> Transform2D<T>::Down() const noexcept
 	{
-		return Core::Rotate(Core::Vector2<float>::Predefined::Down, rotation);
+		return Core::Rotate(Core::Vector2<T>::Predefined::Down, rotation);
 	}
 
-	Core::Vector2<float> Transform2D::Right() const noexcept
+	template<std::floating_point T>
+	Core::Vector2<T> Transform2D<T>::Right() const noexcept
 	{
-		return Core::Rotate(Core::Vector2<float>::Predefined::Right, rotation);
+		return Core::Rotate(Core::Vector2<T>::Predefined::Right, rotation);
 	}
 
-	Core::Vector2<float> Transform2D::Left() const noexcept
+	template<std::floating_point T>
+	Core::Vector2<T> Transform2D<T>::Left() const noexcept
 	{
-		return Core::Rotate(Core::Vector2<float>::Predefined::Left, rotation);
+		return Core::Rotate(Core::Vector2<T>::Predefined::Left, rotation);
 	}
 
-	void Transform2D::Translate(const Core::Vector2<float>& translation) noexcept
+	template<std::floating_point T>
+	void Transform2D<T>::Translate(const Core::Vector2<T>& translation) noexcept
 	{
 		position += translation;
 	}
 
-	void Transform2D::Rotate(const float rotationToAdd) noexcept
+	template<std::floating_point T>
+	void Transform2D<T>::Rotate(const T rotationToAdd) noexcept
 	{
 		rotation += rotationToAdd;
 	}
 
-	void Transform2D::LookIn(const Core::Vector2<float>& direction) noexcept
+	template<std::floating_point T>
+	void Transform2D<T>::LookIn(const Core::Vector2<T>& direction) noexcept
 	{
-		rotation = Core::AngleSigned(Core::Vector2<float>::Predefined::Right, direction);
+		rotation = Core::AngleSigned(Core::Vector2<T>::Predefined::Right, direction);
 	}
 
-	void Transform2D::LookAt(const Core::Vector2<float>& point) noexcept
+	template<std::floating_point T>
+	void Transform2D<T>::LookAt(const Core::Vector2<T>& point) noexcept
 	{
-		const Core::Vector2<float> direction = point - position;
-		if (const float magnitude = direction.Magnitude(); magnitude > 0.0001f)
+		const Core::Vector2<T> direction = point - position;
+		if (const T magnitude = direction.Magnitude(); magnitude > 0.0001f)
 		{
 			LookIn(direction * (1.f / magnitude));
 		}
 	}
 
-	std::string Transform2D::ToString() const
+	template<std::floating_point T>
+	std::string Transform2D<T>::ToString() const
 	{
 		return std::format("Position: {}, Rotation: {}, Scale: {}", position.ToString(), rotation, scale.ToString());
 	}
 
-	bool Transform2D::operator ==(const Transform2D& other) const noexcept
+	template<std::floating_point T>
+	bool Transform2D<T>::operator ==(const Transform2D& other) const noexcept
 	{
 		return position == other.position && rotation == other.rotation && scale == other.scale;
 	}
 
-	bool AreAlmostEqual(const Transform2D& left, const Transform2D& right, const float tolerance) noexcept
+	template<std::floating_point T>
+	bool AreAlmostEqual(const Transform2D<T>& left, const Transform2D<T>& right, const T tolerance) noexcept
 	{
 		return Core::AreAlmostEqual(left.Position(), right.Position(), tolerance) && Core::AreAlmostEqual(left.Rotation(), right.Rotation(), tolerance) && Core::AreAlmostEqual(left.Scale(), right.Scale(), tolerance);
 	}
 
-	std::ostream& operator <<(std::ostream& stream, const Transform2D& transform)
+	template<std::floating_point T>
+	std::ostream& operator <<(std::ostream& stream, const Transform2D<T>& transform)
 	{
 		return stream << transform.ToString();
 	}

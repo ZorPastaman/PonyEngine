@@ -774,9 +774,9 @@ namespace Shape
 			const auto vector = PonyMath::Core::Vector3<float>(9.f, -10, -8);
 
 			const auto normalized = box.Normalize(vector);
-			Assert::AreEqual(0.5, static_cast<double>(normalized.X()), 0.0001);
-			Assert::AreEqual(-1. / 7., static_cast<double>(normalized.Y()), 0.0001);
-			Assert::AreEqual(2., static_cast<double>(normalized.Z()), 0.0001);
+			Assert::AreEqual(0.5f, normalized.X(), 0.0001f);
+			Assert::AreEqual(-1.f / 7.f, normalized.Y(), 0.0001f);
+			Assert::AreEqual(2.f, normalized.Z(), 0.0001f);
 
 			const auto unnormalized = box.Unnormalize(normalized);
 			Assert::IsTrue(vector == unnormalized);
@@ -794,12 +794,12 @@ namespace Shape
 			const auto other = PonyMath::Shape::Box<float>(1.f, -1.f, 20.f, 8.f, 7.f, 10.f);
 
 			const auto normalized = box.Normalize(other);
-			Assert::AreEqual(-1.5, static_cast<double>(normalized.Position().X()), 0.0001);
-			Assert::AreEqual(0.5, static_cast<double>(normalized.Position().Y()), 0.0001);
-			Assert::AreEqual(16., static_cast<double>(normalized.Position().Z()), 0.0001);
-			Assert::AreEqual(2., static_cast<double>(normalized.Size().X()), 0.0001);
-			Assert::AreEqual(0.5, static_cast<double>(normalized.Size().Y()), 0.0001);
-			Assert::AreEqual(5., static_cast<double>(normalized.Size().Z()), 0.0001);
+			Assert::AreEqual(-1.5f, normalized.Position().X(), 0.0001f);
+			Assert::AreEqual(0.5f, normalized.Position().Y(), 0.0001f);
+			Assert::AreEqual(16.f, normalized.Position().Z(), 0.0001f);
+			Assert::AreEqual(2.f, normalized.Size().X(), 0.0001f);
+			Assert::AreEqual(0.5f, normalized.Size().Y(), 0.0001f);
+			Assert::AreEqual(5.f, normalized.Size().Z(), 0.0001f);
 
 			const auto unnormalized = box.Unnormalize(normalized);
 			Assert::IsTrue(other == unnormalized);
