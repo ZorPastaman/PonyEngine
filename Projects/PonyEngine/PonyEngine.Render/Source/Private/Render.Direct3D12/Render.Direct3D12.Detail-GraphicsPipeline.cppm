@@ -298,8 +298,9 @@ namespace PonyEngine::Render::Direct3D12
 		cameras.reserve(8);
 		renderObjects.reserve(64);
 		renderObjectData.reserve(8 * 64);
+		meshes.reserve(64);
 		cameraTasks.reserve(8);
-		originalHeapOffsets.reserve(128);
+		originalHeapOffsets.reserve(16 * 64);
 	}
 
 	const FrameParams& GraphicsPipeline::MainFrameParams() const noexcept
