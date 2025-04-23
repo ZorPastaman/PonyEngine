@@ -10,8 +10,16 @@
 /// @brief Transform. It corresponds to @p PonyShader::Space::Transform on the C++ side.
 struct Pony_Transform
 {
-	float4x4 modelMatrix; ///< Model matrix.
-	float4x4 viewMatrix; ///< View matrix.
-	float4x4 projectionMatrix; ///< Projection matrix.
-	float4x4 mvpMatrix; ///< Model-view-projection matrix.
+	float4x4 model; ///< Model matrix.
+	float4x4 view; ///< View matrix.
+	float4x4 projection; ///< Projection matrix.
+	float4x4 mv; ///< Model-view matrix.
+	float4x4 vp; ///< View-projection matrix.
+	float4x4 mvp; ///< Model-view-projection matrix.
+	float4x4 modelInv; ///< Inverse of the model matrix.
+	float4x4 viewInv; ///< Inverse of the view matrix.
+	float4x4 projectionInv; ///< Inverse of the projection matrix.
+	float4x4 mvInv; ///< Inverse of the model-view matrix.
+	float4x4 vpInv; ///< Inverse of the view-projection matrix.
+	float4x4 mvpInv; ///< Inverse of the model-view-projection matrix.
 };

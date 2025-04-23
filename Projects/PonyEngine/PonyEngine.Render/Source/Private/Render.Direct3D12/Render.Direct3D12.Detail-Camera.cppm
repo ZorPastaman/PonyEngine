@@ -48,6 +48,12 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const PonyMath::Core::Matrix4x4<float>& ProjectionMatrix() const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ViewProjectionMatrix() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ViewInverseMatrix() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ProjectionInverseMatrix() const noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ViewProjectionInverseMatrix() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const CameraProjection& Projection() const noexcept override;
@@ -88,9 +94,13 @@ export namespace PonyEngine::Render::Direct3D12
 		static PonyMath::Core::Matrix4x4<float> ComputeOrthographicMatrix(const Orthographic& params) noexcept;
 
 		PonyMath::Core::Matrix4x4<float> viewMatrix; ///< View matrix.
-		CameraProjection projection; ///< Projection parameters.
 		mutable std::optional<PonyMath::Core::Matrix4x4<float>> projectionMatrix; ///< Projection matrix. It becomes std::nullopt if the projection parameters are changed.
-		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionMatrix; ///< View-projection matrix. It becomes std::nullopt if the projection parameters are changed.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionMatrix; ///< View-projection matrix. It becomes std::nullopt if the view matrix and/or the projection parameters are changed.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewInverseMatrix; /// Inverse of the view matrix. It becomes std::nullopt if the view matrix is changed.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> projectionInverseMatrix; /// Inverse of the projection matrix. It becomes std::nullopt if the projection parameters are changed.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> viewProjectionInverseMatrix; /// Inverse of the view-projection matrix. It becomes std::nullopt if the view matrix and/or the projection parameters are changed.
+
+		CameraProjection projection; ///< Projection parameters.
 		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler; ///< Culler. It becomes std::nullopt if the projection parameters are changed.
 
 		struct Clear clear; ///< Clear parameters.
@@ -121,6 +131,8 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		viewMatrix = matrix;
 		viewProjectionMatrix = std::nullopt;
+		viewInverseMatrix = std::nullopt;
+		viewProjectionInverseMatrix = std::nullopt;
 	}
 
 	const PonyMath::Core::Matrix4x4<float>& Camera::ProjectionMatrix() const noexcept
@@ -143,6 +155,36 @@ namespace PonyEngine::Render::Direct3D12
 		return viewProjectionMatrix.value();
 	}
 
+	const PonyMath::Core::Matrix4x4<float>& Camera::ViewInverseMatrix() const noexcept
+	{
+		if (!viewInverseMatrix)
+		{
+			viewInverseMatrix = viewMatrix.Inverse();
+		}
+
+		return viewInverseMatrix.value();
+	}
+
+	const PonyMath::Core::Matrix4x4<float>& Camera::ProjectionInverseMatrix() const noexcept
+	{
+		if (!projectionInverseMatrix)
+		{
+			projectionInverseMatrix = ProjectionMatrix().Inverse();
+		}
+
+		return projectionInverseMatrix.value();
+	}
+
+	const PonyMath::Core::Matrix4x4<float>& Camera::ViewProjectionInverseMatrix() const noexcept
+	{
+		if (!viewProjectionInverseMatrix)
+		{
+			viewProjectionInverseMatrix = ViewInverseMatrix() * ProjectionInverseMatrix();
+		}
+
+		return viewProjectionInverseMatrix.value();
+	}
+
 	const CameraProjection& Camera::Projection() const noexcept
 	{
 		return projection;
@@ -153,6 +195,8 @@ namespace PonyEngine::Render::Direct3D12
 		this->projection = projection;
 		projectionMatrix = std::nullopt;
 		viewProjectionMatrix = std::nullopt;
+		projectionInverseMatrix = std::nullopt;
+		viewProjectionInverseMatrix = std::nullopt;
 		culler = std::nullopt;
 	}
 

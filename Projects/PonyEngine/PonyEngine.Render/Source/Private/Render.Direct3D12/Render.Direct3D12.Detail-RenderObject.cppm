@@ -10,6 +10,7 @@
 export module PonyEngine.Render.Direct3D12.Detail:RenderObject;
 
 import <memory>;
+import <optional>;
 import <string>;
 import <string_view>;
 
@@ -42,6 +43,8 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ModelMatrix() const noexcept override;
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ModelInverseMatrix() const noexcept override;
 
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
@@ -71,7 +74,9 @@ export namespace PonyEngine::Render::Direct3D12
 	private:
 		std::shared_ptr<class PipelineState> pipelineState; ///< Pipeline state.
 		std::shared_ptr<class Mesh> mesh; ///< Mesh.
+
 		PonyMath::Core::Matrix4x4<float> modelMatrix; ///< Model matrix.
+		mutable std::optional<PonyMath::Core::Matrix4x4<float>> modelInverseMatrix; ///< Inverse of the model matrix.
 
 		std::string name; ///< Render object name.
 	};
@@ -94,6 +99,17 @@ namespace PonyEngine::Render::Direct3D12
 	void RenderObject::ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept
 	{
 		modelMatrix = matrix;
+		modelInverseMatrix = std::nullopt;
+	}
+
+	const PonyMath::Core::Matrix4x4<float>& RenderObject::ModelInverseMatrix() const noexcept
+	{
+		if (!modelInverseMatrix)
+		{
+			modelInverseMatrix = modelMatrix.Inverse();
+		}
+
+		return modelInverseMatrix.value();
 	}
 
 	PipelineState& RenderObject::PipelineState() noexcept
