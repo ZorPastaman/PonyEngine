@@ -317,12 +317,12 @@ namespace Shape
 			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
 			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
 			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
-			Assert::AreEqual(4., static_cast<double>(obb.Width()), 0.0001);
-			Assert::AreEqual(10., static_cast<double>(obb.Height()), 0.0001);
-			Assert::AreEqual(2., static_cast<double>(obb.Depth()), 0.0001);
-			Assert::AreEqual(4., static_cast<double>(obb.Size(0)), 0.0001);
-			Assert::AreEqual(10., static_cast<double>(obb.Size(1)), 0.0001);
-			Assert::AreEqual(2., static_cast<double>(obb.Size(2)), 0.0001);
+			Assert::AreEqual(4.f, obb.Width(), 0.0001f);
+			Assert::AreEqual(10.f, obb.Height(), 0.0001f);
+			Assert::AreEqual(2.f, obb.Depth(), 0.0001f);
+			Assert::AreEqual(4.f, obb.Size(0), 0.0001f);
+			Assert::AreEqual(10.f, obb.Size(1), 0.0001f);
+			Assert::AreEqual(2.f, obb.Size(2), 0.0001f);
 		}
 
 		TEST_METHOD(CornerTest)
@@ -374,7 +374,7 @@ namespace Shape
 			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
 			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
 			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
-			Assert::AreEqual(136., static_cast<double>(obb.Area()), 0.0001);
+			Assert::AreEqual(136.f, obb.Area(), 0.0001f);
 		}
 
 		TEST_METHOD(VolumeTest)
@@ -382,7 +382,7 @@ namespace Shape
 			const auto aabb = PonyMath::Shape::AABB<float>(PonyMath::Core::Vector3<float>(3.f, 5.f, 7.f), PonyMath::Core::Vector3<float>(2.f, 5.f, 1.f));
 			const auto quaternion = PonyMath::Core::RotationQuaternion(PonyMath::Core::Vector3<float>(1.1f, 0.7f, -1.2f));
 			const auto obb = PonyMath::Shape::OBB<float>(aabb, quaternion);
-			Assert::AreEqual(80., static_cast<double>(obb.Volume()), 0.0001);
+			Assert::AreEqual(80.f, obb.Volume(), 0.0001f);
 		}
 
 		TEST_METHOD(IsFiniteTest)

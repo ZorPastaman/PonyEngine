@@ -44,7 +44,7 @@ namespace PonyEngine::Render::Direct3D12
 		"DepthStencil"
 	};
 
-	constexpr std::string_view ToString(const Attachment attachment) noexcept // TODO: Check other enums. Make ToString() like this.
+	constexpr std::string_view ToString(const Attachment attachment) noexcept
 	{
 		if (const std::size_t index = static_cast<std::size_t>(attachment); index < AttachmentNames.size()) [[likely]]
 		{

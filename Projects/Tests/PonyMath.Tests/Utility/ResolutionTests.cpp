@@ -117,7 +117,7 @@ namespace Utility
 			constexpr std::uint32_t width = 320u;
 			constexpr std::uint32_t height = 240u;
 			constexpr auto resolution = PonyMath::Utility::Resolution<std::uint32_t>(width, height);
-			Assert::AreEqual(320. / 240., static_cast<double>(resolution.Aspect<float>()), 0.001);
+			Assert::AreEqual(320.f / 240.f, resolution.Aspect<float>(), 0.001f);
 		}
 
 		TEST_METHOD(ToStringTest)

@@ -232,10 +232,10 @@ namespace Shape
 			const auto aabr = PonyMath::Shape::AABR<float>(PonyMath::Core::Vector2<float>(-2.f, 3.f), PonyMath::Core::Vector2<float>(2.f, 3.f));
 			constexpr float angle = 0.3f;
 			const auto obr = PonyMath::Shape::OBR<float>(aabr, angle);
-			Assert::AreEqual(4., static_cast<double>(obr.Width()), 0.0001);
-			Assert::AreEqual(6., static_cast<double>(obr.Height()), 0.0001);
-			Assert::AreEqual(4., static_cast<double>(obr.Size(0)), 0.0001);
-			Assert::AreEqual(6., static_cast<double>(obr.Size(1)), 0.0001);
+			Assert::AreEqual(4.f, obr.Width(), 0.0001f);
+			Assert::AreEqual(6.f, obr.Height(), 0.0001f);
+			Assert::AreEqual(4.f, obr.Size(0), 0.0001f);
+			Assert::AreEqual(6.f, obr.Size(1), 0.0001f);
 		}
 
 		TEST_METHOD(CornerTest)
@@ -274,7 +274,7 @@ namespace Shape
 			const auto aabr = PonyMath::Shape::AABR<float>(PonyMath::Core::Vector2<float>(-2.f, 3.f), PonyMath::Core::Vector2<float>(2.f, 3.f));
 			constexpr float angle = 0.3f;
 			const auto obr = PonyMath::Shape::OBR<float>(aabr, angle);
-			Assert::AreEqual(20., static_cast<double>(obr.Perimeter()), 0.0001);
+			Assert::AreEqual(20.f, obr.Perimeter(), 0.0001f);
 		}
 
 		TEST_METHOD(AreaTest)
@@ -282,7 +282,7 @@ namespace Shape
 			const auto aabr = PonyMath::Shape::AABR<float>(PonyMath::Core::Vector2<float>(-2.f, 3.f), PonyMath::Core::Vector2<float>(2.f, 3.f));
 			constexpr float angle = 0.3f;
 			const auto obr = PonyMath::Shape::OBR<float>(aabr, angle);
-			Assert::AreEqual(24., static_cast<double>(obr.Area()), 0.0001);
+			Assert::AreEqual(24.f, obr.Area(), 0.0001f);
 		}
 
 		TEST_METHOD(IsFiniteTest)

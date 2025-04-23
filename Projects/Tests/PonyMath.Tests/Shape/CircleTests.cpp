@@ -117,7 +117,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector2<float>(-2.f, -1.f);
 			constexpr float radius = 2.f;
 			constexpr auto circle = PonyMath::Shape::Circle<float>(center, radius);
-			Assert::AreEqual(radius * 2., static_cast<double>(circle.Diameter()), 0.00001);
+			Assert::AreEqual(radius * 2.f, circle.Diameter(), 0.00001f);
 		}
 
 		TEST_METHOD(PerimeterTest)
@@ -125,7 +125,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector2<float>(-2.f, -1.f);
 			constexpr float radius = 2.f;
 			constexpr auto circle = PonyMath::Shape::Circle<float>(center, radius);
-			Assert::AreEqual(2. * std::numbers::pi_v<double> * radius, static_cast<double>(circle.Perimeter()), 0.0001);
+			Assert::AreEqual(2.f * std::numbers::pi_v<float> * radius, circle.Perimeter(), 0.0001f);
 		}
 
 		TEST_METHOD(AreaTest)
@@ -133,7 +133,7 @@ namespace Shape
 			constexpr auto center = PonyMath::Core::Vector2<float>(-2.f, -1.f);
 			constexpr float radius = 2.f;
 			constexpr auto circle = PonyMath::Shape::Circle<float>(center, radius);
-			Assert::AreEqual(std::numbers::pi_v<double> * radius * radius, static_cast<double>(circle.Area()), 0.0001);
+			Assert::AreEqual(std::numbers::pi_v<float> * radius * radius, circle.Area(), 0.0001f);
 		}
 
 		TEST_METHOD(IsFiniteTest)

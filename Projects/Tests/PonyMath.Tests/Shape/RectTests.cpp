@@ -187,12 +187,12 @@ namespace Shape
 		{
 			auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
 			const auto center = rect.Center();
-			Assert::AreEqual(5., static_cast<double>(center.X()), 0.001);
-			Assert::AreEqual(4.5, static_cast<double>(center.Y()), 0.001);
+			Assert::AreEqual(5.f, center.X(), 0.001f);
+			Assert::AreEqual(4.5f, center.Y(), 0.001f);
 
 			rect.Center(PonyMath::Core::Vector2<float>(-1.f, -2.f));
-			Assert::AreEqual(-2, static_cast<double>(rect.MinX()), 0.001);
-			Assert::AreEqual(-5.5, static_cast<double>(rect.MinY()), 0.001);
+			Assert::AreEqual(-2.f, rect.MinX(), 0.001f);
+			Assert::AreEqual(-5.5f, rect.MinY(), 0.001f);
 		}
 
 		TEST_METHOD(CornerTest)
@@ -215,13 +215,13 @@ namespace Shape
 		TEST_METHOD(PerimeterTest)
 		{
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
-			Assert::AreEqual(18., static_cast<double>(rect.Perimeter()), 0.001);
+			Assert::AreEqual(18.f, rect.Perimeter(), 0.001f);
 		}
 
 		TEST_METHOD(AreaTest)
 		{
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
-			Assert::AreEqual(14., static_cast<double>(rect.Area()), 0.001);
+			Assert::AreEqual(14.f, rect.Area(), 0.001f);
 		}
 
 		TEST_METHOD(IsFiniteTest)
@@ -279,39 +279,39 @@ namespace Shape
 		{
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
 			auto point = rect.Normalize(PonyMath::Core::Vector2<float>(4.f, 1.f));
-			Assert::AreEqual(0., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(0.f, point.X(), 0.001f);
+			Assert::AreEqual(0.f, point.Y(), 0.001f);
 			point = rect.Unnormalize(point);
-			Assert::AreEqual(4., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(1., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(4.f, point.X(), 0.001f);
+			Assert::AreEqual(1.f, point.Y(), 0.001f);
 
 			point = rect.Normalize(PonyMath::Core::Vector2<float>(6.f, 8.f));
-			Assert::AreEqual(1., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(1., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(1.f, point.X(), 0.001f);
+			Assert::AreEqual(1.f, point.Y(), 0.001f);
 			point = rect.Unnormalize(point);
-			Assert::AreEqual(6., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(8., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(6.f, point.X(), 0.001f);
+			Assert::AreEqual(8.f, point.Y(), 0.001f);
 
 			point = rect.Normalize(PonyMath::Core::Vector2<float>(5.f, 4.5f));
-			Assert::AreEqual(0.5, static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(0.5, static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(0.5f, point.X(), 0.001f);
+			Assert::AreEqual(0.5f, point.Y(), 0.001f);
 			point = rect.Unnormalize(point);
-			Assert::AreEqual(5., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(4.5, static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(5.f, point.X(), 0.001f);
+			Assert::AreEqual(4.5f, point.Y(), 0.001f);
 
 			point = rect.Normalize(PonyMath::Core::Vector2<float>(8.f, 15.f));
-			Assert::AreEqual(2., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(2., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(2.f, point.X(), 0.001f);
+			Assert::AreEqual(2.f, point.Y(), 0.001f);
 			point = rect.Unnormalize(point);
-			Assert::AreEqual(8., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(15., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(8.f, point.X(), 0.001f);
+			Assert::AreEqual(15.f, point.Y(), 0.001f);
 
 			point = rect.Normalize(PonyMath::Core::Vector2<float>(2.f, -6.f));
-			Assert::AreEqual(-1., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(-1., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(-1.f, point.X(), 0.001f);
+			Assert::AreEqual(-1.f, point.Y(), 0.001f);
 			point = rect.Unnormalize(point);
-			Assert::AreEqual(2., static_cast<double>(point.X()), 0.001);
-			Assert::AreEqual(-6., static_cast<double>(point.Y()), 0.001);
+			Assert::AreEqual(2.f, point.X(), 0.001f);
+			Assert::AreEqual(-6.f, point.Y(), 0.001f);
 		}
 
 		TEST_METHOD(NormalizeRectTest)
@@ -319,39 +319,39 @@ namespace Shape
 			constexpr auto rect = PonyMath::Shape::Rect<float>(4.f, 1.f, 2.f, 7.f);
 			auto rectN = rect;
 			rectN = rect.Normalize(rectN);
-			Assert::AreEqual(0., static_cast<double>(rectN.Position().X()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(rectN.Position().Y()), 0.001);
-			Assert::AreEqual(1., static_cast<double>(rectN.Size().X()), 0.001);
-			Assert::AreEqual(1., static_cast<double>(rectN.Size().Y()), 0.001);
+			Assert::AreEqual(0.f, rectN.Position().X(), 0.001f);
+			Assert::AreEqual(0.f, rectN.Position().Y(), 0.001f);
+			Assert::AreEqual(1.f, rectN.Size().X(), 0.001f);
+			Assert::AreEqual(1.f, rectN.Size().Y(), 0.001f);
 			rectN = rect.Unnormalize(rectN);
-			Assert::AreEqual(4., static_cast<double>(rectN.MinX()), 0.001);
-			Assert::AreEqual(1., static_cast<double>(rectN.MinY()), 0.001);
-			Assert::AreEqual(6., static_cast<double>(rectN.MaxX()), 0.001);
-			Assert::AreEqual(8., static_cast<double>(rectN.MaxY()), 0.001);
+			Assert::AreEqual(4.f, rectN.MinX(), 0.001f);
+			Assert::AreEqual(1.f, rectN.MinY(), 0.001f);
+			Assert::AreEqual(6.f, rectN.MaxX(), 0.001f);
+			Assert::AreEqual(8.f, rectN.MaxY(), 0.001f);
 
 			rectN = PonyMath::Shape::Rect<float>(5.f, 4.5f, 1.f, 3.5f);
 			rectN = rect.Normalize(rectN);
-			Assert::AreEqual(0.5, static_cast<double>(rectN.Position().X()), 0.001);
-			Assert::AreEqual(0.5, static_cast<double>(rectN.Position().Y()), 0.001);
-			Assert::AreEqual(0.5, static_cast<double>(rectN.Size().X()), 0.001);
-			Assert::AreEqual(0.5, static_cast<double>(rectN.Size().Y()), 0.001);
+			Assert::AreEqual(0.5f, rectN.Position().X(), 0.001f);
+			Assert::AreEqual(0.5f, rectN.Position().Y(), 0.001f);
+			Assert::AreEqual(0.5f, rectN.Size().X(), 0.001f);
+			Assert::AreEqual(0.5f, rectN.Size().Y(), 0.001f);
 			rectN = rect.Unnormalize(rectN);
-			Assert::AreEqual(5., static_cast<double>(rectN.MinX()), 0.001);
-			Assert::AreEqual(4.5, static_cast<double>(rectN.MinY()), 0.001);
-			Assert::AreEqual(6., static_cast<double>(rectN.MaxX()), 0.001);
-			Assert::AreEqual(8., static_cast<double>(rectN.MaxY()), 0.001);
+			Assert::AreEqual(5.f, rectN.MinX(), 0.001f);
+			Assert::AreEqual(4.5f, rectN.MinY(), 0.001f);
+			Assert::AreEqual(6.f, rectN.MaxX(), 0.001f);
+			Assert::AreEqual(8.f, rectN.MaxY(), 0.001f);
 
 			rectN = PonyMath::Shape::Rect<float>(2.f, -6.f, 6.f, 21.f);
 			rectN = rect.Normalize(rectN);
-			Assert::AreEqual(-1., static_cast<double>(rectN.Position().X()), 0.001);
-			Assert::AreEqual(-1., static_cast<double>(rectN.Position().Y()), 0.001);
-			Assert::AreEqual(3., static_cast<double>(rectN.Size().X()), 0.001);
-			Assert::AreEqual(3., static_cast<double>(rectN.Size().Y()), 0.001);
+			Assert::AreEqual(-1.f, rectN.Position().X(), 0.001f);
+			Assert::AreEqual(-1.f, rectN.Position().Y(), 0.001f);
+			Assert::AreEqual(3.f, rectN.Size().X(), 0.001f);
+			Assert::AreEqual(3.f, rectN.Size().Y(), 0.001f);
 			rectN = rect.Unnormalize(rectN);
-			Assert::AreEqual(2., static_cast<double>(rectN.MinX()), 0.001);
-			Assert::AreEqual(-6., static_cast<double>(rectN.MinY()), 0.001);
-			Assert::AreEqual(8., static_cast<double>(rectN.MaxX()), 0.001);
-			Assert::AreEqual(15., static_cast<double>(rectN.MaxY()), 0.001);
+			Assert::AreEqual(2.f, rectN.MinX(), 0.001f);
+			Assert::AreEqual(-6.f, rectN.MinY(), 0.001f);
+			Assert::AreEqual(8.f, rectN.MaxX(), 0.001f);
+			Assert::AreEqual(15.f, rectN.MaxY(), 0.001f);
 		}
 
 		TEST_METHOD(ResolveNegativeTest)

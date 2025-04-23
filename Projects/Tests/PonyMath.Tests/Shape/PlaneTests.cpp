@@ -65,7 +65,7 @@ namespace Shape
 			constexpr auto point = PonyMath::Core::Vector3<float>(2.f, 3.f, -1.f);
 			const auto plane = PonyMath::Shape::Plane<float>(normal, point);
 			Assert::IsTrue(normal == plane.Normal());
-			Assert::AreEqual(-1.643, static_cast<double>(plane.Distance()), 0.001);
+			Assert::AreEqual(-1.643f, plane.Distance(), 0.001f);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(0.f, plane.Distance(point)));
 		}
 
@@ -76,7 +76,7 @@ namespace Shape
 			constexpr auto point2 = PonyMath::Core::Vector3<float>(-5.f, 2.f, 4.f);
 			const auto plane = PonyMath::Shape::Plane<float>(point0, point1, point2);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(PonyMath::Core::Vector3<float>(0.369f, 0.921f, -0.123f), plane.Normal(), 0.001f));
-			Assert::AreEqual(0.491, static_cast<double>(plane.Distance()), 0.001);
+			Assert::AreEqual(0.491f, plane.Distance(), 0.001f);
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(0.f, plane.Distance(point0)));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(0.f, plane.Distance(point1)));
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(0.f, plane.Distance(point2)));
@@ -139,7 +139,7 @@ namespace Shape
 			auto plane = PonyMath::Shape::Plane<float>(normal, distance);
 			const auto flipped = plane.Flipped();
 			Assert::IsTrue(PonyMath::Core::AreAlmostEqual(-normal, flipped.Normal()));
-			Assert::AreEqual(static_cast<double>(-distance), static_cast<double>(flipped.Distance()), 0.0001);
+			Assert::AreEqual(-distance, flipped.Distance(), 0.0001f);
 
 			plane.Flip();
 			Assert::IsTrue(PonyMath::Shape::AreAlmostEqual(flipped, plane));
@@ -172,9 +172,9 @@ namespace Shape
 			constexpr float distance = -3.f;
 			const auto plane = PonyMath::Shape::Plane<float>(normal, distance);
 
-			Assert::AreEqual(0., static_cast<double>(plane.Distance(PonyMath::Core::Vector3<float>(1.095f, 0.548f, -2.739f))), 0.001);
-			Assert::AreEqual(-4.607, static_cast<double>(plane.Distance(PonyMath::Core::Vector3<float>(-2.f, 0.2f, 1.f))), 0.001);
-			Assert::AreEqual(4.12, static_cast<double>(plane.Distance(PonyMath::Core::Vector3<float>(5.f, -1.f, -6.f))), 0.001);
+			Assert::AreEqual(0.f, plane.Distance(PonyMath::Core::Vector3<float>(1.095f, 0.548f, -2.739f)), 0.001f);
+			Assert::AreEqual(-4.607f, plane.Distance(PonyMath::Core::Vector3<float>(-2.f, 0.2f, 1.f)), 0.001f);
+			Assert::AreEqual(4.12f, plane.Distance(PonyMath::Core::Vector3<float>(5.f, -1.f, -6.f)), 0.001f);
 		}
 
 		TEST_METHOD(ProjectTest)

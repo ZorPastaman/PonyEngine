@@ -57,5 +57,6 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void AddCopyTask(Texture& source, Texture& destination, 
 			const std::variant<D3D12_PLACED_SUBRESOURCE_FOOTPRINT, UINT>& sourceInfo, const std::variant<D3D12_PLACED_SUBRESOURCE_FOOTPRINT, UINT>& destinationInfo,
 			std::uint32_t destinationX, std::uint32_t destinationY, std::uint32_t destinationZ, const std::optional<D3D12_BOX>& sourceBox) = 0;
+		// TODO: Last func in incorrect. D3D12_TEXTURE_COPY_TYPE_PLACED_FOOTPRINT must use a buffer and UINT must use a texture.
 	};
 }

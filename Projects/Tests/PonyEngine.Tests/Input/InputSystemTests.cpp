@@ -98,7 +98,7 @@ namespace Input
 
 			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{.inputCode = PonyEngine::Input::InputCode::H, .inputValue = 0.5f, .inputType = PonyEngine::Input::InputType::Delta});
 			std::get<1>(system.system)->Tick();
-			Assert::AreEqual(0.8, static_cast<double>(inputSystem->State("Mock")), 0.001);
+			Assert::AreEqual(0.8f, inputSystem->State("Mock"), 0.001f);
 
 			std::get<1>(system.system)->Tick();
 			Assert::AreEqual(0.3f, inputSystem->State("Mock"));
@@ -111,7 +111,7 @@ namespace Input
 			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{ .inputCode = PonyEngine::Input::InputCode::H, .inputValue = 0.6f, .inputType = PonyEngine::Input::InputType::Delta });
 			deviceFactory->inputDevice->AddInput(PonyEngine::Input::InputEvent{ .inputCode = PonyEngine::Input::InputCode::H, .inputValue = -0.3f, .inputType = PonyEngine::Input::InputType::Delta });
 			std::get<1>(system.system)->Tick();
-			Assert::AreEqual(0.3, static_cast<double>(inputSystem->State("Mock")), 0.001);
+			Assert::AreEqual(0.3f, inputSystem->State("Mock"), 0.001f);
 
 			std::get<1>(system.system)->End();
 		}

@@ -79,9 +79,9 @@ namespace Core
 			constexpr std::uint8_t blue = 211;
 			constexpr auto rgbInt = PonyMath::Color::RGBInt<std::uint8_t>(red, green, blue);
 			auto convertedRGB = PonyMath::Color::RGB<float>(rgbInt);
-			Assert::AreEqual(red / 255., static_cast<double>(convertedRGB.R()), 0.00001);
-			Assert::AreEqual(green / 255., static_cast<double>(convertedRGB.G()), 0.00001);
-			Assert::AreEqual(blue / 255., static_cast<double>(convertedRGB.B()), 0.00001);
+			Assert::AreEqual(red / 255.f, convertedRGB.R(), 0.00001f);
+			Assert::AreEqual(green / 255.f, convertedRGB.G(), 0.00001f);
+			Assert::AreEqual(blue / 255.f, convertedRGB.B(), 0.00001f);
 
 			constexpr auto vector = PonyMath::Core::Vector3<float>(r, g, b);
 			auto vectorColor = PonyMath::Color::RGB<float>(vector);
@@ -151,8 +151,8 @@ namespace Core
 			constexpr float g = 0.16f;
 			constexpr float b = 0.98f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
-			constexpr double expectedGrayscale = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-			Assert::AreEqual(expectedGrayscale, static_cast<double>(color.Grayscale()), 0.00001);
+			constexpr float expectedGrayscale = 0.2126f * r + 0.7152f * g + 0.0722f * b;
+			Assert::AreEqual(expectedGrayscale, color.Grayscale(), 0.00001f);
 		}
 
 		TEST_METHOD(MinTest)
@@ -199,9 +199,9 @@ namespace Core
 			constexpr float b = 0.002f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
-			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
+			Assert::AreEqual(0.729f, gamma.R(), 0.001f);
+			Assert::AreEqual(0.849f, gamma.G(), 0.001f);
+			Assert::AreEqual(0.026f, gamma.B(), 0.001f);
 		}
 
 		TEST_METHOD(LinearTest)
@@ -211,9 +211,9 @@ namespace Core
 			constexpr float b = 0.026f;
 			constexpr auto color = PonyMath::Color::RGB<float>(r, g, b);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
-			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
+			Assert::AreEqual(0.459f, linear.R(), 0.001f);
+			Assert::AreEqual(0.667f, linear.G(), 0.001f);
+			Assert::AreEqual(0.002f, linear.B(), 0.001f);
 		}
 
 		TEST_METHOD(IsBlackTest)
@@ -459,9 +459,9 @@ namespace Core
 			constexpr float b1 = 0.219f;
 			constexpr auto color1 = PonyMath::Color::RGB<float>(r1, g1, b1);
 			PonyMath::Color::RGB<float>& colorRef = color /= color1;
-			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(color.R()), 0.00001);
-			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(color.G()), 0.00001);
-			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(color.B()), 0.00001);
+			Assert::AreEqual(r / r1, color.R(), 0.00001f);
+			Assert::AreEqual(g / g1, color.G(), 0.00001f);
+			Assert::AreEqual(b / b1, color.B(), 0.00001f);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
 		}
 
@@ -509,8 +509,8 @@ namespace Core
 			constexpr float g1 = 0.09f;
 			constexpr float b1 = 0.219f;
 			constexpr auto color1 = PonyMath::Color::RGB<float>(r1, g1, b1);
-			Assert::AreEqual(0.45, static_cast<double>(PonyMath::Color::DistanceSquared(color, color1)), 0.001);
-			Assert::AreEqual(0.671, static_cast<double>(PonyMath::Color::Distance(color, color1)), 0.001);
+			Assert::AreEqual(0.45f, PonyMath::Color::DistanceSquared(color, color1), 0.001f);
+			Assert::AreEqual(0.671f, PonyMath::Color::Distance(color, color1), 0.001f);
 		}
 
 		TEST_METHOD(MinCombinedTest)
@@ -583,24 +583,24 @@ namespace Core
 			Assert::AreEqual(b, lerped.B());
 
 			lerped = PonyMath::Color::Lerp(color, color1, 1.f);
-			Assert::AreEqual(static_cast<double>(r1), static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(static_cast<double>(g1), static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(static_cast<double>(b1), static_cast<double>(lerped.B()), 0.0001);
+			Assert::AreEqual(r1, lerped.R(), 0.0001f);
+			Assert::AreEqual(g1, lerped.G(), 0.0001f);
+			Assert::AreEqual(b1, lerped.B(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, 0.5f);
-			Assert::AreEqual(0.34, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(0.39, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.215, static_cast<double>(lerped.B()), 0.0001);
+			Assert::AreEqual(0.34f, lerped.R(), 0.0001f);
+			Assert::AreEqual(0.39f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.215f, lerped.B(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, 2.f);
-			Assert::AreEqual(-0.11, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(-0.51, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.227, static_cast<double>(lerped.B()), 0.0001);
+			Assert::AreEqual(-0.11f, lerped.R(), 0.0001f);
+			Assert::AreEqual(-0.51f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.227f, lerped.B(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, -1.f);
-			Assert::AreEqual(0.79, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(1.29, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.203, static_cast<double>(lerped.B()), 0.0001);
+			Assert::AreEqual(0.79f, lerped.R(), 0.0001f);
+			Assert::AreEqual(1.29f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.203f, lerped.B(), 0.0001f);
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)
@@ -702,9 +702,9 @@ namespace Core
 			constexpr float b1 = 0.219f;
 			constexpr auto color1 = PonyMath::Color::RGB<float>(r1, g1, b1);
 			auto quotient = color / color1;
-			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(quotient.R()), 0.0001);
-			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(quotient.G()), 0.0001);
-			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(quotient.B()), 0.0001);
+			Assert::AreEqual(r / r1, quotient.R(), 0.0001f);
+			Assert::AreEqual(g / g1, quotient.G(), 0.0001f);
+			Assert::AreEqual(b / b1, quotient.B(), 0.0001f);
 		}
 
 		TEST_METHOD(DivisionTest)

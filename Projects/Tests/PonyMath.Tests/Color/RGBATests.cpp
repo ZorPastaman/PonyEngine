@@ -91,16 +91,16 @@ namespace Core
 			constexpr std::uint8_t alpha = 220;
 			constexpr auto rgbaInt = PonyMath::Color::RGBAInt<std::uint8_t>(red, green, blue, alpha);
 			auto convertedRGBA = PonyMath::Color::RGBA<float>(rgbaInt);
-			Assert::AreEqual(red / 255., static_cast<double>(convertedRGBA.R()), 0.00001);
-			Assert::AreEqual(green / 255., static_cast<double>(convertedRGBA.G()), 0.00001);
-			Assert::AreEqual(blue / 255., static_cast<double>(convertedRGBA.B()), 0.00001);
-			Assert::AreEqual(alpha / 255., static_cast<double>(convertedRGBA.A()), 0.00001);
+			Assert::AreEqual(red / 255.f, convertedRGBA.R(), 0.00001f);
+			Assert::AreEqual(green / 255.f, convertedRGBA.G(), 0.00001f);
+			Assert::AreEqual(blue / 255.f, convertedRGBA.B(), 0.00001f);
+			Assert::AreEqual(alpha / 255.f, convertedRGBA.A(), 0.00001f);
 
 			constexpr auto rgbInt = PonyMath::Color::RGBInt<std::uint8_t>(red, green, blue);
 			auto convertedRGB = PonyMath::Color::RGBA<float>(rgbInt, a);
-			Assert::AreEqual(red / 255., static_cast<double>(convertedRGB.R()), 0.00001);
-			Assert::AreEqual(green / 255., static_cast<double>(convertedRGB.G()), 0.00001);
-			Assert::AreEqual(blue / 255., static_cast<double>(convertedRGB.B()), 0.00001);
+			Assert::AreEqual(red / 255.f, convertedRGB.R(), 0.00001f);
+			Assert::AreEqual(green / 255.f, convertedRGB.G(), 0.00001f);
+			Assert::AreEqual(blue / 255.f, convertedRGB.B(), 0.00001f);
 			Assert::AreEqual(a, convertedRGB.A());
 
 			constexpr auto vector = PonyMath::Core::Vector4<float>(r, g, b, a);
@@ -184,8 +184,8 @@ namespace Core
 			constexpr float b = 0.98f;
 			constexpr float a = 0.95f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
-			constexpr double expectedGrayscale = 0.2126 * r + 0.7152 * g + 0.0722 * b;
-			Assert::AreEqual(expectedGrayscale, static_cast<double>(color.Grayscale()), 0.00001);
+			constexpr float expectedGrayscale = 0.2126f * r + 0.7152f * g + 0.0722f * b;
+			Assert::AreEqual(expectedGrayscale, color.Grayscale(), 0.00001f);
 		}
 
 		TEST_METHOD(MinTest)
@@ -236,9 +236,9 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto gamma = color.Gamma();
-			Assert::AreEqual(0.729, static_cast<double>(gamma.R()), 0.001);
-			Assert::AreEqual(0.849, static_cast<double>(gamma.G()), 0.001);
-			Assert::AreEqual(0.026, static_cast<double>(gamma.B()), 0.001);
+			Assert::AreEqual(0.729f, gamma.R(), 0.001f);
+			Assert::AreEqual(0.849f, gamma.G(), 0.001f);
+			Assert::AreEqual(0.026f, gamma.B(), 0.001f);
 			Assert::AreEqual(a, gamma.A());
 		}
 
@@ -250,9 +250,9 @@ namespace Core
 			constexpr float a = 0.166f;
 			constexpr auto color = PonyMath::Color::RGBA<float>(r, g, b, a);
 			auto linear = color.Linear();
-			Assert::AreEqual(0.459, static_cast<double>(linear.R()), 0.001);
-			Assert::AreEqual(0.667, static_cast<double>(linear.G()), 0.001);
-			Assert::AreEqual(0.002, static_cast<double>(linear.B()), 0.001);
+			Assert::AreEqual(0.459f, linear.R(), 0.001f);
+			Assert::AreEqual(0.667f, linear.G(), 0.001f);
+			Assert::AreEqual(0.002f, linear.B(), 0.001f);
 			Assert::AreEqual(a, linear.A());
 		}
 
@@ -586,10 +586,10 @@ namespace Core
 			constexpr float a1 = 0.366f;
 			constexpr auto color1 = PonyMath::Color::RGBA<float>(r1, g1, b1, a1);
 			PonyMath::Color::RGBA<float>& colorRef = color /= color1;
-			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(color.R()), 0.00001);
-			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(color.G()), 0.00001);
-			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(color.B()), 0.00001);
-			Assert::AreEqual(static_cast<double>(a / a1), static_cast<double>(color.A()), 0.00001);
+			Assert::AreEqual(r / r1, color.R(), 0.00001f);
+			Assert::AreEqual(g / g1, color.G(), 0.00001f);
+			Assert::AreEqual(b / b1, color.B(), 0.00001f);
+			Assert::AreEqual(a / a1, color.A(), 0.00001f);
 			Assert::AreEqual(reinterpret_cast<std::uintptr_t>(&color), reinterpret_cast<std::uintptr_t>(&colorRef));
 		}
 
@@ -642,8 +642,8 @@ namespace Core
 			constexpr float b1 = 0.219f;
 			constexpr float a1 = 0.366f;
 			constexpr auto color1 = PonyMath::Color::RGBA<float>(r1, g1, b1, a1);
-			Assert::AreEqual(0.49, static_cast<double>(PonyMath::Color::DistanceSquared(color, color1)), 0.001);
-			Assert::AreEqual(0.7, static_cast<double>(PonyMath::Color::Distance(color, color1)), 0.001);
+			Assert::AreEqual(0.49f, PonyMath::Color::DistanceSquared(color, color1), 0.001f);
+			Assert::AreEqual(0.7f, PonyMath::Color::Distance(color, color1), 0.001f);
 		}
 
 		TEST_METHOD(MinCombinedTest)
@@ -729,28 +729,29 @@ namespace Core
 			Assert::AreEqual(a, lerped.A());
 
 			lerped = PonyMath::Color::Lerp(color, color1, 1.f);
-			Assert::AreEqual(static_cast<double>(r1), static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(static_cast<double>(g1), static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(static_cast<double>(b1), static_cast<double>(lerped.B()), 0.0001);
-			Assert::AreEqual(static_cast<double>(a1), static_cast<double>(lerped.A()), 0.0001);
+			lerped = PonyMath::Color::Lerp(color, color1, 1.f);
+			Assert::AreEqual(r1, lerped.R(), 0.0001f);
+			Assert::AreEqual(g1, lerped.G(), 0.0001f);
+			Assert::AreEqual(b1, lerped.B(), 0.0001f);
+			Assert::AreEqual(a1, lerped.A(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, 0.5f);
-			Assert::AreEqual(0.34, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(0.39, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.215, static_cast<double>(lerped.B()), 0.0001);
-			Assert::AreEqual(0.266, static_cast<double>(lerped.A()), 0.0001);
+			Assert::AreEqual(0.34f, lerped.R(), 0.0001f);
+			Assert::AreEqual(0.39f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.215f, lerped.B(), 0.0001f);
+			Assert::AreEqual(0.266f, lerped.A(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, 2.f);
-			Assert::AreEqual(-0.11, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(-0.51, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.227, static_cast<double>(lerped.B()), 0.0001);
-			Assert::AreEqual(0.566, static_cast<double>(lerped.A()), 0.0001);
+			Assert::AreEqual(-0.11f, lerped.R(), 0.0001f);
+			Assert::AreEqual(-0.51f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.227f, lerped.B(), 0.0001f);
+			Assert::AreEqual(0.566f, lerped.A(), 0.0001f);
 
 			lerped = PonyMath::Color::Lerp(color, color1, -1.f);
-			Assert::AreEqual(0.79, static_cast<double>(lerped.R()), 0.0001);
-			Assert::AreEqual(1.29, static_cast<double>(lerped.G()), 0.0001);
-			Assert::AreEqual(0.203, static_cast<double>(lerped.B()), 0.0001);
-			Assert::AreEqual(-0.034, static_cast<double>(lerped.A()), 0.0001);
+			Assert::AreEqual(0.79f, lerped.R(), 0.0001f);
+			Assert::AreEqual(1.29f, lerped.G(), 0.0001f);
+			Assert::AreEqual(0.203f, lerped.B(), 0.0001f);
+			Assert::AreEqual(-0.034f, lerped.A(), 0.0001f);
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)
@@ -867,10 +868,10 @@ namespace Core
 			constexpr float a1 = 0.366f;
 			constexpr auto color1 = PonyMath::Color::RGBA<float>(r1, g1, b1, a1);
 			auto quotient = color / color1;
-			Assert::AreEqual(static_cast<double>(r / r1), static_cast<double>(quotient.R()), 0.00001);
-			Assert::AreEqual(static_cast<double>(g / g1), static_cast<double>(quotient.G()), 0.00001);
-			Assert::AreEqual(static_cast<double>(b / b1), static_cast<double>(quotient.B()), 0.00001);
-			Assert::AreEqual(static_cast<double>(a / a1), static_cast<double>(quotient.A()), 0.00001);
+			Assert::AreEqual(r / r1, quotient.R(), 0.00001f);
+			Assert::AreEqual(g / g1, quotient.G(), 0.00001f);
+			Assert::AreEqual(b / b1, quotient.B(), 0.00001f);
+			Assert::AreEqual(a / a1, quotient.A(), 0.00001f);
 		}
 
 		TEST_METHOD(DivisionTest)

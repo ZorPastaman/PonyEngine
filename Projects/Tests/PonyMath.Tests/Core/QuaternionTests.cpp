@@ -164,7 +164,7 @@ namespace Core
 			constexpr float w = 2;
 			constexpr auto quaternion = PonyMath::Core::Quaternion<float>(x, y, z, w);
 			Assert::AreEqual(22.f, quaternion.MagnitudeSquared());
-			Assert::AreEqual(4.69, static_cast<double>(quaternion.Magnitude()), 0.001);
+			Assert::AreEqual(4.69f, quaternion.Magnitude(), 0.001f);
 		}
 
 		TEST_METHOD(ConjugateTest)
@@ -189,10 +189,10 @@ namespace Core
 			constexpr float w = 2;
 			constexpr auto quaternion = PonyMath::Core::Quaternion<float>(x, y, z, w);
 			PonyMath::Core::Quaternion<float> inverse = quaternion.Inverse();
-			Assert::AreEqual(-0.182, static_cast<double>(inverse.X()), 0.001);
-			Assert::AreEqual(0.045, static_cast<double>(inverse.Y()), 0.001);
-			Assert::AreEqual(-0.045, static_cast<double>(inverse.Z()), 0.001);
-			Assert::AreEqual(0.091, static_cast<double>(inverse.W()), 0.001);
+			Assert::AreEqual(-0.182f, inverse.X(), 0.001f);
+			Assert::AreEqual(0.045f, inverse.Y(), 0.001f);
+			Assert::AreEqual(-0.045f, inverse.Z(), 0.001f);
+			Assert::AreEqual(0.091f, inverse.W(), 0.001f);
 		}
 
 		TEST_METHOD(NormalizeTest)
@@ -203,10 +203,10 @@ namespace Core
 			constexpr float w = 2;
 			auto quaternion = PonyMath::Core::Quaternion<float>(x, y, z, w);
 			PonyMath::Core::Quaternion<float> normalized = quaternion.Normalized();
-			Assert::AreEqual(0.853, static_cast<double>(normalized.X()), 0.001);
-			Assert::AreEqual(-0.213, static_cast<double>(normalized.Y()), 0.001);
-			Assert::AreEqual(0.213, static_cast<double>(normalized.Z()), 0.001);
-			Assert::AreEqual(0.426, static_cast<double>(normalized.W()), 0.001);
+			Assert::AreEqual(0.853f, normalized.X(), 0.001f);
+			Assert::AreEqual(-0.213f, normalized.Y(), 0.001f);
+			Assert::AreEqual(0.213f, normalized.Z(), 0.001f);
+			Assert::AreEqual(0.426f, normalized.W(), 0.001f);
 			quaternion.Normalize();
 			Assert::IsTrue(quaternion == normalized);
 		}
@@ -461,7 +461,7 @@ namespace Core
 			float zL = -1;
 			float wL = 2;
 			auto quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
-			Assert::AreEqual(1.178, static_cast<double>(PonyMath::Core::Angle(quaternionL, quaternionR)), 0.001);
+			Assert::AreEqual(1.178f, PonyMath::Core::Angle(quaternionL, quaternionR), 0.001f);
 			xR = 2;
 			yR = 3;
 			zR = 5;
@@ -472,8 +472,8 @@ namespace Core
 			zL = 1;
 			wL = 2;
 			quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
-			Assert::AreEqual(2.662, static_cast<double>(PonyMath::Core::Angle(quaternionL, quaternionR)), 0.001);
-			Assert::AreEqual(0., static_cast<double>(PonyMath::Core::Angle(quaternionL, quaternionL)), 0.001);
+			Assert::AreEqual(2.662f, PonyMath::Core::Angle(quaternionL, quaternionR), 0.001f);
+			Assert::AreEqual(0.f, PonyMath::Core::Angle(quaternionL, quaternionL), 0.001f);
 			xR = 3;
 			yR = 2;
 			zR = 2;
@@ -484,7 +484,7 @@ namespace Core
 			zL = -1;
 			wL = 2;
 			quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
-			Assert::AreEqual(std::numbers::pi_v<double>, static_cast<double>(PonyMath::Core::Angle(quaternionL, quaternionR)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float>, PonyMath::Core::Angle(quaternionL, quaternionR), 0.001f);
 			xR = 0;
 			yR = 1;
 			zR = 0;
@@ -495,7 +495,7 @@ namespace Core
 			zL = -1;
 			wL = 2;
 			quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
-			Assert::AreEqual(std::numbers::pi_v<double> / 2., static_cast<double>(PonyMath::Core::Angle(quaternionL, quaternionR)), 0.001);
+			Assert::AreEqual(std::numbers::pi_v<float> / 2.f, PonyMath::Core::Angle(quaternionL, quaternionR), 0.001f);
 		}
 
 		TEST_METHOD(LerpTest)
@@ -556,40 +556,40 @@ namespace Core
 			auto quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
 
 			PonyMath::Core::Quaternion<float> slerped = PonyMath::Core::Slerp(quaternionL, quaternionR, 0.f);
-			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(quaternionL.X(), slerped.X(), 0.001f);
+			Assert::AreEqual(quaternionL.Y(), slerped.Y(), 0.001f);
+			Assert::AreEqual(quaternionL.Z(), slerped.Z(), 0.001f);
+			Assert::AreEqual(quaternionL.W(), slerped.W(), 0.001f);
 
 			slerped = PonyMath::Core::Slerp(quaternionL, quaternionR, 1.f);
-			Assert::AreEqual(static_cast<double>(quaternionR.X()), static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionR.Y()), static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionR.Z()), static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionR.W()), static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(quaternionR.X(), slerped.X(), 0.001f);
+			Assert::AreEqual(quaternionR.Y(), slerped.Y(), 0.001f);
+			Assert::AreEqual(quaternionR.Z(), slerped.Z(), 0.001f);
+			Assert::AreEqual(quaternionR.W(), slerped.W(), 0.001f);
 
 			slerped = PonyMath::Core::Slerp(quaternionL, quaternionR, 0.5f);
-			Assert::AreEqual(0.378, static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(0.567, static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(0.452, static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(0.575, static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(0.378f, slerped.X(), 0.001f);
+			Assert::AreEqual(0.567f, slerped.Y(), 0.001f);
+			Assert::AreEqual(0.452f, slerped.Z(), 0.001f);
+			Assert::AreEqual(0.575f, slerped.W(), 0.001f);
 
 			slerped = PonyMath::Core::Slerp(quaternionL, quaternionR.Conjugate(), 0.5f);
-			Assert::AreEqual(0.46, static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(0.69, static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(0.55, static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(-0.1, static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(0.46f, slerped.X(), 0.001f);
+			Assert::AreEqual(0.69f, slerped.Y(), 0.001f);
+			Assert::AreEqual(0.55f, slerped.Z(), 0.001f);
+			Assert::AreEqual(-0.1f, slerped.W(), 0.001f);
 
 			slerped = PonyMath::Core::Slerp(quaternionL, quaternionL, 0.5f);
-			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(quaternionL.X(), slerped.X(), 0.001f);
+			Assert::AreEqual(quaternionL.Y(), slerped.Y(), 0.001f);
+			Assert::AreEqual(quaternionL.Z(), slerped.Z(), 0.001f);
+			Assert::AreEqual(quaternionL.W(), slerped.W(), 0.001f);
 
 			slerped = PonyMath::Core::Slerp(quaternionL, static_cast<PonyMath::Core::Quaternion<float>>(-static_cast<PonyMath::Core::Vector4<float>>(quaternionL)), 0.5f);
-			Assert::AreEqual(static_cast<double>(quaternionL.X()), static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Y()), static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.Z()), static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(static_cast<double>(quaternionL.W()), static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(quaternionL.X(), slerped.X(), 0.001f);
+			Assert::AreEqual(quaternionL.Y(), slerped.Y(), 0.001f);
+			Assert::AreEqual(quaternionL.Z(), slerped.Z(), 0.001f);
+			Assert::AreEqual(quaternionL.W(), slerped.W(), 0.001f);
 
 			xR = 2;
 			yR = 3;
@@ -602,10 +602,10 @@ namespace Core
 			wL = 5;
 			quaternionL = PonyMath::Core::Quaternion<float>(xL, yL, zL, wL).Normalized();
 			slerped = PonyMath::Core::Slerp(quaternionL, quaternionR, 0.5f);
-			Assert::AreEqual(0.445, static_cast<double>(slerped.X()), 0.001);
-			Assert::AreEqual(0.089, static_cast<double>(slerped.Y()), 0.001);
-			Assert::AreEqual(0., static_cast<double>(slerped.Z()), 0.001);
-			Assert::AreEqual(0.891, static_cast<double>(slerped.W()), 0.001);
+			Assert::AreEqual(0.445f, slerped.X(), 0.001f);  
+			Assert::AreEqual(0.089f, slerped.Y(), 0.001f);  
+			Assert::AreEqual(0.0f, slerped.Z(), 0.001f);  
+			Assert::AreEqual(0.891f, slerped.W(), 0.001f);
 		}
 
 		TEST_METHOD(AreAlmostEqualTest)
@@ -668,10 +668,10 @@ namespace Core
 			Assert::AreEqual(8.f, product.W());
 
 			product = quaternionL.Normalized() * quaternionR.Normalized();
-			Assert::AreEqual(0.772, static_cast<double>(product.X()), 0.001);
-			Assert::AreEqual(-0.386, static_cast<double>(product.Y()), 0.001);
-			Assert::AreEqual(0.445, static_cast<double>(product.Z()), 0.001);
-			Assert::AreEqual(0.238, static_cast<double>(product.W()), 0.001);
+			Assert::AreEqual(0.772f, product.X(), 0.001f);  
+			Assert::AreEqual(-0.386f, product.Y(), 0.001f);  
+			Assert::AreEqual(0.445f, product.Z(), 0.001f);  
+			Assert::AreEqual(0.238f, product.W(), 0.001f);
 		}
 
 		TEST_METHOD(MultiplicationVectorTest)
@@ -692,9 +692,9 @@ namespace Core
 			Assert::AreEqual(-99.f, product.Z());
 
 			product = quaternion.Normalized() * vector;
-			Assert::AreEqual(5.556, static_cast<double>(product.X()), 0.001);
-			Assert::AreEqual(-2.556, static_cast<double>(product.Y()), 0.001);
-			Assert::AreEqual(-0.778, static_cast<double>(product.Z()), 0.001);
+			Assert::AreEqual(5.556f, product.X(), 0.001f);
+			Assert::AreEqual(-2.556f, product.Y(), 0.001f);
+			Assert::AreEqual(-0.778f, product.Z(), 0.001f);
 		}
 
 		static constexpr PonyMath::Core::Quaternion<float> QuaternionConstexpr()
