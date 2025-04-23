@@ -515,7 +515,21 @@ namespace PonyEngine::Render::Direct3D12
 			meshes.insert(mesh);
 		}
 
-		const auto transform = PonyShader::Space::Transform(renderObject.ModelMatrix(), camera.ViewMatrix(), camera.ProjectionMatrix());
+		const auto transform = PonyShader::Space::Transform
+		{
+			.model = renderObject.ModelMatrix(),
+			.view = camera.ViewMatrix(),
+			.projection = camera.ProjectionMatrix(),
+			.mv = camera.ViewMatrix() * renderObject.ModelMatrix(),
+			.vp = camera.ViewProjectionMatrix(),
+			.mvp = camera.ViewProjectionMatrix() * renderObject.ModelMatrix(),
+			.modelInv = renderObject.ModelInverseMatrix(),
+			.viewInv = camera.ViewInverseMatrix(),
+			.projectionInv = camera.ProjectionInverseMatrix(),
+			.mvInv = renderObject.ModelInverseMatrix() * camera.ViewInverseMatrix(),
+			.vpInv = camera.ViewProjectionInverseMatrix(),
+			.mvpInv = renderObject.ModelInverseMatrix() * camera.ViewProjectionInverseMatrix()
+		};
 
 		const ThreadGroupCounts& pipelineStateCounts = renderObject.PipelineState().ThreadGroupCounts();
 		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
@@ -526,7 +540,7 @@ namespace PonyEngine::Render::Direct3D12
 			.meshThreadGroupCounts = meshGroups,
 			.renderQueue = renderObject.PipelineState().RenderQueue(),
 			.isTransparent = renderObject.PipelineState().IsTransparent(),
-			.isFlipped = transform.MvpMatrix().Determinant() < 0.f
+			.isFlipped = transform.mvp.Determinant() < 0.f
 		};
 
 		renderObjectData.push_back(RenderObjectData
@@ -1049,8 +1063,8 @@ namespace PonyEngine::Render::Direct3D12
 				? rightMesh->BoundingBox().value().Center()
 				: PonyMath::Core::Vector3<float>::Predefined::Zero;
 
-			const PonyMath::Core::Matrix4x4<float>& leftMvp = renderObjectData[left.dataIndex].transform.MvpMatrix();
-			const PonyMath::Core::Matrix4x4<float>& rightMvp = renderObjectData[right.dataIndex].transform.MvpMatrix();
+			const PonyMath::Core::Matrix4x4<float>& leftMvp = renderObjectData[left.dataIndex].transform.mvp;
+			const PonyMath::Core::Matrix4x4<float>& rightMvp = renderObjectData[right.dataIndex].transform.mvp;
 
 			const float leftDistance = PonyMath::Core::TransformPoint(leftMvp, leftCentralPoint).Z();
 			const float rightDistance = PonyMath::Core::TransformPoint(rightMvp, rightCentralPoint).Z();

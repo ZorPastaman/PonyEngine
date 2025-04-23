@@ -31,6 +31,10 @@ export namespace PonyEngine::Render
 		/// @brief Sets the translation-rotation-scaling matrix of the object.
 		/// @param matrix Translation-rotation-scaling matrix.
 		virtual void ModelMatrix(const PonyMath::Core::Matrix4x4<float>& matrix) noexcept = 0;
+		/// @brief Gets the inverse of the translation-rotation-scaling matrix of the object.
+		/// @return Inverse of the translation-rotation-scaling matrix.
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ModelInverseMatrix() const noexcept = 0;
 
 		/// @brief Gets the name.
 		/// @return Name.

@@ -37,7 +37,7 @@ StructuredBuffer<float4> Colors : register(t4);
 Vertex CreateVertex(in uint index)
 {
 	Vertex vertex;
-	vertex.position = mul(Transform.mvpMatrix, float4(Positions[index], 1.f));
+	vertex.position = mul(Transform.mvp, float4(Positions[index], 1.f));
 	vertex.color = Colors[index];
 
 	return vertex;

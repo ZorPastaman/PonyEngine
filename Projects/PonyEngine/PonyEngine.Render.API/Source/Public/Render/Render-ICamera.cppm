@@ -45,6 +45,18 @@ export namespace PonyEngine::Render
 		/// @return View-projection matrix.
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ViewProjectionMatrix() const noexcept = 0;
+		/// @brief Gets the inverse of the view matrix.
+		/// @return Inverse of the view matrix.
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ViewInverseMatrix() const noexcept = 0;
+		/// @brief Gets the inverse of the projection matrix.
+		/// @return Inverse of the projection matrix.
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ProjectionInverseMatrix() const noexcept = 0;
+		/// @brief Gets the inverse of the view-projection matrix.
+		/// @return Inverse of the view-projection matrix.
+		[[nodiscard("Pure function")]]
+		virtual const PonyMath::Core::Matrix4x4<float>& ViewProjectionInverseMatrix() const noexcept = 0;
 
 		/// @brief Gets the projection parameters.
 		/// @return Projection parameters.
