@@ -432,7 +432,6 @@ namespace PonyEngine::Render::Direct3D12
 
 		graphicsPipeline->Clear();
 		copyPipeline->Clear();
-		meshManager->Clear();
 	}
 
 	PonyDebug::Log::ILogger& SubSystem::Logger() noexcept

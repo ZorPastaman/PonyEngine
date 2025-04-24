@@ -57,8 +57,6 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Ticks the mesh manager.
 		void Tick();
 
-		/// @brief Clears the data.
-		void Clear() noexcept;
 		/// @brief Cleans out of dead meshes.
 		void Clean() noexcept;
 
@@ -178,8 +176,6 @@ export namespace PonyEngine::Render::Direct3D12
 		std::vector<std::shared_ptr<Mesh>> meshes; ///< Meshes.
 		std::vector<std::shared_ptr<const Render::Mesh>> sources; ///< Mesh sources.
 		std::vector<std::unique_ptr<MeshObserver>> observers; ///< Mesh observers.
-
-		std::vector<std::shared_ptr<Buffer>> uploadBuffers; ///< Upload buffers.
 	};
 }
 
@@ -292,11 +288,6 @@ namespace PonyEngine::Render::Direct3D12
 
 			observer.Reset();
 		}
-	}
-
-	void MeshManager::Clear() noexcept
-	{
-		uploadBuffers.clear();
 	}
 
 	void MeshManager::Clean() noexcept
@@ -428,7 +419,6 @@ namespace PonyEngine::Render::Direct3D12
 		Buffer& gpuBuffer = *mesh.Buffer();
 		const std::uint64_t size = gpuBuffer.Data().GetDesc1().Width;
 		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(size, HeapType::Upload);
-		uploadBuffers.push_back(uploadBuffer);
 
 		for (std::uint32_t dataIndex = 0u; dataIndex < mesh.DataCount(); ++dataIndex)
 		{
@@ -447,7 +437,6 @@ namespace PonyEngine::Render::Direct3D12
 		const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
 		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Upload);
 		uploadBuffer->SetData(sourceBuffer);
-		uploadBuffers.push_back(uploadBuffer);
 
 		Buffer& gpuBuffer = *mesh.Buffer();
 		d3d12System->CopyPipeline().AddCopyTask(*uploadBuffer, gpuBuffer, 0ULL, mesh.BufferOffset(dataIndex, bufferIndex), sourceBuffer.Size());
