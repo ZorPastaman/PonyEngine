@@ -54,7 +54,6 @@ export namespace PonyEngine::Render::Direct3D12
 
 		RenderObjectManager& operator =(const RenderObjectManager&) = delete;
 		RenderObjectManager& operator =(RenderObjectManager&&) = delete;
-		
 
 	private:
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
