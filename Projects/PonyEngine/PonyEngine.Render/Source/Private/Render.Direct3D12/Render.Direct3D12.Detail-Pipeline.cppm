@@ -87,7 +87,6 @@ export namespace PonyEngine::Render::Direct3D12
 
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
 
-		// TODO: Add command list per back buffer.
 		Microsoft::WRL::ComPtr<ID3D12CommandQueue> commandQueue; ///< Copy command queue.
 		Microsoft::WRL::ComPtr<ID3D12CommandAllocator> commandAllocator; ///< Copy command allocator.
 		Microsoft::WRL::ComPtr<ID3D12GraphicsCommandList7> commandList; ///< Copy command list.
