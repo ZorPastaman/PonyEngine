@@ -27,7 +27,7 @@ namespace Input
 {
 	TEST_CLASS(WindowsKeyboardDeviceTests)
 	{
-		class WindowsWindowTitleBar final : public PonyEngine::Window::Windows::ITitleBar
+		class WindowsWindowTitleBar final : public PonyEngine::Window::ITitleBar
 		{
 		public:
 			[[nodiscard("Pure function")]]
@@ -60,14 +60,14 @@ namespace Input
 			}
 		};
 
-		class RawInputManager final : public PonyEngine::Window::Windows::IRawInputManager
+		class RawInput final : public PonyEngine::Window::Windows::IRawInput
 		{
 		public:
 			virtual void AddRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver&, std::span<const DWORD>) override {}
 			virtual void RemoveRawInputObserver(PonyEngine::Window::Windows::IRawInputObserver&) noexcept override {}
 		};
 
-		class Cursor final : public PonyEngine::Window::Windows::ICursor
+		class Cursor final : public PonyEngine::Window::ICursor
 		{
 			std::optional<PonyMath::Shape::Rect<float>> rect;
 
@@ -90,13 +90,13 @@ namespace Input
 		public:
 			WindowsWindowTitleBar titleBar;
 			class MessagePump messagePump;
-			class RawInputManager rawInputManager;
+			class RawInput rawInputManager;
 			class Cursor cursor;
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::Windows::ITitleBar& TitleBar() noexcept override { return titleBar; }
+			virtual PonyEngine::Window::ITitleBar& TitleBar() noexcept override { return titleBar; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::Windows::ITitleBar& TitleBar() const noexcept override { return titleBar; }
+			virtual const PonyEngine::Window::ITitleBar& TitleBar() const noexcept override { return titleBar; }
 
 			[[nodiscard("Pure function")]]
 			virtual bool IsVisible() const noexcept override { return false; }
@@ -115,9 +115,9 @@ namespace Input
 			}
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::Windows::ICursor& Cursor() noexcept override { return cursor; }
+			virtual PonyEngine::Window::ICursor& Cursor() noexcept override { return cursor; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::Windows::ICursor& Cursor() const noexcept override { return cursor; }
+			virtual const PonyEngine::Window::ICursor& Cursor() const noexcept override { return cursor; }
 
 			[[nodiscard("Pure function")]]
 			virtual PonyEngine::Window::Windows::IMessagePump& MessagePump() noexcept override { return messagePump; }
@@ -125,9 +125,9 @@ namespace Input
 			virtual const PonyEngine::Window::Windows::IMessagePump& MessagePump() const noexcept override { return messagePump; }
 
 			[[nodiscard("Pure function")]]
-			virtual PonyEngine::Window::Windows::IRawInputManager& RawInputManager() noexcept override { return rawInputManager; }
+			virtual PonyEngine::Window::Windows::IRawInput& RawInputManager() noexcept override { return rawInputManager; }
 			[[nodiscard("Pure function")]]
-			virtual const PonyEngine::Window::Windows::IRawInputManager& RawInputManager() const noexcept override { return rawInputManager; }
+			virtual const PonyEngine::Window::Windows::IRawInput& RawInputManager() const noexcept override { return rawInputManager; }
 
 			[[nodiscard("Pure function")]]
 			virtual HWND WindowHandle() const noexcept override { return nullptr; }

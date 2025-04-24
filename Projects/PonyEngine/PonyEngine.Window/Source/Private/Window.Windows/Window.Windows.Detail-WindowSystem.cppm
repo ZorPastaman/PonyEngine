@@ -35,7 +35,7 @@ import PonyEngine.Window.Windows;
 import :Cursor;
 import :IWindowSystemContext;
 import :MessagePump;
-import :RawInputManager;
+import :RawInput;
 import :Utility;
 import :TitleBar;
 
@@ -92,9 +92,9 @@ export namespace PonyEngine::Window::Windows
 		virtual const IMessagePump& MessagePump() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual IRawInputManager& RawInputManager() noexcept override;
+		virtual IRawInput& RawInputManager() noexcept override;
 		[[nodiscard("Pure function")]]
-		virtual const IRawInputManager& RawInputManager() const noexcept override;
+		virtual const IRawInput& RawInputManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual HWND WindowHandle() const noexcept override;
@@ -136,7 +136,7 @@ export namespace PonyEngine::Window::Windows
 
 		std::unique_ptr<class TitleBar> titleBar; ///< Windows window title bar.
 		std::unique_ptr<class MessagePump> messagePump; ///< Windows message pump.
-		std::unique_ptr<class RawInputManager> rawInputManager; ///< Windows raw input manager.
+		std::unique_ptr<class RawInput> rawInputManager; ///< Windows raw input manager.
 		std::unique_ptr<class Cursor> cursor; ///< Windows cursor.
 	};
 }
@@ -181,7 +181,7 @@ namespace PonyEngine::Window::Windows
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Window title bar created.");
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create raw input manager.");
-		rawInputManager = std::make_unique<class RawInputManager>(*static_cast<IWindowSystemContext*>(this));
+		rawInputManager = std::make_unique<class RawInput>(*static_cast<IWindowSystemContext*>(this));
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Raw input manager created at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(rawInputManager.get()));
 
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Info, "Create cursor.");
@@ -354,12 +354,12 @@ namespace PonyEngine::Window::Windows
 		return *messagePump;
 	}
 
-	IRawInputManager& WindowSystem::RawInputManager() noexcept
+	IRawInput& WindowSystem::RawInputManager() noexcept
 	{
 		return *rawInputManager;
 	}
 
-	const IRawInputManager& WindowSystem::RawInputManager() const noexcept
+	const IRawInput& WindowSystem::RawInputManager() const noexcept
 	{
 		return *rawInputManager;
 	}

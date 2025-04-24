@@ -12,7 +12,7 @@ module;
 #include "PonyBase/Core/Windows/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Window.Windows:IRawInputManager;
+export module PonyEngine.Window.Windows:IRawInput;
 
 import <span>;
 
@@ -20,10 +20,10 @@ import :IRawInputObserver;
 
 export namespace PonyEngine::Window::Windows
 {
-	/// @brief Windows raw input manager.
-	class IRawInputManager
+	/// @brief Windows raw input.
+	class IRawInput
 	{
-		INTERFACE_BODY(IRawInputManager)
+		INTERFACE_BODY(IRawInput)
 
 		/// @brief Adds the raw input observer.
 		/// @note It's not supported to add the same raw input observer twice in a row. If you need to update its raw input types, you should remove it first.
