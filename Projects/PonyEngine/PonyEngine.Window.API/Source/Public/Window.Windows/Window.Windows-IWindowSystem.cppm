@@ -16,10 +16,8 @@ export module PonyEngine.Window.Windows:IWindowSystem;
 
 import PonyEngine.Window;
 
-import :ICursor;
 import :IMessagePump;
-import :IRawInputManager;
-import :ITitleBar;
+import :IRawInput;
 
 export namespace PonyEngine::Window::Windows
 {
@@ -27,24 +25,6 @@ export namespace PonyEngine::Window::Windows
 	class IWindowSystem : public Window::IWindowSystem
 	{
 		INTERFACE_BODY(IWindowSystem)
-
-		/// @brief Gets the window title bar.
-		/// @return Window title bar.
-		[[nodiscard("Pure function")]]
-		virtual ITitleBar& TitleBar() noexcept override = 0;
-		/// @brief Gets the window title bar.
-		/// @return Window title bar.
-		[[nodiscard("Pure function")]]
-		virtual const ITitleBar& TitleBar() const noexcept override = 0;
-
-		/// @brief Gets the cursor.
-		/// @return Cursor.
-		[[nodiscard("Pure function")]]
-		virtual ICursor& Cursor() noexcept override = 0;
-		/// @brief Gets the cursor.
-		/// @return Cursor.
-		[[nodiscard("Pure function")]]
-		virtual const ICursor& Cursor() const noexcept override = 0;
 
 		/// @brief Gets the message pump.
 		/// @return Message pump.
@@ -58,11 +38,11 @@ export namespace PonyEngine::Window::Windows
 		/// @brief Gets the raw input manager.
 		/// @return Raw input manager.
 		[[nodiscard("Pure function")]]
-		virtual IRawInputManager& RawInputManager() noexcept = 0;
+		virtual IRawInput& RawInputManager() noexcept = 0;
 		/// @brief Gets the raw input manager.
 		/// @return Raw input manager.
 		[[nodiscard("Pure function")]]
-		virtual const IRawInputManager& RawInputManager() const noexcept = 0;
+		virtual const IRawInput& RawInputManager() const noexcept = 0;
 
 		/// @brief Gets the window handle.
 		/// @return Window handle.

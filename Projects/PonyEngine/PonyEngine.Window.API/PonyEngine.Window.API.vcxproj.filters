@@ -69,22 +69,16 @@
     <ClCompile Include="Source\Public\Window\Window-ITitleBar.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ITitleBar.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessagePump.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInputManager.cppm">
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInput.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessageHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Window-ICursor.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ICursor.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Window\Window-CursorParams.cppm">

@@ -20,7 +20,7 @@
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-IWindowSystemContext.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-Cursor.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-MessagePump.cppm" />
-    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-RawInputManager.cppm" />
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-RawInput.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-Utility.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail.cppm" />
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-ClassImpl.cppm" />

@@ -17,13 +17,11 @@
     <ResourceCompile Include="PonyEngine.Window.API.rc" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ICursor.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessageObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessagePump.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInputManager.cppm" />
+    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInput.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IRawInputObserver.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-IMessageHandler.cppm" />
-    <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ITitleBar.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-Class.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ClassData.cppm" />
     <ClCompile Include="Source\Public\Window.Windows\Window.Windows-ClassParams.cppm" />

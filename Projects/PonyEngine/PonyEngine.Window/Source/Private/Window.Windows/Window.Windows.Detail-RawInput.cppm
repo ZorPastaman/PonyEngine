@@ -15,7 +15,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Window.Windows.Detail:RawInputManager;
+export module PonyEngine.Window.Windows.Detail:RawInput;
 
 import <algorithm>;
 import <array>;
@@ -36,26 +36,26 @@ import :IWindowSystemContext;
 
 export namespace PonyEngine::Window::Windows
 {
-	/// @brief Windows raw input manager.
-	class RawInputManager final : public IRawInputManager, private IMessageObserver
+	/// @brief Windows raw input.
+	class RawInput final : public IRawInput, private IMessageObserver
 	{
 	public:
-		/// @brief Creates a @p RawInputManager.
+		/// @brief Creates a @p RawInput.
 		/// @param windowSystem Windows window system context.
 		[[nodiscard("Pure constructor")]]
-		explicit RawInputManager(IWindowSystemContext& windowSystem) noexcept;
-		RawInputManager(const RawInputManager&) = delete;
-		RawInputManager(RawInputManager&&) = delete;
+		explicit RawInput(IWindowSystemContext& windowSystem) noexcept;
+		RawInput(const RawInput&) = delete;
+		RawInput(RawInput&&) = delete;
 
-		~RawInputManager() noexcept;
+		~RawInput() noexcept;
 
 		virtual void AddRawInputObserver(IRawInputObserver& observer, std::span<const DWORD> rawInputTypes) override;
 		virtual void RemoveRawInputObserver(IRawInputObserver& observer) noexcept override;
 
 		virtual void Observe(UINT uMsg, WPARAM wParam, LPARAM lParam) noexcept override;
 
-		RawInputManager& operator =(const RawInputManager&) = delete;
-		RawInputManager& operator =(RawInputManager&&) = delete;
+		RawInput& operator =(const RawInput&) = delete;
+		RawInput& operator =(RawInput&&) = delete;
 
 	private:
 		/// @brief Registers the raw input type.
@@ -80,13 +80,13 @@ export namespace PonyEngine::Window::Windows
 
 namespace PonyEngine::Window::Windows
 {
-	RawInputManager::RawInputManager(IWindowSystemContext& windowSystem) noexcept :
+	RawInput::RawInput(IWindowSystemContext& windowSystem) noexcept :
 		windowSystem{&windowSystem}
 	{
 		this->windowSystem->MessagePump().AddMessageObserver(*this, std::array<UINT, 1> { WM_INPUT });
 	}
 
-	RawInputManager::~RawInputManager() noexcept
+	RawInput::~RawInput() noexcept
 	{
 		try
 		{
@@ -98,7 +98,7 @@ namespace PonyEngine::Window::Windows
 		}
 	}
 
-	void RawInputManager::AddRawInputObserver(IRawInputObserver& observer, const std::span<const DWORD> rawInputTypes)
+	void RawInput::AddRawInputObserver(IRawInputObserver& observer, const std::span<const DWORD> rawInputTypes)
 	{
 		for (const DWORD rawInputType : rawInputTypes)
 		{
@@ -116,7 +116,7 @@ namespace PonyEngine::Window::Windows
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input observer added.", typeid(observer).name());
 	}
 
-	void RawInputManager::RemoveRawInputObserver(IRawInputObserver& observer) noexcept
+	void RawInput::RemoveRawInputObserver(IRawInputObserver& observer) noexcept
 	{
 		for (auto& [inputType, observers] : rawInputObservers)
 		{
@@ -140,7 +140,7 @@ namespace PonyEngine::Window::Windows
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input observer removed.", typeid(observer).name());
 	}
 
-	void RawInputManager::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam) noexcept
+	void RawInput::Observe(const UINT uMsg, const WPARAM, const LPARAM lParam) noexcept
 	{
 		assert(uMsg == WM_INPUT && "The message type is incorrect.");
 
@@ -183,19 +183,19 @@ namespace PonyEngine::Window::Windows
 		}
 	}
 
-	void RawInputManager::RegisterRawInputType(const DWORD rawInputType)
+	void RawInput::RegisterRawInputType(const DWORD rawInputType)
 	{
 		RegisterRawInputType(rawInputType, DWORD{0}, windowSystem->WindowHandle());
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input type registered.", rawInputType);
 	}
 
-	void RawInputManager::UnregisterRawInputType(const DWORD rawInputType)
+	void RawInput::UnregisterRawInputType(const DWORD rawInputType)
 	{
 		RegisterRawInputType(rawInputType, RIDEV_REMOVE, nullptr);
 		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "'{}' raw input type unregistered.", rawInputType);
 	}
 
-	void RawInputManager::RegisterRawInputType(const DWORD rawInputType, const DWORD flags, const HWND windowHandle)
+	void RawInput::RegisterRawInputType(const DWORD rawInputType, const DWORD flags, const HWND windowHandle)
 	{
 		auto rid = RAWINPUTDEVICE{.dwFlags = flags, .hwndTarget = windowHandle};
 

@@ -52,7 +52,7 @@
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-MessagePump.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-RawInputManager.cppm">
+    <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-RawInput.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Window.Windows\Window.Windows.Detail-Cursor.cppm">
