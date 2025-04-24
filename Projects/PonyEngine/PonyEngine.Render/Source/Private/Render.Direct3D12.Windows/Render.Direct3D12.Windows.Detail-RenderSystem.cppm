@@ -180,9 +180,9 @@ namespace PonyEngine::Render::Direct3D12::Windows
 
 	void RenderSystem::Tick()
 	{
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End frame.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "End previous frame.");
 		direct3D12SubSystem->EndFrame();
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Begin frame.");
+		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Begin new frame.");
 		direct3D12SubSystem->BeginFrame();
 		PONY_LOG(Logger(), PonyDebug::Log::LogType::Verbose, "Render.");
 		direct3D12SubSystem->Render(static_cast<std::uint32_t>(dxgiSubSystem->SwapChain()->GetCurrentBackBufferIndex()));
