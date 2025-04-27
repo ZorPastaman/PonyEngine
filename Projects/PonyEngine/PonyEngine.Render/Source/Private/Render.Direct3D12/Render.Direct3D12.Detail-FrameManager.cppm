@@ -9,8 +9,6 @@
 
 module;
 
-#include <cassert>
-
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
 #include "PonyDebug/Log/Log.h"

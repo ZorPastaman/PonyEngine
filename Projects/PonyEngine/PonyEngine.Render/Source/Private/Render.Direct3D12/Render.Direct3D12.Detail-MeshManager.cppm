@@ -68,7 +68,7 @@ export namespace PonyEngine::Render::Direct3D12
 		class MeshObserver final : public IMeshObserver
 		{
 		public:
-			/// @brief Creates a mesh observer with all fields false.
+			/// @brief Creates a mesh observer with all fields true.
 			[[nodiscard("Pure constructor")]]
 			MeshObserver() noexcept;
 			MeshObserver(const MeshObserver&) = delete;
@@ -141,17 +141,17 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param mesh Mesh to update.
 		/// @param source Mesh source.
 		/// @param observer Mesh observer.
-		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer);
+		void UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) const;
 		/// @brief Updates the whole mesh buffer.
 		/// @param mesh Mesh to update.
 		/// @param source Mesh source.
-		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source);
+		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source) const;
 		/// @brief Updates a mesh buffer.
 		/// @param mesh Mesh to update.
 		/// @param source Mesh source.
 		/// @param dataIndex Data index.
 		/// @param bufferIndex Buffer index.
-		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source, std::uint32_t dataIndex, std::uint32_t bufferIndex);
+		void UpdateBuffer(Mesh& mesh, const Render::Mesh& source, std::uint32_t dataIndex, std::uint32_t bufferIndex) const;
 		/// @brief Updates the mesh additional data.
 		/// @param mesh Mesh to update.
 		/// @param source Mesh source.
@@ -294,9 +294,9 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		for (std::size_t i = meshes.size(); i-- > 0; )
 		{
-			if (meshes[i].use_count() <= 1L)
+			if (const std::shared_ptr<Mesh>& mesh = meshes[i]; mesh.use_count() <= 1L)
 			{
-				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(meshes[i].get()));
+				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(mesh.get()));
 				Remove(i);
 				PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Mesh destroyed.");
 			}
@@ -399,7 +399,7 @@ namespace PonyEngine::Render::Direct3D12
 		mesh = Mesh(std::move(buffer), std::move(heap), std::move(dataTypes), std::move(bufferOffsets), std::move(heapIndices), source.ThreadGroupCounts().Span(), source.BoundingBox());
 	}
 
-	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer)
+	void MeshManager::UpdateBuffers(Mesh& mesh, const Render::Mesh& source, const MeshObserver& observer) const
 	{
 		if (observer.MeshChanged()) [[unlikely]]
 		{
@@ -414,7 +414,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
-	void MeshManager::UpdateBuffer(Mesh& mesh, const Render::Mesh& source)
+	void MeshManager::UpdateBuffer(Mesh& mesh, const Render::Mesh& source) const
 	{
 		Buffer& gpuBuffer = *mesh.Buffer();
 		const std::uint64_t size = gpuBuffer.Data().GetDesc1().Width;
@@ -432,7 +432,7 @@ namespace PonyEngine::Render::Direct3D12
 		d3d12System->CopyPipeline().AddCopyTask(*uploadBuffer, gpuBuffer);
 	}
 
-	void MeshManager::UpdateBuffer(Mesh& mesh, const Render::Mesh& source, const std::uint32_t dataIndex, const std::uint32_t bufferIndex)
+	void MeshManager::UpdateBuffer(Mesh& mesh, const Render::Mesh& source, const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const
 	{
 		const PonyBase::Container::Buffer& sourceBuffer = source.Buffer(dataIndex, bufferIndex);
 		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(sourceBuffer.Size(), HeapType::Upload);

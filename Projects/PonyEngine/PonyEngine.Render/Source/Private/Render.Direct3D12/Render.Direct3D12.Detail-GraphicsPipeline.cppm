@@ -146,6 +146,10 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Data descriptor count.
 		[[nodiscard("Pure function")]]
 		static std::size_t DataDescriptorCount(std::size_t dataCount) noexcept;
+		/// @brief Gets a sum of material descriptors.
+		/// @return Material descriptor count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t MaterialDescriptorCount() const noexcept;
 		/// @brief Gets a sum of mesh descriptors.
 		/// @return Mesh descriptor count.
 		[[nodiscard("Pure function")]]
@@ -157,6 +161,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param elementIndex Element index.
 		/// @return Index the merged heap.
 		std::uint32_t MergedHeapDataIndex(std::uint32_t dataIndex, std::uint32_t elementIndex) noexcept;
+		/// @brief Calculates an index in the merged heap by the original data.
+		/// @param material Material.
+		/// @param dataIndex Material data index.
+		/// @return Index in the merged heap.
+		std::uint32_t MergedHeapMaterialIndex(const Material& material, std::uint32_t dataIndex) noexcept;
 		/// @brief Calculates an index in the merged heap by the original data.
 		/// @param mesh Mesh.
 		/// @param dataIndex Mesh data index.
@@ -190,6 +199,10 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param destOffset Destination offset.
 		/// @return How many descriptors were copied.
 		std::uint32_t CopyDataDescriptors(std::uint32_t destOffset);
+		/// @brief Copies material descriptors into the merged heap.
+		/// @param destOffset Destination offset.
+		/// @return How many descriptors were copied.
+		std::uint32_t CopyMaterialDescriptors(std::uint32_t destOffset);
 		/// @brief Copies mesh descriptors into the merged heap.
 		/// @param destOffset Destination offset.
 		/// @return How many descriptors were copied.
@@ -239,12 +252,18 @@ export namespace PonyEngine::Render::Direct3D12
 		void SortRenderObjects(std::uint32_t cameraIndex);
 		/// @brief Populates render objects.
 		void PopulateRenderObjects(std::uint32_t cameraIndex);
-		/// @brief Populates a pipeline state. If the pipeline state is the same as a previous one, does nothing.
+		/// @brief Populates a root signature. If the root signature is the same as a previous one, does nothing.
 		/// @param prevRootSignature Previous root signature.
-		/// @param prevPipelineState Previous pipeline state.
 		/// @param rootSignature New root signature.
+		void PopulateRootSignature(const RootSignature* prevRootSignature, RootSignature* rootSignature);
+		/// @brief Populates a pipeline state. If the pipeline state is the same as a previous one, does nothing.
+		/// @param prevPipelineState Previous pipeline state.
 		/// @param pipelineState New pipeline state.
-		void PopulatePipelineState(const RootSignature* prevRootSignature, const PipelineState* prevPipelineState, RootSignature* rootSignature, PipelineState* pipelineState);
+		void PopulatePipelineState(const PipelineState* prevPipelineState, PipelineState* pipelineState);
+		/// @brief Populates a material. If the material is the same as a previous one, does nothing.
+		/// @param prevMaterial Previous material.
+		/// @param material New material.
+		void PopulateMaterial(const Material* prevMaterial, Material* material);
 		/// @brief Populates a mesh. If the mesh is the same as a previous one, does nothing.
 		/// @param prevRootSignature Previous root signature.
 		/// @param prevMesh Previous mesh.
@@ -276,6 +295,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<Buffer> renderObjectGpuData; ///< Render object data gpu buffer.
 		std::shared_ptr<DescriptorHeap> renderObjectDataHeap; ///< Render object data heap.
 
+		std::unordered_set<Material*> materials; ///< Render object materials cache.
 		std::unordered_set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<CameraTask> cameraTasks; ///< Camera tasks.
@@ -421,10 +441,21 @@ namespace PonyEngine::Render::Direct3D12
 		return dataCount * RenderObjectData::DataTypeCount;
 	}
 
+	std::uint32_t GraphicsPipeline::MaterialDescriptorCount() const noexcept
+	{
+		std::uint32_t descriptorCount = 0u;
+		for (const Material* const material : materials)
+		{
+			descriptorCount += material->Heap()->HandleCount();
+		}
+
+		return descriptorCount;
+	}
+
 	std::uint32_t GraphicsPipeline::MeshDescriptorCount() const noexcept
 	{
 		std::uint32_t descriptorCount = 0u;
-		for (Mesh* const mesh : meshes)
+		for (const Mesh* const mesh : meshes)
 		{
 			descriptorCount += mesh->Heap()->HandleCount();
 		}
@@ -435,6 +466,11 @@ namespace PonyEngine::Render::Direct3D12
 	std::uint32_t GraphicsPipeline::MergedHeapDataIndex(const std::uint32_t dataIndex, const std::uint32_t elementIndex) noexcept
 	{
 		return originalHeapOffsets[&renderObjectDataHeap->Heap()] + static_cast<std::uint32_t>(DataDescriptorCount(dataIndex)) + elementIndex;
+	}
+
+	std::uint32_t GraphicsPipeline::MergedHeapMaterialIndex(const Material& material, const std::uint32_t dataIndex) noexcept
+	{
+		return originalHeapOffsets[&material.Heap()->Heap()] + material.HeapIndex(dataIndex);
 	}
 
 	std::uint32_t GraphicsPipeline::MergedHeapMeshIndex(const Mesh& mesh, const std::uint32_t dataIndex) noexcept
@@ -484,7 +520,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	bool GraphicsPipeline::Cull(const Camera& camera, const RenderObject& renderObject) noexcept
 	{
-		if (!renderObject.PipelineState().CameraCulling())
+		if (!renderObject.Material().PipelineState()->CameraCulling())
 		{
 			return false;
 		}
@@ -531,15 +567,16 @@ namespace PonyEngine::Render::Direct3D12
 			.mvpInv = renderObject.ModelInverseMatrix() * camera.ViewProjectionInverseMatrix()
 		};
 
-		const ThreadGroupCounts& pipelineStateCounts = renderObject.PipelineState().ThreadGroupCounts();
+		const PipelineState* const pipelineState = renderObject.Material().PipelineState();
+		const ThreadGroupCounts& pipelineStateCounts = pipelineState->ThreadGroupCounts();
 		const PonyShader::Core::ThreadGroupCounts meshGroups = mesh ? mesh->ThreadGroupCounts() : PonyShader::Core::ThreadGroupCounts();
 		const auto context = PonyShader::Core::Context
 		{
 			.dispatchThreadGroupCounts = CreateDispatchThreadGroupCounts(pipelineStateCounts, meshGroups),
 			.pipelineStateThreadGroupCounts = pipelineStateCounts.threadGroupCounts,
 			.meshThreadGroupCounts = meshGroups,
-			.renderQueue = renderObject.PipelineState().RenderQueue(),
-			.isTransparent = renderObject.PipelineState().IsTransparent(),
+			.renderQueue = pipelineState->RenderQueue(),
+			.isTransparent = pipelineState->IsTransparent(),
 			.isFlipped = transform.mvp.Determinant() < 0.f
 		};
 
@@ -603,7 +640,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::MergeHeaps()
 	{
-		std::uint32_t descriptorCount = DataDescriptorCount() + MeshDescriptorCount();
+		std::uint32_t descriptorCount = DataDescriptorCount() + MaterialDescriptorCount() + MeshDescriptorCount();
 		if (!mergedDataHeap || mergedDataHeap->HandleCount() < descriptorCount)
 		{
 			mergedDataHeap = D3D12System().DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, descriptorCount, true);
@@ -613,6 +650,7 @@ namespace PonyEngine::Render::Direct3D12
 		originalHeapOffsets.clear();
 
 		descriptorCount = CopyDataDescriptors(0u);
+		descriptorCount += CopyMaterialDescriptors(descriptorCount);
 		descriptorCount += CopyMeshDescriptors(descriptorCount);
 
 		for (std::uint32_t i = descriptorCount; i < mergedDataHeap->HandleCount(); ++i)
@@ -635,11 +673,34 @@ namespace PonyEngine::Render::Direct3D12
 		return descriptorCount;
 	}
 
+	std::uint32_t GraphicsPipeline::CopyMaterialDescriptors(const std::uint32_t destOffset)
+	{
+		std::uint32_t descriptorCount = 0u;
+
+		for (const Material* const material : materials)
+		{
+			const DescriptorHeap* const heap = material->Heap();
+			const std::uint32_t handleCount = heap->HandleCount();
+			const std::uint32_t destIndex = destOffset + descriptorCount;
+
+			originalHeapOffsets[&heap->Heap()] = destIndex;
+			if (handleCount > 0u)
+			{
+				D3D12System().Device().CopyDescriptorsSimple(handleCount, mergedDataHeap->CpuHandle(destIndex),
+					material->Heap()->CpuHandle(0u), D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+			}
+
+			descriptorCount += handleCount;
+		}
+
+		return descriptorCount;
+	}
+
 	std::uint32_t GraphicsPipeline::CopyMeshDescriptors(const std::uint32_t destOffset)
 	{
 		std::uint32_t descriptorCount = 0u;
 
-		for (Mesh* const mesh : meshes)
+		for (const Mesh* const mesh : meshes)
 		{
 			const DescriptorHeap* const heap = mesh->Heap();
 			const std::uint32_t handleCount = heap->HandleCount();
@@ -1041,8 +1102,8 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			const RenderObject* const leftRenderObject = renderObjects[left.renderObjectIndex];
 			const RenderObject* const rightRenderObject = renderObjects[right.renderObjectIndex];
-			const PipelineState* const leftPipelineState = &leftRenderObject->PipelineState();
-			const PipelineState* const rightPipelineState = &rightRenderObject->PipelineState();
+			const PipelineState* const leftPipelineState = leftRenderObject->Material().PipelineState();
+			const PipelineState* const rightPipelineState = rightRenderObject->Material().PipelineState();
 
 			if (leftPipelineState->RenderQueue() != rightPipelineState->RenderQueue())
 			{
@@ -1084,24 +1145,24 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			const RenderObjectTask& baseTask = tasks[baseIndex];
 			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
-			const PipelineState& basePipelineState = baseRenderObject->PipelineState();
-			if (basePipelineState.IsTransparent())
+			const PipelineState* const basePipelineState = baseRenderObject->Material().PipelineState();
+			if (basePipelineState->IsTransparent())
 			{
 				continue;
 			}
-			const RootSignature* const baseRootSignature = basePipelineState.RootSignature();
+			const RootSignature* const baseRootSignature = basePipelineState->RootSignature();
 
 			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
 			{
 				const RenderObjectTask& targetTask = tasks[targetIndex];
 				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
-				const PipelineState& targetPipelineState = targetRenderObject->PipelineState();
-				if (targetPipelineState.IsTransparent() || targetPipelineState.RenderQueue() != basePipelineState.RenderQueue())
+				const PipelineState* const targetPipelineState = targetRenderObject->Material().PipelineState();
+				if (targetPipelineState->IsTransparent() || targetPipelineState->RenderQueue() != basePipelineState->RenderQueue())
 				{
 					break;
 				}
 
-				if (targetPipelineState.RootSignature() == baseRootSignature)
+				if (targetPipelineState->RootSignature() == baseRootSignature)
 				{
 					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
 					break;
@@ -1114,24 +1175,53 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			const RenderObjectTask& baseTask = tasks[baseIndex];
 			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
-			const PipelineState& basePipelineState = baseRenderObject->PipelineState();
-			if (basePipelineState.IsTransparent())
+			const PipelineState* const basePipelineState = baseRenderObject->Material().PipelineState();
+			if (basePipelineState->IsTransparent())
 			{
 				continue;
 			}
-			const RootSignature* const baseRootSignature = basePipelineState.RootSignature();
+			const RootSignature* const baseRootSignature = basePipelineState->RootSignature();
 
 			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
 			{
 				const RenderObjectTask& targetTask = tasks[targetIndex];
 				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
-				const PipelineState& targetPipelineState = targetRenderObject->PipelineState();
-				if (targetPipelineState.IsTransparent() || targetPipelineState.RenderQueue() != basePipelineState.RenderQueue() || targetPipelineState.RootSignature() != baseRootSignature)
+				const PipelineState* const targetPipelineState = targetRenderObject->Material().PipelineState();
+				if (targetPipelineState->IsTransparent() || targetPipelineState->RenderQueue() != basePipelineState->RenderQueue() || targetPipelineState->RootSignature() != baseRootSignature)
 				{
 					break;
 				}
 
-				if (&targetPipelineState == &basePipelineState)
+				if (targetPipelineState == basePipelineState)
+				{
+					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
+					break;
+				}
+			}
+		}
+
+		// Group opaque objects with the same material together.
+		for (std::size_t baseIndex = 0; baseIndex < tasks.size() - 2; ++baseIndex)
+		{
+			const RenderObjectTask& baseTask = tasks[baseIndex];
+			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
+			const Material& baseMaterial = baseRenderObject->Material();
+			if (baseMaterial.PipelineState()->IsTransparent())
+			{
+				continue;
+			}
+
+			for (std::size_t targetIndex = baseIndex + 1; targetIndex < tasks.size(); ++targetIndex)
+			{
+				const RenderObjectTask& targetTask = tasks[targetIndex];
+				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
+				const Material& targetMaterial = targetRenderObject->Material();
+				if (targetMaterial.PipelineState()->IsTransparent() || targetMaterial.PipelineState() != baseMaterial.PipelineState())
+				{
+					break;
+				}
+
+				if (&targetRenderObject->Material() == &baseRenderObject->Material())
 				{
 					PonyBase::Utility::Move(tasks, targetIndex, baseIndex + 1);
 					break;
@@ -1144,8 +1234,8 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			const RenderObjectTask& baseTask = tasks[baseIndex];
 			const RenderObject* const baseRenderObject = renderObjects[baseTask.renderObjectIndex];
-			const PipelineState& basePipelineState = baseRenderObject->PipelineState();
-			if (basePipelineState.IsTransparent())
+			const Material& baseMaterial = baseRenderObject->Material();
+			if (baseMaterial.PipelineState()->IsTransparent())
 			{
 				continue;
 			}
@@ -1155,8 +1245,8 @@ namespace PonyEngine::Render::Direct3D12
 			{
 				const RenderObjectTask& targetTask = tasks[targetIndex];
 				const RenderObject* const targetRenderObject = renderObjects[targetTask.renderObjectIndex];
-				const PipelineState& targetPipelineState = targetRenderObject->PipelineState();
-				if (targetPipelineState.IsTransparent() || targetPipelineState.RenderQueue() != basePipelineState.RenderQueue() || &targetPipelineState != &basePipelineState)
+				const Material& targetMaterial = targetRenderObject->Material();
+				if (targetMaterial.PipelineState()->IsTransparent() || &targetMaterial != &baseMaterial)
 				{
 					break;
 				}
@@ -1177,15 +1267,19 @@ namespace PonyEngine::Render::Direct3D12
 
 		const RootSignature* prevRootSignature = nullptr;
 		const PipelineState* prevPipelineState = nullptr;
+		const Material* prevMaterial = nullptr;
 		const Mesh* prevMesh = nullptr;
 		for (const RenderObjectTask& renderObjectTask : cameraTasks[cameraIndex].renderObjectTasks)
 		{
 			RenderObject* const renderObject = renderObjects[renderObjectTask.renderObjectIndex];
-			PipelineState* const pipelineState = &renderObject->PipelineState();
+			Material* const material = &renderObject->Material();
+			PipelineState* const pipelineState = material->PipelineState();
 			RootSignature* const rootSignature = pipelineState->RootSignature();
 			const Mesh* const mesh = renderObject->Mesh();
 
-			PopulatePipelineState(prevRootSignature, prevPipelineState, rootSignature, pipelineState);
+			PopulateRootSignature(prevRootSignature, rootSignature);
+			PopulatePipelineState(prevPipelineState, pipelineState);
+			PopulateMaterial(prevMaterial, material);
 			PopulateMesh(prevRootSignature, prevMesh, rootSignature, mesh);
 			PopulateEngineData(rootSignature, renderObjectTask.dataIndex);
 
@@ -1194,19 +1288,38 @@ namespace PonyEngine::Render::Direct3D12
 
 			prevRootSignature = rootSignature;
 			prevPipelineState = pipelineState;
+			prevMaterial = material;
 			prevMesh = mesh;
 		}
 	}
 
-	void GraphicsPipeline::PopulatePipelineState(const RootSignature* const prevRootSignature, const PipelineState* const prevPipelineState, RootSignature* const rootSignature, PipelineState* const pipelineState)
+	void GraphicsPipeline::PopulateRootSignature(const RootSignature* const prevRootSignature, RootSignature* const rootSignature)
 	{
 		if (rootSignature != prevRootSignature)
 		{
 			CommandList().SetGraphicsRootSignature(&rootSignature->RootSig());
 		}
+	}
+
+	void GraphicsPipeline::PopulatePipelineState(const PipelineState* const prevPipelineState, PipelineState* const pipelineState)
+	{
 		if (pipelineState != prevPipelineState)
 		{
 			CommandList().SetPipelineState(pipelineState->State());
+		}
+	}
+
+	void GraphicsPipeline::PopulateMaterial(const Material* prevMaterial, Material* const material)
+	{
+		if (material != prevMaterial)
+		{
+			for (const auto& [dataType, dataSlot] : material->PipelineState()->RootSignature()->DataSlots())
+			{
+				if (const std::optional<std::uint32_t> materialDataIndex = material->DataTypeIndex(dataType))
+				{
+					CommandList().SetGraphicsRootDescriptorTable(dataSlot, mergedDataHeap->GpuHandle(MergedHeapMaterialIndex(*material, materialDataIndex.value())));
+				}
+			}
 		}
 	}
 

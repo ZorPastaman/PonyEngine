@@ -21,6 +21,7 @@ import :ICopyPipeline;
 import :IDescriptorHeapManager;
 import :IFrameManager;
 import :IGraphicsPipeline;
+import :IMaterialManager;
 import :IMeshManager;
 import :IPipelineStateManager;
 import :IResourceManager;
@@ -123,6 +124,15 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Pipeline state manager.
 		[[nodiscard("Pure function")]]
 		virtual const IPipelineStateManager& PipelineStateManager() const noexcept = 0;
+
+		/// @brief Gets the material manager.
+		/// @return Material manager.
+		[[nodiscard("Pure function")]]
+		virtual IMaterialManager& MaterialManager() noexcept = 0;
+		/// @brief Gets the material manager.
+		/// @return Material manager.
+		[[nodiscard("Pure function")]]
+		virtual const IMaterialManager& MaterialManager() const noexcept = 0;
 
 		/// @brief Gets the copy pipeline.
 		/// @return Copy pipeline.

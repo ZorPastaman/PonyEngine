@@ -182,6 +182,19 @@ namespace Game
 		const auto opaquePipelineState = std::make_shared<PonyEngine::Render::PipelineState>(opaquePipelineStateParams);
 		const auto transparentPipelineState = std::make_shared<PonyEngine::Render::PipelineState>(transparentPipelineStateParams);
 
+		const auto opaqueMaterialParams = PonyEngine::Render::MaterialParams
+		{
+			.pipelineState = opaquePipelineState,
+			.name = "Opaque"
+		};
+		const auto transparentMaterialParams = PonyEngine::Render::MaterialParams
+		{
+			.pipelineState = transparentPipelineState,
+			.name = "Transparent"
+		};
+		const auto opaqueMaterial = std::make_shared<PonyEngine::Render::Material>(opaqueMaterialParams);
+		const auto transparentMaterial = std::make_shared<PonyEngine::Render::Material>(transparentMaterialParams);
+
 		const auto boxMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array
 		{
 			PonyShader::Mesh::Meshlet(0u, 0u, 7u, 6u),
@@ -410,77 +423,77 @@ namespace Game
 
 		floor = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = floorMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>::Predefined::Zero, PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(10.f, 0.1f, 10.f)),
 			.name = "Floor"
 		});
 		centralColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = centralColumnMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(0.f, 2.5f, 0.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(-1.f, 5.f, 1.f)),
 			.name = "CentralColumn"
 		});
 		leftNearColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = leftNearColumnMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-8.f, 6.f, -8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
 			.name = "LeftNearColumn"
 		});
 		leftFarColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = leftFarColumnMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-8.f, 6.f, 8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
 			.name = "LeftFarColumn"
 		});
 		rightFarColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = rightFarColumnMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(8.f, 6.f, 8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
 			.name = "RightFarColumn"
 		});
 		rightNearColumn = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = rightNearColumnMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(8.f, 6.f, -8.f), PonyMath::Core::Quaternion<float>::Predefined::Identity, PonyMath::Core::Vector3<float>(1.f, 8.f, 1.f)),
 			.name = "RightNearColumn"
 		});
 		pyramid = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = opaquePipelineState,
+			.material = opaqueMaterial,
 			.mesh = pyramidMesh,
 			.modelMatrix = pyramidTransform.TrsMatrix(),
 			.name = "Pyramid"
 		});
 		leftNearGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = transparentPipelineState,
+			.material = transparentMaterial,
 			.mesh = leftNearGlassMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-5.f, 4.f, -5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 45.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
 			.name = "LeftNearGlass"
 		});
 		leftFarGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = transparentPipelineState,
+			.material = transparentMaterial,
 			.mesh = leftFarGlassMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(-5.f, 4.f, 5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 135.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
 			.name = "LeftFarGlass"
 		});
 		rightFarGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = transparentPipelineState,
+			.material = transparentMaterial,
 			.mesh = rightFarGlassMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(5.f, 4.f, 5.f), PonyMath::Core::Vector3<float>::Predefined::Up, 225.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
 			.name = "RightFarGlass"
 		});
 		rightNearGlass = renderSystem->RenderObjectManager().CreateObject(PonyEngine::Render::RenderObjectParams
 		{
-			.pipelineState = transparentPipelineState,
+			.material = transparentMaterial,
 			.mesh = rightNearGlassMesh,
 			.modelMatrix = PonyMath::Core::TrsMatrix(PonyMath::Core::Vector3<float>(5.f, 4.f, -5.f), PonyMath::Core::Vector3<float>::Predefined::Up, -45.f * PonyMath::Core::DegToRad<float>, PonyMath::Core::Vector3<float>(6.f, 6.f, 0.1f)),
 			.name = "RightNearGlass"
