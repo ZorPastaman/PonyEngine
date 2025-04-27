@@ -42,10 +42,6 @@ export namespace PonyEngine::Render
 		/// @param params Pipeline state parameters.
 		[[nodiscard("Pure constructor")]]
 		explicit PipelineState(const PipelineStateParams& params);
-		/// @brief Creates a pipeline state.
-		/// @param params Pipeline state parameters.
-		[[nodiscard("Pure constructor")]]
-		explicit PipelineState(PipelineStateParams&& params);
 		/// @brief Copy constructor.
 		/// @param other Copy source.
 		[[nodiscard("Pure constructor")]]
@@ -64,9 +60,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the root signature shader.
 		/// @param shader Root signature shader. Relative path to a shader file without extension.
 		void RootSignatureShader(std::string_view shader);
-		/// @brief Sets the root signature shader.
-		/// @param shader Root signature shader. Relative path to a shader file without extension.
-		void RootSignatureShader(std::string&& shader);
 		/// @brief Gets the amplification shader.
 		/// @return Amplification shader. Relative path to a shader file without extension.
 		[[nodiscard("Pure function")]]
@@ -74,9 +67,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the amplification shader.
 		/// @param shader Amplification shader. Relative path to a shader file without extension.
 		void AmplificationShader(std::string_view shader);
-		/// @brief Sets the amplification shader.
-		/// @param shader Amplification shader. Relative path to a shader file without extension.
-		void AmplificationShader(std::string&& shader);
 		/// @brief Gets the mesh shader.
 		/// @return Mesh shader. Relative path to a shader file without extension.
 		[[nodiscard("Pure function")]]
@@ -84,9 +74,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the mesh shader.
 		/// @param shader Mesh shader. Relative path to a shader file without extension.
 		void MeshShader(std::string_view shader);
-		/// @brief Sets the mesh shader.
-		/// @param shader Mesh shader. Relative path to a shader file without extension.
-		void MeshShader(std::string&& shader);
 		/// @brief Gets the pixel shader.
 		/// @return Pixel shader. Relative path to a shader file without extension.
 		[[nodiscard("Pure function")]]
@@ -94,9 +81,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the pixel shader.
 		/// @param shader Pixel shader. Relative path to a shader file without extension.
 		void PixelShader(std::string_view shader);
-		/// @brief Sets the pixel shader.
-		/// @param shader Pixel shader. Relative path to a shader file without extension.
-		void PixelShader(std::string&& shader);
 
 		/// @brief Gets the blend parameters.
 		/// @return Blend parameters.
@@ -136,9 +120,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the data slots.
 		/// @param data Data slots.
 		void DataSlots(const std::unordered_map<std::string, std::uint32_t>& data);
-		/// @brief Sets the data slots.
-		/// @param data Data slots.
-		void DataSlots(std::unordered_map<std::string, std::uint32_t>&& data);
 
 		/// @brief Gets the thread group counts.
 		/// @return Thread group counts.
@@ -171,9 +152,6 @@ export namespace PonyEngine::Render
 		/// @brief Sets the name.
 		/// @param name Name to set.
 		void Name(std::string_view name);
-		/// @brief Sets the name.
-		/// @param name Name to set.
-		void Name(std::string&& name);
 
 		/// @brief Adds a pipeline state observer.
 		/// @param observer Pipeline state observer to add. It must be unique. It must live longer than the pipeline state.
@@ -254,22 +232,6 @@ namespace PonyEngine::Render
 	{
 	}
 
-	PipelineState::PipelineState(PipelineStateParams&& params) :
-		rootSignatureShader(std::move(params.rootSignatureShader)),
-		amplificationShader(std::move(params.amplificationShader)),
-		meshShader(std::move(params.meshShader)),
-		pixelShader(std::move(params.pixelShader)),
-		blend(std::move(params.blend)),
-		rasterizer(std::move(params.rasterizer)),
-		depthStencil(std::move(params.depthStencil)),
-		dataSlots(std::move(params.dataSlots)),
-		threadGroupCounts(std::move(params.threadGroupCounts)),
-		renderQueue{params.renderQueue},
-		cameraCulling{params.cameraCulling},
-		name(std::move(params.name))
-	{
-	}
-
 	PipelineState::PipelineState(const PipelineState& other) :
 		rootSignatureShader(other.rootSignatureShader),
 		amplificationShader(other.amplificationShader),
@@ -318,17 +280,6 @@ namespace PonyEngine::Render
 		OnRootSignatureShaderChanged();
 	}
 
-	void PipelineState::RootSignatureShader(std::string&& shader)
-	{
-		if (rootSignatureShader == shader)
-		{
-			return;
-		}
-
-		rootSignatureShader = std::move(shader);
-		OnRootSignatureShaderChanged();
-	}
-
 	std::string_view PipelineState::AmplificationShader() const noexcept
 	{
 		return amplificationShader;
@@ -342,17 +293,6 @@ namespace PonyEngine::Render
 		}
 
 		amplificationShader = shader;
-		OnAmplificationShaderChanged();
-	}
-
-	void PipelineState::AmplificationShader(std::string&& shader)
-	{
-		if (amplificationShader == shader)
-		{
-			return;
-		}
-
-		amplificationShader = std::move(shader);
 		OnAmplificationShaderChanged();
 	}
 
@@ -372,17 +312,6 @@ namespace PonyEngine::Render
 		OnMeshShaderChanged();
 	}
 
-	void PipelineState::MeshShader(std::string&& shader)
-	{
-		if (meshShader == shader)
-		{
-			return;
-		}
-
-		meshShader = std::move(shader);
-		OnMeshShaderChanged();
-	}
-
 	std::string_view PipelineState::PixelShader() const noexcept
 	{
 		return pixelShader;
@@ -396,17 +325,6 @@ namespace PonyEngine::Render
 		}
 
 		pixelShader = shader;
-		OnPixelShaderChanged();
-	}
-
-	void PipelineState::PixelShader(std::string&& shader)
-	{
-		if (pixelShader == shader)
-		{
-			return;
-		}
-
-		pixelShader = std::move(shader);
 		OnPixelShaderChanged();
 	}
 
@@ -507,17 +425,6 @@ namespace PonyEngine::Render
 		OnDataSlotsChanged();
 	}
 
-	void PipelineState::DataSlots(std::unordered_map<std::string, std::uint32_t>&& data)
-	{
-		if (dataSlots == data)
-		{
-			return;
-		}
-
-		dataSlots = std::move(data);
-		OnDataSlotsChanged();
-	}
-
 	const struct ThreadGroupCounts& PipelineState::ThreadGroupCounts() const noexcept
 	{
 		return threadGroupCounts;
@@ -579,17 +486,6 @@ namespace PonyEngine::Render
 		}
 
 		this->name = name;
-		OnNameChanged();
-	}
-
-	void PipelineState::Name(std::string&& name)
-	{
-		if (this->name == name)
-		{
-			return;
-		}
-
-		this->name = std::move(name);
 		OnNameChanged();
 	}
 

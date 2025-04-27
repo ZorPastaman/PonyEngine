@@ -32,7 +32,6 @@ export namespace PonyEngine::Input
 		[[nodiscard("Pure function")]]
 		virtual const std::function<void(float)>& Action() const noexcept override;
 		virtual void Action(const std::function<void(float)>& action) noexcept override;
-		virtual void Action(std::function<void(float)>&& action) noexcept override;
 
 		/// @brief Executes the input event action.
 		/// @param value Input event value.
@@ -73,18 +72,6 @@ namespace PonyEngine::Input
 		}
 
 		func = action;
-	}
-
-	void InputReceiver::Action(std::function<void(float)>&& action) noexcept
-	{
-		if (action == nullptr)
-		{
-			Reset();
-
-			return;
-		}
-
-		func = std::move(action);
 	}
 
 	void InputReceiver::Execute(const float value)
