@@ -27,8 +27,11 @@ import PonyDebug.Log;
 import PonyEngine.Render.Direct3D12;
 
 import :IGraphicsPipeline;
+import :IMaterialManager;
+import :IMeshManager;
 import :ISubSystemContext;
-import :PipelineState;
+import :Material;
+import :Mesh;
 import :RenderObject;
 
 export namespace PonyEngine::Render::Direct3D12
@@ -54,7 +57,6 @@ export namespace PonyEngine::Render::Direct3D12
 
 		RenderObjectManager& operator =(const RenderObjectManager&) = delete;
 		RenderObjectManager& operator =(RenderObjectManager&&) = delete;
-		
 
 	private:
 		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
@@ -72,15 +74,15 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::shared_ptr<IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render pipeline state.");
-		const std::shared_ptr<PipelineState> renderPipelineState = d3d12System->PipelineStateManager().CreatePipelineState(params.pipelineState);
-		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render pipeline state created.");
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render material.");
+		const std::shared_ptr<Material> renderMaterial = d3d12System->MaterialManager().CreateMaterial(params.material);
+		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render material created.");
 
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create render mesh.");
 		const std::shared_ptr<Mesh> renderMesh = params.mesh ? d3d12System->MeshManager().CreateMesh(params.mesh) : nullptr;
 		PONY_LOG(d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Render mesh created");
 
-		const auto renderObject = std::make_shared<RenderObject>(renderPipelineState, renderMesh, params.modelMatrix);
+		const auto renderObject = std::make_shared<RenderObject>(std::move(renderMaterial), std::move(renderMesh), params.modelMatrix);
 		renderObject->Name(params.name);
 		renderObjects.push_back(renderObject);
 		d3d12System->GraphicsPipeline().AddRenderObject(*renderObject);

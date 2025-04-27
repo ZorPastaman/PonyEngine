@@ -50,7 +50,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param threadGroupCounts Thread group counts.
 		/// @param boundingBox Bounding box.
 		[[nodiscard("Pure constructor")]]
-		Mesh(const std::shared_ptr<class Buffer>& buffer, const std::shared_ptr<DescriptorHeap>& heap, std::span<const std::string> dataTypes,
+		Mesh(const std::shared_ptr<class Buffer>& buffer, const std::shared_ptr<DescriptorHeap>& heap, std::span<const std::string_view> dataTypes,
 			std::span<const std::span<const std::uint64_t>> bufferOffsets, std::span<const std::uint32_t> heapIndices,
 			std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox);
 		/// @brief Creates a mesh.
@@ -64,7 +64,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure constructor")]]
 		Mesh(std::shared_ptr<class Buffer>&& buffer, std::shared_ptr<DescriptorHeap>&& heap, std::vector<std::string>&& dataTypes,
 			std::vector<std::vector<std::uint64_t>>&& bufferOffsets, std::vector<std::uint32_t>&& heapIndices,
-			std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox);
+			std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept;
 		[[nodiscard("Pure constructor")]]
 		Mesh(const Mesh& other) = default;
 		[[nodiscard("Pure constructor")]]
@@ -205,7 +205,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	Mesh::Mesh(const std::shared_ptr<class Buffer>& buffer, const std::shared_ptr<DescriptorHeap>& heap, const std::span<const std::string> dataTypes,
+	Mesh::Mesh(const std::shared_ptr<class Buffer>& buffer, const std::shared_ptr<DescriptorHeap>& heap, const std::span<const std::string_view> dataTypes,
 		const std::span<const std::span<const std::size_t>> bufferOffsets, const std::span<const std::uint32_t> heapIndices, 
 		const std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) :
 		buffer(buffer),
@@ -224,7 +224,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	Mesh::Mesh(std::shared_ptr<class Buffer>&& buffer, std::shared_ptr<DescriptorHeap>&& heap, std::vector<std::string>&& dataTypes,
 		std::vector<std::vector<std::size_t>>&& bufferOffsets, std::vector<std::uint32_t>&& heapIndices, 
-		const std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) :
+		const std::span<const std::uint32_t, 3> threadGroupCounts, const std::optional<PonyMath::Shape::AABB<float>>& boundingBox) noexcept :
 		buffer(std::move(buffer)),
 		heap(std::move(heap)),
 		dataTypes(std::move(dataTypes)),
@@ -257,7 +257,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	std::optional<std::uint32_t> Mesh::DataIndex(const std::string_view dataType) const noexcept
 	{
-		for (std::uint32_t i = 0u; i < dataTypes.size(); ++i)
+		for (std::uint32_t i = 0u; i < static_cast<std::uint32_t>(dataTypes.size()); ++i)
 		{
 			if (dataTypes[i] == dataType)
 			{

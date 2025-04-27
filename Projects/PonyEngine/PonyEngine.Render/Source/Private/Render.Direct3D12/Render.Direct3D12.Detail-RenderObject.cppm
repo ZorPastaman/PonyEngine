@@ -18,8 +18,8 @@ import PonyEngine.Render.Direct3D12;
 
 import PonyMath.Core;
 
+import :Material;
 import :Mesh;
-import :PipelineState;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -28,11 +28,17 @@ export namespace PonyEngine::Render::Direct3D12
 	{
 	public:
 		/// @brief Creates a @p RenderObject.
-		/// @param pipelineState Pipeline state.
+		/// @param material Material.
 		/// @param mesh Mesh.
 		/// @param modelMatrix Model matrix.
 		[[nodiscard("Pure constructor")]]
-		RenderObject(const std::shared_ptr<PipelineState>& pipelineState, const std::shared_ptr<Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept;
+		RenderObject(const std::shared_ptr<class Material>& material, const std::shared_ptr<class Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept;
+		/// @brief Creates a @p RenderObject.
+		/// @param material Material.
+		/// @param mesh Mesh.
+		/// @param modelMatrix Model matrix.
+		[[nodiscard("Pure constructor")]]
+		RenderObject(std::shared_ptr<class Material>&& material, std::shared_ptr<class Mesh>&& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept;
 		[[nodiscard("Pure constructor")]]
 		RenderObject(const RenderObject& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -46,14 +52,14 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Core::Matrix4x4<float>& ModelInverseMatrix() const noexcept override;
 
-		/// @brief Gets the pipeline state.
-		/// @return Pipeline state.
+		/// @brief Gets the material.
+		/// @return Material.
 		[[nodiscard("Pure function")]]
-		class PipelineState& PipelineState() noexcept;
-		/// @brief Gets the pipeline state.
-		/// @return Pipeline state.
+		class Material& Material() noexcept;
+		/// @brief Gets the material.
+		/// @return Material.
 		[[nodiscard("Pure function")]]
-		const class PipelineState& PipelineState() const noexcept;
+		const class Material& Material() const noexcept;
 
 		/// @brief Gets the mesh.
 		/// @return Mesh.
@@ -72,7 +78,7 @@ export namespace PonyEngine::Render::Direct3D12
 		RenderObject& operator =(RenderObject&& other) noexcept = default;
 
 	private:
-		std::shared_ptr<class PipelineState> pipelineState; ///< Pipeline state.
+		std::shared_ptr<class Material> material; ///< Pipeline state.
 		std::shared_ptr<class Mesh> mesh; ///< Mesh.
 
 		PonyMath::Core::Matrix4x4<float> modelMatrix; ///< Model matrix.
@@ -84,9 +90,16 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	RenderObject::RenderObject(const std::shared_ptr<class PipelineState>& pipelineState, const std::shared_ptr<class Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept :
-		pipelineState(pipelineState),
+	RenderObject::RenderObject(const std::shared_ptr<class Material>& material, const std::shared_ptr<class Mesh>& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept :
+		material(material),
 		mesh(mesh),
+		modelMatrix(modelMatrix)
+	{
+	}
+
+	RenderObject::RenderObject(std::shared_ptr<class Material>&& material, std::shared_ptr<class Mesh>&& mesh, const PonyMath::Core::Matrix4x4<float>& modelMatrix) noexcept :
+		material(std::move(material)),
+		mesh(std::move(mesh)),
 		modelMatrix(modelMatrix)
 	{
 	}
@@ -112,14 +125,14 @@ namespace PonyEngine::Render::Direct3D12
 		return modelInverseMatrix.value();
 	}
 
-	PipelineState& RenderObject::PipelineState() noexcept
+	Material& RenderObject::Material() noexcept
 	{
-		return *pipelineState;
+		return *material;
 	}
 
-	const PipelineState& RenderObject::PipelineState() const noexcept
+	const Material& RenderObject::Material() const noexcept
 	{
-		return *pipelineState;
+		return *material;
 	}
 
 	Mesh* RenderObject::Mesh() noexcept

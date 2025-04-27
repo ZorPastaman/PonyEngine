@@ -31,8 +31,5 @@ export namespace PonyEngine::Input
 		/// @brief Sets the action.
 		/// @param action Action that is called on a receiver event.
 		virtual void Action(const std::function<void(float)>& action) noexcept = 0;
-		/// @brief Sets the action.
-		/// @param action Action that is called on a receiver event.
-		virtual void Action(std::function<void(float)>&& action) noexcept = 0;
 	};
 }

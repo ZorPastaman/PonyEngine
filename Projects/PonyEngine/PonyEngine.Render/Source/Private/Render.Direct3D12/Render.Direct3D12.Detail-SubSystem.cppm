@@ -42,13 +42,15 @@ import :ICopyPipeline;
 import :IDescriptorHeapManager;
 import :IFrameManager;
 import :IGraphicsPipeline;
-import :IPipelineStateManager;
+import :IMaterialManager;
 import :IMeshManager;
+import :IPipelineStateManager;
 import :IRenderSystemContext;
 import :IRootSignatureManager;
 import :ISubSystemContext;
-import :PipelineStateManager;
+import :MaterialManager;
 import :MeshManager;
+import :PipelineStateManager;
 import :ObjectUtility;
 import :RenderObjectManager;
 import :ResourceManager;
@@ -168,6 +170,11 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IPipelineStateManager& PipelineStateManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual IMaterialManager& MaterialManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const IMaterialManager& MaterialManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual ICopyPipeline& CopyPipeline() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const ICopyPipeline& CopyPipeline() const noexcept override;
@@ -194,6 +201,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::unique_ptr<class ShaderManager> shaderManager; ///< Shader manager.
 		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<class PipelineStateManager> pipelineStateManager; ///< Pipeline state manager.
+		std::unique_ptr<class MaterialManager> materialManager; ///< Material manager.
 
 		std::unique_ptr<class CameraManager> cameraManager; ///< Camera manager.
 		std::unique_ptr<class RenderObjectManager> renderObjectManager; ///< Render object manager.
@@ -277,6 +285,10 @@ namespace PonyEngine::Render::Direct3D12
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy camera manager.");
 		cameraManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Camera manager destroyed");
+
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy material manager.");
+		materialManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager destroyed.");
 
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy pipeline state manager.");
 		pipelineStateManager.reset();
@@ -384,6 +396,10 @@ namespace PonyEngine::Render::Direct3D12
 		pipelineStateManager = std::make_unique<class PipelineStateManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Pipeline state manager created.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create material manager.");
+		materialManager = std::make_unique<class MaterialManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Material manager created.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create camera manager.");
 		cameraManager = std::make_unique<class CameraManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Camera manager created.");
@@ -401,6 +417,7 @@ namespace PonyEngine::Render::Direct3D12
 	{
 		renderObjectManager->Clean();
 		cameraManager->Clean();
+		materialManager->Clean();
 		pipelineStateManager->Clean();
 		rootSignatureManager->Clean();
 		shaderManager->Clean();
@@ -415,6 +432,7 @@ namespace PonyEngine::Render::Direct3D12
 		back->CurrentBackBufferIndex(backBufferIndex);
 
 		meshManager->Tick();
+		materialManager->Tick();
 		pipelineStateManager->Tick();
 		graphicsPipeline->Prepare();
 
@@ -432,7 +450,6 @@ namespace PonyEngine::Render::Direct3D12
 
 		graphicsPipeline->Clear();
 		copyPipeline->Clear();
-		meshManager->Clear();
 	}
 
 	PonyDebug::Log::ILogger& SubSystem::Logger() noexcept
@@ -533,6 +550,16 @@ namespace PonyEngine::Render::Direct3D12
 	const IPipelineStateManager& SubSystem::PipelineStateManager() const noexcept
 	{
 		return *pipelineStateManager;
+	}
+
+	IMaterialManager& SubSystem::MaterialManager() noexcept
+	{
+		return *materialManager;
+	}
+
+	const IMaterialManager& SubSystem::MaterialManager() const noexcept
+	{
+		return *materialManager;
 	}
 
 	ICopyPipeline& SubSystem::CopyPipeline() noexcept
