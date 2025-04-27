@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cassert>
-
 export module PonyBase.Container:Buffer;
 
 import <cstddef>;
@@ -99,24 +95,24 @@ export namespace PonyBase::Container
 		/// @param index Object index.
 		/// @return Object.
 		template<typename T> [[nodiscard("Pure function")]]
-		T& Get(std::size_t index) noexcept;
+		T& Get(std::size_t index);
 		/// @brief Gets a part of the buffer as an objects of type @p T.
 		/// @tparam T Object type. Its size must be @ Stride().
 		/// @param index Object index.
 		/// @return Object.
 		template<typename T> [[nodiscard("Pure function")]]
-		const T& Get(std::size_t index) const noexcept;
+		const T& Get(std::size_t index) const;
 
 		/// @brief Gets a buffer as a span of type @p T.
 		/// @tparam T Object type. Its size must be @ Stride().
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::span<T> Span() noexcept;
+		std::span<T> Span();
 		/// @brief Gets a buffer as a span of type @p T.
 		/// @tparam T Object type. Its size must be @ Stride().
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::span<const T> Span() const noexcept;
+		std::span<const T> Span() const;
 
 		/// @brief Copies data from the @p source.
 		/// @param source Data source. Its stride and count must be the same as the stride and count if this buffer.
@@ -213,33 +209,45 @@ namespace PonyBase::Container
 	}
 
 	template<typename T>
-	T& Buffer::Get(const std::size_t index) noexcept
+	T& Buffer::Get(const std::size_t index)
 	{
-		assert(sizeof(T) == stride && "Incorrect type.");
+		if (sizeof(T) != stride) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
 
 		return reinterpret_cast<T*>(data.get())[index];
 	}
 
 	template<typename T>
-	const T& Buffer::Get(std::size_t index) const noexcept
+	const T& Buffer::Get(std::size_t index) const
 	{
-		assert(sizeof(T) == stride && "Incorrect type.");
+		if (sizeof(T) != stride) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
 
 		return reinterpret_cast<const T*>(data.get())[index];
 	}
 
 	template<typename T>
-	std::span<T> Buffer::Span() noexcept
+	std::span<T> Buffer::Span()
 	{
-		assert(sizeof(T) == stride && "Incorrect type.");
+		if (sizeof(T) != stride) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
 
 		return std::span<T>(reinterpret_cast<T*>(data.get()), count);
 	}
 
 	template<typename T>
-	std::span<const T> Buffer::Span() const noexcept
+	std::span<const T> Buffer::Span() const
 	{
-		assert(sizeof(T) == stride && "Incorrect type.");
+		if (sizeof(T) != stride) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
 
 		return std::span<const T>(reinterpret_cast<const T*>(data.get()), count);
 	}

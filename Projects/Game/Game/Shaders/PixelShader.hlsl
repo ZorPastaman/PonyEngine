@@ -7,21 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-struct PixelInput
-{
-	float4 position : SV_POSITION;
-	float4 color : COLOR;
-};
-
 struct PixelOutput
 {
 	float4 color : SV_TARGET;
 };
 
-PixelOutput main(PixelInput input)
+StructuredBuffer<float4> Color : register(t4);
+
+PixelOutput main()
 {
 	PixelOutput output;
-	output.color = input.color;
+	output.color = Color[0];
 
 	return output;
 }
