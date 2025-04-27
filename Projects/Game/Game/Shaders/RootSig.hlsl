@@ -11,7 +11,7 @@
 // 0: Context, Transform
 // 1: Meshlets, Vertex indices and Primitives
 // 2: Positions
-// 3: Colors
+// 3: Color
 
 // GPU:
 // b0: Context
@@ -20,7 +20,7 @@
 // t1: Vertex indices
 // t2: Primitives
 // t3: Positions
-// t4: Colors
+// t4: Color
 
 #define ROOT_SIG \
 	"DescriptorTable(CBV(b0, numDescriptors = 2)), " \
