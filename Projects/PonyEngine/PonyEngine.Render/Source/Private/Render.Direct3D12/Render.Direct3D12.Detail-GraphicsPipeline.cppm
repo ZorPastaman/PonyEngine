@@ -236,6 +236,10 @@ export namespace PonyEngine::Render::Direct3D12
 		void AddRenderDataBeginBarriers();
 		/// @brief Adds render data end barriers.
 		void AddRenderDataEndBarriers();
+		/// @brief Adds material begin barriers.
+		void AddMaterialBeginBarriers();
+		/// @brief Adds material end barriers.
+		void AddMaterialEndBarriers();
 		/// @brief Adds mesh begin barriers.
 		void AddMeshBeginBarriers();
 		/// @brief Adds mesh end barriers.
@@ -318,6 +322,7 @@ namespace PonyEngine::Render::Direct3D12
 		cameras.reserve(8);
 		renderObjects.reserve(64);
 		renderObjectData.reserve(8 * 64);
+		materials.reserve(64);
 		meshes.reserve(64);
 		cameraTasks.reserve(8);
 		originalHeapOffsets.reserve(16 * 64);
@@ -422,6 +427,7 @@ namespace PonyEngine::Render::Direct3D12
 
 	void GraphicsPipeline::Clear() noexcept
 	{
+		materials.clear();
 		meshes.clear();
 		renderObjectData.clear();
 	}
@@ -544,6 +550,8 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			throw std::runtime_error("Max render object count is exceeded.");
 		}
+
+		materials.insert(&renderObject.Material());
 
 		Mesh* const mesh = renderObject.Mesh();
 		if (mesh)
@@ -942,12 +950,14 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::AddRenderBeginBarriers()
 	{
 		AddRenderDataBeginBarriers();
+		AddMaterialBeginBarriers();
 		AddMeshBeginBarriers();
 	}
 
 	void GraphicsPipeline::AddRenderEndBarriers()
 	{
 		AddRenderDataEndBarriers();
+		AddMaterialEndBarriers();
 		AddMeshEndBarriers();
 	}
 
@@ -979,6 +989,42 @@ namespace PonyEngine::Render::Direct3D12
 			.Size = UINT64_MAX
 		};
 		AddBarrier(barrier);
+	}
+
+	void GraphicsPipeline::AddMaterialBeginBarriers()
+	{
+		for (Material* const material : materials)
+		{
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.pResource = &material->Buffer()->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(bufferBarrier);
+		}
+	}
+
+	void GraphicsPipeline::AddMaterialEndBarriers()
+	{
+		for (Material* const material : materials)
+		{
+			const auto bufferBarrier = D3D12_BUFFER_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.pResource = &material->Buffer()->Data(),
+				.Offset = 0UL,
+				.Size = UINT64_MAX
+			};
+			AddBarrier(bufferBarrier);
+		}
 	}
 
 	void GraphicsPipeline::AddMeshBeginBarriers()

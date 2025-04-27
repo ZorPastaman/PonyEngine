@@ -22,7 +22,6 @@
 struct Vertex
 {
 	float4 position : SV_POSITION;
-	float4 color : COLOR;
 };
 
 ConstantBuffer<Pony_Context> Context : register(b0);
@@ -32,13 +31,11 @@ StructuredBuffer<Pony_Meshlet> Meshlets : register(t0);
 StructuredBuffer<uint> VertexIndices : register(t1);
 StructuredBuffer<Pony_Primitive> Primitives : register(t2);
 StructuredBuffer<float3> Positions : register(t3);
-StructuredBuffer<float4> Colors : register(t4);
 
 Vertex CreateVertex(in uint index)
 {
 	Vertex vertex;
 	vertex.position = mul(Transform.mvp, float4(Positions[index], 1.f));
-	vertex.color = Colors[index];
 
 	return vertex;
 }
