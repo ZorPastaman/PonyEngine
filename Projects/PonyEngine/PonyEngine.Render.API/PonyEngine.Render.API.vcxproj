@@ -61,6 +61,15 @@
     <ClCompile Include="Source\Public\Render\Render-DepthStencilOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-SwapChainParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture1D.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture1DArray.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture2D.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture2DArray.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-Texture3D.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TextureCube.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TextureCubeArray.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-TextureDimension.cppm" />
     <ClCompile Include="Source\Public\Render\Render-TextureFormat.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCounts.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ThreadGroupCountsMode.cppm" />

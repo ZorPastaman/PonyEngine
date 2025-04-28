@@ -50,4 +50,14 @@
     <None Include="Shaders\PonyShader\Core\Context.hlsli" />
     <None Include="Shaders\PonyShader\Core\ThreadGroupCounts.hlsli" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyShader.rc">
+      <Filter>Resource Files</Filter>
+    </ResourceCompile>
+  </ItemGroup>
 </Project>
