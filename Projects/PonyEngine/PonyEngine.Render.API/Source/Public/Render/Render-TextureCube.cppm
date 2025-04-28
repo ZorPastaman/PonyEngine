@@ -7,17 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:CullMode;
+export module PonyEngine.Render:TextureCube;
 
-import <cstdint>;
+import :Texture;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Cull mode.
-	enum class CullMode : std::uint8_t
+	class TextureCube final : public Texture
 	{
-		None,
-		Front,
-		Back
 	};
 }
