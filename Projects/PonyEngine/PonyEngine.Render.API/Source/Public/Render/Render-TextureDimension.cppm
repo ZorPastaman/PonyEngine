@@ -13,14 +13,11 @@ import <cstdint>;
 
 export namespace PonyEngine::Render
 {
+	/// @brief Texture dimensions.
 	enum class TextureDimension : std::uint8_t
 	{
-		Texture1D = 0,
-		Texture2D = 1,
-		Texture3D = 2,
-		TextureCube = 3,
-		Texture1DArray = 4,
-		Texture2DArray = 5,
-		TextureCubeArray = 6
+		Texture1D,
+		Texture2D,
+		Texture3D
 	};
 }

@@ -28,6 +28,7 @@
     <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm" />
     <ClCompile Include="Source\Public\Container\Container-BufferView.cppm" />
     <ClCompile Include="Source\Public\Container\Container.cppm" />
+    <ClCompile Include="Source\Public\Core\Core-FloatConversion.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\Core-ExitCodes.cppm" />
     <ClCompile Include="Source\Public\Utility.COM\Utility.COM.cppm" />
