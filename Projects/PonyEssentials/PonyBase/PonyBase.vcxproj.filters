@@ -97,5 +97,8 @@
     <ClCompile Include="Source\Public\Utility\Utility-Container.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Public\Core\Core-FloatConversion.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
 </Project>
