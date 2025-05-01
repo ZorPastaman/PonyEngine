@@ -29,7 +29,7 @@ import PonyMath.Shape;
 
 import PonyShader.Core;
 
-import :BufferData;
+import :DataTable;
 import :IMeshObserver;
 import :MeshParams;
 
@@ -181,7 +181,7 @@ export namespace PonyEngine::Render
 		/// @brief Calls @p OnNameChanged() on each observer.
 		void OnNameChanged() const noexcept;
 
-		BufferData bufferData; ///< Buffer data.
+		DataTable<PonyBase::Container::Buffer> bufferData; ///< Buffer data.
 
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
 		std::optional<PonyMath::Shape::AABB<float>> boundingBox; ///< Bounding box.
@@ -220,42 +220,49 @@ namespace PonyEngine::Render
 
 	std::optional<std::uint32_t> Mesh::DataIndex(const std::string_view dataType) const noexcept
 	{
-		return bufferData.DataIndex(dataType);
+		return bufferData.TypeIndex(dataType);
 	}
 
 	std::string_view Mesh::DataType(const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.DataType(dataIndex);
+		return bufferData.Type(dataIndex);
 	}
 
 	std::uint32_t Mesh::DataTypeCount() const noexcept
 	{
-		return bufferData.DataTypeCount();
+		return bufferData.TypeCount();
 	}
 
 	std::span<const std::string> Mesh::DataTypes() const noexcept
 	{
-		return bufferData.DataTypes();
+		return bufferData.Types();
 	}
 
 	std::uint32_t Mesh::BufferCount(const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.BufferCount(dataIndex);
+		return bufferData.ElementCount(dataIndex);
 	}
 
 	std::uint32_t Mesh::BufferCount() const noexcept
 	{
-		return bufferData.BufferCount();
+		return bufferData.ElementCount();
 	}
 
 	const PonyBase::Container::Buffer& Mesh::Buffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex) const noexcept
 	{
-		return bufferData.Buffer(dataIndex, bufferIndex);
+		return bufferData.Element(dataIndex, bufferIndex);
 	}
 
 	std::uint32_t Mesh::CreateBufferTable(const std::string_view dataType, const std::span<const PonyBase::Container::BufferParams> bufferParams)
 	{
-		const std::uint32_t dataIndex = bufferData.CreateBufferTable(dataType, bufferParams);
+		std::vector<PonyBase::Container::Buffer> newBuffers;
+		newBuffers.reserve(bufferParams.size());
+		for (const PonyBase::Container::BufferParams& params : bufferParams)
+		{
+			newBuffers.push_back(PonyBase::Container::Buffer(params));
+		}
+
+		const std::uint32_t dataIndex = bufferData.SetData(dataType, newBuffers);
 		OnMeshChanged();
 
 		return dataIndex;
@@ -263,27 +270,38 @@ namespace PonyEngine::Render
 
 	void Mesh::DestroyBufferTable(const std::uint32_t dataIndex) noexcept
 	{
-		bufferData.DestroyBufferTable(dataIndex);
+		bufferData.RemoveData(dataIndex);
 		OnMeshChanged();
 	}
 
 	void Mesh::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const std::span<const std::byte> data, const std::size_t offset)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, data, offset);
+		if (data.size() + offset > bufferData.Element(dataIndex, bufferIndex).Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Data size exceeds buffer size.");
+		}
+
+		std::ranges::copy(data, bufferData.Element(dataIndex, bufferIndex).Data() + offset);
 		OnBufferChanged(dataIndex, bufferIndex);
 	}
 
 	template <typename T>
 	void Mesh::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const T& value, const std::size_t index)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, value, index);
+		bufferData.Element(dataIndex, bufferIndex).Get<T>(index) = value;
 		OnBufferChanged(dataIndex, bufferIndex);
 	}
 
 	template <typename T>
 	void Mesh::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const std::span<const T> data, const std::size_t startIndex)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, data, startIndex);
+		const std::span<T> bufferSpan = bufferData.Element(dataIndex, bufferIndex).Span<T>();
+		if (data.size() + startIndex > bufferSpan.size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Data size exceeds buffer size.");
+		}
+
+		std::ranges::copy(data, bufferSpan.data() + startIndex);
 		OnBufferChanged(dataIndex, bufferIndex);
 	}
 
@@ -391,7 +409,7 @@ namespace PonyEngine::Render
 
 	Mesh& Mesh::operator =(const Mesh& other)
 	{
-		BufferData newBufferData = other.bufferData;
+		DataTable newBufferData = other.bufferData;
 		std::optional<std::string> newName = name == other.name ? std::nullopt : std::optional(other.name);
 
 		bufferData = std::move(newBufferData);

@@ -7,14 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include <cassert>
+
 export module PonyEngine.Render:Texture;
 
+import <algorithm>;
 import <cstddef>;
 import <cstdint>;
 import <utility>;
+import <vector>;
 
 import PonyBase.Container;
 
+import :ITextureObserver;
 import :TextureDimension;
 import :TextureFormat;
 
@@ -70,6 +77,13 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t PixelCount() const noexcept;
 
+		/// @brief Adds a texture observer.
+		/// @param observer Texture observer to add.
+		void AddObserver(ITextureObserver& observer) const;
+		/// @brief Removes a texture observer.
+		/// @param observer Texture observer to remove.
+		void RemoveObserver(ITextureObserver& observer) const noexcept;
+
 	protected:
 		/// @brief Creates a texture.
 		/// @param data Data buffer.
@@ -88,6 +102,9 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		Texture(Texture&& other) noexcept = default;
 
+		/// @brief Calls @p OnTextureChanged() on each observer.
+		void OnTextureChanged() const noexcept;
+
 		Texture& operator =(const Texture& other) = default;
 		Texture& operator =(Texture&& other) noexcept = default;
 
@@ -95,6 +112,9 @@ export namespace PonyEngine::Render
 
 		TextureDimension dimension; ///< Texture dimension.
 		TextureFormat format; ///< Texture format.
+
+	private:
+		mutable std::vector<ITextureObserver*> textureObservers; ///< Texture observers.
 
 		// TODO: Add mips
 	};
@@ -137,6 +157,20 @@ namespace PonyEngine::Render
 		return Width() * Height() * Depth();
 	}
 
+	void Texture::AddObserver(ITextureObserver& observer) const
+	{
+		assert(std::ranges::find(textureObservers, &observer) == textureObservers.cend() && "The texture observer is already been added.");
+		textureObservers.push_back(&observer);
+	}
+
+	void Texture::RemoveObserver(ITextureObserver& observer) const noexcept
+	{
+		if (const auto position = std::ranges::find(textureObservers, &observer); position != textureObservers.cend()) [[likely]]
+		{
+			textureObservers.erase(position);
+		}
+	}
+
 	Texture::Texture(const PonyBase::Container::Buffer& data, const TextureDimension dimension, const TextureFormat format) :
 		data(data),
 		dimension{dimension},
@@ -149,5 +183,13 @@ namespace PonyEngine::Render
 		dimension{dimension},
 		format{format}
 	{
+	}
+
+	void Texture::OnTextureChanged() const noexcept
+	{
+		for (ITextureObserver* const observer : textureObservers)
+		{
+			observer->OnTextureChanged();
+		}
 	}
 }

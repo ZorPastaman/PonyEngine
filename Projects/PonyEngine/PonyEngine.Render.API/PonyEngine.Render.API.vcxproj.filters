@@ -196,7 +196,7 @@
     <ClCompile Include="Source\Public\Render\Render-MaterialParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-BufferData.cppm">
+    <ClCompile Include="Source\Public\Render\Render-DataTable.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-Texture.cppm">
@@ -212,6 +212,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-TextureDimension.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-ITextureObserver.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

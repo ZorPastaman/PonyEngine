@@ -17,6 +17,7 @@ import <vector>;
 import PonyBase.Container;
 
 import :PipelineState;
+import :Texture;
 
 export namespace PonyEngine::Render
 {
@@ -27,7 +28,12 @@ export namespace PonyEngine::Render
 
 		/// @brief Map of data types to data tables.
 		/// @note Don't use strings starting with "Pony_" as data types.
+		/// @note Don't use the same key in the @p dataTables and @p textures.
 		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> dataTables;
+		/// @brief Map of data types to textures.
+		/// @note Don't use strings starting with "Pony_" as data types.
+		/// @note Don't use the same key in the @p dataTables and @p textures.
+		std::unordered_map<std::string, std::vector<std::shared_ptr<Texture>>> textures;
 
 		std::string name; ///< Material name.
 	};
