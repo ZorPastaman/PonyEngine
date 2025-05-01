@@ -23,10 +23,11 @@ import <vector>;
 import PonyBase.Container;
 import PonyBase.Utility;
 
-import :BufferData;
+import :DataTable;
 import :IMaterialObserver;
 import :MaterialParams;
 import :PipelineState;
+import :Texture;
 
 export namespace PonyEngine::Render
 {
@@ -165,7 +166,8 @@ export namespace PonyEngine::Render
 		void OnNameChanged() const noexcept;
 
 		std::shared_ptr<class PipelineState> pipelineState; ///< Pipeline state.
-		BufferData bufferData; ///< Buffer data.
+		DataTable<PonyBase::Container::Buffer> bufferData; ///< Buffer data.
+		DataTable<std::shared_ptr<Texture>> textureData; ///< Texture data.
 
 		std::string name; ///< Material name.
 
@@ -178,13 +180,22 @@ namespace PonyEngine::Render
 	Material::Material(const MaterialParams& params) :
 		pipelineState(params.pipelineState),
 		bufferData(params.dataTables),
+		textureData(params.textures),
 		name(params.name)
 	{
+		for (std::uint32_t bufferTypeIndex = 0; bufferTypeIndex < bufferData.TypeCount(); ++bufferTypeIndex)
+		{
+			if (textureData.TypeIndex(bufferData.Type(bufferTypeIndex))) [[unlikely]]
+			{
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Buffers and textures have the same type: {}.", bufferTypeIndex));
+			}
+		}
 	}
 
 	Material::Material(const Material& other) :
 		pipelineState(other.pipelineState),
 		bufferData(other.bufferData),
+		textureData(other.textureData),
 		name(other.name)
 	{
 	}
@@ -192,6 +203,7 @@ namespace PonyEngine::Render
 	Material::Material(Material&& other) noexcept :
 		pipelineState(std::move(other.pipelineState)),
 		bufferData(std::move(other.bufferData)),
+		textureData(std::move(other.textureData)),
 		name(std::move(other.name))
 	{
 	}
@@ -214,42 +226,49 @@ namespace PonyEngine::Render
 
 	std::optional<std::uint32_t> Material::DataTypeIndex(const std::string_view dataType) const noexcept
 	{
-		return bufferData.DataIndex(dataType);
+		return bufferData.TypeIndex(dataType);
 	}
 
 	std::string_view Material::DataType(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.DataType(dataTypeIndex);
+		return bufferData.Type(dataTypeIndex);
 	}
 
 	std::uint32_t Material::DataTypeCount() const noexcept
 	{
-		return bufferData.DataTypeCount();
+		return bufferData.TypeCount();
 	}
 
 	std::span<const std::string> Material::DataTypes() const noexcept
 	{
-		return bufferData.DataTypes();
+		return bufferData.Types();
 	}
 
 	std::uint32_t Material::DataCount(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.BufferCount(dataTypeIndex);
+		return bufferData.ElementCount(dataTypeIndex);
 	}
 
 	std::uint32_t Material::DataCount() const noexcept
 	{
-		return bufferData.BufferCount();
+		return bufferData.ElementCount();
 	}
 
 	const PonyBase::Container::Buffer& Material::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.Buffer(dataTypeIndex, dataIndex);
+		return bufferData.Element(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Material::CreateDataTable(const std::string_view dataType, const std::span<const PonyBase::Container::BufferParams> dataParams)
 	{
-		const std::uint32_t dataIndex = bufferData.CreateBufferTable(dataType, dataParams);
+		std::vector<PonyBase::Container::Buffer> newBuffers;
+		newBuffers.reserve(dataParams.size());
+		for (const PonyBase::Container::BufferParams& params : dataParams)
+		{
+			newBuffers.push_back(PonyBase::Container::Buffer(params));
+		}
+
+		const std::uint32_t dataIndex = bufferData.SetData(dataType, newBuffers);
 		OnDataChanged();
 
 		return dataIndex;
@@ -257,27 +276,38 @@ namespace PonyEngine::Render
 
 	void Material::DestroyDataTable(const std::uint32_t dataTypeIndex) noexcept
 	{
-		bufferData.DestroyBufferTable(dataTypeIndex);
+		bufferData.RemoveData(dataTypeIndex);
 		OnDataChanged();
 	}
 
 	void Material::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const std::span<const std::byte> data, const std::size_t offset)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, data, offset);
+		if (data.size() + offset > bufferData.Element(dataIndex, bufferIndex).Size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Data size exceeds buffer size.");
+		}
+
+		std::ranges::copy(data, bufferData.Element(dataIndex, bufferIndex).Data() + offset);
 		OnDataChanged(dataIndex, bufferIndex);
 	}
 
 	template <typename T>
 	void Material::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const T& value, const std::size_t index)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, value, index);
+		bufferData.Element(dataIndex, bufferIndex).Get<T>(index) = value;
 		OnDataChanged(dataIndex, bufferIndex);
 	}
 
 	template <typename T>
 	void Material::SetBuffer(const std::uint32_t dataIndex, const std::uint32_t bufferIndex, const std::span<const T> data, const std::size_t startIndex)
 	{
-		bufferData.SetData(dataIndex, bufferIndex, data, startIndex);
+		const std::span<T> bufferSpan = bufferData.Element(dataIndex, bufferIndex).Span<T>();
+		if (data.size() + startIndex > bufferSpan.size()) [[unlikely]]
+		{
+			throw std::invalid_argument("Data size exceeds buffer size.");
+		}
+
+		std::ranges::copy(data, bufferSpan.data() + startIndex);
 		OnDataChanged(dataIndex, bufferIndex);
 	}
 
@@ -345,7 +375,7 @@ namespace PonyEngine::Render
 
 	Material& Material::operator =(const Material& other)
 	{
-		BufferData newBufferData = other.bufferData;
+		DataTable newBufferData = other.bufferData;
 		std::optional<std::string> newName = other.name == name ? std::nullopt : std::optional(other.name);
 
 		if (pipelineState != other.pipelineState)
