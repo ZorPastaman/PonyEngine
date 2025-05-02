@@ -91,6 +91,14 @@ export namespace PonyEngine::Render
 		BC7_Unorm
 	};
 
+	/// @brief Texture format type.
+	enum class TextureFormatType : std::uint8_t
+	{
+		Unknown,
+		Color,
+		Depth
+	};
+
 	/// @brief Pixel data types.
 	enum class PixelDataType : std::uint8_t
 	{
@@ -99,35 +107,29 @@ export namespace PonyEngine::Render
 		Unorm,
 		Sint,
 		Uint,
-		Float
+		Sfloat,
+		Ufloat
 	};
 
-	/// @brief Gets a pixel size by the texture format.
-	/// @param format Texture format. Mustn't be compressed.
-	/// @return Pixel size in bytes.
-	[[nodiscard("Pure function")]]
-	std::uint32_t PixelSize(TextureFormat format) noexcept;
-	/// @brief Gets a pixel data type.
-	/// @param format Texture format. Mustn't be compressed. Mustn't be a depth stencil format.
-	/// @return Pixel data type.
-	[[nodiscard("Pure function")]]
-	PixelDataType PixelType(TextureFormat format) noexcept;
+	/// @brief Texture format info.
+	struct TextureFormatInfo final
+	{
+		std::uint32_t blockSize; ///< Block size in bytes. For uncompressed formats it's a pixel size.
+		std::uint32_t blockWidth; ///< Block width in pixels. For uncompressed formats it's always 1.
+		std::uint32_t blockHeight; ///< Block height in pixels. For uncompressed formats it's always 1.
+		TextureFormatType textureFormatType; ///< Texture format type.
+		PixelDataType pixelDataType; ///< Pixel data type. For depth stencil formats it's unknown.
+		bool isCompressed; ///< Is it a compressed format?
+		bool texture1DCompatible; ///< Is it compatible with a texture1D?
+		bool texture2DCompatible; ///< Is it compatible with a texture2D?
+		bool texture3DCompatible; ///< Is it compatible with a texture3D?
+	};
 
-	/// @brief Is the texture format a color format?
+	/// @brief Gets a texture format info for the @p format.
 	/// @param format Texture format.
-	/// @return @a True if it's a color format; @a false otherwise.
+	/// @return Texture format info.
 	[[nodiscard("Pure function")]]
-	bool IsColor(TextureFormat format) noexcept;
-	/// @brief Is the texture format a depth stencil format?
-	/// @param format Texture format.
-	/// @return @a True if it's a depth stencil format; @a false otherwise.
-	[[nodiscard("Pure function")]]
-	bool IsDepthStencil(TextureFormat format) noexcept;
-	/// @brief Is the texture format compressed?
-	/// @param format Texture format.
-	/// @return @a True if it's compressed; @a false otherwise.
-	[[nodiscard("Pure function")]]
-	bool IsCompressed(TextureFormat format) noexcept;
+	const TextureFormatInfo& FormatInfo(TextureFormat format) noexcept;
 
 	/// @brief Gets a pixel color.
 	/// @details Snorm and unorm colors are returned in correct ranges: [-1, 1] and [0, 1].
@@ -193,167 +195,79 @@ export namespace PonyEngine::Render
 
 namespace PonyEngine::Render
 {
-	/// @brief Pixel sizes.
-	const std::unordered_map<TextureFormat, std::uint32_t> PixelSizes
+	/// @brief Texture format infos.
+	const std::unordered_map<TextureFormat, TextureFormatInfo> FormatInfos  
 	{
-		{ TextureFormat::R32G32B32A32_Float, 16 },
-		{ TextureFormat::R32G32B32A32_Uint, 16 },
-		{ TextureFormat::R32G32B32A32_Sint, 16 },
-		{ TextureFormat::R32G32B32_Float, 12 },
-		{ TextureFormat::R32G32B32_Uint, 12 },
-		{ TextureFormat::R32G32B32_Sint, 12 },
-		{ TextureFormat::R16G16B16A16_Float, 8 },
-		{ TextureFormat::R16G16B16A16_Unorm, 8 },
-		{ TextureFormat::R16G16B16A16_Uint, 8 },
-		{ TextureFormat::R16G16B16A16_Snorm, 8 },
-		{ TextureFormat::R16G16B16A16_Sint, 8 },
-		{ TextureFormat::R32G32_Float, 8 },
-		{ TextureFormat::R32G32_Uint, 8 },
-		{ TextureFormat::R32G32_Sint, 8 },
-		{ TextureFormat::D32_Float_S8X24_Uint, 8 },
-		{ TextureFormat::R8G8B8A8_Unorm, 4 },
-		{ TextureFormat::R8G8B8A8_Uint, 4 },
-		{ TextureFormat::R8G8B8A8_Snorm, 4 },
-		{ TextureFormat::R8G8B8A8_Sint, 4 },
-		{ TextureFormat::R16G16_Float, 4 },
-		{ TextureFormat::R16G16_Unorm, 4 },
-		{ TextureFormat::R16G16_Uint, 4 },
-		{ TextureFormat::R16G16_Snorm, 4 },
-		{ TextureFormat::R16G16_Sint, 4 },
-		{ TextureFormat::D32_Float, 4 },
-		{ TextureFormat::R32_Float, 4 },
-		{ TextureFormat::R32_Uint, 4 },
-		{ TextureFormat::R32_Sint, 4 },
-		{ TextureFormat::D24_Unorm_S8_Uint, 4 },
-		{ TextureFormat::R8G8_Unorm, 2 },
-		{ TextureFormat::R8G8_Uint, 2 },
-		{ TextureFormat::R8G8_Snorm, 2 },
-		{ TextureFormat::R8G8_Sint, 2 },
-		{ TextureFormat::R16_Float, 2 },
-		{ TextureFormat::D16_Unorm, 2 },
-		{ TextureFormat::R16_Unorm, 2 },
-		{ TextureFormat::R16_Uint, 2 },
-		{ TextureFormat::R16_Snorm, 2 },
-		{ TextureFormat::R16_Sint, 2 },
-		{ TextureFormat::R8_Unorm, 1 },
-		{ TextureFormat::R8_Uint, 1 },
-		{ TextureFormat::R8_Snorm, 1 },
-		{ TextureFormat::R8_Sint, 1 },
-		{ TextureFormat::A8_Unorm, 1 },
-		{ TextureFormat::R1_Unorm, 1 },
-		{ TextureFormat::B8G8R8A8_Unorm, 4 },
-		{ TextureFormat::B8G8R8X8_Unorm, 4 }
+		{ TextureFormat::Unknown, TextureFormatInfo{.blockSize = 0u, .blockWidth = 0u, .blockHeight = 0u, .textureFormatType = TextureFormatType::Unknown, .pixelDataType = PixelDataType::Unknown, .isCompressed = false, .texture1DCompatible = false, .texture2DCompatible = false, .texture3DCompatible = false} },
+		{ TextureFormat::R32G32B32A32_Float, TextureFormatInfo{.blockSize = 16u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32B32A32_Uint, TextureFormatInfo{.blockSize = 16u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32B32A32_Sint, TextureFormatInfo{.blockSize = 16u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32B32_Float, TextureFormatInfo{.blockSize = 12u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32B32_Uint, TextureFormatInfo{.blockSize = 12u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32B32_Sint, TextureFormatInfo{.blockSize = 12u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16B16A16_Float, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16B16A16_Unorm, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16B16A16_Uint, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16B16A16_Snorm, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16B16A16_Sint, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32_Float, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32_Uint, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32G32_Sint, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::D32_Float_S8X24_Uint, TextureFormatInfo{.blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Depth, .pixelDataType = PixelDataType::Unknown, .isCompressed = false, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::R8G8B8A8_Unorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8B8A8_Uint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8B8A8_Snorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8B8A8_Sint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16_Float, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16_Unorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16_Uint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16_Snorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16G16_Sint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::D32_Float, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Depth, .pixelDataType = PixelDataType::Unknown, .isCompressed = false, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::R32_Float, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32_Uint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R32_Sint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::D24_Unorm_S8_Uint, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Depth, .pixelDataType = PixelDataType::Unknown, .isCompressed = false, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::R8G8_Unorm, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8_Uint, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8_Snorm, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8G8_Sint, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16_Float, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::D16_Unorm, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Depth, .pixelDataType = PixelDataType::Unknown, .isCompressed = false, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::R16_Unorm, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16_Uint, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16_Snorm, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R16_Sint, TextureFormatInfo{.blockSize = 2u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8_Unorm, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8_Uint, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Uint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8_Snorm, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R8_Sint, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sint, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::A8_Unorm, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::R1_Unorm, TextureFormatInfo{.blockSize = 1u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::BC1_Unorm, TextureFormatInfo{.blockSize = 8u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC2_Unorm, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC3_Unorm, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC4_Unorm, TextureFormatInfo{.blockSize = 8u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC4_Snorm, TextureFormatInfo{.blockSize = 8u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC5_Unorm, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC5_Snorm, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Snorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::B8G8R8A8_Unorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::B8G8R8X8_Unorm, TextureFormatInfo{.blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = false, .texture1DCompatible = true, .texture2DCompatible = true, .texture3DCompatible = true} },
+		{ TextureFormat::BC6H_UF16, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Ufloat, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC6H_SF16, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Sfloat, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} },
+		{ TextureFormat::BC7_Unorm, TextureFormatInfo{.blockSize = 16u, .blockWidth = 4u, .blockHeight = 4u, .textureFormatType = TextureFormatType::Color, .pixelDataType = PixelDataType::Unorm, .isCompressed = true, .texture1DCompatible = false, .texture2DCompatible = true, .texture3DCompatible = false} }
 	};
 
-	/// @brief Pixel data types.
-	const std::unordered_map<TextureFormat, PixelDataType> PixelTypes
+	const TextureFormatInfo& FormatInfo(const TextureFormat format) noexcept
 	{
-	   { TextureFormat::R32G32B32A32_Float, PixelDataType::Float },
-	   { TextureFormat::R32G32B32A32_Uint, PixelDataType::Uint },
-	   { TextureFormat::R32G32B32A32_Sint, PixelDataType::Sint },
-	   { TextureFormat::R32G32B32_Float, PixelDataType::Float },
-	   { TextureFormat::R32G32B32_Uint, PixelDataType::Uint },
-	   { TextureFormat::R32G32B32_Sint, PixelDataType::Sint },
-	   { TextureFormat::R16G16B16A16_Float, PixelDataType::Float },
-	   { TextureFormat::R16G16B16A16_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R16G16B16A16_Uint, PixelDataType::Uint },
-	   { TextureFormat::R16G16B16A16_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R16G16B16A16_Sint, PixelDataType::Sint },
-	   { TextureFormat::R32G32_Float, PixelDataType::Float },
-	   { TextureFormat::R32G32_Uint, PixelDataType::Uint },
-	   { TextureFormat::R32G32_Sint, PixelDataType::Sint },
-	   { TextureFormat::R8G8B8A8_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R8G8B8A8_Uint, PixelDataType::Uint },
-	   { TextureFormat::R8G8B8A8_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R8G8B8A8_Sint, PixelDataType::Sint },
-	   { TextureFormat::R16G16_Float, PixelDataType::Float },
-	   { TextureFormat::R16G16_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R16G16_Uint, PixelDataType::Uint },
-	   { TextureFormat::R16G16_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R16G16_Sint, PixelDataType::Sint },
-	   { TextureFormat::R32_Float, PixelDataType::Float },
-	   { TextureFormat::R32_Uint, PixelDataType::Uint },
-	   { TextureFormat::R32_Sint, PixelDataType::Sint },
-	   { TextureFormat::R8G8_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R8G8_Uint, PixelDataType::Uint },
-	   { TextureFormat::R8G8_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R8G8_Sint, PixelDataType::Sint },
-	   { TextureFormat::R16_Float, PixelDataType::Float },
-	   { TextureFormat::R16_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R16_Uint, PixelDataType::Uint },
-	   { TextureFormat::R16_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R16_Sint, PixelDataType::Sint },
-	   { TextureFormat::R8_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R8_Uint, PixelDataType::Uint },
-	   { TextureFormat::R8_Snorm, PixelDataType::Snorm },
-	   { TextureFormat::R8_Sint, PixelDataType::Sint },
-	   { TextureFormat::A8_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::R1_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::B8G8R8A8_Unorm, PixelDataType::Unorm },
-	   { TextureFormat::B8G8R8X8_Unorm, PixelDataType::Unorm }
-	};
-
-	/// @brief Depth stencil formats.
-	const std::unordered_set<TextureFormat> DepthStencilFormats
-	{
-		TextureFormat::D32_Float_S8X24_Uint,
-		TextureFormat::D32_Float,
-		TextureFormat::D24_Unorm_S8_Uint,
-		TextureFormat::D16_Unorm
-	};
-
-	/// @brief Compressed formats.
-	const std::unordered_set<TextureFormat> CompressedFormats
-	{
-		TextureFormat::BC1_Unorm,
-		TextureFormat::BC2_Unorm,
-		TextureFormat::BC3_Unorm,
-		TextureFormat::BC4_Unorm,
-		TextureFormat::BC4_Snorm,
-		TextureFormat::BC5_Unorm,
-		TextureFormat::BC5_Snorm,
-		TextureFormat::BC6H_UF16,
-		TextureFormat::BC6H_SF16,
-		TextureFormat::BC7_Unorm
-	};
-
-	std::uint32_t PixelSize(const TextureFormat format) noexcept
-	{
-		if (const auto position = PixelSizes.find(format); position != PixelSizes.cend()) [[likely]]
+		if (const auto position = FormatInfos.find(format); position != FormatInfos.cend()) [[likely]]
 		{
 			return position->second;
 		}
 
 		assert(false && "Invalid texture format.");
 
-		return 1u;
-	}
-
-	PixelDataType PixelType(const TextureFormat format) noexcept
-	{
-		if (const auto position = PixelTypes.find(format); position != PixelTypes.cend()) [[likely]]
-		{
-			return position->second;
-		}
-
-		assert(false && "Invalid texture format.");
-
-		return PixelDataType::Unknown;
-	}
-
-	bool IsColor(const TextureFormat format) noexcept
-	{
-		return !DepthStencilFormats.contains(format);
-	}
-
-	bool IsDepthStencil(const TextureFormat format) noexcept
-	{
-		return DepthStencilFormats.contains(format);
-	}
-
-	bool IsCompressed(const TextureFormat format) noexcept
-	{
-		return CompressedFormats.contains(format);
+		return TextureFormatInfo{};
 	}
 
 	template <std::floating_point T>

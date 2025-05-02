@@ -30,6 +30,12 @@ export namespace PonyEngine::Render
 		/// @param dataTypeIndex Data type index.
 		/// @param dataIndex Data index.
 		virtual void OnDataChanged(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) noexcept = 0;
+		/// @brief Invoked when a texture structure is changed.
+		virtual void OnTextureChanged() noexcept = 0;
+		/// @brief Invoked when a texture is changed.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		virtual void OnTextureChanged(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) noexcept = 0;
 		/// @brief Invoked when a name is changed.
 		virtual void OnNameChanged() noexcept = 0;
 	};

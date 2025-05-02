@@ -193,6 +193,7 @@ export namespace PonyEngine::Render
 		/// @brief Calls @p OnNameChanged() on each observer.
 		void OnNameChanged() const noexcept;
 
+		// TODO: Add a shader class.
 		std::string rootSignatureShader; ///< Root signature shader path.
 		std::string amplificationShader; ///< Amplification shader path.
 		std::string meshShader; ///< Mesh shader path.
@@ -202,6 +203,7 @@ export namespace PonyEngine::Render
 		struct Rasterizer rasterizer; ///< Rasterizer parameters.
 		struct DepthStencil depthStencil; ///< Depth stencil parameters.
 
+		// TODO: Move to a RootSignature class along with a root sig shader.
 		std::unordered_map<std::string, std::uint32_t> dataSlots; ///< Data slots mapping.
 
 		struct ThreadGroupCounts threadGroupCounts; ///< Thread group counts.

@@ -15,6 +15,7 @@ module;
 export module PonyEngine.Render.Direct3D12.Detail:IResourceManager;
 
 import <memory>;
+import <utility>;
 
 import PonyMath.Color;
 
@@ -63,6 +64,34 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Texture.
 		[[nodiscard("Redendant call")]]
 		virtual std::shared_ptr<Texture> CreateTexture3D(std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) = 0;
+
+		/// @brief Creates a buffer for texture copying operations.
+		/// @param width Width.
+		/// @param format Format.
+		/// @param sampleDesc Sample description.
+		/// @param heapType Heap type.
+		/// @return Buffer and its footprint.
+		[[nodiscard("Redendant call")]]
+		virtual std::pair<std::shared_ptr<Buffer>, D3D12_PLACED_SUBRESOURCE_FOOTPRINT> CreateTextureBuffer1D(std::uint64_t width, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) = 0;
+		/// @brief Creates a buffer for texture copying operations.
+		/// @param width Width.
+		/// @param height Height.
+		/// @param format Format.
+		/// @param sampleDesc Sample description.
+		/// @param heapType Heap type.
+		/// @return Buffer and its footprint.
+		[[nodiscard("Redendant call")]]
+		virtual std::pair<std::shared_ptr<Buffer>, D3D12_PLACED_SUBRESOURCE_FOOTPRINT> CreateTextureBuffer2D(std::uint64_t width, std::uint32_t height, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) = 0;
+		/// @brief Creates a buffer for texture copying operations.
+		/// @param width Width.
+		/// @param height Height.
+		/// @param depth Depth.
+		/// @param format Format.
+		/// @param sampleDesc Sample description.
+		/// @param heapType Heap type.
+		/// @return Buffer and its footprint.
+		[[nodiscard("Redendant call")]]
+		virtual std::pair<std::shared_ptr<Buffer>, D3D12_PLACED_SUBRESOURCE_FOOTPRINT> CreateTextureBuffer3D(std::uint64_t width, std::uint32_t height, std::uint16_t depth, DXGI_FORMAT format, DXGI_SAMPLE_DESC sampleDesc, HeapType heapType) = 0;
 
 		/// @brief Creates a render target.
 		/// @param width Width.
