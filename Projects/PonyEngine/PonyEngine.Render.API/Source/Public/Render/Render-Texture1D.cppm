@@ -40,7 +40,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure constructor")]]
 		explicit Texture1D(std::uint32_t width, TextureFormat format = TextureFormat::R8G8B8A8_Unorm);
 		/// @brief Creates a texture with the preset buffer.
-		/// @param buffer Texture data buffer. If the @p format isn't compressed, its stride must be equal the @p format pixel size and its count must be equal the @p width.
+		/// @param buffer Texture data buffer. It must have count equal 1.
 		/// @param width Texture width.
 		/// @param format Texture format.
 		[[nodiscard("Pure constructor")]]
@@ -392,7 +392,7 @@ namespace PonyEngine::Render
 
 	const std::byte* Texture1D::GetPixelRaw(const std::uint32_t index) const noexcept
 	{
-		return data.Data() + index * BlockSize();
+		return data.Data() + index * RowSize();
 	}
 
 	void Texture1D::GetPixelsRaw(const std::uint32_t startIndex, const std::span<std::byte> output) const
@@ -505,7 +505,7 @@ namespace PonyEngine::Render
 
 	void Texture1D::SetPixelRaw(const std::uint32_t index, const std::byte* const data)
 	{
-		std::memcpy(GetPixelRaw(index), data, BlockSize());
+		std::memcpy(GetPixelRaw(index), data, RowSize());
 
 		OnTextureChanged();
 	}
@@ -521,24 +521,51 @@ namespace PonyEngine::Render
 
 	PonyBase::Container::Buffer Texture1D::CreateBuffer(const std::uint32_t width, const TextureFormat format)
 	{
-		if (IsCompressed(format)) [[unlikely]]
+		if (width == 0u) [[unlikely]]
 		{
-			throw std::invalid_argument("Format is compressed.");
+			throw std::invalid_argument("Width is 0.");
 		}
 
-		return PonyBase::Container::Buffer(PixelSize(format), width);
+		const TextureFormatInfo& info = FormatInfo(format);
+
+		if (!info.texture1DCompatible) [[unlikely]]
+		{
+			throw std::invalid_argument("Format isn't compatible with texture 1D.");
+		}
+		if (width % info.blockWidth) [[unlikely]]
+		{
+			throw std::invalid_argument("Width is incorrect.");
+		}
+
+		const std::uint32_t stride = width / info.blockWidth * info.blockSize;
+
+		return PonyBase::Container::Buffer(stride, 1u);
 	}
 
 	const PonyBase::Container::Buffer& Texture1D::ValidateBuffer(const PonyBase::Container::Buffer& buffer, const std::uint32_t width, const TextureFormat format)
 	{
-		if (IsCompressed(format))
+		if (width == 0u) [[unlikely]]
 		{
-			return buffer;
+			throw std::invalid_argument("Width is 0.");
 		}
 
-		if (buffer.Stride() != PixelSize(format) || buffer.Count() != width) [[unlikely]]
+		const TextureFormatInfo& info = FormatInfo(format);
+
+		if (!info.texture1DCompatible) [[unlikely]]
 		{
-			throw std::invalid_argument("Buffer is not compatible with width and format.");
+			throw std::invalid_argument("Format isn't compatible with texture 1D.");
+		}
+		if (width % info.blockWidth) [[unlikely]]
+		{
+			throw std::invalid_argument("Width is incorrect.");
+		}
+		if (buffer.Stride() != width / info.blockWidth * info.blockSize) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer has incorrect stride.");
+		}
+		if (buffer.Count() != 1u) [[unlikely]]
+		{
+			throw std::invalid_argument("Buffer has incorrect count.");
 		}
 
 		return buffer;
@@ -546,16 +573,16 @@ namespace PonyEngine::Render
 
 	std::byte* Texture1D::GetPixelRaw(const std::uint32_t index) noexcept
 	{
-		return data.Data() + index * BlockSize();
+		return data.Data() + index * RowSize();
 	}
 
 	void Texture1D::ValidateColor(const std::uint32_t startIndex, const std::size_t size) const
 	{
-		if (startIndex >= BlockCount()) [[unlikely]]
+		if (startIndex >= RowCount()) [[unlikely]]
 		{
 			throw std::out_of_range("Start index exceeds pixel count.");
 		}
-		if (size > BlockCount() - startIndex) [[unlikely]]
+		if (size > RowCount() - startIndex) [[unlikely]]
 		{
 			throw std::out_of_range("Input is too large.");
 		}
@@ -563,15 +590,15 @@ namespace PonyEngine::Render
 
 	void Texture1D::ValidateRaw(const std::uint32_t startIndex, const std::size_t size) const
 	{
-		if (startIndex >= BlockCount()) [[unlikely]]
+		if (startIndex >= RowCount()) [[unlikely]]
 		{
 			throw std::out_of_range("Start index exceeds pixel count.");
 		}
-		if (size % BlockSize()) [[unlikely]]
+		if (size % RowSize()) [[unlikely]]
 		{
 			throw std::invalid_argument("Output is invalid size.");
 		}
-		if (size > Size() - startIndex * BlockSize()) [[unlikely]]
+		if (size > Size() - startIndex * RowSize()) [[unlikely]]
 		{
 			throw std::out_of_range("Output is too large.");
 		}

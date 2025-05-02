@@ -747,7 +747,7 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		const std::shared_ptr<Shader> rootSignatureShader = d3d12System->ShaderManager().CreateShader(source.RootSignatureShader());
-		const std::shared_ptr<RootSignature> rootSignature = d3d12System->RootSignatureManager().CreateRootSignature(rootSignatureShader);
+		const std::shared_ptr<RootSignature> rootSignature = d3d12System->RootSignatureManager().CreateRootSignature(rootSignatureShader); // TODO: It creates a bug. The same root signature will be updated with data slots from different pipeline states.
 		rootSignature->Name(source.RootSignatureShader());
 		const FrameParams& frameParams = d3d12System->GraphicsPipeline().MainFrameParams();
 

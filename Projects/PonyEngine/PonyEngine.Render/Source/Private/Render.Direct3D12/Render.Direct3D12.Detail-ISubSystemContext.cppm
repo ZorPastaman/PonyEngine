@@ -27,6 +27,7 @@ import :IPipelineStateManager;
 import :IResourceManager;
 import :IRootSignatureManager;
 import :IShaderManager;
+import :ITextureManager;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -61,6 +62,15 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @return Resource manager.
 		[[nodiscard("Pure function")]]
 		virtual const IResourceManager& ResourceManager() const noexcept = 0;
+
+		/// @brief Gets the texture manager.
+		/// @return Texture manager.
+		[[nodiscard("Pure function")]]
+		virtual ITextureManager& TextureManager() noexcept = 0;
+		/// @brief Gets the texture manager.
+		/// @return Texture manager.
+		[[nodiscard("Pure function")]]
+		virtual const ITextureManager& TextureManager() const noexcept = 0;
 
 		/// @brief Gets the descriptor heap manager.
 		/// @return Descriptor heap manager.

@@ -47,14 +47,14 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		TextureFormat Format() const noexcept;
 
-		/// @brief Gets the block size.
-		/// @return Block size in bytes. For uncompressed textures it's a size of a pixel, for compressed textures it's unspecified.
+		/// @brief Gets the row size.
+		/// @return Row size in bytes.
 		[[nodiscard("Pure function")]]
-		std::uint32_t BlockSize() const noexcept;
-		/// @brief Gets the block count.
-		/// @return Block count. For uncompressed textures it's a pixel count, for compressed textures it's unspecified.
+		std::uint32_t RowSize() const noexcept;
+		/// @brief Gets the row count.
+		/// @return Row count.
 		[[nodiscard("Pure function")]]
-		std::uint32_t BlockCount() const noexcept;
+		std::uint32_t RowCount() const noexcept;
 		/// @brief Gets the texture size.
 		/// @return Texture size in bytes.
 		[[nodiscard("Pure function")]]
@@ -75,7 +75,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the texture pixel count.
 		/// @return Pixel count.
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t PixelCount() const noexcept;
+		std::uint32_t PixelCount() const noexcept;
 
 		/// @brief Adds a texture observer.
 		/// @param observer Texture observer to add.
@@ -86,13 +86,13 @@ export namespace PonyEngine::Render
 
 	protected:
 		/// @brief Creates a texture.
-		/// @param data Data buffer.
+		/// @param data Data buffer. Each stride must represent one row.
 		/// @param dimension Texture dimension.
 		/// @param format Texture format.
 		[[nodiscard("Pure constructor")]]
 		Texture(const PonyBase::Container::Buffer& data, TextureDimension dimension, TextureFormat format);
 		/// @brief Creates a texture.
-		/// @param data Data buffer.
+		/// @param data Data buffer. Each stride must represent one row.
 		/// @param dimension Texture dimension.
 		/// @param format Texture format.
 		[[nodiscard("Pure constructor")]]
@@ -137,12 +137,12 @@ namespace PonyEngine::Render
 		return format;
 	}
 
-	std::uint32_t Texture::BlockSize() const noexcept
+	std::uint32_t Texture::RowSize() const noexcept
 	{
 		return data.Stride();
 	}
 
-	std::uint32_t Texture::BlockCount() const noexcept
+	std::uint32_t Texture::RowCount() const noexcept
 	{
 		return data.Count();
 	}

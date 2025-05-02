@@ -67,6 +67,15 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param buffer Input.
 		/// @param offset Write offset.
 		void SetData(const PonyBase::Container::Buffer& buffer, std::size_t offset = 0);
+		/// @brief Sets the buffer data by the footprint.
+		/// @param data Data source.
+		/// @param stride Data stride.
+		/// @param footprint Footprint.
+		void SetData(const std::byte* data, std::size_t stride, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint);
+		/// @brief Sets the buffer data by the footprint.
+		/// @param buffer Buffer.
+		/// @param footprint Footprint.
+		void SetData(const PonyBase::Container::Buffer& buffer, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint);
 
 		Buffer& operator =(const Buffer& other) noexcept = default;
 		Buffer& operator =(Buffer&& other) noexcept = default;
@@ -77,6 +86,11 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param size Read/Write size.
 		/// @param offset Read/Write offset.
 		void CheckParams(const void* data, std::size_t size, std::size_t offset) const;
+		/// @brief Checks if the parameters are correct.
+		/// @param data Input.
+		/// @param stride Input stride.
+		/// @param footprint Footprint.
+		void CheckParams(const void* data, std::size_t stride, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint) const;
 	};
 }
 
@@ -116,6 +130,28 @@ namespace PonyEngine::Render::Direct3D12
 		SetData(buffer.Data(), buffer.Size(), offset);
 	}
 
+	void Buffer::SetData(const std::byte* data, const std::size_t stride, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint)
+	{
+		CheckParams(data, stride, footprint);
+
+		std::byte* resourceData = static_cast<std::byte*>(Map()) + footprint.Offset;
+
+		for (UINT depthIndex = 0u; depthIndex < footprint.Footprint.Depth; ++depthIndex)
+		{
+			for (UINT rowIndex = 0u; rowIndex < footprint.Footprint.Height; ++rowIndex, resourceData += footprint.Footprint.RowPitch, data += stride)
+			{
+				std::memcpy(resourceData, data, stride);
+			}
+		}
+
+		Unmap();
+	}
+
+	void Buffer::SetData(const PonyBase::Container::Buffer& buffer, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint)
+	{
+		SetData(buffer.Data(), buffer.Stride(), footprint);
+	}
+
 	void Buffer::CheckParams(const void* const data, const std::size_t size, const std::size_t offset) const
 	{
 		if (!data) [[unlikely]]
@@ -124,6 +160,24 @@ namespace PonyEngine::Render::Direct3D12
 		}
 
 		if (offset + size > resource->GetDesc1().Width) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+	}
+
+	void Buffer::CheckParams(const void* const data, const std::size_t stride, const D3D12_PLACED_SUBRESOURCE_FOOTPRINT& footprint) const
+	{
+		if (!data) [[unlikely]]
+		{
+			throw std::invalid_argument("Data is nullptr.");
+		}
+
+		if (stride > footprint.Footprint.RowPitch) [[unlikely]]
+		{
+			throw std::invalid_argument("Stride is too great.");
+		}
+
+		if (footprint.Footprint.RowPitch * footprint.Footprint.Height * footprint.Footprint.Depth + footprint.Offset > resource->GetDesc1().Width) [[unlikely]]
 		{
 			throw std::out_of_range("Out of bounds.");
 		}

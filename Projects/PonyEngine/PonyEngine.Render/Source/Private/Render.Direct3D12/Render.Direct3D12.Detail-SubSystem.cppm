@@ -48,6 +48,7 @@ import :IPipelineStateManager;
 import :IRenderSystemContext;
 import :IRootSignatureManager;
 import :ISubSystemContext;
+import :ITextureManager;
 import :MaterialManager;
 import :MeshManager;
 import :PipelineStateManager;
@@ -57,6 +58,7 @@ import :ResourceManager;
 import :RootSignatureManager;
 import :ShaderManager;
 import :SubSystemParams;
+import :TextureManager;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -155,6 +157,11 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual const IMeshManager& MeshManager() const noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual ITextureManager& TextureManager() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const ITextureManager& TextureManager() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual IShaderManager& ShaderManager() noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual const IShaderManager& ShaderManager() const noexcept override;
@@ -198,6 +205,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::unique_ptr<class FrameManager> frameManager; ///< Frame manager.
 
 		std::unique_ptr<class MeshManager> meshManager; ///< Mesh manager.
+		std::unique_ptr<class TextureManager> textureManager; ///< Texture manager.
 		std::unique_ptr<class ShaderManager> shaderManager; ///< Shader manager.
 		std::unique_ptr<class RootSignatureManager> rootSignatureManager; ///< Root signature manager.
 		std::unique_ptr<class PipelineStateManager> pipelineStateManager; ///< Pipeline state manager.
@@ -298,6 +306,10 @@ namespace PonyEngine::Render::Direct3D12
 		rootSignatureManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Root signature manager destroyed.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy texture manager.");
+		textureManager.reset();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Texture manager manager.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Destroy mesh manager.");
 		meshManager.reset();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Mesh manager destroyed.");
@@ -384,6 +396,10 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager = std::make_unique<class MeshManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Mesh manager created.");
 
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create texture manager.");
+		textureManager = std::make_unique<class TextureManager>(*static_cast<ISubSystemContext*>(this));
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Texture manager created.");
+
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Create shader manager.");
 		shaderManager = std::make_unique<class ShaderManager>(*static_cast<ISubSystemContext*>(this));
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Shader manager created.");
@@ -421,6 +437,7 @@ namespace PonyEngine::Render::Direct3D12
 		pipelineStateManager->Clean();
 		rootSignatureManager->Clean();
 		shaderManager->Clean();
+		textureManager->Clean();
 		meshManager->Clean();
 		frameManager->Clean();
 		heapManager->Clean();
@@ -434,6 +451,7 @@ namespace PonyEngine::Render::Direct3D12
 		meshManager->Tick();
 		materialManager->Tick();
 		pipelineStateManager->Tick();
+		textureManager->Tick();
 		graphicsPipeline->Prepare();
 
 		copyPipeline->PopulateCommands();
@@ -520,6 +538,16 @@ namespace PonyEngine::Render::Direct3D12
 	const IMeshManager& SubSystem::MeshManager() const noexcept
 	{
 		return *meshManager;
+	}
+
+	ITextureManager& SubSystem::TextureManager() noexcept
+	{
+		return *textureManager;
+	}
+
+	const ITextureManager& SubSystem::TextureManager() const noexcept
+	{
+		return *textureManager;
 	}
 
 	IShaderManager& SubSystem::ShaderManager() noexcept

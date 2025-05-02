@@ -129,6 +129,57 @@ export namespace PonyEngine::Render
 		template<typename T>
 		void SetBuffer(std::uint32_t dataIndex, std::uint32_t bufferIndex, std::span<const T> data, std::size_t startIndex = 0);
 
+		/// @brief Tries to find a texture type index by the @p textureType.
+		/// @param textureType Texture type.
+		/// @return Texture type index; std::nullopt if such a texture type isn't found.
+		[[nodiscard("Pure function")]]
+		std::optional<std::uint32_t> TextureTypeIndex(std::string_view textureType) const noexcept;
+		/// @brief Gets a texture type by the @p textureTypeIndex.
+		/// @param textureTypeIndex Texture type index.
+		/// @return Texture type.
+		[[nodiscard("Pure function")]]
+		std::string_view TextureType(std::uint32_t textureTypeIndex) const noexcept;
+		/// @brief Gets the texture type count.
+		/// @return Texture type count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t TextureTypeCount() const noexcept;
+		/// @brief Gets the texture types.
+		/// @return Texture types.
+		[[nodiscard("Pure function")]]
+		std::span<const std::string> TextureTypes() const noexcept;
+
+		/// @brief Gets the texture count by the @p textureTypeIndex.
+		/// @param textureTypeIndex Texture type index.
+		/// @return Texture count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t TextureCount(std::uint32_t textureTypeIndex) const noexcept;
+		/// @brief Gets the texture count of all the tables.
+		/// @return Texture count.
+		[[nodiscard("Pure function")]]
+		std::uint32_t TextureCount() const noexcept;
+
+		/// @brief Gets the texture.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		/// @return Texture.
+		[[nodiscard("Pure function")]]
+		const std::shared_ptr<class Texture>& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept;
+
+		/// @brief Creates a texture table or overrides an existing one if their texture types are the same.
+		/// @param textureType Texture type.
+		/// @param textures Textures.
+		/// @return Texture type index.
+		std::uint32_t CreateTextureTable(std::string_view textureType, std::span<const std::shared_ptr<class Texture>> textures);
+		/// @brief Destroys a texture table.
+		/// @param textureTypeIndex Texture type index.
+		void DestroyTextureTable(std::uint32_t textureTypeIndex) noexcept;
+
+		/// @brief Sets the texture.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		/// @param texture Texture to set. Mustn't be nullptr.
+		void SetTexture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const std::shared_ptr<class Texture>& texture);
+
 		/// @brief Gets the name.
 		/// @return Name.
 		[[nodiscard("Pure function")]]
@@ -162,12 +213,18 @@ export namespace PonyEngine::Render
 		/// @param dataIndex Data index.
 		/// @param bufferIndex Buffer index.
 		void OnDataChanged(std::uint32_t dataIndex, std::uint32_t bufferIndex) const noexcept;
+		/// @brief Calls @p OnTextureChanged() on each observer.
+		void OnTextureChanged() const noexcept;
+		/// @brief Calls @p OnTextureChanged() on each observer.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		void OnTextureChanged(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept;
 		/// @brief Calls @p OnNameChanged() on each observer.
 		void OnNameChanged() const noexcept;
 
 		std::shared_ptr<class PipelineState> pipelineState; ///< Pipeline state.
 		DataTable<PonyBase::Container::Buffer> bufferData; ///< Buffer data.
-		DataTable<std::shared_ptr<Texture>> textureData; ///< Texture data.
+		DataTable<std::shared_ptr<class Texture>> textureData; ///< Texture data.
 
 		std::string name; ///< Material name.
 
@@ -188,6 +245,17 @@ namespace PonyEngine::Render
 			if (textureData.TypeIndex(bufferData.Type(bufferTypeIndex))) [[unlikely]]
 			{
 				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Buffers and textures have the same type: {}.", bufferTypeIndex));
+			}
+		}
+
+		for (std::uint32_t textureTypeIndex = 0; textureTypeIndex < textureData.TypeCount(); ++textureTypeIndex)
+		{
+			for (std::uint32_t textureIndex = 0; textureIndex < textureData.ElementCount(textureTypeIndex); ++textureIndex)
+			{
+				if (!textureData.Element(textureTypeIndex, textureIndex)) [[unlikely]]
+				{
+					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Texture at ['{}', '{}'] is nullptr.", textureTypeIndex, textureIndex));
+				}
 			}
 		}
 	}
@@ -261,6 +329,11 @@ namespace PonyEngine::Render
 
 	std::uint32_t Material::CreateDataTable(const std::string_view dataType, const std::span<const PonyBase::Container::BufferParams> dataParams)
 	{
+		if (textureData.TypeIndex(dataType))
+		{
+			throw std::invalid_argument("Such data type is used in textures.");
+		}
+
 		std::vector<PonyBase::Container::Buffer> newBuffers;
 		newBuffers.reserve(dataParams.size());
 		for (const PonyBase::Container::BufferParams& params : dataParams)
@@ -311,6 +384,79 @@ namespace PonyEngine::Render
 		OnDataChanged(dataIndex, bufferIndex);
 	}
 
+	std::optional<std::uint32_t> Material::TextureTypeIndex(const std::string_view textureType) const noexcept
+	{
+		return textureData.TypeIndex(textureType);
+	}
+
+	std::string_view Material::TextureType(const std::uint32_t textureTypeIndex) const noexcept
+	{
+		return textureData.Type(textureTypeIndex);
+	}
+
+	std::uint32_t Material::TextureTypeCount() const noexcept
+	{
+		return textureData.TypeCount();
+	}
+
+	std::span<const std::string> Material::TextureTypes() const noexcept
+	{
+		return textureData.Types();
+	}
+
+	std::uint32_t Material::TextureCount(const std::uint32_t textureTypeIndex) const noexcept
+	{
+		return textureData.ElementCount(textureTypeIndex);
+	}
+
+	std::uint32_t Material::TextureCount() const noexcept
+	{
+		return textureData.ElementCount();
+	}
+
+	std::uint32_t Material::CreateTextureTable(const std::string_view textureType, const std::span<const std::shared_ptr<class Texture>> textures)
+	{
+		for (const std::shared_ptr<class Texture>& texture : textures)
+		{
+			if (!texture)
+			{
+				throw std::invalid_argument("Texture is nullptr.");
+			}
+		}
+
+		if (bufferData.TypeIndex(textureType))
+		{
+			throw std::invalid_argument("Such data type is used in buffer data.");
+		}
+
+		const std::uint32_t typeIndex = textureData.SetData(textureType, textures);
+		OnTextureChanged();
+
+		return typeIndex;
+	}
+
+	void Material::DestroyTextureTable(const std::uint32_t textureTypeIndex) noexcept
+	{
+		textureData.RemoveData(textureTypeIndex);
+		OnTextureChanged();
+	}
+
+	void Material::SetTexture(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex, const std::shared_ptr<class Texture>& texture)
+	{
+		if (!texture)
+		{
+			throw std::invalid_argument("Texture is nullptr.");
+		}
+
+		textureData.Element(textureTypeIndex, textureIndex) = texture;
+		OnTextureChanged(textureTypeIndex, textureIndex);
+	}
+
+	const std::shared_ptr<class Texture>& Material::Texture(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex) const noexcept
+	{
+		return textureData.Element(textureTypeIndex, textureIndex);
+	}
+
 	void Material::OnPipelineStateChanged() const noexcept
 	{
 		for (IMaterialObserver* const observer : materialObservers)
@@ -332,6 +478,22 @@ namespace PonyEngine::Render
 		for (IMaterialObserver* const observer : materialObservers)
 		{
 			observer->OnDataChanged(dataIndex, bufferIndex);
+		}
+	}
+
+	void Material::OnTextureChanged() const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnTextureChanged();
+		}
+	}
+
+	void Material::OnTextureChanged(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex) const noexcept
+	{
+		for (IMaterialObserver* const observer : materialObservers)
+		{
+			observer->OnTextureChanged(textureTypeIndex, textureIndex);
 		}
 	}
 
@@ -376,6 +538,7 @@ namespace PonyEngine::Render
 	Material& Material::operator =(const Material& other)
 	{
 		DataTable newBufferData = other.bufferData;
+		DataTable newTextureData = other.textureData;
 		std::optional<std::string> newName = other.name == name ? std::nullopt : std::optional(other.name);
 
 		if (pipelineState != other.pipelineState)
@@ -386,6 +549,9 @@ namespace PonyEngine::Render
 
 		bufferData = std::move(newBufferData);
 		OnDataChanged();
+
+		textureData = std::move(newTextureData);
+		OnTextureChanged();
 
 		if (newName)
 		{
@@ -406,6 +572,9 @@ namespace PonyEngine::Render
 
 		bufferData = std::move(other.bufferData);
 		OnDataChanged();
+
+		textureData = std::move(other.textureData);
+		OnTextureChanged();
 
 		if (name != other.name)
 		{

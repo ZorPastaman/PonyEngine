@@ -67,16 +67,26 @@ export namespace PonyEngine::Render::Direct3D12
 			virtual void OnPipelineStateChanged() noexcept override;
 			virtual void OnDataChanged() noexcept override;
 			virtual void OnDataChanged(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) noexcept override;
+			virtual void OnTextureChanged() noexcept override;
+			virtual void OnTextureChanged(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) noexcept override;
 			virtual void OnNameChanged() noexcept override;
 
 			/// @brief Gets the changed data.
 			/// @return Changed data. It's empty if the @p DataChanged() is @a true.
 			[[nodiscard("Pure function")]]
 			const std::set<std::pair<std::uint32_t, std::uint32_t>>& ChangedData() const noexcept;
+			/// @brief Gets the changed textures.
+			/// @return Changed textures. It's empty if the @p TextureChanged() is @a true.
+			[[nodiscard("Pure function")]]
+			const std::set<std::pair<std::uint32_t, std::uint32_t>>& ChangedTextures() const noexcept;
 			/// @brief Is the data structure changed?
 			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
 			bool DataChanged() const noexcept;
+			/// @brief Is the texture structure changed?
+			/// @return @a True if it's changed; @a false otherwise.
+			[[nodiscard("Pure function")]]
+			bool TextureChanged() const noexcept;
 			/// @brief Is the pipeline state changed?
 			/// @return @a True if it's changed; @a false otherwise.
 			[[nodiscard("Pure function")]]
@@ -94,9 +104,11 @@ export namespace PonyEngine::Render::Direct3D12
 
 		private:
 			std::set<std::pair<std::uint32_t, std::uint32_t>> changedData; ///< Changed data indices.
-			bool dataChanged;
-			bool pipelineStateChanged;
-			bool nameChanged;
+			std::set<std::pair<std::uint32_t, std::uint32_t>> changedTextures; ///< Changed texture indices.
+			bool dataChanged; ///< Is data structure changed?
+			bool textureChanged; ///< Is texture structure changed?
+			bool pipelineStateChanged; ///< Is pipeline state changed?
+			bool nameChanged; ///< Is name changed?
 		};
 
 		/// @brief Buffer info. Used to sort material data buffers.
@@ -170,6 +182,7 @@ namespace PonyEngine::Render::Direct3D12
 {
 	MaterialManager::MaterialObserver::MaterialObserver() noexcept :
 		dataChanged{true},
+		textureChanged{true},
 		pipelineStateChanged{true},
 		nameChanged{true}
 	{
@@ -194,6 +207,20 @@ namespace PonyEngine::Render::Direct3D12
 		}
 	}
 
+	void MaterialManager::MaterialObserver::OnTextureChanged() noexcept
+	{
+		changedTextures.clear();
+		textureChanged = true;
+	}
+
+	void MaterialManager::MaterialObserver::OnTextureChanged(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex) noexcept
+	{
+		if (!textureChanged)
+		{
+			changedTextures.insert(std::pair(textureTypeIndex, textureIndex));
+		}
+	}
+
 	void MaterialManager::MaterialObserver::OnNameChanged() noexcept
 	{
 		nameChanged = true;
@@ -204,9 +231,19 @@ namespace PonyEngine::Render::Direct3D12
 		return changedData;
 	}
 
+	const std::set<std::pair<std::uint32_t, std::uint32_t>>& MaterialManager::MaterialObserver::ChangedTextures() const noexcept
+	{
+		return changedTextures;
+	}
+
 	bool MaterialManager::MaterialObserver::DataChanged() const noexcept
 	{
 		return dataChanged;
+	}
+
+	bool MaterialManager::MaterialObserver::TextureChanged() const noexcept
+	{
+		return textureChanged;
 	}
 
 	bool MaterialManager::MaterialObserver::PipelineStateChanged() const noexcept
@@ -222,7 +259,9 @@ namespace PonyEngine::Render::Direct3D12
 	void MaterialManager::MaterialObserver::Reset() noexcept
 	{
 		changedData.clear();
+		changedTextures.clear();
 		dataChanged = false;
+		textureChanged = false;
 		pipelineStateChanged = false;
 		nameChanged = false;
 	}
