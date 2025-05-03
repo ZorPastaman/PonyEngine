@@ -22,9 +22,14 @@ import <vector>;
 
 import PonyEngine.Render;
 
+import :Buffer;
+import :FormatUtility;
 import :IMaterialManager;
+import :IResourceManager;
 import :ISubSystemContext;
+import :ITextureManager;
 import :Material;
+import :Texture;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -131,6 +136,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		static std::uint64_t CalculateBufferSize(std::span<const BufferInfo> bufferInfos) noexcept;
 
+		[[nodiscard("Pure function")]]
+		static D3D12_SHADER_RESOURCE_VIEW_DESC GetSRV(const Render::Texture& texture);
+
 		/// @brief Updates the material.
 		/// @param material Material
 		/// @param source Material source.
@@ -156,6 +164,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @param dataTypeIndex Data type index.
 		/// @param dataIndex Data index.
 		void UpdateData(Material& material, const Render::Material& source, std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const;
+		void UpdateTextures(Material& material, const Render::Material& source, const MaterialObserver& observer);
 		/// @brief Updates the material name.
 		/// @param material Material.
 		/// @param source Material source.
@@ -360,41 +369,110 @@ namespace PonyEngine::Render::Direct3D12
 		return last.offset * last.buffer->Stride() + last.buffer->Size();
 	}
 
+	D3D12_SHADER_RESOURCE_VIEW_DESC MaterialManager::GetSRV(const Render::Texture& texture)
+	{
+		switch (texture.Dimension())
+		{
+		case TextureDimension::Texture1D:
+			return D3D12_SHADER_RESOURCE_VIEW_DESC
+			{
+				.Format = GetD3D12Format(texture.Format()),
+				.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE1D,
+				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+				.Texture1D = D3D12_TEX1D_SRV
+				{
+					.MostDetailedMip = 0u,
+					.MipLevels = 1u,
+					.ResourceMinLODClamp = 0.f
+				}
+			};
+		case TextureDimension::Texture2D:
+			return D3D12_SHADER_RESOURCE_VIEW_DESC
+			{
+				.Format = GetD3D12Format(texture.Format()),
+				.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D,
+				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+				.Texture2D = D3D12_TEX2D_SRV
+				{
+					.MostDetailedMip = 0u,
+					.MipLevels = 1u,
+					.PlaneSlice = 0u,
+					.ResourceMinLODClamp = 0.f
+				}
+			};
+		case TextureDimension::Texture3D:
+			return D3D12_SHADER_RESOURCE_VIEW_DESC
+			{
+				.Format = GetD3D12Format(texture.Format()),
+				.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE3D,
+				.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
+				.Texture3D = D3D12_TEX3D_SRV
+				{
+					.MostDetailedMip = 0u,
+					.MipLevels = 1u,
+					.ResourceMinLODClamp = 0.f
+				}
+			};
+		default: [[unlikely]]
+			throw std::invalid_argument("Unsupported texture dimension.");
+		}
+	}
+
 	void MaterialManager::UpdateMaterial(Material& material, const Render::Material& source, const MaterialObserver& observer) const
 	{
-		if (!observer.DataChanged()) [[likely]]
+		if (!observer.DataChanged() && !observer.TextureChanged()) [[likely]]
 		{
 			return;
 		}
 
+		const std::uint32_t dataCount = source.DataCount();
+		const std::uint32_t textureCount = source.TextureCount();
+		const std::uint32_t heapSize = dataCount + textureCount;
+
 		const std::vector<BufferInfo> bufferInfos = CalculateBufferOrder(source);
 		std::shared_ptr<Buffer> buffer = d3d12System->ResourceManager().CreateBuffer(CalculateBufferSize(bufferInfos), HeapType::Default);
-		std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, static_cast<std::uint32_t>(bufferInfos.size()), false);
+
+		std::vector<std::vector<std::shared_ptr<Texture>>> textures;
+		textures.reserve(source.TextureTypeCount());
+		for (std::uint32_t textureTypeIndex = 0; textureTypeIndex < source.TextureTypeCount(); ++textureTypeIndex)
+		{
+			std::vector<std::shared_ptr<Texture>>& createdTextures = textures[textureTypeIndex];
+			createdTextures.reserve(source.TextureCount(textureTypeIndex));
+
+			for (std::uint32_t textureIndex = 0; textureIndex < source.TextureCount(textureTypeIndex); ++textureIndex)
+			{
+				createdTextures.push_back(d3d12System->TextureManager().CreateTexture(source.Texture(textureTypeIndex, textureIndex)));
+			}
+		}
+
+		std::shared_ptr<DescriptorHeap> heap = d3d12System->DescriptorHeapManager().CreateDescriptorHeap(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV, heapSize, false);
 
 		std::vector<std::vector<std::uint64_t>> bufferOffsets;
-		std::vector<std::string> dataTypes;
-		std::vector<std::uint32_t> heapIndices;
 		bufferOffsets.reserve(source.DataTypeCount());
-		dataTypes.reserve(source.DataTypeCount());
-		heapIndices.reserve(source.DataTypeCount());
 		for (std::uint32_t i = 0u; i < source.DataTypeCount(); ++i)
 		{
 			bufferOffsets.push_back(std::vector<std::uint64_t>(source.DataCount(i)));
 		}
-
 		for (const BufferInfo& bufferInfo : bufferInfos)
 		{
 			bufferOffsets[bufferInfo.dataTypeIndex][bufferInfo.bufferIndex] = bufferInfo.offset;
 		}
 
-		for (std::uint32_t dataIndex = 0u, heapIndex = 0u; dataIndex < source.DataTypeCount(); ++dataIndex)
+		std::vector<std::string> types;
+		std::vector<std::uint32_t> heapIndices;
+		types.reserve(heapSize);
+		heapIndices.reserve(heapSize);
+
+		std::uint32_t heapIndex = 0u;
+
+		for (std::uint32_t dataTypeIndex = 0u; dataTypeIndex < source.DataTypeCount(); ++dataTypeIndex)
 		{
-			dataTypes.push_back(std::string(source.DataType(dataIndex)));
+			types.push_back(std::string(source.DataType(dataTypeIndex)));
 			heapIndices.push_back(heapIndex);
 
-			for (std::uint32_t bufferIndex = 0u; bufferIndex < source.DataCount(dataIndex); ++bufferIndex, ++heapIndex)
+			for (std::uint32_t dataIndex = 0u; dataIndex < source.DataCount(dataTypeIndex); ++dataIndex, ++heapIndex)
 			{
-				const PonyBase::Container::Buffer& sourceBuffer = source.Data(dataIndex, bufferIndex);
+				const PonyBase::Container::Buffer& sourceBuffer = source.Data(dataTypeIndex, dataIndex);
 				const auto srvDesc = D3D12_SHADER_RESOURCE_VIEW_DESC
 				{
 					.Format = DXGI_FORMAT_UNKNOWN,
@@ -402,7 +480,7 @@ namespace PonyEngine::Render::Direct3D12
 					.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING,
 					.Buffer = D3D12_BUFFER_SRV
 					{
-						.FirstElement = bufferOffsets[dataIndex][bufferIndex],
+						.FirstElement = bufferOffsets[dataTypeIndex][dataIndex],
 						.NumElements = static_cast<UINT>(sourceBuffer.Count()),
 						.StructureByteStride = static_cast<UINT>(sourceBuffer.Stride()),
 						.Flags = D3D12_BUFFER_SRV_FLAG_NONE
@@ -411,13 +489,26 @@ namespace PonyEngine::Render::Direct3D12
 				d3d12System->Device().CreateShaderResourceView(&buffer->Data(), &srvDesc, heap->CpuHandle(heapIndex));
 			}
 		}
-
 		for (const BufferInfo& bufferInfo : bufferInfos)
 		{
 			bufferOffsets[bufferInfo.dataTypeIndex][bufferInfo.bufferIndex] = bufferInfo.offset * bufferInfo.buffer->Stride();
 		}
 
-		material = Material(nullptr, std::move(buffer), std::move(bufferOffsets), std::move(heap), std::move(dataTypes), std::move(heapIndices));
+		for (std::uint32_t textureTypeIndex = 0u; textureTypeIndex < source.TextureTypeCount(); ++textureTypeIndex)
+		{
+			types.push_back(std::string(source.TextureType(textureTypeIndex)));
+			heapIndices.push_back(heapIndex);
+
+			for (std::uint32_t textureIndex = 0u; textureIndex < source.TextureCount(textureTypeIndex); ++textureIndex, ++heapIndex)
+			{
+				Texture& texture = *textures[textureTypeIndex][textureIndex];
+				const Render::Texture& sourceTexture = *source.Texture(textureTypeIndex, textureIndex);
+				const auto srvDesc = GetSRV(sourceTexture);
+				d3d12System->Device().CreateShaderResourceView(&texture.Data(), &srvDesc, heap->CpuHandle(heapIndex));
+			}
+		}
+
+		material = Material(nullptr, std::move(buffer), std::move(bufferOffsets), std::move(textures), std::move(heap), std::move(types), std::move(heapIndices));
 	}
 
 	void MaterialManager::UpdatePipelineState(Material& material, const Render::Material& source, const MaterialObserver& observer) const
@@ -451,7 +542,7 @@ namespace PonyEngine::Render::Direct3D12
 		const std::uint64_t size = gpuBuffer.Data().GetDesc1().Width;
 		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(size, HeapType::Upload);
 
-		for (std::uint32_t dataTypeIndex = 0u; dataTypeIndex < material.DataTypeCount(); ++dataTypeIndex)
+		for (std::uint32_t dataTypeIndex = 0u; dataTypeIndex < material.TypeCount(); ++dataTypeIndex)
 		{
 			for (std::uint32_t dataIndex = 0u; dataIndex < material.DataCount(dataTypeIndex); ++dataIndex)
 			{
@@ -471,6 +562,14 @@ namespace PonyEngine::Render::Direct3D12
 
 		Buffer& gpuBuffer = *material.Buffer();
 		d3d12System->CopyPipeline().AddCopyTask(*uploadBuffer, gpuBuffer, 0ULL, material.BufferOffset(dataTypeIndex, dataIndex), sourceBuffer.Size());
+	}
+
+	void MaterialManager::UpdateTextures(Material& material, const Render::Material& source, const MaterialObserver& observer)
+	{
+		for (const auto [textureTypeIndex, textureIndex] : observer.ChangedTextures())
+		{
+			material.Texture(textureTypeIndex, textureIndex, d3d12System->TextureManager().CreateTexture(source.Texture(textureTypeIndex, textureIndex)));
+		}
 	}
 
 	void MaterialManager::UpdateName(Material& material, const Render::Material& source, const MaterialObserver& observer)
