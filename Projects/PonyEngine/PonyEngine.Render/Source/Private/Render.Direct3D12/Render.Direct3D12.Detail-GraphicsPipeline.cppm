@@ -1361,7 +1361,7 @@ namespace PonyEngine::Render::Direct3D12
 		{
 			for (const auto& [dataType, dataSlot] : material->PipelineState()->RootSignature()->DataSlots())
 			{
-				if (const std::optional<std::uint32_t> materialDataIndex = material->DataTypeIndex(dataType))
+				if (const std::optional<std::uint32_t> materialDataIndex = material->TypeIndex(dataType))
 				{
 					CommandList().SetGraphicsRootDescriptorTable(dataSlot, mergedDataHeap->GpuHandle(MergedHeapMaterialIndex(*material, materialDataIndex.value())));
 				}
