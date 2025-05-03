@@ -562,7 +562,7 @@ namespace PonyEngine::Render
 		case TextureFormat::R16G16B16A16_Snorm:
 		case TextureFormat::R16G16_Snorm:
 		case TextureFormat::R16_Snorm:
-			SetPixelColorData(static_cast<PonyMath::Core::Vector4<std::int16_t>>(static_cast<PonyMath::Core::Vector4<T>>(color * -std::numeric_limits<std::int16_t>::min())), data, format);
+			SetPixelColorData(static_cast<PonyMath::Core::Vector4<std::int16_t>>(static_cast<PonyMath::Core::Vector4<T>>(color) * static_cast<T>(-std::numeric_limits<std::int16_t>::min())), data, format);
 			break;
 		case TextureFormat::R8G8B8A8_Unorm:
 		case TextureFormat::R8G8_Unorm:
@@ -573,7 +573,7 @@ namespace PonyEngine::Render
 			SetPixelColor(static_cast<PonyMath::Color::RGBAInt<std::uint8_t>>(color), data, format);
 			break;
 		case TextureFormat::R8G8B8A8_Snorm:
-			SetPixelColorData(static_cast<PonyMath::Core::Vector4<std::int16_t>>(static_cast<PonyMath::Core::Vector4<T>>(color * -std::numeric_limits<std::int8_t>::min())), data, format);
+			SetPixelColorData(static_cast<PonyMath::Core::Vector4<std::int16_t>>(static_cast<PonyMath::Core::Vector4<T>>(color) * static_cast<T>(-std::numeric_limits<std::int8_t>::min())), data, format);
 			break;
 		default: [[unlikely]]
 			assert(false && "Incorrect texture format.");

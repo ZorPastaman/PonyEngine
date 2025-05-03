@@ -29,7 +29,7 @@ export namespace PonyEngine::Render
 {
 	/// @brief Texture 1D.
 	class Texture1D final : public Texture // TODO: Add texture array and texture cube
-	{
+	{// TODO: Docs here are incorrect. Update. It uses terms pixel and block incorrrectly.
 	public:
 		/// @brief Creates an empty texture.
 		[[nodiscard("Pure constructor")]]
@@ -392,7 +392,7 @@ namespace PonyEngine::Render
 
 	const std::byte* Texture1D::GetPixelRaw(const std::uint32_t index) const noexcept
 	{
-		return data.Data() + index * RowSize();
+		return data.Data() + index * FormatInfo(format).blockSize;
 	}
 
 	void Texture1D::GetPixelsRaw(const std::uint32_t startIndex, const std::span<std::byte> output) const
@@ -573,34 +573,26 @@ namespace PonyEngine::Render
 
 	std::byte* Texture1D::GetPixelRaw(const std::uint32_t index) noexcept
 	{
-		return data.Data() + index * RowSize();
+		return data.Data() + index * FormatInfo(format).blockSize;
 	}
 
 	void Texture1D::ValidateColor(const std::uint32_t startIndex, const std::size_t size) const
 	{
-		if (startIndex >= RowCount()) [[unlikely]]
+		if (startIndex + size > RowSize() / FormatInfo(format).blockSize) [[unlikely]]
 		{
-			throw std::out_of_range("Start index exceeds pixel count.");
-		}
-		if (size > RowCount() - startIndex) [[unlikely]]
-		{
-			throw std::out_of_range("Input is too large.");
+			throw std::out_of_range("Out of bounds.");
 		}
 	}
 
 	void Texture1D::ValidateRaw(const std::uint32_t startIndex, const std::size_t size) const
 	{
-		if (startIndex >= RowCount()) [[unlikely]]
-		{
-			throw std::out_of_range("Start index exceeds pixel count.");
-		}
 		if (size % RowSize()) [[unlikely]]
 		{
 			throw std::invalid_argument("Output is invalid size.");
 		}
-		if (size > Size() - startIndex * RowSize()) [[unlikely]]
+		if (startIndex + size > Size()) [[unlikely]]
 		{
-			throw std::out_of_range("Output is too large.");
+			throw std::out_of_range("Out of bounds.");
 		}
 	}
 }

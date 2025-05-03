@@ -177,7 +177,7 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::invalid_argument("Stride is too great.");
 		}
 
-		if (footprint.Footprint.RowPitch * footprint.Footprint.Height * footprint.Footprint.Depth + footprint.Offset > resource->GetDesc1().Width) [[unlikely]]
+		if (footprint.Footprint.RowPitch * (footprint.Footprint.Height * footprint.Footprint.Depth - 1) + stride + footprint.Offset > resource->GetDesc1().Width) [[unlikely]]
 		{
 			throw std::out_of_range("Out of bounds.");
 		}

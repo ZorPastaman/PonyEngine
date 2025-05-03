@@ -16,6 +16,8 @@ export module PonyEngine.Render:Texture;
 import <algorithm>;
 import <cstddef>;
 import <cstdint>;
+import <string>;
+import <string_view>;
 import <utility>;
 import <vector>;
 
@@ -77,6 +79,10 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		std::uint32_t PixelCount() const noexcept;
 
+		[[nodiscard("Pure function")]]
+		std::string_view Name() const noexcept; // TODO: Add docs
+		void Name(std::string_view name);
+
 		/// @brief Adds a texture observer.
 		/// @param observer Texture observer to add.
 		void AddObserver(ITextureObserver& observer) const;
@@ -105,7 +111,7 @@ export namespace PonyEngine::Render
 		/// @brief Calls @p OnTextureChanged() on each observer.
 		void OnTextureChanged() const noexcept;
 
-		Texture& operator =(const Texture& other) = default;
+		Texture& operator =(const Texture& other) = default; // TODO: Add correct copying
 		Texture& operator =(Texture&& other) noexcept = default;
 
 		PonyBase::Container::Buffer data; ///< Data buffer.
@@ -114,6 +120,8 @@ export namespace PonyEngine::Render
 		TextureFormat format; ///< Texture format.
 
 	private:
+		std::string name;
+
 		mutable std::vector<ITextureObserver*> textureObservers; ///< Texture observers.
 
 		// TODO: Add mips
@@ -155,6 +163,22 @@ namespace PonyEngine::Render
 	std::uint32_t Texture::PixelCount() const noexcept
 	{
 		return Width() * Height() * Depth();
+	}
+
+	std::string_view Texture::Name() const noexcept
+	{
+		return name;
+	}
+
+	void Texture::Name(const std::string_view name)
+	{
+		if (this->name == name)
+		{
+			return;
+		}
+
+		this->name = name;
+		// TODO: Add observer call.
 	}
 
 	void Texture::AddObserver(ITextureObserver& observer) const
