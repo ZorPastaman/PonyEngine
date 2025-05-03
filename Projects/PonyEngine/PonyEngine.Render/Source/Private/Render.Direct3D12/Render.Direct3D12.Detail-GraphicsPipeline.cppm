@@ -55,6 +55,7 @@ import :IFrameManager;
 import :IGraphicsPipeline;
 import :ISubSystemContext;
 import :PipelineState;
+import :Material;
 import :Mesh;
 import :ObjectUtility;
 import :Pipeline;
@@ -300,6 +301,7 @@ export namespace PonyEngine::Render::Direct3D12
 		std::shared_ptr<DescriptorHeap> renderObjectDataHeap; ///< Render object data heap.
 
 		std::unordered_set<Material*> materials; ///< Render object materials cache.
+		std::unordered_set<Texture*> textures; ///< Render object texture cache.
 		std::unordered_set<Mesh*> meshes; ///< Render object meshes cache.
 
 		std::vector<CameraTask> cameraTasks; ///< Camera tasks.
@@ -323,6 +325,7 @@ namespace PonyEngine::Render::Direct3D12
 		renderObjects.reserve(64);
 		renderObjectData.reserve(8 * 64);
 		materials.reserve(64);
+		textures.reserve(64);
 		meshes.reserve(64);
 		cameraTasks.reserve(8);
 		originalHeapOffsets.reserve(16 * 64);
@@ -428,6 +431,7 @@ namespace PonyEngine::Render::Direct3D12
 	void GraphicsPipeline::Clear() noexcept
 	{
 		materials.clear();
+		textures.clear();
 		meshes.clear();
 		renderObjectData.clear();
 	}
@@ -551,7 +555,16 @@ namespace PonyEngine::Render::Direct3D12
 			throw std::runtime_error("Max render object count is exceeded.");
 		}
 
-		materials.insert(&renderObject.Material());
+		Material& material = renderObject.Material();
+		materials.insert(&material);
+
+		for (std::uint32_t textureTypeIndex = 0u; textureTypeIndex < material.TextureTypeCount(); ++textureTypeIndex)
+		{
+			for (uint32_t textureIndex = 0u; textureIndex < material.TextureCount(textureTypeIndex); ++textureIndex)
+			{
+				textures.insert(material.Texture(textureTypeIndex, textureIndex));
+			}
+		}
 
 		Mesh* const mesh = renderObject.Mesh();
 		if (mesh)
@@ -1007,6 +1020,23 @@ namespace PonyEngine::Render::Direct3D12
 			};
 			AddBarrier(bufferBarrier);
 		}
+
+		for (Texture* const texture : textures)
+		{
+			const auto textureBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_NONE,
+				.SyncAfter = D3D12_BARRIER_SYNC_DRAW,
+				.AccessBefore = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.AccessAfter = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_COMMON,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
+				.pResource = &texture->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(textureBarrier);
+		}
 	}
 
 	void GraphicsPipeline::AddMaterialEndBarriers()
@@ -1024,6 +1054,23 @@ namespace PonyEngine::Render::Direct3D12
 				.Size = UINT64_MAX
 			};
 			AddBarrier(bufferBarrier);
+		}
+
+		for (Texture* const texture : textures)
+		{
+			const auto textureBarrier = D3D12_TEXTURE_BARRIER
+			{
+				.SyncBefore = D3D12_BARRIER_SYNC_DRAW,
+				.SyncAfter = D3D12_BARRIER_SYNC_NONE,
+				.AccessBefore = D3D12_BARRIER_ACCESS_SHADER_RESOURCE,
+				.AccessAfter = D3D12_BARRIER_ACCESS_NO_ACCESS,
+				.LayoutBefore = D3D12_BARRIER_LAYOUT_SHADER_RESOURCE,
+				.LayoutAfter = D3D12_BARRIER_LAYOUT_COMMON,
+				.pResource = &texture->Data(),
+				.Subresources = D3D12_RESOURCE_BARRIER_ALL_SUBRESOURCES,
+				.Flags = D3D12_TEXTURE_BARRIER_FLAG_NONE
+			};
+			AddBarrier(textureBarrier);
 		}
 	}
 

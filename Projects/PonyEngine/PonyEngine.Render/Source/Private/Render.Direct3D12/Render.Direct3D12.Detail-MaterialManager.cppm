@@ -314,6 +314,7 @@ namespace PonyEngine::Render::Direct3D12
 			UpdateMaterial(material, source, observer);
 			UpdatePipelineState(material, source, observer);
 			UpdateData(material, source, observer);
+			UpdateTextures(material, source, observer);
 			UpdateName(material, source, observer);
 
 			observer.Reset();
@@ -436,7 +437,8 @@ namespace PonyEngine::Render::Direct3D12
 		textures.reserve(source.TextureTypeCount());
 		for (std::uint32_t textureTypeIndex = 0; textureTypeIndex < source.TextureTypeCount(); ++textureTypeIndex)
 		{
-			std::vector<std::shared_ptr<Texture>>& createdTextures = textures[textureTypeIndex];
+			textures.push_back(std::vector<std::shared_ptr<Texture>>());
+			std::vector<std::shared_ptr<Texture>>& createdTextures = textures.back();
 			createdTextures.reserve(source.TextureCount(textureTypeIndex));
 
 			for (std::uint32_t textureIndex = 0; textureIndex < source.TextureCount(textureTypeIndex); ++textureIndex)
@@ -542,7 +544,7 @@ namespace PonyEngine::Render::Direct3D12
 		const std::uint64_t size = gpuBuffer.Data().GetDesc1().Width;
 		const std::shared_ptr<Buffer> uploadBuffer = d3d12System->ResourceManager().CreateBuffer(size, HeapType::Upload);
 
-		for (std::uint32_t dataTypeIndex = 0u; dataTypeIndex < material.TypeCount(); ++dataTypeIndex)
+		for (std::uint32_t dataTypeIndex = 0u; dataTypeIndex < material.DataTypeCount(); ++dataTypeIndex)
 		{
 			for (std::uint32_t dataIndex = 0u; dataIndex < material.DataCount(dataTypeIndex); ++dataIndex)
 			{
