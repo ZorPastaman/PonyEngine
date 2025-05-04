@@ -38,7 +38,7 @@ export namespace PonyEngine::Window::Windows
 	};
 
 	/// @brief Process window messages.
-	/// @details Actually, it translates invocations to a corresponding @p IWindowsWindowMessageHandler.
+	/// @details Actually, it translates invocations to a corresponding @p IMessageHandler.
 	///          It's needed because WinAPI doesn't take pointers to member functions.
 	///          It's required to set a pointer to @p IMessageHandler in a CreateWindow() function.
 	/// @param hWnd Window handler.
