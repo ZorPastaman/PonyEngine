@@ -28,7 +28,7 @@ export namespace PonyBase::Core
 
 namespace PonyBase::Core
 {
-	constexpr std::uint16_t ToFloat16(const float value) noexcept
+	constexpr std::uint16_t ToFloat16(const float value) noexcept // TODO: Add tests
 	{
 		const std::uint32_t value32 = std::bit_cast<std::uint32_t>(value);
 		const std::uint32_t sign = value32 >> 16 & 0x8000;
