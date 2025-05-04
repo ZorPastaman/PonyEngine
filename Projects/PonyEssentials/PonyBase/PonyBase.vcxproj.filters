@@ -76,9 +76,6 @@
     <ClCompile Include="Source\Public\Container\Container-Buffer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Container\Container-BufferView.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

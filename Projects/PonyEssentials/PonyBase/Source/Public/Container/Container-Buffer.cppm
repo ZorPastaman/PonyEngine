@@ -91,28 +91,40 @@ export namespace PonyBase::Container
 		bool IsEmpty() const noexcept;
 
 		/// @brief Gets a part of the buffer as an objects of type @p T.
-		/// @tparam T Object type. Its size must be @ Stride().
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @param index Object index.
 		/// @return Object.
 		template<typename T> [[nodiscard("Pure function")]]
 		T& Get(std::size_t index);
 		/// @brief Gets a part of the buffer as an objects of type @p T.
-		/// @tparam T Object type. Its size must be @ Stride().
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @param index Object index.
 		/// @return Object.
 		template<typename T> [[nodiscard("Pure function")]]
 		const T& Get(std::size_t index) const;
 
 		/// @brief Gets a buffer as a span of type @p T.
-		/// @tparam T Object type. Its size must be @ Stride().
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::span<T> Span();
 		/// @brief Gets a buffer as a span of type @p T.
-		/// @tparam T Object type. Its size must be @ Stride().
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::span<const T> Span() const;
+		/// @brief Gets a buffer stride as a span of type @p T.
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
+		/// @param strideIndex Stride index.
+		/// @return Span.
+		template<typename T> [[nodiscard("Pure function")]]
+		std::span<T> Span(std::uint32_t strideIndex);
+		/// @brief Gets a buffer stride as a span of type @p T.
+		/// @tparam T Object type. Its size must be a factor of @p Stride.
+		/// @param strideIndex Stride index.
+		/// @return Span.
+		template<typename T> [[nodiscard("Pure function")]]
+		std::span<const T> Span(std::uint32_t strideIndex) const;
 
 		/// @brief Copies data from the @p source.
 		/// @param source Data source. Its stride and count must be the same as the stride and count if this buffer.
@@ -211,9 +223,13 @@ namespace PonyBase::Container
 	template<typename T>
 	T& Buffer::Get(const std::size_t index)
 	{
-		if (sizeof(T) != stride) [[unlikely]]
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
 		{
 			throw std::invalid_argument("Incorrect type.");
+		}
+		if (index > Size() / sizeof(T)) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
 		}
 
 		return reinterpret_cast<T*>(data.get())[index];
@@ -222,9 +238,13 @@ namespace PonyBase::Container
 	template<typename T>
 	const T& Buffer::Get(std::size_t index) const
 	{
-		if (sizeof(T) != stride) [[unlikely]]
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
 		{
 			throw std::invalid_argument("Incorrect type.");
+		}
+		if (index > Size() / sizeof(T)) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
 		}
 
 		return reinterpret_cast<const T*>(data.get())[index];
@@ -233,23 +253,53 @@ namespace PonyBase::Container
 	template<typename T>
 	std::span<T> Buffer::Span()
 	{
-		if (sizeof(T) != stride) [[unlikely]]
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
 		{
 			throw std::invalid_argument("Incorrect type.");
 		}
 
-		return std::span<T>(reinterpret_cast<T*>(data.get()), count);
+		return std::span<T>(reinterpret_cast<T*>(data.get()), Size() / sizeof(T));
 	}
 
 	template<typename T>
 	std::span<const T> Buffer::Span() const
 	{
-		if (sizeof(T) != stride) [[unlikely]]
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
 		{
 			throw std::invalid_argument("Incorrect type.");
 		}
 
-		return std::span<const T>(reinterpret_cast<const T*>(data.get()), count);
+		return std::span<const T>(reinterpret_cast<const T*>(data.get()), Size() / sizeof(T));
+	}
+
+	template <typename T>
+	std::span<T> Buffer::Span(const std::uint32_t strideIndex) // TODO: Update tests
+	{
+		if (strideIndex >= count) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
+
+		return std::span<T>(reinterpret_cast<T*>(data.get() + strideIndex * stride), stride);
+	}
+
+	template <typename T>
+	std::span<const T> Buffer::Span(const std::uint32_t strideIndex) const
+	{
+		if (strideIndex >= count) [[unlikely]]
+		{
+			throw std::out_of_range("Out of bounds.");
+		}
+		if (sizeof(T) > stride || stride % sizeof(T)) [[unlikely]]
+		{
+			throw std::invalid_argument("Incorrect type.");
+		}
+
+		return std::span<T>(reinterpret_cast<const T*>(data.get() + strideIndex * stride), stride);
 	}
 
 	void Buffer::CopyFrom(const Buffer& source)
