@@ -70,7 +70,7 @@ namespace PonyEngine::Render::Direct3D12
 		fence(std::make_unique<Fence>(d3d12System, commandQueue))
 	{
 		PONY_LOG(this->d3d12System->Logger(), PonyDebug::Log::LogType::Info, "Create wait event.");
-		if ((waitEvent = CreateEventA(nullptr, false, false, nullptr)) == nullptr) [[unlikely]]
+		if (!((waitEvent = CreateEventA(nullptr, false, false, nullptr)))) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to create wait event. Error code: '0x{:X}'.", GetLastError()));
 		}
