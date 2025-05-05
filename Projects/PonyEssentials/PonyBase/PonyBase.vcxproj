@@ -37,6 +37,7 @@
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm" />
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-Container.cppm" />
+    <ClCompile Include="Source\Public\Utility\Utility-Mask.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-SafeFormat.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-StringConvert.cppm" />

@@ -114,8 +114,8 @@ namespace PonyEngine::Render::Direct3D12
 		heaps(heaps),
 		handles(handles)
 	{
-		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return p.second == nullptr; }) == this->textures.cend() && "At least one of the textures is nullptr.");
-		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return p.second == nullptr; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
+		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return !p.second; }) == this->textures.cend() && "At least one of the textures is nullptr.");
+		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return !p.second; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
 		assert(std::ranges::find_if(this->handles, [&](const std::pair<View, std::uint32_t>& p) { return !this->heaps.contains(p.first) || p.second >= this->heaps.find(p.first)->second->HandleCount(); }) == this->handles.cend() && "No heap for a handle is found.");
 	}
 
@@ -125,8 +125,8 @@ namespace PonyEngine::Render::Direct3D12
 		heaps(std::move(heaps)),
 		handles(std::move(handles))
 	{
-		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return p.second == nullptr; }) == this->textures.cend() && "At least one of the textures is nullptr.");
-		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return p.second == nullptr; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
+		assert(std::ranges::find_if(this->textures, [](const std::pair<Attachment, std::shared_ptr<Texture>>& p) { return !p.second; }) == this->textures.cend() && "At least one of the textures is nullptr.");
+		assert(std::ranges::find_if(this->heaps, [](const std::pair<View, std::shared_ptr<DescriptorHeap>>& p) { return !p.second; }) == this->heaps.cend() && "At least one of the heaps is nullptr.");
 		assert(std::ranges::find_if(this->handles, [&](const std::pair<View, std::uint32_t>& p) { return !this->heaps.contains(p.first) || p.second >= this->heaps.find(p.first)->second->HandleCount(); }) == this->handles.cend() && "No heap for a handle is found.");
 	}
 

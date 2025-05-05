@@ -10,6 +10,7 @@
 export module PonyEngine.Render:TextureDimension;
 
 import <cstdint>;
+import <type_traits>;
 
 export namespace PonyEngine::Render
 {
