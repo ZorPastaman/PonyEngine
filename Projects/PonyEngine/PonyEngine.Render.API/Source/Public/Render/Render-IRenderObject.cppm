@@ -17,12 +17,24 @@ import <string_view>;
 
 import PonyMath.Core;
 
+import :IMaterial;
+import :IMesh;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Render object.
 	class IRenderObject
 	{
 		INTERFACE_BODY(IRenderObject)
+
+		/// @brief Gets the material.
+		/// @return Material.
+		[[nodiscard("Pure function")]]
+		virtual IMaterial& Material() const noexcept = 0;
+		/// @brief Gets the mesh.
+		/// @return Mesh.
+		[[nodiscard("Pure function")]]
+		virtual IMesh* Mesh() const noexcept = 0;
 
 		/// @brief Gets the translation-rotation-scaling matrix of the object.
 		/// @return Translation-rotation-scaling matrix.

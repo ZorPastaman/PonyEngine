@@ -7,25 +7,22 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:RenderObjectParams;
+export module PonyEngine.Render:RootSignatureParams;
 
 import <memory>;
 import <string>;
+import <unordered_map>;
 
-import PonyMath.Core;
-
-import :IMaterial;
-import :IMesh;
+import :IShader;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Render object parameters.
-	struct RenderObjectParams final
+	/// @brief Root signature parameters.
+	struct RootSignatureParams final
 	{
-		std::shared_ptr<const IMaterial> material; ///< Render object material.
-		std::shared_ptr<const IMesh> mesh; ///< Render object mesh.
-		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< Render object model matrix.
+		std::shared_ptr<IShader> shader; ///< Root signature shader.
+		std::unordered_map<std::string, std::uint32_t> slots; ///< Root signature slots.
 
-		std::string name; ///< Render object name.
+		std::string name; ///< Root signature name.
 	};
 }
