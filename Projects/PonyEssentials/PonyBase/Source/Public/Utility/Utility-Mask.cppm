@@ -9,6 +9,9 @@
 
 export module PonyBase.Utility:Mask;
 
+import <concepts>;
+import <cstdint>;
+import <span>;
 import <type_traits>;
 
 export namespace PonyBase::Utility
@@ -19,18 +22,52 @@ export namespace PonyBase::Utility
 
 	/// @brief Checks if the enum value is in the enum mask.
 	/// @tparam T Enum type.
+	/// @tparam U Mask type.
 	/// @param value Value.
 	/// @param mask Mask.
 	/// @return @a True if it's in the mask; @a false otherwise.
-	template<UnsignedEnum T> [[nodiscard("Pure function")]] // TODO: Add tests
-	constexpr bool IsInMask(T value, std::underlying_type_t<T> mask) noexcept;
+	template<UnsignedEnum T, std::unsigned_integral U> [[nodiscard("Pure function")]]// TODO: Add tests
+	constexpr bool IsInMask(T value, U mask) noexcept;
+
+	/// @brief Converts an enum value to an enum mask.
+	/// @tparam T Enum type.
+	/// @tparam U Mask type.
+	/// @param value Value.
+	/// @return Mask.
+	template<UnsignedEnum T, std::unsigned_integral U = std::uint32_t> [[nodiscard("Pure function")]]
+	constexpr U ToMask(T value) noexcept;
+	/// @brief Converts enum values to an enum mask.
+	/// @tparam T Enum type.
+	/// @tparam U Mask type.
+	/// @param values Values.
+	/// @return Mask.
+	template<UnsignedEnum T, std::unsigned_integral U = std::uint32_t> [[nodiscard("Pure function")]]
+	constexpr U ToMask(std::span<const T> values) noexcept;
 }
 
 namespace PonyBase::Utility
 {
-	template <UnsignedEnum T>
-	constexpr bool IsInMask(const T value, const std::underlying_type_t<T> mask) noexcept
+	template <UnsignedEnum T, std::unsigned_integral U>
+	constexpr bool IsInMask(const T value, const U mask) noexcept
 	{
-		return std::underlying_type_t<T>{1} << static_cast<std::underlying_type_t<T>>(value) & mask;
+		return ToMask<T, U>(value) & mask;
+	}
+
+	template <UnsignedEnum T, std::unsigned_integral U>
+	constexpr U ToMask(const T value) noexcept
+	{
+		return U{1} << static_cast<U>(value);
+	}
+
+	template <UnsignedEnum T, std::unsigned_integral U>
+	constexpr U ToMask(const std::span<const T> values) noexcept
+	{
+		U mask = U{0};
+		for (const T value : values)
+		{
+			mask |= ToMask<T, U>(value);
+		}
+
+		return mask;
 	}
 }

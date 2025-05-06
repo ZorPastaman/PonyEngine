@@ -10,7 +10,7 @@
 module;
 
 #ifdef PONY_SYSTEM_CONSOLE_LOG
-#ifdef _WIN32
+#ifdef _WIN32 // TODO: Make a custom define.
 #include "PonyBase/Core/Windows/Framework.h"
 #endif
 #endif

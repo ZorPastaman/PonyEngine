@@ -16,15 +16,15 @@ import <vector>;
 
 import PonyBase.Container;
 
-import :PipelineState;
-import :Texture;
+import :IPipelineState;
+import :ITexture;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Material parameters.
 	struct MaterialParams final
 	{
-		std::shared_ptr<PipelineState> pipelineState; ///< Pipeline state.
+		std::shared_ptr<IPipelineState> pipelineState; ///< Pipeline state.
 
 		/// @brief Map of data types to data tables.
 		/// @note Don't use strings starting with "Pony_" as data types.
@@ -33,7 +33,7 @@ export namespace PonyEngine::Render
 		/// @brief Map of data types to textures.
 		/// @note Don't use strings starting with "Pony_" as data types.
 		/// @note Don't use the same key in the @p dataTables and @p textures.
-		std::unordered_map<std::string, std::vector<std::shared_ptr<Texture>>> textures;
+		std::unordered_map<std::string, std::vector<std::shared_ptr<ITexture>>> textures;
 
 		std::string name; ///< Material name.
 	};

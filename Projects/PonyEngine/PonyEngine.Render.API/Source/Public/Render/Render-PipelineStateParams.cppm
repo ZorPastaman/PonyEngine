@@ -10,11 +10,14 @@
 export module PonyEngine.Render:PipelineStateParams;
 
 import <cstdint>;
+import <memory>;
 import <string>;
 import <unordered_map>;
 
 import :Blend;
 import :DepthStencil;
+import :IRootSignature;
+import :IShader;
 import :Rasterizer;
 import :ThreadGroupCounts;
 
@@ -23,10 +26,10 @@ export namespace PonyEngine::Render
 	/// @brief Pipeline state parameters.
 	struct PipelineStateParams final
 	{
-		std::string rootSignatureShader; ///< Root signature shader. Relative path to a shader file without extension.
-		std::string amplificationShader; ///< Amplification shader. Relative path to a shader file without extension.
-		std::string meshShader; ///< Mesh shader. Relative path to a shader file without extension.
-		std::string pixelShader; ///< Pixel shader. Relative path to a shader file without extension.
+		std::shared_ptr<IRootSignature> rootSignature; ///< Root signature.
+		std::shared_ptr<IShader> amplificationShader; ///< Amplification shader. It's optional.
+		std::shared_ptr<IShader> meshShader; ///< Mesh shader.
+		std::shared_ptr<IShader> pixelShader; ///< Pixel shader.
 
 		Blend blend; ///< Blend parameters.
 		Rasterizer rasterizer; ///< Rasterizer parameters.

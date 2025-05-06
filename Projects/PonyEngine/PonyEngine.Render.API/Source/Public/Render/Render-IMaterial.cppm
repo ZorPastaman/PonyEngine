@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render:IMesh;
+export module PonyEngine.Render:IMaterial;
 
 import <cstddef>;
 import <cstdint>;
@@ -22,16 +22,20 @@ import <string_view>;
 
 import PonyBase.Container;
 
-import PonyMath.Shape;
-
-import PonyShader.Core;
+import :IPipelineState;
+import :ITexture;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Mesh.
-	class IMesh
+	/// @brief Material.
+	class IMaterial
 	{
-		INTERFACE_BODY(IMesh)
+		INTERFACE_BODY(IMaterial)
+
+		/// @brief Gets the pipeline state.
+		/// @return Pipeline state.
+		[[nodiscard("Pure function")]]
+		virtual const IPipelineState& PipelineState() const noexcept = 0;
 
 		/// @brief Tries to find a data type index by the @p dataType.
 		/// @param dataType Data type.
@@ -130,30 +134,56 @@ export namespace PonyEngine::Render
 		virtual std::uint32_t ElementCount(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept = 0;
 
 		/// @brief Creates a data.
-		/// @note Throws if the data with same type already exists.
-		/// @param dataType Data type.
+		/// @note Throws if the data or texture set with same type already exist.
+		/// @param textureType Data type.
 		/// @param dataParams Data params. Use stride as an element size and count as an element count.
 		/// @return Data type index.
-		virtual std::uint32_t CreateData(std::string_view dataType, std::span<const PonyBase::Container::BufferParams> dataParams) = 0;
+		virtual std::uint32_t CreateData(std::string_view textureType, std::span<const PonyBase::Container::BufferParams> dataParams) = 0;
 		/// @brief Destroys a data.
 		/// @param dataTypeIndex Type index of a data to destroy.
 		virtual void DestroyData(std::uint32_t dataTypeIndex) noexcept = 0;
 
-		/// @brief Gets the thread group counts.
-		/// @return Thread group counts.
+		/// @brief Tries to find a texture type index by the @p textureType.
+		/// @param textureType Texture type.
+		/// @return Texture type index if it's found; std::nullopt otherwise.
 		[[nodiscard("Pure function")]]
-		virtual const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept = 0;
-		/// @brief Sets the thread group counts.
-		/// @param counts Thread group counts to set.
-		virtual void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& counts) = 0;
+		virtual std::optional<std::uint32_t> FindTextureTypeIndex(std::string_view textureType) const noexcept = 0;
+		/// @brief Gets a texture type.
+		/// @param textureTypeIndex Texture type index.
+		/// @return Texture type.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view TextureType(std::uint32_t textureTypeIndex) const noexcept = 0;
+		/// @brief Gets a texture type count.
+		/// @return Texture type count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t TextureTypeCount() const noexcept = 0;
 
-		/// @brief Gets the bounding box.
-		/// @return Bounding box.
+		/// @brief Gets a texture.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		/// @return Texture.
 		[[nodiscard("Pure function")]]
-		virtual const std::optional<PonyMath::Shape::AABB<float>>& BoundingBox() const noexcept = 0;
-		/// @brief Sets the bounding box.
-		/// @param box Bounding box to set.
-		virtual void BoundingBox(const std::optional<PonyMath::Shape::AABB<float>>& box) = 0;
+		virtual const ITexture& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept = 0;
+		/// @brief Sets a texture.
+		/// @param textureTypeIndex Texture type index.
+		/// @param textureIndex Texture index.
+		/// @param texture Texture to set.
+		virtual void Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const ITexture& texture) = 0;
+		/// @brief Gets a texture count.
+		/// @param textureTypeIndex Texture type index.
+		/// @return Texture count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint32_t TextureCount(std::uint32_t textureTypeIndex) const noexcept = 0;
+
+		/// @brief Creates a texture set.
+		/// @note Throws if the data or texture set with same type already exist.
+		/// @param textureType Texture type.
+		/// @param textureCount Texture count in a set.
+		/// @return Texture type index.
+		virtual std::uint32_t CreateTextureSet(std::string_view textureType, std::uint32_t textureCount) = 0;
+		/// @brief Destroys a texture set.
+		/// @param textureTypeIndex Type index of a texture set to destroy.
+		virtual void DestroyTextureSet(std::uint32_t textureTypeIndex) noexcept = 0;
 
 		/// @brief Gets the name.
 		/// @return Name.
@@ -168,7 +198,7 @@ export namespace PonyEngine::Render
 namespace PonyEngine::Render
 {
 	template <typename T>
-	std::span<const T> IMesh::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const
+	std::span<const T> IMaterial::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const
 	{
 		if (sizeof(T) != ElementSize(dataTypeIndex, dataIndex)) [[unlikely]]
 		{
@@ -181,7 +211,7 @@ namespace PonyEngine::Render
 	}
 
 	template <typename T>
-	void IMesh::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::span<const T> data)
+	void IMaterial::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::span<const T> data)
 	{
 		if (sizeof(T) != ElementSize(dataTypeIndex, dataIndex)) [[unlikely]]
 		{
@@ -192,7 +222,7 @@ namespace PonyEngine::Render
 	}
 
 	template <typename T>
-	const T& IMesh::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex) const
+	const T& IMaterial::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex) const
 	{
 		if (sizeof(T) != ElementSize(dataTypeIndex, dataIndex)) [[unlikely]]
 		{
@@ -205,7 +235,7 @@ namespace PonyEngine::Render
 	}
 
 	template <typename T>
-	void IMesh::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex, const T& element)
+	void IMaterial::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex, const T& element)
 	{
 		if (sizeof(T) != ElementSize(dataTypeIndex, dataIndex)) [[unlikely]]
 		{

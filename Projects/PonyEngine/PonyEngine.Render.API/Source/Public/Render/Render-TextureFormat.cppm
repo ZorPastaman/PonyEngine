@@ -106,11 +106,10 @@ export namespace PonyEngine::Render
 		std::uint32_t blockWidth; ///< Block width in pixels. For uncompressed formats it's always 1.
 		std::uint32_t blockHeight; ///< Block height in pixels. For uncompressed formats it's always 1.
 		std::uint32_t blockDepth; ///< Block depth in pixels. For uncompressed formats it's always 1.
-		std::underlying_type_t<TextureDimension> supportedDimensions; ///< Supported dimensions.
+		std::uint16_t supportedDimensions; ///< Supported dimensions. It's a dimension mask. TODO: Add EnumMask<T>
 		TextureFormatType textureFormatType; ///< Texture format type.
 		PixelDataType pixelDataType; ///< Pixel data type. For depth stencil formats it's unknown.
 		bool isCompressed; ///< Is it a compressed format?
 		bool pixelAccessible; ///< Is it possible to read/write individual pixels? Usually uncompressed formats have @a true, and compressed ones have @a false.
-		bool supportedByPlatform; /// < Does the current platform supports the format? If it's false, all other fields will be default.
 	};
 }
