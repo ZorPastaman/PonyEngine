@@ -10,7 +10,6 @@
 export module PonyBase.Utility;
 
 export import :Container;
-export import :Mask;
 export import :ObjectInterfaces;
 export import :SafeFormat;
 export import :StringConvert;

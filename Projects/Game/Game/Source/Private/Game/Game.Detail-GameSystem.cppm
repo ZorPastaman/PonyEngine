@@ -107,6 +107,17 @@ namespace Game
 
 	void GameSystem::Begin()
 	{
+		const auto mask = PonyEngine::Render::ToMask(PonyEngine::Render::TextureDimension::Texture1D);
+		const auto maskS = PonyEngine::Render::ToMask(std::array<PonyEngine::Render::TextureDimension, 1> {PonyEngine::Render::TextureDimension::Texture1D });
+		const auto value = PonyEngine::Render::ToValue(mask);
+		const auto isIn = PonyEngine::Render::IsInMask(value, mask);
+		const auto andd = mask & maskS;
+		const auto orr = mask | maskS;
+		const auto xorr = mask ^ maskS;
+		const auto nott = ~mask;
+		const auto t = PonyEngine::Render::ToString(PonyEngine::Render::TextureDimension::Texture3D);
+		const auto tt = PonyEngine::Render::ToString(maskS);
+
 		inputSystem = Engine().SystemManager().FindSystem<PonyEngine::Input::IInputSystem>();
 		if (!inputSystem)
 		{
@@ -132,30 +143,56 @@ namespace Game
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Render view params set.");
 
 		PONY_LOG(Engine().Logger(), PonyDebug::Log::LogType::Debug, "Create render objects.");
-		const auto opaquePipelineStateParams = PonyEngine::Render::PipelineStateParams
+		const auto rootSignatureShaderParams = PonyEngine::Render::ShaderParams
 		{
-			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
-			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
-			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
-			.blend = PonyEngine::Render::OpaqueBlend{},
-			.rasterizer = PonyEngine::Render::Rasterizer{},
-			.depthStencil = PonyEngine::Render::DepthStencil{},
-			.dataSlots =
+			.shaderPath = std::format("{}{}.cso", GAME_SHADERS_DIR, "RootSig"),
+			.name = "RootSig"
+		};
+		const auto meshShaderParams = PonyEngine::Render::ShaderParams
+		{
+			.shaderPath = std::format("{}{}.cso", GAME_SHADERS_DIR, "MeshShader"),
+			.name = "MeshShader"
+		};
+		const auto pixelShaderParams = PonyEngine::Render::ShaderParams
+		{
+			.shaderPath = std::format("{}{}.cso", GAME_SHADERS_DIR, "PixelShader"),
+			.name = "PixelShader"
+		};
+		const auto rootSignatureShader = renderSystem->ShaderManager().CreateShader(rootSignatureShaderParams);
+		const auto meshShader = renderSystem->ShaderManager().CreateShader(meshShaderParams);
+		const auto pixelShader = renderSystem->ShaderManager().CreateShader(pixelShaderParams);
+
+		const auto rootSignatureParams = PonyEngine::Render::RootSignatureParams
+		{
+			.shader = rootSignatureShader,
+			.slots = 
 			{
 				{ std::string(PonyEngine::Render::DataTypes::Data), 0u },
 				{ "Meshlets", 1u },
 				{ "Positions", 2u },
-				{ "Colors", 3u },
+				{ "Color", 3u },
 				{ "Filter", 4u }
 			},
+			.name = "RootSig"
+		};
+		const auto rootSignature = renderSystem->RootSignatureManager().CreateRootSignature(rootSignatureParams);
+
+		const auto opaquePipelineStateParams = PonyEngine::Render::PipelineStateParams
+		{
+			.rootSignature = rootSignature,
+			.meshShader = meshShader,
+			.pixelShader = pixelShader,
+			.blend = PonyEngine::Render::OpaqueBlend{},
+			.rasterizer = PonyEngine::Render::Rasterizer{},
+			.depthStencil = PonyEngine::Render::DepthStencil{},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Opaque),
 			.name = "Opaque"
 		};
 		const auto transparentPipelineStateParams = PonyEngine::Render::PipelineStateParams
 		{
-			.rootSignatureShader = std::format("{}{}", GAME_SHADERS_DIR, "RootSig"),
-			.meshShader = std::format("{}{}", GAME_SHADERS_DIR, "MeshShader"),
-			.pixelShader = std::format("{}{}", GAME_SHADERS_DIR, "PixelShader"),
+			.rootSignature = rootSignature,
+			.meshShader = meshShader,
+			.pixelShader = pixelShader,
 			.blend = PonyEngine::Render::TransparentBlend
 			{
 				.sourceBlend = PonyEngine::Render::BlendFactor::AlphaSource,
@@ -170,19 +207,24 @@ namespace Game
 			{
 				.depthWrite = false
 			},
-			.dataSlots =
-			{
-				{ std::string(PonyEngine::Render::DataTypes::Data), 0u },
-				{ "Meshlets", 1u },
-				{ "Positions", 2u },
-				{ "Color", 3u },
-				{ "Filter", 4u }
-			},
 			.renderQueue = static_cast<std::int32_t>(PonyEngine::Render::RenderQueue::Transparent),
 			.name = "Transparent"
 		};
-		const auto opaquePipelineState = std::make_shared<PonyEngine::Render::PipelineState>(opaquePipelineStateParams);
-		const auto transparentPipelineState = std::make_shared<PonyEngine::Render::PipelineState>(transparentPipelineStateParams);
+		const auto opaquePipelineState = renderSystem->PipelineStateManager().CreatePipelineState(opaquePipelineStateParams);
+		const auto transparentPipelineState = renderSystem->PipelineStateManager().CreatePipelineState(transparentPipelineStateParams);
+
+		const auto filterTextureParams = PonyEngine::Render::TextureParams
+		{
+			.dimension = PonyEngine::Render::TextureDimension::Texture1D,
+			.format = PonyEngine::Render::TextureFormat::R8G8B8A8_Unorm,
+			.width = 3u,
+			.height = 1u,
+			.depth = 1u
+		};
+		auto filterTexture = renderSystem->TextureManager().CreateTexture(filterTextureParams);
+		filterTexture->Color(PonyMath::Color::RGBA<float>::Predefined::Red, 0u);
+		filterTexture->Color(PonyMath::Color::RGBA<float>::Predefined::Yellow, 1u);
+		filterTexture->Color(PonyMath::Color::RGBA<float>::Predefined::Blue, 2u);
 
 		const auto greenBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Green });
 		const auto whiteBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::White });
@@ -196,100 +238,95 @@ namespace Game
 		const auto blueTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f) });
 		const auto yellowTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f) });
 
-		auto filterTexture = std::make_shared<PonyEngine::Render::Texture1D>(3u);
-		filterTexture->SetPixelRGBA(0u, PonyMath::Color::RGBA<float>::Predefined::Red);
-		filterTexture->SetPixelRGBA(1u, PonyMath::Color::RGBA<float>::Predefined::Yellow);
-		filterTexture->SetPixelRGBA(2u, PonyMath::Color::RGBA<float>::Predefined::Blue);
-
 		auto greenOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "GreenOpaque"
 		};
 		greenOpaqueMaterialParams.dataTables["Color"] = std::vector{ greenBuffer };
-		greenOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		greenOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto whiteOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "WhiteOpaque"
 		};
 		whiteOpaqueMaterialParams.dataTables["Color"] = std::vector{ whiteBuffer };
-		whiteOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		whiteOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto yellowOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "YellowOpaque"
 		};
 		yellowOpaqueMaterialParams.dataTables["Color"] = std::vector{ yellowBuffer };
-		yellowOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		yellowOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto cyanOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "CyanOpaque"
 		};
 		cyanOpaqueMaterialParams.dataTables["Color"] = std::vector{ cyanBuffer };
-		cyanOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		cyanOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto blueOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "BlueOpaque"
 		};
 		blueOpaqueMaterialParams.dataTables["Color"] = std::vector{ blueBuffer };
-		blueOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		blueOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto magentaOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "MagentaOpaque"
 		};
 		magentaOpaqueMaterialParams.dataTables["Color"] = std::vector{ magentaBuffer };
-		magentaOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		magentaOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto redOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "RedOpaque"
 		};
 		redOpaqueMaterialParams.dataTables["Color"] = std::vector{ redBuffer };
-		redOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		redOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto redTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "RedTransparent"
 		};
 		redTransparentMaterialParams.dataTables["Color"] = std::vector{ redTransparentBuffer };
-		redTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		redTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto greenTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "GreenTransparent"
 		};
 		greenTransparentMaterialParams.dataTables["Color"] = std::vector{ greenTransparentBuffer };
-		greenTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		greenTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto blueTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "BlueTransparent"
 		};
 		blueTransparentMaterialParams.dataTables["Color"] = std::vector{ blueTransparentBuffer };
-		blueTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		blueTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 		auto yellowTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "YellowTransparent"
 		};
 		yellowTransparentMaterialParams.dataTables["Color"] = std::vector{ yellowTransparentBuffer };
-		yellowTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<PonyEngine::Render::Texture>>{ filterTexture };
+		yellowTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
 
-		const auto greenOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(greenOpaqueMaterialParams);
-		const auto whiteOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(whiteOpaqueMaterialParams);
-		const auto yellowOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(yellowOpaqueMaterialParams);
-		const auto cyanOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(cyanOpaqueMaterialParams);
-		const auto blueOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(blueOpaqueMaterialParams);
-		const auto magentaOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(magentaOpaqueMaterialParams);
-		const auto redOpaqueMaterial = std::make_shared<PonyEngine::Render::Material>(redOpaqueMaterialParams);
-		const auto redTransparentMaterial = std::make_shared<PonyEngine::Render::Material>(redTransparentMaterialParams);
-		const auto greenTransparentMaterial = std::make_shared<PonyEngine::Render::Material>(greenTransparentMaterialParams);
-		const auto blueTransparentMaterial = std::make_shared<PonyEngine::Render::Material>(blueTransparentMaterialParams);
-		const auto yellowTransparentMaterial = std::make_shared<PonyEngine::Render::Material>(yellowTransparentMaterialParams);
+		const auto greenOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial(greenOpaqueMaterialParams);
+		const auto whiteOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((whiteOpaqueMaterialParams);
+		const auto yellowOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((yellowOpaqueMaterialParams);
+		const auto cyanOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((cyanOpaqueMaterialParams);
+		const auto blueOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((blueOpaqueMaterialParams);
+		const auto magentaOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((magentaOpaqueMaterialParams);
+		const auto redOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial((redOpaqueMaterialParams);
+		const auto redTransparentMaterial = renderSystem->MaterialManager().CreateMaterial((redTransparentMaterialParams);
+		const auto greenTransparentMaterial = renderSystem->MaterialManager().CreateMaterial((greenTransparentMaterialParams);
+		const auto blueTransparentMaterial = renderSystem->MaterialManager().CreateMaterial((blueTransparentMaterialParams);
+		const auto yellowTransparentMaterial = renderSystem->MaterialManager().CreateMaterial((yellowTransparentMaterialParams);
 
 		const auto boxMeshlets = PonyBase::Container::Buffer::Create<PonyShader::Mesh::Meshlet>(std::array
 		{
@@ -347,8 +384,8 @@ namespace Game
 		});
 
 		auto floorMeshParams = PonyEngine::Render::MeshParams{};
-		floorMeshParams.bufferTables["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ boxMeshlets, boxVertexIndices, boxTriangles };
-		floorMeshParams.bufferTables["Positions"] = std::vector<PonyBase::Container::Buffer>{ boxPositions };
+		floorMeshParams.data["Meshlets"] = std::vector<PonyBase::Container::Buffer>{ boxMeshlets, boxVertexIndices, boxTriangles };
+		floorMeshParams.data["Positions"] = std::vector<PonyBase::Container::Buffer>{ boxPositions };
 		floorMeshParams.threadGroupCounts = { 2u, 1u, 1u };
 		floorMeshParams.boundingBox = PonyMath::Shape::CreateBoundingBox(boxPositions.Span<PonyMath::Core::Vector3<float>>());
 		floorMeshParams.name = "Floor";

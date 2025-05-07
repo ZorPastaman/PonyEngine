@@ -7,9 +7,32 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Enum.h"
+
 export module PonyEngine.Render:ThreadGroupCountsMode;
 
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <cstdint>;
+import <ostream>;
+import <string_view>;
+
+namespace PonyEngine::Render
+{
+	/// @brief Thread group counts names.
+	constexpr std::array<std::string_view, 6> ThreadGroupCountsModeNames
+	{
+		"SetMesh",
+		"SetPipelineState",
+		"Multiply",
+		"DivideMeshByPipelineState",
+		"DividePipelineStateByMesh",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render
 {
@@ -32,4 +55,6 @@ export namespace PonyEngine::Render
 		/// The result is ceiled.
 		DividePipelineStateByMesh
 	};
+
+	ENUM_VALUE_FEATURES(ThreadGroupCountsMode, ThreadGroupCountsModeNames)
 }

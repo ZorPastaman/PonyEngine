@@ -17,6 +17,7 @@
     <ClInclude Include="Include\Public\PonyBase\Core\Linking.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Optimization.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Windows\Framework.h" />
+    <ClInclude Include="Include\Public\PonyBase\Utility\Enum.h" />
     <ClInclude Include="Include\Public\PonyBase\Utility\ObjectBody.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -37,7 +38,6 @@
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows-Priority.cppm" />
     <ClCompile Include="Source\Public\Utility.Windows\Utility.Windows.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-Container.cppm" />
-    <ClCompile Include="Source\Public\Utility\Utility-Mask.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-ObjectInterfaces.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-SafeFormat.cppm" />
     <ClCompile Include="Source\Public\Utility\Utility-StringConvert.cppm" />

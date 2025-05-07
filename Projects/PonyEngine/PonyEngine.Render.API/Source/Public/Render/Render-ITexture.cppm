@@ -61,8 +61,8 @@ export namespace PonyEngine::Render
 		/// @return Height in pixels.
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t Height() const noexcept = 0;
-		/// @brief Gets the depth.
-		/// @return Depth in pixels.
+		/// @brief Gets the depth or an array size.
+		/// @return Depth in pixels or array size.
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t Depth() const noexcept = 0;
 
@@ -109,8 +109,8 @@ export namespace PonyEngine::Render
 		/// @brief Gets a pixel color.
 		/// @note Texture format must be pixel accessible and color type.
 		/// @param x X-coordinate.
-		/// @param y Y-coordinate. Texture1D ignores this value.
-		/// @param z Z-coordinate. Texture1D and Texture2D ignore this value.
+		/// @param y Y-coordinate. Texture1D ignores this value. Texture1D interprets this as an array element.
+		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
 		/// @return Color.
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> Color(std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u) const = 0;
@@ -118,15 +118,15 @@ export namespace PonyEngine::Render
 		/// @note Texture format must be pixel accessible and color type.
 		/// @param color Color to set.
 		/// @param x X-coordinate.
-		/// @param y Y-coordinate. Texture1D ignores this value.
-		/// @param z Z-coordinate. Texture1D and Texture2D ignore this value.
+		/// @param y Y-coordinate. Texture1D ignores this value. Texture1D interprets this as an array element.
+		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
 		virtual void Color(const PonyMath::Color::RGBA<float>& color, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u);
 
 		/// @brief Gets a pixel depth stencil.
 		/// @note Texture format must be pixel accessible and depth type.
 		/// @param x X-coordinate.
 		/// @param y Y-coordinate. Texture1D ignores this value.
-		/// @param z Z-coordinate. Texture1D and Texture2D ignore this value.
+		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
 		/// @return Color.
 		[[nodiscard("Pure function")]]
 		virtual std::pair<float, std::uint8_t> DepthStencil(std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u) const = 0;
@@ -134,8 +134,8 @@ export namespace PonyEngine::Render
 		/// @note Texture format must be pixel accessible and depth type.
 		/// @param depthStencil Depth stencil to set.
 		/// @param x X-coordinate.
-		/// @param y Y-coordinate. Texture1D ignores this value.
-		/// @param z Z-coordinate. Texture1D and Texture2D ignore this value.
+		/// @param y Y-coordinate. Texture1D ignores this value. Texture1D interprets this as an array element.
+		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
 		virtual void DepthStencil(const std::pair<float, std::uint8_t>& depthStencil, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u);
 	};
 }
