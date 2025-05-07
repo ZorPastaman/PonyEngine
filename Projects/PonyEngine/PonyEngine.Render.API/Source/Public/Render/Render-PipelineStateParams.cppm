@@ -35,12 +35,6 @@ export namespace PonyEngine::Render
 		Rasterizer rasterizer; ///< Rasterizer parameters.
 		DepthStencil depthStencil; ///< Depth stencil parameters.
 
-		/// @brief Data slots.
-		/// @details The engine automatically binds mesh data to shader slots if their types match.
-		/// If a type matches one of the special types declared in @p PonyEngine::Render::DataTypes,
-		/// the engine will bind specific data to it automatically.
-		std::unordered_map<std::string, std::uint32_t> dataSlots;
-
 		ThreadGroupCounts threadGroupCounts; ///< Thread group counts parameters.
 		std::int32_t renderQueue = 0; ///< Render queue.
 		bool cameraCulling = true; ///< Is camera culling enabled?

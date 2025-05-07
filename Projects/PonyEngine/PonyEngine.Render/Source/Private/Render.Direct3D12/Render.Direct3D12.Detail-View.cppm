@@ -9,13 +9,28 @@
 
 module;
 
-#include <cassert>
+#include "PonyBase/Utility/Enum.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:View;
 
+import <algorithm>;
 import <array>;
+import <cstddef>;
 import <cstdint>;
+import <ostream>;
 import <string_view>;
+
+namespace PonyEngine::Render::Direct3D12
+{
+	/// @brief View names.
+	constexpr std::array<std::string_view, 4> ViewNames
+	{
+		"RenderTarget",
+		"Output",
+		"DepthStencil",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -27,31 +42,5 @@ export namespace PonyEngine::Render::Direct3D12
 		DepthStencil
 	};
 
-	/// @brief Creates a string representing the @p view.
-	/// @param view View type.
-	/// @return String representing the @p view.
-	[[nodiscard("Pure function")]]
-	constexpr std::string_view ToString(View view) noexcept;
-}
-
-namespace PonyEngine::Render::Direct3D12
-{
-	/// @brief View names.
-	constexpr std::array<std::string_view, 3> ViewNames
-	{
-		"RenderTarget",
-		"Output",
-		"DepthStencil"
-	};
-
-	constexpr std::string_view ToString(const View view) noexcept
-	{
-		if (const std::size_t index = static_cast<std::size_t>(view); index < ViewNames.size()) [[likely]]
-		{
-			return ViewNames[index];
-		}
-
-		assert(false && "Invalid view.");
-		return "Unknown";
-	}
+	ENUM_VALUE_FEATURES(View, ViewNames)
 }

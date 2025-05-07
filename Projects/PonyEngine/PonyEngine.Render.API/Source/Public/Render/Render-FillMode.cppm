@@ -7,9 +7,29 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Enum.h"
+
 export module PonyEngine.Render:FillMode;
 
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <cstdint>;
+import <ostream>;
+import <string_view>;
+
+namespace PonyEngine::Render
+{
+	/// @brief Fill mode names.
+	constexpr std::array<std::string_view, 3> FillModeNames
+	{
+		"Solid",
+		"Wireframe",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render
 {
@@ -19,4 +39,6 @@ export namespace PonyEngine::Render
 		Solid,
 		Wireframe
 	};
+
+	ENUM_VALUE_FEATURES(FillMode, FillModeNames)
 }

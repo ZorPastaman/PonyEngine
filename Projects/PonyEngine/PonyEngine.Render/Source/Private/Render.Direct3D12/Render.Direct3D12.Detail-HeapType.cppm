@@ -7,9 +7,30 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Enum.h"
+
 export module PonyEngine.Render.Direct3D12.Detail:HeapType;
 
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <cstdint>;
+import <ostream>;
+import <string_view>;
+
+namespace PonyEngine::Render::Direct3D12
+{
+	/// @brief Heap type names.
+	constexpr std::array<std::string_view, 4> HeapTypeNames
+	{
+		"Default",
+		"Upload",
+		"Readback",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -20,4 +41,6 @@ export namespace PonyEngine::Render::Direct3D12
 		Upload,
 		Readback
 	};
+
+	ENUM_VALUE_FEATURES(HeapType, HeapTypeNames)
 }

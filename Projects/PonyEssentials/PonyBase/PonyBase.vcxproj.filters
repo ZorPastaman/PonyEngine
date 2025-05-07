@@ -39,6 +39,9 @@
     <ClInclude Include="Include\Public\PonyBase\Utility\ObjectBody.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="Include\Public\PonyBase\Utility\Enum.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="PonyBase.rc">
@@ -95,9 +98,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Core\Core-FloatConversion.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Public\Utility\Utility-Mask.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

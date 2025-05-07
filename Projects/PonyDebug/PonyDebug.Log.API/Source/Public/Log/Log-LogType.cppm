@@ -7,15 +7,37 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyBase/Utility/Enum.h"
+
 export module PonyDebug.Log:LogType;
 
+import <algorithm>;
 import <array>;
-import <cmath>;
+import <bit>;
 import <cstddef>;
 import <cstdint>;
 import <ostream>;
+import <span>;
+import <string>;
 import <string_view>;
 import <type_traits>;
+
+namespace PonyDebug::Log
+{
+	/// @brief Log type names by index.
+	constexpr std::array<std::string_view, 7> LogTypeNames
+	{
+		"Verbose",
+		"Debug",
+		"Info",
+		"Warning",
+		"Error",
+		"Exception",
+		"Unknown"
+	};
+}
 
 export namespace PonyDebug::Log
 {
@@ -36,40 +58,24 @@ export namespace PonyDebug::Log
 		Exception
 	};
 
-	/// @brief Gets a string representing the @p logType.
-	/// @param logType Log type.
-	/// @return Representing string.
-	[[nodiscard("Pure function")]]
-	constexpr std::string_view ToString(LogType logType) noexcept;
-
-	/// @brief Puts @p ToString(logType) into the @p stream.
-	/// @param stream Target stream.
-	/// @param logType Input source.
-	/// @return @p stream.
-	std::ostream& operator <<(std::ostream& stream, LogType logType);
-}
-
-namespace PonyDebug::Log
-{
-	/// @brief Log type names by index.
-	constexpr std::array<std::string_view, 7> LogTypeNames
+	/// @brief Severity of a log as a mask.
+	enum class LogTypeMask : std::uint8_t
 	{
-		"Verbose",
-		"Debug",
-		"Info",
-		"Warning",
-		"Error",
-		"Exception",
-		"Unknown"
+		None = 0,
+		/// @brief Log everything.
+		Verbose = 1 << 0,
+		/// @brief Log additional debug information.
+		Debug = 1 << 1,
+		/// @brief Log a normal program execution.
+		Info = 1 << 2,
+		/// @brief Log a non-critical error or suspicious program execution.
+		Warning = 1 << 3,
+		/// @brief Log an error.
+		Error = 1 << 4,
+		/// @brief Log an exception.
+		Exception = 1 << 5,
+		All = Verbose | Debug | Info | Warning | Error | Exception
 	};
 
-	constexpr std::string_view ToString(const LogType logType) noexcept
-	{
-		return LogTypeNames[std::min(static_cast<std::size_t>(logType), LogTypeNames.size() - 1)];
-	}
-
-	std::ostream& operator <<(std::ostream& stream, const LogType logType)
-	{
-		return stream << ToString(logType);
-	}
+	ENUM_VALUE_MASK_FEATURES(LogType, LogTypeNames, LogTypeMask)
 }

@@ -9,13 +9,28 @@
 
 module;
 
-#include <cassert>
+#include "PonyBase/Utility/Enum.h"
 
 export module PonyEngine.Render.Direct3D12.Detail:Attachment;
 
+import <algorithm>;
 import <array>;
+import <cstddef>;
 import <cstdint>;
+import <ostream>;
 import <string_view>;
+
+namespace PonyEngine::Render::Direct3D12
+{
+	/// @brief Attachment names.
+	constexpr std::array<std::string_view, 4> AttachmentNames
+	{
+		"RenderTarget",
+		"Resolve",
+		"DepthStencil",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -27,31 +42,5 @@ export namespace PonyEngine::Render::Direct3D12
 		DepthStencil
 	};
 
-	/// @brief Gets a string representation of the @p attachment.
-	/// @param attachment Attachment.
-	/// @return String representation of the @p attachment.
-	[[nodiscard("Pure function")]]
-	constexpr std::string_view ToString(Attachment attachment) noexcept;
-}
-
-namespace PonyEngine::Render::Direct3D12
-{
-	/// @brief Attachment names.
-	constexpr std::array<std::string_view, 3> AttachmentNames
-	{
-		"RenderTarget",
-		"Resolve",
-		"DepthStencil"
-	};
-
-	constexpr std::string_view ToString(const Attachment attachment) noexcept
-	{
-		if (const std::size_t index = static_cast<std::size_t>(attachment); index < AttachmentNames.size()) [[likely]]
-		{
-			return AttachmentNames[index];
-		}
-
-		assert(false && "Invalid attachment.");
-		return "Unknown";
-	}
+	ENUM_VALUE_FEATURES(Attachment, AttachmentNames)
 }
