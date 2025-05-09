@@ -77,5 +77,5 @@ export namespace PonyDebug::Log
 		All = Verbose | Debug | Info | Warning | Error | Exception
 	};
 
-	ENUM_VALUE_MASK_FEATURES(LogType, LogTypeNames, LogTypeMask)
+	ENUM_VALUE_MASK_FEATURES(LogType, LogTypeNames, LogTypeMask, LogTypeNames)
 }

@@ -11,22 +11,23 @@ module;
 
 #include <cassert>
 
-export module PonyEngine.Render.Direct3D12.Detail:Camera;
+export module PonyEngine.Render.Detail:Camera;
 
 import <cstdint>;
 import <optional>;
-import <memory>;
 import <variant>;
 
 import PonyMath.Core;
 import PonyMath.Shape;
 
 import PonyEngine.Render;
-import PonyEngine.Render.Detail;
 
-export namespace PonyEngine::Render::Direct3D12
+import :BoxCuller;
+import :FrustumCuller;
+
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 camera.
+	/// @brief Camera
 	class Camera final : public ICamera
 	{
 	public:
@@ -35,9 +36,9 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure constructor")]]
 		explicit Camera(const CameraParams& cameraParams) noexcept;
 		[[nodiscard("Pure constructor")]]
-		Camera(const Camera& other) noexcept = default;
+		Camera(const Camera& other) = delete;
 		[[nodiscard("Pure constructor")]]
-		Camera(Camera&& other) noexcept = default;
+		Camera(Camera&& other) = delete;
 
 		~Camera() noexcept = default;
 
@@ -60,8 +61,8 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void Projection(const CameraProjection& projection) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const struct Clear& Clear() const noexcept override;
-		virtual void Clear(const struct Clear& clear) noexcept override;
+		virtual const Render::Clear& Clear() const noexcept override;
+		virtual void Clear(const Render::Clear& clear) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept override;
@@ -74,8 +75,8 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Pure function")]]
 		virtual const ICuller& Culler() const noexcept override;
 
-		Camera& operator =(const Camera& other) noexcept = default;
-		Camera& operator =(Camera&& other) noexcept = default;
+		Camera& operator =(const Camera&) = delete;
+		Camera& operator =(Camera&&) = delete;
 
 	private:
 		/// @brief Computes a projection matrix by current parameters.
@@ -111,7 +112,7 @@ export namespace PonyEngine::Render::Direct3D12
 	};
 }
 
-namespace PonyEngine::Render::Direct3D12
+namespace PonyEngine::Render
 {
 	Camera::Camera(const CameraParams& cameraParams) noexcept :
 		viewMatrix(cameraParams.viewMatrix),

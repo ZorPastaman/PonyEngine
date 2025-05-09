@@ -11,15 +11,24 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.DXGI.Detail:IRenderSystemContext;
+export module PonyEngine.Render.Detail.Old:IRenderContext;
 
-import PonyEngine.Render.Detail.Old;
+import PonyDebug.Log;
 
-export namespace PonyEngine::Render::DXGI
+export namespace PonyEngine::Render
 {
-	/// @brief DXGI render system context.
-	class IRenderSystemContext : public Render::IRenderSystemContext
+	/// @brief Render system context.
+	class IRenderSystemContext
 	{
 		INTERFACE_BODY(IRenderSystemContext)
+
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
 	};
 }

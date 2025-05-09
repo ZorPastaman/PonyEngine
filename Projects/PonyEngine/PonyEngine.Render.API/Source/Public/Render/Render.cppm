@@ -9,11 +9,13 @@
 
 export module PonyEngine.Render;
 
+export import :API;
 export import :Blend;
 export import :BlendFactor;
 export import :BlendOperation;
 export import :CameraParams;
 export import :Clear;
+export import :CommandQueuePriority;
 export import :Common;
 export import :ComparisonFunction;
 export import :CullMode;

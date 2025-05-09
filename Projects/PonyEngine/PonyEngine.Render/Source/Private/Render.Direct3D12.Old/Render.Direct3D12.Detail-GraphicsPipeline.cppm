@@ -40,7 +40,7 @@ import PonyMath.Utility;
 import PonyShader.Core;
 import PonyShader.Space;
 
-import PonyEngine.Render.Detail;
+import PonyEngine.Render.Detail.Old;
 
 import :Attachment;
 import :Buffer;

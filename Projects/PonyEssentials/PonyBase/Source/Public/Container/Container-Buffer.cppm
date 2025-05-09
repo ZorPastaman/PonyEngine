@@ -103,6 +103,14 @@ export namespace PonyBase::Container
 		template<typename T> [[nodiscard("Pure function")]]
 		const T& Get(std::size_t index) const;
 
+		/// @brief Gets a raw span.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		std::span<std::byte> Span() noexcept; // TODO: Add tests for new functions.
+		/// @brief Gets a raw span.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		std::span<const std::byte> Span() const noexcept;
 		/// @brief Gets a buffer as a span of type @p T.
 		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @return Span.
@@ -113,6 +121,16 @@ export namespace PonyBase::Container
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
 		std::span<const T> Span() const;
+		/// @brief Gets a raw span.
+		/// @param strideIndex Stride index.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		std::span<std::byte> Span(std::uint32_t strideIndex) noexcept;
+		/// @brief Gets a raw span.
+		/// @param strideIndex Stride index.
+		/// @return Span.
+		[[nodiscard("Pure function")]]
+		std::span<const std::byte> Span(std::uint32_t strideIndex) const noexcept;
 		/// @brief Gets a buffer stride as a span of type @p T.
 		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @param strideIndex Stride index.
@@ -250,6 +268,16 @@ namespace PonyBase::Container
 		return reinterpret_cast<const T*>(data.get())[index];
 	}
 
+	std::span<std::byte> Buffer::Span() noexcept
+	{
+		return std::span(data.get(), Size());
+	}
+
+	std::span<const std::byte> Buffer::Span() const noexcept
+	{
+		return std::span(data.get(), Size());
+	}
+
 	template<typename T>
 	std::span<T> Buffer::Span()
 	{
@@ -270,6 +298,16 @@ namespace PonyBase::Container
 		}
 
 		return std::span<const T>(reinterpret_cast<const T*>(data.get()), Size() / sizeof(T));
+	}
+
+	std::span<std::byte> Buffer::Span(const std::uint32_t strideIndex) noexcept
+	{
+		return std::span(data.get() + strideIndex * stride, stride);
+	}
+
+	std::span<const std::byte> Buffer::Span(const std::uint32_t strideIndex) const noexcept
+	{
+		return std::span(data.get() + strideIndex * stride, stride);
 	}
 
 	template <typename T>

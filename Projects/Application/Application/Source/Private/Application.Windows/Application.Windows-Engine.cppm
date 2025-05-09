@@ -35,7 +35,7 @@ import PonyDebug.Log;
 
 import PonyEngine.Core.Impl;
 import PonyEngine.Input.Windows.Impl;
-import PonyEngine.Render.Direct3D12.Windows.Impl;
+import PonyEngine.Render.Windows.Impl;
 import PonyEngine.Screen.Windows.Impl;
 import PonyEngine.Time.Impl;
 import PonyEngine.Window.Windows.Impl;
@@ -300,14 +300,15 @@ namespace Application::Windows
 		}
 	}
 
-	PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryData Engine::CreateRenderSystemFactory() const
+	PonyEngine::Render::Windows::RenderSystemFactoryData Engine::CreateRenderSystemFactory() const
 	{
 		try
 		{
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "Create Direct3D 12 render system for Windows factory.");
-			auto renderParams = PonyEngine::Render::Direct3D12::Windows::RenderSystemParams{};
+			auto renderParams = PonyEngine::Render::Windows::RenderSystemParams{};
 			renderParams.mainFrameParams.msaa.sampleCount = 4u;
-			PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryData factory = PonyEngine::Render::Direct3D12::Windows::CreateRenderSystemFactory(*application, PonyEngine::Render::Direct3D12::Windows::RenderSystemFactoryParams{}, renderParams);
+			renderParams.api = PonyEngine::Render::API::Direct3D12;
+			PonyEngine::Render::Windows::RenderSystemFactoryData factory = PonyEngine::Render::Windows::CreateRenderSystemFactory(*application, PonyEngine::Render::Windows::RenderSystemFactoryParams{}, renderParams);
 			assert(factory.systemFactory && "The Direct3D render system for Windows factory is nullptr.");
 			PONY_LOG(application->Logger(), PonyDebug::Log::LogType::Info, "'{}' Direct3D 12 render system for Windows factory created.", typeid(*factory.systemFactory).name());
 

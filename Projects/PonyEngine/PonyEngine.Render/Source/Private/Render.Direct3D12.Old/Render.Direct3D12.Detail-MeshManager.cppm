@@ -334,7 +334,7 @@ namespace PonyEngine::Render::Direct3D12
 			return 1ULL;
 		}
 
-		const BufferInfo& last = bufferInfos[bufferInfos.size() - 1];
+		const BufferInfo& last = bufferInfos.back();
 
 		return last.offset * last.buffer->Stride() + last.buffer->Size();
 	}

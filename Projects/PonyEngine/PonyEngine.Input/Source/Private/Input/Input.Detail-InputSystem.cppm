@@ -411,7 +411,6 @@ namespace PonyEngine::Input
 		{
 			PONY_LOG(Logger(), PonyDebug::Log::LogType::Warning, "Input receiver created for a not bound input ID: '{}'.", id);
 		}
-		PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Input receiver created with '{}' ID at '0x{:X}'.", id, reinterpret_cast<std::uintptr_t>(receiver.get()));
 
 		return receiver;
 	}
@@ -493,9 +492,7 @@ namespace PonyEngine::Input
 			{
 				if (receivers[i].use_count() <= 1L)
 				{
-					PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Destroy input receiver at '0x{:X}'.", reinterpret_cast<std::uintptr_t>(receivers[i].get()));
 					receivers.erase(receivers.cbegin() + i);
-					PONY_LOG(Logger(), PonyDebug::Log::LogType::Debug, "Input receiver destroyed.");
 				}
 			}
 		}

@@ -7,19 +7,13 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Render.Direct3D12.Detail;
 
-#include "PonyBase/Utility/ObjectBody.h"
+export import PonyEngine.Render.Detail.Old;
 
-export module PonyEngine.Render.DXGI.Detail:IRenderSystemContext;
-
-import PonyEngine.Render.Detail.Old;
-
-export namespace PonyEngine::Render::DXGI
-{
-	/// @brief DXGI render system context.
-	class IRenderSystemContext : public Render::IRenderSystemContext
-	{
-		INTERFACE_BODY(IRenderSystemContext)
-	};
-}
+export import :BackParams;
+export import :FormatUtility;
+export import :FrameParams;
+export import :IRenderSystemContext;
+export import :SubSystem;
+export import :SubSystemParams;

@@ -11,15 +11,24 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Windows:IRenderSystem;
+export module PonyEngine.Render.Detail:IRenderAgent;
 
-import PonyEngine.Render.Direct3D12;
+import :IMeshAgent;
 
-export namespace PonyEngine::Render::Direct3D12::Windows
+export namespace PonyEngine::Render
 {
-	/// @brief Windows Direct3D12 render system.
-	class IRenderSystem : public Direct3D12::IRenderSystem
+	/// @brief Render agent.
+	class IRenderAgent
 	{
-		INTERFACE_BODY(IRenderSystem)
+		INTERFACE_BODY(IRenderAgent)
+
+		/// @brief Gets the mesh agent.
+		/// @return Mesh agent.
+		[[nodiscard("Pure function")]]
+		virtual IMeshAgent& MeshAgent() noexcept = 0;
+		/// @brief Gets the mesh agent.
+		/// @return Mesh agent.
+		[[nodiscard("Pure function")]]
+		virtual const IMeshAgent& MeshAgent() const noexcept = 0;
 	};
 }

@@ -7,17 +7,19 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Windows:RenderSystemFactoryData;
+module;
 
-import <memory>;
+#include "PonyBase/Utility/ObjectBody.h"
+
+export module PonyEngine.Render.Windows:IRenderSystem;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render::Direct3D12::Windows
+export namespace PonyEngine::Render::Windows
 {
-	/// @brief Direct3D 12 render system for Windows factory data.
-	struct RenderSystemFactoryData final
+	/// @brief Windows render system.
+	class IRenderSystem : public Render::IRenderSystem
 	{
-		std::shared_ptr<RenderSystemFactory> systemFactory; ///< Render system factory.
+		INTERFACE_BODY(IRenderSystem)
 	};
 }

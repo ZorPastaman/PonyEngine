@@ -7,11 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Windows;
+module;
 
-export import PonyEngine.Render.Direct3D12;
+#include "PonyBase/Utility/ObjectBody.h"
 
-export import :IRenderSystem;
-export import :RenderSystemFactoryData;
-export import :RenderSystemFactoryParams;
-export import :RenderSystemParams;
+export module PonyEngine.Render.Detail:IPipeline;
+
+import :Camera;
+
+export namespace PonyEngine::Render
+{
+	/// @brief Pipeline.
+	class IPipeline
+	{
+		INTERFACE_BODY(IPipeline)
+
+		/// @brief Submits the camera for rendering.
+		/// @param camera Camera to submit.
+		virtual void Submit(const Camera& camera) = 0;
+	};
+}

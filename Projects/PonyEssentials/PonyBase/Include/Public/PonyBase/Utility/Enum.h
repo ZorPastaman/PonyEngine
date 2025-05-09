@@ -27,6 +27,42 @@
 		return stream << ToString(value); \
 	} \
 
+/// @brief Creates a function that makes a string representing the enum mask.
+/// @note Enum must have Enum::All value defined.
+/// @note Import <bit>, <ostream>, <string> and <type_traits>.
+/// @param Mask Mask enum type.
+/// @param MaskNames Array of mask enum names.
+#define ENUM_MASK_TO_STRING(Mask, MaskNames) \
+	[[nodiscard("Pure function")]] \
+	constexpr std::string ToString(const Mask mask) \
+	{ \
+		if (static_cast<std::underlying_type_t<Mask>>(mask) == std::underlying_type_t<Mask>{0}) \
+		{ \
+			return "None"; \
+		} \
+		if (static_cast<std::underlying_type_t<Mask>>(mask) == static_cast<std::underlying_type_t<Mask>>(Mask::All)) \
+		{ \
+			return "All"; \
+		} \
+		std::string answer = ""; \
+		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)); ++i) \
+		{ \
+			if (std::underlying_type_t<Mask>{1} << i & static_cast<std::underlying_type_t<Mask>>(mask) != std::underlying_type_t<Mask>{0}) \
+			{ \
+				if (!answer.empty()) \
+				{ \
+					answer += " | "; \
+				} \
+				answer += MaskNames[i]; \
+			} \
+		} \
+		return answer; \
+	} \
+	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
+	{ \
+		return stream << ToString(mask); \
+	} \
+
 /// @brief Creates mask enum operators.
 /// @note Mask must include All value. Import <type_traits>.
 /// @param Mask Mask enum type.
@@ -51,6 +87,19 @@
 	constexpr Mask operator ~(const Mask mask) noexcept \
 	{ \
 		return mask ^ Mask::All; \
+	} \
+	constexpr Mask& operator &=(Mask& left, const Mask right) noexcept \
+	{ \
+		return left = left & right; \
+	} \
+	 \
+	constexpr Mask& operator |=(Mask& left, const Mask right) noexcept \
+	{ \
+		return left = left | right; \
+	} \
+	constexpr Mask& operator ^=(Mask& left, const Mask right) noexcept \
+	{ \
+		return left = left ^ right; \
 	} \
 
 /// @brief Creates functions for the value enum and mask enum pair.
@@ -119,53 +168,17 @@
 		return valueCount; \
 	} \
 
-/// @brief Creates a function that makes a string representing the enum mask.
-/// @note It must be declared after a ToString(Value) function and after a declaration of ENUM_VALUE_MASK.
-/// @note Import <ostream> and <string>.
-/// @param Value Value enum type.
-/// @param Mask Mask enum type.
-#define ENUM_MASK_TO_STRING(Value, Mask) \
-	[[nodiscard("Pure function")]] \
-	constexpr std::string ToString(const Mask mask) \
-	{ \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == std::underlying_type_t<Mask>{0}) \
-		{ \
-			return "None"; \
-		} \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == static_cast<std::underlying_type_t<Mask>>(Mask::All)) \
-		{ \
-			return "All"; \
-		} \
-		std::string answer = ""; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)); ++i) \
-		{ \
-			if (IsInMask(static_cast<Value>(i), mask)) \
-			{ \
-				if (!answer.empty()) \
-				{ \
-					answer += " | "; \
-				} \
-				answer += ToString(static_cast<Value>(i)); \
-			} \
-		} \
-		return answer; \
-	} \
-	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
-	{ \
-		return stream << ToString(mask); \
-	} \
-
 /// @brief Creates all the value enum features.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 #define ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_VALUE_TO_STRING(Value, ValueNames)
 /// @brief Creates all the mask enum features.
 /// @note All the restrictions of the features are applied to this.
-/// @param Value Value enum type.
 /// @param Mask Mask enum type.
-#define ENUM_MASK_FEATURES(Value, Mask) ENUM_MASK_OPERATORS(Mask) ENUM_VALUE_MASK(Value, Mask) ENUM_MASK_TO_STRING(Value, Mask)
+#define ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_MASK_TO_STRING(Mask, MaskNames) ENUM_MASK_OPERATORS(Mask)
 /// @brief Creates all the value enum and mask enum features.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
-#define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Value, Mask)
+#define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask, MaskNames) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Mask, MaskNames) \
+	ENUM_VALUE_MASK(Value, Mask)
