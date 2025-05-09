@@ -11,27 +11,27 @@ module;
 
 #include "PonyBase/Core/Linking.h"
 
-export module PonyEngine.Render.Direct3D12.Windows.Impl;
+export module PonyEngine.Render.Windows.Impl;
 
-export import PonyEngine.Render.Direct3D12.Windows;
+export import PonyEngine.Render.Windows;
 
 import <memory>;
 
 import PonyEngine.Core;
-import PonyEngine.Render.Direct3D12.Windows.Detail;
+import PonyEngine.Render.Windows.Detail;
 
-export namespace PonyEngine::Render::Direct3D12::Windows
+export namespace PonyEngine::Render::Windows
 {
-	/// @brief Creates a Direct3D 12 render system for Windows factory.
+	/// @brief Creates a render system for Windows factory.
 	///	@param application Application context.
-	///	@param factoryParams Direct3D 12 render system for Windows factory parameters.
-	///	@param systemParams Direct3D 12 render system for Windows parameters.
-	/// @return Direct3D 12 render system for Windows factory
+	///	@param factoryParams Render system for Windows factory parameters.
+	///	@param systemParams Render system for Windows parameters.
+	/// @return Render system for Windows factory
 	[[nodiscard("Pure function")]]
 	PONY_DLL_EXPORT RenderSystemFactoryData CreateRenderSystemFactory(Core::IApplicationContext& application, const RenderSystemFactoryParams& factoryParams, const RenderSystemParams& systemParams);
 }
 
-namespace PonyEngine::Render::Direct3D12::Windows
+namespace PonyEngine::Render::Windows
 {
 	RenderSystemFactoryData CreateRenderSystemFactory(Core::IApplicationContext& application, const RenderSystemFactoryParams& factoryParams, const RenderSystemParams& systemParams)
 	{

@@ -7,14 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Direct3D12.Windows:RenderSystemFactoryParams;
+export module PonyEngine.Render:CommandQueuePriority;
 
-import PonyEngine.Render.Direct3D12;
+import <cstdint>;
 
-export namespace PonyEngine::Render::Direct3D12::Windows
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D 12 render system for Windows factory parameters.
-	struct RenderSystemFactoryParams final : Direct3D12::RenderSystemFactoryParams
+	/// @brief Command queue priority.
+	enum class CommandQueuePriority : std::int32_t
 	{
+		Normal = 0,
+		High = 100,
+		Realtime = 10000
 	};
 }

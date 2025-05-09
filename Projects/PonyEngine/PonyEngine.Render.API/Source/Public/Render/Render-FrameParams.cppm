@@ -10,6 +10,7 @@
 export module PonyEngine.Render:FrameParams;
 
 import <cstdint>;
+import <optional>;
 
 import PonyMath.Color;
 import PonyMath.Utility;
@@ -22,7 +23,7 @@ export namespace PonyEngine::Render
 	/// @brief Frame parameters.
 	struct FrameParams final
 	{
-		PonyMath::Utility::Resolution<std::uint32_t> resolution = PonyMath::Utility::Resolution<std::uint32_t>(1280u, 720u); ///< Resolution.
+		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution = std::nullopt; ///< Resolution. If it's std::nullopt, uses the swap chain's resolution.
 		MSAA msaa = MSAA{.sampleCount = 1u, .sampleQuality = 1.f}; ///< Multi-sample anti-aliasing parameters.
 		PonyMath::Color::RGBA<float> clearColor = PonyMath::Color::RGBA<float>::Predefined::Black; ///< Clear color.
 		float clearDepth = 1.f; ///< Clear depth.

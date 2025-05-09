@@ -68,5 +68,5 @@ export namespace PonyEngine::Render
 		All = Texture1D | Texture2D | Texture3D | TextureCube | Texture1DArray | Texture2DArray | TextureCubeArray
 	};
 
-	ENUM_VALUE_MASK_FEATURES(TextureDimension, TextureDimensionNames, TextureDimensionMask)
+	ENUM_VALUE_MASK_FEATURES(TextureDimension, TextureDimensionNames, TextureDimensionMask, TextureDimensionNames)
 }

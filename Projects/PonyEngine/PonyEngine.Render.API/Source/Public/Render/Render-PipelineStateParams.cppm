@@ -26,10 +26,10 @@ export namespace PonyEngine::Render
 	/// @brief Pipeline state parameters.
 	struct PipelineStateParams final
 	{
-		std::shared_ptr<IRootSignature> rootSignature; ///< Root signature.
-		std::shared_ptr<IShader> amplificationShader; ///< Amplification shader. It's optional.
-		std::shared_ptr<IShader> meshShader; ///< Mesh shader.
-		std::shared_ptr<IShader> pixelShader; ///< Pixel shader.
+		std::shared_ptr<const IRootSignature> rootSignature; ///< Root signature.
+		std::shared_ptr<const IShader> amplificationShader; ///< Amplification shader. It's optional.
+		std::shared_ptr<const IShader> meshShader; ///< Mesh shader.
+		std::shared_ptr<const IShader> pixelShader; ///< Pixel shader.
 
 		Blend blend; ///< Blend parameters.
 		Rasterizer rasterizer; ///< Rasterizer parameters.

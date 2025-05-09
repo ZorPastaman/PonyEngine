@@ -11,9 +11,12 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Detail:IRenderContext;
+export module PonyEngine.Render.Detail:IRenderSystemContext;
 
 import PonyDebug.Log;
+
+import :IPipeline;
+import :IRenderAgent;
 
 export namespace PonyEngine::Render
 {
@@ -30,5 +33,23 @@ export namespace PonyEngine::Render
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+
+		/// @brief Gets the pipeline.
+		/// @return Pipeline.
+		[[nodiscard("Pure function")]]
+		virtual IPipeline& Pipeline() noexcept = 0;
+		/// @brief Gets the pipeline.
+		/// @return Pipeline.
+		[[nodiscard("Pure function")]]
+		virtual const IPipeline& Pipeline() const noexcept = 0;
+
+		/// @brief Gets the render agent.
+		/// @return Render agent.
+		[[nodiscard("Pure function")]]
+		virtual IRenderAgent& RenderAgent() noexcept = 0;
+		/// @brief Gets the render agent.
+		/// @return Render agent.
+		[[nodiscard("Pure function")]]
+		virtual const IRenderAgent& RenderAgent() const noexcept = 0;
 	};
 }

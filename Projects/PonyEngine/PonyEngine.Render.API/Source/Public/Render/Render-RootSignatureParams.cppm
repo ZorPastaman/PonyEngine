@@ -20,7 +20,7 @@ export namespace PonyEngine::Render
 	/// @brief Root signature parameters.
 	struct RootSignatureParams final
 	{
-		std::shared_ptr<IShader> shader; ///< Root signature shader.
+		std::shared_ptr<const IShader> shader; ///< Root signature shader.
 		std::unordered_map<std::string, std::uint32_t> slots; ///< Root signature slots.
 
 		std::string name; ///< Root signature name.

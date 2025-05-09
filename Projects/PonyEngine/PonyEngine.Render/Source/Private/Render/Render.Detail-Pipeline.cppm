@@ -9,17 +9,17 @@
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IRenderSystemContext;
+export module PonyEngine.Render.Detail:Pipeline;
 
-import PonyEngine.Render.Detail;
+import :IPipeline;
 
-export namespace PonyEngine::Render::Direct3D12
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render system context.
-	class IRenderSystemContext : public Render::IRenderSystemContext
+	/// @brief Pipeline.
+	class Pipeline final : public IPipeline
 	{
-		INTERFACE_BODY(IRenderSystemContext)
+		
 	};
 }

@@ -15,7 +15,6 @@ export module PonyEngine.Render:ICamera;
 
 import <cstdint>;
 
-import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 

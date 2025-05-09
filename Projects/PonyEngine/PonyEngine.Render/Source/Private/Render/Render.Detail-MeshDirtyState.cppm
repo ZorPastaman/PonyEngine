@@ -7,19 +7,20 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
+export module PonyEngine.Render.Detail:MeshDirtyState;
 
-#include "PonyBase/Utility/ObjectBody.h"
+import <cstdint>;
+import <unordered_set>;
+import <utility>;
 
-export module PonyEngine.Render.Direct3D12:IRenderSystem;
+import :MeshDirtyFlag;
 
-import PonyEngine.Render;
-
-export namespace PonyEngine::Render::Direct3D12
+export namespace PonyEngine::Render
 {
-	/// @brief Direct3D12 render system.
-	class IRenderSystem : public Render::IRenderSystem
+	/// @brief Mesh dirty state.
+	struct MeshDirtyState final
 	{
-		INTERFACE_BODY(IRenderSystem)
+		std::unordered_set<std::pair<std::uint32_t, std::uint32_t>> dirtyData; ///< Dirty data buffer indices. Data type index, data index.
+		MeshDirtyFlag dirtyFlags; ///< Mesh dirty flags.
 	};
 }

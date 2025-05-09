@@ -9,7 +9,3 @@
 
 export module PonyEngine.Render.Detail;
 
-export import :BoxCuller;
-export import :CameraFrustum;
-export import :FrustumCuller;
-export import :IRenderContext;

@@ -7,19 +7,38 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:SwapChainParams;
+module;
 
+#include "PonyBase/Utility/Enum.h"
+
+export module PonyEngine.Render:API;
+
+import <algorithm>;
+import <array>;
+import <cstddef>;
 import <cstdint>;
-import <optional>;
+import <ostream>;
+import <string_view>;
 
-import PonyMath.Utility;
+namespace PonyEngine::Render
+{
+	/// @brief Render API names.
+	constexpr std::array<std::string_view, 3> APINames
+	{
+		"None"
+		"Direct3D12",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Render
 {
-	/// @brief Swap chain parameters.
-	struct SwapChainParams final
+	/// @brief Render API.
+	enum class API : std::uint8_t
 	{
-		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution = std::nullopt; ///< Swap chain resolution. If it's std::nullopt, uses a window resolution.
-		std::uint8_t bufferCount = 3u; ///< Back buffer count.
+		None,
+		Direct3D12
 	};
+
+	ENUM_VALUE_FEATURES(API, APINames)
 }
