@@ -1168,12 +1168,12 @@ namespace PonyEngine::Render::Direct3D12
 		};
 		CommandList().RSSetScissorRects(1u, &rect);
 
-		const struct Clear& clear = camera.Clear();
+		const struct ClearValue& clear = camera.ClearValue();
 
 		const std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> rtv = frame->FindCpuHandle(View::RenderTarget);
-		if (rtv && clear.renderTargetColor)
+		if (rtv && clear.color)
 		{
-			CommandList().ClearRenderTargetView(rtv.value(), clear.renderTargetColor.value().Span().data(), 1u, &rect);
+			CommandList().ClearRenderTargetView(rtv.value(), clear.color.value().Span().data(), 1u, &rect);
 		}
 
 		const std::optional<D3D12_CPU_DESCRIPTOR_HANDLE> dsv = frame->FindCpuHandle(View::DepthStencil);

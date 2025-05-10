@@ -66,6 +66,11 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t Depth() const noexcept = 0;
 
+		/// @brief Gets the sample count.
+		/// @return Sample count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint8_t SampleCount() const noexcept = 0;
+
 		/// @brief Gets the raw data.
 		/// @return Raw data.
 		[[nodiscard("Pure function")]]

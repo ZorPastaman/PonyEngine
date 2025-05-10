@@ -60,8 +60,8 @@ export namespace PonyEngine::Render::Direct3D12
 		virtual void Projection(const CameraProjection& projection) noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const struct Clear& Clear() const noexcept override;
-		virtual void Clear(const struct Clear& clear) noexcept override;
+		virtual const struct ClearValue& ClearValue() const noexcept override;
+		virtual void ClearValue(const struct ClearValue& clear) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual const PonyMath::Shape::Rect<float>& ViewportRect() const noexcept override;
@@ -103,7 +103,7 @@ export namespace PonyEngine::Render::Direct3D12
 		CameraProjection projection; ///< Projection parameters.
 		mutable std::optional<std::variant<FrustumCuller, BoxCuller>> culler; ///< Culler. It becomes std::nullopt if the projection parameters are changed.
 
-		struct Clear clear; ///< Clear parameters.
+		struct ClearValue clear; ///< Clear parameters.
 
 		PonyMath::Shape::Rect<float> viewportRect; ///< Normalized viewport rect.
 
@@ -116,7 +116,7 @@ namespace PonyEngine::Render::Direct3D12
 	Camera::Camera(const CameraParams& cameraParams) noexcept :
 		viewMatrix(cameraParams.viewMatrix),
 		projection(cameraParams.projection),
-		clear(cameraParams.clearParams),
+		clear(cameraParams.clearValue),
 		viewportRect(cameraParams.viewportRect),
 		sortingOrder{cameraParams.sortingOrder}
 	{
@@ -200,12 +200,12 @@ namespace PonyEngine::Render::Direct3D12
 		culler = std::nullopt;
 	}
 
-	const struct Clear& Camera::Clear() const noexcept
+	const struct ClearValue& Camera::ClearValue() const noexcept
 	{
 		return clear;
 	}
 
-	void Camera::Clear(const struct Clear& clear) noexcept
+	void Camera::ClearValue(const struct ClearValue& clear) noexcept
 	{
 		this->clear = clear;
 	}

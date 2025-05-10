@@ -21,5 +21,6 @@ export namespace PonyEngine::Render
 	{
 		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution = std::nullopt; ///< Swap chain resolution. If it's std::nullopt, uses a window resolution.
 		std::uint8_t bufferCount = 3u; ///< Back buffer count.
+		bool srgbOutput = true; ///< Should the output be converted to srgb? The main frame render target texture format must be srgb compatible.
 	};
 }

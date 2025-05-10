@@ -37,13 +37,16 @@
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows.cppm" />
     <ClCompile Include="Source\Public\Render\Render-API.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-Clear.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ClearValue.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CommandQueuePriority.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-FrameAttachment.cppm" />
     <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IFrame.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IFrameManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMaterial.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMaterialManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IMesh.cppm" />
@@ -83,7 +86,6 @@
     <ClCompile Include="Source\Public\Render\Render-LogicOperation.cppm" />
     <ClCompile Include="Source\Public\Render\Render-PipelineStateParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm" />
     <ClCompile Include="Source\Public\Render\Render-OpaqueBlend.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Rasterizer.cppm" />
     <ClCompile Include="Source\Public\Render\Render-RenderObjectParams.cppm" />
