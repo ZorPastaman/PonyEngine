@@ -46,15 +46,13 @@ export namespace PonyEngine::Render
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IShader> CreateShader(const ShaderParams& params) override;
 
-		/// @brief Ticks the shader manager.
-		void Tick();
+		/// @brief Cleans out of dead shaders.
+		void Clean();
 
 		ShaderManager& operator =(const ShaderManager&) = delete;
 		ShaderManager& operator =(ShaderManager&&) = delete;
 
 	private:
-		void Clean();
-
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 		std::vector<std::pair<std::shared_ptr<Shader>, std::filesystem::path>> shaders; ///< Shaders.
@@ -98,11 +96,6 @@ namespace PonyEngine::Render
 		shaders.push_back(std::pair(shader, params.shaderPath));
 
 		return shader;
-	}
-
-	void ShaderManager::Tick()
-	{
-		Clean();
 	}
 
 	void ShaderManager::Clean()

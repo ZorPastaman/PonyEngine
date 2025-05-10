@@ -61,9 +61,6 @@
     <ClCompile Include="Source\Public\Render\Render-RenderSystemFactoryParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-MSAA.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-MeshParams.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -139,7 +136,7 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-Clear.cppm">
+    <ClCompile Include="Source\Public\Render\Render-ClearValue.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-StencilOperation.cppm">
@@ -218,6 +215,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-CommandQueuePriority.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-FrameAttachment.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-IFrame.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Public\Render\Render-IFrameManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -107,7 +107,17 @@ namespace PonyEngine::Render
 		"Uint",
 		"Sfloat",
 		"Ufloat",
-		"Unknown"
+		"Invalid"
+	};
+
+	/// @brief Texture feature names.
+	constexpr std::array<std::string_view, 5> TextureFeatureNames
+	{
+		"Pixel",
+		"SRGB",
+		"RenderTarget",
+		"DepthStencil",
+		"Invalid"
 	};
 }
 
@@ -196,9 +206,25 @@ export namespace PonyEngine::Render
 		Ufloat
 	};
 
+	/// @brief Texture features.
+	enum class TextureFeature : std::uint8_t
+	{
+		None = 0,
+		/// @brief Is an individual pixel readable and writable?
+		Pixel = 1 << 0,
+		/// @brief Is a format compatible with sRGB? The engine works only with linear space. But if a texture is used as an output render target and it's sRGB compatible, its output will be converted to srgb.
+		SRGB = 1 << 1,
+		/// @brief Is a format render target compatible?
+		RenderTarget = 1 << 2,
+		/// @brief Is a format depth stencil compatible?
+		DepthStencil = 1 << 3,
+		All = Pixel | SRGB | RenderTarget | DepthStencil
+	};
+
 	ENUM_VALUE_FEATURES(TextureFormat, TextureFormatNames)
 	ENUM_VALUE_FEATURES(TextureFormatType, TextureFormatTypeNames)
 	ENUM_VALUE_FEATURES(PixelDataType, PixelDataTypeNames)
+	ENUM_MASK_FEATURES(TextureFeature, TextureFeatureNames)
 
 	/// @brief Texture format info.
 	struct TextureFormatInfo final
@@ -210,8 +236,8 @@ export namespace PonyEngine::Render
 		TextureDimensionMask supportedDimensions; ///< Supported dimensions. It's a dimension mask.
 		TextureFormatType textureFormatType; ///< Texture format type.
 		PixelDataType pixelDataType; ///< Pixel data type. For depth stencil formats it's unknown.
-		bool isCompressed; ///< Is it a compressed format?
-		bool pixelAccessible; ///< Is it possible to read/write individual pixels? Usually uncompressed formats have @a true, and compressed ones have @a false.
+		TextureFeature features; ///< Texture format features.
+		bool compressed; ///< Is it a compressed format?
 		bool supportedByPlatform; ///< Is the format supported by a current platform?
 	};
 }

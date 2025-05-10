@@ -47,6 +47,8 @@ export namespace PonyEngine::Render
 
 		/// @brief Tick the mesh manager.
 		void Tick();
+		/// @brief Cleans out of dead meshes.
+		void Clean();
 
 		MeshManager& operator =(const MeshManager&) = delete;
 		MeshManager& operator =(MeshManager&&) = delete;
@@ -54,8 +56,6 @@ export namespace PonyEngine::Render
 	private:
 		/// @brief Creates new meshes on GPU.
 		void Create();
-		/// @brief Destroys expired meshes on both CPU and GPU.
-		void Destroy();
 		/// @brief Updates living meshes.
 		void Update();
 		/// @brief Clears dirty flags and caches.
@@ -86,8 +86,6 @@ namespace PonyEngine::Render
 
 	void MeshManager::Tick()
 	{
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Destroy.");
-		Destroy();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Create.");
 		Create();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Update.");
@@ -96,15 +94,7 @@ namespace PonyEngine::Render
 		Clear();
 	}
 
-	void MeshManager::Create()
-	{
-		for (const Mesh* mesh : newMeshes)
-		{
-			renderSystem->RenderAgent().MeshAgent().Create(*mesh);
-		}
-	}
-
-	void MeshManager::Destroy()
+	void MeshManager::Clean()
 	{
 		for (std::size_t i = meshes.size(); i-- > 0; )
 		{
@@ -123,6 +113,14 @@ namespace PonyEngine::Render
 				renderSystem->RenderAgent().MeshAgent().Destroy(*mesh);
 			}
 			meshes.erase(meshes.cbegin() + i);
+		}
+	}
+
+	void MeshManager::Create()
+	{
+		for (const Mesh* mesh : newMeshes)
+		{
+			renderSystem->RenderAgent().MeshAgent().Create(*mesh);
 		}
 	}
 

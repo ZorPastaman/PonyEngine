@@ -46,20 +46,15 @@ export namespace PonyEngine::Render
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<ICamera> CreateCamera(const CameraParams& cameraParams) override;
 
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<Camera> FindCamera(ICamera& camera) const noexcept override;
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<const Camera> FindCamera(const ICamera& camera) const noexcept override;
-
 		/// @brief Ticks the camera manager.
 		void Tick();
+		/// @brief Cleans out of dead cameras.
+		void Clean();
 
 		CameraManager& operator =(const CameraManager&) = delete;
 		CameraManager& operator =(CameraManager&&) = delete;
 
 	private:
-		/// @brief Cleans out of dead cameras.
-		void Clean();
 		/// @brief Submits cameras to a pipeline.
 		void Submit();
 
@@ -86,8 +81,6 @@ namespace PonyEngine::Render
 
 	void CameraManager::Tick()
 	{
-		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clean.");
-		Clean();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Submit.");
 		Submit();
 	}

@@ -7,16 +7,24 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render:MSAA;
+module;
 
-import <cstdint>;
+#include "PonyBase/Utility/ObjectBody.h"
+
+export module PonyEngine.Render:IFrameManager;
+
+import :IFrame;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Multi sample anti-aliasing parameters.
-	struct MSAA final
+	/// @brief Frame manager.
+	class IFrameManager
 	{
-		std::uint32_t sampleCount; ///< Sample count.
-		float sampleQuality; ///< Sample quality. Must be in range [0, 1].
+		INTERFACE_BODY(IFrameManager)
+
+		/// @brief Gets the main frame.
+		/// @return Main frame.
+		[[nodiscard("Pure function")]]
+		virtual const IFrame& MainFrame() const noexcept = 0;
 	};
 }
