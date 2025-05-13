@@ -48,8 +48,8 @@ export namespace PonyEngine::Render
 
 		/// @brief Ticks the camera manager.
 		void Tick();
-		/// @brief Cleans out of dead cameras.
-		void Clean();
+		/// @brief Cleans out dead cameras.
+		void Clean() noexcept;
 
 		CameraManager& operator =(const CameraManager&) = delete;
 		CameraManager& operator =(CameraManager&&) = delete;
@@ -85,7 +85,7 @@ namespace PonyEngine::Render
 		Submit();
 	}
 
-	void CameraManager::Clean()
+	void CameraManager::Clean() noexcept
 	{
 		for (std::size_t i = cameras.size(); i-- > 0; )
 		{

@@ -25,7 +25,7 @@ import :TextureDimension;
 namespace PonyEngine::Render
 {
 	/// @brief Texture format names.
-	constexpr std::array<std::string_view, 59> TextureFormatNames
+	constexpr std::array<std::string_view, 67> TextureFormatNames
 	{
 		"Unknown",
 		"R32G32B32A32_Float",
@@ -43,6 +43,9 @@ namespace PonyEngine::Render
 		"R32G32_Uint",
 		"R32G32_Sint",
 		"D32_Float_S8X24_Uint",
+		"R10G10B10A2_Unorm",
+		"R10G10B10A2_Uint",
+		"R11G11B10_Float",
 		"R8G8B8A8_Unorm",
 		"R8G8B8A8_Uint",
 		"R8G8B8A8_Snorm",
@@ -72,7 +75,7 @@ namespace PonyEngine::Render
 		"R8_Snorm",
 		"R8_Sint",
 		"A8_Unorm",
-		"R1_Unorm",
+		"R9G9B9E5_SharedExp",
 		"BC1_Unorm",
 		"BC2_Unorm",
 		"BC3_Unorm",
@@ -80,11 +83,14 @@ namespace PonyEngine::Render
 		"BC4_Snorm",
 		"BC5_Unorm",
 		"BC5_Snorm",
+		"B5G6R5_Unorm",
+		"B5G5R5A1_Unorm",
 		"B8G8R8A8_Unorm",
 		"B8G8R8X8_Unorm",
 		"BC6H_UF16",
 		"BC6H_SF16",
 		"BC7_Unorm",
+		"B4G4R4A4_Unorm",
 		"Invalid"
 	};
 
@@ -142,6 +148,9 @@ export namespace PonyEngine::Render
 		R32G32_Uint,
 		R32G32_Sint,
 		D32_Float_S8X24_Uint,
+		R10G10B10A2_Unorm,
+		R10G10B10A2_Uint,
+		R11G11B10_Float,
 		R8G8B8A8_Unorm,
 		R8G8B8A8_Uint,
 		R8G8B8A8_Snorm,
@@ -171,7 +180,7 @@ export namespace PonyEngine::Render
 		R8_Snorm,
 		R8_Sint,
 		A8_Unorm,
-		R1_Unorm,
+		R9G9B9E5_SharedExp,
 		BC1_Unorm,
 		BC2_Unorm,
 		BC3_Unorm,
@@ -179,11 +188,14 @@ export namespace PonyEngine::Render
 		BC4_Snorm,
 		BC5_Unorm,
 		BC5_Snorm,
+		B5G6R5_Unorm,
+		B5G5R5A1_Unorm,
 		B8G8R8A8_Unorm,
 		B8G8R8X8_Unorm,
 		BC6H_UF16,
 		BC6H_SF16,
-		BC7_Unorm
+		BC7_Unorm,
+		B4G4R4A4_Unorm
 	};
 
 	/// @brief Texture format type.

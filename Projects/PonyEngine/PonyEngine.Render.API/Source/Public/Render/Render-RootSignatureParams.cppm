@@ -11,7 +11,7 @@ export module PonyEngine.Render:RootSignatureParams;
 
 import <memory>;
 import <string>;
-import <unordered_map>;
+import <vector>;
 
 import :IShader;
 
@@ -21,7 +21,7 @@ export namespace PonyEngine::Render
 	struct RootSignatureParams final
 	{
 		std::shared_ptr<const IShader> shader; ///< Root signature shader.
-		std::unordered_map<std::string, std::uint32_t> slots; ///< Root signature slots.
+		std::vector<std::string> slots; ///< Root signature slots.
 
 		std::string name; ///< Root signature name.
 	};

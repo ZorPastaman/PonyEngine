@@ -94,6 +94,11 @@
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChainParams.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineState.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineStateManager.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-RootSignature.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-BufferData.cppm" />

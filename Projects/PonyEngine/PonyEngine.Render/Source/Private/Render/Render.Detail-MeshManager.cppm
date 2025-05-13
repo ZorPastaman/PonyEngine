@@ -47,7 +47,7 @@ export namespace PonyEngine::Render
 
 		/// @brief Tick the mesh manager.
 		void Tick();
-		/// @brief Cleans out of dead meshes.
+		/// @brief Cleans out dead meshes.
 		void Clean();
 
 		MeshManager& operator =(const MeshManager&) = delete;
@@ -59,7 +59,7 @@ export namespace PonyEngine::Render
 		/// @brief Updates living meshes.
 		void Update();
 		/// @brief Clears dirty flags and caches.
-		void Clear();
+		void Clear() noexcept;
 
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
@@ -135,7 +135,7 @@ namespace PonyEngine::Render
 		}
 	}
 
-	void MeshManager::Clear()
+	void MeshManager::Clear() noexcept
 	{
 		for (const std::shared_ptr<Mesh>& mesh : meshes)
 		{
