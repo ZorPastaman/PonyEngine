@@ -14,9 +14,13 @@ module;
 export module PonyEngine.Render:IPipelineState;
 
 import <cstdint>;
+import <memory>;
 
+import :Blend;
+import :DepthStencil;
 import :IRootSignature;
 import :IShader;
+import :Rasterizer;
 import :ThreadGroupCounts;
 
 export namespace PonyEngine::Render
@@ -29,33 +33,42 @@ export namespace PonyEngine::Render
 		/// @brief Gets the root signature.
 		/// @return Root signature.
 		[[nodiscard("Pure function")]]
-		virtual const IRootSignature& RootSignature() const noexcept = 0;
+		virtual const std::shared_ptr<const IRootSignature>& RootSignature() const noexcept = 0;
 
 		/// @brief Gets the amplification shader.
 		/// @return Amplification shader.
 		[[nodiscard("Pure function")]]
-		virtual const IShader* AmplificationShader() const noexcept = 0;
+		virtual const std::shared_ptr<const IShader>& AmplificationShader() const noexcept = 0;
 		/// @brief Gets the mesh shader.
 		/// @return Mesh shader.
 		[[nodiscard("Pure function")]]
-		virtual const IShader& MeshShader() const noexcept = 0;
+		virtual const std::shared_ptr<const IShader>& MeshShader() const noexcept = 0;
 		/// @brief Gets the pixel shader.
 		/// @return Pixel shader.
 		[[nodiscard("Pure function")]]
-		virtual const IShader& PixelShader() const noexcept = 0;
+		virtual const std::shared_ptr<const IShader>& PixelShader() const noexcept = 0;
+
+		/// @brief Gets the blend.
+		/// @return Blend.
+		[[nodiscard("Pure function")]]
+		virtual const Blend& Blend() const noexcept = 0;
+		/// @brief Gets the rasterizer.
+		/// @return Rasterizer.
+		[[nodiscard("Pure function")]]
+		virtual const Rasterizer& Rasterizer() const noexcept = 0;
+		/// @brief Gets the depth stencil.
+		/// @return Depth stencil.
+		[[nodiscard("Pure function")]]
+		virtual const DepthStencil& DepthStencil() const noexcept = 0;
 
 		/// @brief Gets the thread group counts.
 		/// @return Thread group counts.
 		[[nodiscard("Pure function")]]
-		virtual const ThreadGroupCounts& ThreadGroupCount() const noexcept = 0;
+		virtual const ThreadGroupCounts& ThreadGroupCounts() const noexcept = 0;
 		/// @brief Gets the render queue.
 		/// @return Render queue.
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t RenderQueue() const noexcept = 0;
-		/// @brief Is the state transparent?
-		/// @return @a True if it's transparent; @a false otherwise.
-		[[nodiscard("Pure function")]]
-		virtual bool IsTransparent() const noexcept = 0;
 		/// @brief Is camera culling enabled?
 		/// @return @a True if it's enabled; @a false otherwise.
 		[[nodiscard("Pure function")]]

@@ -154,13 +154,13 @@ namespace Game
 		const auto rootSignatureParams = PonyEngine::Render::RootSignatureParams
 		{
 			.shader = rootSignatureShader,
-			.slots = 
+			.slots =
 			{
-				{ std::string(PonyEngine::Render::DataTypes::Data), 0u },
-				{ "Meshlets", 1u },
-				{ "Positions", 2u },
-				{ "Color", 3u },
-				{ "Filter", 4u }
+				std::string(PonyEngine::Render::DataTypes::Data),
+				"Meshlets",
+				"Positions",
+				"Color",
+				"Filter"
 			},
 			.name = "RootSig"
 		};
@@ -233,77 +233,77 @@ namespace Game
 			.name = "GreenOpaque"
 		};
 		greenOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		greenOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		greenOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>> { filterTexture };
 		auto whiteOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "WhiteOpaque"
 		};
 		whiteOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		whiteOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		whiteOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto yellowOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "YellowOpaque"
 		};
 		yellowOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		yellowOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		yellowOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto cyanOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "CyanOpaque"
 		};
 		cyanOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		cyanOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		cyanOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto blueOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "BlueOpaque"
 		};
 		blueOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		blueOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		blueOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto magentaOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "MagentaOpaque"
 		};
 		magentaOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		magentaOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		magentaOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto redOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,
 			.name = "RedOpaque"
 		};
 		redOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		redOpaqueMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		redOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto redTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "RedTransparent"
 		};
 		redTransparentMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		redTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		redTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto greenTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "GreenTransparent"
 		};
 		greenTransparentMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		greenTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		greenTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto blueTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "BlueTransparent"
 		};
 		blueTransparentMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		blueTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		blueTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 		auto yellowTransparentMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = transparentPipelineState,
 			.name = "YellowTransparent"
 		};
 		yellowTransparentMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		yellowTransparentMaterialParams.textures["Filter"] = std::vector{ filterTexture };
+		yellowTransparentMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>>{ filterTexture };
 
 		const auto greenOpaqueMaterial = renderSystem->MaterialManager().CreateMaterial(greenOpaqueMaterialParams);
 		greenOpaqueMaterial->Element(0u, 0u, 0u, PonyMath::Color::RGBA<float>::Predefined::Green);

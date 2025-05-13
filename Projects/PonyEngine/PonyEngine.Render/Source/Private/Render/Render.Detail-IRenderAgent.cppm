@@ -14,6 +14,8 @@ module;
 export module PonyEngine.Render.Detail:IRenderAgent;
 
 import :IMeshAgent;
+import :IPipelineStateAgent;
+import :IRootSignatureAgent;
 
 export namespace PonyEngine::Render
 {
@@ -21,6 +23,24 @@ export namespace PonyEngine::Render
 	class IRenderAgent
 	{
 		INTERFACE_BODY(IRenderAgent)
+
+		/// @brief Gets the root signature agent.
+		/// @return Root signature agent.
+		[[nodiscard("Pure function")]]
+		virtual IRootSignatureAgent& RootSignatureAgent() noexcept = 0;
+		/// @brief Gets the root signature agent.
+		/// @return Root signature agent.
+		[[nodiscard("Pure function")]]
+		virtual const IRootSignatureAgent& RootSignatureAgent() const noexcept = 0;
+
+		/// @brief Gets the pipeline state agent.
+		/// @return Pipeline state agent.
+		[[nodiscard("Pure function")]]
+		virtual IPipelineStateAgent& PipelineStateAgent() noexcept = 0;
+		/// @brief Gets the pipeline state agent.
+		/// @return Pipeline state agent.
+		[[nodiscard("Pure function")]]
+		virtual const IPipelineStateAgent& PipelineStateAgent() const noexcept = 0;
 
 		/// @brief Gets the mesh agent.
 		/// @return Mesh agent.

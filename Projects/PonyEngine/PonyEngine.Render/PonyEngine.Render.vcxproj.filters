@@ -295,6 +295,21 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-RootSignature.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineState.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineStateManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">

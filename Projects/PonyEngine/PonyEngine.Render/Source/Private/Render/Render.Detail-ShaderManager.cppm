@@ -46,8 +46,8 @@ export namespace PonyEngine::Render
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IShader> CreateShader(const ShaderParams& params) override;
 
-		/// @brief Cleans out of dead shaders.
-		void Clean();
+		/// @brief Cleans out dead shaders.
+		void Clean() noexcept;
 
 		ShaderManager& operator =(const ShaderManager&) = delete;
 		ShaderManager& operator =(ShaderManager&&) = delete;
@@ -98,7 +98,7 @@ namespace PonyEngine::Render
 		return shader;
 	}
 
-	void ShaderManager::Clean()
+	void ShaderManager::Clean() noexcept
 	{
 		for (std::size_t i = shaders.size(); i-- > 0; )
 		{

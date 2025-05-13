@@ -148,7 +148,7 @@ export namespace PonyEngine::Input
 
 		/// @brief Zeroes deltas.
 		void ZeroDeltas() noexcept;
-		/// @brief Cleans out of dead receivers.
+		/// @brief Cleans out dead receivers.
 		void Clean() noexcept;
 		/// @brief Ticks devices.
 		void TickDevices();

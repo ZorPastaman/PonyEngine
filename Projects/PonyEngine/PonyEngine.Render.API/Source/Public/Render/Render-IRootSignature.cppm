@@ -14,6 +14,7 @@ module;
 export module PonyEngine.Render:IRootSignature;
 
 import <cstdint>;
+import <memory>;
 import <optional>;
 import <string_view>;
 
@@ -29,7 +30,7 @@ export namespace PonyEngine::Render
 		/// @brief Get the root signature shader.
 		/// @return Root signature shader.
 		[[nodiscard("Pure function")]]
-		virtual const IShader& Shader() const noexcept = 0;
+		virtual const std::shared_ptr<const IShader>& Shader() const noexcept = 0;
 
 		/// @brief Tries to find a slot index by the @p slotName.
 		/// @param slotName Slot name.
