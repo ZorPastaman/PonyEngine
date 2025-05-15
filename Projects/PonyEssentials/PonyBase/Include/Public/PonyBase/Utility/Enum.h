@@ -47,7 +47,7 @@
 		std::string answer = ""; \
 		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)); ++i) \
 		{ \
-			if (std::underlying_type_t<Mask>{1} << i & static_cast<std::underlying_type_t<Mask>>(mask) != std::underlying_type_t<Mask>{0}) \
+			if (((std::underlying_type_t<Mask>{1} << i) & static_cast<std::underlying_type_t<Mask>>(mask)) != std::underlying_type_t<Mask>{0}) \
 			{ \
 				if (!answer.empty()) \
 				{ \

@@ -93,7 +93,7 @@ namespace PonyEngine::Render
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Info, "Shader file read.");
 
 		const auto shader = std::make_shared<Shader>(std::move(data), params.name);
-		shaders.push_back(std::pair(shader, params.shaderPath));
+		shaders.emplace_back(shader, params.shaderPath);
 
 		return shader;
 	}

@@ -64,8 +64,8 @@ namespace PonyEngine::Render
 		"R8G8_Uint",
 		"R8G8_Snorm",
 		"R8G8_Sint",
-		"R16_Float",
 		"D16_Unorm",
+		"R16_Float",
 		"R16_Unorm",
 		"R16_Uint",
 		"R16_Snorm",
@@ -75,6 +75,11 @@ namespace PonyEngine::Render
 		"R8_Snorm",
 		"R8_Sint",
 		"A8_Unorm",
+		"B8G8R8A8_Unorm",
+		"B8G8R8X8_Unorm",
+		"B5G6R5_Unorm",
+		"B5G5R5A1_Unorm",
+		"B4G4R4A4_Unorm",
 		"BC1_Unorm",
 		"BC2_Unorm",
 		"BC3_Unorm",
@@ -82,14 +87,9 @@ namespace PonyEngine::Render
 		"BC4_Snorm",
 		"BC5_Unorm",
 		"BC5_Snorm",
-		"B5G6R5_Unorm",
-		"B5G5R5A1_Unorm",
-		"B8G8R8A8_Unorm",
-		"B8G8R8X8_Unorm",
 		"BC6H_UF16",
 		"BC6H_SF16",
 		"BC7_Unorm",
-		"B4G4R4A4_Unorm",
 		"Invalid"
 	};
 
@@ -165,8 +165,8 @@ export namespace PonyEngine::Render
 		R8G8_Uint,
 		R8G8_Snorm,
 		R8G8_Sint,
-		R16_Float,
 		D16_Unorm,
+		R16_Float,
 		R16_Unorm,
 		R16_Uint,
 		R16_Snorm,
@@ -176,6 +176,11 @@ export namespace PonyEngine::Render
 		R8_Snorm,
 		R8_Sint,
 		A8_Unorm,
+		B8G8R8A8_Unorm,
+		B8G8R8X8_Unorm,
+		B5G6R5_Unorm,
+		B5G5R5A1_Unorm,
+		B4G4R4A4_Unorm,
 		BC1_Unorm,
 		BC2_Unorm,
 		BC3_Unorm,
@@ -183,14 +188,9 @@ export namespace PonyEngine::Render
 		BC4_Snorm,
 		BC5_Unorm,
 		BC5_Snorm,
-		B5G6R5_Unorm,
-		B5G5R5A1_Unorm,
-		B8G8R8A8_Unorm,
-		B8G8R8X8_Unorm,
 		BC6H_UF16,
 		BC6H_SF16,
-		BC7_Unorm,
-		B4G4R4A4_Unorm
+		BC7_Unorm
 	};
 
 	/// @brief Pixel data types.
@@ -244,12 +244,12 @@ export namespace PonyEngine::Render
 		std::uint8_t blockWidth; ///< Block width in pixels. For uncompressed formats it's always 1.
 		std::uint8_t blockHeight; ///< Block height in pixels. For uncompressed formats it's always 1.
 		std::uint8_t blockDepth; ///< Block depth in pixels. For uncompressed formats it's always 1.
-		std::uint8_t redBits; ///< How many bits a red channel uses.
-		std::uint8_t greenBits; ///< How many bits a green channel uses.
-		std::uint8_t blueBits; ///< How many bits a blue channel uses.
-		std::uint8_t alphaBits; ///< How many bits an alpha channel uses.
-		std::uint8_t depthBits; ///< How many bits a depth channel uses.
-		std::uint8_t stencilBits; ///< How many bits a stencil channel uses.
+		std::uint8_t redBits; ///< How many bits a red channel uses. For compressed format, it's 0.
+		std::uint8_t greenBits; ///< How many bits a green channel uses. For compressed format, it's 0.
+		std::uint8_t blueBits; ///< How many bits a blue channel uses. For compressed format, it's 0.
+		std::uint8_t alphaBits; ///< How many bits an alpha channel uses. For compressed format, it's 0.
+		std::uint8_t depthBits; ///< How many bits a depth channel uses. For compressed format, it's 0.
+		std::uint8_t stencilBits; ///< How many bits a stencil channel uses. For compressed format, it's 0.
 		bool compressed; ///< Is it a compressed format?
 		bool supportedByPlatform; ///< Is the format supported by a current platform?
 	};

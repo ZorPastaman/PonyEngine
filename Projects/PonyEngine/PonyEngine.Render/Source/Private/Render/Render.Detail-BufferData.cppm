@@ -180,7 +180,7 @@ namespace PonyEngine::Render
 			buffers.reserve(params.size());
 			for (const PonyBase::Container::BufferParams& param : params)
 			{
-				buffers.push_back(PonyBase::Container::Buffer(param));
+				buffers.emplace_back(param);
 			}
 			dataBuffers.push_back(std::move(buffers));
 		}
@@ -276,7 +276,7 @@ namespace PonyEngine::Render
 		buffers.reserve(bufferParams.size());
 		for (const PonyBase::Container::BufferParams& bufferParam : bufferParams)
 		{
-			buffers.push_back(PonyBase::Container::Buffer(bufferParam));
+			buffers.emplace_back(bufferParam);
 		}
 
 		const std::size_t currentSize = dataTypes.size();
