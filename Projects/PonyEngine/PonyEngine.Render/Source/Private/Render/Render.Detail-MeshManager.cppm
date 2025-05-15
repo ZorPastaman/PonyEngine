@@ -25,7 +25,7 @@ import PonyEngine.Render;
 import :IMeshAgent;
 import :IRenderSystemContext;
 import :Mesh;
-import :MeshDirtyState;
+import :MeshDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -128,7 +128,7 @@ namespace PonyEngine::Render
 	{
 		for (const std::shared_ptr<Mesh>& mesh : meshes)
 		{
-			if (const MeshDirtyState& dirtyState = mesh->DirtyState(); dirtyState.dirtyData.size() > 0 || dirtyState.dirtyFlags != MeshDirtyFlag::None)
+			if (mesh->DirtyFlags() != MeshDirtyFlag::None)
 			{
 				renderSystem->RenderAgent().MeshAgent().Update(*mesh);
 			}
@@ -139,7 +139,7 @@ namespace PonyEngine::Render
 	{
 		for (const std::shared_ptr<Mesh>& mesh : meshes)
 		{
-			mesh->ResetDirtyState();
+			mesh->ResetDirty();
 		}
 
 		newMeshes.clear();

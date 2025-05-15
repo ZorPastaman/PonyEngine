@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Utility/Enum.h"
 
-export module PonyEngine.Render.Detail:MeshDirtyFlag;
+export module PonyEngine.Render.Detail:TextureDirtyFlag;
 
 import <array>;
 import <bit>;
@@ -23,10 +23,9 @@ import <type_traits>;
 
 namespace PonyEngine::Render
 {
-	/// @brief Mesh dirty flag names.
-	constexpr std::array<std::string_view, 4> MeshDirtyFlagNames
+	/// @brief Texture dirty flag names.
+	constexpr std::array<std::string_view, 3> TextureDirtyFlagNames
 	{
-		"DataStructure",
 		"Data"
 		"Name",
 		"Unknown"
@@ -35,15 +34,14 @@ namespace PonyEngine::Render
 
 export namespace PonyEngine::Render
 {
-	/// @brief Mesh dirty flag.
-	enum class MeshDirtyFlag : std::uint8_t
+	/// @brief Texture dirty flag.
+	enum class TextureDirtyFlag : std::uint8_t
 	{
 		None = 0,
-		DataStructure = 1 << 0,
-		Data = 1 << 1,
-		Name = 1 << 2,
-		All = DataStructure | Data | Name
+		Data = 1 << 0,
+		Name = 1 << 1,
+		All = Data | Name
 	};
 
-	ENUM_MASK_FEATURES(MeshDirtyFlag, MeshDirtyFlagNames)
+	ENUM_MASK_FEATURES(TextureDirtyFlag, TextureDirtyFlagNames)
 }

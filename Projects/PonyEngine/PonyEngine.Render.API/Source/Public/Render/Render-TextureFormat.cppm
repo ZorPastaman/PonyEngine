@@ -25,7 +25,7 @@ import :TextureDimension;
 namespace PonyEngine::Render
 {
 	/// @brief Texture format names.
-	constexpr std::array<std::string_view, 67> TextureFormatNames
+	constexpr std::array<std::string_view, 64> TextureFormatNames
 	{
 		"Unknown",
 		"R32G32B32A32_Float",
@@ -75,7 +75,6 @@ namespace PonyEngine::Render
 		"R8_Snorm",
 		"R8_Sint",
 		"A8_Unorm",
-		"R9G9B9E5_SharedExp",
 		"BC1_Unorm",
 		"BC2_Unorm",
 		"BC3_Unorm",
@@ -94,17 +93,8 @@ namespace PonyEngine::Render
 		"Invalid"
 	};
 
-	/// @brief Texture format type names.
-	constexpr std::array<std::string_view, 4> TextureFormatTypeNames
-	{
-		"Unknown",
-		"Color",
-		"Depth",
-		"Invalid"
-	};
-
 	/// @brief Pixel data type names.
-	constexpr std::array<std::string_view, 8> PixelDataTypeNames
+	constexpr std::array<std::string_view, 10> PixelDataTypeNames
 	{
 		"Unknown",
 		"Snorm",
@@ -113,16 +103,22 @@ namespace PonyEngine::Render
 		"Uint",
 		"Sfloat",
 		"Ufloat",
+		"Depth",
+		"DepthStencil"
 		"Invalid"
 	};
 
 	/// @brief Texture feature names.
-	constexpr std::array<std::string_view, 5> TextureFeatureNames
+	constexpr std::array<std::string_view, 9> TextureFeatureNames
 	{
 		"Pixel",
 		"SRGB",
 		"RenderTarget",
 		"DepthStencil",
+		"SwapChain",
+		"Blendable",
+		"LogicBlendable",
+		"MSAA",
 		"Invalid"
 	};
 }
@@ -180,7 +176,6 @@ export namespace PonyEngine::Render
 		R8_Snorm,
 		R8_Sint,
 		A8_Unorm,
-		R9G9B9E5_SharedExp,
 		BC1_Unorm,
 		BC2_Unorm,
 		BC3_Unorm,
@@ -198,14 +193,6 @@ export namespace PonyEngine::Render
 		B4G4R4A4_Unorm
 	};
 
-	/// @brief Texture format type.
-	enum class TextureFormatType : std::uint8_t
-	{
-		Unknown,
-		Color,
-		Depth
-	};
-
 	/// @brief Pixel data types.
 	enum class PixelDataType : std::uint8_t
 	{
@@ -215,11 +202,13 @@ export namespace PonyEngine::Render
 		Sint,
 		Uint,
 		Sfloat,
-		Ufloat
+		Ufloat,
+		Depth,
+		DepthStencil
 	};
 
 	/// @brief Texture features.
-	enum class TextureFeature : std::uint8_t
+	enum class TextureFeature : std::uint16_t
 	{
 		None = 0,
 		/// @brief Is an individual pixel readable and writable?
@@ -230,25 +219,37 @@ export namespace PonyEngine::Render
 		RenderTarget = 1 << 2,
 		/// @brief Is a format depth stencil compatible?
 		DepthStencil = 1 << 3,
-		All = Pixel | SRGB | RenderTarget | DepthStencil
+		/// @brief Is a format swap chain buffer compatible?
+		SwapChain = 1 << 4,
+		/// @brief Are blend operations supported?
+		Blendable = 1 << 5,
+		/// @brief Are logic blend operations supported?
+		LogicBlendable = 1 << 6,
+		/// @brief Is a format msaa compatible?
+		MSAA = 1 << 7,
+		All = Pixel | SRGB | RenderTarget | DepthStencil | SwapChain | Blendable | LogicBlendable | MSAA
 	};
 
 	ENUM_VALUE_FEATURES(TextureFormat, TextureFormatNames)
-	ENUM_VALUE_FEATURES(TextureFormatType, TextureFormatTypeNames)
 	ENUM_VALUE_FEATURES(PixelDataType, PixelDataTypeNames)
 	ENUM_MASK_FEATURES(TextureFeature, TextureFeatureNames)
 
 	/// @brief Texture format info.
 	struct TextureFormatInfo final
 	{
-		std::uint32_t blockSize; ///< Block size in bytes. For uncompressed formats it's a pixel size.
-		std::uint32_t blockWidth; ///< Block width in pixels. For uncompressed formats it's always 1.
-		std::uint32_t blockHeight; ///< Block height in pixels. For uncompressed formats it's always 1.
-		std::uint32_t blockDepth; ///< Block depth in pixels. For uncompressed formats it's always 1.
-		TextureDimensionMask supportedDimensions; ///< Supported dimensions. It's a dimension mask.
-		TextureFormatType textureFormatType; ///< Texture format type.
-		PixelDataType pixelDataType; ///< Pixel data type. For depth stencil formats it's unknown.
 		TextureFeature features; ///< Texture format features.
+		TextureDimensionMask supportedDimensions; ///< Supported dimensions. It's a dimension mask.
+		PixelDataType pixelDataType; ///< Pixel data type. For depth stencil formats it's unknown.
+		std::uint8_t blockSize; ///< Block size in bytes. For uncompressed formats it's a pixel size.
+		std::uint8_t blockWidth; ///< Block width in pixels. For uncompressed formats it's always 1.
+		std::uint8_t blockHeight; ///< Block height in pixels. For uncompressed formats it's always 1.
+		std::uint8_t blockDepth; ///< Block depth in pixels. For uncompressed formats it's always 1.
+		std::uint8_t redBits; ///< How many bits a red channel uses.
+		std::uint8_t greenBits; ///< How many bits a green channel uses.
+		std::uint8_t blueBits; ///< How many bits a blue channel uses.
+		std::uint8_t alphaBits; ///< How many bits an alpha channel uses.
+		std::uint8_t depthBits; ///< How many bits a depth channel uses.
+		std::uint8_t stencilBits; ///< How many bits a stencil channel uses.
 		bool compressed; ///< Is it a compressed format?
 		bool supportedByPlatform; ///< Is the format supported by a current platform?
 	};

@@ -242,6 +242,6 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Incompatible type.");
 		}
 
-		Element(dataTypeIndex, dataIndex, elementIndex, std::span<const std::byte>(&element, sizeof(T)));
+		Element(dataTypeIndex, dataIndex, elementIndex, std::span(reinterpret_cast<const std::byte*>(&element), sizeof(T)));
 	}
 }

@@ -10,7 +10,6 @@
 export module PonyBase.Container:Buffer;
 
 import <cstddef>;
-import <cstdint>;
 import <cstring>;
 import <memory>;
 import <span>;
@@ -32,7 +31,7 @@ export namespace PonyBase::Container
 		/// @param stride Element size.
 		/// @param count Element count.
 		[[nodiscard("Pure constructor")]]
-		Buffer(std::uint32_t stride, std::uint32_t count);
+		Buffer(std::size_t stride, std::size_t count);
 		/// @brief Creates a buffer.
 		/// @param params Buffer parameters.
 		[[nodiscard("Pure constructor")]]
@@ -41,7 +40,7 @@ export namespace PonyBase::Container
 		/// @param stride Element size.
 		/// @param data Data to copy from. If its size isn't a multiple of the @p stride, the trail is ignored.
 		[[nodiscard("Pure constructor")]]
-		Buffer(std::uint32_t stride, std::span<const std::byte> data);
+		Buffer(std::size_t stride, std::span<const std::byte> data);
 		/// @brief Creates a buffer and copies data from the @p other.
 		/// @param other Copied buffer.
 		[[nodiscard("Pure constructor")]]
@@ -54,10 +53,10 @@ export namespace PonyBase::Container
 		/// @param count Element count.
 		/// @return Created buffer.
 		template<typename T> [[nodiscard("Pure function")]]
-		static Buffer Create(std::uint32_t count);
+		static Buffer Create(std::size_t count);
 		/// @brief Creates a buffer and initializes it with a copy of the @p span.
 		/// @tparam T Element type.
-		/// @param span Data source. The size can't exceed uint32 max value.
+		/// @param span Data source.
 		/// @return Created buffer.
 		template<typename T> [[nodiscard("Pure function")]]
 		static Buffer Create(std::span<const T> span);
@@ -67,11 +66,11 @@ export namespace PonyBase::Container
 		/// @brief Gets the element size.
 		/// @return Element size.
 		[[nodiscard("Pure function")]]
-		std::uint32_t Stride() const noexcept;
+		std::size_t Stride() const noexcept;
 		/// @brief Gets the element count.
 		/// @return Element count.
 		[[nodiscard("Pure function")]]
-		std::uint32_t Count() const noexcept;
+		std::size_t Count() const noexcept;
 		/// @brief Gets the buffer size.
 		/// @return Buffer size in bytes.
 		[[nodiscard("Pure function")]]
@@ -125,24 +124,24 @@ export namespace PonyBase::Container
 		/// @param strideIndex Stride index.
 		/// @return Span.
 		[[nodiscard("Pure function")]]
-		std::span<std::byte> Span(std::uint32_t strideIndex) noexcept;
+		std::span<std::byte> Span(std::size_t strideIndex) noexcept;
 		/// @brief Gets a raw span.
 		/// @param strideIndex Stride index.
 		/// @return Span.
 		[[nodiscard("Pure function")]]
-		std::span<const std::byte> Span(std::uint32_t strideIndex) const noexcept;
+		std::span<const std::byte> Span(std::size_t strideIndex) const noexcept;
 		/// @brief Gets a buffer stride as a span of type @p T.
 		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @param strideIndex Stride index.
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::span<T> Span(std::uint32_t strideIndex);
+		std::span<T> Span(std::size_t strideIndex);
 		/// @brief Gets a buffer stride as a span of type @p T.
 		/// @tparam T Object type. Its size must be a factor of @p Stride.
 		/// @param strideIndex Stride index.
 		/// @return Span.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::span<const T> Span(std::uint32_t strideIndex) const;
+		std::span<const T> Span(std::size_t strideIndex) const;
 
 		/// @brief Copies data from the @p source.
 		/// @param source Data source. Its stride and count must be the same as the stride and count if this buffer.
@@ -159,15 +158,15 @@ export namespace PonyBase::Container
 		Buffer& operator =(Buffer&& other) noexcept = default;
 
 	private:
-		std::uint32_t stride; ///< Element size.
-		std::uint32_t count; ///< Element count.
+		std::size_t stride; ///< Element size.
+		std::size_t count; ///< Element count.
 		std::unique_ptr<std::byte[]> data; ///< Data.
 	};
 }
 
 namespace PonyBase::Container
 {
-	Buffer::Buffer(const std::uint32_t stride, const std::uint32_t count) :
+	Buffer::Buffer(const std::size_t stride, const std::size_t count) :
 		stride{stride},
 		count{count},
 		data(std::make_unique<std::byte[]>(Size()))
@@ -179,9 +178,9 @@ namespace PonyBase::Container
 	{
 	}
 
-	Buffer::Buffer(const std::uint32_t stride, const std::span<const std::byte> data) :
+	Buffer::Buffer(const std::size_t stride, const std::span<const std::byte> data) :
 		stride{stride},
-		count{static_cast<std::uint32_t>(data.size() / stride)},
+		count{data.size() / stride},
 		data(std::make_unique<std::byte[]>(Size()))
 	{
 		std::memcpy(this->data.get(), data.data(), Size());
@@ -194,7 +193,7 @@ namespace PonyBase::Container
 	}
 
 	template<typename T>
-	Buffer Buffer::Create(const std::uint32_t count)
+	Buffer Buffer::Create(const std::size_t count)
 	{
 		return Buffer(sizeof(T), count);
 	}
@@ -202,25 +201,25 @@ namespace PonyBase::Container
 	template<typename T>
 	Buffer Buffer::Create(const std::span<const T> span)
 	{
-		auto buffer = Create<T>(static_cast<std::uint32_t>(span.size()));
+		auto buffer = Create<T>(span.size());
 		std::memcpy(buffer.Data(), span.data(), buffer.Size());
 
 		return buffer;
 	}
 
-	std::uint32_t Buffer::Stride() const noexcept
+	std::size_t Buffer::Stride() const noexcept
 	{
 		return stride;
 	}
 
-	std::uint32_t Buffer::Count() const noexcept
+	std::size_t Buffer::Count() const noexcept
 	{
 		return count;
 	}
 
 	std::size_t Buffer::Size() const noexcept
 	{
-		return static_cast<std::size_t>(stride) * count;
+		return stride * count;
 	}
 
 	std::byte* Buffer::Data() noexcept
@@ -300,18 +299,18 @@ namespace PonyBase::Container
 		return std::span<const T>(reinterpret_cast<const T*>(data.get()), Size() / sizeof(T));
 	}
 
-	std::span<std::byte> Buffer::Span(const std::uint32_t strideIndex) noexcept
+	std::span<std::byte> Buffer::Span(const std::size_t strideIndex) noexcept
 	{
 		return std::span(data.get() + strideIndex * stride, stride);
 	}
 
-	std::span<const std::byte> Buffer::Span(const std::uint32_t strideIndex) const noexcept
+	std::span<const std::byte> Buffer::Span(const std::size_t strideIndex) const noexcept
 	{
 		return std::span(data.get() + strideIndex * stride, stride);
 	}
 
 	template <typename T>
-	std::span<T> Buffer::Span(const std::uint32_t strideIndex) // TODO: Update tests
+	std::span<T> Buffer::Span(const std::size_t strideIndex) // TODO: Update tests
 	{
 		if (strideIndex >= count) [[unlikely]]
 		{
@@ -326,7 +325,7 @@ namespace PonyBase::Container
 	}
 
 	template <typename T>
-	std::span<const T> Buffer::Span(const std::uint32_t strideIndex) const
+	std::span<const T> Buffer::Span(const std::size_t strideIndex) const
 	{
 		if (strideIndex >= count) [[unlikely]]
 		{

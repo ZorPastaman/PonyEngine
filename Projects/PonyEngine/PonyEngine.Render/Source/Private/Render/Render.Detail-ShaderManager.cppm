@@ -85,7 +85,7 @@ namespace PonyEngine::Render
 		const std::size_t size = stream.tellg();
 		stream.seekg(std::ios::beg);
 
-		auto data = PonyBase::Container::Buffer(sizeof(char), static_cast<std::uint32_t>(size));
+		auto data = PonyBase::Container::Buffer(sizeof(char), size);
 		if (!stream.read(reinterpret_cast<char*>(data.Data()), size))
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to read shader file at '{}'.", params.shaderPath));

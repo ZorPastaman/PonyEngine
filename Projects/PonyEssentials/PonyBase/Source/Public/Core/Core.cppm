@@ -10,4 +10,3 @@
 export module PonyBase.Core;
 
 export import :ExitCodes;
-export import :FloatConversion;

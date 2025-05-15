@@ -215,18 +215,6 @@ namespace Game
 		filterTexture->Color(PonyMath::Color::RGBA<float>::Predefined::Yellow, 1u);
 		filterTexture->Color(PonyMath::Color::RGBA<float>::Predefined::Blue, 2u);
 
-		const auto greenBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Green });
-		const auto whiteBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::White });
-		const auto yellowBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Yellow });
-		const auto cyanBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Cyan });
-		const auto blueBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Blue });
-		const auto magentaBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Magenta });
-		const auto redBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>::Predefined::Red });
-		const auto redTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(1.f, 0.f, 0.f, 0.2f) });
-		const auto greenTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(0.f, 1.f, 0.f, 0.1f) });
-		const auto blueTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(0.f, 0.f, 1.f, 0.3f) });
-		const auto yellowTransparentBuffer = PonyBase::Container::Buffer::Create<PonyMath::Color::RGBA<float>>(std::array{ PonyMath::Color::RGBA<float>(1.f, 1.f, 0.f, 0.15f) });
-
 		auto greenOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,

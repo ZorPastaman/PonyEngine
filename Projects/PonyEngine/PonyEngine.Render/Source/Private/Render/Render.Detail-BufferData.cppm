@@ -158,7 +158,7 @@ namespace PonyEngine::Render
 			}
 			for (std::size_t i = 0; i < params.size(); ++i)
 			{
-				if (params[i].stride == 0u || params[i].count == 0u) [[unlikely]]
+				if (params[i].stride == 0 || params[i].count == 0) [[unlikely]]
 				{
 					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data buffer of type '{}' at '{}' is empty.", dataType, i));
 				}
@@ -262,7 +262,7 @@ namespace PonyEngine::Render
 		}
 		for (std::size_t i = 0; i < bufferParams.size(); ++i)
 		{
-			if (bufferParams[i].stride == 0u || bufferParams[i].count == 0u) [[unlikely]]
+			if (bufferParams[i].stride == 0 || bufferParams[i].count == 0) [[unlikely]]
 			{
 				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data buffer at '{}' is empty.", i));
 			}
