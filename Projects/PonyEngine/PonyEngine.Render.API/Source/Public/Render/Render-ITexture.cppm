@@ -17,6 +17,7 @@ import <cstddef>;
 import <cstdint>;
 import <span>;
 import <stdexcept>;
+import <string_view>;
 import <utility>;
 
 import PonyMath.Color;
@@ -47,7 +48,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the block count.
 		/// @return Block count.
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t BlockCount() const noexcept = 0;
+		virtual std::uint64_t BlockCount() const noexcept = 0;
 		/// @brief Gets the texture size.
 		/// @return Texture size in bytes.
 		[[nodiscard("Pure function")]]
@@ -65,11 +66,6 @@ export namespace PonyEngine::Render
 		/// @return Depth in pixels or array size.
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t Depth() const noexcept = 0;
-
-		/// @brief Gets the sample count.
-		/// @return Sample count.
-		[[nodiscard("Pure function")]]
-		virtual std::uint8_t SampleCount() const noexcept = 0;
 
 		/// @brief Gets the raw data.
 		/// @return Raw data.
@@ -93,23 +89,23 @@ export namespace PonyEngine::Render
 		/// @param index Block index.
 		/// @return Raw block.
 		[[nodiscard("Pure function")]]
-		virtual std::span<const std::byte> Block(std::uint32_t index) const noexcept = 0;
+		virtual std::span<const std::byte> Block(std::uint64_t index) const noexcept = 0;
 		/// @brief Gets a raw block.
 		/// @tparam T Data type. Its size must be the same as the block size.
 		/// @param index Block index.
 		/// @return Raw block.
 		template<typename T> [[nodiscard("Pure function")]]
-		std::span<const T> Block(std::uint32_t index) const;
+		std::span<const T> Block(std::uint64_t index) const;
 		/// @brief Sets a raw block.
 		/// @param index Block index.
 		/// @param data Data to set. Its size must be the same as the block size.
-		virtual void Block(std::uint32_t index, std::span<const std::byte> data) = 0;
+		virtual void Block(std::uint64_t index, std::span<const std::byte> data) = 0;
 		/// @brief Sets a raw block.
 		/// @tparam T Data type. Its size must be the same as the block size.
 		/// @param index Block index.
 		/// @param data Data to set. Its size must be the same as the block size.
 		template<typename T>
-		void Block(std::uint32_t index, std::span<const T> data);
+		void Block(std::uint64_t index, std::span<const T> data);
 
 		/// @brief Gets a pixel color.
 		/// @note Texture format must be pixel accessible and color type.
@@ -125,7 +121,7 @@ export namespace PonyEngine::Render
 		/// @param x X-coordinate.
 		/// @param y Y-coordinate. Texture1D ignores this value. Texture1D interprets this as an array element.
 		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
-		virtual void Color(const PonyMath::Color::RGBA<float>& color, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u);
+		virtual void Color(const PonyMath::Color::RGBA<float>& color, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u) = 0;
 
 		/// @brief Gets a pixel depth stencil.
 		/// @note Texture format must be pixel accessible and depth type.
@@ -141,7 +137,15 @@ export namespace PonyEngine::Render
 		/// @param x X-coordinate.
 		/// @param y Y-coordinate. Texture1D ignores this value. Texture1D interprets this as an array element.
 		/// @param z Z-coordinate. Texture1D, Texture1DArray and Texture2D ignore this value.
-		virtual void DepthStencil(const std::pair<float, std::uint8_t>& depthStencil, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u);
+		virtual void DepthStencil(const std::pair<float, std::uint8_t>& depthStencil, std::uint32_t x, std::uint32_t y = 0u, std::uint32_t z = 0u) = 0;
+
+		/// @brief Gets the name.
+		/// @return Name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		/// @brief Sets the name.
+		/// @param name Name to set.
+		virtual void Name(std::string_view name) = 0;
 	};
 }
 
@@ -172,7 +176,7 @@ namespace PonyEngine::Render
 	}
 
 	template <typename T>
-	std::span<const T> ITexture::Block(const std::uint32_t index) const
+	std::span<const T> ITexture::Block(const std::uint64_t index) const
 	{
 		if (sizeof(T) != BlockSize()) [[unlikely]]
 		{
@@ -185,7 +189,7 @@ namespace PonyEngine::Render
 	}
 
 	template <typename T>
-	void ITexture::Block(const std::uint32_t index, const std::span<const T> data)
+	void ITexture::Block(const std::uint64_t index, const std::span<const T> data)
 	{
 		if (sizeof(T) != BlockSize()) [[unlikely]]
 		{

@@ -94,8 +94,14 @@
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChainParams.cppm" />
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-PixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UniformColorPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-IPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UnsupportedPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-PipelineState.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-PipelineStateManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-RootSignature.cppm" />
@@ -127,11 +133,13 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Mesh.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-MeshDirtyFlag.cppm" />
-    <ClCompile Include="Source\Private\Render\Render.Detail-MeshDirtyState.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-MeshManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Pipeline.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Shader.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-ShaderManager.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-Texture.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-TextureDirtyFlag.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-TextureManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm" />
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows.Impl.cppm" />
   </ItemGroup>

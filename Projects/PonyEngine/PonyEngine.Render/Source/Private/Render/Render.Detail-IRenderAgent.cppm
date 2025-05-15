@@ -16,6 +16,7 @@ export module PonyEngine.Render.Detail:IRenderAgent;
 import :IMeshAgent;
 import :IPipelineStateAgent;
 import :IRootSignatureAgent;
+import :ITextureAgent;
 
 export namespace PonyEngine::Render
 {
@@ -50,5 +51,14 @@ export namespace PonyEngine::Render
 		/// @return Mesh agent.
 		[[nodiscard("Pure function")]]
 		virtual const IMeshAgent& MeshAgent() const noexcept = 0;
+
+		/// @brief Gets the texture agent.
+		/// @return Texture agent.
+		[[nodiscard("Pure function")]]
+		virtual ITextureAgent& TextureAgent() noexcept = 0;
+		/// @brief Gets the texture agent.
+		/// @return Texture agent.
+		[[nodiscard("Pure function")]]
+		virtual const ITextureAgent& TextureAgent() const noexcept = 0;
 	};
 }

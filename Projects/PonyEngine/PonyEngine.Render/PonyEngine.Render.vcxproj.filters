@@ -274,9 +274,6 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-BufferData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-MeshDirtyState.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -308,6 +305,33 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-Texture.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-TextureDirtyFlag.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-IPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-TextureManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UniformColorPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-PixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UnsupportedPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

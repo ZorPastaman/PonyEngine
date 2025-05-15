@@ -61,7 +61,7 @@ export namespace PonyEngine::Render
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 		std::vector<std::shared_ptr<PipelineState>> pipelineStates; ///< Pipeline states.
-		std::vector<PipelineState*> newPipelineStates; ///< New pipeline states.
+		std::vector<const PipelineState*> newPipelineStates; ///< New pipeline states.
 	};
 }
 

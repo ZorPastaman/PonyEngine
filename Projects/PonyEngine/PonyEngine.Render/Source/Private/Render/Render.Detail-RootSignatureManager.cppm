@@ -62,7 +62,7 @@ export namespace PonyEngine::Render
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 		std::vector<std::shared_ptr<RootSignature>> rootSignatures; ///< Root signatures.
-		std::vector<RootSignature*> newRootSignatures; ///< Root signatures created this frame.
+		std::vector<const RootSignature*> newRootSignatures; ///< Root signatures created this frame.
 	};
 }
 
