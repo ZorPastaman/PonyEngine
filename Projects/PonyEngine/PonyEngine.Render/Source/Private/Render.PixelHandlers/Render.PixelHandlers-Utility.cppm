@@ -260,7 +260,7 @@ namespace PonyEngine::Render
 	}
 
 	template <std::uint64_t Offset, std::uint32_t ExponentBits, std::uint32_t MantissaBits>
-	void FloatToSpecialUfloat(const std::span<std::byte> data, const float value) noexcept requires (Offset + ExponentBits + MantissaBits <= sizeof(unsigned long long) * 8 && ExponentBits + MantissaBits <= sizeof(unsigned int) * 8)
+	void FloatToSpecialUfloat(const std::span<std::byte> data, const float value) noexcept requires (Offset + ExponentBits + MantissaBits <= sizeof(std::uint64_t) * 8 && ExponentBits + MantissaBits <= sizeof(std::uint32_t) * 8)
 	{
 		using BitInfo = UfloatBitValueInfo<Offset, ExponentBits, MantissaBits>;
 
@@ -272,7 +272,7 @@ namespace PonyEngine::Render
 		{
 			const std::uint32_t bits = std::bit_cast<uint32_t>(value);
 			const std::int32_t exponent = (bits >> FloatMantissaBits & FloatExponentMask) - FloatBias + BitInfo::Bias;
-			const std::uint32_t mantissa = bits & FloatMantissaMask >> (FloatMantissaBits - MantissaBits);
+			const std::uint32_t mantissa = (bits & FloatMantissaMask) >> (FloatMantissaBits - MantissaBits);
 
 			if (exponent > 0)
 			{

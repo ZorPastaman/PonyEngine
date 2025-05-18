@@ -181,6 +181,8 @@ namespace PonyEngine::Render
 	const UnormPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UnormPixelHandler;
 	/// @brief R10G10B10A2_Uint pixel handler.
 	const UintPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UintPixelHandler;
+	/// @brief R11G11B10_Float pixel handler.
+	const UfloatPixelHandler<0, 11, 22, 0, 5, 6, 5, 6, 5, 5, 0, 0> R11G11B10FloatPixelHandler;
 
 	/// @brief Pixel handlers.
 	const std::unordered_map<TextureFormat, const IPixelHandler*> PixelHandlers
@@ -203,6 +205,7 @@ namespace PonyEngine::Render
 		{ TextureFormat::D32_Float_S8X24_Uint, &UnsupportedPixelHandler },
 		{ TextureFormat::R10G10B10A2_Unorm, &R10G10B10A2UnormPixelHandler },
 		{ TextureFormat::R10G10B10A2_Uint, &R10G10B10A2UintPixelHandler },
+		{ TextureFormat::R11G11B10_Float, &R11G11B10FloatPixelHandler },
 	};
 
 	TextureManager::TextureManager(IRenderSystemContext& renderSystem) noexcept :

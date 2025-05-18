@@ -11,6 +11,7 @@ export module PonyEngine.Render.PixelHandlers;
 
 export import :IPixelHandler;
 export import :SnormPixelHandler;
+export import :UfloatPixelHandler;
 export import :UintPixelHandler;
 export import :UniformPixelHandler;
 export import :UnormPixelHandler;
