@@ -7,9 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Detail.PixelHandlers;
+export module PonyEngine.Render.PixelHandlers;
 
 export import :IPixelHandler;
-export import :PixelHandler;
-export import :UniformColorPixelHandler;
+export import :SnormPixelHandler;
+export import :UintPixelHandler;
+export import :UniformPixelHandler;
+export import :UnormPixelHandler;
 export import :UnsupportedPixelHandler;

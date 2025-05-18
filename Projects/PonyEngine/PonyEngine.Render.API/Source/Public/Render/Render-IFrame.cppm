@@ -15,11 +15,11 @@ export module PonyEngine.Render:IFrame;
 
 import <cstdint>;
 import <memory>;
+import <string_view>;
 
 import PonyMath.Utility;
 
 import :ClearValue;
-import :FrameAttachment;
 import :ITexture;
 import :TextureFormat;
 
@@ -29,12 +29,6 @@ export namespace PonyEngine::Render
 	class IFrame
 	{
 		INTERFACE_BODY(IFrame)
-
-		/// @brief Tries to find an attachment.
-		/// @param attachment Attachment type.
-		/// @return Attachment if it's found; nullptr otherwise.
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<const ITexture> FindAttachment(FrameAttachment attachment) const noexcept = 0;
 
 		/// @brief Gets the clear value.
 		/// @return Clear value.
@@ -61,5 +55,13 @@ export namespace PonyEngine::Render
 		/// @return Depth stencil format. Unknown if there's no depth stencil attached.
 		[[nodiscard("Pure function")]]
 		virtual TextureFormat DepthStencilFormat() const noexcept = 0;
+
+		/// @brief Gets the name.
+		/// @return Name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
+		/// @brief Sets the name.
+		/// @param name Name to set.
+		virtual void Name(std::string_view name) = 0;
 	};
 }

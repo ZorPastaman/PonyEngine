@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Detail.PixelHandlers:IPixelHandler;
+export module PonyEngine.Render.PixelHandlers:IPixelHandler;
 
 import <cstdint>;
 import <utility>;
@@ -43,21 +43,5 @@ export namespace PonyEngine::Render
 		/// @param color Color to set.
 		virtual void Color(PonyBase::Container::Buffer& buffer, const PonyMath::Core::Vector3<std::uint32_t>& size,
 			const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate, const PonyMath::Color::RGBA<float>& color) const = 0;
-
-		/// @brief Gets a depth stencil.
-		/// @param buffer Buffer source.
-		/// @param size Buffer size in pixels.
-		/// @param pixelCoordinate Pixel coordinate.
-		/// @return Depth stencil.
-		[[nodiscard("Pure function")]]
-		virtual std::pair<float, std::uint8_t> DepthStencil(const PonyBase::Container::Buffer& buffer, const PonyMath::Core::Vector3<std::uint32_t>& size,
-			const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate) const = 0;
-		/// @brief Sets a depth stencil.
-		/// @param buffer Buffer destination.
-		/// @param size Buffer size in pixels.
-		/// @param pixelCoordinate Pixel coordinate.
-		/// @param depthStencil Depth stencil to set.
-		virtual void DepthStencil(PonyBase::Container::Buffer& buffer, const PonyMath::Core::Vector3<std::uint32_t>& size,
-			const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate, const std::pair<float, std::uint8_t>& depthStencil) const = 0;
 	};
 }

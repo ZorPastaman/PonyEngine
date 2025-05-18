@@ -217,9 +217,6 @@
     <ClCompile Include="Source\Public\Render\Render-CommandQueuePriority.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Public\Render\Render-FrameAttachment.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Source\Public\Render\Render-IFrame.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>

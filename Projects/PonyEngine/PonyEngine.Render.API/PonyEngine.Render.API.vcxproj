@@ -42,7 +42,6 @@
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
-    <ClCompile Include="Source\Public\Render\Render-FrameAttachment.cppm" />
     <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IFrame.cppm" />

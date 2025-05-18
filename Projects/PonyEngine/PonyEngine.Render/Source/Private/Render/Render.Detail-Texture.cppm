@@ -24,7 +24,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 
 import PonyEngine.Render;
-import PonyEngine.Render.Detail.PixelHandlers;
+import PonyEngine.Render.PixelHandlers;
 
 import :TextureDirtyFlag;
 
@@ -75,10 +75,6 @@ export namespace PonyEngine::Render
 		[[nodiscard("Pure function")]]
 		virtual PonyMath::Color::RGBA<float> Color(std::uint32_t x, std::uint32_t y, std::uint32_t z) const override;
 		virtual void Color(const PonyMath::Color::RGBA<float>& color, std::uint32_t x, std::uint32_t y, std::uint32_t z) override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::pair<float, std::uint8_t> DepthStencil(std::uint32_t x, std::uint32_t y, std::uint32_t z) const override;
-		virtual void DepthStencil(const std::pair<float, std::uint8_t>& depthStencil, std::uint32_t x, std::uint32_t y, std::uint32_t z) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -205,17 +201,6 @@ namespace PonyEngine::Render
 	void Texture::Color(const PonyMath::Color::RGBA<float>& color, const std::uint32_t x, const std::uint32_t y, const std::uint32_t z)
 	{
 		pixelHandler->Color(buffer, size, PonyMath::Core::Vector3<std::uint32_t>(x, y, z), color);
-		dirtyFlags |= TextureDirtyFlag::Data;
-	}
-
-	std::pair<float, std::uint8_t> Texture::DepthStencil(const std::uint32_t x, const std::uint32_t y, const std::uint32_t z) const
-	{
-		return pixelHandler->DepthStencil(buffer, size, PonyMath::Core::Vector3<std::uint32_t>(x, y, z));
-	}
-
-	void Texture::DepthStencil(const std::pair<float, std::uint8_t>& depthStencil, const std::uint32_t x, const std::uint32_t y, const std::uint32_t z)
-	{
-		pixelHandler->DepthStencil(buffer, size, PonyMath::Core::Vector3<std::uint32_t>(x, y, z), depthStencil);
 		dirtyFlags |= TextureDirtyFlag::Data;
 	}
 
