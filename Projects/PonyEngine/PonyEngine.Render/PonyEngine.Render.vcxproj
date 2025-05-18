@@ -94,11 +94,14 @@
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-ISubSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.DXGI\Render.DXGI.Detail-SwapChainParams.cppm" />
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-PixelHandler.cppm" />
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UniformColorPixelHandler.cppm" />
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-IPixelHandler.cppm" />
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UnsupportedPixelHandler.cppm" />
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-SnormPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UintPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnormPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UniformPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-IPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnsupportedPixelHandler.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-Utility.cppm" />
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm" />
@@ -141,6 +144,8 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-TextureDirtyFlag.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-TextureManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Half.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types.cppm" />
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows.Impl.cppm" />
   </ItemGroup>
   <ItemGroup>

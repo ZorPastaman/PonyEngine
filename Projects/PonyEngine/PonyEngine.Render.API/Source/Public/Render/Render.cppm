@@ -23,7 +23,6 @@ export import :DataTypes;
 export import :DepthStencil;
 export import :DepthStencilOperation;
 export import :FillMode;
-export import :FrameAttachment;
 export import :FrameParams;
 export import :ICamera;
 export import :ICameraManager;

@@ -313,25 +313,40 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-TextureDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers.cppm">
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-IPixelHandler.cppm">
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-IPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-TextureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UniformColorPixelHandler.cppm">
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UniformPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-PixelHandler.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render\PixelHandlers\Render.Detail.PixelHandlers-UnsupportedPixelHandler.cppm">
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnsupportedPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Types\Render.Types.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Half.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnormPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-Utility.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-SnormPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UintPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

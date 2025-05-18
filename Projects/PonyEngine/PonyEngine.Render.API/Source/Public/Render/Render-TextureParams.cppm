@@ -22,7 +22,7 @@ export namespace PonyEngine::Render
 	struct TextureParams final
 	{
 		TextureDimension dimension = TextureDimension::Texture2D; ///< Texture dimension.
-		TextureFormat format = TextureFormat::R8G8B8A8_Unorm; ///< Texture format.
+		TextureFormat format = TextureFormat::R8G8B8A8_Unorm; ///< Texture format. Can't be a depth stencil format.
 
 		std::uint32_t width = 1u; ///< Width in pixels.
 		std::uint32_t height = 1u; ///< Height in pixels.

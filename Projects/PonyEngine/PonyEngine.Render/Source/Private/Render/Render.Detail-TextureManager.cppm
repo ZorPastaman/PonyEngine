@@ -25,7 +25,8 @@ import <vector>;
 import PonyBase.Utility;
 
 import PonyEngine.Render;
-import PonyEngine.Render.Detail.PixelHandlers;
+import PonyEngine.Render.PixelHandlers;
+import PonyEngine.Render.Types;
 
 import :IRenderSystemContext;
 import :Texture;
@@ -99,7 +100,7 @@ namespace PonyEngine::Render
 		{ TextureFormat::D32_Float_S8X24_Uint, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::DepthStencil, .blockSize = 8u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 0u, .greenBits = 0u, .blueBits = 0u, .alphaBits = 0u, .depthBits = 32u, .stencilBits = 8u, .compressed = false, .supportedByPlatform = false} },
 		{ TextureFormat::R10G10B10A2_Unorm, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Unorm, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 10u, .greenBits = 10u, .blueBits = 10u, .alphaBits = 2u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
 		{ TextureFormat::R10G10B10A2_Uint, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Uint, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 10u, .greenBits = 10u, .blueBits = 10u, .alphaBits = 2u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
-		{ TextureFormat::R11G11B10_Float, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Sfloat, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 11u, .greenBits = 11u, .blueBits = 10u, .alphaBits = 0u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
+		{ TextureFormat::R11G11B10_Float, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Ufloat, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 11u, .greenBits = 11u, .blueBits = 10u, .alphaBits = 0u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
 		{ TextureFormat::R8G8B8A8_Unorm, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Unorm, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 8u, .greenBits = 8u, .blueBits = 8u, .alphaBits = 8u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
 		{ TextureFormat::R8G8B8A8_Uint, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Uint, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 8u, .greenBits = 8u, .blueBits = 8u, .alphaBits = 8u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
 		{ TextureFormat::R8G8B8A8_Snorm, TextureFormatInfo{.features = TextureFeature::Pixel, .supportedDimensions = TextureDimensionMask::None, .pixelDataType = PixelDataType::Snorm, .blockSize = 4u, .blockWidth = 1u, .blockHeight = 1u, .blockDepth = 1u, .redBits = 8u, .greenBits = 8u, .blueBits = 8u, .alphaBits = 8u, .depthBits = 0u, .stencilBits = 0u, .compressed = false, .supportedByPlatform = false} },
@@ -147,15 +148,61 @@ namespace PonyEngine::Render
 	};
 
 	/// @brief Unsupported pixel handler.
-	const std::unique_ptr<const PixelHandler> UnsupportedPixelHandler = std::make_unique<class UnsupportedPixelHandler>();
+	const UnsupportedPixelHandler UnsupportedPixelHandler;
 	/// @brief R32G32B32A32_Float pixel handler.
-	const std::unique_ptr<const PixelHandler> R32G32B32A32FloatPixelHandler = std::make_unique<UniformColorPixelHandler<float, 0, 1, 2, 3, true, true, true, true>>();
+	const UniformPixelHandler<float, 0, 1, 2, 3, true, true, true, true> R32G32B32A32FloatPixelHandler;
+	/// @brief R32G32B32A32_Uint pixel handler.
+	const UniformPixelHandler<std::uint32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32UintPixelHandler;
+	/// @brief R32G32B32A32_Sint pixel handler.
+	const UniformPixelHandler<std::int32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32SintPixelHandler;
+	/// @brief R32G32B32_Float pixel handler.
+	const UniformPixelHandler<float, 0, 1, 2, 0, true, true, true, false> R32G32B32FloatPixelHandler;
+	/// @brief R32G32B32_Uint pixel handler.
+	const UniformPixelHandler<std::uint32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32UintPixelHandler;
+	/// @brief R32G32B32_Sint pixel handler.
+	const UniformPixelHandler<std::int32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32SintPixelHandler;
+	/// @brief R16G16B16A16_Float pixel handler.
+	const UniformPixelHandler<Half, 0, 1, 2, 3, true, true, true, true> R16G16B16A16FloatPixelHandler;
+	/// @brief R16G16B16A16_Unorm pixel handler
+	const UnormPixelHandler<0, 16, 32, 48, 16, 16, 16, 16> R16G16B16A16UnormPixelHandler;
+	/// @brief R16G16B16A16_Uint pixel handler.
+	const UniformPixelHandler<std::uint16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UintPixelHandler;
+	/// @brief R16G16B16A16_Snorm pixel handler.
+	const SnormPixelHandler<0, 16, 32, 48, 16, 16, 16, 16> R16G16B16A16SnormPixelHandler;
+	/// @brief R16G16B16A16_Sint pixel handler.
+	const UniformPixelHandler<std::int16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SintPixelHandler;
+	/// @brief R32G32_Float pixel handler.
+	const UniformPixelHandler<float, 0, 1, 0, 0, true, true, false, false> R32G32FloatPixelHandler;
+	/// @brief R32G32_Uint pixel handler.
+	const UniformPixelHandler<std::uint32_t, 0, 1, 0, 0, true, true, false, false> R32G32UintPixelHandler;
+	/// @brief R32G32_Sint pixel handler.
+	const UniformPixelHandler<std::int32_t, 0, 1, 0, 0, true, true, false, false> R32G32SintPixelHandler;
+	/// @brief R10G10B10A2_Unorm pixel handler.
+	const UnormPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UnormPixelHandler;
+	/// @brief R10G10B10A2_Uint pixel handler.
+	const UintPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UintPixelHandler;
 
 	/// @brief Pixel handlers.
-	const std::unordered_map<TextureFormat, const PixelHandler*> PixelHandlers
+	const std::unordered_map<TextureFormat, const IPixelHandler*> PixelHandlers
 	{
-		{ TextureFormat::Unknown, UnsupportedPixelHandler.get() },
-		{ TextureFormat::R32G32B32A32_Float, R32G32B32A32FloatPixelHandler.get() }
+		{ TextureFormat::Unknown, &UnsupportedPixelHandler },
+		{ TextureFormat::R32G32B32A32_Float, &R32G32B32A32FloatPixelHandler },
+		{ TextureFormat::R32G32B32A32_Uint, &R32G32B32A32UintPixelHandler },
+		{ TextureFormat::R32G32B32A32_Sint, &R32G32B32A32SintPixelHandler },
+		{ TextureFormat::R32G32B32_Float, &R32G32B32FloatPixelHandler },
+		{ TextureFormat::R32G32B32_Uint, &R32G32B32UintPixelHandler },
+		{ TextureFormat::R32G32B32_Sint, &R32G32B32SintPixelHandler },
+		{ TextureFormat::R16G16B16A16_Float, &R16G16B16A16FloatPixelHandler },
+		{ TextureFormat::R16G16B16A16_Unorm, &R16G16B16A16UnormPixelHandler },
+		{ TextureFormat::R16G16B16A16_Uint, &R16G16B16A16UintPixelHandler },
+		{ TextureFormat::R16G16B16A16_Snorm, &R16G16B16A16SnormPixelHandler },
+		{ TextureFormat::R16G16B16A16_Sint, &R16G16B16A16SintPixelHandler },
+		{ TextureFormat::R32G32_Float, &R32G32FloatPixelHandler },
+		{ TextureFormat::R32G32_Uint, &R32G32UintPixelHandler },
+		{ TextureFormat::R32G32_Sint, &R32G32SintPixelHandler },
+		{ TextureFormat::D32_Float_S8X24_Uint, &UnsupportedPixelHandler },
+		{ TextureFormat::R10G10B10A2_Unorm, &R10G10B10A2UnormPixelHandler },
+		{ TextureFormat::R10G10B10A2_Uint, &R10G10B10A2UintPixelHandler },
 	};
 
 	TextureManager::TextureManager(IRenderSystemContext& renderSystem) noexcept :
@@ -187,6 +234,10 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Format is not supported by current platform.");
 		}
+		if (formatInfo.pixelDataType == PixelDataType::Depth || formatInfo.pixelDataType == PixelDataType::DepthStencil) [[unlikely]]
+		{
+			throw std::invalid_argument("Depth stencil textures can't be created as usual textures.");
+		}
 		if (!IsInMask(params.dimension, formatInfo.supportedDimensions)) [[unlikely]]
 		{
 			throw std::invalid_argument(PonyBase::Utility::SafeFormat("'{}' format doesn't support '{}' dimension.", ToString(params.format), ToString(params.dimension)));
@@ -201,7 +252,7 @@ namespace PonyEngine::Render
 		const auto bufferParams = PonyBase::Container::BufferParams{.stride = formatInfo.blockSize, blockCount};
 
 		assert(PixelHandlers.contains(params.format) && "No pixel handler.");
-		const PixelHandler* const pixelHandler = PixelHandlers.find(params.format)->second;
+		const IPixelHandler* const pixelHandler = PixelHandlers.find(params.format)->second;
 
 		const auto texture = std::make_shared<Texture>(params, bufferParams, *pixelHandler);
 		textures.push_back(texture);
