@@ -349,6 +349,9 @@
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UintPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UfloatPixelHandler.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">
