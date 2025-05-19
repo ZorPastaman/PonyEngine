@@ -103,6 +103,10 @@
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnsupportedPixelHandler.cppm" />
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-Utility.cppm" />
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Snorm16.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Snorm8.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Unorm16.cppm" />
+    <ClCompile Include="Source\Private\Render.Types\Render.Types-Unorm8.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm" />

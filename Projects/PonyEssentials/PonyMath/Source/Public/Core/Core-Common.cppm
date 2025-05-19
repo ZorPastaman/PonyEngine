@@ -88,7 +88,14 @@ export namespace PonyMath::Core
 	/// @tparam To Output type.
 	/// @param from Input value.
 	/// @return Rounded integral.
-	template<std::floating_point From, std::integral To> [[nodiscard("Pure function")]]
+	template<std::floating_point From, std::unsigned_integral To> [[nodiscard("Pure function")]]
+	constexpr To RoundToIntegral(From from) noexcept; // TODO: Add tests
+	/// @brief Rounds the floating point value to an integral value and returns it as an integral value.
+	/// @tparam From Input type.
+	/// @tparam To Output type.
+	/// @param from Input value.
+	/// @return Rounded integral.
+	template<std::floating_point From, std::signed_integral To> [[nodiscard("Pure function")]]
 	constexpr To RoundToIntegral(From from) noexcept;
 
 	/// @brief Divides the @p numerator by the @p denominator and ceils the result.
@@ -139,7 +146,13 @@ namespace PonyMath::Core
 		return static_cast<U>(T{0} < value) - (value < T{0});
 	}
 
-	template<std::floating_point From, std::integral To>
+	template <std::floating_point From, std::unsigned_integral To>
+	constexpr To RoundToIntegral(const From from) noexcept
+	{
+		return static_cast<To>(from + From{0.5});
+	}
+
+	template<std::floating_point From, std::signed_integral To>
 	constexpr To RoundToIntegral(const From from) noexcept
 	{
 		return static_cast<To>(from + From{0.5} - (from < From{0}));

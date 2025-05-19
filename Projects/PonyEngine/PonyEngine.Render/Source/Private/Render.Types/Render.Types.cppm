@@ -10,3 +10,7 @@
 export module PonyEngine.Render.Types;
 
 export import :Half;
+export import :Snorm8;
+export import :Snorm16;
+export import :Unorm8;
+export import :Unorm16;
