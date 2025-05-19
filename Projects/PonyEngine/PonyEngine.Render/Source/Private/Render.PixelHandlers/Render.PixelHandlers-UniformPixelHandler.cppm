@@ -67,22 +67,22 @@ export namespace PonyEngine::Render
 		UniformPixelHandler& operator =(UniformPixelHandler&&) = delete;
 
 	private:
-		static constexpr std::size_t ComponentCount = HasRed + HasGreen + HasBlue + HasAlpha; ///< Component count.
+		static constexpr std::size_t UsedBytes = (std::max({RedIndex, GreenIndex, BlueIndex, AlphaIndex}) + 1) * sizeof(T); ///< How many bytes are used by the data.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	template <FloatConvertible T, std::size_t RedIndex, std::size_t GreenIndex, std::size_t BlueIndex, std::size_t  AlphaIndex,
+	template <FloatConvertible T, std::size_t RedIndex, std::size_t GreenIndex, std::size_t BlueIndex, std::size_t AlphaIndex,
 		bool HasRed, bool HasGreen, bool HasBlue, bool HasAlpha>
 	PonyMath::Color::RGBA<float> UniformPixelHandler<T, RedIndex, GreenIndex, BlueIndex, AlphaIndex, HasRed, HasGreen, HasBlue, HasAlpha>::Color(
 		const PonyBase::Container::Buffer& buffer, const PonyMath::Core::Vector3<std::uint32_t>& size, const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate) const
 	{
-		assert(sizeof(T) * ComponentCount <= buffer.Stride() && "Unsupported buffer stride.");
+		assert(UsedBytes <= buffer.Stride() && "Unsupported buffer stride.");
 
 		const std::size_t pixelIndex = PixelIndex(size, pixelCoordinate);
 		const std::span<const std::byte> span = buffer.Span(pixelIndex);
-		const auto dataSpan = std::span<const T, ComponentCount>(reinterpret_cast<const T*>(span.data()), ComponentCount);
+		const auto dataSpan = std::span<const T, UsedBytes>(reinterpret_cast<const T*>(span.data()), UsedBytes);
 
 		auto color = PonyMath::Color::RGBA<float>::Predefined::Black;
 		if constexpr (HasRed)
@@ -111,11 +111,11 @@ namespace PonyEngine::Render
 		PonyBase::Container::Buffer& buffer, const PonyMath::Core::Vector3<std::uint32_t>& size, const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate, 
 		const PonyMath::Color::RGBA<float>& color) const
 	{
-		assert(sizeof(T) * ComponentCount <= buffer.Stride() && "Unsupported buffer stride.");
+		assert(UsedBytes <= buffer.Stride() && "Unsupported buffer stride.");
 
 		const std::uint32_t pixelIndex = PixelIndex(size, pixelCoordinate);
 		const std::span<std::byte> span = buffer.Span(pixelIndex);
-		const auto dataSpan = std::span<T, ComponentCount>(reinterpret_cast<T*>(span.data()), ComponentCount);
+		const auto dataSpan = std::span<T, UsedBytes>(reinterpret_cast<T*>(span.data()), UsedBytes);
 
 		if constexpr (HasRed)
 		{

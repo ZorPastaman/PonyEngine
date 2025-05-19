@@ -164,11 +164,11 @@ namespace PonyEngine::Render
 	/// @brief R16G16B16A16_Float pixel handler.
 	const UniformPixelHandler<Half, 0, 1, 2, 3, true, true, true, true> R16G16B16A16FloatPixelHandler;
 	/// @brief R16G16B16A16_Unorm pixel handler
-	const UnormPixelHandler<0, 16, 32, 48, 16, 16, 16, 16> R16G16B16A16UnormPixelHandler;
+	const UniformPixelHandler<Unorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UnormPixelHandler;
 	/// @brief R16G16B16A16_Uint pixel handler.
 	const UniformPixelHandler<std::uint16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UintPixelHandler;
 	/// @brief R16G16B16A16_Snorm pixel handler.
-	const SnormPixelHandler<0, 16, 32, 48, 16, 16, 16, 16> R16G16B16A16SnormPixelHandler;
+	const UniformPixelHandler<Snorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SnormPixelHandler;
 	/// @brief R16G16B16A16_Sint pixel handler.
 	const UniformPixelHandler<std::int16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SintPixelHandler;
 	/// @brief R32G32_Float pixel handler.
@@ -183,6 +183,68 @@ namespace PonyEngine::Render
 	const UintPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UintPixelHandler;
 	/// @brief R11G11B10_Float pixel handler.
 	const UfloatPixelHandler<0, 11, 22, 0, 5, 6, 5, 6, 5, 5, 0, 0> R11G11B10FloatPixelHandler;
+	/// @brief R8G8B8A8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UnormPixelHandler;
+	/// @brief R8G8B8A8_Uint pixel handler.
+	const UniformPixelHandler<std::uint8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UintPixelHandler;
+	/// @brief R8G8B8A8_Snorm pixel handler.
+	const UniformPixelHandler<Snorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SnormPixelHandler;
+	/// @brief R8G8B8A8_Sint pixel handler.
+	const UniformPixelHandler<std::int8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SintPixelHandler;
+	/// @brief R16G16_Float pixel handler.
+	const UniformPixelHandler<Half, 0, 1, 0, 0, true, true, false, false> R16G16FloatPixelHandler;
+	/// @brief R16G16_Unorm pixel handler.
+	const UniformPixelHandler<Unorm16, 0, 1, 0, 0, true, true, false, false> R16G16UnormPixelHandler;
+	/// @brief R16G16_Uint pixel handler.
+	const UniformPixelHandler<std::uint16_t, 0, 1, 0, 0, true, true, false, false> R16G16UintPixelHandler;
+	/// @brief R16G16_Snorm pixel handler.
+	const UniformPixelHandler<Snorm16, 0, 1, 0, 0, true, true, false, false> R16G16SnormPixelHandler;
+	/// @brief R16G16_Sint pixel handler.
+	const UniformPixelHandler<std::int16_t, 0, 1, 0, 0, true, true, false, false> R16G16SintPixelHandler;
+	/// @brief R32_Float pixel handler.
+	const UniformPixelHandler<float, 0, 0, 0, 0, true, false, false, false> R32FloatPixelHandler;
+	/// @brief R32_Uint pixel handler.
+	const UniformPixelHandler<std::uint32_t, 0, 0, 0, 0, true, false, false, false> R32UintPixelHandler;
+	/// @brief R32_Sint pixel handler.
+	const UniformPixelHandler<std::int32_t, 0, 0, 0, 0, true, false, false, false> R32SintPixelHandler;
+	/// @brief R8G8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 0, 1, 0, 0, true, true, false, false> R8G8UnormPixelHandler;
+	/// @brief R8G8_Uint pixel handler.
+	const UniformPixelHandler<std::uint8_t, 0, 1, 0, 0, true, true, false, false> R8G8UintPixelHandler;
+	/// @brief R8G8_Snorm pixel handler.
+	const UniformPixelHandler<Snorm8, 0, 1, 0, 0, true, true, false, false> R8G8SnormPixelHandler;
+	/// @brief R8G8_Sint pixel handler.
+	const UniformPixelHandler<std::int8_t, 0, 1, 0, 0, true, true, false, false> R8G8SintPixelHandler;
+	/// @brief R16_Float pixel handler.
+	const UniformPixelHandler<Half, 0, 0, 0, 0, true, false, false, false> R16FloatPixelHandler;
+	/// @brief R16_Unorm pixel handler.
+	const UniformPixelHandler<Unorm16, 0, 0, 0, 0, true, false, false, false> R16UnormPixelHandler;
+	/// @brief R16_Uint pixel handler.
+	const UniformPixelHandler<std::uint16_t, 0, 0, 0, 0, true, false, false, false> R16UintPixelHandler;
+	/// @brief R16_Snorm pixel handler.
+	const UniformPixelHandler<Snorm16, 0, 0, 0, 0, true, false, false, false> R16SnormPixelHandler;
+	/// @brief R16_Sint pixel handler.
+	const UniformPixelHandler<std::int16_t, 0, 0, 0, 0, true, false, false, false> R16SintPixelHandler;
+	/// @brief R8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 0, 0, 0, 0, true, false, false, false> R8UnormPixelHandler;
+	/// @brief R8_Uint pixel handler.
+	const UniformPixelHandler<std::uint8_t, 0, 0, 0, 0, true, false, false, false> R8UintPixelHandler;
+	/// @brief R8_Snorm pixel handler.
+	const UniformPixelHandler<Snorm8, 0, 0, 0, 0, true, false, false, false> R8SnormPixelHandler;
+	/// @brief R8_Sint pixel handler.
+	const UniformPixelHandler<std::int8_t, 0, 0, 0, 0, true, false, false, false> R8SintPixelHandler;
+	/// @brief A8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 0, 0, 0, 0, false, false, false, true> A8UnormPixelHandler;
+	/// @brief B8G8R8A8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 2, 1, 0, 3, true, true, true, true> B8G8R8A8UnormPixelHandler;
+	/// @brief B8G8R8X8_Unorm pixel handler.
+	const UniformPixelHandler<Unorm8, 2, 1, 0, 0, true, true, true, false> B8G8R8X8UnormPixelHandler;
+	/// @brief B5G6R5_Unorm pixel handler.
+	const UnormPixelHandler<11, 5, 0, 0, 5, 6, 5, 0> B5G6R5UnormPixelHandler;
+	/// @brief B5G5R5A1_Unorm pixel handler.
+	const UnormPixelHandler<10, 5, 0, 15, 5, 5, 5, 1> B5G5R5A1UnormPixelHandler;
+	/// @brief B4G4R4A4_Unorm pixel handler.
+	const UnormPixelHandler<8, 4, 0, 12, 4, 4, 4, 4> B4G4R4A4UnormPixelHandler;
 
 	/// @brief Pixel handlers.
 	const std::unordered_map<TextureFormat, const IPixelHandler*> PixelHandlers
@@ -206,6 +268,50 @@ namespace PonyEngine::Render
 		{ TextureFormat::R10G10B10A2_Unorm, &R10G10B10A2UnormPixelHandler },
 		{ TextureFormat::R10G10B10A2_Uint, &R10G10B10A2UintPixelHandler },
 		{ TextureFormat::R11G11B10_Float, &R11G11B10FloatPixelHandler },
+		{ TextureFormat::R8G8B8A8_Unorm, &R8G8B8A8UnormPixelHandler },
+		{ TextureFormat::R8G8B8A8_Uint, &R8G8B8A8UintPixelHandler },
+		{ TextureFormat::R8G8B8A8_Snorm, &R8G8B8A8SnormPixelHandler },
+		{ TextureFormat::R8G8B8A8_Sint, &R8G8B8A8SintPixelHandler },
+		{ TextureFormat::R16G16_Float, &R16G16FloatPixelHandler },
+		{ TextureFormat::R16G16_Unorm, &R16G16UnormPixelHandler },
+		{ TextureFormat::R16G16_Uint, &R16G16UintPixelHandler },
+		{ TextureFormat::R16G16_Snorm, &R16G16SnormPixelHandler },
+		{ TextureFormat::R16G16_Sint, &R16G16SintPixelHandler },
+		{ TextureFormat::D32_Float, &UnsupportedPixelHandler },
+		{ TextureFormat::R32_Float, &R32FloatPixelHandler },
+		{ TextureFormat::R32_Uint, &R32UintPixelHandler },
+		{ TextureFormat::R32_Sint, &R32SintPixelHandler },
+		{ TextureFormat::D24_Unorm_S8_Uint, &UnsupportedPixelHandler },
+		{ TextureFormat::R8G8_Unorm, &R8G8UnormPixelHandler },
+		{ TextureFormat::R8G8_Uint, &R8G8UintPixelHandler },
+		{ TextureFormat::R8G8_Snorm, &R8G8SnormPixelHandler },
+		{ TextureFormat::R8G8_Sint, &R8G8SintPixelHandler },
+		{ TextureFormat::D16_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::R16_Float, &R16FloatPixelHandler },
+		{ TextureFormat::R16_Unorm, &R16UnormPixelHandler },
+		{ TextureFormat::R16_Uint, &R16UintPixelHandler },
+		{ TextureFormat::R16_Snorm, &R16SnormPixelHandler },
+		{ TextureFormat::R16_Sint, &R16SintPixelHandler },
+		{ TextureFormat::R8_Unorm, &R8UnormPixelHandler },
+		{ TextureFormat::R8_Uint, &R8UintPixelHandler },
+		{ TextureFormat::R8_Snorm, &R8SnormPixelHandler },
+		{ TextureFormat::R8_Sint, &R8SintPixelHandler },
+		{ TextureFormat::A8_Unorm, &A8UnormPixelHandler },
+		{ TextureFormat::B8G8R8A8_Unorm, &B8G8R8A8UnormPixelHandler },
+		{ TextureFormat::B8G8R8X8_Unorm, &B8G8R8X8UnormPixelHandler },
+		{ TextureFormat::B5G6R5_Unorm, &B5G6R5UnormPixelHandler },
+		{ TextureFormat::B5G5R5A1_Unorm, &B5G5R5A1UnormPixelHandler },
+		{ TextureFormat::B4G4R4A4_Unorm, &B4G4R4A4UnormPixelHandler },
+		{ TextureFormat::BC1_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC2_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC3_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC4_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC4_Snorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC5_Unorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC5_Snorm, &UnsupportedPixelHandler },
+		{ TextureFormat::BC6H_UF16, &UnsupportedPixelHandler },
+		{ TextureFormat::BC6H_SF16, &UnsupportedPixelHandler },
+		{ TextureFormat::BC7_Unorm, &UnsupportedPixelHandler }
 	};
 
 	TextureManager::TextureManager(IRenderSystemContext& renderSystem) noexcept :

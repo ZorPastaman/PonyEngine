@@ -120,8 +120,10 @@ namespace PonyEngine::Render
 
 		/// @brief Value mask. For unorms, it's a max value as well.
 		static constexpr std::uint64_t Mask = BitMask<Bits>;
+		static constexpr float MaskInv = 1.f / static_cast<float>(Mask); ///< Mask inverse.
 
 		static constexpr std::int64_t MaxValue = std::bit_cast<std::int64_t>(Mask >> 1); ///< Snorm max value. Don't use it for unorms.
+		static constexpr float MaxValueInv = 1.f / static_cast<float>(MaxValue); ///< Max value inverse.
 	};
 
 	/// @brief Bit value info that has a required constants for parsing ufloats
@@ -161,7 +163,7 @@ namespace PonyEngine::Render
 		value >>= BitInfo::BitOffset;
 		value &= BitInfo::Mask;
 
-		return static_cast<float>(value) / static_cast<float>(BitInfo::Mask);
+		return std::clamp(static_cast<float>(value) * BitInfo::MaskInv, 0.f, 1.f);
 	}
 
 	template <std::uint64_t Offset, std::uint64_t Bits>
@@ -172,7 +174,7 @@ namespace PonyEngine::Render
 		std::uint64_t currentValue = 0;
 		std::memcpy(&currentValue, &data[BitInfo::ByteOffset], BitInfo::TotalBytes);
 
-		const std::uint64_t bitValue = PonyMath::Core::RoundToIntegral<float, std::uint64_t>(std::clamp(value, 0.f, 1.f) * BitInfo::Mask);
+		const std::uint64_t bitValue = PonyMath::Core::RoundToIntegral<float, std::uint64_t>(std::clamp(value, 0.f, 1.f) * static_cast<float>(BitInfo::Mask));
 
 		const std::uint64_t result = currentValue & ~(BitInfo::Mask << BitInfo::BitOffset) | (bitValue << BitInfo::BitOffset);
 		std::memcpy(&data[BitInfo::ByteOffset], &result, BitInfo::TotalBytes);
@@ -188,7 +190,7 @@ namespace PonyEngine::Render
 		value >>= BitInfo::BitOffset;
 		value = (value & BitInfo::MaxValue) | (value >> (Bits - 1) << (sizeof(std::int64_t) * 8 - 1));
 
-		return std::clamp(static_cast<float>(value) / static_cast<float>(BitInfo::MaxValue), -1.f, 1.f);
+		return std::clamp(static_cast<float>(value) * BitInfo::MaxValueInv, -1.f, 1.f);
 	}
 
 	template <std::uint64_t Offset, std::uint64_t Bits>
@@ -199,7 +201,7 @@ namespace PonyEngine::Render
 		std::uint64_t currentValue = 0;
 		std::memcpy(&currentValue, &data[BitInfo::ByteOffset], BitInfo::TotalBytes);
 
-		std::int64_t bitValue = PonyMath::Core::RoundToIntegral<float, std::int64_t>(std::clamp(value, -1.f, 1.f) * BitInfo::MaxValue);
+		std::int64_t bitValue = PonyMath::Core::RoundToIntegral<float, std::int64_t>(std::clamp(value, -1.f, 1.f) * static_cast<float>(BitInfo::MaxValue));
 		bitValue |= bitValue >> (sizeof(std::int64_t) * 8 - 1) << (Bits - 1);
 		bitValue &= BitInfo::Mask;
 
