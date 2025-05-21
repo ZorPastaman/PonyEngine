@@ -20,6 +20,7 @@ import :IPipelineStateManager;
 import :IRootSignatureManager;
 import :IRenderObjectManager;
 import :IShaderManager;
+import :ISwapChain;
 import :ITextureManager;
 
 export namespace PonyEngine::Render
@@ -28,6 +29,15 @@ export namespace PonyEngine::Render
 	class IRenderSystem
 	{
 		INTERFACE_BODY(IRenderSystem)
+
+		/// @brief Gets the swap chain.
+		/// @return Swap chain.
+		[[nodiscard("Pure function")]]
+		virtual ISwapChain& SwapChain() noexcept = 0;
+		/// @brief Gets the swap chain.
+		/// @return Swap chain.
+		[[nodiscard("Pure function")]]
+		virtual const ISwapChain& SwapChain() const noexcept = 0;
 
 		/// @brief Gets the shader manager.
 		/// @return Shader manager.

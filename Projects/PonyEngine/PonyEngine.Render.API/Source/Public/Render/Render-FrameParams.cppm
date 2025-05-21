@@ -11,6 +11,7 @@ export module PonyEngine.Render:FrameParams;
 
 import <cstdint>;
 import <optional>;
+import <string>;
 
 import PonyMath.Utility;
 
@@ -28,5 +29,7 @@ export namespace PonyEngine::Render
 		TextureFormat rtvFormat = TextureFormat::R8G8B8A8_Unorm; ///< Render target view format. If it's unknown, the render target won't be created.
 		TextureFormat dsvFormat = TextureFormat::D32_Float_S8X24_Uint; ///< Depth stencil view format. Must be a depth stencil format. If it's unknown, the depth stencil won't be created.
 		std::uint8_t sampleCount = 1u; ///< Sample count.
+
+		std::string name; ///< Frame name.
 	};
 }

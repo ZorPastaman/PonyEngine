@@ -19,10 +19,13 @@ import <stdexcept>;
 import <utility>;
 import <vector>;
 
+import PonyDebug.Log;
+
 import PonyEngine.Render;
 
 import :IRenderSystemContext;
 import :PipelineState;
+import :PipelineStateDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -87,29 +90,7 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Pixel shader is nullptr.");
 		}
 
-		std::shared_ptr<const RootSignature> rootSignature = std::dynamic_pointer_cast<const RootSignature>(params.rootSignature);
-		if (!rootSignature) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect root signature type. Don't try to use custom root signature classes.");
-		}
-		std::shared_ptr<const Shader> amplificationShader = std::dynamic_pointer_cast<const Shader>(params.amplificationShader);
-		if (!amplificationShader && params.amplificationShader) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect amplification shader type. Don't try to use custom shader classes.");
-		}
-		std::shared_ptr<const Shader> meshShader = std::dynamic_pointer_cast<const Shader>(params.meshShader);
-		if (!meshShader) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect mesh shader type. Don't try to use custom shader classes.");
-		}
-		std::shared_ptr<const Shader> pixelShader = std::dynamic_pointer_cast<const Shader>(params.pixelShader);
-		if (!pixelShader) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect pixel shader type. Don't try to use custom shader classes.");
-		}
-
-		const auto pipelineState = std::make_shared<PipelineState>(params, std::move(rootSignature), 
-			std::move(amplificationShader), std::move(meshShader), std::move(pixelShader));
+		const auto pipelineState = std::make_shared<PipelineState>(params);
 		pipelineStates.push_back(pipelineState);
 		newPipelineStates.push_back(pipelineState.get());
 
@@ -160,9 +141,9 @@ namespace PonyEngine::Render
 	{
 		for (const std::shared_ptr<PipelineState>& pipelineState : pipelineStates)
 		{
-			if (pipelineState->IsNameDirty())
+			if (pipelineState->DirtyFlags() != PipelineStateDirtyFlag::None)
 			{
-				renderSystem->RenderAgent().PipelineStateAgent().Update(*pipelineState);
+				renderSystem->RenderAgent().PipelineStateAgent().Update(*pipelineState, pipelineState->DirtyFlags());
 			}
 		}
 	}

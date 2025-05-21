@@ -17,13 +17,13 @@ import <memory>;
 import <stdexcept>;
 import <vector>;
 
-import PonyBase.Utility;
+import PonyDebug.Log;
 
 import PonyEngine.Render;
 
 import :IRenderSystemContext;
 import :RootSignature;
-import :Shader;
+import :RootSignatureDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -80,13 +80,7 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Shader is nullptr.");
 		}
 
-		auto shader = std::dynamic_pointer_cast<const Shader>(params.shader);
-		if (!shader) [[unlikely]]
-		{
-			throw std::invalid_argument("Incorrect shader type. Don't try to use custom shader classes.");
-		}
-
-		const auto rootSignature = std::make_shared<RootSignature>(params, std::move(shader));
+		const auto rootSignature = std::make_shared<RootSignature>(params);
 		rootSignatures.push_back(rootSignature);
 		newRootSignatures.push_back(rootSignature.get());
 
@@ -137,9 +131,9 @@ namespace PonyEngine::Render
 	{
 		for (const std::shared_ptr<RootSignature>& rootSignature : rootSignatures)
 		{
-			if (rootSignature->IsNameDirty())
+			if (rootSignature->DirtyFlags() != RootSignatureDirtyFlag::None)
 			{
-				renderSystem->RenderAgent().RootSignatureAgent().Update(*rootSignature);
+				renderSystem->RenderAgent().RootSignatureAgent().Update(*rootSignature, rootSignature->DirtyFlags());
 			}
 		}
 	}

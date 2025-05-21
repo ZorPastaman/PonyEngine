@@ -13,7 +13,9 @@ module;
 
 export module PonyEngine.Render.Detail:IRootSignatureAgent;
 
-import :RootSignature;
+import PonyEngine.Render;
+
+import :RootSignatureDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -24,12 +26,13 @@ export namespace PonyEngine::Render
 
 		/// @brief Creates a GPU root signature.
 		/// @param rootSignature CPU root signature.
-		virtual void Create(const RootSignature& rootSignature) = 0;
+		virtual void Create(const IRootSignature& rootSignature) = 0;
 		/// @brief Destroys a GPU root signature.
 		/// @param rootSignature CPU root signature.
-		virtual void Destroy(const RootSignature& rootSignature) = 0;
+		virtual void Destroy(const IRootSignature& rootSignature) = 0;
 		/// @brief Updates a GPU root signature.
 		/// @param rootSignature CPU root signature.
-		virtual void Update(const RootSignature& rootSignature) = 0;
+		/// @param dirtyFlags Root signature dirty flags.
+		virtual void Update(const IRootSignature& rootSignature, RootSignatureDirtyFlag dirtyFlags) = 0;
 	};
 }

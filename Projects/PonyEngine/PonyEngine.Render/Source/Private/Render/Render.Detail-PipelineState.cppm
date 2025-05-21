@@ -18,6 +18,7 @@ import <utility>;
 import PonyEngine.Render;
 
 import :RootSignature;
+import :PipelineStateDirtyFlag;
 import :Shader;
 
 export namespace PonyEngine::Render
@@ -28,13 +29,8 @@ export namespace PonyEngine::Render
 	public:
 		/// @brief Creates a pipeline state.
 		/// @param params Pipeline state parameters.
-		/// @param rootSignature Root signature.
-		/// @param amplificationShader Amplification shader.
-		/// @param meshShader Mesh shader.
-		/// @param pixelShader Pixel shader.
 		[[nodiscard("Pure constructor")]]
-		PipelineState(const PipelineStateParams& params, std::shared_ptr<const class RootSignature>&& rootSignature,
-			std::shared_ptr<const Shader>&& amplificationShader, std::shared_ptr<const Shader>&& meshShader, std::shared_ptr<const Shader>&& pixelShader) noexcept;
+		explicit PipelineState(const PipelineStateParams& params) noexcept;
 		PipelineState(const PipelineState&) = delete;
 		PipelineState(PipelineState&&) = delete;
 
@@ -67,10 +63,10 @@ export namespace PonyEngine::Render
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
-		/// @brief Is the name dirty?
-		/// @return @a True if it's dirty; @a false otherwise.
+		/// @brief Gets the dirty flags.
+		/// @return Dirty flags.
 		[[nodiscard("Pure function")]]
-		bool IsNameDirty() const noexcept;
+		PipelineStateDirtyFlag DirtyFlags() const noexcept;
 		/// @brief Resets the dirty flags.
 		void ResetDirty() noexcept;
 
@@ -78,11 +74,11 @@ export namespace PonyEngine::Render
 		PipelineState& operator =(PipelineState&&) = delete;
 
 	private:
-		std::shared_ptr<const class RootSignature> rootSignature; ///< Root signature.
+		std::shared_ptr<const IRootSignature> rootSignature; ///< Root signature.
 
-		std::shared_ptr<const Shader> amplificationShader; ///< Amplification shader.
-		std::shared_ptr<const Shader> meshShader; ///< Mesh shader.
-		std::shared_ptr<const Shader> pixelShader; ///< Pixel shader.
+		std::shared_ptr<const IShader> amplificationShader; ///< Amplification shader.
+		std::shared_ptr<const IShader> meshShader; ///< Mesh shader.
+		std::shared_ptr<const IShader> pixelShader; ///< Pixel shader.
 
 		struct Blend blend; ///< Blend.
 		struct Rasterizer rasterizer; ///< Rasterizer.
@@ -94,18 +90,17 @@ export namespace PonyEngine::Render
 
 		std::string name; ///< Pipeline state name.
 
-		bool isNameDirty; ///< Is the name dirty?
+		PipelineStateDirtyFlag dirtyFlags; ///< Dirty flags.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	PipelineState::PipelineState(const PipelineStateParams& params, std::shared_ptr<const class RootSignature>&& rootSignature,
-		std::shared_ptr<const Shader>&& amplificationShader, std::shared_ptr<const Shader>&& meshShader, std::shared_ptr<const Shader>&& pixelShader) noexcept :
-		rootSignature(std::move(rootSignature)),
-		amplificationShader(std::move(amplificationShader)),
-		meshShader(std::move(meshShader)),
-		pixelShader(std::move(pixelShader)),
+	PipelineState::PipelineState(const PipelineStateParams& params) noexcept :
+		rootSignature(params.rootSignature),
+		amplificationShader(params.amplificationShader),
+		meshShader(params.meshShader),
+		pixelShader(params.pixelShader),
 		blend(params.blend),
 		rasterizer(params.rasterizer),
 		depthStencil(params.depthStencil),
@@ -113,7 +108,7 @@ namespace PonyEngine::Render
 		renderQueue{params.renderQueue},
 		cameraCulling(params.cameraCulling),
 		name(params.name),
-		isNameDirty{true}
+		dirtyFlags{PipelineStateDirtyFlag::All}
 	{
 	}
 
@@ -180,16 +175,16 @@ namespace PonyEngine::Render
 		}
 
 		this->name = name;
-		isNameDirty = true;
+		dirtyFlags |= PipelineStateDirtyFlag::Name;
 	}
 
-	bool PipelineState::IsNameDirty() const noexcept
+	PipelineStateDirtyFlag PipelineState::DirtyFlags() const noexcept
 	{
-		return isNameDirty;
+		return dirtyFlags;
 	}
 
 	void PipelineState::ResetDirty() noexcept
 	{
-		isNameDirty = false;
+		dirtyFlags = PipelineStateDirtyFlag::None;
 	}
 }

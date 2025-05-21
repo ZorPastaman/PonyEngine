@@ -19,6 +19,7 @@ import <vector>;
 
 import PonyEngine.Render;
 
+import :RootSignatureDirtyFlag;
 import :Shader;
 
 export namespace PonyEngine::Render
@@ -29,9 +30,8 @@ export namespace PonyEngine::Render
 	public:
 		/// @brief Creates a root signature.
 		/// @param params Root signature parameters.
-		/// @param shader Root signature shader.
 		[[nodiscard("Pure constructor")]]
-		RootSignature(const RootSignatureParams& params, std::shared_ptr<const class Shader>&& shader);
+		explicit RootSignature(const RootSignatureParams& params);
 		RootSignature(const RootSignature&) = delete;
 		RootSignature(RootSignature&&) = delete;
 
@@ -51,10 +51,11 @@ export namespace PonyEngine::Render
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
-		/// @brief Is the name dirty?
-		/// @return @a True if it's dirty; @a false otherwise.
+		/// @brief Gets the dirty flags.
+		/// @return Dirty flags.
 		[[nodiscard("Pure function")]]
-		bool IsNameDirty() const noexcept;
+		RootSignatureDirtyFlag DirtyFlags() const noexcept;
+		[[nodiscard("Pure function")]]
 		/// @brief Resets the dirty flags.
 		void ResetDirty() noexcept;
 
@@ -62,22 +63,22 @@ export namespace PonyEngine::Render
 		RootSignature& operator =(RootSignature&&) = delete;
 
 	private:
-		std::shared_ptr<const class Shader> shader; ///< Root signature shader.
+		std::shared_ptr<const IShader> shader; ///< Root signature shader.
 		std::vector<std::string> slots; ///< Root signature slots.
 
 		std::string name; ///< Root signature name.
 
-		bool isNameDirty; ///< Is the name dirty?
+		RootSignatureDirtyFlag dirtyFlags; ///< Dirty flags.
 	};
 }
 
 namespace PonyEngine::Render
 {
-	RootSignature::RootSignature(const RootSignatureParams& params, std::shared_ptr<const class Shader>&& shader) :
-		shader(std::move(shader)),
+	RootSignature::RootSignature(const RootSignatureParams& params) :
+		shader(params.shader),
 		slots(params.slots),
 		name(params.name),
-		isNameDirty{true}
+		dirtyFlags{RootSignatureDirtyFlag::All}
 	{
 	}
 
@@ -122,16 +123,16 @@ namespace PonyEngine::Render
 		}
 
 		this->name = name;
-		isNameDirty = true;
+		dirtyFlags |= RootSignatureDirtyFlag::Name;
 	}
 
-	bool RootSignature::IsNameDirty() const noexcept
+	RootSignatureDirtyFlag RootSignature::DirtyFlags() const noexcept
 	{
-		return isNameDirty;
+		return dirtyFlags;
 	}
 
 	void RootSignature::ResetDirty() noexcept
 	{
-		isNameDirty = false;
+		dirtyFlags = RootSignatureDirtyFlag::None;
 	}
 }

@@ -17,6 +17,7 @@ import <algorithm>;
 import <cstddef>;
 import <memory>;
 import <vector>;
+import <utility>;
 
 import PonyDebug.Log;
 
@@ -77,6 +78,11 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IMesh> MeshManager::CreateMesh(const MeshParams& params)
 	{
+		if (std::ranges::find_if(params.data, [](const auto& p) { return p.first.starts_with(DataTypes::Prefix); }) != params.data.cend())
+		{
+			throw std::invalid_argument("Invalid data type name.");
+		}
+
 		const auto mesh = std::make_shared<Mesh>(params);
 		meshes.push_back(mesh);
 		newMeshes.push_back(mesh.get());
@@ -130,7 +136,7 @@ namespace PonyEngine::Render
 		{
 			if (mesh->DirtyFlags() != MeshDirtyFlag::None)
 			{
-				renderSystem->RenderAgent().MeshAgent().Update(*mesh);
+				renderSystem->RenderAgent().MeshAgent().Update(*mesh, mesh->DirtyFlags());
 			}
 		}
 	}

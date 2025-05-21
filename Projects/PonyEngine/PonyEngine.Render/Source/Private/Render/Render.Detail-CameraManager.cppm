@@ -91,7 +91,7 @@ namespace PonyEngine::Render
 		{
 			if (cameras[i].use_count() <= 1L)
 			{
-				cameras.erase(cameras.begin() + i);
+				cameras.erase(cameras.cbegin() + i);
 			}
 		}
 	}

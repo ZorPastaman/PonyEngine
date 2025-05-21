@@ -28,8 +28,6 @@ export namespace PonyEngine::Render
 		std::uint32_t height = 1u; ///< Height in pixels.
 		std::uint32_t depth = 1u; ///< Depth in pixels. It's an array size for array dimensions. For TextureCube it must be 6.
 
-		ClearValue clear; ///< Clear value.
-
 		std::string name; ///< Texture name.
 	};
 }
