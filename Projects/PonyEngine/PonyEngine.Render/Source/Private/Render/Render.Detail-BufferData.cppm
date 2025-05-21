@@ -163,7 +163,7 @@ namespace PonyEngine::Render
 					throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data buffer of type '{}' at '{}' is empty.", dataType, i));
 				}
 			}
-			++bufferCount;
+			bufferCount += params.size();
 		}
 		if (bufferCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{

@@ -15,6 +15,7 @@ export module PonyEngine.Render:IMaterial;
 
 import <cstddef>;
 import <cstdint>;
+import <memory>;
 import <optional>;
 import <span>;
 import <stdexcept>;
@@ -35,7 +36,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the pipeline state.
 		/// @return Pipeline state.
 		[[nodiscard("Pure function")]]
-		virtual const IPipelineState& PipelineState() const noexcept = 0;
+		virtual const std::shared_ptr<const IPipelineState>& PipelineState() const noexcept = 0;
 
 		/// @brief Tries to find a data type index by the @p dataType.
 		/// @param dataType Data type.
@@ -163,12 +164,12 @@ export namespace PonyEngine::Render
 		/// @param textureIndex Texture index.
 		/// @return Texture.
 		[[nodiscard("Pure function")]]
-		virtual const ITexture& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept = 0;
+		virtual const std::shared_ptr<const ITexture>& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept = 0;
 		/// @brief Sets a texture.
 		/// @param textureTypeIndex Texture type index.
 		/// @param textureIndex Texture index.
 		/// @param texture Texture to set.
-		virtual void Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const ITexture& texture) = 0;
+		virtual void Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const std::shared_ptr<const ITexture>& texture) = 0;
 		/// @brief Gets a texture count.
 		/// @param textureTypeIndex Texture type index.
 		/// @return Texture count.

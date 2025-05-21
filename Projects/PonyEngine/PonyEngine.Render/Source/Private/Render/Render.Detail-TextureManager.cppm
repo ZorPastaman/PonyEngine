@@ -24,6 +24,8 @@ import <vector>;
 
 import PonyBase.Utility;
 
+import PonyDebug.Log;
+
 import PonyEngine.Render;
 import PonyEngine.Render.PixelHandlers;
 import PonyEngine.Render.Types;
@@ -73,7 +75,7 @@ export namespace PonyEngine::Render
 		std::unordered_map<TextureFormat, TextureFormatInfo> formatInfos; ///< Texture format infos.
 
 		std::vector<std::shared_ptr<Texture>> textures; ///< Textures.
-		std::vector<std::pair<const Texture*, ClearValue>> newTextures; ///< New textures and their clear values.
+		std::vector<const Texture*> newTextures; ///< New textures and their clear values.
 	};
 }
 
@@ -365,7 +367,7 @@ namespace PonyEngine::Render
 
 		const auto texture = std::make_shared<Texture>(params, bufferParams, *pixelHandler);
 		textures.push_back(texture);
-		newTextures.emplace_back(texture.get(), params.clear);
+		newTextures.push_back(texture.get());
 
 		return texture;
 	}
@@ -402,7 +404,7 @@ namespace PonyEngine::Render
 				continue;
 			}
 
-			if (const auto position = std::ranges::find_if(newTextures, [&](const std::pair<const Texture*, ClearValue>& p) { return p.first == texture.get(); }); position != newTextures.cend())
+			if (const auto position = std::ranges::find(newTextures, texture.get()); position != newTextures.cend())
 			{
 				newTextures.erase(position);
 			}
@@ -416,9 +418,9 @@ namespace PonyEngine::Render
 
 	void TextureManager::Create()
 	{
-		for (const auto& [texture, clear] : newTextures)
+		for (const Texture* texture : newTextures)
 		{
-			renderSystem->RenderAgent().TextureAgent().Create(*texture, clear);
+			renderSystem->RenderAgent().TextureAgent().Create(*texture);
 		}
 	}
 
@@ -428,7 +430,7 @@ namespace PonyEngine::Render
 		{
 			if (texture->DirtyFlags() != TextureDirtyFlag::None)
 			{
-				renderSystem->RenderAgent().TextureAgent().Update(*texture);
+				renderSystem->RenderAgent().TextureAgent().Update(*texture, texture->DirtyFlags());
 			}
 		}
 	}

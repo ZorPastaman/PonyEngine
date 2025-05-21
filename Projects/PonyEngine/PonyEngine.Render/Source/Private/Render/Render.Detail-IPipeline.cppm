@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.Detail:IPipeline;
 
-import :Camera;
+import PonyEngine.Render;
 
 export namespace PonyEngine::Render
 {
@@ -22,8 +22,11 @@ export namespace PonyEngine::Render
 	{
 		INTERFACE_BODY(IPipeline)
 
+		/// @brief Submits the render object for rendering.
+		/// @param renderObject Render object to submit.
+		virtual void Submit(const IRenderObject& renderObject) = 0;
 		/// @brief Submits the camera for rendering.
 		/// @param camera Camera to submit.
-		virtual void Submit(const Camera& camera) = 0;
+		virtual void Submit(const ICamera& camera) = 0;
 	};
 }

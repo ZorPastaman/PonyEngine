@@ -10,6 +10,7 @@
 export module PonyEngine.Render;
 
 export import :API;
+export import :AttachmentType;
 export import :Blend;
 export import :BlendFactor;
 export import :BlendOperation;
@@ -24,6 +25,7 @@ export import :DepthStencil;
 export import :DepthStencilOperation;
 export import :FillMode;
 export import :FrameParams;
+export import :IAttachment;
 export import :ICamera;
 export import :ICameraManager;
 export import :ICuller;
@@ -42,6 +44,7 @@ export import :IRootSignature;
 export import :IRootSignatureManager;
 export import :IShader;
 export import :IShaderManager;
+export import :ISwapChain;
 export import :ITexture;
 export import :ITextureManager;
 export import :LogicBlend;

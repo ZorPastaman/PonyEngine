@@ -37,12 +37,14 @@
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows-IRenderSystem.cppm" />
     <ClCompile Include="Source\Public\Render.Windows\Render.Windows.cppm" />
     <ClCompile Include="Source\Public\Render\Render-API.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-AttachmentType.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ClearValue.cppm" />
     <ClCompile Include="Source\Public\Render\Render-CommandQueuePriority.cppm" />
     <ClCompile Include="Source\Public\Render\Render-Common.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ComparisonFunction.cppm" />
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
     <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IAttachment.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IFrame.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IFrameManager.cppm" />
@@ -56,6 +58,7 @@
     <ClCompile Include="Source\Public\Render\Render-IRootSignatureManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IShader.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IShaderManager.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-ISwapChain.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ITexture.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ITextureManager.cppm" />
     <ClCompile Include="Source\Public\Render\Render-MaterialParams.cppm" />

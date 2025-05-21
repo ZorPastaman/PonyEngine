@@ -13,7 +13,9 @@ module;
 
 export module PonyEngine.Render.Detail:IMeshAgent;
 
-import :Mesh;
+import PonyEngine.Render;
+
+import :MeshDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -24,12 +26,13 @@ export namespace PonyEngine::Render
 
 		/// @brief Creates a GPU mesh.
 		/// @param mesh CPU mesh.
-		virtual void Create(const Mesh& mesh) = 0;
+		virtual void Create(const IMesh& mesh) = 0;
 		/// @brief Destroys a GPU mesh.
 		/// @param mesh CPU mesh.
-		virtual void Destroy(const Mesh& mesh) = 0;
+		virtual void Destroy(const IMesh& mesh) = 0;
 		/// @brief Updates a GPU mesh.
 		/// @param mesh CPU mesh.
-		virtual void Update(const Mesh& mesh) = 0;
+		/// @param dirtyFlags Dirty flags.
+		virtual void Update(const IMesh& mesh, MeshDirtyFlag dirtyFlags) = 0;
 	};
 }
