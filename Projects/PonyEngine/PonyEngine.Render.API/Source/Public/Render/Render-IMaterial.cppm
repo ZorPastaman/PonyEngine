@@ -23,6 +23,7 @@ import <string_view>;
 
 import PonyBase.Container;
 
+import :IBuffer;
 import :IPipelineState;
 import :ITexture;
 
@@ -143,6 +144,11 @@ export namespace PonyEngine::Render
 		/// @brief Destroys a data.
 		/// @param dataTypeIndex Type index of a data to destroy.
 		virtual void DestroyData(std::uint32_t dataTypeIndex) noexcept = 0;
+
+		/// @brief Gets the buffer.
+		/// @return Buffer.
+		[[nodiscard("Pure function")]]
+		virtual const IBuffer& Buffer() const noexcept = 0;
 
 		/// @brief Tries to find a texture type index by the @p textureType.
 		/// @param textureType Texture type.

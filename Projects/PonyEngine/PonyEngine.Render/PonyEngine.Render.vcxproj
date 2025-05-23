@@ -111,6 +111,7 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-AttachmentDirtyFlag.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Frame.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-FrameManager.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm" />
@@ -125,7 +126,7 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureDirtyFlag.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm" />
-    <ClCompile Include="Source\Private\Render\Render.Detail-BufferData.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-Buffer.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-CameraBox.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-CameraFrustum.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-CameraManager.cppm" />
@@ -145,12 +146,12 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail.cppm" />
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-RenderObject.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Camera.cppm" />
-    <ClCompile Include="Source\Private\Render\Render.Detail-IMeshAgent.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-IBufferAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipeline.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRenderAgent.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IRenderSystemContext.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Mesh.cppm" />
-    <ClCompile Include="Source\Private\Render\Render.Detail-MeshDirtyFlag.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-BufferDirtyFlag.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-MeshManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Pipeline.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Shader.cppm" />

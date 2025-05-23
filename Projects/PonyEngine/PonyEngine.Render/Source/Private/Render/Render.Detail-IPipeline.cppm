@@ -28,5 +28,12 @@ export namespace PonyEngine::Render
 		/// @brief Submits the camera for rendering.
 		/// @param camera Camera to submit.
 		virtual void Submit(const ICamera& camera) = 0;
+		/// @brief Submits the frame rendering.
+		/// @param frame Frame to submit.
+		virtual void Submit(const IFrame& frame) = 0;
+
+		/// @brief Sets the main frame.
+		/// @param mainFrame Main frame.
+		virtual void SetMainFrame(const IFrame& mainFrame) = 0;
 	};
 }

@@ -11,28 +11,28 @@ module;
 
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Detail:IMeshAgent;
+export module PonyEngine.Render.Detail:IBufferAgent;
 
 import PonyEngine.Render;
 
-import :MeshDirtyFlag;
+import :BufferDirtyFlag;
 
 export namespace PonyEngine::Render
 {
-	/// @brief Mesh agent.
-	class IMeshAgent
+	/// @brief Buffer agent.
+	class IBufferAgent
 	{
-		INTERFACE_BODY(IMeshAgent)
+		INTERFACE_BODY(IBufferAgent)
 
-		/// @brief Creates a GPU mesh.
-		/// @param mesh CPU mesh.
-		virtual void Create(const IMesh& mesh) = 0;
-		/// @brief Destroys a GPU mesh.
-		/// @param mesh CPU mesh.
-		virtual void Destroy(const IMesh& mesh) = 0;
-		/// @brief Updates a GPU mesh.
-		/// @param mesh CPU mesh.
+		/// @brief Creates a GPU buffer.
+		/// @param buffer CPU buffer.
+		virtual void Create(const IBuffer& buffer) = 0;
+		/// @brief Destroys a GPU buffer.
+		/// @param buffer CPU buffer.
+		virtual void Destroy(const IBuffer& buffer) = 0;
+		/// @brief Updates a GPU buffer.
+		/// @param buffer CPU buffer.
 		/// @param dirtyFlags Dirty flags.
-		virtual void Update(const IMesh& mesh, MeshDirtyFlag dirtyFlags) = 0;
+		virtual void Update(const IBuffer& buffer, BufferDirtyFlag dirtyFlags) = 0;
 	};
 }

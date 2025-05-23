@@ -45,6 +45,7 @@
     <ClCompile Include="Source\Public\Render\Render-DepthStencil.cppm" />
     <ClCompile Include="Source\Public\Render\Render-FrameParams.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IAttachment.cppm" />
+    <ClCompile Include="Source\Public\Render\Render-IBuffer.cppm" />
     <ClCompile Include="Source\Public\Render\Render-ICuller.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IFrame.cppm" />
     <ClCompile Include="Source\Public\Render\Render-IFrameManager.cppm" />

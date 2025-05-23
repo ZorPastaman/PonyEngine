@@ -15,6 +15,7 @@ module;
 
 export module PonyEngine.Render.Detail:TextureManager;
 
+import <algorithm>;
 import <cstddef>;
 import <cstdint>;
 import <memory>;

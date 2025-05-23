@@ -26,6 +26,8 @@ import PonyMath.Shape;
 
 import PonyShader.Core;
 
+import :IBuffer;
+
 export namespace PonyEngine::Render
 {
 	/// @brief Mesh.
@@ -138,6 +140,11 @@ export namespace PonyEngine::Render
 		/// @brief Destroys a data.
 		/// @param dataTypeIndex Type index of a data to destroy.
 		virtual void DestroyData(std::uint32_t dataTypeIndex) noexcept = 0;
+
+		/// @brief Gets the buffer.
+		/// @return Buffer.
+		[[nodiscard("Pure function")]]
+		virtual const IBuffer& Buffer() const noexcept = 0;
 
 		/// @brief Gets the thread group counts.
 		/// @return Thread group counts.

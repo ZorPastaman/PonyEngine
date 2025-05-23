@@ -25,6 +25,6 @@ export namespace PonyEngine::Render
 		/// @brief Gets the main frame.
 		/// @return Main frame.
 		[[nodiscard("Pure function")]]
-		virtual const IFrame& MainFrame() const noexcept = 0;
+		virtual const std::shared_ptr<const IFrame>& MainFrame() const noexcept = 0;
 	};
 }

@@ -15,6 +15,7 @@ module;
 
 export module PonyEngine.Render.Detail:FrameManager;
 
+import <algorithm>;
 import <cstddef>;
 import <cstdint>;
 import <memory>;
@@ -49,13 +50,17 @@ export namespace PonyEngine::Render
 		~FrameManager() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual const IFrame& MainFrame() const noexcept override;
+		virtual const std::shared_ptr<const IFrame>& MainFrame() const noexcept override;
 
 		/// @brief Creates a new frame.
 		/// @param frameParams Frame parameters.
 		/// @return Frame.
 		[[nodiscard("Redundant call")]]
-		std::shared_ptr<Frame> CreateFrame(const FrameParams& frameParams);
+		std::shared_ptr<IFrame> CreateFrame(const FrameParams& frameParams);
+		/// @brief Creates a main frame.
+		/// @param frameParams Frame parameters.
+		/// @return Main frame.
+		std::shared_ptr<IFrame> CreateMainFrame(const FrameParams& frameParams);
 
 		/// @brief Tick the frame manager.
 		void Tick();
@@ -72,34 +77,40 @@ export namespace PonyEngine::Render
 		void Update();
 		/// @brief Clears dirty flags and caches.
 		void Clear() noexcept;
+		/// @brief Submits the main frame to a pipeline.
+		void Submit();
 
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
 		std::vector<std::shared_ptr<Frame>> frames; ///< Frames.
 		std::vector<std::pair<const Frame*, ClearValue>> newFrames; ///< New frames with their clear values.
 
-		std::shared_ptr<const Frame> mainFrame; ///< Main frame.
+		std::shared_ptr<const IFrame> mainFrame; ///< Main frame.
 	};
 }
 
 namespace PonyEngine::Render
 {
 	FrameManager::FrameManager(IRenderSystemContext& renderSystem, const FrameParams& mainFrameParams) :
-		renderSystem{&renderSystem},
-		mainFrame(CreateFrame(mainFrameParams))
+		renderSystem{&renderSystem}
 	{
+		CreateMainFrame(mainFrameParams);
 	}
 
-	const IFrame& FrameManager::MainFrame() const noexcept
+	const std::shared_ptr<const IFrame>& FrameManager::MainFrame() const noexcept
 	{
-		return *mainFrame;
+		return mainFrame;
 	}
 
-	std::shared_ptr<Frame> FrameManager::CreateFrame(const FrameParams& frameParams)
+	std::shared_ptr<IFrame> FrameManager::CreateFrame(const FrameParams& frameParams)
 	{
 		if (frameParams.sampleCount < 1u)
 		{
 			throw std::invalid_argument("Sample count must be greater than 0.");
+		}
+		if (frameParams.rtvFormat == TextureFormat::Unknown && frameParams.dsvFormat == TextureFormat::Unknown) [[unlikely]]
+		{
+			throw std::invalid_argument("No rtv and no dsv are specified.");
 		}
 
 		if (frameParams.rtvFormat != TextureFormat::Unknown)
@@ -171,6 +182,19 @@ namespace PonyEngine::Render
 		return frame;
 	}
 
+	std::shared_ptr<IFrame> FrameManager::CreateMainFrame(const FrameParams& frameParams)
+	{
+		if (frameParams.rtvFormat == TextureFormat::Unknown) [[unlikely]]
+		{
+			throw std::invalid_argument("Main frame must have rtv.");
+		}
+
+		const std::shared_ptr<IFrame> frame = CreateFrame(frameParams);
+		mainFrame = frame;
+
+		return frame;
+	}
+
 	void FrameManager::Tick()
 	{
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Create.");
@@ -179,6 +203,8 @@ namespace PonyEngine::Render
 		Update();
 		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Clear.");
 		Clear();
+		PONY_LOG(renderSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Submit.");
+		Submit();
 	}
 
 	void FrameManager::Clean()
@@ -244,5 +270,15 @@ namespace PonyEngine::Render
 		}
 
 		newFrames.clear();
+	}
+
+	void FrameManager::Submit()
+	{
+		for (const std::shared_ptr<Frame>& frame : frames)
+		{
+			renderSystem->Pipeline().Submit(*frame);
+		}
+
+		renderSystem->Pipeline().SetMainFrame(*mainFrame);
 	}
 }

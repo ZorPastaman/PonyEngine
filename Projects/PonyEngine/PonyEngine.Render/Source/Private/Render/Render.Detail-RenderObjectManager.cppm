@@ -9,6 +9,8 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Detail:RenderObjectManager;
@@ -22,6 +24,8 @@ import PonyDebug.Log;
 import PonyEngine.Render;
 
 import :IRenderSystemContext;
+import :Material;
+import :Mesh;
 import :RenderObject;
 
 export namespace PonyEngine::Render
@@ -69,10 +73,12 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IRenderObject> RenderObjectManager::CreateObject(const RenderObjectParams& params)
 	{
-		if (params.material == nullptr)
+		if (params.material == nullptr) [[unlikely]]
 		{
 			throw std::runtime_error{ "Material is nullptr." };
 		}
+		assert(dynamic_cast<const Material*>(params.material.get()) && "The material is not a valid type.");
+		assert((!params.mesh || dynamic_cast<const Mesh*>(params.mesh.get())) && "The mesh is not a valid type.");
 
 		auto renderObject = std::make_shared<RenderObject>(params);
 		renderObjects.push_back(renderObject);
