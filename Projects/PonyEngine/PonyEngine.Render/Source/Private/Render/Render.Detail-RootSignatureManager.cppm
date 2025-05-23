@@ -9,10 +9,13 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Detail:RootSignatureManager;
 
+import <algorithm>;
 import <memory>;
 import <stdexcept>;
 import <vector>;
@@ -24,6 +27,7 @@ import PonyEngine.Render;
 import :IRenderSystemContext;
 import :RootSignature;
 import :RootSignatureDirtyFlag;
+import :Shader;
 
 export namespace PonyEngine::Render
 {
@@ -79,6 +83,7 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Shader is nullptr.");
 		}
+		assert(dynamic_cast<const Shader*>(params.shader.get()) && "The shader is not a valid type.");
 
 		const auto rootSignature = std::make_shared<RootSignature>(params);
 		rootSignatures.push_back(rootSignature);

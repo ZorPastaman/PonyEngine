@@ -18,7 +18,8 @@ import <vector>;
 
 import PonyEngine.Render;
 
-import :BufferData;
+import :Buffer;
+import :BufferDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -68,6 +69,9 @@ export namespace PonyEngine::Render
 		virtual void DestroyData(std::uint32_t dataTypeIndex) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual const IBuffer& Buffer() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual std::optional<std::uint32_t> FindTextureTypeIndex(std::string_view textureType) const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::string_view TextureType(std::uint32_t textureTypeIndex) const noexcept override;
@@ -89,15 +93,24 @@ export namespace PonyEngine::Render
 		virtual std::string_view Name() const noexcept override;
 		virtual void Name(std::string_view name) override;
 
+		/// @brief Gets the dirty flags.
+		/// @return Dirty flags.
+		[[nodiscard("Pure function")]]
+		BufferDirtyFlag DirtyFlags() const noexcept;
+		/// @brief Resets the dirty flags.
+		void ResetDirty() noexcept;
+
 	private:
 		std::shared_ptr<const IPipelineState> pipelineState; ///< Pipeline state.
 
-		BufferData bufferData; ///< Buffer data.
+		class Buffer buffer; ///< Buffer data.
 
 		std::vector<std::string> textureTypes; ///< Texture types.
 		std::vector<std::vector<std::shared_ptr<const ITexture>>> textures; ///< Textures.
 
 		std::string name; ///< Material name.
+
+		BufferDirtyFlag dirtyFlags; ///< Dirty flags.
 	};
 }
 
@@ -105,8 +118,9 @@ namespace PonyEngine::Render
 {
 	Material::Material(const MaterialParams& params) :
 		pipelineState(params.pipelineState),
-		bufferData(params.data),
-		name(params.name)
+		buffer(params.data),
+		name(params.name),
+		dirtyFlags{BufferDirtyFlag::All}
 	{
 		std::size_t textureCount = 0;
 		for (const auto& [dataType, textureSet] : params.textures)
@@ -116,6 +130,11 @@ namespace PonyEngine::Render
 				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Texture set of type '{}' is empty.", dataType));
 			}
 			textureCount += textureSet.size();
+
+			if (params.data.contains(dataType)) [[unlikely]]
+			{
+				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Data type name '{}' is used in both data and textures.", dataType));
+			}
 		}
 		if (textureCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{
@@ -138,67 +157,83 @@ namespace PonyEngine::Render
 
 	std::optional<std::uint32_t> Material::FindDataTypeIndex(const std::string_view dataType) const noexcept
 	{
-		return bufferData.DataTypeIndex(dataType);
+		return buffer.DataTypeIndex(dataType);
 	}
 
 	std::string_view Material::DataType(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.DataType(dataTypeIndex);
+		return buffer.DataType(dataTypeIndex);
 	}
 
 	std::uint32_t Material::DataTypeCount() const noexcept
 	{
-		return bufferData.DataTypeCount();
+		return buffer.DataTypeCount();
 	}
 
 	std::span<const std::byte> Material::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.GetData(dataTypeIndex, dataIndex);
+		return buffer.Data(dataTypeIndex, dataIndex);
 	}
 
 	void Material::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::span<const std::byte> data)
 	{
-		bufferData.SetData(dataTypeIndex, dataIndex, data);
+		buffer.Data(dataTypeIndex, dataIndex, data);
+		dirtyFlags |= BufferDirtyFlag::Data;
 	}
 
 	std::size_t Material::DataSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.DataSize(dataTypeIndex, dataIndex);
+		return buffer.DataSize(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Material::DataCount(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.DataCount(dataTypeIndex);
+		return buffer.DataCount(dataTypeIndex);
 	}
 
 	std::span<const std::byte> Material::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex) const noexcept
 	{
-		return bufferData.GetData(dataTypeIndex, dataIndex, elementIndex);
+		return buffer.Element(dataTypeIndex, dataIndex, elementIndex);
 	}
 
 	void Material::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex, const std::span<const std::byte> element)
 	{
-		bufferData.SetData(dataTypeIndex, dataIndex, elementIndex, element);
+		buffer.Element(dataTypeIndex, dataIndex, elementIndex, element);
+		dirtyFlags |= BufferDirtyFlag::Data;
 	}
 
 	std::uint32_t Material::ElementSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.ElementSize(dataTypeIndex, dataIndex);
+		return buffer.ElementSize(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Material::ElementCount(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.ElementCount(dataTypeIndex, dataIndex);
+		return buffer.ElementCount(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Material::CreateData(const std::string_view textureType, const std::span<const PonyBase::Container::BufferParams> dataParams)
 	{
-		return bufferData.Create(textureType, dataParams);
+		if (FindTextureTypeIndex(textureType)) [[unlikely]]
+		{
+			throw std::invalid_argument("Type is already used in textures.");
+		}
+
+		const std::uint32_t answer = buffer.Create(textureType, dataParams);
+		dirtyFlags |= BufferDirtyFlag::DataStructure;
+
+		return answer;
 	}
 
 	void Material::DestroyData(const std::uint32_t dataTypeIndex) noexcept
 	{
-		bufferData.Destroy(dataTypeIndex);
+		buffer.Destroy(dataTypeIndex);
+		dirtyFlags |= BufferDirtyFlag::DataStructure;
+	}
+
+	const IBuffer& Material::Buffer() const noexcept
+	{
+		return buffer;
 	}
 
 	std::optional<std::uint32_t> Material::FindTextureTypeIndex(const std::string_view textureType) const noexcept
@@ -261,6 +296,10 @@ namespace PonyEngine::Render
 			throw std::invalid_argument("Texture count exceeds std::uint32_t max value.");
 		}
 
+		if (FindDataTypeIndex(textureType)) [[unlikely]]
+		{
+			throw std::invalid_argument("Type is already used in data.");
+		}
 		if (FindTextureTypeIndex(textureType)) [[unlikely]]
 		{
 			throw std::invalid_argument("Such texture type already exists.");
@@ -302,5 +341,17 @@ namespace PonyEngine::Render
 		}
 
 		this->name = name;
+		buffer.Name(name);
+		dirtyFlags |= BufferDirtyFlag::Name;
+	}
+
+	BufferDirtyFlag Material::DirtyFlags() const noexcept
+	{
+		return dirtyFlags;
+	}
+
+	void Material::ResetDirty() noexcept
+	{
+		dirtyFlags = BufferDirtyFlag::None;
 	}
 }

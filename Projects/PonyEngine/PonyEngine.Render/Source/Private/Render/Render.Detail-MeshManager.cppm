@@ -23,10 +23,10 @@ import PonyDebug.Log;
 
 import PonyEngine.Render;
 
-import :IMeshAgent;
+import :IBufferAgent;
 import :IRenderSystemContext;
 import :Mesh;
-import :MeshDirtyFlag;
+import :BufferDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -46,7 +46,7 @@ export namespace PonyEngine::Render
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<IMesh> CreateMesh(const MeshParams& params) override;
 
-		/// @brief Tick the mesh manager.
+		/// @brief Ticks the mesh manager.
 		void Tick();
 		/// @brief Cleans out dead meshes.
 		void Clean();
@@ -78,7 +78,7 @@ namespace PonyEngine::Render
 
 	std::shared_ptr<IMesh> MeshManager::CreateMesh(const MeshParams& params)
 	{
-		if (std::ranges::find_if(params.data, [](const auto& p) { return p.first.starts_with(DataTypes::Prefix); }) != params.data.cend())
+		if (std::ranges::find_if(params.data, [](const auto& p) { return p.first.starts_with(DataTypes::Prefix); }) != params.data.cend()) [[unlikely]]
 		{
 			throw std::invalid_argument("Invalid data type name.");
 		}
@@ -116,7 +116,7 @@ namespace PonyEngine::Render
 			}
 			else
 			{
-				renderSystem->RenderAgent().MeshAgent().Destroy(*mesh);
+				renderSystem->RenderAgent().BufferAgent().Destroy(mesh->Buffer());
 			}
 			meshes.erase(meshes.cbegin() + i);
 		}
@@ -126,7 +126,7 @@ namespace PonyEngine::Render
 	{
 		for (const Mesh* mesh : newMeshes)
 		{
-			renderSystem->RenderAgent().MeshAgent().Create(*mesh);
+			renderSystem->RenderAgent().BufferAgent().Create(mesh->Buffer());
 		}
 	}
 
@@ -134,9 +134,9 @@ namespace PonyEngine::Render
 	{
 		for (const std::shared_ptr<Mesh>& mesh : meshes)
 		{
-			if (mesh->DirtyFlags() != MeshDirtyFlag::None)
+			if (mesh->DirtyFlags() != BufferDirtyFlag::None)
 			{
-				renderSystem->RenderAgent().MeshAgent().Update(*mesh, mesh->DirtyFlags());
+				renderSystem->RenderAgent().BufferAgent().Update(mesh->Buffer(), mesh->DirtyFlags());
 			}
 		}
 	}

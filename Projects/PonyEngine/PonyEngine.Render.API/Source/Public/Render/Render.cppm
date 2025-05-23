@@ -26,6 +26,7 @@ export import :DepthStencilOperation;
 export import :FillMode;
 export import :FrameParams;
 export import :IAttachment;
+export import :IBuffer;
 export import :ICamera;
 export import :ICameraManager;
 export import :ICuller;

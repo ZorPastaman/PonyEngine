@@ -9,10 +9,13 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyDebug/Log/Log.h"
 
 export module PonyEngine.Render.Detail:PipelineStateManager;
 
+import <algorithm>;
 import <cstddef>;
 import <memory>;
 import <stdexcept>;
@@ -26,6 +29,8 @@ import PonyEngine.Render;
 import :IRenderSystemContext;
 import :PipelineState;
 import :PipelineStateDirtyFlag;
+import :RootSignature;
+import :Shader;
 
 export namespace PonyEngine::Render
 {
@@ -89,6 +94,10 @@ namespace PonyEngine::Render
 		{
 			throw std::invalid_argument("Pixel shader is nullptr.");
 		}
+		assert(dynamic_cast<const RootSignature*>(params.rootSignature.get()) && "The root signature is not a valid type.");
+		assert((!params.amplificationShader || dynamic_cast<const Shader*>(params.amplificationShader.get())) && "The amplification shader is not a valid type.");
+		assert(dynamic_cast<const Shader*>(params.meshShader.get()) && "The mesh shader is not a valid type.");
+		assert(dynamic_cast<const Shader*>(params.pixelShader.get()) && "The pixel shader is not a valid type.");
 
 		const auto pipelineState = std::make_shared<PipelineState>(params);
 		pipelineStates.push_back(pipelineState);

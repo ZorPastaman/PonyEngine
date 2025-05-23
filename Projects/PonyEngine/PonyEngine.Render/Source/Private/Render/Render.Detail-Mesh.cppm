@@ -11,6 +11,7 @@ export module PonyEngine.Render.Detail:Mesh;
 
 import <cstddef>;
 import <cstdint>;
+import <memory>;
 import <optional>;
 import <span>;
 import <string>;
@@ -24,8 +25,8 @@ import PonyShader.Core;
 
 import PonyEngine.Render;
 
-import :BufferData;
-import :MeshDirtyFlag;
+import :Buffer;
+import :BufferDirtyFlag;
 
 export namespace PonyEngine::Render
 {
@@ -69,6 +70,9 @@ export namespace PonyEngine::Render
 		virtual void DestroyData(std::uint32_t dataTypeIndex) noexcept override;
 
 		[[nodiscard("Pure function")]]
+		virtual const IBuffer& Buffer() const noexcept override;
+
+		[[nodiscard("Pure function")]]
 		virtual const PonyShader::Core::ThreadGroupCounts& ThreadGroupCounts() const noexcept override;
 		virtual void ThreadGroupCounts(const PonyShader::Core::ThreadGroupCounts& counts) override;
 
@@ -83,7 +87,7 @@ export namespace PonyEngine::Render
 		/// @brief Gets the dirty flags.
 		/// @return Dirty flags.
 		[[nodiscard("Pure function")]]
-		MeshDirtyFlag DirtyFlags() const noexcept;
+		BufferDirtyFlag DirtyFlags() const noexcept;
 		/// @brief Resets the dirty flags.
 		void ResetDirty() noexcept;
 
@@ -91,97 +95,102 @@ export namespace PonyEngine::Render
 		Mesh& operator =(Mesh&&) = delete;
 
 	private:
-		BufferData bufferData; ///< Buffer data.
+		class Buffer buffer; ///< Buffer.
 
 		PonyShader::Core::ThreadGroupCounts threadGroupCounts; ///< Thread group counts.
 		std::optional<PonyMath::Shape::AABB<float>> boundingBox; ///< Bounding box.
 
 		std::string name; ///< Mesh name.
 
-		MeshDirtyFlag dirtyFlags; ///< Dirty flags.
+		BufferDirtyFlag dirtyFlags; ///< Dirty flags.
 	};
 }
 
 namespace PonyEngine::Render
 {
 	Mesh::Mesh(const MeshParams& params) :
-		bufferData(params.data),
+		buffer(params.data),
 		threadGroupCounts(params.threadGroupCounts),
 		boundingBox(params.boundingBox),
 		name(params.name),
-		dirtyFlags{MeshDirtyFlag::All}
+		dirtyFlags{BufferDirtyFlag::All}
 	{
 	}
 
 	std::optional<std::uint32_t> Mesh::FindDataTypeIndex(const std::string_view dataType) const noexcept
 	{
-		return bufferData.DataTypeIndex(dataType);
+		return buffer.DataTypeIndex(dataType);
 	}
 
 	std::string_view Mesh::DataType(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.DataType(dataTypeIndex);
+		return buffer.DataType(dataTypeIndex);
 	}
 
 	std::uint32_t Mesh::DataTypeCount() const noexcept
 	{
-		return bufferData.DataTypeCount();
+		return buffer.DataTypeCount();
 	}
 
 	std::span<const std::byte> Mesh::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.GetData(dataTypeIndex, dataIndex);
+		return buffer.Data(dataTypeIndex, dataIndex);
 	}
 
 	void Mesh::Data(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::span<const std::byte> data)
 	{
-		bufferData.SetData(dataTypeIndex, dataIndex, data);
-		dirtyFlags |= MeshDirtyFlag::Data;
+		buffer.Data(dataTypeIndex, dataIndex, data);
+		dirtyFlags |= BufferDirtyFlag::Data;
 	}
 
 	std::size_t Mesh::DataSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.DataSize(dataTypeIndex, dataIndex);
+		return buffer.DataSize(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Mesh::DataCount(const std::uint32_t dataTypeIndex) const noexcept
 	{
-		return bufferData.DataCount(dataTypeIndex);
+		return buffer.DataCount(dataTypeIndex);
 	}
 
 	std::span<const std::byte> Mesh::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex) const noexcept
 	{
-		return bufferData.GetData(dataTypeIndex, dataIndex, elementIndex);
+		return buffer.Element(dataTypeIndex, dataIndex, elementIndex);
 	}
 
 	void Mesh::Element(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex, const std::uint32_t elementIndex, const std::span<const std::byte> element)
 	{
-		bufferData.SetData(dataTypeIndex, dataIndex, elementIndex, element);
-		dirtyFlags |= MeshDirtyFlag::Data;
+		buffer.Element(dataTypeIndex, dataIndex, elementIndex, element);
+		dirtyFlags |= BufferDirtyFlag::Data;
 	}
 
 	std::uint32_t Mesh::ElementSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.ElementSize(dataTypeIndex, dataIndex);
+		return buffer.ElementSize(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Mesh::ElementCount(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
-		return bufferData.ElementCount(dataTypeIndex, dataIndex);
+		return buffer.ElementCount(dataTypeIndex, dataIndex);
 	}
 
 	std::uint32_t Mesh::CreateData(const std::string_view dataType, const std::span<const PonyBase::Container::BufferParams> dataParams)
 	{
-		const std::uint32_t index = bufferData.Create(dataType, dataParams);
-		dirtyFlags |= MeshDirtyFlag::DataStructure;
+		const std::uint32_t index = buffer.Create(dataType, dataParams);
+		dirtyFlags |= BufferDirtyFlag::DataStructure;
 
 		return index;
 	}
 
 	void Mesh::DestroyData(const std::uint32_t dataTypeIndex) noexcept
 	{
-		bufferData.Destroy(dataTypeIndex);
-		dirtyFlags |= MeshDirtyFlag::DataStructure;
+		buffer.Destroy(dataTypeIndex);
+		dirtyFlags |= BufferDirtyFlag::DataStructure;
+	}
+
+	const IBuffer& Mesh::Buffer() const noexcept
+	{
+		return buffer;
 	}
 
 	const PonyShader::Core::ThreadGroupCounts& Mesh::ThreadGroupCounts() const noexcept
@@ -217,16 +226,17 @@ namespace PonyEngine::Render
 		}
 
 		this->name = name;
-		dirtyFlags |= MeshDirtyFlag::Name;
+		buffer.Name(this->name);
+		dirtyFlags |= BufferDirtyFlag::Name;
 	}
 
-	MeshDirtyFlag Mesh::DirtyFlags() const noexcept
+	BufferDirtyFlag Mesh::DirtyFlags() const noexcept
 	{
 		return dirtyFlags;
 	}
 
 	void Mesh::ResetDirty() noexcept
 	{
-		dirtyFlags = MeshDirtyFlag::None;
+		dirtyFlags = BufferDirtyFlag::None;
 	}
 }

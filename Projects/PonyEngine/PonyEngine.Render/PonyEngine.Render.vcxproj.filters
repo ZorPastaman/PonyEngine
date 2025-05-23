@@ -271,16 +271,16 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-BufferData.cppm">
+    <ClCompile Include="Source\Private\Render\Render.Detail-Buffer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IMeshAgent.cppm">
+    <ClCompile Include="Source\Private\Render\Render.Detail-IBufferAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-MeshDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render\Render.Detail-BufferDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-Shader.cppm">
@@ -392,6 +392,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render\Render.Detail-RenderObjectManager.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
