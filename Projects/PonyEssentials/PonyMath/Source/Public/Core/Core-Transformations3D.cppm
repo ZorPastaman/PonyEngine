@@ -410,6 +410,13 @@ export namespace PonyMath::Core
 	/// @return Transformed point.
 	template<std::floating_point T> [[nodiscard("Pure function")]]
 	constexpr Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept;
+	/// @brief Applies the 3D transformation matrix to the point vector and divides the result by w-component.
+	/// @tparam T Value type.
+	/// @param transformationMatrix Transformation matrix.
+	/// @param vector Point.
+	/// @return Transformed point.
+	template<std::floating_point T> [[nodiscard("Pure function")]]
+	constexpr Vector3<T> ProjectPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept; /// TODO: Add tests.
 	/// @brief Applies the 3D transformation matrix to the direction vector.
 	/// @tparam T Value type.
 	/// @param transformationMatrix Transformation matrix.
@@ -1062,6 +1069,14 @@ namespace PonyMath::Core
 	constexpr Vector3<T> TransformPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept
 	{
 		return TransformVector(transformationMatrix, vector, T{1});
+	}
+
+	template <std::floating_point T>
+	constexpr Vector3<T> ProjectPoint(const Matrix4x4<T>& transformationMatrix, const Vector3<T>& vector) noexcept
+	{
+		const Vector4<T> transformed = transformationMatrix * Vector4<T>(vector.X(), vector.Y(), vector.Z(), T{1});
+
+		return Vector3<T>(transformed.X(), transformed.Y(), transformed.Z()) * (T{1} / transformed.W());
 	}
 
 	template<std::floating_point T>

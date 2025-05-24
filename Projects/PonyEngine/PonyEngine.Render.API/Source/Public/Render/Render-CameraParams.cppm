@@ -15,7 +15,7 @@ import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
-import :Clear;
+import :ClearValue;
 import :Common;
 
 export namespace PonyEngine::Render
@@ -26,7 +26,7 @@ export namespace PonyEngine::Render
 		PonyMath::Core::Matrix4x4<float> viewMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< View matrix.
 		CameraProjection projection = Perspective{.fov = 60.f * PonyMath::Core::DegToRad<float>, .aspect = 16.f / 9.f, .nearPlane = 0.2f, .farPlane = 1000.f}; ///< Projection parameters.
 
-		Clear clearParams; ///< Clear parameters.
+		ClearValue clearValue; ///< Clear value.
 
 		PonyMath::Shape::Rect<float> viewportRect = PonyMath::Shape::Rect<float>::Predefined::NormalizedFull; ///< Normalized viewport rect. It tells what part of a frame the camera writes to.
 

@@ -13,50 +13,50 @@
 
 #ifdef PONY_LOG_VERBOSE
 /// @brief Verbose log mask.
-#define PONY_LOG_VERBOSE_MASK PonyDebug::Log::LogType::Verbose
+#define PONY_LOG_VERBOSE_MASK PonyDebug::Log::LogTypeMask::Verbose
 #else
 /// @brief Verbose log mask.
-#define PONY_LOG_VERBOSE_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_VERBOSE_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 #ifdef PONY_LOG_DEBUG
 /// @brief Debug log mask.
-#define PONY_LOG_DEBUG_MASK PonyDebug::Log::LogType::Debug
+#define PONY_LOG_DEBUG_MASK PonyDebug::Log::LogTypeMask::Debug
 #else
 /// @brief Debug log mask.
-#define PONY_LOG_DEBUG_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_DEBUG_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 #ifdef PONY_LOG_INFO
 /// @brief Info log mask.
-#define PONY_LOG_INFO_MASK PonyDebug::Log::LogType::Info
+#define PONY_LOG_INFO_MASK PonyDebug::Log::LogTypeMask::Info
 #else
 /// @brief Info log mask.
-#define PONY_LOG_INFO_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_INFO_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 #ifdef PONY_LOG_WARNING
 /// @brief Warning log mask.
-#define PONY_LOG_WARNING_MASK PonyDebug::Log::LogType::Warning
+#define PONY_LOG_WARNING_MASK PonyDebug::Log::LogTypeMask::Warning
 #else
 /// @brief Warning log mask.
-#define PONY_LOG_WARNING_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_WARNING_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 #ifdef PONY_LOG_ERROR
 /// @brief Error log mask.
-#define PONY_LOG_ERROR_MASK PonyDebug::Log::LogType::Error
+#define PONY_LOG_ERROR_MASK PonyDebug::Log::LogTypeMask::Error
 #else
 /// @brief Error log mask.
-#define PONY_LOG_ERROR_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_ERROR_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 #ifdef PONY_LOG_EXCEPTION
 /// @brief Exception log mask.
-#define PONY_LOG_EXCEPTION_MASK PonyDebug::Log::LogType::Exception
+#define PONY_LOG_EXCEPTION_MASK PonyDebug::Log::LogTypeMask::Exception
 #else
 /// @brief Exception log mask.
-#define PONY_LOG_EXCEPTION_MASK PonyDebug::Log::LogType::None
+#define PONY_LOG_EXCEPTION_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 /// @brief Log mask. It contains a mask of all possible log types.
@@ -67,7 +67,7 @@
 #define PONY_CONSOLE_LOG_MASK PONY_LOG_MASK
 #else
 /// @brief Console log mask.
-#define PONY_CONSOLE_LOG_MASK PonyDebug::Log::LogType::None
+#define PONY_CONSOLE_LOG_MASK PonyDebug::Log::LogTypeMask::None
 #endif
 
 /// @brief If wrapper.
@@ -85,7 +85,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG(logger, logType, logMessage, ...) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr (PonyDebug::Log::IsInMask(logType, PONY_LOG_MASK)) \
 	{ \
 		PonyDebug::Log::LogToLogger(logger, logType, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
@@ -97,7 +97,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_IF(condition, logger, logType, logMessage, ...) \
-	if constexpr (((logType) & PONY_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr (PonyDebug::Log::IsInMask(logType, PONY_LOG_MASK)) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogToLogger(logger, logType, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
@@ -107,7 +107,7 @@
 /// @param exception std::exception reference.
 /// @param ... Format arguments.
 #define PONY_LOG_E_S(logger, exception) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PonyDebug::Log::LogExceptionToLogger(logger, exception); \
 	}
@@ -118,7 +118,7 @@
 /// @param exception std::exception reference.
 /// @param ... Format arguments.
 #define PONY_LOG_E_S_IF(condition, logger, exception, logMessage, ...) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToLogger(logger, exception)); \
 	}
@@ -129,7 +129,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_E(logger, exception, logMessage, ...) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PonyDebug::Log::LogExceptionToLogger(logger, exception, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
@@ -141,7 +141,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_LOG_E_IF(condition, logger, exception, logMessage, ...) \
-	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogType::None) \
+	if constexpr (PONY_LOG_EXCEPTION_MASK != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToLogger(logger, exception, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
@@ -152,7 +152,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE(logType, logMessage, ...) \
-	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr (PonyDebug::Log::IsInMask(logType, PONY_LOG_MASK)) \
 	{ \
 		PonyDebug::Log::LogToConsole(logType, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
@@ -164,7 +164,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_IF(condition, logType, logMessage, ...) \
-	if constexpr (((logType) & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr (PonyDebug::Log::IsInMask(logType, PONY_LOG_MASK)) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogToConsole(logType, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
@@ -173,7 +173,7 @@
 /// @details std::cout corresponds to Verbose, Debug and Info log types; std::clog corresponds to Warning log type; std::cerr corresponds to Error and Exception log type.
 /// @param exception std::exception reference.
 #define PONY_CONSOLE_E_S(exception) \
-	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PonyDebug::Log::LogExceptionToConsole(exception); \
 	}
@@ -183,7 +183,7 @@
 /// @param condition Log condition.
 /// @param exception std::exception reference.
 #define PONY_CONSOLE_E_S_IF(condition, exception) \
-	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToConsole(exception)); \
 	}
@@ -195,7 +195,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_E(exception, logMessage, ...) \
-	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PonyDebug::Log::LogExceptionToConsole(exception, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
@@ -207,7 +207,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_E_IF(condition, exception, logMessage, ...) \
-	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogType::None) \
+	if constexpr ((PONY_LOG_EXCEPTION_MASK & PONY_CONSOLE_LOG_MASK) != PonyDebug::Log::LogTypeMask::None) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyDebug::Log::LogExceptionToConsole(exception, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}

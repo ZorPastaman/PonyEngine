@@ -17,6 +17,7 @@
     <ClInclude Include="Include\Public\PonyBase\Core\Linking.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Optimization.h" />
     <ClInclude Include="Include\Public\PonyBase\Core\Windows\Framework.h" />
+    <ClInclude Include="Include\Public\PonyBase\Utility\Enum.h" />
     <ClInclude Include="Include\Public\PonyBase\Utility\ObjectBody.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
@@ -26,7 +27,6 @@
   <ItemGroup>
     <ClCompile Include="Source\Public\Container\Container-Buffer.cppm" />
     <ClCompile Include="Source\Public\Container\Container-BufferParams.cppm" />
-    <ClCompile Include="Source\Public\Container\Container-BufferView.cppm" />
     <ClCompile Include="Source\Public\Container\Container.cppm" />
     <ClCompile Include="Source\Public\Core\Core.cppm" />
     <ClCompile Include="Source\Public\Core\Core-ExitCodes.cppm" />

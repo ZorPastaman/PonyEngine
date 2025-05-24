@@ -12,6 +12,7 @@
 // 1: Meshlets, Vertex indices and Primitives
 // 2: Positions
 // 3: Color
+// 4: Filter texture
 
 // GPU:
 // b0: Context
@@ -21,9 +22,12 @@
 // t2: Primitives
 // t3: Positions
 // t4: Color
+// t5: Filter texture
 
 #define ROOT_SIG \
 	"DescriptorTable(CBV(b0, numDescriptors = 2)), " \
 	"DescriptorTable(SRV(t0, numDescriptors = 3)), " \
 	"DescriptorTable(SRV(t3, numDescriptors = 1)), " \
-	"DescriptorTable(SRV(t4, numDescriptors = 1))"
+	"DescriptorTable(SRV(t4, numDescriptors = 1)), " \
+	"DescriptorTable(SRV(t5, numDescriptors = 1)), " \
+	"StaticSampler(s0, Filter = FILTER_MIN_MAG_MIP_LINEAR, AddressU = TEXTURE_ADDRESS_CLAMP, AddressV = TEXTURE_ADDRESS_CLAMP)"

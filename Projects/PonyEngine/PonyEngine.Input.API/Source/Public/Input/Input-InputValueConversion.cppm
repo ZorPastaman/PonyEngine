@@ -11,11 +11,31 @@ module;
 
 #include <cassert>
 
+#include "PonyBase/Utility/Enum.h"
+
 export module PonyEngine.Input:InputValueConversion;
 
+import <algorithm>;
+import <array>;
 import <cmath>;
+import <cstddef>;
 import <cstdint>;
 import <functional>;
+import <ostream>;
+import <string_view>;
+
+namespace PonyEngine::Input
+{
+	/// @brief Comparison mode names.
+	constexpr std::array<std::string_view, 5> ComparisonModeNames
+	{
+		"Less",
+		"LessOrEqual",
+		"Greater",
+		"GreaterOrEqual",
+		"Unknown"
+	};
+}
 
 export namespace PonyEngine::Input
 {
@@ -27,6 +47,8 @@ export namespace PonyEngine::Input
 		Greater,
 		GreaterOrEqual
 	};
+
+	ENUM_VALUE_FEATURES(ComparisonMode, ComparisonModeNames)
 
 	/// @brief Creates an action that transforms a float value to bool via the comparison with the magnitude and calls the action that accepts bool. The conversion is dependent on the comparison mode.
 	/// @param action Action that accepts bool.

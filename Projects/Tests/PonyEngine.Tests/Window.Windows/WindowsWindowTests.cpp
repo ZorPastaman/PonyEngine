@@ -72,11 +72,11 @@ namespace Window
 			std::get<1>(window.system)->Begin();
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
 			constexpr std::string_view title = "Test title";
-			windowsWindow->TitleBar().MainTitle(title);
+			windowsWindow->TitleBar().Title(title);
 			wchar_t gotTitle[64];
 			GetWindowTextW(windowsWindow->WindowHandle(), gotTitle, 64);
 			Assert::AreEqual(title.data(), PonyBase::Utility::ConvertToString(gotTitle).c_str());
-			Assert::AreEqual(title, windowsWindow->TitleBar().MainTitle());
+			Assert::AreEqual(title, windowsWindow->TitleBar().Title());
 
 			constexpr std::string_view secondaryTitle = "Secondary";
 			windowsWindow->TitleBar().SecondaryTitle(secondaryTitle);
@@ -129,7 +129,7 @@ namespace Window
 			auto factory = PonyEngine::Window::Windows::CreateWindowFactory(application, PonyEngine::Window::Windows::WindowSystemFactoryParams{}, systemParams);
 			auto window = factory.systemFactory->Create(engine, PonyEngine::Core::SystemParams());
 			auto windowsWindow = dynamic_cast<PonyEngine::Window::Windows::IWindowSystem*>(std::get<1>(window.system).get());
-			Assert::AreEqual(std::string_view(title), windowsWindow->TitleBar().MainTitle());
+			Assert::AreEqual(std::string_view(title), windowsWindow->TitleBar().Title());
 		}
 
 		TEST_METHOD(CreateCursorTest)

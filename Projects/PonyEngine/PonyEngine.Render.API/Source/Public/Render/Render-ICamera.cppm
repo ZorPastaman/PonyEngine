@@ -15,11 +15,10 @@ export module PonyEngine.Render:ICamera;
 
 import <cstdint>;
 
-import PonyMath.Color;
 import PonyMath.Core;
 import PonyMath.Shape;
 
-import :Clear;
+import :ClearValue;
 import :Common;
 import :ICuller;
 
@@ -66,13 +65,13 @@ export namespace PonyEngine::Render
 		/// @param projection Projection parameters to set.
 		virtual void Projection(const CameraProjection& projection) noexcept = 0;
 
-		/// @brief Gets the clear parameters.
-		/// @return Clear parameters.
+		/// @brief Gets the clear value.
+		/// @return Clear value.
 		[[nodiscard("Pure function")]]
-		virtual const struct Clear& Clear() const noexcept = 0;
-		/// @brief Sets the clear parameters.
-		/// @param clear Clear parameters to set.
-		virtual void Clear(const struct Clear& clear) noexcept = 0;
+		virtual const struct ClearValue& ClearValue() const noexcept = 0;
+		/// @brief Sets the clear value.
+		/// @param clear Clear value to set.
+		virtual void ClearValue(const struct ClearValue& clear) noexcept = 0;
 
 		/// @brief Gets the normalized viewport rect.
 		/// @return Normalized viewport rect.

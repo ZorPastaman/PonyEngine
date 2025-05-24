@@ -21,7 +21,8 @@
 
 struct Vertex
 {
-	float4 position : SV_POSITION;
+	float4 clipPosition : SV_POSITION;
+	float3 position : TEXCOORD0;
 };
 
 ConstantBuffer<Pony_Context> Context : register(b0);
@@ -35,7 +36,8 @@ StructuredBuffer<float3> Positions : register(t3);
 Vertex CreateVertex(in uint index)
 {
 	Vertex vertex;
-	vertex.position = mul(Transform.mvp, float4(Positions[index], 1.f));
+	vertex.clipPosition = mul(Transform.mvp, float4(Positions[index], 1.f));
+	vertex.position = vertex.clipPosition.xyz / vertex.clipPosition.w;
 
 	return vertex;
 }

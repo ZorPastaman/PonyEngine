@@ -9,6 +9,10 @@
 
 export module PonyEngine.Render:RenderSystemParams;
 
+import <cstdint>;
+
+import :API;
+import :CommandQueuePriority;
 import :FrameParams;
 import :SwapChainParams;
 
@@ -18,10 +22,10 @@ export namespace PonyEngine::Render
 	struct RenderSystemParams
 	{
 		/// @brief Main frame parameters.
-		/// @note Must have a correct rtv format that is compatible with sRGB but not sRGB.
 		FrameParams mainFrameParams;
 		SwapChainParams swapChainParams; ///< Swap chain parameters.
-		bool useWindowResolutionAsSwapChainResolution = true; ///< If it's true, the swap chain resolution will be the same as the window resolution.
-		bool useSwapChainResolutionAsRenderResolution = true; ///< If it's true, the render resolution will be the same as the swap chain resolution.
+		std::int32_t commandQueuePriority = static_cast<std::int32_t>(CommandQueuePriority::High); ///< Command queue priority.
+		std::uint32_t timeout = 5000; ///< Timeout in milliseconds. The system throws an exception if the render time exceeds this value.
+		API renderAPI = API::None; ///< Render API.
 	};
 }

@@ -10,15 +10,20 @@
 export module PonyEngine.Render:SwapChainParams;
 
 import <cstdint>;
+import <optional>;
 
 import PonyMath.Utility;
+
+import :TextureFormat;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Swap chain parameters.
 	struct SwapChainParams final
 	{
-		PonyMath::Utility::Resolution<std::uint32_t> resolution = PonyMath::Utility::Resolution<std::uint32_t>(1280u, 720u);; ///< Swap chain resolution.
+		std::optional<PonyMath::Utility::Resolution<std::uint32_t>> resolution = std::nullopt; ///< Swap chain resolution. If it's std::nullopt, uses a window resolution.
+		TextureFormat bufferFormat; ///< Swap chain buffer format. Must be a color format.
 		std::uint8_t bufferCount = 3u; ///< Back buffer count.
+		bool srgbOutput = true; ///< Should the output be gamma-corrected? The @p buffer format must be sRGB-compatible.
 	};
 }
