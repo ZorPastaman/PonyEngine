@@ -214,16 +214,16 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-ShaderManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-CameraFrustum.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-CameraFrustum.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-FrustumCuller.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-FrustumCuller.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-BoxCuller.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-BoxCuller.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-CameraBox.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-CameraBox.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-Attachment.cppm">
@@ -247,70 +247,70 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-TextureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Camera.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Camera.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-CameraManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-CameraManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IRenderSystemContext.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IRenderSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IRenderAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IRenderAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Pipeline.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Pipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IPipeline.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IPipeline.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Mesh.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Mesh.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Buffer.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Buffer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-MeshManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-MeshManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IBufferAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IBufferAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-BufferDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-BufferDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Shader.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Shader.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-ShaderManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-ShaderManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-RootSignatureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-RootSignature.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-RootSignature.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IRootSignatureAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IRootSignatureAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineState.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-PipelineState.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineStateManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-PipelineStateManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineStateAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IPipelineStateAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Texture.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Texture.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-TextureDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-TextureDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers.cppm">
@@ -319,7 +319,7 @@
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-IPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-TextureManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-TextureManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UniformPixelHandler.cppm">
@@ -328,7 +328,7 @@
     <ClCompile Include="Source\Private\Render.PixelHandlers\Render.PixelHandlers-UnsupportedPixelHandler.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-ITextureAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-ITextureAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Types\Render.Types.cppm">
@@ -364,40 +364,40 @@
     <ClCompile Include="Source\Private\Render.Types\Render.Types-Snorm8.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Attachment.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Attachment.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Frame.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Frame.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-FrameManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-FrameManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-Material.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-Material.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-RootSignatureDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-RootSignatureDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-PipelineStateDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-PipelineStateDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-AttachmentDirtyFlag.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-AttachmentDirtyFlag.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-MaterialManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-MaterialManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-RenderObject.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-RenderObject.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-RenderObjectManager.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-RenderObjectManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineAgent.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-IPipelineAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render\Render.Detail-ConstantData.cppm">
+    <ClCompile Include="Source\Private\Render.Core\Render.Core-ConstantData.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
