@@ -12,7 +12,7 @@ module;
 #include "PonyBase/Core/Direct3D12/Framework.h"
 #include "PonyBase/Utility/ObjectBody.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:IResourceManager;
+export module PonyEngine.Render.Direct3D12:IResourceManager;
 
 import <memory>;
 import <utility>;

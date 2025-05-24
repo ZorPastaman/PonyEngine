@@ -65,7 +65,7 @@ export namespace PonyEngine::Render
 		/// @param dataIndex Data index.
 		/// @return Data element size in bytes.
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t ElementSize(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept = 0;
+		virtual std::size_t ElementSize(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept = 0;
 		/// @brief Gets a data element count.
 		/// @param dataTypeIndex Data type index.
 		/// @param dataIndex Data index.

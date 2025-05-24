@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Utility/Enum.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:HeapType;
+export module PonyEngine.Render.Direct3D12:HeapType;
 
 import <algorithm>;
 import <array>;

@@ -13,7 +13,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeapManager;
+export module PonyEngine.Render.Direct3D12:DescriptorHeapManager;
 
 import <cstddef>;
 import <cstdint>;
@@ -26,7 +26,7 @@ import PonyBase.Utility;
 
 import :DescriptorHeap;
 import :IDescriptorHeapManager;
-import :ISubSystemContext;
+import :IRenderSystemContext;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -37,7 +37,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Creates a @p DescriptorHeapManager.
 		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
-		explicit DescriptorHeapManager(ISubSystemContext& d3d12System) noexcept;
+		explicit DescriptorHeapManager(IRenderSystemContext& d3d12System) noexcept;
 		[[nodiscard("Pure constructor")]]
 		DescriptorHeapManager(const DescriptorHeapManager& other) noexcept = default;
 		[[nodiscard("Pure constructor")]]
@@ -55,7 +55,7 @@ export namespace PonyEngine::Render::Direct3D12
 		DescriptorHeapManager& operator =(DescriptorHeapManager&& other) noexcept = default;
 
 	private:
-		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
+		IRenderSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<DescriptorHeap>> descriptorHeaps; ///< Descriptor heaps.
 	};
@@ -63,7 +63,7 @@ export namespace PonyEngine::Render::Direct3D12
 
 namespace PonyEngine::Render::Direct3D12
 {
-	DescriptorHeapManager::DescriptorHeapManager(ISubSystemContext& d3d12System) noexcept :
+	DescriptorHeapManager::DescriptorHeapManager(IRenderSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
 		descriptorHeaps.reserve(128);

@@ -11,9 +11,12 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Resource;
+export module PonyEngine.Render.Direct3D12:Resource;
 
+import <stdexcept>;
 import <string_view>;
+
+import PonyBase.Utility;
 
 import :ObjectUtility;
 

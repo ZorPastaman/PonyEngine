@@ -15,7 +15,7 @@ module;
 
 #include "PonyDebug/Log/Log.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:ResourceManager;
+export module PonyEngine.Render.Direct3D12:ResourceManager;
 
 import <algorithm>;
 import <cstddef>;
@@ -29,7 +29,7 @@ import <vector>;
 
 import :HeapType;
 import :IResourceManager;
-import :ISubSystemContext;
+import :IRenderSystemContext;
 
 export namespace PonyEngine::Render::Direct3D12
 {
@@ -40,7 +40,7 @@ export namespace PonyEngine::Render::Direct3D12
 		/// @brief Creates a @p ResourceManager.
 		/// @param d3d12System Direct3D12 system context.
 		[[nodiscard("Pure constructor")]]
-		explicit ResourceManager(ISubSystemContext& d3d12System) noexcept;
+		explicit ResourceManager(IRenderSystemContext& d3d12System) noexcept;
 		[[nodiscard("Pure constructor")]]
 		ResourceManager(const ResourceManager&) = delete;
 		[[nodiscard("Pure constructor")]]
@@ -125,7 +125,7 @@ export namespace PonyEngine::Render::Direct3D12
 		[[nodiscard("Redendant call")]]
 		std::pair<std::shared_ptr<Buffer>, D3D12_PLACED_SUBRESOURCE_FOOTPRINT> CreateTextureBuffer(const D3D12_RESOURCE_DESC1& resourceDesc, HeapType heapType);
 
-		ISubSystemContext* d3d12System; ///< Direct3D12 system context.
+		IRenderSystemContext* d3d12System; ///< Direct3D12 system context.
 
 		std::vector<std::shared_ptr<Resource>> resources; ///< Resources
 	};
@@ -141,7 +141,7 @@ namespace PonyEngine::Render::Direct3D12
 		{ HeapType::Readback, D3D12_HEAP_TYPE_READBACK }
 	};
 
-	ResourceManager::ResourceManager(ISubSystemContext& d3d12System) noexcept :
+	ResourceManager::ResourceManager(IRenderSystemContext& d3d12System) noexcept :
 		d3d12System{&d3d12System}
 	{
 	}
