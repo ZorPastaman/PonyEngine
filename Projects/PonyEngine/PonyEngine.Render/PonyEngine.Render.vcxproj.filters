@@ -397,6 +397,9 @@
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineAgent.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Source\Private\Render\Render.Detail-ConstantData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <FxCompile Include="Shaders\OutputRootSig.hlsl">

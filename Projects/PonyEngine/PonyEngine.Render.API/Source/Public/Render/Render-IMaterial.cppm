@@ -167,30 +167,22 @@ export namespace PonyEngine::Render
 
 		/// @brief Gets a texture.
 		/// @param textureTypeIndex Texture type index.
-		/// @param textureIndex Texture index.
 		/// @return Texture.
 		[[nodiscard("Pure function")]]
-		virtual const std::shared_ptr<const ITexture>& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept = 0;
+		virtual const std::shared_ptr<const ITexture>& Texture(std::uint32_t textureTypeIndex) const noexcept = 0;
 		/// @brief Sets a texture.
 		/// @param textureTypeIndex Texture type index.
-		/// @param textureIndex Texture index.
 		/// @param texture Texture to set.
-		virtual void Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const std::shared_ptr<const ITexture>& texture) = 0;
-		/// @brief Gets a texture count.
-		/// @param textureTypeIndex Texture type index.
-		/// @return Texture count.
-		[[nodiscard("Pure function")]]
-		virtual std::uint32_t TextureCount(std::uint32_t textureTypeIndex) const noexcept = 0;
+		virtual void Texture(std::uint32_t textureTypeIndex, const std::shared_ptr<const ITexture>& texture) = 0;
 
 		/// @brief Creates a texture set.
 		/// @note Throws if the data or texture set with same type already exist.
 		/// @param textureType Texture type.
-		/// @param textureCount Texture count in a set.
 		/// @return Texture type index.
-		virtual std::uint32_t CreateTextureSet(std::string_view textureType, std::uint32_t textureCount) = 0;
+		virtual std::uint32_t CreateTextureSlot(std::string_view textureType) = 0;
 		/// @brief Destroys a texture set.
 		/// @param textureTypeIndex Type index of a texture set to destroy.
-		virtual void DestroyTextureSet(std::uint32_t textureTypeIndex) noexcept = 0;
+		virtual void DestroyTextureSlot(std::uint32_t textureTypeIndex) noexcept = 0;
 
 		/// @brief Gets the name.
 		/// @return Name.
