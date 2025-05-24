@@ -26,7 +26,7 @@ import PonyBase.Utility;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	class Buffer final : public IBuffer
 	{
@@ -122,7 +122,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Buffer::Buffer(const std::unordered_map<std::string, std::vector<PonyBase::Container::BufferParams>>& bufferParams)
 	{

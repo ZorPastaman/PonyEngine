@@ -25,7 +25,7 @@ import PonyMath.Core;
 import :IPixelHandler;
 import :Utility;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief The concept is satisfied if @p T can be converted to float and back.
 	template<typename T>
@@ -71,7 +71,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::PixelHandlers
 {
 	template <FloatConvertible T, std::size_t RedIndex, std::size_t GreenIndex, std::size_t BlueIndex, std::size_t AlphaIndex,
 		bool HasRed, bool HasGreen, bool HasBlue, bool HasAlpha>

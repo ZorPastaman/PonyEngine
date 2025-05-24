@@ -17,7 +17,7 @@ import PonyEngine.Render;
 
 import :BufferDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Buffer agent.
 	class IBufferAgent

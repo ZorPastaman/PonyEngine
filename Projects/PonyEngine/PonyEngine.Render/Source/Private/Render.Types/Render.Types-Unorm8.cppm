@@ -15,7 +15,7 @@ import <limits>;
 
 import PonyMath.Core;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Types
 {
 	/// @brief Unorm8 implementation.
 	struct Unorm8 final
@@ -51,7 +51,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Types
 {
 	constexpr Unorm8::Unorm8(const std::uint8_t value) noexcept :
 		value{value}

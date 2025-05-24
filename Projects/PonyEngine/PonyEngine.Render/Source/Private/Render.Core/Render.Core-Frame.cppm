@@ -23,7 +23,7 @@ import PonyEngine.Render;
 import :Attachment;
 import :AttachmentDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Frame.
 	class Frame final : public IFrame
@@ -103,7 +103,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Frame::Frame(std::unordered_map<enum AttachmentType, std::unique_ptr<class Attachment>>&& attachments, const struct ClearValue& clearValue,
 		const PonyMath::Utility::Resolution<std::uint32_t>& resolution, const std::uint8_t sampleCount,

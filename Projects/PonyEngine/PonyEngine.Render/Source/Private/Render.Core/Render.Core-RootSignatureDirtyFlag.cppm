@@ -21,7 +21,7 @@ import <string>;
 import <string_view>;
 import <type_traits>;
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	/// @brief Root signature dirty flag names.
 	constexpr std::array<std::string_view, 2> RootSignatureDirtyFlagNames
@@ -31,7 +31,7 @@ namespace PonyEngine::Render
 	};
 }
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Root signature dirty flag.
 	enum class RootSignatureDirtyFlag : std::uint8_t

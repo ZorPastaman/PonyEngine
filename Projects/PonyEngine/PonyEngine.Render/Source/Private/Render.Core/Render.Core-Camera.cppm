@@ -25,7 +25,7 @@ import PonyEngine.Render;
 import :BoxCuller;
 import :FrustumCuller;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Camera
 	class Camera final : public ICamera
@@ -112,7 +112,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Camera::Camera(const CameraParams& cameraParams) noexcept :
 		viewMatrix(cameraParams.viewMatrix),

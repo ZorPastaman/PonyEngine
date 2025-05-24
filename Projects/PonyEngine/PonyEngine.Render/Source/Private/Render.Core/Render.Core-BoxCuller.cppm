@@ -21,7 +21,7 @@ import PonyEngine.Render;
 
 import :CameraBox;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Box culler.
 	class BoxCuller final : public ICuller
@@ -58,7 +58,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	BoxCuller::BoxCuller(const PonyMath::Shape::AABB<float>& cameraBox) noexcept :
 		cameraBox(cameraBox)

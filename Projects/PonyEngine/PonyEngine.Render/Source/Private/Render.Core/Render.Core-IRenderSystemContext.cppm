@@ -18,7 +18,7 @@ import PonyDebug.Log;
 import :IPipeline;
 import :IRenderAgent;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Render system context.
 	class IRenderSystemContext

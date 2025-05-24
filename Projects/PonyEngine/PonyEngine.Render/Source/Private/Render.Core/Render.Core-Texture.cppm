@@ -28,7 +28,7 @@ import PonyEngine.Render.PixelHandlers;
 
 import :TextureDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Texture.
 	class Texture final : public ITexture
@@ -39,7 +39,7 @@ export namespace PonyEngine::Render
 		/// @param bufferParams Buffer parameters.
 		/// @param pixelHandler Pixel handler.
 		[[nodiscard("Pure constructor")]]
-		Texture(const TextureParams& params, PonyBase::Container::BufferParams bufferParams, const IPixelHandler& pixelHandler);
+		Texture(const TextureParams& params, PonyBase::Container::BufferParams bufferParams, const PixelHandlers::IPixelHandler& pixelHandler);
 		Texture(const Texture&) = delete;
 		Texture(Texture&&) = delete;
 
@@ -100,15 +100,15 @@ export namespace PonyEngine::Render
 
 		std::string name; ///< Texture name.
 
-		const IPixelHandler* pixelHandler; ///< Pixel handler.
+		const PixelHandlers::IPixelHandler* pixelHandler; ///< Pixel handler.
 
 		TextureDirtyFlag dirtyFlags; ///< Dirty flags.
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
-	Texture::Texture(const TextureParams& params, const PonyBase::Container::BufferParams bufferParams, const IPixelHandler& pixelHandler) :
+	Texture::Texture(const TextureParams& params, const PonyBase::Container::BufferParams bufferParams, const PixelHandlers::IPixelHandler& pixelHandler) :
 		buffer(bufferParams),
 		dimension{params.dimension},
 		format{params.format},

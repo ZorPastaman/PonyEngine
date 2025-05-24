@@ -22,7 +22,7 @@ import PonyEngine.Render;
 import :RootSignatureDirtyFlag;
 import :Shader;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Root signature shader.
 	class RootSignature final : public IRootSignature
@@ -72,7 +72,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	RootSignature::RootSignature(const RootSignatureParams& params) :
 		shader(params.shader),

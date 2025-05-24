@@ -28,7 +28,7 @@ import :IRenderSystemContext;
 import :Mesh;
 import :BufferDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Mesh manager.
 	class MeshManager final : public IMeshManager
@@ -69,7 +69,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	MeshManager::MeshManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

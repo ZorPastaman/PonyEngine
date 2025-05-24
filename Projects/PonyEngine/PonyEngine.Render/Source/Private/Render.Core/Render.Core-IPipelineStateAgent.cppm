@@ -17,7 +17,7 @@ import PonyEngine.Render;
 
 import :PipelineStateDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline state agent.
 	class IPipelineStateAgent

@@ -21,7 +21,7 @@ import <string>;
 import <string_view>;
 import <type_traits>;
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	/// @brief Buffer dirty flag names.
 	constexpr std::array<std::string_view, 4> BufferDirtyFlagNames
@@ -33,7 +33,7 @@ namespace PonyEngine::Render
 	};
 }
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Buffer dirty flag.
 	enum class BufferDirtyFlag : std::uint8_t

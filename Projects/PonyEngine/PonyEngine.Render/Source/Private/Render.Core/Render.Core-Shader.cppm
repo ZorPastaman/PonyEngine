@@ -17,7 +17,7 @@ import <utility>;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Shader.
 	class Shader final : public IShader
@@ -50,7 +50,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Shader::Shader(PonyBase::Container::Buffer&& data, const std::string_view name) noexcept :
 		data(std::move(data)),

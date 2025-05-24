@@ -21,7 +21,7 @@ import <stdexcept>;
 import :IPixelHandler;
 import :Utility;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief Pixel handler that supports texture formats with uint values.
 	/// @tparam RedOffset Red channel offset.
@@ -72,7 +72,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::PixelHandlers
 {
 	template <std::uint64_t RedOffset, std::uint64_t GreenOffset, std::uint64_t BlueOffset, std::uint64_t AlphaOffset,
 		std::uint64_t RedBits, std::uint64_t GreenBits, std::uint64_t BlueBits, std::uint64_t AlphaBits>

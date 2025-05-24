@@ -15,7 +15,7 @@ import <limits>;
 
 import PonyMath.Core;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Types
 {
 	/// @brief Snorm16 implementation.
 	struct Snorm16 final
@@ -51,7 +51,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Types
 {
 	constexpr Snorm16::Snorm16(const std::int16_t value) noexcept :
 		value{value}

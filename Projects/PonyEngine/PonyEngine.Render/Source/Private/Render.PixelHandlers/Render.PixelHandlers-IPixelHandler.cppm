@@ -21,7 +21,7 @@ import PonyBase.Container;
 import PonyMath.Color;
 import PonyMath.Core;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief Pixel handler.
 	class IPixelHandler

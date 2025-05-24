@@ -28,7 +28,7 @@ import PonyEngine.Render;
 import :IRenderSystemContext;
 import :Shader;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Shader manager.
 	class ShaderManager final : public IShaderManager
@@ -59,7 +59,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	ShaderManager::ShaderManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

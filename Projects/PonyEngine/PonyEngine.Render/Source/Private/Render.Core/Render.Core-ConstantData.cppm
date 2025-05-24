@@ -13,7 +13,7 @@ import <cstddef>;
 import <cstdint>;
 import <span>;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Constant data reference.
 	struct ConstantData final

@@ -36,7 +36,7 @@ import :ConstantData;
 import :IPipeline;
 import :IRenderSystemContext;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline.
 	class Pipeline final : public IPipeline
@@ -201,7 +201,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Pipeline::Pipeline(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem},

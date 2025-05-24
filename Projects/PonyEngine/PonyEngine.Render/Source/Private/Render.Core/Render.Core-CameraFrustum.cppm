@@ -22,7 +22,7 @@ import PonyMath.Shape;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Camera frustum.
 	class CameraFrustum final
@@ -126,7 +126,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	CameraFrustum::CameraFrustum(const Perspective& perspective) noexcept
 	{

@@ -18,7 +18,7 @@ import PonyMath.Core;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Render object.
 	class RenderObject final : public IRenderObject
@@ -62,7 +62,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	RenderObject::RenderObject(const RenderObjectParams& params) noexcept :
 		material(params.material),

@@ -12,7 +12,7 @@ export module PonyEngine.Render.Types:Half;
 import <bit>;
 import <cstdint>;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Types
 {
 	/// @brief Half implementation.
 	struct Half final
@@ -45,7 +45,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Types
 {
 	constexpr Half::Half(const std::uint16_t bits) noexcept :
 		bits{bits}
