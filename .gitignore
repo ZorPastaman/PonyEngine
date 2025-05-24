@@ -34,6 +34,13 @@
 # Visual Studio
 .vs/
 
+# CLion
+.idea/
+
+# Visual Studio Code
+.vscode/
+.cache/
+
 # Build
 [Ii]ntermediate/
 [Oo]utput/
@@ -47,3 +54,4 @@
 *.user
 *.userosscache
 *.sln.docstates
+CMakeUserPresets.json
