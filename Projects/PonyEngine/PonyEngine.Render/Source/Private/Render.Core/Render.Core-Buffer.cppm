@@ -60,7 +60,7 @@ export namespace PonyEngine::Render::Core
 		virtual std::uint32_t DataCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual std::uint32_t ElementSize(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept override;
+		virtual std::size_t ElementSize(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept override;
 		[[nodiscard("Pure function")]]
 		virtual std::uint32_t ElementCount(std::uint32_t dataTypeIndex, std::uint32_t dataIndex) const noexcept override;
 
@@ -207,7 +207,7 @@ namespace PonyEngine::Render::Core
 		return count;
 	}
 
-	std::uint32_t Buffer::ElementSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
+	std::size_t Buffer::ElementSize(const std::uint32_t dataTypeIndex, const std::uint32_t dataIndex) const noexcept
 	{
 		return Container(dataTypeIndex, dataIndex).Stride();
 	}

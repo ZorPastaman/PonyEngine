@@ -13,7 +13,7 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Texture;
+export module PonyEngine.Render.Direct3D12:Texture;
 
 import :Resource;
 

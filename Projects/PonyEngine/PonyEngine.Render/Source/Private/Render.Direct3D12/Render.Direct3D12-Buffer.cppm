@@ -13,7 +13,7 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:Buffer;
+export module PonyEngine.Render.Direct3D12:Buffer;
 
 import <cstddef>;
 import <cstring>;

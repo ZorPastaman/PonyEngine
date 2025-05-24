@@ -11,7 +11,7 @@ module;
 
 #include "PonyBase/Core/Direct3D12/Framework.h"
 
-export module PonyEngine.Render.Direct3D12.Detail:DescriptorHeap;
+export module PonyEngine.Render.Direct3D12:DescriptorHeap;
 
 import <cstdint>;
 import <string_view>;

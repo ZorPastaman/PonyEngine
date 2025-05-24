@@ -157,37 +157,34 @@
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-PipelineStateUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-ObjectUtility.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-ObjectUtility.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-IRenderSystemContext.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-DescriptorHeap.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-DescriptorHeap.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-IDescriptorHeapManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-IDescriptorHeapManager.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-DescriptorHeapManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-DescriptorHeapManager.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-Buffer.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-Buffer.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-Texture.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-Texture.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-IResourceManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-IResourceManager.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-HeapType.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-HeapType.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-ResourceManager.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-ResourceManager.cppm">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-Resource.cppm">
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-Resource.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Direct3D12.Old\Render.Direct3D12.Detail-Camera.cppm">
@@ -398,6 +395,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Source\Private\Render.Core\Render.Core-ConstantData.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-BufferAgent.cppm">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Source\Private\Render.Direct3D12\Render.Direct3D12-IRenderSystemContext.cppm">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
