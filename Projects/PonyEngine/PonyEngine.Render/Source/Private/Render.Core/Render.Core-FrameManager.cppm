@@ -33,7 +33,7 @@ import :AttachmentDirtyFlag;
 import :Frame;
 import :IRenderSystemContext;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Frame manager.
 	class FrameManager final : public IFrameManager
@@ -89,7 +89,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	FrameManager::FrameManager(IRenderSystemContext& renderSystem, const FrameParams& mainFrameParams) :
 		renderSystem{&renderSystem}

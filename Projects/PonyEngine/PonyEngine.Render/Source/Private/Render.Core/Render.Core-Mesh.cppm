@@ -28,7 +28,7 @@ import PonyEngine.Render;
 import :Buffer;
 import :BufferDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Mesh.
 	class Mesh final : public IMesh
@@ -106,7 +106,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Mesh::Mesh(const MeshParams& params) :
 		buffer(params.data),

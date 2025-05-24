@@ -17,7 +17,7 @@ import PonyMath.Utility;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Attachment.
 	class Attachment final : public IAttachment
@@ -60,7 +60,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Attachment::Attachment(const TextureFormat format, const PonyMath::Utility::Resolution<std::uint32_t>& size, const std::uint8_t sampleCount) noexcept :
 		format{format},

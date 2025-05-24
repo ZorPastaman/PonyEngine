@@ -21,7 +21,7 @@ import <string>;
 import <string_view>;
 import <type_traits>;
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	/// @brief Texture dirty flag names.
 	constexpr std::array<std::string_view, 3> TextureDirtyFlagNames
@@ -32,7 +32,7 @@ namespace PonyEngine::Render
 	};
 }
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Texture dirty flag.
 	enum class TextureDirtyFlag : std::uint8_t

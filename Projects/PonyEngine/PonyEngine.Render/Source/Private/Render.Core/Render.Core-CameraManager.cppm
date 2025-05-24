@@ -28,7 +28,7 @@ import :Camera;
 import :IPipeline;
 import :IRenderSystemContext;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Camera manager.
 	class CameraManager final : public ICameraManager
@@ -64,7 +64,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	CameraManager::CameraManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

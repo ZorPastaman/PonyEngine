@@ -23,7 +23,7 @@ import <span>;
 
 import PonyMath.Core;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief Value mask.
 	/// @tparam Bits Value bit count.
@@ -102,7 +102,7 @@ export namespace PonyEngine::Render
 	void FloatToSpecialUfloat(std::span<std::byte> data, float value) noexcept requires (Offset + ExponentBits + MantissaBits <= sizeof(std::uint64_t) * 8 && ExponentBits + MantissaBits <= sizeof(std::uint32_t) * 8);
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief Bit value info that has a required constants for parsing unorms and snorms.
 	/// @tparam Offset Bit offset.

@@ -24,12 +24,12 @@ import PonyEngine.Render;
 
 import :ConstantData;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline agent interface.
 	class IPipelineAgent
 	{
-		INTERFACE_BODY(IPipelineAgent)
+		INTERFACE_BODY(IPipelineAgent) // TODO: Add docs
 
 		virtual void BeginTick() = 0;
 		virtual void EndTick() = 0;

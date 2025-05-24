@@ -28,7 +28,7 @@ import :Material;
 import :Mesh;
 import :RenderObject;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Render object manager.
 	class RenderObjectManager final : public IRenderObjectManager
@@ -64,7 +64,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	RenderObjectManager::RenderObjectManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

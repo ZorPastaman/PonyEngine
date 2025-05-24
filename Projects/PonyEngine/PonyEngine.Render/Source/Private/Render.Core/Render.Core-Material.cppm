@@ -21,7 +21,7 @@ import PonyEngine.Render;
 import :Buffer;
 import :BufferDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Material.
 	class Material final : public IMaterial
@@ -110,7 +110,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	Material::Material(const MaterialParams& params) :
 		pipelineState(params.pipelineState),

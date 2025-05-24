@@ -18,7 +18,7 @@ import PonyMath.Shape;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Camera box.
 	class CameraBox final
@@ -65,7 +65,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	CameraBox::CameraBox(const PonyMath::Shape::AABB<float>& aabb) noexcept :
 		cameraBox(aabb),

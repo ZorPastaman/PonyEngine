@@ -29,7 +29,7 @@ import :RootSignature;
 import :RootSignatureDirtyFlag;
 import :Shader;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Root signature manager.
 	class RootSignatureManager final : public IRootSignatureManager
@@ -70,7 +70,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	RootSignatureManager::RootSignatureManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

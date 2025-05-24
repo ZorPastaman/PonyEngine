@@ -21,7 +21,7 @@ import PonyEngine.Render;
 
 import :CameraFrustum;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Camera frustum culler.
 	class FrustumCuller final : public ICuller
@@ -58,7 +58,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	FrustumCuller::FrustumCuller(const CameraFrustum& frustum) noexcept :
 		frustum(frustum)

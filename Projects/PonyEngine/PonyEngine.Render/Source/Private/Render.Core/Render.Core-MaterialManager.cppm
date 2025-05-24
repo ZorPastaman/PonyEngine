@@ -28,7 +28,7 @@ import :IRenderSystemContext;
 import :Material;
 import :PipelineState;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Material manager.
 	class MaterialManager final : public IMaterialManager
@@ -69,7 +69,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	MaterialManager::MaterialManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}

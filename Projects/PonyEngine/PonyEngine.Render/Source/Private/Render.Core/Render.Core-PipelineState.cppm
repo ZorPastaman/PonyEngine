@@ -21,7 +21,7 @@ import :RootSignature;
 import :PipelineStateDirtyFlag;
 import :Shader;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline state.
 	class PipelineState final : public IPipelineState
@@ -94,7 +94,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	PipelineState::PipelineState(const PipelineStateParams& params) noexcept :
 		rootSignature(params.rootSignature),

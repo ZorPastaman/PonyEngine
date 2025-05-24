@@ -13,7 +13,7 @@ import <stdexcept>;
 
 import :IPixelHandler;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::PixelHandlers
 {
 	/// @brief Pixel handler that throws on any function.
 	class UnsupportedPixelHandler final : public IPixelHandler
@@ -38,7 +38,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::PixelHandlers
 {
 	PonyMath::Color::RGBA<float> UnsupportedPixelHandler::Color(const PonyBase::Container::Buffer& buffer,
 		const PonyMath::Core::Vector3<std::uint32_t>& size, const PonyMath::Core::Vector3<std::uint32_t>& pixelCoordinate) const

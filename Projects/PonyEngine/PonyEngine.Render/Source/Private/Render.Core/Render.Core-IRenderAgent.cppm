@@ -19,7 +19,7 @@ import :IPipelineStateAgent;
 import :IRootSignatureAgent;
 import :ITextureAgent;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Render agent.
 	class IRenderAgent

@@ -35,7 +35,7 @@ import :IRenderSystemContext;
 import :Texture;
 import :TextureDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Texture manager.
 	class TextureManager final : public ITextureManager
@@ -80,7 +80,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	/// @brief Static texture format infos. It doesn't contain info that is dependent on a runtime.
 	const std::unordered_map<TextureFormat, TextureFormatInfo> StaticFormatInfos
@@ -151,106 +151,106 @@ namespace PonyEngine::Render
 	};
 
 	/// @brief Unsupported pixel handler.
-	const UnsupportedPixelHandler UnsupportedPixelHandler;
+	const PixelHandlers::UnsupportedPixelHandler UnsupportedPixelHandler;
 	/// @brief R32G32B32A32_Float pixel handler.
-	const UniformPixelHandler<float, 0, 1, 2, 3, true, true, true, true> R32G32B32A32FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<float, 0, 1, 2, 3, true, true, true, true> R32G32B32A32FloatPixelHandler;
 	/// @brief R32G32B32A32_Uint pixel handler.
-	const UniformPixelHandler<std::uint32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32UintPixelHandler;
 	/// @brief R32G32B32A32_Sint pixel handler.
-	const UniformPixelHandler<std::int32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int32_t, 0, 1, 2, 3, true, true, true, true> R32G32B32A32SintPixelHandler;
 	/// @brief R32G32B32_Float pixel handler.
-	const UniformPixelHandler<float, 0, 1, 2, 0, true, true, true, false> R32G32B32FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<float, 0, 1, 2, 0, true, true, true, false> R32G32B32FloatPixelHandler;
 	/// @brief R32G32B32_Uint pixel handler.
-	const UniformPixelHandler<std::uint32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32UintPixelHandler;
 	/// @brief R32G32B32_Sint pixel handler.
-	const UniformPixelHandler<std::int32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int32_t, 0, 1, 2, 0, true, true, true, false> R32G32B32SintPixelHandler;
 	/// @brief R16G16B16A16_Float pixel handler.
-	const UniformPixelHandler<Half, 0, 1, 2, 3, true, true, true, true> R16G16B16A16FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Half, 0, 1, 2, 3, true, true, true, true> R16G16B16A16FloatPixelHandler;
 	/// @brief R16G16B16A16_Unorm pixel handler
-	const UniformPixelHandler<Unorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UnormPixelHandler;
 	/// @brief R16G16B16A16_Uint pixel handler.
-	const UniformPixelHandler<std::uint16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16UintPixelHandler;
 	/// @brief R16G16B16A16_Snorm pixel handler.
-	const UniformPixelHandler<Snorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm16, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SnormPixelHandler;
 	/// @brief R16G16B16A16_Sint pixel handler.
-	const UniformPixelHandler<std::int16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int16_t, 0, 1, 2, 3, true, true, true, true> R16G16B16A16SintPixelHandler;
 	/// @brief R32G32_Float pixel handler.
-	const UniformPixelHandler<float, 0, 1, 0, 0, true, true, false, false> R32G32FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<float, 0, 1, 0, 0, true, true, false, false> R32G32FloatPixelHandler;
 	/// @brief R32G32_Uint pixel handler.
-	const UniformPixelHandler<std::uint32_t, 0, 1, 0, 0, true, true, false, false> R32G32UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint32_t, 0, 1, 0, 0, true, true, false, false> R32G32UintPixelHandler;
 	/// @brief R32G32_Sint pixel handler.
-	const UniformPixelHandler<std::int32_t, 0, 1, 0, 0, true, true, false, false> R32G32SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int32_t, 0, 1, 0, 0, true, true, false, false> R32G32SintPixelHandler;
 	/// @brief R10G10B10A2_Unorm pixel handler.
-	const UnormPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UnormPixelHandler;
+	const PixelHandlers::UnormPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UnormPixelHandler;
 	/// @brief R10G10B10A2_Uint pixel handler.
-	const UintPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UintPixelHandler;
+	const PixelHandlers::UintPixelHandler<0, 10, 20, 30, 10, 10, 10, 2> R10G10B10A2UintPixelHandler;
 	/// @brief R11G11B10_Float pixel handler.
-	const UfloatPixelHandler<0, 11, 22, 0, 5, 6, 5, 6, 5, 5, 0, 0> R11G11B10FloatPixelHandler;
+	const PixelHandlers::UfloatPixelHandler<0, 11, 22, 0, 5, 6, 5, 6, 5, 5, 0, 0> R11G11B10FloatPixelHandler;
 	/// @brief R8G8B8A8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UnormPixelHandler;
 	/// @brief R8G8B8A8_Uint pixel handler.
-	const UniformPixelHandler<std::uint8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8UintPixelHandler;
 	/// @brief R8G8B8A8_Snorm pixel handler.
-	const UniformPixelHandler<Snorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm8, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SnormPixelHandler;
 	/// @brief R8G8B8A8_Sint pixel handler.
-	const UniformPixelHandler<std::int8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int8_t, 0, 1, 2, 3, true, true, true, true> R8G8B8A8SintPixelHandler;
 	/// @brief R16G16_Float pixel handler.
-	const UniformPixelHandler<Half, 0, 1, 0, 0, true, true, false, false> R16G16FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Half, 0, 1, 0, 0, true, true, false, false> R16G16FloatPixelHandler;
 	/// @brief R16G16_Unorm pixel handler.
-	const UniformPixelHandler<Unorm16, 0, 1, 0, 0, true, true, false, false> R16G16UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm16, 0, 1, 0, 0, true, true, false, false> R16G16UnormPixelHandler;
 	/// @brief R16G16_Uint pixel handler.
-	const UniformPixelHandler<std::uint16_t, 0, 1, 0, 0, true, true, false, false> R16G16UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint16_t, 0, 1, 0, 0, true, true, false, false> R16G16UintPixelHandler;
 	/// @brief R16G16_Snorm pixel handler.
-	const UniformPixelHandler<Snorm16, 0, 1, 0, 0, true, true, false, false> R16G16SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm16, 0, 1, 0, 0, true, true, false, false> R16G16SnormPixelHandler;
 	/// @brief R16G16_Sint pixel handler.
-	const UniformPixelHandler<std::int16_t, 0, 1, 0, 0, true, true, false, false> R16G16SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int16_t, 0, 1, 0, 0, true, true, false, false> R16G16SintPixelHandler;
 	/// @brief R32_Float pixel handler.
-	const UniformPixelHandler<float, 0, 0, 0, 0, true, false, false, false> R32FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<float, 0, 0, 0, 0, true, false, false, false> R32FloatPixelHandler;
 	/// @brief R32_Uint pixel handler.
-	const UniformPixelHandler<std::uint32_t, 0, 0, 0, 0, true, false, false, false> R32UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint32_t, 0, 0, 0, 0, true, false, false, false> R32UintPixelHandler;
 	/// @brief R32_Sint pixel handler.
-	const UniformPixelHandler<std::int32_t, 0, 0, 0, 0, true, false, false, false> R32SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int32_t, 0, 0, 0, 0, true, false, false, false> R32SintPixelHandler;
 	/// @brief R8G8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 0, 1, 0, 0, true, true, false, false> R8G8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 0, 1, 0, 0, true, true, false, false> R8G8UnormPixelHandler;
 	/// @brief R8G8_Uint pixel handler.
-	const UniformPixelHandler<std::uint8_t, 0, 1, 0, 0, true, true, false, false> R8G8UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint8_t, 0, 1, 0, 0, true, true, false, false> R8G8UintPixelHandler;
 	/// @brief R8G8_Snorm pixel handler.
-	const UniformPixelHandler<Snorm8, 0, 1, 0, 0, true, true, false, false> R8G8SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm8, 0, 1, 0, 0, true, true, false, false> R8G8SnormPixelHandler;
 	/// @brief R8G8_Sint pixel handler.
-	const UniformPixelHandler<std::int8_t, 0, 1, 0, 0, true, true, false, false> R8G8SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int8_t, 0, 1, 0, 0, true, true, false, false> R8G8SintPixelHandler;
 	/// @brief R16_Float pixel handler.
-	const UniformPixelHandler<Half, 0, 0, 0, 0, true, false, false, false> R16FloatPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Half, 0, 0, 0, 0, true, false, false, false> R16FloatPixelHandler;
 	/// @brief R16_Unorm pixel handler.
-	const UniformPixelHandler<Unorm16, 0, 0, 0, 0, true, false, false, false> R16UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm16, 0, 0, 0, 0, true, false, false, false> R16UnormPixelHandler;
 	/// @brief R16_Uint pixel handler.
-	const UniformPixelHandler<std::uint16_t, 0, 0, 0, 0, true, false, false, false> R16UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint16_t, 0, 0, 0, 0, true, false, false, false> R16UintPixelHandler;
 	/// @brief R16_Snorm pixel handler.
-	const UniformPixelHandler<Snorm16, 0, 0, 0, 0, true, false, false, false> R16SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm16, 0, 0, 0, 0, true, false, false, false> R16SnormPixelHandler;
 	/// @brief R16_Sint pixel handler.
-	const UniformPixelHandler<std::int16_t, 0, 0, 0, 0, true, false, false, false> R16SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int16_t, 0, 0, 0, 0, true, false, false, false> R16SintPixelHandler;
 	/// @brief R8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 0, 0, 0, 0, true, false, false, false> R8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 0, 0, 0, 0, true, false, false, false> R8UnormPixelHandler;
 	/// @brief R8_Uint pixel handler.
-	const UniformPixelHandler<std::uint8_t, 0, 0, 0, 0, true, false, false, false> R8UintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::uint8_t, 0, 0, 0, 0, true, false, false, false> R8UintPixelHandler;
 	/// @brief R8_Snorm pixel handler.
-	const UniformPixelHandler<Snorm8, 0, 0, 0, 0, true, false, false, false> R8SnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Snorm8, 0, 0, 0, 0, true, false, false, false> R8SnormPixelHandler;
 	/// @brief R8_Sint pixel handler.
-	const UniformPixelHandler<std::int8_t, 0, 0, 0, 0, true, false, false, false> R8SintPixelHandler;
+	const PixelHandlers::UniformPixelHandler<std::int8_t, 0, 0, 0, 0, true, false, false, false> R8SintPixelHandler;
 	/// @brief A8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 0, 0, 0, 0, false, false, false, true> A8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 0, 0, 0, 0, false, false, false, true> A8UnormPixelHandler;
 	/// @brief B8G8R8A8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 2, 1, 0, 3, true, true, true, true> B8G8R8A8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 2, 1, 0, 3, true, true, true, true> B8G8R8A8UnormPixelHandler;
 	/// @brief B8G8R8X8_Unorm pixel handler.
-	const UniformPixelHandler<Unorm8, 2, 1, 0, 0, true, true, true, false> B8G8R8X8UnormPixelHandler;
+	const PixelHandlers::UniformPixelHandler<Types::Unorm8, 2, 1, 0, 0, true, true, true, false> B8G8R8X8UnormPixelHandler;
 	/// @brief B5G6R5_Unorm pixel handler.
-	const UnormPixelHandler<11, 5, 0, 0, 5, 6, 5, 0> B5G6R5UnormPixelHandler;
+	const PixelHandlers::UnormPixelHandler<11, 5, 0, 0, 5, 6, 5, 0> B5G6R5UnormPixelHandler;
 	/// @brief B5G5R5A1_Unorm pixel handler.
-	const UnormPixelHandler<10, 5, 0, 15, 5, 5, 5, 1> B5G5R5A1UnormPixelHandler;
+	const PixelHandlers::UnormPixelHandler<10, 5, 0, 15, 5, 5, 5, 1> B5G5R5A1UnormPixelHandler;
 	/// @brief B4G4R4A4_Unorm pixel handler.
-	const UnormPixelHandler<8, 4, 0, 12, 4, 4, 4, 4> B4G4R4A4UnormPixelHandler;
+	const PixelHandlers::UnormPixelHandler<8, 4, 0, 12, 4, 4, 4, 4> B4G4R4A4UnormPixelHandler;
 
 	/// @brief Pixel handlers.
-	const std::unordered_map<TextureFormat, const IPixelHandler*> PixelHandlers
+	const std::unordered_map<TextureFormat, const PixelHandlers::IPixelHandler*> PixelHandlers
 	{
 		{ TextureFormat::Unknown, &UnsupportedPixelHandler },
 		{ TextureFormat::R32G32B32A32_Float, &R32G32B32A32FloatPixelHandler },
@@ -364,7 +364,7 @@ namespace PonyEngine::Render
 		const auto bufferParams = PonyBase::Container::BufferParams{.stride = formatInfo.blockSize, blockCount};
 
 		assert(PixelHandlers.contains(params.format) && "No pixel handler.");
-		const IPixelHandler* const pixelHandler = PixelHandlers.find(params.format)->second;
+		const PixelHandlers::IPixelHandler* const pixelHandler = PixelHandlers.find(params.format)->second;
 
 		const auto texture = std::make_shared<Texture>(params, bufferParams, *pixelHandler);
 		textures.push_back(texture);

@@ -17,7 +17,7 @@ import PonyEngine.Render;
 
 import :RootSignatureDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Root signature agent.
 	class IRootSignatureAgent

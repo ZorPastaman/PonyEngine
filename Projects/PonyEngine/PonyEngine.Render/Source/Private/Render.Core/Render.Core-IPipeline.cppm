@@ -15,7 +15,7 @@ export module PonyEngine.Render.Core:IPipeline;
 
 import PonyEngine.Render;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline.
 	class IPipeline

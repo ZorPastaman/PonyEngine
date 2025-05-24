@@ -20,7 +20,7 @@ import PonyEngine.Render;
 import :AttachmentDirtyFlag;
 import :TextureDirtyFlag;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Texture agent.
 	class ITextureAgent

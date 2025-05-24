@@ -32,7 +32,7 @@ import :PipelineStateDirtyFlag;
 import :RootSignature;
 import :Shader;
 
-export namespace PonyEngine::Render
+export namespace PonyEngine::Render::Core
 {
 	/// @brief Pipeline state manager.
 	class PipelineStateManager final : public IPipelineStateManager
@@ -73,7 +73,7 @@ export namespace PonyEngine::Render
 	};
 }
 
-namespace PonyEngine::Render
+namespace PonyEngine::Render::Core
 {
 	PipelineStateManager::PipelineStateManager(IRenderSystemContext& renderSystem) noexcept :
 		renderSystem{&renderSystem}
