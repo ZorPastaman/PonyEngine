@@ -11,13 +11,14 @@ and this project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.
 
 - Base module.
 - Math module.
+- Shader module.
 - Log module.
 - Core module.
 - Input module.
 - Render module.
-- Screen module.
+- Surface module.
 - Time module.
-- Window module.
-- Game & Launcher implementation example.
+- Application implementation.
+- Game implementation example.
 
 [Unreleased]: https://github.com/ZorPastaman/PonyEngine
