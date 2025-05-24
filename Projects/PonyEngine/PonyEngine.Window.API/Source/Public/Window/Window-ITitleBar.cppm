@@ -22,20 +22,12 @@ export namespace PonyEngine::Window
 	{
 		INTERFACE_BODY(ITitleBar)
 
-		/// @brief Gets the window title.
-		/// @return Window title.
+		/// @brief Gets the title.
+		/// @return Title.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view MainTitle() const noexcept = 0;
-		/// @brief Sets the window title.
-		/// @param title Window title to set.
-		virtual void MainTitle(std::string_view title) = 0;
-
-		/// @brief Gets the window title text.
-		/// @return Window title text.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view SecondaryTitle() const noexcept = 0;
-		/// @brief Sets the window title text.
-		/// @param title Window title text to set.
-		virtual void SecondaryTitle(std::string_view title) = 0;
+		virtual std::string_view Title() const noexcept = 0;
+		/// @brief Sets the title.
+		/// @param title Title to set.
+		virtual void Title(std::string_view title) = 0;
 	};
 }

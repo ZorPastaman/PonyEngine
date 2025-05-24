@@ -83,7 +83,7 @@ export namespace PonyDebug::Log
 		const std::optional<std::int64_t> frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
-		mutable std::optional<std::string> stringCache; ///< ToString() cache.
+		const std::string logString; ///< Log string.
 	};
 
 	/// @brief Puts logEntry.ToString() into the @p stream.
@@ -100,7 +100,8 @@ namespace PonyDebug::Log
 		exception{exception},
 		timePoint{timePoint},
 		frameCount{frameCount},
-		logType{logType}
+		logType{logType},
+		logString(MakeString())
 	{
 	}
 
@@ -131,12 +132,7 @@ namespace PonyDebug::Log
 
 	std::string_view LogEntry::ToString() const noexcept
 	{
-		if (!stringCache)
-		{
-			stringCache = MakeString();
-		}
-
-		return stringCache.value();
+		return logString;
 	}
 
 	std::string LogEntry::MakeString() const noexcept

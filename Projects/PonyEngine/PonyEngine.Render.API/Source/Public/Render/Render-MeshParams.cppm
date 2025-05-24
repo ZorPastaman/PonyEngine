@@ -1,14 +1,15 @@
 /***************************************************
-* MIT License                                     *
-*                                                 *
-* Copyright (c) 2023-present Vladimir Popov       *
-*                                                 *
-* Email: zor1994@gmail.com                        *
-* Repo: https://github.com/ZorPastaman/PonyEngine *
-***************************************************/
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
 
 export module PonyEngine.Render:MeshParams;
 
+import <memory>;
 import <optional>;
 import <string>;
 import <unordered_map>;
@@ -25,9 +26,9 @@ export namespace PonyEngine::Render
 	/// @brief Mesh parameters.
 	struct MeshParams final
 	{
-		/// @brief Map of data types to buffer tables.
+		/// @brief Map of data types to buffer parameters.
 		/// @note Don't use strings starting with "Pony_" as data types.
-		std::unordered_map<std::string, std::vector<PonyBase::Container::Buffer>> bufferTables;
+		std::unordered_map<std::string, std::vector<PonyBase::Container::BufferParams>> data;
 
 		/// @brief How many thread group counts are required for a mesh.
 		/// @details Usually these numbers correspond to a meshlet count or a grid size.

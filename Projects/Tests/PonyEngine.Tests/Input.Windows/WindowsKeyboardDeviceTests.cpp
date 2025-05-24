@@ -31,8 +31,8 @@ namespace Input
 		{
 		public:
 			[[nodiscard("Pure function")]]
-			virtual std::string_view MainTitle() const noexcept override { return ""; }
-			virtual void MainTitle(std::string_view) override {}
+			virtual std::string_view Title() const noexcept override { return ""; }
+			virtual void Title(std::string_view) override {}
 
 			[[nodiscard("Pure function")]]
 			virtual std::string_view SecondaryTitle() const noexcept override { return ""; }

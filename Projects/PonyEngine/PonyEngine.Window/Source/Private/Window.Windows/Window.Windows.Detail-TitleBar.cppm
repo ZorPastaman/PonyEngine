@@ -35,91 +35,57 @@ export namespace PonyEngine::Window::Windows
 	public:
 		/// @brief Creates a @p TitleBar.
 		/// @param windowSystem Window system context.
-		/// @param mainTitle Current main title.
+		/// @param title Title.
 		[[nodiscard("Pure constructor")]]
-		TitleBar(IWindowSystemContext& windowSystem, std::string_view mainTitle);
+		TitleBar(IWindowSystemContext& windowSystem, std::string_view title);
 		TitleBar(const TitleBar&) = delete;
 		[[nodiscard("Pure constructor")]]
 		TitleBar(TitleBar&& other) noexcept = default;
 
 		~TitleBar() noexcept = default;
 
-		/// @brief Gets the main title.
-		/// @return Main title.
 		[[nodiscard("Pure function")]]
-		virtual std::string_view MainTitle() const noexcept override;
-		/// @brief Sets the main title.
-		/// @param title Main title to set.
-		virtual void MainTitle(std::string_view title) override;
-
-		/// @brief Gets the secondary title.
-		/// @return Secondary title.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view SecondaryTitle() const noexcept override;
-		/// @brief Sets the secondary title.
-		/// @param title Secondary title to set.
-		virtual void SecondaryTitle(std::string_view title) override;
+		virtual std::string_view Title() const noexcept override;
+		virtual void Title(std::string_view title) override;
 
 		TitleBar& operator =(const TitleBar&) = delete;
 		TitleBar& operator =(TitleBar&& other) noexcept = default;
 
 	private:
-		/// @brief Update the window title.
-		void UpdateWindowTitle() const;
-
 		IWindowSystemContext* windowSystem; ///< Windows window system context.
 
-		std::string mainTitle; ///< Window main title cache.
-		std::string secondaryTitle; ///< Window title text cache.
+		std::string title; ///< Window main title cache.
 	};
 }
 
 namespace PonyEngine::Window::Windows
 {
-	TitleBar::TitleBar(IWindowSystemContext& windowSystem, const std::string_view mainTitle) :
+	TitleBar::TitleBar(IWindowSystemContext& windowSystem, const std::string_view title) :
 		windowSystem{&windowSystem},
-		mainTitle(mainTitle)
+		title(title)
 	{
 	}
 
-	std::string_view TitleBar::MainTitle() const noexcept
+	std::string_view TitleBar::Title() const noexcept
 	{
-		return mainTitle;
+		return title;
 	}
 
-	void TitleBar::MainTitle(const std::string_view title)
-	{
-		mainTitle = title;
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Debug, "Main title set to '{}'.", mainTitle);
-		UpdateWindowTitle();
-	}
-
-	std::string_view TitleBar::SecondaryTitle() const noexcept
-	{
-		return secondaryTitle;
-	}
-
-	void TitleBar::SecondaryTitle(const std::string_view title)
-	{
-		secondaryTitle = title;
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Secondary title set to '{}'.", secondaryTitle);
-		UpdateWindowTitle();
-	}
-
-	void TitleBar::UpdateWindowTitle() const
+	void TitleBar::Title(const std::string_view title)
 	{
 		if (!IsWindow(windowSystem->WindowHandle())) [[unlikely]]
 		{
-			return;
+			throw std::logic_error("Window is destroyed.");
 		}
 
-		const std::string windowTitle = secondaryTitle.length() > 0 ? std::format("{} - {}", mainTitle, secondaryTitle) : mainTitle;
+		auto newTitle = std::string(title);
 
-		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(windowTitle).c_str())) [[unlikely]]
+		if (!SetWindowTextW(windowSystem->WindowHandle(), PonyBase::Utility::ConvertToWideString(newTitle).c_str())) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to set new window title. Error code: '0x{:X}'.", GetLastError()));
 		}
 
-		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to '{}'.", windowTitle);
+		this->title = std::move(newTitle);
+		PONY_LOG(windowSystem->Logger(), PonyDebug::Log::LogType::Verbose, "Window title set to '{}'.", this->title);
 	}
 }

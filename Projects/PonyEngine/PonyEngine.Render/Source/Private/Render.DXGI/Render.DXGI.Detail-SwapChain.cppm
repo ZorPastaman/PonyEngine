@@ -126,7 +126,7 @@ namespace PonyEngine::Render::DXGI
 
 	void SwapChain::Present()
 	{
-		// TODO: Add VSync support.
+		// TODO: Add exclusive fullscreen and VSync support.
 		if (const HRESULT result = swapChain->Present(1, 0); FAILED(result)) [[unlikely]]
 		{
 			throw std::runtime_error(PonyBase::Utility::SafeFormat("Failed to present swap chain with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));

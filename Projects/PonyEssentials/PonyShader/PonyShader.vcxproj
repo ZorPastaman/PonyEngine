@@ -33,6 +33,12 @@
     <ClCompile Include="Source\Public\Space\Space-Transform.cppm" />
     <ClCompile Include="Source\Public\Space\Space.cppm" />
   </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="PonyShader.rc" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>17.0</VCProjectVersion>
     <Keyword>Win32Proj</Keyword>

@@ -14,16 +14,16 @@ import <string>;
 
 import PonyMath.Core;
 
-import :Material;
-import :Mesh;
+import :IMaterial;
+import :IMesh;
 
 export namespace PonyEngine::Render
 {
 	/// @brief Render object parameters.
 	struct RenderObjectParams final
 	{
-		std::shared_ptr<const Material> material; ///< Render object material.
-		std::shared_ptr<const Mesh> mesh; ///< Render object mesh.
+		std::shared_ptr<const IMaterial> material; ///< Render object material.
+		std::shared_ptr<const IMesh> mesh; ///< Render object mesh.
 		PonyMath::Core::Matrix4x4<float> modelMatrix = PonyMath::Core::Matrix4x4<float>::Predefined::Identity; ///< Render object model matrix.
 
 		std::string name; ///< Render object name.

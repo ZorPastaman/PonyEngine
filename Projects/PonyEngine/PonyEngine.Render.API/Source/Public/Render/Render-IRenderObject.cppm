@@ -13,9 +13,13 @@ module;
 
 export module PonyEngine.Render:IRenderObject;
 
+import <memory>;
 import <string_view>;
 
 import PonyMath.Core;
+
+import :IMaterial;
+import :IMesh;
 
 export namespace PonyEngine::Render
 {
@@ -23,6 +27,15 @@ export namespace PonyEngine::Render
 	class IRenderObject
 	{
 		INTERFACE_BODY(IRenderObject)
+
+		/// @brief Gets the material.
+		/// @return Material.
+		[[nodiscard("Pure function")]]
+		virtual const std::shared_ptr<const IMaterial>& Material() const noexcept = 0;
+		/// @brief Gets the mesh.
+		/// @return Mesh.
+		[[nodiscard("Pure function")]]
+		virtual const std::shared_ptr<const IMesh> Mesh() const noexcept = 0;
 
 		/// @brief Gets the translation-rotation-scaling matrix of the object.
 		/// @return Translation-rotation-scaling matrix.

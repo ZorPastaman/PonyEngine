@@ -162,6 +162,11 @@ export namespace PonyMath::Color
 		[[nodiscard("Pure function")]]
 		std::string ToString() const;
 
+		/// @brief Converts to a color of the other component type.
+		/// @tparam U Component type.
+		template<std::unsigned_integral U> [[nodiscard("Pure operator")]]
+		explicit constexpr operator RGBAInt<U>() const noexcept; // TODO: Add tests
+
 		/// @brief Converts the rgba color to an rgb color skipping the alpha.
 		[[nodiscard("Pure operator")]]
 		explicit constexpr operator RGBInt<T>() const noexcept;
@@ -413,6 +418,29 @@ namespace PonyMath::Color
 	constexpr RGBAInt<T> Clamp(const RGBAInt<T>& value, const RGBAInt<T>& min, const RGBAInt<T>& max) noexcept
 	{
 		return RGBAInt<T>(Core::Clamp(value.Vector(), min.Vector(), max.Vector()));
+	}
+
+	template <std::unsigned_integral T>
+	template <std::unsigned_integral U>
+	constexpr RGBAInt<T>::operator RGBAInt<U>() const noexcept
+	{
+		if constexpr (std::numeric_limits<U>::max() > std::numeric_limits<T>::max())
+		{
+			const auto vector = Core::Vector4<U>(static_cast<U>(R()), static_cast<U>(G()), static_cast<U>(B()), static_cast<U>(A())) *
+				(std::numeric_limits<U>::max() / std::numeric_limits<T>::max());
+
+			return RGBAInt<U>(vector);
+		}
+		else if constexpr (std::numeric_limits<U>::max() < std::numeric_limits<T>::max())
+		{
+			const auto vector = components / (std::numeric_limits<T>::max() / std::numeric_limits<U>::max());
+
+			return RGBAInt<U>(static_cast<Core::Vector4<U>>(vector));
+		}
+		else
+		{
+			return RGBAInt<U>(static_cast<U>(R()), static_cast<U>(G()), static_cast<U>(B()), static_cast<U>(A()));
+		}
 	}
 
 	template<std::unsigned_integral T>

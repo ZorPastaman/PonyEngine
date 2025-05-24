@@ -64,7 +64,7 @@ namespace PonyEngine::Input
 
 	void InputReceiver::Action(const std::function<void(float)>& action) noexcept
 	{
-		if (action == nullptr)
+		if (!action)
 		{
 			Reset();
 

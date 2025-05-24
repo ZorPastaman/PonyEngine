@@ -13,7 +13,7 @@ module;
 
 export module PonyEngine.Render.DXGI.Detail:IRenderSystemContext;
 
-import PonyEngine.Render.Detail;
+import PonyEngine.Render.Detail.Old;
 
 export namespace PonyEngine::Render::DXGI
 {
