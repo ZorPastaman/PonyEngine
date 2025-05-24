@@ -16,6 +16,7 @@ module;
 export module PonyEngine.Render.Detail:Pipeline;
 
 import <algorithm>;
+import <array>;
 import <cstddef>;
 import <cstdint>;
 import <functional>;
@@ -33,6 +34,7 @@ import PonyMath.Utility;
 import PonyShader.Core;
 import PonyShader.Space;
 
+import :ConstantData;
 import :IPipeline;
 import :IRenderSystemContext;
 
@@ -67,7 +69,6 @@ export namespace PonyEngine::Render
 		struct RenderObjectData
 		{
 			static constexpr std::uint32_t DataTypeCount = 2u; ///< Data type count.
-			static constexpr std::uint32_t DataIndex = 0u; ///< Common data index.
 			static constexpr std::uint32_t ContextIndex = 0u; ///< Context data index.
 			static constexpr std::uint32_t TransformIndex = 1u; ///< Transform data index.
 			/// @brief Data sizes for each type.
@@ -76,6 +77,9 @@ export namespace PonyEngine::Render
 			PonyShader::Core::Context context; ///< Context.
 			PonyShader::Space::Transform transform; ///< Transform
 		};
+
+		static constexpr std::size_t DataCount = 1u; ///< Data count.
+		static constexpr std::size_t RenderObjectDataIndex = 0u; ///< Render object data index in a global constant buffer.
 
 		/// @brief Render object task.
 		struct RenderObjectTask final
@@ -90,9 +94,6 @@ export namespace PonyEngine::Render
 		{
 			std::vector<RenderObjectTask> renderObjectTasks; ///< Render object tasks.
 		};
-
-		/// @brief Process the submitted objects.
-		void Process();
 
 		/// @brief Begins a tick.
 		void BeginTick();
@@ -136,9 +137,6 @@ export namespace PonyEngine::Render
 		/// @brief Uploads data to GPU.
 		void Upload();
 
-		/// @brief Finalizes the render.
-		void Finalize();
-
 		/// @brief Renders.
 		void Render();
 		/// @brief Clears all the submitted frames.
@@ -156,6 +154,15 @@ export namespace PonyEngine::Render
 		/// @param cameraIndex Camera index.
 		void RenderObjects(std::size_t cameraIndex);
 
+		/// @brief Finalizes the render.
+		void Finalize();
+		/// @brief Resolves the frame.
+		/// @param frame Frame to resolve.
+		void Resolve(const IFrame* frame);
+		/// @brief Outputs the frame.
+		/// @param frame Frame to output.
+		void Output(const IFrame* frame);
+
 		/// @brief Clears the submitted objects.
 		void Clear() noexcept;
 
@@ -164,6 +171,16 @@ export namespace PonyEngine::Render
 		/// @return <Render target, Depth stencil>.
 		[[nodiscard("Pure function")]]
 		static std::tuple<const IAttachment*, const IAttachment*> GetTargets(const IFrame* frame) noexcept;
+		/// @brief Gets the resolve resources.
+		/// @param frame Frame.
+		/// @return <Resolve source, Resolve destination>.
+		[[nodiscard("Pure function")]]
+		static std::pair<const IAttachment*, const IAttachment*> GetResolveResources(const IFrame* frame) noexcept;
+		/// @brief Gets a final attachment: a render target or a resolve.
+		/// @param frame Frame.
+		/// @return Final attachment.
+		[[nodiscard("Pure function")]]
+		static const IAttachment* GetFinalAttachment(const IFrame* frame) noexcept;
 
 		IRenderSystemContext* renderSystem; ///< Render system context.
 
@@ -182,7 +199,7 @@ export namespace PonyEngine::Render
 		std::vector<std::reference_wrapper<const ITexture>> textures; ///< Textures used this frame.
 		std::vector<std::reference_wrapper<const IAttachment>> attachments; /// < Attachments used this frame.
 
-		std::unordered_set<const IAttachment*> dirtyAttachments; ///< Dirty attachments.
+		std::unordered_set<const IAttachment*> outdatedAttachments; ///< Outdated attachments.
 	};
 }
 
@@ -220,22 +237,6 @@ namespace PonyEngine::Render
 
 	void Pipeline::Tick()
 	{
-		try
-		{
-			Process();
-		}
-		catch (...)
-		{
-			Clear();
-
-			throw;
-		}
-
-		Clear();
-	}
-
-	void Pipeline::Process()
-	{
 		BeginTick();
 		Prepare();
 		BeginRender();
@@ -243,6 +244,7 @@ namespace PonyEngine::Render
 		EndRender();
 		Finalize();
 		EndTick();
+		Clear();
 	}
 
 	void Pipeline::BeginTick()
@@ -310,13 +312,9 @@ namespace PonyEngine::Render
 		auto [renderTarget, depthStencil] = GetTargets(frame);
 		renderSystem->RenderAgent().PipelineAgent().EndTarget(renderTarget, depthStencil);
 
-		if (renderTarget)
+		if (const std::optional<std::uint32_t> renderTargetIndex = frame->FindAttachmentIndex(AttachmentType::Resolve))
 		{
-			dirtyAttachments.insert(renderTarget);
-		}
-		if (depthStencil)
-		{
-			dirtyAttachments.insert(depthStencil);
+			outdatedAttachments.insert(&frame->Attachment(renderTargetIndex.value()));
 		}
 	}
 
@@ -443,14 +441,11 @@ namespace PonyEngine::Render
 
 			for (std::uint32_t textureTypeIndex = 0u; textureTypeIndex < material->TextureTypeCount(); ++textureTypeIndex)
 			{
-				for (std::uint32_t textureIndex = 0u; textureIndex < material->TextureCount(textureTypeIndex); ++textureIndex)
+				if (const ITexture* const texture = material->Texture(textureTypeIndex).get()) // TODO: Add default texture. Default buffers are needed as well.
 				{
-					if (const ITexture* const texture = material->Texture(textureTypeIndex, textureIndex).get()) // TODO: Add default texture. Default buffers are needed as well.
+					if (std::ranges::find_if(textures, [&](const std::reference_wrapper<const ITexture>& t) { return &t.get() == texture; }) == textures.cend())
 					{
-						if (std::ranges::find_if(textures, [&](const std::reference_wrapper<const ITexture>& t) { return &t.get() == texture; }) == textures.cend())
-						{
-							textures.push_back(*texture);
-						}
+						textures.push_back(*texture);
 					}
 				}
 			}
@@ -472,18 +467,20 @@ namespace PonyEngine::Render
 
 	void Pipeline::SetResources()
 	{
-		const auto data = std::span(reinterpret_cast<const std::byte*>(renderObjectData.data()), renderObjectData.size() * sizeof(RenderObjectData));
-		renderSystem->RenderAgent().PipelineAgent().SetResources(data, RenderObjectData::DataSizes, buffers, textures, attachments);
+		const auto data = std::array<ConstantData, DataCount>
+		{
+			ConstantData
+			{
+				.data = std::span(reinterpret_cast<const std::byte*>(renderObjectData.data()), renderObjectData.size() * sizeof(RenderObjectData)),
+				.scheme = RenderObjectData::DataSizes
+			}
+		};
+		renderSystem->RenderAgent().PipelineAgent().SetResources(data, buffers, textures, attachments);
 	}
 
 	void Pipeline::Upload()
 	{
 		renderSystem->RenderAgent().PipelineAgent().Upload();
-	}
-
-	void Pipeline::Finalize()
-	{
-
 	}
 
 	void Pipeline::Render()
@@ -508,7 +505,11 @@ namespace PonyEngine::Render
 				{
 					const IAttachment& renderTarget = frame->Attachment(renderTargetIndex.value());
 					renderSystem->RenderAgent().PipelineAgent().ClearColor(renderTarget, clearValue.color.value());
-					dirtyAttachments.insert(&renderTarget);
+
+					if (const std::optional<std::uint32_t> resolveIndex = frame->FindAttachmentIndex(AttachmentType::Resolve))
+					{
+						outdatedAttachments.insert(&frame->Attachment(resolveIndex.value()));
+					}
 				}
 			}
 			if (clearValue.depth || clearValue.stencil)
@@ -529,8 +530,6 @@ namespace PonyEngine::Render
 					{
 						renderSystem->RenderAgent().PipelineAgent().ClearDepthStencil(depthStencil, clearValue.stencil.value());
 					}
-					
-					dirtyAttachments.insert(&depthStencil);
 				}
 			}
 		}
@@ -617,12 +616,93 @@ namespace PonyEngine::Render
 		for (const RenderObjectTask& renderObjectTask : cameraTasks[cameraIndex].renderObjectTasks)
 		{
 			const IRenderObject& renderObject = *renderObjects[renderObjectTask.renderObjectIndex];
+			const IMesh* const mesh = renderObject.Mesh().get();
 			const IMaterial& material = *renderObject.Material();
 			const IPipelineState& pipelineState = *material.PipelineState();
+			const IRootSignature& rootSignature = *pipelineState.RootSignature();
 
 			renderSystem->RenderAgent().PipelineAgent().SetPipelineState(pipelineState);
-			
+
+			for (std::uint32_t i = 0; i < rootSignature.SlotCount(); ++i) // TODO: Bind defaults if not found.
+			{
+				const std::string_view slotName = rootSignature.SlotName(i);
+
+				// TODO: Add slot info to root signature.
+				if (slotName == DataTypes::Data)
+				{
+					renderSystem->RenderAgent().PipelineAgent().BindData(renderObjectData.data(), 
+						static_cast<std::uint32_t>(renderObjectTask.dataIndex), i);
+					continue;
+				}
+				if (slotName == DataTypes::Context)
+				{
+					renderSystem->RenderAgent().PipelineAgent().BindData(renderObjectData.data(), 
+						static_cast<std::uint32_t>(renderObjectTask.dataIndex) + RenderObjectData::ContextIndex, i);
+					continue;
+				}
+				if (slotName == DataTypes::Transform)
+				{
+					renderSystem->RenderAgent().PipelineAgent().BindData(renderObjectData.data(),
+						static_cast<std::uint32_t>(renderObjectTask.dataIndex) + RenderObjectData::TransformIndex, i);
+					continue;
+				}
+
+				if (const std::optional<std::uint32_t> typeIndex = material.FindDataTypeIndex(slotName))
+				{
+					renderSystem->RenderAgent().PipelineAgent().BindBuffer(material.Buffer(), typeIndex.value(), i);
+					continue;
+				}
+				if (const std::optional<std::uint32_t> typeIndex = material.FindTextureTypeIndex(slotName))
+				{
+					renderSystem->RenderAgent().PipelineAgent().BindTexture(*material.Texture(typeIndex.value()), i); // TODO: Check for nullptr or default texture.
+					continue;
+				}
+
+				if (mesh)
+				{
+					if (const std::optional<std::uint32_t> typeIndex = mesh->FindDataTypeIndex(slotName))
+					{
+						renderSystem->RenderAgent().PipelineAgent().BindBuffer(mesh->Buffer(), typeIndex.value(), i);
+						continue;
+					}
+				}
+			}
+
+			const auto groupCounts = renderObjectData[renderObjectTask.dataIndex].context.dispatchThreadGroupCounts;
+			renderSystem->RenderAgent().PipelineAgent().Dispatch(groupCounts.ThreadGroupCountX(), groupCounts.ThreadGroupCountY(), groupCounts.ThreadGroupCountZ());
 		}
+	}
+
+	void Pipeline::Finalize()
+	{
+		Resolve(mainFrame);
+		Output(mainFrame);
+	}
+
+	void Pipeline::Resolve(const IFrame* frame)
+	{
+		auto [source, destination] = GetResolveResources(frame);
+		if (!source || !destination)
+		{
+			return;
+		}
+
+		if (outdatedAttachments.contains(destination))
+		{
+			renderSystem->RenderAgent().PipelineAgent().Resolve(*source, *destination);
+			outdatedAttachments.erase(destination);
+		}
+	}
+
+	void Pipeline::Output(const IFrame* frame)
+	{
+		const IAttachment* const finalAttachment = GetFinalAttachment(frame);
+		if (!finalAttachment)
+		{
+			return;
+		}
+
+		renderSystem->RenderAgent().PipelineAgent().Output(*finalAttachment);
 	}
 
 	void Pipeline::Clear() noexcept
@@ -641,7 +721,7 @@ namespace PonyEngine::Render
 		meshes.clear();
 		frames.clear();
 
-		dirtyAttachments.clear();
+		outdatedAttachments.clear();
 
 		buffers.clear();
 		textures.clear();
@@ -657,6 +737,31 @@ namespace PonyEngine::Render
 		const std::optional<std::uint32_t> depthStencilIndex = frame->FindAttachmentIndex(AttachmentType::DepthStencil);
 		const IAttachment* const depthStencil = depthStencilIndex ? &frame->Attachment(depthStencilIndex.value()) : nullptr;
 
-		return std::make_tuple(renderTarget, depthStencil);
+		return std::tuple(renderTarget, depthStencil);
+	}
+
+	std::pair<const IAttachment*, const IAttachment*> Pipeline::GetResolveResources(const IFrame* frame) noexcept
+	{
+		const std::optional<std::uint32_t> renderTargetIndex = frame->FindAttachmentIndex(AttachmentType::RenderTarget);
+		const IAttachment* const renderTarget = renderTargetIndex ? &frame->Attachment(renderTargetIndex.value()) : nullptr;
+		const std::optional<std::uint32_t> resolveIndex = frame->FindAttachmentIndex(AttachmentType::Resolve);
+		const IAttachment* const resolve = resolveIndex ? &frame->Attachment(resolveIndex.value()) : nullptr;
+
+		return std::pair(renderTarget, resolve);
+	}
+
+	const IAttachment* Pipeline::GetFinalAttachment(const IFrame* frame) noexcept
+	{
+		if (const std::optional<std::uint32_t> resolveIndex = frame->FindAttachmentIndex(AttachmentType::Resolve))
+		{
+			return &frame->Attachment(resolveIndex.value());
+		}
+
+		if (const std::optional<std::uint32_t> renderTargetIndex = frame->FindAttachmentIndex(AttachmentType::RenderTarget))
+		{
+			return &frame->Attachment(renderTargetIndex.value());
+		}
+
+		return nullptr;
 	}
 }

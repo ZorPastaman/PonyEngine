@@ -13,7 +13,6 @@ module;
 
 export module PonyEngine.Render.Detail:IPipelineAgent;
 
-import <cstddef>;
 import <cstdint>;
 import <functional>;
 import <span>;
@@ -22,6 +21,8 @@ import PonyMath.Color;
 import PonyMath.Shape;
 
 import PonyEngine.Render;
+
+import :ConstantData;
 
 export namespace PonyEngine::Render
 {
@@ -39,9 +40,8 @@ export namespace PonyEngine::Render
 		virtual void BeginTarget(const IAttachment* renderTarget, const IAttachment* depthStencil) = 0;
 		virtual void EndTarget(const IAttachment* renderTarget, const IAttachment* depthStencil) = 0;
 
-		virtual void SetResources(std::span<const std::byte> data, std::span<const std::uint32_t> dataScheme,
-			std::span<std::reference_wrapper<const IBuffer>> buffers, std::span<std::reference_wrapper<const ITexture>> textures, 
-			std::span<std::reference_wrapper<const IAttachment>> attachments) = 0;
+		virtual void SetResources(std::span<const ConstantData> data, std::span<std::reference_wrapper<const IBuffer>> buffers, 
+			std::span<std::reference_wrapper<const ITexture>> textures, std::span<std::reference_wrapper<const IAttachment>> attachments) = 0;
 
 		virtual void ClearColor(const IAttachment& attachment, const PonyMath::Color::RGBA<float>& color) = 0;
 		virtual void ClearColor(const IAttachment& attachment, const PonyMath::Color::RGBA<float>& color, const PonyMath::Shape::Rect<float>& rect) = 0;
@@ -55,11 +55,14 @@ export namespace PonyEngine::Render
 		virtual void SetViewport(const PonyMath::Shape::Rect<float>& rect) = 0;
 
 		virtual void SetPipelineState(const IPipelineState& pipelineState) = 0;
+		virtual void BindData(const void* data, std::uint32_t subElementIndex, std::uint32_t slotIndex) = 0;
 		virtual void BindBuffer(const IBuffer& buffer, std::uint32_t dataTypeIndex, std::uint32_t slotIndex) = 0;
 		virtual void BindTexture(const ITexture& texture, std::uint32_t slotIndex) = 0;
-		virtual void Dispatch() = 0;
+		virtual void Dispatch(std::uint32_t x, std::uint32_t y, std::uint32_t z) = 0;
 
 		virtual void Resolve(const IAttachment& source, const IAttachment& destination) = 0;
+
+		virtual void Output(const IAttachment& source) = 0;
 
 		virtual void Upload() = 0;
 

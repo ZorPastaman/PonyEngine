@@ -79,15 +79,11 @@ export namespace PonyEngine::Render
 		virtual std::uint32_t TextureTypeCount() const noexcept override;
 
 		[[nodiscard("Pure function")]]
-		virtual const std::shared_ptr<const ITexture>& Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex) const noexcept override;
-		virtual void Texture(std::uint32_t textureTypeIndex, std::uint32_t textureIndex, const std::shared_ptr<const ITexture>& texture) override;
-		[[nodiscard("Pure function")]]
-		virtual std::uint32_t TextureCount(std::uint32_t textureTypeIndex) const noexcept override;
-		[[nodiscard("Pure function")]]
-		std::uint32_t TextureCount() const noexcept;
+		virtual const std::shared_ptr<const ITexture>& Texture(std::uint32_t textureTypeIndex) const noexcept override;
+		virtual void Texture(std::uint32_t textureTypeIndex, const std::shared_ptr<const ITexture>& texture) override;
 
-		virtual std::uint32_t CreateTextureSet(std::string_view textureType, std::uint32_t textureCount) override;
-		virtual void DestroyTextureSet(std::uint32_t textureTypeIndex) noexcept override;
+		virtual std::uint32_t CreateTextureSlot(std::string_view textureType) override;
+		virtual void DestroyTextureSlot(std::uint32_t textureTypeIndex) noexcept override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -106,7 +102,7 @@ export namespace PonyEngine::Render
 		class Buffer buffer; ///< Buffer data.
 
 		std::vector<std::string> textureTypes; ///< Texture types.
-		std::vector<std::vector<std::shared_ptr<const ITexture>>> textures; ///< Textures.
+		std::vector<std::shared_ptr<const ITexture>> textures; ///< Textures.
 
 		std::string name; ///< Material name.
 
@@ -123,13 +119,9 @@ namespace PonyEngine::Render
 		dirtyFlags{BufferDirtyFlag::All}
 	{
 		std::size_t textureCount = 0;
-		for (const auto& [dataType, textureSet] : params.textures)
+		for (const auto& [dataType, texture] : params.textures)
 		{
-			if (textureSet.size() == 0) [[unlikely]]
-			{
-				throw std::invalid_argument(PonyBase::Utility::SafeFormat("Texture set of type '{}' is empty.", dataType));
-			}
-			textureCount += textureSet.size();
+			++textureCount;
 
 			if (params.data.contains(dataType)) [[unlikely]]
 			{
@@ -138,15 +130,15 @@ namespace PonyEngine::Render
 		}
 		if (textureCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{
-			throw std::invalid_argument("Texture count exceeds std::uint32_t max value.");
+			throw std::invalid_argument("Texture count exceeds std::uint32_t max value."); // TODO: Check for overall count textures + buffers. And make it a universal container.
 		}
 
 		textureTypes.reserve(params.textures.size());
 		textures.reserve(params.textures.size());
-		for (const auto& [textureType, textureSet] : params.textures)
+		for (const auto& [textureType, texture] : params.textures)
 		{
 			textureTypes.push_back(textureType);
-			textures.push_back(textureSet);
+			textures.push_back(texture);
 		}
 	}
 
@@ -259,39 +251,19 @@ namespace PonyEngine::Render
 		return static_cast<std::uint32_t>(textureTypes.size());
 	}
 
-	const std::shared_ptr<const ITexture>& Material::Texture(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex) const noexcept
+	const std::shared_ptr<const ITexture>& Material::Texture(const std::uint32_t textureTypeIndex) const noexcept
 	{
-		return textures[textureTypeIndex][textureIndex];
+		return textures[textureTypeIndex];
 	}
 
-	void Material::Texture(const std::uint32_t textureTypeIndex, const std::uint32_t textureIndex, const std::shared_ptr<const ITexture>& texture)
+	void Material::Texture(const std::uint32_t textureTypeIndex, const std::shared_ptr<const ITexture>& texture)
 	{
-		textures[textureTypeIndex][textureIndex] = texture;
+		textures[textureTypeIndex] = texture;
 	}
 
-	std::uint32_t Material::TextureCount(const std::uint32_t textureTypeIndex) const noexcept
+	std::uint32_t Material::CreateTextureSlot(const std::string_view textureType)
 	{
-		return static_cast<std::uint32_t>(textures[textureTypeIndex].size());
-	}
-
-	std::uint32_t Material::TextureCount() const noexcept
-	{
-		std::uint32_t count = 0u;
-		for (std::uint32_t i = 0; i < TextureTypeCount(); ++i)
-		{
-			count += TextureCount(i);
-		}
-
-		return count;
-	}
-
-	std::uint32_t Material::CreateTextureSet(const std::string_view textureType, const std::uint32_t textureCount)
-	{
-		if (textureCount == 0) [[unlikely]]
-		{
-			throw std::invalid_argument("Texture count is zero.");
-		}
-		if (TextureCount() + textureCount > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
+		if (TextureTypeCount() + 1 > std::numeric_limits<std::uint32_t>::max()) [[unlikely]]
 		{
 			throw std::invalid_argument("Texture count exceeds std::uint32_t max value.");
 		}
@@ -309,7 +281,7 @@ namespace PonyEngine::Render
 		try
 		{
 			textureTypes.push_back(std::string(textureType));
-			textures.push_back(std::vector<std::shared_ptr<const ITexture>>(textureCount));
+			textures.push_back(std::shared_ptr<const ITexture>());
 		}
 		catch (...)
 		{
@@ -322,7 +294,7 @@ namespace PonyEngine::Render
 		return static_cast<std::uint32_t>(currentSize);
 	}
 
-	void Material::DestroyTextureSet(const std::uint32_t textureTypeIndex) noexcept
+	void Material::DestroyTextureSlot(const std::uint32_t textureTypeIndex) noexcept
 	{
 		textureTypes.erase(textureTypes.cbegin() + textureTypeIndex);
 		textures.erase(textures.cbegin() + textureTypeIndex);

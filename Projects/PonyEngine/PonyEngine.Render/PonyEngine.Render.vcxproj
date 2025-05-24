@@ -109,6 +109,7 @@
     <ClCompile Include="Source\Private\Render.Types\Render.Types-Unorm8.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Attachment.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-AttachmentDirtyFlag.cppm" />
+    <ClCompile Include="Source\Private\Render\Render.Detail-ConstantData.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-Frame.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-FrameManager.cppm" />
     <ClCompile Include="Source\Private\Render\Render.Detail-IPipelineAgent.cppm" />

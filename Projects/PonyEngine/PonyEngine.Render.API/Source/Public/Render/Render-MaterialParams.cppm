@@ -26,14 +26,14 @@ export namespace PonyEngine::Render
 	{
 		std::shared_ptr<const IPipelineState> pipelineState; ///< Pipeline state.
 
-		/// @brief Map of data types to data buffer parameters.
+		/// @brief Map of a data type to data buffer parameters.
 		/// @note Don't use strings starting with "Pony_" as data types.
 		/// @note Don't use the same key in the @p data and @p textures.
 		std::unordered_map<std::string, std::vector<PonyBase::Container::BufferParams>> data;
-		/// @brief Map of data types to textures.
+		/// @brief Map of a data type to a texture.
 		/// @note Don't use strings starting with "Pony_" as data types.
 		/// @note Don't use the same key in the @p data and @p textures.
-		std::unordered_map<std::string, std::vector<std::shared_ptr<const ITexture>>> textures;
+		std::unordered_map<std::string, std::shared_ptr<const ITexture>> textures;
 
 		std::string name; ///< Material name.
 	};

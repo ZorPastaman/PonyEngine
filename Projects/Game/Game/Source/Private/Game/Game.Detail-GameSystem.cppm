@@ -221,7 +221,7 @@ namespace Game
 			.name = "GreenOpaque"
 		};
 		greenOpaqueMaterialParams.data["Color"] = std::vector{ PonyBase::Container::BufferParams(sizeof(PonyMath::Color::RGBA<float>), 1) };
-		greenOpaqueMaterialParams.textures["Filter"] = std::vector<std::shared_ptr<const PonyEngine::Render::ITexture>> { filterTexture };
+		greenOpaqueMaterialParams.textures["Filter"] = std::shared_ptr<const PonyEngine::Render::ITexture> { filterTexture };
 		auto whiteOpaqueMaterialParams = PonyEngine::Render::MaterialParams
 		{
 			.pipelineState = opaquePipelineState,

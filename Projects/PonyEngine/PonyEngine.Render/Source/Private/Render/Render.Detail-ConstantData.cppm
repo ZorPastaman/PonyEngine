@@ -7,16 +7,18 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Render.Detail;
+export module PonyEngine.Render.Detail:ConstantData;
 
-export import :AttachmentDirtyFlag;
-export import :BufferDirtyFlag;
-export import :ConstantData;
-export import :IBufferAgent;
-export import :IPipelineStateAgent;
-export import :IRenderAgent;
-export import :IRootSignatureAgent;
-export import :ITextureAgent;
-export import :PipelineStateDirtyFlag;
-export import :RootSignatureDirtyFlag;
-export import :TextureDirtyFlag;
+import <cstddef>;
+import <cstdint>;
+import <span>;
+
+export namespace PonyEngine::Render
+{
+	/// @brief Constant data reference.
+	struct ConstantData final
+	{
+		std::span<const std::byte> data; ///< Data.
+		std::span<const std::uint32_t> scheme; ///< Data scheme. It set a size of each sub-element in bytes.
+	};
+}
