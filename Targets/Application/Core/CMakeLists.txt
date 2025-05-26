@@ -8,7 +8,8 @@ if (WIN32)
 
 	target_sources(PonyApplication PRIVATE "Source/Main.Windows.cppm")
 
-	target_sources(PonyApplication PRIVATE "Data/Windows/Application.manifest")
+	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
+	target_sources(PonyApplication PRIVATE Application.manifest)
 else()
 	message(FATAL_ERROR "Unsupported platform!")
 endif()
