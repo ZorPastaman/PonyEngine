@@ -2,11 +2,8 @@
 if (WIN32)
 	add_executable(PonyApplication WIN32)
 
-	target_sources(PonyApplication PRIVATE FILE_SET CXX_MODULES
-		FILES "Source/Main.Windows.cppm"
-	)
-
-	target_sources(PonyApplication PRIVATE "Source/Main.Windows.cppm")
+	target_sources(PonyApplication PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Main.Windows.cppm")
 
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
 	target_sources(PonyApplication PRIVATE Application.manifest)
