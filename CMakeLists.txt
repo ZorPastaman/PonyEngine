@@ -6,7 +6,10 @@ include(${CMAKE_SOURCE_DIR}/cmake/Compiler.cmake)
 
 message(STATUS "Configuring project")
 project("PonyEngineGame" LANGUAGES CXX)
-init_compile_options()
+init_build_options()
 
 message(STATUS "Configuring main application")
-add_subdirectory("Targets/Application/Application.Core")
+add_subdirectory("Targets/Application/Core")
+
+message(STATUS "Installing")
+install(TARGETS PonyApplication RUNTIME DESTINATION .)
