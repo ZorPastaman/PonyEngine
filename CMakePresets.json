@@ -1,0 +1,80 @@
+﻿{
+	"version": 9,
+	"configurePresets": [
+		{
+			"name": "Base",
+			"hidden": true,
+			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
+			"installDir": "${sourceDir}/Output/Install/${presetName}"
+		},
+		{
+			"name": "Debug",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"GAME_OPTIMAZATION": "Debug",
+				"ENGINE_OPTIMIZATION": "Debug"
+			}
+		},
+		{
+			"name": "Development",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Debug",
+				"GAME_OPTIMAZATION": "Debug",
+				"ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Release",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
+				"GAME_OPTIMAZATION": "Release",
+				"ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Shipping",
+			"inherits": "Base",
+			"hidden": true,
+			"cacheVariables": {
+				"CMAKE_BUILD_TYPE": "Release",
+				"GAME_OPTIMAZATION": "Release",
+				"ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "Windows",
+			"hidden": true,
+			"architecture": {
+				"value": "x64",
+				"strategy": "external"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
+			}
+		},
+		{
+			"name": "Windows-Debug",
+			"inherits": [ "Debug", "Windows" ]
+		},
+		{
+			"name": "Windows-Development",
+			"inherits": [ "Development", "Windows" ]
+		},
+		{
+			"name": "Windows-Release",
+			"inherits": [ "Release", "Windows" ]
+		},
+		{
+			"name": "Windows-Shipping",
+			"inherits": [ "Shipping", "Windows" ]
+		}
+	]
+}
