@@ -49,9 +49,13 @@ function(set_build_options target_name is_engine_target)
 		set_base_options(${target_name})
 
 		if(optimization STREQUAL "Debug")
+			message(STATUS "Setting debug options")
 			set_debug_options(${target_name})
 		elseif(optimization STREQUAL "Release")
+			message(STATUS "Setting release options")
 			set_release_options(${target_name})
+		else()
+			message(FATAL_ERROR "Incorrect optimization type")
 		endif()
 	endfunction()
 

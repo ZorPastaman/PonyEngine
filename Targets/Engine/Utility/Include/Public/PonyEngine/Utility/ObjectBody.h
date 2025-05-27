@@ -9,44 +9,6 @@
 
 #pragma once
 
- /// @brief Base body macro that adds a default constructor. It must be used inside a base class.
- /// @param baseName Base name. Must be the same as a class name where the body is declared.
-#define SIMPLE_BASE_BODY(baseName) \
-	public: \
-		virtual ~baseName() noexcept = default; \
-	 \
-	protected: \
-		[[nodiscard("Pure constructor")]] \
-		baseName() noexcept = default; \
-		[[nodiscard("Pure constructor")]] \
-		baseName(const baseName& other) noexcept = default; \
-		[[nodiscard("Pure constructor")]] \
-		baseName(baseName&& other) noexcept = default; \
-		 \
-		baseName& operator =(const baseName& other) noexcept = default; \
-		baseName& operator =(baseName&& other) noexcept = default; \
-		 \
-	private:
-
-// TODO: Seems it's better to remove BASE_BODY
-
- /// @brief Base body macro that doesn't add a default constructor. It must be used inside a base class.
- /// @param baseName Base name. Must be the same as a class name where the body is declared.
-#define BASE_BODY(baseName) \
-	public: \
-		virtual ~baseName() noexcept = default; \
-	 \
-	protected: \
-		[[nodiscard("Pure constructor")]] \
-		baseName(const baseName& other) noexcept = default; \
-		[[nodiscard("Pure constructor")]] \
-		baseName(baseName&& other) noexcept = default; \
-		 \
-		baseName& operator =(const baseName& other) noexcept = default; \
-		baseName& operator =(baseName&& other) noexcept = default; \
-		 \
-	private:
-
 /// @brief Interface body macro. It must be used inside an interface class.
 /// @param interfaceName Interface name. Must be the same as a class name where the body is declared.
 #define INTERFACE_BODY(interfaceName) \

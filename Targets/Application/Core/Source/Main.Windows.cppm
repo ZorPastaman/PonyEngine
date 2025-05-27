@@ -15,12 +15,12 @@ module;
 
 export module Main;
 
-import PonyEngine.Platform.Windows;
+import Application.Windows;
 
 export int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
-	PonyEngine::Platform::Windows::SetConsoleCodePage(CP_UTF8);
-	PonyEngine::Platform::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
+	Application::Windows::SetConsoleCodePage(CP_UTF8);
+	Application::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 
 	OutputDebugStringA("Wow ☃ 日本国 кошка\n");
 	OutputDebugStringA(std::format("{}\n", GetACP()).c_str());
