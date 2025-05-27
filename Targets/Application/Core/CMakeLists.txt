@@ -6,6 +6,10 @@ if (WIN32)
 	message(STATUS "Configuring sources for Windows")
 	target_sources(PonyApplication.Core PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Main.Windows.cppm"
+		"Source/Private/Application/Application.cppm" 
+		"Source/Private/Application/Windows/Application.Windows.cppm"
+		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
+		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
 	)
 
 	message(STATUS "Configuring data for Windows")
@@ -16,7 +20,10 @@ else()
 endif()
 
 message(STATUS "Configuring dependencies")
-target_link_libraries(PonyApplication.Core PRIVATE PonyEngine.Platform)
+target_link_libraries(PonyApplication.Core PRIVATE
+	PonyEngine.Platform
+	PonyEngine.Utility
+)
 
 message(STATUS "Setting build options")
 set_build_options(PonyApplication.Core TRUE)

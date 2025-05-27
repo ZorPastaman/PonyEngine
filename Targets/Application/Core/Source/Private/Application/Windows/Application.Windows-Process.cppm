@@ -13,24 +13,24 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Platform.Windows:Process;
+export module Application.Windows:Process;
 
 import PonyEngine.Utility;
 
-export namespace PonyEngine::Platform::Windows
+export namespace Application::Windows
 {
 	/// @brief Sets the process priority.
 	/// @param priority Priority to set.
 	void SetProcessPriority(DWORD priority);
 }
 
-namespace PonyEngine::Platform::Windows
+namespace Application::Windows
 {
 	void SetProcessPriority(const DWORD priority)
 	{
 		if (!SetPriorityClass(GetCurrentProcess(), priority))
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to set process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
+			throw std::runtime_error(PonyEngine::Utility::SafeFormat("Failed to set process priority to '0x{:X}'. Error code: '0x{:X}'.", priority, GetLastError()));
 		}
 	}
 }

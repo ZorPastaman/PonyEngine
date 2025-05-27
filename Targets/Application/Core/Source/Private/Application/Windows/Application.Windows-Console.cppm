@@ -11,16 +11,16 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module PonyEngine.Platform.Windows:Console;
+export module Application.Windows:Console;
 
-export namespace PonyEngine::Platform::Windows
+export namespace Application::Windows
 {
 	/// @brief Sets both the input and output code pages of the console.
 	/// @param codePageID Code page ID.
 	void SetConsoleCodePage(UINT codePageID);
 }
 
-namespace PonyEngine::Platform::Windows
+namespace Application::Windows
 {
 	void SetConsoleCodePage(const UINT codePageID)
 	{

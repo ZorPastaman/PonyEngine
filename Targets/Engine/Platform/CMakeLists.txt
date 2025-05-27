@@ -13,17 +13,7 @@ if (WIN32)
 	target_include_directories(PonyEngine.Platform PUBLIC 
 		"Include/Public/Windows"
 	)
-
-	message(STATUS "Configuring sources for Windows")
-	target_sources(PonyEngine.Platform PUBLIC FILE_SET CXX_MODULES FILES 
-		"Source/Public/Platform/Windows/Platform.Windows.cppm" 
-		"Source/Public/Platform/Windows/Platform.Windows-Console.cppm" 
-		"Source/Public/Platform/Windows/Platform.Windows-Process.cppm"
-	)
 endif()
-
-message(STATUS "Configuring dependencies")
-target_link_libraries(PonyEngine.Platform PRIVATE PonyEngine.Utility)
 
 message(STATUS "Setting build options")
 set_build_options(PonyEngine.Platform TRUE)

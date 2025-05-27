@@ -7,9 +7,5 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Platform.Windows;
+export module Application;
 
-export import PonyEngine.Platform;
-
-export import :Console;
-export import :Process;
