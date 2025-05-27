@@ -3,18 +3,19 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyBase.Utility:SafeFormat;
+module;
 
-import <exception>;
-import <format>;
-import <string>;
-import <type_traits>;
+#include <exception>
+#include <format>
+#include <string>
 
-export namespace PonyBase::Utility
+export module PonyEngine.Utility:SafeFormat;
+
+export namespace PonyEngine::Utility
 {
 	/// @brief The concept is satisfied if @p T has a function that accepts @p const @p std::exception& like this: @p exceptionHandler(e).
 	template<typename T>
@@ -49,7 +50,7 @@ export namespace PonyBase::Utility
 	std::string SafeFormat(const ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
-namespace PonyBase::Utility
+namespace PonyEngine::Utility
 {
 	/// @brief Exception handler that does nothing.
 	struct EmptyExceptionHandler final

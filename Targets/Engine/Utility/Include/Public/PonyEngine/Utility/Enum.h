@@ -3,13 +3,11 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 #pragma once
-
-// TODO: Add tests
 
 /// @brief Creates a function to convert an enum value to a predefined string value.
 /// @note Import <algorithm>, <cstddef>, <ostream> and <string_view>.
