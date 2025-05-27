@@ -9,23 +9,22 @@
 
 module;
 
-#define WIN32_LEAN_AND_MEAN
-#define NOMINMAX
-#include <windows.h>
+#include <format>
 
-#include <format> // TODO: Check for module support.
+#include "PonyEngine/Platform/Windows/Framework.h"
 
 export module Main;
 
+import PonyEngine.Platform.Windows;
+
 export int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
-	SetConsoleCP(CP_UTF8); // TODO: Move to base.
-	SetConsoleOutputCP(CP_UTF8);
+	PonyEngine::Platform::Windows::SetConsoleCodePage(CP_UTF8);
+	PonyEngine::Platform::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 
 	OutputDebugStringA("Wow ☃ 日本国 кошка\n");
 	OutputDebugStringA(std::format("{}\n", GetACP()).c_str());
 	MessageBoxExA(nullptr, "Wow ☃ 日本国 кошка", "Wowe", MB_OK, 0);
-
 
 	return 0;
 }
