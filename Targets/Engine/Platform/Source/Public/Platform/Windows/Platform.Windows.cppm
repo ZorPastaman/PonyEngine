@@ -3,10 +3,13 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Platform.Windows;
 
-#include <wrl/client.h>
+export import PonyEngine.Platform.WinCore;
+
+export import :Cursor;
+export import :Module;

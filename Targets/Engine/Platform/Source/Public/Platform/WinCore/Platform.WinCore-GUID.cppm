@@ -3,23 +3,25 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include "PonyBase/Core/COM/Framework.h"
+#include <stdexcept>;
+#include <string>;
+#include <type_traits>;
 
-export module PonyBase.Utility.COM:GUID;
+#include "PonyEngine/Platform/WinCore/Framework.h"
 
-import <stdexcept>;
-import <string>;
-import <type_traits>;
+export module PonyEngine.Platform.WinCore:GUID;
 
-import PonyBase.Utility;
+import PonyEngine.Utility;
 
-export namespace PonyBase::Utility::COM
+import :Utility;
+
+export namespace PonyEngine::Platform::WinCore
 {
 	/// @brief Acquires GUID.
 	/// @return GUID.
@@ -33,14 +35,14 @@ export namespace PonyBase::Utility::COM
 	std::string ToString(const GUID& guid);
 }
 
-namespace PonyBase::Utility::COM
+namespace PonyEngine::Platform::WinCore
 {
 	GUID AcquireGuid()
 	{
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(SafeFormat("Failed to get guid with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(Utility::SafeFormat("Failed to get guid with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return acquiredGuid;

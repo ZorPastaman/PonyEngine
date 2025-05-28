@@ -3,15 +3,13 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 #pragma once
 
-#ifdef _MSC_VER
-/// @brief Dll export macro.
-#define PONY_DLL_EXPORT __declspec(dllexport)
-#else
-#error "Unsupported compiler!"
-#endif
+#define WIN32_LEAN_AND_MEAN
+#define NOMINMAX
+#include <windows.h>
+#include <wrl/client.h>
