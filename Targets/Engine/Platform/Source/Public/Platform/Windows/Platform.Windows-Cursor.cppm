@@ -3,21 +3,21 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include "PonyBase/Core/Windows/Framework.h"
+#include <stdexcept>;
 
-export module PonyBase.Utility.Windows:Cursor;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-import <stdexcept>;
+export module PonyEngine.Platform.Windows:Cursor;
 
-import PonyBase.Utility;
+import PonyEngine.Utility;
 
-export namespace PonyBase::Utility::Windows
+export namespace PonyEngine::Platform::Windows
 {
 	/// @brief Gets a default cursor.
 	/// @return Default cursor.
@@ -25,14 +25,14 @@ export namespace PonyBase::Utility::Windows
 	HCURSOR DefaultCursor();
 }
 
-namespace PonyBase::Utility::Windows
+namespace PonyEngine::Platform::Windows
 {
 	HCURSOR DefaultCursor()
 	{
-		const auto cursor = static_cast<HCURSOR>(LoadImageW(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
+		const auto cursor = static_cast<HCURSOR>(LoadImageA(nullptr, IDC_ARROW, IMAGE_CURSOR, 0, 0, LR_DEFAULTSIZE | LR_SHARED));
 		if (!cursor)
 		{
-			throw std::runtime_error(SafeFormat("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Utility::SafeFormat("Failed to load default cursor. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return cursor;

@@ -3,21 +3,21 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include "PonyBase/Core/Windows/Framework.h"
+#include <stdexcept>;
 
-export module PonyBase.Utility.Windows:Module;
+#include "PonyEngine/Platform/Windows/Framework.h"
 
-import <stdexcept>;
+export module PonyEngine.Platform.Windows:Module;
 
-import PonyBase.Utility;
+import PonyEngine.Utility;
 
-export namespace PonyBase::Utility::Windows
+export namespace PonyEngine::Platform::Windows
 {
 	/// @brief Gets this dll module.
 	/// @return Dll module.
@@ -25,14 +25,14 @@ export namespace PonyBase::Utility::Windows
 	HMODULE GetModule();
 }
 
-namespace PonyBase::Utility::Windows
+namespace PonyEngine::Platform::Windows
 {
 	HMODULE GetModule()
 	{
 		HMODULE moduleHandle;
-		if (!GetModuleHandleExW(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCWSTR>(&GetModule), &moduleHandle) || !moduleHandle)
+		if (!GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS | GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT, reinterpret_cast<LPCSTR>(&GetModule), &moduleHandle) || !moduleHandle)
 		{
-			throw std::runtime_error(SafeFormat("Failed to find dll module. Error code: '0x{:X}'.", GetLastError()));
+			throw std::runtime_error(Utility::SafeFormat("Failed to find module. Error code: '0x{:X}'.", GetLastError()));
 		}
 
 		return moduleHandle;

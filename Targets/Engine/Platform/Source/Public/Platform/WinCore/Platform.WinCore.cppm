@@ -7,6 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module Application;
+export module PonyEngine.Platform.WinCore;
 
-export import :ExitCodes;
+export import PonyEngine.Platform;
+
+export import :GUID;
+export import :Utility;

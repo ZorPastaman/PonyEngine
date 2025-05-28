@@ -16,4 +16,4 @@ message(STATUS "Setting build options")
 set_build_options(PonyEngine.Utility TRUE)
 
 message(STATUS "Setting globals")
-set_property(GLOBAL APPEND PROPERTY PONY_ENGINE_API PonyEngine.Utility)
+set_property(GLOBAL APPEND PROPERTY PONY_API PonyEngine.Utility)
