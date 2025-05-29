@@ -14,11 +14,11 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module Application.Windows:Console;
+export module PonyEngine.Application.Windows:Console;
 
 import PonyEngine.Utility;
 
-export namespace Application::Windows
+export namespace PonyEngine::Application::Windows
 {
 	/// @brief Creates a console.
 	/// @param codePageID Console code page.
@@ -27,7 +27,7 @@ export namespace Application::Windows
 	void DestroyConsole();
 }
 
-namespace Application::Windows
+namespace PonyEngine::Application::Windows
 {
 	/// @brief Sets both the input and output code pages of the console.
 	/// @param codePageID Code page ID.

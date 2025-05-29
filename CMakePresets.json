@@ -48,8 +48,19 @@
 			}
 		},
 		{
-			"name": "Windows",
+			"name": "WinCore",
 			"hidden": true,
+			"cacheVariables": {
+				"PONY_WINCORE": "TRUE"
+			}
+		},
+		{
+			"name": "Windows",
+			"inherits": "WinCore",
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_WINDOWS": "TRUE"
+			},
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
