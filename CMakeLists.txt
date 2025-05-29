@@ -2,6 +2,7 @@
 cmake_minimum_required (VERSION 3.31)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+set_property(GLOBAL PROPERTY PONY_APP_MODULES)
 set_property(GLOBAL PROPERTY PONY_INSTALL)
 include("CMake/Compiler.cmake")
 if(PONY_WINCORE)
@@ -19,6 +20,7 @@ message(STATUS "Configuring modules")
 add_subdirectory("Targets/Modules/PonyEngine.Core")
 
 message(STATUS "Configuring application modules")
+add_subdirectory("Targets/ApplicationModules/PonyEngine.Core.Impl")
 
 message(STATUS "Configuring application")
 add_subdirectory("Targets/Application/PonyEngine.Application")

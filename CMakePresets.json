@@ -73,11 +73,17 @@
 		},
 		{
 			"name": "Windows-Debug",
-			"inherits": [ "Debug", "Windows" ]
+			"inherits": [ "Debug", "Windows" ],
+			"cacheVariables": {
+				"PONY_CREATE_CONSOLE": "TRUE"
+			}
 		},
 		{
 			"name": "Windows-Development",
-			"inherits": [ "Development", "Windows" ]
+			"inherits": [ "Development", "Windows" ],
+			"cacheVariables": {
+				"PONY_CREATE_CONSOLE": "TRUE"
+			}
 		},
 		{
 			"name": "Windows-Release",
