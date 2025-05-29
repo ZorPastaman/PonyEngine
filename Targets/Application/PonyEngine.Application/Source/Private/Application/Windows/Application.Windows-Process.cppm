@@ -13,18 +13,18 @@ module;
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-export module Application.Windows:Process;
+export module PonyEngine.Application.Windows:Process;
 
 import PonyEngine.Utility;
 
-export namespace Application::Windows
+export namespace PonyEngine::Application::Windows
 {
 	/// @brief Sets the process priority.
 	/// @param priority Priority to set.
 	void SetProcessPriority(DWORD priority);
 }
 
-namespace Application::Windows
+namespace PonyEngine::Application::Windows
 {
 	void SetProcessPriority(const DWORD priority)
 	{

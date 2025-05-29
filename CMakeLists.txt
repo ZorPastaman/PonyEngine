@@ -2,19 +2,26 @@
 cmake_minimum_required (VERSION 3.31)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-set_property(GLOBAL PROPERTY PONY_API)
 set_property(GLOBAL PROPERTY PONY_INSTALL)
 include("CMake/Compiler.cmake")
+if(PONY_WINCORE)
+	add_compile_definitions(PONY_WINCORE)
+endif()
+if(PONY_WINDOWS)
+	add_compile_definitions(PONY_WINDOWS)
+endif()
 
 message(STATUS "Configuring project")
 project("PonyEngineGame" VERSION 0.0.0.0 LANGUAGES CXX)
 init_build_options()
 
-add_subdirectory("Targets/Engine")
-get_property(PONY_API_VALUE GLOBAL PROPERTY PONY_API)
-message(STATUS "Pony API: ${PONY_API_VALUE}")
+message(STATUS "Configuring modules")
+add_subdirectory("Targets/Modules/PonyEngine.Core")
 
-add_subdirectory("Targets/Application")
+message(STATUS "Configuring application modules")
+
+message(STATUS "Configuring application")
+add_subdirectory("Targets/Application/PonyEngine.Application")
 
 message(STATUS "Installing")
 get_property(PONY_INSTALL_VALUE GLOBAL PROPERTY PONY_INSTALL)
