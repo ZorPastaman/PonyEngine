@@ -13,11 +13,29 @@ module;
 #include <format>
 #include <iostream>
 
+#include "PonyEngine/Module/API.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Main;
 
 import PonyEngine.Application.Windows;
+
+import PonyEngine.Core;
+import PonyEngine.Module;
+
+extern "C" void InitializeModule1();
+PONY_MODULE_INITIALIZER_EARLIEST(InitializeModule1);
+
+void InitializeModule1()
+{
+	std::cout << "Module!\n";
+}
+
+namespace PonyEngine::Module
+{
+	PONY_MODULE_ALLOCATE(a) const ModuleInitializer FirstInitializer = nullptr;
+	PONY_MODULE_ALLOCATE(z) const ModuleInitializer LastInitializer = nullptr;
+}
 
 export int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
@@ -27,6 +45,15 @@ export int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const 
 #if !NDEBUG
 		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
 #endif
+
+		auto begin = (uintptr_t)&PonyEngine::Module::FirstInitializer
+			+ sizeof(PonyEngine::Module::FirstInitializer);
+		auto end = (uintptr_t)&PonyEngine::Module::LastInitializer;
+		for (auto current = begin; current < end;
+			current += sizeof(PonyEngine::Module::ModuleInitializer)) {
+			auto initializer = *(const PonyEngine::Module::ModuleInitializer*)current;
+			if (initializer) initializer();
+		}
 
 		std::cout << "Wow ☃ 日本国 кошка\n";
 		OutputDebugStringA("Wow ☃ 日本国 кошка\n");

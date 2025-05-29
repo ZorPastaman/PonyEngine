@@ -27,6 +27,9 @@ message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE
 	PonyEngine.Core
 )
+get_property(PONY_APP_MODULES_VALUE GLOBAL PROPERTY PONY_APP_MODULES)
+message(STATUS "Application module list: ${PONY_APP_MODULES_VALUE}")
+target_link_libraries(PonyEngine.Application PRIVATE ${PONY_APP_MODULES_VALUE})
 
 message(STATUS "Setting build options")
 set_build_options(PonyEngine.Application TRUE)
