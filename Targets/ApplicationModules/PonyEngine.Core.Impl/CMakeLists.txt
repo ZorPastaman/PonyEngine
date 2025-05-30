@@ -1,10 +1,12 @@
 message(STATUS "Configuring PonyEngine.Core.Impl")
-add_library(PonyEngine.Core.Impl STATIC)
-#add_compile_definitions(PONY_DLL)
+add_library(PonyEngine.Core.Impl SHARED)
+add_compile_definitions(PONY_DLL)
+
+target_include_directories(PonyEngine.Core.Impl PUBLIC "Include/Public")
 
 message(STATUS "Configuring sources")
-target_sources(PonyEngine.Core.Impl PUBLIC FILE_SET CXX_MODULES FILES 
-	"Source/Public/Core/Core.cppm"
+target_sources(PonyEngine.Core.Impl PUBLIC
+	"Source/Public/Core/Core.cpp"
 )
 
 message(STATUS "Configuring dependencies")

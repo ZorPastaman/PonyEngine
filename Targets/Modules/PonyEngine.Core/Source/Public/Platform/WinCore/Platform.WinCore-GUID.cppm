@@ -9,9 +9,9 @@
 
 module;
 
-#include <stdexcept>;
-#include <string>;
-#include <type_traits>;
+#include <stdexcept>
+#include <string>
+#include <type_traits>
 
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
