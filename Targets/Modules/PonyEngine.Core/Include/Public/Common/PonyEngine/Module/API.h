@@ -11,11 +11,14 @@
 
 #pragma once
 
+#include "PonyEngine/Module/Module.h"
+#include "PonyEngine/Utility/Compiler.h"
 #include "PonyEngine/Utility/Macro.h"
 
 /// @brief Creates a module section name.
 /// @param order Section order.
 #define PONY_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModule$, order))
+#define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
 
 // Order list. The order of execution is Begin -> Earliest -> Earlier -> Early -> Default -> Late -> Later -> Latest -> End
 // Don't use Begin and End. They are special marks.
@@ -30,7 +33,7 @@
 #define PONY_MODULE_ORDER_END z
 
 // PONY_MODULE_ALLOCATE allocates a linker section.
-// PONY_MODULE_INCLUDE Forces a linker to include a function.
+// PONY_MODULE_INCLUDE Forces a linker to include a symbol.
 #ifdef _MSC_VER
 #pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN), read)
 #pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLIEST), read)
@@ -41,8 +44,6 @@
 #pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATER), read)
 #pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATEST), read)
 #pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END), read)
-#define PONY_MODULE_ALLOCATE(order) __declspec(allocate(PONY_MODULE_SECTION_NAME(order)))
-#define PONY_MODULE_INCLUDE(function) __pragma(comment(linker, PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(/include:, function))))
 #else
 #error "Unsupported compiler!"
 #endif
@@ -51,8 +52,9 @@
 /// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
 /// @param order Execution order. Must be one of PONY_MODULE_ORDER except Begin and End.
 #define PONY_MODULE_INITIALIZER(function, order) \
-	PONY_MODULE_ALLOCATE(order) const PonyEngine::Module::ModuleInitializer PONY_CONCAT_VALUES(PonyInitializer, function) = function; \
-	PONY_MODULE_INCLUDE(function);
+	extern "C" PONY_MODULE_ALLOCATE(order) const PonyEngine::Module::ModuleInitializer PONY_CONCAT_VALUES(PonyInitializer, function) = function; \
+	PONY_PRESERVE(function); \
+	PONY_PRESERVE(PONY_CONCAT_VALUES(PonyInitializer, function));
 
 /// @brief Adds a module initialization function and sets the earliest order.
 /// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.

@@ -20,15 +20,12 @@ export module PonyEngine.Main;
 
 import PonyEngine.Application.Windows;
 
-import PonyEngine.Core;
-import PonyEngine.Module;
-
 extern "C" void InitializeModule1();
 PONY_MODULE_INITIALIZER_EARLIEST(InitializeModule1);
 
 void InitializeModule1()
 {
-	std::cout << "Module!\n";
+	std::cout << "Module1!\n";
 }
 
 namespace PonyEngine::Module

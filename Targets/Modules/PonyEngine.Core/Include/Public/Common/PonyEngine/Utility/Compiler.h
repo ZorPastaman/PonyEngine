@@ -9,6 +9,8 @@
 
 #pragma once
 
+#include "PonyEngine/Utility/Macro.h"
+
 // PONY_DLL_EXPORT sets a correct dll export attribute. If the build target isn't dll, it sets nothing.
 #ifdef PONY_DLL
 #ifdef _MSC_VER
@@ -18,4 +20,18 @@
 #endif
 #else
 #define PONY_DLL_EXPORT
+#endif
+
+// PONY_ALLOCATE allocates a segment by its name.
+#ifdef _MSC_VER
+#define PONY_ALLOCATE(segment) __declspec(allocate(segment))
+#else
+#error "Unsupported compiler!"
+#endif
+
+// PONY_PRESERVE prevents a compiler from removing the symbol.
+#ifdef _MSC_VER
+#define PONY_PRESERVE(symbol) __pragma(comment(linker, "/include:" PONY_STRINGIFY(symbol)))
+#else
+#error "Unsupported compiler!"
 #endif

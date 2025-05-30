@@ -14,7 +14,8 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMAZATION": "Debug",
-				"PONY_ENGINE_OPTIMIZATION": "Debug"
+				"PONY_ENGINE_OPTIMIZATION": "Debug",
+				"PONY_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
@@ -24,7 +25,8 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMAZATION": "Debug",
-				"PONY_ENGINE_OPTIMIZATION": "Release"
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
@@ -73,17 +75,11 @@
 		},
 		{
 			"name": "Windows-Debug",
-			"inherits": [ "Debug", "Windows" ],
-			"cacheVariables": {
-				"PONY_CREATE_CONSOLE": "TRUE"
-			}
+			"inherits": [ "Debug", "Windows" ]
 		},
 		{
 			"name": "Windows-Development",
-			"inherits": [ "Development", "Windows" ],
-			"cacheVariables": {
-				"PONY_CREATE_CONSOLE": "TRUE"
-			}
+			"inherits": [ "Development", "Windows" ]
 		},
 		{
 			"name": "Windows-Release",
