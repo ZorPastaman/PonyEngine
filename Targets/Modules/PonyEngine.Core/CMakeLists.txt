@@ -8,6 +8,8 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Public/Module/Module.cppm"
+	"Source/Public/Module/Module-ModuleInitializer.cppm"
 	"Source/Public/Platform/Platform.cppm"
 	"Source/Public/Utility/Utility.cppm"
 	"Source/Public/Utility/Utility-SafeFormat.cppm"

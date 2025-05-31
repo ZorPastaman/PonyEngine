@@ -22,16 +22,22 @@
 #define PONY_DLL_EXPORT
 #endif
 
-// PONY_ALLOCATE allocates a segment by its name.
+// PONY_PRESERVE prevents a compiler from removing the symbol.
 #ifdef _MSC_VER
-#define PONY_ALLOCATE(segment) __declspec(allocate(segment))
+#define PONY_PRESERVE(symbol) __pragma(comment(linker, "/include:" PONY_STRINGIFY(symbol)))
 #else
 #error "Unsupported compiler!"
 #endif
 
-// PONY_PRESERVE prevents a compiler from removing the symbol.
 #ifdef _MSC_VER
-#define PONY_PRESERVE(symbol) __pragma(comment(linker, "/include:" PONY_STRINGIFY(symbol)))
+#define PONY_SECTION(name) __pragma(section(name, read))
+#else
+#error "Unsupported compiler!"
+#endif
+
+// PONY_ALLOCATE allocates a segment by its name.
+#ifdef _MSC_VER
+#define PONY_ALLOCATE(segment) __declspec(allocate(segment))
 #else
 #error "Unsupported compiler!"
 #endif

@@ -7,7 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application;
+export module PonyEngine.Module:ModuleInitializer;
 
-export import :Bootstrap;
-export import :ExitCodes;
+export namespace PonyEngine::Module
+{
+	/// @brief Module initializer function.
+	using ModuleInitializer = void(*)();
+}
