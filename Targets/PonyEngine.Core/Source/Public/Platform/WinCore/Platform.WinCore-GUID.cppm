@@ -1,0 +1,58 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: cybercode.smith@pm.me                    *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+module;
+
+#include <stdexcept>
+#include <string>
+#include <type_traits>
+
+#include "PonyEngine/Platform/WinCore/Framework.h"
+
+export module PonyEngine.Platform.WinCore:GUID;
+
+import PonyEngine.Utility;
+
+import :Utility;
+
+export namespace PonyEngine::Platform::WinCore
+{
+	/// @brief Acquires GUID.
+	/// @return GUID.
+	[[nodiscard("Pure function")]]
+	GUID AcquireGuid();
+
+	/// @brief Creates a string representing the @p guid.
+	/// @param guid GUID.
+	/// @return String representing the @p guid.
+	[[nodiscard("Pure function")]]
+	std::string ToString(const GUID& guid);
+}
+
+namespace PonyEngine::Platform::WinCore
+{
+	GUID AcquireGuid()
+	{
+		GUID acquiredGuid;
+		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
+		{
+			throw std::runtime_error(Utility::SafeFormat("Failed to get guid with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+		}
+
+		return acquiredGuid;
+	}
+
+	std::string ToString(const GUID& guid)
+	{
+		auto buffer = std::wstring(39, L'\0');
+		StringFromGUID2(guid, buffer.data(), static_cast<int>(buffer.size()));
+
+		return ConvertToString(std::wstring_view(&buffer.front() + 1, &buffer.back() - 1));
+	}
+}
