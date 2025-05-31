@@ -10,6 +10,7 @@
 module;
 
 #include <cstdint>
+#include <iostream>
 
 #include "PonyEngine/Module/API.h"
 
@@ -25,18 +26,25 @@ export namespace PonyEngine::Application
 
 namespace PonyEngine::Application
 {
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) const Module::ModuleInitializer FirstInitializer = nullptr; ///< First initializer. It's always nullptr. To get a real one, you have to add a size of an initializer.
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) const Module::ModuleInitializer LastInitializer = nullptr; ///< Last initializer. It's an end.
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) const Module::ModuleInfo FirstInitializer{}; ///< First initializer. It's always nullptr. To get a real one, you have to add a size of an initializer.
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) const Module::ModuleInfo LastInitializer{}; ///< Last initializer. It's an end.
 
 	void InitializeModules()
 	{
-		const std::uintptr_t begin = reinterpret_cast<std::uintptr_t>(&FirstInitializer) + sizeof(Module::ModuleInitializer);
+		const std::uintptr_t begin = reinterpret_cast<std::uintptr_t>(&FirstInitializer) + sizeof(Module::ModuleInfo);
 		const std::uintptr_t end = reinterpret_cast<std::uintptr_t>(&LastInitializer);
-		for (std::uintptr_t current = begin; current < end; current += sizeof(Module::ModuleInitializer))
+		std::uintptr_t current = begin;
+		while (current < end)
 		{
-			if (const Module::ModuleInitializer initializer = *reinterpret_cast<const Module::ModuleInitializer*>(current))
+			if (const auto info = reinterpret_cast<const Module::ModuleInfo*>(current); info->name.data() && info->initializer)
 			{
-				initializer();
+				std::cout << info->name << "\n";
+				info->initializer();
+				current += sizeof(Module::ModuleInfo);
+			}
+			else
+			{
+				current += alignof(Module::ModuleInfo);
 			}
 		}
 	}

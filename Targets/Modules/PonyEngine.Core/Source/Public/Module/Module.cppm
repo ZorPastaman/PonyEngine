@@ -9,4 +9,4 @@
 
 export module PonyEngine.Module;
 
-export import :ModuleInitializer;
+export import :ModuleInfo;

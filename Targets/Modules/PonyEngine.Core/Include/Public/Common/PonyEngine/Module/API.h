@@ -21,11 +21,11 @@
 /// @param order Segment order.
 #define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
 /// @brief Creates a module function name.
-/// @param function Target function name.
-#define PONY_MODULE_FUNCTION_NAME(function) PONY_CONCAT_VALUES(PonyInitializerFunc, function)
+/// @param moduleName Target module name.
+#define PONY_MODULE_FUNCTION_NAME(moduleName) PONY_CONCAT_VALUES(PonyInitializerFunc, moduleName)
 /// @brief Creates a module field name.
-/// @param function Target function name.
-#define PONY_MODULE_FIELD_NAME(function) PONY_CONCAT_VALUES(PonyInitializerField, function)
+/// @param moduleName Target module name.
+#define PONY_MODULE_FIELD_NAME(moduleName) PONY_CONCAT_VALUES(PonyInitializerField, moduleName)
 
 // Order list. The order of execution is Begin -> Earliest -> Earlier -> Early -> Default -> Late -> Later -> Latest -> End
 // Don't use Begin and End. They are special marks.
@@ -53,34 +53,42 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 /// @brief Adds a module initialization function.
 /// @note The function name must be unique across the whole application.
 /// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
 /// @param order Execution order. Must be one of PONY_MODULE_ORDER except Begin and End.
-#define PONY_MODULE_INITIALIZER(function, order) \
-	extern "C" void PONY_MODULE_FUNCTION_NAME(function)() \
+#define PONY_MODULE_INITIALIZER(function, moduleName, order) \
+	extern "C" void PONY_MODULE_FUNCTION_NAME(moduleName)() \
 	{ \
 		function(); \
 	} \
-	extern "C" PONY_MODULE_ALLOCATE(order) const PonyEngine::Module::ModuleInitializer PONY_MODULE_FIELD_NAME(function) = &PONY_MODULE_FUNCTION_NAME(function); \
-	PONY_PRESERVE(PONY_MODULE_FUNCTION_NAME(function)); \
-	PONY_PRESERVE(PONY_MODULE_FIELD_NAME(function));
+	extern "C" PONY_MODULE_ALLOCATE(order) const auto PONY_MODULE_FIELD_NAME(moduleName) = PonyEngine::Module::ModuleInfo{PONY_STRINGIFY(moduleName), &PONY_MODULE_FUNCTION_NAME(moduleName)}; \
+	PONY_PRESERVE(PONY_MODULE_FUNCTION_NAME(moduleName)); \
+	PONY_PRESERVE(PONY_MODULE_FIELD_NAME(moduleName));
 
 /// @brief Adds a module initialization function and sets the earliest order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_EARLIEST(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_EARLIEST)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_EARLIEST(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_EARLIEST)
 /// @brief Adds a module initialization function and sets the earlier order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_EARLIER(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_EARLIER)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_EARLIER(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_EARLIER)
 /// @brief Adds a module initialization function and sets the early order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_EARLY(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_EARLY)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_EARLY(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_EARLY)
 /// @brief Adds a module initialization function and sets the default order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_DEFAULT(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_DEFAULT)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_DEFAULT(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_DEFAULT)
 /// @brief Adds a module initialization function and sets the late order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_LATE(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_LATE)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_LATE(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_LATE)
 /// @brief Adds a module initialization function and sets the later order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_LATER(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_LATER)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_LATER(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_LATER)
 /// @brief Adds a module initialization function and sets the latest order.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
-#define PONY_MODULE_INITIALIZER_LATEST(function) PONY_MODULE_INITIALIZER(function, PONY_MODULE_ORDER_LATEST)
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
+/// @param module Module name.
+#define PONY_MODULE_INITIALIZER_LATEST(function, moduleName) PONY_MODULE_INITIALIZER(function, moduleName, PONY_MODULE_ORDER_LATEST)
