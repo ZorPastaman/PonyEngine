@@ -60,7 +60,7 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 	{ \
 		function(); \
 	} \
-	extern "C" PONY_MODULE_ALLOCATE(order) const auto PONY_MODULE_FIELD_NAME(moduleName) = PonyEngine::Module::ModuleInfo{PONY_STRINGIFY(moduleName), &PONY_MODULE_FUNCTION_NAME(moduleName)}; \
+	extern "C" PONY_MODULE_ALLOCATE(order) const auto PONY_MODULE_FIELD_NAME(moduleName) = PonyEngine::Module::ModuleInfo{.initializer = &PONY_MODULE_FUNCTION_NAME(moduleName), .name = PONY_STRINGIFY(moduleName)}; \
 	PONY_PRESERVE(PONY_MODULE_FUNCTION_NAME(moduleName)); \
 	PONY_PRESERVE(PONY_MODULE_FIELD_NAME(moduleName));
 

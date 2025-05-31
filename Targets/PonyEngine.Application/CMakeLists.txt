@@ -2,7 +2,7 @@
 if(PONY_WINDOWS)
 	add_executable(PonyEngine.Application WIN32)
 else()
-	add_executable(PonyEngine.Application)
+	message(FATAL_ERROR "Unsupported platform!")
 endif()
 
 message(STATUS "Configuring sources")
