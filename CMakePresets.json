@@ -13,8 +13,9 @@
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
-				"GAME_OPTIMAZATION": "Debug",
-				"ENGINE_OPTIMIZATION": "Debug"
+				"PONY_GAME_OPTIMAZATION": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Debug",
+				"PONY_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
@@ -23,8 +24,9 @@
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Debug",
-				"GAME_OPTIMAZATION": "Debug",
-				"ENGINE_OPTIMIZATION": "Release"
+				"PONY_GAME_OPTIMAZATION": "Debug",
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_CREATE_CONSOLE": "TRUE"
 			}
 		},
 		{
@@ -33,8 +35,8 @@
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
-				"GAME_OPTIMAZATION": "Release",
-				"ENGINE_OPTIMIZATION": "Release"
+				"PONY_GAME_OPTIMAZATION": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release"
 			}
 		},
 		{
@@ -43,13 +45,24 @@
 			"hidden": true,
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
-				"GAME_OPTIMAZATION": "Release",
-				"ENGINE_OPTIMIZATION": "Release"
+				"PONY_GAME_OPTIMAZATION": "Release",
+				"PONY_ENGINE_OPTIMIZATION": "Release"
+			}
+		},
+		{
+			"name": "WinCore",
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_WINCORE": "TRUE"
 			}
 		},
 		{
 			"name": "Windows",
+			"inherits": "WinCore",
 			"hidden": true,
+			"cacheVariables": {
+				"PONY_WINDOWS": "TRUE"
+			},
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
