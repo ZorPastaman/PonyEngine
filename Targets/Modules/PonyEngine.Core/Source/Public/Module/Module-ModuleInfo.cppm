@@ -7,10 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Module:ModuleInitializer;
+module;
+
+#include <string_view>
+
+export module PonyEngine.Module:ModuleInfo;
 
 export namespace PonyEngine::Module
 {
 	/// @brief Module initializer function.
 	using ModuleInitializer = void(*)();
+
+	/// @brief Module info.
+	struct ModuleInfo final
+	{
+		const std::string_view name; ///< Module name.
+		ModuleInitializer initializer = nullptr; ///< Module initializer.
+	};
 }
