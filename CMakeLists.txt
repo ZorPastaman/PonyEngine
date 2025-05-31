@@ -17,13 +17,10 @@ project("PonyEngineGame" VERSION 0.0.0.0 LANGUAGES CXX)
 init_build_options()
 
 message(STATUS "Configuring modules")
-add_subdirectory("Targets/Modules/PonyEngine.Core")
-
-message(STATUS "Configuring application modules")
-add_subdirectory("Targets/ApplicationModules/PonyEngine.Core.Impl")
+add_subdirectory("Targets/PonyEngine.Core")
 
 message(STATUS "Configuring application")
-add_subdirectory("Targets/Application/PonyEngine.Application")
+add_subdirectory("Targets/PonyEngine.Application")
 
 message(STATUS "Installing")
 get_property(PONY_INSTALL_VALUE GLOBAL PROPERTY PONY_INSTALL)

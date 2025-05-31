@@ -7,8 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Module/API.h"
+module;
 
-import Write;
+#include <string_view>
 
-PONY_MODULE_INITIALIZER_DEFAULT(WriteThat, Core);
+export module PonyEngine.Module:ModuleInfo;
+
+export namespace PonyEngine::Module
+{
+	/// @brief Module initializer function.
+	using ModuleInitializer = void(*)();
+
+	/// @brief Module info.
+	struct ModuleInfo final
+	{
+		ModuleInitializer initializer = nullptr; ///< Module initializer.
+		const std::string_view name; ///< Module name.
+	};
+}

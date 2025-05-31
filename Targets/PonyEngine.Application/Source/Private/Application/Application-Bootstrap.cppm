@@ -36,7 +36,7 @@ namespace PonyEngine::Application
 		std::uintptr_t current = begin;
 		while (current < end)
 		{
-			if (const auto info = reinterpret_cast<const Module::ModuleInfo*>(current); info->name.data() && info->initializer)
+			if (const auto info = reinterpret_cast<const Module::ModuleInfo*>(current); info->initializer)
 			{
 				std::cout << info->name << "\n";
 				info->initializer();
