@@ -11,14 +11,21 @@
 
 #pragma once
 
-#include "PonyEngine/Module/Module.h"
 #include "PonyEngine/Utility/Compiler.h"
 #include "PonyEngine/Utility/Macro.h"
 
 /// @brief Creates a module section name.
 /// @param order Section order.
 #define PONY_MODULE_SECTION_NAME(order) PONY_STRINGIFY_VALUE(PONY_CONCAT_VALUES(PonyModule$, order))
+/// @brief Allocates a module segment.
+/// @param order Segment order.
 #define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
+/// @brief Creates a module function name.
+/// @param function Target function name.
+#define PONY_MODULE_FUNCTION_NAME(function) PONY_CONCAT_VALUES(PonyInitializerFunc, function)
+/// @brief Creates a module field name.
+/// @param function Target function name.
+#define PONY_MODULE_FIELD_NAME(function) PONY_CONCAT_VALUES(PonyInitializerField, function)
 
 // Order list. The order of execution is Begin -> Earliest -> Earlier -> Early -> Default -> Late -> Later -> Latest -> End
 // Don't use Begin and End. They are special marks.
@@ -32,29 +39,29 @@
 #define PONY_MODULE_ORDER_LATEST y
 #define PONY_MODULE_ORDER_END z
 
-// PONY_MODULE_ALLOCATE allocates a linker section.
-// PONY_MODULE_INCLUDE Forces a linker to include a symbol.
-#ifdef _MSC_VER
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLIEST), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLIER), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLY), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_DEFAULT), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATE), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATER), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATEST), read)
-#pragma section(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END), read)
-#else
-#error "Unsupported compiler!"
-#endif
+// Section declaration.
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLIEST))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLIER))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_EARLY))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_DEFAULT))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATE))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATER))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LATEST))
+PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds a module initialization function.
-/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.
+/// @note The function name must be unique across the whole application.
+/// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using. In a dll, it must have PONY_DLL_EXPORT as well.
 /// @param order Execution order. Must be one of PONY_MODULE_ORDER except Begin and End.
 #define PONY_MODULE_INITIALIZER(function, order) \
-	extern "C" PONY_MODULE_ALLOCATE(order) const PonyEngine::Module::ModuleInitializer PONY_CONCAT_VALUES(PonyInitializer, function) = function; \
-	PONY_PRESERVE(function); \
-	PONY_PRESERVE(PONY_CONCAT_VALUES(PonyInitializer, function));
+	extern "C" void PONY_MODULE_FUNCTION_NAME(function)() \
+	{ \
+		function(); \
+	} \
+	extern "C" PONY_MODULE_ALLOCATE(order) const PonyEngine::Module::ModuleInitializer PONY_MODULE_FIELD_NAME(function) = &PONY_MODULE_FUNCTION_NAME(function); \
+	PONY_PRESERVE(PONY_MODULE_FUNCTION_NAME(function)); \
+	PONY_PRESERVE(PONY_MODULE_FIELD_NAME(function));
 
 /// @brief Adds a module initialization function and sets the earliest order.
 /// @param function Function to add. It must satisfy PonyEngine::Module::ModuleInitializer using, have extern "C" mark and be in a global namespace.

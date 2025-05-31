@@ -1,27 +1,44 @@
 ﻿message(STATUS "Configuring PonyEngine.Application")
-if (PONY_WINDOWS)
+if(PONY_WINDOWS)
 	add_executable(PonyEngine.Application WIN32)
-
-	message(STATUS "Configuring sources for Windows")
-	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Main.Windows.cppm"
-		"Source/Private/Application/Windows/Application.Windows.cppm"
-		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
-		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
-	 )
-
-	message(STATUS "Configuring data for Windows")
-	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
-	target_sources(PonyEngine.Application PRIVATE Application.manifest)
 else()
-	message(FATAL_ERROR "Unsupported platform!")
+	add_executable(PonyEngine.Application)
 endif()
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Application/Application.cppm"
+	"Source/Private/Application/Application-Bootstrap.cppm"
 	"Source/Private/Application/Application-ExitCodes.cppm"
 )
+
+if(PONY_WINCORE)
+	message(STATUS "Configuring sources for WinCore")
+	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Application/WinCore/Application.WinCore.cppm"
+	)
+endif()
+
+if(PONY_WINDOWS)
+	message(STATUS "Configuring sources for Windows")
+	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Application/Windows/Application.Windows.cppm"
+		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
+		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
+	 )
+	 target_sources(PonyEngine.Application PRIVATE
+		"Source/Main.Windows.cpp"
+	 )
+
+	message(STATUS "Configuring data for Windows")
+	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
+	target_sources(PonyEngine.Application PRIVATE Application.manifest)
+endif()
+
+message(STATUS "Configuring defines")
+if(PONY_CREATE_CONSOLE)
+	add_compile_definitions(PONY_CREATE_CONSOLE)
+endif()
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE

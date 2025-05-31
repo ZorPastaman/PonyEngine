@@ -7,15 +7,8 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <iostream>
-
 #include "PonyEngine/Module/API.h"
-#include "PonyEngine/Utility/Compiler.h"
 
-extern "C" void PONY_DLL_EXPORT InitializeModule();
-PONY_MODULE_INITIALIZER_DEFAULT(InitializeModule);
+import Write;
 
-void InitializeModule()
-{
-	std::cout << "Module!\n";
-}
+PONY_MODULE_INITIALIZER_DEFAULT(WriteThat);

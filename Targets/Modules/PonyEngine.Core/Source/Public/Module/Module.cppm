@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Module;
 
-namespace PonyEngine::Module
-{
-	/// @brief Module initializer function.
-	using ModuleInitializer = void(*)();
-}
+export import :ModuleInitializer;
