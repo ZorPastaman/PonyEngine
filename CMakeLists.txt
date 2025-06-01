@@ -29,12 +29,6 @@ install(TARGETS ${PONY_INSTALL_VALUE} RUNTIME DESTINATION .)
 
 message(STATUS "Configuring test project")
 project("PonyEngineTests")
-include(FetchContent)
-FetchContent_Declare(
-  Catch2
-  GIT_REPOSITORY https://github.com/catchorg/Catch2.git
-  GIT_TAG v3.8.1
-)
-FetchContent_MakeAvailable(Catch2)
 
-add_subdirectory("Tests/PonyEngine.Core.Tests")
+message(STATUS "Fetching Catch2")
+add_subdirectory("Tests")
