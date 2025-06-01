@@ -3,8 +3,25 @@ add_executable(PonyEngine.Core.Tests)
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
-	"Utility.cpp"
+	"Utility/Enum.cpp"
+	"Utility/SafeFormat.cpp"
 )
+
+if(PONY_WINCORE)
+	message(STATUS "Configuring sources for WinCore")
+	target_sources(PonyEngine.Core.Tests PRIVATE
+		"Platform/WinCore/GUID.cpp"
+		"Platform/WinCore/Utility.cpp"
+	)
+endif()
+
+if(PONY_WINDOWS)
+	message(STATUS "Configuring sources for Windows")
+	target_sources(PonyEngine.Core.Tests PRIVATE
+		"Platform/Windows/Cursor.cpp"
+		"Platform/Windows/Module.cpp"
+	)
+endif()
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 

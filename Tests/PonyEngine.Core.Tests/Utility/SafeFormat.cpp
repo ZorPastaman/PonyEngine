@@ -7,6 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+#include <format>
 #include <stdexcept>
 #include <string>
 
@@ -31,8 +32,12 @@ struct ThrowingType {};
 template<>
 struct std::formatter<ThrowingType, char>
 {
-	constexpr auto parse(std::format_parse_context& ctx) { return ctx.begin(); }
-	auto format(const ThrowingType&, std::format_context& ctx) const
+	static constexpr auto parse(std::format_parse_context& ctx)
+	{
+		return ctx.begin();
+	}
+
+	static auto format(const ThrowingType&, std::format_context& ctx)
 	{
 		throw std::runtime_error("Custom formatter error");
 		return ctx.out();
