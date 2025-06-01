@@ -17,12 +17,18 @@ project("PonyEngineGame" VERSION 0.0.0.0 LANGUAGES CXX)
 init_build_options()
 
 message(STATUS "Configuring modules")
-add_subdirectory("Targets/PonyEngine.Core")
+add_subdirectory("Engine/PonyEngine.Core")
 
 message(STATUS "Configuring application")
-add_subdirectory("Targets/PonyEngine.Application")
+add_subdirectory("Engine/PonyEngine.Application")
 
 message(STATUS "Installing")
 get_property(PONY_INSTALL_VALUE GLOBAL PROPERTY PONY_INSTALL)
 message(STATUS "Install list: ${PONY_INSTALL_VALUE}")
 install(TARGETS ${PONY_INSTALL_VALUE} RUNTIME DESTINATION .)
+
+message(STATUS "Configuring test project")
+project("PonyEngineTests")
+
+message(STATUS "Fetching Catch2")
+add_subdirectory("Tests")

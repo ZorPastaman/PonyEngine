@@ -9,8 +9,12 @@
 
 module;
 
+#include <algorithm>
+#include <format>
+#include <ostream>
 #include <stdexcept>
 #include <string>
+#include <string_view>
 #include <type_traits>
 
 #include "PonyEngine/Platform/WinCore/Framework.h"
@@ -34,6 +38,35 @@ export namespace PonyEngine::Platform::WinCore
 	[[nodiscard("Pure function")]]
 	std::string ToString(const GUID& guid);
 }
+
+/// @brief Stream insertion operator for GUID.
+/// @param stream The output stream to write to.
+/// @param guid The GUID to output.
+/// @return Reference to the output stream.
+export std::ostream& operator <<(std::ostream& stream, const GUID& guid)
+{
+	return stream << PonyEngine::Platform::WinCore::ToString(guid);
+}
+
+/// @brief WinCore GUID formatter.
+export template<>
+struct std::formatter<GUID, char>
+{
+	static constexpr auto parse(std::format_parse_context& context)
+	{
+		if (*context.begin() != '}') [[unlikely]]
+		{
+			throw std::format_error("Unexpected format specifier.");
+		}
+
+		return context.begin();
+	}
+
+	static auto format(const GUID& guid, std::format_context& context)
+	{
+		return std::ranges::copy(PonyEngine::Platform::WinCore::ToString(guid), context.out()).out;
+	}
+};
 
 namespace PonyEngine::Platform::WinCore
 {

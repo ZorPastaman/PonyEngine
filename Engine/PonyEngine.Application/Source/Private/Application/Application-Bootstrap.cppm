@@ -38,7 +38,7 @@ namespace PonyEngine::Application
 		{
 			if (const auto info = reinterpret_cast<const Module::ModuleInfo*>(current); info->initializer)
 			{
-				std::cout << info->name << "\n";
+				std::cout << info->name << "\n"; // TODO: Add correct log
 				info->initializer();
 				current += sizeof(Module::ModuleInfo);
 			}

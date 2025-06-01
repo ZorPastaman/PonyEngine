@@ -9,8 +9,18 @@
 
 #pragma once
 
+#include <algorithm>
+#include <bit>
+#include <cstddef>
+#include <format>
+#include <ostream>
+#include <span>
+#include <stdexcept>
+#include <string>
+#include <string_view>
+#include <type_traits>
+
 /// @brief Creates a function to convert an enum value to a predefined string value.
-/// @note Import <algorithm>, <cstddef>, <ostream> and <string_view>.
 /// @param Value Value enum type.
 /// @param Value param name.
 /// @param ValueNames Array of value enum names.
@@ -18,16 +28,31 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string_view ToString(const Value value) noexcept \
 	{ \
-		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1)]; \
+		return (ValueNames)[std::min(static_cast<std::size_t>(value), (ValueNames).size() - 1)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Value value) \
 	{ \
 		return stream << ToString(value); \
 	} \
+	template<> \
+	struct std::formatter<Value, char> \
+	{ \
+		static constexpr auto parse(std::format_parse_context& context) \
+		{ \
+			if (*context.begin() != '}') [[unlikely]] \
+			{ \
+				throw std::format_error("Unexpected format specifier."); \
+			} \
+			return context.begin(); \
+		} \
+		static auto format(const Value value, std::format_context& context) \
+		{ \
+			return std::ranges::copy(ToString(value), context.out()).out; \
+		} \
+	}; \
 
 /// @brief Creates a function that makes a string representing the enum mask.
 /// @note Enum must have Enum::All value defined.
-/// @note Import <bit>, <ostream>, <string> and <type_traits>.
 /// @param Mask Mask enum type.
 /// @param MaskNames Array of mask enum names.
 #define ENUM_MASK_TO_STRING(Mask, MaskNames) \
@@ -60,9 +85,25 @@
 	{ \
 		return stream << ToString(mask); \
 	} \
+	template<> \
+	struct std::formatter<Mask, char> \
+	{ \
+		static constexpr auto parse(std::format_parse_context& context) \
+		{ \
+			if (*context.begin() != '}') [[unlikely]] \
+			{ \
+				throw std::format_error("Unexpected format specifier."); \
+			} \
+			return context.begin(); \
+		} \
+		static auto format(const Mask mask, std::format_context& context) \
+		{ \
+			return std::ranges::copy(ToString(mask), context.out()).out; \
+		} \
+	}; \
 
 /// @brief Creates mask enum operators.
-/// @note Mask must include All value. Import <type_traits>.
+/// @note Mask must include All value.
 /// @param Mask Mask enum type.
 #define ENUM_MASK_OPERATORS(Mask) \
 	[[nodiscard("Pure function")]] \
@@ -101,7 +142,6 @@
 	} \
 
 /// @brief Creates functions for the value enum and mask enum pair.
-/// @note Import <bit>, <cstddef>, <span> and <type_traits>.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
 #define ENUM_VALUE_MASK(Value, Mask) \
