@@ -19,7 +19,7 @@ export namespace PonyEngine::Utility
 {
 	/// @brief The concept is satisfied if @p T has a function that accepts @p const @p std::exception& like this: @p exceptionHandler(e).
 	template<typename T>
-	concept ExceptionHandler = requires (const T & exceptionHandler, const std::exception & e)
+	concept ExceptionHandler = requires (T& exceptionHandler, const std::exception& e)
 	{
 		{ exceptionHandler(e) } noexcept;
 	};
@@ -47,7 +47,7 @@ export namespace PonyEngine::Utility
 	/// @param args Format arguments.
 	/// @return Format result or exception string.
 	template<ExceptionHandler ExceptionHandler, typename... Args> [[nodiscard("Pure function")]]
-	std::string SafeFormat(const ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
+	std::string SafeFormat(ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept;
 }
 
 namespace PonyEngine::Utility
@@ -70,11 +70,13 @@ namespace PonyEngine::Utility
 	template<ExceptionHandler ExceptionHandler, typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept requires (std::is_default_constructible_v<ExceptionHandler>)
 	{
-		return SafeFormat(ExceptionHandler(), format, std::forward<Args>(args)...);
+		auto handler = ExceptionHandler();
+
+		return SafeFormat(handler, format, std::forward<Args>(args)...);
 	}
 
 	template<ExceptionHandler ExceptionHandler, typename... Args>
-	std::string SafeFormat(const ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept
+	std::string SafeFormat(ExceptionHandler& exceptionHandler, std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		try
 		{

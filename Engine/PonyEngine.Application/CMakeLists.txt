@@ -36,6 +36,7 @@ if(PONY_WINDOWS)
 endif()
 
 message(STATUS "Configuring defines")
+option(PONY_CREATE_CONSOLE "Create system console" FALSE)
 if(PONY_CREATE_CONSOLE)
 	add_compile_definitions(PONY_CREATE_CONSOLE)
 endif()

@@ -1,0 +1,18 @@
+message(STATUS "Configuring PonyEngine.Core.Tests")
+add_executable(PonyEngine.Core.Tests)
+
+message(STATUS "Configuring sources")
+target_sources(PonyEngine.Core.Tests PRIVATE
+	"Utility.cpp"
+)
+
+message(STATUS "Configuring dependencies")
+target_link_libraries(PonyEngine.Core.Tests PRIVATE 
+	Catch2::Catch2WithMain
+	PonyEngine.Core
+)
+
+message(STATUS "Discovering tests")
+include(CTest)
+include(Catch)
+catch_discover_tests(PonyEngine.Core.Tests)

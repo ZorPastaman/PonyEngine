@@ -5,7 +5,10 @@
 			"name": "Base",
 			"hidden": true,
 			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
-			"installDir": "${sourceDir}/Output/Install/${presetName}"
+			"installDir": "${sourceDir}/Output/Install/${presetName}",
+			"cacheVariables": {
+				"CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo"
+			}
 		},
 		{
 			"name": "Debug",
