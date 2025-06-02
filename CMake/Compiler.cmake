@@ -1,5 +1,5 @@
 # Cleans default build flags.
-function(init_build_options)
+function(pony_init_build_options)
 if (MSVC)
 	string(REGEX REPLACE "/RTC[^ ]*" "" NEW_DEBUG_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
 	string(REGEX REPLACE "/O[^ ]*" "" NEW_DEBUG_FLAGS "${NEW_DEBUG_FLAGS}")
@@ -16,7 +16,7 @@ endfunction()
 # Sets build options based on if the target is an engine target or a game target.
 # target_name - Target name.
 # is_engine_target - Is the target an engine target?
-function(set_build_options target_name is_engine_target)
+function(pony_set_build_options target_name is_engine_target)
 	function(set_base_options target_name)
 		target_compile_options(${target_name} PUBLIC
 			$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /EHsc /fp:fast /GR /W4 /permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew>

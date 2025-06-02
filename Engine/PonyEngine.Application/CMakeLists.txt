@@ -36,24 +36,23 @@ if(PONY_WINDOWS)
 endif()
 
 message(STATUS "Configuring defines")
-option(PONY_CREATE_CONSOLE "Create system console" FALSE)
 if(PONY_CREATE_CONSOLE)
-	add_compile_definitions(PONY_CREATE_CONSOLE)
+	target_compile_definitions(PonyEngine.Application PRIVATE PONY_CREATE_CONSOLE)
 endif()
-
-message(STATUS "Configuring dependencies")
-target_link_libraries(PonyEngine.Application PRIVATE
-	PonyEngine.Core
-)
-get_property(PONY_APP_MODULES_VALUE GLOBAL PROPERTY PONY_APP_MODULES)
-message(STATUS "Application module list: ${PONY_APP_MODULES_VALUE}")
-target_link_libraries(PonyEngine.Application PRIVATE ${PONY_APP_MODULES_VALUE})
-
-message(STATUS "Setting build options")
-set_build_options(PonyEngine.Application TRUE)
+pony_set_log_mask(PonyEngine.Log TRUE)
 
 message(STATUS "Setting properties")
 set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PROJECT_NAME}")
 
-message(STATUS "Setting globals")
-set_property(GLOBAL APPEND PROPERTY PONY_INSTALL PonyEngine.Application)
+message(STATUS "Setting build options")
+pony_set_build_options(PonyEngine.Application TRUE)
+
+message(STATUS "Configuring dependencies")
+target_link_libraries(PonyEngine.Application PRIVATE
+	PonyEngine.Core
+	PonyEngine.Log
+)
+pony_target_link_app_modules(PonyEngine.Application)
+
+message(STATUS "Adding to install")
+pony_add_install(PonyEngine.Application)

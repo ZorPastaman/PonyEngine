@@ -7,7 +7,9 @@
 			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
 			"installDir": "${sourceDir}/Output/Install/${presetName}",
 			"cacheVariables": {
-				"CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo"
+				"CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo",
+				"PONY_CONSOLE_LOG": "TRUE",
+				"PONY_SYSTEM_CONSOLE_LOG": "TRUE"
 			}
 		},
 		{
@@ -18,7 +20,9 @@
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMAZATION": "Debug",
 				"PONY_ENGINE_OPTIMIZATION": "Debug",
-				"PONY_CREATE_CONSOLE": "TRUE"
+				"PONY_CREATE_CONSOLE": "TRUE",
+				"PONY_GAME_LOG_LEVEL": "Debug",
+				"PONY_ENGINE_LOG_LEVEL": "Debug"
 			}
 		},
 		{
@@ -29,7 +33,9 @@
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMAZATION": "Debug",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
-				"PONY_CREATE_CONSOLE": "TRUE"
+				"PONY_CREATE_CONSOLE": "TRUE",
+				"PONY_GAME_LOG_LEVEL": "Debug",
+				"PONY_ENGINE_LOG_LEVEL": "Info"
 			}
 		},
 		{
@@ -39,7 +45,9 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
 				"PONY_GAME_OPTIMAZATION": "Release",
-				"PONY_ENGINE_OPTIMIZATION": "Release"
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Info",
+				"PONY_ENGINE_LOG_LEVEL": "Warning"
 			}
 		},
 		{
@@ -49,7 +57,9 @@
 			"cacheVariables": {
 				"CMAKE_BUILD_TYPE": "Release",
 				"PONY_GAME_OPTIMAZATION": "Release",
-				"PONY_ENGINE_OPTIMIZATION": "Release"
+				"PONY_ENGINE_OPTIMIZATION": "Release",
+				"PONY_GAME_LOG_LEVEL": "Error",
+				"PONY_ENGINE_LOG_LEVEL": "Error"
 			}
 		},
 		{
