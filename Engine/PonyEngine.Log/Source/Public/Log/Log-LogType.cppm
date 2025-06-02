@@ -3,28 +3,21 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include "PonyBase/Utility/Enum.h"
+#include <array>
+#include <cstdint>
+#include <string_view>
 
-export module PonyDebug.Log:LogType;
+#include "PonyEngine/Utility/Enum.h"
 
-import <algorithm>;
-import <array>;
-import <bit>;
-import <cstddef>;
-import <cstdint>;
-import <ostream>;
-import <span>;
-import <string>;
-import <string_view>;
-import <type_traits>;
+export module PonyEngine.Log:LogType;
 
-namespace PonyDebug::Log
+namespace PonyEngine::Log
 {
 	/// @brief Log type names by index.
 	constexpr std::array<std::string_view, 7> LogTypeNames
@@ -39,7 +32,7 @@ namespace PonyDebug::Log
 	};
 }
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Severity of a log.
 	enum class LogType : std::uint8_t
@@ -78,4 +71,9 @@ export namespace PonyDebug::Log
 	};
 
 	ENUM_VALUE_MASK_FEATURES(LogType, LogTypeNames, LogTypeMask, LogTypeNames)
+}
+
+export
+{
+	ENUM_VALUE_MASK_FORMATTER(PonyEngine::Log, LogType, LogTypeMask)
 }

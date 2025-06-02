@@ -3,21 +3,23 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogFormat;
+module;
 
-import <cstdint>;
-import <chrono>;
-import <format>;
-import <string>;
-import <string_view>;
+#include <cstdint>
+#include <chrono>
+#include <format>
+#include <string>
+#include <string_view>
+
+export module PonyEngine.Log:LogFormat;
 
 import :LogType;
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Log
 {
 	/// @brief Formats a log string.
 	/// @param logType Log type.
@@ -31,7 +33,7 @@ export namespace PonyDebug::Log
 	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
-	std::string LogFormat(LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::int64_t frameCount);
+	std::string LogFormat(LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);
 	/// @brief Formats a log string.
 	/// @param logType Log type.
 	/// @param message Log message.
@@ -46,7 +48,7 @@ export namespace PonyDebug::Log
 	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
-	std::string LogFormat(LogType logType, std::string_view message, std::chrono::time_point<std::chrono::system_clock> timePoint, std::int64_t frameCount);
+	std::string LogFormat(LogType logType, std::string_view message, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);
 	/// @brief Formats a log string.
 	/// @param logType Log type.
 	/// @param firstMessage First log message.
@@ -63,18 +65,18 @@ export namespace PonyDebug::Log
 	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
-	std::string LogFormat(LogType logType, std::string_view firstMessage, std::string_view secondMessage, std::chrono::time_point<std::chrono::system_clock> timePoint, std::int64_t frameCount);
+	std::string LogFormat(LogType logType, std::string_view firstMessage, std::string_view secondMessage, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);
 
 }
 
-namespace PonyDebug::Log
+namespace PonyEngine::Log
 {
 	std::string LogFormat(const LogType logType, const std::chrono::time_point<std::chrono::system_clock> timePoint)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC}]\n", ToString(logType), timePoint);
 	}
 
-	std::string LogFormat(const LogType logType, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::int64_t frameCount)
+	std::string LogFormat(const LogType logType, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})]\n", ToString(logType), timePoint, frameCount);
 	}
@@ -84,7 +86,7 @@ namespace PonyDebug::Log
 		return std::format("[{}] [{:%F %R:%OS UTC}] {}\n", ToString(logType), timePoint, message);
 	}
 
-	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::int64_t frameCount)
+	std::string LogFormat(const LogType logType, const std::string_view message, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {}\n", ToString(logType), timePoint, frameCount, message);
 	}
@@ -94,7 +96,7 @@ namespace PonyDebug::Log
 		return std::format("[{}] [{:%F %R:%OS UTC}] {} - {}\n", ToString(logType), timePoint, firstMessage, secondMessage);
 	}
 
-	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::int64_t frameCount)
+	std::string LogFormat(const LogType logType, const std::string_view firstMessage, const std::string_view secondMessage, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::uint64_t frameCount)
 	{
 		return std::format("[{}] [{:%F %R:%OS UTC} ({})] {} - {}\n", ToString(logType), timePoint, frameCount, firstMessage, secondMessage);
 	}

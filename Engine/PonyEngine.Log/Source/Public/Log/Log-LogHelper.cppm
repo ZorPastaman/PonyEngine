@@ -3,47 +3,37 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
+#include <cassert>
+#include <chrono>
+#include <format>
+#include <exception>
+#include <iostream>
+#include <string>
+#include <string_view>
+
 #ifdef PONY_SYSTEM_CONSOLE_LOG
-#ifdef _WIN32 // TODO: Make a custom define.
-#include "PonyBase/Core/Windows/Framework.h"
+#ifdef PONY_WINCORE
+#include "PonyEngine/Platform/WinCore/Framework.h"
 #endif
 #endif
 
-#include "PonyDebug/Log/Log.h"
+export module PonyEngine.Log:LogHelper;
 
-export module PonyDebug.Log:LogHelper;
-
-import <chrono>;
-import <cstddef>;
-import <format>;
-import <exception>;
-import <iostream>;
-import <string>;
-import <string_view>;
-
-import PonyBase.Utility;
+import PonyEngine.Utility;
 
 import :ILogger;
 import :LogFormat;
 import :LogInput;
 import :LogType;
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Log
 {
-	/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
-	struct ConsoleExceptionHandler final
-	{
-		/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
-		/// @param e Exception to pass.
-		void operator ()(const std::exception& e) const noexcept;
-	};
-
 	/// @brief Logs to the @p logger.
 	/// @param logger Logger.
 	/// @param logType Log type.
@@ -108,6 +98,17 @@ export namespace PonyDebug::Log
 	/// @return Chosen stream.
 	[[nodiscard("Pure function")]]
 	std::ostream& ChooseConsoleStream(LogType logType) noexcept;
+}
+
+namespace PonyEngine::Log
+{
+	/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
+	struct ConsoleExceptionHandler final
+	{
+		/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
+		/// @param e Exception to pass.
+		void operator ()(const std::exception& e) const noexcept;
+	};
 
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p ConsoleExceptionHandler.
 	/// @tparam Args Format argument types.
@@ -116,10 +117,7 @@ export namespace PonyDebug::Log
 	/// @return Format result or empty string if std::format() threw.
 	template<typename... Args> [[nodiscard("Pure function")]]
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept;
-}
 
-namespace PonyDebug::Log
-{
 	/// @brief Logs to a standard console and a system console.
 	/// @param logType Log type.
 	/// @param log Formatted log message.
@@ -127,7 +125,7 @@ namespace PonyDebug::Log
 
 	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
 	{
-		PONY_CONSOLE_E_S(e);
+		LogExceptionToConsole(e);
 	}
 
 	void LogToLogger(const ILogger& logger, const LogType logType, const std::string_view message) noexcept
@@ -223,7 +221,8 @@ namespace PonyDebug::Log
 		case LogType::Error:
 		case LogType::Exception:
 			return std::cerr;
-		default:
+		default: [[unlikely]]
+			assert(false && "Invalid log type.");
 			return std::cerr; // Fallback
 		}
 	}
@@ -231,7 +230,7 @@ namespace PonyDebug::Log
 	template<typename... Args>
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		return PonyBase::Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
+		return Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
 	static void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
@@ -247,7 +246,7 @@ namespace PonyDebug::Log
 		}
 #endif
 #ifdef PONY_SYSTEM_CONSOLE_LOG
-#ifdef _WIN32
+#ifdef PONY_WINCORE
 		OutputDebugStringA(log.data());
 #endif
 #endif

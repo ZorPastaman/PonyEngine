@@ -3,22 +3,24 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyDebug.Log:LogInput;
+module;
 
-import <cstdint>;
-import <optional>;
-import <string_view>;
+#include <cstdint>
+#include <optional>
+#include <string_view>
 
-export namespace PonyDebug::Log
+export module PonyEngine.Log:LogInput;
+
+export namespace PonyEngine::Log
 {
 	/// @brief Log data input.
 	struct LogInput final
 	{
 		std::string_view message; ///< Log message.
-		std::optional<std::int64_t> frameCount = {}; ///< Engine frame count.
+		std::optional<std::uint64_t> frameCount = {}; ///< Engine frame count.
 	};
 }

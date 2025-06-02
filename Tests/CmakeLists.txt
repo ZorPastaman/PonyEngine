@@ -1,3 +1,4 @@
+message(STATUS "Fetching Catch2")
 include(FetchContent)
 FetchContent_Declare(
   Catch2

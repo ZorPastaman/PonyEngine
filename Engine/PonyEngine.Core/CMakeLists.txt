@@ -44,4 +44,4 @@ if(PONY_WINDOWS)
 endif()
 
 message(STATUS "Setting build options")
-set_build_options(PonyEngine.Core TRUE)
+pony_set_build_options(PonyEngine.Core TRUE)
