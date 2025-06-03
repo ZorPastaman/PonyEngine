@@ -102,10 +102,10 @@ export namespace PonyEngine::Log
 
 namespace PonyEngine::Log
 {
-	/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
+	/// @brief Passes exceptions to a console.
 	struct ConsoleExceptionHandler final
 	{
-		/// @brief Passes exceptions to @p PONY_CONSOLE_E_S.
+		/// @brief Passes exceptions to a console.
 		/// @param e Exception to pass.
 		void operator ()(const std::exception& e) const noexcept;
 	};
@@ -122,11 +122,6 @@ namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param log Formatted log message.
 	void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
-
-	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
-	{
-		LogExceptionToConsole(e);
-	}
 
 	void LogToLogger(const ILogger& logger, const LogType logType, const std::string_view message) noexcept
 	{
@@ -223,7 +218,7 @@ namespace PonyEngine::Log
 			return std::cerr;
 		default: [[unlikely]]
 			assert(false && "Invalid log type.");
-			return std::cerr; // Fallback
+			return std::cerr;
 		}
 	}
 
@@ -233,7 +228,7 @@ namespace PonyEngine::Log
 		return Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
 
-	static void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
+	void LogFormattedToConsole(const LogType logType, const std::string_view log) noexcept
 	{
 #ifdef PONY_CONSOLE_LOG
 		try
@@ -250,5 +245,10 @@ namespace PonyEngine::Log
 		OutputDebugStringA(log.data());
 #endif
 #endif
+	}
+
+	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
+	{
+		LogExceptionToConsole(e);
 	}
 }

@@ -7,10 +7,6 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Utility/Enum.h"
-
-#include <catch2/catch_test_macros.hpp>
-
 #include <algorithm>
 #include <array>
 #include <bit>
@@ -21,6 +17,10 @@
 #include <string>
 #include <string_view>
 #include <type_traits>
+
+#include "PonyEngine/Utility/Enum.h"
+
+#include <catch2/catch_test_macros.hpp>
 
 namespace Name
 {
