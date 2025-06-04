@@ -23,13 +23,13 @@ export namespace PonyEngine::Log
 {
 	/// @brief Formats a log string.
 	/// @param logType Log type.
-	/// @param timePoint Time when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
 	std::string LogFormat(LogType logType, std::chrono::time_point<std::chrono::system_clock> timePoint);
 	/// @brief Formats a log string.
 	/// @param logType Log type.
-	/// @param timePoint Time when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
 	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
@@ -37,15 +37,15 @@ export namespace PonyEngine::Log
 	/// @brief Formats a log string.
 	/// @param logType Log type.
 	/// @param message Log message.
-	/// @param timePoint Time when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
 	std::string LogFormat(LogType logType, std::string_view message, std::chrono::time_point<std::chrono::system_clock> timePoint);
 	/// @brief Formats a log string.
 	/// @param logType Log type.
 	/// @param message Log message.
-	/// @param timePoint Time when the log has been created.
-	/// @param frameCount Frame when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
+	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
 	std::string LogFormat(LogType logType, std::string_view message, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);
@@ -53,7 +53,7 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param firstMessage First log message.
 	/// @param secondMessage Second log message.
-	/// @param timePoint Time when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
 	std::string LogFormat(LogType logType, std::string_view firstMessage, std::string_view secondMessage, std::chrono::time_point<std::chrono::system_clock> timePoint);
@@ -61,8 +61,8 @@ export namespace PonyEngine::Log
 	/// @param logType Log type.
 	/// @param firstMessage First log message.
 	/// @param secondMessage Second log message.
-	/// @param timePoint Time when the log has been created.
-	/// @param frameCount Frame when the log has been created. Must UTC.
+	/// @param timePoint Time when the log has been created. Must be UTC.
+	/// @param frameCount Frame when the log has been created.
 	/// @return Formatted log string.
 	[[nodiscard("Pure function")]]
 	std::string LogFormat(LogType logType, std::string_view firstMessage, std::string_view secondMessage, std::chrono::time_point<std::chrono::system_clock> timePoint, std::uint64_t frameCount);

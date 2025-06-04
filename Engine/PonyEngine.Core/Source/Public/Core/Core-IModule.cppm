@@ -11,17 +11,20 @@ module;
 
 #include <string_view>
 
-export module PonyEngine.Module:ModuleInfo;
+#include "PonyEngine/Utility/ObjectBody.h"
 
-export namespace PonyEngine::Module
+export module PonyEngine.Core:IModule;
+
+export namespace PonyEngine::Core
 {
-	/// @brief Module initializer function.
-	using ModuleInitializer = void(*)();
-
-	/// @brief Module info.
-	struct ModuleInfo final
+	/// @brief Module.
+	class IModule
 	{
-		ModuleInitializer initializer = nullptr; ///< Module initializer.
-		const std::string_view name; ///< Module name.
+		INTERFACE_BODY(IModule)
+
+		/// @brief Gets the name.
+		/// @return Name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 	};
 }

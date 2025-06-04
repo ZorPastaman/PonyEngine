@@ -3,32 +3,32 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: zor1994@gmail.com                        *
+ * Email: cybercode.smith@pm.me                    *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Core:IApplicationContext;
 
-import PonyDebug.Log;
+import PonyEngine.Log;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Application context.
+	/// @brief Application context. It exists for the whole life of an application.
 	class IApplicationContext
 	{
 		INTERFACE_BODY(IApplicationContext)
 
-		/// @brief Gets the application logger.
-		/// @return Application logger.
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
-		/// @brief Gets the application logger.
-		/// @return Application logger.
+		virtual Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
 		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+		virtual const Log::ILogger& Logger() const noexcept = 0;
 	};
 }

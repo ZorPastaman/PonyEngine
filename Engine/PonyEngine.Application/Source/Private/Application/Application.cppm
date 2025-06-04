@@ -9,5 +9,5 @@
 
 export module PonyEngine.Application;
 
-export import :Bootstrap;
+export import :App;
 export import :ExitCodes;

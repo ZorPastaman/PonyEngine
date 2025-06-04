@@ -8,8 +8,17 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
-	"Source/Public/Module/Module.cppm"
-	"Source/Public/Module/Module-ModuleInfo.cppm"
+	"Source/Public/Core/Core.cppm"
+	"Source/Public/Core/Core-IApplicationContext.cppm"
+	"Source/Public/Core/Core-ILoggerModule.cppm"
+	"Source/Public/Core/Core-IModule.cppm"
+	"Source/Public/Core/Core-IModuleContext.cppm"
+	"Source/Public/Log/Log.cppm"
+	"Source/Public/Log/Log-ILogger.cppm"
+	"Source/Public/Log/Log-LogFormat.cppm"
+	"Source/Public/Log/Log-LogHelper.cppm"
+	"Source/Public/Log/Log-LogInput.cppm"
+	"Source/Public/Log/Log-LogType.cppm"
 	"Source/Public/Platform/Platform.cppm"
 	"Source/Public/Utility/Utility.cppm"
 	"Source/Public/Utility/Utility-SafeFormat.cppm"
@@ -42,6 +51,9 @@ if(PONY_WINDOWS)
 		"Source/Public/Platform/Windows/Platform.Windows-Module.cppm"
 	)
 endif()
+
+message(STATUS "Configuring defines")
+pony_set_log_mask(PonyEngine.Core TRUE)
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Core TRUE)

@@ -3,6 +3,8 @@ add_executable(PonyEngine.Core.Tests)
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
+	"Log/LogFormat.cpp"
+	"Log/LogHelper.cpp"
 	"Utility/Enum.cpp"
 	"Utility/SafeFormat.cpp"
 )
