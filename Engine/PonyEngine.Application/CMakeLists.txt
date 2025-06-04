@@ -8,7 +8,9 @@ endif()
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Application/Application.cppm"
-	"Source/Private/Application/Application-Bootstrap.cppm"
+	"Source/Private/Application/Application-App.cppm"
+	"Source/Private/Application/Application-AppLogger.cppm"
+	"Source/Private/Application/Application-EmptyLogger.cppm"
 	"Source/Private/Application/Application-ExitCodes.cppm"
 )
 
@@ -39,7 +41,7 @@ message(STATUS "Configuring defines")
 if(PONY_CREATE_CONSOLE)
 	target_compile_definitions(PonyEngine.Application PRIVATE PONY_CREATE_CONSOLE)
 endif()
-pony_set_log_mask(PonyEngine.Log TRUE)
+pony_set_log_mask(PonyEngine.Application TRUE)
 
 message(STATUS "Setting properties")
 set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PROJECT_NAME}")
@@ -50,9 +52,10 @@ pony_set_build_options(PonyEngine.Application TRUE)
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE
 	PonyEngine.Core
-	PonyEngine.Log
 )
-pony_target_link_app_modules(PonyEngine.Application)
+pony_link_app_modules(PonyEngine.Application)
 
-message(STATUS "Adding to install")
-pony_add_install(PonyEngine.Application)
+message(STATUS "Installing")
+get_property(PONY_APP_INSTALL_PATH_VALUE GLOBAL PROPERTY PONY_APP_INSTALL_PATH)
+message(STATUS "Application destination: ${PONY_APP_INSTALL_PATH_VALUE}")
+install(TARGETS PonyEngine.Application RUNTIME DESTINATION ${PONY_APP_INSTALL_PATH_VALUE})

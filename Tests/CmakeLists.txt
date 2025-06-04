@@ -9,4 +9,3 @@ FetchContent_MakeAvailable(Catch2)
 
 message(STATUS "Configuring tests")
 add_subdirectory("PonyEngine.Core.Tests")
-add_subdirectory("PonyEngine.Log.Tests")

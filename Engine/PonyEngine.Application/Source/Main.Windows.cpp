@@ -13,8 +13,6 @@
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
-import PonyEngine.Module;
-
 import PonyEngine.Application.Windows;
 
 int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
@@ -26,7 +24,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
 #endif
 
-		PonyEngine::Application::InitializeModules();
+		PonyEngine::Application::App app;
 
 		std::cout << "Wow ☃ 日本国 кошка\n";
 		OutputDebugStringA("Wow ☃ 日本国 кошка\n");
