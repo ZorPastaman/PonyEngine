@@ -10,6 +10,8 @@ message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Core/Core.cppm"
 	"Source/Public/Core/Core-IApplicationContext.cppm"
+	"Source/Public/Core/Core-IEngine.cppm"
+	"Source/Public/Core/Core-IEngineModule.cppm"
 	"Source/Public/Core/Core-ILoggerModule.cppm"
 	"Source/Public/Core/Core-IModule.cppm"
 	"Source/Public/Core/Core-IModuleContext.cppm"

@@ -10,12 +10,13 @@
 module;
 
 #include <memory>
+#include <stdexcept>
 
 export module PonyEngine.Application:AppLogger;
 
 import PonyEngine.Log;
 
-import :EmptyLogger;
+import :DefaultLogger;
 
 export namespace PonyEngine::Application
 {
@@ -35,6 +36,10 @@ export namespace PonyEngine::Application
 		[[nodiscard("Pure function")]]
 		Log::ILogger& Logger() const noexcept;
 
+		/// @brief Sets a new logger.
+		/// @param logger Logger to set. Mustn't be nullptr.
+		void SetLogger(const std::shared_ptr<Log::ILogger>& logger);
+
 		AppLogger& operator =(const AppLogger&) = delete;
 		AppLogger& operator =(AppLogger&&) = delete;
 
@@ -46,12 +51,22 @@ export namespace PonyEngine::Application
 namespace PonyEngine::Application
 {
 	AppLogger::AppLogger() :
-		logger(std::make_shared<EmptyLogger>())
+		logger(std::make_shared<DefaultLogger>())
 	{
 	}
 
 	Log::ILogger& AppLogger::Logger() const noexcept
 	{
 		return *logger;
+	}
+
+	void AppLogger::SetLogger(const std::shared_ptr<Log::ILogger>& logger)
+	{
+		if (!logger) [[unlikely]]
+		{
+			throw std::invalid_argument("Logger is nullptr.");
+		}
+
+		this->logger = logger;
 	}
 }

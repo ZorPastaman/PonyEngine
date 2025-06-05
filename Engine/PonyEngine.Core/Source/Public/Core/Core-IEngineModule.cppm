@@ -13,26 +13,25 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:ILoggerModule;
-
-import PonyEngine.Log;
+export module PonyEngine.Core:IEngineModule;
 
 import :IApplicationContext;
+import :IEngine;
 import :IModule;
 import :IModuleContext;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Logger module.
-	class ILoggerModule : public IModule
+	/// @brief Engine module.
+	class IEngineModule : public IModule
 	{
-		INTERFACE_BODY(ILoggerModule)
+		INTERFACE_BODY(IEngineModule)
 
-		/// @brief Creates a logger.
+		/// @brief Creates an engine.
 		/// @param moduleContext Module context.
 		/// @param applicationContext Application context.
-		/// @return Logger.
+		/// @return Engine.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<Log::ILogger> CreateLogger(const IModuleContext& moduleContext, IApplicationContext& applicationContext) = 0;
+		virtual std::shared_ptr<IEngine> CreateEngine(const IModuleContext& moduleContext, IApplicationContext& applicationContext) = 0;
 	};
 }

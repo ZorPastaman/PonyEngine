@@ -8,12 +8,12 @@
  ***************************************************/
 
 #include <exception>
-#include <format>
-#include <iostream>
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 import PonyEngine.Application.Windows;
+import PonyEngine.Log;
 
 int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
@@ -26,23 +26,19 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 
 		PonyEngine::Application::App app;
 
-		std::cout << "Wow ☃ 日本国 кошка\n";
-		OutputDebugStringA("Wow ☃ 日本国 кошка\n");
-		MessageBoxExA(nullptr, "Wow ☃ 日本国 кошка", "Wowe", MB_OK, 0);
-
 #if PONY_CREATE_CONSOLE
 		PonyEngine::Application::Windows::DestroyConsole();
 #endif
 	}
 	catch (const std::exception& e)
 	{
-		std::cerr << e.what(); // TODO: Use pony console later.
+		PONY_CONSOLE_E(e, "On main.");
 
 		return PonyEngine::Application::ExitCodes::MainException;
 	}
 	catch (...)
 	{
-		std::cerr << "Non std::exception!"; // TODO: Use pony console later.
+		PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception - on main.");
 
 		return PonyEngine::Application::ExitCodes::MainException;
 	}

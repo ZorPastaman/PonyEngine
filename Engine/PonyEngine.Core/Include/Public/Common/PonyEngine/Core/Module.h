@@ -35,10 +35,6 @@
 #define PONY_MODULE_ORDER_LOG_CHECKPOINT e
 /// @brief Order for engine modules.
 #define PONY_MODULE_ORDER_ENGINE m
-/// @brief Used by the application to find an end point of engine modules. Don't use in modules.
-#define PONY_MODULE_ORDER_ENGINE_CHECKPOINT n
-/// @brief Order for post-initialization modules.
-#define PONY_MODULE_ORDER_MISC w
 /// @brief Used by the application to find an end point. Don't use in modules.
 #define PONY_MODULE_ORDER_END z
 
@@ -47,8 +43,6 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_BEGIN))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LOG))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_LOG_CHECKPOINT))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE))
-PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE_CHECKPOINT))
-PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_MISC))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the module.
@@ -72,7 +66,3 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 /// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule.
 /// @param moduleName Module name. Must be unique across the whole application.
 #define PONY_MODULE_ENGINE(module, moduleName) PONY_MODULE(module, moduleName, PONY_MODULE_ORDER_ENGINE)
-/// @brief Adds the misc module.
-/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule.
-/// @param moduleName Module name. Must be unique across the whole application.
-#define PONY_MODULE_MISC(module, moduleName) PONY_MODULE(module, moduleName, PONY_MODULE_ORDER_MISC)

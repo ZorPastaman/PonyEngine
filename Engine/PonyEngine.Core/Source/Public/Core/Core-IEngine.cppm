@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+module;
 
-export import :IApplicationContext;
-export import :IEngine;
-export import :IEngineModule;
-export import :ILoggerModule;
-export import :IModule;
-export import :IModuleContext;
+#include "PonyEngine/Utility/ObjectBody.h"
+
+export module PonyEngine.Core:IEngine;
+
+export namespace PonyEngine::Core
+{
+	/// @brief Engine.
+	class IEngine
+	{
+		INTERFACE_BODY(IEngine)
+	};
+}
