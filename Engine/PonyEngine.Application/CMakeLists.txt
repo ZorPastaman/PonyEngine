@@ -10,7 +10,7 @@ target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application/Application.cppm"
 	"Source/Private/Application/Application-App.cppm"
 	"Source/Private/Application/Application-AppLogger.cppm"
-	"Source/Private/Application/Application-EmptyLogger.cppm"
+	"Source/Private/Application/Application-DefaultLogger.cppm"
 	"Source/Private/Application/Application-ExitCodes.cppm"
 )
 

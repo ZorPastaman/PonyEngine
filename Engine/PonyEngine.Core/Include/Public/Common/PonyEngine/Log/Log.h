@@ -152,7 +152,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE(logType, logMessage, ...) \
-	if constexpr (PonyEngine::Log::IsInMask(logType, PONY_LOG_MASK)) \
+	if constexpr (PonyEngine::Log::IsInMask(logType, PONY_CONSOLE_LOG_MASK)) \
 	{ \
 		PonyEngine::Log::LogToConsole(logType, logMessage __VA_OPT__(,) __VA_ARGS__); \
 	}
@@ -164,7 +164,7 @@
 /// @param logMessage std::string_view as a message or format string.
 /// @param ... Format arguments.
 #define PONY_CONSOLE_IF(condition, logType, logMessage, ...) \
-	if constexpr (PonyEngine::Log::IsInMask(logType, PONY_LOG_MASK)) \
+	if constexpr (PonyEngine::Log::IsInMask(logType, PONY_CONSOLE_LOG_MASK)) \
 	{ \
 		PONY_LOG_CONDITIONAL(condition, PonyEngine::Log::LogToConsole(logType, logMessage __VA_OPT__(,) __VA_ARGS__)); \
 	}
