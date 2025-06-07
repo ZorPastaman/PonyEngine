@@ -27,10 +27,10 @@ if(PONY_WINDOWS)
 		"Source/Private/Application/Windows/Application.Windows.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
-	 )
+	)
 	 target_sources(PonyEngine.Application PRIVATE
 		"Source/Main.Windows.cpp"
-	 )
+	)
 
 	message(STATUS "Configuring data for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)

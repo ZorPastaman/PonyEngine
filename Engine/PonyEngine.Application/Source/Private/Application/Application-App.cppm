@@ -185,7 +185,7 @@ namespace PonyEngine::Application
 				PONY_LOG(logger.Logger(), Log::LogType::Info, "Module '{}' found.", module->Name());
 				if (const auto loggerModuleCandidate = dynamic_cast<Core::ILoggerModule*>(module))
 				{
-					if (!loggerModule) [[unlikely]]
+					if (loggerModule) [[unlikely]]
 					{
 						throw std::logic_error("Second logger module is presented.");
 					}
@@ -194,7 +194,7 @@ namespace PonyEngine::Application
 				}
 				if (const auto engineModuleCandidate = dynamic_cast<Core::IEngineModule*>(module))
 				{
-					if (!engineModule) [[unlikely]]
+					if (engineModule) [[unlikely]]
 					{
 						throw std::logic_error("Second engine module is presented.");
 					}
