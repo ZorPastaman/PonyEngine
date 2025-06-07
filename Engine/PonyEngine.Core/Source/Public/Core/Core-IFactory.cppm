@@ -10,28 +10,29 @@
 module;
 
 #include <memory>
+#include <string_view>
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IEngineModule;
-
-import :IApplicationContext;
-import :IEngine;
-import :IModule;
-import :IModuleContext;
+export module PonyEngine.Core:IFactory;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Engine module.
-	class IEngineModule : public IModule
+	/// @brief Factory.
+	/// @tparam T Factory output type.
+	template<typename T>
+	class IFactory // TODO: Move to another module
 	{
-		INTERFACE_BODY(IEngineModule)
+		INTERFACE_BODY(IFactory)
 
-		/// @brief Creates an engine.
-		/// @param moduleContext Module context.
-		/// @param applicationContext Application context.
-		/// @return Engine.
+		/// @brief Creates an object.
+		/// @return Created object.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<IEngine> CreateEngine(const IModuleContext& moduleContext, IApplicationContext& applicationContext) = 0;
+		virtual std::shared_ptr<T> Create() = 0;
+
+		/// @brief Gets the name.
+		/// @return Name.
+		[[nodiscard("Pure function")]]
+		virtual std::string_view Name() const noexcept = 0;
 	};
 }

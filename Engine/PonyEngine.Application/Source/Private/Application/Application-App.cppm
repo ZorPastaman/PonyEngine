@@ -10,8 +10,11 @@
 module;
 
 #include <cstdint>
-#include <span>
+#include <memory>
 #include <stdexcept>
+#include <typeindex>
+#include <typeinfo>
+#include <unordered_map>
 #include <vector>
 
 #include "PonyEngine/Core/Module.h"
@@ -35,15 +38,18 @@ export namespace PonyEngine::Application
 		App(const App&) = delete;
 		App(App&&) = delete;
 
-		~App() noexcept = default;
+		~App() noexcept = default; // TODO: Add shutdown
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&&) = delete;
 
 	private:
+		/// @brief Application context.
 		class AppContext final : public Core::IApplicationContext
 		{
 		public:
+			/// @brief Creates an application context.
+			/// @param logger Application logger.
 			[[nodiscard("Pure constructor")]]
 			explicit AppContext(AppLogger& logger) noexcept;
 			AppContext(const AppContext&) = delete;
@@ -60,41 +66,56 @@ export namespace PonyEngine::Application
 			AppContext& operator =(AppContext&&) = delete;
 
 		private:
-			AppLogger* logger;
+			AppLogger* logger; ///< Application logger.
 		};
 
+		/// @brief Module context.
 		class ModuleContext final : public Core::IModuleContext
 		{
 		public:
+			/// @brief Creates a module context.
+			/// @param appContext Application context.
 			[[nodiscard("Pure constructor")]]
-			explicit ModuleContext(AppLogger& logger) noexcept;
+			explicit ModuleContext(Core::IApplicationContext& appContext) noexcept;
 			ModuleContext(const ModuleContext&) = delete;
 			ModuleContext(ModuleContext&&) = delete;
 
 			~ModuleContext() noexcept = default;
 
 			[[nodiscard("Pure function")]]
-			virtual Log::ILogger& Logger() noexcept override;
+			virtual Core::IApplicationContext& Application() noexcept override;
 			[[nodiscard("Pure function")]]
-			virtual const Log::ILogger& Logger() const noexcept override;
-			[[nodiscard("Pure function")]]
-			virtual std::span<Core::IModule*> Modules() const noexcept override;
+			virtual const Core::IApplicationContext& Application() const noexcept override;
 
-			void AddModule(Core::IModule& module);
-			void Clear() noexcept;
+			[[nodiscard("Pure function")]]
+			virtual std::size_t DataCount(const std::type_info& type) const noexcept override;
+			[[nodiscard("Pure function")]]
+			virtual const std::shared_ptr<void>& GetData(const std::type_info& type, std::size_t index) const override;
+			virtual void AddData(const std::type_info& type, const std::shared_ptr<void>& data) override;
+
+			/// @brief Clears data.
+			void ClearData() noexcept;
 
 			ModuleContext& operator =(const ModuleContext&) = delete;
 			ModuleContext& operator =(ModuleContext&&) = delete;
 
 		private:
-			AppLogger* logger;
-			mutable std::vector<Core::IModule*> modules;
+			Core::IApplicationContext* appContext; ///< Application context.
+			std::unordered_map<std::type_index, std::vector<std::shared_ptr<void>>> dataMap; ///< Data map.
 		};
 
-		void FindModules(ModuleContext& context, Core::ILoggerModule*& loggerModule, Core::IEngineModule*& engineModule, std::uintptr_t start, std::uintptr_t end);
+		/// @brief Start up modules.
+		/// @param start Start pointer.
+		/// @param end End pointer.
+		void StartupModules(std::uintptr_t start, std::uintptr_t end);
+		/// @brief Shuts down modules.
+		/// @param start Start pointer.
+		/// @param end End pointer.
+		void ShutdownModules(std::uintptr_t start, std::uintptr_t end) const noexcept;
 
 		AppLogger logger; ///< Application logger.
-		AppContext context; ///< Application context.
+		AppContext appContext; ///< Application context.
+		ModuleContext moduleContext; ///< Module context.
 	};
 }
 
@@ -105,30 +126,21 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule* LastModule = nullptr;
 
 	App::App() :
-		context(logger)
+		appContext(logger),
+		moduleContext(appContext)
 	{
-		auto moduleContext = ModuleContext(logger);
-
-		Core::ILoggerModule* loggerModule = nullptr;
-		Core::IEngineModule* engineModule = nullptr;
-
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Find log modules.");
-		FindModules(moduleContext, loggerModule, engineModule, reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule*), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
-		if (loggerModule)
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Start up log modules.");
+		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule*), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
+		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 1) [[unlikely]]
 		{
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Update logger.");
-			logger.SetLogger(loggerModule->CreateLogger(moduleContext, context));
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger updated.");
+			throw std::logic_error("More than 1 logger modules added.");
 		}
-		if (engineModule) [[unlikely]]
+		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 0)
 		{
-			PONY_LOG(logger.Logger(), Log::LogType::Exception, "Engine module found in logger sector.");
-			throw std::logic_error("Engine module found in logger sector.");
+			logger.SetLogger(std::static_pointer_cast<Core::IFactory<Log::ILogger>>(moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0))->Create());
 		}
-		moduleContext.Clear();
-
-		// TODO: Add engine module support
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Log modules found.");
+		moduleContext.ClearData();
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Log modules started up.");
 	}
 
 	App::AppContext::AppContext(AppLogger& logger) noexcept :
@@ -146,63 +158,85 @@ namespace PonyEngine::Application
 		return logger->Logger();
 	}
 
-	App::ModuleContext::ModuleContext(AppLogger& logger) noexcept :
-		logger{&logger}
+	App::ModuleContext::ModuleContext(Core::IApplicationContext& appContext) noexcept :
+		appContext{&appContext}
 	{
 	}
 
-	Log::ILogger& App::ModuleContext::Logger() noexcept
+	Core::IApplicationContext& App::ModuleContext::Application() noexcept
 	{
-		return logger->Logger();
+		return *appContext;
 	}
 
-	const Log::ILogger& App::ModuleContext::Logger() const noexcept
+	const Core::IApplicationContext& App::ModuleContext::Application() const noexcept
 	{
-		return logger->Logger();
+		return *appContext;
 	}
 
-	std::span<Core::IModule*> App::ModuleContext::Modules() const noexcept
+	std::size_t App::ModuleContext::DataCount(const std::type_info& type) const noexcept
 	{
-		return modules;
+		if (const auto position = dataMap.find(type); position != dataMap.cend())
+		{
+			return position->second.size();
+		}
+
+		return 0;
 	}
 
-	void App::ModuleContext::AddModule(Core::IModule& module)
+	const std::shared_ptr<void>& App::ModuleContext::GetData(const std::type_info& type, const std::size_t index) const
 	{
-		modules.push_back(&module);
+		if (const auto position = dataMap.find(type); position != dataMap.cend())
+		{
+			if (index < position->second.size())
+			{
+				return position->second[index];
+			}
+		}
+
+		throw std::invalid_argument("Such a data doesn't exist in context.");
 	}
 
-	void App::ModuleContext::Clear() noexcept
+	void App::ModuleContext::AddData(const std::type_info& type, const std::shared_ptr<void>& data)
 	{
-		modules.clear();
+		dataMap[type].push_back(data);
 	}
 
-	void App::FindModules(ModuleContext& context, Core::ILoggerModule*& loggerModule, Core::IEngineModule*& engineModule, const std::uintptr_t start, const std::uintptr_t end)
+	void App::ModuleContext::ClearData() noexcept
+	{
+		dataMap.clear();
+	}
+
+	void App::StartupModules(const std::uintptr_t start, const std::uintptr_t end)
 	{
 		for (std::uintptr_t current = start; current < end; current += sizeof(Core::IModule*))
 		{
 			if (const auto module = *reinterpret_cast<Core::IModule**>(current))
 			{
-				PONY_LOG(logger.Logger(), Log::LogType::Info, "Module '{}' found.", module->Name());
-				if (const auto loggerModuleCandidate = dynamic_cast<Core::ILoggerModule*>(module))
+				PONY_LOG(logger.Logger(), Log::LogType::Info, "Start up '{}' module.", module->Name());
+				module->StartUp(moduleContext);
+			}
+		}
+	}
+
+	void App::ShutdownModules(const std::uintptr_t start, const std::uintptr_t end) const noexcept
+	{
+		for (std::uintptr_t current = end; current > start; current -= sizeof(Core::IModule*))
+		{
+			if (const auto module = *reinterpret_cast<Core::IModule**>(current))
+			{
+				PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down '{}' module.", module->Name());
+				try
 				{
-					if (loggerModule) [[unlikely]]
-					{
-						throw std::logic_error("Second logger module is presented.");
-					}
-
-					loggerModule = loggerModuleCandidate;
+					module->ShutDown(moduleContext);
 				}
-				if (const auto engineModuleCandidate = dynamic_cast<Core::IEngineModule*>(module))
+				catch (const std::exception& e)
 				{
-					if (engineModule) [[unlikely]]
-					{
-						throw std::logic_error("Second engine module is presented.");
-					}
-
-					engineModule = engineModuleCandidate;
+					PONY_LOG_E(logger.Logger(), e, "On '{}' module shutdown.", module->Name());
 				}
-
-				context.AddModule(*module);
+				catch (...)
+				{
+					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on '{}' module shutdown.", module->Name());
+				}
 			}
 		}
 	}
