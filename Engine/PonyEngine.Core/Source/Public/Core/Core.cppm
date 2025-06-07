@@ -11,7 +11,6 @@ export module PonyEngine.Core;
 
 export import :IApplicationContext;
 export import :IEngine;
-export import :IEngineModule;
-export import :ILoggerModule;
+export import :IFactory;
 export import :IModule;
 export import :IModuleContext;
