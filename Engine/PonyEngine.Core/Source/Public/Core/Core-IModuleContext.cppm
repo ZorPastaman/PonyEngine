@@ -17,15 +17,12 @@ module;
 
 export module PonyEngine.Core:IModuleContext;
 
-import PonyEngine.Log;
-
 import :IApplicationContext;
 import :IEngine;
-import :IFactory;
 
 export namespace PonyEngine::Core
 {
-	/// @brief Module context. It exists at module initialization phase only.
+	/// @brief Module context. It exists for the whole life of an application.
 	class IModuleContext
 	{
 		INTERFACE_BODY(IModuleContext)

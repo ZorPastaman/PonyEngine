@@ -14,14 +14,14 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IFactory;
+export module PonyEngine.Object:IFactory;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Object
 {
 	/// @brief Factory.
 	/// @tparam T Factory output type.
 	template<typename T>
-	class IFactory // TODO: Move to another module
+	class IFactory
 	{
 		INTERFACE_BODY(IFactory)
 
