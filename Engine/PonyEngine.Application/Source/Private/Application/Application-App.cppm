@@ -24,7 +24,6 @@ export module PonyEngine.Application:App;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
-import PonyEngine.Object;
 
 import :AppLogger;
 
@@ -115,7 +114,10 @@ export namespace PonyEngine::Application
 		/// @param end End pointer.
 		void ShutdownModules(std::uintptr_t start, std::uintptr_t end) const noexcept;
 
+		/// @brief Checks if logger modules are correct.
+		/// @param loggerPhase Is this a logger phase now?
 		void CheckForLoggerModule(bool loggerPhase) const;
+		/// @brief Tries to create a logger if there's at least one registered.
 		void TryCreateLogger();
 
 		AppLogger logger; ///< Application logger.
@@ -249,7 +251,7 @@ namespace PonyEngine::Application
 
 	void App::CheckForLoggerModule(const bool loggerPhase) const
 	{
-		if (moduleContext.DataCount(typeid(Object::IFactory<Log::ILogger>)) > loggerPhase) [[unlikely]]
+		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > loggerPhase) [[unlikely]]
 		{
 			if (loggerPhase)
 			{
@@ -264,12 +266,12 @@ namespace PonyEngine::Application
 
 	void App::TryCreateLogger()
 	{
-		if (moduleContext.DataCount(typeid(Object::IFactory<Log::ILogger>)) > 0)
+		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 0)
 		{
-			const std::shared_ptr<void> loggerFactoryData = moduleContext.GetData(typeid(Object::IFactory<Log::ILogger>), 0);
-			const std::shared_ptr<Object::IFactory<Log::ILogger>> loggerFactory = std::static_pointer_cast<Object::IFactory<Log::ILogger>>(loggerFactoryData);
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Create logger.");
-			logger.SetLogger(loggerFactory->Create());
+			const std::shared_ptr<void> loggerFactoryData = moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0);
+			const std::shared_ptr<Core::IFactory<Log::ILogger>> loggerFactory = std::static_pointer_cast<Core::IFactory<Log::ILogger>>(loggerFactoryData);
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", loggerFactory->Name());
+			logger.SetLogger(loggerFactory->Create(moduleContext));
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger created.");
 		}
 	}
