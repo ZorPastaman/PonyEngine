@@ -10,4 +10,4 @@
 #include "PonyEngine/Core/Module.h"
 #include "PonyEngine/Log/Core/LoggerModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::Core::LoggerModule, PonyEngineLogger);
+PONY_MODULE_LOG(PonyEngine::Log::Core::GetLoggerModule, PonyEngineLogger);

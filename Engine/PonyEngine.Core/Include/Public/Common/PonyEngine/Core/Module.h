@@ -20,9 +20,9 @@
 /// @brief Allocates a module segment.
 /// @param order Segment order.
 #define PONY_MODULE_ALLOCATE(order) PONY_ALLOCATE(PONY_MODULE_SECTION_NAME(order))
-/// @brief Creates a module field name.
+/// @brief Creates a module function name.
 /// @param moduleName Target module name.
-#define PONY_MODULE_FIELD_NAME(moduleName) PONY_CONCAT_VALUES(PonyField, moduleName)
+#define PONY_MODULE_FUNC_NAME(moduleName) PONY_CONCAT_VALUES(PonyFunc, moduleName)
 /// @brief Creates a module pointer name.
 /// @param moduleName Target module name.
 #define PONY_MODULE_POINTER_NAME(moduleName) PONY_CONCAT_VALUES(PonyPointer, moduleName)
@@ -46,23 +46,26 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the module.
-/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule. In a dll, it must have PONY_DLL_EXPORT attribute as well.
+/// @param function Module getter function of type PonyEngine::Core::ModuleGetter.
 /// @param moduleName Module name. Must be unique across the whole application.
 /// @param order Execution order. Must be one of PONY_MODULE_ORDER except special ones.
-#define PONY_MODULE(module, moduleName, order) \
+#define PONY_MODULE(function, moduleName, order) \
 	extern "C" \
 	{ \
-		module PONY_MODULE_FIELD_NAME(moduleName); \
-		PONY_MODULE_ALLOCATE(order) PonyEngine::Core::IModule* PONY_MODULE_POINTER_NAME(moduleName) = &PONY_MODULE_FIELD_NAME(moduleName); \
-		PONY_PRESERVE(PONY_MODULE_FIELD_NAME(moduleName)); \
+		PONY_DLL_EXPORT PonyEngine::Core::IModule* PONY_MODULE_FUNC_NAME(moduleName)() \
+		{ \
+			return function(); \
+		} \
+		PONY_MODULE_ALLOCATE(order) PonyEngine::Core::ModuleGetter PONY_MODULE_POINTER_NAME(moduleName) = &PONY_MODULE_FUNC_NAME(moduleName); \
+		PONY_PRESERVE(PONY_MODULE_FUNC_NAME(moduleName)); \
 		PONY_PRESERVE(PONY_MODULE_POINTER_NAME(moduleName)); \
 	}
 
 /// @brief Adds the log module.
-/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule.
+/// @param function Module getter function of type PonyEngine::Core::ModuleGetter.
 /// @param moduleName Module name. Must be unique across the whole application.
-#define PONY_MODULE_LOG(module, moduleName) PONY_MODULE(module, moduleName, PONY_MODULE_ORDER_LOG)
+#define PONY_MODULE_LOG(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_LOG)
 /// @brief Adds the engine module.
-/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule.
+/// @param function Module getter function of type PonyEngine::Core::ModuleGetter.
 /// @param moduleName Module name. Must be unique across the whole application.
-#define PONY_MODULE_ENGINE(module, moduleName) PONY_MODULE(module, moduleName, PONY_MODULE_ORDER_ENGINE)
+#define PONY_MODULE_ENGINE(function, moduleName) PONY_MODULE(function, moduleName, PONY_MODULE_ORDER_ENGINE)
