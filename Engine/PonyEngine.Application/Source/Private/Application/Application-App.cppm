@@ -23,6 +23,8 @@ module;
 export module PonyEngine.Application:App;
 
 import PonyEngine.Core;
+import PonyEngine.Log;
+import PonyEngine.Object;
 
 import :AppLogger;
 
@@ -38,7 +40,7 @@ export namespace PonyEngine::Application
 		App(const App&) = delete;
 		App(App&&) = delete;
 
-		~App() noexcept = default; // TODO: Add shutdown
+		~App() noexcept;
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&&) = delete;
@@ -113,6 +115,9 @@ export namespace PonyEngine::Application
 		/// @param end End pointer.
 		void ShutdownModules(std::uintptr_t start, std::uintptr_t end) const noexcept;
 
+		void CheckForLoggerModule(bool loggerPhase) const;
+		void TryCreateLogger();
+
 		AppLogger logger; ///< Application logger.
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
@@ -129,18 +134,19 @@ namespace PonyEngine::Application
 		appContext(logger),
 		moduleContext(appContext)
 	{
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Start up log modules.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up log modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule*), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
-		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 1) [[unlikely]]
-		{
-			throw std::logic_error("More than 1 logger modules added.");
-		}
-		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 0)
-		{
-			logger.SetLogger(std::static_pointer_cast<Core::IFactory<Log::ILogger>>(moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0))->Create());
-		}
+		CheckForLoggerModule(true);
+		TryCreateLogger();
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Log modules started up.");
+	}
+
+	App::~App() noexcept
+	{
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down modules.");
+		ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(Core::IModule*));
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Modules shut down.");
 	}
 
 	App::AppContext::AppContext(AppLogger& logger) noexcept :
@@ -212,7 +218,7 @@ namespace PonyEngine::Application
 		{
 			if (const auto module = *reinterpret_cast<Core::IModule**>(current))
 			{
-				PONY_LOG(logger.Logger(), Log::LogType::Info, "Start up '{}' module.", module->Name());
+				PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up '{}' module.", module->Name());
 				module->StartUp(moduleContext);
 			}
 		}
@@ -238,6 +244,33 @@ namespace PonyEngine::Application
 					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on '{}' module shutdown.", module->Name());
 				}
 			}
+		}
+	}
+
+	void App::CheckForLoggerModule(const bool loggerPhase) const
+	{
+		if (moduleContext.DataCount(typeid(Object::IFactory<Log::ILogger>)) > loggerPhase) [[unlikely]]
+		{
+			if (loggerPhase)
+			{
+				throw std::logic_error("More than 1 logger modules added.");
+			}
+			else
+			{
+				throw std::logic_error("No logger modules allowed out of log module phase.");
+			}
+		}
+	}
+
+	void App::TryCreateLogger()
+	{
+		if (moduleContext.DataCount(typeid(Object::IFactory<Log::ILogger>)) > 0)
+		{
+			const std::shared_ptr<void> loggerFactoryData = moduleContext.GetData(typeid(Object::IFactory<Log::ILogger>), 0);
+			const std::shared_ptr<Object::IFactory<Log::ILogger>> loggerFactory = std::static_pointer_cast<Object::IFactory<Log::ILogger>>(loggerFactoryData);
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Create logger.");
+			logger.SetLogger(loggerFactory->Create());
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger created.");
 		}
 	}
 }
