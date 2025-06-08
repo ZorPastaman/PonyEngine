@@ -26,6 +26,9 @@ function(pony_set_build_options target_name is_engine_target)
 			target_compile_options(${target_name} PUBLIC
 				$<$<CXX_COMPILER_ID:MSVC>:/Zi>
 			)
+		elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
+		else()
+			message(FATAL_ERROR "Incorrect build type")
 		endif()
 	endfunction()
 

@@ -7,7 +7,26 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Core/Module.h"
+#include <memory>
+
 #include "PonyEngine/Log/Core/LoggerModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::Core::LoggerModule, PonyEngineLogger);
+import PonyEngine.Core;
+import PonyEngine.Log.Core;
+
+namespace PonyEngine::Log::Core
+{
+	void LoggerModule::StartUp(PonyEngine::Core::IModuleContext& context)
+	{
+		context.AddData<PonyEngine::Core::IFactory<ILogger>>(std::make_shared<LoggerFactory>());
+	}
+
+	void LoggerModule::ShutDown(const PonyEngine::Core::IModuleContext& context)
+	{
+	}
+
+	std::string_view LoggerModule::Name() const noexcept
+	{
+		return "PonyEngineLogger";
+	}
+}
