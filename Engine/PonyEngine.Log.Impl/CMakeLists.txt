@@ -1,16 +1,21 @@
 message(STATUS "Configuring PonyEngine.Log.Impl")
-add_library(PonyEngine.Log.Impl SHARED)
+if(PONY_FORCE_STATIC)
+	add_library(PonyEngine.Log.Impl STATIC)
+else()
+	add_library(PonyEngine.Log.Impl SHARED)
+endif()
 
+message(STATUS "Configuring headers")
 target_include_directories(PonyEngine.Log.Impl PUBLIC
-	"Include/Private"
+	"Include/Public"
 )
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Log.Impl PUBLIC
-	"Source/Main.Logger.cpp"
+	"Source/Main.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE
-	"Source/Main.Logger.Impl.cpp"
+	"Source/Main.Logger.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Core/Core.cppm"
@@ -20,7 +25,9 @@ target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES
 
 message(STATUS "Configuring defines")
 pony_set_log_mask(PonyEngine.Log.Impl TRUE)
-target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_DLL)
+if(NOT PONY_FORCE_STATIC)
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_DLL)
+endif()
 
 message(STATUS "Setting properties")
 set_target_properties(PonyEngine.Log.Impl PROPERTIES OUTPUT_NAME "PonyEngine.Log")
@@ -34,10 +41,12 @@ target_link_libraries(PonyEngine.Log.Impl PRIVATE
 )
 pony_add_app_module(PonyEngine.Log.Impl)
 
-message(STATUS "Installing")
-get_property(PONY_APP_INSTALL_PATH_VALUE GLOBAL PROPERTY PONY_APP_INSTALL_PATH)
-message(STATUS "Application destination: ${PONY_APP_INSTALL_PATH_VALUE}")
-install(TARGETS PonyEngine.Log.Impl 
-	RUNTIME DESTINATION ${PONY_APP_INSTALL_PATH_VALUE}
-	LIBRARY DESTINATION
-)
+if(NOT PONY_FORCE_STATIC)
+	message(STATUS "Installing")
+	get_property(PONY_APP_INSTALL_PATH_VALUE GLOBAL PROPERTY PONY_APP_INSTALL_PATH)
+	message(STATUS "Application destination: ${PONY_APP_INSTALL_PATH_VALUE}")
+	install(TARGETS PonyEngine.Log.Impl 
+		RUNTIME DESTINATION ${PONY_APP_INSTALL_PATH_VALUE}
+		LIBRARY DESTINATION
+	)
+endif()

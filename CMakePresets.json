@@ -22,7 +22,8 @@
 				"PONY_ENGINE_OPTIMIZATION": "Debug",
 				"PONY_CREATE_CONSOLE": "TRUE",
 				"PONY_GAME_LOG_LEVEL": "Debug",
-				"PONY_ENGINE_LOG_LEVEL": "Debug"
+				"PONY_ENGINE_LOG_LEVEL": "Debug",
+				"PONY_FORCE_STATIC": "FALSE"
 			}
 		},
 		{
@@ -35,7 +36,8 @@
 				"PONY_ENGINE_OPTIMIZATION": "Release",
 				"PONY_CREATE_CONSOLE": "TRUE",
 				"PONY_GAME_LOG_LEVEL": "Debug",
-				"PONY_ENGINE_LOG_LEVEL": "Info"
+				"PONY_ENGINE_LOG_LEVEL": "Info",
+				"PONY_FORCE_STATIC": "FALSE"
 			}
 		},
 		{
@@ -47,7 +49,8 @@
 				"PONY_GAME_OPTIMAZATION": "Release",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
 				"PONY_GAME_LOG_LEVEL": "Info",
-				"PONY_ENGINE_LOG_LEVEL": "Warning"
+				"PONY_ENGINE_LOG_LEVEL": "Warning",
+				"PONY_FORCE_STATIC": "TRUE"
 			}
 		},
 		{
@@ -59,7 +62,8 @@
 				"PONY_GAME_OPTIMAZATION": "Release",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
 				"PONY_GAME_LOG_LEVEL": "Error",
-				"PONY_ENGINE_LOG_LEVEL": "Error"
+				"PONY_ENGINE_LOG_LEVEL": "Error",
+				"PONY_FORCE_STATIC": "TRUE"
 			}
 		},
 		{
