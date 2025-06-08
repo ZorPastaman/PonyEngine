@@ -36,4 +36,7 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept = 0;
 	};
+
+	/// @brief Module getter.
+	using ModuleGetter = IModule*(*)();
 }

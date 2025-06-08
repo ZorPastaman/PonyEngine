@@ -11,4 +11,4 @@ export module PonyEngine.Log.Core;
 
 export import PonyEngine.Log;
 
-export import :LoggerFactory;
+export import :LoggerModule;

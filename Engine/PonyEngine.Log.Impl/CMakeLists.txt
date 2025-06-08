@@ -21,6 +21,7 @@ target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Core/Core.cppm"
 	"Source/Private/Core/Core-Logger.cppm"
 	"Source/Private/Core/Core-LoggerFactory.cppm"
+	"Source/Private/Core/Core-LoggerModule.cppm"
 )
 
 message(STATUS "Configuring defines")
