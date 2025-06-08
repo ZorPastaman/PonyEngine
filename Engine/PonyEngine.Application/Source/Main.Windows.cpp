@@ -32,6 +32,10 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creates application.");
 			auto app = std::make_unique<PonyEngine::Application::App>();
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application created.");
+
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroys application.");
+			app.reset();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application destroyed.");
 		}
 		catch (const std::exception& e)

@@ -251,7 +251,7 @@ namespace PonyEngine::Application
 
 	void App::CheckForLoggerModule(const bool loggerPhase) const
 	{
-		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > loggerPhase) [[unlikely]]
+		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > static_cast<std::size_t>(loggerPhase)) [[unlikely]]
 		{
 			if (loggerPhase)
 			{

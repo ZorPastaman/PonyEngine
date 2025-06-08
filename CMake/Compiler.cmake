@@ -19,32 +19,32 @@ endfunction()
 function(pony_set_build_options target_name is_engine_target)
 	function(set_base_options target_name)
 		target_compile_options(${target_name} PUBLIC
-			$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /EHsc /fp:fast /GR /W4 /permissive- /utf-8 /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew>
+			$<$<CXX_COMPILER_ID:MSVC>:/fp:fast /utf-8>
+		)
+		target_compile_options(${target_name} PRIVATE
+			$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /EHsc /GR /W3 /permissive- /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew>
 		)
 
 		if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
-			target_compile_options(${target_name} PUBLIC
+			target_compile_options(${target_name} PRIVATE
 				$<$<CXX_COMPILER_ID:MSVC>:/Zi>
 			)
-		elseif(CMAKE_BUILD_TYPE STREQUAL "Release")
-		else()
-			message(FATAL_ERROR "Incorrect build type")
 		endif()
 	endfunction()
 
 	function(set_debug_options target_name)
-		target_compile_options(${target_name} PUBLIC
+		target_compile_options(${target_name} PRIVATE
 			$<$<CXX_COMPILER_ID:MSVC>:/Ob0 /Od /RTC1>
 		)
-		target_link_options(${target_name} PUBLIC
+		target_link_options(${target_name} PRIVATE
 			$<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL /OPT:NOREF>
 		)
 	endfunction()
 	function(set_release_options target_name)
-		target_compile_options(${target_name} PUBLIC
+		target_compile_options(${target_name} PRIVATE
 			$<$<CXX_COMPILER_ID:MSVC>:/GL /Gw /Gy /Ob3 /O2 /Zc:inline>
 		)
-		target_link_options(${target_name} PUBLIC
+		target_link_options(${target_name} PRIVATE
 			$<$<CXX_COMPILER_ID:MSVC>:/INCREMENTAL:NO /LTCG /OPT:REF /OPT:ICF>
 		)
 	endfunction()
