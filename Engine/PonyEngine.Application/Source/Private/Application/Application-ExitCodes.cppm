@@ -20,6 +20,7 @@ export namespace PonyEngine::Application
 	{
 		NON_CONSTRUCTIBLE_BODY(ExitCodes)
 
+		static constexpr int ApplicationException = -2;
 		static constexpr int MainException = -1;
 		static constexpr int Success = 0;
 	};
