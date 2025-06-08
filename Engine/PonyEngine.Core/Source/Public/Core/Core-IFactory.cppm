@@ -14,9 +14,11 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Object:IFactory;
+export module PonyEngine.Core:IFactory;
 
-export namespace PonyEngine::Object
+import :IModuleContext;
+
+export namespace PonyEngine::Core
 {
 	/// @brief Factory.
 	/// @tparam T Factory output type.
@@ -26,9 +28,10 @@ export namespace PonyEngine::Object
 		INTERFACE_BODY(IFactory)
 
 		/// @brief Creates an object.
+		/// @param context Module context.
 		/// @return Created object.
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<T> Create() = 0;
+		virtual std::shared_ptr<T> Create(const IModuleContext& context) = 0;
 
 		/// @brief Gets the name.
 		/// @return Name.

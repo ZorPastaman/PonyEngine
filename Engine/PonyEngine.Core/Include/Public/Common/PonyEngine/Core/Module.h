@@ -46,13 +46,13 @@ PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_ENGINE))
 PONY_SECTION(PONY_MODULE_SECTION_NAME(PONY_MODULE_ORDER_END))
 
 /// @brief Adds the module.
-/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule.
+/// @param module Module. Must be a default constructible class inheriting PonyEngine::Core::IModule. In a dll, it must have PONY_DLL_EXPORT attribute as well.
 /// @param moduleName Module name. Must be unique across the whole application.
 /// @param order Execution order. Must be one of PONY_MODULE_ORDER except special ones.
 #define PONY_MODULE(module, moduleName, order) \
 	extern "C" \
 	{ \
-		PONY_DLL_EXPORT module PONY_MODULE_FIELD_NAME(moduleName); \
+		module PONY_MODULE_FIELD_NAME(moduleName); \
 		PONY_MODULE_ALLOCATE(order) PonyEngine::Core::IModule* PONY_MODULE_POINTER_NAME(moduleName) = &PONY_MODULE_FIELD_NAME(moduleName); \
 		PONY_PRESERVE(PONY_MODULE_FIELD_NAME(moduleName)); \
 		PONY_PRESERVE(PONY_MODULE_POINTER_NAME(moduleName)); \
