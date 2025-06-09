@@ -277,7 +277,7 @@ namespace PonyEngine::Application
 
 	void App::CheckForLoggerModule(const bool loggerPhase) const
 	{
-		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > static_cast<std::size_t>(loggerPhase)) [[unlikely]]
+		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > static_cast<std::size_t>(loggerPhase)) [[unlikely]]
 		{
 			if (loggerPhase)
 			{
@@ -292,10 +292,10 @@ namespace PonyEngine::Application
 
 	void App::TryCreateLogger()
 	{
-		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 0)
+		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > 0)
 		{
-			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0);
-			const std::shared_ptr<Core::IFactory<Log::ILogger>> loggerFactory = std::static_pointer_cast<Core::IFactory<Log::ILogger>>(loggerFactoryData);
+			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0);
+			const std::shared_ptr<Core::ILoggerFactory> loggerFactory = std::static_pointer_cast<Core::ILoggerFactory>(loggerFactoryData);
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", typeid(*loggerFactory).name());
 			logger.SetLogger(loggerFactory->Create(moduleContext));
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger created.");

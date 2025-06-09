@@ -9,13 +9,13 @@
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyDebug.Log:ISubLogger;
+export module PonyEngine.Log.Ext:ISubLogger;
 
 import :LogEntry;
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Log::Ext
 {
 	/// @brief Sub-logger.
 	class ISubLogger

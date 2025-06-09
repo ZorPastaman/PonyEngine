@@ -9,22 +9,21 @@
 
 module;
 
-#include "PonyDebug/Log/Log.h"
+#include <chrono>
+#include <cstdint>
+#include <exception>
+#include <format>
+#include <optional>
+#include <string>
+#include <string_view>
 
-export module PonyDebug.Log:LogEntry;
+#include "PonyEngine/Log/Log.h"
 
-import <chrono>;
-import <cstdint>;
-import <exception>;
-import <optional>;
-import <string>;
-import <string_view>;
+export module PonyEngine.Log.Ext:LogEntry;
 
-import :LogFormat;
-import :LogHelper;
-import :LogType;
+import PonyEngine.Log;
 
-export namespace PonyDebug::Log
+export namespace PonyEngine::Log::Ext
 {
 	/// @brief Information that must be logged.
 	class LogEntry final
@@ -93,7 +92,27 @@ export namespace PonyDebug::Log
 	std::ostream& operator <<(std::ostream& stream, const LogEntry& logEntry);
 }
 
-namespace PonyDebug::Log
+/// @brief Log entry formatter.
+export template<>
+struct std::formatter<PonyEngine::Log::Ext::LogEntry, char>
+{
+	static constexpr auto parse(std::format_parse_context& context)
+	{
+		if (*context.begin() != '}') [[unlikely]]
+		{
+			throw std::format_error("Unexpected format specifier.");
+		}
+
+		return context.begin();
+	}
+
+	static auto format(const PonyEngine::Log::Ext::LogEntry& entry, std::format_context& context)
+	{
+		return std::ranges::copy(entry.ToString(), context.out()).out;
+	}
+};
+
+namespace PonyEngine::Log::Ext
 {
 	LogEntry::LogEntry(const std::string_view message, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::int64_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},
