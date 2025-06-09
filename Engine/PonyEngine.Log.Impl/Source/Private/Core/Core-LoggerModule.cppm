@@ -12,6 +12,9 @@ module;
 #include <memory>
 #include <string_view>
 
+#include "PonyEngine/Log/Core/LoggerModule.h"
+#include "PonyEngine/Utility/Macro.h"
+
 export module PonyEngine.Log.Core:LoggerModule;
 
 import PonyEngine.Core;
@@ -45,6 +48,6 @@ namespace PonyEngine::Log::Core
 
 	std::string_view LoggerModule::Name() const noexcept
 	{
-		return "PonyEngineLogger";
+		return PONY_STRINGIFY_VALUE(PONY_LOGGER_MODULE_NAME);
 	}
 }

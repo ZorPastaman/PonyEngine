@@ -9,7 +9,6 @@
 
 module;
 
-#include <iostream>
 #include <stdexcept>
 
 #include "PonyEngine/Platform/Windows/Framework.h"

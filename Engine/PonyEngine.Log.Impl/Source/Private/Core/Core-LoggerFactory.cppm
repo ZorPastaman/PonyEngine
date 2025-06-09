@@ -27,9 +27,6 @@ export namespace PonyEngine::Log::Core
 	public:
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<ILogger> Create(const PonyEngine::Core::IModuleContext& context) override;
-
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept override;
 	};
 }
 
@@ -38,10 +35,5 @@ namespace PonyEngine::Log::Core
 	std::shared_ptr<ILogger> LoggerFactory::Create(const PonyEngine::Core::IModuleContext& context)
 	{
 		return std::make_shared<Logger>();
-	}
-
-	std::string_view LoggerFactory::Name() const noexcept
-	{
-		return "PonyEngineLoggerFactory";
 	}
 }

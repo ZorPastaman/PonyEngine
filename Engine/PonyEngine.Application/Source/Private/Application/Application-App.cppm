@@ -41,6 +41,13 @@ export namespace PonyEngine::Application
 
 		~App() noexcept;
 
+		/// @brief Begins the application.
+		void Begin();
+		/// @brief Ends the application.
+		void End();
+		/// @brief Ticks the application.
+		void Tick();
+
 		App& operator =(const App&) = delete;
 		App& operator =(App&&) = delete;
 
@@ -123,32 +130,48 @@ export namespace PonyEngine::Application
 		AppLogger logger; ///< Application logger.
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
+
+		std::uintptr_t lastStartedModule; ///< Last started module.
 	};
 }
 
 namespace PonyEngine::Application
 {
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) Core::ModuleGetter FirstModule = nullptr;
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_LOG_CHECKPOINT) Core::ModuleGetter LogCheckpoint = nullptr;
-	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::ModuleGetter LastModule = nullptr;
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) Core::IModule** FirstModule = nullptr;
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_LOG_CHECKPOINT) Core::IModule** LogCheckpoint = nullptr;
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
 	App::App() :
 		appContext(logger),
-		moduleContext(appContext)
+		moduleContext(appContext),
+		lastStartedModule(reinterpret_cast<std::uintptr_t>(&FirstModule))
 	{
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up log modules.");
-		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::ModuleGetter), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
-		CheckForLoggerModule(true);
-		TryCreateLogger();
-		moduleContext.ClearData();
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Log modules started up.");
 	}
 
 	App::~App() noexcept
 	{
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down modules.");
-		ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), reinterpret_cast<std::uintptr_t>(&LastModule) - sizeof(Core::ModuleGetter));
+		ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), lastStartedModule);
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Modules shut down.");
+	}
+
+	void App::Begin()
+	{
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up modules.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up log modules.");
+		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
+		CheckForLoggerModule(true);
+		TryCreateLogger();
+		moduleContext.ClearData();
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Modules started up.");
+	}
+
+	void App::End()
+	{
+	}
+
+	void App::Tick()
+	{
 	}
 
 	App::AppContext::AppContext(AppLogger& logger) noexcept :
@@ -216,24 +239,25 @@ namespace PonyEngine::Application
 
 	void App::StartupModules(const std::uintptr_t start, const std::uintptr_t end)
 	{
-		for (std::uintptr_t current = start; current < end; current += sizeof(Core::ModuleGetter))
+		for (std::uintptr_t current = start; current < end; current += sizeof(Core::IModule**))
 		{
-			if (const auto moduleGetter = *reinterpret_cast<Core::ModuleGetter*>(current))
+			if (const auto modulePtr = *reinterpret_cast<Core::IModule***>(current))
 			{
-				Core::IModule* const module = moduleGetter();
+				Core::IModule* const module = *modulePtr;
 				PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up '{}' module.", module->Name());
 				module->StartUp(moduleContext);
+				lastStartedModule = current;
 			}
 		}
 	}
 
 	void App::ShutdownModules(const std::uintptr_t start, const std::uintptr_t end) const noexcept
 	{
-		for (std::uintptr_t current = end; current > start; current -= sizeof(Core::ModuleGetter*))
+		for (std::uintptr_t current = end; current > start; current -= sizeof(Core::IModule**))
 		{
-			if (const auto moduleGetter = *reinterpret_cast<Core::ModuleGetter*>(current))
+			if (const auto modulePtr = *reinterpret_cast<Core::IModule***>(current))
 			{
-				Core::IModule* const module = moduleGetter();
+				Core::IModule* const module = *modulePtr;
 				PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down '{}' module.", module->Name());
 				try
 				{
@@ -241,11 +265,11 @@ namespace PonyEngine::Application
 				}
 				catch (const std::exception& e)
 				{
-					PONY_LOG_E(logger.Logger(), e, "On '{}' module shutdown.", module->Name());
+					PONY_LOG_E(logger.Logger(), e, "On '{}' module shutdown.", typeid(*module).name());
 				}
 				catch (...)
 				{
-					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on '{}' module shutdown.", module->Name());
+					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on '{}' module shutdown.", typeid(*module).name());
 				}
 			}
 		}
@@ -270,9 +294,9 @@ namespace PonyEngine::Application
 	{
 		if (moduleContext.DataCount(typeid(Core::IFactory<Log::ILogger>)) > 0)
 		{
-			const std::shared_ptr<void> loggerFactoryData = moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0);
+			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::IFactory<Log::ILogger>), 0);
 			const std::shared_ptr<Core::IFactory<Log::ILogger>> loggerFactory = std::static_pointer_cast<Core::IFactory<Log::ILogger>>(loggerFactoryData);
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", loggerFactory->Name());
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", typeid(*loggerFactory).name());
 			logger.SetLogger(loggerFactory->Create(moduleContext));
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger created.");
 		}

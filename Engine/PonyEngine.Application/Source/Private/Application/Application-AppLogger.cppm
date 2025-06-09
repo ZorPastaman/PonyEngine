@@ -12,6 +12,8 @@ module;
 #include <memory>
 #include <stdexcept>
 
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.Application:AppLogger;
 
 import PonyEngine.Log;
@@ -67,6 +69,7 @@ namespace PonyEngine::Application
 			throw std::invalid_argument("Logger is nullptr.");
 		}
 
+		PONY_LOG(*this->logger, Log::LogType::Info, "Change logger to '{}'.", typeid(*logger).name());
 		this->logger = logger;
 	}
 }

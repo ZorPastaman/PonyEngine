@@ -12,10 +12,10 @@ target_include_directories(PonyEngine.Log.Impl PUBLIC
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Log.Impl PUBLIC
-	"Source/Main.cpp"
+	"Source/Main.Logger.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE
-	"Source/Main.Logger.cpp"
+	"Source/Main.Logger.Impl.cpp"
 )
 target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Core/Core.cppm"

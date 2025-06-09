@@ -32,10 +32,5 @@ export namespace PonyEngine::Core
 		/// @return Created object.
 		[[nodiscard("Pure function")]]
 		virtual std::shared_ptr<T> Create(const IModuleContext& context) = 0;
-
-		/// @brief Gets the name.
-		/// @return Name.
-		[[nodiscard("Pure function")]]
-		virtual std::string_view Name() const noexcept = 0;
 	};
 }
