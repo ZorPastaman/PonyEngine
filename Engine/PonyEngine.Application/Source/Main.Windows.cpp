@@ -32,9 +32,15 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creates application.");
 			auto app = std::make_unique<PonyEngine::Application::App>();
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Begins application.");
+			app->Begin();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application created.");
 
+			// TODO: Here should be tick.
+
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroys application.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Ends application.");
+			app->End();
 			app.reset();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application destroyed.");
 		}
@@ -53,6 +59,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
 		}
 
+		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Exits with code '{}'.", exitCode);
 #if PONY_CREATE_CONSOLE
 		PonyEngine::Application::Windows::DestroyConsole();
 #endif
