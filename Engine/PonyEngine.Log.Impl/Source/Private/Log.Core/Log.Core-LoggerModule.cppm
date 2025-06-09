@@ -39,7 +39,7 @@ namespace PonyEngine::Log::Core
 {
 	void LoggerModule::StartUp(PonyEngine::Core::IModuleContext& context)
 	{
-		context.AddData<PonyEngine::Core::IFactory<ILogger>>(std::make_shared<LoggerFactory>());
+		context.AddData<PonyEngine::Core::ILoggerFactory>(std::make_shared<LoggerFactory>());
 	}
 
 	void LoggerModule::ShutDown(const PonyEngine::Core::IModuleContext& context)

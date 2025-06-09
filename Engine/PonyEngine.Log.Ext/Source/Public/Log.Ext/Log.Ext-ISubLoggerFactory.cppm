@@ -10,27 +10,22 @@
 module;
 
 #include <memory>
-#include <string_view>
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IFactory;
+export module PonyEngine.Log.Ext:ISubLoggerFactory;
 
-import :IModuleContext;
+import :ISubLogger;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Log::Ext
 {
-	/// @brief Factory.
-	/// @tparam T Factory output type.
-	template<typename T>
-	class IFactory
+	class ISubLoggerFactory
 	{
-		INTERFACE_BODY(IFactory)
+		INTERFACE_BODY(ISubLoggerFactory)
 
-		/// @brief Creates an object.
-		/// @param context Module context.
-		/// @return Created object.
-		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<T> Create(const IModuleContext& context) = 0;
+		/// @brief Creates a sub-logger.
+		/// @return Created sub-logger.
+		[[nodiscard("Redundant call")]]
+		virtual std::shared_ptr<ISubLogger> CreateSubLogger() = 0;
 	};
 }

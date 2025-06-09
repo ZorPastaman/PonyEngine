@@ -10,7 +10,6 @@
 module;
 
 #include <memory>
-#include <string_view>
 
 export module PonyEngine.Log.Core:LoggerFactory;
 
@@ -22,7 +21,7 @@ import :Logger;
 export namespace PonyEngine::Log::Core
 {
 	/// @brief Logger factory.
-	class LoggerFactory final : public PonyEngine::Core::IFactory<ILogger>
+	class LoggerFactory final : public PonyEngine::Core::ILoggerFactory
 	{
 	public:
 		[[nodiscard("Pure function")]]

@@ -18,6 +18,7 @@ if(${CMAKE_CURRENT_LIST_DIR} STREQUAL ${CMAKE_SOURCE_DIR}) # It's an engine buil
 	message(STATUS "Configuring modules")
 	get_property(PONY_ENGINE_PATH_VALUE GLOBAL PROPERTY PONY_ENGINE_PATH)
 	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Core")
+	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Ext")
 	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Impl")
 
 	message(STATUS "Configuring application")
