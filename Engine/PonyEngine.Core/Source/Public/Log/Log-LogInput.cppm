@@ -7,13 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cstdint>
-#include <optional>
-#include <string_view>
-
 export module PonyEngine.Log:LogInput;
+
+import std;
 
 export namespace PonyEngine::Log
 {

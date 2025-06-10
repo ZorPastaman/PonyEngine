@@ -7,12 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <exception>
-#include <iostream>
-
 export module PonyEngine.Log.Core:Logger;
+
+import std;
 
 import PonyEngine.Log;
 

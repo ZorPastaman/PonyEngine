@@ -25,6 +25,10 @@ if(PONY_WINDOWS)
 	)
 endif()
 
+message(STATUS "Setting build options")
+pony_set_build_options(PonyEngine.Core.Tests TRUE)
+set_target_properties(PonyEngine.Core.Tests PROPERTIES CXX_STANDARD 23)
+
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 
 	Catch2::Catch2WithMain

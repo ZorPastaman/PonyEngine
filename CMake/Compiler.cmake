@@ -1,16 +1,46 @@
-# Cleans default build flags.
+# Sets global compile and link options.
+# It's the only way to set std module flags.
+# Must be called before a first project(), then must be cleaned with pony_clean_std_compile_flags().
+# Std module options are synced with engine options.
+function(pony_set_std_build_options)
+	if(CMAKE_CXX_COMPILER STREQUAL "cl.exe")
+		add_compile_options(/arch:AVX2 /EHsc /fp:fast /GR /permissive- /utf-8 /W4 /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew)
+		if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+			add_compile_options(/Zi)
+		endif()
+
+		if(PONY_ENGINE_OPTIMIZATION STREQUAL "Debug")
+			add_compile_options(/Ob0 /Od /RTC1)
+			add_link_options(/INCREMENTAL /OPT:NOREF)
+		elseif(PONY_ENGINE_OPTIMIZATION STREQUAL "Release")
+			add_compile_options(/GL /Gw /Gy /Ob3 /O2 /Zc:inline)
+			add_link_options(/INCREMENTAL:NO /LTCG /OPT:REF /OPT:ICF)
+		else()
+			message(FATAL_ERROR "Incorrect optimization type")
+		endif()
+	endif()
+endfunction()
+
+# Cleans flags that were set with pony_set_std_build_options.
+# Must be called after a first project() but before a first target.
+function(pony_clean_std_compile_flags)
+	set_directory_properties(PROPERTIES COMPILE_OPTIONS "")
+	set_directory_properties(PROPERTIES LINK_OPTIONS "")
+endfunction()
+
+# Cleans default build flags in a project.
 function(pony_init_build_options)
-if (MSVC)
-	string(REGEX REPLACE "/RTC[^ ]*" "" NEW_DEBUG_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
-	string(REGEX REPLACE "/O[^ ]*" "" NEW_DEBUG_FLAGS "${NEW_DEBUG_FLAGS}")
-	set(CMAKE_CXX_FLAGS_DEBUG "${NEW_DEBUG_FLAGS}" CACHE STRING "Clean debug flags" FORCE)
+	if(MSVC)
+		string(REGEX REPLACE "/RTC[^ ]*" "" NEW_DEBUG_FLAGS "${CMAKE_CXX_FLAGS_DEBUG}")
+		string(REGEX REPLACE "/O[^ ]*" "" NEW_DEBUG_FLAGS "${NEW_DEBUG_FLAGS}")
+		set(CMAKE_CXX_FLAGS_DEBUG "${NEW_DEBUG_FLAGS}" CACHE STRING "Clean debug flags" FORCE)
 
-	string(REGEX REPLACE "/O[^ ]*" "" NEW_RELEASE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}")
-	set(CMAKE_CXX_FLAGS_RELEASE "${NEW_RELEASE_FLAGS}" CACHE STRING "Clean release flags" FORCE)
+		string(REGEX REPLACE "/O[^ ]*" "" NEW_RELEASE_FLAGS "${CMAKE_CXX_FLAGS_RELEASE}")
+		set(CMAKE_CXX_FLAGS_RELEASE "${NEW_RELEASE_FLAGS}" CACHE STRING "Clean release flags" FORCE)
 
-	string(REGEX REPLACE "/O[^ ]*" "" NEW_RELWITHDEBINFO_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
-	set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${NEW_RELWITHDEBINFO_FLAGS}" CACHE STRING "Clean release with debug info flags" FORCE)
-endif()
+		string(REGEX REPLACE "/O[^ ]*" "" NEW_RELWITHDEBINFO_FLAGS "${CMAKE_CXX_FLAGS_RELWITHDEBINFO}")
+		set(CMAKE_CXX_FLAGS_RELWITHDEBINFO "${NEW_RELWITHDEBINFO_FLAGS}" CACHE STRING "Clean release with debug info flags" FORCE)
+	endif()
 endfunction()
 
 # Sets build options based on if the target is an engine target or a game target.
@@ -22,7 +52,7 @@ function(pony_set_build_options target_name is_engine_target)
 			$<$<CXX_COMPILER_ID:MSVC>:/fp:fast /utf-8>
 		)
 		target_compile_options(${target_name} PRIVATE
-			$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /EHsc /GR /W3 /permissive- /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew>
+			$<$<CXX_COMPILER_ID:MSVC>:/arch:AVX2 /EHsc /GR /permissive- /W3 /Zc:__cplusplus /Zc:preprocessor /Zc:throwingNew>
 		)
 
 		if(CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")

@@ -48,6 +48,7 @@ set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PROJECT_N
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Application TRUE)
+set_target_properties(PonyEngine.Application PROPERTIES CXX_STANDARD 23)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE

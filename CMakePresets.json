@@ -70,6 +70,7 @@
 			"name": "WinCore",
 			"hidden": true,
 			"cacheVariables": {
+				"CMAKE_CXX_COMPILER": "cl.exe",
 				"PONY_WINCORE": "TRUE"
 			}
 		},

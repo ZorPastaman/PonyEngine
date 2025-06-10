@@ -7,11 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <exception>
-#include <memory>
-
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Platform/Windows/Framework.h"
+
+import std;
 
 import PonyEngine.Application.Windows;
 import PonyEngine.Log;

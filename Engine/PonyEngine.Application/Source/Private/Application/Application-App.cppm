@@ -9,18 +9,12 @@
 
 module;
 
-#include <cstdint>
-#include <memory>
-#include <stdexcept>
-#include <typeindex>
-#include <typeinfo>
-#include <unordered_map>
-#include <vector>
-
 #include "PonyEngine/Core/Module.h"
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Application:App;
+
+import std;
 
 import PonyEngine.Core;
 import PonyEngine.Log;

@@ -7,13 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <exception>
-#include <format>
-#include <string>
-
 export module PonyEngine.Utility:SafeFormat;
+
+import std;
 
 export namespace PonyEngine::Utility
 {

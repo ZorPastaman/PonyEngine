@@ -13,6 +13,8 @@ module;
 
 export module PonyEngine.Log.Ext:ISubLogger;
 
+import std;
+
 import :LogEntry;
 
 export namespace PonyEngine::Log::Ext

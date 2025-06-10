@@ -7,15 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <cstdint>
-#include <chrono>
-#include <format>
-#include <string>
-#include <string_view>
-
 export module PonyEngine.Log:LogFormat;
+
+import std;
 
 import :LogType;
 

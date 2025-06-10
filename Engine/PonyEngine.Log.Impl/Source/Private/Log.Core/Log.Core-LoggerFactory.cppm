@@ -7,11 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <memory>
-
 export module PonyEngine.Log.Core:LoggerFactory;
+
+import std;
 
 import PonyEngine.Core;
 import PonyEngine.Log;
@@ -31,7 +29,7 @@ export namespace PonyEngine::Log::Core
 
 namespace PonyEngine::Log::Core
 {
-	std::shared_ptr<ILogger> LoggerFactory::Create(const PonyEngine::Core::IModuleContext& context)
+	std::shared_ptr<ILogger> LoggerFactory::Create(const PonyEngine::Core::IModuleContext&)
 	{
 		return std::make_shared<Logger>();
 	}

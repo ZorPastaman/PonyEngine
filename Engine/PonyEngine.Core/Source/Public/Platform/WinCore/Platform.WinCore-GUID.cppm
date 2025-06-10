@@ -9,17 +9,11 @@
 
 module;
 
-#include <algorithm>
-#include <format>
-#include <ostream>
-#include <stdexcept>
-#include <string>
-#include <string_view>
-#include <type_traits>
-
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 export module PonyEngine.Platform.WinCore:GUID;
+
+import std;
 
 import PonyEngine.Utility;
 
