@@ -9,17 +9,11 @@
 
 module;
 
-#include <chrono>
-#include <cstdint>
-#include <exception>
-#include <format>
-#include <optional>
-#include <string>
-#include <string_view>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log.Ext:LogEntry;
+
+import std;
 
 import PonyEngine.Log;
 

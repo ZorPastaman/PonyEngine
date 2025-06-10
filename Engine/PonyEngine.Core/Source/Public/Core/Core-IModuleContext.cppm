@@ -9,13 +9,11 @@
 
 module;
 
-#include <cstddef>
-#include <memory>
-#include <typeinfo>
-
 #include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Core:IModuleContext;
+
+import std;
 
 import :IApplicationContext;
 import :IEngine;

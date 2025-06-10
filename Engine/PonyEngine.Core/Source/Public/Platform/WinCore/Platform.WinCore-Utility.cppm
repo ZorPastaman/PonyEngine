@@ -9,12 +9,11 @@
 
 module;
 
-#include <stdexcept>
-#include <string>
-
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 export module PonyEngine.Platform.WinCore:Utility;
+
+import std;
 
 import PonyEngine.Utility;
 

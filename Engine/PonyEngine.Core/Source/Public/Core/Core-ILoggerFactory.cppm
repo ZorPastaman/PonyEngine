@@ -9,11 +9,11 @@
 
 module;
 
-#include <memory>
-
 #include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Core:ILoggerFactory;
+
+import std;
 
 import PonyEngine.Log;
 

@@ -9,11 +9,11 @@
 
 module;
 
-#include <stdexcept>
-
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Application.Windows:Process;
+
+import std;
 
 import PonyEngine.Utility;
 

@@ -7,7 +7,7 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-// Import PonyEngine.Module to use these macros.
+// Import PonyEngine.Core to use these macros.
 
 #pragma once
 

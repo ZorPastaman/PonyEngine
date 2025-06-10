@@ -9,13 +9,11 @@
 
 module;
 
-#include <array>
-#include <cstdint>
-#include <string_view>
-
 #include "PonyEngine/Utility/Enum.h"
 
 export module PonyEngine.Log:LogType;
+
+import std;
 
 namespace PonyEngine::Log
 {

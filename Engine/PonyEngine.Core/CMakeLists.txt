@@ -58,3 +58,4 @@ pony_set_log_mask(PonyEngine.Core TRUE)
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Core TRUE)
+set_target_properties(PonyEngine.Core PROPERTIES CXX_STANDARD 23)

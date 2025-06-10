@@ -9,11 +9,11 @@
 
 module;
 
-#include <string_view>
-
 #include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Core:IModule;
+
+import std;
 
 import :IModuleContext;
 

@@ -35,6 +35,7 @@ set_target_properties(PonyEngine.Log.Impl PROPERTIES OUTPUT_NAME "PonyEngine.Log
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Log.Impl TRUE)
+set_target_properties(PonyEngine.Log.Impl PROPERTIES CXX_STANDARD 23)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Impl PRIVATE

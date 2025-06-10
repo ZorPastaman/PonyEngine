@@ -9,11 +9,11 @@
 
 module;
 
-#include <exception>
-
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Application:DefaultLogger;
+
+import std;
 
 import PonyEngine.Log;
 

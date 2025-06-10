@@ -13,6 +13,7 @@ pony_set_log_mask(PonyEngine.Log.Ext TRUE)
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Log.Ext TRUE)
+set_target_properties(PonyEngine.Log.Ext PROPERTIES CXX_STANDARD 23)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Ext PRIVATE

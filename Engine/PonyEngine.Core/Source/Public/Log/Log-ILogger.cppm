@@ -9,11 +9,11 @@
 
 module;
 
-#include <exception>
-
 #include "PonyEngine/Utility/ObjectBody.h"
 
 export module PonyEngine.Log:ILogger;
+
+import std;
 
 import :LogInput;
 import :LogType;

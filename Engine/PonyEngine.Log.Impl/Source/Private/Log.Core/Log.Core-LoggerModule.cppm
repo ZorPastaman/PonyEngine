@@ -9,13 +9,12 @@
 
 module;
 
-#include <memory>
-#include <string_view>
-
 #include "PonyEngine/Log/Core/LoggerModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.Core:LoggerModule;
+
+import std;
 
 import PonyEngine.Core;
 
@@ -42,7 +41,7 @@ namespace PonyEngine::Log::Core
 		context.AddData<PonyEngine::Core::ILoggerFactory>(std::make_shared<LoggerFactory>());
 	}
 
-	void LoggerModule::ShutDown(const PonyEngine::Core::IModuleContext& context)
+	void LoggerModule::ShutDown(const PonyEngine::Core::IModuleContext&)
 	{
 	}
 
