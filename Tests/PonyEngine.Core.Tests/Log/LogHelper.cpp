@@ -7,13 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <exception>
-#include <iostream>
-#include <optional>
-#include <sstream>
-#include <string>
-
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Log;
 

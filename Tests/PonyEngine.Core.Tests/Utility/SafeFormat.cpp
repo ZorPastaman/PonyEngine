@@ -7,11 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <format>
-#include <stdexcept>
-#include <string>
-
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Utility;
 

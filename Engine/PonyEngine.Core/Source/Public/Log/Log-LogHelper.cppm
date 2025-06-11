@@ -11,7 +11,7 @@ module;
 
 #include <cassert>
 
-#ifdef PONY_SYSTEM_CONSOLE_LOG
+#ifdef PONY_PLATFORM_CONSOLE_LOG
 #ifdef PONY_WINCORE
 #include "PonyEngine/Platform/WinCore/Framework.h"
 #endif
@@ -62,11 +62,11 @@ export namespace PonyEngine::Log
 	template<typename... Args>
 	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
 
-	/// @brief Logs to a standard console and a system console.
+	/// @brief Logs to a standard console and a platform console.
 	/// @param logType Log type.
 	/// @param message Log message.
 	void LogToConsole(LogType logType, std::string_view message) noexcept;
-	/// @brief Logs to a standard console and a system console.
+	/// @brief Logs to a standard console and a platform console.
 	/// @tparam Args Format argument types.
 	/// @param logType Log type.
 	/// @param format Format.
@@ -74,14 +74,14 @@ export namespace PonyEngine::Log
 	template<typename... Args>
 	void LogToConsole(LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
 
-	/// @brief Logs the @p exception to a standard console and a system console.
+	/// @brief Logs the @p exception to a standard console and a platform console.
 	/// @param exception Exception to log.
 	void LogExceptionToConsole(const std::exception& exception) noexcept;
-	/// @brief Logs the @p exception to a standard console and a system console.
+	/// @brief Logs the @p exception to a standard console and a platform console.
 	/// @param exception Exception to log.
 	/// @param message Log message.
 	void LogExceptionToConsole(const std::exception& exception, std::string_view message) noexcept;
-	/// @brief Logs the @p exception to a standard console and a system console.
+	/// @brief Logs the @p exception to a standard console and a platform console.
 	/// @tparam Args Format argument types.
 	/// @param exception Exception to log.
 	/// @param format Format.
@@ -114,7 +114,7 @@ namespace PonyEngine::Log
 	template<typename... Args> [[nodiscard("Pure function")]]
 	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept;
 
-	/// @brief Logs to a standard console and a system console.
+	/// @brief Logs to a standard console and a platform console.
 	/// @param logType Log type.
 	/// @param log Formatted log message.
 	void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
@@ -236,7 +236,7 @@ namespace PonyEngine::Log
 			// Something totally wrong happened.
 		}
 #endif
-#ifdef PONY_SYSTEM_CONSOLE_LOG
+#ifdef PONY_PLATFORM_CONSOLE_LOG
 #ifdef PONY_WINCORE
 		OutputDebugStringA(log.data());
 #endif

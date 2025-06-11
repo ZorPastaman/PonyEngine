@@ -1,0 +1,74 @@
+/***************************************************
+ * MIT License                                     *
+ *                                                 *
+ * Copyright (c) 2023-present Vladimir Popov       *
+ *                                                 *
+ * Email: zor1994@gmail.com                        *
+ * Repo: https://github.com/ZorPastaman/PonyEngine *
+ ***************************************************/
+
+export module PonyEngine.Log.Core:Logger;
+
+import std;
+
+import PonyEngine.Log.Extension;
+
+export namespace PonyEngine::Log::Core
+{
+	/// @brief Logger.
+	class Logger final : public ILogger
+	{
+	public:
+		[[nodiscard("Pure constuctor")]]
+		Logger() noexcept = default;
+		Logger(const Logger&) = delete;
+		Logger(Logger&&) = delete;
+
+		~Logger() noexcept = default;
+
+		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
+		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept override;
+
+		/// @brief Adds a sub-logger.
+		/// @param subLogger Sub-logger to add.
+		void AddSubLogger(const std::shared_ptr<Extension::ISubLogger>& subLogger);
+
+		Logger& operator =(const Logger&) = delete;
+		Logger& operator =(Logger&&) = delete;
+
+	private:
+		/// @brief Logs the entry.
+		/// @param logEntry Log entry to log.
+		void Log(const Extension::LogEntry& logEntry) const noexcept;
+
+		std::vector<std::shared_ptr<Extension::ISubLogger>> subLoggers; ///< Sub-loggers.
+	};
+}
+
+namespace PonyEngine::Log::Core
+{
+	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
+	{
+		const auto logEntry = Extension::LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
+		Log(logEntry);
+	}
+
+	void Logger::LogException(const std::exception& exception, const LogInput& logInput) const noexcept
+	{
+		const auto logEntry = Extension::LogEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
+		Log(logEntry);
+	}
+
+	void Logger::AddSubLogger(const std::shared_ptr<Extension::ISubLogger>& subLogger)
+	{
+		subLoggers.push_back(subLogger);
+	}
+
+	void Logger::Log(const Extension::LogEntry& logEntry) const noexcept
+	{
+		for (const std::shared_ptr<Extension::ISubLogger>& subLogger : subLoggers)
+		{
+			subLogger->Log(logEntry);
+		}
+	}
+}

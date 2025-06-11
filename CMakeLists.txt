@@ -17,15 +17,15 @@ set_property(GLOBAL PROPERTY PONY_ENGINE_PATH "${CMAKE_CURRENT_LIST_DIR}/Engine"
 
 if(${CMAKE_CURRENT_LIST_DIR} STREQUAL ${CMAKE_SOURCE_DIR}) # It's an engine build.
 	message(STATUS "Configuring project")
-	project("PonyEngineGame" VERSION 0.0.0.0 LANGUAGES CXX)
+	project(${PONY_GAME_NAME} VERSION ${PONY_GAME_VERSION} LANGUAGES CXX)
 	pony_clean_std_compile_flags()
 	pony_init_build_options() # Must be done in a game build as well.
 
 	message(STATUS "Configuring modules")
 	get_property(PONY_ENGINE_PATH_VALUE GLOBAL PROPERTY PONY_ENGINE_PATH)
 	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Core")
-	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Ext")
-	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Impl")
+	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Extension")
+	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Log.Implementation")
 
 	message(STATUS "Configuring application")
 	add_subdirectory("${PONY_ENGINE_PATH_VALUE}/PonyEngine.Application")
