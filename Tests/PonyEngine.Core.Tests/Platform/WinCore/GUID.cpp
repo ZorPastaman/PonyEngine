@@ -7,14 +7,11 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <algorithm>
-#include <ostream>
-#include <string>
-#include <format>
-
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Platform.WinCore;
 

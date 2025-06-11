@@ -41,6 +41,10 @@ message(STATUS "Configuring defines")
 if(PONY_CREATE_CONSOLE)
 	target_compile_definitions(PonyEngine.Application PRIVATE PONY_CREATE_CONSOLE)
 endif()
+target_compile_definitions(PonyEngine.Application PRIVATE 
+	PONY_COMPANY_NAME=${PONY_COMPANY_NAME}
+	PONY_GAME_NAME=${PONY_GAME_NAME}
+)
 pony_set_log_mask(PonyEngine.Application TRUE)
 
 message(STATUS "Setting properties")

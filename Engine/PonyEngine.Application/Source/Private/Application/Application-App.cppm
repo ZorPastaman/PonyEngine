@@ -51,9 +51,9 @@ export namespace PonyEngine::Application
 		{
 		public:
 			/// @brief Creates an application context.
-			/// @param logger Application logger.
+			/// @param application Application.
 			[[nodiscard("Pure constructor")]]
-			explicit AppContext(AppLogger& logger) noexcept;
+			explicit AppContext(App& application) noexcept;
 			AppContext(const AppContext&) = delete;
 			AppContext(AppContext&&) = delete;
 
@@ -68,7 +68,7 @@ export namespace PonyEngine::Application
 			AppContext& operator =(AppContext&&) = delete;
 
 		private:
-			AppLogger* logger; ///< Application logger.
+			App* application; ///< Application.
 		};
 
 		/// @brief Module context.
@@ -136,7 +136,7 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
 	App::App() :
-		appContext(logger),
+		appContext(*this),
 		moduleContext(appContext),
 		lastStartedModule(reinterpret_cast<std::uintptr_t>(&FirstModule))
 	{
@@ -168,19 +168,19 @@ namespace PonyEngine::Application
 	{
 	}
 
-	App::AppContext::AppContext(AppLogger& logger) noexcept :
-		logger{&logger}
+	App::AppContext::AppContext(App& application) noexcept :
+		application{&application}
 	{
 	}
 
 	Log::ILogger& App::AppContext::Logger() noexcept
 	{
-		return logger->Logger();
+		return application->logger.Logger();
 	}
 
 	const Log::ILogger& App::AppContext::Logger() const noexcept
 	{
-		return logger->Logger();
+		return application->logger.Logger();
 	}
 
 	App::ModuleContext::ModuleContext(Core::IApplicationContext& appContext) noexcept :
@@ -286,9 +286,9 @@ namespace PonyEngine::Application
 
 	void App::TryCreateLogger()
 	{
-		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > 0)
+		if (moduleContext.DataCount(typeid(Core::ILoggerFactory)) > 0Z)
 		{
-			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0);
+			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0Z);
 			const std::shared_ptr<Core::ILoggerFactory> loggerFactory = std::static_pointer_cast<Core::ILoggerFactory>(loggerFactoryData);
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", typeid(*loggerFactory).name());
 			logger.SetLogger(loggerFactory->Create(moduleContext));

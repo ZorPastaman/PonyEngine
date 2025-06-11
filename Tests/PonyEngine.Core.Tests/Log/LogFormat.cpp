@@ -7,12 +7,9 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <chrono>
-#include <cstdint>
-#include <string>
-#include <string_view>
-
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Log;
 

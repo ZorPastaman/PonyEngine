@@ -7,9 +7,15 @@
 			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
 			"installDir": "${sourceDir}/Output/Install/${presetName}",
 			"cacheVariables": {
-				"CMAKE_CONFIGURATION_TYPES": "Debug;Release;RelWithDebInfo",
+				"PONY_COMPANY_NAME": "PonyEngine",
+				"PONY_GAME_NAME": "PonyEngineGame",
+				"PONY_GAME_VERSION": "0.0.0.0",
 				"PONY_CONSOLE_LOG": "TRUE",
-				"PONY_SYSTEM_CONSOLE_LOG": "TRUE"
+				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
+				"PONY_ENGINE_LOG_CORE": "TRUE",
+				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_PLATFORM_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_FILE": "TRUE"
 			}
 		},
 		{

@@ -17,7 +17,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string_view ToString(const Value value) noexcept \
 	{ \
-		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1)]; \
+		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1Z)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Value value) \
 	{ \
@@ -55,22 +55,22 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string Mask##GenerateToString(const Mask mask) \
 	{ \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == std::underlying_type_t<Mask>{0}) \
+		if (std::to_underlying(mask) == std::underlying_type_t<Mask>{0}) \
 		{ \
 			return "None"; \
 		} \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == static_cast<std::underlying_type_t<Mask>>(Mask::All)) \
+		if (mask == Mask::All) \
 		{ \
 			return "All"; \
 		} \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) > static_cast<std::underlying_type_t<Mask>>(Mask::All)) \
+		if (std::to_underlying(mask) > std::to_underlying(Mask::All)) \
 		{ \
 			return "Unknown"; \
 		} \
 		std::string answer = ""; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)); ++i) \
+		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(std::to_underlying(Mask::All)); ++i) \
 		{ \
-			if (((std::underlying_type_t<Mask>{1} << i) & static_cast<std::underlying_type_t<Mask>>(mask)) != std::underlying_type_t<Mask>{0}) \
+			if (((std::underlying_type_t<Mask>{1} << i) & std::to_underlying(mask)) != std::underlying_type_t<Mask>{0}) \
 			{ \
 				if (!answer.empty()) \
 				{ \
@@ -82,20 +82,20 @@
 		return answer; \
 	} \
 	[[nodiscard("Pure function")]] \
-	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2> Mask##GenerateToStrings() \
+	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GenerateToStrings() \
 	{ \
-		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2> answer; \
-		for (std::size_t i = 0; i < answer.size(); ++i) \
+		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> answer; \
+		for (std::size_t i = 0Z; i < answer.size(); ++i) \
 		{ \
 			answer[i] = Mask##GenerateToString(static_cast<Mask>(i)); \
 		} \
 		return answer; \
 	} \
-	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2> Mask##GeneratedNames = Mask##GenerateToStrings(); \
+	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GeneratedNames = Mask##GenerateToStrings(); \
 	[[nodiscard("Pure function")]] \
 	std::string_view ToString(const Mask mask) noexcept \
 	{ \
-		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1)]; \
+		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1Z)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
 	{ \
@@ -132,18 +132,18 @@
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator &(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) & static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) & std::to_underlying(right)); \
 	} \
 	 \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator |(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) | static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) | std::to_underlying(right)); \
 	} \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator ^(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) ^ static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) ^ std::to_underlying(right)); \
 	} \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator ~(const Mask mask) noexcept \
@@ -186,7 +186,7 @@
 		std::underlying_type_t<Mask> mask = std::underlying_type_t<Mask>{0u}; \
 		for (const Value value : values) \
 		{ \
-			mask |= static_cast<std::underlying_type_t<Mask>>(ToMask(value)); \
+			mask |= std::to_underlying(ToMask(value)); \
 		} \
 		 \
 		return static_cast<Mask>(mask); \
@@ -199,7 +199,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr bool IsInMask(const Value value, const Mask mask) noexcept \
 	{ \
-		return static_cast<std::underlying_type_t<Mask>>(ToMask(value)) & static_cast<std::underlying_type_t<Mask>>(mask); \
+		return std::to_underlying(ToMask(value)) & std::to_underlying(mask); \
 	} \
 	 \
 	/* @brief Converts the mask to a value. */ \
@@ -208,7 +208,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr Value ToValue(const Mask mask) noexcept \
 	{ \
-		return static_cast<Value>(std::countr_zero(static_cast<std::underlying_type_t<Mask>>(mask))); \
+		return static_cast<Value>(std::countr_zero(std::to_underlying(mask))); \
 	} \
 	 \
 	/* @brief Converts the mask to values. */ \
@@ -218,7 +218,7 @@
 	constexpr std::size_t ToValues(const Mask mask, const std::span<Value> values) noexcept \
 	{ \
 		std::size_t valueCount = 0; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)) && valueCount < values.size(); ++i) \
+		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(std::to_underlying(Mask::All)) && valueCount < values.size(); ++i) \
 		{ \
 			if (IsInMask(static_cast<Value>(i), mask)) \
 			{ \
