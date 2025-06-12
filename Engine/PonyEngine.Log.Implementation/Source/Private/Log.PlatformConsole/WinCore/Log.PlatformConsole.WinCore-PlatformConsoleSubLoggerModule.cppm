@@ -56,6 +56,6 @@ namespace PonyEngine::Log::PlatformConsole::WinCore
 
 	std::string_view PlatformConsoleSubLoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_WINCORE_PLATFORM_CONSOLE_MODULE_NAME);
+		return PONY_STRINGIFY_VALUE(PONY_ENGINE_WINCORE_PLATFORM_CONSOLE_SUBLOGGER_MODULE_NAME);
 	}
 }

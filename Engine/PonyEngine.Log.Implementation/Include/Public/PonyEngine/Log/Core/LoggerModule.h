@@ -13,7 +13,7 @@
 
 import PonyEngine.Core;
 
-#define PONY_LOGGER_MODULE_NAME PonyEngineLogger
+#define PONY_ENGINE_LOGGER_MODULE_NAME PonyEngineLogger
 
 namespace PonyEngine::Log::Core
 {

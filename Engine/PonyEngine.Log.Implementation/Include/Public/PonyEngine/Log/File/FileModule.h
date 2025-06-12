@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+#pragma once
 
-export import :ApplicationPaths;
-export import :IApplicationContext;
-export import :IEngine;
-export import :ILoggerFactory;
-export import :IModule;
-export import :IModuleContext;
+#include "PonyEngine/Utility/Compiler.h"
+
+import PonyEngine.Core;
+
+#define PONY_ENGINE_FILE_SUBLOGGER_MODULE_NAME PonyEngineFileSubLogger
+
+namespace PonyEngine::Log::File
+{
+	/// @brief Gets the file sub-logger module.
+	/// @return File sub-logger module.
+	PONY_DLL_EXPORT Core::IModule* GetFileModule();
+}

@@ -12,6 +12,7 @@ target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES
 	"Source/Private/Application/Application-AppLogger.cppm"
 	"Source/Private/Application/Application-DefaultLogger.cppm"
 	"Source/Private/Application/Application-ExitCodes.cppm"
+	"Source/Private/Application/Application-PlatformPaths.cppm"
 )
 
 if(PONY_WINCORE)
@@ -26,6 +27,7 @@ if(PONY_WINDOWS)
 	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application/Windows/Application.Windows.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
+		"Source/Private/Application/Windows/Application.Windows-Paths.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
 	)
 	 target_sources(PonyEngine.Application PRIVATE
@@ -41,10 +43,16 @@ message(STATUS "Configuring defines")
 if(PONY_CREATE_CONSOLE)
 	target_compile_definitions(PonyEngine.Application PRIVATE PONY_CREATE_CONSOLE)
 endif()
-target_compile_definitions(PonyEngine.Application PRIVATE 
-	PONY_COMPANY_NAME=${PONY_COMPANY_NAME}
-	PONY_GAME_NAME=${PONY_GAME_NAME}
-)
+if(PONY_COMPANY_NAME)
+	target_compile_definitions(PonyEngine.Application PRIVATE PONY_COMPANY_NAME=${PONY_COMPANY_NAME})
+else()
+	message(FATAL_ERROR "Company name isn't set")
+endif()
+if(PONY_GAME_NAME)
+	target_compile_definitions(PonyEngine.Application PRIVATE PONY_GAME_NAME=${PONY_GAME_NAME})
+else()
+	message(FATAL_ERROR "Game name isn't set")
+endif()
 pony_set_log_mask(PonyEngine.Application TRUE)
 
 message(STATUS "Setting properties")

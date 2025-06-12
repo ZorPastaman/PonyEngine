@@ -57,6 +57,6 @@ namespace PonyEngine::Log::Console
 
 	std::string_view ConsoleSubLoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_CONSOLE_MODULE_NAME);
+		return PONY_STRINGIFY_VALUE(PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME);
 	}
 }

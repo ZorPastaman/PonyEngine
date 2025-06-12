@@ -11,3 +11,4 @@ export module PonyEngine.Application;
 
 export import :App;
 export import :ExitCodes;
+export import :PlatformPaths;

@@ -30,7 +30,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		try
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creates application.");
-			auto app = std::make_unique<PonyEngine::Application::App>();
+			auto app = std::make_unique<PonyEngine::Application::App>(PonyEngine::Application::Windows::GetPlatformPaths());
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Begins application.");
 			app->Begin();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application created.");

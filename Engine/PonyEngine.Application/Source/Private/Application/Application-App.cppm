@@ -20,6 +20,7 @@ import PonyEngine.Core;
 import PonyEngine.Log;
 
 import :AppLogger;
+import :PlatformPaths;
 
 export namespace PonyEngine::Application
 {
@@ -29,7 +30,7 @@ export namespace PonyEngine::Application
 	public:
 		/// @brief Creates application.
 		[[nodiscard("Pure constructor")]]
-		App();
+		explicit App(const PlatformPaths& platformPaths);
 		App(const App&) = delete;
 		App(App&&) = delete;
 
@@ -63,6 +64,9 @@ export namespace PonyEngine::Application
 			virtual Log::ILogger& Logger() noexcept override;
 			[[nodiscard("Pure function")]]
 			virtual const Log::ILogger& Logger() const noexcept override;
+
+			[[nodiscard("Pure function")]]
+			virtual const Core::ApplicationPaths& Paths() const noexcept override;
 
 			AppContext& operator =(const AppContext&) = delete;
 			AppContext& operator =(AppContext&&) = delete;
@@ -121,6 +125,7 @@ export namespace PonyEngine::Application
 		/// @brief Tries to create a logger if there's at least one registered.
 		void TryCreateLogger();
 
+		Core::ApplicationPaths paths; ///< Application paths.
 		AppLogger logger; ///< Application logger.
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
@@ -135,11 +140,20 @@ namespace PonyEngine::Application
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_LOG_CHECKPOINT) Core::IModule** LogCheckpoint = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
-	App::App() :
+	App::App(const PlatformPaths& platformPaths) :
+		paths
+		{
+			.gameData = platformPaths.gameData,
+			.executable = platformPaths.executable,
+			.localData = platformPaths.localData,
+			.userData = platformPaths.userData
+		},
 		appContext(*this),
 		moduleContext(appContext),
 		lastStartedModule(reinterpret_cast<std::uintptr_t>(&FirstModule))
 	{
+		std::filesystem::create_directories(paths.localData);
+		std::filesystem::create_directories(paths.userData);
 	}
 
 	App::~App() noexcept
@@ -181,6 +195,11 @@ namespace PonyEngine::Application
 	const Log::ILogger& App::AppContext::Logger() const noexcept
 	{
 		return application->logger.Logger();
+	}
+
+	const Core::ApplicationPaths& App::AppContext::Paths() const noexcept
+	{
+		return application->paths;
 	}
 
 	App::ModuleContext::ModuleContext(Core::IApplicationContext& appContext) noexcept :

@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core;
+#include "PonyEngine/Log/File/FileModule.h"
 
-export import :ApplicationPaths;
-export import :IApplicationContext;
-export import :IEngine;
-export import :ILoggerFactory;
-export import :IModule;
-export import :IModuleContext;
+import PonyEngine.Core;
+import PonyEngine.Log.File;
+
+namespace PonyEngine::Log::File
+{
+	FileSubLoggerModule FileModule; ///< File sub-logger module.
+
+	Core::IModule* GetFileModule()
+	{
+		return &FileModule;
+	}
+}
