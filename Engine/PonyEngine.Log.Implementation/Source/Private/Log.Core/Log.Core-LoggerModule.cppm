@@ -57,6 +57,6 @@ namespace PonyEngine::Log::Core
 
 	std::string_view LoggerModule::Name() const noexcept
 	{
-		return PONY_STRINGIFY_VALUE(PONY_LOGGER_MODULE_NAME);
+		return PONY_STRINGIFY_VALUE(PONY_ENGINE_LOGGER_MODULE_NAME);
 	}
 }

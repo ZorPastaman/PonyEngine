@@ -30,7 +30,7 @@ export namespace PonyEngine::Log::PlatformConsole::WinCore
 
 		~PlatformConsoleSubLogger() noexcept = default;
 
-		virtual void Log(const Extension::LogEntry& logEntry) const noexcept override;
+		virtual void Log(const Extension::LogEntry& logEntry) noexcept override;
 
 		PlatformConsoleSubLogger& operator =(const PlatformConsoleSubLogger&) = delete;
 		PlatformConsoleSubLogger& operator =(PlatformConsoleSubLogger&&) = delete;
@@ -39,7 +39,7 @@ export namespace PonyEngine::Log::PlatformConsole::WinCore
 
 namespace PonyEngine::Log::PlatformConsole::WinCore
 {
-	void PlatformConsoleSubLogger::Log(const Extension::LogEntry& logEntry) const noexcept
+	void PlatformConsoleSubLogger::Log(const Extension::LogEntry& logEntry) noexcept
 	{
 		OutputDebugStringA(logEntry.ToString().data());
 	}

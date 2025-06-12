@@ -41,24 +41,49 @@ if(PONY_ENGINE_LOG_CONSOLE)
 	)
 endif()
 if(PONY_ENGINE_LOG_PLATFORM_CONSOLE)
+	message(STATUS "Configuring plaform console sources")
 	if(PONY_WINCORE)
+		message(STATUS "Configuring plaform console sources for WinCore")
 		target_sources(PonyEngine.Log.Implementation PUBLIC
 			"Source/Main.PlatformConsole.WinCore.cpp"
 		)
 		target_sources(PonyEngine.Log.Implementation PRIVATE
 			"Source/Main.PlatformConsole.WinCore.Implementation.cpp"
 		)
-		message(STATUS "Configuring platform console sources for WinCore")
 		target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
 			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore.cppm"
 			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLogger.cppm"
 			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLoggerFactory.cppm"
 			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLoggerModule.cppm"
 		)
+	else()
+		message(FATAL_ERROR "Unsupported platform!")
 	endif()
+endif()
+if(PONY_ENGINE_LOG_FILE)
+	message(STATUS "Configuring file sources")
+	target_sources(PonyEngine.Log.Implementation PUBLIC
+		"Source/Main.File.cpp"
+	)
+	target_sources(PonyEngine.Log.Implementation PRIVATE
+		"Source/Main.File.Implementation.cpp"
+	)
+	target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
+		"Source/Private/Log.File/Log.File.cppm"
+		"Source/Private/Log.File/Log.File-FileSubLogger.cppm"
+		"Source/Private/Log.File/Log.File-FileSubLoggerFactory.cppm"
+		"Source/Private/Log.File/Log.File-FileSubLoggerModule.cppm"
+	)
 endif()
 
 message(STATUS "Configuring defines")
+if(PONY_ENGINE_LOG_FILE)
+	if(PONY_ENGINE_LOG_FILE_PATH)
+		target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH})
+	else()
+		message(FATAL_ERROR, "Log file path isn't set")
+	endif()
+endif()
 pony_set_log_mask(PonyEngine.Log.Implementation TRUE)
 if(NOT PONY_FORCE_STATIC)
 	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_DLL)

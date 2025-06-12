@@ -30,7 +30,7 @@ export namespace PonyEngine::Log::Console
 
 		~ConsoleSubLogger() noexcept = default;
 
-		virtual void Log(const Extension::LogEntry& logEntry) const noexcept override;
+		virtual void Log(const Extension::LogEntry& logEntry) noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
@@ -39,7 +39,7 @@ export namespace PonyEngine::Log::Console
 
 namespace PonyEngine::Log::Console
 {
-	void ConsoleSubLogger::Log(const Extension::LogEntry& logEntry) const noexcept
+	void ConsoleSubLogger::Log(const Extension::LogEntry& logEntry) noexcept
 	{
 		try
 		{

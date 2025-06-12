@@ -13,7 +13,7 @@
 
 import PonyEngine.Core;
 
-#define PONY_CONSOLE_MODULE_NAME PonyEngineConsoleSubLogger
+#define PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineConsoleSubLogger
 
 namespace PonyEngine::Log::Console
 {

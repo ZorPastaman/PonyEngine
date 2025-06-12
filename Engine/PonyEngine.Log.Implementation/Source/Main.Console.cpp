@@ -10,4 +10,4 @@
 #include "PonyEngine/Core/Module.h"
 #include "PonyEngine/Log/Console/ConsoleModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::Console::GetConsoleModule, PONY_CONSOLE_MODULE_NAME);
+PONY_MODULE_LOG(PonyEngine::Log::Console::GetConsoleModule, PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME);

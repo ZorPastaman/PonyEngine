@@ -26,6 +26,6 @@ export namespace PonyEngine::Log::Extension
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.
-		virtual void Log(const LogEntry& logEntry) const noexcept = 0;
+		virtual void Log(const LogEntry& logEntry) noexcept = 0;
 	};
 }

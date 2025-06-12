@@ -15,6 +15,8 @@ export module PonyEngine.Core:IApplicationContext;
 
 import PonyEngine.Log;
 
+import :ApplicationPaths;
+
 export namespace PonyEngine::Core
 {
 	/// @brief Application context. It exists for the whole life of an application.
@@ -30,5 +32,10 @@ export namespace PonyEngine::Core
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
+
+		/// @brief Gets the application paths.
+		/// @return Application paths.
+		[[nodiscard("Pure function")]]
+		virtual const ApplicationPaths& Paths() const noexcept = 0;
 	};
 }

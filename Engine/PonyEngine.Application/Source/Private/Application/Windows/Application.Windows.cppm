@@ -12,4 +12,5 @@ export module PonyEngine.Application.Windows;
 export import PonyEngine.Application.WinCore;
 
 export import :Console;
+export import :Paths;
 export import :Process;
