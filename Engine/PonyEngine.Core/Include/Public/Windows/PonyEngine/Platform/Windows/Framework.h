@@ -3,7 +3,7 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
@@ -12,3 +12,4 @@
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 #include <windowsx.h>
+#include <shlobj.h>

@@ -3,6 +3,9 @@ add_executable(PonyEngine.Core.Tests)
 
 message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
+	"Log/LogFormat.cpp"
+	"Log/LogHelper.cpp"
+	"Log/LogMacro.cpp"
 	"Utility/Enum.cpp"
 	"Utility/SafeFormat.cpp"
 )
@@ -22,6 +25,13 @@ if(PONY_WINDOWS)
 		"Platform/Windows/Module.cpp"
 	)
 endif()
+
+message(STATUS "Configuring defines")
+pony_set_log_mask(PonyEngine.Core.Tests TRUE)
+
+message(STATUS "Setting build options")
+pony_set_build_options(PonyEngine.Core.Tests TRUE)
+set_target_properties(PonyEngine.Core.Tests PROPERTIES CXX_STANDARD 23)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Core.Tests PRIVATE 

@@ -3,18 +3,15 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
-
-#include <algorithm>
-#include <ostream>
-#include <string>
-#include <format>
 
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Platform.WinCore;
 
