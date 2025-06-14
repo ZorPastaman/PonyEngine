@@ -17,6 +17,7 @@ export namespace PonyEngine::Log
 	struct LogInput final
 	{
 		std::string_view message; ///< Log message.
-		std::optional<std::uint64_t> frameCount = {}; ///< Engine frame count.
+		const std::basic_stacktrace<std::allocator<std::stacktrace_entry>>* stacktrace = nullptr; ///< Stacktrace.
+		std::optional<std::uint64_t> frameCount = std::nullopt; ///< Engine frame count.
 	};
 }

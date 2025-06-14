@@ -13,3 +13,4 @@ pony_set_build_options(Catch2WithMain TRUE)
 
 message(STATUS "Configuring tests")
 add_subdirectory("PonyEngine.Core.Tests")
+add_subdirectory("PonyEngine.Log.Extension.Tests")

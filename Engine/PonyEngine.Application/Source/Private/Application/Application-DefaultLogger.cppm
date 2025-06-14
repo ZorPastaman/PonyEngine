@@ -31,7 +31,7 @@ export namespace PonyEngine::Application
 		~DefaultLogger() noexcept = default;
 
 		virtual void Log(Log::LogType logType, const Log::LogInput& logInput) const noexcept override;
-		virtual void LogException(const std::exception& exception, const Log::LogInput& logInput) const noexcept override;
+		virtual void Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept override;
 
 		DefaultLogger& operator =(const DefaultLogger&) = delete;
 		DefaultLogger& operator =(DefaultLogger&&) = delete;
@@ -46,13 +46,24 @@ namespace PonyEngine::Application
 		{
 			if (Log::IsInMask(logType, PONY_CONSOLE_LOG_MASK))
 			{
-				Log::LogToConsole(logType, logInput.message);
+				const auto logData = Log::LogData
+				{
+					.stacktrace = logInput.stacktrace ? *logInput.stacktrace : std::optional<std::basic_stacktrace<std::allocator<std::stacktrace_entry>>>(std::nullopt)
+				};
+				Log::LogToConsole(logType, logData, logInput.message);
 			}
 		}
 	}
 
-	void DefaultLogger::LogException(const std::exception& exception, const Log::LogInput& logInput) const noexcept
+	void DefaultLogger::Log(const std::exception& exception, const Log::LogInput& logInput) const noexcept
 	{
-		PONY_CONSOLE_E(exception, logInput.message);
+		if constexpr (Log::IsInMask(Log::LogType::Exception, PONY_CONSOLE_LOG_MASK))
+		{
+			const auto logData = Log::LogData
+			{
+				.stacktrace = logInput.stacktrace ? *logInput.stacktrace : std::optional<std::basic_stacktrace<std::allocator<std::stacktrace_entry>>>(std::nullopt)
+			};
+			Log::LogToConsole(exception, logData, logInput.message);
+		}
 	}
 }
