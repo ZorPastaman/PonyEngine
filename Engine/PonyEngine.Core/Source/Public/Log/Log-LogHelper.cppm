@@ -24,6 +24,7 @@ import std;
 import PonyEngine.Utility;
 
 import :ILogger;
+import :LogData;
 import :LogFormat;
 import :LogInput;
 import :LogType;
@@ -33,61 +34,60 @@ export namespace PonyEngine::Log
 	/// @brief Logs to the @p logger.
 	/// @param logger Logger.
 	/// @param logType Log type.
+	/// @param logData Log data.
 	/// @param message Log message.
-	void LogToLogger(const ILogger& logger, LogType logType, std::string_view message) noexcept;
+	void LogToLogger(const ILogger& logger, LogType logType, const LogData& logData, std::string_view message = std::string_view()) noexcept;
 	/// @brief Logs to the @p logger.
 	/// @tparam Args Format argument types.
 	/// @param logger Logger.
 	/// @param logType Log type.
+	/// @param logData Log data.
 	/// @param format Format.
 	/// @param args Format arguments.
 	template<typename... Args>
-	void LogToLogger(const ILogger& logger, LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
-
-	/// @brief Logs the @p exception to the @p logger.
+	void LogToLogger(const ILogger& logger, LogType logType, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to the @p logger.
 	/// @param logger Logger.
-	/// @param exception Exception to log.
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception) noexcept;
-	/// @brief Logs the @p exception to the @p logger.
-	/// @param logger Logger.
-	/// @param exception Exception to log.
+	/// @param exception Exception.
+	/// @param logData Log data.
 	/// @param message Log message.
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception, std::string_view message) noexcept;
-	/// @brief Logs the @p exception to the @p logger.
+	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, std::string_view message = std::string_view()) noexcept;
+	/// @brief Logs to the @p logger.
 	/// @tparam Args Format argument types.
 	/// @param logger Logger.
-	/// @param exception Exception to log.
+	/// @param exception Exception.
+	/// @param logData Log data.
 	/// @param format Format.
 	/// @param args Format arguments.
 	template<typename... Args>
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
+	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Logs to a standard console and a platform console.
 	/// @param logType Log type.
+	/// @param logData Log data.
 	/// @param message Log message.
-	void LogToConsole(LogType logType, std::string_view message) noexcept;
+	void LogToConsole(LogType logType, const LogData& logData, std::string_view message = std::string_view()) noexcept;
 	/// @brief Logs to a standard console and a platform console.
 	/// @tparam Args Format argument types.
 	/// @param logType Log type.
+	/// @param logData Log data.
 	/// @param format Format.
 	/// @param args Format arguments.
 	template<typename... Args>
-	void LogToConsole(LogType logType, std::format_string<Args...> format, Args&&... args) noexcept;
-
-	/// @brief Logs the @p exception to a standard console and a platform console.
-	/// @param exception Exception to log.
-	void LogExceptionToConsole(const std::exception& exception) noexcept;
-	/// @brief Logs the @p exception to a standard console and a platform console.
-	/// @param exception Exception to log.
+	void LogToConsole(LogType logType, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
+	/// @brief Logs to a standard console and a platform console.
+	/// @param exception Exception.
+	/// @param logData Log data.
 	/// @param message Log message.
-	void LogExceptionToConsole(const std::exception& exception, std::string_view message) noexcept;
-	/// @brief Logs the @p exception to a standard console and a platform console.
+	void LogToConsole(const std::exception& exception, const LogData& logData, std::string_view message = std::string_view()) noexcept;
+	/// @brief Logs to a standard console and a platform console.
 	/// @tparam Args Format argument types.
-	/// @param exception Exception to log.
+	/// @param exception Exception.
+	/// @param logData Log data.
 	/// @param format Format.
 	/// @param args Format arguments.
 	template<typename... Args>
-	void LogExceptionToConsole(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept;
+	void LogToConsole(const std::exception& exception, const LogData& logData, std::format_string<Args...> format, Args&&... args) noexcept;
 
 	/// @brief Chooses a console output stream by the @p logType.
 	/// @param logType Log type.
@@ -106,6 +106,22 @@ namespace PonyEngine::Log
 		void operator ()(const std::exception& e) const noexcept;
 	};
 
+	/// @brief Formats the log.
+	/// @param logType Log type.
+	/// @param logData Log data.
+	/// @param timePoint Time point.
+	/// @param message Log massage.
+	/// @return Formatted log.
+	[[nodiscard("Pure function")]]
+	std::string Format(LogType logType, const LogData& logData, std::chrono::time_point<std::chrono::system_clock> timePoint, std::string_view message);
+	/// @brief Formats the log.
+	/// @param exception Exception.
+	/// @param logData Log data.
+	/// @param timePoint Time point.
+	/// @param message Log massage.
+	/// @return Formatted log.
+	[[nodiscard("Pure function")]]
+	std::string Format(const std::exception& exception, const LogData& logData, std::chrono::time_point<std::chrono::system_clock> timePoint, std::string_view message);
 	/// @brief @p std::format() wrapper that doesn't throw. If @p std::format() throws, the exception is passed to the @p ConsoleExceptionHandler.
 	/// @tparam Args Format argument types.
 	/// @param format Format.
@@ -119,40 +135,35 @@ namespace PonyEngine::Log
 	/// @param log Formatted log message.
 	void LogFormattedToConsole(LogType logType, std::string_view log) noexcept;
 
-	void LogToLogger(const ILogger& logger, const LogType logType, const std::string_view message) noexcept
+	void LogToLogger(const ILogger& logger, const LogType logType, const LogData& logData, const std::string_view message) noexcept
 	{
-		const auto logInput = LogInput{.message = message};
+		const auto logInput = LogInput{.message = message, .stacktrace = logData.stacktrace.has_value() ? &logData.stacktrace.value() : nullptr};
 		logger.Log(logType, logInput);
 	}
 
 	template<typename... Args>
-	void LogToLogger(const ILogger& logger, const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToLogger(const ILogger& logger, const LogType logType, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToLogger(logger, logType, SafeFormat(format, std::forward<Args>(args)...));
+		LogToLogger(logger, logType, logData, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception) noexcept
+	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, const std::string_view message) noexcept
 	{
-		logger.LogException(exception, LogInput{});
-	}
-
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception, const std::string_view message) noexcept
-	{
-		const auto logInput = LogInput{.message = message};
-		logger.LogException(exception, logInput);
+		const auto logInput = LogInput{.message = message, .stacktrace = logData.stacktrace.has_value() ? &logData.stacktrace.value() : nullptr};
+		logger.Log(exception, logInput);
 	}
 
 	template<typename... Args>
-	void LogExceptionToLogger(const ILogger& logger, const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToLogger(const ILogger& logger, const std::exception& exception, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogExceptionToLogger(logger, exception, SafeFormat(format, std::forward<Args>(args)...));
+		LogToLogger(logger, exception, logData, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
-	void LogToConsole(const LogType logType, const std::string_view message) noexcept
+	void LogToConsole(const LogType logType, const LogData& logData, const std::string_view message) noexcept
 	{
 		try
 		{
-			const std::string log = message.empty() ? LogFormat(logType, std::chrono::system_clock::now()) : LogFormat(logType, message, std::chrono::system_clock::now());
+			const std::string log = Format(logType, logData, std::chrono::system_clock::now(), message);
 			LogFormattedToConsole(logType, log);
 		}
 		catch (...)
@@ -162,29 +173,16 @@ namespace PonyEngine::Log
 	}
 
 	template<typename... Args>
-	void LogToConsole(const LogType logType, std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToConsole(const LogType logType, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogToConsole(logType, SafeFormat(format, std::forward<Args>(args)...));
+		LogToConsole(logType, logData, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
-	void LogExceptionToConsole(const std::exception& exception) noexcept
+	void LogToConsole(const std::exception& exception, const LogData& logData, const std::string_view message) noexcept
 	{
 		try
 		{
-			const std::string log = LogFormat(LogType::Exception, exception.what(), std::chrono::system_clock::now());
-			LogFormattedToConsole(LogType::Exception, log);
-		}
-		catch (...)
-		{
-			// Something totally wrong happened.
-		}
-	}
-
-	void LogExceptionToConsole(const std::exception& exception, const std::string_view message) noexcept
-	{
-		try
-		{
-			const std::string log = message.empty() ? LogFormat(LogType::Exception, exception.what(), std::chrono::system_clock::now()) : LogFormat(LogType::Exception, exception.what(), message, std::chrono::system_clock::now());
+			const std::string log = Format(exception, logData, std::chrono::system_clock::now(), message);
 			LogFormattedToConsole(LogType::Exception, log);
 		}
 		catch (...)
@@ -194,9 +192,9 @@ namespace PonyEngine::Log
 	}
 
 	template<typename... Args>
-	void LogExceptionToConsole(const std::exception& exception, std::format_string<Args...> format, Args&&... args) noexcept
+	void LogToConsole(const std::exception& exception, const LogData& logData, const std::format_string<Args...> format, Args&&... args) noexcept
 	{
-		LogExceptionToConsole(exception, SafeFormat(format, std::forward<Args>(args)...));
+		LogToConsole(exception, logData, SafeFormat(format, std::forward<Args>(args)...));
 	}
 
 	std::ostream& ChooseConsoleStream(const LogType logType) noexcept
@@ -218,8 +216,42 @@ namespace PonyEngine::Log
 		}
 	}
 
+	std::string Format(const LogType logType, const LogData& logData, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::string_view message)
+	{
+		switch ((logData.stacktrace.has_value() << 1) | (!message.empty()))
+		{
+		case 0:
+			return LogFormat(logType, timePoint);
+		case 1:
+			return LogFormat(logType, message, timePoint);
+		case 2:
+			return LogFormat(logType, timePoint, logData.stacktrace.value());
+		case 3:
+			return LogFormat(logType, message, timePoint, logData.stacktrace.value());
+		default: [[unlikely]]
+			return LogFormat(logType, message.empty() ? "Unknown message" : message, timePoint, logData.stacktrace.has_value() ? logData.stacktrace.value() : std::stacktrace::current());
+		}
+	}
+
+	std::string Format(const std::exception& exception, const LogData& logData, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::string_view message)
+	{
+		switch ((logData.stacktrace.has_value() << 1) | (!message.empty()))
+		{
+		case 0:
+			return LogFormat(LogType::Exception, exception.what(), timePoint);
+		case 1:
+			return LogFormat(LogType::Exception, exception.what(), message, timePoint);
+		case 2:
+			return LogFormat(LogType::Exception, exception.what(), timePoint, logData.stacktrace.value());
+		case 3:
+			return LogFormat(LogType::Exception, exception.what(), message, timePoint, logData.stacktrace.value());
+		default: [[unlikely]]
+			return LogFormat(LogType::Exception, exception.what(), message.empty() ? "Unknown message" : message, timePoint, logData.stacktrace.has_value() ? logData.stacktrace.value() : std::stacktrace::current());
+		}
+	}
+
 	template<typename... Args>
-	std::string SafeFormat(std::format_string<Args...> format, Args&&... args) noexcept
+	std::string SafeFormat(const std::format_string<Args...> format, Args&&... args) noexcept
 	{
 		return Utility::SafeFormat<ConsoleExceptionHandler>(format, std::forward<Args>(args)...);
 	}
@@ -245,6 +277,6 @@ namespace PonyEngine::Log
 
 	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
 	{
-		LogExceptionToConsole(e);
+		LogToConsole(e, LogData{});
 	}
 }

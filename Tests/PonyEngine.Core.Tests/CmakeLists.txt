@@ -5,6 +5,7 @@ message(STATUS "Configuring sources")
 target_sources(PonyEngine.Core.Tests PRIVATE
 	"Log/LogFormat.cpp"
 	"Log/LogHelper.cpp"
+	"Log/LogMacro.cpp"
 	"Utility/Enum.cpp"
 	"Utility/SafeFormat.cpp"
 )
@@ -24,6 +25,9 @@ if(PONY_WINDOWS)
 		"Platform/Windows/Module.cpp"
 	)
 endif()
+
+message(STATUS "Configuring defines")
+pony_set_log_mask(PonyEngine.Core.Tests TRUE)
 
 message(STATUS "Setting build options")
 pony_set_build_options(PonyEngine.Core.Tests TRUE)

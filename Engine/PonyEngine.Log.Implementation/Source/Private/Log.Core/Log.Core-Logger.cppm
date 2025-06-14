@@ -27,7 +27,7 @@ export namespace PonyEngine::Log::Core
 		~Logger() noexcept = default;
 
 		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
-		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept override;
+		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
 
 		/// @brief Adds a sub-logger.
 		/// @param subLogger Sub-logger to add.
@@ -49,13 +49,13 @@ namespace PonyEngine::Log::Core
 {
 	void Logger::Log(const LogType logType, const LogInput& logInput) const noexcept
 	{
-		const auto logEntry = Extension::LogEntry(logInput.message, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
+		const auto logEntry = Extension::LogEntry(logInput.message, logInput.stacktrace, nullptr, std::chrono::system_clock::now(), logInput.frameCount, logType);
 		Log(logEntry);
 	}
 
-	void Logger::LogException(const std::exception& exception, const LogInput& logInput) const noexcept
+	void Logger::Log(const std::exception& exception, const LogInput& logInput) const noexcept
 	{
-		const auto logEntry = Extension::LogEntry(logInput.message, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
+		const auto logEntry = Extension::LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 		Log(logEntry);
 	}
 

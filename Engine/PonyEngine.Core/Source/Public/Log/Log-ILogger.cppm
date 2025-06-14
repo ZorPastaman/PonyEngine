@@ -32,6 +32,6 @@ export namespace PonyEngine::Log
 		/// @brief Logs the exception.
 		/// @param exception Exception to log.
 		/// @param logInput Log input.
-		virtual void LogException(const std::exception& exception, const LogInput& logInput) const noexcept = 0;
+		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept = 0;
 	};
 }

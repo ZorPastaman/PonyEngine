@@ -7,11 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log;
+export module PonyEngine.Log:LogData;
 
-export import :ILogger;
-export import :LogData;
-export import :LogFormat;
-export import :LogHelper;
-export import :LogInput;
-export import :LogType;
+import std;
+
+import :LogType;
+
+export namespace PonyEngine::Log
+{
+	/// @brief Log data.
+	struct LogData final
+	{
+		std::optional<std::basic_stacktrace<std::allocator<std::stacktrace_entry>>> stacktrace = std::nullopt; ///< Stacktrace.
+	};
+}

@@ -17,6 +17,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Core/Core-IModuleContext.cppm"
 	"Source/Public/Log/Log.cppm"
 	"Source/Public/Log/Log-ILogger.cppm"
+	"Source/Public/Log/Log-LogData.cppm"
 	"Source/Public/Log/Log-LogFormat.cppm"
 	"Source/Public/Log/Log-LogHelper.cppm"
 	"Source/Public/Log/Log-LogInput.cppm"
