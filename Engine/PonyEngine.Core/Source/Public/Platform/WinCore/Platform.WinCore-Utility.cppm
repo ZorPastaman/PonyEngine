@@ -3,18 +3,17 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include <stdexcept>
-#include <string>
-
 #include "PonyEngine/Platform/WinCore/Framework.h"
 
 export module PonyEngine.Platform.WinCore:Utility;
+
+import std;
 
 import PonyEngine.Utility;
 

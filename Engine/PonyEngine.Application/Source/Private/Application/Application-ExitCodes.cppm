@@ -3,7 +3,7 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
@@ -20,6 +20,7 @@ export namespace PonyEngine::Application
 	{
 		NON_CONSTRUCTIBLE_BODY(ExitCodes)
 
+		static constexpr int ApplicationException = -2;
 		static constexpr int MainException = -1;
 		static constexpr int Success = 0;
 	};

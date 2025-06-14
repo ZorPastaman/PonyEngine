@@ -3,18 +3,19 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 module;
 
-#include <iostream>
-#include <stdexcept>
+#include <stdio.h>
 
 #include "PonyEngine/Platform/Windows/Framework.h"
 
 export module PonyEngine.Application.Windows:Console;
+
+import std;
 
 import PonyEngine.Utility;
 
@@ -55,27 +56,22 @@ namespace PonyEngine::Application::Windows
 		{
 			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdin. Error code: '0x{:X}'.", error));
 		}
-
-		std::ios::sync_with_stdio();
-		std::cout.clear();
-		std::clog.clear();
-		std::cerr.clear();
-		std::cin.clear();
 	}
 
 	void DestroyConsole()
 	{
-		if (const int error = fclose(stdin))
+		FILE* fp;
+		if (const errno_t error = freopen_s(&fp, "NUL", "w", stdout))
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to close stdin. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdout. Error code: '0x{:X}'.", error));
 		}
-		if (const int error = fclose(stdout))
+		if (const errno_t error = freopen_s(&fp, "NUL", "w", stderr))
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to close stdout. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stderr. Error code: '0x{:X}'.", error));
 		}
-		if (const int error = fclose(stderr))
+		if (const errno_t error = freopen_s(&fp, "NUL", "r", stdin))
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to close stderr. Error code: '0x{:X}'.", error));
+			throw std::runtime_error(Utility::SafeFormat("Failed to reassign stdin. Error code: '0x{:X}'.", error));
 		}
 
 		if (!FreeConsole())

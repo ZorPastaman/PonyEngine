@@ -1,5 +1,5 @@
 # PonyEngine
-Game engine on C++ 20. Very deep WIP.
+Game engine on C++ 23. Very deep WIP.
 
 ## Math
 

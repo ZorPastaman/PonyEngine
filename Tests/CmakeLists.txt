@@ -1,3 +1,4 @@
+message(STATUS "Fetching Catch2")
 include(FetchContent)
 FetchContent_Declare(
   Catch2
@@ -6,5 +7,10 @@ FetchContent_Declare(
 )
 FetchContent_MakeAvailable(Catch2)
 
+message(STATUS "Setting build options")
+pony_set_build_options(Catch2 TRUE)
+pony_set_build_options(Catch2WithMain TRUE)
+
 message(STATUS "Configuring tests")
 add_subdirectory("PonyEngine.Core.Tests")
+add_subdirectory("PonyEngine.Log.Extension.Tests")

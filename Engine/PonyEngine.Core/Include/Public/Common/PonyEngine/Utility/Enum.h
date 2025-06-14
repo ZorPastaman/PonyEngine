@@ -3,22 +3,11 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
 #pragma once
-
-#include <algorithm>
-#include <bit>
-#include <cstddef>
-#include <format>
-#include <ostream>
-#include <span>
-#include <stdexcept>
-#include <string>
-#include <string_view>
-#include <type_traits>
 
 /// @brief Creates a function to convert an enum value to a predefined string value.
 /// @param Value Value enum type.
@@ -28,14 +17,21 @@
 	[[nodiscard("Pure function")]] \
 	constexpr std::string_view ToString(const Value value) noexcept \
 	{ \
-		return (ValueNames)[std::min(static_cast<std::size_t>(value), (ValueNames).size() - 1)]; \
+		return ValueNames[std::min(static_cast<std::size_t>(value), ValueNames.size() - 1Z)]; \
 	} \
 	std::ostream& operator <<(std::ostream& stream, const Value value) \
 	{ \
 		return stream << ToString(value); \
 	} \
+
+/// @brief Creates a formatter for an enum value.
+/// @note This define must be used in a global namespace.
+/// @remark Before this define, you must use ENUM_VALUE_TO_STRING.
+/// @param Namespace Enum namespace.
+/// @param Value Value enum type.
+#define ENUM_VALUE_FORMATTER(Namespace, Value) \
 	template<> \
-	struct std::formatter<Value, char> \
+	struct std::formatter<Namespace::Value, char> \
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
@@ -45,9 +41,9 @@
 			} \
 			return context.begin(); \
 		} \
-		static auto format(const Value value, std::format_context& context) \
+		static auto format(const Namespace::Value value, std::format_context& context) \
 		{ \
-			return std::ranges::copy(ToString(value), context.out()).out; \
+			return std::ranges::copy(Namespace::ToString(value), context.out()).out; \
 		} \
 	}; \
 
@@ -57,20 +53,24 @@
 /// @param MaskNames Array of mask enum names.
 #define ENUM_MASK_TO_STRING(Mask, MaskNames) \
 	[[nodiscard("Pure function")]] \
-	constexpr std::string ToString(const Mask mask) \
+	constexpr std::string Mask##GenerateToString(const Mask mask) \
 	{ \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == std::underlying_type_t<Mask>{0}) \
+		if (std::to_underlying(mask) == std::underlying_type_t<Mask>{0}) \
 		{ \
 			return "None"; \
 		} \
-		if (static_cast<std::underlying_type_t<Mask>>(mask) == static_cast<std::underlying_type_t<Mask>>(Mask::All)) \
+		if (mask == Mask::All) \
 		{ \
 			return "All"; \
 		} \
-		std::string answer = ""; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)); ++i) \
+		if (std::to_underlying(mask) > std::to_underlying(Mask::All)) \
 		{ \
-			if (((std::underlying_type_t<Mask>{1} << i) & static_cast<std::underlying_type_t<Mask>>(mask)) != std::underlying_type_t<Mask>{0}) \
+			return "Unknown"; \
+		} \
+		std::string answer = ""; \
+		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(std::to_underlying(Mask::All)); ++i) \
+		{ \
+			if (((std::underlying_type_t<Mask>{1} << i) & std::to_underlying(mask)) != std::underlying_type_t<Mask>{0}) \
 			{ \
 				if (!answer.empty()) \
 				{ \
@@ -81,12 +81,35 @@
 		} \
 		return answer; \
 	} \
+	[[nodiscard("Pure function")]] \
+	constexpr std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GenerateToStrings() \
+	{ \
+		std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> answer; \
+		for (std::size_t i = 0Z; i < answer.size(); ++i) \
+		{ \
+			answer[i] = Mask##GenerateToString(static_cast<Mask>(i)); \
+		} \
+		return answer; \
+	} \
+	const std::array<std::string, static_cast<std::size_t>(Mask::All) + 2Z> Mask##GeneratedNames = Mask##GenerateToStrings(); \
+	[[nodiscard("Pure function")]] \
+	std::string_view ToString(const Mask mask) noexcept \
+	{ \
+		return Mask##GeneratedNames[std::min(static_cast<std::size_t>(mask), Mask##GeneratedNames.size() - 1Z)]; \
+	} \
 	std::ostream& operator <<(std::ostream& stream, const Mask mask) \
 	{ \
 		return stream << ToString(mask); \
 	} \
+
+/// @brief Creates a formatter for an enum mask.
+/// @note This define must be used in a global namespace.
+/// @remark Before this define, you must use ENUM_MASK_TO_STRING.
+/// @param Namespace Enum namespace.
+/// @param Mask Mask enum type.
+#define ENUM_MASK_FORMATTER(Namespace, Mask) \
 	template<> \
-	struct std::formatter<Mask, char> \
+	struct std::formatter<Namespace::Mask, char> \
 	{ \
 		static constexpr auto parse(std::format_parse_context& context) \
 		{ \
@@ -96,7 +119,7 @@
 			} \
 			return context.begin(); \
 		} \
-		static auto format(const Mask mask, std::format_context& context) \
+		static auto format(const Namespace::Mask mask, std::format_context& context) \
 		{ \
 			return std::ranges::copy(ToString(mask), context.out()).out; \
 		} \
@@ -109,18 +132,18 @@
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator &(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) & static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) & std::to_underlying(right)); \
 	} \
 	 \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator |(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) | static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) | std::to_underlying(right)); \
 	} \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator ^(const Mask left, const Mask right) noexcept \
 	{ \
-		return static_cast<Mask>(static_cast<std::underlying_type_t<Mask>>(left) ^ static_cast<std::underlying_type_t<Mask>>(right)); \
+		return static_cast<Mask>(std::to_underlying(left) ^ std::to_underlying(right)); \
 	} \
 	[[nodiscard("Pure function")]] \
 	constexpr Mask operator ~(const Mask mask) noexcept \
@@ -163,7 +186,7 @@
 		std::underlying_type_t<Mask> mask = std::underlying_type_t<Mask>{0u}; \
 		for (const Value value : values) \
 		{ \
-			mask |= static_cast<std::underlying_type_t<Mask>>(ToMask(value)); \
+			mask |= std::to_underlying(ToMask(value)); \
 		} \
 		 \
 		return static_cast<Mask>(mask); \
@@ -176,7 +199,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr bool IsInMask(const Value value, const Mask mask) noexcept \
 	{ \
-		return static_cast<std::underlying_type_t<Mask>>(ToMask(value)) & static_cast<std::underlying_type_t<Mask>>(mask); \
+		return std::to_underlying(ToMask(value)) & std::to_underlying(mask); \
 	} \
 	 \
 	/* @brief Converts the mask to a value. */ \
@@ -185,7 +208,7 @@
 	[[nodiscard("Pure function")]] \
 	constexpr Value ToValue(const Mask mask) noexcept \
 	{ \
-		return static_cast<Value>(std::countr_zero(static_cast<std::underlying_type_t<Mask>>(mask))); \
+		return static_cast<Value>(std::countr_zero(std::to_underlying(mask))); \
 	} \
 	 \
 	/* @brief Converts the mask to values. */ \
@@ -195,7 +218,7 @@
 	constexpr std::size_t ToValues(const Mask mask, const std::span<Value> values) noexcept \
 	{ \
 		std::size_t valueCount = 0; \
-		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(static_cast<std::underlying_type_t<Mask>>(Mask::All)) && valueCount < values.size(); ++i) \
+		for (std::underlying_type_t<Mask> i = 0; i < std::countr_one(std::to_underlying(Mask::All)) && valueCount < values.size(); ++i) \
 		{ \
 			if (IsInMask(static_cast<Value>(i), mask)) \
 			{ \
@@ -206,17 +229,22 @@
 		return valueCount; \
 	} \
 
-/// @brief Creates all the value enum features.
+/// @brief Creates all the value enum features except a formatter.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 #define ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_VALUE_TO_STRING(Value, ValueNames)
-/// @brief Creates all the mask enum features.
+/// @brief Creates all the mask enum features except a formatter.
 /// @note All the restrictions of the features are applied to this.
 /// @param Mask Mask enum type.
 #define ENUM_MASK_FEATURES(Mask, MaskNames) ENUM_MASK_TO_STRING(Mask, MaskNames) ENUM_MASK_OPERATORS(Mask)
-/// @brief Creates all the value enum and mask enum features.
+/// @brief Creates all the value enum and mask enum features except formatters.
 /// @note All the restrictions of the features are applied to this.
 /// @param Value Value enum type.
 /// @param Mask Mask enum type.
 #define ENUM_VALUE_MASK_FEATURES(Value, ValueNames, Mask, MaskNames) ENUM_VALUE_FEATURES(Value, ValueNames) ENUM_MASK_FEATURES(Mask, MaskNames) \
 	ENUM_VALUE_MASK(Value, Mask)
+/// @brief Creates formatter for value and mask enums.
+/// @param Namespace Enum namespace.
+/// @param Value Value enum type.
+/// @param Mask Mask enum type.
+#define ENUM_VALUE_MASK_FORMATTER(Namespace, Value, Mask) ENUM_VALUE_FORMATTER(Namespace, Value) ENUM_MASK_FORMATTER(Namespace, Mask)

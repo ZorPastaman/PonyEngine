@@ -3,15 +3,13 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include <format>
-#include <stdexcept>
-#include <string>
-
 #include <catch2/catch_test_macros.hpp>
+
+import std;
 
 import PonyEngine.Utility;
 

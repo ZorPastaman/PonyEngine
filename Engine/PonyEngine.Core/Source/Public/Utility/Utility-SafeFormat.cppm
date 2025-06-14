@@ -3,17 +3,13 @@
  *                                                 *
  * Copyright (c) 2023-present Vladimir Popov       *
  *                                                 *
- * Email: cybercode.smith@pm.me                    *
+ * Email: zor1994@gmail.com                        *
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-module;
-
-#include <exception>
-#include <format>
-#include <string>
-
 export module PonyEngine.Utility:SafeFormat;
+
+import std;
 
 export namespace PonyEngine::Utility
 {
