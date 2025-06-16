@@ -30,5 +30,10 @@ export namespace PonyEngine::Log::Extension
 		/// @return Created sub-logger.
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<ISubLogger> CreateSubLogger(const Core::IModuleContext& context) = 0;
+
+		/// @brief Gets the sub-logger order.
+		/// @return Sub-logger order.
+		[[nodiscard("Pure function")]]
+		virtual std::int32_t Order() const noexcept = 0;
 	};
 }

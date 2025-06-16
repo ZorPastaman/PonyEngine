@@ -9,6 +9,7 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.File:FileSubLoggerFactory;
@@ -35,6 +36,9 @@ export namespace PonyEngine::Log::File
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Extension::ISubLogger> CreateSubLogger(const Core::IModuleContext& context) override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::int32_t Order() const noexcept override;
+
 		FileSubLoggerFactory& operator =(const FileSubLoggerFactory&) = delete;
 		FileSubLoggerFactory& operator =(FileSubLoggerFactory&&) = delete;
 	};
@@ -44,14 +48,24 @@ namespace PonyEngine::Log::File
 {
 	std::shared_ptr<Extension::ISubLogger> FileSubLoggerFactory::CreateSubLogger(const Core::IModuleContext& context)
 	{
-		const std::filesystem::path logPath = (context.Application().Paths().localData / PONY_STRINGIFY_VALUE(PONY_ENGINE_LOG_FILE_PATH)).lexically_normal();
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Preparing log files.");
+		const std::filesystem::path logPath = (context.Application().Paths().localData / PONY_STRINGIFY_VALUE(PONY_LOG_FILE_PATH)).lexically_normal();
 		if (std::filesystem::exists(logPath))
 		{
 			const std::filesystem::path prevLogPath = logPath.parent_path() / (logPath.stem().string() + "_prev" + logPath.extension().string());
 			std::filesystem::copy_file(logPath, prevLogPath, std::filesystem::copy_options::overwrite_existing);
 		}
-		std::filesystem::create_directories(logPath.parent_path());
+		else
+		{
+			std::filesystem::create_directories(logPath.parent_path());
+		}
 
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing file sub-logger. Log path: '{}'.", logPath.string());
 		return std::make_shared<FileSubLogger>(logPath);
+	}
+
+	std::int32_t FileSubLoggerFactory::Order() const noexcept
+	{
+		return PONY_ENGINE_LOG_FILE_ORDER;
 	}
 }

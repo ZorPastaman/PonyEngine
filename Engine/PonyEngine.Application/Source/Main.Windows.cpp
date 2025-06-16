@@ -29,19 +29,34 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 
 		try
 		{
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creates application.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application...");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application.");
 			auto app = std::make_unique<PonyEngine::Application::App>(PonyEngine::Application::Windows::GetPlatformPaths());
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Begins application.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Beginning application.");
 			app->Begin();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application created.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application done.");
 
-			// TODO: Here should be tick.
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
+			bool shouldExit = false;
+			while (!shouldExit)
+			{
+				PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Ticking application.");
+				shouldExit = app->Tick(exitCode);
 
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroys application.");
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Ends application.");
+				if (!shouldExit) [[likely]]
+				{
+					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
+					shouldExit = PonyEngine::Application::Windows::CheckForQuit(exitCode);
+				}
+			}
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
+
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application...");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Ending application.");
 			app->End();
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application.")
 			app.reset();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Application destroyed.");
+			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application done.");
 		}
 		catch (const std::exception& e)
 		{
@@ -58,7 +73,6 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
 		}
 
-		PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Exits with code '{}'.", exitCode);
 #if PONY_CREATE_CONSOLE
 		PonyEngine::Application::Windows::DestroyConsole();
 #endif

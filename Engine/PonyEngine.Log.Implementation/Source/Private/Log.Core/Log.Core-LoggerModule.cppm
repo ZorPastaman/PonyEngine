@@ -9,6 +9,7 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Log/Core/LoggerModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
@@ -48,6 +49,7 @@ namespace PonyEngine::Log::Core
 {
 	void LoggerModule::StartUp(PonyEngine::Core::IModuleContext& context)
 	{
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(LoggerFactory).name(), typeid(PonyEngine::Core::ILoggerFactory).name());
 		context.AddData<PonyEngine::Core::ILoggerFactory>(std::make_shared<LoggerFactory>());
 	}
 

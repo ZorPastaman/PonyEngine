@@ -11,6 +11,7 @@ module;
 
 #include <cassert>
 
+#include "PonyEngine/Log/Log.h"
 #ifdef PONY_PLATFORM_CONSOLE_LOG
 #ifdef PONY_WINCORE
 #include "PonyEngine/Platform/WinCore/Framework.h"
@@ -277,6 +278,6 @@ namespace PonyEngine::Log
 
 	void ConsoleExceptionHandler::operator ()(const std::exception& e) const noexcept
 	{
-		LogToConsole(e, LogData{});
+		PONY_CONSOLE_E_S(e);
 	}
 }
