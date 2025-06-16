@@ -29,6 +29,9 @@ export namespace PonyEngine::Log::Core
 		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
 		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
 
+		/// @brief Reserves a memory for sub-loggers.
+		/// @param subLoggerCount Sub-logger count.
+		void Reserve(std::size_t subLoggerCount);
 		/// @brief Adds a sub-logger.
 		/// @param subLogger Sub-logger to add.
 		void AddSubLogger(const std::shared_ptr<Extension::ISubLogger>& subLogger);
@@ -57,6 +60,11 @@ namespace PonyEngine::Log::Core
 	{
 		const auto logEntry = Extension::LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 		Log(logEntry);
+	}
+
+	void Logger::Reserve(const std::size_t subLoggerCount)
+	{
+		subLoggers.reserve(subLoggerCount);
 	}
 
 	void Logger::AddSubLogger(const std::shared_ptr<Extension::ISubLogger>& subLogger)

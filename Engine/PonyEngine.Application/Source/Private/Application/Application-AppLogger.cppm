@@ -68,7 +68,7 @@ namespace PonyEngine::Application
 			throw std::invalid_argument("Logger is nullptr.");
 		}
 
-		PONY_LOG(*this->logger, Log::LogType::Info, "Change logger to '{}'.", typeid(*logger).name());
 		this->logger = logger;
+		PONY_LOG(*this->logger, Log::LogType::Info, "Application logger changed to '{}'.", typeid(*logger).name());
 	}
 }

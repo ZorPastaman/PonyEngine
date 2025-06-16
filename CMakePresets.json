@@ -13,11 +13,7 @@
 				"PONY_BUILD_TYPE": "Engine",
 				"PONY_CONSOLE_LOG": "TRUE",
 				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
-				"PONY_ENGINE_LOG_CORE": "TRUE",
-				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
-				"PONY_ENGINE_LOG_PLATFORM_CONSOLE": "TRUE",
-				"PONY_ENGINE_LOG_FILE": "TRUE",
-				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log"
+				"PONY_LOG_FILE_PATH": "Logs/Log.log"
 			}
 		},
 		{
@@ -100,11 +96,6 @@
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
-			},
-			"condition": {
-				"type": "equals",
-				"lhs": "${hostSystemName}",
-				"rhs": "Windows"
 			}
 		},
 		{

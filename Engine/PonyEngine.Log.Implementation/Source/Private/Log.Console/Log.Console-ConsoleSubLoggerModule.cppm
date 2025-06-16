@@ -9,6 +9,9 @@
 
 module;
 
+#include <typeinfo>
+
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Log/Console/ConsoleModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
@@ -48,6 +51,7 @@ namespace PonyEngine::Log::Console
 {
 	void ConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(ConsoleSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<ConsoleSubLoggerFactory>());
 	}
 

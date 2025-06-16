@@ -41,7 +41,10 @@ export namespace PonyEngine::Application
 		/// @brief Ends the application.
 		void End();
 		/// @brief Ticks the application.
-		void Tick();
+		/// @param exitCode Exit code. Set if the function returns @a true.
+		/// @return @a True if the application should exit; @a false otherwise.
+		[[nodiscard("Return value must be checked: true means no further ticks should be called")]]
+		bool Tick(int& exitCode);
 
 		App& operator =(const App&) = delete;
 		App& operator =(App&&) = delete;
@@ -158,28 +161,29 @@ namespace PonyEngine::Application
 
 	App::~App() noexcept
 	{
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down modules.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Shutting down modules...");
 		ShutdownModules(reinterpret_cast<std::uintptr_t>(&FirstModule), lastStartedModule);
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Modules shut down.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Shutting down modules done.");
 	}
 
 	void App::Begin()
 	{
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up modules.");
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up log modules.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up modules...");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up log modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
 		CheckForLoggerModule(true);
 		TryCreateLogger();
 		moduleContext.ClearData();
-		PONY_LOG(logger.Logger(), Log::LogType::Info, "Modules started up.");
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up modules done.");
 	}
 
 	void App::End()
 	{
 	}
 
-	void App::Tick()
+	bool App::Tick(int& exitCode)
 	{
+		return false;
 	}
 
 	App::AppContext::AppContext(App& application) noexcept :
@@ -237,7 +241,7 @@ namespace PonyEngine::Application
 			}
 		}
 
-		throw std::invalid_argument("Such a data doesn't exist in context.");
+		throw std::invalid_argument("Data not found.");
 	}
 
 	void App::ModuleContext::AddData(const std::type_info& type, const std::shared_ptr<void>& data)
@@ -257,7 +261,7 @@ namespace PonyEngine::Application
 			if (const auto modulePtr = *reinterpret_cast<Core::IModule***>(current))
 			{
 				Core::IModule* const module = *modulePtr;
-				PONY_LOG(logger.Logger(), Log::LogType::Info, "Starts up '{}' module.", module->Name());
+				PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up '{}' module.", module->Name());
 				module->StartUp(moduleContext);
 				lastStartedModule = current;
 			}
@@ -271,18 +275,18 @@ namespace PonyEngine::Application
 			if (const auto modulePtr = *reinterpret_cast<Core::IModule***>(current))
 			{
 				Core::IModule* const module = *modulePtr;
-				PONY_LOG(logger.Logger(), Log::LogType::Info, "Shuts down '{}' module.", module->Name());
+				PONY_LOG(logger.Logger(), Log::LogType::Info, "Shutting down '{}' module.", module->Name());
 				try
 				{
 					module->ShutDown(moduleContext);
 				}
 				catch (const std::exception& e)
 				{
-					PONY_LOG_E(logger.Logger(), e, "On '{}' module shutdown.", typeid(*module).name());
+					PONY_LOG_E(logger.Logger(), e, "On shutting down '{}' module.", typeid(*module).name());
 				}
 				catch (...)
 				{
-					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on '{}' module shutdown.", typeid(*module).name());
+					PONY_LOG(logger.Logger(), Log::LogType::Exception, "Unknown exception on shutting down '{}' module.", typeid(*module).name());
 				}
 			}
 		}
@@ -309,9 +313,9 @@ namespace PonyEngine::Application
 		{
 			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0Z);
 			const std::shared_ptr<Core::ILoggerFactory> loggerFactory = std::static_pointer_cast<Core::ILoggerFactory>(loggerFactoryData);
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creates logger with '{}'.", typeid(*loggerFactory).name());
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger... Factory: '{}'", typeid(*loggerFactory).name());
 			logger.SetLogger(loggerFactory->Create(moduleContext));
-			PONY_LOG(logger.Logger(), Log::LogType::Info, "Logger created.");
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger done. Logger: '{}'.", typeid(logger.Logger()).name());
 		}
 	}
 }

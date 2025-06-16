@@ -9,6 +9,7 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Log/PlatformConsole/WinCore/PlatformConsoleModule.h"
 
 export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerModule;
@@ -47,6 +48,7 @@ namespace PonyEngine::Log::PlatformConsole::WinCore
 {
 	void PlatformConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>());
 	}
 

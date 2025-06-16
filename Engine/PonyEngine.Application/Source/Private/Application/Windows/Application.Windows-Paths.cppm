@@ -91,23 +91,13 @@ namespace PonyEngine::Application::Windows
 
 	std::filesystem::path GetKnownPath(REFKNOWNFOLDERID folderId)
 	{
-		wchar_t* path = nullptr;
-		try
+		wchar_t* pathRaw = nullptr;
+		if (const HRESULT result = SHGetKnownFolderPath(folderId, 0, nullptr, &pathRaw); FAILED(result)) [[unlikely]]
 		{
-			if (const HRESULT result = SHGetKnownFolderPath(folderId, 0, nullptr, &path); FAILED(result)) [[unlikely]]
-			{
-				throw std::runtime_error(Utility::SafeFormat("Failed to get known path. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
-			}
-			const auto answer = std::filesystem::path(path).append(PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME)).append(PONY_STRINGIFY_VALUE(PONY_GAME_NAME));
-			CoTaskMemFree(path);
-
-			return answer;
+			throw std::runtime_error(Utility::SafeFormat("Failed to get known path. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
-		catch (...)
-		{
-			CoTaskMemFree(path);
+		const auto path = std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)>(pathRaw, &CoTaskMemFree);
 
-			throw;
-		}
+		return std::filesystem::path(path.get()).append(PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME)).append(PONY_STRINGIFY_VALUE(PONY_GAME_NAME));
 	}
 }

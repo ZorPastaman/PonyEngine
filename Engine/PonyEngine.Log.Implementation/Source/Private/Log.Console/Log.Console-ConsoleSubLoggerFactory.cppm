@@ -7,6 +7,10 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
+module;
+
+#include "PonyEngine/Log/Log.h"
+
 export module PonyEngine.Log.Console:ConsoleSubLoggerFactory;
 
 import std;
@@ -31,6 +35,9 @@ export namespace PonyEngine::Log::Console
 		[[nodiscard("Redundant call")]]
 		virtual std::shared_ptr<Extension::ISubLogger> CreateSubLogger(const Core::IModuleContext& context) override;
 
+		[[nodiscard("Pure function")]]
+		virtual std::int32_t Order() const noexcept override;
+
 		ConsoleSubLoggerFactory& operator =(const ConsoleSubLoggerFactory&) = delete;
 		ConsoleSubLoggerFactory& operator =(ConsoleSubLoggerFactory&&) = delete;
 	};
@@ -40,6 +47,12 @@ namespace PonyEngine::Log::Console
 {
 	std::shared_ptr<Extension::ISubLogger> ConsoleSubLoggerFactory::CreateSubLogger(const Core::IModuleContext& context)
 	{
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing console sub-logger.");
 		return std::make_shared<ConsoleSubLogger>();
+	}
+
+	std::int32_t ConsoleSubLoggerFactory::Order() const noexcept
+	{
+		return PONY_ENGINE_LOG_CONSOLE_ORDER;
 	}
 }

@@ -14,3 +14,4 @@ export import PonyEngine.Application.WinCore;
 export import :Console;
 export import :Paths;
 export import :Process;
+export import :QuitChecker;

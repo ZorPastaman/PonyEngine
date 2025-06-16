@@ -9,6 +9,7 @@
 
 module;
 
+#include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Log/File/FileModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
@@ -38,6 +39,7 @@ namespace PonyEngine::Log::File
 {
 	void FileSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
+		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(FileSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<FileSubLoggerFactory>());
 	}
 

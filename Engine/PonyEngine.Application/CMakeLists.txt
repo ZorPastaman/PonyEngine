@@ -29,6 +29,7 @@ if(PONY_WINDOWS)
 		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Paths.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
+		"Source/Private/Application/Windows/Application.Windows-QuitChecker.cppm"
 	)
 	 target_sources(PonyEngine.Application PRIVATE
 		"Source/Main.Windows.cpp"
