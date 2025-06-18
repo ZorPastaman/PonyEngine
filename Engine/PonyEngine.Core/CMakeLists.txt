@@ -56,11 +56,11 @@ if(PONY_WINDOWS)
 endif()
 
 message(STATUS "Configuring defines")
-pony_set_log_mask(PonyEngine.Core TRUE)
+pony_set_log_defines(PonyEngine.Core TRUE)
 
 message(STATUS "Setting properties")
 set_target_properties(PonyEngine.Core PROPERTIES OUTPUT_NAME "PonyEngine.Core.API")
 
 message(STATUS "Setting build options")
-pony_set_build_options(PonyEngine.Core TRUE)
 set_target_properties(PonyEngine.Core PROPERTIES CXX_STANDARD 23)
+pony_set_build_options(PonyEngine.Core TRUE)

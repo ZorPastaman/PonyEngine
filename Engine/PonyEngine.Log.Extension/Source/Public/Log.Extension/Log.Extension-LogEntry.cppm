@@ -31,7 +31,7 @@ export namespace PonyEngine::Log::Extension
 		/// @param frameCount Frame when the log entry has been created.
 		/// @param logType Log type.
 		[[nodiscard("Pure constructor")]]
-		LogEntry(std::string_view message, const std::stacktrace* stacktrace, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::int64_t> frameCount, LogType logType) noexcept;
+		LogEntry(std::string_view message, const std::stacktrace* stacktrace, const std::exception* exception, std::chrono::time_point<std::chrono::system_clock> timePoint, std::optional<std::uint64_t> frameCount, LogType logType) noexcept;
 		LogEntry(const LogEntry&) = delete;
 		LogEntry(LogEntry&&) = delete;
 
@@ -56,7 +56,7 @@ export namespace PonyEngine::Log::Extension
 		/// @brief Gets the frame count.
 		/// @return Frame count.
 		[[nodiscard("Pure function")]]
-		std::optional<std::int64_t> FrameCount() const noexcept;
+		std::optional<std::uint64_t> FrameCount() const noexcept;
 		/// @brief Gets the log type.
 		/// @return Log type.
 		[[nodiscard("Pure function")]]
@@ -79,7 +79,7 @@ export namespace PonyEngine::Log::Extension
 		const std::stacktrace* const stacktrace; ///< Stacktrace attached to the log entry.
 		const std::exception* const exception; ///< Exception attached to the log entry.
 		const std::chrono::time_point<std::chrono::system_clock> timePoint; ///< Time when the log entry is created.
-		const std::optional<std::int64_t> frameCount; ///< Frame when the log entry is created.
+		const std::optional<std::uint64_t> frameCount; ///< Frame when the log entry is created.
 		const Log::LogType logType; ///< Log type.
 
 		const std::string logString; ///< Log string.
@@ -114,7 +114,7 @@ struct std::formatter<PonyEngine::Log::Extension::LogEntry, char>
 
 namespace PonyEngine::Log::Extension
 {
-	LogEntry::LogEntry(const std::string_view message, const std::stacktrace* const stacktrace, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::int64_t> frameCount, const Log::LogType logType) noexcept :
+	LogEntry::LogEntry(const std::string_view message, const std::stacktrace* const stacktrace, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::uint64_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},
 		stacktrace{stacktrace},
 		exception{exception},
@@ -145,7 +145,7 @@ namespace PonyEngine::Log::Extension
 		return timePoint;
 	}
 
-	std::optional<std::int64_t> LogEntry::FrameCount() const noexcept
+	std::optional<std::uint64_t> LogEntry::FrameCount() const noexcept
 	{
 		return frameCount;
 	}

@@ -36,10 +36,9 @@ export namespace PonyEngine::Application
 		/// @return Logger.
 		[[nodiscard("Pure function")]]
 		Log::ILogger& Logger() const noexcept;
-
 		/// @brief Sets a new logger.
 		/// @param logger Logger to set. Mustn't be nullptr.
-		void SetLogger(const std::shared_ptr<Log::ILogger>& logger);
+		void Logger(const std::shared_ptr<Log::ILogger>& logger);
 
 		AppLogger& operator =(const AppLogger&) = delete;
 		AppLogger& operator =(AppLogger&&) = delete;
@@ -61,7 +60,7 @@ namespace PonyEngine::Application
 		return *logger;
 	}
 
-	void AppLogger::SetLogger(const std::shared_ptr<Log::ILogger>& logger)
+	void AppLogger::Logger(const std::shared_ptr<Log::ILogger>& logger)
 	{
 		if (!logger) [[unlikely]]
 		{

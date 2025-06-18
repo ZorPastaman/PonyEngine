@@ -55,7 +55,7 @@ namespace PonyEngine::Log::Console
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<ConsoleSubLoggerFactory>());
 	}
 
-	void ConsoleSubLoggerModule::ShutDown(const Core::IModuleContext& context)
+	void ConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)
 	{
 	}
 

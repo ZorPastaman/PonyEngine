@@ -314,7 +314,7 @@ namespace PonyEngine::Application
 			const std::shared_ptr<void>& loggerFactoryData = moduleContext.GetData(typeid(Core::ILoggerFactory), 0Z);
 			const std::shared_ptr<Core::ILoggerFactory> loggerFactory = std::static_pointer_cast<Core::ILoggerFactory>(loggerFactoryData);
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger... Factory: '{}'", typeid(*loggerFactory).name());
-			logger.SetLogger(loggerFactory->Create(moduleContext));
+			logger.Logger(loggerFactory->Create(moduleContext));
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger done. Logger: '{}'.", typeid(logger.Logger()).name());
 		}
 	}

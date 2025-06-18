@@ -7,11 +7,11 @@ target_sources(PonyEngine.Log.Extension.Tests PRIVATE
 )
 
 message(STATUS "Configuring defines")
-pony_set_log_mask(PonyEngine.Log.Extension.Tests TRUE)
+pony_set_log_defines(PonyEngine.Log.Extension.Tests TRUE)
 
 message(STATUS "Setting build options")
-pony_set_build_options(PonyEngine.Log.Extension.Tests TRUE)
 set_target_properties(PonyEngine.Log.Extension.Tests PROPERTIES CXX_STANDARD 23)
+pony_set_build_options(PonyEngine.Log.Extension.Tests TRUE)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Extension.Tests PRIVATE 

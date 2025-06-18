@@ -52,7 +52,7 @@ namespace PonyEngine::Log::PlatformConsole::WinCore
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>());
 	}
 
-	void PlatformConsoleSubLoggerModule::ShutDown(const Core::IModuleContext& context)
+	void PlatformConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)
 	{
 	}
 

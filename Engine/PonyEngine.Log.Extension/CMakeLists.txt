@@ -9,11 +9,11 @@ target_sources(PonyEngine.Log.Extension PUBLIC FILE_SET CXX_MODULES FILES
 )
 
 message(STATUS "Configuring defines")
-pony_set_log_mask(PonyEngine.Log.Extension TRUE)
+pony_set_log_defines(PonyEngine.Log.Extension TRUE)
 
 message(STATUS "Setting build options")
-pony_set_build_options(PonyEngine.Log.Extension TRUE)
 set_target_properties(PonyEngine.Log.Extension PROPERTIES CXX_STANDARD 23)
+pony_set_build_options(PonyEngine.Log.Extension TRUE)
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Extension PRIVATE
