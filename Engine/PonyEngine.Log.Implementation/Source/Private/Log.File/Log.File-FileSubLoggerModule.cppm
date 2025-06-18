@@ -43,7 +43,7 @@ namespace PonyEngine::Log::File
 		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<FileSubLoggerFactory>());
 	}
 
-	void FileSubLoggerModule::ShutDown(const Core::IModuleContext& context)
+	void FileSubLoggerModule::ShutDown(const Core::IModuleContext&)
 	{
 	}
 

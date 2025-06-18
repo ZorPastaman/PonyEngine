@@ -80,22 +80,25 @@
 		},
 		{
 			"name": "WinCore",
-			"hidden": true,
-			"cacheVariables": {
-				"CMAKE_CXX_COMPILER": "cl.exe",
-				"PONY_WINCORE": "TRUE"
-			}
+			"hidden": true
 		},
 		{
 			"name": "Windows",
 			"inherits": "WinCore",
 			"hidden": true,
-			"cacheVariables": {
-				"PONY_WINDOWS": "TRUE"
-			},
+			"toolchainFile": "CMake/Toolchains/Windows.cmake",
 			"architecture": {
 				"value": "x64",
 				"strategy": "external"
+			},
+			"toolset": {
+				"value": "v143",
+				"strategy": "external"
+			},
+			"condition": {
+				"type": "equals",
+				"lhs": "${hostSystemName}",
+				"rhs": "Windows"
 			}
 		},
 		{

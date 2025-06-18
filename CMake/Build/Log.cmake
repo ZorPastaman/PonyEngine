@@ -1,20 +1,7 @@
-# Sets log defines that must be applied to all targets.
-function(pony_set_global_log_defines)
-	if(PONY_CONSOLE_LOG)
-		add_compile_definitions(PONY_CONSOLE_LOG)
-	endif()
-	if(PONY_PLATFORM_CONSOLE_LOG)
-		if (NOT PONY_WINCORE)
-			message(FATAL_ERROR "Current platform doesn't support a system console.")
-		endif()
-		add_compile_definitions(PONY_PLATFORM_CONSOLE_LOG)
-	endif()
-endfunction()
-
 # Sets log defines by a log level.
 # target_name - Target name.
 # is_engine_target - Is the target an engine target?
-function(pony_set_log_mask target_name is_engine_target)
+function(pony_set_log_defines target_name is_engine_target)
 	function(get_sublist log_level sublist)
 		set(LOG_LEVELS Verbose Debug Info Warning Error Exception)
 		set(LOG_INDEX -1)
@@ -79,6 +66,17 @@ function(pony_set_log_mask target_name is_engine_target)
 			endforeach()
 		endif()
 	endfunction()
+
+	if(PONY_CONSOLE_LOG)
+		target_compile_definitions(${target_name} PRIVATE PONY_CONSOLE_LOG)
+	endif()
+	if(PONY_PLATFORM_CONSOLE_LOG)
+		if (PONY_WINCORE)
+			target_compile_definitions(${target_name} PRIVATE PONY_PLATFORM_CONSOLE_LOG)
+		else()
+			message(FATAL_ERROR "Current platform doesn't support a system console.")
+		endif()
+	endif()
 
 	if(is_engine_target)
 		set_log_options(${target_name} ${PONY_ENGINE_LOG_LEVEL})
