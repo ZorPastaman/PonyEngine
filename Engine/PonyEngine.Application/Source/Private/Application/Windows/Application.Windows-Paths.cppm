@@ -98,6 +98,6 @@ namespace PonyEngine::Application::Windows
 		}
 		const auto path = std::unique_ptr<wchar_t, decltype(&CoTaskMemFree)>(pathRaw, &CoTaskMemFree);
 
-		return std::filesystem::path(path.get()).append(PONY_STRINGIFY_VALUE(PONY_COMPANY_NAME)).append(PONY_STRINGIFY_VALUE(PONY_GAME_NAME));
+		return std::filesystem::path(path.get()).append(PONY_STRINGIFY_VALUE(PONY_PROJECT_NAME));
 	}
 }
