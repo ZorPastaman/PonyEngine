@@ -23,7 +23,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 	try
 	{
 		PonyEngine::Application::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
-#if PONY_CREATE_CONSOLE
+#if PONY_ENGINE_CREATE_CONSOLE
 		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
 #endif
 
@@ -73,7 +73,7 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
 		}
 
-#if PONY_CREATE_CONSOLE
+#if PONY_ENGINE_CREATE_CONSOLE
 		PonyEngine::Application::Windows::DestroyConsole();
 #endif
 	}

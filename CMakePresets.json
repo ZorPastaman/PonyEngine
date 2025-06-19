@@ -7,13 +7,19 @@
 			"binaryDir": "${sourceDir}/Output/Build/${presetName}",
 			"installDir": "${sourceDir}/Output/Install/${presetName}",
 			"cacheVariables": {
-				"PONY_COMPANY_NAME": "PonyEngine",
-				"PONY_GAME_NAME": "PonyEngineGame",
-				"PONY_GAME_VERSION": "0.0.0.0",
-				"PONY_BUILD_TYPE": "Engine",
+				"PONY_PROJECT_NAME": "PonyEngineGame",
+				"PONY_PROJECT_VERSION": "1.0.0.0",
 				"PONY_CONSOLE_LOG": "TRUE",
-				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
-				"PONY_LOG_FILE_PATH": "Logs/Log.log"
+				"PONY_ENGINE_LOG_EXTENSION": "TRUE",
+				"PONY_ENGINE_LOG_IMPLEMENTATION": "TRUE",
+				"PONY_ENGINE_LOG_CORE": "TRUE",
+				"PONY_ENGINE_LOG_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_FILE": "TRUE",
+				"PONY_ENGINE_LOG_FILE_PATH": "Logs/Log.log",
+				"PONY_ENGINE_LOG_CONSOLE_ORDER": "10",
+				"PONY_ENGINE_LOG_FILE_ORDER": "50",
+				"PONY_ENGINE_APPLICATION": "TRUE",
+				"PONY_ENGINE_TESTING": "TRUE"
 			}
 		},
 		{
@@ -24,12 +30,8 @@
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMIZATION": "Debug",
 				"PONY_ENGINE_OPTIMIZATION": "Debug",
-				"PONY_CREATE_CONSOLE": "TRUE",
-				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Debug",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_FORCE_STATIC": "FALSE"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Error"
 			}
 		},
 		{
@@ -40,12 +42,8 @@
 				"CMAKE_BUILD_TYPE": "Debug",
 				"PONY_GAME_OPTIMIZATION": "Debug",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
-				"PONY_CREATE_CONSOLE": "TRUE",
-				"PONY_GAME_LOG_LEVEL": "Debug",
 				"PONY_ENGINE_LOG_LEVEL": "Info",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
-				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_FORCE_STATIC": "FALSE"
+				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception"
 			}
 		},
 		{
@@ -56,11 +54,9 @@
 				"CMAKE_BUILD_TYPE": "RelWithDebInfo",
 				"PONY_GAME_OPTIMIZATION": "Release",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
-				"PONY_GAME_LOG_LEVEL": "Info",
 				"PONY_ENGINE_LOG_LEVEL": "Warning",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Error",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_FORCE_STATIC": "TRUE"
+				"PONY_ENGINE_FORCE_STATIC": "TRUE"
 			}
 		},
 		{
@@ -71,16 +67,19 @@
 				"CMAKE_BUILD_TYPE": "Release",
 				"PONY_GAME_OPTIMIZATION": "Release",
 				"PONY_ENGINE_OPTIMIZATION": "Release",
-				"PONY_GAME_LOG_LEVEL": "Error",
 				"PONY_ENGINE_LOG_LEVEL": "Error",
-				"PONY_GAME_LOG_STACKTRACE_LEVEL": "Exception",
 				"PONY_ENGINE_LOG_STACKTRACE_LEVEL": "Exception",
-				"PONY_FORCE_STATIC": "TRUE"
+				"PONY_ENGINE_FORCE_STATIC": "TRUE"
 			}
 		},
 		{
 			"name": "WinCore",
-			"hidden": true
+			"hidden": true,
+			"cacheVariables": {
+				"PONY_PLATFORM_CONSOLE_LOG": "TRUE",
+				"PONY_ENGINE_LOG_PLATFORM_CONSOLE": "TRUE",
+				"PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER": "20"
+			}
 		},
 		{
 			"name": "Windows",
@@ -103,11 +102,17 @@
 		},
 		{
 			"name": "Windows-Debug",
-			"inherits": [ "Debug", "Windows" ]
+			"inherits": [ "Debug", "Windows" ],
+			"cacheVariables": {
+				"PONY_ENGINE_CREATE_CONSOLE" : "TRUE"
+			}
 		},
 		{
 			"name": "Windows-Development",
-			"inherits": [ "Development", "Windows" ]
+			"inherits": [ "Development", "Windows" ],
+			"cacheVariables": {
+				"PONY_ENGINE_CREATE_CONSOLE": "TRUE"
+			}
 		},
 		{
 			"name": "Windows-Release",

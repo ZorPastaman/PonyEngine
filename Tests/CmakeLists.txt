@@ -6,6 +6,7 @@ FetchContent_Declare(
   GIT_TAG v3.8.1
 )
 FetchContent_MakeAvailable(Catch2)
+pony_set_build_options(Catch2WithMain ${PONY_ENGINE_OPTIMIZATION})
 
 message(STATUS "Configuring tests")
 add_subdirectory("PonyEngine.Core.Tests")

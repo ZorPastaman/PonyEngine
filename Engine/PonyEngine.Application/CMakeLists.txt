@@ -1,11 +1,25 @@
 ﻿message(STATUS "Configuring PonyEngine.Application")
-if(PONY_WINDOWS)
-	add_executable(PonyEngine.Application WIN32)
-else()
-	message(FATAL_ERROR "Unsupported platform!")
+
+message(VERBOSE "Validating settings")
+if(PONY_ENGINE_CREATE_CONSOLE)
+	if(NOT PONY_WINCORE)
+		message(FATAL_ERROR "PONY_ENGINE_CREATE_CONSOLE is set but the current platform doesn't support a console")
+	endif()
 endif()
 
-message(STATUS "Configuring sources")
+if(NOT PONY_PROJECT_NAME)
+	message(FATAL_ERROR "PONY_PROJECT_NAME isn't set")
+endif()
+if(NOT PONY_PROJECT_VERSION)
+	message(FATAL_ERROR "PONY_PROJECT_VERSION isn't set")
+endif()
+
+message(VERBOSE "Configuring target")
+if(PONY_WINDOWS)
+	add_executable(PonyEngine.Application WIN32)
+endif()
+
+message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 	"Source/Private/Application/Application.cppm"
 	"Source/Private/Application/Application-App.cppm"
@@ -16,14 +30,14 @@ target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES
 )
 
 if(PONY_WINCORE)
-	message(STATUS "Configuring sources for WinCore")
+	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application/WinCore/Application.WinCore.cppm"
 	)
 endif()
 
 if(PONY_WINDOWS)
-	message(STATUS "Configuring sources for Windows")
+	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Application/Windows/Application.Windows.cppm"
 		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
@@ -35,41 +49,22 @@ if(PONY_WINDOWS)
 		"Source/Main.Windows.cpp"
 	)
 
-	message(STATUS "Configuring data for Windows")
+	message(VERBOSE "Configuring manifest for Windows")
 	configure_file("Data/Windows/Application.manifest.in" Application.manifest)
 	target_sources(PonyEngine.Application PRIVATE Application.manifest)
 endif()
 
-message(STATUS "Configuring defines")
-if(PONY_CREATE_CONSOLE)
-	target_compile_definitions(PonyEngine.Application PRIVATE PONY_CREATE_CONSOLE)
+message(VERBOSE "Configuring defines")
+if(PONY_ENGINE_CREATE_CONSOLE)
+	target_compile_definitions(PonyEngine.Application PRIVATE PONY_ENGINE_CREATE_CONSOLE)
 endif()
-if(PONY_COMPANY_NAME)
-	target_compile_definitions(PonyEngine.Application PRIVATE PONY_COMPANY_NAME=${PONY_COMPANY_NAME})
-else()
-	message(FATAL_ERROR "PONY_COMPANY_NAME isn't set")
-endif()
-if(PONY_GAME_NAME)
-	target_compile_definitions(PonyEngine.Application PRIVATE PONY_GAME_NAME=${PONY_GAME_NAME})
-else()
-	message(FATAL_ERROR "PONY_GAME_NAME isn't set")
-endif()
-pony_set_log_defines(PonyEngine.Application TRUE)
+target_compile_definitions(PonyEngine.Application PRIVATE PONY_PROJECT_NAME=${PONY_PROJECT_NAME})
 
-message(STATUS "Setting properties")
-set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PROJECT_NAME}")
-
-message(STATUS "Setting build options")
+message(VERBOSE "Setting properties")
 set_target_properties(PonyEngine.Application PROPERTIES CXX_STANDARD 23)
-pony_set_build_options(PonyEngine.Application TRUE)
+set_target_properties(PonyEngine.Application PROPERTIES OUTPUT_NAME "${PONY_PROJECT_NAME}")
 
-message(STATUS "Configuring dependencies")
+message(VERBOSE "Configuring dependencies")
 target_link_libraries(PonyEngine.Application PRIVATE
 	PonyEngine.Core
 )
-pony_link_app_modules(PonyEngine.Application)
-
-message(STATUS "Installing")
-get_property(PONY_APP_INSTALL_PATH_VALUE GLOBAL PROPERTY PONY_APP_INSTALL_PATH)
-message(STATUS "Application destination: ${PONY_APP_INSTALL_PATH_VALUE}")
-install(TARGETS PonyEngine.Application RUNTIME DESTINATION ${PONY_APP_INSTALL_PATH_VALUE})

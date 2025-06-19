@@ -1,7 +1,10 @@
-# Sets log defines by a log level.
+# Sets log defines.
 # target_name - Target name.
-# is_engine_target - Is the target an engine target?
-function(pony_set_log_defines target_name is_engine_target)
+# log_level - Log level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no logs.
+# stacktrace_level - Log stacktrace level. Allowed values: Verbose, Debug, Info, Warning, Error, Exception. "" means no log stracktraces.
+# console - If it's true, logs to a standard console are allowed.
+# platform_console - If it's true, logs to a platform console are allowed. The platform must support a platform console.
+function(pony_set_log_defines target_name log_level stacktrace_level console platform_console)
 	function(get_sublist log_level sublist)
 		set(LOG_LEVELS Verbose Debug Info Warning Error Exception)
 		set(LOG_INDEX -1)
@@ -14,7 +17,7 @@ function(pony_set_log_defines target_name is_engine_target)
 			math(EXPR i "${i} + 1")
 		endforeach()
 		if(index EQUAL -1)
-			message(FATAL_ERROR "Incorrect log level")
+			message(FATAL_ERROR "Incorrect log level: ${log_level}")
 		endif()
 
 		list(LENGTH LOG_LEVELS LOG_LEVELS_LEN)
@@ -67,22 +70,23 @@ function(pony_set_log_defines target_name is_engine_target)
 		endif()
 	endfunction()
 
-	if(PONY_CONSOLE_LOG)
+	if(NOT TARGET ${target_name})
+		message(FATAL_ERROR "${target_name} isn't a target")
+	endif()
+
+	if(console)
+		message(STATUS "Setting console defines")
 		target_compile_definitions(${target_name} PRIVATE PONY_CONSOLE_LOG)
 	endif()
-	if(PONY_PLATFORM_CONSOLE_LOG)
+	if(platform_console)
 		if (PONY_WINCORE)
+			message(STATUS "Setting platform console defines")
 			target_compile_definitions(${target_name} PRIVATE PONY_PLATFORM_CONSOLE_LOG)
 		else()
-			message(FATAL_ERROR "Current platform doesn't support a system console.")
+			message(FATAL_ERROR "Current platform doesn't support a platform console.")
 		endif()
 	endif()
 
-	if(is_engine_target)
-		set_log_options(${target_name} ${PONY_ENGINE_LOG_LEVEL})
-		set_stacktrace_options(${target_name} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL})
-	else()
-		set_log_options(${target_name} ${PONY_GAME_LOG_LEVEL})
-		set_stacktrace_options(${target_name} ${PONY_GAME_LOG_STACKTRACE_LEVEL})
-	endif()
+	set_log_options(${target_name} ${log_level})
+	set_stacktrace_options(${target_name} ${stacktrace_level})
 endfunction()

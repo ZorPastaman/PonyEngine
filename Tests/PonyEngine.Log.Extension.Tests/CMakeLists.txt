@@ -7,11 +7,13 @@ target_sources(PonyEngine.Log.Extension.Tests PRIVATE
 )
 
 message(STATUS "Configuring defines")
-pony_set_log_defines(PonyEngine.Log.Extension.Tests TRUE)
+pony_set_log_defines(PonyEngine.Log.Extension.Tests ${PONY_ENGINE_LOG_LEVEL} ${PONY_ENGINE_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
+
+message(STATUS "Setting properties")
+set_target_properties(PonyEngine.Log.Extension.Tests PROPERTIES CXX_STANDARD 23)
 
 message(STATUS "Setting build options")
-set_target_properties(PonyEngine.Log.Extension.Tests PROPERTIES CXX_STANDARD 23)
-pony_set_build_options(PonyEngine.Log.Extension.Tests TRUE)
+pony_set_build_options(PonyEngine.Log.Extension.Tests ${PONY_ENGINE_OPTIMIZATION})
 
 message(STATUS "Configuring dependencies")
 target_link_libraries(PonyEngine.Log.Extension.Tests PRIVATE 
