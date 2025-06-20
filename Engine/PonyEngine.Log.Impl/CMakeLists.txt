@@ -1,8 +1,8 @@
-message(STATUS "Configuring PonyEngine.Log.Implementation")
+message(STATUS "Configuring PonyEngine.Log.Impl")
 
 message(VERBOSE "Validating settings")
 if(NOT PONY_ENGINE_LOG_CORE AND NOT PONY_ENGINE_LOG_CONSOLE AND NOT PONY_ENGINE_LOG_PLATFORM_CONSOLE AND NOT PONY_ENGINE_LOG_FILE)
-	message(FATAL_ERROR "No part of PonyEngine.Log.Implementation is set")
+	message(FATAL_ERROR "No part of PonyEngine.Log.Impl is set")
 endif()
 
 if(PONY_ENGINE_LOG_CONSOLE)
@@ -52,32 +52,32 @@ if(PONY_ENGINE_LOG_FILE)
 	endforeach()
 endif()
 
-if(NOT TARGET PonyEngine.Log.Extension)
+if(NOT TARGET PonyEngine.Log.Ext)
 	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
 endif()
 
 if(PONY_ENGINE_FORCE_STATIC)
 	message(VERBOSE "Configuring target as static")
-	add_library(PonyEngine.Log.Implementation STATIC)
+	add_library(PonyEngine.Log.Impl STATIC)
 else()
 	message(VERBOSE "Configuring target as shared")
-	add_library(PonyEngine.Log.Implementation SHARED)
+	add_library(PonyEngine.Log.Impl SHARED)
 endif()
 
 message(VERBOSE "Configuring headers")
-target_include_directories(PonyEngine.Log.Implementation PUBLIC
+target_include_directories(PonyEngine.Log.Impl PUBLIC
 	"Include/Public"
 )
 
 if(PONY_ENGINE_LOG_CORE)
 	message(VERBOSE "Configuring core sources")
-	target_sources(PonyEngine.Log.Implementation PUBLIC
+	target_sources(PonyEngine.Log.Impl PUBLIC
 		"Source/Main.Logger.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE
-		"Source/Main.Logger.Implementation.cpp"
+	target_sources(PonyEngine.Log.Impl PRIVATE
+		"Source/Main.Logger.Impl.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
+	target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Log.Core/Log.Core.cppm"
 		"Source/Private/Log.Core/Log.Core-Logger.cppm"
 		"Source/Private/Log.Core/Log.Core-LoggerFactory.cppm"
@@ -86,13 +86,13 @@ if(PONY_ENGINE_LOG_CORE)
 endif()
 if(PONY_ENGINE_LOG_CONSOLE)
 	message(VERBOSE "Configuring console sources")
-	target_sources(PonyEngine.Log.Implementation PUBLIC
+	target_sources(PonyEngine.Log.Impl PUBLIC
 		"Source/Main.Console.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE
-		"Source/Main.Console.Implementation.cpp"
+	target_sources(PonyEngine.Log.Impl PRIVATE
+		"Source/Main.Console.Impl.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
+	target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Log.Console/Log.Console.cppm"
 		"Source/Private/Log.Console/Log.Console-ConsoleSubLogger.cppm"
 		"Source/Private/Log.Console/Log.Console-ConsoleSubLoggerFactory.cppm"
@@ -103,29 +103,29 @@ if(PONY_ENGINE_LOG_PLATFORM_CONSOLE)
 	message(VERBOSE "Configuring plaform console sources")
 	if(PONY_WINCORE)
 		message(VERBOSE "Configuring plaform console sources for WinCore")
-		target_sources(PonyEngine.Log.Implementation PUBLIC
-			"Source/Main.PlatformConsole.WinCore.cpp"
+		target_sources(PonyEngine.Log.Impl PUBLIC
+			"Source/Main.PConsole.WinCore.cpp"
 		)
-		target_sources(PonyEngine.Log.Implementation PRIVATE
-			"Source/Main.PlatformConsole.WinCore.Implementation.cpp"
+		target_sources(PonyEngine.Log.Impl PRIVATE
+			"Source/Main.PConsole.WinCore.Impl.cpp"
 		)
-		target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
-			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore.cppm"
-			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLogger.cppm"
-			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLoggerFactory.cppm"
-			"Source/Private/Log.PlatformConsole/WinCore/Log.PlatformConsole.WinCore-PlatformConsoleSubLoggerModule.cppm"
+		target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
+			"Source/Private/Log.PConsole/WinCore/Log.PConsole.WinCore.cppm"
+			"Source/Private/Log.PConsole/WinCore/Log.PConsole.WinCore-PConsoleSubLogger.cppm"
+			"Source/Private/Log.PConsole/WinCore/Log.PConsole.WinCore-PConsoleSubLoggerFactory.cppm"
+			"Source/Private/Log.PConsole/WinCore/Log.PConsole.WinCore-PConsoleSubLoggerModule.cppm"
 		)
 	endif()
 endif()
 if(PONY_ENGINE_LOG_FILE)
 	message(VERBOSE "Configuring file sources")
-	target_sources(PonyEngine.Log.Implementation PUBLIC
+	target_sources(PonyEngine.Log.Impl PUBLIC
 		"Source/Main.File.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE
-		"Source/Main.File.Implementation.cpp"
+	target_sources(PonyEngine.Log.Impl PRIVATE
+		"Source/Main.File.Impl.cpp"
 	)
-	target_sources(PonyEngine.Log.Implementation PRIVATE FILE_SET CXX_MODULES FILES 
+	target_sources(PonyEngine.Log.Impl PRIVATE FILE_SET CXX_MODULES FILES 
 		"Source/Private/Log.File/Log.File.cppm"
 		"Source/Private/Log.File/Log.File-FileSubLogger.cppm"
 		"Source/Private/Log.File/Log.File-FileSubLoggerFactory.cppm"
@@ -135,25 +135,25 @@ endif()
 
 message(VERBOSE "Configuring defines")
 if(PONY_ENGINE_LOG_CONSOLE)
-	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_ENGINE_LOG_CONSOLE_ORDER=${PONY_ENGINE_LOG_CONSOLE_ORDER})
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_ENGINE_LOG_CONSOLE_ORDER=${PONY_ENGINE_LOG_CONSOLE_ORDER})
 endif()
 if(PONY_ENGINE_LOG_PLATFORM_CONSOLE)
-	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER=${PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER})
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER=${PONY_ENGINE_LOG_PLATFORM_CONSOLE_ORDER})
 endif()
 if(PONY_ENGINE_LOG_FILE)
-	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER})
-	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH})
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_ENGINE_LOG_FILE_ORDER=${PONY_ENGINE_LOG_FILE_ORDER})
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_ENGINE_LOG_FILE_PATH=${PONY_ENGINE_LOG_FILE_PATH})
 endif()
 if(NOT PONY_FORCE_STATIC)
-	target_compile_definitions(PonyEngine.Log.Implementation PRIVATE PONY_DLL)
+	target_compile_definitions(PonyEngine.Log.Impl PRIVATE PONY_DLL)
 endif()
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Log.Implementation PROPERTIES CXX_STANDARD 23)
-set_target_properties(PonyEngine.Log.Implementation PROPERTIES OUTPUT_NAME "PonyEngine.Log")
+set_target_properties(PonyEngine.Log.Impl PROPERTIES CXX_STANDARD 23)
+set_target_properties(PonyEngine.Log.Impl PROPERTIES OUTPUT_NAME "PonyEngine.Log")
 
 message(VERBOSE "Configuring dependencies")
-target_link_libraries(PonyEngine.Log.Implementation PRIVATE
+target_link_libraries(PonyEngine.Log.Impl PRIVATE
 	PonyEngine.Core
-	PonyEngine.Log.Extension
+	PonyEngine.Log.Ext
 )

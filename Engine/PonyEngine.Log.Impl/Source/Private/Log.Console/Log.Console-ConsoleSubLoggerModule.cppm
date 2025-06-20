@@ -9,8 +9,6 @@
 
 module;
 
-#include <typeinfo>
-
 #include "PonyEngine/Log/Log.h"
 #include "PonyEngine/Log/Console/ConsoleModule.h"
 #include "PonyEngine/Utility/Macro.h"
