@@ -141,6 +141,8 @@ namespace PonyEngine::Application
 {
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_BEGIN) Core::IModule** FirstModule = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_LOG_CHECKPOINT) Core::IModule** LogCheckpoint = nullptr;
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_ENGINE_EARLY_CHECKPOINT) Core::IModule** EngineEarlyCheckpoint = nullptr;
+	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_ENGINE_CHECKPOINT) Core::IModule** EngineCheckpoint = nullptr;
 	PONY_MODULE_ALLOCATE(PONY_MODULE_ORDER_END) Core::IModule** LastModule = nullptr;
 
 	App::App(const PlatformPaths& platformPaths) :
@@ -173,6 +175,18 @@ namespace PonyEngine::Application
 		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
 		CheckForLoggerModule(true);
 		TryCreateLogger();
+		moduleContext.ClearData();
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up early engine modules.");
+		StartupModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint));
+		CheckForLoggerModule(false);
+		moduleContext.ClearData();
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up engine modules.");
+		StartupModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineCheckpoint));
+		CheckForLoggerModule(false);
+		moduleContext.ClearData();
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up late engine modules.");
+		StartupModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LastModule));
+		CheckForLoggerModule(false);
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up modules done.");
 	}
