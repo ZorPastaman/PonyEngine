@@ -53,7 +53,7 @@ if(PONY_ENGINE_LOG_FILE)
 endif()
 
 if(NOT TARGET PonyEngine.Log.Ext)
-	message(FATAL_ERROR "PonyEngine.Log.Extension wasn't configured")
+	message(FATAL_ERROR "PonyEngine.Log.Ext wasn't configured")
 endif()
 
 if(PONY_ENGINE_FORCE_STATIC)
