@@ -8,10 +8,7 @@ set(CMAKE_CXX_MODULE_STD ON)
 include(FetchContent)
 
 # Set game project.
-project("PonyEngineGameSample" LANGUAGES CXX)
-
-# Set PonyEngine variables.
-set(PONY_ENGINE_APPLICATION "TRUE")
+project(${PONY_PROJECT_NAME} VERSION ${PONY_PROJECT_VERSION} LANGUAGES CXX)
 
 # Add PonyEngine project.
 FetchContent_Declare(
