@@ -69,6 +69,9 @@ export namespace PonyEngine::Application
 			virtual const Log::ILogger& Logger() const noexcept override;
 
 			[[nodiscard("Pure function")]]
+			virtual const Core::IEngine* Engine() const noexcept override;
+
+			[[nodiscard("Pure function")]]
 			virtual const Core::ApplicationPaths& Paths() const noexcept override;
 
 			AppContext& operator =(const AppContext&) = delete;
@@ -128,10 +131,18 @@ export namespace PonyEngine::Application
 		/// @brief Tries to create a logger if there's at least one registered.
 		void TryCreateLogger();
 
+		/// @brief Checks if engine modules are correct.
+		/// @param enginePhase Is this an engine phase now?
+		void CheckForEngineModule(bool enginePhase) const;
+		/// @brief Creates an engine.
+		void CreateEngine();
+
 		Core::ApplicationPaths paths; ///< Application paths.
 		AppLogger logger; ///< Application logger.
 		AppContext appContext; ///< Application context.
 		ModuleContext moduleContext; ///< Module context.
+
+		std::shared_ptr<Core::IEngine> engine; ///< Engine.
 
 		std::uintptr_t lastStartedModule; ///< Last started module.
 	};
@@ -174,30 +185,47 @@ namespace PonyEngine::Application
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up log modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&FirstModule) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LogCheckpoint));
 		CheckForLoggerModule(true);
+		CheckForEngineModule(false);
 		TryCreateLogger();
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up early engine modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&LogCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint));
 		CheckForLoggerModule(false);
+		CheckForEngineModule(false);
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up engine modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&EngineEarlyCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&EngineCheckpoint));
 		CheckForLoggerModule(false);
+		CheckForEngineModule(true);
+		CreateEngine();
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up late engine modules.");
 		StartupModules(reinterpret_cast<std::uintptr_t>(&EngineCheckpoint) + sizeof(Core::IModule**), reinterpret_cast<std::uintptr_t>(&LastModule));
 		CheckForLoggerModule(false);
+		CheckForEngineModule(false);
 		moduleContext.ClearData();
 		PONY_LOG(logger.Logger(), Log::LogType::Info, "Starting up modules done.");
 	}
 
 	void App::End()
 	{
+		PONY_LOG(logger.Logger(), Log::LogType::Info, "Stopping engine... Is engine running: {}.", engine->IsRunning());
+		engine->Stop();
 	}
 
 	bool App::Tick(int& exitCode)
 	{
-		return false;
+		PONY_LOG(logger.Logger(), Log::LogType::Verbose, "Ticking engine...");
+		engine->Tick();
+
+		const bool isRunning = engine->IsRunning();
+		if (!isRunning)
+		{
+			exitCode = engine->ExitCode();
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Engine stopped. Exit code: {}.", exitCode);
+		}
+
+		return !isRunning;
 	}
 
 	App::AppContext::AppContext(App& application) noexcept :
@@ -213,6 +241,11 @@ namespace PonyEngine::Application
 	const Log::ILogger& App::AppContext::Logger() const noexcept
 	{
 		return application->logger.Logger();
+	}
+
+	const Core::IEngine* App::AppContext::Engine() const noexcept
+	{
+		return application->engine.get();
 	}
 
 	const Core::ApplicationPaths& App::AppContext::Paths() const noexcept
@@ -330,6 +363,37 @@ namespace PonyEngine::Application
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger... Factory: '{}'", typeid(*loggerFactory).name());
 			logger.Logger(loggerFactory->Create(moduleContext));
 			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application logger done. Logger: '{}'.", typeid(logger.Logger()).name());
+		}
+	}
+
+	void App::CheckForEngineModule(const bool enginePhase) const
+	{
+		if (moduleContext.DataCount(typeid(Core::IEngineFactory)) > static_cast<std::size_t>(enginePhase)) [[unlikely]]
+		{
+			if (enginePhase)
+			{
+				throw std::logic_error("More than 1 engine modules added.");
+			}
+			else
+			{
+				throw std::logic_error("No engine modules allowed out of engine module phase.");
+			}
+		}
+	}
+
+	void App::CreateEngine()
+	{
+		if (moduleContext.DataCount(typeid(Core::IEngineFactory)) > 0Z)
+		{
+			const std::shared_ptr<void>& engineFactoryData = moduleContext.GetData(typeid(Core::IEngineFactory), 0Z);
+			const std::shared_ptr<Core::IEngineFactory> engineFactory = std::static_pointer_cast<Core::IEngineFactory>(engineFactoryData);
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application engine... Factory: '{}'", typeid(*engineFactory).name());
+			engine = engineFactory->Create(moduleContext);
+			PONY_LOG(logger.Logger(), Log::LogType::Info, "Creating application engine done. Engine: '{}'.", typeid(*engine).name());
+		}
+		else
+		{
+			throw std::logic_error("No engine factory found.");
 		}
 	}
 }
