@@ -17,6 +17,7 @@ target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
 	"Source/Public/Core/Core-ApplicationPaths.cppm"
 	"Source/Public/Core/Core-IApplicationContext.cppm"
 	"Source/Public/Core/Core-IEngine.cppm"
+	"Source/Public/Core/Core-IEngineFactory.cppm"
 	"Source/Public/Core/Core-ILoggerFactory.cppm"
 	"Source/Public/Core/Core-IModule.cppm"
 	"Source/Public/Core/Core-IModuleContext.cppm"
