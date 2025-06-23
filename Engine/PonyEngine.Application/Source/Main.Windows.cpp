@@ -12,28 +12,30 @@
 
 import std;
 
-import PonyEngine.Application.Windows;
 import PonyEngine.Log;
+import PonyEngine.Main.Windows;
 import PonyEngine.Utility;
+
+/// @brief Creates an application.
+/// @return Application.
+[[nodiscard("Pure function")]]
+std::unique_ptr<PonyEngine::Main::App> CreateApp();
 
 int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 {
-	int exitCode = PonyEngine::Application::ExitCodes::Success;
+	int exitCode = PonyEngine::Main::ExitCodes::Success;
 
 	try
 	{
-		PonyEngine::Application::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
+		PonyEngine::Main::Windows::SetProcessPriority(ABOVE_NORMAL_PRIORITY_CLASS);
 #if PONY_ENGINE_CREATE_CONSOLE
-		PonyEngine::Application::Windows::CreateConsole(CP_UTF8);
+		PonyEngine::Main::Windows::CreateConsole(CP_UTF8);
 #endif
 
 		try
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application...");
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application.");
-			auto app = std::make_unique<PonyEngine::Application::App>(PonyEngine::Application::Windows::GetPlatformPaths());
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Beginning application.");
-			app->Begin();
+			std::unique_ptr<PonyEngine::Main::App> app = CreateApp();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Creating application done.");
 
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop start.");
@@ -46,15 +48,12 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 				if (!shouldExit) [[likely]]
 				{
 					PONY_CONSOLE(PonyEngine::Log::LogType::Verbose, "Checking for quit message.");
-					shouldExit = PonyEngine::Application::Windows::CheckForQuit(exitCode);
+					shouldExit = PonyEngine::Main::Windows::CheckForQuit(exitCode);
 				}
 			}
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Main loop finish. Exit code: '{}'.", exitCode);
 
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application...");
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Ending application.");
-			app->End();
-			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destructing application.")
 			app.reset();
 			PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Destroying application done.");
 		}
@@ -63,18 +62,18 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 			PONY_CONSOLE_E(e, "On application.");
 			MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on application: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
 
-			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
+			exitCode = PonyEngine::Main::ExitCodes::ApplicationException;
 		}
 		catch (...)
 		{
 			PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception - on application.");
 			MessageBoxA(nullptr, "Exception on application.", "PonyEngine exception", MB_OK | MB_ICONERROR);
 
-			exitCode = PonyEngine::Application::ExitCodes::ApplicationException;
+			exitCode = PonyEngine::Main::ExitCodes::ApplicationException;
 		}
 
 #if PONY_ENGINE_CREATE_CONSOLE
-		PonyEngine::Application::Windows::DestroyConsole();
+		PonyEngine::Main::Windows::DestroyConsole();
 #endif
 	}
 	catch (const std::exception& e)
@@ -82,15 +81,24 @@ int APIENTRY WinMain(const HINSTANCE, const HINSTANCE, const PSTR, const int)
 		PONY_CONSOLE_E(e, "On main.");
 		MessageBoxA(nullptr, PonyEngine::Utility::SafeFormat("Exception on main: '{}'.", e.what()).c_str(), "PonyEngine exception", MB_OK | MB_ICONERROR);
 
-		exitCode = PonyEngine::Application::ExitCodes::MainException;
+		exitCode = PonyEngine::Main::ExitCodes::MainException;
 	}
 	catch (...)
 	{
 		PONY_CONSOLE(PonyEngine::Log::LogType::Exception, "Unknown exception - on main.");
 		MessageBoxA(nullptr, "Unknown exception on main.", "PonyEngine exception", MB_OK | MB_ICONERROR);
 
-		exitCode = PonyEngine::Application::ExitCodes::MainException;
+		exitCode = PonyEngine::Main::ExitCodes::MainException;
 	}
 
 	return exitCode;
+}
+
+std::unique_ptr<PonyEngine::Main::App> CreateApp()
+{
+	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Getting platform paths.");
+	const PonyEngine::Main::PlatformPaths paths = PonyEngine::Main::Windows::GetPlatformPaths();
+
+	PONY_CONSOLE(PonyEngine::Log::LogType::Info, "Constructing application.");
+	return std::make_unique<PonyEngine::Main::App>(paths);
 }

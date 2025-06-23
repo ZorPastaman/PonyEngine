@@ -7,6 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Application.WinCore;
+module;
 
-export import PonyEngine.Application;
+#include "PonyEngine/Utility/ObjectBody.h"
+
+export module PonyEngine.Main:ExitCodes;
+
+export namespace PonyEngine::Main
+{
+	/// @brief Exit codes that must be used by main. The application uses negative codes.
+	struct ExitCodes final
+	{
+		NON_CONSTRUCTIBLE_BODY(ExitCodes)
+
+		static constexpr int ApplicationException = -2;
+		static constexpr int MainException = -1;
+		static constexpr int Success = 0;
+	};
+}

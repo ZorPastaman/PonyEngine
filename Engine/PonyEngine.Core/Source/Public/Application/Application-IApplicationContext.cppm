@@ -11,14 +11,14 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IApplicationContext;
+export module PonyEngine.Application:IApplicationContext;
 
+import PonyEngine.Engine;
 import PonyEngine.Log;
 
 import :ApplicationPaths;
-import :IEngine;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Application
 {
 	/// @brief Application context. It exists for the whole life of an application.
 	class IApplicationContext
@@ -35,9 +35,13 @@ export namespace PonyEngine::Core
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Gets the engine.
-		/// @return Engine. It's nullptr before the engine module phase, and non-nullptr after it.
+		/// @return Engine.
 		[[nodiscard("Pure function")]]
-		virtual const IEngine* Engine() const noexcept = 0;
+		virtual Engine::IEngine* Engine() noexcept = 0;
+		/// @brief Gets the engine.
+		/// @return Engine.
+		[[nodiscard("Pure function")]]
+		virtual const Engine::IEngine* Engine() const noexcept = 0;
 
 		/// @brief Gets the application paths.
 		/// @return Application paths.

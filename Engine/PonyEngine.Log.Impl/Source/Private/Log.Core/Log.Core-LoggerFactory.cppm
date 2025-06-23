@@ -9,12 +9,15 @@
 
 module;
 
+#include <cassert>
+
 #include "PonyEngine/Log/Log.h"
 
 export module PonyEngine.Log.Core:LoggerFactory;
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Core;
 import PonyEngine.Log.Extension;
 
@@ -34,7 +37,7 @@ export namespace PonyEngine::Log::Core
 		~LoggerFactory() noexcept = default;
 
 		[[nodiscard("Pure function")]]
-		virtual std::shared_ptr<ILogger> Create(const PonyEngine::Core::IModuleContext& context) override;
+		virtual std::shared_ptr<PonyEngine::Core::ILogger> Create(const PonyEngine::Core::IModuleContext& context) override;
 
 		LoggerFactory& operator =(const LoggerFactory&) = delete;
 		LoggerFactory& operator =(LoggerFactory&&) = delete;
@@ -50,7 +53,7 @@ export namespace PonyEngine::Log::Core
 
 namespace PonyEngine::Log::Core
 {
-	std::shared_ptr<ILogger> LoggerFactory::Create(const PonyEngine::Core::IModuleContext& context)
+	std::shared_ptr<PonyEngine::Core::ILogger> LoggerFactory::Create(const PonyEngine::Core::IModuleContext& context)
 	{
 		const std::vector<std::shared_ptr<Extension::ISubLogger>> subLoggers = CreateSubLoggers(context);
 
@@ -79,6 +82,7 @@ namespace PonyEngine::Log::Core
 			{
 				PONY_LOG(context.Application().Logger(), LogType::Info, "Creating sub-logger... Factory: '{}'.", typeid(*subLoggerFactory).name());
 				const std::shared_ptr<Extension::ISubLogger> subLogger = subLoggerFactory->CreateSubLogger(context);
+				assert(subLogger && "The created sub-logger is nullptr!");
 				subLoggers.emplace_back(subLogger, subLoggerFactory->Order());
 				PONY_LOG(context.Application().Logger(), LogType::Info, "Creating sub-logger done. Sub-logger: '{}'.", typeid(*subLoggerFactory).name(), typeid(*subLogger).name());
 			}

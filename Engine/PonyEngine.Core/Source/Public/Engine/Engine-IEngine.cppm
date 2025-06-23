@@ -11,22 +11,14 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IEngine;
+export module PonyEngine.Engine:IEngine;
 
-import PonyEngine.Engine;
-
-export namespace PonyEngine::Core
+export namespace PonyEngine::Engine
 {
 	/// @brief Engine.
 	class IEngine
 	{
 		INTERFACE_BODY(IEngine)
-
-		/// @brief Gets a public engine.
-		/// @return Public engine.
-		/// @remark The function must return the same reference each time it is called.
-		[[nodiscard("Pure function")]]
-		virtual Engine::IEngine& PublicEngine() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().
@@ -38,12 +30,5 @@ export namespace PonyEngine::Core
 		/// @return Exit code.
 		[[nodiscard("Pure function")]]
 		virtual int ExitCode() const noexcept = 0;
-		/// @brief Stops the engine with the @p exitCode.
-		/// @remark If the engine is already stopped, the invocation of this function is ignored.
-		/// @param exitCode Exit code.
-		virtual void Stop(int exitCode = 0) noexcept = 0;
-
-		/// @brief Ticks the engine.
-		virtual void Tick() = 0;
 	};
 }

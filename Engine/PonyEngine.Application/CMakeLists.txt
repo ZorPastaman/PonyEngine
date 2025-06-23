@@ -24,29 +24,30 @@ endif()
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
-	"Source/Private/Application/Application.cppm"
-	"Source/Private/Application/Application-App.cppm"
-	"Source/Private/Application/Application-AppLogger.cppm"
-	"Source/Private/Application/Application-DefaultLogger.cppm"
-	"Source/Private/Application/Application-ExitCodes.cppm"
-	"Source/Private/Application/Application-PlatformPaths.cppm"
+	"Source/Private/Main/Main.cppm"
+	"Source/Private/Main/Main-App.cppm"
+	
+	
+	"Source/Private/Main/Main-DefaultLogger.cppm"
+	"Source/Private/Main/Main-ExitCodes.cppm"
+	"Source/Private/Main/Main-PlatformPaths.cppm"
 )
 
 if(PONY_WINCORE)
 	message(VERBOSE "Configuring sources for WinCore")
 	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Application/WinCore/Application.WinCore.cppm"
+		"Source/Private/Main/WinCore/Main.WinCore.cppm"
 	)
 endif()
 
 if(PONY_WINDOWS)
 	message(VERBOSE "Configuring sources for Windows")
 	target_sources(PonyEngine.Application PRIVATE FILE_SET CXX_MODULES FILES 
-		"Source/Private/Application/Windows/Application.Windows.cppm"
-		"Source/Private/Application/Windows/Application.Windows-Console.cppm"
-		"Source/Private/Application/Windows/Application.Windows-Paths.cppm"
-		"Source/Private/Application/Windows/Application.Windows-Process.cppm"
-		"Source/Private/Application/Windows/Application.Windows-QuitChecker.cppm"
+		"Source/Private/Main/Windows/Main.Windows.cppm"
+		"Source/Private/Main/Windows/Main.Windows-Console.cppm"
+		"Source/Private/Main/Windows/Main.Windows-Paths.cppm"
+		"Source/Private/Main/Windows/Main.Windows-Process.cppm"
+		"Source/Private/Main/Windows/Main.Windows-QuitChecker.cppm"
 	)
 	 target_sources(PonyEngine.Application PRIVATE
 		"Source/Main.Windows.cpp"

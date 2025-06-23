@@ -7,14 +7,14 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:ApplicationPaths;
+export module PonyEngine.Main:PlatformPaths;
 
 import std;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Main
 {
-	/// @brief Application paths.
-	struct ApplicationPaths final
+	/// @brief Platform specific paths.
+	struct PlatformPaths final
 	{
 		std::filesystem::path gameData; ///< Path to the game executable directory.
 		std::filesystem::path executable; ///< Path to the game executable. It's @p gameData/<GameExecutableName>

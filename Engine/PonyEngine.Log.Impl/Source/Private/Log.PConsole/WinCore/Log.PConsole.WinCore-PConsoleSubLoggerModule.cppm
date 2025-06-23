@@ -16,7 +16,9 @@ export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerMod
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Core;
+import PonyEngine.Log;
 
 import :PlatformConsoleSubLoggerFactory;
 
