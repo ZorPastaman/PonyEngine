@@ -15,8 +15,7 @@ export module PonyEngine.Core:IModuleContext;
 
 import std;
 
-import :IApplicationContext;
-import :IEngine;
+import PonyEngine.Application;
 
 export namespace PonyEngine::Core
 {
@@ -28,11 +27,11 @@ export namespace PonyEngine::Core
 		/// @brief Gets the application context.
 		/// @return Application.
 		[[nodiscard("Pure function")]]
-		virtual IApplicationContext& Application() noexcept = 0;
+		virtual Application::IApplicationContext& Application() noexcept = 0;
 		/// @brief Gets the application context.
 		/// @return Application.
 		[[nodiscard("Pure function")]]
-		virtual const IApplicationContext& Application() const noexcept = 0;
+		virtual const Application::IApplicationContext& Application() const noexcept = 0;
 
 		/// @brief Gets a data count.
 		/// @param type Data type.

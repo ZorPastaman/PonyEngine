@@ -9,6 +9,5 @@
 
 export module PonyEngine.Application;
 
-export import :App;
-export import :ExitCodes;
-export import :PlatformPaths;
+export import :ApplicationPaths;
+export import :IApplicationContext;

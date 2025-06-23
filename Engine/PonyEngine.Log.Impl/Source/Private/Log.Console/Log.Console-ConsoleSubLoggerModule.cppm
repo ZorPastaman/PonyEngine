@@ -17,7 +17,9 @@ export module PonyEngine.Log.Console:ConsoleSubLoggerModule;
 
 import std;
 
+import PonyEngine.Application;
 import PonyEngine.Core;
+import PonyEngine.Log;
 
 import :ConsoleSubLoggerFactory;
 

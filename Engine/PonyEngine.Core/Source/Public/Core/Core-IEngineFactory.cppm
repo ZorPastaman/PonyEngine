@@ -15,6 +15,7 @@ export module PonyEngine.Core:IEngineFactory;
 
 import std;
 
+import :IEngine;
 import :IModuleContext;
 
 export namespace PonyEngine::Core

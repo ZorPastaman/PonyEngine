@@ -11,12 +11,13 @@ export module PonyEngine.Log.Core:Logger;
 
 import std;
 
+import PonyEngine.Core;
 import PonyEngine.Log.Extension;
 
 export namespace PonyEngine::Log::Core
 {
 	/// @brief Logger.
-	class Logger final : public ILogger
+	class Logger final : public PonyEngine::Core::ILogger, private ILogger
 	{
 	public:
 		[[nodiscard("Pure constuctor")]]
@@ -28,6 +29,11 @@ export namespace PonyEngine::Log::Core
 
 		virtual void Log(LogType logType, const LogInput& logInput) const noexcept override;
 		virtual void Log(const std::exception& exception, const LogInput& logInput) const noexcept override;
+
+		[[nodiscard("Pure function")]]
+		virtual Log::ILogger& PublicLogger() noexcept override;
+		[[nodiscard("Pure function")]]
+		virtual const Log::ILogger& PublicLogger() const noexcept override;
 
 		/// @brief Reserves a memory for sub-loggers.
 		/// @param subLoggerCount Sub-logger count.
@@ -60,6 +66,16 @@ namespace PonyEngine::Log::Core
 	{
 		const auto logEntry = Extension::LogEntry(logInput.message, logInput.stacktrace, &exception, std::chrono::system_clock::now(), logInput.frameCount, LogType::Exception);
 		Log(logEntry);
+	}
+
+	Log::ILogger& Logger::PublicLogger() noexcept
+	{
+		return *this;
+	}
+
+	const Log::ILogger& Logger::PublicLogger() const noexcept
+	{
+		return *this;
 	}
 
 	void Logger::Reserve(const std::size_t subLoggerCount)

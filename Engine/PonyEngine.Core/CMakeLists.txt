@@ -13,14 +13,18 @@ target_include_directories(PonyEngine.Core PUBLIC
 
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Core PUBLIC FILE_SET CXX_MODULES FILES
+	"Source/Public/Application/Application.cppm"
+	"Source/Public/Application/Application-ApplicationPaths.cppm"
+	"Source/Public/Application/Application-IApplicationContext.cppm"
 	"Source/Public/Core/Core.cppm"
-	"Source/Public/Core/Core-ApplicationPaths.cppm"
-	"Source/Public/Core/Core-IApplicationContext.cppm"
 	"Source/Public/Core/Core-IEngine.cppm"
 	"Source/Public/Core/Core-IEngineFactory.cppm"
+	"Source/Public/Core/Core-ILogger.cppm"
 	"Source/Public/Core/Core-ILoggerFactory.cppm"
 	"Source/Public/Core/Core-IModule.cppm"
 	"Source/Public/Core/Core-IModuleContext.cppm"
+	"Source/Public/Engine/Engine.cppm"
+	"Source/Public/Engine/Engine-IEngine.cppm"
 	"Source/Public/Log/Log.cppm"
 	"Source/Public/Log/Log-ILogger.cppm"
 	"Source/Public/Log/Log-LogData.cppm"

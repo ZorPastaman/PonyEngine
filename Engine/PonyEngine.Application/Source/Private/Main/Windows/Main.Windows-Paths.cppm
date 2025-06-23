@@ -12,14 +12,14 @@ module;
 #include "PonyEngine/Platform/Windows/Framework.h"
 #include "PonyEngine/Utility/Macro.h"
 
-export module PonyEngine.Application.Windows:Paths;
+export module PonyEngine.Main.Windows:Paths;
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Main;
 import PonyEngine.Utility;
 
-export namespace PonyEngine::Application::Windows
+export namespace PonyEngine::Main::Windows
 {
 	/// @brief Gets the Windows paths.
 	/// @return Platform paths.
@@ -44,7 +44,7 @@ export namespace PonyEngine::Application::Windows
 	std::filesystem::path GetUserDataPath();
 }
 
-namespace PonyEngine::Application::Windows
+namespace PonyEngine::Main::Windows
 {
 	/// @brief Gets a known path.
 	/// @param folderId Folder id.
