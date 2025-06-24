@@ -10,19 +10,18 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/PlatformConsole/WinCore/PlatformConsoleModule.h"
+#include "PonyEngine/Log/WinCore/PlatformConsoleModule.h"
 
 export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerModule;
 
 import std;
 
-import PonyEngine.Application;
 import PonyEngine.Core;
 import PonyEngine.Log;
 
 import :PlatformConsoleSubLoggerFactory;
 
-export namespace PonyEngine::Log::PlatformConsole::WinCore
+export namespace PonyEngine::Log::WinCore
 {
 	/// @brief WinCore platform console sub-logger module.
 	class PlatformConsoleSubLoggerModule final : public Core::IModule
@@ -46,12 +45,12 @@ export namespace PonyEngine::Log::PlatformConsole::WinCore
 	};
 }
 
-namespace PonyEngine::Log::PlatformConsole::WinCore
+namespace PonyEngine::Log::WinCore
 {
 	void PlatformConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
-		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
-		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>());
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(PlatformConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
+		context.AddData<ISubLoggerFactory>(std::make_shared<PlatformConsoleSubLoggerFactory>(context));
 	}
 
 	void PlatformConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)

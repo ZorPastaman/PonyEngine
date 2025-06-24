@@ -17,7 +17,7 @@ TEST_CASE("LogEntry: basic", "[Log][LogEntry]")
 {
 	const auto tp = std::chrono::system_clock::now();
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), nullptr, nullptr, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), nullptr, nullptr, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -33,7 +33,7 @@ TEST_CASE("LogEntry: frame", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	constexpr std::uint64_t frame = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), nullptr, nullptr, tp, frame, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), nullptr, nullptr, tp, frame, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -49,7 +49,7 @@ TEST_CASE("LogEntry: exception", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	const auto e = std::logic_error("Test!");
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), nullptr, &e, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), nullptr, &e, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -66,7 +66,7 @@ TEST_CASE("LogEntry: exception, frame", "[Log][LogEntry]")
 	const auto e = std::logic_error("Test!");
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), nullptr, &e, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), nullptr, &e, tp, f, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -82,7 +82,7 @@ TEST_CASE("LogEntry: stacktrace", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	const auto s = std::stacktrace::current();
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), &s, nullptr, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), &s, nullptr, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -99,7 +99,7 @@ TEST_CASE("LogEntry: stacktrace, frame", "[Log][LogEntry]")
 	const auto s = std::stacktrace::current();
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), &s, nullptr, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), &s, nullptr, tp, f, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -116,7 +116,7 @@ TEST_CASE("LogEntry: stacktrace, exception", "[Log][LogEntry]")
 	const auto e = std::logic_error("Test!");
 	const auto s = std::stacktrace::current();
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), &s, &e, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), &s, &e, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -134,7 +134,7 @@ TEST_CASE("LogEntry: stacktrace, exception, frame", "[Log][LogEntry]")
 	const auto s = std::stacktrace::current();
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(std::string_view(), &s, &e, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(std::string_view(), &s, &e, tp, f, lt);
 
 	REQUIRE(logEntry.Message().empty());
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -151,7 +151,7 @@ TEST_CASE("LogEntry: message, frame", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	constexpr std::uint64_t frame = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, nullptr, nullptr, tp, frame, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, nullptr, nullptr, tp, frame, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -168,7 +168,7 @@ TEST_CASE("LogEntry: message, exception", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	const auto e = std::logic_error("Test!");
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, nullptr, &e, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, nullptr, &e, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -186,7 +186,7 @@ TEST_CASE("LogEntry: message, exception, frame", "[Log][LogEntry]")
 	const auto e = std::logic_error("Test!");
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, nullptr, &e, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, nullptr, &e, tp, f, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE_FALSE(logEntry.Stacktrace());
@@ -203,7 +203,7 @@ TEST_CASE("LogEntry: message, stacktrace, message", "[Log][LogEntry]")
 	const auto tp = std::chrono::system_clock::now();
 	const auto s = std::stacktrace::current();
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, &s, nullptr, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, &s, nullptr, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -221,7 +221,7 @@ TEST_CASE("LogEntry: message, stacktrace, frame", "[Log][LogEntry]")
 	const auto s = std::stacktrace::current();
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, &s, nullptr, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, &s, nullptr, tp, f, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -239,7 +239,7 @@ TEST_CASE("LogEntry: message, stacktrace, exception", "[Log][LogEntry]")
 	const auto e = std::logic_error("Test!");
 	const auto s = std::stacktrace::current();
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, &s, &e, tp, std::nullopt, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, &s, &e, tp, std::nullopt, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -258,7 +258,7 @@ TEST_CASE("LogEntry: message, stacktrace, exception, frame", "[Log][LogEntry]")
 	const auto s = std::stacktrace::current();
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, &s, &e, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, &s, &e, tp, f, lt);
 
 	REQUIRE(logEntry.Message() == m);
 	REQUIRE(logEntry.Stacktrace() == &s);
@@ -277,7 +277,7 @@ TEST_CASE("LogEntry: ToString", "[Log][LogEntry]")
 	const auto s = std::stacktrace::current();
 	constexpr std::uint64_t f = 42;
 	constexpr auto lt = PonyEngine::Log::LogType::Info;
-	const auto logEntry = PonyEngine::Log::Extension::LogEntry(m, &s, &e, tp, f, lt);
+	const auto logEntry = PonyEngine::Log::LogEntry(m, &s, &e, tp, f, lt);
 
 	std::string expected = PonyEngine::Log::LogFormat(lt, e.what(), m, tp, f, s);
 

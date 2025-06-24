@@ -7,17 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+export module PonyEngine.Engine.Ext;
 
-#include "PonyEngine/Utility/Compiler.h"
+export import PonyEngine.Engine;
 
-import PonyEngine.Core;
-
-#define PONY_ENGINE_WINCORE_PLATFORM_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineWinCorePlatformConsoleSubLogger
-
-namespace PonyEngine::Log::PlatformConsole::WinCore
-{
-	/// @brief Gets the WinCore platform console sub-logger module.
-	/// @return Platform console sub-logger module.
-	PONY_DLL_EXPORT Core::IModule* GetPlatformConsoleModule();
-}
+export import :IEngineContext;
+export import :ISystem;
+export import :ISystemManager;
+export import :ITickableSystem;
+export import :SystemData;

@@ -16,6 +16,7 @@ export module PonyEngine.Core:IModuleContext;
 import std;
 
 import PonyEngine.Application;
+import PonyEngine.Log;
 
 export namespace PonyEngine::Core
 {
@@ -32,6 +33,15 @@ export namespace PonyEngine::Core
 		/// @return Application.
 		[[nodiscard("Pure function")]]
 		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual Log::ILogger& Logger() noexcept = 0;
+		/// @brief Gets the logger.
+		/// @return Logger.
+		[[nodiscard("Pure function")]]
+		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Gets a data count.
 		/// @param type Data type.

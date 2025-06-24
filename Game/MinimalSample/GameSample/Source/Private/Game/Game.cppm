@@ -27,13 +27,13 @@ namespace Game
 	void GameModule::StartUp(PonyEngine::Core::IModuleContext& context)
 	{
 		// Add startup logic here. The log can be safely removed.
-		PONY_LOG(context.Application().Logger(), PonyEngine::Log::LogType::Info, "Game module started up.");
+		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Game module started up.");
 	}
 
 	void GameModule::ShutDown(const PonyEngine::Core::IModuleContext& context)
 	{
 		// Add shutdown logic here. The log can be safely removed.
-		PONY_LOG(context.Application().Logger(), PonyEngine::Log::LogType::Info, "Game module shut up.");
+		PONY_LOG(context.Logger(), PonyEngine::Log::LogType::Info, "Game module shut up.");
 	}
 
 	std::string_view GameModule::Name() const noexcept

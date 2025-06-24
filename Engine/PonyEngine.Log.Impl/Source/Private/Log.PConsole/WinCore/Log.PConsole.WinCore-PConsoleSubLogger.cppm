@@ -17,10 +17,10 @@ import std;
 
 import PonyEngine.Log.Extension;
 
-export namespace PonyEngine::Log::PlatformConsole::WinCore
+export namespace PonyEngine::Log::WinCore
 {
 	/// @brief Sub-logger that writes every message to the OutputDebugString.
-	class PlatformConsoleSubLogger final : public Extension::ISubLogger
+	class PlatformConsoleSubLogger final : public ISubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -30,16 +30,27 @@ export namespace PonyEngine::Log::PlatformConsole::WinCore
 
 		~PlatformConsoleSubLogger() noexcept = default;
 
-		virtual void Log(const Extension::LogEntry& logEntry) noexcept override;
+		virtual void Begin() override;
+		virtual void End() noexcept override;
+
+		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		PlatformConsoleSubLogger& operator =(const PlatformConsoleSubLogger&) = delete;
 		PlatformConsoleSubLogger& operator =(PlatformConsoleSubLogger&&) = delete;
 	};
 }
 
-namespace PonyEngine::Log::PlatformConsole::WinCore
+namespace PonyEngine::Log::WinCore
 {
-	void PlatformConsoleSubLogger::Log(const Extension::LogEntry& logEntry) noexcept
+	void PlatformConsoleSubLogger::Begin()
+	{
+	}
+
+	void PlatformConsoleSubLogger::End() noexcept
+	{
+	}
+
+	void PlatformConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		OutputDebugStringA(logEntry.ToString().data());
 	}

@@ -7,12 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/Console/ConsoleModule.h"
+#include "PonyEngine/Log/ConsoleModule.h"
 
 import PonyEngine.Core;
 import PonyEngine.Log.Console;
 
-namespace PonyEngine::Log::Console
+namespace PonyEngine::Log
 {
 	ConsoleSubLoggerModule ConsoleModule; ///< Console sub-logger module.
 

@@ -6,6 +6,7 @@ add_library(PonyEngine.Log.Ext STATIC)
 message(VERBOSE "Configuring sources")
 target_sources(PonyEngine.Log.Ext PUBLIC FILE_SET CXX_MODULES FILES 
 	"Source/Public/Log.Ext/Log.Ext.cppm"
+	"Source/Public/Log.Ext/Log.Ext-ILoggerContext.cppm"
 	"Source/Public/Log.Ext/Log.Ext-ISubLogger.cppm"
 	"Source/Public/Log.Ext/Log.Ext-ISubLoggerFactory.cppm"
 	"Source/Public/Log.Ext/Log.Ext-LogEntry.cppm"

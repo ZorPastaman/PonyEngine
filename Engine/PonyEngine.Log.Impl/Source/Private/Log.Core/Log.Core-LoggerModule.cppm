@@ -10,23 +10,22 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/Core/LoggerModule.h"
+#include "PonyEngine/Log/LoggerModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.Core:LoggerModule;
 
 import std;
 
-import PonyEngine.Application;
 import PonyEngine.Core;
 import PonyEngine.Log;
 
 import :LoggerFactory;
 
-export namespace PonyEngine::Log::Core
+export namespace PonyEngine::Log
 {
 	/// @brief Logger module.
-	class LoggerModule final : public PonyEngine::Core::IModule
+	class LoggerModule final : public Core::IModule
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -36,8 +35,8 @@ export namespace PonyEngine::Log::Core
 
 		~LoggerModule() noexcept = default;
 
-		virtual void StartUp(PonyEngine::Core::IModuleContext& context) override;
-		virtual void ShutDown(const PonyEngine::Core::IModuleContext& context) override;
+		virtual void StartUp(Core::IModuleContext& context) override;
+		virtual void ShutDown(const Core::IModuleContext& context) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::string_view Name() const noexcept override;
@@ -47,15 +46,15 @@ export namespace PonyEngine::Log::Core
 	};
 }
 
-namespace PonyEngine::Log::Core
+namespace PonyEngine::Log
 {
-	void LoggerModule::StartUp(PonyEngine::Core::IModuleContext& context)
+	void LoggerModule::StartUp(Core::IModuleContext& context)
 	{
-		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(LoggerFactory).name(), typeid(PonyEngine::Core::ILoggerFactory).name());
-		context.AddData<PonyEngine::Core::ILoggerFactory>(std::make_shared<LoggerFactory>());
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(LoggerFactory).name(), typeid(PonyEngine::Core::ILoggerFactory).name());
+		context.AddData<Core::ILoggerFactory>(std::make_shared<LoggerFactory>(context));
 	}
 
-	void LoggerModule::ShutDown(const PonyEngine::Core::IModuleContext&)
+	void LoggerModule::ShutDown(const Core::IModuleContext&)
 	{
 	}
 

@@ -7,17 +7,23 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#pragma once
+module;
 
-#include "PonyEngine/Utility/Compiler.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
-import PonyEngine.Core;
+export module PonyEngine.Engine.Ext:ITickableSystem;
 
-#define PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineConsoleSubLogger
+import :IEngineContext;
+import :ISystem;
 
-namespace PonyEngine::Log::Console
+export namespace PonyEngine::Engine
 {
-	/// @brief Gets the console sub-logger module.
-	/// @return Console sub-logger module.
-	PONY_DLL_EXPORT Core::IModule* GetConsoleModule();
+	/// @brief Tickable system.
+	class ITickableSystem : public ISystem
+	{
+		INTERFACE_BODY(ITickableSystem)
+
+		/// @brief Ticks the system.
+		virtual void Tick() = 0;
+	};
 }

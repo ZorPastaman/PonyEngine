@@ -7,12 +7,12 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/File/FileModule.h"
+#include "PonyEngine/Log/FileModule.h"
 
 import PonyEngine.Core;
 import PonyEngine.Log.File;
 
-namespace PonyEngine::Log::File
+namespace PonyEngine::Log
 {
 	FileSubLoggerModule FileModule; ///< File sub-logger module.
 

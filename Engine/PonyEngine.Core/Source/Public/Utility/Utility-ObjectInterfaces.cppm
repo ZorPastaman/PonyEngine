@@ -11,15 +11,11 @@ module;
 
 #include <cassert>
 
-export module PonyBase.Utility:ObjectInterfaces;
+export module PonyEngine.Utility:ObjectInterfaces;
 
-import <concepts>;
-import <functional>;
-import <span>;
-import <typeinfo>;
-import <vector>;
+import std;
 
-export namespace PonyBase::Utility
+export namespace PonyEngine::Utility
 {
 	/// @brief Object interfaces.
 	class ObjectInterfaces final
@@ -85,7 +81,7 @@ export namespace PonyBase::Utility
 	};
 }
 
-namespace PonyBase::Utility
+namespace PonyEngine::Utility
 {
 	void ObjectInterfaces::AddInterface(const std::type_info& typeInfo, void* const pointer)
 	{

@@ -7,22 +7,17 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Core:SystemData;
+#pragma once
 
-import <memory>;
-import <variant>;
+#include "PonyEngine/Utility/Compiler.h"
 
-import PonyBase.Utility;
+import PonyEngine.Core;
 
-import :System;
-import :TickableSystem;
+#define PONY_ENGINE_CONSOLE_SUBLOGGER_MODULE_NAME PonyEngineConsoleSubLogger
 
-export namespace PonyEngine::Core
+namespace PonyEngine::Log
 {
-	/// @brief System data.
-	struct SystemData final
-	{
-		std::variant<std::shared_ptr<System>, std::shared_ptr<TickableSystem>> system; ///< System.
-		PonyBase::Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
-	};
+	/// @brief Gets the console sub-logger module.
+	/// @return Console sub-logger module.
+	PONY_DLL_EXPORT Core::IModule* GetConsoleModule();
 }

@@ -17,7 +17,7 @@ import std;
 
 import PonyEngine.Log;
 
-export namespace PonyEngine::Log::Extension
+export namespace PonyEngine::Log
 {
 	/// @brief Information that must be logged.
 	class LogEntry final
@@ -94,7 +94,7 @@ export namespace PonyEngine::Log::Extension
 
 /// @brief Log entry formatter.
 export template<>
-struct std::formatter<PonyEngine::Log::Extension::LogEntry, char>
+struct std::formatter<PonyEngine::Log::LogEntry, char>
 {
 	static constexpr auto parse(std::format_parse_context& context)
 	{
@@ -106,13 +106,13 @@ struct std::formatter<PonyEngine::Log::Extension::LogEntry, char>
 		return context.begin();
 	}
 
-	static auto format(const PonyEngine::Log::Extension::LogEntry& entry, std::format_context& context)
+	static auto format(const PonyEngine::Log::LogEntry& entry, std::format_context& context)
 	{
 		return std::ranges::copy(entry.ToString(), context.out()).out;
 	}
 };
 
-namespace PonyEngine::Log::Extension
+namespace PonyEngine::Log
 {
 	LogEntry::LogEntry(const std::string_view message, const std::stacktrace* const stacktrace, const std::exception* const exception, const std::chrono::time_point<std::chrono::system_clock> timePoint, const std::optional<std::uint64_t> frameCount, const Log::LogType logType) noexcept :
 		message{message},

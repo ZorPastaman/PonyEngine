@@ -10,20 +10,19 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/File/FileModule.h"
+#include "PonyEngine/Log/FileModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.File:FileSubLoggerModule;
 
 import std;
 
-import PonyEngine.Application;
 import PonyEngine.Core;
 import PonyEngine.Log;
 
 import :FileSubLoggerFactory;
 
-export namespace PonyEngine::Log::File
+export namespace PonyEngine::Log
 {
 	/// @brief File sub-logger module.
 	class FileSubLoggerModule final : public Core::IModule
@@ -37,12 +36,12 @@ export namespace PonyEngine::Log::File
 	};
 }
 
-namespace PonyEngine::Log::File
+namespace PonyEngine::Log
 {
 	void FileSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
-		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(FileSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
-		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<FileSubLoggerFactory>());
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(FileSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
+		context.AddData<ISubLoggerFactory>(std::make_shared<FileSubLoggerFactory>(context));
 	}
 
 	void FileSubLoggerModule::ShutDown(const Core::IModuleContext&)
