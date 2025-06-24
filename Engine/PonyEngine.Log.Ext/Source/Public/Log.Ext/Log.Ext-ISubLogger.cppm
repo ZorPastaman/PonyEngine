@@ -17,12 +17,17 @@ import std;
 
 import :LogEntry;
 
-export namespace PonyEngine::Log::Extension
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger.
 	class ISubLogger
 	{
 		INTERFACE_BODY(ISubLogger)
+
+		/// @brief Begins logging.
+		virtual void Begin() = 0;
+		/// @brief Ends logging.
+		virtual void End() noexcept = 0;
 
 		/// @brief Logs the @p logEntry.
 		/// @param logEntry Log entry to log.

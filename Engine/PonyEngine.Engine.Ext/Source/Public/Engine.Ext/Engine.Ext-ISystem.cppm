@@ -11,22 +11,24 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:ILoggerFactory;
+export module PonyEngine.Engine.Ext:ISystem;
 
-import std;
+import PonyEngine.Engine;
 
-import :ILogger;
+import :IEngineContext;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Engine
 {
-	/// @brief Logger factory.
-	class ILoggerFactory
+	/// @brief System.
+	class ISystem
 	{
-		INTERFACE_BODY(ILoggerFactory)
+		INTERFACE_BODY(ISystem)
 
-		/// @brief Creates a logger.
-		/// @return Created logger.
-		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<ILogger> Create() = 0;
+		/// @brief Begins the system.
+		/// @details It's called once before a first engine tick.
+		virtual void Begin() = 0;
+		/// @brief Ends the system.
+		/// @details It's called once after a last engine tick.
+		virtual void End() = 0;
 	};
 }

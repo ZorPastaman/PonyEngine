@@ -15,40 +15,50 @@ export module PonyEngine.Log.PlatformConsole.WinCore:PlatformConsoleSubLoggerFac
 
 import std;
 
-import PonyEngine.Application;
+import PonyEngine.Core;
 import PonyEngine.Log.Extension;
 
 import :PlatformConsoleSubLogger;
 
-export namespace PonyEngine::Log::PlatformConsole::WinCore
+export namespace PonyEngine::Log::WinCore
 {
 	/// @brief WinCore platform console sub-logger factory.
-	class PlatformConsoleSubLoggerFactory final : public Extension::ISubLoggerFactory
+	class PlatformConsoleSubLoggerFactory final : public ISubLoggerFactory
 	{
 	public:
+		/// @brief Creates a platform console sub-logger factory.
+		/// @param context Module context.
 		[[nodiscard("Pure constructor")]]
-		PlatformConsoleSubLoggerFactory() noexcept = default;
+		PlatformConsoleSubLoggerFactory(Core::IModuleContext& context) noexcept;
 		PlatformConsoleSubLoggerFactory(const PlatformConsoleSubLoggerFactory&) = delete;
 		PlatformConsoleSubLoggerFactory(PlatformConsoleSubLoggerFactory&&) = delete;
 
 		~PlatformConsoleSubLoggerFactory() noexcept = default;
 
 		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<Extension::ISubLogger> CreateSubLogger(const Core::IModuleContext& context) override;
+		virtual std::shared_ptr<ISubLogger> CreateSubLogger(ILoggerContext& logger) override;
 
 		[[nodiscard("Pure function")]]
 		virtual std::int32_t Order() const noexcept override;
 
 		PlatformConsoleSubLoggerFactory& operator =(const PlatformConsoleSubLoggerFactory&) = delete;
 		PlatformConsoleSubLoggerFactory& operator =(PlatformConsoleSubLoggerFactory&&) = delete;
+
+	private:
+		Core::IModuleContext* context; ///< Module context.
 	};
 }
 
-namespace PonyEngine::Log::PlatformConsole::WinCore
+namespace PonyEngine::Log::WinCore
 {
-	std::shared_ptr<Extension::ISubLogger> PlatformConsoleSubLoggerFactory::CreateSubLogger(const Core::IModuleContext& context)
+	PlatformConsoleSubLoggerFactory::PlatformConsoleSubLoggerFactory(Core::IModuleContext& context) noexcept :
+		context{&context}
 	{
-		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing WinCore console sub-logger.");
+	}
+
+	std::shared_ptr<ISubLogger> PlatformConsoleSubLoggerFactory::CreateSubLogger(ILoggerContext&)
+	{
+		PONY_LOG(context->Logger(), LogType::Debug, "Constructing WinCore console sub-logger.");
 		return std::make_shared<PlatformConsoleSubLogger>();
 	}
 

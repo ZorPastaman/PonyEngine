@@ -17,10 +17,10 @@ import std;
 
 import PonyEngine.Log.Extension;
 
-export namespace PonyEngine::Log::Console
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger that writes every message to a standard console.
-	class ConsoleSubLogger final : public Extension::ISubLogger
+	class ConsoleSubLogger final : public ISubLogger
 	{
 	public:
 		[[nodiscard("Pure constructor")]]
@@ -30,16 +30,27 @@ export namespace PonyEngine::Log::Console
 
 		~ConsoleSubLogger() noexcept = default;
 
-		virtual void Log(const Extension::LogEntry& logEntry) noexcept override;
+		virtual void Begin() override;
+		virtual void End() noexcept override;
+
+		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		ConsoleSubLogger& operator =(const ConsoleSubLogger&) = delete;
 		ConsoleSubLogger& operator =(ConsoleSubLogger&&) = delete;
 	};
 }
 
-namespace PonyEngine::Log::Console
+namespace PonyEngine::Log
 {
-	void ConsoleSubLogger::Log(const Extension::LogEntry& logEntry) noexcept
+	void ConsoleSubLogger::Begin()
+	{
+	}
+
+	void ConsoleSubLogger::End() noexcept
+	{
+	}
+
+	void ConsoleSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
 		{

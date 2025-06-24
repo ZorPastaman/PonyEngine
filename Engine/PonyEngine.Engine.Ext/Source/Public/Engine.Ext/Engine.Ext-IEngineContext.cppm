@@ -9,19 +9,18 @@
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:IEngineContext;
+export module PonyEngine.Engine.Ext:IEngineContext;
 
-import <cstdint>;
+import std;
 
-import PonyBase.Core;
-
-import PonyDebug.Log;
+import PonyEngine.Application;
+import PonyEngine.Log;
 
 import :ISystemManager;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Engine
 {
 	/// @brief Engine context.
 	class IEngineContext
@@ -33,14 +32,23 @@ export namespace PonyEngine::Core
 		[[nodiscard("Pure function")]]
 		virtual std::uint64_t FrameCount() const noexcept = 0;
 
+		/// @brief Gets the application context.
+		/// @return Application context.
+		[[nodiscard("Pure function")]]
+		virtual Application::IApplicationContext& Application() noexcept = 0;
+		/// @brief Gets the application context.
+		/// @return Application context.
+		[[nodiscard("Pure function")]]
+		virtual const Application::IApplicationContext& Application() const noexcept = 0;
+
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual PonyDebug::Log::ILogger& Logger() noexcept = 0;
+		virtual Log::ILogger& Logger() noexcept = 0;
 		/// @brief Gets the engine logger.
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
-		virtual const PonyDebug::Log::ILogger& Logger() const noexcept = 0;
+		virtual const Log::ILogger& Logger() const noexcept = 0;
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
@@ -63,6 +71,6 @@ export namespace PonyEngine::Core
 		/// @brief Stops the engine with the @p exitCode.
 		/// @remark If the engine is already stopped, the invocation of this function is ignored.
 		/// @param exitCode Exit code.
-		virtual void Stop(int exitCode = static_cast<int>(PonyBase::Core::ExitCodes::Success)) noexcept = 0;
+		virtual void Stop(int exitCode = 0) noexcept = 0;
 	};
 }

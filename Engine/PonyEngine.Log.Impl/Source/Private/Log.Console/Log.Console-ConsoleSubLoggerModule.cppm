@@ -10,20 +10,19 @@
 module;
 
 #include "PonyEngine/Log/Log.h"
-#include "PonyEngine/Log/Console/ConsoleModule.h"
+#include "PonyEngine/Log/ConsoleModule.h"
 #include "PonyEngine/Utility/Macro.h"
 
 export module PonyEngine.Log.Console:ConsoleSubLoggerModule;
 
 import std;
 
-import PonyEngine.Application;
 import PonyEngine.Core;
 import PonyEngine.Log;
 
 import :ConsoleSubLoggerFactory;
 
-export namespace PonyEngine::Log::Console
+export namespace PonyEngine::Log
 {
 	/// @brief Console sub-logger module.
 	class ConsoleSubLoggerModule final : public Core::IModule
@@ -47,12 +46,12 @@ export namespace PonyEngine::Log::Console
 	};
 }
 
-namespace PonyEngine::Log::Console
+namespace PonyEngine::Log
 {
 	void ConsoleSubLoggerModule::StartUp(Core::IModuleContext& context)
 	{
-		PONY_LOG(context.Application().Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(ConsoleSubLoggerFactory).name(), typeid(Extension::ISubLoggerFactory).name());
-		context.AddData<Extension::ISubLoggerFactory>(std::make_shared<ConsoleSubLoggerFactory>());
+		PONY_LOG(context.Logger(), LogType::Debug, "Constructing '{}' and adding it to context as '{}'.", typeid(ConsoleSubLoggerFactory).name(), typeid(ISubLoggerFactory).name());
+		context.AddData<ISubLoggerFactory>(std::make_shared<ConsoleSubLoggerFactory>(context));
 	}
 
 	void ConsoleSubLoggerModule::ShutDown(const Core::IModuleContext&)

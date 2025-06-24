@@ -11,30 +11,24 @@ module;
 
 #include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Log.Extension:ISubLoggerFactory;
+export module PonyEngine.Log.Extension:ILoggerContext;
 
-import std;
-
-import PonyEngine.Core;
-
-import :ILoggerContext;
-import :ISubLogger;
+import PonyEngine.Application;
 
 export namespace PonyEngine::Log
 {
-	class ISubLoggerFactory
+	/// @brief Logger context.
+	class ILoggerContext
 	{
-		INTERFACE_BODY(ISubLoggerFactory)
+		INTERFACE_BODY(ILoggerContext)
 
-		/// @brief Creates a sub-logger.
-		/// @param logger Logger context.
-		/// @return Created sub-logger.
-		[[nodiscard("Redundant call")]]
-		virtual std::shared_ptr<ISubLogger> CreateSubLogger(ILoggerContext& logger) = 0;
-
-		/// @brief Gets the sub-logger order.
-		/// @return Sub-logger order.
+		/// @brief Gets the application context.
+		/// @return Application context.
 		[[nodiscard("Pure function")]]
-		virtual std::int32_t Order() const noexcept = 0;
+		virtual Application::IApplicationContext& Application() noexcept = 0;
+		/// @brief Gets the application context.
+		/// @return Application context.
+		[[nodiscard("Pure function")]]
+		virtual const Application::IApplicationContext& Application() const noexcept = 0;
 	};
 }

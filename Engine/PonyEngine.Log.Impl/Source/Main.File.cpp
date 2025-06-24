@@ -8,6 +8,6 @@
  ***************************************************/
 
 #include "PonyEngine/Core/Module.h"
-#include "PonyEngine/Log/File/FileModule.h"
+#include "PonyEngine/Log/FileModule.h"
 
-PONY_MODULE_LOG(PonyEngine::Log::File::GetFileModule, PONY_ENGINE_FILE_SUBLOGGER_MODULE_NAME);
+PONY_MODULE_LOG(PonyEngine::Log::GetFileModule, PONY_ENGINE_FILE_SUBLOGGER_MODULE_NAME);

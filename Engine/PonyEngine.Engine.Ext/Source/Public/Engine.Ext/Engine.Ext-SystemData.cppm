@@ -7,11 +7,21 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-export module PonyEngine.Log.Extension;
+export module PonyEngine.Engine.Ext:SystemData;
 
-export import PonyEngine.Log;
+import std;
 
-export import :ILoggerContext;
-export import :ISubLogger;
-export import :ISubLoggerFactory;
-export import :LogEntry;
+import PonyEngine.Utility;
+
+import :ISystem;
+import :ITickableSystem;
+
+export namespace PonyEngine::Engine
+{
+	/// @brief System data.
+	struct SystemData final
+	{
+		std::variant<std::shared_ptr<ISystem>, std::shared_ptr<ITickableSystem>> system; ///< System.
+		Utility::ObjectInterfaces publicInterfaces; ///< System public interfaces.
+	};
+}

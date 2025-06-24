@@ -7,16 +7,16 @@
  * Repo: https://github.com/ZorPastaman/PonyEngine *
  ***************************************************/
 
-#include "PonyEngine/Log/Core/LoggerModule.h"
+#include "PonyEngine/Log/LoggerModule.h"
 
 import PonyEngine.Core;
 import PonyEngine.Log.Core;
 
-namespace PonyEngine::Log::Core
+namespace PonyEngine::Log
 {
 	LoggerModule LoggerModule; ///< Logger module.
 
-	PonyEngine::Core::IModule* GetLoggerModule()
+	Core::IModule* GetLoggerModule()
 	{
 		return &LoggerModule;
 	}

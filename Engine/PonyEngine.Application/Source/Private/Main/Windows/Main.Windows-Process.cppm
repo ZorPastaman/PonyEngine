@@ -20,7 +20,7 @@ import PonyEngine.Utility;
 export namespace PonyEngine::Main::Windows
 {
 	/// @brief Sets the process priority.
-	/// @param priority Priority to set.
+	/// @param priority Process priority.
 	void SetProcessPriority(DWORD priority);
 }
 

@@ -17,10 +17,10 @@ import std;
 
 import PonyEngine.Log.Extension;
 
-export namespace PonyEngine::Log::File
+export namespace PonyEngine::Log
 {
 	/// @brief Sub-logger that writes logs to a file.
-	class FileSubLogger final : public Extension::ISubLogger
+	class FileSubLogger final : public ISubLogger
 	{
 	public:
 		/// @brief Creates a file sub-logger.
@@ -32,7 +32,10 @@ export namespace PonyEngine::Log::File
 
 		~FileSubLogger() noexcept;
 
-		virtual void Log(const Extension::LogEntry& logEntry) noexcept override;
+		virtual void Begin() override;
+		virtual void End() noexcept override;
+
+		virtual void Log(const LogEntry& logEntry) noexcept override;
 
 		FileSubLogger& operator =(const FileSubLogger&) = delete;
 		FileSubLogger& operator =(FileSubLogger&&) = delete;
@@ -42,7 +45,7 @@ export namespace PonyEngine::Log::File
 	};
 }
 
-namespace PonyEngine::Log::File
+namespace PonyEngine::Log
 {
 	FileSubLogger::FileSubLogger(const std::filesystem::path& path) :
 		logFile(path)
@@ -68,7 +71,15 @@ namespace PonyEngine::Log::File
 		}
 	}
 
-	void FileSubLogger::Log(const Extension::LogEntry& logEntry) noexcept
+	void FileSubLogger::Begin()
+	{
+	}
+
+	void FileSubLogger::End() noexcept
+	{
+	}
+
+	void FileSubLogger::Log(const LogEntry& logEntry) noexcept
 	{
 		try
 		{
