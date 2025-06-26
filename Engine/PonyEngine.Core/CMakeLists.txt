@@ -75,5 +75,7 @@ if(PONY_WINDOWS)
 endif()
 
 message(VERBOSE "Setting properties")
-set_target_properties(PonyEngine.Core PROPERTIES CXX_STANDARD 23)
-set_target_properties(PonyEngine.Core PROPERTIES OUTPUT_NAME "PonyEngine.Core.API")
+set_target_properties(PonyEngine.Core PROPERTIES 
+	CXX_STANDARD 23
+	OUTPUT_NAME "PonyEngine.Core.API"
+)

@@ -13,6 +13,7 @@ export import PonyEngine.Engine;
 
 export import :IEngineContext;
 export import :ISystem;
+export import :ISystemFactory;
 export import :ISystemManager;
 export import :ITickableSystem;
 export import :SystemData;

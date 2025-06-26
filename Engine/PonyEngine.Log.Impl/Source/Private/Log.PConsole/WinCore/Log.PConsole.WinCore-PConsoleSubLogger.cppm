@@ -31,7 +31,7 @@ export namespace PonyEngine::Log::WinCore
 		~PlatformConsoleSubLogger() noexcept = default;
 
 		virtual void Begin() override;
-		virtual void End() noexcept override;
+		virtual void End() override;
 
 		virtual void Log(const LogEntry& logEntry) noexcept override;
 
@@ -46,7 +46,7 @@ namespace PonyEngine::Log::WinCore
 	{
 	}
 
-	void PlatformConsoleSubLogger::End() noexcept
+	void PlatformConsoleSubLogger::End()
 	{
 	}
 

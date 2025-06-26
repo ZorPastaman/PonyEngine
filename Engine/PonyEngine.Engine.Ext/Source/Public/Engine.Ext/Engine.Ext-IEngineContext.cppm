@@ -27,11 +27,6 @@ export namespace PonyEngine::Engine
 	{
 		INTERFACE_BODY(IEngineContext)
 
-		/// @brief Gets the current frame count.
-		/// @return Current frame count.
-		[[nodiscard("Pure function")]]
-		virtual std::uint64_t FrameCount() const noexcept = 0;
-
 		/// @brief Gets the application context.
 		/// @return Application context.
 		[[nodiscard("Pure function")]]
@@ -49,6 +44,7 @@ export namespace PonyEngine::Engine
 		/// @return Engine logger.
 		[[nodiscard("Pure function")]]
 		virtual const Log::ILogger& Logger() const noexcept = 0;
+
 		/// @brief Gets the engine system manager.
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
@@ -57,6 +53,11 @@ export namespace PonyEngine::Engine
 		/// @return Engine system manager.
 		[[nodiscard("Pure function")]]
 		virtual const ISystemManager& SystemManager() const noexcept = 0;
+
+		/// @brief Gets the current frame count.
+		/// @return Current frame count.
+		[[nodiscard("Pure function")]]
+		virtual std::uint64_t FrameCount() const noexcept = 0;
 
 		/// @brief Did the engine receive an exit code?
 		/// @remark Exit code can be gotten via @p ExitCode().

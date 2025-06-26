@@ -9,16 +9,14 @@
 
 module;
 
-#include "PonyBase/Utility/ObjectBody.h"
+#include "PonyEngine/Utility/ObjectBody.h"
 
-export module PonyEngine.Core:ISystemFactory;
+export module PonyEngine.Engine.Ext:ISystemFactory;
 
 import :IEngineContext;
-import :ISystemInfo;
 import :SystemData;
-import :SystemParams;
 
-export namespace PonyEngine::Core
+export namespace PonyEngine::Engine
 {
 	/// @brief System factory.
 	class ISystemFactory
@@ -27,14 +25,17 @@ export namespace PonyEngine::Core
 
 		/// @brief Creates a system.
 		/// @param engine Engine context.
-		/// @param params System parameters.
 		/// @return Created system data.
 		[[nodiscard("Redundant call")]]
-		virtual SystemData Create(IEngineContext& engine, const SystemParams& params) = 0;
+		virtual SystemData Create(IEngineContext& engine) = 0;
 
-		/// @brief Gets a system info.
-		/// @return System info.
+		/// @brief Gets the system initialize order.
+		/// @return System initialize order.
 		[[nodiscard("Pure function")]]
-		virtual const ISystemInfo& SystemInfo() const noexcept = 0;
+		virtual std::int32_t InitOrder() const noexcept = 0;
+		/// @brief Gets the system tick order.
+		/// @return System tick order.
+		[[nodiscard("Pure function")]]
+		virtual std::int32_t TickOrder() const noexcept = 0;
 	};
 }

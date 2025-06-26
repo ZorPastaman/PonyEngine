@@ -40,12 +40,12 @@ pony_set_build_options(PonyEngine.Application ${PONY_ENGINE_OPTIMIZATION})
 
 # Add game modules.
 add_subdirectory("GameSample")
-
 # Set Game log defines.
 pony_set_log_defines(GameSample ${PONY_GAME_LOG_LEVEL} ${PONY_GAME_LOG_STACKTRACE_LEVEL} ${PONY_CONSOLE_LOG} ${PONY_PLATFORM_CONSOLE_LOG})
-
 # Set Game build options.
 pony_set_build_options(GameSample ${PONY_GAME_OPTIMIZATION})
+# Add Game module to PonyEngine.
+target_link_libraries(PonyEngine.Application PRIVATE GameSample)
 
 # Install targets.
 set(INSTALL_TARGETS "")

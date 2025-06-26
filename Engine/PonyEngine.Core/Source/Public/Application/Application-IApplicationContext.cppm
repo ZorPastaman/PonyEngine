@@ -35,11 +35,11 @@ export namespace PonyEngine::Application
 		virtual const Log::ILogger& Logger() const noexcept = 0;
 
 		/// @brief Gets the engine.
-		/// @return Engine.
+		/// @return Engine. It's not nullptr between ENGINE_CHECKPOINT on startup and ENGINE_CHECKPOINT on shutdown.
 		[[nodiscard("Pure function")]]
 		virtual Engine::IEngine* Engine() noexcept = 0;
 		/// @brief Gets the engine.
-		/// @return Engine.
+		/// @return Engine. It's not nullptr between ENGINE_CHECKPOINT on startup and ENGINE_CHECKPOINT on shutdown.
 		[[nodiscard("Pure function")]]
 		virtual const Engine::IEngine* Engine() const noexcept = 0;
 

@@ -69,7 +69,7 @@ namespace PonyEngine::Platform::WinCore
 		GUID acquiredGuid;
 		if (const HRESULT result = CoCreateGuid(&acquiredGuid); FAILED(result)) [[unlikely]]
 		{
-			throw std::runtime_error(Utility::SafeFormat("Failed to get guid with '0x{:X}' result.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
+			throw std::runtime_error(Utility::SafeFormat("Failed to get guid. Result: '0x{:X}'.", static_cast<std::make_unsigned_t<HRESULT>>(result)));
 		}
 
 		return acquiredGuid;
